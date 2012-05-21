@@ -1,0 +1,52 @@
+.\"  -*- nroff -*-
+.\"
+.\" romcmp.1
+.\"
+.\" Man page created from FAQs, source and usage information by 
+.\" Ashley T. Howes <debiandev@ashleyhowes.com>, February 2005
+.\" updated by Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\" 
+.\" References
+.\" http://www.mame.net/mamefaq.html
+.\"
+.TH ROMCMP 1 2012-03-25 0.145u5 "romcmp"
+.\"
+.\" NAME chapter
+.SH NAME
+romcmp \- MAME rom and romsets check and comparison tool
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B romcmp
+.RI [ \-option ]
+.RI [ dir1 | zip1 ] 
+.RI [ dir2 | zip2 ] 
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+An eternal nuisance in arcade emulation are incomplete or corrupt dumps of the ROM chips.
+\fBromcmp\fP is a tool developed to detect the most common errors that can occur when dumping ROMS,
+for example stuck bits and address line errors.
+.PP
+It can check the ROMs in ZIP files or subdirectories.
+.PP
+\fBromcmp\fP can also be used to compare two ROM sets, by giving it two files or subdirectories
+as parameters. It will determine which ROMS are identical and which are the closest matches.
+This is useful when figuring out if a newly dumped ROM set is a clone of another ROM set.
+.\"
+.\" OPTIONS chapter
+.SH OPTIONS
+.TP
+.B \-d
+Enables a slower, more comprehensive comparison.
+.\"
+.\" EXAMPLES chapter
+.SH EXAMPLES
+.B romcmp \fIjumpkids.zip\fP
+will output the following:
+
+  11 files
+  23.3c			FIXED BITS (xxxxxx1x)
+  23.3c		  	FIRST AND SECOND HALF IDENTICAL
+      
+This tells us that the 23.3C ROM in Jump Kids is bad, and incidentally, it causes the missing sound in that game.

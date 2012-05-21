@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="rswing" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="RT SWING/FASTBALL" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="lswing" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LT SWING/CHANGE-UP" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="rbunt" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="RT BUNT/CURVE BALL" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="lbunt" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LT BUNT/KNUCKLE BALL" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<view name="Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<bezel name="ledleft0" element="rswing">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledleft1" element="lswing">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledleft2" element="rbunt">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledleft3" element="lbunt">
+			<bounds x="0" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledright0" element="rswing">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledright1" element="lswing">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledright2" element="rbunt">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</bezel>
+		<bezel name="ledright3" element="lbunt">
+			<bounds x="2" y="-0.2" width="2" height="0.2" />
+		</bezel>
+	</view>
+</mamelayout>

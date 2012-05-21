@@ -1,0 +1,713 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+	<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+	</led7seg>
+	</element>
+	<element name="play" defstate="0">
+		<text string="PLAY" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="pass" defstate="0">
+		<text string="PASS" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="select" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="SELECT" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="drop" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="DROP" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="timeout" defstate="0">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="TIMEOUT" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="redpiece">
+		<disk state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="yellowpiece">
+		<disk state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.0" />
+		</disk>
+	</element>
+	<element name="greenpiece">
+		<disk state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="0.7" blue="0.0" />
+		</disk>
+	</element>
+	<element name="emptypiece">
+		<disk state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</disk>
+	</element>
+
+	<element name="C" defstate="0">
+		<text string="C" state="1">
+			<color red="0.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="O" defstate="0">
+		<text string="O" state="1">
+			<color red="0.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="N" defstate="0">
+		<text string="N" state="1">
+			<color red="0.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="E" defstate="0">
+		<text string="E" state="1">
+			<color red="0.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="T" defstate="0">
+		<text string="T" state="1">
+			<color red="0.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="4" defstate="0">
+		<text string="4" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="20p" defstate="0">
+		<text string="20p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="20p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="50p" defstate="0">
+		<text string="50p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="50p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="100p" defstate="0">
+		<text string="100p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="100p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="200p" defstate="0">
+		<text string="200p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="200p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="500p" defstate="0">
+		<text string="500p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="500p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="1000p" defstate="0">
+		<text string="1000p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+		<text string="1000p" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="vfd0">
+	<led16segsc>
+			<color red="0" green="0.6" blue="1.0" />
+	</led16segsc>
+	</element>
+
+	<view name="Classic graphics and VFD">
+		<backdrop name="lamp96" element="greenpiece" state="0">
+			<bounds x="0" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp97" element="greenpiece" state="0">
+			<bounds x="8" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp98" element="greenpiece" state="0">
+			<bounds x="16" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp99" element="greenpiece" state="0">
+			<bounds x="24" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp100" element="greenpiece" state="0">
+			<bounds x="32" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp101" element="greenpiece" state="0">
+			<bounds x="40" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp102" element="greenpiece" state="0">
+			<bounds x="48" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="0" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="8" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="16" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="24" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="32" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="40" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="48" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp0" element="yellowpiece" state="0">
+			<bounds x="0" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp1" element="yellowpiece" state="0">
+			<bounds x="8" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp2" element="yellowpiece" state="0">
+			<bounds x="16" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp3" element="yellowpiece" state="0">
+			<bounds x="24" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp4" element="yellowpiece" state="0">
+			<bounds x="32" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp5" element="yellowpiece" state="0">
+			<bounds x="40" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp6" element="yellowpiece" state="0">
+			<bounds x="48" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp8" element="redpiece" state="0">
+			<bounds x="0" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp9" element="redpiece" state="0">
+			<bounds x="8" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp10" element="redpiece" state="0">
+			<bounds x="16" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp11" element="redpiece" state="0">
+			<bounds x="24" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp12" element="redpiece" state="0">
+			<bounds x="32" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp13" element="redpiece" state="0">
+			<bounds x="40" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp14" element="redpiece" state="0">
+			<bounds x="48" y="7" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="0" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="8" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="16" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="24" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="32" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="40" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="48" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp24" element="redpiece" state="0">
+			<bounds x="0" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp25" element="redpiece" state="0">
+			<bounds x="8" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp26" element="redpiece" state="0">
+			<bounds x="16" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp27" element="redpiece" state="0">
+			<bounds x="24" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp28" element="redpiece" state="0">
+			<bounds x="32" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp29" element="redpiece" state="0">
+			<bounds x="40" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp30" element="redpiece" state="0">
+			<bounds x="48" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp16" element="yellowpiece" state="0">
+			<bounds x="0" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp17" element="yellowpiece" state="0">
+			<bounds x="8" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp18" element="yellowpiece" state="0">
+			<bounds x="16" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp19" element="yellowpiece" state="0">
+			<bounds x="24" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp20" element="yellowpiece" state="0">
+			<bounds x="32" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp21" element="yellowpiece" state="0">
+			<bounds x="40" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp22" element="yellowpiece" state="0">
+			<bounds x="48" y="14" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="0" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="8" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="16" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="24" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="32" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="40" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="48" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp32" element="yellowpiece" state="0">
+			<bounds x="0" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp33" element="yellowpiece" state="0">
+			<bounds x="8" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp34" element="yellowpiece" state="0">
+			<bounds x="16" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp35" element="yellowpiece" state="0">
+			<bounds x="24" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp36" element="yellowpiece" state="0">
+			<bounds x="32" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp37" element="yellowpiece" state="0">
+			<bounds x="40" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp38" element="yellowpiece" state="0">
+			<bounds x="48" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp40" element="redpiece" state="0">
+			<bounds x="0" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp41" element="redpiece" state="0">
+			<bounds x="8" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp42" element="redpiece" state="0">
+			<bounds x="16" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp43" element="redpiece" state="0">
+			<bounds x="24" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp44" element="redpiece" state="0">
+			<bounds x="32" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp45" element="redpiece" state="0">
+			<bounds x="40" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp46" element="redpiece" state="0">
+			<bounds x="48" y="21" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="0" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="8" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="16" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="24" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="32" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="40" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="48" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp48" element="yellowpiece" state="0">
+			<bounds x="0" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp49" element="yellowpiece" state="0">
+			<bounds x="8" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp50" element="yellowpiece" state="0">
+			<bounds x="16" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp51" element="yellowpiece" state="0">
+			<bounds x="24" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp52" element="yellowpiece" state="0">
+			<bounds x="32" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp53" element="yellowpiece" state="0">
+			<bounds x="40" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp54" element="yellowpiece" state="0">
+			<bounds x="48" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp56" element="redpiece" state="0">
+			<bounds x="0" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp57" element="redpiece" state="0">
+			<bounds x="8" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp58" element="redpiece" state="0">
+			<bounds x="16" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp59" element="redpiece" state="0">
+			<bounds x="24" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp60" element="redpiece" state="0">
+			<bounds x="32" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp61" element="redpiece" state="0">
+			<bounds x="40" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp62" element="redpiece" state="0">
+			<bounds x="48" y="28" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="0" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="8" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="16" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="24" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="32" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="40" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="48" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp64" element="yellowpiece" state="0">
+			<bounds x="0" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp65" element="yellowpiece" state="0">
+			<bounds x="8" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp66" element="yellowpiece" state="0">
+			<bounds x="16" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp67" element="yellowpiece" state="0">
+			<bounds x="24" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp68" element="yellowpiece" state="0">
+			<bounds x="32" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp69" element="yellowpiece" state="0">
+			<bounds x="40" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp70" element="yellowpiece" state="0">
+			<bounds x="48" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp72" element="redpiece" state="0">
+			<bounds x="0" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp73" element="redpiece" state="0">
+			<bounds x="8" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp74" element="redpiece" state="0">
+			<bounds x="16" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp75" element="redpiece" state="0">
+			<bounds x="24" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp76" element="redpiece" state="0">
+			<bounds x="32" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp77" element="redpiece" state="0">
+			<bounds x="40" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp78" element="redpiece" state="0">
+			<bounds x="48" y="35" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="0" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="8" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="16" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="24" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="32" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="40" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="blank" element="emptypiece" state="0">
+			<bounds x="48" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp80" element="yellowpiece" state="0">
+			<bounds x="0" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp81" element="yellowpiece" state="0">
+			<bounds x="8" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp82" element="yellowpiece" state="0">
+			<bounds x="16" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp83" element="yellowpiece" state="0">
+			<bounds x="24" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp84" element="yellowpiece" state="0">
+			<bounds x="32" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp85" element="yellowpiece" state="0">
+			<bounds x="40" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp86" element="yellowpiece" state="0">
+			<bounds x="48" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp88" element="redpiece" state="0">
+			<bounds x="0" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp89" element="redpiece" state="0">
+			<bounds x="8" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp90" element="redpiece" state="0">
+			<bounds x="16" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp91" element="redpiece" state="0">
+			<bounds x="24" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp92" element="redpiece" state="0">
+			<bounds x="32" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp93" element="redpiece" state="0">
+			<bounds x="40" y="42" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp94" element="redpiece" state="0">
+			<bounds x="48" y="42" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp7" element="C" state="0">
+			<bounds x="0" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp15" element="O" state="0">
+			<bounds x="8" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp23" element="N" state="0">
+			<bounds x="16" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp31" element="N" state="0">
+			<bounds x="24" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp39" element="E" state="0">
+			<bounds x="32" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp47" element="C" state="0">
+			<bounds x="40" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp55" element="T" state="0">
+			<bounds x="48" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp63" element="4" state="0">
+			<bounds x="56" y="48" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp71" element="20p" state="0">
+			<bounds x="64" y="48" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp79" element="50p" state="0">
+			<bounds x="64" y="40" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp87" element="100p" state="0">
+			<bounds x="64" y="32" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp95" element="200p" state="0">
+			<bounds x="64" y="24" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp103" element="500p" state="0">
+			<bounds x="64" y="16" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp111" element="1000p" state="0">
+			<bounds x="64" y="8" width="7" height="7"/>
+		</backdrop>
+
+		<backdrop name="lamp119" element="timeout" state="0">
+			<bounds x="30" y="56" width="28" height="14"/>
+		</backdrop>
+
+		<backdrop name="digit8" element="digit" state="0">
+			<bounds x="0" y="56" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit9" element="digit" state="0">
+			<bounds x="9" y="56" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="lamp119" element="timeout" state="0">
+			<bounds x="30" y="56" width="28" height="14"/>
+		</backdrop>
+
+		<backdrop name="lamp122" element="play" state="0">
+			<bounds x="0" y="140" width="28" height="14"/>
+		</backdrop>
+		<backdrop name="lamp121" element="pass" state="0">
+			<bounds x="40" y="140" width="28" height="14"/>
+		</backdrop>
+		<backdrop name="lamp24" element="select" state="0">
+			<bounds x="0" y="90" width="28" height="14"/>
+		</backdrop>
+		<backdrop name="lamp123" element="drop" state="0">
+			<bounds x="20" y="90" width="28" height="14"/>
+		</backdrop>
+		<backdrop name="vfd0" element="vfd0" state="0">
+			<bounds x="0" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd1" element="vfd0" state="0">
+			<bounds x="9" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd2" element="vfd0" state="0">
+			<bounds x="18" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd3" element="vfd0" state="0">
+			<bounds x="27" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd4" element="vfd0" state="0">
+			<bounds x="36" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd5" element="vfd0" state="0">
+			<bounds x="45" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd6" element="vfd0" state="0">
+			<bounds x="54" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd7" element="vfd0" state="0">
+			<bounds x="63" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd8" element="vfd0" state="0">
+			<bounds x="72" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd9" element="vfd0" state="0">
+			<bounds x="81" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd10" element="vfd0" state="0">
+			<bounds x="90" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd11" element="vfd0" state="0">
+			<bounds x="99" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd12" element="vfd0" state="0">
+			<bounds x="108" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd13" element="vfd0" state="0">
+			<bounds x="117" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd14" element="vfd0" state="0">
+			<bounds x="126" y="120" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd15" element="vfd0" state="0">
+			<bounds x="135" y="120" width="9" height="14"/>
+		</backdrop>
+	</view>
+</mamelayout>
+
+

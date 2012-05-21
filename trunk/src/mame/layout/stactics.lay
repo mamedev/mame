@@ -1,0 +1,1158 @@
+<mamelayout version="2">
+	<element name="divider">
+		<rect>
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+	</element>
+	<element name="red_disc" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.125" blue="0.125" />
+		</disk>
+	</element>
+	<element name="red_disc_b">
+		<disk>
+			<color red="1.0" green="0.125" blue="0.125" />
+		</disk>
+	</element>
+	<element name="basetext">
+		<text string="BASE MISSILE BUTTON">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="scoretext">
+		<text string="SCORE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="digit" defstate="10">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="c_text">
+		<text string="C">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="r_text">
+		<text string="R">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="e_text">
+		<text string="E">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="d_text">
+		<text string="D">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="i_text">
+		<text string="I">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="t_text">
+		<text string="T">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="yellow_disc" defstate="0">
+		<disk state="1">
+			<color red="0.92" green="1.0" blue="0.4" />
+		</disk>
+	</element>
+	<element name="yellow_disc_b">
+		<disk>
+			<color red="0.92" green="1.0" blue="0.4" />
+		</disk>
+	</element>
+	<element name="white_r">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+	<element name="yellow_r">
+		<rect>
+			<color red="1.0" green="1.0" blue="0" />
+		</rect>
+	</element>
+	<element name="energy_text">
+		<text string="ENERGY BARRIER">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="energy_b_text">
+		<text string="ENERGY BARRIER BUTTON">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="round_text">
+		<text string="ROUND">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="1_text">
+		<text string="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="2_text">
+		<text string="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="3_text">
+		<text string="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="4_text">
+		<text string="4">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="5_text">
+		<text string="5">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="6_text">
+		<text string="6">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="7_text">
+		<text string="7">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="8_text">
+		<text string="8">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="9_text">
+		<text string="9">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="0_text">
+		<text string="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="green_disc" defstate="0">
+		<disk state="1">
+			<color red="0" green="0.87" blue="0.14" />
+		</disk>
+	</element>
+	<element name="green_disc_b">
+		<disk>
+			<color red="0" green="0.87" blue="0.14" />
+		</disk>
+	</element>
+
+	<view name="Control Panel / Laser LEDs">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<bezel element="divider">
+            		<bounds x="-60" y="480" width="760" height="4" />
+		</bezel>
+
+<!--Laser Sight -->
+
+		<bezel name="sight_led" element="red_disc">
+            		<bounds x="317" y="225" width="2" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="sight_led" element="red_disc">
+            		<bounds x="319" y="225" width="2" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="sight_led" element="red_disc">
+            		<bounds x="317" y="227" width="2" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="sight_led" element="red_disc">
+            		<bounds x="319" y="227" width="2" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+
+<!--Base Missile Lamps-->
+
+		<bezel element="basetext">
+            		<bounds x="250" y="500" width="140" height="15" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="250" y="525" width="20" height="20" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="280" y="525" width="20" height="20" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="310" y="525" width="20" height="20" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="340" y="525" width="20" height="20" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="370" y="525" width="20" height="20" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel name="base_lamp0" element="red_disc">
+            		<bounds x="250" y="525" width="20" height="20" />
+		</bezel>
+		<bezel name="base_lamp1" element="red_disc">
+            		<bounds x="280" y="525" width="20" height="20" />
+		</bezel>
+		<bezel name="base_lamp2" element="red_disc">
+            		<bounds x="310" y="525" width="20" height="20" />
+		</bezel>
+		<bezel name="base_lamp3" element="red_disc">
+            		<bounds x="340" y="525" width="20" height="20" />
+		</bezel>
+		<bezel name="base_lamp4" element="red_disc">
+            		<bounds x="370" y="525" width="20" height="20" />
+		</bezel>
+
+<!--Score LEDs-->
+
+		<bezel element="scoretext">
+            		<bounds x="230" y="590" width="50" height="30" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="280" y="590" width="17" height="30" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="300" y="590" width="17" height="30" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="320" y="590" width="17" height="30" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="340" y="590" width="17" height="30" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds x="360" y="590" width="17" height="30" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="380" y="590" width="17" height="30" />
+		</bezel>
+
+<!--Credit LEDs-->
+
+		<bezel element="c_text">
+            		<bounds x="420" y="580" width="10" height="10" />
+		</bezel>
+		<bezel element="r_text">
+            		<bounds x="420" y="591" width="10" height="10" />
+		</bezel>
+		<bezel element="e_text">
+            		<bounds x="420" y="602" width="10" height="10" />
+		</bezel>
+		<bezel element="d_text">
+            		<bounds x="420" y="613" width="10" height="10" />
+		</bezel>
+		<bezel element="i_text">
+            		<bounds x="420" y="624" width="10" height="10" />
+		</bezel>
+		<bezel element="t_text">
+            		<bounds x="420" y="635" width="10" height="10" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="442" y="580" width="11" height="11" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="442" y="593" width="11" height="11" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="442" y="606" width="11" height="11" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="442" y="619" width="11" height="11" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="442" y="632" width="11" height="11" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel name="credit_led0" element="red_disc">
+            		<bounds x="442" y="580" width="11" height="11" />
+		</bezel>
+		<bezel name="credit_led1" element="red_disc">
+            		<bounds x="442" y="593" width="11" height="11" />
+		</bezel>
+		<bezel name="credit_led2" element="red_disc">
+            		<bounds x="442" y="606" width="11" height="11" />
+		</bezel>
+		<bezel name="credit_led3" element="red_disc">
+            		<bounds x="442" y="619" width="11" height="11" />
+		</bezel>
+		<bezel name="credit_led4" element="red_disc">
+            		<bounds x="442" y="632" width="11" height="11" />
+		</bezel>
+
+<!--Start Lamp-->
+
+		<bezel name="start_lamp" element="green_disc">
+            		<bounds x="460" y="650" width="20" height="20" />
+		</bezel>
+		<bezel element="green_disc_b">
+            		<bounds x="460" y="650" width="20" height="20" />
+			<color alpha="0.1" />
+		</bezel>
+
+<!--Energy Barrier LEDs-->
+
+		<bezel element="energy_text">
+            		<bounds x="-25" y="545" width="140" height="20" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="-60" y="555" width="30" height="4" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="110" y="555" width="30" height="4" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="-60" y="555" width="4" height="45" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="136" y="555" width="4" height="45" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="-60" y="596" width="200" height="4" />
+		</bezel>
+		<bezel name="barrier_led0" element="red_disc">
+            		<bounds x="-47" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led1" element="red_disc">
+            		<bounds x="-35" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led2" element="red_disc">
+            		<bounds x="-23" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led3" element="red_disc">
+            		<bounds x="-11" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led4" element="red_disc">
+            		<bounds x="1" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led5" element="red_disc">
+            		<bounds x="13" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led6" element="red_disc">
+            		<bounds x="25" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led7" element="red_disc">
+            		<bounds x="37" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led8" element="red_disc">
+            		<bounds x="49" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led9" element="red_disc">
+            		<bounds x="61" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led10" element="red_disc">
+            		<bounds x="73" y="586" width="5" height="5" />
+		</bezel>
+		<bezel name="barrier_led11" element="red_disc">
+            		<bounds x="85" y="586" width="5" height="5" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-47" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-35" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-23" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-11" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="1" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="13" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="25" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="37" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="49" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="61" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="73" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="85" y="586" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="-48" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="2_text">
+            		<bounds x="-36" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="3_text">
+            		<bounds x="-24" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="4_text">
+            		<bounds x="-12" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="5_text">
+            		<bounds x="0" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="6_text">
+            		<bounds x="12" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="7_text">
+            		<bounds x="24" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="8_text">
+            		<bounds x="36" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="9_text">
+            		<bounds x="48" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="59" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="0_text">
+        		<bounds x="63" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="71" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+        		<bounds x="75" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="83" y="573" width="7" height="7" />
+		</bezel>
+		<bezel element="2_text">
+        		<bounds x="87" y="573" width="7" height="7" />
+		</bezel>
+
+<!--Energy Barrier Lamp-->
+
+		<bezel element="yellow_r">
+            		<bounds x="-60" y="604" width="200" height="24" />
+		</bezel>
+		<bezel element="energy_b_text">
+            		<bounds x="-60" y="608" width="216" height="15" />
+		</bezel>
+
+		<bezel name="barrier_lamp" element="yellow_disc">
+            		<bounds x="160" y="570" width="40" height="40" />
+		</bezel>
+		<bezel element="yellow_disc_b">
+            		<bounds x="160" y="570" width="40" height="40" />
+			<color alpha="0.1" />
+		</bezel>
+
+<!--Round LEDs-->
+
+		<bezel element="round_text">
+            		<bounds x="-30" y="645" width="140" height="20" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="-60" y="655" width="60" height="4" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="80" y="655" width="60" height="4" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="-60" y="655" width="4" height="45" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="136" y="655" width="4" height="45" />
+		</bezel>
+		<bezel element="white_r">
+            		<bounds x="-60" y="696" width="200" height="4" />
+		</bezel>
+		<bezel name="round_led0" element="red_disc">
+            		<bounds x="-47" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led1" element="red_disc">
+            		<bounds x="-35" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led2" element="red_disc">
+            		<bounds x="-23" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led3" element="red_disc">
+            		<bounds x="-11" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led4" element="red_disc">
+            		<bounds x="1" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led5" element="red_disc">
+            		<bounds x="13" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led6" element="red_disc">
+            		<bounds x="25" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led7" element="red_disc">
+            		<bounds x="37" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led8" element="red_disc">
+            		<bounds x="49" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led9" element="red_disc">
+            		<bounds x="61" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led10" element="red_disc">
+            		<bounds x="73" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led11" element="red_disc">
+            		<bounds x="85" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led12" element="red_disc">
+            		<bounds x="97" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led13" element="red_disc">
+            		<bounds x="109" y="686" width="5" height="5" />
+		</bezel>
+		<bezel name="round_led14" element="red_disc">
+            		<bounds x="121" y="686" width="5" height="5" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-47" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-35" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-23" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="-11" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="1" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="13" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="25" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="37" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="49" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="61" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="73" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="85" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="97" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="109" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="red_disc_b">
+            		<bounds x="121" y="686" width="5" height="5" />
+			<color alpha="0.1" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="-48" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="2_text">
+            		<bounds x="-36" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="3_text">
+            		<bounds x="-24" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="4_text">
+            		<bounds x="-12" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="5_text">
+            		<bounds x="0" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="6_text">
+            		<bounds x="12" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="7_text">
+            		<bounds x="24" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="8_text">
+            		<bounds x="36" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="9_text">
+            		<bounds x="48" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="59" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="0_text">
+        		<bounds x="63" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="71" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+        		<bounds x="75" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="83" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="2_text">
+        		<bounds x="87" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="95" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="3_text">
+        		<bounds x="99" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="107" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="4_text">
+        		<bounds x="111" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="1_text">
+            		<bounds x="119" y="673" width="7" height="7" />
+		</bezel>
+		<bezel element="5_text">
+        		<bounds x="123" y="673" width="7" height="7" />
+		</bezel>
+
+<!--Laser Beam Left-->
+
+		<bezel name="beam_led_left0" element="green_disc">
+            		<bounds x="-43" y="463" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left1" element="green_disc">
+            		<bounds x="-35" y="457" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left2" element="green_disc">
+            		<bounds x="-27" y="451" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left3" element="green_disc">
+            		<bounds x="-19" y="445" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left4" element="green_disc">
+            		<bounds x="-11" y="439" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left5" element="green_disc">
+            		<bounds x="-3" y="433" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left6" element="green_disc">
+            		<bounds x="5" y="427" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left7" element="green_disc">
+            		<bounds x="13" y="421" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left8" element="green_disc">
+            		<bounds x="21" y="415" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left9" element="green_disc">
+            		<bounds x="29" y="409" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left10" element="green_disc">
+            		<bounds x="37" y="403" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left11" element="green_disc">
+            		<bounds x="45" y="397" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left12" element="green_disc">
+            		<bounds x="53" y="391" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left13" element="green_disc">
+            		<bounds x="61" y="385" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left14" element="green_disc">
+            		<bounds x="69" y="379" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left16" element="green_disc">
+            		<bounds x="77" y="373" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left17" element="green_disc">
+            		<bounds x="85" y="367" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left18" element="green_disc">
+            		<bounds x="93" y="361" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left19" element="green_disc">
+            		<bounds x="101" y="355" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left20" element="green_disc">
+            		<bounds x="109" y="349" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left21" element="green_disc">
+            		<bounds x="117" y="345" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left22" element="green_disc">
+            		<bounds x="123" y="341" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left23" element="green_disc">
+            		<bounds x="129" y="337" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left24" element="green_disc">
+            		<bounds x="135" y="333" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left25" element="green_disc">
+            		<bounds x="141" y="329" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left26" element="green_disc">
+            		<bounds x="147" y="325" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left27" element="green_disc">
+            		<bounds x="153" y="321" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left28" element="green_disc">
+            		<bounds x="159" y="317" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left29" element="green_disc">
+            		<bounds x="165" y="313" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left30" element="green_disc">
+            		<bounds x="171" y="309" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left32" element="green_disc">
+            		<bounds x="177" y="305" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left33" element="green_disc">
+            		<bounds x="183" y="301" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left34" element="green_disc">
+            		<bounds x="189" y="297" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left35" element="green_disc">
+            		<bounds x="195" y="293" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left36" element="green_disc">
+            		<bounds x="201" y="289" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left37" element="green_disc">
+            		<bounds x="207" y="285" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left38" element="green_disc">
+            		<bounds x="213" y="281" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left39" element="green_disc">
+            		<bounds x="219" y="277" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left40" element="green_disc">
+            		<bounds x="225" y="273" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left41" element="green_disc">
+            		<bounds x="231" y="269" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left42" element="green_disc">
+            		<bounds x="237" y="267" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left43" element="green_disc">
+            		<bounds x="241" y="265" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left44" element="green_disc">
+            		<bounds x="245" y="263" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left45" element="green_disc">
+            		<bounds x="249" y="261" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left46" element="green_disc">
+            		<bounds x="253" y="259" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left48" element="green_disc">
+            		<bounds x="257" y="257" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left49" element="green_disc">
+            		<bounds x="261" y="255" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left50" element="green_disc">
+            		<bounds x="265" y="253" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left51" element="green_disc">
+            		<bounds x="269" y="251" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left52" element="green_disc">
+            		<bounds x="273" y="249" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left53" element="green_disc">
+            		<bounds x="277" y="247" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left54" element="green_disc">
+            		<bounds x="281" y="245" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left55" element="green_disc">
+            		<bounds x="285" y="243" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left56" element="green_disc">
+            		<bounds x="289" y="241" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left57" element="green_disc">
+            		<bounds x="293" y="239" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left58" element="green_disc">
+            		<bounds x="297" y="237" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left59" element="green_disc">
+            		<bounds x="301" y="235" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left60" element="green_disc">
+            		<bounds x="305" y="233" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left61" element="green_disc">
+            		<bounds x="309" y="231" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_left62" element="green_disc">
+            		<bounds x="313" y="229" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+
+<!--Laser Beam Right-->
+
+		<bezel name="beam_led_right0" element="green_disc">
+            		<bounds x="673" y="463" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right1" element="green_disc">
+            		<bounds x="665" y="457" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right2" element="green_disc">
+            		<bounds x="657" y="451" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right3" element="green_disc">
+            		<bounds x="649" y="445" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right4" element="green_disc">
+            		<bounds x="641" y="439" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right5" element="green_disc">
+            		<bounds x="633" y="433" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right6" element="green_disc">
+            		<bounds x="625" y="427" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right7" element="green_disc">
+            		<bounds x="617" y="421" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right8" element="green_disc">
+            		<bounds x="609" y="415" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right9" element="green_disc">
+            		<bounds x="601" y="409" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right10" element="green_disc">
+            		<bounds x="593" y="403" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right11" element="green_disc">
+            		<bounds x="585" y="397" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right12" element="green_disc">
+            		<bounds x="577" y="391" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right13" element="green_disc">
+            		<bounds x="569" y="385" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right14" element="green_disc">
+            		<bounds x="561" y="379" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right16" element="green_disc">
+            		<bounds x="553" y="373" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right17" element="green_disc">
+            		<bounds x="545" y="367" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right18" element="green_disc">
+            		<bounds x="537" y="361" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right19" element="green_disc">
+            		<bounds x="529" y="355" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right20" element="green_disc">
+            		<bounds x="521" y="349" width="8" height="6" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right21" element="green_disc">
+            		<bounds x="515" y="345" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right22" element="green_disc">
+            		<bounds x="509" y="341" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right23" element="green_disc">
+            		<bounds x="503" y="337" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right24" element="green_disc">
+            		<bounds x="497" y="333" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right25" element="green_disc">
+            		<bounds x="491" y="329" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right26" element="green_disc">
+            		<bounds x="485" y="325" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right27" element="green_disc">
+            		<bounds x="479" y="321" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right28" element="green_disc">
+            		<bounds x="473" y="317" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right29" element="green_disc">
+            		<bounds x="467" y="313" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right30" element="green_disc">
+            		<bounds x="461" y="309" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right32" element="green_disc">
+            		<bounds x="455" y="305" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right33" element="green_disc">
+            		<bounds x="449" y="301" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right34" element="green_disc">
+            		<bounds x="443" y="297" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right35" element="green_disc">
+            		<bounds x="437" y="293" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right36" element="green_disc">
+            		<bounds x="431" y="289" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right37" element="green_disc">
+            		<bounds x="425" y="285" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right38" element="green_disc">
+            		<bounds x="419" y="281" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right39" element="green_disc">
+            		<bounds x="413" y="277" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right40" element="green_disc">
+            		<bounds x="407" y="273" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right41" element="green_disc">
+            		<bounds x="401" y="269" width="6" height="4" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right42" element="green_disc">
+            		<bounds x="397" y="267" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right43" element="green_disc">
+            		<bounds x="393" y="265" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right44" element="green_disc">
+            		<bounds x="389" y="263" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right45" element="green_disc">
+            		<bounds x="385" y="261" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right46" element="green_disc">
+            		<bounds x="381" y="259" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right48" element="green_disc">
+            		<bounds x="377" y="257" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right49" element="green_disc">
+            		<bounds x="373" y="255" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right50" element="green_disc">
+            		<bounds x="369" y="253" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right51" element="green_disc">
+            		<bounds x="365" y="251" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right52" element="green_disc">
+            		<bounds x="361" y="249" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right53" element="green_disc">
+            		<bounds x="357" y="247" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right54" element="green_disc">
+            		<bounds x="353" y="245" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right55" element="green_disc">
+            		<bounds x="349" y="243" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right56" element="green_disc">
+            		<bounds x="345" y="241" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right57" element="green_disc">
+            		<bounds x="341" y="239" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right58" element="green_disc">
+            		<bounds x="337" y="237" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right59" element="green_disc">
+            		<bounds x="333" y="235" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right60" element="green_disc">
+            		<bounds x="329" y="233" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right61" element="green_disc">
+            		<bounds x="325" y="231" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+		<bezel name="beam_led_right62" element="green_disc">
+            		<bounds x="321" y="229" width="4" height="2" />
+			<color alpha="0.7" />
+		</bezel>
+	</view>
+</mamelayout>

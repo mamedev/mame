@@ -1,0 +1,123 @@
+.\"  -*- nroff -*-
+.\"
+.\" chdman.1
+.\"
+.\" Man page created from source and usage information by 
+.\" Ashley T. Howes <debiandev@ashleyhowes.com>, February 2005
+.\" updated by Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\"
+.TH CHDMAN 1 2012-03-25 0.145u5 "MAME Compressed Hunks of Data (CHD) manager"
+.\"
+.\" NAME chapter
+.SH NAME
+chdman \- MAME Compressed Hunks of Data (CHD) manager
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B chdman
+.I option switches
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+.B chdman
+is the (C)ompressed (H)unks of (D)ata (CHD) manager for MAME.
+It is a tool to manage CHD images.
+.\"
+.\" OPTIONS chapter
+.SH OPTIONS
+.TP
+.B \info \fIinput\fR.chd
+Dump the header information from a drive image.
+.TP
+.B verify \fIinput\fR.chd
+Validate the MD5/SHA1 on a drive image.
+.TP
+.B createraw \fIinputhd\fR.raw \fIoutput\fR.chd [\fIinputoffs\fR [\fIhunksize\fR]]
+Create a new compressed raw image from a raw file.
+.TP
+.B createhd \fIinputhd\fR.raw \fIoutput\fR.chd [\fIinputoffs\fR [\fIcylinders \
+heads sectors \fR[\fIsectorsize\fR [\fIhunksize\fR]]]]
+Create a new compressed hard disk image from a raw file.
+.TP
+.B createcd \fIinput\fR.toc \fIoutput\fR.chd
+Create a new compressed CD image from a raw file.
+.TP
+.B createld \fIinput\fR.toc \fIoutput\fR.chd
+Create a new compressed laserdisc image from a raw file.
+.TP
+.B extractraw \fIinput\fR.chd \fIoutput\fR.raw
+Extract a raw file from a CHD image.
+.TP
+.B extracthd \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+Extract a hard disk block image from a CHD image.
+.TP
+.B extractcd \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+Extract a CDRDAO .toc/.bin, CDRWIN .bin/.cue, or Sega Dreamcast .GDI file from a CHD\-CD image.
+.TP
+.B extractld \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+Extract a laserdisc image from a CHD\-LD image.
+.TP
+.B copy \fIinput\fR.chd \fIoutput\fR.chd
+Copy all hunks of data from one CHD file to another. The hunk sizes do not need to match.
+If the source is shorter than the destination, the source data will be padded with 0s.
+.\"
+.\" SWITCHES chapter
+.SH SWITCHES
+.TP
+.B \-\-chs, \-chs \fIcylinders,heads,sectors
+Specifies CHS geometry values for CHD harddisks.
+.TP
+.B \-\-compression, \-c \fInone\fR|\fItype1\fR[,\fItype2\fR[,...]]
+Which compression codecs to use (up to 4).
+.TP
+.B \-\-force, \-f
+Force overwriting an existing file.
+.TP
+.B \-\-help, \-h
+Shows the available switches for an option.
+.TP
+.B \-\-hunksize, \-hs \fIbytes
+Size of each unit, in hunks.
+.TP
+.B \-\-ident, \-id \fIfilename
+Name of ident file to provide CHS information.
+.TP
+.B \-\-input, \-i \fIfilename
+Input file name.
+.TP
+.B \-\-inputstartbyte, \-isb \fIoffset
+Starting byte offset within the input.
+.TP
+.B \-\-inputstarthunk, \-ish \fIoffset
+Starting hunk offset within the input.
+.TP
+.B \-\-inputbytes, \-ib \fIlength
+Effective length of the input in bytes.
+.TP                              
+.B \-\-inputhunks, \-ih \fIlength
+Effective length of the input in hunks.
+.TP
+.B \-\-inputparent, \-ip \fIfilename
+Parent CHD's input file name.
+.TP
+.B \-\-numprocessors, \-np \fIcount
+Limits the number of processors to use during compression.
+.TP
+.B \-\-sectorsize, \-ss \fIbytes
+size of each hard disk sector.
+.TP
+.B \-\-verbose, \-v
+Output additional information about the operation.
+.TP
+.B \-\-output, \-o \fIfilename
+Output file name.
+.TP
+.B \-\-outputbin, \-ob \fIfilename
+Output binary file name for extractcd.
+.TP
+.B \-\-outputparent, \-op \fIfilename
+Parent CHD's output file name.
+.TP
+.B \-\-unitsize, \-us \fIbytes
+Size of each unit, in bytes.
+

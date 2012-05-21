@@ -1,0 +1,99 @@
+<mamelayout version="2">
+	<element name="lamp" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.125" blue="0.125" />
+		</disk>
+	</element>
+	<view name="Simple LEDs">
+		<screen index="0">
+			<bounds x="0" y="0" width="300" height="400" />
+		</screen>
+		<backdrop name="LED01" element="lamp">
+            		<bounds x="34" y="36" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED02" element="lamp">
+            		<bounds x="15" y="43" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED03" element="lamp">
+            		<bounds x="12" y="65" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED04" element="lamp">
+            		<bounds x="50" y="73" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED05" element="lamp">
+            		<bounds x="103" y="48" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED06" element="lamp">
+            		<bounds x="131" y="33" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED07" element="lamp">
+            		<bounds x="158" y="47" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED08" element="lamp">
+            		<bounds x="222" y="102" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED09" element="lamp">
+            		<bounds x="18" y="117" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED10" element="lamp">
+            		<bounds x="7" y="140" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED11" element="lamp">
+            		<bounds x="21" y="163" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED12" element="lamp">
+            		<bounds x="126" y="132" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED13" element="lamp">
+            		<bounds x="190" y="133" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED14" element="lamp">
+            		<bounds x="8" y="252" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED15" element="lamp">
+            		<bounds x="38" y="251" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED16" element="lamp">
+            		<bounds x="67" y="229" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED17" element="lamp">
+            		<bounds x="125" y="246" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED18" element="lamp">
+            		<bounds x="125" y="256" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED19" element="lamp">
+            		<bounds x="125" y="265" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED20" element="lamp">
+            		<bounds x="125" y="275" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED21" element="lamp">
+            		<bounds x="125" y="285" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED22" element="lamp">
+            		<bounds x="125" y="295" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED23" element="lamp">
+            		<bounds x="125" y="304" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED24" element="lamp">
+            		<bounds x="125" y="314" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED25" element="lamp">
+            		<bounds x="125" y="324" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED26" element="lamp">
+            		<bounds x="125" y="334" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED27" element="lamp">
+            		<bounds x="186" y="229" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED28" element="lamp">
+            		<bounds x="197" y="288" width="7" height="7" />
+		</backdrop>
+		<backdrop name="LED29" element="lamp">
+            		<bounds x="141" y="366" width="7" height="7" />
+		</backdrop>
+	</view>
+</mamelayout>

@@ -1,0 +1,52 @@
+.\"  -*- nroff -*-
+.\"
+.\" ldplayer.1
+.\"
+.\" Man page created from source and usage information by 
+.\" Cesare Falco <cesare.falco@gmail.com>, August 2008
+.\"
+.TH LDPLAYER 1 2012-03-25 0.145u5 "ldplayer"
+.\"
+.\"
+.\" NAME chapter
+.SH NAME
+ldplayer \- MAME laserdisc image player
+.\"
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B ldplayer pr8210 
+\-rompath \fI/path/to/pr8210.zip\fP\fB\\;\fP\fI/path/to/image.chd\fP
+.\"
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+.B ldplayer
+is an optional utility that simply plays the audio and video from laserdisc
+CHD files. It actually emulates and therefore behaves just like a real
+laserdisc player \- you can pause, fast-forward, rewind, and all the rest.
+.\"
+.\"
+.\" NOTES chapter
+.SH NOTES
+First of all, you need to go to your MAME ROMs folder and make a copy of
+\fBcubeqst.zip\fP (the ROMs for Cube Quest). Rename it as \fBpr8210.zip\fP. 
+.P
+Next, run ldplayer. 
+Note that the first path in the \fB\-rompath\fP option is the full path 
+to the \fBpr8210.zip\fP file and the second is the full path to the laserdisc 
+CHD file you wish to play. \fINote\fP the backslash and the semicolon  
+\- \fB\\;\fP \- between them. 
+.P
+Once ldplayer is running, you can hit \fBTAB\fP like usual and check out 
+Inputs (this game) to see the controls. Space is the Play/Pause button, for 
+instance. Note that some laserdiscs (notably Cube Quest) have 30 seconds or 
+more of nothing at the start, so you either need to be patient or use 
+fast-forward to start seeing video.
+.\"
+.\"
+.\" FILES chapter
+.SH FILES
+.TP
+.B /etc/mame/ldplayer.ini
+Main configuration file.

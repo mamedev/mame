@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<view name="3D Glasses Side-by-Side">
+		<screen index="1">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen index="2">
+			<bounds x="4.03" y="0" width="4" height="3" />
+		</screen>
+	</view>
+	<view name="3D Glasses Left">
+		<screen index="1">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+	<view name="3D Glasses Right">
+		<screen index="2">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+</mamelayout>

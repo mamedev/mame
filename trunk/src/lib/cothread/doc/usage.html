@@ -1,0 +1,107 @@
+<html>
+<head>
+  <title></title>
+  <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<b>License:</b><br/><br/>
+libco is released to the public domain.
+<hr/>
+
+<b>Contact:</b><br/><br/>
+At present, you may contact me at setsunakun0 at hotmail dot com.<br/>
+I am interested in knowing of any projects that make use of this library,
+though this is only a courtesy.
+<hr/>
+
+<b>Foreword:</b><br/><br/>
+libco is a cross-platform, public domain implementation of
+cooperative-multithreading; a feature that is sorely lacking
+from the ISO C/C++ standard.<br/>
+The library is designed for maximum speed and portability, and
+not for safety or features. If safety or extra functionality is desired,
+a wrapper API can easily be written to encapsulate all library functions.<br/>
+Behavior of executing operations that are listed as not permitted
+below result in undefined behavior. They may work anyway, they
+may cause undesired / unknown behavior, or they may crash the
+program entirely.<br/>
+The goal of this library was to simplify the base API as much as possible,
+implementing only that which cannot be implemented using pure C. Additional
+functionality after this would only complicate ports of this library to new
+platforms.
+<hr/>
+
+<b>Porting:</b><br/><br/>
+This document is included as a reference for porting libco. Please submit any
+ports you create to me, so that libco can become more useful. Please note that
+since libco is public domain, you must submit your code as a work of the
+public domain in order for it to be included in the official distribution.
+Full credit will be given in the source code of the official release. Please
+do not bother submitting code to me under any other license -- including GPL,
+LGPL, BSD or CC -- I am not interested in creating a library with multiple
+different licenses depending on which targets are used.
+<hr/>
+
+<b>Synopsis:</b><br/><br/>
+<code>
+typedef void* cothread_t;<br/>
+<br/>
+cothread_t co_active();<br/>
+cothread_t co_create(unsigned int heapsize, void (*coentry)(void));<br/>
+void &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;co_delete(cothread_t cothread);<br/>
+void &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;co_switch(cothread_t cothread);<br/>
+</code>
+<hr/>
+
+<b>Usage:</b>
+<hr/>
+
+<code>typedef void* cothread_t;</code><br/><br/>
+Handle to cothread.<br/>
+Handle must be of type void*.<br/>
+A value of null (0) indicates an uninitialized or invalid
+handle, whereas a non-zero value indicates a valid handle.
+<hr/>
+
+<code>cothread_t co_active();</code><br/><br/>
+Return handle to current cothread. Always returns a valid handle, even when
+called from the main program thread.
+<hr/>
+
+<code>cothread_t co_create(unsigned int heapsize, void (*coentry)(void));</code><br/><br/>
+Create new cothread.<br/>
+Heapsize is the amount of memory allocated for the cothread stack, specified
+in bytes. This is unfortunately impossible to make fully portable. It is
+recommended to specify sizes using `n * sizeof(void*)'. It is better to err
+on the side of caution and allocate more memory than will be needed to ensure
+compatibility with other platforms, within reason. A typical heapsize for a
+32-bit architecture is ~1MB.<br/>
+When the new cothread is first called, program execution jumps to coentry.
+This function does not take any arguments, due to portability issues with
+passing function arguments. However, arguments can be simulated by the use
+of global variables, which can be set before the first call to each cothread.<br/>
+coentry() must not return, and should end with an appropriate co_switch()
+statement. Behavior is undefined if entry point returns normally.<br/>
+Library is responsible for allocating cothread stack memory, to free
+the user from needing to allocate special memory capable of being used
+as program stack memory on platforms where this is required.<br/>
+User is always responsible for deleting cothreads with co_delete().<br/>
+Return value of null (0) indicates cothread creation failed.
+<hr/>
+
+<code>void co_delete(cothread_t cothread);</code><br/><br/>
+Delete specified cothread.<br/>
+Null (0) or invalid cothread handle is not allowed.<br/>
+Passing handle of active cothread to this function is not allowed.<br/>
+Passing handle of primary cothread is not allowed.
+<hr/>
+
+<code>void co_switch(cothread_t cothread);</code><br/><br/>
+Switch to specified cothread.<br/>
+Null (0) or invalid cothread handle is not allowed.<br/>
+Passing handle of active cothread to this function is not allowed.
+<hr/>
+
+</body>
+</html>

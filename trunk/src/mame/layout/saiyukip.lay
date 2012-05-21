@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="Double" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Take" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Leftstop" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LEFT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="STOP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="Right" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="RIGHT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="Bet" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp0" element="Right">
+			<bounds x="1.5" y="3.02" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="Take">
+			<bounds x="0.5" y="3.02" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="Double">
+			<bounds x="0" y="3.02" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="Bet">
+			<bounds x="2.5" y="3.02" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="Leftstop">
+			<bounds x="1.0" y="3.02" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="Start">
+			<bounds x="2.0" y="3.02" width="0.40" height="0.24" />
+		</bezel>
+
+	</view>
+</mamelayout>

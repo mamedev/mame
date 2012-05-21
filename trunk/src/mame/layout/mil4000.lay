@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="hold1" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="hold2" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="hold3" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="hold4" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="hold5" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="start" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="premio" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<text string="PREMIO">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<bezel name="lamp0" element="hold1">
+			<bounds x="0.15" y="3.13" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="hold2">
+			<bounds x="0.80" y="3.13" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="hold3">
+			<bounds x="1.45" y="3.13" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="hold4">
+			<bounds x="2.10" y="3.13" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="hold5">
+			<bounds x="2.75" y="3.13" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="start">
+			<bounds x="3.45" y="3.02" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp6" element="premio">
+			<bounds x="3.45" y="3.28" width="0.55" height="0.24" />
+		</bezel>
+	</view>
+</mamelayout>

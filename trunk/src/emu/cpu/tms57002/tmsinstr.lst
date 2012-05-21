@@ -1,0 +1,535 @@
+abs  1  01 1 n
+  abs
+  aacc = %a;
+  if(((INT32)aacc) < 0) {
+    aacc = - aacc;
+    if(((INT32)aacc) < 0)
+      st1 |= ST1_AOV;
+  }
+
+add  1  03 1 y
+  add %d,a
+  %wa((INT64)(INT32)%d + (INT64)(INT32)%a);
+
+add  1  04 1 y
+  add %c,a
+  %wa((INT64)(INT32)%c + (INT64)(INT32)%a);
+
+add  1  05 1 y
+  add %d,m
+  %sfai(d, %d);
+  %wa((INT64)(INT32)d + (%mo >> 16));
+
+add  1  06 1 y
+  add %c,m
+  %wa((INT64)(INT32)%c + (%mo >> 16));
+
+add  1  07 1 y
+  add %d,%c
+  %wa((INT64)(INT32)%d + (INT64)(INT32)%c);
+
+adds 1  08 1 y
+  adds %d
+
+amac 1  2d 2 y
+  amac %d,%c,a
+
+ampy 1  2c 2 y
+  ampy %d,%c,a
+
+and  1  14 1 n
+  and %d,a
+  %sfai(d, %d);
+  aacc &= d;
+
+and  1  15 1 n
+  and %c,a
+  aacc &= %c;
+
+and  1  16 1 n
+  and %d,%c
+  %sfai(d, %d);
+  aacc = %c & d;
+
+b    3  48 3 n b
+  b %i
+  %b(%i);
+
+bgz  3  50 3 n cb
+  bgz %i
+  if(((INT32)aacc) > 0) {
+    %b(%i);
+  }
+
+bioz 3  70 3 n cb
+  bioz %i
+
+blz  3  58 3 n cb
+  blz %i
+  if(((INT32)aacc) < 0) {
+    %b(%i);
+  }
+
+bnz  3  60 3 n cb
+  bnz %i
+  if(aacc) {
+    %b(%i);
+  }
+
+bv   3  78 3 n cb
+  bv %i
+  if(st1 & ST1_AOV) {
+    st1 &= ~ST1_AOV;
+    %b(%i);
+  }
+
+cmpl 1  13 1 n
+  cmpl
+
+dimh 2a 14 1 n
+  dimh si0_l
+
+dimh 2a 15 1 n
+  dimh si0_r
+
+dimh 2a 16 1 n
+  dimh si1_l
+
+dimh 2a 17 1 n
+  dimh si1_r
+
+diml 2a 18 1 n
+  diml si0_l
+
+diml 2a 19 1 n
+  diml si0_r
+
+diml 2a 1a 1 n
+  diml si1_l
+
+diml 2a 1b 1 n
+  diml si1_r
+
+dis  2a 10 1 n
+  dis si0_l,%d
+  %wd(si[0]);
+
+dis  2a 11 1 n
+  dis si0_r,%d
+  %wd(si[1]);
+
+dis  2a 12 1 n
+  dis si1_l,%d
+  %wd(si[2]);
+
+dis  2a 13 1 n
+  dis si1_r,%d
+  %wd(si[3]);
+
+domh 2a 20 1 n
+  domh so0_l
+  so[0] = (%mo >> 24) & 0xffffff;
+
+domh 2a 21 1 n
+  domh so0_r
+  so[1] = (%mo >> 24) & 0xffffff;
+
+domh 2a 22 1 n
+  domh so1_l
+  so[2] = (%mo >> 24) & 0xffffff;
+
+domh 2a 23 1 n
+  domh so1_r
+  so[3] = (%mo >> 24) & 0xffffff;
+
+doml 2a 24 1 n
+  doml so0_l
+
+doml 2a 25 1 n
+  doml so0_r
+
+doml 2a 26 1 n
+  doml so1_l
+
+doml 2a 27 1 n
+  doml so1_r
+
+dos  2b 1c 1 n
+  dos so0_l,%d
+
+dos  2b 1d 1 n
+  dos so0_r,%d
+
+dos  2b 1e 1 n
+  dos so1_l,%d
+
+dos  2b 1f 1 n
+  dos so1_r,%d
+
+idle 3  08 1 n i
+  idle
+  sti |= S_IDLE;
+
+incd 2a 42 1 y
+  incd
+
+lacc 1  12 1 n
+  lacc %c
+  aacc = %c;
+
+lacd 1  11 1 n
+  lacd %d
+  %sfai(d, %d);
+  aacc = d;
+
+lbrk 3  28 1 n
+  lbrk %i
+
+lcaa 2a 08 1 y
+  lcaa
+  ca = %a >> 24;
+
+lcac 3  40 1 n
+  lcac %i
+  if(((INT32)aacc) >= 0)
+    ca = %i;
+
+lcak 3  18 1 n
+  lcak %i
+  ca = %i;
+
+ldpk 2a 44 1 n f
+  ldpk 0
+  st1 &= ~ST1_DBP;
+
+ldpk 2a 45 1 n f
+  ldpk 1
+  st1 |= ST1_DBP;
+
+ld0t 2b 0c 1 y
+  ld0t %d
+
+lira 2a 09 1 y
+  lira
+  id = %a >> 24;
+
+lirk 3  20 1 n
+  lirk %i
+  id = %i;
+
+lmhc 1  33 1 n
+  lmhc %c
+  macc = ((INT64)(INT32)%c) << 16;
+
+lmhd 1  31 1 n
+  lmhd %d
+  macc = ((INT64)(INT32)%d) << 16;
+
+lmld 1  32 1 n
+  lmld %d
+  macc = (macc & ~0xffffffULL) | %d24;
+
+lpc  2b 31 1 n
+  lpc %c
+  if(sti & S_HOST)
+    break;
+  c = %c;
+  host[0] = c >> 24;
+  host[1] = c >> 16;
+  host[2] = c >> 8;
+  host[3] = c;
+  hidx = 0;
+  sti |= S_HOST;
+
+lpd  2b 30 1 n
+  lpd %d
+
+mac  1  24 1 y
+  mac %d,%c
+  d = %d24;
+  if(d & 0x00800000)
+    d |= 0xff000000;
+  creg = c = %c;
+  r = (INT64)(INT32)c * (INT64)(INT32)d;
+  macc = %ml + (r >> 7);
+
+mac  1  25 1 y
+  mac a,%d
+
+mac  1  26 1 y
+  mac %c,a
+  creg = c = %c;
+  r = (INT64)(INT32)c * (INT64)(INT32)%a;
+  macc = %ml + (r >> 15);
+
+macs 1  2e 1 y
+  macs %c,a
+  creg = c = %c;
+  r = (INT64)(INT32)c * (INT64)(INT32)%a;
+  macc = %ml + (r >> 14);
+
+macu 1  29 1 y
+  macu %d,%c
+  d = %d24; // d is 24bits unsigned
+  creg = c = %c;
+  r = (INT64)(INT32)c * (INT64)d;
+  macc = %ml + (r >> 7);
+
+macu 1  2a 1 y
+  macu a,%d
+  d = %d24; // d is 24bits unsigned
+  creg = c = %a;
+  r = (INT64)(INT32)c * (INT64)d;
+  macc = %ml + (r >> 7);
+
+mpy  1  21 1 y
+  mpy %d,%c
+  d = %d24;
+  if(d & 0x00800000)
+    d |= 0xff000000;
+  creg = c = %c;
+  r = (INT64)(INT32)c * (INT64)(INT32)d;
+  macc = r >> 7;
+
+mpy  1  22 1 y
+  mpy %c,a
+  creg = c = %c;
+  r = (INT64)(INT32)c * (INT64)(INT32)%a;
+  macc = r >> 15;
+
+mpy  1  23 1 y
+  mpy creg,%d
+
+mpyu 1  28 1 y
+  mpyu %d,%c
+  creg = c = %c;
+  d = %d24; // d is 24bits unsigned
+  r = (INT64)(INT32)c * (INT64)d;
+  macc = r >> 7;
+
+neg  1  02 1 n
+  neg
+
+or   1  17 1 n
+  or %d,a
+  %sfai(d, %d);
+  aacc |= d;
+
+or   1  18 1 n
+  or %c,a
+  aacc |= %c;
+
+or   1  19 1 n
+  or %d,%c
+  %sfai(d, %d);
+  aacc = %c | d;
+
+raov 2a 38 1 n
+  raov
+
+rde  1  39 1 n
+  rde %c
+  if(sti & (S_READ|S_WRITE))
+    break;
+  xoa = %c;
+  xm_init();
+  sti |= S_READ;
+
+ref  2a 0e 1 n
+  ref
+  /* nothing to do */
+
+rmom 2a 40 1 n f
+  rmom
+  st1 &= ~ST1_MOVM;
+
+rmov 2a 3a 1 n
+  rmov
+  st1 &= ~ST1_MOV;
+
+rnd  2a 68 1 n f
+  rnd 48
+  st1 = (st1 & ~ST1_RND) | (0 << ST1_RND_SHIFT);
+
+rnd  2a 69 1 n f
+  rnd 32
+  st1 = (st1 & ~ST1_RND) | (1 << ST1_RND_SHIFT);
+
+rnd  2a 6a 1 n f
+  rnd 24
+  st1 = (st1 & ~ST1_RND) | (2 << ST1_RND_SHIFT);
+
+rnd  2a 6b 1 n f
+  rnd 20
+  st1 = (st1 & ~ST1_RND) | (3 << ST1_RND_SHIFT);
+
+rnd  2a 6c 1 n f
+  rnd 16
+  st1 = (st1 & ~ST1_RND) | (4 << ST1_RND_SHIFT);
+
+rnd  2a 6d 1 n f
+  rnd <5>
+  st1 = (st1 & ~ST1_RND) | (5 << ST1_RND_SHIFT);
+
+rnd  2a 6e 1 n f
+  rnd <6>
+  st1 = (st1 & ~ST1_RND) | (6 << ST1_RND_SHIFT);
+
+rnd  2a 6f 1 n f
+  rnd <7>
+  st1 = (st1 & ~ST1_RND) | (7 << ST1_RND_SHIFT);
+
+rptk 3  10 1 n
+  rptk %i
+  rptc_next = %i;
+
+sacc 2a 01 1 y
+  sacc %c
+  %wc(%a);
+
+sacd 2a 02 1 y
+  sacd %d
+  %wd(%a >> 8);
+
+scrm 2a 48 1 n f
+  scrm 32
+  st1 = (st1 & ~ST1_CRM) | (0 << ST1_CRM_SHIFT);
+
+scrm 2a 49 1 n f
+  scrm 16h
+  st1 = (st1 & ~ST1_CRM) | (1 << ST1_CRM_SHIFT);
+
+scrm 2a 4a 1 n f
+  scrm 16l
+  st1 = (st1 & ~ST1_CRM) | (2 << ST1_CRM_SHIFT);
+
+scrm 2a 4b 1 n f
+  scrm <3>
+  st1 = (st1 & ~ST1_CRM) | (3 << ST1_CRM_SHIFT);
+
+sfai 2b 54 1 n f
+  sfai 0
+  st1 &= ~ST1_SFAI;
+
+sfai 2b 55 1 n f
+  sfai -1
+  st1 |= ST1_SFAI;
+
+sfao 2a 50 1 n f
+  sfao 0
+  st1 &= ~ST1_SFAO;
+
+sfao 2a 51 1 n f
+  sfao 7
+  st1 |= ST1_SFAI;
+
+sfma 2b 58 1 n f
+  sfma 0
+  st1 = (st1 & ~ST1_SFMA) | (0 << ST1_SFMA_SHIFT);
+
+sfma 2b 59 1 n f
+  sfma 2
+  st1 = (st1 & ~ST1_SFMA) | (1 << ST1_SFMA_SHIFT);
+
+sfma 2b 5a 1 n f
+  sfma 4
+  st1 = (st1 & ~ST1_SFMA) | (2 << ST1_SFMA_SHIFT);
+
+sfma 2b 5b 1 n f
+  sfma -16
+  st1 = (st1 & ~ST1_SFMA) | (3 << ST1_SFMA_SHIFT);
+
+sfml 1  34 1 y
+  sfml
+  macc = (macc & 0x8000000000000ULL) | ((macc << 1) & 0x7ffffffffffffULL);
+
+sfmo 2a 60 1 n f
+  sfmo 0
+  st1 = (st1 & ~ST1_SFMO) | (0 << ST1_SFMO_SHIFT);
+
+sfmo 2a 61 1 n f
+  sfmo 2
+  st1 = (st1 & ~ST1_SFMO) | (1 << ST1_SFMO_SHIFT);
+
+sfmo 2a 62 1 n f
+  sfmo 4
+  st1 = (st1 & ~ST1_SFMO) | (2 << ST1_SFMO_SHIFT);
+
+sfmo 2a 63 1 n f
+  sfmo -8
+  st1 = (st1 & ~ST1_SFMO) | (3 << ST1_SFMO_SHIFT);
+
+sfmr 1  35 1 y
+  sfmr
+
+slmh 2a 06 1 y
+  slmh %d
+  %wd((%mv >> 24) & 0xffff00);
+
+slml 2a 07 1 y
+  slml %d
+  %wd((%mv >> 8) & 0xffffff);
+
+smhc 2a 05 1 y
+  smhc %c
+  %wc(%mo >> 16);
+
+smhd 2a 03 1 y
+  smhd %d
+  %wd((%mo >> 24) & 0xffffff);
+
+smld 2a 04 1 y
+  smld %d
+
+smom 2a 41 1 n f
+  smom
+  st1 |= ST1_MOVM;
+
+srbd 2a 0f 1 y
+  srbd %d
+  %wd(xrd);
+
+std1 2a 0d 1 y
+  std1 %d
+
+sub  1  09 1 y
+  sub %d,a
+  %wa((INT64)(INT32)%d - (INT64)(INT32)%a);
+
+sub  1  0a 1 y
+  sub %c,a
+  %wa((INT64)(INT32)%c - (INT64)(INT32)%a);
+
+sub  1  0b 1 y
+  sub %d,m
+
+sub  1  0c 1 y
+  sub %c,m
+
+sub  1  0d 1 y
+  sub %d,%c
+  %wa((INT64)(INT32)%d - (INT64)(INT32)%c);
+
+wre  1  38 1 n
+  wre %d,%c
+  if(sti & (S_READ|S_WRITE))
+    break;
+  xwr = %d24;
+  xoa = %c;
+  xm_init();
+  sti |= S_WRITE;
+
+xor  1  1a 1 n
+  xor %d,a
+
+xor  1  1b 1 n
+  xor %c,a
+
+xor  1  1c 1 n
+  xor %d,%c
+
+zacc 1  10 1 n
+  zacc
+
+zmac 1  30 1 n
+  zmac

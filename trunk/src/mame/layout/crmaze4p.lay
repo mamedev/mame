@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="ESCAPE" defstate="0">
+		<disk state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.5" green="0.0" blue="0.0" />
+		</disk>
+		<disk state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="1" y="1" width="5" height="5" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<text string="ESCAPE" state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="4" height="4" />
+		</text>
+		<text string="ESCAPE" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="4" height="4" />
+		</text>
+	</element>
+
+	<element name="digit" defstate="0">
+	<led7seg>
+		<color red="1.0" green="0.0" blue="0.0" />
+	</led7seg>
+	</element>
+	<element name="P1" defstate="0">
+		<text string="Player 1" state="0">
+			<color red="0.5" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.1" width="4" height="4" />
+		</text>
+	</element>
+
+	<element name="P2" defstate="0">
+		<text string="Player 2" state="0">
+			<color red="0.5" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.1" width="4" height="4" />
+		</text>
+	</element>
+	<element name="P3" defstate="0">
+		<text string="Player 3" state="0">
+			<color red="0.5" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.1" width="4" height="4" />
+		</text>
+	</element>
+
+	<element name="P4" defstate="0">
+		<text string="Player 4" state="0">
+			<color red="0.5" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.1" width="4" height="4" />
+		</text>
+	</element>
+
+	<view name="Monitor and Lamps">
+		<bezel name="lamp41" element="ESCAPE">
+			<bounds x="514" y="267" width="30" height="30" />
+		</bezel>
+		<bezel name="P1" element="P1">
+			<bounds x="508" y="180" width="20" height="12" />
+		</bezel>
+		<bezel name="P2" element="P2">
+			<bounds x="530" y="180" width="20" height="12" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds x="510" y="200" width="5" height="10" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds x="516" y="200" width="5" height="10" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds x="532" y="200" width="5" height="10" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="538" y="200" width="5" height="10" />
+		</bezel>
+		<bezel name="P3" element="P3">
+			<bounds x="508" y="220" width="20" height="12" />
+		</bezel>
+		<bezel name="P4" element="P4">
+			<bounds x="530" y="220" width="20" height="12" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="510" y="240" width="5" height="10" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="516" y="240" width="5" height="10" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="532" y="240" width="5" height="10" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="538" y="240" width="5" height="10" />
+		</bezel>
+		<screen index="0">
+			<bounds x="0" y="0" width="504" height="296" />
+		</screen>
+	</view>
+</mamelayout>

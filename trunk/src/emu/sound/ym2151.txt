@@ -1,0 +1,162 @@
+
+This is some very technical info I found during my experiments with real chip.
+I hope someone will find it interesting.
+
+
+           YM2151 TIMING DIAGRAM
+           +-------------------------------------------------------------------------------------------------------------------------------|---------
+Cycle no.  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |10 |11 |12 |13 |14 |15 |16 |17 |18 |19 |20 |21 |22 |23 |24 |25 |26 |27 |28 |29 |30 |31 | 0 | 1 |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+-
+           |  _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _|  _   _
+D/A clock  |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_
+           |                                                                                                                               |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+-
+           |                                _______________________________                                                                |
+SH1 signal |_______________________________|                               |_______________________________________________________________|_________
+           |                                                                                                                               |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+-
+           |                                                                                                _______________________________|
+SH2 signal |_______________________________________________________________________________________________|                               |_________
+           |                                                                                                                               |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+-
+           |                                                               |                                                               |
+SO         | x | x | x | D0| D1| D2| D3| D4| D5| D6| D7| D8| D9| S0| S1| S2| x | x | x | D0| D1| D2| D3| D4| D5| D6| D7| D8| D9| S0| S1| S2| x | x |
+(D/A data) |                                                               |                                                               |
+           |                    R I G H T  C H A N N E L                   |                    L E F T  C H A N N E L                     |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+-
+READ       |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+INTERNAL CH| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 0 | 1 |
+DATA     OP| C2| C2| C2| C2| C2| C2| C2| C2| M1| M1| M1| M1| M1| M1| M1| M1| M2| M2| M2| M2| M2| M2| M2| M2| C1| C1| C1| C1| C1| C1| C1| C1| C2| C2|
+           |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ operator #| 24| 25| 26| 27| 28| 29| 30| 31| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25|
+           +---------------------------------------------------------------|---------------------------------------------------------------|---------
+
+
+	Note:
+	-----
+	The SO (D/A data) is sequentially output to the YM3012 (stereo) or YM3014 (mono).
+	Formula to calculate sample from SO data is:
+	N = S2(2^2) + S1(2^1) + S0
+	where	S2 = S1 = S0 = 0 - not allowed
+	SAMPLE = (-1+D9 + D8(2^-1) + D7(2^-2) + D6(2^-3) + ... + D0(2^-9) + 2^-10) * 2^-N
+
+	Anyway, important is that SO data is delayed by one sample compared to READ INTERNAL DATA.
+	This is logical since chip has to sum all channels' outputs before it will send SO data
+	(this is what the ACC (accumulator) does).
+
+
+
+YM2151 Test register (0x01):
+
+	+----------+-----+------+-----+-----+------+------+------+-------+
+	| bit no.  |  7  |   6  |  5  |  4  |   3  |   2  |   1  |    0  |
+	+----------+-----+------+-----+-----+------+------+------+-------+
+	| hex val. | 80  |  40  | 20  | 10  |  08  |  04  |  02  |   01  |
+	+----------+-----+------+-----+-----+------+------+------+-------+
+	|          |LS/MS| RIen | HEG | NEG | HPGL | ILFO | HLFO | u_clk |
+	+----------+-----+------+-----+-----+------+------+------+-------+
+
+
+bit 6 - RIen (Read Internal data Enable)
+
+	When set to 1, chip's internal data can be read via status register.
+
+	Simply set this bit and read data that will come out sequentially via the 8-bit
+	bus. Format of this data and the timing will be described later (diagram is above).
+
+
+
+bit 7 - LS/MS (Least Significant or Most Significant 8 bits of internal data)
+
+	When 0 - chip's internal data read via status register is lower 8 bits (LSB),
+	When 1 - chip's internal data is upper 8 bits (MSB) (plus something I haven't figured out).
+
+	In other words: in order to read 8 LSB bits set this bit to 0, in order to read
+	8 MSB bits set this bit to 1.
+
+
+
+bit 5 - HEG (Halt Envelope Generator)
+
+	When 1 - Envelope Generator gets halted.
+
+	This means that	*Phase* Generator data can be read out when:
+ 	HEG bit is set to 1 (EG gets halted), and data coming out via the status register
+	will be pure sinus wave at the _CURRENT_ EG output.
+	This means you need to know _EXACTLY_ when to set this bit.
+
+	Simple workaround is to do the following:
+	- TL (Total Level) of the operator to minimum dB value (0x00) - it is max volume,
+	- AR (Attack Rate) of the operator to maximum speed (shortest time) (0x1f),
+	- D1L (Decay Level) of the operator to max (93 dB) (0xf0),
+	- D1R (Decay Rate) of the operator to zero (infinite time) speed (0x00),
+	- set KEYON of that operator,
+	- wait a while (long enough so Attack phase of the EG can be done),
+	- set HEG bit in the test register to 1,
+	and its done, since EG will be halted generating 0 (zero) dB level for
+	that operator (exactly speaking EG will stay in D1R phase) and, since 0 dB from EG
+	means no change on the sinus data stored inside of the chip's internal ROM,
+ 	you can read this ROM data.
+
+	Careful reader will notice that it may not be needed to use HEG bit to read the data
+	(bacause EG will be at 0dB anyway), but using this bit, one can make samples
+	of pure PHASE generator innerworking - that is how I obtained phaseinc_rom[].
+
+
+
+bit 4 - NEG (Negate output data)
+
+	When 1 - output data sign will be simply inverted.
+
+	Worth noticing is that when this bit is 1 - also chip output data will be negated,
+ 	causing bad sound coming out of the speakers since the YM3012 (the D/A converter)
+ 	does not expect the negated data !!!
+
+
+
+bit 3 - HPGL (Halt Phase Generator AND LFO amplitude modulation)
+
+	When 1 - Phase Generator is halted. Also amplitude modulation
+		(from LFO to Envelope Generator) is halted.
+
+	You can use this bit to analyse Envelope Generator work.
+	As it was in the case of HEG bit you need to know _EXACTLY_ when to set this bit.
+	Unfortunately, there is no _simple_ way. You will need to synchronise on the chip
+	output signals to know when to set it.
+
+
+
+bit 2 - ILFO (Internal LFO related)
+
+	When 1 - LFO output (depends on selected waveform)
+
+	LFO outputs some internal signals...what are they ?
+	I did not test if this bit alters Phase Modulation in any way.
+
+	Also alters timer A somehow. At least it sounds like a restart.
+
+
+
+bit 1 - HLFO (Halt LFO)
+
+	When 1 - LFO gets HALTED (at maximum amplitude in case of AM).
+
+	On the 1 to 0 transition LFO will be RESET to startup of the waveform
+	(phase of the LFO _only_).
+
+
+
+bit 0 - u_clk (unknown, but probably internal clock related)
+
+	When 1 - Envelope Generator times are much shorter (faster envelopes).
+
+	I do not know if it alters Attacks parts of the envelope. I'm sure it
+	alters Decays times. Also timers are much (twice ?) faster than normally.
+	Perhaps this bit is disabling some internal clock divider.
+	FWIW, frequencies of the operators are NOT altered by setting this bit.
+
+
+Jarek Burczynski
+
+s0246@poczta.onet.pl
+bujar at mame dot net

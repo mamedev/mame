@@ -1,0 +1,1061 @@
+.\"  -*- nroff -*-
+.\"
+.\" mame.6
+.\"
+.\" Man page created from usage and source information:
+.\" * commands: see src/emu/clifront.c clifront.h
+.\" * options: core entries, see src/emu/emuopts.c emuopts.h
+.\"            SDL-specific entries, see src/osd/sdl/sdlmain.c osdsdl.h
+.\" Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\"
+.\" Also, some text borrowed from the xmame 0.106 man page,
+.\" done by Rene Herrmann <rene.herrmann@berlin.de>, September 2000
+.\" and updated by Andrew Burton <burtona@gol.com>, July 2003
+.\"
+.\"
+.TH MAME 1 2012-03-25 0.145u5 "MAME \- The Multiple Arcade Machine Emulator"
+.\"
+.\"
+.\" NAME chapter
+.SH NAME
+MAME \- The Multiple Arcade Machine Emulator
+.\"
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B mame
+.RI [ options ]
+.I gamename
+.\"
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+Started in 1997 by Nicola Salmoria, MAME was originally intended as a series
+of emulators for individual games, which were later combined into a single
+multi\-game emulator. In the following years, MAME grew over and over up to
+the actual size, with more than 100 contributors to the project.
+.\"
+.\"
+.\" OPTIONS chapter
+.SH OPTIONS
+.\"
+.\" *******************************************************
+.SS Core commands
+.\" *******************************************************
+.TP
+.B \-help, \-?
+Displays current MAME version and copyright notice.
+.TP
+.B \-validate, \-valid
+Performs internal validation on every driver in the system. Run this
+before submitting changes to ensure that you haven't violated any of
+the core system rules.
+.\"
+.\" *******************************************************
+.SS Configuration commands
+.\" *******************************************************
+.TP
+.B \-createconfig, \-cc
+Creates the default \fBmame.ini\fP file in the current directory. All the
+configuration options (not commands) described below can be permanently
+changed by editing this configuration file.
+.TP
+.B \-showconfig, \-sc
+Displays the current configuration settings.
+.TP
+.B \-showusage, \-su
+Displays a summary of all the command line options. For options that
+are not mentioned here, the short summary given by
+\fBmame \-showusage\fR is usually sufficient.
+.\"
+.\" *******************************************************
+.SS Frontend commands
+.\" *******************************************************
+.B NOTE:
+By default, all the '\-list' commands below write info to the screen.
+If you wish to write the info to a textfile instead, use redirection, e.g.
+.B mame \-listxml > ~/mamelist.xml
+writes the full list of supported game to file \fImamelist.xml\fR in your home
+directory.
+.TP
+.B \-listxml, \-lx \fR[\fIgamename\fR|\fIwildcard\fR]
+List comprehensive details for all of the supported games. The output
+is quite long, so it is usually better to redirect this into a file.
+The output is in XML format. By default all games are listed; however,
+you can limit this list by specifying a driver name or wildcard after
+the \-listxml command.
+.TP
+.B \-listfull, \-ll \fR[\fIgamename\fR|\fIwildcard\fR]
+Displays a list of game driver names and descriptions. By default all
+games are listed; however, you can limit this list by specifying a
+driver name or wildcard after the \-listfull command.
+.TP
+.B \-listsource, \-ls \fR[\fIgamename\fR|\fIwildcard\fR]
+Displays a list of drivers and the names of the source files their game
+drivers live in. Useful for finding which driver a game runs on in
+order to fix bugs. By default all games are listed; however, you can
+limit this list by specifying a driver name or wildcard after the
+\-listsource command.
+.TP
+.B \-listclones, \-lc \fR[\fIgamename\fR|\fIwildcard\fR]
+Displays a list of clones. By default all clones are listed; however,
+you can limit this list by specifying a driver name or wildcard after
+the \-listclones command.
+.TP
+.B \-listbrothers, \-lb \fR[\fIgamename\fR|\fIwildcard\fR]
+Displays a list of "brothers" or other drivers from same sourcefile.
+By default all games are listed; however, you can limit this list by
+specifying a driver name or wildcard after the \-listbrothers command.
+.TP
+.B \-listcrc
+Displays a full list of CRCs of all ROM images referenced by all
+drivers within MAME code.
+.TP
+.B \-listroms \fIgamename
+Displays a list of ROM images referenced by the specified game.
+.TP
+.B \-listsamples \fIgamename
+Displays a list of samples referenced by the specified game.
+.TP
+.B \-verifyroms \fR[\fIgamename\fR|\fIwildcard\fR]
+Checks for invalid or missing ROM images. By default all drivers that
+have valid ZIP files or directories in the rompath are verified;
+however, you can limit this list by specifying a driver name or
+wildcard after the \-verifyroms command.
+.TP
+.B \-verifysamples \fR[\fIgamename\fR|\fIwildcard\fR]
+Checks for invalid or missing samples. By default all drivers that
+have valid ZIP files or directories in the samplepath are verified;
+however, you can limit this list by specifying a driver name or
+wildcard after the \-verifyroms command.
+.TP
+.B \-romident
+Attempts to identify ROM files, if they are known to MAME, in the
+specified .zip file or directory. This command can be used to try and
+identify ROM sets taken from unknown boards. On exit, the errorlevel
+is returned as one of the following:
+.br
+\fB0\fR  all files were identified
+.br
+\fB7\fR  all files were identified except for some "non\-ROM" files
+.br
+\fB8\fR  some files were identified
+.br
+\fB9\fR  no files were identified
+.TP
+.B \-listdevices, \-ld
+Output the list of devices referenced by a given game or set of games.
+.TP
+.B \-listslots, \-lslot
+Output the list of available slots and slot devices for the system.
+.TP
+.B \-listmedia, \-lm
+Output the list of available media for the system.
+.TP
+.B \-listsoftware, \-lsoft
+Output the list of known software for the system.
+.TP
+.B \-getsoftlist, \-glist
+Retrieve software list by name.
+.\"
+.\" *******************************************************
+.SS Configuration options
+.\" *******************************************************
+.TP
+.B \-[no]readconfig, \-[no]rc
+Enables or disables the reading of the config files. When enabled
+(which is the default), MAME reads the following config files in order:
+.br
+1. \fBmame.ini\fR
+.br
+the main configuration file
+.br
+2. \fI[name]\fB.ini\fR
+.br
+where \fIname\fR is your executable name, i.e. mame unless you changed it
+(e.g. if you renamed mame to mame0137, the parsed file will be
+\fImame0137.ini\fR)
+.br
+3. \fBdebug.ini\fR, if the debugger is enabled
+.br
+4. \fBvector.ini\fR, for vector games only
+.br
+5. \fI[driver]\fB.ini\fR
+.br
+based on the source filename of the game driver
+.br
+6. \fI[parent]\fB.ini\fR
+.br
+for clones only, may be called recursively
+.br
+7. \fI[gamename]\fB.ini\fR
+.br
+note this sometimes resolves to the same of the source driver
+.br
+The settings in the later ini's override those in the earlier ini's.
+So, for example, if you wanted to disable overlay effects in the
+vector games, you can create a vector.ini with the "effect none" line
+in it, and it will override whatever effect value you have in your
+mame.ini. The default is ON (\-readconfig).
+.TP
+.B \-writeconfig, \-wc
+Write configuration to \fI[driver]\fR.ini on exit.
+.\"
+.\" *******************************************************
+.SS Search path options
+.\" *******************************************************
+.B IMPORTANT\fR: Please use the path, directory and file options in
+mame.ini \fBONLY\fR. Otherwise, the outcome may be unpredictable and not
+consistent across releases.
+.TP
+.B \-rompath, \-rp, \-biospath, \-bp, \fIpathname
+Specifies a list of paths within which to find ROM or hard disk images.
+Multiple paths can be specified by separating them with semicolons.
+The default is 'roms' (that is, a directory "roms" in the same directory
+as the MAME executable).
+.TP
+.B \-samplepath, \-sp \fIpathname
+Specifies a list of paths within which to find sample files. Multiple
+paths can be specified by separating them with semicolons. The default
+is 'samples' (that is, a directory "samples" in the same directory as
+the MAME executable).
+.TP
+.B \-artpath, \-artwork_directory \fIpathname
+Specifies a list of paths within which to find artwork files. Multiple
+paths can be specified by separating them with semicolons. The default
+is 'artwork' (that is, a directory "artwork" in the same directory as
+the MAME executable).
+.TP
+.B \-ctrlrpath, \-ctrlr_directory \fIpathname
+Specifies a list of paths within which to find controller\-specific
+configuration files. Multiple paths can be specified by separating
+them with semicolons. The default is 'ctrlr' (that is, a directory
+"ctrlr" in the same directory as the MAME executable).
+.TP
+.B \-inipath \fIpathname
+Specifies a list of paths within which to find .INI files. Multiple
+paths can be specified by separating them with semicolons. The default
+is '/etc/mame/'.
+.TP
+.B \-fontpath \fIpathname
+Specifies a list of paths within which to find .BDF font files. Multiple
+paths can be specified by separating them with semicolons. The default
+is '.' (that is, search in the same directory as the MAME executable).
+.TP
+.B \-cheatpath \fIpathname
+Specifies a list of paths within which to find cheat files. Multiple
+paths can be specified by separating them with semicolons. The default
+is 'cheat' (that is, a directory "cheat" in the same directory as
+the MAME executable).
+.TP
+.B \-crosshairpath \fIpathname
+Specifies a list of paths within which to find crosshair files. Multiple
+paths can be specified by separating them with semicolons. The default
+is 'crosshair' (that is, a directory "crosshair" in the same directory as
+the MAME executable).  If the Crosshair is set to default in the menu,
+MAME will look for gamename\cross#.png and then cross#.png in the
+specified crosshairpath, where # is the player number.  Failing that,
+MAME will use built\-in default crosshairs.
+.\"
+.\" *******************************************************
+.SS Output Directory Options
+.\" *******************************************************
+.TP
+.B \-cfg_directory \fIpathname
+Specifies a single directory where configuration files are stored.
+Configuration files store user configurable settings that are read at
+startup and written when MAME exits. The default is 'cfg' (that is,
+a directory "cfg" in the same directory as the MAME executable). If this
+directory does not exist, it will be automatically created.
+.TP
+.B \-nvram_directory \fIpathname
+Specifies a single directory where NVRAM files are stored. NVRAM files
+store the contents of EEPROM and non\-volatile RAM (NVRAM) for games
+which used this type of hardware. This data is read at startup and
+written when MAME exits. The default is 'nvram' (that is, a directory
+"nvram" in the same directory as the MAME executable). If this directory
+does not exist, it will be automatically created.
+.TP
+.B \-memcard_directory \fIpathname
+Specifies a single directory where memory card files are stored. Memory
+card files store the contents of removable memory cards for games which
+used this type of hardware. This data is read and written under control
+of the user via the "Memory Card" menu in the user interface. The
+default is 'memcard' (that is, a directory "memcard" in the same
+directory as the MAME executable). If this directory does not exist,
+it will be automatically created.
+.TP
+.B \-input_directory \fIpathname
+Specifies a single directory where input recording files are stored.
+Input recordings are created via the \-record option and played back via
+the \-playback option. The default is 'inp' (that is, a directory
+"inp" in the same directory as the MAME executable). If this directory
+does not exist, it will be automatically created.
+.TP
+.B \-state_directory \fIpathname
+Specifies a single directory where save state files are stored. Save
+state files are read and written either upon user request, or when using
+the \-autosave option. The default is 'sta' (that is, a directory "sta"
+in the same directory as the MAME executable). If this directory does
+not exist, it will be automatically created.
+.TP
+.B \-snapshot_directory \fIpathname
+Specifies a single directory where screen snapshots are stored, when
+requested by the user. The default is 'snap' (that is, a directory
+"snap" in the same directory as the MAME executable). If this directory
+does not exist, it will be automatically created.
+.TP
+.B \-diff_directory \fIpathname
+Specifies a single directory where hard drive differencing files are
+stored. Hard drive differencing files store any data that is written
+back to a hard disk image, in order to preserve the original image. The
+differencing files are created at startup when a game with a hard disk
+image. The default is 'diff' (that is, a directory "diff" in the same
+directory as the MAME executable). If this directory does not exist,
+it will be automatically created.
+.TP
+.B \-comment_directory \fIpathname
+Specifies a single directory where debugger comment files are stored.
+Debugger comment files are written by the debugger when comments are
+added to the disassembly for a game. The default is 'comments' (that is,
+a directory "comments" in the same directory as the MAME executable).
+If this directory does not exist, it will be automatically created.
+.\"
+.\" *******************************************************
+.SS State/playback options
+.\" *******************************************************
+.TP
+.B \-state \fIslot
+Immediately after starting the specified game, will cause the save
+state in the specified \fIslot\fP to be loaded.
+.TP
+.B \-[no]autosave
+When enabled, automatically creates a save state file when exiting MAME
+and automatically attempts to reload it when later starting MAME with
+the same game. This only works for games that have explicitly enabled
+save state support in their driver. The default is OFF (\-noautosave).
+.TP
+.B \-playback, \-pb \fIfilename
+Specifies a file from which to play back a series of game inputs. This
+feature does not work reliably for all games, but can be used to watch
+a previously recorded game session from start to finish. In order to
+make things consistent, you should only record and playback with all
+configuration (.cfg), NVRAM (.nv), and memory card files deleted. The
+default is NULL (no playback).
+.TP
+.B \-record, \-rec \fIfilename
+Specifies a file to record all input from a game session. This can be
+used to record a game session for later playback. This feature does not
+work reliably for all games, but can be used to watch a previously
+recorded game session from start to finish. In order to make things
+consistent, you should only record and playback with all configuration
+(.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL
+(no recording).
+.TP
+.B \-snapname \fIname
+Describes how MAME should name files for snapshots. \fIname\fP is a string
+that provides a template that is used to generate a filename. Three
+simple substitutions are provided: the / character represents the
+path separator on any target platform (even Windows); the string \fI%g\fP
+represents the driver name of the current game; and the string \fI%i\fP
+represents an incrementing index. If \fI%i\fP is omitted, then each
+snapshot taken will overwrite the previous one; otherwise, MAME will
+find the next empty value for \fI%i\fP and use that for a filename. The
+default is \fI%g/%i\fP, which creates a separate folder for each game,
+and names the snapshots under it starting with 0000 and increasing
+from there.
+.TP
+.B \-snapsize \fIwidth\fPx\fIheight\fP
+Hard\-codes the size for snapshots and movie recording. By default,
+MAME will create snapshots at the game's current resolution in raw
+pixels, and will create movies at the game's starting resolution in
+raw pixels. If you specify this option, then MAME will create both
+snapshots and movies at the size specified, and will bilinear filter
+the result. Note that this size does not automatically rotate if the 
+game is vertically oriented. The default is 'auto'.
+.TP
+.B \-snapview \fIviewname\fP
+Specifies the view to use when rendering snapshots and movies. By
+default, both use a special 'internal' view, which renders a separate
+snapshot per screen or renders movies only of the first screen. By
+specifying this option, you can override this default behavior and
+select a single view that will apply to all snapshots and movies.
+Note that \fIviewname\fP does not need to be a perfect match; rather, it
+will select the first view whose name matches all the characters
+specified by \fIviewname\fP. For example, \-snapview native will match the 
+"Native (15:14)" view even though it is not a perfect match. 
+\fIviewname\fP can also be 'auto', which selects the first view with all
+screens present. The default value is 'internal'.
+.TP
+.B \-mngwrite \fIfilename
+Writes each video frame to the given \fIfilename\fP in MNG format, producing
+an animation of the	game session. Note that \-mngwrite only writes video
+frames; it does not save any audio data. Use \-wavwrite for that, and
+reassemble the audio/video using offline tools. The default is NULL (no
+recording).
+.TP
+.B \-aviwrite \fIfilename
+Stream video and sound data to the given \fIfilename\fP in AVI format,
+producing an animation of the game session complete with sound. The
+default is NULL (no recording).
+.TP
+.B \-wavwrite \fIfilename
+Writes the final mixer output to the given \fIfilename\fP in WAV format,
+producing an audio recording of the	game session. The default is NULL
+(no recording).
+.TP
+.B \-[no]burnin
+Tracks brightness of the screen during play and at the end of 
+emulation generates a PNG that can be used to simulate burn\-in
+effects on other games. The resulting PNG is created such that the
+least used\-areas of the screen are fully white (since burned\-in areas 
+are darker, all other areas of the screen must be lightened a touch).
+The intention is that this PNG can be loaded via an artwork file with
+a low alpha (e.g, 0.1\-0.2 seems to work well) and blended over the
+entire screen. The PNG files are saved in the snap directory under 
+the gamename\\burnin\-<screen.name>.png. The default is OFF (\-noburnin).
+.\"
+.\" *******************************************************
+.SS Performance options
+.\" *******************************************************
+.TP
+.B \-[no]autoframeskip, \-[no]afs
+Automatically determines the frameskip level while you're playing the
+game, adjusting it constantly in a frantic attempt to keep the game
+running at full speed. Turning this on overrides the value you have set
+for \-frameskip below. The default is OFF (\-noautoframeskip).
+.TP
+.B \-frameskip, \-fs \fIvalue
+Specifies the frameskip value (autoframeskip must be disabled). This is the
+number of frames out of every 12 to drop when running. For example, if you
+say \-frameskip 2, then MAME will display 10 out of every 12 frames. By
+skipping those frames, you may be able to get full speed in a game that
+requires more horsepower than your computer has. The default value is 0,
+which skips no frames.
+.TP
+.B \-seconds_to_run, \-str \fIvalue
+This option can be used for benchmarking and automated testing. It tells 
+MAME to stop execution after a fixed number of seconds. By combining 
+this with a fixed set of other command line options, you can set up a 
+consistent environment for benchmarking MAME performance. In addition, 
+upon exit, the \-str option will write a screenshot called final.png
+to the game's snapshot directory.
+.TP
+.B \-[no]throttle
+Configures the default thottling setting. When throttling is on, MAME
+attempts to keep the game running at the game's intended speed. When
+throttling is off, MAME runs the game as fast as it can. Note that the
+fastest speed is more often than not limited by your graphics card,
+especially for older games. The default is ON (\-throttle).
+.TP
+.B \-[no]sleep
+Allows MAME to give time back to the system when running with \-throttle.
+This allows other programs to have some CPU time, assuming that the
+game isn't taxing 100% of your CPU resources. This option can potentially
+cause hiccups in performance if other demanding programs are running.
+The default is ON (\-sleep).
+.TP
+.B \-speed
+Controls the speed of gameplay, relative to realtime; smaller numbers are
+slower. Default is 1.00.
+.TP
+.B \-refreshspeed, \-rs
+Automatically adjusts the \fB\-speed\fR parameter to keep the effective refresh
+rate below that of the lowest screen refresh rate.
+.\"
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-multithreading, \-mt
+Enable multithreading; this enables rendering and blitting on a separate
+thread. The default is OFF.
+.TP
+.B \-numprocessors, \-np
+Set number of processors; this overrides the number the system reports.
+.TP
+.B \-sdlvideofps
+Show SDL video performance.
+.TP
+.B \-bench
+Benchmark for the given number of emulated seconds;
+implies \-video none \-nosound \-nothrottle.
+.\"
+.\" *******************************************************
+.SS Rotation options
+.\" *******************************************************
+.TP
+.B \-[no]rotate
+Rotate the game to match its normal state (horizontal/vertical). This
+ensures that both vertically and horizontally oriented games show up
+correctly without the need to rotate your monitor. If you want to keep
+the game displaying 'raw' on the screen the way it would have in the
+arcade, turn this option OFF. The default is ON (\-rotate).
+.TP
+.B \-[no]ror | \-[no]rol
+Rotate the game screen to the right (clockwise) or left (counter\-
+clockwise) relative to either its normal state (if \-rotate is specified)
+or its native state (if \-norotate is specified). The default for both of
+these options is OFF (\-noror \-norol).
+.TP
+.B \-[no]autoror | \-[no]autorol
+These options are designed for use with pivoting screens that only
+pivot in a single direction. If your screen only pivots clockwise,
+use \-autorol to ensure that the game will fill the screen either
+horizontally or vertically in one of the directions you can handle.
+If your screen only pivots counter\-clockwise, use \-autoror.
+.TP
+.B \-[no]flipx
+.TP
+.B \-[no]flipy
+Flip (mirror) the game screen either horizontally (\-flipx) or
+vertically (\-flipy). The flips are applied after the \-rotate and
+\-ror/\-rol options are applied. The default for both of these options
+is OFF (\-noflipx \-noflipy).
+.\"
+.\" *******************************************************
+.SS Artwork options
+.\" *******************************************************
+.TP
+.B \-[no]artwork_crop, \-[no]artcrop
+Enable cropping of artwork to the game screen area only. This
+option can also be controlled via the Video Options menu in the user
+interface. The default is OFF (\-noartwork_crop).
+.TP
+.B \-[no]use_backdrops, \-[no]backdrop
+Enables/disables the display of backdrops. The default is ON
+(\-use_backdrops).
+.TP
+.B \-[no]use_overlays, \-[no]overlay
+Enables/disables the display of overlays. The default is ON
+(\-use_overlays).
+.TP
+.B \-[no]use_bezels, \-[no]bezel
+Enables/disables the display of bezels. The default is ON
+(\-use_bezels).
+.TP
+.B \-[no]use_cpanels, \-[no]cpanel
+Enables/disables the display of cpanels. The default is ON
+(\-use_bezels).
+.TP
+.B \-[no]use_marquees, \-[no]marquee
+Enables/disables the display of marquees. The default is ON
+(\-use_bezels).
+.\"
+.\" *******************************************************
+.SS Screen options
+.\" *******************************************************
+.TP
+.B \-brightness \fIvalue
+Controls the default brightness, or black level, of the game screens.
+This option does not affect the artwork or other parts of the display.
+Using the MAME UI, you can individually set the brightness for each game
+screen; this option controls the initial value for all visible game
+screens. The standard value is 1.0. Selecting lower values (down to 0.1)
+will produce a darkened display, while selecting higher values (up to
+2.0) will give a brighter display. The default is 1.0.
+.TP
+.B \-contrast \fIvalue
+Controls the contrast, or white level, of the game screens. This option
+does not affect the artwork or other parts of the display. Using the
+MAME UI, you can individually set the contrast for each game screen;
+this option controls the initial value for all visible game screens. The
+standard value is 1.0. Selecting lower values (down to 0.1) will produce
+a dimmer display, while selecting higher values (up to 2.0) will
+give a more saturated display. The default is 1.0.
+.TP
+.B \-gamma \fIvalue
+Controls the gamma, which produces a potentially nonlinear black to
+white ramp, for the game screens. This option does not affect the
+artwork or other parts of the display. Using the MAME UI, you can
+individually set the gamma for each game screen; this option controls
+the initial value for all visible game screens. The standard value is
+1.0, which gives a linear ramp from black to white. Selecting lower
+values (down to 0.1) will increase the nonlinearity toward black,
+while selecting higher values (up to 3.0) will push the nonlinearity
+toward white. The default is 1.0.
+.TP
+.B \-pause_brightness \fIvalue
+This controls the brightness level when MAME is paused. The default
+value is 0.65.
+.\"
+.\" *******************************************************
+.SS Vector rendering options
+.\" *******************************************************
+.TP
+.B \-[no]antialias, \-[no]aa
+Enables antialiased line rendering for vector games. The default is ON
+(\-antialias).
+.TP
+.B \-beam \fIwidth
+Sets the width of the vectors. This is a scaling factor against the
+standard vector width. A value of 1.0 will keep the default vector line
+width. Smaller values will reduce the width, and larger values will
+increase the width. The default is 1.0.
+.TP
+.B \-flicker \fIvalue
+Simulates a vector "flicker" effect, similar to a vector monitor that
+needs adjustment. This option requires a float argument in the range of
+0.00\-100.00 (0=none, 100=maximum). The default is 0.
+.\"
+.\" *******************************************************
+.SS Video options
+.\" *******************************************************
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fIopengl16\fR|\fInone\fR]
+Specifies which video subsystem to use for drawing:
+.br
+\fBsoft\fR  uses software rendering, which is slower but more compatible.
+.br
+\fBopengl\fR  uses OpenGL and your graphics accelerator to speed up many
+aspects of drawing MAME including compositing artwork, overlays, and
+bezels, as well as stretching the image to fit your screen.
+.br
+\fBopengl16\fR  uses alternate OpenGL code, which should provide faster
+output on some cards.
+.br
+\fBnone\fR  does no drawing and is intended for CPU benchmarking.
+.br
+Default is SOFT.
+.TP
+.B \-numscreens
+Reserved for future use.
+.TP
+.B \-[no]window, \-[no]w
+Run MAME in either full screen or a window. This is a fully\-featured window
+mode where the window resizes as necessary to track what the game does.
+And you can resize it  yourself with your OS's standard window controls.
+The default is OFF (\-nowindow).
+.TP
+.B \-[no]maximize, \-[no]max
+Controls initial window size in windowed mode. If it is set on, the
+window will initially be set to the maximum supported size when you
+start MAME. If it is turned off, the window will start out at the
+smallest supported size. This option only has an effect when the 
+\-window option is used. The default is ON (\-maximize).
+.TP
+.B \-keepaspect, \-ka
+Forces the correct aspect ratio. This means when you're resizing the window
+in windowed mode the actual game image will resize in discrete steps to
+maintain the proper shape of the game graphics. If you turn this off you can
+resize the window to anything you like and get funny squishing and stretching.
+The same applies for full\-screen. Default is ON (\-keepaspect).
+.TP
+.B \-unevenstretch, \-ues
+Allow non\-integer stretch factors. Video purists should stay far, far away
+from this option, while everyone else will be happy to know that it lets you
+fill the screen properly in full\-screen mode. Default is ON (\-unevenstretch).
+.TP
+.B \-effect
+Name of a PNG file to use for visual effects, or 'none'. Default is 'none'.
+.TP
+.B \-centerh
+Center horizontally within the view area. Default is ON (\-centerh).
+.TP
+.B \-centerv
+Center vertically within the view area. Default is ON (\-centerv).
+.TP
+.B \-waitvsync
+Enable waiting for the start of VBLANK before flipping screens;
+reduces tearing effects.
+.TP
+.B \-syncrefresh
+Enable using the start of VBLANK for throttling instead of the game time.
+.\"
+.\" *******************************************************
+.SS Software video rendering subsystem options
+.\" *******************************************************
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.B NOTE:
+All the options in this group are available only with softare video 
+rendering subsystem, i.e \fB\-video soft\fR.
+.TP
+.B \-prescale
+Scale screen rendering by this amount in software. Default is 1.
+.TP
+.B \-scalemode, \-sm \fR[\fInone\fR|\fIasync\fR|\fIyv12\fR|\fIyuy2\fR|\fIyv12x2\fR|\fIyuy2x2\fR]
+Hardware scaling mode.
+.br
+\fBnone\fR    use software rendering.
+.br
+\fBasync\fR   async overlay.
+.br
+\fByv12\fR    yv12 overlay.
+.br
+\fByuy2\fR    yuy2 overlay.
+.br
+\fByv12x2\fR  yv12 overlay using x2 prescaling.
+.br
+\fByuy2x2\fR  yuy2 overlay using x2 prescaling.
+.br
+Default is NONE.
+.\"
+.\" *******************************************************
+.SS OpenGL video rendering subsystem options
+.\" *******************************************************
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.B NOTE:
+All the options in this group are available only with OpenGL video 
+rendering subsystem, i.e \fB\-video opengl\fR or \fB\-video opengl16\fR.
+.TP
+.B \-filter, \-glfilter, \-flt
+Enable bilinear filtering on screen output. Default is ON (\-filter).
+.TP
+.B \-prescale
+Scale screen rendering by this amount in software. Default is 1.
+.TP
+.B \-gl_forcepow2texture
+Force power of two textures. Default is NO.
+.TP
+.B \-gl_notexturerect
+Don't use OpenGL GL_ARB_texture_rectangle. Default is ON: turn off
+(set this to 0) if corruption occurs in OpenGL mode, at cost of some
+performance loss.
+.TP
+.B \-gl_vbo
+Enable OpenGL VBO, if available, for a performance increase.
+Default is ON: turn off (set this to 0) if corruption occurs.
+.TP
+.B \-gl_pbo
+Enable OpenGL PBO, if available, for a performance increase.
+Default is ON: turn off (set this to 0) if corruption occurs.
+.TP
+.B \-gl_glsl
+Enable OpenGL GLSL, if available, for a performance increase.
+.TP
+.B \-gl_glsl_filter
+Enable OpenGL GLSL filtering instead of FF filtering 0=plain, 1=bilinear.
+Default is 1: bilinear.
+.TP
+.B \-glsl_shader_mame[0\-9]
+Preferred custom OpenGL GLSL shader set mame bitmap (from 0 to 9).
+.TP
+.B \-glsl_shader_screen[0\-9]
+Preferred custom OpenGL GLSL shader screen bitmap (from 0 to 9).
+.TP
+.B \-gl_glsl_vid_attr
+Enable OpenGL GLSL handling of brightness and contrast. Better RGB game
+performance for free. Default is ON.
+.TP
+.B \-screen
+Explicit name for all screens; 'auto' here will try to make a best guess.
+.TP
+.B \-aspect, \-screen_aspect
+Aspect ratio for all screens; 'auto' here will try to make a best guess.
+.TP
+.B \-resolution, \-r
+Preferred resolution for all screens;
+format is \fIwidth\fRx\fIheight\fR[@\fIrefreshrate\fR] or 'auto'.
+.TP
+.B \-view
+Preferred view for all screens
+.TP
+.B \-screen[0\-3]
+Explicit name of the first|second|third|fourth screen; 'auto' here will try
+to make a best guess.
+.TP
+.B \-aspect[0\-3]
+Aspect ratio of the first|second|third|fourth screen; 'auto' here will try
+to make a best guess.
+.TP
+.B \-resolution[0\-3], \-r[0\-3]
+Preferred resolution for the first|second|third|fourth screen;
+format is \fIwidth\fRx\fIheight\fR[@\fIrefreshrate\fR] or 'auto'.
+.TP
+.B \-view[0\-3]
+Preferred view for the first|second|third|fourth screen.
+.\"
+.\" *******************************************************
+.SS Full screen options
+.\" *******************************************************
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-[no]switchres
+Affects full screen mode only. Chooses if MAME can try to change the screen
+resolution (color depth is normally left alone) when in full\-screen mode. If
+it's off, you always get your desktop resolution in full\-screen mode (which can
+be useful for LCDs).
+.TP
+.B \-useallheads
+Split full screen image across monitors.
+.\"
+.\" *******************************************************
+.SS Sound options
+.\" *******************************************************
+.TP
+.B \-[no]sound
+Enable or disable sound altogether. The default is ON (\-sound).
+.TP
+.B \-samplerate, \-sr \fIvalue
+Sets the audio sample rate. Smaller values (e.g. 11025) cause lower
+audio quality but faster emulation speed. Higher values (e.g. 48000)
+cause higher audio quality but slower emulation speed. The default is
+48000.
+.TP
+.B \-[no]samples
+Use samples if available. The default is ON (\-samples).
+.TP
+.B \-volume, \-vol \fIvalue
+Sets the startup volume. It can later be changed with the user interface
+(see Keys section). The volume is an attenuation in dB: e.g.,
+"\-volume \-12" will start with \-12dB attenuation. The default is 0.
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-audio_latency \fIvalue
+This controls the amount of latency built into the audio streaming.
+The latency parameter controls the lower threshold. The default is 1
+(meaning lower=1/5 and upper=2/5). Set it to 2 (\-audio_latency 2) to keep
+the sound buffer between 2/5 and 3/5 full. If you crank it up to 4,
+you can definitely notice the lag.
+.\"
+.\" *******************************************************
+.SS Input options
+.\" *******************************************************
+.TP
+.B \-[no]coin_lockout, \-[no]coinlock
+Enables simulation of the "coin lockout" feature that is implmeneted
+on a number of game PCBs. It was up to the operator whether or not
+the coin lockout outputs were actually connected to the coin
+mechanisms. If this feature is enabled, then attempts to enter a coin
+while the lockout is active will fail and will display a popup message
+in the user interface. If this feature is disabled, the coin lockout
+signal will be ignored. The default is ON (\-coin_lockout).
+.TP
+.B \-ctrlr \fIcontroller
+Enables support for special controllers. Configuration files are
+loaded from the ctrlrpath. They are in the same format as the .cfg
+files that are saved, but only control configuration data is read
+from the file. The default is NULL (no controller file).
+.TP
+.B \-[no]mouse
+Controls whether or not MAME looks for a mouse controller to use. Note
+that in many cases, lightguns are treated as mice by the operating
+system, so you may need to enable this to enable lightgun support. When
+this is enabled, you will not be able to use your mouse while playing
+a game. If you want to get control of your computer back, you will need
+to either pause the game or quit. The default is OFF (\-nomouse).
+.TP
+.B \-[no]joystick, \-[no]joy
+Controls whether or not MAME looks for joystick/gamepad controllers.
+The default is ON (\-joystick).
+.TP
+.B \-[no]lightgun, \-[no]gun
+Controls whether or not MAME makes use of lightgun controllers.
+Note that most lightguns map to the mouse, so using \-lightgun and
+\-mouse together may produce strange results. The default is OFF
+(\-nolightgun).
+.TP
+.B \-[no]multikeyboard, \-[no]multikey
+Determines whether MAME differentiates between multiple keyboards.
+Some systems may report more than one keyboard; by default, the data
+from all of these keyboards is combined so that it looks like a single
+keyboard. Turning this option on will enable MAME to report keypresses
+on different keyboards independently. The default is OFF 
+(\-nomultikeyboard).
+.TP
+.B \-[no]multimouse
+Determines whether MAME differentiates between multiple mice. Some 
+systems may report more than one mouse device; by default, the data
+from all of these mice is combined so that it looks like a single
+mouse. Turning this option on will enable MAME to report mouse 
+movement and button presses on different mice independently. The 
+default is OFF (\-nomultimouse).
+.TP
+.B \-[no]steadykey, \-[no]steady
+Some games require two or more buttons to be pressed at exactly the
+same time to make special moves. Due to limitations in the PC keyboard
+hardware, it can be difficult or even impossible to accomplish that
+using the standard keyboard handling. This option selects a different
+handling that makes it easier to register simultaneous button presses,
+but has the disadvantage of making controls less responsive. The
+default is OFF (\-nosteadykey).
+.TP
+.B \-[no]offscreen_reload, \-[no]reload
+Controls whether or not MAME treats a second button input from a
+lightgun as a reload signal. In this case, MAME will report the gun's
+position as (0,MAX) with the trigger held, which is equivalent to an
+offscreen reload. This is only needed for games that required you to 
+shoot offscreen to reload, and then only if your gun does not support 
+off screen reloads. The default is OFF (\-nooffscreen_reload).
+.TP
+.B \-joystick_map, \-joymap \fImap
+Controls how joystick values map to digital joystick controls.
+See /usr/share/doc/mame/config.txt for full details on \fImap\fR format.
+.TP
+.B \-joystick_deadzone, \-joy_deadzone, \-jdz \fIvalue
+If you play with an analog joystick, the center can drift a little.
+joystick_deadzone tells how far along an axis you must move before the
+axis starts to change. This option expects a float in the range of
+0.0 to 1.0. Where 0 is the center of the joystick and 1 is the outer
+limit. The default is 0.3.
+.TP
+.B \-joystick_saturation, \-joy_saturation, \-jsat \fIvalue
+If you play with an analog joystick, the ends can drift a little,
+and may not match in the +/\- directions. joystick_saturation tells how 
+far along an axis movement change will be accepted before it reaches 
+the maximum range. This option expects a float in the range of 0.0 to 
+1.0, where 0 is the center of the joystick and 1 is the outer limit.
+The default is 0.85.
+.TP
+.B \-natural, \-nat
+Specifies whether to use a natural keyboard or not.
+.TP
+.B \-joystick_contradictory
+Enable contradictory direction digital joystick input at the same time.
+.TP
+.B \-coin_impulse \fItime
+Set coin impulse time. A negative value for \fItime\fR disables the impulse;
+set \fItime\fR to 0 to obey driver or give a positive value to set impulse time.
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-uimodekey, \-umk
+Specifies the key used to toggle between full and partial UI mode.
+.TP
+.B \-keymap
+Enable keymap for non\-QWERTY keyboards. Used in conjuction with
+\fB\-keymap_file\fR.
+.TP
+.B \-keymap_file \fIkeymap_file\fR
+Specifies the full path to the keymap file to be used. Shipped keymap files lie
+in \fB/usr/share/games/mame/keymaps\fR.
+.TP
+.B \-joy_idx[0\-8] \fIjoystick
+With these options you can assign a joystick to a 
+specific index in MAME. Even if the kernel will list the joysticks
+in a different order on the next boot, MAME will still see the joystick
+as e.g. "Joystick 2". Use mame \-v to see which joysticks are recognized.
+Default is 'auto'.
+.TP
+.B \-sixaxis
+Use special handling for PS3 Sixaxis controllers.
+.TP
+.B \-videodriver, \-vd \fIx11\fR|\fIdirectfb\fR|\fIauto\fR
+SDL video driver to use; auto selects SDL default.
+.TP
+.B \-audiodriver, \-ad \fIalsa\fR|\fIarts\fR|\fIauto\fR
+SDL audio driver to use; auto selects SDL default.
+.TP
+.B \-gl_lib \fIalsa\fR|\fIarts\fR|\fIauto\fR
+Alternative libGL.so to use; auto selects SDL default.
+.\"
+.\" *******************************************************
+.SS Input automatic enable options
+.\" *******************************************************
+.TP
+.B \-paddle_device, \-paddle \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-adstick_device, \-adstick \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-pedal_device, \-pedal \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-dial_device, \-dial \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-trackball_device, \-trackball \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-lightgun_device \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-positional_device \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+.TP
+.B \-mouse_device \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
+Each of these options controls autoenabling the mouse, or joystick
+depending on the presence of a particular class of analog
+control for a particular game. For example, if you specify the option
+\-paddle mouse, then any game that has a paddle control will automatically
+enable mouse controls just as if you had explicitly specified \-mouse.
+Note that these controls override the values of \-[no]mouse, \-[no]joystick, etc.
+.\"
+.\" *******************************************************
+.SS Debugging options
+.\" *******************************************************
+.TP
+.B \-[no]log
+Creates a file called error.log which contains all of the internal
+log messages generated by the MAME core and game drivers. The default
+is OFF (\-nolog).
+.TP
+.B \-[no]verbose, \-[no]v
+Displays internal diagnostic information. This information is very
+useful for debugging problems with your configuration. \fBIMPORTANT\fP: when
+reporting bugs, please run with mame \-verbose and include the resulting
+information. The default is off (\-noverbose).
+.TP
+.B \-update_in_pause
+Enables updating the screen bitmap while the game is paused. This is
+useful for debuggin in some scenarios (and gets in the way in others).
+.TP
+.B \-[no]debug, \-[no]d
+Activates the integrated debugger. By default, the debugger is entered 
+by pressing the tilde (~) key during emulation. It is also entered 
+immediately at startup. The default is OFF (\-nodebug).
+.TP
+.B \-debugscript \fIfilename
+Specifies a file that contains a list of debugger commands to execute
+immediately upon startup. The default is NULL (no commands).
+.TP
+.B \-debug_internal, \-di
+Use the internal debugger for debugging.
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-[no]oslog
+Outputs the error.log data to the system debugger. This can be used at
+the same time as \-log to output the log data to both targets as well.
+Default is OFF (\-nooslog).
+.\"
+.\" *******************************************************
+.SS Misc options
+.\" *******************************************************
+.TP
+.B \-bios \fIbiosname
+Specifies the specific BIOS to use with the current game, for game
+systems that make use of a BIOS. The \-listxml output will list all of
+the possible BIOS names for a game. The default is 'default'.
+.TP
+.B \-[no]cheat, \-[no]c
+Enables the reading of the cheat database, if present, and the Cheat
+menu in the user interface. The	default is OFF (\-nocheat).
+.TP
+.B \-[no]skip_gameinfo
+Forces MAME to skip displaying the game info screen. The default is OFF
+(\-noskip_gameinfo).
+.TP
+.B \-uifont \fIfontname
+Specifies the name of a BDF font file to use for the UI font. If this
+font cannot be found or cannot be loaded, the system will fall back
+to its built\-in UI font. On some platforms \fIfontname\fP can be a system
+font name instead of a BDF font file. The default is 'default' (use 
+the OSD\-determined default font).
+.TP
+.B \-ramsize, \-ram
+Size of RAM (if supported by driver).
+.TP
+.B \-confirm_quit
+Display confirm quit screen on exit.
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-watchdog
+Specifies a number of seconds after which MAME should automatically exit
+if it detects that the emulation has locked up.
+.\"
+.\"
+.\" LEGAL NOTICE chapter
+.SH LEGAL NOTICE
+Please visit the MAME website for some important legal information:
+.PP
+http://mamedev.org/legal.html

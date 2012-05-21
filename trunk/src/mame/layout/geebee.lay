@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="224" bottom="272" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+
+		<rect>
+			<bounds left="191.5" top="7.5" right="224" bottom="40.5" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+		<rect>
+			<bounds left="0" top="7.5" right="32.5" bottom="40.5" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+
+		<rect>
+			<bounds left="23.5" top="7.5" right="200.5" bottom="32.5" />
+			<color red="0.878" green="0" blue="0.627" />
+		</rect>
+
+		<rect>
+			<bounds left="32.5" top="32.5" right="191.5" bottom="40.5" />
+			<color red="1" green="0.816" blue="0" />
+		</rect>
+
+		<rect>
+			<bounds left="215.5" top="40.5" right="224" bottom="223.5" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+		<rect>
+			<bounds left="0" top="40.5" right="8.5" bottom="223.5" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+
+		<rect>
+			<bounds left="191.5" top="40.5" right="215.5" bottom="223.5" />
+			<color red="0" green="0.333" blue="1" />
+		</rect>
+		<rect>
+			<bounds left="8.5" top="40.5" right="32.5" bottom="223.5" />
+			<color red="0" green="0.333" blue="1" />
+		</rect>
+		<rect>
+			<bounds left="103.625" top="95.5" right="120.375" bottom="104.5" />
+			<color red="0" green="0.333" blue="1" />
+		</rect>
+		<rect>
+			<bounds left="128" top="168" right="144" bottom="184" />
+			<color red="0" green="0.333" blue="1" />
+		</rect>
+		<rect>
+			<bounds left="80" top="168" right="96" bottom="184" />
+			<color red="0" green="0.333" blue="1" />
+		</rect>
+
+		<rect>
+			<bounds left="0" top="223.5" right="224" bottom="232.5" />
+			<color red="0.878" green="0" blue="0.627" />
+		</rect>
+		<rect>
+			<bounds left="0" top="232.5" right="224" bottom="256" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+	</element>
+
+	<view name="Color Overlay">
+		<screen index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+		<overlay name="overlay" element="overlay">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</overlay>
+	</view>
+</mamelayout>
