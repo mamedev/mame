@@ -833,7 +833,7 @@ public:
 	natural_keyboard(running_machine &machine);
 
 	void initialize();
-	
+
 	// getters and queries
 	running_machine &machine() const { return m_machine; }
 	bool empty() const { return (m_bufbegin == m_bufend); }

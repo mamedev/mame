@@ -2936,4 +2936,4 @@ void megadriv_reset_vdp(void)
 	megadrive_visible_scanlines = 224;
 	megadrive_irq6_scanline = 224;
 	megadrive_z80irq_scanline = 226;
-}	
+}

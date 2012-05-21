@@ -500,10 +500,10 @@ void pokeyn_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			sum += (((m_channel[ch].m_output ^ m_channel[ch].m_filter_sample) || (m_channel[ch].m_AUDC & VOLUME_ONLY)) ? m_channel[ch].m_volume : 0 );
 		}
 
-       	/* store sum of output signals into the buffer */
+    	/* store sum of output signals into the buffer */
 
-       	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;
-       	samples--;
+    	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;
+    	samples--;
 
 	}
 	m_rtimer->adjust(attotime::never);
@@ -1199,12 +1199,12 @@ char *pokeyn_device::audctl2str(int val)
 
 pokeyn_device::pokey_channel::pokey_channel()
 	:	m_AUDF(0),
-	 	m_AUDC(0),
+		m_AUDC(0),
 		m_borrow_cnt(0),
-	 	m_counter(0),
-	 	m_volume(0),
-	 	m_output(0),
-	 	m_filter_sample(0)
+		m_counter(0),
+		m_volume(0),
+		m_output(0),
+		m_filter_sample(0)
 {
 }
 

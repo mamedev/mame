@@ -567,7 +567,7 @@ struct _powerpc_state
 	ppcimp_state *	impstate;
 
 	read32_device_func	dcr_read_func;
-	write32_device_func	dcr_write_func;	
+	write32_device_func	dcr_write_func;
 };
 
 

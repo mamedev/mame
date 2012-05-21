@@ -97,13 +97,13 @@ READ8_MEMBER(timeplt_state::psurge_protection_r)
 static WRITE8_DEVICE_HANDLER(chkun_sound_w)
 {
 	timeplt_state *state = device->machine().driver_data<timeplt_state>();
-	
+
 	// d0-d3: P0-P3
 	// d5: /R (unused?)
 	// d6: /W
 	if (~data & 0x40)
 		state->m_tc8830f->write_p(data & 0xf);
-	
+
 	// d4 (or d7?): /ACL
 	if (~data & 0x10)
 		state->m_tc8830f->reset();

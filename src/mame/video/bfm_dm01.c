@@ -58,7 +58,7 @@ typedef struct _dm01
 	int		 data_avail,
 		        control,
 			  xcounter,
-  		segbuffer[65],
+		segbuffer[65],
 				  busy;
 
 UINT8 scanline[DM_BYTESPERROW],
@@ -152,13 +152,13 @@ static WRITE8_HANDLER( mux_w )
 			{
 
 				UINT8 d = dm01.scanline[p];
-				
+
 				for (int bitpos=0; bitpos <8; bitpos++)
 				{
 					if (((p*8)+bitpos) <65)
 					{
 						if (d & 1<<(7-bitpos)) dm01.segbuffer[(p*8)+bitpos]=1;
-						else dm01.segbuffer[(p*8)+bitpos]=0;	
+						else dm01.segbuffer[(p*8)+bitpos]=0;
 					}
 				}
 				p++;
@@ -167,7 +167,7 @@ static WRITE8_HANDLER( mux_w )
 			for (int pos=0;pos<65;pos++)
 			{
 				output_set_indexed_value("dotmatrix", pos +(65*row), dm01.segbuffer[(pos)]);
-			}			
+			}
 		}
 	}
 }

@@ -158,8 +158,8 @@ private:
     	UINT8 m_output;			/* channel output signal (1 active, 0 inactive) */
     	UINT8 m_filter_sample;  /* high-pass filter sample */
 
-    	inline void sample(void)  			{ m_filter_sample = m_output; }
-    	inline void reset_channel(void)	 	{ m_counter = m_AUDF ^ 0xff; }
+    	inline void sample(void)			{ m_filter_sample = m_output; }
+    	inline void reset_channel(void)		{ m_counter = m_AUDF ^ 0xff; }
     	inline void inc_chan(void)
     	{
     		m_counter = (m_counter + 1) & 0xff;

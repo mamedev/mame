@@ -4050,7 +4050,7 @@ ROM_START( mspacii )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "p1.5e",        0x0000, 0x1000, CRC(04333722) SHA1(bb179d5302b26b815b5d7eff14865e7b4f8a6880) )
- 	ROM_LOAD( "p2.5f",        0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
+	ROM_LOAD( "p2.5f",        0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
@@ -4073,7 +4073,7 @@ ROM_START( mspacii2 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "p7.bin",       0x0000, 0x1000, CRC(04333722) SHA1(bb179d5302b26b815b5d7eff14865e7b4f8a6880) )
- 	ROM_LOAD( "p8.bin",       0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
+	ROM_LOAD( "p8.bin",       0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )

@@ -690,10 +690,10 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 		{
 			astring newtag(screendev->tag()), oldtag(":");
 			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
-			
+
 			fprintf(m_output, "\t\t<display");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
-			
+
 			switch (screendev->screen_type())
 			{
 				case SCREEN_TYPE_RASTER:	fprintf(m_output, " type=\"raster\"");	break;
@@ -701,7 +701,7 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 				case SCREEN_TYPE_LCD:		fprintf(m_output, " type=\"lcd\"");		break;
 				default:					fprintf(m_output, " type=\"unknown\"");	break;
 			}
-			
+
 			// output the orientation as a string
 			switch (m_drivlist.driver().flags & ORIENTATION_MASK)
 			{
@@ -730,7 +730,7 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 					fprintf(m_output, " rotate=\"0\"");
 					break;
 			}
-			
+
 			// output width and height only for games that are not vector
 			if (screendev->screen_type() != SCREEN_TYPE_VECTOR)
 			{
@@ -738,16 +738,16 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 				fprintf(m_output, " width=\"%d\"", visarea.width());
 				fprintf(m_output, " height=\"%d\"", visarea.height());
 			}
-			
+
 			// output refresh rate
 			fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds()));
-			
+
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
 			if (screendev->screen_type() != SCREEN_TYPE_VECTOR && !screendev->oldstyle_vblank_supplied())
 			{
 				int pixclock = screendev->width() * screendev->height() * ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds());
-				
+
 				fprintf(m_output, " pixclock=\"%d\"", pixclock);
 				fprintf(m_output, " htotal=\"%d\"", screendev->width());
 				fprintf(m_output, " hbend=\"%d\"", screendev->visible_area().min_x);

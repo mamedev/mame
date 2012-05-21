@@ -547,11 +547,11 @@
 
 
     Unofficial pcb's from NG:DEV.TEAM:
-    
+
     MVS CHA:
     GIGA CHAR Board 1.0
     GIGA CHAR Board 1.5
-    
+
     MVS PROG:
     GIGA PROG Board 1.0
     GIGA PROG Board 1.5
@@ -646,7 +646,7 @@
 
 *****************************************************************************
 
-	Neo-Geo bios
+    Neo-Geo bios
 
 *****************************************************************************
 
@@ -817,7 +817,7 @@
 
 /****************************************************************************
 
-	Official sets
+    Official sets
 
 *****************************************************************************
 
@@ -7511,12 +7511,12 @@ ROM_END
 
 /*  Some info about the 2nd AES release of Samurai Shodown 5 Special (samsh5sph):
 
-	The fixed carts have a small round neogeo sticker applied to the front side of the cart (top right near cart sticker).
-	SNK Playmore had authorized a recall of all Samurai Shodown V Special (Samurai Spirits 0 Special) home cartridges. This recall involved bug fixes
-	and the addition of fatalities. (The fatalities were originally removed at the last minute due to the Nagasaki incident, a murder caused by a child killing her classmate by knife.)
-	Bug fixes: Improvements on Voice, Back Ground Music, and Practice mode.
-	Fatalities: SNK PLAYMORE modified the game program by including the removed "Zetumei Ougi" in a modified version.
-	This new version does not show the complete fatalities, they are instead replaced by what SNK PLAYMORE refers to as "lessened fatalities".
+    The fixed carts have a small round neogeo sticker applied to the front side of the cart (top right near cart sticker).
+    SNK Playmore had authorized a recall of all Samurai Shodown V Special (Samurai Spirits 0 Special) home cartridges. This recall involved bug fixes
+    and the addition of fatalities. (The fatalities were originally removed at the last minute due to the Nagasaki incident, a murder caused by a child killing her classmate by knife.)
+    Bug fixes: Improvements on Voice, Back Ground Music, and Practice mode.
+    Fatalities: SNK PLAYMORE modified the game program by including the removed "Zetumei Ougi" in a modified version.
+    This new version does not show the complete fatalities, they are instead replaced by what SNK PLAYMORE refers to as "lessened fatalities".
 */
 
 
@@ -7596,7 +7596,7 @@ ROM_END
 
 /****************************************************************************
 
-	BrezzaSoft games, licensed?
+    BrezzaSoft games, licensed?
 
 ****************************************************************************/
 
@@ -7711,7 +7711,7 @@ ROM_END
 
 /****************************************************************************
 
-	Vektorlogic games, unlicensed
+    Vektorlogic games, unlicensed
 
 ****************************************************************************/
 
@@ -7753,7 +7753,7 @@ ROM_END
 
 /****************************************************************************
 
-	Jamma PCB sets
+    Jamma PCB sets
 
 ****************************************************************************/
 
@@ -7924,7 +7924,7 @@ ROM_END
 
 /****************************************************************************
 
-	Bootleg sets
+    Bootleg sets
 
 ****************************************************************************/
 
@@ -8953,7 +8953,7 @@ ROM_END
 
 /****************************************************************************
 
-	Game specific input definitions
+    Game specific input definitions
 
 ****************************************************************************/
 
@@ -9253,7 +9253,7 @@ INPUT_PORTS_END
 
 /****************************************************************************
 
-	Game specific inits
+    Game specific inits
 
 ****************************************************************************/
 
@@ -9924,7 +9924,7 @@ static DRIVER_INIT(sbp )
 
 /****************************************************************************
 
-	Softlist stuff
+    Softlist stuff
 
 ****************************************************************************/
 

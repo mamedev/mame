@@ -1978,7 +1978,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 							(	 BIT(~x, 1)					<<  2	) |
 							(	 BIT( x, 0)					<<  1	) |
 							(	 bit0						<<  0	) ;
-			
+
 			logerror("%s: exec bitswap - mode_3 %02x, mode_f %02x, xor0 %x, val %04x -> %04x\n", machine().describe_context(), m_prot_m3, m_prot_mf, xor0, x, m_prot_val);
 
 			break;
@@ -2148,7 +2148,7 @@ static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
 
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
-//	AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
+//  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )

@@ -54,7 +54,7 @@ private:
     UINT8 m_command;
     int m_cmd_rw;
     UINT8 m_phrase;
-    
+
     UINT8 *m_mem_base;
     UINT32 m_mem_mask;
 };

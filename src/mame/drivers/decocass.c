@@ -28,7 +28,7 @@
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
     Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
- 
+
 
  ***********************************************************************/
 
@@ -1080,7 +1080,7 @@ ROM_START( cdsteljn ) // version 4-A-3
 	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) /* Should be dp-1144a?? */
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
+	ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) )
 ROM_END
 
 /* 15 Lucky Poker */
@@ -1567,7 +1567,7 @@ static DRIVER_INIT( decocrom )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
          GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0) 
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0)
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
          GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )

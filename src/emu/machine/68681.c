@@ -660,7 +660,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
                             rate = attotime::from_hz(2*device->clock()/(2*16*16*0x10000));
                         }
                     }
-                        
+
                     //hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
 
                     duart68681->duart_timer->adjust(rate, 0, rate);

@@ -992,7 +992,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	  m_timer(NULL),
 	  m_current_rate(attotime::zero)
 {
-  	m_queue_chars = ioport_queue_chars_delegate();
+	m_queue_chars = ioport_queue_chars_delegate();
 	m_accept_char = ioport_accept_char_delegate();
 	m_charqueue_empty = ioport_charqueue_empty_delegate();
 
@@ -1833,10 +1833,10 @@ ioport_type_class ioport_field::type_class() const
 unicode_char ioport_field::keyboard_code(int which) const
 {
 	unicode_char ch;
-	
+
 	if (which >= ARRAY_LENGTH(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
-	
+
 	ch = m_chars[which];
 
 	// special hack to allow for PORT_CODE('\xA3')
@@ -3849,8 +3849,8 @@ void ioport_configurer::field_add_char(unicode_char ch)
 			m_curfield->m_chars[index] = ch;
 			return;
 		}
-		
-	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch); 
+
+	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch);
 }
 
 
@@ -3875,7 +3875,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
 
 	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
-	// append a new setting	
+	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
 }
 

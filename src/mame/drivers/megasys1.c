@@ -4020,7 +4020,7 @@ READ16_MEMBER(megasys1_state::monkelf_input_r)
 static DRIVER_INIT( monkelf )
 {
 	DRIVER_INIT_CALL(avspirit);
-	
+
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	UINT16 *ROM = (UINT16*)state->memregion("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?

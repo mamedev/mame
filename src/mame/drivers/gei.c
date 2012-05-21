@@ -1059,7 +1059,7 @@ static I8255A_INTERFACE( getrivia_ppi8255_0_intf )
 	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(sound_w)			/* Port C write */
 };
-											 
+
 static I8255A_INTERFACE( getrivia_ppi8255_1_intf )
 {
 	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
@@ -1069,7 +1069,7 @@ static I8255A_INTERFACE( getrivia_ppi8255_1_intf )
 	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(lamps2_w)			/* Port C write */
 };
-											 
+
 static I8255A_INTERFACE( gselect_ppi8255_0_intf )
 {
 	DEVCB_INPUT_PORT("DSWA"),		/* Port A read */
@@ -1079,7 +1079,7 @@ static I8255A_INTERFACE( gselect_ppi8255_0_intf )
 	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(sound2_w)			/* Port C write */
 };
-											 
+
 static I8255A_INTERFACE( gselect_ppi8255_1_intf )
 {
 	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
@@ -1089,7 +1089,7 @@ static I8255A_INTERFACE( gselect_ppi8255_1_intf )
 	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
 	DEVCB_HANDLER(nmi_w)			/* Port C write */
 };
-											 
+
 static I8255A_INTERFACE( findout_ppi8255_1_intf )
 {
 	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
@@ -1099,7 +1099,7 @@ static I8255A_INTERFACE( findout_ppi8255_1_intf )
 	DEVCB_HANDLER(portC_r),			/* Port C read */
 	DEVCB_NULL						/* Port C write */
 };
-											 											 
+
 
 static INTERRUPT_GEN( vblank_irq )
 {

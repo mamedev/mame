@@ -273,8 +273,8 @@ static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	/* PPI 8255 group A & B set to Mode 0.
-	 Port A, B and lower 4 bits of C set as Input.
-	 High 4 bits of C set as Output */
+     Port A, B and lower 4 bits of C set as Input.
+     High 4 bits of C set as Output */
 	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_INPUT_PORT("IN1"),			/* Port B read */

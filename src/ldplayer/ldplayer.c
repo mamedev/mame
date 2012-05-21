@@ -402,7 +402,7 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			// if we have bits, process
 			if (bitsleft != 0)
 			{
-				// assert the line and set a timer for deassertion				
+				// assert the line and set a timer for deassertion
 				m_laserdisc->control_w(ASSERT_LINE);
 				timer_set(attotime::from_usec(250), TIMER_ID_BIT_OFF);
 
@@ -437,7 +437,7 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 void pr8210_state::machine_start()
 {
 	ldplayer_state::machine_start();
-	m_bit_timer = timer_alloc(TIMER_ID_BIT);	
+	m_bit_timer = timer_alloc(TIMER_ID_BIT);
 }
 
 void pr8210_state::machine_reset()

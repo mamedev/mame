@@ -26,7 +26,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 static INTERRUPT_GEN( crimfght_interrupt )
 {
 	crimfght_state *state = device->machine().driver_data<crimfght_state>();
- 
+
 	if (k051960_is_irq_enabled(state->m_k051960))
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }

@@ -143,7 +143,7 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 
   There are 2 groups of 7 output lines muxed in port 60h
   The first bit is the group/mux selector.
-   
+
   - bits -
   7654 3210
   ---- ---x   Mux selector.
@@ -208,7 +208,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP		// writting bit3 constantly... watchdog? 
+	AM_RANGE(0x10, 0x10) AM_WRITENOP		// writting bit3 constantly... watchdog?
 	AM_RANGE(0x13, 0x13) AM_WRITE(mux_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW1")
@@ -355,7 +355,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("UNK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* Otherwise is a 'Freeze' DIP switch */ 
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* Otherwise is a 'Freeze' DIP switch */
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(52.786)
-//	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)

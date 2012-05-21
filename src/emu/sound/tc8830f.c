@@ -2,7 +2,7 @@
 
     tc8830f.c - Toshiba TC8830F, CMOS voice recording/reproducing LSI
     1-bit ADM (Adaptive Delta Modulation), similar to TC8801 and T6668.
-    
+
     Very preliminary...
 
     TODO:
@@ -36,7 +36,7 @@ void tc8830f_device::device_start()
 
 	m_mem_base = (UINT8 *)device().machine().root_device().memregion(":tc8830f")->base();
 	m_mem_mask = device().machine().root_device().memregion(":tc8830f")->bytes() - 1;
-	
+
 	// register for savestates
 	save_item(NAME(m_playing));
 	save_item(NAME(m_address));
@@ -46,7 +46,7 @@ void tc8830f_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_cmd_rw));
 	save_item(NAME(m_phrase));
-	
+
 	reset();
 }
 
@@ -81,7 +81,7 @@ void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				if (m_address == m_stop_address)
 					m_playing = false;
 			}
-			
+
 			// compute sample
 			// this is a placeholder until ADM is implemented
 			mix = bit * 0x7fff;
@@ -111,7 +111,7 @@ void tc8830f_device::write_p(UINT8 data)
 {
 	m_stream->update();
 	data &= 0xf;
-	
+
 	if (m_cmd_rw == 0)
 	{
 		// select command
@@ -138,13 +138,13 @@ void tc8830f_device::write_p(UINT8 data)
 			case 0x8: case 0x9: case 0xa: case 0xb:
 				logerror("tc8830f: Unemulated command %X\n", m_command);
 				break;
-			
+
 			default:
 				logerror("tc8830f: Invalid command %X\n", m_command);
 				break;
 		}
 	}
-	
+
 	else
 	{
 		// write command
@@ -170,14 +170,14 @@ void tc8830f_device::write_p(UINT8 data)
 					m_cmd_rw = -1;
 				}
 				break;
-			
+
 			case 0x6:
 				// CNDT: d0-d1: bitrate, d2: enable overflow
 				m_bitrate = data & 3;
 				device_clock_changed();
 				m_cmd_rw = -1;
 				break;
-			
+
 			case 0x7:
 				// LABEL: set phrase
 				if (m_cmd_rw == 1)
@@ -199,7 +199,7 @@ void tc8830f_device::write_p(UINT8 data)
 					m_cmd_rw = -1;
 				}
 				break;
-			
+
 			default:
 				m_cmd_rw = -1;
 				break;

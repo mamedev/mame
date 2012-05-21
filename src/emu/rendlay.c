@@ -821,7 +821,7 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 		case CTYPE_DOTMATRIXDOT:
 			draw_dotmatrix(1, dest, bounds, state);
 			break;
-			
+
 		case CTYPE_SIMPLECOUNTER:
 			draw_simplecounter(machine, dest, bounds, state);
 			break;

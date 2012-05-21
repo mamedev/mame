@@ -448,7 +448,7 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	/*  Init with 0x9a... A, B and high C as input
-	 Serial Eprom connected to Port C */
+     Serial Eprom connected to Port C */
 	DEVCB_INPUT_PORT("SYSTEM"),						/* Port A read */
 	DEVCB_NULL,										/* Port A write */
 	DEVCB_INPUT_PORT("INPUT"),						/* Port B read */

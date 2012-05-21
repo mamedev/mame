@@ -107,7 +107,7 @@ static void i386_set_descriptor_accessed(i386_state *cpustate, UINT16 selector)
 	UINT8 rights;
 	if(!(selector & ~3))
 		return;
-	
+
 	if ( selector & 0x4 )
 		base = cpustate->ldtr.base;
 	else
@@ -458,8 +458,8 @@ static void i386_sreg_load(i386_state *cpustate, UINT16 selector, UINT8 reg, boo
 		i386_load_segment_descriptor(cpustate, reg);
 		if(fault) *fault = false;
 		return;
-	}		
-	
+	}
+
 	if(fault) *fault = true;
 	if(reg == SS)
 	{
@@ -1030,7 +1030,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	WRITE16(cpustate,tss+0x28,cpustate->sreg[DS].selector);
 
 	old_task = cpustate->task.segment;
-	
+
 	/* Load task register with the selector of the incoming task */
 	cpustate->task.segment = selector;
 	memset(&seg, 0, sizeof(seg));

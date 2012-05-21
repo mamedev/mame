@@ -152,7 +152,7 @@ struct _powerpc_config
 {
 	UINT32		bus_frequency;
 	read32_device_func	dcr_read_func;
-	write32_device_func	dcr_write_func;	
+	write32_device_func	dcr_write_func;
 };
 
 

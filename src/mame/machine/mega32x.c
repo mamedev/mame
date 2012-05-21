@@ -195,7 +195,7 @@ GFX check (these don't explicitly fails):
 #161 Runlength Mode
 
 */
-		 
+
 #include "includes/megadriv.h"
 
 
