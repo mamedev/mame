@@ -732,7 +732,6 @@ X1-010           X1-006
 
 ***************************************************************************/
 
-
 /***************************************************************************
 
 
@@ -765,6 +764,60 @@ PO-102A
 
 Notes:
       *: 4 jumper pads for region selection (hardwired)
+
+***************************************************************************/
+
+/***************************************************************************
+                               Magical Speed
+
+(c)1994 Allumer
+
+PCB P0-111A:
++--------------------------------------------------+
+| VR1 X1-010   FU001007 FU001006 FU001005 FU001004 |
+|           W2465K                                 |
+|  CN3               X1-011  X1-011       X1-002A  |
+|  CN1                                             |
+|J CN2               X1-012  X1-012       X1-001A  |
+|A X1-007                                          |
+|M   W2465K U54 U50   W2465K W2465K W2465K U53     |
+|M                                                 |
+|A   W2465K     U51   W2465K W2465K W2465K         |
+|                                         FU001002 |
+|*           MC68HC000B16                          |
+|  X1-004                                          |
+|                                         FU001001 |
+|                          CXK58257                |
+| SW1 RST1 DSW2 DSW1 16MHz CXK58257 D71054 U52     |
++--------------------------------------------------+
+
+CPU   : MC68HC000B16
+OSC   : 16.000MHz
+RAM   : WinBond W2465K-70LL (x9), SONY CXK58257AP-10L (x2)
+DIPSW : 8 position (x2)
+CUSTOM: X1-010       Sound
+        X1-004       Input
+        X1-007       Video DAC
+        X1-011 (x2)  Tilemap
+        X1-012 (x2)  Tilemap
+        X1-002A      Sprites
+        X1-001A      Sprites
+
+OTHER : NEC71054C
+
+VR1   : Sound adjust pot
+SW1   : Service switch
+RST1  : Reset
+
+CN1   : 7-Pin header to drive lights underneath buttons to show what cards are available to play
+CN2   : 8-Pin header to drive lights underneath buttons to show what cards are available to play
+CN3   : 5-Pin header connected to aucilliary PCB to drive lights about the cabinet
+
+PAL   :FU-011 @ U50
+       FU-012 @ U51
+       FU-013 @ U52
+       FU-014 @ u53
+       FU-015 @ U54
 
 ***************************************************************************/
 
@@ -4903,29 +4956,19 @@ static INPUT_PORTS_START( magspeed )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("DSW")	// 2 DSWs - $500009 & B.b
-	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW2:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW2:7" ) /* Listed as Unused in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:6" ) /* Listed as Unused in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:5" ) /* Listed as Unused in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:4" ) /* Listed as Unused in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:3" ) /* Listed as Unused in the manual */
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING(      0x0500, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0d00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 4C_1C ) )
@@ -4942,16 +4985,16 @@ static INPUT_PORTS_START( magspeed )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,3")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc000, 0xc000, "Number of Rounds" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Number of Rounds" ) PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(      0x4000, "1" )
 	PORT_DIPSETTING(      0xc000, "2" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Unused ) ) /* Undefined in the manual */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) ) /* Undefined in the manual */
 INPUT_PORTS_END
 
 
@@ -10353,27 +10396,6 @@ ROM_START( madshark )
 	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fq001007.26", 0x000000, 0x100000, CRC(e4b33c13) SHA1(c4f9532de7a09c80f5a74c3a386e99a0f546846f) )
 ROM_END
-
-/***************************************************************************
-                               Magical Speed
-
-(c)1994 Allumer
-
-PCB P0-111A:
-
-TMP68HC000N-16
-X1-001A
-X1-002A
-
-X1-007
-X1-004
-
-X1-010
-
-2 x DSW8
-JAMMA
-
-***************************************************************************/
 
 ROM_START( magspeed )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 Code */
