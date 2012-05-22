@@ -2313,9 +2313,13 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95004120.lo", 0x000000, 0x080000, CRC(770a9c0f) SHA1(2d06e32b1d07bc9dc51f39f9ba22c9fe8a678ef3) ) \
 	ROM_LOAD( "95004121.hi", 0x080000, 0x080000, CRC(239f389c) SHA1(75d6f9f500aab5f114f8b86c4ca1f8dce6ea2ca4) ) \
-	\
-	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "95000611.mtx", 0x0000, 0x007231, CRC(440c355b) SHA1(884eb0fdc5f6c7c4fac4157d1e5f6bddcb70e148) ) /* unzip this */ \
+
+
+#define sc_crcc_matrix \
+	ROM_REGION( 0x400000, "matrix", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95000611.p1", 0x0000, 0x010000, CRC(3f40a2c9) SHA1(f73731171c56add1329f3a9d2f84303311d87884) ) \
+
+
 
 #define sc_crgc_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2940,8 +2944,9 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95004082.p1", 0x000000, 0x080000, CRC(b7caba0f) SHA1(777afdb6a2f78edad5f4df506eb4cd571f9f357b) ) \
 	ROM_LOAD( "95004083.p2", 0x080000, 0x080000, CRC(c0cc21b7) SHA1(d0b22db4c1faeef34b794ac4c31bc9fd386493ea) ) \
-	\
-	ROM_REGION( 0x400000, "others", 0 ) \
+
+#define sc_ticlb_matrix \
+	ROM_REGION( 0x400000, "matrix", 0 ) \
 	ROM_LOAD( "club-treasure-island_mtx_ass.bin", 0x0000, 0x010000, CRC(74f97b29) SHA1(9334bf1e4b4e2bcbbfaa5ae32201ceaab0641d83) ) /* DMD */ \
 
 #define sc_tri7_others \
@@ -3086,22 +3091,30 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_blokq_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
+// I don't think there is a good / complete set of sound roms in here, all the sets we have reject any configuration of this
+// and the dumps are a mess
 #define sc_clbtm_others \
-	ROM_REGION( 0x1000000, "ymz", ROMREGION_ERASE00 ) \
-	/* very large sound roms! - overdumps.. mostly garbage (cut them) */ \
-	ROM_LOAD( "95008055.p1", 0x00000, 0x80000, CRC(ef474fd3) SHA1(e7427184683603b57a3a8b37452fa6ec7a41e34c) ) \
-	ROM_IGNORE(0x780000) \
-	ROM_LOAD( "95008056.p2", 0x80000, 0x80000, CRC(39b1b566) SHA1(937ec27964124b92b75d4b37d09a35585baa68c6) ) \
+	ROM_REGION( 0x1000000, "others2", ROMREGION_ERASE00 ) \
+	/* first 512kb of this = first 512kb of 95008055.bin, rest is garbage? */ \
+	ROM_LOAD( "95008055.p1", 0x00000, 0x80000, BAD_DUMP CRC(ef474fd3) SHA1(e7427184683603b57a3a8b37452fa6ec7a41e34c) ) \
 	ROM_IGNORE(0x780000) \
 	\
-	ROM_REGION( 0x1000000, "others2", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "95008055.bin", 0x0000, 0x100000, CRC(df9ae6e3) SHA1(5766cb1749aa92c34a76270a641f7a9302cc44d7) ) \
+	ROM_REGION( 0x1000000, "ymz", ROMREGION_ERASE00 ) \
+	/* both halves of this valid sound data? */ \
+	ROM_LOAD( "95008055.bin", 0x0000, 0x100000, BAD_DUMP CRC(df9ae6e3) SHA1(5766cb1749aa92c34a76270a641f7a9302cc44d7) ) \
+	/* first 512kb of this = unique sound data? rest ig garbage? */ \
+	ROM_LOAD( "95008056.p2", 0x100000, 0x800000, BAD_DUMP CRC(39b1b566) SHA1(937ec27964124b92b75d4b37d09a35585baa68c6) ) \
 	\
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
-	/* dot matrix roms? - for the SC1 version? */ \
-	ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) ) \
+	ROM_LOAD( "95717692a.bin", 0x0000, 0x008000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) ) /* this looks like an sc1/2 game? */ \
+
+
+#define sc_clbtm_matrix \
+	ROM_REGION( 0x400000, "matrix", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) ) /* DM01 */ \
-	ROM_LOAD( "95717692a.bin", 0x0000, 0x008000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) ) /* is this something else? sc1/2? */ \
+	ROM_REGION( 0x400000, "matrixhex", ROMREGION_ERASE00 ) /* can probably be removed, need to verify it matches first tho */ \
+	ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) ) \
+
 
 #define sc_dcrls_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

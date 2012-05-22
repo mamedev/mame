@@ -174,6 +174,18 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 	return 0;
 }
 
+/* default dmd */
+static void bfmdm01_busy(running_machine &machine, int state)
+{
+	// Must tie back to inputs somehow!
+}
+
+static const bfmdm01_interface dm01_interface =
+{
+	bfmdm01_busy
+};
+
+
 /* default reels */
 const stepper_interface* default_reel_configs[6] =
 {
@@ -3058,6 +3070,8 @@ ROM_START( sc4crcc )
 	ROM_LOAD16_BYTE( "95406082.lo", 0x00001, 0x080000, CRC(f3495110) SHA1(3c2242818d02cf34d61c696073855d491bdbee22) )
 	ROM_LOAD16_BYTE( "95406083.hi", 0x00000, 0x080000, CRC(284933d6) SHA1(2098319ea687069a4f3080f788655a4c6c2ceaca) )
 	sc_crcc_others
+
+	sc_crcc_matrix
 ROM_END
 
 ROM_START( sc4crcca )
@@ -3065,6 +3079,8 @@ ROM_START( sc4crcca )
 	ROM_LOAD16_BYTE( "95407082.lo", 0x00001, 0x080000, CRC(97da4079) SHA1(a75a9be748281ff6406e1cf6a28b9271b3410751) )
 	ROM_LOAD16_BYTE( "95407083.hi", 0x00000, 0x080000, CRC(15ef1bda) SHA1(77dc2a46cbedcb331bade2d121947b32faace179) )
 	sc_crcc_others
+
+	sc_crcc_matrix
 ROM_END
 
 ROM_START( sc4crccb )
@@ -3072,6 +3088,8 @@ ROM_START( sc4crccb )
 	ROM_LOAD16_BYTE( "club-classic-cops-and-robbers_dat_ac_f65ss.lo", 0x00001, 0x080800, CRC(cec630a8) SHA1(91e95a7b89770e75a1b9272e011a7e4dacaa9eeb) )
 	ROM_LOAD16_BYTE( "club-classic-cops-and-robbers_dat_ac_f65ss.hi", 0x00000, 0x080800, CRC(17f4f78c) SHA1(fdb7be31f00c75c28468c5754d398d9ded8ee6e3) )
 	sc_crcc_others
+
+	sc_crcc_matrix
 ROM_END
 
 ROM_START( sc4crccc )
@@ -3079,6 +3097,8 @@ ROM_START( sc4crccc )
 	ROM_LOAD16_BYTE( "club-classic-cops-and-robbers_pcl_ac_f65ss.lo", 0x00001, 0x080800, CRC(603f4bf1) SHA1(1fc78567a9bc266ee612f17929d5abd66f011001) )
 	ROM_LOAD16_BYTE( "club-classic-cops-and-robbers_pcl_ac_f65ss.hi", 0x00000, 0x080800, CRC(d7699839) SHA1(0bcea4750c5d97a0f63a49bc497a631eb76a52bc) )
 	sc_crcc_others
+
+	sc_crcc_matrix
 ROM_END
 
 
@@ -13747,6 +13767,8 @@ ROM_START( sc4ticlb )
 	ROM_LOAD16_BYTE( "club-treasure-island_dat_ac_p65ss.hi", 0x00000, 0x080000, CRC(3529018b) SHA1(aa49f68bb3ca550c77d4667b8373f94856a70cf3) )
 	ROM_LOAD16_BYTE( "club-treasure-island_dat_ac_p65ss.lo", 0x00001, 0x080000, CRC(180fcb0a) SHA1(17400ae744af37b5a17389e4f7a639a5e5743b2d) )
 	sc_ticlb_others
+
+	sc_ticlb_matrix
 ROM_END
 
 ROM_START( sc4ticlba )
@@ -13754,6 +13776,8 @@ ROM_START( sc4ticlba )
 	ROM_LOAD16_BYTE( "club-treasure-island_dat_acss.hi", 0x00000, 0x080000, CRC(a51b94c9) SHA1(919f44f04a3b60b190e9c87c0d844ddde1268318) )
 	ROM_LOAD16_BYTE( "club-treasure-island_dat_acss.lo", 0x00001, 0x080000, CRC(2d685792) SHA1(36329c83f247d284294e381293b25f745ea220da) )
 	sc_ticlb_others
+
+	sc_ticlb_matrix
 ROM_END
 
 ROM_START( sc4ticlbb )
@@ -13761,6 +13785,8 @@ ROM_START( sc4ticlbb )
 	ROM_LOAD16_BYTE( "club-treasure-island_std_ac_p65ss.hi", 0x00000, 0x080000, CRC(856d863b) SHA1(c00ee8032fd0dee6466a30a4bc59ae3b0cd4f556) )
 	ROM_LOAD16_BYTE( "club-treasure-island_std_ac_p65ss.lo", 0x00001, 0x080000, CRC(2335e1b7) SHA1(ed32e892c9e71cccb642734e14eaea36f8f1853c) )
 	sc_ticlb_others
+
+	sc_ticlb_matrix
 ROM_END
 
 ROM_START( sc4ticlbc )
@@ -13768,6 +13794,8 @@ ROM_START( sc4ticlbc )
 	ROM_LOAD16_BYTE( "club-treasure-island_std_acss.hi", 0x00000, 0x080000, CRC(155f1379) SHA1(0768ce46a661f1280bd75897b82cca276ce7dbed) )
 	ROM_LOAD16_BYTE( "club-treasure-island_std_acss.lo", 0x00001, 0x080000, CRC(16527d2f) SHA1(dba35f4b8f5953a1043610efe627a97b4fca8b74) )
 	sc_ticlb_others
+
+	sc_ticlb_matrix
 ROM_END
 
 
@@ -15297,6 +15325,8 @@ ROM_START( sc4clbtm )
 	ROM_LOAD16_BYTE( "95402149.lo", 0x00001, 0x080000, CRC(f5eee630) SHA1(102ef766562a67cd5c339d755f527252aee924be) )
 	ROM_LOAD16_BYTE( "95402150.hi", 0x00000, 0x080000, CRC(19ada5f4) SHA1(3719e29465249026c781fe5226d05770c2e8ce99) )
 	sc_clbtm_others
+
+	sc_clbtm_matrix
 ROM_END
 
 ROM_START( sc4clbtma )
@@ -15304,6 +15334,8 @@ ROM_START( sc4clbtma )
 	ROM_LOAD16_BYTE( "95402257.lo", 0x00001, 0x080000, CRC(fca966af) SHA1(63aa17640405fb858d776799e2388679dfe02a26) )
 	ROM_LOAD16_BYTE( "95402258.hi", 0x00000, 0x080000, CRC(24ca572a) SHA1(5daa89c4427e70d0fbebfca116ea6932716f38f8) )
 	sc_clbtm_others
+
+	sc_clbtm_matrix
 ROM_END
 
 ROM_START( sc4clbtmb )
@@ -15311,6 +15343,8 @@ ROM_START( sc4clbtmb )
 	ROM_LOAD16_BYTE( "95403149.lo", 0x00001, 0x080000, CRC(a62d1945) SHA1(197f9245d46cb156987cbacc1ac0c8230030fdcd) )
 	ROM_LOAD16_BYTE( "95403150.hi", 0x00000, 0x080000, CRC(9f79e460) SHA1(0162d5fc54361c5853dc865d61849f766f833545) )
 	sc_clbtm_others
+
+	sc_clbtm_matrix
 ROM_END
 
 ROM_START( sc4clbtmc )
@@ -15318,6 +15352,8 @@ ROM_START( sc4clbtmc )
 	ROM_LOAD16_BYTE( "95403257.lo", 0x00001, 0x080000, CRC(5aada808) SHA1(e24bc5e523961abdedfb27ec5cff2cbb6f45bddd) )
 	ROM_LOAD16_BYTE( "95403258.hi", 0x00000, 0x080000, CRC(2b133e43) SHA1(805ca1ddf1ebcf6cbbd4b8b41baf5c2056b5bf17) )
 	sc_clbtm_others
+
+	sc_clbtm_matrix
 ROM_END
 
 ROM_START( sc4clbtmd )
@@ -15325,6 +15361,8 @@ ROM_START( sc4clbtmd )
 	ROM_LOAD16_BYTE( "95404682.lo", 0x00001, 0x080000, CRC(3b9e429f) SHA1(01046d8671a287b2a1c739f84d28c69ba2c8c80f) )
 	ROM_LOAD16_BYTE( "95404683.hi", 0x00000, 0x080000, CRC(f84b37ad) SHA1(4430c7fe6274d25de58342d255c4c4a52966b0b3) )
 	sc_clbtm_others
+
+	sc_clbtm_matrix
 ROM_END
 
 ROM_START( sc4clbtme )
@@ -15332,6 +15370,8 @@ ROM_START( sc4clbtme )
 	ROM_LOAD16_BYTE( "95405682.lo", 0x00001, 0x080000, CRC(12d4bf1a) SHA1(2b28c5fdca13e7a70496984e02bfd3b98d60a9ac) )
 	ROM_LOAD16_BYTE( "95405683.hi", 0x00000, 0x080000, CRC(b9aba368) SHA1(ec6404447c9e23e179ec1200848d966d5f3f846b) )
 	sc_clbtm_others
+
+	sc_clbtm_matrix
 ROM_END
 
 
@@ -23722,14 +23762,32 @@ GAME( 200?, sc4cclasp	,sc4cclas,	sc4, sc4, sc4, ROT0, "BFM","Club Class (65% Fer
 GAME( 200?, sc4colos	,0,			sc4, sc4, sc4, ROT0, "BFM","Colossus (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 
+const stepper_interface* sc4crcc_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4crcc )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	BFM_dm01_config(machine, &dm01_interface);
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4crcc_reel_configs;
+}
 
 
 // PR6837 CLASSIC CLUB COPS AND ROBBERS         PR6837 COPS SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcca	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcc		,0,			sc4dmd, sc4, sc4crcc, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcca	,sc4crcc,	sc4dmd, sc4, sc4crcc, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PR6837 CLASSIC CLUB COPS AND ROBBERS 65%         PR6837 COPS SOUNDS11
-GAME( 200?, sc4crccb	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crccc	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// the roms are a weird size, and the code is invalid, bad dumps? can they be fixed?
+GAME( 200?, sc4crccb	,sc4crcc,	sc4dmd, sc4, sc4crcc, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crccc	,sc4crcc,	sc4dmd, sc4, sc4crcc, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
@@ -24031,29 +24089,19 @@ GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bel
 
 const stepper_interface* sc4fcc_reel_configs[6] =
 {
-	&starpoint_interface_200step_reel,
-	&starpoint_interface_200step_reel,
-	&starpoint_interface_200step_reel,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
 	0,
-	0,
-	0,
-};
-
-static void bfmdm01_busy(running_machine &machine, int state)
-{
-	// Must tie back to inputs somehow!
-}
-
-static const bfmdm01_interface dm01_interface =
-{
-	bfmdm01_busy
 };
 
 static DRIVER_INIT( sc4fcc )
 {
 	sc4_state *state = machine.driver_data<sc4_state>();
 	BFM_dm01_config(machine, &dm01_interface);
-	DRIVER_INIT_CALL( sc4mbus );
+	DRIVER_INIT_CALL( sc4 );
 	state->m_reel_setup = sc4fcc_reel_configs;
 }
 
@@ -25733,12 +25781,31 @@ GAME( 200?, sc4tgearg	,sc4tgear,	sc4, sc4, sc4, ROT0, "Mazooma","Top Gear (Mazoo
 // PR2112 TOP LOADER         LOAD SOUNDS         TOP LOADER
 GAME( 200?, sc4tload	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Top Loader (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
+
+const stepper_interface* sc4ticlb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4ticlb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	BFM_dm01_config(machine, &dm01_interface);
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4ticlb_reel_configs;
+}
+
 // PR6832 TREASURE ISLAND FIXED 65%         PR6832 TRES SOUNDS11
-GAME( 200?, sc4ticlb	,0,			sc4, sc4, sc4, ROT0, "BFM","Treasure Island Club (Fixed 65%) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ticlbb	,sc4ticlb,	sc4, sc4, sc4, ROT0, "BFM","Treasure Island Club (Fixed 65%) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ticlb	,0,			sc4dmd, sc4, sc4ticlb, ROT0, "BFM","Treasure Island Club (Fixed 65%) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ticlbb	,sc4ticlb,	sc4dmd, sc4, sc4ticlb, ROT0, "BFM","Treasure Island Club (Fixed 65%) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PR6832 TREASURE ISLAND         PR6832 TRES SOUNDS11
-GAME( 200?, sc4ticlba	,sc4ticlb,	sc4, sc4, sc4, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ticlbc	,sc4ticlb,	sc4, sc4, sc4, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ticlba	,sc4ticlb,	sc4dmd, sc4, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ticlbc	,sc4ticlb,	sc4dmd, sc4, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1305 TREASURE TOMB         PR1305 TRES TOMB SOUNDS11         /    HIT SHOT
 GAME( 200?, sc4ttomb	,0,			sc4, sc4, sc4, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26043,13 +26110,32 @@ GAME( 200?, sc4blokqe	,sc4blokq,	sc4, sc4, sc4, ROT0, "Qps","Blockbuster (Qps) (
 GAME( 200?, sc4bbust	,sc4blokq,	sc4, sc4, sc4, ROT0, "Mazooma","Blockbuster (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
+const stepper_interface* sc4clbtm_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4clbtm )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	BFM_dm01_config(machine, &dm01_interface);
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4clbtm_reel_configs;
+}
+
+
 // PR7131 CLUB TEMPTATION         PR7131 TEMPTATION SOUNDS11
-GAME( 200?, sc4clbtm	,0,			sc4, sc4, sc4, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clbtma	,sc4clbtm,	sc4, sc4, sc4, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clbtmb	,sc4clbtm,	sc4, sc4, sc4, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clbtmc	,sc4clbtm,	sc4, sc4, sc4, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clbtmd	,sc4clbtm,	sc4, sc4, sc4, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clbtme	,sc4clbtm,	sc4, sc4, sc4, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbtm	,0,			sc4dmd, sc4, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbtma	,sc4clbtm,	sc4dmd, sc4, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbtmb	,sc4clbtm,	sc4dmd, sc4, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbtmc	,sc4clbtm,	sc4dmd, sc4, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbtmd	,sc4clbtm,	sc4dmd, sc4, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbtme	,sc4clbtm,	sc4dmd, sc4, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2544 DOUBLE CRAZY REELS 021         DCRZYSND
 GAME( 200?, sc4dcrls	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
