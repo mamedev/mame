@@ -4106,6 +4106,7 @@ src/mame/layout/roundup5.lay svneol=native#text/plain
 src/mame/layout/royalcrd.lay svneol=native#text/plain
 src/mame/layout/saiyukip.lay svneol=native#text/plain
 src/mame/layout/sbrkout.lay svneol=native#text/plain
+src/mame/layout/sc4_dmd.lay svneol=native#text/plain
 src/mame/layout/sderby.lay svneol=native#text/plain
 src/mame/layout/sgsafari.lay svneol=native#text/plain
 src/mame/layout/sharkpy.lay svneol=native#text/plain

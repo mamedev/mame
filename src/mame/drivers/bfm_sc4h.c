@@ -39,6 +39,11 @@
 #include "bfm_sc4.lh"
 #include "machine/bfm_bd1.h"
 #include "video/awpvid.h"
+//DMD01
+#include "video/bfm_dm01.h"
+#include "cpu/m6809/m6809.h"
+#include "sc4_dmd.lh"
+
 
 UINT8 read_input_matrix(running_machine &machine, int row)
 {
@@ -483,8 +488,15 @@ void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, boo
 					if ( state->vfd_ser_count == 8 )
 					{
 						state->vfd_ser_count = 0;
-						BFM_BD1_newdata(0, state->vfd_ser_value);
-						BFM_BD1_draw(0);
+						if (machine.device("matrix"))
+						{
+							BFM_dm01_writedata(machine,state->vfd_ser_value);
+						}			
+						else
+						{
+							BFM_BD1_newdata(0, state->vfd_ser_value);
+							BFM_BD1_draw(0);
+						}
 					}
 				}
 				state->vfd_old_clock = clock;
@@ -659,10 +671,10 @@ void bfm_sc4_duart_irq_handler(device_t *device, int state, UINT8 vector)
 	// triggers after reel tests on luckb, at the start on dnd...
 	// not sure this is right, causes some games to crash
 	logerror("bfm_sc4_duart_irq_handler\n");
-    if (state == ASSERT_LINE)
-    {
-        m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
-    }
+	if (state == ASSERT_LINE)
+	{
+		m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
+	}
 };
 
 void bfm_sc4_duart_tx(device_t *device, int channel, UINT8 data)
@@ -712,10 +724,10 @@ static const duart68681_config bfm_sc4_duart68681_config =
 void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	logerror("m68307_duart_irq_handler\n");
-    if (state == ASSERT_LINE)
-    {
-        m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"), vector);
-    }
+	if (state == ASSERT_LINE)
+	{
+		m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"), vector);
+	}
 };
 
 void m68307_duart_tx(device_t *device, int channel, UINT8 data)
@@ -795,7 +807,15 @@ MACHINE_CONFIG_DERIVED_CLASS( sc4_adder4, sc4, sc4_adder4_state )
 	MCFG_MACHINE_START( adder4 )
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
+	MCFG_CPU_ADD("matrix", M6809, 2000000 )				/* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
+	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
+	MCFG_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */
 
+	MCFG_MACHINE_START( sc4 )
+MACHINE_CONFIG_END
 INPUT_PORTS_START( sc4_base )
 	PORT_START("IN-0")
 	PORT_DIPNAME( 0x01, 0x00, "IN-0:0" )

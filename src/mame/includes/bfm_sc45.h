@@ -77,6 +77,8 @@ public:
 
 MACHINE_CONFIG_EXTERN( sc4 );
 MACHINE_CONFIG_EXTERN( sc4_adder4 );
+MACHINE_CONFIG_EXTERN( sc4dmd );
+
 INPUT_PORTS_EXTERN( sc4_base );
 
 #define SC4_JACKPOT_KEY_SETTINGS \
@@ -2432,8 +2434,10 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95004103.lo", 0x000000, 0x080000, CRC(9926f103) SHA1(f29a0d25eebd0a0990cd165116b425b795ed62e0) ) \
 	ROM_LOAD( "95004104.hi", 0x080000, 0x080000, CRC(bec75a23) SHA1(cdf895081ebf3afb52d5bfaab29f713800c85fc9) ) \
 	\
-	ROM_REGION( 0x400000, "other", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "club-firecracker_mtx_ass.bin", 0x0000, 0x010000, CRC(c23ffee9) SHA1(b4f2542e8ed0b282a439e523baa6cd43c5b2cb50) ) /* DMD01 */ \
+
+#define sc_fcc_matrix \
+	ROM_REGION( 0x200000, "matrix", ROMREGION_ERASEFF )\
+	ROM_LOAD( "club-firecracker_mtx_ass.bin", 0x0000, 0x010000, CRC(c23ffee9) SHA1(b4f2542e8ed0b282a439e523baa6cd43c5b2cb50) )\
 
 #define sc_frsu_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

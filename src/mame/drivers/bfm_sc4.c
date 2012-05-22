@@ -10,6 +10,8 @@
 
     This file contains the set lists only, for the actual hardware
     emulation see bfm_sc4h.c
+	However, the handlers for DMD are currently here, because we only
+	have it hooked up for one game, there must be more.
 
 
     note: default Jackpot keys are set to whatever value the game
@@ -20,6 +22,7 @@
 
 #include "emu.h"
 #include "includes/bfm_sc45.h"
+#include "video/bfm_dm01.h"
 
 
 bool compare_mbus(UINT16* rom)
@@ -5345,6 +5348,9 @@ ROM_START( sc4fcc )
 	ROM_LOAD16_BYTE( "club-firecracker_std_ac_varss.hi", 0x00000, 0x080000, CRC(0bbab14f) SHA1(97e5d7d0f57c81232a06f89b486b2833f0ec8640) )
 	ROM_LOAD16_BYTE( "club-firecracker_std_ac_varss.lo", 0x00001, 0x080000, CRC(b543a3ad) SHA1(42f1c69adcbf7acc48dad98085f3f9e3a69f3342) )
 	sc_fcc_others
+
+	sc_fcc_matrix
+
 ROM_END
 
 ROM_START( sc4fcca )
@@ -5352,6 +5358,9 @@ ROM_START( sc4fcca )
 	ROM_LOAD16_BYTE( "club-firecracker_dat_ac_67pss.hi", 0x00000, 0x080000, CRC(f62d7c6b) SHA1(a8e680074880f33313fe4ad6805d70910a4d8a48) )
 	ROM_LOAD16_BYTE( "club-firecracker_dat_ac_67pss.lo", 0x00001, 0x080000, CRC(cd7ccd11) SHA1(47f7b89a2b27966de21eb08845108e7da2542227) )
 	sc_fcc_others
+
+	sc_fcc_matrix
+
 ROM_END
 
 ROM_START( sc4fccb )
@@ -5359,6 +5368,8 @@ ROM_START( sc4fccb )
 	ROM_LOAD16_BYTE( "club-firecracker_dat_ac_varss.hi", 0x00000, 0x080000, CRC(5e736802) SHA1(6cd0800ab8a96f057080c857c8ae696da71f58bd) )
 	ROM_LOAD16_BYTE( "club-firecracker_dat_ac_varss.lo", 0x00001, 0x080000, CRC(479efeef) SHA1(9115b184c14cc1fb1cdda0db0f6d39b396d424c9) )
 	sc_fcc_others
+
+	sc_fcc_matrix
 ROM_END
 
 ROM_START( sc4fccc )
@@ -5366,6 +5377,8 @@ ROM_START( sc4fccc )
 	ROM_LOAD16_BYTE( "club-firecracker_std_ac_67pss.hi", 0x00000, 0x080000, CRC(6b2e08d5) SHA1(11a870bae9881df116727c942e724320557fac83) )
 	ROM_LOAD16_BYTE( "club-firecracker_std_ac_67pss.lo", 0x00001, 0x080000, CRC(09315677) SHA1(bd9421275331707e1ad24d7d248b8dddb1bf75ee) )
 	sc_fcc_others
+
+	sc_fcc_matrix
 ROM_END
 
 
@@ -24016,11 +24029,39 @@ GAME( 200?, sc4fpitck	,sc4fpitc,	sc4, sc4, sc4, ROT0, "BFM","Fever Pitch (Bellfr
 GAME( 200?, sc4fevnx	,0,			sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
+const stepper_interface* sc4fcc_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+static void bfmdm01_busy(running_machine &machine, int state)
+{
+	// Must tie back to inputs somehow!
+}
+
+static const bfmdm01_interface dm01_interface =
+{
+	bfmdm01_busy
+};
+
+static DRIVER_INIT( sc4fcc )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	BFM_dm01_config(machine, &dm01_interface);
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4fcc_reel_configs;
+}
+
 // PR6835 FIRE CRACKER         PR6835 FIRE SOUNDS11
-GAME( 200?, sc4fcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fcca		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fccb		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fccc		,sc4fcc,	sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fcc		,0,			sc4dmd, sc4, sc4fcc, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fcca		,sc4fcc,	sc4dmd, sc4, sc4fcc, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fccb		,sc4fcc,	sc4dmd, sc4, sc4fcc, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fccc		,sc4fcc,	sc4dmd, sc4, sc4fcc, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2082 FIRE POWER         FPOW SOUNDS         FIRE POWER
 GAME( 200?, sc4fire		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
