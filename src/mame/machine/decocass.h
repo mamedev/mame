@@ -110,7 +110,6 @@ public:
 
 	/* DS Telejan */
 	UINT8     m_mux_data;
-	UINT8     m_mux_side;
 
 	/* devices */
 	device_t *m_maincpu;
