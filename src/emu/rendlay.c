@@ -632,7 +632,8 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	if (strcmp(compnode.name, "image") == 0)
 	{
 		m_type = CTYPE_IMAGE;
-		m_dirname = dirname;
+		if (dirname != NULL)
+			m_dirname = dirname;
 		m_imagefile[0] = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
 		m_alphafile[0] = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
 		m_file[0] = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
