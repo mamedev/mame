@@ -2503,7 +2503,7 @@ ROM_START( dw2001 )
 	ROM_LOAD16_WORD_SWAP( "2001.u22", 0x100000, 0x80000, CRC(5cabed92) SHA1(d513e353c5c4695b16228e0bda9388c396aa4a81) )
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "dw2001_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "dw2001_igs027a_japan.bin", 0x000000, 0x04000, CRC(3a79159b) SHA1(0d693c798ce24c6a749669be8c7b1e4633409e49) )
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "2001.u12", 0x000000, 0x80000, CRC(973db1ab) SHA1(cc35e1a8534fa5d59d888f530769bae4e08c62ca) ) // external ARM data rom (encrypted)
@@ -2533,7 +2533,7 @@ ROM_START( dwpc )
 	ROM_LOAD16_WORD_SWAP( "dwpc_v101jp.u22", 0x100000, 0x80000, CRC(b93027c0) SHA1(602e5f651ccb63e6465ebd7762d8d2dcf7d54077) )
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "dwpc_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "dw2001_igs027a_japan.bin", 0x000000, 0x04000, CRC(3a79159b) SHA1(0d693c798ce24c6a749669be8c7b1e4633409e49) )
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "dwpc_v100jp.u12", 0x000000, 0x80000, CRC(0d112126) SHA1(2b569b8ef974d1d9906cc052eee63b869c8d4fa4) ) // external ARM data rom (encrypted)
@@ -3722,6 +3722,14 @@ GAME( 2001, ddp2,         pgm,       pgm_arm_type2,    ddp2,     ddp2,       ROT
 GAME( 2001, ddp2101,      ddp2,      pgm_arm_type2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 101)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2001, ddp2100,      ddp2,      pgm_arm_type2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
+// japan region only?
+GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001 (V100?, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/21/01 16:05:16
+
+// japan region only?
+GAME( 2001, dwpc,         pgm,       pgm_arm_type2,     dw2001,   dwpc,      ROT0,   "IGS", "Dragon World Pretty Chance (V101, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 09/26/01 10:23:26
+
+
+
 // we bypass the internal ARM rom on these, ideally it should still be dumped tho!
 // ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
 GAME( 2002, dmnfrnt,      pgm,       pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
@@ -3784,10 +3792,6 @@ GAME( 1998, drgw3105,     drgw3,     pgm_022_025_dw,     dw3,      drgw3,      R
 GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
 
 GAME( 1998, dwex,         pgm,       pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-
-GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 02/21/01 16:05:16
-
-GAME( 2001, dwpc,         pgm,       pgm_arm_type2,     dw2001,   dwpc,      ROT0,   "IGS", "Dragon World Pretty Chance (V101, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 09/26/01 10:23:26
 
 
 GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,    pstar,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
