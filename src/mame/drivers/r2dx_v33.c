@@ -837,24 +837,22 @@ ROM_START( r2dx_v33 )
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* COPX */
+	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx_d3.357", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) )
 ROM_END
 
-/* Different hardware, uses COPX-D3 for protection  */
-ROM_START( nzeroteam )
+ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
 	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1", 0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2", 0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* COPX */
-	/* not from this set, assumed to be the same */
-	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, BAD_DUMP CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
+	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* Not from this set, but same data as Zero Team 2000 & Raiden II New */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",       0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) /* Same as some of other Zero Team sets */
@@ -877,17 +875,15 @@ ROM_START( nzeroteam )
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
 ROM_END
 
-/* Different hardware, uses COPX-D3 for protection  */
-ROM_START( zerotm2k )
+ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-D3) for protection  */
 	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD( "mt28f800b1.u0230", 0x000000, 0x100000, CRC(6ab49d8c) SHA1(d94ec9a46ff98a76c3372369246733268474de99) ) /* SMT rom, PCB silkscreened PRG01 */
 	/* PCB has unpopulated socket space for two 27C040 at u0224 silkscreened PRG0 & u0226 silkscreened PRG1) */
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* COPX */
-	ROM_LOAD( "mx27c1000mc.u0366",   0x00000, 0x20000, NO_DUMP ) /* PCB silkscreened 333ROM */
-	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* Use this for now. DELETE when 333ROM is dumped */
+	ROM_REGION( 0x40000, "user2", 0 ) /* SEI333 (AKA COPX-D3) data */
+	ROM_LOAD( "mx27c1000mc.u0366", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* PCB silkscreened 333ROM */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "syz-02.u019",  0x000000, 0x08000, CRC(55371073) SHA1(f6e182fa64630595dc8c25ac820e12983cfbed12) ) /* PCB silkscreened SOUND */
@@ -904,11 +900,9 @@ ROM_START( zerotm2k )
 	/* PCB has an unpopulated socket rom space for a LH535A00D at u0615 for alt BG3 location */
 
 	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "musha_obj-1a.u0729", 0x000000, 0x200000, NO_DUMP ) /* PCB silkscreened OBJ1 */
-	ROM_LOAD32_WORD( "musha_obj-2a.u0730", 0x000002, 0x200000, NO_DUMP ) /* PCB silkscreened OBJ2 */
+	ROM_LOAD32_WORD( "musha_obj-1a.u0729", 0x000000, 0x200000, CRC(9b2cf68c) SHA1(cd8cb277091bfa125fd0f68410de39f72f1c7047) ) /* PCB silkscreened OBJ1 */
+	ROM_LOAD32_WORD( "musha_obj-2a.u0730", 0x000002, 0x200000, CRC(fcabee05) SHA1(b2220c0311b3bd2fd44fb56fff7c27bed0816fe9) ) /* PCB silkscreened OBJ2 */
 	/* PCB has unpopulated rom space for two SMT roms at u0734 & u0736 for alt OBJ1 & OBJ2 locations) */
-	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) ) /* Use this for now. DELETE when MUSHA OBJ-1A is dumped */
-	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Use this for now. DELETE when MUSHA OBJ-2A is dumped */
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "szy-01.u099", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* PCB silkscreened PCM, Same as other Zero Team sets */
@@ -918,7 +912,7 @@ ROM_END
 GAME( 1996, r2dx_v33, 0,          rdx_v33,  rdx_v33,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
-GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
+GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
-GAME( 2000, zerotm2k,  zeroteam,  nzerotea, nzerotea, nzerotea,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
+GAME( 2000, zerotm2k,  zeroteam,  nzerotea, nzerotea, nzerotea,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND)
