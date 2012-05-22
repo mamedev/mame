@@ -108,6 +108,10 @@ public:
 	/* dongle type #5: status */
 	INT32     m_type5_latch;		/* latched enable PROM (1100xxxx written to E5x1) */
 
+	/* DS Telejan */
+	UINT8     m_mux_data;
+	UINT8     m_mux_side;
+
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;

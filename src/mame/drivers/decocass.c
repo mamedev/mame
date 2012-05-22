@@ -331,6 +331,49 @@ static INPUT_PORTS_START( cprogolf )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cdsteljn )
+	PORT_INCLUDE( decocass )
+
+	PORT_START("P1_MP0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1_MP1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+
+	PORT_START("P1_MP2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_K ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_L ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_N ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1_MP3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI ) PORT_PLAYER(1) // trusted
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_PON ) PORT_PLAYER(1) // trusted
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_PLAYER(1) // trusted
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2_MP0")
+
+	PORT_START("P2_MP1")
+	PORT_START("P2_MP2")
+	PORT_START("P2_MP3")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cexplore )
 	PORT_INCLUDE( decocass )
 
@@ -1552,6 +1595,43 @@ static DRIVER_INIT( decocrom )
 	state->save_pointer(NAME(state->m_decrypted2), romlength);
 }
 
+static READ8_HANDLER( cdsteljn_input_r )
+{
+	decocass_state *state = space->machine().driver_data<decocass_state>();
+	UINT8 res;
+	static const char *const portnames[2][4] = {
+		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
+		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}		 };
+
+	if(offset & 7)
+		return decocass_input_r(space,offset);
+
+	res = space->machine().root_device().ioport(portnames[state->m_mux_side][state->m_mux_data])->read();
+
+	return res;
+}
+
+static WRITE8_HANDLER( cdsteljn_mux_w )
+{
+	decocass_state *state = space->machine().driver_data<decocass_state>();
+
+	state->m_mux_data = (data & 0xc) >> 2;
+	state->m_mux_side = (data & 2) >> 1;
+
+	if(data & ~0xf)
+		printf("%02x\n",data);
+}
+
+static DRIVER_INIT( cdsteljn )
+{
+	/* standard init */
+	DRIVER_INIT_CALL(decocass);
+
+	/* install custom mahjong panel */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe413, 0xe413, FUNC(cdsteljn_mux_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe600, 0xe6ff, FUNC(cdsteljn_input_r));
+}
+
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette)", 0 )
 /* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette)", 0 )
@@ -1568,7 +1648,7 @@ static DRIVER_INIT( decocrom )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
          GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", GAME_NOT_WORKING)
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", GAME_NOT_WORKING)
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
          GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
