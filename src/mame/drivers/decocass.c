@@ -1053,14 +1053,14 @@ ROM_END
 
 /* 13 */
 /* Photo of Dongle shows DP-1130B (the "B" is in a seperate white box then the DP-1130 label) */
-ROM_START( cprogolf )
+ROM_START( cprogolf ) // version 9-B-0
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "dp-1130_b.dgl", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cprogolf.cas",  0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
+	ROM_LOAD( "dt-1130_9b.cas",  0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
 ROM_END
 
 ROM_START( cprogolfj ) // version 1-A
@@ -1070,7 +1070,7 @@ ROM_START( cprogolfj ) // version 1-A
 	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) /* Should be dp-1130a?? */
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) ) /* Should be dt-1130?? */
+	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) )
 ROM_END
 
 /* 14 */
@@ -1225,14 +1225,14 @@ ROM_END
 
 /* 26 Hamburger / Burger Time */
 /* Photo of Dongle shows DP-126B with Cassette DT-1267B (the "7B" is in a seperate white box then the DP-126 label) */
-ROM_START( cbtime )
+ROM_START( cbtime ) // version 7-B-0
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "dp-126_b.dgl", 0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) ) /* Is this the 7B version? */
+	ROM_LOAD( "dt-126_7b.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) )
 ROM_END
 
 ROM_START( chamburger ) // version 0-A-0
