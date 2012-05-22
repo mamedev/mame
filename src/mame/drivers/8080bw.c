@@ -2566,6 +2566,19 @@ ROM_START( sisv2 )
 	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+ROM_START( spacerng )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sr1.u36",    0x0000, 0x0800, CRC(b984f52d) SHA1(fdc8b249c0b65339977f91b674bdcb435aa99474) )
+	ROM_LOAD( "sr2.u35",    0x0800, 0x0800, CRC(4b4f07e6) SHA1(408dcdae3e80a09584d8ebd6491bc90c4def1fcf) )
+	ROM_LOAD( "sr3.u34",    0x1000, 0x0800, CRC(edc28ba9) SHA1(c96668f709d3fa0b97a6b118614e9c139f8f54cc) )
+	ROM_LOAD( "sr4.u33",    0x1800, 0x0800, CRC(a95f559f) SHA1(f597c7af96a9d039fd8e54d976d68a065f6bf0c8) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	/* !! not dumped yet, these were taken from sisv */
+	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
 ROM_START( spceking )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "invaders.h",   0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
@@ -3440,6 +3453,7 @@ GAMEL(1978, sitv,     invaders, invaders, sitv,     0, ROT270, "Taito", "Space I
 GAME( 1979, sicv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (CV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1978, sisv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1978, sisv2,    invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1978, spacerng, invaders, invadpt2, sitv,     0, ROT270, "bootleg (Leisure Time Electronics)", "Space Ranger (bootleg of Space Invaders)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // many modifications
 GAME( 1979, galxwars, 0,        invadpt2, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1979, galxwars2,galxwars, invadpt2, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1979, galxwarst,galxwars, invadpt2, galxwars, 0, ROT270, "Universal (Taito license?)", "Galaxy Wars (Taito?)" , GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* Copyright Not Displayed */
