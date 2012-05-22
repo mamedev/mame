@@ -29,6 +29,7 @@
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
     Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
 
+    DS Telejan uses a special control panel for inputs which needs to be implemented, so it is currently unplayable.
 
  ***********************************************************************/
 
@@ -1567,7 +1568,7 @@ static DRIVER_INIT( decocrom )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
          GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0)
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", GAME_NOT_WORKING)
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
          GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
