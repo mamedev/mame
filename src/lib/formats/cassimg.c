@@ -549,7 +549,10 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 		/* compute the value that we are writing */
 		switch(waveform_bytes_per_sample(waveform_flags)) {
 		case 1:
-			dest_value = extrapolate8(*((INT8 *) source_ptr));
+			if (waveform_flags & CASSETTE_WAVEFORM_UNSIGNED)
+				dest_value = extrapolate8((INT8)(*source_ptr - 128));
+			else
+				dest_value = extrapolate8(*((INT8 *) source_ptr));
 			break;
 		case 2:
 			word = *((INT16 *) source_ptr);

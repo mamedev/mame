@@ -155,6 +155,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/trd_dsk.o		\
 	$(LIBOBJ)/formats/trs_cas.o		\
 	$(LIBOBJ)/formats/trs_dsk.o		\
+	$(LIBOBJ)/formats/tvc_cas.o		\
 	$(LIBOBJ)/formats/tzx_cas.o		\
 	$(LIBOBJ)/formats/uef_cas.o		\
 	$(LIBOBJ)/formats/vg5k_cas.o	\

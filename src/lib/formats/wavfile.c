@@ -119,7 +119,7 @@ static casserr_t wavfile_process(cassette_image *cassette, struct CassetteOption
 			switch(opts->bits_per_sample)
 			{
 				case 8:
-					waveform_flags = CASSETTE_WAVEFORM_8BIT;
+					waveform_flags = CASSETTE_WAVEFORM_8BIT | CASSETTE_WAVEFORM_UNSIGNED;	// 8-bits wav are stored unsigned
 					break;
 				case 16:
 					waveform_flags = CASSETTE_WAVEFORM_16BITLE;
