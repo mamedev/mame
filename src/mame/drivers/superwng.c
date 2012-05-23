@@ -1,24 +1,23 @@
 /****************************************************************************************
+
 Super Wing - (c) 1985 Wing (UPL?)
 
 driver by Tomasz Slanina
 
-Hardware a bit (interrupts, sound) similar to mouser
+probably a prequel/sequel to flipjack
+Hardware a bit (interrupts, sound) similar to mouser as well
 
 TODO:
-
- - unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
-   data (similar to the one in roms 4.5p and 5.5r).
-   There are two possibilities: its bad dump of gfx rom (two extra bit layers
-   of current gfx) or it's banked at 0x4000 - 0x7fff area.
-  - missing color prom dump (missing on pcb)
+  - unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
+    data (similar to the one in roms 4.5p and 5.5r).
+    There are two possibilities: its bad dump of gfx rom (two extra bit layers
+    of current gfx) or it's banked at 0x4000 - 0x7fff area.
+  - dump color prom
   - some unknown DSW and inputs
+  - hopper
   - unknown writes
-  - tile and sprite flipping (both h and v controlled by the same bit?)
-  - sprite coords and tile num (is the >>2 correct ?) (name entry, flipped screen)
   - measure clocks
 
-  To enter initials - use tilt. It's probably separate button (?), not a tilt sensor.
 
 *****************************************************************************************/
 
@@ -32,24 +31,25 @@ class superwng_state : public driver_device
 {
 public:
 	superwng_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_videoram_bg(*this, "videorabg"),
 		m_videoram_fg(*this, "videorafg"),
 		m_colorram_bg(*this, "colorrabg"),
-		m_colorram_fg(*this, "colorrafg"){ }
+		m_colorram_fg(*this, "colorrafg")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_videoram_bg;
 	required_shared_ptr<UINT8> m_videoram_fg;
 	required_shared_ptr<UINT8> m_colorram_bg;
 	required_shared_ptr<UINT8> m_colorram_fg;
 
-	int			m_tile_bank;
-
-	UINT8      m_sound_byte;
-	UINT8      m_nmi_enable;
-
-	device_t *	m_maincpu;
-	device_t *	m_audiocpu;
+	UINT8 m_tile_bank;
+	UINT8 m_sound_byte;
+	UINT8 m_nmi_enable;
 
 	tilemap_t *	m_bg_tilemap;
 	tilemap_t *	m_fg_tilemap;
@@ -65,8 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(superwng_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
-	DECLARE_WRITE8_MEMBER(superwng_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(superwng_flip_screen_y_w);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -81,7 +79,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(	0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO(0, code, attr & 0xf, flipx|flipy);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -97,17 +95,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO( 0, code, attr & 0xf, flipx|flipy);
-}
-
-WRITE8_MEMBER(superwng_state::superwng_flip_screen_x_w)
-{
-	flip_screen_x_set(~data & 1);
-}
-
-WRITE8_MEMBER(superwng_state::superwng_flip_screen_y_w)
-{
-	flip_screen_y_set(~data & 1);
+	SET_TILE_INFO(0, code, attr & 0xf, flipx|flipy);
 }
 
 static VIDEO_START( superwng )
@@ -122,48 +110,48 @@ static VIDEO_START( superwng )
 static SCREEN_UPDATE_IND16( superwng )
 {
 	superwng_state *state = screen.machine().driver_data<superwng_state>();
-	int flip=state->flip_screen();
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	rectangle tmp=cliprect;
+	rectangle tmp = cliprect;
 
-	if(flip)
+	if (state->flip_screen())
 	{
-		tmp.min_x+=32;
+		tmp.min_x += 32;
 		state->m_fg_tilemap->draw(bitmap, tmp, 0, 0);
 	}
 	else
 	{
-		tmp.max_x-=32;
+		tmp.max_x -= 32;
 		state->m_fg_tilemap->draw(bitmap, tmp, 0, 0);
 	}
 
+	//sprites
+	for (int i = 0x3e; i >= 0; i -= 2)
 	{
-		//sprites
+		/*      76543210
+		video0: xxxxxx    code
+		              x   /flip
+		               x  enable?
+		video1: xxxxxxxx  x
+		color0: xxxxxxxx  y
+		color1: xxx       unused?
+		           x      ?
+		            xxxx  color
+		*/
+		if (~state->m_videoram_bg[i] & 1)
+			continue;
 
-		for(int i=0x3e; i>=0; i-=2)
-		{
-			int code=(state->m_videoram_bg[i]>>2)+0x40;
-			int sx=256-state->m_videoram_bg[i+1]-8;
-			int sy = state->m_colorram_bg[i]+8;
-			int attr = state->m_colorram_bg[i+1];
+		int code = (state->m_videoram_bg[i] >> 2) | 0x40;
+		int flip = ~state->m_videoram_bg[i] >> 1 & 1;
+		int sx = 240 - state->m_videoram_bg[i + 1];
+		int sy = state->m_colorram_bg[i];
+		int color = state->m_colorram_bg[i + 1] & 0xf;
 
-			if (flip)
-			{
-				sy-=8;
-				sx-=8;
-			}
-
-			if(state->m_videoram_bg[i+1] | state->m_colorram_bg[i])
-			{
-
-				drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
-								code,
-								attr,
-								flip, flip,
-								sx, sy, 0);
-			}
-		}
+		drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
+						code,
+						color,
+						flip, flip,
+						sx, sy, 0);
 	}
 
 	return 0;
@@ -328,48 +316,50 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( superwng )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Launch Ball" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flipper" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flipper" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Launch Ball")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Right Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Left Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Tilt")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Launch Ball" ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flipper" ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flipper" ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Launch Ball")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Right Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Left Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Tilt")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01,  DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02,  DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04,  DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ))
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x10,  DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x20,  DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40,  DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x80, "5" )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )
+	PORT_DIPSETTING(	0x80, "3" )
+	PORT_DIPSETTING(	0x00, "5" )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -382,17 +372,18 @@ static INPUT_PORTS_START( superwng )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x30, 0x00,	DEF_STR( Unknown ) ) //causes writes to 0xa000 every frame
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40,  DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown )) // hopper related
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown )) // hopper related
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown )) // hopper related, if 0x10 or 0x20 is set, and this is set, it will lock up with HOPPER EMPTY
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(	0x00,  DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80,  DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -431,9 +422,7 @@ static MACHINE_START( superwng )
 {
 	superwng_state *state = machine.driver_data<superwng_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-
+	state->save_item(NAME(state->m_tile_bank));
 	state->save_item(NAME(state->m_sound_byte));
 	state->save_item(NAME(state->m_nmi_enable));
 }
@@ -491,7 +480,7 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 
 	MCFG_PALETTE_LENGTH(0x40)
 	MCFG_PALETTE_INIT(superwng)
-	MCFG_VIDEO_START( superwng )
+	MCFG_VIDEO_START(superwng)
 	MCFG_SCREEN_UPDATE_STATIC(superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -525,4 +514,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, 0, ROT90, "Wing", "Super Wing", GAME_WRONG_COLORS )
+GAME( 1985, superwng,   0,      superwng, superwng, 0, ROT90, "Wing", "Super Wing", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
