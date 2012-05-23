@@ -379,8 +379,6 @@ ROM_START( flipjack )
 	ROM_LOAD( "1.l5",  0x4000, 0x2000, CRC(4632263b) SHA1(b1fbb851ffd8aff36aff6f36672122fef3dd0af1) ) // what's this rom?
 	ROM_LOAD( "4.f5",  0x8000, 0x2000, CRC(d27e0184) SHA1(f108993fc3fce9173a4961a76fc60655fdd1cd25) )
 
-	ROM_REGION( 0x1000, "ram", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "s.s5",  0x0000, 0x2000, CRC(34515a7b) SHA1(affe34198b77bddd314fae2851fd6a29d80f734e) )
 
