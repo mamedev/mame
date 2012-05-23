@@ -21,15 +21,9 @@
 
 #include "devlegcy.h"
 
-/* uncomment the line below for MESS to avoid breaking compile
- * please migrate as soon as possible to new device so that we can get rid of the legacy */
-
-//#define OLDDEVICE_FOR_MESS 1
-
-//#define POKEY_EXEC_INTERFACE
+#define POKEY_EXEC_INTERFACE
 
 /* CONSTANT DEFINITIONS */
-
 
 /* exact 1.79 MHz clock freq (of the Atari 800 that is) */
 #define FREQ_17_EXACT   1789790
@@ -65,7 +59,7 @@ struct _pokey_interface
 class pokeyn_device : public device_t,
 					  public device_sound_interface
 #ifdef POKEY_EXEC_INTERFACE
-					  public ,device_execute_interface
+					  ,public device_execute_interface
 #endif
 {
 public:
@@ -134,7 +128,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 #ifdef POKEY_EXEC_INTERFACE
-	virtual void execute_run() { m_icount = 0; } //printf("execute: %d\n", m_icount); m_icount = 0; }
+	virtual void execute_run();
 #endif
 
 	// configuration state
@@ -150,6 +144,8 @@ private:
     {
     public:
     	pokey_channel();
+    	pokeyn_device *m_parent;
+    	UINT8 m_INTMask;
     	UINT8 m_AUDF;           /* AUDFx (D200, D202, D204, D206) */
     	UINT8 m_AUDC;			/* AUDCx (D201, D203, D205, D207) */
     	INT32 m_borrow_cnt;		/* borrow counter */
@@ -160,12 +156,20 @@ private:
 
     	inline void sample(void)			{ m_filter_sample = m_output; }
     	inline void reset_channel(void)		{ m_counter = m_AUDF ^ 0xff; }
-    	inline void inc_chan(void)
+
+    	inline void inc_chan()
     	{
     		m_counter = (m_counter + 1) & 0xff;
     		if (m_counter == 0 && m_borrow_cnt == 0)
+    		{
     			m_borrow_cnt = 3;
+    			if (m_parent->m_IRQEN & m_INTMask)
+    			{
+    				m_parent->m_IRQST |= m_INTMask;
+    			}
+    		}
     	}
+
     	inline int check_borrow()
     	{
     		if (m_borrow_cnt > 0)
@@ -179,6 +183,8 @@ private:
 
 	static const int POKEY_CHANNELS = 4;
 
+	UINT32 step_one_clock();
+
 	void poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert);
 	void poly_init_9_17(UINT32 *poly, int size);
 	inline void process_channel(int ch);
@@ -186,41 +192,45 @@ private:
 	char *audc2str(int val);
 	char *audctl2str(int val);
 
+	void write_internal(offs_t offset, UINT8 data);
+
 	// internal state
 	sound_stream* m_stream;
 
 	pokey_channel m_channel[POKEY_CHANNELS];
 
-	INT32 m_divisor[4];		/* channel divisor (modulo value) */
+	UINT32 m_output;
+
 	INT32 m_clock_cnt[3];		/* clock counters */
 	UINT32 m_p4;              /* poly4 index */
 	UINT32 m_p5;              /* poly5 index */
 	UINT32 m_p9;              /* poly9 index */
 	UINT32 m_p17;             /* poly17 index */
-	UINT32 m_r9;				/* rand9 index */
-	UINT32 m_r17;             /* rand17 index */
 	UINT32 m_clockmult;		/* clock multiplier */
-	emu_timer *m_timer[3];	/* timers for channel 1,2 and 4 events */
-	attotime m_timer_period[3];	/* computed periods for these timers */
-	int m_timer_param[3];		/* computed parameters for these timers */
-	emu_timer *m_rtimer;     /* timer for calculating the random offset */
+
 	emu_timer *m_ptimer[8];	/* pot timers */
+
+#ifdef POKEY_EXEC_INTERFACE
+	emu_timer *m_write_timer;	/* timer for sync operation */
+#endif
+
 	devcb_resolved_read8 m_pot_r[8];
 	devcb_resolved_read8 m_allpot_r;
 	devcb_resolved_read8 m_serin_r;
 	devcb_resolved_write8 m_serout_w;
 	void (*m_interrupt_cb)(pokeyn_device *device, int mask);
-	UINT8 m_POTx[8];			/* POTx   (R/D200-D207) */
+
+	UINT8 m_POTx[8];		/* POTx   (R/D200-D207) */
 	UINT8 m_AUDCTL;			/* AUDCTL (W/D208) */
 	UINT8 m_ALLPOT;			/* ALLPOT (R/D208) */
 	UINT8 m_KBCODE;			/* KBCODE (R/D209) */
-	UINT8 m_RANDOM;			/* RANDOM (R/D20A) */
 	UINT8 m_SERIN;			/* SERIN  (R/D20D) */
 	UINT8 m_SEROUT;			/* SEROUT (W/D20D) */
 	UINT8 m_IRQST;			/* IRQST  (R/D20E) */
 	UINT8 m_IRQEN;			/* IRQEN  (W/D20E) */
 	UINT8 m_SKSTAT;			/* SKSTAT (R/D20F) */
 	UINT8 m_SKCTL;			/* SKCTL  (W/D20F) */
+
 	attotime m_clock_period;
 	attotime m_ad_time_fast;
 	attotime m_ad_time_slow;
