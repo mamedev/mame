@@ -2395,6 +2395,7 @@ src/mame/drivers/firetrap.c svneol=native#text/plain
 src/mame/drivers/firetrk.c svneol=native#text/plain
 src/mame/drivers/fitfight.c svneol=native#text/plain
 src/mame/drivers/flicker.c svneol=native#text/plain
+src/mame/drivers/flipjack.c svneol=native#text/plain
 src/mame/drivers/flkatck.c svneol=native#text/plain
 src/mame/drivers/flower.c svneol=native#text/plain
 src/mame/drivers/flstory.c svneol=native#text/plain
