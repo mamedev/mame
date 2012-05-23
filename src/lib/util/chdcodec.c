@@ -965,7 +965,7 @@ void chd_zlib_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *
 
 	// do it
 	zerr = inflate(&m_inflater, Z_FINISH);
-	if (zerr != Z_OK)
+	if (zerr != Z_STREAM_END)
 		throw CHDERR_DECOMPRESSION_ERROR;
 	if (m_inflater.total_out != destlen)
 		throw CHDERR_DECOMPRESSION_ERROR;
@@ -1574,7 +1574,7 @@ void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT
 
 	// do it
 	zerr = inflate(&m_inflater, Z_FINISH);
-	if (zerr != Z_OK)
+	if (zerr != Z_STREAM_END)
 		throw CHDERR_DECOMPRESSION_ERROR;
 	if (m_inflater.total_out != frames * CD_MAX_SUBCODE_DATA)
 		throw CHDERR_DECOMPRESSION_ERROR;
