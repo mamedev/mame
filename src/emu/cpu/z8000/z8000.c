@@ -367,13 +367,13 @@ INLINE void Interrupt(z8000_state *cpustate)
     if (cpustate->irq_req & Z8000_NVI)
     {
         int type = (*cpustate->irq_callback)(cpustate->device, 0);
-        set_irq(cpustate, type);
+        set_irq(cpustate, type | Z8000_NVI);
     }
 
     if (cpustate->irq_req & Z8000_VI)
     {
         int type = (*cpustate->irq_callback)(cpustate->device, 1);
-        set_irq(cpustate, type);
+        set_irq(cpustate, type | Z8000_VI);
     }
 
     /* trap ? */
@@ -463,9 +463,13 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
-        cpustate->pc = RDMEM_W(cpustate,  VEC00 + (cpustate->device->type() == Z8001 ? 4 : 2) * (cpustate->irq_req & 0xff));
+		if (cpustate->device->type() == Z8001)
+			cpustate->pc =  segmented_addr(RDMEM_L(cpustate, VEC00 + 4 * (cpustate->irq_req & 0xff)));
+		else
+			cpustate->pc = RDMEM_W(cpustate, VEC00 + 2 * (cpustate->irq_req & 0xff));
         cpustate->irq_req &= ~Z8000_VI;
         CHANGE_FCW(cpustate, GET_FCW(VI));
+        //printf ("z8k VI (vec 0x%x)\n", cpustate->irq_req & 0xff);
         LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpustate->device->tag(), cpustate->irq_vec, VEC00 + (cpustate->device->type() == Z8001 ? 4 : 2) * (cpustate->irq_req & 0xff), cpustate->fcw, cpustate->pc));
     }
 }
@@ -703,8 +707,8 @@ CPU_GET_INFO( z8002 )
 		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;					break;
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_state[0];				break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = cpustate->irq_state[1];				break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_state[0];				break;  /* NVI */
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = cpustate->irq_state[1];				break;  /* VI */
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc;							break;
 
