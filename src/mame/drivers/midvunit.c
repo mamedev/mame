@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_devices, "hdd", NULL, true)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2115)

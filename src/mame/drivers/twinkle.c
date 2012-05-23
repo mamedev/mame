@@ -908,7 +908,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_MACHINE_RESET( twinkle )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 
 	/* video hardware */

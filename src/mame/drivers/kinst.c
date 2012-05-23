@@ -664,7 +664,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_MACHINE_START(kinst)
 	MCFG_MACHINE_RESET(kinst)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

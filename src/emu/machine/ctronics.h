@@ -149,7 +149,7 @@ SLOT_INTERFACE_EXTERN(centronics_printer);
 #define MCFG_CENTRONICS_ADD(_tag, _intf, _slot_intf, _def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, CENTRONICS, 0) \
 	MCFG_DEVICE_CONFIG(_intf) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 
 #define MCFG_CENTRONICS_PRINTER_ADD(_tag, _intf) \
 	MCFG_CENTRONICS_ADD(_tag, _intf, centronics_printer, "printer", NULL) \

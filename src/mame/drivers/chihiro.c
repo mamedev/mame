@@ -1179,7 +1179,7 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, "bb", NULL)
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, "bb", NULL, true)
 	MCFG_IDE_BUS_MASTER_SPACE( "ide", "maincpu", PROGRAM )
 
 	/* video hardware */

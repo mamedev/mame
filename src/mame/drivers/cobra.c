@@ -2020,7 +2020,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_VIDEO_START(cobra)

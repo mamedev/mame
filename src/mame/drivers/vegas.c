@@ -2222,7 +2222,7 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_MACHINE_RESET(vegas)
 	MCFG_M48T37_ADD("timekeeper")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_IDE_BUS_MASTER_SPACE("ide", "maincpu", PROGRAM)
 
 	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)

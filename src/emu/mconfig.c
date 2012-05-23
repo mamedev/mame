@@ -78,6 +78,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		{
 			device_t &owner = slot->device();
 			const char *selval = options.value(owner.tag()+1);
+			bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
 			if (!is_selected_driver || !options.exists(owner.tag()+1))
 				selval = slot->get_default_card(*this, options);
 
@@ -88,11 +89,14 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				{
 					if (strcmp(selval, intf[i].name) == 0)
 					{
-						device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, 0);
-						found = true;
-						const char *def = slot->get_default_card(*this, options);
-						if (def != NULL && strcmp(def, selval) == 0)
-							device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
+						if ((!intf[i].internal) || (isdefault && intf[i].internal))
+						{
+							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, 0);
+							found = true;
+							const char *def = slot->get_default_card(*this, options);
+							if (def != NULL && strcmp(def, selval) == 0)
+								device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
+						}
 					}
 				}
 				if (!found)

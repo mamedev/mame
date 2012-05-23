@@ -647,6 +647,7 @@ void cli_frontend::listslots(const char *gamename)
 		bool first = true;
 		for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 		{
+			if (slot->fixed()) continue;
 			// output the line, up to the list of extensions
 			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
 
@@ -654,14 +655,17 @@ void cli_frontend::listslots(const char *gamename)
 			const slot_interface* intf = slot->get_slot_interfaces();
 			for (int i = 0; intf && intf[i].name != NULL; i++)
 			{
-				device_t *dev = (*intf[i].devtype)(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
-				dev->config_complete();
-				if (i==0) {
-					printf("%-15s %s\n", intf[i].name,dev->name());
-				} else {
-					printf("%-23s   %-15s %s\n", "",intf[i].name,dev->name());
+				if (!intf[i].internal)
+				{
+					device_t *dev = (*intf[i].devtype)(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
+					dev->config_complete();
+					if (i==0) {
+						printf("%-15s %s\n", intf[i].name,dev->name());
+					} else {
+						printf("%-23s   %-15s %s\n", "",intf[i].name,dev->name());
+					}
+					global_free(dev);
 				}
-				global_free(dev);
 			}
 			// end the line
 			printf("\n");

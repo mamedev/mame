@@ -575,6 +575,17 @@ const char *core_options::value(const char *name) const
 
 
 //-------------------------------------------------
+//  priority - return the priority of option 
+//-------------------------------------------------
+
+int core_options::priority(const char *name) const
+{
+	entry *curentry = m_entrymap.find(name);
+	return (curentry != NULL) ? curentry->priority() : 0;
+}
+
+
+//-------------------------------------------------
 //  seqid - return the seqid for a given option
 //-------------------------------------------------
 

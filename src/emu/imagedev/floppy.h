@@ -11,7 +11,7 @@
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _def_inp, _formats)	\
 	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	static_cast<floppy_connector *>(device)->set_formats(_formats);
 
 

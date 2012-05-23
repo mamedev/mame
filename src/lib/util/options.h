@@ -115,6 +115,7 @@ public:
 		bool is_header() const { return type() == OPTION_HEADER; }
 		bool is_command() const { return type() == OPTION_COMMAND; }
 		bool has_range() const { return (m_minimum && m_maximum); }
+		int priority() const { return m_priority; }
 
 		// setters
 		void set_value(const char *newvalue, int priority);
@@ -171,6 +172,7 @@ public:
 
 	// reading
 	const char *value(const char *option) const;
+	int priority(const char *option) const;
 	bool bool_value(const char *name) const { return (atoi(value(name)) != 0); }
 	int int_value(const char *name) const { return atoi(value(name)); }
 	float float_value(const char *name) const { return atof(value(name)); }

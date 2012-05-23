@@ -916,7 +916,7 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIC8259_ADD( "pic8259_1", calchase_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", calchase_pic8259_2_config )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_PCI_BUS_ADD("pcibus", 0)

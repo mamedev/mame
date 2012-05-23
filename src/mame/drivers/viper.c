@@ -1963,7 +1963,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_PCI_BUS_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 8, "screen")
 	MCFG_3DFX_VOODOO_CPU("maincpu")
 	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank)

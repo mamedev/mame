@@ -675,7 +675,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_MACHINE_RESET(qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_MACHINE_RESET(qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

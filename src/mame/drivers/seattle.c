@@ -2514,7 +2514,7 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	MCFG_MACHINE_RESET(seattle)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_IDE_BUS_MASTER_SPACE("ide", "maincpu", PROGRAM)
 
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")

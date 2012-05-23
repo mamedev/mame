@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_MACHINE_RESET( coh3002t )
 
 	MCFG_AT28C16_ADD( "at28c16", 0 )
-	MCFG_IDE_CONTROLLER_ADD( "card", 0, ide_devices, "hdd", NULL)
+	MCFG_IDE_CONTROLLER_ADD( "card", 0, ide_devices, "hdd", NULL, true)
 
 	MCFG_MB3773_ADD("mb3773")
 

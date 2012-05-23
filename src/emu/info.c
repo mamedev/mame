@@ -1276,7 +1276,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
              */
 
 			const slot_interface* intf = slot->get_slot_interfaces();
-			for (int i = 0; intf && intf[i].name != NULL; i++)
+			for (int i = 0; intf && intf[i].name != NULL && !intf[i].internal; i++)
 			{
 				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", intf[i].devtype, 0);
 				if (!dev->configured())
