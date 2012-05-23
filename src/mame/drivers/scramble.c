@@ -284,6 +284,26 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( triplep_map, AS_PROGRAM, 8, scramble_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror address */
+	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x5080, 0x50ff) AM_RAM
+	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
+	AM_RANGE(0x6804, 0x6804) AM_WRITE(galaxold_stars_enable_w)
+	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("8910.1", ay8910_data_address_w)
@@ -1236,6 +1256,8 @@ static const ay8910_interface triplep_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -1471,9 +1493,12 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(triplep_map)
 	MCFG_CPU_IO_MAP(triplep_io_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_DEVICE_REMOVE("konami_7474")
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
@@ -2026,10 +2051,10 @@ ROM_START( turpins )
 	ROM_LOAD( "turtles.clr",     0x0000, 0x0020, CRC(f3ef02dd) SHA1(09fd795170d7d30f101d579f57553da5ff3800ab) )
 ROM_END
 
-GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_ppi, ROT90, "KKI", "Triple Punch", GAME_SUPPORTS_SAVE )
-GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_ppi, ROT90, "KKK", "Knock Out!!", GAME_SUPPORTS_SAVE )
+GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_ppi, ROT90, "K.K. International", "Triple Punch", GAME_SUPPORTS_SAVE )
+GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_ppi, ROT90, "KKK", "Knock Out!! (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mariner,  0,        mariner,  scramble, mariner,      ROT90, "Amenip", "Mariner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1981, 800fath,  mariner,  mariner,  800fath,  mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms", GAME_SUPPORTS_SAVE )
+GAME( 1981, 800fath,  mariner,  mariner,  800fath,  mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   ckongs,       ROT90, "bootleg", "Crazy Kong (Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mars,     0,        mars,     mars,     mars,         ROT90, "Artic", "Mars", GAME_SUPPORTS_SAVE )
 GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, devilfsh,     ROT90, "Artic", "Devil Fish", GAME_SUPPORTS_SAVE )
