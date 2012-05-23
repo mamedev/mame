@@ -597,21 +597,14 @@ static const UINT8 nspirit_code[CODE_LEN] =
 	0xc6,0x06,0x00,0x0b,0x49^0xff,	// mov [0b00h], byte 049h
 	0x68,0x00,0xd0,				// push 0d000h
 	0x1f,						// pop ds
-	// the following is for nspiritj only, the game checks for
-	// "This game can only be played in Japan..." message in the video text buffer
-	// the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
-	0xc6,0x06,0x70,0x16,0x57,	// mov [1670h], byte 057h
-	0xc6,0x06,0x71,0x16,0x00,	// mov [1671h], byte 000h
 	0xea,0x00,0x00,0x40,0x00	// jmp  0040:$0000
 };
 static const UINT8 nspirit_crc[CRC_LEN] =   {	0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
-static const UINT8 nspiritj_crc[CRC_LEN] =  {	0x26,0xa3,0xa5,0xe9, 0xc8,0x33,0xa7,0x2d,
-												0xf2,0xa3,0xf9,0xe1, 0xbc,0x6c,0x01,0x95, 0x00,0x00 };
-
 /* Image Fight */
 static const UINT8 imgfight_code[CODE_LEN] =
 {
+
 	0x68,0x00,0xa0,				// push 0a000h
 	0x1f,						// pop ds
 	0xc6,0x06,0x38,0x38,0x50,	// mov [3838h], byte 050h
@@ -631,13 +624,11 @@ static const UINT8 imgfight_code[CODE_LEN] =
 	0xc6,0x06,0x23,0x09,0x47^0xff,	// mov [0923h], byte 047h
 	0x68,0x00,0xd0,				// push 0d000h
 	0x1f,						// pop ds
-	// the game checks for
-	// "This game can only be played in Japan..." message in the video text buffer
-	// the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
-	0xc6,0x06,0xb0,0x1c,0x57,	// mov [1cb0h], byte 057h
 	0xea,0x00,0x00,0x40,0x00	// jmp  0040:$0000
 };
-static const UINT8 imgfight_crc[CRC_LEN] =  {	0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
+
+// these are for the japan set where we have the mcu anyway...
+static const UINT8 imgfightj_crc[CRC_LEN] =  {	0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
 												0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 /* Legend of Hero Tonma */
@@ -655,16 +646,12 @@ static const UINT8 loht_code[CODE_LEN] =
 	0xc6,0x06,0x00,0x0a,0x49^0xff,	// mov [0a00h], byte 049h
 	0xc6,0x06,0x00,0x0b,0x49^0xff,	// mov [0b00h], byte 049h
 
-	0x68,0x00,0xd0,				    // push 0d000h // Japan set only
-	0x1f,						    // pop ds // Japan set only
-	0xc6,0x06,0x70,0x16,0x57,		// mov [1670h], byte 057h // Japan set only - checks this (W) of WARNING
 
 	0xea,0x5d,0x01,0x40,0x00	// jmp  0040:$015d
 
 };
 static const UINT8 loht_crc[CRC_LEN] =	  {	0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
 												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
-/* service mode crashes at the moment (119u2), so I can't add the CRCs for lohtj */
 
 /* X Multiply */
 static const UINT8 xmultiplm72_code[CODE_LEN] =
@@ -766,7 +753,7 @@ static DRIVER_INIT( nspirit )
 
 static DRIVER_INIT( imgfight )
 {
-	install_protection_handler(machine, imgfight_code,imgfight_crc);
+	install_protection_handler(machine, imgfight_code,imgfightj_crc);
 	m72_state *state = machine.driver_data<m72_state>();
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),state));
 }
@@ -2737,8 +2724,8 @@ ROM_START( imgfight )
 	ROM_LOAD16_BYTE( "if-c-l3.bin",   0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )	/* sprites */
@@ -2763,7 +2750,7 @@ ROM_START( imgfight )
 	ROM_LOAD( "if-c-v1.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 ROM_END
 
-ROM_START( imgfighto )
+ROM_START( imgfightj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "if-c-h0.bin",  0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
 	ROM_LOAD16_BYTE( "if-c-l0.bin",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
@@ -2772,8 +2759,8 @@ ROM_START( imgfighto )
 	ROM_LOAD16_BYTE( "if-c-l3.bin",  0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "imgfightj_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )	/* sprites */
@@ -3642,8 +3629,10 @@ ROM_START( kengo )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 ROM_END
 
-
-
+// in the case of the i8751 protected games the World and Japan sets should be using different MCU roms.
+// the MCU roms provide checksum information needed for the sets, so using the wrong ROM will result in
+// the program roms failing their tests.  This is why we still have simulation code for many games
+// despite having Japanese version MCU roms for several of them.  See notes next to the sets
 
 GAME( 1987, rtype,       0,        rtype,       rtype,    0,           ROT0,   "Irem", "R-Type (World)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypej,      rtype,    rtype,       rtype,    0,           ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
@@ -3652,14 +3641,14 @@ GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    0,           ROT0,   "
 GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    0,           ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
 GAME( 1987, bchopper,    0,        m72,         bchopper, bchopper,    ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
 GAME( 1987, mrheli,      bchopper, m72,         bchopper, mrheli,      ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
-GAME( 1988, nspirit,     0,        m72,         nspirit,  nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
-GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL ) /* some corruption on warning screen (layer enable?) */
-GAME( 1988, imgfight,    0,        m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (Japan, revision A)", 0 )
-GAME( 1988, imgfighto,   imgfight, m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (Japan)", 0 )
-GAME( 1989, loht,        0,        m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
-GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
-GAME( 1989, lohtb,       loht,     m72,         loht,     0,           ROT0,   "bootleg", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
-GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
+GAME( 1988, nspirit,     0,        m72,         nspirit,  nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
+GAME( 1988, imgfight,    0,        m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (World, revision A)", 0 )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, imgfightj,   imgfight, m72_8751,    imgfight, m72_8751,    ROT270, "Irem", "Image Fight (Japan)", 0 )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
+GAME( 1989, loht,        0,        m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )         // fails rom check if used with Japan MCU rom (World version?)
+GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL ) // waits for japan warning screen, works with our mcu dump (Japan Version)
+GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", GAME_NO_COCKTAIL ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1989, lohtb,       loht,     m72,         loht,     0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
 GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL )
 GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, xmultiplm72, ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreed,      0,        dbreed,      dbreed,   0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )

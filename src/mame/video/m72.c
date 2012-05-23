@@ -128,8 +128,11 @@ VIDEO_START( m72 )
 
 	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000);
 	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
+
 	//state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
-	state->m_bg_tilemap->set_transmask(2,0x0007,0xfff8);
+	state->m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj japan warning to look correct
+	//state->m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // needed for nspiritj japan warning to look correct
+	// not sure what is needed to be able to see the imgfghto warning message
 
 	memset(state->m_buffered_spriteram,0,state->m_spriteram.bytes());
 
