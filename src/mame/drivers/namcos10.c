@@ -706,6 +706,16 @@ ROM_START( mrdrilrg )
 	ROM_LOAD( "drg1a_2.bin",  0x2100000, 0x1080000, CRC(ccfabf7b) SHA1(0cbd91ce8abd6efca5d427b52279ce265f685aa9) )
 ROM_END
 
+ROM_START( mrdrilrga )
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(def72bcd) SHA1(e243b7ef23b2b00612c185e01493cd01be51f154) )
+	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(c87b5e86) SHA1(b034210da30e1f2f7d04f77e00bf7724437e2024) )
+	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(e0a9339f) SHA1(4284e7233876cfaf8021440d78ccc8c70d00cc00) )
+ROM_END
+
 ROM_START( knpuzzle )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -792,6 +802,7 @@ GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, gunbalna, ROT0, "Namco
 GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, gunbalna, ROT0, "Namco", "Gunbalina (GNN1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, gjspace,   0,        namcos10_memn, namcos10, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, knpuzzle,  0,        namcos10_memn, namcos10, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, chocovdr,  0,        namcos10_memn, namcos10, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, startrgn,  0,        namcos10_memn, namcos10, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
