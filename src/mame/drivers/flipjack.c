@@ -59,19 +59,34 @@ public:
 };
 
 
+PALETTE_INIT( flipjack )
+{
+	// from prom
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	for (int i = 0; i < 0x40; i++)
+	{
+		palette_set_color(machine, i*2, RGB_BLACK);
+		palette_set_color_rgb(machine, i*2+1, pal1bit(color_prom[i] >> 0), pal1bit(color_prom[i] >> 1), pal1bit(color_prom[i] >> 2));
+	}
+
+	// standard 1bpp for blitter
+	for (int i = 0; i < 8; i++)
+		palette_set_color_rgb(machine, i+0x80, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+}
 
 
 static SCREEN_UPDATE_RGB32( flipjack )
 {
 	flipjack_state *state = screen.machine().driver_data<flipjack_state>();
 	int x,y,count;
-	const UINT8 *blit_ram = state->memregion("gfx2")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// draw playfield
 	if (state->m_layer & 2)
 	{
+		const UINT8 *blit_data = state->memregion("gfx2")->base();
+		
 		count = 0;
 
 		for(y=0;y<192;y++)
@@ -81,18 +96,18 @@ static SCREEN_UPDATE_RGB32( flipjack )
 				UINT32 pen_r,pen_g,pen_b,color;
 				int xi;
 
-				pen_r = (blit_ram[count] & 0xff)>>0;
-				pen_g = (blit_ram[count+0x2000] & 0xff)>>0;
-				pen_b = (blit_ram[count+0x4000] & 0xff)>>0;
+				pen_r = (blit_data[count] & 0xff)>>0;
+				pen_g = (blit_data[count+0x2000] & 0xff)>>0;
+				pen_b = (blit_data[count+0x4000] & 0xff)>>0;
 
 				for(xi=0;xi<8;xi++)
 				{
 					if(cliprect.contains(x+xi, y))
 					{
-						color = ((pen_r >> (7-xi)) & 1);
+						color = ((pen_r >> (7-xi)) & 1)<<0;
 						color|= ((pen_g >> (7-xi)) & 1)<<1;
 						color|= ((pen_b >> (7-xi)) & 1)<<2;
-						bitmap.pix32(y, x+xi) = screen.machine().pens[color];
+						bitmap.pix32(y, x+xi) = screen.machine().pens[color+0x80];
 					}
 				}
 
@@ -107,9 +122,10 @@ static SCREEN_UPDATE_RGB32( flipjack )
 		for (x=0;x<32;x++)
 		{
 			const gfx_element *gfx = screen.machine().gfx[0];
-			UINT16 tile = state->m_bank << 8 | state->m_vram[x+y*0x100];
+			int tile = state->m_bank << 8 | state->m_vram[x+y*0x100];
+			int color = state->m_cram[x+y*0x100] & 0x3f;
 
-			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y*8),0);
+			drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8),0);
 		}
 	}
 
@@ -131,7 +147,7 @@ static SCREEN_UPDATE_RGB32( flipjack )
 				{
 					if(cliprect.contains(x+xi, y))
 					{
-						color = ((pen >> (7-xi)) & 1) ? 7 : 0;
+						color = ((pen >> (7-xi)) & 1) ? 0x87 : 0;
 						if(color)
 							bitmap.pix32(y, x+xi) = screen.machine().pens[color];
 					}
@@ -351,7 +367,7 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( flipjack )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 64 )
 GFXDECODE_END
 
 
@@ -391,7 +407,9 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(128+8)
+	MCFG_PALETTE_INIT(flipjack)
+
 	MCFG_SCREEN_UPDATE_STATIC(flipjack)
 
 	MCFG_GFXDECODE(flipjack)
