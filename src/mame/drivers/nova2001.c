@@ -205,8 +205,8 @@ static ADDRESS_MAP_START( ninjakun_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share6")
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakun_cpu2_map, AS_PROGRAM, 8, nova2001_state )
@@ -224,8 +224,8 @@ static ADDRESS_MAP_START( ninjakun_cpu2_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share6") /* swapped wrt CPU1 */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share5") /* swapped wrt CPU1 */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share2") /* swapped wrt CPU1 */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share1") /* swapped wrt CPU1 */
 ADDRESS_MAP_END
 
 
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( raiders5_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xc003, 0xc003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("fg_videoram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiders5_cpu2_map, AS_PROGRAM, 8, nova2001_state )
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( raiders5_cpu2_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* unknown */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("fg_videoram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READNOP /* unknown */
 	AM_RANGE(0xc800, 0xc800) AM_READNOP /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READNOP /* unknown */
