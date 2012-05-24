@@ -10,7 +10,15 @@ class laserbat_state : public driver_device
 {
 public:
 	laserbat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_fo_state(*this, "fo_state")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_shared_ptr<UINT8> m_fo_state;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -42,7 +50,6 @@ public:
 	int        m_bit14;
 
 	/* device */
-	device_t *m_audiocpu;
 	device_t *m_s2636_1;
 	device_t *m_s2636_2;
 	device_t *m_s2636_3;
