@@ -202,6 +202,7 @@ static const game_offset game_offsets[] =
 	{ "madshark", {  0,  0 }, {  0,  0 } },	// unknown (wrong when flipped, but along y)
 	{ "utoukond", {  0,  0 }, { -2,  0 } }, // unknown (wrong when flipped, but along y)
 	{ "crazyfgt", {  0,  0 }, { -2,  0 } }, // wrong (empty background column in title screen, but aligned sprites in screen select)
+	{ "magspeed", {  0,  0 }, { -2,  0 } }, // floating tilemap maybe 1px off in test grid
 
 	{ NULL }
 };
@@ -215,7 +216,8 @@ static const game_offset game_offsets[] =
 void seta_coin_lockout_w(running_machine &machine, int data)
 {
 	seta_state *state = machine.driver_data<seta_state>();
-	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
+	static const char *const seta_nolockout[] =
+	{ "blandia", "eightfrc", "extdwnhl", "gundhara", "kamenrid", "magspeed", "sokonuke", "zingzip", "zombraid"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
 	if (!state->m_coin_lockout_initialized)
@@ -238,7 +240,7 @@ void seta_coin_lockout_w(running_machine &machine, int data)
 	coin_counter_w		(machine, 0, (( data) >> 0) & 1 );
 	coin_counter_w		(machine, 1, (( data) >> 1) & 1 );
 
-	/* blandia, gundhara, kamenrid & zingzip haven't the coin lockout device */
+	/* some games haven't the coin lockout device */
 	if (	!state->m_coin_lockout )
 		return;
 	coin_lockout_w		(machine, 0, ((~data) >> 2) & 1 );

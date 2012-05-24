@@ -27,7 +27,7 @@ P0-045-A (M6100429A)    89 DownTown                             Taito / RomStar
 ?        (M6100430A)    89 U.S. Classic(2)                      Taito / RomStar
 ?                       88 Caliber 50                           Taito / RomStar
 ?                       89 Arbalester                           Taito / RomStar
-PO-047A                 ?? Seta Roulette                        Seta / Visco
+P0-047A                 ?? Seta Roulette                        Seta / Visco
 P1-036-A + P0-045-A +
 P1-049-A                89 Meta Fox                             Taito / RomStar
 P0-053-1                89 Castle of Dragon/Dragon Unit         Taito / RomStar / Athena
@@ -42,30 +42,30 @@ P0-063-A                91 Rezon                                Allumer
 P0-068-B (M6100723A)    92 Block Carnival                       Visco
 P0-072-2 (prototype)    92 Blandia (prototype)                  Allumer
 P0-077-A (BP922)        92 Ultraman Club                        Banpresto
-PO-078-A                92 Blandia (7)                          Allumer
+P0-078-A                92 Blandia (7)                          Allumer
 P0-079-A                92 Zing Zing Zip                        Allumer / Tecmo
 P0-079-A                94 Eight Forces                         Tecmo
-PO-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
+P0-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
 ?                       93 Athena no Hatena?                    Athena
 ?                       93 J.J.Squawkers                        Athena / Able
 ?        (93111A)       93 War Of Aero                          Yang Cheng
 P0-081-A (BP933KA)      93 Mobile Suit Gundam                   Banpresto
-PO-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
-PO-092-A                93 Daioh                                Athena
-PO-096-A (BP934KA)      93 Kamen Rider                          Banpresto
+P0-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
+P0-092-A                93 Daioh                                Athena
+P0-096-A (BP934KA)      93 Kamen Rider                          Banpresto
 P0-097-A                93 Oishii Puzzle ..                     Sunsoft + Atlus
 bootleg                 9? Triple Fun (4)                       bootleg (Comad?)
 P0-100-A                93 Quiz Kokology 2                      Tecmo
 P0-101-1                94 Pro Mahjong Kiwame                   Athena
-PO-102-A                93 Mad Shark                            Allumer
-PO-107-A (prototype?)   94 Orbs (prototype?)                    American Sammy
-PO-107-A                93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
+P0-102-A                93 Mad Shark                            Allumer
+P0-107-A (prototype?)   94 Orbs (prototype?)                    American Sammy
+P0-107-A                93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
 P0-111A                 94 Magical Speed                        Allumer
 P0-114-A (SKB-001)      94 Krazy Bowl                           American Sammy
 P0-117-A (DH-01)        95 Extreme Downhill                     Sammy Japan
 P0-117-A?               95 Sokonuke Taisen Game                 Sammy Industries
 P0-120-A (BP954KA)      95 Gundhara                             Banpresto
-PO-122-A (SZR-001)      95 Zombie Raid                          American Sammy
+P0-122-A (SZR-001)      95 Zombie Raid                          American Sammy
 ?                       96 Crazy Fight                          Subsino
 -------------------------------------------------------------------------------
 (1) YM2203 + YM3812 instead of X1-010
@@ -99,7 +99,7 @@ TODO:
   Current issues: metafox test grid not aligned when screen flipped, madshark & utoukond
   ("floating tilemaps" sprites when flipped)
   krzybowl not aligned vertically when screen flipped
-  zombraid not aligned when flipped vertically or horizantally
+  zombraid not aligned when flipped vertically or horizontally
 
 - bad sound in sokonuke?
 - in msgunda1, colors for the score display screw up after the second animation
@@ -419,7 +419,7 @@ Chips:  X1-001A X1-002A
 
 Blandia by Allumer
 
-This set is coming from an original Blandia PCB ref : PO-078A
+This set is coming from an original Blandia PCB ref : P0-078A
 
 As usually, it use a lot of customs allumer chips !
 
@@ -481,7 +481,7 @@ Lithium battery x1
 
 DAIOH
 Alumer 1993, Sammy license
-PO-092A
+P0-092A
 
 
 FG-001-003
@@ -503,7 +503,7 @@ FG-001-007
 
                                 Eight Forces
 
-PO-079A (Same board as ZingZingZip)
+P0-079A (Same board as ZingZingZip)
 
 CPU  : MC68000B16
 Sound: X1-010
@@ -544,7 +544,7 @@ Custom:     X1-001A X1-002A
 
 (c)1995 Sammy
 DH-01
-PO-117A (board is made by Seta/Allumer)
+P0-117A (board is made by Seta/Allumer)
 
 CPU  : MC68HC000B16
 Sound: X1-010
@@ -584,7 +584,7 @@ Custom chips:   X1-001A     X1-002A
 Seta/Allumer Hardware
 
 PCB: BP954KA
-PCB: PO-120A
+PCB: P0-120A
 CPU: TMP68HC000N16 (68000, 64 pin DIP)
 SND: ?
 OSC: 16.000MHz
@@ -628,7 +628,7 @@ PCB Layout
 ----------
 
 SZR-001
-PO-122A
+P0-122A
 ------------------------------------------------------------------
         FY001012.12L*       FY001009.U67      FY001007.U65
    FY001011.13L*    FY001010.U68     FY001008.U66    FY001006.U200
@@ -683,7 +683,7 @@ Banpresto, 1993
 
 Runs on Seta/Allumer hardware
 
-PCB No: BP934KA   PO-096A
+PCB No: BP934KA   P0-096A
 CPU   : MC68HC000B16
 OSC   : 16.000MHz
 RAM   : LH5160D-10L (x9), CXK58257AP-10L (x2)
@@ -711,7 +711,7 @@ ROMs  :
                                 Krazy Bowl
 
 PCB:    SKB-001
-        PO-114A
+        P0-114A
 
 FV   FV                           2465
 001  001                          2465           X1-005
@@ -743,7 +743,7 @@ This game is a vertical shoot'em-up and runs on fairly standard Allumer hardware
 PCB Layout
 ----------
 
-PO-102A
+P0-102A
 ----------------------------------------------------
 |     X1-010   FQ001007 FQ001006 FQ001005 FQ001004 |
 |           LH5160                                 |
@@ -852,7 +852,7 @@ FA-001-004    X1-011  X1-012  5160
 
                             Oishii Puzzle Ha Irimasenka
 
-PCB  : PO-097A
+PCB  : P0-097A
 CPU  : 68000
 Sound: X1-010
 OSC  : 14.31818MHz
@@ -900,7 +900,7 @@ ROMs  :
 
                             Pro Mahjong Kiwame
 
-PCB  : PO-101-1 (the board is made by Allumer/Seta)
+PCB  : P0-101-1 (the board is made by Allumer/Seta)
 CPU  : TMP68301AF-16 (68000 core)
 Sound: X1-010
 OSC  : 20.0000MHz
@@ -930,7 +930,7 @@ Chips:  X1-001A
 
 (c)1992 Tecmo
 
-PO-053A
+P0-053A
 
 CPU  : MC68000B8
 Sound: X1-010
@@ -978,7 +978,7 @@ Custom chips:   X1-001A     X1-002A
 
                                 Rezon (Japan)
 
-PCB     : PO-063A
+PCB     : P0-063A
 CPU     : TOSHIBA TMP68HC000N-16
 Sound   : X1-010
 OSC     : 16.000MHz
@@ -1001,7 +1001,7 @@ This game runs on Seta/Allumer hardware
 PCB Layout
 ----------
 
-PO-080A
+P0-080A
 BP923
 |----------------------------------------------
 |DSW1  DSW2                   LH5168  62256   |
@@ -1052,7 +1052,7 @@ OSC:    16MHz
 
 (c)1991 Athena (distributed by Tecmo)
 
-PO-053A
+P0-053A
 
 CPU  : TMP68000N-8
 Sound: X1-010
@@ -1073,7 +1073,7 @@ Custom chips:   X1-001A X1-002A
 Banpresto, 1992
 Board looks similar to Castle of Dragon PCB.
 
-PCB No: PO-077A (Seta Number)
+PCB No: P0-077A (Seta Number)
         BP922   (Banpresto Number)
 
 CPU: MC68HC000B16
@@ -1113,7 +1113,7 @@ This game runs on fairly standard Allumer hardware.
 PCB Layout
 ----------
 
-PO-083A
+P0-083A
 BP931
 ----------------------------------------------------
 |     X1-010  93UTA08  93UTA06 93UTA04  93UTA02    |
@@ -1207,7 +1207,7 @@ Allumer, 199x
 PCB Layout
 ----------
 
-PO-068B
+P0-068B
 |-----------------------------------------|
 |             X1-007  X1-006   UT2-001-005|
 |                                         |
@@ -2439,6 +2439,17 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 ADDRESS_MAP_END
 
+
+WRITE16_MEMBER(seta_state::magspeed_lights_w)
+{
+	COMBINE_DATA( &m_magspeed_lights[offset] );
+
+	for (int i = 0; i < 16; i++)
+		set_led_status(machine(), offset * 16 + i, BIT(m_magspeed_lights[offset], i));
+	
+//	popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
+}
+
 /* almost identical to kamenrid */
 static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
@@ -2451,7 +2462,7 @@ static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500010, 0x500015) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x500018, 0x500019) AM_WRITENOP						// lev 2 irq ack?
 	AM_RANGE(0x50001c, 0x50001d) AM_WRITENOP						// lev 4 irq ack?
-	AM_RANGE(0x600000, 0x600005) AM_WRITENOP						// Leds
+	AM_RANGE(0x600000, 0x600005) AM_WRITE(magspeed_lights_w)		// Lights
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP						// ?
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// Palette RAM (tested)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")		// Palette
@@ -10607,7 +10618,7 @@ ROM_START( inttootea )
 ROM_END
 
 /*
-PCB PO-047A
+PCB P0-047A
 
 3x8 DSW
 SETA X1-004 (826100) (input)

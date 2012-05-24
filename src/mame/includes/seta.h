@@ -94,6 +94,8 @@ public:
 	UINT8 m_twineagl_xram[8];
 	int m_twineagl_tilebank[4];
 
+	UINT16 m_magspeed_lights[3];
+
 	UINT16 m_pairslove_protram[0x200];
 	UINT16 m_pairslove_protram_old[0x200];
 	UINT16 m_downtown_protection[0x200/2];
@@ -153,6 +155,7 @@ public:
 	DECLARE_READ16_MEMBER(downtown_protection_r);
 	DECLARE_WRITE16_MEMBER(downtown_protection_w);
 	DECLARE_READ16_MEMBER(arbalest_debug_r);
+	DECLARE_WRITE16_MEMBER(magspeed_lights_w);
 };
 
 /*----------- defined in video/seta.c -----------*/
