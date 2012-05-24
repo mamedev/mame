@@ -2,7 +2,7 @@
 
 prelim notes:
 Flipper Jack, by Jackson, 198?
-probably a prequel/sequel to superwng
+probably a prequel to superwng
 
 xtal: 16mhz, 6mhz
 cpu: 2*z80
@@ -315,9 +315,12 @@ static INPUT_PORTS_START( flipjack )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("A0:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "A0:5" ) // extra lives?
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "A0:6" ) // "
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "A0:7" ) // "
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("A0:5,6,7")
+	PORT_DIPSETTING(	0x70, "150K & Every 70K" )
+	PORT_DIPSETTING(	0x60, "150K & Every 100K" )
+	PORT_DIPSETTING(	0x50, "200K & Every 70K" )
+	PORT_DIPSETTING(	0x40, "200K & Every 100K" )
+	PORT_DIPSETTING(	0x00, "None" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )		PORT_DIPLOCATION("A0:8")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
