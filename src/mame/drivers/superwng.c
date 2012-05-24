@@ -4,19 +4,19 @@ Super Wing - (c) 1985 Wing (UPL?)
 
 driver by Tomasz Slanina
 
-probably a prequel/sequel to flipjack
+probably a sequel to flipjack
 Hardware a bit (interrupts, sound) similar to mouser as well
 
 TODO:
-  - unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
-    data (similar to the one in roms 4.5p and 5.5r).
-    There are two possibilities: its bad dump of gfx rom (two extra bit layers
-    of current gfx) or it's banked at 0x4000 - 0x7fff area.
-  - dump color prom
-  - some unknown DSW and inputs
-  - hopper
-  - unknown writes
-  - measure clocks
+- unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
+  data (similar to the one in roms 4.5p and 5.5r).
+  There are two possibilities: its bad dump of gfx rom (two extra bit layers
+  of current gfx) or it's banked at 0x4000 - 0x7fff area.
+- dump color prom
+- some unknown DSW and inputs
+- hopper
+- unknown writes
+- measure clocks
 
 
 *****************************************************************************************/
@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(superwng_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
+	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -280,28 +281,32 @@ WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
 	coin_counter_w(machine(), 1, data);
 }
 
+WRITE8_MEMBER(superwng_state::superwng_hopper_w)
+{
+}
+
 static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
+	AM_RANGE(0x0000, 0x6fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_SHARE("videorabg")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_SHARE("videorafg")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_SHARE("colorrabg")
 	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_SHARE("colorrafg")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM  //collision map
+	AM_RANGE(0x9800, 0x99ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP //unknown
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(superwng_hopper_w)
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(superwng_sound_interrupt_w)
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa180, 0xa180) AM_WRITENOP //watchdog ? int ack ?
+	AM_RANGE(0xa180, 0xa180) AM_WRITENOP // watchdog? int ack?
 	AM_RANGE(0xa181, 0xa181) AM_WRITE(superwng_nmi_enable_w)
 	AM_RANGE(0xa182, 0xa182) AM_WRITE(superwng_tilebank_w)
 	AM_RANGE(0xa183, 0xa183) AM_WRITE(superwng_flip_screen_w)
 	AM_RANGE(0xa184, 0xa184) AM_WRITE(superwng_cointcnt1_w)
-	AM_RANGE(0xa185, 0xa185) AM_WRITENOP //unknown , always(?) 0
+	AM_RANGE(0xa185, 0xa185) AM_WRITENOP // unknown, always(?) 0
 	AM_RANGE(0xa186, 0xa186) AM_WRITE(superwng_cointcnt2_w)
-	AM_RANGE(0xa187, 0xa187) AM_WRITENOP //unknown , always(?) 0
+	AM_RANGE(0xa187, 0xa187) AM_WRITENOP // unknown, always(?) 0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8, superwng_state )
@@ -316,7 +321,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( superwng )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Launch Ball")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Right Flipper")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Left Flipper")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -326,7 +331,7 @@ static INPUT_PORTS_START( superwng )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Launch Ball")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Right Flipper")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Left Flipper")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Tilt")
@@ -372,13 +377,13 @@ static INPUT_PORTS_START( superwng )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown )) // hopper related
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ))
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown )) // hopper related
+	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown )) // hopper related, writes 0 to 0xa000 every frame if it is set
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown )) // hopper related, if 0x10 or 0x20 is set, and this is set, it will lock up with HOPPER EMPTY
+	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown )) // hopper related, if 0x20 is set, and this is set, it will lock up with HOPPER EMPTY
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ))
