@@ -7,7 +7,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "memconv.h"
 #include "sound/discrete.h"
 #include "latch8.h"
 

@@ -30,7 +30,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "memconv.h"
 #include "8257dma.h"
 #include "devhelpr.h"
 

@@ -79,7 +79,6 @@
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
 #include "video/cgapal.h"
-#include "memconv.h"
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
 
@@ -160,10 +159,6 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( pc_cga8_r );
 static WRITE8_HANDLER( pc_cga8_w );
-static READ16_HANDLER( pc_cga16le_r );
-static WRITE16_HANDLER( pc_cga16le_w );
-static READ32_HANDLER( pc_cga32le_r );
-static WRITE32_HANDLER( pc_cga32le_w );
 static MC6845_UPDATE_ROW( cga_update_row );
 static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed );
 static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );
@@ -314,27 +309,30 @@ static VIDEO_START( pc_cga )
 
 	space->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	UINT64 mask = 0;
 	switch(buswidth)
 	{
 		case 8:
-			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga8_r) );
-			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga8_w) );
+			mask = 0;
 			break;
 
 		case 16:
-			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga16le_r) );
-			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga16le_w) );
+			mask = 0xffff;
 			break;
 
 		case 32:
-			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga32le_r) );
-			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga32le_w) );
+			mask = 0xffffffff;
+			break;
+
+		case 64:
+			mask = -1;
 			break;
 
 		default:
 			fatalerror("CGA: Bus width %d not supported", buswidth);
 			break;
-	}
+	}	
+	spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
 	internal_pc_cga_video_start(machine);
 	cga.videoram_size = 0x4000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
@@ -353,27 +351,30 @@ static VIDEO_START( pc_cga32k )
 
 	space->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
 	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	UINT64 mask = 0;
 	switch(buswidth)
 	{
 		case 8:
-			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga8_r) );
-			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga8_w) );
+			mask = 0;
 			break;
 
 		case 16:
-			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga16le_r) );
-			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga16le_w) );
+			mask = 0xffff;
 			break;
 
 		case 32:
-			spaceio->install_legacy_read_handler(0x3d0, 0x3df, FUNC(pc_cga32le_r) );
-			spaceio->install_legacy_write_handler(0x3d0, 0x3df, FUNC(pc_cga32le_w) );
+			mask = 0xffffffff;
+			break;
+
+		case 64:
+			mask = -1;
 			break;
 
 		default:
 			fatalerror("CGA: Bus width %d not supported", buswidth);
 			break;
-	}
+	}	
+	spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
 
 	internal_pc_cga_video_start(machine);
 
@@ -1111,17 +1112,11 @@ static WRITE8_HANDLER ( char_ram_w )
 	gfx[offset + 0x1800] = data;
 }
 
-static WRITE16_HANDLER( char_ram_16le_w ) { write16le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
-static WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_ram_w, space, offset, data, mem_mask); }
-
 static READ8_HANDLER ( char_ram_r )
 {
 	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
 	return gfx[offset];
 }
-
-static READ16_HANDLER( char_ram_16le_r ) { return read16le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
-static READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(char_ram_r, space, offset, mem_mask); }
 
 static READ8_HANDLER( pc_cga8_r )
 {
@@ -1176,24 +1171,30 @@ static WRITE8_HANDLER( pc_cga8_w )
 		address_space *space_prg = space->machine().firstcpu->memory().space(AS_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
+			UINT64 mask = 0;
 			switch(buswidth)
 			{
 				case 8:
-					space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_r),FUNC(char_ram_w) );
+					mask = 0;
 					break;
 
 				case 16:
-					space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_16le_r),FUNC(char_ram_16le_w) );
+					mask = 0xffff;
 					break;
 
 				case 32:
-					space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_32_r),FUNC(char_ram_32_w) );
+					mask = 0xffffffff;
+					break;
+
+				case 64:
+					mask = -1;
 					break;
 
 				default:
 					fatalerror("CGA: Bus width %d not supported", buswidth);
 					break;
-			}
+			}		
+			space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
 		} else {
 			if (cga.videoram_size== 0x4000) {
 				space_prg->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
@@ -1206,12 +1207,6 @@ static WRITE8_HANDLER( pc_cga8_w )
 	}
 }
 
-
-
-static READ16_HANDLER( pc_cga16le_r ) { return read16le_with_read8_handler(pc_cga8_r,space,  offset, mem_mask); }
-static WRITE16_HANDLER( pc_cga16le_w ) { write16le_with_write8_handler(pc_cga8_w, space, offset, data, mem_mask); }
-static READ32_HANDLER( pc_cga32le_r ) { return read32le_with_read8_handler(pc_cga8_r, space, offset, mem_mask); }
-static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w, space, offset, data, mem_mask); }
 
 
 /* Old plantronics rendering code, leaving it uncommented until we have re-implemented it */
@@ -1595,14 +1590,6 @@ static WRITE8_HANDLER ( pc1512_videoram_w )
 	}
 }
 
-
-
-READ16_HANDLER ( pc1512_16le_r ) { return read16le_with_read8_handler(pc1512_r, space, offset, mem_mask); }
-WRITE16_HANDLER ( pc1512_16le_w ) { write16le_with_write8_handler(pc1512_w, space, offset, data, mem_mask); }
-WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512_videoram_w, space, offset, data, mem_mask); }
-
-
-
 static VIDEO_START( pc1512 )
 {
 	memset( &pc1512, 0, sizeof ( pc1512 ) );
@@ -1619,10 +1606,9 @@ static VIDEO_START( pc1512 )
 
 	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	machine.root_device().membank("bank1")->set_base(cga.videoram + videoram_offset[0]);
-	space->install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram16le_w) );
+	space->install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram_w), 0xffff);
 
-	io_space->install_legacy_read_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_r) );
-	io_space->install_legacy_write_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_w) );
+	io_space->install_legacy_readwrite_handler( 0x3d0, 0x3df, FUNC(pc1512_r), FUNC(pc1512_w), 0xffff);
 
 }
 
