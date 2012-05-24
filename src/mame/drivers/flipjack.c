@@ -37,6 +37,8 @@ public:
 		m_cram(*this, "cram")
 	{
 		m_soundlatch = 0;
+		m_bank = 0;
+		m_layer = 0;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -58,6 +60,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
 };
 
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
 
 PALETTE_INIT( flipjack )
 {
@@ -125,7 +133,7 @@ static SCREEN_UPDATE_RGB32( flipjack )
 			int tile = state->m_bank << 8 | state->m_vram[x+y*0x100];
 			int color = state->m_cram[x+y*0x100] & 0x3f;
 
-			drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8),0);
+			drawgfx_transpen(bitmap, cliprect, gfx, tile, color, 0, 0, x*8, y*8, 0);
 		}
 	}
 
@@ -162,16 +170,12 @@ static SCREEN_UPDATE_RGB32( flipjack )
 	return 0;
 }
 
-WRITE8_MEMBER(flipjack_state::flipjack_sound_nmi_ack_w)
-{
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-}
 
-WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
-{
-	m_soundlatch = data;
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
-}
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
 
 WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
 {
@@ -182,7 +186,6 @@ WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
 	m_bank = data;
 	membank("bank1")->set_entry(data >> 2 & 1);
 }
-
 
 WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
 {
@@ -201,18 +204,28 @@ static READ8_DEVICE_HANDLER( flipjack_soundlatch_r )
 	return state->m_soundlatch;
 }
 
+WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
+{
+	m_soundlatch = data;
+	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(flipjack_state::flipjack_sound_nmi_ack_w)
+{
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+}
 
 static WRITE8_DEVICE_HANDLER( flipjack_portc_w )
 {
 	// watchdog?
 }
 
-
 INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 {
 	if (newval)
 		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
+
 
 
 static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
@@ -251,6 +264,12 @@ static ADDRESS_MAP_START( flipjack_sound_io_map, AS_IO, 8, flipjack_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(flipjack_sound_nmi_ack_w)
 ADDRESS_MAP_END
 
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( flipjack )
 	PORT_START("COIN")
@@ -306,6 +325,12 @@ static INPUT_PORTS_START( flipjack )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("P1"),				/* Port A read */
@@ -353,7 +378,6 @@ static MC6845_INTERFACE( mc6845_intf )
 
 
 
-
 static const gfx_layout tilelayout =
 {
 	8, 8,
@@ -365,11 +389,9 @@ static const gfx_layout tilelayout =
 	8*8
 };
 
-
 static GFXDECODE_START( flipjack )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 64 )
 GFXDECODE_END
-
 
 
 
@@ -407,16 +429,16 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
 
+	MCFG_MC6845_ADD("crtc", HD6845, VIDEO_CLOCK/8, mc6845_intf)
+
+	MCFG_GFXDECODE(flipjack)
+
 	MCFG_PALETTE_LENGTH(128+8)
 	MCFG_PALETTE_INIT(flipjack)
 
 	MCFG_SCREEN_UPDATE_STATIC(flipjack)
 
-	MCFG_GFXDECODE(flipjack)
-
-	MCFG_MC6845_ADD("crtc", HD6845, VIDEO_CLOCK/8, mc6845_intf)
-
-
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
@@ -427,6 +449,7 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SOUND_CONFIG(ay8910_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
 
 ROM_START( flipjack )
 	ROM_REGION( 0x14000, "maincpu", 0 )
@@ -449,8 +472,6 @@ ROM_START( flipjack )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "m3-7611-5.f8", 0x0000, 0x0100, CRC(f0248102) SHA1(22d87935c941e2e8bba5427599f6fd5fa1262ebc) )
 ROM_END
-
-
 
 
 GAME( 198?, flipjack,   0,      flipjack, flipjack, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
