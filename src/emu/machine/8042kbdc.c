@@ -607,21 +607,6 @@ WRITE8_HANDLER(kbdc8042_8_w)
 }
 
 
-
-READ32_HANDLER( kbdc8042_32le_r )
-{
-	return read32le_with_read8_handler(kbdc8042_8_r, space, offset, mem_mask);
-}
-
-
-
-WRITE32_HANDLER( kbdc8042_32le_w )
-{
-	write32le_with_write8_handler(kbdc8042_8_w, space, offset, data, mem_mask);
-}
-
-
-
 READ64_HANDLER( kbdc8042_64be_r )
 {
 	return read64be_with_read8_handler(kbdc8042_8_r, space, offset, mem_mask);
