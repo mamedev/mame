@@ -66,7 +66,6 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "devconv.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

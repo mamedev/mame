@@ -109,8 +109,6 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "memconv.h"
-#include "devconv.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -174,18 +172,6 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
 {
 	i8237_w(device, offset / 2, data);
 }
-
-static READ32_DEVICE_HANDLER(at32_dma8237_2_r)
-{
-	return read32le_with_read8_device_handler(at_dma8237_2_r, device, offset, mem_mask);
-}
-
-static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
-{
-	write32le_with_write8_device_handler(at_dma8237_2_w, device, offset, data, mem_mask);
-}
-
-
 
 READ8_MEMBER(calchase_state::at_page8_r)
 {
@@ -566,7 +552,7 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
