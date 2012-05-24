@@ -298,7 +298,7 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 	{
 		case SOUND_CVSD_SMALL:
 			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM)->install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
-			state->m_cvsd_protection_base = machine.root_device().memregion("cvsdcpu")->base() + 0x10000 + (prot_start - 0x8000);
+			state->m_cvsd_protection_base = machine.root_device().memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
