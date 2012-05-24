@@ -2671,7 +2671,7 @@ ROM_END
     Custom Chip 315-5304 (IC 127)
     IC BD Number: 834-7626-01 (roms are "MPR") / 834-7626-04 (roms are "EPR")
 */
-ROM_START( gprider1 )
+ROM_START( gprideru )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-13406.ic63", 0x00001, 0x20000, CRC(122c711f) SHA1(2bcc51347e771a7e7f770e68b24d82497d24aa2e) )
 	ROM_LOAD16_BYTE( "epr-13407.ic58", 0x00000, 0x20000, CRC(03553ebd) SHA1(041a71a2dce2ad56360f500cb11e29a629020160) )
@@ -2817,4 +2817,4 @@ GAME( 1989, smgpj,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega
 GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev A, FD1094 317-0124a)", 0 )
 GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
 GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
-GAME( 1990, gprider1, gprider,  xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
+GAME( 1990, gprideru, gprider,  xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
