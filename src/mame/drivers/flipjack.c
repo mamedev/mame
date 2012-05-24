@@ -428,6 +428,7 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
+	MCFG_SCREEN_UPDATE_STATIC(flipjack)
 
 	MCFG_MC6845_ADD("crtc", HD6845, VIDEO_CLOCK/8, mc6845_intf)
 
@@ -435,8 +436,6 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 
 	MCFG_PALETTE_LENGTH(128+8)
 	MCFG_PALETTE_INIT(flipjack)
-
-	MCFG_SCREEN_UPDATE_STATIC(flipjack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
