@@ -37,8 +37,6 @@ void jaguar_external_int(device_t *device, int state);
 
 READ16_HANDLER( jaguar_jerry_regs_r );
 WRITE16_HANDLER( jaguar_jerry_regs_w );
-READ32_HANDLER( jaguar_jerry_regs32_r );
-WRITE32_HANDLER( jaguar_jerry_regs32_w );
 
 READ32_HANDLER( jaguar_serial_r );
 WRITE32_HANDLER( jaguar_serial_w );
@@ -59,8 +57,6 @@ WRITE32_HANDLER( jaguar_blitter_w );
 
 READ16_HANDLER( jaguar_tom_regs_r );
 WRITE16_HANDLER( jaguar_tom_regs_w );
-READ32_HANDLER( jaguar_tom_regs32_r );
-WRITE32_HANDLER( jaguar_tom_regs32_w );
 
 READ32_HANDLER( cojag_gun_input_r );
 

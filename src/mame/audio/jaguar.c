@@ -143,7 +143,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "memconv.h"
 #include "includes/jaguar.h"
 #include "cpu/jaguar/jaguar.h"
 #include "sound/dac.h"
@@ -307,25 +306,6 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 
 	if (offset != JINTCTRL && offset != JINTCTRL+2 && offset != ASICTRL)
 		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(&space->device()), offset * 2, data);
-}
-
-
-
-/*************************************
- *
- *  Jerry 32-bit register access
- *
- *************************************/
-
-READ32_HANDLER( jaguar_jerry_regs32_r )
-{
-	return read32be_with_16be_handler(jaguar_jerry_regs_r, space, offset, mem_mask);
-}
-
-
-WRITE32_HANDLER( jaguar_jerry_regs32_w )
-{
-	write32be_with_16be_handler(jaguar_jerry_regs_w, space, offset, data, mem_mask);
 }
 
 

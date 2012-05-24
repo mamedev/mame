@@ -135,7 +135,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "memconv.h"
 #include "machine/atarigen.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/m68000/m68000.h"
@@ -761,25 +760,6 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 
 	if (offset != INT2 && offset != VI && offset != INT1)
 		logerror("%08X:TOM write register @ F00%03X = %04X\n", cpu_get_previouspc(&space->device()), offset * 2, data);
-}
-
-
-
-/*************************************
- *
- *  32-bit TOM register access
- *
- *************************************/
-
-READ32_HANDLER( jaguar_tom_regs32_r )
-{
-	return read32be_with_16be_handler(jaguar_tom_regs_r, space, offset, mem_mask);
-}
-
-
-WRITE32_HANDLER( jaguar_tom_regs32_w )
-{
-	write32be_with_16be_handler(jaguar_tom_regs_w, space, offset, data, mem_mask);
 }
 
 
