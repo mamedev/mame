@@ -77,13 +77,13 @@ PALETTE_INIT( flipjack )
 	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	for (int i = 0; i < 0x40; i++)
 	{
-		palette_set_color(machine, i*2, RGB_BLACK);
-		palette_set_color_rgb(machine, i*2+1, pal1bit(color_prom[i] >> 0), pal1bit(color_prom[i] >> 1), pal1bit(color_prom[i] >> 2));
+		palette_set_color_rgb(machine, 2*i+1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, 2*i+0, pal1bit(color_prom[i] >> 1), pal1bit(color_prom[i] >> 2), pal1bit(color_prom[i] >> 0));
 	}
 
 	// standard 1bpp for blitter
 	for (int i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i+0x80, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color_rgb(machine, i+0x80, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 
@@ -98,7 +98,7 @@ static SCREEN_UPDATE_RGB32( flipjack )
 	if (state->m_layer & 2)
 	{
 		const UINT8 *blit_data = state->memregion("gfx2")->base();
-		
+
 		count = 0;
 
 		for(y=0;y<192;y++)
@@ -470,9 +470,9 @@ ROM_START( flipjack )
 	ROM_LOAD( "cg.l6", 0x0000, 0x2000, CRC(8d87f6b9) SHA1(55ca726f190eac9ee7e26b8f4e519f1634bec0dd) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "r.f6",  0x0000, 0x2000, CRC(8c02fe71) SHA1(148e7382dc9b7678c447ada5ad19e03a3a051a7f) )
-	ROM_LOAD( "g.d6",  0x2000, 0x2000, CRC(8624d07f) SHA1(fb51c9c785d56854a6530b71868e95ad6be7cbee) )
-	ROM_LOAD( "b.h6",  0x4000, 0x2000, CRC(bbc8fdcc) SHA1(93758ca13cc49b87508f01c86c652155945dd484) )
+	ROM_LOAD( "b.h6",  0x0000, 0x2000, CRC(bbc8fdcc) SHA1(93758ca13cc49b87508f01c86c652155945dd484) )
+	ROM_LOAD( "r.f6",  0x2000, 0x2000, CRC(8c02fe71) SHA1(148e7382dc9b7678c447ada5ad19e03a3a051a7f) )
+	ROM_LOAD( "g.d6",  0x4000, 0x2000, CRC(8624d07f) SHA1(fb51c9c785d56854a6530b71868e95ad6be7cbee) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "m3-7611-5.f8", 0x0000, 0x0100, CRC(f0248102) SHA1(22d87935c941e2e8bba5427599f6fd5fa1262ebc) )
