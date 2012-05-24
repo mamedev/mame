@@ -1,25 +1,78 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="static_orange">
+		<rect>
+			<color red="0.85" green="0.30" blue="0.10" />
+		</rect>
+	</element>
+	<element name="static_blue">
+		<rect>
+			<color red="0.08" green="0.17" blue="0.52" />
+		</rect>
+	</element>
+
+	<element name="text1">
+		<text string="FORMATION">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text2">
+		<text string="NUMBER">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
 	<element name="digit" defstate="0">
 		<led7seg>
 			<color red="1.0" green="0.3" blue="0.0" />
 		</led7seg>
 	</element>
 
-	<view name="With LEDs">
-		<bounds left="-20" right="186" top="0" bottom="248" />
-
+	<view name="Simple LEDs">
+		<bounds left="0" right="400" top="0" bottom="330" />
 		<screen index="0">
-			<bounds left="0" top="0" right="186" bottom="248" />
+			<bounds left="0" right="400" top="0" bottom="300" />
 		</screen>
-
-		<bezel name="digit0" element="digit">
-			<bounds left="-15" top="18" right="-8" bottom="31" />
+		<bezel element="static_black">
+			<bounds left="0" right="400" top="300" bottom="330" />
+		</bezel>
+		<bezel element="static_orange">
+			<bounds left="0" right="400" top="302" bottom="330" />
+		</bezel>
+		<bezel element="static_blue">
+			<bounds left="0" right="400" top="304" bottom="330" />
 		</bezel>
 
+		<bezel element="text1">
+			<bounds x="5" y="307" width="50" height="10" />
+		</bezel>
+		<bezel element="text2">
+			<bounds x="10" y="317" width="40" height="10" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="60" y="307" width="14" height="20" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="61" y="308" width="12" height="18" />
+		</bezel>
+
+		<bezel element="text1">
+			<bounds x="345" y="307" width="50" height="10" />
+		</bezel>
+		<bezel element="text2">
+			<bounds x="350" y="317" width="40" height="10" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="326" y="307" width="14" height="20" />
+		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds left="-15" top="50" right="-8" bottom="63" />
+			<bounds x="327" y="308" width="12" height="18" />
 		</bezel>
 	</view>
 </mamelayout>
