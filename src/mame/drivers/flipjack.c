@@ -49,11 +49,12 @@ public:
 
 	UINT8 m_soundlatch;
 	UINT8 m_bank;
+	UINT8 m_layer;
 
 	DECLARE_WRITE8_MEMBER(flipjack_sound_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
-	DECLARE_WRITE8_MEMBER(flipjack_unk_w);
+	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
 	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
 };
 
@@ -68,59 +69,39 @@ static SCREEN_UPDATE_RGB32( flipjack )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	count = (0);
-
-	for(y=0;y<192;y++)
+	// draw playfield
+	if (state->m_layer & 2)
 	{
-		for(x=0;x<256;x+=8)
+		count = 0;
+
+		for(y=0;y<192;y++)
 		{
-			UINT32 pen_r,pen_g,pen_b,color;
-			int xi;
-
-			pen_r = (blit_ram[count] & 0xff)>>0;
-			pen_g = (blit_ram[count+0x2000] & 0xff)>>0;
-			pen_b = (blit_ram[count+0x4000] & 0xff)>>0;
-
-			for(xi=0;xi<8;xi++)
+			for(x=0;x<256;x+=8)
 			{
-				if(cliprect.contains(x+xi, y))
+				UINT32 pen_r,pen_g,pen_b,color;
+				int xi;
+
+				pen_r = (blit_ram[count] & 0xff)>>0;
+				pen_g = (blit_ram[count+0x2000] & 0xff)>>0;
+				pen_b = (blit_ram[count+0x4000] & 0xff)>>0;
+
+				for(xi=0;xi<8;xi++)
 				{
-					color = ((pen_r >> (7-xi)) & 1);
-					color|= ((pen_g >> (7-xi)) & 1)<<1;
-					color|= ((pen_b >> (7-xi)) & 1)<<2;
-					bitmap.pix32(y, x+xi) = screen.machine().pens[color];
-				}
-			}
-
-			count++;
-		}
-	}
-
-	count = 0;
-
-	for(y=0;y<192;y++)
-	{
-		for(x=0;x<256;x+=8)
-		{
-			UINT32 pen,color;
-			int xi;
-
-			pen = (state->m_fbram[count] & 0xff)>>0;
-
-			for(xi=0;xi<8;xi++)
-			{
-				if(cliprect.contains(x+xi, y))
-				{
-					color = ((pen >> (7-xi)) & 1) ? 7 : 0;
-					if(color)
+					if(cliprect.contains(x+xi, y))
+					{
+						color = ((pen_r >> (7-xi)) & 1);
+						color|= ((pen_g >> (7-xi)) & 1)<<1;
+						color|= ((pen_b >> (7-xi)) & 1)<<2;
 						bitmap.pix32(y, x+xi) = screen.machine().pens[color];
+					}
 				}
-			}
 
-			count++;
+				count++;
+			}
 		}
 	}
 
+	// draw tiles
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<32;x++)
@@ -131,6 +112,36 @@ static SCREEN_UPDATE_RGB32( flipjack )
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y*8),0);
 		}
 	}
+
+	// draw framebuffer
+	if (state->m_layer & 4)
+	{
+		count = 0;
+
+		for(y=0;y<192;y++)
+		{
+			for(x=0;x<256;x+=8)
+			{
+				UINT32 pen,color;
+				int xi;
+
+				pen = (state->m_fbram[count] & 0xff)>>0;
+
+				for(xi=0;xi<8;xi++)
+				{
+					if(cliprect.contains(x+xi, y))
+					{
+						color = ((pen >> (7-xi)) & 1) ? 7 : 0;
+						if(color)
+							bitmap.pix32(y, x+xi) = screen.machine().pens[color];
+					}
+				}
+
+				count++;
+			}
+		}
+	}
+
 
 	return 0;
 }
@@ -148,13 +159,23 @@ WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
 
 WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
 {
+	// d0-d1: tile bank
+	// d2: prg bank
+	// d4: ?
+	// other bits: unused?
 	m_bank = data;
 	membank("bank1")->set_entry(data >> 2 & 1);
 }
 
 
-WRITE8_MEMBER(flipjack_state::flipjack_unk_w)
+WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
 {
+	// d0: flip screen
+	// d1: enable playfield layer
+	// d2: enable framebuffer layer
+	// d3: ?
+	// other bits: unused?
+	m_layer = data;
 }
 
 static READ8_DEVICE_HANDLER( flipjack_soundlatch_r )
@@ -167,8 +188,7 @@ static READ8_DEVICE_HANDLER( flipjack_soundlatch_r )
 
 static WRITE8_DEVICE_HANDLER( flipjack_portc_w )
 {
-	//flipjack_state *state = device->machine().driver_data<flipjack_state>();
-	//printf("port c   %X\n",data>>4);
+	// watchdog?
 }
 
 
@@ -189,7 +209,7 @@ static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
 	AM_RANGE(0x7010, 0x7010) AM_DEVWRITE("crtc", hd6845_device, address_w)
 	AM_RANGE(0x7011, 0x7011) AM_DEVWRITE("crtc", hd6845_device, register_w)
 	AM_RANGE(0x7020, 0x7020) AM_READ_PORT("DSW")
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(flipjack_unk_w)
+	AM_RANGE(0x7800, 0x7800) AM_WRITE(flipjack_layer_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("cram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("vram")
@@ -241,10 +261,10 @@ static INPUT_PORTS_START( flipjack )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1" ) // coin?
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P3:4" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // output
 
 	PORT_START("DSW")
@@ -343,6 +363,10 @@ static MACHINE_START( flipjack )
 	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->set_entry(0);
+
+	state->save_item(NAME(state->m_soundlatch));
+	state->save_item(NAME(state->m_bank));
+	state->save_item(NAME(state->m_layer));
 }
 
 
@@ -411,4 +435,4 @@ ROM_END
 
 
 
-GAME( 198?, flipjack,   0,      flipjack, flipjack, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", GAME_NOT_WORKING )
+GAME( 198?, flipjack,   0,      flipjack, flipjack, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
