@@ -242,4 +242,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 19??, unkhorse, 0, horse, horse, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", 0 )
+GAME( 1981?, unkhorse, 0, horse, horse, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", 0 ) // copyright not shown, datecodes on pcb suggests early-1981
