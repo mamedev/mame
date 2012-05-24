@@ -48,12 +48,13 @@ public:
 	required_shared_ptr<UINT8> m_cram;
 
 	UINT8 m_soundlatch;
+	UINT8 m_bank;
 
 	DECLARE_WRITE8_MEMBER(flipjack_sound_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
 	DECLARE_WRITE8_MEMBER(flipjack_unk_w);
 	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
-
 };
 
 
@@ -125,7 +126,7 @@ static SCREEN_UPDATE_RGB32( flipjack )
 		for (x=0;x<32;x++)
 		{
 			const gfx_element *gfx = screen.machine().gfx[0];
-			UINT16 tile = state->m_vram[x+y*0x100];
+			UINT16 tile = state->m_bank << 8 | state->m_vram[x+y*0x100];
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y*8),0);
 		}
@@ -145,9 +146,15 @@ WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
 	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 }
 
+WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
+{
+	m_bank = data;
+	membank("bank1")->set_entry(data >> 2 & 1);
+}
+
+
 WRITE8_MEMBER(flipjack_state::flipjack_unk_w)
 {
-	// banking related?
 }
 
 static READ8_DEVICE_HANDLER( flipjack_soundlatch_r )
@@ -173,7 +180,8 @@ INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 
 
 static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -181,6 +189,7 @@ static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
 	AM_RANGE(0x7010, 0x7010) AM_DEVWRITE("crtc", hd6845_device, address_w)
 	AM_RANGE(0x7011, 0x7011) AM_DEVWRITE("crtc", hd6845_device, register_w)
 	AM_RANGE(0x7020, 0x7020) AM_READ_PORT("DSW")
+	AM_RANGE(0x7800, 0x7800) AM_WRITE(flipjack_unk_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("cram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("vram")
@@ -189,7 +198,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flipjack_main_io_map, AS_IO, 8, flipjack_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xff, 0xff) AM_WRITE(flipjack_unk_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(flipjack_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flipjack_sound_map, AS_PROGRAM, 8, flipjack_state )
@@ -209,27 +218,27 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( flipjack )
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flipjack_state, flipjack_coin, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flipjack_state, flipjack_coin, 0) // where in P1/P2/P3 is it mapped?
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Launch Ball")
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P1:2" ) // P1 Left Flipper?
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P1:3" ) // P1 Tilt?
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4" ) // P1 Right Flipper?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Tilt")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Right Flipper")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P1:8" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P2:1" ) // P2 Launch Ball?
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P2:2" ) // P2 Left Flipper?
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P2:3" ) // P2 Tilt?
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P2:4" ) // P2 Right Flipper?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Tilt")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Right Flipper")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P2:8" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1" ) // coin?
@@ -245,16 +254,18 @@ static INPUT_PORTS_START( flipjack )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coinage ) )		PORT_DIPLOCATION("A0:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "A0:3" ) // drop target
+	PORT_DIPNAME( 0x04, 0x04, "Drop Target" )			PORT_DIPLOCATION("A0:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("A0:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("A0:5")
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "A0:6" ) // extra lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "A0:5" ) // extra lives?
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "A0:6" ) // "
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "A0:7" ) // "
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "A0:8" ) // "
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )		PORT_DIPLOCATION("A0:8")
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 
 INPUT_PORTS_END
 
@@ -328,7 +339,10 @@ GFXDECODE_END
 
 static MACHINE_START( flipjack )
 {
-	//flipjack_state *state = machine.driver_data<flipjack_state>();
+	flipjack_state *state = machine.driver_data<flipjack_state>();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 }
 
 
@@ -373,11 +387,11 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 MACHINE_CONFIG_END
 
 ROM_START( flipjack )
-	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "3.d5",  0x0000, 0x2000, CRC(123bd992) SHA1(d845e2b9af5b81d950e5edf35201f1dd1c4af651) )
-	ROM_LOAD( "2.m5",  0x2000, 0x2000, CRC(e2bdce13) SHA1(50d990095a35837570b3117763e990440d8656ae) )
-	ROM_LOAD( "1.l5",  0x4000, 0x2000, CRC(4632263b) SHA1(b1fbb851ffd8aff36aff6f36672122fef3dd0af1) ) // what's this rom?
 	ROM_LOAD( "4.f5",  0x8000, 0x2000, CRC(d27e0184) SHA1(f108993fc3fce9173a4961a76fc60655fdd1cd25) )
+	ROM_LOAD( "1.l5",  0x10000, 0x2000, CRC(4632263b) SHA1(b1fbb851ffd8aff36aff6f36672122fef3dd0af1) )
+	ROM_LOAD( "2.m5",  0x12000, 0x2000, CRC(e2bdce13) SHA1(50d990095a35837570b3117763e990440d8656ae) )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "s.s5",  0x0000, 0x2000, CRC(34515a7b) SHA1(affe34198b77bddd314fae2851fd6a29d80f734e) )
