@@ -1,8 +1,8 @@
 /***************************************************************************
 
 prelim notes:
-Flipper Jack, by Jackson, 198?
-probably a prequel to superwng
+Flipper Jack, by Jackson, 1983
+probably a prequel to superwng, it has a Falcon logo on the pcb
 
 xtal: 16mhz, 6mhz
 cpu: 2*z80
@@ -11,6 +11,10 @@ other: 8255 ppi, hd6845 crtc, 1 dipsw
 ram: 2*8KB, 4*2KB
 rom: see romdefs
 
+TODO:
+- flipscreen
+- remaining gfx/color issues
+- measure clocks
 
 ***************************************************************************/
 
@@ -225,7 +229,6 @@ INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 	if (newval)
 		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
-
 
 
 static ADDRESS_MAP_START( flipjack_main_map, AS_PROGRAM, 8, flipjack_state )
@@ -455,10 +458,10 @@ MACHINE_CONFIG_END
 
 ROM_START( flipjack )
 	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "3.d5",  0x0000, 0x2000, CRC(123bd992) SHA1(d845e2b9af5b81d950e5edf35201f1dd1c4af651) )
-	ROM_LOAD( "4.f5",  0x8000, 0x2000, CRC(d27e0184) SHA1(f108993fc3fce9173a4961a76fc60655fdd1cd25) )
-	ROM_LOAD( "1.l5",  0x10000, 0x2000, CRC(4632263b) SHA1(b1fbb851ffd8aff36aff6f36672122fef3dd0af1) )
-	ROM_LOAD( "2.m5",  0x12000, 0x2000, CRC(e2bdce13) SHA1(50d990095a35837570b3117763e990440d8656ae) )
+	ROM_LOAD( "3.d5", 0x00000, 0x2000, CRC(123bd992) SHA1(d845e2b9af5b81d950e5edf35201f1dd1c4af651) )
+	ROM_LOAD( "4.f5", 0x08000, 0x2000, CRC(d27e0184) SHA1(f108993fc3fce9173a4961a76fc60655fdd1cd25) )
+	ROM_LOAD( "1.l5", 0x10000, 0x2000, CRC(4632263b) SHA1(b1fbb851ffd8aff36aff6f36672122fef3dd0af1) )
+	ROM_LOAD( "2.m5", 0x12000, 0x2000, CRC(e2bdce13) SHA1(50d990095a35837570b3117763e990440d8656ae) )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "s.s5",  0x0000, 0x2000, CRC(34515a7b) SHA1(affe34198b77bddd314fae2851fd6a29d80f734e) )
@@ -476,4 +479,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 198?, flipjack,   0,      flipjack, flipjack, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983?, flipjack,   0,      flipjack, flipjack, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
