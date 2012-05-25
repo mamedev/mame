@@ -1266,24 +1266,24 @@ static void gakusai_oki_bank_set(device_t *device)
 	downcast<okim6295_device *>(device)->set_bank_base(bank * 0x40000);
 }
 
-static WRITE16_DEVICE_HANDLER( gakusai_oki_bank_hi_w )
+WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
+	device_t *device = machine().device("oki");
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_gakusai_oki_bank_hi = data & 0xff;
+		m_gakusai_oki_bank_hi = data & 0xff;
 		gakusai_oki_bank_set(device);
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( gakusai_oki_bank_lo_w )
+WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
+	device_t *device = machine().device("oki");
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_gakusai_oki_bank_lo = data & 0xff;
+		m_gakusai_oki_bank_lo = data & 0xff;
 		gakusai_oki_bank_set(device);
 	}
 }
@@ -1301,14 +1301,16 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 	return 0xffff;
 }
 
-static READ16_DEVICE_HANDLER( gakusai_eeprom_r )
+READ16_MEMBER(metro_state::gakusai_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return eeprom->read_bit() & 1;
 }
 
-static WRITE16_DEVICE_HANDLER( gakusai_eeprom_w )
+WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -1349,11 +1351,11 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")			// Inputs
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")			// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP										// ? 5
-	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_lo_w)					// Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)					// Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)			// Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE_LEGACY("eeprom", gakusai_eeprom_r, gakusai_eeprom_w)	// EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_hi_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(gakusai_eeprom_r, gakusai_eeprom_w)	// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w)
 ADDRESS_MAP_END
 
 
@@ -1387,11 +1389,11 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678888, 0x678889) AM_WRITEONLY AM_SHARE("input_sel")			// Inputs
 	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")			// Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP										// ? 5
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_lo_w)					// Sound bank
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_hi_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w)					// Sound bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)			// Sound
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE_LEGACY("eeprom", gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1399,8 +1401,9 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-static READ16_DEVICE_HANDLER( dokyusp_eeprom_r )
+READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	// clock line asserted: write latch or select next bit to read
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_clock_line(CLEAR_LINE);
@@ -1409,8 +1412,9 @@ static READ16_DEVICE_HANDLER( dokyusp_eeprom_r )
 	return eeprom->read_bit() & 1;
 }
 
-static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
+WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
@@ -1423,8 +1427,9 @@ static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_reset_w )
+WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
@@ -1458,11 +1463,11 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")				// Screen Control
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")			// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP										// ? 5
-	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_lo_w)					// Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)					// Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)		// Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE_LEGACY("eeprom", dokyusp_eeprom_reset_w)				// EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE_LEGACY("eeprom", dokyusp_eeprom_r, dokyusp_eeprom_bit_w)	// EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w)				// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(dokyusp_eeprom_r, dokyusp_eeprom_bit_w)	// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1498,9 +1503,9 @@ static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN0")								//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")								// 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")								//
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_hi_w)					// Samples Bank?
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w)					// Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP										// ? 4
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("oki", gakusai_oki_bank_lo_w)					// Samples Bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w)					// Samples Bank
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)					//
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)		// Sound
 ADDRESS_MAP_END
@@ -1760,12 +1765,10 @@ ADDRESS_MAP_END
                                     Mouja
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( mouja_sound_rombank_w )
+WRITE16_MEMBER(metro_state::mouja_sound_rombank_w)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
-
 	if (ACCESSING_BITS_0_7)
-		state->m_oki->set_bank_base(((data >> 3) & 0x07) * 0x40000);
+		m_oki->set_bank_base(((data >> 3) & 0x07) * 0x40000);
 }
 
 static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
@@ -1792,7 +1795,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")								//
 	AM_RANGE(0x478888, 0x478889) AM_WRITENOP										// ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")			// Video Registers
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE_LEGACY("oki", mouja_sound_rombank_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(mouja_sound_rombank_w)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xffff)
 #if 0

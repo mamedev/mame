@@ -49,6 +49,7 @@ public:
 	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 

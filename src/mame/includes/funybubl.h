@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE8_MEMBER(funybubl_cpurombank_w);
 	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
 	DECLARE_WRITE8_MEMBER(funybubl_paldatawrite);
+	DECLARE_WRITE8_MEMBER(funybubl_oki_bank_sw);
 };
 
 

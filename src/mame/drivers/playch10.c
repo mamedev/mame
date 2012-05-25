@@ -347,18 +347,21 @@ WRITE8_MEMBER(playch10_state::time_w)
 	popmessage("Time: %d%d%d%d",m_timedata[3],m_timedata[2],m_timedata[1],m_timedata[0]);
 }
 
-static READ8_DEVICE_HANDLER( psg_4015_r )
+READ8_MEMBER(playch10_state::psg_4015_r)
 {
+	device_t *device = machine().device("nes");
 	return nes_psg_r(device, 0x15);
 }
 
-static WRITE8_DEVICE_HANDLER( psg_4015_w )
+WRITE8_MEMBER(playch10_state::psg_4015_w)
 {
+	device_t *device = machine().device("nes");
 	nes_psg_w(device, 0x15, data);
 }
 
-static WRITE8_DEVICE_HANDLER( psg_4017_w )
+WRITE8_MEMBER(playch10_state::psg_4017_w)
 {
+	device_t *device = machine().device("nes");
 	nes_psg_w(device, 0x17, data);
 }
 
@@ -397,9 +400,9 @@ static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)  /* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)  /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(pc10_in0_r, pc10_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r) AM_WRITE(psg_4017_w) /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

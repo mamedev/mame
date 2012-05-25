@@ -338,8 +338,8 @@ Donkey Kong Junior Notes
 
 
 
-static READ8_DEVICE_HANDLER( p8257_ctl_r );
-static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
+
+
 
 /*************************************
  *
@@ -368,8 +368,8 @@ static I8257_INTERFACE( dk_dma )
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
-    { DEVCB_NULL, DEVCB_HANDLER(p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
-    { DEVCB_HANDLER(p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+    { DEVCB_NULL, DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
+    { DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 static I8257_INTERFACE( hb_dma )
@@ -379,8 +379,8 @@ static I8257_INTERFACE( hb_dma )
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(dkong_state, hb_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(dkong_state, hb_dma_write_byte),
-    { DEVCB_NULL, DEVCB_HANDLER(p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
-    { DEVCB_HANDLER(p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+    { DEVCB_NULL, DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
+    { DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 /*************************************
@@ -543,16 +543,14 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
     space.write_byte(addr, data);
 }
 
-static READ8_DEVICE_HANDLER( p8257_ctl_r )
+READ8_MEMBER(dkong_state::p8257_ctl_r)
 {
-    dkong_state *state = device->machine().driver_data<dkong_state>();
-    return state->m_dma_latch;
+    return m_dma_latch;
 }
 
-static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
+WRITE8_MEMBER(dkong_state::p8257_ctl_w)
 {
-    dkong_state *state = device->machine().driver_data<dkong_state>();
-    state->m_dma_latch = data;
+    m_dma_latch = data;
 }
 
 
@@ -567,8 +565,9 @@ WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
     coin_counter_w(machine(), offset, data & 0x01);
 }
 
-static WRITE8_DEVICE_HANDLER( p8257_drq_w )
+WRITE8_MEMBER(dkong_state::p8257_drq_w)
 {
+	device_t *device = machine().device("dma8257");
     i8257_drq0_w(device, data & 0x01);
     i8257_drq1_w(device, data & 0x01);
 }
@@ -751,8 +750,9 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
     }
 }
 
-static WRITE8_DEVICE_HANDLER( dkong_z80dma_rdy_w )
+WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
 {
+	device_t *device = machine().device("z80dma");
 	z80dma_rdy_w(device, data & 0x01);
 }
 
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
     AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
-    AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)     		/* P8257 ==> /DRQ0 /DRQ1 */
+    AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)  		/* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
@@ -809,7 +809,7 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
     AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
-    AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
+    AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE_LEGACY("ls259.5h", latch8_bit0_w)     /* latch for sound and signals above*/
 
@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( dkong3_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)                 /* 2 PSL Signal */
     AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-    AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE_LEGACY("z80dma", dkong_z80dma_rdy_w)  /* ==> DMA Chip */
+    AM_RANGE(0x7e85, 0x7e85) AM_WRITE(dkong_z80dma_rdy_w)  /* ==> DMA Chip */
     AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
@@ -863,7 +863,7 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)                         /* 2 PSL Signal */
     AM_RANGE(0x1584, 0x1584) AM_NOP                                               /* Possibly still interrupt enable */
-    AM_RANGE(0x1585, 0x1585) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)          /* P8257 ==> /DRQ0 /DRQ1 */
+    AM_RANGE(0x1585, 0x1585) AM_WRITE(p8257_drq_w)          /* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */
     AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")        /* 0x7400 */
@@ -1610,9 +1610,9 @@ static const eeprom_interface braze_eeprom_intf =
 	"*10011xxxxx",	/* unlock command */
 };
 
-static READ8_DEVICE_HANDLER( braze_eeprom_r )
+READ8_MEMBER(dkong_state::braze_eeprom_r)
 {
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	return eeprom->read_bit();
 }
 
@@ -1622,9 +1622,9 @@ WRITE8_MEMBER(dkong_state::braze_a15_w)
 	membank("bank2")->set_entry(data & 0x01);
 }
 
-static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
+WRITE8_MEMBER(dkong_state::braze_eeprom_w)
 {
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	eeprom->write_bit(data & 0x01);
 	eeprom->set_cs_line(data & 0x04 ? CLEAR_LINE : ASSERT_LINE);
 	eeprom->set_clock_line(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -3159,7 +3159,6 @@ static DRIVER_INIT( dkongx )
 {
 	UINT8 *decrypted;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *eeprom = machine.device("eeprom");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
@@ -3169,8 +3168,8 @@ static DRIVER_INIT( dkongx )
 	dkong_state *state = machine.driver_data<dkong_state>();
 	space->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),state));
 
-	space->install_legacy_read_handler(*eeprom, 0xc800, 0xc800, FUNC(braze_eeprom_r));
-	space->install_legacy_write_handler(*eeprom, 0xc800, 0xc800, FUNC(braze_eeprom_w));
+	space->install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),state));
+	space->install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),state));
 
 	braze_decrypt_rom(machine, decrypted);
 

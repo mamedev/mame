@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tceptor_bg_ram_w);
 	DECLARE_WRITE8_MEMBER(tceptor_bg_scroll_w);
 	void tile_mark_dirty(int offset);
+	DECLARE_WRITE8_MEMBER(voice_w);
 };
 
 

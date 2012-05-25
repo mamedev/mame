@@ -100,6 +100,10 @@ public:
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
+	DECLARE_WRITE8_MEMBER(sound_control_0_w);
+	DECLARE_WRITE8_MEMBER(sound_control_1_w);
+	DECLARE_WRITE8_MEMBER(sound_control_2_w);
+	DECLARE_WRITE8_MEMBER(sound_control_3_w);
 };
 
 

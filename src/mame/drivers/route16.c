@@ -119,8 +119,9 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( stratvox_sn76477_w )
+WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
 {
+	device_t *device = machine().device("snsnd");
     /***************************************************************
      * AY8910 output bits are connected to...
      * 7    - direct: 5V * 30k/(100+30k) = 1.15V - via DAC??
@@ -561,7 +562,7 @@ static const ay8910_interface stratvox_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("snsnd", stratvox_sn76477_w),  /* SN76477 commands (not used in Route 16?) */
+	DEVCB_DRIVER_MEMBER(route16_state,stratvox_sn76477_w),  /* SN76477 commands (not used in Route 16?) */
 	DEVCB_NULL
 };
 

@@ -446,14 +446,14 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	device_set_input_line_and_vector(n8080->m_maincpu, INPUT_LINE_IRQ0, state, 0xd7);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
+WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
 {
-	n8080_state *n8080 = device->machine().driver_data<n8080_state>();
-	n8080->m_inte = state;
+	m_inte = state;
 }
 
-static WRITE8_DEVICE_HANDLER( n8080_status_callback )
+WRITE8_MEMBER(n8080_state::n8080_status_callback)
 {
+	device_t *device = machine().device("maincpu");
 	if (data & I8085_STATUS_INTA)
 	{
 		/* interrupt acknowledge */
@@ -463,8 +463,8 @@ static WRITE8_DEVICE_HANDLER( n8080_status_callback )
 
 static I8085_CONFIG( n8080_cpu_config )
 {
-	DEVCB_DEVICE_HANDLER("maincpu",n8080_status_callback),	/* STATUS changed callback */
-	DEVCB_DEVICE_LINE("maincpu",n8080_inte_callback),		/* INTE changed callback */
+	DEVCB_DRIVER_MEMBER(n8080_state,n8080_status_callback),	/* STATUS changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(n8080_state,n8080_inte_callback),		/* INTE changed callback */
 	DEVCB_NULL,								/* SID changed callback (8085A only) */
 	DEVCB_NULL								/* SOD changed callback (8085A only) */
 };

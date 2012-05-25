@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE16_MEMBER(m72_port02_w);
 	DECLARE_WRITE16_MEMBER(rtype2_port02_w);
 	DECLARE_WRITE16_MEMBER(majtitle_gfx_ctrl_w);
+	DECLARE_WRITE8_MEMBER(m72_snd_cpu_sample_w);
 };
 
 

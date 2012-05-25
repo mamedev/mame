@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE32_MEMBER(hotgmck_pcm_bank_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	DECLARE_WRITE32_MEMBER(ps4_eeprom_w);
+	DECLARE_READ32_MEMBER(ps4_eeprom_r);
 };
 
 

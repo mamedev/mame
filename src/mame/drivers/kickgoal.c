@@ -149,8 +149,9 @@ static void kickgoal_play(okim6295_device *oki, int melody, int data)
 	}
 }
 
-WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
+WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
 {
+	device_t *device = machine().device("oki");
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (ACCESSING_BITS_0_7)
 	{
@@ -158,8 +159,8 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				oki->write(0,0x40);	/* Stop playing the melody */
-				state->m_melody      = 0x00;
-				state->m_melody_loop = 0x00;
+				m_melody      = 0x00;
+				m_melody_loop = 0x00;
 			}
 			else {
 				logerror("Unknown command (%02x) sent to the Sound controller\n",data);
@@ -203,10 +204,10 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 }
 #endif
 
-static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
+WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 {
-	kickgoal_state *state = device->machine().driver_data<kickgoal_state>();
-	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",device->machine().describe_context(),data,mem_mask);
+	device_t *device = machine().device("oki");
+	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",machine().describe_context(),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7)
 		data >>= 8;
@@ -220,72 +221,72 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 		case 0xff:	oki->set_bank_base((3 * 0x40000)); break;
 		case 0x78:
 				oki->write_command(data);
-				state->m_snd_sam[0] = 00; state->m_snd_sam[1]= 00; state->m_snd_sam[2] = 00; state->m_snd_sam[3] = 00;
+				m_snd_sam[0] = 00; m_snd_sam[1]= 00; m_snd_sam[2] = 00; m_snd_sam[3] = 00;
 				break;
 		default:
-				if (state->m_snd_new) /* Play new sample */
+				if (m_snd_new) /* Play new sample */
 				{
-					if ((data & 0x80) && (state->m_snd_sam[3] != state->m_snd_new))
+					if ((data & 0x80) && (m_snd_sam[3] != m_snd_new))
 					{
-						logerror("About to play sample %02x at vol %02x\n", state->m_snd_new, data);
+						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
 						if ((oki->read_status() & 0x08) != 0x08)
 						{
-							logerror("Playing sample %02x at vol %02x\n", state->m_snd_new, data);
-							oki->write_command(state->m_snd_new);
+							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
+							oki->write_command(m_snd_new);
 							oki->write_command(data);
 						}
-						state->m_snd_new = 00;
+						m_snd_new = 00;
 					}
-					if ((data & 0x40) && (state->m_snd_sam[2] != state->m_snd_new))
+					if ((data & 0x40) && (m_snd_sam[2] != m_snd_new))
 					{
-						logerror("About to play sample %02x at vol %02x\n", state->m_snd_new, data);
+						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
 						if ((oki->read_status() & 0x04) != 0x04)
 						{
-							logerror("Playing sample %02x at vol %02x\n", state->m_snd_new, data);
-							oki->write_command(state->m_snd_new);
+							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
+							oki->write_command(m_snd_new);
 							oki->write_command(data);
 						}
-						state->m_snd_new = 00;
+						m_snd_new = 00;
 					}
-					if ((data & 0x20) && (state->m_snd_sam[1] != state->m_snd_new))
+					if ((data & 0x20) && (m_snd_sam[1] != m_snd_new))
 					{
-						logerror("About to play sample %02x at vol %02x\n", state->m_snd_new, data);
+						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
 						if ((oki->read_status() & 0x02) != 0x02)
 						{
-							logerror("Playing sample %02x at vol %02x\n", state->m_snd_new, data);
-							oki->write_command(state->m_snd_new);
+							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
+							oki->write_command(m_snd_new);
 							oki->write_command(data);
 						}
-						state->m_snd_new = 00;
+						m_snd_new = 00;
 					}
-					if ((data & 0x10) && (state->m_snd_sam[0] != state->m_snd_new))
+					if ((data & 0x10) && (m_snd_sam[0] != m_snd_new))
 					{
-						logerror("About to play sample %02x at vol %02x\n", state->m_snd_new, data);
+						logerror("About to play sample %02x at vol %02x\n", m_snd_new, data);
 						if ((oki->read_status() & 0x01) != 0x01)
 						{
-							logerror("Playing sample %02x at vol %02x\n", state->m_snd_new, data);
-							oki->write_command(state->m_snd_new);
+							logerror("Playing sample %02x at vol %02x\n", m_snd_new, data);
+							oki->write_command(m_snd_new);
 							oki->write_command(data);
 						}
-						state->m_snd_new = 00;
+						m_snd_new = 00;
 					}
 					break;
 				}
 				else if (data > 0x80) /* New sample command */
 				{
 					logerror("Next sample %02x\n", data);
-					state->m_snd_new = data;
+					m_snd_new = data;
 					break;
 				}
 				else /* Turn a channel off */
 				{
 					logerror("Turning channel %02x off\n", data);
 					oki->write_command(data);
-					if (data & 0x40) state->m_snd_sam[3] = 00;
-					if (data & 0x20) state->m_snd_sam[2] = 00;
-					if (data & 0x10) state->m_snd_sam[1] = 00;
-					if (data & 0x08) state->m_snd_sam[0] = 00;
-					state->m_snd_new = 00;
+					if (data & 0x40) m_snd_sam[3] = 00;
+					if (data & 0x20) m_snd_sam[2] = 00;
+					if (data & 0x10) m_snd_sam[1] = 00;
+					if (data & 0x08) m_snd_sam[0] = 00;
+					m_snd_new = 00;
 					break;
 				}
 	}
@@ -480,11 +481,11 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 
 static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE_LEGACY("oki", kickgoal_snd_w)
+/// AM_RANGE(0x30001e, 0x30001f) AM_WRITE(kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
 /// AM_RANGE(0x800004, 0x800005) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE_LEGACY("oki", actionhw_snd_w)
+	AM_RANGE(0x800004, 0x800005) AM_WRITE(actionhw_snd_w)
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
 	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_SHARE("fgram") /* FG Layer */

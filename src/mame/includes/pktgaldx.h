@@ -29,6 +29,7 @@ public:
 	device_t *m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
+	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
 };
 
 

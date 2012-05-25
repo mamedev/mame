@@ -27,6 +27,8 @@ public:
 	DECLARE_READ8_MEMBER(magmax_sound_irq_ack);
 	DECLARE_READ8_MEMBER(magmax_sound_r);
 	DECLARE_WRITE16_MEMBER(magmax_vreg_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
 };
 
 

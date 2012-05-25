@@ -188,18 +188,21 @@ READ16_MEMBER(twin16_state::twin16_input_r)
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER( twin16_upd_busy_r )
+READ8_MEMBER(twin16_state::twin16_upd_busy_r)
 {
+	device_t *device = machine().device("upd");
 	return upd7759_busy_r(device);
 }
 
-static WRITE8_DEVICE_HANDLER( twin16_upd_reset_w )
+WRITE8_MEMBER(twin16_state::twin16_upd_reset_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_reset_w(device, data & 2);
 }
 
-static WRITE8_DEVICE_HANDLER( twin16_upd_start_w )
+WRITE8_MEMBER(twin16_state::twin16_upd_start_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_start_w(device, data & 1);
 }
 
@@ -223,13 +226,13 @@ WRITE16_MEMBER(twin16_state::cuebrickj_nvram_bank_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("upd", twin16_upd_reset_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(twin16_upd_reset_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("upd", twin16_upd_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREAD_LEGACY("upd", twin16_upd_busy_r)	// miaj writes 0 to it
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(twin16_upd_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ(twin16_upd_busy_r)	// miaj writes 0 to it
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )

@@ -472,16 +472,16 @@ static void dakkochn_custom_w(running_machine &machine, UINT8 data, UINT8 prevda
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( sound_control_w )
+WRITE8_MEMBER(system1_state::sound_control_w)
 {
-	system1_state *state = device->machine().driver_data<system1_state>();
+	device_t *device = machine().device("ppi8255");
 	/* bit 0 = MUTE (inverted sense on System 2) */
-	device->machine().sound().system_mute((data ^ state->m_mute_xor) & 1);
+	machine().sound().system_mute((data ^ m_mute_xor) & 1);
 
 	/* bit 6 = feedback from sound board that read occurrred */
 
 	/* bit 7 controls the sound CPU's NMI line */
-	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
 	system1_videoram_bank_w(device, offset, data);
@@ -2106,7 +2106,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL,											/* Port B read */
 	DEVCB_DRIVER_MEMBER(system1_state, videomode_w),	/* Port B write */
 	DEVCB_NULL,											/* Port C read */
-	DEVCB_HANDLER(sound_control_w)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(system1_state,sound_control_w)						/* Port C write */
 };
 
 static Z80PIO_INTERFACE( pio_interface )

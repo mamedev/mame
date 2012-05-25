@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tecfri_scroll_bg_w);
 	DECLARE_WRITE8_MEMBER(sauro_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(sauro_scroll_fg_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
 };
 
 

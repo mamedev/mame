@@ -134,32 +134,31 @@ static DRIVER_INIT( alienchac )
 
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER(fake_w)
+WRITE8_MEMBER(lordgun_state::fake_w)
 {
 }
-static WRITE8_DEVICE_HANDLER(fake2_w)
+WRITE8_MEMBER(lordgun_state::fake2_w)
 {
 //  popmessage("%02x",data);
 }
 
-static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
+WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 {
-	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	eeprom_device *eeprom = device->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	int i;
 
 	if (data & ~0xfd)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine().describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
 	}
 
-	coin_counter_w(device->machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 0, data & 0x01);
 
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
-		if ( (data & (0x04 << i)) && !(state->m_old & (0x04 << i)) )
-			lordgun_update_gun(device->machine(), i);
+		if ( (data & (0x04 << i)) && !(m_old & (0x04 << i)) )
+			lordgun_update_gun(machine(), i);
 
 	// latch the bit
 	eeprom->write_bit(data & 0x40);
@@ -170,27 +169,26 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 	// clock line asserted: write latch or select next bit to read
 	eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
-	state->m_whitescreen = data & 0x80;
+	m_whitescreen = data & 0x80;
 
-	state->m_old = data;
+	m_old = data;
 }
 
-static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
+WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 {
-	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	eeprom_device *eeprom = device->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 
 	if (~data & ~0xf8)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine().describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
 	}
 
 	// bit 1? cleared during screen transitions
-	state->m_whitescreen = !(data & 0x02);
+	m_whitescreen = !(data & 0x02);
 
-	coin_counter_w(device->machine(), 0, data & 0x08);
-	coin_counter_w(device->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x08);
+	coin_counter_w(machine(), 1, data & 0x10);
 
 	// latch the bit
 	eeprom->write_bit(data & 0x80);
@@ -203,25 +201,23 @@ static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 }
 
 
-static READ8_DEVICE_HANDLER( aliencha_dip_r )
+READ8_MEMBER(lordgun_state::aliencha_dip_r)
 {
-	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	switch (state->m_aliencha_dip_sel & 0x70)
+	switch (m_aliencha_dip_sel & 0x70)
 	{
-		case 0x30:	return state->ioport("DIP1")->read();
-		case 0x60:	return state->ioport("DIP2")->read();
-		case 0x50:	return state->ioport("DIP3")->read();
+		case 0x30:	return ioport("DIP1")->read();
+		case 0x60:	return ioport("DIP2")->read();
+		case 0x50:	return ioport("DIP3")->read();
 
 		default:
-			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine().describe_context(),state->m_aliencha_dip_sel);
+			logerror("%s: dip_r with unknown dip_sel = %02X\n",machine().describe_context(),m_aliencha_dip_sel);
 			return 0xff;
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( aliencha_dip_w )
+WRITE8_MEMBER(lordgun_state::aliencha_dip_w)
 {
-	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	state->m_aliencha_dip_sel = data;
+	m_aliencha_dip_sel = data;
 }
 
 
@@ -333,10 +329,11 @@ static ADDRESS_MAP_START( lordgun_soundmem_map, AS_PROGRAM, 8, lordgun_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
+WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base((data & 2) ? 0x40000 : 0);
-	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", device->machine().describe_context(), data);
+	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);
 //  popmessage("OKI %x", data);
 }
 
@@ -346,7 +343,7 @@ static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_byte_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r )
 	AM_RANGE(0x5000, 0x5000) AM_READNOP
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("oki", lordgun_okibank_w )
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(lordgun_okibank_w )
 ADDRESS_MAP_END
 
 
@@ -609,41 +606,41 @@ INPUT_PORTS_END
 static I8255A_INTERFACE( lordgun_ppi8255_0_intf )
 {
 	DEVCB_INPUT_PORT("DIP"),			/* Port A read */
-	DEVCB_HANDLER(fake_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(lordgun_eeprom_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,lordgun_eeprom_w),	/* Port B write */
 	DEVCB_INPUT_PORT("SERVICE"),		/* Port C read */
-	DEVCB_HANDLER(fake2_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake2_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( lordgun_ppi8255_1_intf )
 {
 	DEVCB_INPUT_PORT("START1"),			/* Port A read */
-	DEVCB_HANDLER(fake_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),				/* Port A write */
 	DEVCB_INPUT_PORT("START2"),			/* Port B read */
-	DEVCB_HANDLER(fake_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),				/* Port B write */
 	DEVCB_INPUT_PORT("COIN"),			/* Port C read */
-	DEVCB_HANDLER(fake_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( aliencha_ppi8255_0_intf )
 {
-	DEVCB_HANDLER(aliencha_dip_r),		/* Port A read */
-	DEVCB_HANDLER(fake2_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,aliencha_dip_r),		/* Port A read */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake2_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(aliencha_eeprom_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,aliencha_eeprom_w),	/* Port B write */
 	DEVCB_INPUT_PORT("SERVICE"),		/* Port C read */
-	DEVCB_HANDLER(aliencha_dip_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,aliencha_dip_w)		/* Port C write */
 };
 
 static I8255A_INTERFACE( aliencha_ppi8255_1_intf )
 {
 	DEVCB_INPUT_PORT("P1"),				/* Port A read */
-	DEVCB_HANDLER(fake_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),				/* Port A write */
 	DEVCB_INPUT_PORT("P2"),				/* Port B read */
-	DEVCB_HANDLER(fake_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w),				/* Port B write */
 	DEVCB_INPUT_PORT("COIN"),			/* Port C read */
-	DEVCB_HANDLER(fake_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(lordgun_state,fake_w)				/* Port C write */
 };
 
 

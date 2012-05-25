@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(analog_w);
 	DECLARE_WRITE16_MEMBER(foodf_paletteram_w);
 	void foodf_set_flip(int flip);
+	DECLARE_READ8_MEMBER(pot_r);
 };
 
 

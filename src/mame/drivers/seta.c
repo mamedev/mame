@@ -1579,14 +1579,14 @@ READ16_MEMBER(seta_state::seta_dsw_r)
 
 /* DSW reading for 8 bit CPUs */
 
-static READ8_DEVICE_HANDLER( dsw1_r )
+READ8_MEMBER(seta_state::dsw1_r)
 {
-	return (device->machine().root_device().ioport("DSW")->read() >> 8) & 0xff;
+	return (machine().root_device().ioport("DSW")->read() >> 8) & 0xff;
 }
 
-static READ8_DEVICE_HANDLER( dsw2_r )
+READ8_MEMBER(seta_state::dsw2_r)
 {
-	return (device->machine().root_device().ioport("DSW")->read() >> 0) & 0xff;
+	return (machine().root_device().ioport("DSW")->read() >> 0) & 0xff;
 }
 
 
@@ -2446,8 +2446,8 @@ WRITE16_MEMBER(seta_state::magspeed_lights_w)
 
 	for (int i = 0; i < 16; i++)
 		set_led_status(machine(), offset * 16 + i, BIT(m_magspeed_lights[offset], i));
-	
-//	popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
+
+//  popmessage("%04X %04X %04X", m_magspeed_lights[0], m_magspeed_lights[1], m_magspeed_lights[2]);
 }
 
 /* almost identical to kamenrid */
@@ -7467,8 +7467,8 @@ static const ym2203_interface tndrcade_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(dsw1_r),		/* input A: DSW 1 */
-		DEVCB_HANDLER(dsw2_r),		/* input B: DSW 2 */
+		DEVCB_DRIVER_MEMBER(seta_state,dsw1_r),		/* input A: DSW 1 */
+		DEVCB_DRIVER_MEMBER(seta_state,dsw2_r),		/* input B: DSW 2 */
 		DEVCB_NULL,
 		DEVCB_NULL
 	},

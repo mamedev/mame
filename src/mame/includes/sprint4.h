@@ -28,6 +28,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(get_lever);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_wheel);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
+	DECLARE_WRITE8_MEMBER(sprint4_screech_1_w);
+	DECLARE_WRITE8_MEMBER(sprint4_screech_2_w);
+	DECLARE_WRITE8_MEMBER(sprint4_screech_3_w);
+	DECLARE_WRITE8_MEMBER(sprint4_screech_4_w);
+	DECLARE_WRITE8_MEMBER(sprint4_bang_w);
+	DECLARE_WRITE8_MEMBER(sprint4_attract_w);
 };
 
 

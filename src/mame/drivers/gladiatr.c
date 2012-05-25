@@ -263,7 +263,7 @@ static MACHINE_RESET( gladiator )
 }
 
 /* YM2203 port B handler (output) */
-static WRITE8_DEVICE_HANDLER( gladiator_int_control_w )
+WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 {
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
@@ -277,12 +277,13 @@ static void gladiator_ym_irq(device_t *device, int irq)
 }
 
 /*Sound Functions*/
-static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
+WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
 {
-	UINT8 *rom = device->machine().root_device().memregion("audiocpu")->base() + 0x10000;
+	device_t *device = machine().device("msm");
+	UINT8 *rom = machine().root_device().memregion("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
-	device->machine().root_device().membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
+	machine().root_device().membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
 
 	msm5205_data_w(device,data);         /* bit0..3  */
 	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
@@ -425,7 +426,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE_LEGACY("msm", glad_adpcm_w)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(glad_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
@@ -621,9 +622,9 @@ GFXDECODE_END
 
 
 
-static READ8_DEVICE_HANDLER(f1_r)
+READ8_MEMBER(gladiatr_state::f1_r)
 {
-	return device->machine().rand();
+	return machine().rand();
 }
 
 static const ym2203_interface ppking_ym2203_interface =
@@ -631,8 +632,8 @@ static const ym2203_interface ppking_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(f1_r),
-		DEVCB_HANDLER(f1_r),
+		DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
+		DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -646,7 +647,7 @@ static const ym2203_interface gladiatr_ym2203_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_INPUT_PORT("DSW3"),       		/* port B read */
-		DEVCB_HANDLER(gladiator_int_control_w), /* port A write */
+		DEVCB_DRIVER_MEMBER(gladiatr_state,gladiator_int_control_w), /* port A write */
 		DEVCB_NULL,
 	},
 	gladiator_ym_irq          /* NMI request for 2nd cpu */

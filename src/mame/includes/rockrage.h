@@ -25,6 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(rockrage_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);
+	DECLARE_READ8_MEMBER(rockrage_VLM5030_busy_r);
+	DECLARE_WRITE8_MEMBER(rockrage_speech_w);
 };
 
 

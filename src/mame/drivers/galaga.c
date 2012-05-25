@@ -779,17 +779,17 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 
 CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)param)->read() >> 4; }
 
-static WRITE8_DEVICE_HANDLER( out_0 )
+WRITE8_MEMBER(galaga_state::out_0)
 {
-	set_led_status(device->machine(), 1,data & 1);
-	set_led_status(device->machine(), 0,data & 2);
-	coin_counter_w(device->machine(), 1,~data & 4);
-	coin_counter_w(device->machine(), 0,~data & 8);
+	set_led_status(machine(), 1,data & 1);
+	set_led_status(machine(), 0,data & 2);
+	coin_counter_w(machine(), 1,~data & 4);
+	coin_counter_w(machine(), 0,~data & 8);
 }
 
-static WRITE8_DEVICE_HANDLER( out_1 )
+WRITE8_MEMBER(galaga_state::out_1)
 {
-	coin_lockout_global_w(device->machine(), data & 1);
+	coin_lockout_global_w(machine(), data & 1);
 }
 
 static const namco_51xx_interface namco_51xx_intf =
@@ -801,15 +801,15 @@ static const namco_51xx_interface namco_51xx_intf =
 		DEVCB_INPUT_PORT("IN1H")
 	},
 	{	/* port write handlers */
-		DEVCB_HANDLER(out_0),
-		DEVCB_HANDLER(out_1)
+		DEVCB_DRIVER_MEMBER(galaga_state,out_0),
+		DEVCB_DRIVER_MEMBER(galaga_state,out_1)
 	}
 };
 
 
-static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
+READ8_MEMBER(galaga_state::namco_52xx_rom_r)
 {
-	UINT32 length = device->machine().root_device().memregion("52xx")->bytes();
+	UINT32 length = machine().root_device().memregion("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
 	if (!(offset & 0x1000))
 		offset = (offset & 0xfff) | 0x0000;
@@ -819,10 +819,10 @@ static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 		offset = (offset & 0xfff) | 0x2000;
 	else if (!(offset & 0x8000))
 		offset = (offset & 0xfff) | 0x3000;
-	return (offset < length) ? device->machine().root_device().memregion("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? machine().root_device().memregion("52xx")->base()[offset] : 0xff;
 }
 
-static READ8_DEVICE_HANDLER( namco_52xx_si_r )
+READ8_MEMBER(galaga_state::namco_52xx_si_r)
 {
 	/* pulled to GND */
 	return 0;
@@ -833,21 +833,20 @@ static const namco_52xx_interface namco_52xx_intf =
 	"discrete",							/* name of the discrete sound device */
 	NODE_04,							/* index of the first node */
 	ATTOSECONDS_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))),	/* external clock rate */
-	DEVCB_HANDLER(namco_52xx_rom_r),	/* ROM read handler */
-	DEVCB_HANDLER(namco_52xx_si_r)		/* SI (pin 6) read handler */
+	DEVCB_DRIVER_MEMBER(galaga_state,namco_52xx_rom_r),	/* ROM read handler */
+	DEVCB_DRIVER_MEMBER(galaga_state,namco_52xx_si_r)		/* SI (pin 6) read handler */
 };
 
 
-static READ8_DEVICE_HANDLER( custom_mod_r )
+READ8_MEMBER(galaga_state::custom_mod_r)
 {
-	galaga_state *state = device->machine().driver_data<galaga_state>();
 	/* MOD0-2 is connected to K1-3; K0 is left unconnected */
-	return state->m_custom_mod << 1;
+	return m_custom_mod << 1;
 }
 
 static const namco_53xx_interface namco_53xx_intf =
 {
-	DEVCB_HANDLER(custom_mod_r),		/* K port */
+	DEVCB_DRIVER_MEMBER(galaga_state,custom_mod_r),		/* K port */
 	{
 		DEVCB_INPUT_PORT("DSWA"),		/* R0 port */
 		DEVCB_INPUT_PORT("DSWA_HI"),	/* R1 port */

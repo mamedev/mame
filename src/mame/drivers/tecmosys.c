@@ -267,14 +267,16 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 	}
 }
 
-static READ16_DEVICE_HANDLER( eeprom_r )
+READ16_MEMBER(tecmosys_state::eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	 return ((eeprom->read_bit() & 0x01) << 11);
 }
 
-static WRITE16_DEVICE_HANDLER( eeprom_w )
+WRITE16_MEMBER(tecmosys_state::eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if ( ACCESSING_BITS_8_15 )
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -308,7 +310,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("tmap_palette")
 
 	AM_RANGE(0x880000, 0x88002f) AM_WRITE(unk880000_w ) AM_SHARE("880000regs")	// 10 byte dta@88000c, 880022=watchdog?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("eeprom", eeprom_w	)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
 	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_SHARE("a80000regs")	// a80000-3 scroll? a80004 inverted ? 3 : 0
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_SHARE("b00000regs")	// b00000-3 scrool?, b00004 inverted ? 3 : 0
 	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(tecmosys_prot_status_r, tecmosys_prot_status_w)
@@ -316,7 +318,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_SHARE("c80000regs")	// c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
-	AM_RANGE(0xd80000, 0xd80001) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_w )
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(tecmosys_prot_data_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)

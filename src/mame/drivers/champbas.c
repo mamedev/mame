@@ -142,11 +142,23 @@ static TIMER_CALLBACK( exctsccr_fm_callback )
 }
 
 // Champion Baseball has only one DAC
-static WRITE8_DEVICE_HANDLER( champbas_dac_w )
+WRITE8_MEMBER(champbas_state::champbas_dac_w)
 {
+	device_t *device = machine().device("dac");
 	dac_signed_data_w(device, data << 2);
 }
 
+WRITE8_MEMBER(champbas_state::champbas_dac1_w)
+{
+	device_t *device = machine().device("dac1");
+	dac_signed_data_w(device, data << 2);
+}
+
+WRITE8_MEMBER(champbas_state::champbas_dac2_w)
+{
+	device_t *device = machine().device("dac2");
+	dac_signed_data_w(device, data << 2);
+}
 
 /*************************************
  *
@@ -329,7 +341,7 @@ static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x7fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP	// 4-bit return code to main CPU (not used)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("dac", champbas_dac_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(champbas_dac_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -337,8 +349,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccr_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE_LEGACY("dac1", champbas_dac_w)
-	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE_LEGACY("dac2", champbas_dac_w)
+	AM_RANGE(0xc008, 0xc008) AM_WRITE(champbas_dac1_w)
+	AM_RANGE(0xc009, 0xc009) AM_WRITE(champbas_dac2_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_byte_r)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */

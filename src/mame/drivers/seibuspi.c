@@ -868,13 +868,14 @@ READ32_MEMBER(seibuspi_state::spi_unknown_r)
 	return 0xffffffff;
 }
 
-static WRITE32_DEVICE_HANDLER( eeprom_w )
+WRITE32_MEMBER(seibuspi_state::eeprom_w)
 {
-	okim6295_device *oki2 = device->machine().device<okim6295_device>("oki2");
+	device_t *device = machine().device("eeprom");
+	okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
 
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
-		rf2_set_layer_banks(device->machine(), data >> 16);
+		rf2_set_layer_banks(machine(), data >> 16);
 
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
 		eeprom->write_bit((data & 0x800000) ? 1 : 0);
@@ -1068,32 +1069,30 @@ static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static READ8_DEVICE_HANDLER( flashrom_read )
+READ8_MEMBER(seibuspi_state::flashrom_read)
 {
-	seibuspi_state *state = device->machine().driver_data<seibuspi_state>();
 	logerror("Flash Read: %08X\n", offset);
 	if( offset < 0x100000 )
 	{
-		return state->m_flash[0]->read(offset);
+		return m_flash[0]->read(offset);
 	}
 	else if( offset < 0x200000 )
 	{
-		return state->m_flash[1]->read(offset - 0x100000 );
+		return m_flash[1]->read(offset - 0x100000 );
 	}
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( flashrom_write )
+WRITE8_MEMBER(seibuspi_state::flashrom_write)
 {
-	seibuspi_state *state = device->machine().driver_data<seibuspi_state>();
 	logerror("Flash Write: %08X, %02X\n", offset, data);
 	if( offset < 0x100000 )
 	{
-		state->m_flash[0]->write(offset + 1, data);
+		m_flash[0]->write(offset + 1, data);
 	}
 	else if( offset < 0x200000 )
 	{
-		state->m_flash[1]->write(offset - 0x100000 + 1, data);
+		m_flash[1]->write(offset - 0x100000 + 1, data);
 	}
 }
 
@@ -1105,8 +1104,9 @@ static void irqhandler(device_t *device, int state)
 		cputag_set_input_line(device->machine(), "soundcpu", 0, CLEAR_LINE);
 }
 
-static WRITE32_DEVICE_HANDLER(sys386f2_eeprom_w)
+WRITE32_MEMBER(seibuspi_state::sys386f2_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit((data & 0x80) ? 1 : 0);
 	eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -1115,8 +1115,8 @@ static WRITE32_DEVICE_HANDLER(sys386f2_eeprom_w)
 
 static const ymf271_interface ymf271_config =
 {
-	DEVCB_HANDLER(flashrom_read),
-	DEVCB_HANDLER(flashrom_write),
+	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_read),
+	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_write),
 	irqhandler
 };
 
@@ -1137,7 +1137,7 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)	/* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)	/* Player controls (start) */
-	AM_RANGE(0x0000068c, 0x0000068f) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("spimainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
@@ -1155,7 +1155,7 @@ static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)				/* Unknown */
 	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
 	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(input_select_w)
-	AM_RANGE(0x00000404, 0x00000407) AM_DEVWRITE_LEGACY("eeprom", sys386f2_eeprom_w)
+	AM_RANGE(0x00000404, 0x00000407) AM_WRITE(sys386f2_eeprom_w)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x000000ff)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -1904,7 +1904,7 @@ static MACHINE_RESET( sxx2f )
 
 	memcpy(state->m_z80_rom, rom, 0x40000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*machine.device("eeprom"), 0x0000068c, 0x0000068f, FUNC(eeprom_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::eeprom_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sb_coin_r),state));
 
 	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);

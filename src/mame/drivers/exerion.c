@@ -153,20 +153,18 @@ INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 
 /* This is the first of many Exerion "features". No clue if it's */
 /* protection or some sort of timer. */
-static READ8_DEVICE_HANDLER( exerion_porta_r )
+READ8_MEMBER(exerion_state::exerion_porta_r)
 {
-	exerion_state *state = device->machine().driver_data<exerion_state>();
-	state->m_porta ^= 0x40;
-	return state->m_porta;
+	m_porta ^= 0x40;
+	return m_porta;
 }
 
 
-static WRITE8_DEVICE_HANDLER( exerion_portb_w )
+WRITE8_MEMBER(exerion_state::exerion_portb_w)
 {
-	exerion_state *state = device->machine().driver_data<exerion_state>();
 	/* pull the expected value from the ROM */
-	state->m_porta = state->memregion("maincpu")->base()[0x5f76];
-	state->m_portb = data;
+	m_porta = memregion("maincpu")->base()[0x5f76];
+	m_portb = data;
 
 	logerror("Port B = %02X\n", data);
 }
@@ -365,10 +363,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(exerion_porta_r),
+	DEVCB_DRIVER_MEMBER(exerion_state,exerion_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(exerion_portb_w)
+	DEVCB_DRIVER_MEMBER(exerion_state,exerion_portb_w)
 };
 
 

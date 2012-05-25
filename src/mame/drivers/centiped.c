@@ -635,9 +635,9 @@ WRITE8_MEMBER(centiped_state::led_w)
 }
 
 
-static READ8_DEVICE_HANDLER( caterplr_rand_r )
+READ8_MEMBER(centiped_state::caterplr_rand_r)
 {
-	return device->machine().rand() % 0xff;
+	return machine().rand() % 0xff;
 }
 
 
@@ -660,15 +660,17 @@ WRITE8_MEMBER(centiped_state::bullsdrt_coin_count_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( caterplr_AY8910_w )
+WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
 {
+	device_t *device = machine().device("pokey");
 	ay8910_address_w(device, 0, offset);
 	ay8910_data_w(device, 0, data);
 }
 
 
-static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
+READ8_MEMBER(centiped_state::caterplr_AY8910_r)
 {
+	device_t *device = machine().device("pokey");
 	ay8910_address_w(device, 0, offset);
 	return ay8910_r(device, 0);
 }
@@ -1557,7 +1559,7 @@ static const ay8910_interface centipdb_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(caterplr_rand_r)
+	DEVCB_DRIVER_MEMBER(centiped_state,caterplr_rand_r)
 };
 
 
@@ -1978,10 +1980,10 @@ ROM_END
 
 static DRIVER_INIT( caterplr )
 {
+	centiped_state *state = machine.driver_data<centiped_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *device = machine.device("pokey");
-	space->install_legacy_readwrite_handler(*device, 0x1000, 0x100f, FUNC(caterplr_AY8910_r), FUNC(caterplr_AY8910_w));
-	space->install_legacy_read_handler(*device, 0x1780, 0x1780, FUNC(caterplr_rand_r));
+	space->install_readwrite_handler(0x1000, 0x100f, read8_delegate(FUNC(centiped_state::caterplr_AY8910_r),state), write8_delegate(FUNC(centiped_state::caterplr_AY8910_w),state));
+	space->install_read_handler(0x1780, 0x1780, read8_delegate(FUNC(centiped_state::caterplr_rand_r),state));
 }
 
 

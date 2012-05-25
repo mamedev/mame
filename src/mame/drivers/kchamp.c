@@ -85,11 +85,11 @@ WRITE8_MEMBER(kchamp_state::sound_reset_w)
 		device_set_input_line(m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_w )
+WRITE8_MEMBER(kchamp_state::sound_control_w)
 {
-	kchamp_state *state = device->machine().driver_data<kchamp_state>();
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, !(data & 1));
-	state->m_sound_nmi_enable = ((data >> 1) & 1);
+	m_sound_nmi_enable = ((data >> 1) & 1);
 }
 
 WRITE8_MEMBER(kchamp_state::sound_command_w)
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("msm", sound_control_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
 

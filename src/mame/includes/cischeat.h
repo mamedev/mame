@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE16_MEMBER(f1gpstr2_vregs_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_vregs_w);
 	void cischeat_set_vreg_flag(int which, int data);
+	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
+	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
 };
 
 

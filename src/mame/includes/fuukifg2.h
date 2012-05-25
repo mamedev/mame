@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE16_MEMBER(fuuki16_vram_1_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_vram_2_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_vram_3_w);
+	DECLARE_WRITE8_MEMBER(fuuki16_oki_banking_w);
 };
 
 

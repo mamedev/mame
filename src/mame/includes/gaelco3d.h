@@ -103,6 +103,12 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
+	DECLARE_WRITE_LINE_MEMBER(ser_irq);
+	DECLARE_READ16_MEMBER(eeprom_data_r);
+	DECLARE_READ32_MEMBER(eeprom_data32_r);
+	DECLARE_WRITE16_MEMBER(eeprom_data_w);
+	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
+	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
 };
 
 

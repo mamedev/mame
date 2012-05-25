@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wc90b_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(wc90b_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(wc90b_txvideoram_w);
+	DECLARE_WRITE8_MEMBER(adpcm_control_w);
 };
 
 

@@ -74,6 +74,7 @@ public:
 	DECLARE_WRITE16_MEMBER(wbeachvl_scroll_w);
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
+	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
 };
 
 /*----------- defined in video/playmark.c -----------*/

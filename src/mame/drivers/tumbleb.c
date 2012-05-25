@@ -626,8 +626,10 @@ static void process_tumbleb2_music_command( okim6295_device *oki, int data )
 }
 
 
-static WRITE16_DEVICE_HANDLER( tumbleb2_soundmcu_w )
+WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 {
+	device_t *device = machine().device("oki");
+
 	int sound = tumbleb_sound_lookup[data & 0xff];
 
 	if (sound == 0x00)
@@ -3401,15 +3403,13 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
-	device_t *oki = machine.device("oki");
-
 	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(machine, 0x000132);
 	#endif
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki, 0x100000, 0x100001, FUNC(tumbleb2_soundmcu_w) );
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(tumbleb_state::tumbleb2_soundmcu_w),state));
 
 }
 

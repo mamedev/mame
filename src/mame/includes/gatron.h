@@ -9,6 +9,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(output_port_0_w);
 	DECLARE_WRITE8_MEMBER(gat_videoram_w);
+	DECLARE_WRITE8_MEMBER(output_port_1_w);
 };
 
 

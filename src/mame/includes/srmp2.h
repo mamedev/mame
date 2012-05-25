@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(srmp3_flags_w);
 	DECLARE_WRITE8_MEMBER(srmp3_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(rmgoldyh_rombank_w);
+	DECLARE_WRITE16_MEMBER(srmp2_adpcm_code_w);
+	DECLARE_WRITE8_MEMBER(srmp3_adpcm_code_w);
 };
 
 

@@ -155,8 +155,9 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 		soundlatch_byte_w(space,offset,data >> 8);
 }
 
-static WRITE8_DEVICE_HANDLER( msm5205_w )
+WRITE8_MEMBER(tigeroad_state::msm5205_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device,(data>>7)&1);
 	msm5205_data_w(device,data);
 	msm5205_vclk_w(device,1);
@@ -202,7 +203,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sample_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm", msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
 

@@ -22,6 +22,7 @@ public:
 	DECLARE_WRITE32_MEMBER(silkroad_fgram_w);
 	DECLARE_WRITE32_MEMBER(silkroad_fgram2_w);
 	DECLARE_WRITE32_MEMBER(silkroad_fgram3_w);
+	DECLARE_WRITE32_MEMBER(silk_6295_bank_w);
 };
 
 

@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(amspdwy_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_videoram_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_colorram_w);
+	DECLARE_READ8_MEMBER(amspdwy_sound_r);
 };
 
 

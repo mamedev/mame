@@ -216,12 +216,12 @@
 *           Read/Write Handlers            *
 *******************************************/
 
-static WRITE8_DEVICE_HANDLER( porta_w )
+WRITE8_MEMBER(truco_state::porta_w)
 {
 	logerror("Port A writes: %2x\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( pia_ca2_w )
+WRITE8_MEMBER(truco_state::pia_ca2_w)
 {
 /*  PIA CA2 line is connected to IC U19, leg 11.
     The IC was successfully identified as MAX691.
@@ -231,25 +231,25 @@ static WRITE8_DEVICE_HANDLER( pia_ca2_w )
     Legs 07 [OSC IN] and 08 [OSC SEL] aren't connected,
     setting 1.6 seconds as WD timeout.
 */
-	device->machine().watchdog_reset();
+	machine().watchdog_reset();
 }
 
-static WRITE8_DEVICE_HANDLER( portb_w )
+WRITE8_MEMBER(truco_state::portb_w)
 {
 	if ((data & 0x80) | (data == 0))
 	{
-		dac_data_w(device->machine().device("dac"), data & 0x80);	/* Isolated the bit for Delta-Sigma DAC */
+		dac_data_w(machine().device("dac"), data & 0x80);	/* Isolated the bit for Delta-Sigma DAC */
 	}
 	else
 		logerror("Port B writes: %2x\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( pia_irqa_w )
+WRITE8_MEMBER(truco_state::pia_irqa_w)
 {
 		logerror("PIA irq A: %2x\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( pia_irqb_w )
+WRITE8_MEMBER(truco_state::pia_irqb_w)
 {
 		logerror("PIA irq B: %2x\n", data);
 }
@@ -421,12 +421,12 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,					/* line CB1 in ??? */
 	DEVCB_NULL,					/* line CA2 in */
 	DEVCB_NULL,					/* line CB2 in */
-	DEVCB_HANDLER(porta_w),		/* port A out */
-	DEVCB_HANDLER(portb_w),		/* port B out */
-	DEVCB_HANDLER(pia_ca2_w),	/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(truco_state,porta_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(truco_state,portb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(truco_state,pia_ca2_w),	/* line CA2 out */
 	DEVCB_NULL,					/* port CB2 out */
-	DEVCB_HANDLER(pia_irqa_w),	/* IRQA */
-	DEVCB_HANDLER(pia_irqb_w)	/* IRQB */
+	DEVCB_DRIVER_MEMBER(truco_state,pia_irqa_w),	/* IRQA */
+	DEVCB_DRIVER_MEMBER(truco_state,pia_irqb_w)	/* IRQB */
 };
 
 

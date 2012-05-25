@@ -25,6 +25,7 @@ public:
 	DECLARE_READ8_MEMBER(routex_prot_read);
 	DECLARE_WRITE8_MEMBER(route16_out0_w);
 	DECLARE_WRITE8_MEMBER(route16_out1_w);
+	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
 };
 
 

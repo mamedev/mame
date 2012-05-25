@@ -422,57 +422,53 @@ WRITE8_MEMBER(darius_state::darius_da_pan)
 
 /**** Mixer Control ****/
 
-static WRITE8_DEVICE_HANDLER( darius_write_portA0 )
+WRITE8_MEMBER(darius_state::darius_write_portA0)
 {
-	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control FM #0 PSG #0 A
-	//popmessage(" pan %02x %02x %02x %02x %02x", state->m_pan[0], state->m_pan[1], state->m_pan[2], state->m_pan[3], state->m_pan[4] );
+	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 	//popmessage(" A0 %02x A1 %02x B0 %02x B1 %02x", port[0], port[1], port[2], port[3] );
 
-	state->m_vol[0] = state->m_def_vol[(data >> 4) & 0x0f];
-	state->m_vol[6] = state->m_def_vol[(data >> 0) & 0x0f];
-	update_fm0(device->machine());
-	update_psg0(device->machine(), 0);
+	m_vol[0] = m_def_vol[(data >> 4) & 0x0f];
+	m_vol[6] = m_def_vol[(data >> 0) & 0x0f];
+	update_fm0(machine());
+	update_psg0(machine(), 0);
 }
 
-static WRITE8_DEVICE_HANDLER( darius_write_portA1 )
+WRITE8_MEMBER(darius_state::darius_write_portA1)
 {
-	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control FM #1 PSG #1 A
-	//popmessage(" pan %02x %02x %02x %02x %02x", state->m_pan[0], state->m_pan[1], state->m_pan[2], state->m_pan[3], state->m_pan[4] );
+	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
-	state->m_vol[3] = state->m_def_vol[(data >> 4) & 0x0f];
-	state->m_vol[7] = state->m_def_vol[(data >> 0) & 0x0f];
-	update_fm1(device->machine());
-	update_psg1(device->machine(), 0);
+	m_vol[3] = m_def_vol[(data >> 4) & 0x0f];
+	m_vol[7] = m_def_vol[(data >> 0) & 0x0f];
+	update_fm1(machine());
+	update_psg1(machine(), 0);
 }
 
-static WRITE8_DEVICE_HANDLER( darius_write_portB0 )
+WRITE8_MEMBER(darius_state::darius_write_portB0)
 {
-	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control PSG #0 B/C
-	//popmessage(" pan %02x %02x %02x %02x %02x", state->m_pan[0], state->m_pan[1], state->m_pan[2], state->m_pan[3], state->m_pan[4] );
+	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
-	state->m_vol[1] = state->m_def_vol[(data >> 4) & 0x0f];
-	state->m_vol[2] = state->m_def_vol[(data >> 0) & 0x0f];
-	update_psg0(device->machine(), 1);
-	update_psg0(device->machine(), 2);
+	m_vol[1] = m_def_vol[(data >> 4) & 0x0f];
+	m_vol[2] = m_def_vol[(data >> 0) & 0x0f];
+	update_psg0(machine(), 1);
+	update_psg0(machine(), 2);
 }
 
-static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
+WRITE8_MEMBER(darius_state::darius_write_portB1)
 {
-	darius_state *state = device->machine().driver_data<darius_state>();
 
 	// volume control PSG #1 B/C
-	//popmessage(" pan %02x %02x %02x %02x %02x", state->m_pan[0], state->m_pan[1], state->m_pan[2], state->m_pan[3], state->m_pan[4] );
+	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
-	state->m_vol[4] = state->m_def_vol[(data >> 4) & 0x0f];
-	state->m_vol[5] = state->m_def_vol[(data >> 0) & 0x0f];
-	update_psg1(device->machine(), 1);
-	update_psg1(device->machine(), 2);
+	m_vol[4] = m_def_vol[(data >> 4) & 0x0f];
+	m_vol[5] = m_def_vol[(data >> 0) & 0x0f];
+	update_psg1(machine(), 1);
+	update_psg1(machine(), 2);
 }
 
 
@@ -547,8 +543,9 @@ WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(&space.device()) ); */
 }
 
-static WRITE8_DEVICE_HANDLER( adpcm_data_w )
+WRITE8_MEMBER(darius_state::adpcm_data_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_data_w(device, data);
 	msm5205_reset_w(device, !(data & 0x20));	/* my best guess, but it could be output enable as well */
 }
@@ -557,7 +554,7 @@ static ADDRESS_MAP_START( darius_sound2_io_map, AS_IO, 8, darius_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE_LEGACY("msm", adpcm_data_w)	/* readport2 ??? */
+	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_WRITE(adpcm_data_w)	/* readport2 ??? */
 	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
 ADDRESS_MAP_END
 
@@ -798,8 +795,8 @@ static const ym2203_interface ym2203_interface_1 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,					/* portA read */
 		DEVCB_NULL,
-		DEVCB_HANDLER(darius_write_portA0),	/* portA write */
-		DEVCB_HANDLER(darius_write_portB0),	/* portB write */
+		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA0),	/* portA write */
+		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB0),	/* portB write */
 	},
 	irqhandler
 };
@@ -811,8 +808,8 @@ static const ym2203_interface ym2203_interface_2 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,					/* portA read */
 		DEVCB_NULL,
-		DEVCB_HANDLER(darius_write_portA1),	/* portA write */
-		DEVCB_HANDLER(darius_write_portB1)		/* portB write */
+		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA1),	/* portA write */
+		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB1)		/* portB write */
 	},
 };
 

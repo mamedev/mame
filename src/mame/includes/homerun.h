@@ -29,6 +29,9 @@ public:
 	DECLARE_WRITE8_MEMBER(homerun_videoram_w);
 	DECLARE_WRITE8_MEMBER(homerun_color_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(homerun_40_r);
+	DECLARE_WRITE8_MEMBER(pa_w);
+	DECLARE_WRITE8_MEMBER(pb_w);
+	DECLARE_WRITE8_MEMBER(pc_w);
 };
 
 

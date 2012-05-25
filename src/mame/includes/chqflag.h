@@ -39,6 +39,7 @@ public:
 	DECLARE_READ8_MEMBER(analog_read_r);
 	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
 };
 
 /*----------- defined in video/chqflag.c -----------*/

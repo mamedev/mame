@@ -81,33 +81,31 @@ static MACHINE_RESET( friskyt )
 
 
 
-static READ8_DEVICE_HANDLER( friskyt_portB_r )
+READ8_MEMBER(seicross_state::friskyt_portB_r)
 {
-	seicross_state *state = device->machine().driver_data<seicross_state>();
 
-	return (state->m_portb & 0x9f) | (state->ioport("DEBUG")->read_safe(0) & 0x60);
+	return (m_portb & 0x9f) | (ioport("DEBUG")->read_safe(0) & 0x60);
 }
 
-static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
+WRITE8_MEMBER(seicross_state::friskyt_portB_w)
 {
-	seicross_state *state = device->machine().driver_data<seicross_state>();
 
 	//logerror("PC %04x: 8910 port B = %02x\n", cpu_get_pc(&space->device()), data);
 	/* bit 0 is IRQ enable */
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 
 	/* bit 1 flips screen */
 
 	/* bit 2 resets the microcontroller */
-	if (((state->m_portb & 4) == 0) && (data & 4))
+	if (((m_portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
-		cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */
-	state->m_portb = data;
+	m_portb = data;
 }
 
 
@@ -385,9 +383,9 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_HANDLER(friskyt_portB_r),
+	DEVCB_DRIVER_MEMBER(seicross_state,friskyt_portB_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(friskyt_portB_w)
+	DEVCB_DRIVER_MEMBER(seicross_state,friskyt_portB_w)
 };
 
 static INTERRUPT_GEN( vblank_irq )

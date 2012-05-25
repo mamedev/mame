@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lwings_bg1_scrolly_w);
 	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
+	DECLARE_WRITE8_MEMBER(msm5205_w);
 };
 
 

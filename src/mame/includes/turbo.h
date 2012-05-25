@@ -85,6 +85,22 @@ public:
 	DECLARE_READ8_MEMBER(buckrog_port_3_r);
 	DECLARE_WRITE8_MEMBER(turbo_videoram_w);
 	DECLARE_WRITE8_MEMBER(buckrog_bitmap_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi0a_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi0b_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi0c_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi1a_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi1b_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi1c_w);
+	DECLARE_WRITE8_MEMBER(turbo_ppi3c_w);
+	DECLARE_WRITE8_MEMBER(subroc3d_ppi0a_w);
+	DECLARE_WRITE8_MEMBER(subroc3d_ppi0c_w);
+	DECLARE_WRITE8_MEMBER(subroc3d_ppi0b_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi0a_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi0b_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi0c_w);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi1c_w);
+	DECLARE_READ8_MEMBER(turbo_analog_r);
+	DECLARE_WRITE8_MEMBER(buckrog_ppi8255_0_w);
 };
 
 

@@ -272,8 +272,9 @@ READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
 	return(data);
 }
 
-static WRITE8_DEVICE_HANDLER( msm5205_w )
+WRITE8_MEMBER(lwings_state::msm5205_w)
 {
+	device_t *device = machine().device("5205");
 	msm5205_reset_w(device, (data >> 7) & 1);
 	msm5205_data_w(device, data);
 	msm5205_vclk_w(device, 1);
@@ -367,13 +368,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( avengers_adpcm_io_map, AS_IO, 8, lwings_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("5205", msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_adpcm_io_map, AS_IO, 8, lwings_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("5205", msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
 /*************************************

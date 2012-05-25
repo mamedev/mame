@@ -93,33 +93,33 @@ READ8_MEMBER(tunhunt_state::tunhunt_button_r)
 }
 
 
-static READ8_DEVICE_HANDLER( dsw2_0r )
+READ8_MEMBER(tunhunt_state::dsw2_0r)
 {
-	return (device->machine().root_device().ioport("DSW")->read()&0x0100)?0x80:0x00;
+	return (machine().root_device().ioport("DSW")->read()&0x0100)?0x80:0x00;
 }
 
 
-static READ8_DEVICE_HANDLER( dsw2_1r )
+READ8_MEMBER(tunhunt_state::dsw2_1r)
 {
-	return (device->machine().root_device().ioport("DSW")->read()&0x0200)?0x80:0x00;
+	return (machine().root_device().ioport("DSW")->read()&0x0200)?0x80:0x00;
 }
 
 
-static READ8_DEVICE_HANDLER( dsw2_2r )
+READ8_MEMBER(tunhunt_state::dsw2_2r)
 {
-	return (device->machine().root_device().ioport("DSW")->read()&0x0400)?0x80:0x00;
+	return (machine().root_device().ioport("DSW")->read()&0x0400)?0x80:0x00;
 }
 
 
-static READ8_DEVICE_HANDLER( dsw2_3r )
+READ8_MEMBER(tunhunt_state::dsw2_3r)
 {
-	return (device->machine().root_device().ioport("DSW")->read()&0x0800)?0x80:0x00;
+	return (machine().root_device().ioport("DSW")->read()&0x0800)?0x80:0x00;
 }
 
 
-static READ8_DEVICE_HANDLER( dsw2_4r )
+READ8_MEMBER(tunhunt_state::dsw2_4r)
 {
-	return (device->machine().root_device().ioport("DSW")->read()&0x1000)?0x80:0x00;
+	return (machine().root_device().ioport("DSW")->read()&0x1000)?0x80:0x00;
 }
 
 
@@ -283,11 +283,11 @@ static const pokey_interface pokey_interface_2 =
 	{
 		DEVCB_INPUT_PORT("IN1"),
 		DEVCB_INPUT_PORT("IN2"),
-		DEVCB_HANDLER(dsw2_0r),
-		DEVCB_HANDLER(dsw2_1r),
-		DEVCB_HANDLER(dsw2_2r),
-		DEVCB_HANDLER(dsw2_3r),
-		DEVCB_HANDLER(dsw2_4r)
+		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_0r),
+		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_1r),
+		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_2r),
+		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_3r),
+		DEVCB_DRIVER_MEMBER(tunhunt_state,dsw2_4r)
 	}
 };
 

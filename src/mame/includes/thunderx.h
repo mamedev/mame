@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(thunderx_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	DECLARE_WRITE8_MEMBER(scontra_snd_bankswitch_w);
 };
 
 

@@ -245,16 +245,16 @@ static MACHINE_RESET( ginganin )
 }
 
 
-static WRITE8_DEVICE_HANDLER( ptm_irq )
+WRITE8_MEMBER(ginganin_state::ptm_irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
 {
 	SOUND_CLOCK/2,
 	{ 0, 0, 0 },
-	{ DEVCB_HANDLER(ptm_irq), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(ginganin_state,ptm_irq), DEVCB_NULL, DEVCB_NULL },
 	DEVCB_NULL
 };
 

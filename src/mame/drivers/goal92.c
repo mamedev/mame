@@ -67,9 +67,10 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-static WRITE8_DEVICE_HANDLER( adpcm_control_w )
+WRITE8_MEMBER(goal92_state::adpcm_control_w)
 {
-	device->machine().root_device().membank("bank1")->set_entry(data & 0x01);
+	device_t *device = machine().device("msm");
+	machine().root_device().membank("bank1")->set_entry(data & 0x01);
 
 	msm5205_reset_w(device, data & 0x08);
 }
@@ -82,7 +83,7 @@ WRITE8_MEMBER(goal92_state::adpcm_data_w)
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", adpcm_control_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)

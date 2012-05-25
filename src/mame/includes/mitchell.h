@@ -73,6 +73,10 @@ public:
 	DECLARE_READ8_MEMBER(pang_paletteram_r);
 	DECLARE_WRITE8_MEMBER(mgakuen_paletteram_w);
 	DECLARE_READ8_MEMBER(mgakuen_paletteram_r);
+	DECLARE_WRITE8_MEMBER(eeprom_cs_w);
+	DECLARE_WRITE8_MEMBER(eeprom_clock_w);
+	DECLARE_WRITE8_MEMBER(eeprom_serial_w);
+	DECLARE_WRITE8_MEMBER(oki_banking_w);
 };
 
 

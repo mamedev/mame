@@ -294,13 +294,13 @@ static void sslam_play(device_t *device, int track, int data)
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( sslam_snd_w )
+WRITE16_MEMBER(sslam_state::sslam_snd_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
-		sslam_state *state = device->machine().driver_data<sslam_state>();
 
-		logerror("%s Writing %04x to Sound CPU\n",device->machine().describe_context(),data);
+		logerror("%s Writing %04x to Sound CPU\n",machine().describe_context(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */
@@ -313,57 +313,57 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 			}
 		}
 		else if (data == 0) {
-			state->m_bar = 0;		/* Complete any current bars then stop sequencing */
-			state->m_melody = 0;
+			m_bar = 0;		/* Complete any current bars then stop sequencing */
+			m_melody = 0;
 		}
 		else {
-			state->m_sound = sslam_snd_cmd[data];
+			m_sound = sslam_snd_cmd[data];
 
-			if (state->m_sound == 0xff) {
-				popmessage("Unmapped sound command %02x on Bank %02x",data,state->m_snd_bank);
+			if (m_sound == 0xff) {
+				popmessage("Unmapped sound command %02x on Bank %02x",data,m_snd_bank);
 			}
-			else if (state->m_sound >= 0x70) {
+			else if (m_sound >= 0x70) {
 				/* These vocals are in bank 1, but a bug in the actual MCU doesn't set the bank */
-//              if (state->m_snd_bank != 1)
+//              if (m_snd_bank != 1)
 //                  downcast<okim6295_device *>(device)->set_bank_base((1 * 0x40000));
 //              sslam_snd_bank = 1;
-				sslam_play(device, 0, state->m_sound);
+				sslam_play(device, 0, m_sound);
 			}
-			else if (state->m_sound >= 0x69) {
-				if (state->m_snd_bank != 2)
+			else if (m_sound >= 0x69) {
+				if (m_snd_bank != 2)
 					downcast<okim6295_device *>(device)->set_bank_base(2 * 0x40000);
-				state->m_snd_bank = 2;
-				switch (state->m_sound)
+				m_snd_bank = 2;
+				switch (m_sound)
 				{
-					case 0x69:	state->m_melody = 5; break;
-					case 0x6b:	state->m_melody = 6; break;
-					case 0x6c:	state->m_melody = 7; break;
-					default:	state->m_melody = 0; state->m_bar = 0; break;	/* Invalid */
+					case 0x69:	m_melody = 5; break;
+					case 0x6b:	m_melody = 6; break;
+					case 0x6c:	m_melody = 7; break;
+					default:	m_melody = 0; m_bar = 0; break;	/* Invalid */
 				}
-				sslam_play(device, state->m_melody, state->m_sound);
+				sslam_play(device, m_melody, m_sound);
 			}
-			else if (state->m_sound >= 0x65) {
-				if (state->m_snd_bank != 1)
+			else if (m_sound >= 0x65) {
+				if (m_snd_bank != 1)
 					downcast<okim6295_device *>(device)->set_bank_base(1 * 0x40000);
-				state->m_snd_bank = 1;
-				state->m_melody = 4;
-				sslam_play(device, state->m_melody, state->m_sound);
+				m_snd_bank = 1;
+				m_melody = 4;
+				sslam_play(device, m_melody, m_sound);
 			}
-			else if (state->m_sound >= 0x60) {
-				if (state->m_snd_bank != 0)
+			else if (m_sound >= 0x60) {
+				if (m_snd_bank != 0)
 					downcast<okim6295_device *>(device)->set_bank_base(0 * 0x40000);
-				state->m_snd_bank = 0;
-				switch (state->m_sound)
+				m_snd_bank = 0;
+				switch (m_sound)
 				{
-					case 0x60:	state->m_melody = 1; break;
-					case 0x63:	state->m_melody = 2; break;
-					case 0x64:	state->m_melody = 3; break;
-					default:	state->m_melody = 0; state->m_bar = 0; break;	/* Invalid */
+					case 0x60:	m_melody = 1; break;
+					case 0x63:	m_melody = 2; break;
+					case 0x64:	m_melody = 3; break;
+					default:	m_melody = 0; m_bar = 0; break;	/* Invalid */
 				}
-				sslam_play(device, state->m_melody, state->m_sound);
+				sslam_play(device, m_melody, m_sound);
 			}
 			else {
-				sslam_play(device, 0, state->m_sound);
+				sslam_play(device, 0, m_sound);
 			}
 		}
 	}
@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("IN4")
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE_LEGACY("oki", sslam_snd_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(sslam_snd_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM	  /* Main RAM */
 
 	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */

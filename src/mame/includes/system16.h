@@ -150,6 +150,7 @@ public:
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrolly_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrollx_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_tilemapselect_w);
+	DECLARE_WRITE8_MEMBER(upd7759_bank_w);
 };
 
 /*----------- defined in video/system16.c -----------*/

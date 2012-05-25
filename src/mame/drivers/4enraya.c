@@ -67,14 +67,14 @@ WRITE8_MEMBER(_4enraya_state::sound_data_w)
 	m_soundlatch = data;
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_w )
+WRITE8_MEMBER(_4enraya_state::sound_control_w)
 {
-	_4enraya_state *state = device->machine().driver_data<_4enraya_state>();
+	device_t *device = machine().device("aysnd");
 
-	if ((state->m_last_snd_ctrl & state->m_snd_latch_bit ) == state->m_snd_latch_bit && (data & state->m_snd_latch_bit) == 0x00)
-		ay8910_data_address_w(device, state->m_last_snd_ctrl, state->m_soundlatch);
+	if ((m_last_snd_ctrl & m_snd_latch_bit ) == m_snd_latch_bit && (data & m_snd_latch_bit) == 0x00)
+		ay8910_data_address_w(device, m_last_snd_ctrl, m_soundlatch);
 
-	state->m_last_snd_ctrl = data;
+	m_last_snd_ctrl = data;
 }
 
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x23, 0x23) AM_WRITE(sound_data_w)
-	AM_RANGE(0x33, 0x33) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8, _4enraya_state )
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8, _4enraya_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x20, 0x20) AM_WRITE(sound_data_w)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 4enraya )

@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kickgoal_fgram_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
+	DECLARE_WRITE16_MEMBER(kickgoal_snd_w);
+	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
 };
 
 

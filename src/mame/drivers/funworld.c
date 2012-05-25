@@ -792,7 +792,7 @@
 * Read/Write Handlers *
 **********************/
 
-static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
+WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
 {
 /*  - bits -
     7654 3210
@@ -812,15 +812,15 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 	output_set_lamp_value(3, (data >> 7) & 1);		/* Hold4 / High */
 	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* Cancel / Collect (inverted) */
 
-	coin_counter_w(device->machine(), 0, data & 0x01);	/* Credit In counter */
-	coin_counter_w(device->machine(), 7, data & 0x04);	/* Credit Out counter, mapped as coin 8 */
+	coin_counter_w(machine(), 0, data & 0x01);	/* Credit In counter */
+	coin_counter_w(machine(), 7, data & 0x04);	/* Credit Out counter, mapped as coin 8 */
 
 	output_set_lamp_value(7, 1-((data >> 6) & 1));		/* Hopper Motor (inverted) */
 
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
 
-static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
+WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
 {
 /*  - bits -
     7654 3210
@@ -835,7 +835,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 //  popmessage("Lamps B: %02X", data);
 }
 
-static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
+WRITE8_MEMBER(funworld_state::pia1_ca2_w)
 {
 /* TAB and Impera games are writing 0x01 constantly, and 0x00 with each screen change.
    This line is tied to sort of reset circuitery.
@@ -2284,19 +2284,19 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
 	DEVCB_NULL,		/* port B out */
-	DEVCB_HANDLER(pia1_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(funworld_state,pia1_ca2_w),		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
 
 /* these ports are set to output anyway, but this quietens the log */
-static READ8_DEVICE_HANDLER( funquiz_ay8910_a_r )
+READ8_MEMBER(funworld_state::funquiz_ay8910_a_r)
 {
 	return 0x00;
 }
 
-static READ8_DEVICE_HANDLER( funquiz_ay8910_b_r )
+READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 {
 	return 0x00;
 }
@@ -2311,18 +2311,18 @@ static const ay8910_interface ay8910_intf =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,							/* portA in  */
 	DEVCB_NULL,							/* portB in  */
-	DEVCB_HANDLER(funworld_lamp_a_w),	/* portA out */
-	DEVCB_HANDLER(funworld_lamp_b_w)	/* portB out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),	/* portA out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)	/* portB out */
 };
 
 static const ay8910_interface funquiz_ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(funquiz_ay8910_a_r),							/* portA in  */
-	DEVCB_HANDLER(funquiz_ay8910_b_r),							/* portB in  */
-	DEVCB_HANDLER(funworld_lamp_a_w),	/* portA out */
-	DEVCB_HANDLER(funworld_lamp_b_w)	/* portB out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_a_r),							/* portA in  */
+	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_b_r),							/* portB in  */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),	/* portA out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)	/* portB out */
 };
 
 /************************

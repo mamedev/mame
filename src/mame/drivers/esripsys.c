@@ -41,9 +41,9 @@
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
+WRITE_LINE_MEMBER(esripsys_state::ptm_irq)
 {
-	cputag_set_input_line(device->machine(), "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -51,7 +51,7 @@ static const ptm6840_interface ptm_intf =
 	XTAL_8MHz / 4,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_LINE(ptm_irq)
+	DEVCB_DRIVER_LINE_MEMBER(esripsys_state,ptm_irq)
 };
 
 
@@ -558,22 +558,22 @@ WRITE8_MEMBER(esripsys_state::control_w)
 
 
 /* 10-bit MC3410CL DAC */
-static WRITE8_DEVICE_HANDLER( esripsys_dac_w )
+WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 {
-	esripsys_state *state = device->machine().driver_data<esripsys_state>();
+	device_t *device = machine().device("dac");
 	if (offset == 0)
 	{
-		state->m_dac_msb = data & 3;
+		m_dac_msb = data & 3;
 	}
 	else
 	{
-		UINT16 dac_data = (state->m_dac_msb << 8) | data;
+		UINT16 dac_data = (m_dac_msb << 8) | data;
 
 		/*
             The 8-bit DAC modulates the 10-bit DAC.
             Shift down to prevent clipping.
         */
-		dac_signed_data_16_w(device, (state->m_dac_vol * dac_data) >> 1);
+		dac_signed_data_16_w(device, (m_dac_vol * dac_data) >> 1);
 	}
 }
 
@@ -618,7 +618,7 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
 	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
-	AM_RANGE(0x200a, 0x200b) AM_DEVWRITE_LEGACY("dac", esripsys_dac_w)
+	AM_RANGE(0x200a, 0x200b) AM_WRITE(esripsys_dac_w)
 	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
 	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)

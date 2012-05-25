@@ -493,33 +493,32 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( dipA_l )	{ return device->machine().root_device().ioport("DSW1")->read(); }				// dips A
-static READ8_DEVICE_HANDLER( dipA_h )	{ return device->machine().root_device().ioport("DSW1")->read() >> 4; }			// dips A
-static READ8_DEVICE_HANDLER( dipB_l )	{ return device->machine().root_device().ioport("DSW2")->read(); }				// dips B
-static READ8_DEVICE_HANDLER( dipB_h )	{ return device->machine().root_device().ioport("DSW2")->read() >> 4; }			// dips B
+READ8_MEMBER(toypop_state::dipA_l){ return machine().root_device().ioport("DSW1")->read(); }				// dips A
+READ8_MEMBER(toypop_state::dipA_h){ return machine().root_device().ioport("DSW1")->read() >> 4; }			// dips A
+READ8_MEMBER(toypop_state::dipB_l){ return machine().root_device().ioport("DSW2")->read(); }				// dips B
+READ8_MEMBER(toypop_state::dipB_h){ return machine().root_device().ioport("DSW2")->read() >> 4; }			// dips B
 
-static WRITE8_DEVICE_HANDLER( out_coin0 )
+WRITE8_MEMBER(toypop_state::out_coin0)
 {
-	coin_lockout_global_w(device->machine(), data & 4);
-	coin_counter_w(device->machine(), 0, ~data & 8);
+	coin_lockout_global_w(machine(), data & 4);
+	coin_counter_w(machine(), 0, ~data & 8);
 }
 
-static WRITE8_DEVICE_HANDLER( out_coin1 )
+WRITE8_MEMBER(toypop_state::out_coin1)
 {
-	coin_counter_w(device->machine(), 1, ~data & 1);
+	coin_counter_w(machine(), 1, ~data & 1);
 }
 
-static WRITE8_DEVICE_HANDLER( flip )
+WRITE8_MEMBER(toypop_state::flip)
 {
-	toypop_state *state = device->machine().driver_data<toypop_state>();
-	state->flip_screen_set(data & 1);
+	flip_screen_set(data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */
 static const namcoio_interface intf0_coin =
 {
 	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1_RIGHT"), DEVCB_INPUT_PORT("P2_RIGHT"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
-	{ DEVCB_HANDLER(out_coin0), DEVCB_HANDLER(out_coin1) },		/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(toypop_state,out_coin0), DEVCB_DRIVER_MEMBER(toypop_state,out_coin1) },		/* port write handlers */
 	NULL	/* device */
 };
 static const namcoio_interface intf0 =
@@ -532,8 +531,8 @@ static const namcoio_interface intf0 =
 /* chip #1: dip switches */
 static const namcoio_interface intf1 =
 {
-	{ DEVCB_HANDLER(dipA_h), DEVCB_HANDLER(dipB_l), DEVCB_HANDLER(dipB_h), DEVCB_HANDLER(dipA_l) },	/* port read handlers */
-	{ DEVCB_HANDLER(flip), DEVCB_NULL },						/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(toypop_state,dipA_h), DEVCB_DRIVER_MEMBER(toypop_state,dipB_l), DEVCB_DRIVER_MEMBER(toypop_state,dipB_h), DEVCB_DRIVER_MEMBER(toypop_state,dipA_l) },	/* port read handlers */
+	{ DEVCB_DRIVER_MEMBER(toypop_state,flip), DEVCB_NULL },						/* port write handlers */
 	NULL	/* device */
 };
 

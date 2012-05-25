@@ -344,8 +344,9 @@ WRITE8_MEMBER(m72_state::m72_mcu_high_w)
 	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
+WRITE8_MEMBER(m72_state::m72_snd_cpu_sample_w)
 {
+	device_t *device = machine().device("dac");
 	//dac_signed_data_w(device, data);
 	dac_data_w(device, data);
 }
@@ -361,7 +362,6 @@ INLINE DRIVER_INIT( m72_8751 )
 	address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	address_space *io = machine.device("maincpu")->memory().space(AS_IO);
 	address_space *sndio = machine.device("soundcpu")->memory().space(AS_IO);
-	device_t *dac = machine.device("dac");
 
 	state->m_protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	program->install_read_bank(0xb0000, 0xbffff, "bank1");
@@ -372,7 +372,7 @@ INLINE DRIVER_INIT( m72_8751 )
 	io->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),state));
 
 	/* sound cpu */
-	sndio->install_legacy_write_handler(*dac, 0x82, 0x82, 0xff, 0, FUNC(m72_snd_cpu_sample_w));
+	sndio->install_write_handler(0x82, 0x82, 0xff, 0, write8_delegate(FUNC(m72_state::m72_snd_cpu_sample_w),state));
 	sndio->install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::m72_snd_cpu_sample_r),state));
 
 	/* lohtb2 */

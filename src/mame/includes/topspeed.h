@@ -43,6 +43,9 @@ public:
 	DECLARE_READ8_MEMBER(topspeed_input_bypass_r);
 	DECLARE_READ16_MEMBER(topspeed_motor_r);
 	DECLARE_WRITE16_MEMBER(topspeed_motor_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(topspeed_msm5205_address_w);
+	DECLARE_WRITE8_MEMBER(topspeed_msm5205_stop_w);
 };
 
 

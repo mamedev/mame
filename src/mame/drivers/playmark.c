@@ -159,17 +159,17 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
+WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 {
-	playmark_state *state = device->machine().driver_data<playmark_state>();
+	device_t *device = machine().device("oki");
 
-	if (state->m_old_oki_bank != (data & 7))
+	if (m_old_oki_bank != (data & 7))
 	{
-		state->m_old_oki_bank = data & 7;
+		m_old_oki_bank = data & 7;
 
-		if (((state->m_old_oki_bank - 1) * 0x40000) < state->memregion("oki")->bytes())
+		if (((m_old_oki_bank - 1) * 0x40000) < memregion("oki")->bytes())
 		{
-			downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (state->m_old_oki_bank - 1));
+			downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (m_old_oki_bank - 1));
 		}
 	}
 }
@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 	/* $000 - 07F  PIC16C57 Internal Data RAM */
 
 static ADDRESS_MAP_START( playmark_sound_io_map, AS_IO, 8, playmark_state )
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("oki", playmark_oki_banking_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)

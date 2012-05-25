@@ -32,6 +32,15 @@ public:
 	DECLARE_WRITE8_MEMBER(zaccaria_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(zaccaria_flip_screen_y_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(acs_r);
+	DECLARE_WRITE8_MEMBER(zaccaria_dsw_sel_w);
+	DECLARE_WRITE8_MEMBER(ay8910_port0a_w);
+	DECLARE_WRITE_LINE_MEMBER(zaccaria_irq0a);
+	DECLARE_WRITE_LINE_MEMBER(zaccaria_irq0b);
+	DECLARE_READ8_MEMBER(zaccaria_port0a_r);
+	DECLARE_WRITE8_MEMBER(zaccaria_port0a_w);
+	DECLARE_WRITE8_MEMBER(zaccaria_port0b_w);
+	DECLARE_WRITE8_MEMBER(zaccaria_port1b_w);
+	DECLARE_WRITE8_MEMBER(mc1408_data_w);
 };
 
 

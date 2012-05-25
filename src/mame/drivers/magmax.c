@@ -50,13 +50,12 @@ READ8_MEMBER(magmax_state::magmax_sound_r)
 	return (m_sound_latch | m_LS74_q);
 }
 
-static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
+WRITE8_MEMBER(magmax_state::ay8910_portB_0_w)
 {
-	magmax_state *state = device->machine().driver_data<magmax_state>();
 	/*bit 0 is input to CLR line of the LS74*/
-	state->m_LS74_clr = data & 1;
-	if (state->m_LS74_clr == 0)
-		state->m_LS74_q = 0;
+	m_LS74_clr = data & 1;
+	if (m_LS74_clr == 0)
+		m_LS74_q = 0;
 }
 
 static TIMER_CALLBACK( scanline_callback )
@@ -104,12 +103,11 @@ static MACHINE_RESET( magmax )
 
 
 
-static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
+WRITE8_MEMBER(magmax_state::ay8910_portA_0_w)
 {
-	magmax_state *state = device->machine().driver_data<magmax_state>();
-ay8910_device *ay1 = device->machine().device<ay8910_device>("ay1");
-ay8910_device *ay2 = device->machine().device<ay8910_device>("ay2");
-ay8910_device *ay3 = device->machine().device<ay8910_device>("ay3");
+ay8910_device *ay1 = machine().device<ay8910_device>("ay1");
+ay8910_device *ay2 = machine().device<ay8910_device>("ay2");
+ay8910_device *ay3 = machine().device<ay8910_device>("ay3");
 float percent;
 
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
@@ -156,18 +154,18 @@ bit3 - SOUND Chan#7 name=AY-3-8910 #2 Ch B
 bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 */
 
-	if (state->m_gain_control == (data & 0x0f))
+	if (m_gain_control == (data & 0x0f))
 		return;
 
-	state->m_gain_control = data & 0x0f;
+	m_gain_control = data & 0x0f;
 
 	/*popmessage("gain_ctrl = %2x",data&0x0f);*/
 
-	percent = (state->m_gain_control & 1) ? 1.0 : 0.50;
+	percent = (m_gain_control & 1) ? 1.0 : 0.50;
 	ay1->set_output_gain(0, percent);
 //fixme:    set_RC_filter(0,10000,100000000,0,10000);   /* 10K, 10000pF = 0.010uF */
 
-	percent = (state->m_gain_control & 2) ? 0.45 : 0.23;
+	percent = (m_gain_control & 2) ? 0.45 : 0.23;
 	ay1->set_output_gain(1, percent);
 	ay1->set_output_gain(2, percent);
 	ay2->set_output_gain(0, percent);
@@ -177,11 +175,11 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 //fixme:    set_RC_filter(3,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(4,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 
-	percent = (state->m_gain_control & 4) ? 0.45 : 0.23;
+	percent = (m_gain_control & 4) ? 0.45 : 0.23;
 	ay2->set_output_gain(2, percent);
 	ay3->set_output_gain(0, percent);
 
-	percent = (state->m_gain_control & 8) ? 0.45 : 0.23;
+	percent = (m_gain_control & 8) ? 0.45 : 0.23;
 	ay3->set_output_gain(1, percent);
 	ay3->set_output_gain(2, percent);
 }
@@ -341,8 +339,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ay8910_portA_0_w), /*write port A*/
-	DEVCB_HANDLER(ay8910_portB_0_w)  /*write port B*/
+	DEVCB_DRIVER_MEMBER(magmax_state,ay8910_portA_0_w), /*write port A*/
+	DEVCB_DRIVER_MEMBER(magmax_state,ay8910_portB_0_w)  /*write port B*/
 };
 
 

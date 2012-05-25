@@ -135,8 +135,9 @@ Notes:
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( yawdim_oki_bank_w )
+WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	if (data & 4)
 		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
@@ -193,7 +194,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( yawdim_sound_map, AS_PROGRAM, 8, midyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_DEVWRITE_LEGACY("oki", yawdim_oki_bank_w)
+	AM_RANGE(0x9000, 0x97ff) AM_WRITE(yawdim_oki_bank_w)
 	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END

@@ -226,6 +226,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dkong_spritebank_w);
 	DECLARE_WRITE8_MEMBER(dkong_voice_w);
 	DECLARE_WRITE8_MEMBER(dkong_audio_irq_w);
+	DECLARE_READ8_MEMBER(p8257_ctl_r);
+	DECLARE_WRITE8_MEMBER(p8257_ctl_w);
+	DECLARE_WRITE8_MEMBER(p8257_drq_w);
+	DECLARE_WRITE8_MEMBER(dkong_z80dma_rdy_w);
+	DECLARE_READ8_MEMBER(braze_eeprom_r);
+	DECLARE_WRITE8_MEMBER(braze_eeprom_w);
 };
 
 /*----------- defined in video/dkong.c -----------*/

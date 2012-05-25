@@ -41,6 +41,7 @@ public:
 	DECLARE_READ16_MEMBER(rbisland_cchip_ram_r);
 	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
 };
 
 

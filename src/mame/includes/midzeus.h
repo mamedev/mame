@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE32_MEMBER(zeus_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
+	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
 };
 
 

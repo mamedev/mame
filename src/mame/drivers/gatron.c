@@ -298,7 +298,7 @@ WRITE8_MEMBER(gatron_state::output_port_0_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( output_port_1_w )
+WRITE8_MEMBER(gatron_state::output_port_1_w)
 {
 /*  ----------------
     Lamps & Counters
@@ -329,7 +329,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(output_port_1_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(gatron_state,output_port_1_w)	/* Port C write */
 };
 
 

@@ -51,6 +51,9 @@ public:
 	DECLARE_WRITE16_MEMBER(fround_gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(twin16_video_register_w);
 	DECLARE_READ16_MEMBER(twin16_sprite_status_r);
+	DECLARE_READ8_MEMBER(twin16_upd_busy_r);
+	DECLARE_WRITE8_MEMBER(twin16_upd_reset_w);
+	DECLARE_WRITE8_MEMBER(twin16_upd_start_w);
 };
 
 

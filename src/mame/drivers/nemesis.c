@@ -244,23 +244,24 @@ WRITE16_MEMBER(nemesis_state::nemesis_soundlatch_word_w)
 		soundlatch_byte_w(space, offset, data & 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( gx400_speech_start_w )
+WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
 {
-	nemesis_state *state = device->machine().driver_data<nemesis_state>();
+	device_t *device = machine().device("vlm");
 
 	/* the voice data is not in a rom but in sound RAM at $8000 */
-	vlm5030_set_rom(device, state->m_gx400_shared_ram + 0x4000);
+	vlm5030_set_rom(device, m_gx400_shared_ram + 0x4000);
 	vlm5030_st(device, 1);
 	vlm5030_st(device, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( salamand_speech_start_w )
+WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
 {
+	device_t *device = machine().device("vlm");
 	vlm5030_st(device, 1);
 	vlm5030_st(device, 0);
 }
 
-static READ8_DEVICE_HANDLER( nemesis_portA_r )
+READ8_MEMBER(nemesis_state::nemesis_portA_r)
 {
 /*
    bit 0-3:   timer
@@ -268,19 +269,19 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
    bit 5:     vlm5030 busy
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
-	nemesis_state *state = device->machine().driver_data<nemesis_state>();
-	int res = (state->m_audiocpu->total_cycles() / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (m_audiocpu->total_cycles() / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
 
-	if (state->m_vlm != NULL && vlm5030_bsy(state->m_vlm))
+	if (m_vlm != NULL && vlm5030_bsy(m_vlm))
 		res |= 0x20;
 
 	return res;
 }
 
-static WRITE8_DEVICE_HANDLER( city_sound_bank_w )
+WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
 {
+	device_t *device = machine().device("k007232");
 	int bank_A = (data & 0x03);
 	int bank_B = ((data >> 2) & 0x03);
 	k007232_set_bank(device, bank_A, bank_B);
@@ -448,7 +449,7 @@ static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE_LEGACY("k007232", k005289_keylatch_B_w)
 	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0xe030, 0xe030) AM_DEVWRITE_LEGACY("vlm", gx400_speech_start_w)
+	AM_RANGE(0xe030, 0xe030) AM_WRITE(gx400_speech_start_w)
 	AM_RANGE(0xe086, 0xe086) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
 	AM_RANGE(0xe205, 0xe205) AM_DEVREAD_LEGACY("ay2", ay8910_r)
@@ -574,7 +575,7 @@ static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("vlm", salamand_speech_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(salamand_speech_start_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8, nemesis_state )
@@ -596,7 +597,7 @@ static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE_LEGACY("k051649", k051649_test_r, k051649_test_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("k007232", city_sound_bank_w) /* 7232 bankswitch */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(city_sound_bank_w) /* 7232 bankswitch */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -1496,7 +1497,7 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(nemesis_portA_r),
+	DEVCB_DRIVER_MEMBER(nemesis_state,nemesis_portA_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

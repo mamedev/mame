@@ -325,42 +325,45 @@ WRITE8_MEMBER(combatsc_state::combatsc_sh_irqtrigger_w)
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static READ8_DEVICE_HANDLER( combatsc_busy_r )
+READ8_MEMBER(combatsc_state::combatsc_busy_r)
 {
+	device_t *device = machine().device("upd");
 	return upd7759_busy_r(device) ? 1 : 0;
 }
 
-static WRITE8_DEVICE_HANDLER( combatsc_play_w )
+WRITE8_MEMBER(combatsc_state::combatsc_play_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_start_w(device, data & 2);
 }
 
-static WRITE8_DEVICE_HANDLER( combatsc_voice_reset_w )
+WRITE8_MEMBER(combatsc_state::combatsc_voice_reset_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_reset_w(device,data & 1);
 }
 
-static WRITE8_DEVICE_HANDLER( combatsc_portA_w )
+WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 {
 	/* unknown. always write 0 */
 }
 
-static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
+READ8_MEMBER(combatsc_state::combatsc_ym2203_r)
 {
-	combatsc_state *state = device->machine().driver_data<combatsc_state>();
+	device_t *device = machine().device("ymsnd");
 	int status = ym2203_r(device,offset);
 
-	if (cpu_get_pc(state->m_audiocpu) == 0x334)
+	if (cpu_get_pc(m_audiocpu) == 0x334)
 	{
-		if (state->m_boost)
+		if (m_boost)
 		{
-			state->m_boost = 0;
-			state->m_interleave_timer->adjust(attotime::zero, 0, state->m_audiocpu->cycles_to_attotime(80));
+			m_boost = 0;
+			m_interleave_timer->adjust(attotime::zero, 0, m_audiocpu->cycles_to_attotime(80));
 		}
 		else if (status & 2)
 		{
-			state->m_boost = 1;
-			state->m_interleave_timer->adjust(attotime::zero);
+			m_boost = 1;
+			m_interleave_timer->adjust(attotime::zero);
 		}
 	}
 
@@ -414,17 +417,18 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("upd", combatsc_play_w)					/* upd7759 play voice */
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(combatsc_play_w)					/* upd7759 play voice */
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)					/* upd7759 voice select */
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD_LEGACY("upd", combatsc_busy_r)					/* upd7759 busy? */
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("upd", combatsc_voice_reset_w)			/* upd7759 reset? */
+	AM_RANGE(0xb000, 0xb000) AM_READ(combatsc_busy_r)					/* upd7759 busy? */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(combatsc_voice_reset_w)			/* upd7759 reset? */
 
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)								/* soundlatch_byte_r? */
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", combatsc_ym2203_r, ym2203_w)	/* YM 2203 intercepted */
+	AM_RANGE(0xe000, 0xe001) AM_READ(combatsc_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( combatscb_dac_w )
+WRITE8_MEMBER(combatsc_state::combatscb_dac_w)
 {
+	device_t *device = machine().device("msm5205");
 	if(data & 0xe0)
 		printf("%02x\n",data);
 
@@ -439,7 +443,7 @@ static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM										/* RAM */
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 */
 	AM_RANGE(0x9008, 0x9009) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)					/* ??? */
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE_LEGACY("msm5205",combatscb_dac_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(combatscb_dac_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)						/* soundlatch_byte_r? */
 ADDRESS_MAP_END
 
@@ -668,7 +672,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(combatsc_portA_w),
+		DEVCB_DRIVER_MEMBER(combatsc_state,combatsc_portA_w),
 		DEVCB_NULL
 	},
 	NULL

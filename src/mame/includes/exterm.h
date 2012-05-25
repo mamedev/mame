@@ -32,6 +32,8 @@ public:
 	DECLARE_READ8_MEMBER(sound_slave_latch_r);
 	DECLARE_READ8_MEMBER(sound_nmi_to_slave_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
+	DECLARE_WRITE8_MEMBER(ym2151_data_latch_w);
+	DECLARE_WRITE8_MEMBER(sound_slave_dac_w);
 };
 
 

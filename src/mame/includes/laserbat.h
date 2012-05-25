@@ -72,6 +72,11 @@ public:
 	DECLARE_WRITE8_MEMBER(laserbat_cntmov_w);
 	DECLARE_WRITE8_MEMBER(laserbat_csound1_w);
 	DECLARE_WRITE8_MEMBER(laserbat_csound2_w);
+	DECLARE_WRITE_LINE_MEMBER(zaccaria_irq0a);
+	DECLARE_WRITE_LINE_MEMBER(zaccaria_irq0b);
+	DECLARE_READ8_MEMBER(zaccaria_port0a_r);
+	DECLARE_WRITE8_MEMBER(zaccaria_port0a_w);
+	DECLARE_WRITE8_MEMBER(zaccaria_port0b_w);
 };
 
 

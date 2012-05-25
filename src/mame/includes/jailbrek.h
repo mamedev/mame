@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(jailbrek_videoram_w);
 	DECLARE_WRITE8_MEMBER(jailbrek_colorram_w);
+	DECLARE_READ8_MEMBER(jailbrek_speech_r);
+	DECLARE_WRITE8_MEMBER(jailbrek_speech_w);
 };
 
 

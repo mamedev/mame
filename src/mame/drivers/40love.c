@@ -291,13 +291,12 @@ WRITE8_MEMBER(fortyl_state::pix1_w)
 	m_pix1 = data;
 }
 
-static WRITE8_DEVICE_HANDLER( pix1_mcu_w )
+WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
 {
-	fortyl_state *state = device->machine().driver_data<fortyl_state>();
 //  if (data > 7)
 //      logerror("pix1 = %2x\n", data);
 
-	state->m_pix1 = data;
+	m_pix1 = data;
 }
 
 WRITE8_MEMBER(fortyl_state::pix2_w)
@@ -630,7 +629,7 @@ static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* M5517P on main board */
 	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_status_r, pix1_mcu_w)		//pixel layer related
+	AM_RANGE(0x8801, 0x8801) AM_DEVREAD_LEGACY("bmcu", buggychl_mcu_status_r) AM_WRITE(pix1_mcu_w)		//pixel layer related
 	AM_RANGE(0x8802, 0x8802) AM_WRITE(bank_select_w)
 	AM_RANGE(0x8803, 0x8803) AM_READWRITE(pix2_r, pix2_w)		//pixel layer related
 	AM_RANGE(0x8804, 0x8804) AM_READWRITE(from_snd_r, sound_command_w)
@@ -701,52 +700,51 @@ static MACHINE_RESET( ta7630 )
 */
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_0_w )
+WRITE8_MEMBER(fortyl_state::sound_control_0_w)
 {
-	fortyl_state *state = device->machine().driver_data<fortyl_state>();
-	state->m_snd_ctrl0 = data & 0xff;
-//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
+	device_t *device = machine().device("msm");
+	m_snd_ctrl0 = data & 0xff;
+//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(0, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(1, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(2, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(3, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
 
 }
-static WRITE8_DEVICE_HANDLER( sound_control_1_w )
+WRITE8_MEMBER(fortyl_state::sound_control_1_w)
 {
-	fortyl_state *state = device->machine().driver_data<fortyl_state>();
-	state->m_snd_ctrl1 = data & 0xff;
-//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
+	device_t *device = machine().device("msm");
+	m_snd_ctrl1 = data & 0xff;
+//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(4, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(5, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(6, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(7, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_2_w )
+WRITE8_MEMBER(fortyl_state::sound_control_2_w)
 {
-	fortyl_state *state = device->machine().driver_data<fortyl_state>();
+	device_t *device = machine().device("aysnd");
 	int i;
-	state->m_snd_ctrl2 = data & 0xff;
-//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
+	m_snd_ctrl2 = data & 0xff;
+//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
 	device_sound_interface *sound;
 	device->interface(sound);
 	for (i = 0; i < 3; i++)
-		sound->set_output_gain(i, state->m_vol_ctrl[(state->m_snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
+		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
+WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
 {
-	fortyl_state *state = device->machine().driver_data<fortyl_state>();
-	state->m_snd_ctrl3 = data & 0xff;
-//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
+	m_snd_ctrl3 = data & 0xff;
+//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
@@ -754,8 +752,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
-	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE_LEGACY("msm", sound_control_1_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
+	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w) /* unknown read */
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
@@ -968,8 +966,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("aysnd", sound_control_2_w),
-	DEVCB_HANDLER(sound_control_3_w)
+	DEVCB_DRIVER_MEMBER(fortyl_state,sound_control_2_w),
+	DEVCB_DRIVER_MEMBER(fortyl_state,sound_control_3_w)
 };
 
 static const msm5232_interface msm5232_config =

@@ -99,16 +99,15 @@ READ8_MEMBER(iqblock_state::extrarom_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( port_C_w )
+WRITE8_MEMBER(iqblock_state::port_C_w)
 {
-	iqblock_state *state = device->machine().driver_data<iqblock_state>();
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 
 	/* bit 5 seems to be 0 during screen redraw */
-	state->m_videoenable = data & 0x20;
+	m_videoenable = data & 0x20;
 
 	/* bit 6 is coin counter */
-	coin_counter_w(device->machine(), 0,data & 0x40);
+	coin_counter_w(machine(), 0,data & 0x40);
 
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
@@ -120,7 +119,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_INPUT_PORT("P2"),				/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_INPUT_PORT("EXTRA"),			/* Port C read */
-	DEVCB_HANDLER(port_C_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(iqblock_state,port_C_w)				/* Port C write */
 };
 
 

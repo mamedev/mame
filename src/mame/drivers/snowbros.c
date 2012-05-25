@@ -351,8 +351,9 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
+WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	int bank = (data &0x02)>>1;
 
 	if (data&0xfd) logerror ("Unused bank bits! %02x\n",data);
@@ -363,7 +364,7 @@ static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
 static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w) // back to 68k?
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("oki", twinadv_oki_bank_w) // oki bank?
+	AM_RANGE(0x04, 0x04) AM_WRITE(twinadv_oki_bank_w) // oki bank?
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -471,13 +472,13 @@ static void sb3_play_sound (okim6295_device *oki, int data)
 
 }
 
-static WRITE16_DEVICE_HANDLER( sb3_sound_w )
+WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 {
-	snowbros_state *state = device->machine().driver_data<snowbros_state>();
+	device_t *device = machine().device("oki");
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0x00fe)
 	{
-		state->m_sb3_music_is_playing = 0;
+		m_sb3_music_is_playing = 0;
 		oki->write_command(0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
@@ -491,7 +492,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if (data>=0x22 && data<=0x31)
 		{
-			sb3_play_music(device->machine(), data);
+			sb3_play_music(machine(), data);
 		}
 
 		if ((data>=0x30) && (data<=0x51))
@@ -501,7 +502,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if (data>=0x52 && data<=0x5f)
 		{
-			sb3_play_music(device->machine(), data-0x30);
+			sb3_play_music(machine(), data-0x30);
 		}
 
 	}
@@ -514,7 +515,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE( 0x100000, 0x103fff) AM_RAM
 	AM_RANGE( 0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE( 0x300000, 0x300001) AM_READ(sb3_sound_r) // ?
-	AM_RANGE( 0x300000, 0x300001) AM_DEVWRITE_LEGACY("oki", sb3_sound_w)  // ?
+	AM_RANGE( 0x300000, 0x300001) AM_WRITE(sb3_sound_w)  // ?
 	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE( 0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")

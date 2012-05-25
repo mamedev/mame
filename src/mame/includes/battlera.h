@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(HuC6270_register_w);
 	DECLARE_READ8_MEMBER(HuC6270_data_r);
 	DECLARE_WRITE8_MEMBER(HuC6270_data_w);
+	DECLARE_WRITE8_MEMBER(battlera_adpcm_reset_w);
 };
 
 

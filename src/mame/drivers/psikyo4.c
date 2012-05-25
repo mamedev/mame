@@ -163,8 +163,9 @@ static const eeprom_interface eeprom_interface_93C56 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-static WRITE32_DEVICE_HANDLER( ps4_eeprom_w )
+WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_16_31)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -178,11 +179,11 @@ static WRITE32_DEVICE_HANDLER( ps4_eeprom_w )
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-static READ32_DEVICE_HANDLER( ps4_eeprom_r )
+READ32_MEMBER(psikyo4_state::ps4_eeprom_r)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return device->machine().root_device().ioport("JP4")->read();
+		return machine().root_device().ioport("JP4")->read();
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -356,7 +357,7 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x03003fe0, 0x03003fe3) AM_DEVREADWRITE_LEGACY("eeprom", ps4_eeprom_r,ps4_eeprom_w)
+	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
 	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_SHARE("vidregs") // vid regs?

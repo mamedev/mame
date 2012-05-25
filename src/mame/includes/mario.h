@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(masao_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(mario_sh_tuneselect_w);
 	DECLARE_WRITE8_MEMBER(mario_sh3_w);
+	DECLARE_WRITE8_MEMBER(mario_z80dma_rdy_w);
 };
 
 /*----------- defined in video/mario.c -----------*/

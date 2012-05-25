@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(warpwarp_out3_w);
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 	DECLARE_WRITE8_MEMBER(warpwarp_videoram_w);
+	DECLARE_READ8_MEMBER(warpwarp_dsw1_r);
+	DECLARE_READ8_MEMBER(warpwarp_vol_r);
 };
 
 

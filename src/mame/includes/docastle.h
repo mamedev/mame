@@ -39,6 +39,8 @@ public:
 	DECLARE_READ8_MEMBER(docastle_flipscreen_on_r);
 	DECLARE_WRITE8_MEMBER(docastle_flipscreen_off_w);
 	DECLARE_WRITE8_MEMBER(docastle_flipscreen_on_w);
+	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
+	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);
 };
 
 

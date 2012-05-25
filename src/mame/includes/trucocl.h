@@ -16,6 +16,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
 	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
+	DECLARE_WRITE8_MEMBER(audio_dac_w);
 };
 
 

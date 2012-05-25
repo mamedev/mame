@@ -1209,17 +1209,17 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 static const pia6821_interface pia_ic5t_intf =
 {
 	DEVCB_HANDLER(pia_ic5_porta_track_r),		/* port A in */
-	DEVCB_HANDLER(pia_ic5_portb_r),	/* port B in */
+	DEVCB_DRIVER_MEMBER(mpu4_state, pia_ic5_portb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
 	DEVCB_NULL,		/* port B out */
-	DEVCB_LINE(pia_ic5_ca2_w),		/* line CA2 out */
-	DEVCB_LINE(pia_ic5_cb2_w),		/* port CB2 out */
-	DEVCB_LINE(cpu0_irq),			/* IRQA */
-	DEVCB_LINE(cpu0_irq)			/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, pia_ic5_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, pia_ic5_cb2_w),		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, cpu0_irq),			/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, cpu0_irq)			/* IRQB */
 };
 
 

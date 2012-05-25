@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE16_MEMBER(wwfwfest_bg1_videoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
+	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 };
 
 

@@ -85,8 +85,9 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )
+READ8_MEMBER(mainevt_state::mainevt_sh_busy_r)
 {
+	device_t *device = machine().device("upd");
 	return upd7759_busy_r(device);
 }
 
@@ -120,8 +121,9 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 	upd7759_set_bank_base(m_upd, ((data >> 4) & 0x03) * 0x20000);
 }
 
-static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
+WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 {
+	device_t *device = machine().device("k007232");
 	int bank_A, bank_B;
 
 //logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(&space->device()),data);
@@ -215,7 +217,7 @@ static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r,k007232_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD_LEGACY("upd", mainevt_sh_busy_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(mainevt_sh_busy_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
@@ -227,7 +229,7 @@ static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r,k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", dv_sh_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(dv_sh_bankswitch_w)
 ADDRESS_MAP_END
 
 

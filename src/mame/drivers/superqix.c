@@ -170,18 +170,16 @@ The MCU acts this way:
 **************************************************************************/
 
 
-static READ8_DEVICE_HANDLER( in4_mcu_r )
+READ8_MEMBER(superqix_state::in4_mcu_r)
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
 //  logerror("%04x: in4_mcu_r\n",cpu_get_pc(&space->device()));
-	return state->ioport("P2")->read() | (state->m_from_mcu_pending << 6) | (state->m_from_z80_pending << 7);
+	return ioport("P2")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 }
 
-static READ8_DEVICE_HANDLER( sqix_from_mcu_r )
+READ8_MEMBER(superqix_state::sqix_from_mcu_r)
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
-//  logerror("%04x: read mcu answer (%02x)\n",cpu_get_pc(&space->device()),state->m_from_mcu);
-	return state->m_from_mcu;
+//  logerror("%04x: read mcu answer (%02x)\n",cpu_get_pc(&space->device()),m_from_mcu);
+	return m_from_mcu;
 }
 
 static TIMER_CALLBACK( mcu_acknowledge_callback )
@@ -198,11 +196,10 @@ READ8_MEMBER(superqix_state::mcu_acknowledge_r)
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( sqix_z80_mcu_w )
+WRITE8_MEMBER(superqix_state::sqix_z80_mcu_w)
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
 //  logerror("%04x: sqix_z80_mcu_w %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_portb = data;
+	m_portb = data;
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
@@ -323,9 +320,9 @@ READ8_MEMBER(superqix_state::nmi_ack_r)
 	return sqix_system_status_r(space, 0);
 }
 
-static READ8_DEVICE_HANDLER( bootleg_in0_r )
+READ8_MEMBER(superqix_state::bootleg_in0_r)
 {
-	return BITSWAP8(device->machine().root_device().ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(machine().root_device().ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
@@ -474,11 +471,10 @@ READ8_MEMBER(superqix_state::hotsmash_from_mcu_r)
 	return m_from_mcu;
 }
 
-static READ8_DEVICE_HANDLER(hotsmash_ay_port_a_r)
+READ8_MEMBER(superqix_state::hotsmash_ay_port_a_r)
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
-//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(&space->device()),state->m_from_mcu_pending);
-	return state->ioport("SYSTEM")->read() | 0x40 | ((state->m_from_mcu_pending^1) << 7);
+//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(&space->device()),m_from_mcu_pending);
+	return ioport("SYSTEM")->read() | 0x40 | ((m_from_mcu_pending^1) << 7);
 }
 
 /**************************************************************************
@@ -517,11 +513,11 @@ READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
+READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",cpu_get_pc(&space->device()));
 	/* bits 76------  MCU status bits */
-	return (device->machine().rand() & 0xc0) | device->machine().root_device().ioport("BUTTONS")->read();
+	return (machine().rand() & 0xc0) | machine().root_device().ioport("BUTTONS")->read();
 }
 
 
@@ -930,7 +926,7 @@ static const ay8910_interface pbillian_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(pbillian_ay_port_a_r),	/* port Aread */
+	DEVCB_DRIVER_MEMBER(superqix_state,pbillian_ay_port_a_r),	/* port Aread */
 	DEVCB_INPUT_PORT("SYSTEM"),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -940,7 +936,7 @@ static const ay8910_interface hotsmash_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(hotsmash_ay_port_a_r),	/* port Aread */
+	DEVCB_DRIVER_MEMBER(superqix_state,hotsmash_ay_port_a_r),	/* port Aread */
 	DEVCB_INPUT_PORT("SYSTEM"),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -951,7 +947,7 @@ static const ay8910_interface sqix_ay8910_interface_1 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("P1"),
-	DEVCB_HANDLER(in4_mcu_r),		/* port Bread */
+	DEVCB_DRIVER_MEMBER(superqix_state,in4_mcu_r),		/* port Bread */
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -961,9 +957,9 @@ static const ay8910_interface sqix_ay8910_interface_2 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_HANDLER(sqix_from_mcu_r),	/* port Bread */
+	DEVCB_DRIVER_MEMBER(superqix_state,sqix_from_mcu_r),	/* port Bread */
 	DEVCB_NULL,						/* port Awrite */
-	DEVCB_HANDLER(sqix_z80_mcu_w)	/* port Bwrite */
+	DEVCB_DRIVER_MEMBER(superqix_state,sqix_z80_mcu_w)	/* port Bwrite */
 };
 
 static const ay8910_interface bootleg_ay8910_interface_1 =
@@ -981,7 +977,7 @@ static const ay8910_interface bootleg_ay8910_interface_2 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_HANDLER(bootleg_in0_r),	/* port Bread */
+	DEVCB_DRIVER_MEMBER(superqix_state,bootleg_in0_r),	/* port Bread */
 	DEVCB_NULL,
 	DEVCB_NULL
 };

@@ -61,6 +61,12 @@ public:
 	DECLARE_WRITE8_MEMBER(superqix_bitmapram2_w);
 	DECLARE_WRITE8_MEMBER(pbillian_0410_w);
 	DECLARE_WRITE8_MEMBER(superqix_0410_w);
+	DECLARE_READ8_MEMBER(in4_mcu_r);
+	DECLARE_READ8_MEMBER(sqix_from_mcu_r);
+	DECLARE_WRITE8_MEMBER(sqix_z80_mcu_w);
+	DECLARE_READ8_MEMBER(bootleg_in0_r);
+	DECLARE_READ8_MEMBER(hotsmash_ay_port_a_r);
+	DECLARE_READ8_MEMBER(pbillian_ay_port_a_r);
 };
 
 

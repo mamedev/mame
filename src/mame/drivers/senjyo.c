@@ -102,11 +102,11 @@ WRITE8_MEMBER(senjyo_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_cmd_w )
+WRITE8_MEMBER(senjyo_state::sound_cmd_w)
 {
-	senjyo_state *state = device->machine().driver_data<senjyo_state>();
+	device_t *device = machine().device("z80pio");
 
-	state->m_sound_cmd = data;
+	m_sound_cmd = data;
 
 	z80pio_astb_w(device, 0);
 	z80pio_astb_w(device, 1);
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_DEVWRITE_LEGACY("z80pio", sound_cmd_w)
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_DEVWRITE_LEGACY("z80pio", sound_cmd_w)
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 
 	/* these aren't used / written, left here to make sure memory is allocated */

@@ -123,20 +123,23 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
 	return (ioport("SYS0")->read() & 0xfe) | (m_irq_source & 1);
 }
 
-static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
+WRITE8_MEMBER(mitchell_state::eeprom_cs_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( eeprom_clock_w )
+WRITE8_MEMBER(mitchell_state::eeprom_clock_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
+WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data);
 }
@@ -325,9 +328,9 @@ static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
 ADDRESS_MAP_END
 
 /* spangbl */
@@ -350,9 +353,9 @@ static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
 ADDRESS_MAP_END
 
 
@@ -375,16 +378,15 @@ ADDRESS_MAP_END
 
 
 /**** Monsters World ****/
-static WRITE8_DEVICE_HANDLER( oki_banking_w )
+WRITE8_MEMBER(mitchell_state::oki_banking_w)
 {
-	mitchell_state *state = device->machine().driver_data<mitchell_state>();
-	state->m_oki->set_bank_base(0x40000 * (data & 3));
+	m_oki->set_bank_base(0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END

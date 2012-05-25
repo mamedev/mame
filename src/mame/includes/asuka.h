@@ -39,6 +39,9 @@ public:
 	DECLARE_READ16_MEMBER(cadash_share_r);
 	DECLARE_WRITE16_MEMBER(cadash_share_w);
 	DECLARE_WRITE16_MEMBER(asuka_spritectrl_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_2151_w);
+	DECLARE_WRITE8_MEMBER(asuka_msm5205_start_w);
+	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
 };
 
 

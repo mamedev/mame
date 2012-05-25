@@ -287,8 +287,9 @@ READ8_MEMBER(cvs_state::cvs_393hz_clock_r)
 }
 #endif
 
-static READ8_DEVICE_HANDLER( tms_clock_r )
+READ8_MEMBER(cvs_state::tms_clock_r)
 {
+	device_t *device = machine().device("tms");
 	return tms5110_romclk_hack_r(device, 0) ? 0x80 : 0;
 }
 
@@ -321,9 +322,9 @@ static void start_393hz_timer(running_machine &machine)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
+WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 {
-	cvs_state *state = device->machine().driver_data<cvs_state>();
+	device_t *device = machine().device("dac2");
 	UINT8 dac_value;
 	static int old_data[4] = {0,0,0,0};
 
@@ -332,22 +333,20 @@ static WRITE8_DEVICE_HANDLER( cvs_4_bit_dac_data_w )
 		LOG(("4BIT: %02x %02x\n", offset, data));
 		old_data[offset] = data;
 	}
-	state->m_cvs_4_bit_dac_data[offset] = data >> 7;
+	m_cvs_4_bit_dac_data[offset] = data >> 7;
 
 	/* merge into D0-D3 */
-	dac_value = (state->m_cvs_4_bit_dac_data[0] << 0) |
-			    (state->m_cvs_4_bit_dac_data[1] << 1) |
-			    (state->m_cvs_4_bit_dac_data[2] << 2) |
-			    (state->m_cvs_4_bit_dac_data[3] << 3);
+	dac_value = (m_cvs_4_bit_dac_data[0] << 0) |
+			    (m_cvs_4_bit_dac_data[1] << 1) |
+			    (m_cvs_4_bit_dac_data[2] << 2) |
+			    (m_cvs_4_bit_dac_data[3] << 3);
 
 	/* scale up to a full byte and output */
 	dac_data_w(device, (dac_value << 4) | dac_value);
 }
 
-static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
+WRITE8_MEMBER(cvs_state::cvs_unknown_w)
 {
-	cvs_state *state = device->machine().driver_data<cvs_state>();
-
 	/* offset 2 is used in 8ball
      * offset 0 is used in spacefrt
      * offset 3 is used in darkwar
@@ -355,11 +354,11 @@ static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
      * offset 1 is not used (no trace in disassembly)
      */
 
-	if (data != state->m_dac3_state[offset])
+	if (data != m_dac3_state[offset])
 	{
 		if (offset != 2)
 			popmessage("Unknown: %02x %02x\n", offset, data);
-		state->m_dac3_state[offset] = data;
+		m_dac3_state[offset] = data;
 	}
 }
 
@@ -395,27 +394,28 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( cvs_tms5110_ctl_w )
+WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 {
-	cvs_state *state = device->machine().driver_data<cvs_state>();
+	device_t *device = machine().device("tms");
 	UINT8 ctl;
 	/*
      * offset 0: CS ?
      */
-	state->m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
+	m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
 	ctl = 0 |								/* CTL1 */
-		  (state->m_tms5110_ctl_data[1] << 1) |	/* CTL2 */
-		  (state->m_tms5110_ctl_data[2] << 2) |	/* CTL4 */
-		  (state->m_tms5110_ctl_data[1] << 3);	/* CTL8 */
+		  (m_tms5110_ctl_data[1] << 1) |	/* CTL2 */
+		  (m_tms5110_ctl_data[2] << 2) |	/* CTL4 */
+		  (m_tms5110_ctl_data[1] << 3);	/* CTL8 */
 
 	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
 	tms5110_ctl_w(device, 0, ctl);
 }
 
 
-static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
+WRITE8_MEMBER(cvs_state::cvs_tms5110_pdc_w)
 {
+	device_t *device = machine().device("tms");
 	UINT8 out = ((~data) >> 7) & 1;
 	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
 	tms5110_pdc_w(device, out);
@@ -507,8 +507,8 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE_LEGACY("dac1", dac_w)
-	AM_RANGE(0x1880, 0x1883) AM_DEVWRITE_LEGACY("dac2", cvs_4_bit_dac_data_w) AM_SHARE("4bit_dac")
-	AM_RANGE(0x1884, 0x1887) AM_DEVWRITE_LEGACY("dac3", cvs_unknown_w)	AM_SHARE("dac3_state")	/* ???? not connected to anything */
+	AM_RANGE(0x1880, 0x1883) AM_WRITE(cvs_4_bit_dac_data_w) AM_SHARE("4bit_dac")
+	AM_RANGE(0x1884, 0x1887) AM_WRITE(cvs_unknown_w)	AM_SHARE("dac3_state")	/* ???? not connected to anything */
 ADDRESS_MAP_END
 
 
@@ -531,15 +531,15 @@ static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)
 	AM_RANGE(0x1d40, 0x1d40) AM_WRITE(cvs_speech_rom_address_hi_w)
 	AM_RANGE(0x1d80, 0x1d80) AM_READ(cvs_speech_command_r)
-	AM_RANGE(0x1ddc, 0x1dde) AM_DEVWRITE_LEGACY("tms", cvs_tms5110_ctl_w) AM_SHARE("tms5110_ctl")
-	AM_RANGE(0x1ddf, 0x1ddf) AM_DEVWRITE_LEGACY("tms", cvs_tms5110_pdc_w)
+	AM_RANGE(0x1ddc, 0x1dde) AM_WRITE(cvs_tms5110_ctl_w) AM_SHARE("tms5110_ctl")
+	AM_RANGE(0x1ddf, 0x1ddf) AM_WRITE(cvs_tms5110_pdc_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_speech_cpu_io_map, AS_IO, 8, cvs_state )
 /* romclk is much more probable, 393 Hz results in timing issues */
 //  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD_LEGACY("tms", tms_clock_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(tms_clock_r)
 ADDRESS_MAP_END
 
 

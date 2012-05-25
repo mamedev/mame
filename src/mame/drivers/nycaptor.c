@@ -302,7 +302,7 @@ WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER(unk_w)
+WRITE8_MEMBER(nycaptor_state::unk_w)
 {
 
 }
@@ -313,8 +313,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(unk_w),
-	DEVCB_HANDLER(unk_w)
+	DEVCB_DRIVER_MEMBER(nycaptor_state,unk_w),
+	DEVCB_DRIVER_MEMBER(nycaptor_state,unk_w)
 };
 
 static const msm5232_interface msm5232_config =

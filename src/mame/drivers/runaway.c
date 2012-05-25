@@ -63,9 +63,9 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 }
 
 
-static READ8_DEVICE_HANDLER( runaway_pot_r )
+READ8_MEMBER(runaway_state::runaway_pot_r)
 {
-	return (device->machine().root_device().ioport("7000")->read() << (7 - offset)) & 0x80;
+	return (machine().root_device().ioport("7000")->read() << (7 - offset)) & 0x80;
 }
 
 
@@ -335,14 +335,14 @@ static const pokey_interface pokey_interface_1 =
 static const pokey_interface pokey_interface_2 =
 {
 	{
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r),
-		DEVCB_HANDLER(runaway_pot_r)
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r),
+		DEVCB_DRIVER_MEMBER(runaway_state,runaway_pot_r)
 	}
 };
 

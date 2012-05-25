@@ -86,6 +86,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
+	DECLARE_WRITE8_MEMBER(yawdim_oki_bank_w);
 };
 
 

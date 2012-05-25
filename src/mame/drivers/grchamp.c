@@ -413,22 +413,24 @@ READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( grchamp_portA_0_w )
+WRITE8_MEMBER(grchamp_state::grchamp_portA_0_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, GRCHAMP_A_DATA, data);
 }
 
-static WRITE8_DEVICE_HANDLER( grchamp_portB_0_w )
+WRITE8_MEMBER(grchamp_state::grchamp_portB_0_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, GRCHAMP_B_DATA, 255-data);
 }
 
-static WRITE8_DEVICE_HANDLER( grchamp_portA_2_w )
+WRITE8_MEMBER(grchamp_state::grchamp_portA_2_w)
 {
 	/* A0/A1 modify the output of AY8910 #2 */
 	/* A7 contributes to the discrete logic hanging off of AY8910 #0 */
 }
-static WRITE8_DEVICE_HANDLER( grchamp_portB_2_w )
+WRITE8_MEMBER(grchamp_state::grchamp_portB_2_w)
 {
 	/* B0 connects elsewhere */
 }
@@ -447,8 +449,8 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("discrete", grchamp_portA_0_w),
-	DEVCB_DEVICE_HANDLER("discrete", grchamp_portB_0_w)
+	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portA_0_w),
+	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portB_0_w)
 };
 
 static const ay8910_interface ay8910_interface_3 =
@@ -457,8 +459,8 @@ static const ay8910_interface ay8910_interface_3 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(grchamp_portA_2_w),
-	DEVCB_HANDLER(grchamp_portB_2_w)
+	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portA_2_w),
+	DEVCB_DRIVER_MEMBER(grchamp_state,grchamp_portB_2_w)
 };
 
 

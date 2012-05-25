@@ -395,11 +395,10 @@ static void reset_sound_region( running_machine &machine )
 	state->membank("bank10")->set_entry(state->m_banknum);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
+WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)/* assumes Z80 sandwiched between 68Ks */
 {
-	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	state->m_banknum = data & 7;
-	reset_sound_region(device->machine());
+	m_banknum = data & 7;
+	reset_sound_region(machine());
 }
 
 static void topspeed_msm5205_vck( device_t *device )
@@ -418,18 +417,18 @@ static void topspeed_msm5205_vck( device_t *device )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( topspeed_msm5205_address_w )
+WRITE8_MEMBER(topspeed_state::topspeed_msm5205_address_w)
 {
-	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff) | (data << 8);
+	device_t *device = machine().device("msm");
+	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
 	msm5205_reset_w(device, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
+WRITE8_MEMBER(topspeed_state::topspeed_msm5205_stop_w)
 {
-	topspeed_state *state = device->machine().driver_data<topspeed_state>();
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, 1);
-	state->m_adpcm_pos &= 0xff00;
+	m_adpcm_pos &= 0xff00;
 }
 
 
@@ -477,9 +476,9 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_LEGACY("msm", topspeed_msm5205_address_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(topspeed_msm5205_address_w)
 //  AM_RANGE(0xb400, 0xb400) // msm5205 start? doesn't seem to work right
-	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE_LEGACY("msm", topspeed_msm5205_stop_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(topspeed_msm5205_stop_w)
 //  AM_RANGE(0xc000, 0xc000) // ??
 //  AM_RANGE(0xc400, 0xc400) // ??
 //  AM_RANGE(0xc800, 0xc800) // ??
@@ -622,7 +621,7 @@ static void irq_handler( device_t *device, int irq )	/* assumes Z80 sandwiched b
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(irq_handler),
-	DEVCB_HANDLER(sound_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(topspeed_state,sound_bankswitch_w)
 };
 
 static const msm5205_interface msm5205_config =

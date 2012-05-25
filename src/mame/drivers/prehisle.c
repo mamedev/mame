@@ -39,15 +39,17 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( D7759_write_port_0_w )
+WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_port_w(device, 0, data);
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }
 
-static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
+WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_reset_w(device, data & 0x80);
 }
 
@@ -62,8 +64,8 @@ static ADDRESS_MAP_START( prehisle_sound_io_map, AS_IO, 8, prehisle_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("upd", D7759_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("upd", D7759_upd_reset_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(D7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(D7759_upd_reset_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

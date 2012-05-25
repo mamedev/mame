@@ -158,8 +158,9 @@ WRITE8_MEMBER(sauro_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-static WRITE8_DEVICE_HANDLER( adpcm_w )
+WRITE8_MEMBER(sauro_state::adpcm_w)
 {
+	device_t *device = machine().device("speech");
 	sp0256_ALD_w(device, 0, data);
 }
 
@@ -202,7 +203,7 @@ static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("speech", adpcm_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP

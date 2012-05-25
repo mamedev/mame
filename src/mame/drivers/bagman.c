@@ -67,31 +67,30 @@ DIP locations verified for:
 #include "includes/bagman.h"
 
 
-static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
+WRITE8_MEMBER(bagman_state::bagman_ls259_w)
 {
-	bagman_state *state = device->machine().driver_data<bagman_state>();
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	state->bagman_pal16r6_w(*space, offset,data); /*this is just a simulation*/
+	device_t *device = machine().device("tmsprom");
+	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
-	if (state->m_ls259_buf[offset] != (data&1) )
+	if (m_ls259_buf[offset] != (data&1) )
 	{
-		state->m_ls259_buf[offset] = data&1;
+		m_ls259_buf[offset] = data&1;
 
 		switch (offset)
 		{
 		case 0:
 		case 1:
 		case 2:
-			tmsprom_bit_w(device, 0, 7 - ((state->m_ls259_buf[0]<<2) | (state->m_ls259_buf[1]<<1) | (state->m_ls259_buf[2]<<0)));
+			tmsprom_bit_w(device, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
 			break;
 		case 3:
-			tmsprom_enable_w(device, state->m_ls259_buf[offset]);
+			tmsprom_enable_w(device, m_ls259_buf[offset]);
 			break;
 		case 4:
-			tmsprom_rom_csq_w(device, 0, state->m_ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, 0, m_ls259_buf[offset]);
 			break;
 		case 5:
-			tmsprom_rom_csq_w(device, 1, state->m_ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, 1, m_ls259_buf[offset]);
 			break;
 		}
 	}
@@ -123,7 +122,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram")	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
-	AM_RANGE(0xa800, 0xa805) AM_DEVWRITE_LEGACY("tmsprom", bagman_ls259_w) /* TMS5110 driving state machine */
+	AM_RANGE(0xa800, 0xa805) AM_WRITE(bagman_ls259_w) /* TMS5110 driving state machine */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READNOP								/* looks like watchdog from schematics */
@@ -374,54 +373,52 @@ static const ay8910_interface ay8910_config =
 
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
-static READ8_DEVICE_HANDLER( dial_input_p1_r )
+READ8_MEMBER(bagman_state::dial_input_p1_r)
 {
-	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = state->ioport("DIAL_P1")->read();
+	dial_val = ioport("DIAL_P1")->read();
 
-	if(state->m_p1_res != 0x60)
-		state->m_p1_res = 0x60;
-	else if(dial_val > state->m_p1_old_val)
-		state->m_p1_res = 0x40;
-	else if(dial_val < state->m_p1_old_val)
-		state->m_p1_res = 0x20;
+	if(m_p1_res != 0x60)
+		m_p1_res = 0x60;
+	else if(dial_val > m_p1_old_val)
+		m_p1_res = 0x40;
+	else if(dial_val < m_p1_old_val)
+		m_p1_res = 0x20;
 	else
-		state->m_p1_res = 0x60;
+		m_p1_res = 0x60;
 
-	state->m_p1_old_val = dial_val;
+	m_p1_old_val = dial_val;
 
-	return (state->ioport("P1")->read() & 0x9f) | (state->m_p1_res);
+	return (ioport("P1")->read() & 0x9f) | (m_p1_res);
 }
 
-static READ8_DEVICE_HANDLER( dial_input_p2_r )
+READ8_MEMBER(bagman_state::dial_input_p2_r)
 {
-	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = state->ioport("DIAL_P2")->read();
+	dial_val = ioport("DIAL_P2")->read();
 
-	if(state->m_p2_res != 0x60)
-		state->m_p2_res = 0x60;
-	else if(dial_val > state->m_p2_old_val)
-		state->m_p2_res = 0x40;
-	else if(dial_val < state->m_p2_old_val)
-		state->m_p2_res = 0x20;
+	if(m_p2_res != 0x60)
+		m_p2_res = 0x60;
+	else if(dial_val > m_p2_old_val)
+		m_p2_res = 0x40;
+	else if(dial_val < m_p2_old_val)
+		m_p2_res = 0x20;
 	else
-		state->m_p2_res = 0x60;
+		m_p2_res = 0x60;
 
-	state->m_p2_old_val = dial_val;
+	m_p2_old_val = dial_val;
 
-	return (state->ioport("P2")->read() & 0x9f) | (state->m_p2_res);
+	return (ioport("P2")->read() & 0x9f) | (m_p2_res);
 }
 
 static const ay8910_interface ay8910_dial_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(dial_input_p1_r),
-	DEVCB_HANDLER(dial_input_p2_r),
+	DEVCB_DRIVER_MEMBER(bagman_state,dial_input_p1_r),
+	DEVCB_DRIVER_MEMBER(bagman_state,dial_input_p2_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

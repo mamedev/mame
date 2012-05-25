@@ -53,26 +53,24 @@ static INTERRUPT_GEN( dribling_irq_gen )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( dsr_r )
+READ8_MEMBER(dribling_state::dsr_r)
 {
-	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* return DSR0-7 */
-	return (state->m_ds << state->m_sh) | (state->m_dr >> (8 - state->m_sh));
+	return (m_ds << m_sh) | (m_dr >> (8 - m_sh));
 }
 
 
-static READ8_DEVICE_HANDLER( input_mux0_r )
+READ8_MEMBER(dribling_state::input_mux0_r)
 {
-	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* low value in the given bit selects */
-	if (!(state->m_input_mux & 0x01))
-		return state->ioport("MUX0")->read();
-	else if (!(state->m_input_mux & 0x02))
-		return state->ioport("MUX1")->read();
-	else if (!(state->m_input_mux & 0x04))
-		return state->ioport("MUX2")->read();
+	if (!(m_input_mux & 0x01))
+		return ioport("MUX0")->read();
+	else if (!(m_input_mux & 0x02))
+		return ioport("MUX1")->read();
+	else if (!(m_input_mux & 0x04))
+		return ioport("MUX2")->read();
 	return 0xff;
 }
 
@@ -84,19 +82,18 @@ static READ8_DEVICE_HANDLER( input_mux0_r )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( misc_w )
+WRITE8_MEMBER(dribling_state::misc_w)
 {
-	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* bit 7 = di */
-	state->m_di = (data >> 7) & 1;
-	if (!state->m_di)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	m_di = (data >> 7) & 1;
+	if (!m_di)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 
 	/* bit 5 = ab. campo */
-	state->m_abca = (data >> 5) & 1;
+	m_abca = (data >> 5) & 1;
 
 	/* bit 4 = ab. a.b.f. */
 	/* bit 3 = n/c */
@@ -104,12 +101,12 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 2 = (9) = PC2 */
 	/* bit 1 = (10) = PC1 */
 	/* bit 0 = (32) = PC0 */
-	state->m_input_mux = data & 7;
-	logerror("%s:misc_w(%02X)\n", device->machine().describe_context(), data);
+	m_input_mux = data & 7;
+	logerror("%s:misc_w(%02X)\n", machine().describe_context(), data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( sound_w )
+WRITE8_MEMBER(dribling_state::sound_w)
 {
 	/* bit 7 = stop palla */
 	/* bit 6 = contrasto */
@@ -119,27 +116,26 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	/* bit 2 = folla a */
 	/* bit 1 = folla m */
 	/* bit 0 = folla b */
-	logerror("%s:sound_w(%02X)\n", device->machine().describe_context(), data);
+	logerror("%s:sound_w(%02X)\n", machine().describe_context(), data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( pb_w )
+WRITE8_MEMBER(dribling_state::pb_w)
 {
 	/* write PB0-7 */
-	logerror("%s:pb_w(%02X)\n", device->machine().describe_context(), data);
+	logerror("%s:pb_w(%02X)\n", machine().describe_context(), data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( shr_w )
+WRITE8_MEMBER(dribling_state::shr_w)
 {
-	dribling_state *state = device->machine().driver_data<dribling_state>();
 
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		device->machine().watchdog_reset();
+		machine().watchdog_reset();
 
 	/* bit 2-0 = SH0-2 */
-	state->m_sh = data & 0x07;
+	m_sh = data & 0x07;
 }
 
 
@@ -185,22 +181,22 @@ WRITE8_MEMBER(dribling_state::iowrite)
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_HANDLER(dsr_r),				/* Port A read */
+	DEVCB_DRIVER_MEMBER(dribling_state,dsr_r),				/* Port A read */
 	DEVCB_NULL,							/* Port A write */
-	DEVCB_HANDLER(input_mux0_r),		/* Port B read */
+	DEVCB_DRIVER_MEMBER(dribling_state,input_mux0_r),		/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(misc_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(dribling_state,misc_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(sound_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(dribling_state,sound_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(pb_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(dribling_state,pb_w),				/* Port B write */
 	DEVCB_INPUT_PORT("IN0"),			/* Port C read */
-	DEVCB_HANDLER(shr_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(dribling_state,shr_w)				/* Port C write */
 };
 
 

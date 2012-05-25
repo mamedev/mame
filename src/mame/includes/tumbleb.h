@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tumblepb_control_0_w);
 	DECLARE_WRITE16_MEMBER(pangpang_pf1_data_w);
 	DECLARE_WRITE16_MEMBER(pangpang_pf2_data_w);
+	DECLARE_WRITE16_MEMBER(tumbleb2_soundmcu_w);
 };
 
 /*----------- defined in video/tumbleb.c -----------*/

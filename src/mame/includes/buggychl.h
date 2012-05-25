@@ -47,6 +47,10 @@ public:
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);
 	DECLARE_WRITE8_MEMBER(buggychl_ctrl_w);
 	DECLARE_WRITE8_MEMBER(buggychl_bg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(port_a_0_w);
+	DECLARE_WRITE8_MEMBER(port_b_0_w);
+	DECLARE_WRITE8_MEMBER(port_a_1_w);
+	DECLARE_WRITE8_MEMBER(port_b_1_w);
 };
 
 

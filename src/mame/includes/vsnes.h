@@ -71,6 +71,12 @@ public:
 	DECLARE_READ8_MEMBER(set_bnglngby_irq_r);
 	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking);
 	void v_set_mirroring(int ppu, int mirroring);
+	DECLARE_READ8_MEMBER(psg1_4015_r);
+	DECLARE_WRITE8_MEMBER(psg1_4015_w);
+	DECLARE_WRITE8_MEMBER(psg1_4017_w);
+	DECLARE_READ8_MEMBER(psg2_4015_r);
+	DECLARE_WRITE8_MEMBER(psg2_4015_w);
+	DECLARE_WRITE8_MEMBER(psg2_4017_w);
 };
 
 

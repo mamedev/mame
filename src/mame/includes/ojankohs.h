@@ -56,6 +56,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ojankohs_gfxreg_w);
 	DECLARE_WRITE8_MEMBER(ojankohs_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(ojankoc_videoram_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_adpcm_reset_w);
+	DECLARE_READ8_MEMBER(ojankohs_ay8910_0_r);
+	DECLARE_READ8_MEMBER(ojankohs_ay8910_1_r);
 };
 
 

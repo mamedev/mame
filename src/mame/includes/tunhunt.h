@@ -16,6 +16,11 @@ public:
 	DECLARE_WRITE8_MEMBER(tunhunt_control_w);
 	DECLARE_READ8_MEMBER(tunhunt_button_r);
 	DECLARE_WRITE8_MEMBER(tunhunt_videoram_w);
+	DECLARE_READ8_MEMBER(dsw2_0r);
+	DECLARE_READ8_MEMBER(dsw2_1r);
+	DECLARE_READ8_MEMBER(dsw2_2r);
+	DECLARE_READ8_MEMBER(dsw2_3r);
+	DECLARE_READ8_MEMBER(dsw2_4r);
 };
 
 

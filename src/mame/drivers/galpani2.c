@@ -34,17 +34,17 @@ To Do:
 
 ***************************************************************************/
 
-static READ16_DEVICE_HANDLER(galpani2_eeprom_r)
+READ16_MEMBER(galpani2_state::galpani2_eeprom_r)
 {
-	galpani2_state *state = device->machine().driver_data<galpani2_state>();
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (state->m_eeprom_word & ~1) | (eeprom->read_bit() & 1);
+	return (m_eeprom_word & ~1) | (eeprom->read_bit() & 1);
 }
 
-static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
+WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 {
-	galpani2_state *state = device->machine().driver_data<galpani2_state>();
-	COMBINE_DATA( &state->m_eeprom_word );
+	device_t *device = machine().device("eeprom");
+	COMBINE_DATA( &m_eeprom_word );
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
@@ -273,18 +273,19 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 		// & 0x40     CARD out
 }
 
-static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
+WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 {
-	UINT8 *ROM = device->machine().root_device().memregion("oki1")->base();
-	logerror("%s : %s bank %08X\n",device->machine().describe_context(),device->tag(),data);
+	UINT8 *ROM = machine().root_device().memregion("oki1")->base();
+	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
-static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
+WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 {
+	device_t *device = machine().device("oki2");
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base(0x40000 * (data & 0xf) );
-	logerror("%s : %s bank %08X\n",device->machine().describe_context(),device->tag(),data);
+	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 }
 
 
@@ -299,7 +300,7 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP										// ? hblank effect ?
 	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE_LEGACY(galpani2_palette_0_w) AM_SHARE("palette.0")	// ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP										// ? flip backgrounds ?
-	AM_RANGE(0x318000, 0x318001) AM_DEVREADWRITE_LEGACY("eeprom", galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
+	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM												// Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram"	)	// Palette
 	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP										// ? at startup of service mode
@@ -333,8 +334,8 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x780006, 0x780007) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff	)	// 2 x OKIM6295
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff	)	//
-	AM_RANGE(0xc80000, 0xc80001) AM_DEVWRITE8_LEGACY("oki1", galpani2_oki1_bank_w, 0x00ff			)	//
-	AM_RANGE(0xcc0000, 0xcc0001) AM_DEVWRITE8_LEGACY("oki2", galpani2_oki2_bank_w, 0x00ff			)	//
+	AM_RANGE(0xc80000, 0xc80001) AM_WRITE8(galpani2_oki1_bank_w, 0x00ff			)	//
+	AM_RANGE(0xcc0000, 0xcc0001) AM_WRITE8(galpani2_oki2_bank_w, 0x00ff			)	//
 ADDRESS_MAP_END
 
 

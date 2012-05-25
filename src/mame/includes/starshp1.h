@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(starshp1_playfield_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
+	DECLARE_WRITE8_MEMBER(starshp1_audio_w);
+	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
 };
 
 

@@ -167,13 +167,15 @@ static INTERRUPT_GEN( skydiver_interrupt )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( skydiver_sound_enable_w )
+WRITE8_MEMBER(skydiver_state::skydiver_sound_enable_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, SKYDIVER_SOUND_EN, offset);
 }
 
-static WRITE8_DEVICE_HANDLER( skydiver_whistle_w )
+WRITE8_MEMBER(skydiver_state::skydiver_whistle_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, NODE_RELATIVE(SKYDIVER_WHISTLE1_EN, (offset >> 1)), offset & 0x01);
 }
 
@@ -196,11 +198,11 @@ static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	AM_RANGE(0x0806, 0x0807) AM_MIRROR(0x47f0) AM_WRITE(skydiver_start_lamp_2_w)
 	AM_RANGE(0x0808, 0x0809) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_y_w)
 	AM_RANGE(0x080a, 0x080b) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_d_w)
-	AM_RANGE(0x080c, 0x080d) AM_MIRROR(0x47f0) AM_DEVWRITE_LEGACY("discrete", skydiver_sound_enable_w)
+	AM_RANGE(0x080c, 0x080d) AM_MIRROR(0x47f0) AM_WRITE(skydiver_sound_enable_w)
 	// AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x47f0) AM_WRITE_LEGACY(skydiver_jump1_lamps_w)
 	AM_RANGE(0x1002, 0x1003) AM_MIRROR(0x47f0) AM_WRITE(skydiver_coin_lockout_w)
 	// AM_RANGE(0x1006, 0x1007) AM_MIRROR(0x47f0) AM_WRITE_LEGACY(skydiver_jump2_lamps_w)
-	AM_RANGE(0x1008, 0x100b) AM_MIRROR(0x47f0) AM_DEVWRITE_LEGACY("discrete", skydiver_whistle_w)
+	AM_RANGE(0x1008, 0x100b) AM_MIRROR(0x47f0) AM_WRITE(skydiver_whistle_w)
 	AM_RANGE(0x100c, 0x100d) AM_MIRROR(0x47f0) AM_WRITE(skydiver_nmion_w)
 	AM_RANGE(0x100e, 0x100f) AM_MIRROR(0x47f0) AM_WRITE(skydiver_width_w)
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x47e0) AM_READ_PORT("IN0")

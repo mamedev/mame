@@ -19,6 +19,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_data_w);
 	DECLARE_WRITE8_MEMBER(vram_addr_w);
 	DECLARE_READ8_MEMBER(test2_r);
+	DECLARE_WRITE8_MEMBER(mainlamps_w);
+	DECLARE_WRITE8_MEMBER(soundlamps_w);
+	DECLARE_WRITE8_MEMBER(counterlamps_w);
 };
 
 

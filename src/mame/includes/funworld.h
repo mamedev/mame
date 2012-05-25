@@ -13,6 +13,11 @@ public:
 	DECLARE_WRITE8_MEMBER(question_bank_w);
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
 	DECLARE_WRITE8_MEMBER(funworld_colorram_w);
+	DECLARE_WRITE8_MEMBER(funworld_lamp_a_w);
+	DECLARE_WRITE8_MEMBER(funworld_lamp_b_w);
+	DECLARE_WRITE8_MEMBER(pia1_ca2_w);
+	DECLARE_READ8_MEMBER(funquiz_ay8910_a_r);
+	DECLARE_READ8_MEMBER(funquiz_ay8910_b_r);
 };
 
 

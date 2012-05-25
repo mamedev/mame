@@ -213,15 +213,24 @@ ADDRESS_MAP_END
 
 /* the bootleg has 2x z80 sample players */
 
-static WRITE8_DEVICE_HANDLER( cabalbl_adpcm_w )
+WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
+	device_t *device = machine().device("msm1");
 	msm5205_reset_w(device,(data>>7)&1);
 	/* ?? bit 6?? */
 	msm5205_data_w(device,data);
 	msm5205_vclk_w(device,1);
 	msm5205_vclk_w(device,0);
 }
-
+WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
+{
+	device_t *device = machine().device("msm2");
+	msm5205_reset_w(device,(data>>7)&1);
+	/* ?? bit 6?? */
+	msm5205_data_w(device,data);
+	msm5205_vclk_w(device,1);
+	msm5205_vclk_w(device,0);
+}
 static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
@@ -229,7 +238,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_byte_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm1", cabalbl_adpcm_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_1_adpcm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_talk2_map, AS_PROGRAM, 8, cabal_state )
@@ -239,7 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_byte_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm2", cabalbl_adpcm_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_2_adpcm_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/

@@ -104,8 +104,9 @@ WRITE8_MEMBER(gbusters_state::gbusters_sh_irqtrigger_w)
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
+WRITE8_MEMBER(gbusters_state::gbusters_snd_bankswitch_w)
 {
+	device_t *device = machine().device("k007232");
 	int bank_B = BIT(data, 2);	/* ?? */
 	int bank_A = BIT(data, 0);		/* ?? */
 	k007232_set_bank(device, bank_A, bank_B );
@@ -175,7 +176,7 @@ static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
 	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ymsnd", ym2151_status_port_r)					/* YM 2151 */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)				/* YM 2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
 ADDRESS_MAP_END
 
 /***************************************************************************

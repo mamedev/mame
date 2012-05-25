@@ -517,17 +517,17 @@ static const samples_interface gaplus_samples_interface =
 
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( out_lamps0 )
+WRITE8_MEMBER(gaplus_state::out_lamps0)
 {
-	set_led_status(device->machine(), 0, data & 1);
-	set_led_status(device->machine(), 1, data & 2);
-	coin_lockout_global_w(device->machine(), data & 4);
-	coin_counter_w(device->machine(), 0, ~data & 8);
+	set_led_status(machine(), 0, data & 1);
+	set_led_status(machine(), 1, data & 2);
+	coin_lockout_global_w(machine(), data & 4);
+	coin_counter_w(machine(), 0, ~data & 8);
 }
 
-static WRITE8_DEVICE_HANDLER( out_lamps1 )
+WRITE8_MEMBER(gaplus_state::out_lamps1)
 {
-	coin_counter_w(device->machine(), 1, ~data & 1);
+	coin_counter_w(machine(), 1, ~data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */
@@ -541,7 +541,7 @@ static const namcoio_interface intf0 =
 static const namcoio_interface intf0_lamps =
 {
 	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
-	{ DEVCB_HANDLER(out_lamps0), DEVCB_HANDLER(out_lamps1) },		/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(gaplus_state,out_lamps0), DEVCB_DRIVER_MEMBER(gaplus_state,out_lamps1) },		/* port write handlers */
 	NULL	/* device */
 };
 

@@ -401,43 +401,47 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
  *          D5 =    LED (out)
  */
 
-static WRITE8_DEVICE_HANDLER( via_pa_w )
+WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	tms5220_data_w(device->machine().device("tms"), 0, data);
+	device_t *device = machine().device("tms");
+	tms5220_data_w(device, 0, data);
 }
 
 
-static READ8_DEVICE_HANDLER( via_pa_r )
+READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	return tms5220_status_r(device->machine().device("tms"), 0);
+	device_t *device = machine().device("tms");
+	return tms5220_status_r(device, 0);
 }
 
 
-static WRITE8_DEVICE_HANDLER( via_pb_w )
+WRITE8_MEMBER(atarisy1_state::via_pb_w)
 {
+	device_t *device = machine().device("tms");
 	/* write strobe */
-	tms5220_wsq_w(device->machine().device("tms"), data & 1);
+	tms5220_wsq_w(device, data & 1);
 
 	/* read strobe */
-	tms5220_rsq_w(device->machine().device("tms"), (data & 2)>>1);
+	tms5220_rsq_w(device, (data & 2)>>1);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
-	tms5220_set_frequency(device->machine().device("tms"), ATARI_CLOCK_14MHz/2 / (16 - data));
+	tms5220_set_frequency(device, ATARI_CLOCK_14MHz/2 / (16 - data));
 }
 
 
-static READ8_DEVICE_HANDLER( via_pb_r )
+READ8_MEMBER(atarisy1_state::via_pb_r)
 {
-	return (tms5220_readyq_r(device->machine().device("tms")) << 2) | (tms5220_intq_r(device->machine().device("tms")) << 3);
+	device_t *device = machine().device("tms");
+	return (tms5220_readyq_r(device) << 2) | (tms5220_intq_r(device) << 3);
 }
 
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(via_pa_r), DEVCB_DEVICE_HANDLER("tms", via_pb_r),
+	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(atarisy1_state,via_pa_r), DEVCB_DRIVER_MEMBER(atarisy1_state,via_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_HANDLER(via_pa_w), DEVCB_DEVICE_HANDLER("tms", via_pb_w),
+	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(atarisy1_state,via_pa_w), DEVCB_DRIVER_MEMBER(atarisy1_state,via_pb_w),
     /*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irq                  */ DEVCB_NULL
 };

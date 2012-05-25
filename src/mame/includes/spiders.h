@@ -21,6 +21,13 @@ public:
 	UINT8 m_gfx_rom_ctrl_latch;
 	UINT8 m_gfx_rom_ctrl_data;
 	pen_t m_pens[NUM_PENS];
+	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
+	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	DECLARE_WRITE8_MEMBER(gfx_rom_intf_w);
+	DECLARE_READ8_MEMBER(gfx_rom_r);
 };
 
 

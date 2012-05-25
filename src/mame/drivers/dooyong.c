@@ -769,7 +769,7 @@ static GFXDECODE_START( popbingo )
 	GFXDECODE_ENTRY( "gfx2", 0, popbingo_tilelayout, 256,  1 )
 GFXDECODE_END
 
-static READ8_DEVICE_HANDLER( unk_r )
+READ8_MEMBER(dooyong_state::unk_r)
 {
 	return 0;
 }
@@ -798,7 +798,7 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+		DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler_2203_1
 };
@@ -808,7 +808,7 @@ static const ym2203_interface ym2203_interface_2 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+		DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler_2203_2
 };

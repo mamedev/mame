@@ -19,6 +19,8 @@ public:
 	UINT8      m_yiear_irq_enable;
 	DECLARE_WRITE8_MEMBER(yiear_videoram_w);
 	DECLARE_WRITE8_MEMBER(yiear_control_w);
+	DECLARE_READ8_MEMBER(yiear_speech_r);
+	DECLARE_WRITE8_MEMBER(yiear_VLM5030_control_w);
 };
 
 
@@ -28,6 +30,3 @@ public:
 PALETTE_INIT( yiear );
 VIDEO_START( yiear );
 SCREEN_UPDATE_IND16( yiear );
-
-READ8_DEVICE_HANDLER( yiear_speech_r );
-WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w );

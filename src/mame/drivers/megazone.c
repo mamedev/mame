@@ -18,9 +18,8 @@ To enter service mode, keep 1&2 pressed on reset
 #include "includes/megazone.h"
 
 
-static READ8_DEVICE_HANDLER( megazone_port_a_r )
+READ8_MEMBER(megazone_state::megazone_port_a_r)
 {
-	megazone_state *state = device->machine().driver_data<megazone_state>();
 	int clock, timer;
 
 
@@ -31,14 +30,14 @@ static READ8_DEVICE_HANDLER( megazone_port_a_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = state->m_audiocpu->total_cycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = m_audiocpu->total_cycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
-	return (timer << 4) | state->m_i8039_status;
+	return (timer << 4) | m_i8039_status;
 }
 
-static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
+WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 {
 	static const char *const fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
 	int i;
@@ -52,7 +51,7 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 			C += 220000;	/* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter_rc_set_RC(device->machine().device(fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(machine().device(fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 
@@ -219,10 +218,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(megazone_port_a_r),
+	DEVCB_DRIVER_MEMBER(megazone_state,megazone_port_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(megazone_port_b_w)
+	DEVCB_DRIVER_MEMBER(megazone_state,megazone_port_b_w)
 };
 
 

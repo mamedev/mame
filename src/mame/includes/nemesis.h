@@ -75,6 +75,10 @@ public:
 	DECLARE_WRITE16_MEMBER(nemesis_colorram1_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_colorram2_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_charram_word_w);
+	DECLARE_WRITE8_MEMBER(gx400_speech_start_w);
+	DECLARE_WRITE8_MEMBER(salamand_speech_start_w);
+	DECLARE_READ8_MEMBER(nemesis_portA_r);
+	DECLARE_WRITE8_MEMBER(city_sound_bank_w);
 };
 
 

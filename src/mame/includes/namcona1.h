@@ -88,6 +88,8 @@ public:
 	DECLARE_WRITE16_MEMBER(namcona1_paletteram_w);
 	DECLARE_READ16_MEMBER(namcona1_gfxram_r);
 	DECLARE_WRITE16_MEMBER(namcona1_gfxram_w);
+	DECLARE_READ16_MEMBER(snd_r);
+	DECLARE_WRITE16_MEMBER(snd_w);
 };
 
 

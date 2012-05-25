@@ -88,6 +88,8 @@ public:
 	DECLARE_WRITE8_MEMBER(esripsys_bg_intensity_w);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
 };
 
 

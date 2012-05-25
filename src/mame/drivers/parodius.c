@@ -100,8 +100,9 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 	/* other bits unknown */
 }
 
-static READ8_DEVICE_HANDLER( parodius_sound_r )
+READ8_MEMBER(parodius_state::parodius_sound_r)
 {
+	device_t *device = machine().device("k053260");
 	return k053260_r(device, 2 + offset);
 }
 
@@ -149,7 +150,7 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x3fc0, 0x3fc0) AM_READ(watchdog_reset_r) AM_WRITE(parodius_3fc0_w)
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE_LEGACY("k053260", parodius_sound_r, k053260_w)	/* K053260 */
+	AM_RANGE(0x3fcc, 0x3fcd) AM_READ(parodius_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)	/* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(parodius_052109_053245_r, parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")			/* banked ROM */

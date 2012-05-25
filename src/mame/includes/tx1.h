@@ -157,6 +157,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tx1_ppi_latch_w);
 	DECLARE_READ8_MEMBER(bb_analog_r);
 	DECLARE_READ8_MEMBER(bbjr_analog_r);
+	DECLARE_WRITE8_MEMBER(tx1_coin_cnt_w);
+	DECLARE_WRITE8_MEMBER(bb_coin_cnt_w);
+	DECLARE_READ8_MEMBER(tx1_ppi_porta_r);
+	DECLARE_READ8_MEMBER(tx1_ppi_portb_r);
 };
 
 

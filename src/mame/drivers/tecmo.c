@@ -76,10 +76,10 @@ WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
 	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
+WRITE8_MEMBER(tecmo_state::tecmo_adpcm_start_w)
 {
-	tecmo_state *state = device->machine().driver_data<tecmo_state>();
-	state->m_adpcm_pos = data << 8;
+	device_t *device = machine().device("msm");
+	m_adpcm_pos = data << 8;
 	msm5205_reset_w(device, 0);
 }
 
@@ -88,8 +88,9 @@ WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
 	m_adpcm_end = (data + 1) << 8;
 }
 
-static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
+WRITE8_MEMBER(tecmo_state::tecmo_adpcm_vol_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
 }
 
@@ -232,9 +233,9 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_start_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(tecmo_adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_vol_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(tecmo_adpcm_vol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(tecmo_nmi_ack_w)
 ADDRESS_MAP_END
 
@@ -244,9 +245,9 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_start_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(tecmo_adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_vol_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(tecmo_adpcm_vol_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(tecmo_nmi_ack_w)
 ADDRESS_MAP_END
 

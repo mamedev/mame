@@ -212,9 +212,9 @@ static void vck_callback( device_t *device )
 }
 
 
-static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
+WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 {
-	crgolf_state *state = device->machine().driver_data<crgolf_state>();
+	device_t *device = machine().device("msm");
 
 	switch (offset)
 	{
@@ -225,12 +225,12 @@ static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
 
 		/* offset 1 is the length/256 nibbles */
 		case 1:
-			state->m_sample_count = data;
+			m_sample_count = data;
 			break;
 
 		/* offset 2 is the offset/256 nibbles */
 		case 2:
-			state->m_sample_offset = data << 8;
+			m_sample_offset = data << 8;
 			break;
 
 		/* offset 3 turns on playback */
@@ -595,8 +595,8 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	device_t *msm = machine.device("msm");
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*msm, 0xa000, 0xa003, FUNC(crgolfhi_sample_w));
+	crgolf_state *state = machine.driver_data<crgolf_state>();
+	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),state));
 }
 
 

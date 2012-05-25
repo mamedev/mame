@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(msisaac_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(msisaac_bg2_videoram_w);
 	DECLARE_WRITE8_MEMBER(msisaac_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(sound_control_0_w);
 };
 
 

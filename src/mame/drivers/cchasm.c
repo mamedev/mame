@@ -67,9 +67,9 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, cchasm_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
-static WRITE_LINE_DEVICE_HANDLER( cchasm_6840_irq )
+WRITE_LINE_MEMBER(cchasm_state::cchasm_6840_irq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 4, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface cchasm_6840_intf =
@@ -77,7 +77,7 @@ static const ptm6840_interface cchasm_6840_intf =
 	CCHASM_68K_CLOCK/10,
 	{ 0, CCHASM_68K_CLOCK / 10, 0 },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_LINE(cchasm_6840_irq)
+	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,cchasm_6840_irq)
 };
 
 /*************************************

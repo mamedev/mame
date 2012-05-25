@@ -117,13 +117,15 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 }
 
 
-static READ8_DEVICE_HANDLER( jailbrek_speech_r )
+READ8_MEMBER(jailbrek_state::jailbrek_speech_r)
 {
+	device_t *device = machine().device("vlm");
 	return (vlm5030_bsy(device) ? 1 : 0);
 }
 
-static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
+WRITE8_MEMBER(jailbrek_state::jailbrek_speech_w)
 {
+	device_t *device = machine().device("vlm");
 	/* bit 0 could be latch direction like in yiear */
 	vlm5030_st(device, (data >> 1) & 1);
 	vlm5030_rst(device, (data >> 2) & 1);
@@ -148,9 +150,9 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("vlm", jailbrek_speech_w) /* speech pins */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(jailbrek_speech_w) /* speech pins */
 	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) /* speech data */
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD_LEGACY("vlm", jailbrek_speech_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(jailbrek_speech_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -223,8 +223,9 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, legionna_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_DEVICE_HANDLER( okim_rombank_w )
+WRITE8_MEMBER(legionna_state::okim_rombank_w)
 {
+	device_t *device = machine().device("oki");
 //  popmessage("%08x",0x40000 * (data & 0x07));
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x7));
 }
@@ -232,7 +233,7 @@ static WRITE8_DEVICE_HANDLER( okim_rombank_w )
 static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, legionna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki", okim_rombank_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(okim_rombank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END

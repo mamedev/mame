@@ -53,13 +53,11 @@ The 2 ay-8910 read ports are responsible for reading the sound commands.
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( timer_r )
+READ8_MEMBER(jack_state::timer_r)
 {
-	jack_state *state = device->machine().driver_data<jack_state>();
-
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
-	return state->m_audiocpu->total_cycles() / state->m_timer_rate;
+	return m_audiocpu->total_cycles() / m_timer_rate;
 }
 
 
@@ -777,7 +775,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DEVICE_HANDLER("audiocpu", timer_r)
+	DEVCB_DRIVER_MEMBER(jack_state,timer_r)
 };
 
 

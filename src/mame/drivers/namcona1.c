@@ -802,14 +802,16 @@ WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 	COMBINE_DATA(&m_workram[offset]);
 }
 
-static READ16_DEVICE_HANDLER(snd_r)
+READ16_MEMBER(namcona1_state::snd_r)
 {
+	device_t *device = machine().device("c140");
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	return c140_r(device,offset*2+1) | c140_r(device,offset*2)<<8;
 }
 
-static WRITE16_DEVICE_HANDLER(snd_w)
+WRITE16_MEMBER(namcona1_state::snd_w)
 {
+	device_t *device = machine().device("c140");
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
 	{
@@ -824,7 +826,7 @@ static WRITE16_DEVICE_HANDLER(snd_w)
 
 static ADDRESS_MAP_START( namcona1_mcu_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
-	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE_LEGACY("c140", snd_r, snd_w)	// C140-alike sound chip
+	AM_RANGE(0x001000, 0x001fff) AM_READWRITE(snd_r, snd_w)	// C140-alike sound chip
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
 	AM_RANGE(0x003000, 0x00afff) AM_RAM						// there is a 32k RAM chip according to CGFM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)			// internal ROM BIOS

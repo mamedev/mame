@@ -69,9 +69,10 @@ WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 	coin_counter_w(machine(), 1,(data >> 1) & 0x01);
 }
 
-static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
+READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 {
-	return device->machine().rand(); /* patch */
+//  device_t *device = machine().device("vlm");
+	return machine().rand(); /* patch */
 	/* FIXME: remove ? */
 #if 0
 	if (vlm5030_bsy(device)) return 1;
@@ -79,10 +80,10 @@ static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
 #endif
 }
 
-static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
+WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 {
-	ddribble_state *state = device->machine().driver_data<ddribble_state>();
-	UINT8 *SPEECH_ROM = state->memregion("vlm")->base();
+	device_t *device = machine().device("vlm");
+	UINT8 *SPEECH_ROM = memregion("vlm")->base();
 
 	/* b7 : vlm data bus OE   */
 
@@ -99,13 +100,13 @@ static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
 	vlm5030_set_rom(device, &SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
 
 	/* b2 : SSG-C rc filter enable */
-	filter_rc_set_RC(state->m_filter3, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	filter_rc_set_RC(m_filter3, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	/* b1 : SSG-B rc filter enable */
-	filter_rc_set_RC(state->m_filter2, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	filter_rc_set_RC(m_filter2, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	/* b0 : SSG-A rc filter enable */
-	filter_rc_set_RC(state->m_filter1, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	filter_rc_set_RC(m_filter1, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
@@ -230,8 +231,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER("vlm", ddribble_vlm5030_busy_r),
-		DEVCB_DEVICE_HANDLER("vlm", ddribble_vlm5030_ctrl_w),
+		DEVCB_DRIVER_MEMBER(ddribble_state,ddribble_vlm5030_busy_r),
+		DEVCB_DRIVER_MEMBER(ddribble_state,ddribble_vlm5030_ctrl_w),
 		DEVCB_NULL
 	},
 	NULL

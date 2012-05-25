@@ -36,6 +36,10 @@ public:
 	DECLARE_WRITE8_MEMBER(slave_irq_mask_w);
 	DECLARE_WRITE8_MEMBER(gyruss_spriteram_w);
 	DECLARE_READ8_MEMBER(gyruss_scanline_r);
+	DECLARE_READ8_MEMBER(gyruss_portA_r);
+	DECLARE_WRITE8_MEMBER(gyruss_dac_w);
+	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
+	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
 };
 
 

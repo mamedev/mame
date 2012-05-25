@@ -537,23 +537,22 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( konami_sound_control_w )
+WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
-	UINT8 old = state->m_konami_sound_control;
-	state->m_konami_sound_control = data;
+	UINT8 old = m_konami_sound_control;
+	m_konami_sound_control = data;
 
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
-		cputag_set_input_line(device->machine(), "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
-	device->machine().sound().system_mute(data & 0x10);
+	machine().sound().system_mute(data & 0x10);
 }
 
 
-static READ8_DEVICE_HANDLER( konami_sound_timer_r )
+READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 {
 	/*
         The timer is clocked at KONAMI_SOUND_CLOCK and cascades through a
@@ -569,7 +568,7 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
         current counter index, we use the sound cpu clock times 8 mod
         16*16*2*8*5*2.
     */
-	UINT32 cycles = (device->machine().device<cpu_device>("audiocpu")->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (machine().device<cpu_device>("audiocpu")->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */
@@ -610,15 +609,15 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( konami_portc_0_w )
+WRITE8_MEMBER(galaxian_state::konami_portc_0_w)
 {
-	logerror("%s:ppi0_portc_w = %02X\n", device->machine().describe_context(), data);
+	logerror("%s:ppi0_portc_w = %02X\n", machine().describe_context(), data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
+WRITE8_MEMBER(galaxian_state::konami_portc_1_w)
 {
-	logerror("%s:ppi1_portc_w = %02X\n", device->machine().describe_context(), data);
+	logerror("%s:ppi1_portc_w = %02X\n", machine().describe_context(), data);
 }
 
 
@@ -629,7 +628,7 @@ static I8255A_INTERFACE( konami_ppi8255_0_intf )
 	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_HANDLER(konami_portc_0_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_portc_0_w)	/* Port C write */
 };
 
 static I8255A_INTERFACE( konami_ppi8255_1_intf )
@@ -637,9 +636,9 @@ static I8255A_INTERFACE( konami_ppi8255_1_intf )
 	DEVCB_NULL,								/* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,								/* Port B read */
-	DEVCB_HANDLER(konami_sound_control_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w),	/* Port B write */
 	DEVCB_INPUT_PORT("IN3"),				/* Port C read */
-	DEVCB_HANDLER(konami_portc_1_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_portc_1_w)			/* Port C write */
 };
 
 
@@ -667,9 +666,9 @@ WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( theend_coin_counter_w )
+WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
 {
-	coin_counter_w(device->machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x80);
 }
 
 
@@ -680,7 +679,7 @@ static I8255A_INTERFACE( theend_ppi8255_0_intf )
 	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_HANDLER(theend_coin_counter_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,theend_coin_counter_w)	/* Port C write */
 };
 
 
@@ -691,35 +690,33 @@ static I8255A_INTERFACE( theend_ppi8255_0_intf )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( scramble_protection_w )
+WRITE8_MEMBER(galaxian_state::scramble_protection_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	/*
         This is not fully understood; the low 4 bits of port C are
         inputs; the upper 4 bits are outputs. Scramble main set always
         writes sequences of 3 or more nibbles to the low port and
         expects certain results in the upper nibble afterwards.
     */
-	state->m_protection_state = (state->m_protection_state << 4) | (data & 0x0f);
-	switch (state->m_protection_state & 0xfff)
+	m_protection_state = (m_protection_state << 4) | (data & 0x0f);
+	switch (m_protection_state & 0xfff)
 	{
 		/* scramble */
-		case 0xf09:		state->m_protection_result = 0xff;	break;
-		case 0xa49:		state->m_protection_result = 0xbf;	break;
-		case 0x319:		state->m_protection_result = 0x4f;	break;
-		case 0x5c9:		state->m_protection_result = 0x6f;	break;
+		case 0xf09:		m_protection_result = 0xff;	break;
+		case 0xa49:		m_protection_result = 0xbf;	break;
+		case 0x319:		m_protection_result = 0x4f;	break;
+		case 0x5c9:		m_protection_result = 0x6f;	break;
 
 		/* scrambls */
-		case 0x246:		state->m_protection_result ^= 0x80;	break;
-		case 0xb5f:		state->m_protection_result = 0x6f;	break;
+		case 0x246:		m_protection_result ^= 0x80;	break;
+		case 0xb5f:		m_protection_result = 0x6f;	break;
 	}
 }
 
 
-static READ8_DEVICE_HANDLER( scramble_protection_r )
+READ8_MEMBER(galaxian_state::scramble_protection_r)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
-	return state->m_protection_result;
+	return m_protection_result;
 }
 
 
@@ -739,9 +736,9 @@ static I8255A_INTERFACE( scramble_ppi8255_1_intf )
 	DEVCB_NULL,								/* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,								/* Port B read */
-	DEVCB_HANDLER(konami_sound_control_w),	/* Port B write */
-	DEVCB_HANDLER(scramble_protection_r),	/* Port C read */
-	DEVCB_HANDLER(scramble_protection_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scramble_protection_r),	/* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scramble_protection_w)	/* Port C write */
 };
 
 
@@ -757,11 +754,10 @@ WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 }
 
 
-static READ8_DEVICE_HANDLER( explorer_sound_latch_r )
+READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
-	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
-	return state->soundlatch_byte_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
+	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+	return soundlatch_byte_r(*machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
 }
 
 
@@ -789,16 +785,15 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
+WRITE8_MEMBER(galaxian_state::sfx_sample_control_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
-	UINT8 old = state->m_sfx_sample_control;
-	state->m_sfx_sample_control = data;
+	UINT8 old = m_sfx_sample_control;
+	m_sfx_sample_control = data;
 
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		cputag_set_input_line(device->machine(), "audio2", 0, HOLD_LINE);
+		cputag_set_input_line(machine(), "audio2", 0, HOLD_LINE);
 }
 
 
@@ -846,42 +841,40 @@ static void monsterz_set_latch(running_machine &machine)
 }
 
 
-static WRITE8_DEVICE_HANDLER( monsterz_porta_1_w )
+WRITE8_MEMBER(galaxian_state::monsterz_porta_1_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 
 	// d7 high: set latch + advance address high bits (and reset low bits?)
 	if (data & 0x80)
 	{
-		monsterz_set_latch(device->machine());
-		state->m_protection_state = (state->m_protection_state + 0x100) & 0xff00;
+		monsterz_set_latch(machine());
+		m_protection_state = (m_protection_state + 0x100) & 0xff00;
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( monsterz_portb_1_w )
+WRITE8_MEMBER(galaxian_state::monsterz_portb_1_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 
 	// d3 high: set latch + advance address low bits
 	if (data & 0x08)
 	{
-		monsterz_set_latch(device->machine());
-		state->m_protection_state = ((state->m_protection_state + 1) & 0x00ff) | (state->m_protection_state & 0xff00);
+		monsterz_set_latch(machine());
+		m_protection_state = ((m_protection_state + 1) & 0x00ff) | (m_protection_state & 0xff00);
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( monsterz_portc_1_w )
+WRITE8_MEMBER(galaxian_state::monsterz_portc_1_w)
 {
 }
 
 static I8255A_INTERFACE( monsterz_ppi8255_1_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(monsterz_porta_1_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_porta_1_w),	/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(monsterz_portb_1_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_portb_1_w),	/* Port B write */
 	DEVCB_INPUT_PORT("IN3"),			/* Port C read */
-	DEVCB_HANDLER(monsterz_portc_1_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_portc_1_w)	/* Port C write */
 };
 
 
@@ -929,10 +922,10 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 }
 
 
-static READ8_DEVICE_HANDLER( frogger_sound_timer_r )
+READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 {
 	/* same as regular Konami sound but with bits 3,5 swapped */
-	UINT8 konami_value = konami_sound_timer_r(device, 0);
+	UINT8 konami_value = konami_sound_timer_r(space, 0);
 	return BITSWAP8(konami_value, 7,6,3,4,5,2,1,0);
 }
 
@@ -1011,14 +1004,13 @@ WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 }
 
 
-static READ8_DEVICE_HANDLER( scorpion_protection_r )
+READ8_MEMBER(galaxian_state::scorpion_protection_r)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	UINT16 paritybits;
 	UINT8 parity = 0;
 
 	/* compute parity of the current (bitmask & $CE29) */
-	for (paritybits = state->m_protection_state & 0xce29; paritybits != 0; paritybits >>= 1)
+	for (paritybits = m_protection_state & 0xce29; paritybits != 0; paritybits >>= 1)
 		if (paritybits & 1)
 			parity++;
 
@@ -1027,18 +1019,17 @@ static READ8_DEVICE_HANDLER( scorpion_protection_r )
 }
 
 
-static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
+WRITE8_MEMBER(galaxian_state::scorpion_protection_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	/* bit 5 low is a reset */
 	if (!(data & 0x20))
-		state->m_protection_state = 0x0000;
+		m_protection_state = 0x0000;
 
 	/* bit 4 low is a clock */
 	if (!(data & 0x10))
 	{
 		/* each clock shifts left one bit and ORs in the inverse of the parity */
-		state->m_protection_state = (state->m_protection_state << 1) | (~scorpion_protection_r(device, 0) & 1);
+		m_protection_state = (m_protection_state << 1) | (~scorpion_protection_r(space, 0) & 1);
 	}
 }
 
@@ -1048,8 +1039,9 @@ READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
 	return digitalker_0_intr_r(digitalker);
 }
 
-static WRITE8_DEVICE_HANDLER( scorpion_digitalker_control_w )
+WRITE8_MEMBER(galaxian_state::scorpion_digitalker_control_w)
 {
+	device_t *device = machine().device("digitalker");
 	digitalker_0_cs_w(device, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 	digitalker_0_cms_w(device, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 	digitalker_0_wr_w(device, data & 4 ? ASSERT_LINE : CLEAR_LINE);
@@ -1060,9 +1052,9 @@ static I8255A_INTERFACE( scorpion_ppi8255_1_intf )
 	DEVCB_NULL,								/* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,								/* Port B read */
-	DEVCB_HANDLER(konami_sound_control_w),	/* Port B write */
-	DEVCB_HANDLER(scorpion_protection_r),	/* Port C read */
-	DEVCB_HANDLER(scorpion_protection_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_protection_r),	/* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_protection_w)	/* Port C write */
 };
 
 
@@ -1193,8 +1185,9 @@ WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( kingball_dac_w )
+WRITE8_MEMBER(galaxian_state::kingball_dac_w)
 {
+	device_t *device = machine().device("dac");
 	dac_w(device, offset, data ^ 0xff);
 }
 
@@ -1325,10 +1318,9 @@ READ8_MEMBER(galaxian_state::dingoe_3001_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
+WRITE8_MEMBER(galaxian_state::moonwar_port_select_w)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
-	state->m_moonwar_port_select = data & 0x10;
+	m_moonwar_port_select = data & 0x10;
 }
 
 
@@ -1339,7 +1331,7 @@ static I8255A_INTERFACE( moonwar_ppi8255_0_intf )
 	DEVCB_INPUT_PORT("IN1"),				/* Port B read */
 	DEVCB_NULL,								/* Port B write */
 	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
-	DEVCB_HANDLER(moonwar_port_select_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,moonwar_port_select_w)	/* Port C write */
 };
 
 
@@ -1849,7 +1841,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingball_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("dac", kingball_dac_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_byte_r) AM_WRITE(kingball_dac_w)
 ADDRESS_MAP_END
 
 
@@ -1955,7 +1947,7 @@ static const ay8910_interface frogger_ay8910_interface =
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_HANDLER(frogger_sound_timer_r),
+	DEVCB_DRIVER_MEMBER(galaxian_state,frogger_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1965,7 +1957,7 @@ static const ay8910_interface konami_ay8910_interface_1 =
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_HANDLER(konami_sound_timer_r),
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1984,7 +1976,7 @@ static const ay8910_interface explorer_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(explorer_sound_latch_r),
+	DEVCB_DRIVER_MEMBER(galaxian_state,explorer_sound_latch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1994,7 +1986,7 @@ static const ay8910_interface explorer_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(konami_sound_timer_r),
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -2007,7 +1999,7 @@ static const ay8910_interface sfx_ay8910_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_w),
-	DEVCB_HANDLER(sfx_sample_control_w)
+	DEVCB_DRIVER_MEMBER(galaxian_state,sfx_sample_control_w)
 };
 
 static const ay8910_interface scorpion_ay8910_interface =
@@ -2017,7 +2009,7 @@ static const ay8910_interface scorpion_ay8910_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("digitalker", digitalker_data_w),
-	DEVCB_DEVICE_HANDLER("digitalker", scorpion_digitalker_control_w)
+	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_digitalker_control_w)
 };
 
 static const ay8910_interface checkmaj_ay8910_interface =

@@ -168,17 +168,17 @@ static INPUT_PORTS_START( ksayakyu )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-static WRITE8_DEVICE_HANDLER(dummy1_w)
+WRITE8_MEMBER(ksayakyu_state::dummy1_w)
 {
 //  printf("%02x 1\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(dummy2_w)
+WRITE8_MEMBER(ksayakyu_state::dummy2_w)
 {
 //  printf("%02x 2\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(dummy3_w)
+WRITE8_MEMBER(ksayakyu_state::dummy3_w)
 {
 //  printf("%02x 3\n", data);
 }
@@ -191,7 +191,7 @@ static const ay8910_interface ay8910_interface_1 =
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(dummy1_w)
+	DEVCB_DRIVER_MEMBER(ksayakyu_state,dummy1_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
@@ -200,8 +200,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(dummy2_w),
-	DEVCB_HANDLER(dummy3_w)
+	DEVCB_DRIVER_MEMBER(ksayakyu_state,dummy2_w),
+	DEVCB_DRIVER_MEMBER(ksayakyu_state,dummy3_w)
 };
 
 static const gfx_layout charlayout =

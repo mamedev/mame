@@ -50,6 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER(K005885_1_w);
 	DECLARE_WRITE8_MEMBER(ddribble_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(ddribble_bg_videoram_w);
+	DECLARE_READ8_MEMBER(ddribble_vlm5030_busy_r);
+	DECLARE_WRITE8_MEMBER(ddribble_vlm5030_ctrl_w);
 };
 
 /*----------- defined in video/ddribble.c -----------*/

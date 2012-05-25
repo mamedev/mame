@@ -181,28 +181,26 @@ static void idsoccer_adpcm_int( device_t *device )
 	}
 }
 
-static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
+READ8_MEMBER(docastle_state::idsoccer_adpcm_status_r)
 {
-	docastle_state *state = device->machine().driver_data<docastle_state>();
-
 	// this is wrong, but the samples work anyway!!
-	state->m_adpcm_status ^= 0x80;
-	return state->m_adpcm_status;
+	m_adpcm_status ^= 0x80;
+	return m_adpcm_status;
 }
 
-static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
+WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
 {
-	docastle_state *state = device->machine().driver_data<docastle_state>();
+	device_t *device = machine().device("msm");
 
 	if (data & 0x80)
 	{
-		state->m_adpcm_idle = 1;
+		m_adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
 	}
 	else
 	{
-		state->m_adpcm_pos = (data & 0x7f) * 0x200;
-		state->m_adpcm_idle = 0;
+		m_adpcm_pos = (data & 0x7f) * 0x200;
+		m_adpcm_idle = 0;
 		msm5205_reset_w(device, 0);
 	}
 }
@@ -290,7 +288,7 @@ static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("msm", idsoccer_adpcm_status_r, idsoccer_adpcm_w)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(idsoccer_adpcm_status_r, idsoccer_adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 

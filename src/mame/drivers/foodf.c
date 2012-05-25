@@ -324,22 +324,22 @@ GFXDECODE_END
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( pot_r )
+READ8_MEMBER(foodf_state::pot_r)
 {
-	return (device->machine().root_device().ioport("DSW")->read() >> offset) << 7;
+	return (machine().root_device().ioport("DSW")->read() >> offset) << 7;
 }
 
 static const pokey_interface pokey_config =
 {
 	{
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r),
-		DEVCB_HANDLER(pot_r)
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r),
+		DEVCB_DRIVER_MEMBER(foodf_state,pot_r)
 	}
 };
 

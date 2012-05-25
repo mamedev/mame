@@ -218,14 +218,13 @@ static MACHINE_RESET( bogeyman )
 	state->m_last_write = 0;
 }
 
-static WRITE8_DEVICE_HANDLER( bogeyman_colbank_w )
+WRITE8_MEMBER(bogeyman_state::bogeyman_colbank_w)
 {
-	bogeyman_state *state = device->machine().driver_data<bogeyman_state>();
 
-	if((data & 1) != (state->m_colbank & 1))
+	if((data & 1) != (m_colbank & 1))
 	{
-		state->m_colbank = data & 1;
-		state->m_fg_tilemap->mark_all_dirty();
+		m_colbank = data & 1;
+		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -235,7 +234,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(bogeyman_colbank_w),
+	DEVCB_DRIVER_MEMBER(bogeyman_state,bogeyman_colbank_w),
 	DEVCB_NULL
 };
 

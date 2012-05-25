@@ -52,4 +52,5 @@ public:
 	DECLARE_READ16_MEMBER(dsp_rom_r);
 	DECLARE_WRITE16_MEMBER(dsp_romaddr_w);
 	DECLARE_READ16_MEMBER(coolpool_input_r);
+	DECLARE_WRITE16_MEMBER(dsp_dac_w);
 };

@@ -60,6 +60,14 @@ public:
 	DECLARE_WRITE8_MEMBER(tubep_sprite_control_w);
 	DECLARE_WRITE8_MEMBER(rjammer_background_LS377_w);
 	DECLARE_WRITE8_MEMBER(rjammer_background_page_w);
+	DECLARE_WRITE8_MEMBER(rjammer_voice_startstop_w);
+	DECLARE_WRITE8_MEMBER(rjammer_voice_frequency_select_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portA_1_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portB_1_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portA_2_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
 };
 
 

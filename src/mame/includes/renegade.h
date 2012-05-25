@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(renegade_scroll0_w);
 	DECLARE_WRITE8_MEMBER(renegade_scroll1_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	DECLARE_WRITE8_MEMBER(adpcm_play_w);
 };
 
 

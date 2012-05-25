@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
 	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
 	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
+	DECLARE_WRITE_LINE_MEMBER(dbz_irq2_ack_w);
 };
 
 

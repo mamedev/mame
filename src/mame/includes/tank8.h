@@ -48,6 +48,12 @@ public:
 	DECLARE_WRITE8_MEMBER(tank8_lockout_w);
 	DECLARE_WRITE8_MEMBER(tank8_int_reset_w);
 	DECLARE_WRITE8_MEMBER(tank8_video_ram_w);
+	DECLARE_WRITE8_MEMBER(tank8_crash_w);
+	DECLARE_WRITE8_MEMBER(tank8_explosion_w);
+	DECLARE_WRITE8_MEMBER(tank8_bugle_w);
+	DECLARE_WRITE8_MEMBER(tank8_bug_w);
+	DECLARE_WRITE8_MEMBER(tank8_attract_w);
+	DECLARE_WRITE8_MEMBER(tank8_motor_w);
 };
 
 

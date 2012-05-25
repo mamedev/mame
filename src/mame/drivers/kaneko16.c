@@ -314,15 +314,35 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 
 /* Two identically mapped YM2149 chips */
 
-static READ16_DEVICE_HANDLER( kaneko16_YM2149_r )
+READ16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_r)
 {
+	device_t *device = machine().device("ay1");
 	/* Each 2149 register is mapped to a different address */
 	ay8910_address_w(device,0,offset);
 	return ay8910_r(device,0);
 }
 
-static WRITE16_DEVICE_HANDLER( kaneko16_YM2149_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_w)
 {
+	device_t *device = machine().device("ay1");
+	/* Each 2149 register is mapped to a different address */
+	ay8910_address_w(device,0,offset);
+	/* The registers are mapped to odd addresses, except one! */
+	if (ACCESSING_BITS_0_7)	ay8910_data_w(device,0, data       & 0xff);
+	else				ay8910_data_w(device,0,(data >> 8) & 0xff);
+}
+
+READ16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_r)
+{
+	device_t *device = machine().device("ay2");
+	/* Each 2149 register is mapped to a different address */
+	ay8910_address_w(device,0,offset);
+	return ay8910_r(device,0);
+}
+
+WRITE16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_w)
+{
+	device_t *device = machine().device("ay2");
 	/* Each 2149 register is mapped to a different address */
 	ay8910_address_w(device,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
@@ -383,8 +403,8 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_state )
 //  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0x780000, 0x780001) AM_READ(watchdog_reset16_r)		// Watchdog
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE_LEGACY("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
-	AM_RANGE(0x800200, 0x80021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r, kaneko16_YM2149_w)
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w)	// Sound
+	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w)
 	AM_RANGE(0x8003fe, 0x8003ff) AM_NOP // for OKI when accessed as .l
 	AM_RANGE(0x800400, 0x800401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_SHARE("vram.1")	// Layers
@@ -403,22 +423,23 @@ ADDRESS_MAP_END
 /* The two YM2149 chips are only used when entering high score initials, and */
 /* when the game is fully completed. Overkill??? */
 
-static WRITE16_DEVICE_HANDLER( bakubrkr_oki_bank_sw )
+WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_sw)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7) {
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0x7) );
-		logerror("%s:Selecting OKI bank %02X\n",device->machine().describe_context(),data&0xff);
+		logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 	}
 }
 
 static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREAD_LEGACY("ay1", kaneko16_YM2149_r)	// Sound
-	AM_RANGE(0x400000, 0x40001d) AM_DEVWRITE_LEGACY("ay1", kaneko16_YM2149_w)
-	AM_RANGE(0x40001e, 0x40001f) AM_DEVWRITE_LEGACY("oki", bakubrkr_oki_bank_sw)	// OKI bank Switch
-	AM_RANGE(0x400200, 0x40021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r,kaneko16_YM2149_w)			// Sound
+	AM_RANGE(0x400000, 0x40001f) AM_READ(kaneko16_ay1_YM2149_r)	// Sound
+	AM_RANGE(0x400000, 0x40001d) AM_WRITE(kaneko16_ay2_YM2149_w)
+	AM_RANGE(0x40001e, 0x40001f) AM_WRITE(bakubrkr_oki_bank_sw)	// OKI bank Switch
+	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay1_YM2149_r,kaneko16_ay2_YM2149_w)			// Sound
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	//
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_SHARE("vram.1")	// Layers 0
 	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_SHARE("vram.0")	//
@@ -474,8 +495,9 @@ ADDRESS_MAP_END
                                 Blood Warrior
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( bloodwar_oki_0_bank_w )
+WRITE16_MEMBER(kaneko16_state::bloodwar_oki_0_bank_w)
 {
+	device_t *device = machine().device("oki1");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -484,8 +506,9 @@ static WRITE16_DEVICE_HANDLER( bloodwar_oki_0_bank_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( bloodwar_oki_1_bank_w )
+WRITE16_MEMBER(kaneko16_state::bloodwar_oki_1_bank_w)
 {
+	device_t *device = machine().device("oki2");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -537,8 +560,8 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("oki1", bloodwar_oki_0_bank_w)
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE_LEGACY("oki2", bloodwar_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(bloodwar_oki_0_bank_w)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(bloodwar_oki_1_bank_w)
 ADDRESS_MAP_END
 
 
@@ -546,23 +569,25 @@ ADDRESS_MAP_END
                                 Bonk's Adventure
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( bonkadv_oki_0_bank_w )
+WRITE16_MEMBER(kaneko16_state::bonkadv_oki_0_bank_w)
 {
+	device_t *device = machine().device("oki1");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0xF));
-		logerror("%s: OKI0  bank %08X\n",device->machine().describe_context(),data);
+		logerror("%s: OKI0  bank %08X\n",machine().describe_context(),data);
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( bonkadv_oki_1_bank_w )
+WRITE16_MEMBER(kaneko16_state::bonkadv_oki_1_bank_w)
 {
+	device_t *device = machine().device("oki2");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * data );
-		logerror("%s: OKI1  bank %08X\n",device->machine().describe_context(),data);
+		logerror("%s: OKI1  bank %08X\n",machine().describe_context(),data);
 	}
 }
 
@@ -599,8 +624,8 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("oki1", bonkadv_oki_0_bank_w)
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE_LEGACY("oki2", bonkadv_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(bonkadv_oki_0_bank_w)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(bonkadv_oki_1_bank_w)
 ADDRESS_MAP_END
 
 
@@ -623,8 +648,9 @@ READ16_MEMBER(kaneko16_state::gtmr_wheel_r)
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( gtmr_oki_0_bank_w )
+WRITE16_MEMBER(kaneko16_state::gtmr_oki_0_bank_w)
 {
+	device_t *device = machine().device("oki1");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -633,8 +659,9 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_0_bank_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( gtmr_oki_1_bank_w )
+WRITE16_MEMBER(kaneko16_state::gtmr_oki_1_bank_w)
 {
+	device_t *device = machine().device("oki2");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -689,8 +716,8 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("oki1", gtmr_oki_0_bank_w)										// Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE_LEGACY("oki2", gtmr_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gtmr_oki_0_bank_w)										// Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(gtmr_oki_1_bank_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -764,8 +791,8 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(toybox_mcu_status_r)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("oki1", gtmr_oki_0_bank_w)	// Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE_LEGACY("oki2", gtmr_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gtmr_oki_0_bank_w)	// Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(gtmr_oki_1_bank_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -775,8 +802,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE_LEGACY("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
-	AM_RANGE(0x400200, 0x40021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r, kaneko16_YM2149_w)
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w)	// Sound
+	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay2_YM2149_r, kaneko16_ay1_YM2149_w)
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_SHARE("vram.1")	// Layers 0
@@ -1781,11 +1808,11 @@ static const ay8910_interface ay8910_intf_dsw =
 	DEVCB_NULL,
 };
 
-static WRITE8_DEVICE_HANDLER( kaneko16_eeprom_reset_w )
+WRITE8_MEMBER(kaneko16_state::kaneko16_eeprom_reset_w)
 {
 	// FIXME: the device line cannot be directly put in the interface due to inverse value!
 	// we might want to define a "reversed" set_cs_line handler
-	eeprom_device *eeprom = device->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	// reset line asserted: reset.
 	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
@@ -1797,7 +1824,7 @@ static const ay8910_interface ay8910_intf_eeprom =
 	DEVCB_DEVICE_LINE_MEMBER("eeprom", eeprom_device, read_bit),	/* inputs  A:  0,EEPROM bit read */
 	DEVCB_NULL,						/* inputs  B */
 	DEVCB_NULL,						/* outputs A */
-	DEVCB_HANDLER(kaneko16_eeprom_reset_w)	/* outputs B:  0,EEPROM reset */
+	DEVCB_DRIVER_MEMBER(kaneko16_state,kaneko16_eeprom_reset_w)	/* outputs B:  0,EEPROM reset */
 };
 
 

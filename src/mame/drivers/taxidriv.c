@@ -17,142 +17,131 @@ OTHER: 5 * M5L8255AP
 
 
 
-static WRITE8_DEVICE_HANDLER( p2a_w ) { taxidriv_spritectrl_w(device,0,data); }
-static WRITE8_DEVICE_HANDLER( p2b_w ) { taxidriv_spritectrl_w(device,1,data); }
-static WRITE8_DEVICE_HANDLER( p2c_w ) { taxidriv_spritectrl_w(device,2,data); }
-static WRITE8_DEVICE_HANDLER( p3a_w ) { taxidriv_spritectrl_w(device,3,data); }
-static WRITE8_DEVICE_HANDLER( p3b_w ) { taxidriv_spritectrl_w(device,4,data); }
-static WRITE8_DEVICE_HANDLER( p3c_w ) { taxidriv_spritectrl_w(device,5,data); }
-static WRITE8_DEVICE_HANDLER( p4a_w ) { taxidriv_spritectrl_w(device,6,data); }
-static WRITE8_DEVICE_HANDLER( p4b_w ) { taxidriv_spritectrl_w(device,7,data); }
-static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidriv_spritectrl_w(device,8,data); }
+WRITE8_MEMBER(taxidriv_state::p2a_w){ taxidriv_spritectrl_w(space,0,data); }
+WRITE8_MEMBER(taxidriv_state::p2b_w){ taxidriv_spritectrl_w(space,1,data); }
+WRITE8_MEMBER(taxidriv_state::p2c_w){ taxidriv_spritectrl_w(space,2,data); }
+WRITE8_MEMBER(taxidriv_state::p3a_w){ taxidriv_spritectrl_w(space,3,data); }
+WRITE8_MEMBER(taxidriv_state::p3b_w){ taxidriv_spritectrl_w(space,4,data); }
+WRITE8_MEMBER(taxidriv_state::p3c_w){ taxidriv_spritectrl_w(space,5,data); }
+WRITE8_MEMBER(taxidriv_state::p4a_w){ taxidriv_spritectrl_w(space,6,data); }
+WRITE8_MEMBER(taxidriv_state::p4b_w){ taxidriv_spritectrl_w(space,7,data); }
+WRITE8_MEMBER(taxidriv_state::p4c_w){ taxidriv_spritectrl_w(space,8,data); }
 
 
-static READ8_DEVICE_HANDLER( p0a_r )
+READ8_MEMBER(taxidriv_state::p0a_r)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return state->m_latchA;
+	return m_latchA;
 }
 
-static READ8_DEVICE_HANDLER( p0c_r )
+READ8_MEMBER(taxidriv_state::p0c_r)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return (state->m_s1 << 7);
+	return (m_s1 << 7);
 }
 
-static WRITE8_DEVICE_HANDLER( p0b_w )
+WRITE8_MEMBER(taxidriv_state::p0b_w)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	state->m_latchB = data;
+	m_latchB = data;
 }
 
-static WRITE8_DEVICE_HANDLER( p0c_w )
+WRITE8_MEMBER(taxidriv_state::p0c_w)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	state->m_s2 = data & 1;
+	m_s2 = data & 1;
 
-	state->m_bghide = data & 2;
+	m_bghide = data & 2;
 
 	/* bit 2 toggles during gameplay */
 
-	state->flip_screen_set(data & 8);
+	flip_screen_set(data & 8);
 
 //  popmessage("%02x",data&0x0f);
 }
 
-static READ8_DEVICE_HANDLER( p1b_r )
+READ8_MEMBER(taxidriv_state::p1b_r)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return state->m_latchB;
+	return m_latchB;
 }
 
-static READ8_DEVICE_HANDLER( p1c_r )
+READ8_MEMBER(taxidriv_state::p1c_r)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return (state->m_s2 << 7) | (state->m_s4 << 6) | ((state->ioport("SERVCOIN")->read() & 1) << 4);
+	return (m_s2 << 7) | (m_s4 << 6) | ((ioport("SERVCOIN")->read() & 1) << 4);
 }
 
-static WRITE8_DEVICE_HANDLER( p1a_w )
+WRITE8_MEMBER(taxidriv_state::p1a_w)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	state->m_latchA = data;
+	m_latchA = data;
 }
 
-static WRITE8_DEVICE_HANDLER( p1c_w )
+WRITE8_MEMBER(taxidriv_state::p1c_w)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	state->m_s1 = data & 1;
-	state->m_s3 = (data & 2) >> 1;
+	m_s1 = data & 1;
+	m_s3 = (data & 2) >> 1;
 }
 
-static READ8_DEVICE_HANDLER( p8910_0a_r )
+READ8_MEMBER(taxidriv_state::p8910_0a_r)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return state->m_latchA;
+	return m_latchA;
 }
 
-static READ8_DEVICE_HANDLER( p8910_1a_r )
+READ8_MEMBER(taxidriv_state::p8910_1a_r)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return state->m_s3;
+	return m_s3;
 }
 
 /* note that a lot of writes happen with port B set as input. I think this is a bug in the
    original, since it works anyway even if the communication is flawed. */
-static WRITE8_DEVICE_HANDLER( p8910_0b_w )
+WRITE8_MEMBER(taxidriv_state::p8910_0b_w)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	state->m_s4 = data & 1;
+	m_s4 = data & 1;
 }
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_HANDLER(p0a_r),				/* Port A read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0a_r),				/* Port A read */
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(p0b_w),				/* Port B write */
-	DEVCB_HANDLER(p0c_r),				/* Port C read */
-	DEVCB_HANDLER(p0c_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0b_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_r),				/* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(p1a_w),				/* Port A write */
-	DEVCB_HANDLER(p1b_r),				/* Port B read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1a_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1b_r),				/* Port B read */
 	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(p1c_r),				/* Port C read */
-	DEVCB_HANDLER(p1c_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_r),				/* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_2_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(p2a_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p2a_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(p2b_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p2b_w),				/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(p2c_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p2c_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_3_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(p3a_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p3a_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(p3b_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p3b_w),				/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(p3c_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p3c_w)				/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_4_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(p4a_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p4a_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(p4b_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p4b_w),				/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(p4c_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p4c_w)				/* Port C write */
 };
 
 
@@ -357,17 +346,17 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(p8910_0a_r),
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p8910_0a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(p8910_0b_w)
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p8910_0b_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(p8910_1a_r),
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p8910_1a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

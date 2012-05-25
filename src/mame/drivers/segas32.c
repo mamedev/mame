@@ -1141,15 +1141,17 @@ WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( multipcm_bank_w )
+WRITE8_MEMBER(segas32_state::multipcm_bank_w)
 {
+	device_t *device = machine().device("sega");
 	multipcm_set_bank(device, 0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
 }
 
 
-static WRITE8_DEVICE_HANDLER( scross_bank_w )
+WRITE8_MEMBER(segas32_state::scross_bank_w)
 {
-	multipcm_set_bank(device, 0x80000 * (data & 7), 0x80000 * (data & 7));
+	multipcm_device *multipcm = machine().device<multipcm_device>("sega");
+	multipcm_set_bank(multipcm, 0x80000 * (data & 7), 0x80000 * (data & 7));
 }
 
 
@@ -1260,7 +1262,7 @@ static ADDRESS_MAP_START( multi32_sound_portmap, AS_IO, 8, segas32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
-	AM_RANGE(0xb0, 0xbf) AM_DEVWRITE_LEGACY("sega", multipcm_bank_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(multipcm_bank_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x04) AM_WRITE(sound_int_control_hi_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(sound_dummy_r, sound_dummy_w)
@@ -4215,9 +4217,8 @@ static DRIVER_INIT( radr )
 static DRIVER_INIT( scross )
 {
 	segas32_state *state = machine.driver_data<segas32_state>();
-	multipcm_device *multipcm = machine.device<multipcm_device>("sega");
 	segas32_common_init(machine, read16_delegate(FUNC(segas32_state::analog_custom_io_r),state), write16_delegate(FUNC(segas32_state::analog_custom_io_w),state));
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*multipcm, 0xb0, 0xbf, FUNC(scross_bank_w));
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),state));
 
 	state->m_sw1_output = scross_sw1_output;
 	state->m_sw2_output = scross_sw2_output;

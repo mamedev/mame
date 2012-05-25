@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spacfury1_sh_w);
 	DECLARE_WRITE8_MEMBER(spacfury2_sh_w);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	DECLARE_WRITE8_MEMBER(usb_ram_w);
 };
 
 

@@ -48,8 +48,9 @@ Year + Game         PCB             Notes
                                 Burglar X
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( burglarx_sound_bank_w )
+WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;
@@ -69,7 +70,7 @@ static ADDRESS_MAP_START( burglarx_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_write_port_w, 0xff00			)	//
 	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
-	AM_RANGE(0x80018e, 0x80018f) AM_DEVWRITE_LEGACY("oki", burglarx_sound_bank_w)					//
+	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(burglarx_sound_bank_w)					//
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP												// IRQ Ack
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_SHARE("vram")		// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM														// ? 0
@@ -196,10 +197,11 @@ WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
 	}
 }
 
-static WRITE32_DEVICE_HANDLER( zeropnt2_eeprom_w )
+WRITE32_MEMBER(unico_state::zeropnt2_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (data & ~0xfe00000)
-		logerror("%s - Unknown EEPROM bit written %04X\n",device->machine().describe_context(),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
@@ -232,7 +234,7 @@ static ADDRESS_MAP_START( zeropnt2_map, AS_PROGRAM, 32, unico_state )
 	AM_RANGE(0x800154, 0x800157) AM_READ_PORT("DSW2")
 	AM_RANGE(0x80015c, 0x80015f) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x8001e0, 0x8001e3) AM_WRITENOP									// ? IRQ Ack
-	AM_RANGE(0x8001f0, 0x8001f3) AM_DEVWRITE_LEGACY("eeprom", zeropnt2_eeprom_w)					// EEPROM
+	AM_RANGE(0x8001f0, 0x8001f3) AM_WRITE(zeropnt2_eeprom_w)					// EEPROM
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram32_w) AM_SHARE("vram32")	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM											// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_SHARE("spriteram")	// Sprites

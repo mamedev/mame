@@ -391,24 +391,22 @@ GFXDECODE_END
 
 
 
-static WRITE8_DEVICE_HANDLER( popeye_portB_w )
+WRITE8_MEMBER(popeye_state::popeye_portB_w)
 {
-	popeye_state *state = device->machine().driver_data<popeye_state>();
 	/* bit 0 flips screen */
-	state->flip_screen_set(data & 1);
+	flip_screen_set(data & 1);
 
 	/* bits 1-3 select DSW1 bit to read */
-	state->m_dswbit = (data & 0x0e) >> 1;
+	m_dswbit = (data & 0x0e) >> 1;
 }
 
-static READ8_DEVICE_HANDLER( popeye_portA_r )
+READ8_MEMBER(popeye_state::popeye_portA_r)
 {
-	popeye_state *state = device->machine().driver_data<popeye_state>();
 	int res;
 
 
-	res = state->ioport("DSW0")->read();
-	res |= (state->ioport("DSW1")->read() << (7-state->m_dswbit)) & 0x80;
+	res = ioport("DSW0")->read();
+	res |= (ioport("DSW1")->read() << (7-m_dswbit)) & 0x80;
 
 	return res;
 }
@@ -417,10 +415,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(popeye_portA_r),
+	DEVCB_DRIVER_MEMBER(popeye_state,popeye_portA_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(popeye_portB_w)
+	DEVCB_DRIVER_MEMBER(popeye_state,popeye_portB_w)
 };
 
 

@@ -39,6 +39,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bagman_videoram_w);
 	DECLARE_WRITE8_MEMBER(bagman_colorram_w);
 	DECLARE_WRITE8_MEMBER(bagman_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(bagman_ls259_w);
+	DECLARE_READ8_MEMBER(dial_input_p1_r);
+	DECLARE_READ8_MEMBER(dial_input_p2_r);
 };
 
 

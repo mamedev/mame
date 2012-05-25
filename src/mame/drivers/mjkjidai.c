@@ -105,8 +105,9 @@ static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int le
 	state->m_playing = 1;
 }
 
-static WRITE8_DEVICE_HANDLER( adpcm_w )
+WRITE8_MEMBER(mjkjidai_state::adpcm_w)
 {
+	device_t *device = machine().device("adpcm");
 	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 	mjkjidai_adpcm_play (state, (data & 0x07) * 0x1000, 0x1000 * 2);
 }
@@ -190,7 +191,7 @@ static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x30, 0x30) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("adpcm", adpcm_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
 ADDRESS_MAP_END
 
 

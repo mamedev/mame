@@ -156,18 +156,20 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
  *
  *************************************/
 
-static READ32_DEVICE_HANDLER( zeus2_timekeeper_r )
+READ32_MEMBER(midzeus_state::zeus2_timekeeper_r)
 {
+	device_t *device = machine().device("m48t35");
 	return timekeeper_r(device, offset) | 0xffffff00;
 }
 
 
-static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
+WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 {
+	device_t *device = machine().device("m48t35");
 	if (bitlatch[2] && !cmos_protected)
 		timekeeper_w(device, offset, data);
 	else
-		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", device->machine().describe_context(), bitlatch[2], cmos_protected);
+		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
@@ -587,7 +589,7 @@ static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus_state )
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE_LEGACY("m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(zeus2_timekeeper_r, zeus2_timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank1") AM_REGION("user2", 0)

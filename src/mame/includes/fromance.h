@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fromance_scroll_w);
 	DECLARE_WRITE8_MEMBER(fromance_crtc_data_w);
 	DECLARE_WRITE8_MEMBER(fromance_crtc_register_w);
+	DECLARE_WRITE8_MEMBER(fromance_adpcm_reset_w);
 };
 
 

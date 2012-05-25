@@ -21,19 +21,19 @@ static INTERRUPT_GEN( starshp1_interrupt )
 }
 
 
-static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
+WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
 {
-	starshp1_state *state = device->machine().driver_data<starshp1_state>();
+	device_t *device = machine().device("discrete");
 	data &= 1;
 
 	switch (offset & 7)
 	{
 	case 0:
-		state->m_attract = data;
+		m_attract = data;
 		discrete_sound_w(device, STARSHP1_ATTRACT, data);
 		break;
 	case 1:
-		state->m_phasor = data;
+		m_phasor = data;
 		discrete_sound_w(device, STARSHP1_PHASOR_ON, data);
 		break;
 	case 2:
@@ -53,8 +53,8 @@ static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 		break;
 	}
 
-	coin_lockout_w(device->machine(), 0, !state->m_attract);
-	coin_lockout_w(device->machine(), 1, !state->m_attract);
+	coin_lockout_w(machine(), 0, !m_attract);
+	coin_lockout_w(machine(), 1, !m_attract);
 }
 
 
@@ -100,13 +100,13 @@ WRITE8_MEMBER(starshp1_state::starshp1_analog_in_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
+WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
 {
-	starshp1_state *state = device->machine().driver_data<starshp1_state>();
+	device_t *device = machine().device("discrete");
 	switch (offset & 7)
 	{
 	case 1:
-		state->m_ship_size = data;
+		m_ship_size = data;
 		break;
 	case 2:
 		discrete_sound_w(device, STARSHP1_NOISE_AMPLITUDE, data);
@@ -118,13 +118,13 @@ static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 		discrete_sound_w(device, STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
-		state->m_circle_hpos = data;
+		m_circle_hpos = data;
 		break;
 	case 6:
-		state->m_circle_vpos = data;
+		m_circle_vpos = data;
 		break;
 	case 7:
-		state->m_circle_size = data;
+		m_circle_size = data;
 		break;
 	}
 }
@@ -180,8 +180,8 @@ static ADDRESS_MAP_START( starshp1_map, AS_PROGRAM, 8, starshp1_state )
 	AM_RANGE(0xd800, 0xd80f) AM_WRITE(starshp1_collision_reset_w)
 	AM_RANGE(0xdc00, 0xdc0f) AM_WRITE(starshp1_misc_w)
 	AM_RANGE(0xdd00, 0xdd0f) AM_WRITE(starshp1_analog_in_w)
-	AM_RANGE(0xde00, 0xde0f) AM_DEVWRITE_LEGACY("discrete", starshp1_audio_w)
-	AM_RANGE(0xdf00, 0xdf0f) AM_DEVWRITE_LEGACY("discrete", starshp1_analog_out_w)
+	AM_RANGE(0xde00, 0xde0f) AM_WRITE(starshp1_audio_w)
+	AM_RANGE(0xdf00, 0xdf0f) AM_WRITE(starshp1_analog_out_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

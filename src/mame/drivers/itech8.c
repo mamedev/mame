@@ -525,7 +525,7 @@
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( pia_porta_out );
+
 
 
 static const pia6821_interface pia_interface =
@@ -536,7 +536,7 @@ static const pia6821_interface pia_interface =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(pia_porta_out),		/* port A out */
+	DEVCB_DRIVER_MEMBER(itech8_state,pia_porta_out),		/* port A out */
 	DEVCB_DRIVER_MEMBER(itech8_state, pia_portb_out),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
@@ -738,11 +738,10 @@ CUSTOM_INPUT_MEMBER(itech8_state::special_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( pia_porta_out )
+WRITE8_MEMBER(itech8_state::pia_porta_out)
 {
-	itech8_state *state = device->machine().driver_data<itech8_state>();
 	logerror("PIA port A write = %02x\n", data);
-	state->m_pia_porta_data = data;
+	m_pia_porta_data = data;
 }
 
 
@@ -760,18 +759,17 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 }
 
 
-static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
+WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 {
-	itech8_state *state = device->machine().driver_data<itech8_state>();
 	logerror("YM2203 port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
-	state->m_pia_portb_data = data;
-	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, data & 0x80);
-	coin_counter_w(device->machine(), 0, (data & 0x20) >> 5);
+	m_pia_portb_data = data;
+	machine().device<ticket_dispenser_device>("ticket")->write(*machine().memory().first_space(), 0, data & 0x80);
+	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
 
@@ -1648,7 +1646,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(ym2203_portb_out)
+		DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out)
 	},
 	generate_sound_irq
 };
@@ -1662,7 +1660,7 @@ static const ym2608_interface ym2608b_config =
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(ym2203_portb_out),
+		DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
 	},
 	generate_sound_irq
 };

@@ -43,16 +43,15 @@ WRITE8_MEMBER(crimfght_state::crimfght_sh_irqtrigger_w)
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
+WRITE8_MEMBER(crimfght_state::crimfght_snd_bankswitch_w)
 {
 	/* b1: bank for channel A */
 	/* b0: bank for channel B */
 
-	crimfght_state *state = device->machine().driver_data<crimfght_state>();
 	int bank_A = BIT(data, 1);
 	int bank_B = BIT(data, 0);
 
-	k007232_set_bank(state->m_k007232, bank_A, bank_B );
+	k007232_set_bank(m_k007232, bank_A, bank_B );
 }
 
 READ8_MEMBER(crimfght_state::k052109_051960_r)
@@ -228,7 +227,7 @@ INPUT_PORTS_END
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(crimfght_snd_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(crimfght_state,crimfght_snd_bankswitch_w)
 };
 
 static void volume_callback( device_t *device, int v )

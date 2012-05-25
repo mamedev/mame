@@ -371,8 +371,9 @@ static ADDRESS_MAP_START( m92_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(m92_sound_reset_w)
 ADDRESS_MAP_END
 
-static WRITE16_DEVICE_HANDLER( oki_bank_w )
+WRITE16_MEMBER(m92_state::oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data+1) & 0x3)); // +1?
 }
 
@@ -382,7 +383,7 @@ static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x08, 0x09) AM_READ(m92_sound_status_r)	/* answer from sound CPU */
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
+	AM_RANGE(0x10, 0x11) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */

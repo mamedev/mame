@@ -26,6 +26,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cabal_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(cabal_background_videoram16_w);
 	DECLARE_WRITE16_MEMBER(cabal_text_videoram16_w);
+	DECLARE_WRITE8_MEMBER(cabalbl_1_adpcm_w);
+	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
 };
 
 

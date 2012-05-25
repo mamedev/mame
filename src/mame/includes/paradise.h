@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(paradise_vram_2_w);
 	DECLARE_WRITE8_MEMBER(paradise_pixmap_w);
 	DECLARE_WRITE8_MEMBER(paradise_priority_w);
+	DECLARE_WRITE8_MEMBER(paradise_okibank_w);
 };
 
 /*----------- defined in video/paradise.c -----------*/

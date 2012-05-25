@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_port_p_w);
 	DECLARE_WRITE8_MEMBER(arabian_blitter_w);
 	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
+	DECLARE_WRITE8_MEMBER(ay8910_porta_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 };
 
 

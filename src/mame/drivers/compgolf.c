@@ -22,16 +22,14 @@
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( compgolf_scrollx_lo_w )
+WRITE8_MEMBER(compgolf_state::compgolf_scrollx_lo_w)
 {
-	compgolf_state *state = device->machine().driver_data<compgolf_state>();
-	state->m_scrollx_lo = data;
+	m_scrollx_lo = data;
 }
 
-static WRITE8_DEVICE_HANDLER( compgolf_scrolly_lo_w )
+WRITE8_MEMBER(compgolf_state::compgolf_scrolly_lo_w)
 {
-	compgolf_state *state = device->machine().driver_data<compgolf_state>();
-	state->m_scrolly_lo = data;
+	m_scrolly_lo = data;
 }
 
 WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
@@ -212,8 +210,8 @@ static const ym2203_interface ym2203_config =
 			AY8910_DEFAULT_LOADS,
 			DEVCB_NULL,
 			DEVCB_NULL,
-			DEVCB_HANDLER(compgolf_scrollx_lo_w),
-			DEVCB_HANDLER(compgolf_scrolly_lo_w),
+			DEVCB_DRIVER_MEMBER(compgolf_state,compgolf_scrollx_lo_w),
+			DEVCB_DRIVER_MEMBER(compgolf_state,compgolf_scrolly_lo_w),
 	},
 	sound_irq
 };

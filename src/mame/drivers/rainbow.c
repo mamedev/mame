@@ -395,9 +395,9 @@ ADDRESS_MAP_END
               Jumping uses two YM2203's
 ***********************************************************/
 
-static WRITE8_DEVICE_HANDLER( bankswitch_w )
+WRITE8_MEMBER(rbisland_state::bankswitch_w)
 {
-	device->machine().root_device().membank("bank1")->set_entry(data & 3);
+	machine().root_device().membank("bank1")->set_entry(data & 3);
 }
 
 READ8_MEMBER(rbisland_state::jumping_latch_r)
@@ -632,7 +632,7 @@ static void irqhandler( device_t *device, int irq )
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(irqhandler),
-	DEVCB_HANDLER(bankswitch_w)
+	DEVCB_DRIVER_MEMBER(rbisland_state,bankswitch_w)
 };
 
 

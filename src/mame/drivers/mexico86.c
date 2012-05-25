@@ -63,8 +63,9 @@ PS4  J8635      PS4  J8541       PS4  J8648
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( kiki_ym2203_r )
+READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 {
+	device_t *device = machine().device("ymsnd");
 	UINT8 result = ym2203_r(device, offset);
 
 	if (offset == 0)
@@ -99,7 +100,7 @@ static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", kiki_ym2203_r,ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_READ(kiki_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )

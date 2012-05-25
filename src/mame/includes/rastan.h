@@ -28,6 +28,9 @@ public:
 	device_t *m_pc080sn;
 	DECLARE_WRITE8_MEMBER(rastan_msm5205_address_w);
 	DECLARE_WRITE16_MEMBER(rastan_spritectrl_w);
+	DECLARE_WRITE8_MEMBER(rastan_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(rastan_msm5205_start_w);
+	DECLARE_WRITE8_MEMBER(rastan_msm5205_stop_w);
 };
 
 

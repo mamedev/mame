@@ -301,11 +301,10 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static WRITE8_DEVICE_HANDLER( speedatk_output_w )
+WRITE8_MEMBER(speedatk_state::speedatk_output_w)
 {
-	speedatk_state *state = device->machine().driver_data<speedatk_state>();
 
-	state->m_flip_scr = data & 0x80;
+	m_flip_scr = data & 0x80;
 
 	if((data & 0x7f) != 0x7f)
 		logerror("%02x\n",data);
@@ -317,7 +316,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_HANDLER(speedatk_output_w),
+	DEVCB_DRIVER_MEMBER(speedatk_state,speedatk_output_w),
 	DEVCB_NULL
 };
 

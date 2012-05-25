@@ -80,6 +80,11 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_nmi_disable);
 	DECLARE_WRITE8_MEMBER(adpcm_nmi_enable);
 	DECLARE_WRITE16_MEMBER(darius_fg_layer_w);
+	DECLARE_WRITE8_MEMBER(darius_write_portA0);
+	DECLARE_WRITE8_MEMBER(darius_write_portA1);
+	DECLARE_WRITE8_MEMBER(darius_write_portB0);
+	DECLARE_WRITE8_MEMBER(darius_write_portB1);
+	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 };
 
 

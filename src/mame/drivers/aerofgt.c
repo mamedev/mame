@@ -111,15 +111,17 @@ WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
 }
 
 
-static WRITE16_DEVICE_HANDLER( pspikesb_oki_banking_w )
+WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
 {
+	device_t *device = machine().device("oki");
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base(0x40000 * (data & 3));
 }
 
 /*TODO: sound banking. */
-static WRITE16_DEVICE_HANDLER( aerfboo2_okim6295_banking_w )
+WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
 {
+//  device_t *device = machine().device("oki");
 //  if(ACCESSING_BITS_8_15)
 //  {
 //      okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -163,7 +165,7 @@ static ADDRESS_MAP_START( pspikesb_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE_LEGACY("oki", pspikesb_oki_banking_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(pspikesb_oki_banking_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spikes91_map, AS_PROGRAM, 16, aerofgt_state )
@@ -352,7 +354,7 @@ static ADDRESS_MAP_START( aerfboo2_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
 	AM_RANGE(0x0fe006, 0x0fe007) AM_DEVREAD8("oki", okim6295_device, read, 0xff00)
 	AM_RANGE(0x0fe00e, 0x0fe00f) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
-	AM_RANGE(0x0fe01e, 0x0fe01f) AM_DEVWRITE_LEGACY("oki", aerfboo2_okim6295_banking_w)
+	AM_RANGE(0x0fe01e, 0x0fe01f) AM_WRITE(aerfboo2_okim6295_banking_w)
 //  AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
 //  AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
 	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP // data for a crtc?

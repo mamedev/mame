@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE16_MEMBER(rpunch_crtc_register_w);
 	DECLARE_WRITE16_MEMBER(rpunch_ins_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
+	DECLARE_WRITE8_MEMBER(upd_control_w);
+	DECLARE_WRITE8_MEMBER(upd_data_w);
 };
 
 

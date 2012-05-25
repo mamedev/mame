@@ -49,6 +49,13 @@ public:
 	DECLARE_WRITE16_MEMBER(lordgun_vram_1_w);
 	DECLARE_WRITE16_MEMBER(lordgun_vram_2_w);
 	DECLARE_WRITE16_MEMBER(lordgun_vram_3_w);
+	DECLARE_WRITE8_MEMBER(fake_w);
+	DECLARE_WRITE8_MEMBER(fake2_w);
+	DECLARE_WRITE8_MEMBER(lordgun_eeprom_w);
+	DECLARE_WRITE8_MEMBER(aliencha_eeprom_w);
+	DECLARE_READ8_MEMBER(aliencha_dip_r);
+	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
+	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
 };
 
 

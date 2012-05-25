@@ -93,6 +93,7 @@ public:
 	DECLARE_READ8_MEMBER(nycaptor_gfxctrl_r);
 	DECLARE_READ8_MEMBER(nycaptor_scrlram_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
+	DECLARE_WRITE8_MEMBER(unk_w);
 };
 
 

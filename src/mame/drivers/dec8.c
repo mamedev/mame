@@ -493,8 +493,9 @@ static void csilver_adpcm_int( device_t *device )
 	state->m_msm5205next <<= 4;
 }
 
-static READ8_DEVICE_HANDLER( csilver_adpcm_reset_r )
+READ8_MEMBER(dec8_state::csilver_adpcm_reset_r)
 {
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, 0);
 	return 0;
 }
@@ -903,7 +904,7 @@ static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x3400, 0x3400) AM_DEVREAD_LEGACY("msm", csilver_adpcm_reset_r)	/* ? not sure */
+	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r)	/* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

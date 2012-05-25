@@ -312,19 +312,19 @@ GFXDECODE_END
 
 
 
-static WRITE8_DEVICE_HANDLER( port_a_0_w )
+WRITE8_MEMBER(buggychl_state::port_a_0_w)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-static WRITE8_DEVICE_HANDLER( port_b_0_w )
+WRITE8_MEMBER(buggychl_state::port_b_0_w)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
-static WRITE8_DEVICE_HANDLER( port_a_1_w )
+WRITE8_MEMBER(buggychl_state::port_a_1_w)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-static WRITE8_DEVICE_HANDLER( port_b_1_w )
+WRITE8_MEMBER(buggychl_state::port_b_1_w)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
@@ -336,8 +336,8 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(port_a_0_w),
-	DEVCB_HANDLER(port_b_0_w)
+	DEVCB_DRIVER_MEMBER(buggychl_state,port_a_0_w),
+	DEVCB_DRIVER_MEMBER(buggychl_state,port_b_0_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
@@ -346,8 +346,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(port_a_1_w),
-	DEVCB_HANDLER(port_b_1_w)
+	DEVCB_DRIVER_MEMBER(buggychl_state,port_a_1_w),
+	DEVCB_DRIVER_MEMBER(buggychl_state,port_b_1_w)
 };
 
 static const msm5232_interface msm5232_config =

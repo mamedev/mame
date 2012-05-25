@@ -455,14 +455,16 @@ WRITE32_MEMBER(dragngun_state::dragngun_lightgun_w)
 	m_dragngun_lightgun_port=offset;
 }
 
-static READ32_DEVICE_HANDLER( dragngun_eeprom_r )
+READ32_MEMBER(deco32_state::dragngun_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return 0xfffffffe | eeprom->read_bit();
 }
 
-static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
+WRITE32_MEMBER(deco32_state::dragngun_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7) {
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
 		eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
@@ -470,7 +472,7 @@ static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 		eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
-	logerror("%s:Write control 1 %08x %08x\n",device->machine().describe_context(),offset,data);
+	logerror("%s:Write control 1 %08x %08x\n",machine().describe_context(),offset,data);
 }
 
 /**********************************************************************************/
@@ -857,7 +859,7 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
-	AM_RANGE(0x420000, 0x420003) AM_DEVREADWRITE_LEGACY("eeprom", dragngun_eeprom_r, dragngun_eeprom_w)
+	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
 	AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
 	AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
@@ -904,7 +906,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x420000, 0x420003) AM_DEVREADWRITE_LEGACY("eeprom", dragngun_eeprom_r, dragngun_eeprom_w)
+	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
@@ -1626,10 +1628,10 @@ static void sound_irq_nslasher(device_t *device, int state)
 	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 {
-	okim6295_device *oki1 = device->machine().device<okim6295_device>("oki1");
-	okim6295_device *oki2 = device->machine().device<okim6295_device>("oki2");
+	okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
+	okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
 	oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
 	oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
 }
@@ -1637,13 +1639,13 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(sound_irq),
-	DEVCB_HANDLER(sound_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(deco32_state,sound_bankswitch_w)
 };
 
 static const ym2151_interface ym2151_interface_nslasher =
 {
 	DEVCB_LINE(sound_irq_nslasher),
-	DEVCB_HANDLER(sound_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(deco32_state,sound_bankswitch_w)
 };
 
 static const eeprom_interface eeprom_interface_tattass =

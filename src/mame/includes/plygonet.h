@@ -64,6 +64,7 @@ public:
 	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
 	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
 	DIRECT_UPDATE_MEMBER(plygonet_dsp56k_direct_handler);
+	DECLARE_READ32_MEMBER(polygonet_eeprom_r);
 };
 
 /*----------- defined in video/plygonet.c -----------*/

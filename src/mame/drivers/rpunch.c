@@ -193,21 +193,22 @@ READ16_MEMBER(rpunch_state::sound_busy_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( upd_control_w )
+WRITE8_MEMBER(rpunch_state::upd_control_w)
 {
-	rpunch_state *state = device->machine().driver_data<rpunch_state>();
-	if ((data & 1) != state->m_upd_rom_bank)
+	device_t *device = machine().device("upd");
+	if ((data & 1) != m_upd_rom_bank)
 	{
-		UINT8 *snd = state->memregion("upd")->base();
-		state->m_upd_rom_bank = data & 1;
-		memcpy(snd, snd + 0x20000 * (state->m_upd_rom_bank + 1), 0x20000);
+		UINT8 *snd = memregion("upd")->base();
+		m_upd_rom_bank = data & 1;
+		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
 	upd7759_reset_w(device, data >> 7);
 }
 
 
-static WRITE8_DEVICE_HANDLER( upd_data_w )
+WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_port_w(device, 0, data);
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
@@ -253,8 +254,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("upd", upd_control_w)
-	AM_RANGE(0xf600, 0xf600) AM_DEVWRITE_LEGACY("upd", upd_data_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(upd_control_w)
+	AM_RANGE(0xf600, 0xf600) AM_WRITE(upd_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

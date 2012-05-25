@@ -172,14 +172,16 @@ ADDRESS_MAP_END
                         Mobile Suit Gundam EX Revue
 ***************************************************************************/
 
-static READ16_DEVICE_HANDLER( gundamex_eeprom_r )
+READ16_MEMBER(seta2_state::gundamex_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return ((eeprom->read_bit() & 1)) << 3;
 }
 
-static WRITE16_DEVICE_HANDLER( gundamex_eeprom_w )
+WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 	eeprom->write_bit(data & 0x1);
@@ -205,7 +207,7 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE_LEGACY("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
+	AM_RANGE(0xfffd0a, 0xfffd0b) AM_READWRITE(gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -583,12 +585,14 @@ READ32_MEMBER(seta2_state::funcube_debug_r)
 	return ret;
 }
 
-static READ32_DEVICE_HANDLER( oki_read )
+READ32_MEMBER(seta2_state::oki_read)
 {
+	device_t *device = machine().device("oki");
 	return downcast<okim9810_device *>(device)->read_status() << 16;
 }
-static WRITE32_DEVICE_HANDLER( oki_write )
+WRITE32_MEMBER(seta2_state::oki_write)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
         const UINT8 tmp = (data & 0x000000ff);
@@ -609,7 +613,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ(funcube_debug_r )
 	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ(watchdog_reset32_r ) AM_WRITENOP
 
-	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVREADWRITE_LEGACY("oki", oki_read, oki_write)
+	AM_RANGE( 0x00600000, 0x00600003 ) AM_READWRITE(oki_read, oki_write)
 
 	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_SHARE("spriteram")
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_dword_be_w) AM_SHARE("paletteram")

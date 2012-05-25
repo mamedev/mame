@@ -188,9 +188,10 @@ DEVICE_GET_INFO( renegade_adpcm )
 DEFINE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 
 
-static WRITE8_DEVICE_HANDLER( adpcm_play_w )
+WRITE8_MEMBER(renegade_state::adpcm_play_w)
 {
-	renegade_adpcm_state *state = get_safe_token(device);
+	device_t *device = machine().device("adpcm");
+	renegade_adpcm_state *renstate = get_safe_token(device);
 	int offs = (data - 0x2c) * 0x2000;
 	int len = 0x2000 * 2;
 
@@ -200,13 +201,13 @@ static WRITE8_DEVICE_HANDLER( adpcm_play_w )
 
 	if (offs >= 0 && offs+len <= 0x20000)
 	{
-		state->m_stream->update();
-		state->m_adpcm.reset();
+		renstate->m_stream->update();
+		renstate->m_adpcm.reset();
 
-		state->m_current = offs;
-		state->m_end = offs + len/2;
-		state->m_nibble = 4;
-		state->m_playing = 1;
+		renstate->m_current = offs;
+		renstate->m_end = offs + len/2;
+		renstate->m_nibble = 4;
+		renstate->m_playing = 1;
 	}
 	else
 		logerror("out of range adpcm command: 0x%02x\n", data);
@@ -665,7 +666,7 @@ static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("adpcm", adpcm_play_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r,ym3526_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM

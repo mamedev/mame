@@ -21,6 +21,7 @@ public:
 	int      m_counter;
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(epos_port_1_w);
+	DECLARE_WRITE8_MEMBER(write_prtc);
 };
 
 

@@ -79,6 +79,11 @@ public:
 	DECLARE_READ8_MEMBER(fortyl_bg_videoram_r);
 	DECLARE_WRITE8_MEMBER(fortyl_bg_colorram_w);
 	DECLARE_READ8_MEMBER(fortyl_bg_colorram_r);
+	DECLARE_WRITE8_MEMBER(pix1_mcu_w);
+	DECLARE_WRITE8_MEMBER(sound_control_0_w);
+	DECLARE_WRITE8_MEMBER(sound_control_1_w);
+	DECLARE_WRITE8_MEMBER(sound_control_2_w);
+	DECLARE_WRITE8_MEMBER(sound_control_3_w);
 };
 
 

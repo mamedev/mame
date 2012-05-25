@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
 	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
 	DECLARE_WRITE16_MEMBER(rshark_ctrl_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 

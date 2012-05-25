@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 

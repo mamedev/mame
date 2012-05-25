@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrolly_w);
 	DECLARE_WRITE16_MEMBER(pspikes_palette_bank_w);
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
+	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
+	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
 };
 
 

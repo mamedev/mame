@@ -35,6 +35,11 @@ public:
 	DECLARE_WRITE8_MEMBER(kncljoe_videoram_w);
 	DECLARE_WRITE8_MEMBER(kncljoe_control_w);
 	DECLARE_WRITE8_MEMBER(kncljoe_scroll_w);
+	DECLARE_WRITE8_MEMBER(m6803_port1_w);
+	DECLARE_WRITE8_MEMBER(m6803_port2_w);
+	DECLARE_READ8_MEMBER(m6803_port1_r);
+	DECLARE_READ8_MEMBER(m6803_port2_r);
+	DECLARE_WRITE8_MEMBER(unused_w);
 };
 
 

@@ -162,32 +162,29 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 /* Emulate MSM sound samples with counters */
 
 
-static READ8_DEVICE_HANDLER( tehkanwc_portA_r )
+READ8_MEMBER(tehkanwc_state::tehkanwc_portA_r)
 {
-	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
-	return state->m_msm_data_offs & 0xff;
+	return m_msm_data_offs & 0xff;
 }
 
-static READ8_DEVICE_HANDLER( tehkanwc_portB_r )
+READ8_MEMBER(tehkanwc_state::tehkanwc_portB_r)
 {
-	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
-	return (state->m_msm_data_offs >> 8) & 0xff;
+	return (m_msm_data_offs >> 8) & 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( tehkanwc_portA_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_portA_w)
 {
-	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
-	state->m_msm_data_offs = (state->m_msm_data_offs & 0xff00) | data;
+	m_msm_data_offs = (m_msm_data_offs & 0xff00) | data;
 }
 
-static WRITE8_DEVICE_HANDLER( tehkanwc_portB_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_portB_w)
 {
-	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
-	state->m_msm_data_offs = (state->m_msm_data_offs & 0x00ff) | (data << 8);
+	m_msm_data_offs = (m_msm_data_offs & 0x00ff) | (data << 8);
 }
 
-static WRITE8_DEVICE_HANDLER( msm_reset_w )
+WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device,data ? 0 : 1);
 }
 
@@ -257,7 +254,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE_LEGACY("msm", msm_reset_w)/* MSM51xx reset */
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(msm_reset_w)/* MSM51xx reset */
 	AM_RANGE(0x8002, 0x8002) AM_WRITENOP	/* ?? written in the IRQ handler */
 	AM_RANGE(0x8003, 0x8003) AM_WRITENOP	/* ?? written in the NMI handler */
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_answer_w)
@@ -620,16 +617,16 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(tehkanwc_portA_w),
-	DEVCB_HANDLER(tehkanwc_portB_w)
+	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portA_w),
+	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portB_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(tehkanwc_portA_r),
-	DEVCB_HANDLER(tehkanwc_portB_r),
+	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portA_r),
+	DEVCB_DRIVER_MEMBER(tehkanwc_state,tehkanwc_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

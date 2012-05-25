@@ -27,6 +27,10 @@ public:
 	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_start_w);
 	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_clear_w);
 	DECLARE_WRITE8_MEMBER(hnayayoi_palbank_w);
+	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(adpcm_vclk_w);
+	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
+	DECLARE_WRITE8_MEMBER(adpcm_reset_inv_w);
 };
 
 

@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tecmo_fgscroll_w);
 	DECLARE_WRITE8_MEMBER(tecmo_bgscroll_w);
 	DECLARE_WRITE8_MEMBER(tecmo_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(tecmo_adpcm_start_w);
+	DECLARE_WRITE8_MEMBER(tecmo_adpcm_vol_w);
 };
 
 

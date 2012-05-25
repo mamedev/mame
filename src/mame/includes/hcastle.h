@@ -47,6 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(hcastle_gfxbank_r);
 	DECLARE_WRITE8_MEMBER(hcastle_pf1_control_w);
 	DECLARE_WRITE8_MEMBER(hcastle_pf2_control_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
 };
 
 

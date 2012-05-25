@@ -431,10 +431,10 @@ WRITE8_MEMBER(dynax_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-static WRITE8_DEVICE_HANDLER( adpcm_reset_w )
+WRITE8_MEMBER(dynax_state::adpcm_reset_w)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
-	state->m_resetkludge = data & 1;
+	device_t *device = machine().device("msm");
+	m_resetkludge = data & 1;
 	msm5205_reset_w(device, ~data & 1);
 }
 
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
 	AM_RANGE( 0x6d, 0x6d ) AM_WRITE(dynax_blit_palette23_w)	//
 	AM_RANGE( 0x6e, 0x6e ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
-	AM_RANGE( 0x70, 0x70 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x70, 0x70 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
 	AM_RANGE( 0x72, 0x72 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x73, 0x73 ) AM_WRITE(dynax_coincounter_1_w)	//
@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW1")			// DSW2
 	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT("DSW3")			// DSW4
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT("DSW2")			// DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)		// AY8910, DSW1
@@ -646,7 +646,7 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT("DSW3")			// DSW3
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT("DSW2")			// DSW2
 
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 
@@ -787,7 +787,7 @@ static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x00, 0x01 ) AM_WRITE(yarunara_input_w)		// Controls
 	AM_RANGE( 0x02, 0x03 ) AM_READ(yarunara_input_r)		//
 	AM_RANGE( 0x11, 0x17 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
-	AM_RANGE( 0x20, 0x20 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x20, 0x20 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x22, 0x22 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
@@ -826,7 +826,7 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x23, 0x23 ) AM_READ(hanamai_keyboard_0_r)		// P1
 	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW0")			// DSW2
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT("DSW1")			// DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
@@ -871,7 +871,7 @@ static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x35, 0x35 ) AM_WRITE(dynax_blit_palette23_w)	//
 	AM_RANGE( 0x36, 0x36 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x37, 0x37 ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
-//  AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)    // MSM5205 reset
+//  AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_reset_w)    // MSM5205 reset
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_coincounter_1_w)	//
@@ -909,7 +909,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
@@ -1035,7 +1035,7 @@ static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)			// AY8910
 	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)	//
 	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	//
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)		// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)		// MSM5205 reset
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_data_w)				// MSM5205 data
 	AM_RANGE( 0x50, 0x50 ) AM_READ(jantouki_soundlatch_status_r)	// Soundlatch status
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE(jantouki_soundlatch_ack_w)		// Soundlatch status
@@ -1068,7 +1068,7 @@ WRITE8_MEMBER(dynax_state::mjelctrn_blitter_ack_w)
 
 static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
@@ -1115,21 +1115,19 @@ WRITE8_MEMBER(dynax_state::htengoku_select_w)
 	m_keyb = 0;
 }
 
-static WRITE8_DEVICE_HANDLER( htengoku_dsw_w )
+WRITE8_MEMBER(dynax_state::htengoku_dsw_w)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
-	state->m_dsw_sel = data;
+	m_dsw_sel = data;
 }
 
-static READ8_DEVICE_HANDLER( htengoku_dsw_r )
+READ8_MEMBER(dynax_state::htengoku_dsw_r)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
-	if (!BIT(state->m_dsw_sel, 0))	return state->ioport("DSW0")->read();
-	if (!BIT(state->m_dsw_sel, 1))	return state->ioport("DSW1")->read();
-	if (!BIT(state->m_dsw_sel, 2))	return state->ioport("DSW2")->read();
-	if (!BIT(state->m_dsw_sel, 3))	return state->ioport("DSW3")->read();
-	if (!BIT(state->m_dsw_sel, 4))	return state->ioport("DSW4")->read();
-	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", device->machine().describe_context(), state->m_dsw_sel);
+	if (!BIT(m_dsw_sel, 0))	return ioport("DSW0")->read();
+	if (!BIT(m_dsw_sel, 1))	return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 2))	return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 3))	return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 4))	return ioport("DSW4")->read();
+	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", machine().describe_context(), m_dsw_sel);
 
 	return 0xff;
 }
@@ -1327,22 +1325,20 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( tenkai_dswsel_w )
+WRITE8_MEMBER(dynax_state::tenkai_dswsel_w)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
-	state->m_dsw_sel = data;
+	m_dsw_sel = data;
 }
 
-static READ8_DEVICE_HANDLER( tenkai_dsw_r )
+READ8_MEMBER(dynax_state::tenkai_dsw_r)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
 
-	if (!BIT(state->m_dsw_sel, 0)) return state->ioport("DSW0")->read();
-	if (!BIT(state->m_dsw_sel, 1)) return state->ioport("DSW1")->read();
-	if (!BIT(state->m_dsw_sel, 2)) return state->ioport("DSW2")->read();
-	if (!BIT(state->m_dsw_sel, 3)) return state->ioport("DSW3")->read();
-	if (!BIT(state->m_dsw_sel, 4)) return state->ioport("DSW4")->read();
-	logerror("%s: unmapped dsw %02x read\n", device->machine().describe_context(), state->m_dsw_sel);
+	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
+	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 2)) return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 3)) return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 4)) return ioport("DSW4")->read();
+	logerror("%s: unmapped dsw %02x read\n", machine().describe_context(), m_dsw_sel);
 
 	return 0xff;
 }
@@ -4818,8 +4814,8 @@ static const ay8910_interface htengoku_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	// A            B
-	DEVCB_HANDLER(htengoku_dsw_r),	DEVCB_NULL,							// R
-	DEVCB_NULL,						DEVCB_HANDLER(htengoku_dsw_w)		// W
+	DEVCB_DRIVER_MEMBER(dynax_state,htengoku_dsw_r),	DEVCB_NULL,							// R
+	DEVCB_NULL,						DEVCB_DRIVER_MEMBER(dynax_state,htengoku_dsw_w)		// W
 };
 
 static MSM6242_INTERFACE( htengoku_rtc_intf )
@@ -4891,8 +4887,8 @@ static const ay8910_interface tenkai_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	// A                // B
-	DEVCB_HANDLER(tenkai_dsw_r),	DEVCB_NULL,						// Read
-	DEVCB_NULL,						DEVCB_HANDLER(tenkai_dswsel_w)	// Write
+	DEVCB_DRIVER_MEMBER(dynax_state,tenkai_dsw_r),	DEVCB_NULL,						// Read
+	DEVCB_NULL,						DEVCB_DRIVER_MEMBER(dynax_state,tenkai_dswsel_w)	// Write
 };
 
 static MACHINE_START( tenkai )
@@ -4902,16 +4898,14 @@ static MACHINE_START( tenkai )
 	machine.save().register_postload(save_prepost_delegate(FUNC(tenkai_update_rombank), &machine));
 }
 
-static WRITE_LINE_DEVICE_HANDLER(tenkai_rtc_irq)
+WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
 {
-	dynax_state *drvstate = device->machine().driver_data<dynax_state>();
-
-	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
 }
 
 static MSM6242_INTERFACE( tenkai_rtc_intf )
 {
-	DEVCB_LINE(tenkai_rtc_irq)
+	DEVCB_DRIVER_LINE_MEMBER(dynax_state,tenkai_rtc_irq)
 };
 
 static MACHINE_CONFIG_START( tenkai, dynax_state )

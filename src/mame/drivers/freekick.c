@@ -494,31 +494,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( snd_rom_addr_l_w )
+WRITE8_MEMBER(freekick_state::snd_rom_addr_l_w)
 {
-	freekick_state *state = device->machine().driver_data<freekick_state>();
-	state->m_romaddr = (state->m_romaddr & 0xff00) | data;
+	m_romaddr = (m_romaddr & 0xff00) | data;
 }
 
-static WRITE8_DEVICE_HANDLER( snd_rom_addr_h_w )
+WRITE8_MEMBER(freekick_state::snd_rom_addr_h_w)
 {
-	freekick_state *state = device->machine().driver_data<freekick_state>();
-	state->m_romaddr = (state->m_romaddr & 0x00ff) | (data << 8);
+	m_romaddr = (m_romaddr & 0x00ff) | (data << 8);
 }
 
-static READ8_DEVICE_HANDLER( snd_rom_r )
+READ8_MEMBER(freekick_state::snd_rom_r)
 {
-	freekick_state *state = device->machine().driver_data<freekick_state>();
-	return state->memregion("user1")->base()[state->m_romaddr & 0x7fff];
+	return memregion("user1")->base()[m_romaddr & 0x7fff];
 }
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(snd_rom_addr_l_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(freekick_state,snd_rom_addr_l_w),	/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(snd_rom_addr_h_w),	/* Port B write */
-	DEVCB_HANDLER(snd_rom_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(freekick_state,snd_rom_addr_h_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(freekick_state,snd_rom_r),			/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 

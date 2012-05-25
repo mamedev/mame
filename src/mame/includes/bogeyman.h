@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bogeyman_videoram2_w);
 	DECLARE_WRITE8_MEMBER(bogeyman_colorram2_w);
 	DECLARE_WRITE8_MEMBER(bogeyman_paletteram_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_colbank_w);
 };
 
 

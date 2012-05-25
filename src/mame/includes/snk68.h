@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE16_MEMBER(pow_flipscreen16_w);
 	DECLARE_WRITE16_MEMBER(searchar_flipscreen16_w);
 	DECLARE_WRITE16_MEMBER(pow_paletteram16_word_w);
+	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
+	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
 };
 
 

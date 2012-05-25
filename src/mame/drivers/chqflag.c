@@ -24,7 +24,7 @@
 #include "chqflag.lh"
 
 
-static WRITE8_DEVICE_HANDLER( k007232_extvolume_w );
+
 
 static TIMER_DEVICE_CALLBACK( chqflag_scanline )
 {
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)	/* 007232 bankswitch */
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)	/* 007232 (chip 1) */
-	AM_RANGE(0xa01c, 0xa01c) AM_DEVWRITE_LEGACY("k007232_2", k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
+	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)	/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
@@ -275,8 +275,9 @@ static void volume_callback0( device_t *device, int v )
 	k007232_set_volume(device, 1, 0, (v >> 4) * 0x11);
 }
 
-static WRITE8_DEVICE_HANDLER( k007232_extvolume_w )
+WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 {
+	device_t *device = machine().device("k007232_2");
 	k007232_set_volume(device, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 

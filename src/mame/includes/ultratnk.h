@@ -31,6 +31,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ultratnk_video_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_joystick);
+	DECLARE_WRITE8_MEMBER(ultratnk_fire_1_w);
+	DECLARE_WRITE8_MEMBER(ultratnk_fire_2_w);
+	DECLARE_WRITE8_MEMBER(ultratnk_attract_w);
+	DECLARE_WRITE8_MEMBER(ultratnk_explosion_w);
 };
 
 

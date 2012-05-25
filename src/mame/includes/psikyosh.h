@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(psikyosh_vidregs_w);
 	DECLARE_READ32_MEMBER(mjgtaste_input_r);
+	DECLARE_WRITE32_MEMBER(psh_eeprom_w);
+	DECLARE_READ32_MEMBER(psh_eeprom_r);
 };
 
 /*----------- defined in video/psikyosh.c -----------*/

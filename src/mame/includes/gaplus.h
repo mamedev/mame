@@ -37,6 +37,8 @@ public:
 	DECLARE_READ8_MEMBER(gaplus_videoram_r);
 	DECLARE_WRITE8_MEMBER(gaplus_videoram_w);
 	DECLARE_WRITE8_MEMBER(gaplus_starfield_control_w);
+	DECLARE_WRITE8_MEMBER(out_lamps0);
+	DECLARE_WRITE8_MEMBER(out_lamps1);
 };
 
 

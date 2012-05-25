@@ -692,9 +692,8 @@ READ8_MEMBER(itech32_state::sound_data_buffer_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
+WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 {
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 controls the fan light */
@@ -703,30 +702,29 @@ static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	set_led_status(space->machine(), 1, data & 0x01);
-	set_led_status(space->machine(), 2, data & 0x02);
-	set_led_status(space->machine(), 3, data & 0x04);
-	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, (data & 0x10) << 3);
-	coin_counter_w(space->machine(), 0, (data & 0x20) >> 5);
+	set_led_status(machine(), 1, data & 0x01);
+	set_led_status(machine(), 2, data & 0x02);
+	set_led_status(machine(), 3, data & 0x04);
+	machine().device<ticket_dispenser_device>("ticket")->write(*machine().memory().first_space(), 0, (data & 0x10) << 3);
+	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
 
-static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
+WRITE8_MEMBER(itech32_state::drivedge_turbo_light)
 {
-	set_led_status(device->machine(), 0, data);
+	set_led_status(machine(), 0, data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( pia_portb_out )
+WRITE8_MEMBER(itech32_state::pia_portb_out)
 {
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, (data & 0x10) << 3);
-	coin_counter_w(space->machine(), 0, (data & 0x20) >> 5);
+	machine().device<ticket_dispenser_device>("ticket")->write(*machine().memory().first_space(), 0, (data & 0x10) << 3);
+	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
 
@@ -741,7 +739,7 @@ static const via6522_interface via_interface =
 {
 	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(pia_portb_out),
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech32_state,pia_portb_out),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
 };
@@ -751,8 +749,8 @@ static const via6522_interface drivedge_via_interface =
 {
 	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(drivedge_portb_out),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(drivedge_turbo_light),
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech32_state,drivedge_portb_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech32_state,drivedge_turbo_light),
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
 };
 
@@ -857,16 +855,6 @@ READ32_MEMBER(itech32_state::drivedge_tms2_speedup_r)
 WRITE32_MEMBER(itech32_state::int1_ack32_w)
 {
 	int1_ack_w(space, offset, data, mem_mask);
-}
-
-static WRITE32_DEVICE_HANDLER( timekeeper_32be_w )
-{
-	write32be_with_write8_device_handler( timekeeper_w, device, offset, data, mem_mask );
-}
-
-static READ32_DEVICE_HANDLER( timekeeper_32be_r )
-{
-	return read32be_with_read8_device_handler( timekeeper_r, device, offset, mem_mask );
 }
 
 
@@ -4085,7 +4073,7 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 static void install_timekeeper(running_machine &machine)
 {
 	device_t *device = machine.device("m48t02");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x681000, 0x6817ff, FUNC(timekeeper_32be_r), FUNC(timekeeper_32be_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x681000, 0x6817ff, FUNC(timekeeper_r), FUNC(timekeeper_w), 0xffffffff);
 }
 
 static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */

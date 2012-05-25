@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pandoras_cram_w);
 	DECLARE_WRITE8_MEMBER(pandoras_scrolly_w);
 	DECLARE_WRITE8_MEMBER(pandoras_flipscreen_w);
+	DECLARE_READ8_MEMBER(pandoras_portA_r);
+	DECLARE_READ8_MEMBER(pandoras_portB_r);
 };
 
 

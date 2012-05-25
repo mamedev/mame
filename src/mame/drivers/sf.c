@@ -177,8 +177,9 @@ WRITE8_MEMBER(sf_state::sound2_bank_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( msm5205_w )
+WRITE8_MEMBER(sf_state::msm1_5205_w)
 {
+	device_t *device = machine().device("msm1");
 	msm5205_reset_w(device, (data >> 7) & 1);
 	/* ?? bit 6?? */
 	msm5205_data_w(device, data);
@@ -186,6 +187,15 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 	msm5205_vclk_w(device, 0);
 }
 
+WRITE8_MEMBER(sf_state::msm2_5205_w)
+{
+	device_t *device = machine().device("msm2");
+	msm5205_reset_w(device, (data >> 7) & 1);
+	/* ?? bit 6?? */
+	msm5205_data_w(device, data);
+	msm5205_vclk_w(device, 1);
+	msm5205_vclk_w(device, 0);
+}
 
 
 static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
@@ -270,8 +280,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8, sf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("msm1", msm5205_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm2", msm5205_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_5205_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_5205_w)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END

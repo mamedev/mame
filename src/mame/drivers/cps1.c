@@ -284,8 +284,9 @@ WRITE8_MEMBER(cps_state::cps1_snd_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
+WRITE8_MEMBER(cps_state::cps1_oki_pin7_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_pin7(data & 1);
 }
 
@@ -581,7 +582,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("2151", ym2151_r, ym2151_w)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(cps1_snd_bankswitch_w)
-	AM_RANGE(0xf006, 0xf006) AM_DEVWRITE_LEGACY("oki", cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
+	AM_RANGE(0xf006, 0xf006) AM_WRITE(cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)	/* Sound command */
 	AM_RANGE(0xf00a, 0xf00a) AM_READ(soundlatch2_byte_r) /* Sound timer fade */
 ADDRESS_MAP_END

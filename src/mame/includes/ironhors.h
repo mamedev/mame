@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ironhors_charbank_w);
 	DECLARE_WRITE8_MEMBER(ironhors_palettebank_w);
 	DECLARE_WRITE8_MEMBER(ironhors_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(ironhors_filter_w);
+	DECLARE_READ8_MEMBER(farwest_soundlatch_r);
 };
 
 

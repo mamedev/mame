@@ -34,6 +34,9 @@ public:
 	DECLARE_WRITE8_MEMBER(videopin_led_w);
 	DECLARE_WRITE8_MEMBER(videopin_ball_w);
 	DECLARE_WRITE8_MEMBER(videopin_video_ram_w);
+	DECLARE_WRITE8_MEMBER(videopin_out1_w);
+	DECLARE_WRITE8_MEMBER(videopin_out2_w);
+	DECLARE_WRITE8_MEMBER(videopin_note_dvsr_w);
 };
 
 

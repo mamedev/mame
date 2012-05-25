@@ -88,6 +88,9 @@ public:
 	void pc10_set_mirroring(int mirroring);
 	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+	DECLARE_READ8_MEMBER(psg_4015_r);
+	DECLARE_WRITE8_MEMBER(psg_4015_w);
+	DECLARE_WRITE8_MEMBER(psg_4017_w);
 };
 
 

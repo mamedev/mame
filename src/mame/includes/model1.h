@@ -127,6 +127,8 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_ram_w);
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
+	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
+	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 };
 
 

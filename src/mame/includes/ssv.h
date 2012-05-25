@@ -97,6 +97,8 @@ public:
 	DECLARE_READ16_MEMBER(ssv_vblank_r);
 	DECLARE_WRITE16_MEMBER(ssv_scroll_w);
 	DECLARE_WRITE16_MEMBER(paletteram16_xrgb_swap_word_w);
+	DECLARE_READ16_MEMBER(gdfs_eeprom_r);
+	DECLARE_WRITE16_MEMBER(gdfs_eeprom_w);
 };
 
 /*----------- defined in video/ssv.c -----------*/

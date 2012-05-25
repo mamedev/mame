@@ -91,6 +91,11 @@ public:
 	DECLARE_WRITE8_MEMBER(unkch_reel3_attrram_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
 	DECLARE_WRITE8_MEMBER(cm_background_col_w);
+	DECLARE_WRITE8_MEMBER(system_outputa_w);
+	DECLARE_WRITE8_MEMBER(system_outputb_w);
+	DECLARE_WRITE8_MEMBER(system_outputc_w);
+	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
+	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
 };
 
 

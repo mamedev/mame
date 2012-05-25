@@ -106,10 +106,11 @@ WRITE8_MEMBER(paradise_state::paradise_rombank_w)
 	membank("bank1")->set_entry(bank);
 }
 
-static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
+WRITE8_MEMBER(paradise_state::paradise_okibank_w)
 {
+	device_t *device = machine().device("oki2");
 	if (data & ~0x02)
-		logerror("%s: unknown oki bank bits %02X\n", device->machine().describe_context(), data);
+		logerror("%s: unknown oki bank bits %02X\n", machine().describe_context(), data);
 
 	downcast<okim6295_device *>(device)->set_bank_base((data & 0x02) ? 0x40000 : 0);
 }
@@ -153,7 +154,7 @@ static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
-	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE_LEGACY("oki2", paradise_okibank_w)	// OKI 1 samples bank
+	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w)	// OKI 1 samples bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")

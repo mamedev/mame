@@ -75,15 +75,17 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_lamp_flash_w){}
 WRITE8_MEMBER(wolfpack_state::wolfpack_warning_light_w){}
 WRITE8_MEMBER(wolfpack_state::wolfpack_audamp_w){}
 
-static WRITE8_DEVICE_HANDLER( wolfpack_word_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
 {
+	device_t *device = machine().device("speech");
        /* latch word from bus into temp register, and place on s14001a input bus */
        /* there is no real need for a temp register at all, since the bus 'register' acts as one */
         s14001a_reg_w(device, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
-static WRITE8_DEVICE_HANDLER( wolfpack_start_speech_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
 {
+	device_t *device = machine().device("speech");
         s14001a_set_volume(device, 15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
         s14001a_rst_w(device, data&1);
 }
@@ -116,7 +118,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(wolfpack_sonar_ping_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(wolfpack_sirlat_w)
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(wolfpack_pt_sound_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("speech", wolfpack_start_speech_w)
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(wolfpack_start_speech_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(wolfpack_launch_torpedo_w)
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(wolfpack_low_explo_w)
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(wolfpack_screw_cont_w)
@@ -131,7 +133,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(wolfpack_audamp_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(wolfpack_pt_horz_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(wolfpack_pt_pic_w)
-	AM_RANGE(0x3004, 0x3004) AM_DEVWRITE_LEGACY("speech", wolfpack_word_w)
+	AM_RANGE(0x3004, 0x3004) AM_WRITE(wolfpack_word_w)
 	AM_RANGE(0x3007, 0x3007) AM_WRITE(wolfpack_coldetres_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(wolfpack_ship_h_w)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(wolfpack_torpedo_pic_w)

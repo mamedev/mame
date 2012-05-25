@@ -276,8 +276,9 @@ static void ym2203_irq_handler( device_t *device, int irq )
 	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( ym2203_write_a )
+WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 {
+	device_t *device = machine().device("msm");
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
 	if (data == 0xff)
 		return;
@@ -285,9 +286,9 @@ static WRITE8_DEVICE_HANDLER( ym2203_write_a )
 	msm5205_reset_w(device, !(data & 0x01));
 }
 
-static WRITE8_DEVICE_HANDLER( ym2203_write_b )
+WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
 {
-	device->machine().root_device().membank("bank4")->set_entry(data & 0x0f);
+	machine().root_device().membank("bank4")->set_entry(data & 0x0f);
 }
 
 static const ym2203_interface ym2203_config =
@@ -297,8 +298,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER("msm", ym2203_write_a),
-		DEVCB_HANDLER(ym2203_write_b),
+		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_a),
+		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_b),
 	},
 	ym2203_irq_handler
 };

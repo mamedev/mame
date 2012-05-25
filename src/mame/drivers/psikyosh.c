@@ -319,8 +319,9 @@ static const eeprom_interface eeprom_interface_93C56 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-static WRITE32_DEVICE_HANDLER( psh_eeprom_w )
+WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_24_31)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -334,11 +335,11 @@ static WRITE32_DEVICE_HANDLER( psh_eeprom_w )
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-static READ32_DEVICE_HANDLER( psh_eeprom_r )
+READ32_MEMBER(psikyosh_state::psh_eeprom_r)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return device->machine().root_device().ioport("JP4")->read();
+		return machine().root_device().ioport("JP4")->read();
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -526,7 +527,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // inputs/eeprom
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE_LEGACY("eeprom", psh_eeprom_r, psh_eeprom_w)
+	AM_RANGE(0x05800004, 0x05800007) AM_READWRITE(psh_eeprom_r, psh_eeprom_w)
 // ram
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("ram") // main RAM (1 meg)
 ADDRESS_MAP_END
@@ -537,7 +538,7 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 // inputs/eeprom
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x03000004, 0x03000007) AM_DEVREADWRITE_LEGACY("eeprom", psh_eeprom_r, psh_eeprom_w)
+	AM_RANGE(0x03000004, 0x03000007) AM_READWRITE(psh_eeprom_r, psh_eeprom_w)
 // sound chip
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // video chip

@@ -77,6 +77,8 @@ public:
 	DECLARE_READ8_MEMBER(bking_input_port_5_r);
 	DECLARE_READ8_MEMBER(bking_input_port_6_r);
 	DECLARE_READ8_MEMBER(bking_pos_r);
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_WRITE8_MEMBER(port_b_w);
 };
 
 

@@ -203,11 +203,11 @@ static TIMER_DEVICE_CALLBACK( master_sound_nmi_callback )
 }
 
 
-static WRITE8_DEVICE_HANDLER( ym2151_data_latch_w )
+WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
-	exterm_state *state = device->machine().driver_data<exterm_state>();
+	device_t *device = machine().device("ymsnd");
 	/* bit 7 of the sound control selects which port */
-	ym2151_w(device, state->m_sound_control >> 7, data);
+	ym2151_w(device, m_sound_control >> 7, data);
 }
 
 
@@ -238,12 +238,12 @@ READ8_MEMBER(exterm_state::sound_slave_latch_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( sound_slave_dac_w )
+WRITE8_MEMBER(exterm_state::sound_slave_dac_w)
 {
-	exterm_state *state = device->machine().driver_data<exterm_state>();
+	device_t *device = machine().device("dac");
 	/* DAC A is used to modulate DAC B */
-	state->m_dac_value[offset & 1] = data;
-	dac_data_16_w(device, (state->m_dac_value[0] ^ 0xff) * state->m_dac_value[1]);
+	m_dac_value[offset & 1] = data;
+	dac_data_16_w(device, (m_dac_value[0] ^ 0xff) * m_dac_value[1]);
 }
 
 
@@ -308,7 +308,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_master_map, AS_PROGRAM, 8, exterm_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE_LEGACY("ymsnd", ym2151_data_latch_w)
+	AM_RANGE(0x4000, 0x5fff) AM_WRITE(ym2151_data_latch_w)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(sound_nmi_rate_w)
 	AM_RANGE(0x6800, 0x6fff) AM_READ(sound_master_latch_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(sound_nmi_to_slave_r)
@@ -321,7 +321,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_slave_map, AS_PROGRAM, 8, exterm_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE_LEGACY("dac", sound_slave_dac_w)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(sound_slave_dac_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

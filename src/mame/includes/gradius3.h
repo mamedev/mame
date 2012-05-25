@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(gradius3_gfxrom_r);
 	DECLARE_WRITE16_MEMBER(gradius3_gfxram_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
 };
 
 /*----------- defined in video/gradius3.c -----------*/

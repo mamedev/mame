@@ -62,9 +62,10 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 	return amspdwy_wheel_r(machine(), 1);
 }
 
-static READ8_DEVICE_HANDLER( amspdwy_sound_r )
+READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
-	return (ym2151_status_port_r(device, 0) & ~ 0x30) | device->machine().root_device().ioport("IN0")->read();
+	device_t *device = machine().device("ymsnd");
+	return (ym2151_status_port_r(device, 0) & ~ 0x30) | machine().root_device().ioport("IN0")->read();
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
@@ -85,7 +86,7 @@ static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)							// Player 1
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
-	AM_RANGE(0xb400, 0xb400) AM_DEVREAD_LEGACY("ymsnd", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
+	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")// Sprites
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM												// Work RAM
 ADDRESS_MAP_END

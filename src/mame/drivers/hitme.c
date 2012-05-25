@@ -183,27 +183,28 @@ READ8_MEMBER(hitme_state::hitme_port_3_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( output_port_0_w )
+WRITE8_MEMBER(hitme_state::output_port_0_w)
 {
+	device_t *device = machine().device("discrete");
 	/*
         Note: We compute the timeout time on a write here. Unfortunately, the situation is
         kind of weird, because the discrete sound system is also affected by this timeout.
         In fact, it is very important that our timing calculation timeout AFTER the sound
         system's equivalent computation, or else we will hang notes.
     */
-	hitme_state *state = device->machine().driver_data<hitme_state>();
-	UINT8 raw_game_speed = state->ioport("R3")->read();
+	UINT8 raw_game_speed = ioport("R3")->read();
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
-	state->m_timeout_time = device->machine().time() + duration;
+	m_timeout_time = machine().time() + duration;
 
 	discrete_sound_w(device, HITME_DOWNCOUNT_VAL, data);
 	discrete_sound_w(device, HITME_OUT0, 1);
 }
 
 
-static WRITE8_DEVICE_HANDLER( output_port_1_w )
+WRITE8_MEMBER(hitme_state::output_port_1_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, HITME_ENABLE_VAL, data);
 	discrete_sound_w(device, HITME_OUT1, 1);
 }
@@ -234,8 +235,8 @@ static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8, hitme_state )
 	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
 	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE_LEGACY("discrete", output_port_1_w)
+	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(output_port_0_w)
+	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(output_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -246,8 +247,8 @@ static ADDRESS_MAP_START( hitme_portmap, AS_IO, 8, hitme_state )
 	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
 	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE_LEGACY("discrete", output_port_1_w)
+	AM_RANGE(0x1d, 0x1d) AM_WRITE(output_port_0_w)
+	AM_RANGE(0x1e, 0x1f) AM_WRITE(output_port_1_w)
 ADDRESS_MAP_END
 
 

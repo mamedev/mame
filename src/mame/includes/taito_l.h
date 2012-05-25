@@ -96,6 +96,13 @@ public:
 	DECLARE_READ8_MEMBER(taitol_bankc_r);
 	DECLARE_WRITE8_MEMBER(taitol_control_w);
 	DECLARE_READ8_MEMBER(taitol_control_r);
+	DECLARE_READ8_MEMBER(portA_r);
+	DECLARE_READ8_MEMBER(portB_r);
+	DECLARE_READ8_MEMBER(extport_select_and_ym2203_r);
+	DECLARE_WRITE8_MEMBER(champwr_msm5205_start_w);
+	DECLARE_WRITE8_MEMBER(champwr_msm5205_stop_w);
+	DECLARE_WRITE8_MEMBER(champwr_msm5205_volume_w);
+	DECLARE_WRITE8_MEMBER(portA_w);
 };
 
 /*----------- defined in video/taito_l.c -----------*/

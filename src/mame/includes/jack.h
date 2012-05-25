@@ -41,6 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(jack_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_check_r);
+	DECLARE_READ8_MEMBER(timer_r);
 };
 
 

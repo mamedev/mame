@@ -143,6 +143,8 @@ public:
 	DECLARE_READ32_MEMBER(jaleco_network_r);
 	DECLARE_WRITE32_MEMBER(jaleco_network_w);
 	void push_geo_data(UINT32 data);
+	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
+	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 };
 
 

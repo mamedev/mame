@@ -22,33 +22,30 @@ Todo :
 #include "includes/homerun.h"
 
 
-static WRITE8_DEVICE_HANDLER(pa_w)
+WRITE8_MEMBER(homerun_state::pa_w)
 {
-	homerun_state *state = device->machine().driver_data<homerun_state>();
-	state->m_xpa = data;
+	m_xpa = data;
 }
 
-static WRITE8_DEVICE_HANDLER(pb_w)
+WRITE8_MEMBER(homerun_state::pb_w)
 {
-	homerun_state *state = device->machine().driver_data<homerun_state>();
-	state->m_xpb = data;
+	m_xpb = data;
 }
 
-static WRITE8_DEVICE_HANDLER(pc_w)
+WRITE8_MEMBER(homerun_state::pc_w)
 {
-	homerun_state *state = device->machine().driver_data<homerun_state>();
-	state->m_xpc = data;
+	m_xpc = data;
 }
 
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,				/* Port A read */
-	DEVCB_HANDLER(pa_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(homerun_state,pa_w),	/* Port A write */
 	DEVCB_NULL,				/* Port B read */
-	DEVCB_HANDLER(pb_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(homerun_state,pb_w),	/* Port B write */
 	DEVCB_NULL,				/* Port C read */
-	DEVCB_HANDLER(pc_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(homerun_state,pc_w)		/* Port C write */
 };
 
 

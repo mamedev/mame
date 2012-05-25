@@ -78,13 +78,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mcr68_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_spriteram_w);
+	DECLARE_READ8_MEMBER(zwackery_port_2_r);
 };
-
-
-/*----------- defined in drivers/mcr68.c -----------*/
-
-READ8_DEVICE_HANDLER( zwackery_port_2_r );
-
 
 /*----------- defined in machine/mcr68.c -----------*/
 

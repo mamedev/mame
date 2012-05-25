@@ -23,6 +23,8 @@ public:
 	UINT8 m_irq_mask;
 	DECLARE_WRITE8_MEMBER(seicross_videoram_w);
 	DECLARE_WRITE8_MEMBER(seicross_colorram_w);
+	DECLARE_READ8_MEMBER(friskyt_portB_r);
+	DECLARE_WRITE8_MEMBER(friskyt_portB_w);
 };
 
 

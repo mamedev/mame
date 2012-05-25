@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(madalien_videoram_w);
 	DECLARE_WRITE8_MEMBER(madalien_charram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_WRITE8_MEMBER(madalien_portA_w);
+	DECLARE_WRITE8_MEMBER(madalien_portB_w);
 };
 
 

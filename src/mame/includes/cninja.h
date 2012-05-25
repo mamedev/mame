@@ -57,6 +57,7 @@ public:
 	DECLARE_READ16_MEMBER(robocop2_prot_r);
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 /*----------- defined in video/cninja.c -----------*/

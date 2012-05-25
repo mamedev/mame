@@ -20,6 +20,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tigeroad_videoram_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_videoctrl_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_scroll_w);
+	DECLARE_WRITE8_MEMBER(msm5205_w);
 };
 
 

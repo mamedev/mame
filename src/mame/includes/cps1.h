@@ -172,6 +172,7 @@ public:
 	DECLARE_READ16_MEMBER(cps2_objram2_r);
 	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
 	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
+	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

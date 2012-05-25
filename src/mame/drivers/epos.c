@@ -101,9 +101,9 @@ ADDRESS_MAP_END
    There's a separate ROM check for banked U04 at 30F3.
    It looks like dealer/revenger uses ppi8255 to control bankswitching.
 */
-static WRITE8_DEVICE_HANDLER( write_prtc )
+WRITE8_MEMBER(epos_state::write_prtc)
 {
-	device->machine().root_device().membank("bank2")->set_entry(data & 0x01);
+	machine().root_device().membank("bank2")->set_entry(data & 0x01);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -113,7 +113,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL,						/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(write_prtc)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(epos_state,write_prtc)		/* Port C write */
 };
 
 

@@ -43,6 +43,10 @@ public:
 	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
 	DECLARE_WRITE8_MEMBER(trackfld_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
+	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
+	DECLARE_READ8_MEMBER(trackfld_speech_r);
+	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
+
 };
 
 

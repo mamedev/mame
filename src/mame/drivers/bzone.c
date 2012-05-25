@@ -275,16 +275,15 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( redbaron_joy_r )
+READ8_MEMBER(bzone_state::redbaron_joy_r)
 {
-	bzone_state *state = device->machine().driver_data<bzone_state>();
-	return state->ioport(state->m_rb_input_select ? "FAKE1" : "FAKE2")->read();
+	return ioport(m_rb_input_select ? "FAKE1" : "FAKE2")->read();
 }
 
-static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
+WRITE8_MEMBER(bzone_state::redbaron_joysound_w)
 {
-	bzone_state *state = device->machine().driver_data<bzone_state>();
-	state->m_rb_input_select = data & 1;
+	device_t *device = machine().device("custom");
+	m_rb_input_select = data & 1;
 	redbaron_sounds_w(device, offset, data);
 }
 
@@ -330,7 +329,7 @@ static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
 	AM_RANGE(0x1804, 0x1804) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
 	AM_RANGE(0x1806, 0x1806) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
-	AM_RANGE(0x1808, 0x1808) AM_DEVWRITE_LEGACY("custom", redbaron_joysound_w)	/* and select joystick pot also */
+	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_joysound_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITENOP				/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
@@ -536,7 +535,7 @@ INPUT_PORTS_END
 static const pokey_interface redbaron_pokey_interface =
 {
 	{ DEVCB_NULL },
-	DEVCB_HANDLER(redbaron_joy_r)
+	DEVCB_DRIVER_MEMBER(bzone_state,redbaron_joy_r)
 };
 
 

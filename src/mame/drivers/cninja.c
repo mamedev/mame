@@ -721,18 +721,17 @@ static void sound_irq2(device_t *device, int state)
 	device_set_input_line(driver_state->m_audiocpu, 0, state);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
 {
-	cninja_state *state = device->machine().driver_data<cninja_state>();
 
 	/* the second OKIM6295 ROM is bank switched */
-	state->m_oki2->set_bank_base((data & 1) * 0x40000);
+	m_oki2->set_bank_base((data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(sound_irq),
-	DEVCB_HANDLER(sound_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(cninja_state,sound_bankswitch_w)
 };
 
 static const ym2151_interface ym2151_interface2 =

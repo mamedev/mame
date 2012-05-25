@@ -292,24 +292,40 @@ ADDRESS_MAP_END
 
 /* 2 DACs per CPU - 4 bits per sample */
 
-static WRITE8_DEVICE_HANDLER( bssoccer_DAC_w )
+WRITE8_MEMBER(suna16_state::bssoccer_DAC1_w)
 {
+	device_t *device = machine().device("dac1");
+	dac_data_w( device, (data & 0xf) * 0x11 );
+}
+WRITE8_MEMBER(suna16_state::bssoccer_DAC2_w)
+{
+	device_t *device = machine().device("dac2");
+	dac_data_w( device, (data & 0xf) * 0x11 );
+}
+WRITE8_MEMBER(suna16_state::bssoccer_DAC3_w)
+{
+	device_t *device = machine().device("dac3");
+	dac_data_w( device, (data & 0xf) * 0x11 );
+}
+WRITE8_MEMBER(suna16_state::bssoccer_DAC4_w)
+{
+	device_t *device = machine().device("dac4");
 	dac_data_w( device, (data & 0xf) * 0x11 );
 }
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)	// From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_WRITE(bssoccer_DAC1_w)	// 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC2_w)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_byte_r)	// From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac3", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac4", bssoccer_DAC_w)	// 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_WRITE(bssoccer_DAC3_w)	// 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC4_w)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_2_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
@@ -338,8 +354,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)	// From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_WRITE(bssoccer_DAC1_w)	// 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC2_w)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
@@ -362,8 +378,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bestbest_pcm_1_iomap, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_byte_r	)	// From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_WRITE(bssoccer_DAC1_w)	// 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_WRITE(bssoccer_DAC2_w)	// 2 x DAC
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -914,7 +930,7 @@ static const ym3526_interface bestbest_ym3526_interface =
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)
 };
 
-static WRITE8_DEVICE_HANDLER( bestbest_ay8910_port_a_w )
+WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 {
 	// ?
 }
@@ -924,7 +940,7 @@ static const ay8910_interface bestbest_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,									DEVCB_NULL,
-	DEVCB_HANDLER(bestbest_ay8910_port_a_w),	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(suna16_state,bestbest_ay8910_port_a_w),	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( bestbest, suna16_state )

@@ -145,6 +145,8 @@ public:
 	DECLARE_READ16_MEMBER(arescue_handshake_r);
 	DECLARE_READ16_MEMBER(arescue_slavebusy_r);
 	DECLARE_WRITE16_MEMBER(f1en_comms_echo_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_w);
+	DECLARE_WRITE8_MEMBER(scross_bank_w);
 };
 
 

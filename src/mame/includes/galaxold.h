@@ -132,6 +132,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+	DECLARE_READ8_MEMBER(ttl7474_trampoline);
 };
 
 

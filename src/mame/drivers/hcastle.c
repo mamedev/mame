@@ -63,8 +63,9 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( sound_bank_w )
+WRITE8_MEMBER(hcastle_state::sound_bank_w)
 {
+	device_t *device = machine().device("konami1");
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
 	k007232_set_bank(device, bank_A, bank_B );
@@ -80,7 +81,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE_LEGACY("konami2", k051649_test_r, k051649_test_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami1", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("konami1", sound_bank_w) /* 7232 bankswitch */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_bank_w) /* 7232 bankswitch */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 

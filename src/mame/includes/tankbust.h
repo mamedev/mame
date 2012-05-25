@@ -35,6 +35,8 @@ public:
 	DECLARE_READ8_MEMBER(tankbust_txtram_r);
 	DECLARE_WRITE8_MEMBER(tankbust_xscroll_w);
 	DECLARE_WRITE8_MEMBER(tankbust_yscroll_w);
+	DECLARE_READ8_MEMBER(tankbust_soundlatch_r);
+	DECLARE_READ8_MEMBER(tankbust_soundtimer_r);
 };
 
 

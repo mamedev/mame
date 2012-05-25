@@ -48,8 +48,9 @@ READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 		return k051316_r(m_k051316, offset);
 }
 
-static READ8_DEVICE_HANDLER( rollerg_sound_r )
+READ8_MEMBER(rollerg_state::rollerg_sound_r)
 {
+	device_t *device = machine().device("k053260");
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
 	return k053260_r(device, 2 + offset);
@@ -80,7 +81,7 @@ READ8_MEMBER(rollerg_state::pip_r)
 static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_READWRITE(watchdog_reset_r,watchdog_reset_w)
-	AM_RANGE(0x0030, 0x0031) AM_DEVREADWRITE_LEGACY("k053260", rollerg_sound_r, k053260_w)	/* K053260 */
+	AM_RANGE(0x0030, 0x0031) AM_READ(rollerg_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)	/* K053260 */
 	AM_RANGE(0x0040, 0x0040) AM_WRITE(soundirq_w)
 	AM_RANGE(0x0050, 0x0050) AM_READ_PORT("P1")
 	AM_RANGE(0x0051, 0x0051) AM_READ_PORT("P2")
@@ -231,9 +232,9 @@ static const k051316_interface rollerg_k051316_intf =
 	rollerg_zoom_callback
 };
 
-static WRITE_LINE_DEVICE_HANDLER( rollerg_irq_ack_w )
+WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static const k053252_interface rollerg_k053252_intf =
@@ -241,7 +242,7 @@ static const k053252_interface rollerg_k053252_intf =
 	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(rollerg_irq_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(rollerg_state,rollerg_irq_ack_w),
 	DEVCB_NULL,
 	14*8, 2*8
 };

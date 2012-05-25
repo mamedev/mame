@@ -203,7 +203,7 @@ WRITE8_MEMBER(segag80v_state::mainram_w)
 	m_mainram[decrypt_offset(&space, offset)] = data;
 }
 
-static WRITE8_DEVICE_HANDLER( usb_ram_w ) { sega_usb_ram_w(device, decrypt_offset(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
 	m_vectorram[decrypt_offset(&space, offset)] = data;
@@ -1374,7 +1374,8 @@ static DRIVER_INIT( tacscan )
 	/* configure sound */
 	state->m_usb = machine.device("usbsnd");
 	iospace->install_legacy_readwrite_handler(*state->m_usb, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
+	pgmspace->install_legacy_read_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r));
+	pgmspace->install_write_handler(0xd000, 0xdfff, write8_delegate(FUNC(segag80v_state::usb_ram_w),state));
 
 	/* configure inputs */
 	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));
@@ -1397,7 +1398,8 @@ static DRIVER_INIT( startrek )
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 
 	iospace->install_legacy_readwrite_handler(*state->m_usb, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
+	pgmspace->install_legacy_read_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r));
+	pgmspace->install_write_handler(0xd000, 0xdfff, write8_delegate(FUNC(segag80v_state::usb_ram_w),state));
 
 	/* configure inputs */
 	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));

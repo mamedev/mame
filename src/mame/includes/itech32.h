@@ -134,6 +134,9 @@ public:
 	DECLARE_WRITE32_MEMBER(drivedge_zbuf_control_w);
 	DECLARE_READ32_MEMBER(itech020_video_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
+	DECLARE_WRITE8_MEMBER(drivedge_portb_out);
+	DECLARE_WRITE8_MEMBER(drivedge_turbo_light);
+	DECLARE_WRITE8_MEMBER(pia_portb_out);
 };
 
 

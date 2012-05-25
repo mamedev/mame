@@ -133,13 +133,13 @@ WRITE32_MEMBER(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> (10+16)),pal5bit(m_generic_paletteram_32[offset] >> (5+16)),pal5bit(m_generic_paletteram_32[offset] >> (0+16)));
 }
 
-static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
+WRITE32_MEMBER(silkroad_state::silk_6295_bank_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			device->machine().device<okim6295_device>("oki1")->set_bank_base(0x40000 * (bank));
+			machine().device<okim6295_device>("oki1")->set_bank_base(0x40000 * (bank));
 	}
 }
 
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, silkroad_state )
 	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000)
 	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff0000)
 	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff0000)
-	AM_RANGE(0xc00034, 0xc00037) AM_DEVWRITE_LEGACY("oki1", silk_6295_bank_w)
+	AM_RANGE(0xc00034, 0xc00037) AM_WRITE(silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
 	AM_RANGE(0xc0010c, 0xc00123) AM_WRITEONLY AM_SHARE("regs")
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM

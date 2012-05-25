@@ -75,6 +75,11 @@ public:
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	DECLARE_WRITE8_MEMBER(usb_ram_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);
 };
 
 

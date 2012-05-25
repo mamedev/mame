@@ -18,8 +18,8 @@
 
 
 
-static WRITE8_DEVICE_HANDLER(videopin_out1_w);
-static WRITE8_DEVICE_HANDLER(videopin_out2_w);
+
+
 
 
 static void update_plunger(running_machine &machine)
@@ -63,14 +63,14 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET( videopin )
 {
-	device_t *discrete = machine.device("discrete");
+	videopin_state *state = machine.driver_data<videopin_state>();
 
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(interrupt_callback), 32);
 
 	/* both output latches are cleared on reset */
 
-	videopin_out1_w(discrete, 0, 0);
-	videopin_out2_w(discrete, 0, 0);
+	state->videopin_out1_w(*machine.memory().first_space(), 0, 0);
+	state->videopin_out2_w(*machine.memory().first_space(), 0, 0);
 }
 
 
@@ -136,9 +136,9 @@ WRITE8_MEMBER(videopin_state::videopin_led_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( videopin_out1_w )
+WRITE8_MEMBER(videopin_state::videopin_out1_w)
 {
-	videopin_state *state = device->machine().driver_data<videopin_state>();
+	device_t *device = machine().device("discrete");
 	/* D0 => OCTAVE0  */
 	/* D1 => OCTACE1  */
 	/* D2 => OCTAVE2  */
@@ -148,20 +148,21 @@ static WRITE8_DEVICE_HANDLER( videopin_out1_w )
 	/* D6 => NOT USED */
 	/* D7 => NOT USED */
 
-	state->m_mask = ~data & 0x10;
+	m_mask = ~data & 0x10;
 
-	if (state->m_mask)
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	if (m_mask)
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
-	coin_lockout_global_w(device->machine(), ~data & 0x08);
+	coin_lockout_global_w(machine(), ~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
 	discrete_sound_w(device, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
 }
 
 
-static WRITE8_DEVICE_HANDLER( videopin_out2_w )
+WRITE8_MEMBER(videopin_state::videopin_out2_w)
 {
+	device_t *device = machine().device("discrete");
 	/* D0 => VOL0      */
 	/* D1 => VOL1      */
 	/* D2 => VOL2      */
@@ -171,7 +172,7 @@ static WRITE8_DEVICE_HANDLER( videopin_out2_w )
 	/* D6 => BELL      */
 	/* D7 => ATTRACT   */
 
-	coin_counter_w(device->machine(), 0, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x10);
 
 	discrete_sound_w(device, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
 	discrete_sound_w(device, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
@@ -180,8 +181,9 @@ static WRITE8_DEVICE_HANDLER( videopin_out2_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
+WRITE8_MEMBER(videopin_state::videopin_note_dvsr_w)
 {
+	device_t *device = machine().device("discrete");
 	/* note data */
 	discrete_sound_w(device, VIDEOPIN_NOTE_DATA, ~data &0xff);
 }
@@ -196,12 +198,12 @@ static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE_LEGACY("discrete", videopin_note_dvsr_w)
+	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_WRITE(videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(videopin_ball_w)
-	AM_RANGE(0x0805, 0x0805) AM_DEVWRITE_LEGACY("discrete", videopin_out1_w)
-	AM_RANGE(0x0806, 0x0806) AM_DEVWRITE_LEGACY("discrete", videopin_out2_w)
+	AM_RANGE(0x0805, 0x0805) AM_WRITE(videopin_out1_w)
+	AM_RANGE(0x0806, 0x0806) AM_WRITE(videopin_out2_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM

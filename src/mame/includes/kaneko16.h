@@ -163,6 +163,18 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
 	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
+	DECLARE_READ16_MEMBER(kaneko16_ay1_YM2149_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_ay1_YM2149_w);
+	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
+	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_sw);
+	DECLARE_WRITE16_MEMBER(bloodwar_oki_0_bank_w);
+	DECLARE_WRITE16_MEMBER(bloodwar_oki_1_bank_w);
+	DECLARE_WRITE16_MEMBER(bonkadv_oki_0_bank_w);
+	DECLARE_WRITE16_MEMBER(bonkadv_oki_1_bank_w);
+	DECLARE_WRITE16_MEMBER(gtmr_oki_0_bank_w);
+	DECLARE_WRITE16_MEMBER(gtmr_oki_1_bank_w);
+	DECLARE_WRITE8_MEMBER(kaneko16_eeprom_reset_w);
 };
 
 

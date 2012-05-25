@@ -46,6 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(champbas_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(champbas_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(champbas_watchdog_bit2);
+	DECLARE_WRITE8_MEMBER(champbas_dac_w);
+	DECLARE_WRITE8_MEMBER(champbas_dac1_w);
+	DECLARE_WRITE8_MEMBER(champbas_dac2_w);
 };
 
 

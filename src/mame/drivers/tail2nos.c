@@ -27,9 +27,9 @@ WRITE16_MEMBER(tail2nos_state::sound_command_w)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(tail2nos_state::sound_bankswitch_w)
 {
-	device->machine().root_device().membank("bank3")->set_entry(data & 0x01);
+	machine().root_device().membank("bank3")->set_entry(data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
@@ -191,7 +191,7 @@ static const ym2608_interface ym2608_config =
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(sound_bankswitch_w)
+		DEVCB_DRIVER_MEMBER(tail2nos_state,sound_bankswitch_w)
 	},
 	irqhandler
 };

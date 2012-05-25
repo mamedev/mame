@@ -30,6 +30,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tomaincpu_w);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
+	DECLARE_WRITE8_MEMBER(dummy1_w);
+	DECLARE_WRITE8_MEMBER(dummy2_w);
+	DECLARE_WRITE8_MEMBER(dummy3_w);
 };
 
 

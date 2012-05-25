@@ -62,36 +62,35 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( m6803_port1_w )
+WRITE8_MEMBER(kncljoe_state::m6803_port1_w)
 {
-	kncljoe_state *state = device->machine().driver_data<kncljoe_state>();
-	state->m_port1 = data;
+	m_port1 = data;
 }
 
-static WRITE8_DEVICE_HANDLER( m6803_port2_w )
+WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 {
-	kncljoe_state *state = device->machine().driver_data<kncljoe_state>();
+	device_t *device = machine().device("aysnd");
 
 	/* write latch */
-	if ((state->m_port2 & 0x01) && !(data & 0x01))
+	if ((m_port2 & 0x01) && !(data & 0x01))
 	{
 		/* control or data port? */
-		if (state->m_port2 & 0x08)
-			ay8910_data_address_w(device, state->m_port2 >> 2, state->m_port1);
+		if (m_port2 & 0x08)
+			ay8910_data_address_w(device, m_port2 >> 2, m_port1);
 	}
-	state->m_port2 = data;
+	m_port2 = data;
 }
 
-static READ8_DEVICE_HANDLER( m6803_port1_r )
+READ8_MEMBER(kncljoe_state::m6803_port1_r)
 {
-	kncljoe_state *state = device->machine().driver_data<kncljoe_state>();
+	device_t *device = machine().device("aysnd");
 
-	if (state->m_port2 & 0x08)
+	if (m_port2 & 0x08)
 		return ay8910_r(device, 0);
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( m6803_port2_r )
+READ8_MEMBER(kncljoe_state::m6803_port2_r)
 {
 	return 0;
 }
@@ -101,7 +100,7 @@ WRITE8_MEMBER(kncljoe_state::sound_irq_ack_w)
 	device_set_input_line(m_soundcpu, 0, CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER(unused_w)
+WRITE8_MEMBER(kncljoe_state::unused_w)
 {
 	//unused - no MSM on the pcb
 }
@@ -114,8 +113,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kncljoe_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kncljoe_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE_LEGACY("aysnd", m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE_LEGACY("aysnd", m6803_port2_r, m6803_port2_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 
@@ -238,7 +237,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(unused_w)
+	DEVCB_DRIVER_MEMBER(kncljoe_state,unused_w)
 };
 
 static INTERRUPT_GEN (sound_nmi)

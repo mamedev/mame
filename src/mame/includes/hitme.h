@@ -32,6 +32,8 @@ public:
 	DECLARE_READ8_MEMBER(hitme_port_1_r);
 	DECLARE_READ8_MEMBER(hitme_port_2_r);
 	DECLARE_READ8_MEMBER(hitme_port_3_r);
+	DECLARE_WRITE8_MEMBER(output_port_0_w);
+	DECLARE_WRITE8_MEMBER(output_port_1_w);
 };
 
 

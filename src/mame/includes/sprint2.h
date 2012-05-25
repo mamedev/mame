@@ -54,6 +54,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset1_w);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_video_ram_w);
+	DECLARE_WRITE8_MEMBER(sprint2_attract_w);
+	DECLARE_WRITE8_MEMBER(sprint2_noise_reset_w);
+	DECLARE_WRITE8_MEMBER(sprint2_skid1_w);
+	DECLARE_WRITE8_MEMBER(sprint2_skid2_w);
 };
 
 

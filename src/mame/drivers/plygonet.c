@@ -101,8 +101,9 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
+READ32_MEMBER(polygonet_state::polygonet_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_15)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -110,8 +111,8 @@ static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
 	}
 	else
 	{
-		UINT8 lowInputBits = device->machine().root_device().ioport("IN1")->read();
-		UINT8 highInputBits = device->machine().root_device().ioport("IN0")->read();
+		UINT8 lowInputBits = machine().root_device().ioport("IN1")->read();
+		UINT8 highInputBits = machine().root_device().ioport("IN0")->read();
 		return ((highInputBits << 24) | (lowInputBits << 16));
 	}
 
@@ -505,7 +506,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16_LEGACY("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
-	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD_LEGACY("eeprom", polygonet_eeprom_r)
+	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_SHARE("shared_ram")
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)

@@ -90,8 +90,9 @@ READ16_MEMBER(oneshot_state::oneshot_gun_y_p2_r)
 	return m_gun_y_p2;
 }
 
-static WRITE16_DEVICE_HANDLER( soundbank_w )
+WRITE16_MEMBER(oneshot_state::soundbank_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data & 0x03) ^ 0x03));
@@ -111,7 +112,7 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_SHARE("scroll")	// scroll registers
 	AM_RANGE(0x190002, 0x190003) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE_LEGACY("oki", soundbank_w)
+	AM_RANGE(0x190018, 0x190019) AM_WRITE(soundbank_w)
 	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
 	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
 	AM_RANGE(0x190036, 0x190037) AM_READ(oneshot_gun_y_p1_r)

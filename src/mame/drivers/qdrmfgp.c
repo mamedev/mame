@@ -197,32 +197,36 @@ WRITE16_MEMBER(qdrmfgp_state::sndram_w)
 #define IDE_STD_OFFSET	(0x1f0/2)
 #define IDE_ALT_OFFSET	(0x3f6/2)
 
-static READ16_DEVICE_HANDLER( ide_std_r )
+READ16_MEMBER(qdrmfgp_state::ide_std_r)
 {
+	device_t *device = machine().device("ide");
 	if (offset & 0x01)
 		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
 	else
 		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xffff);
 }
 
-static WRITE16_DEVICE_HANDLER( ide_std_w )
+WRITE16_MEMBER(qdrmfgp_state::ide_std_w)
 {
+	device_t *device = machine().device("ide");
 	if (offset & 0x01)
 		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data << 8, 0xff00);
 	else
 		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data, 0xffff);
 }
 
-static READ16_DEVICE_HANDLER( ide_alt_r )
+READ16_MEMBER(qdrmfgp_state::ide_alt_r)
 {
+	device_t *device = machine().device("ide");
 	if (offset == 0)
 		return ide_controller16_r(device, IDE_ALT_OFFSET, 0x00ff);
 
 	return 0;
 }
 
-static WRITE16_DEVICE_HANDLER( ide_alt_w )
+WRITE16_MEMBER(qdrmfgp_state::ide_alt_w)
 {
+	device_t *device = machine().device("ide");
 	if (offset == 0)
 		ide_controller16_w(device, IDE_ALT_OFFSET, data, 0x00ff);
 }
@@ -347,8 +351,8 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)			/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)			/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)												/* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE_LEGACY("ide", ide_std_r,ide_std_w)					/* IDE control regs */
-	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREADWRITE_LEGACY("ide", ide_alt_r,ide_alt_w)					/* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(ide_std_r,ide_std_w)					/* IDE control regs */
+	AM_RANGE(0xa4000c, 0xa4000f) AM_READWRITE(ide_alt_r,ide_alt_w)					/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r, sndram_w)								/* sound ram */
 ADDRESS_MAP_END
 
@@ -370,8 +374,8 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x880000, 0x881fff) AM_READWRITE(gp2_vram_r, gp2_vram_w)							/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READWRITE(gp2_vram_mirror_r, gp2_vram_mirror_w)				/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)												/* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_DEVWRITE_LEGACY("ide", ide_std_w)			/* IDE control regs */
-	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREADWRITE_LEGACY("ide", ide_alt_r,ide_alt_w)					/* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_WRITE(ide_std_w)			/* IDE control regs */
+	AM_RANGE(0xa4000c, 0xa4000f) AM_READWRITE(ide_alt_r,ide_alt_w)					/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r,sndram_w)								/* sound ram */
 ADDRESS_MAP_END
 
@@ -601,14 +605,14 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 	qdrmfgp2_tile_callback, "none"
 };
 
-static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq3_ack_w )
+WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq3_ack_w)
 {
-//  cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
+//  cputag_set_input_line(machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq4_ack_w )
+WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq4_ack_w)
 {
-//  cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+//  cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
 }
 
 static const k053252_interface qdrmfgp_k053252_intf =
@@ -616,7 +620,7 @@ static const k053252_interface qdrmfgp_k053252_intf =
 	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(qdrmfgp_irq3_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(qdrmfgp_state,qdrmfgp_irq3_ack_w),
 	DEVCB_NULL,
 	40, 16
 };
@@ -626,8 +630,8 @@ static const k053252_interface qdrmfgp2_k053252_intf =
 	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(qdrmfgp_irq4_ack_w),
-	DEVCB_LINE(qdrmfgp_irq3_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(qdrmfgp_state,qdrmfgp_irq4_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(qdrmfgp_state,qdrmfgp_irq3_ack_w),
 	40, 16
 };
 

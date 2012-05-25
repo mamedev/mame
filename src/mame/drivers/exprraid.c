@@ -435,15 +435,14 @@ GFXDECODE_END
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static WRITE_LINE_DEVICE_HANDLER( irqhandler )
+WRITE_LINE_MEMBER(exprraid_state::irqhandler)
 {
-	exprraid_state *driver_state = device->machine().driver_data<exprraid_state>();
-	device_set_input_line_and_vector(driver_state->m_slave, 0, state, 0xff);
+	device_set_input_line_and_vector(m_slave, 0, state, 0xff);
 }
 
 static const ym3526_interface ym3526_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(exprraid_state,irqhandler)
 };
 
 #if 0

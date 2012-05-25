@@ -25,6 +25,13 @@ public:
 	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
 	DECLARE_READ8_MEMBER(superpac_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(mappy_scroll_w);
+	DECLARE_READ8_MEMBER(dipA_l);
+	DECLARE_READ8_MEMBER(dipA_h);
+	DECLARE_READ8_MEMBER(dipB_mux);
+	DECLARE_READ8_MEMBER(dipB_muxi);
+	DECLARE_WRITE8_MEMBER(out_mux);
+	DECLARE_WRITE8_MEMBER(out_lamps);
+	DECLARE_WRITE8_MEMBER(grobda_DAC_w);
 };
 
 

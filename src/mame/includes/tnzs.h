@@ -70,6 +70,10 @@ public:
 	DECLARE_READ8_MEMBER(mcu_extrmatn_r);
 	DECLARE_WRITE8_MEMBER(mcu_extrmatn_w);
 	DECLARE_WRITE8_MEMBER(tnzs_sync_kludge_w);
+	DECLARE_READ8_MEMBER(kageki_csport_r);
+	DECLARE_WRITE8_MEMBER(kageki_csport_w);
+	DECLARE_WRITE8_MEMBER(kabukiz_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(kabukiz_sample_w);
 };
 
 

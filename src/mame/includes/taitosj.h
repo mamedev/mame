@@ -76,6 +76,10 @@ public:
 	DECLARE_WRITE8_MEMBER(taitosj_collision_reg_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+	DECLARE_WRITE8_MEMBER(taitosj_sndnmi_msk_w);
+	DECLARE_WRITE8_MEMBER(input_port_4_f0_w);
+	DECLARE_WRITE8_MEMBER(dac_out_w);
+	DECLARE_WRITE8_MEMBER(dac_vol_w);
 };
 
 

@@ -171,10 +171,9 @@ TODO:
 #include "includes/taitosj.h"
 
 
-static WRITE8_DEVICE_HANDLER( taitosj_sndnmi_msk_w )
+WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 {
-	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->m_sndnmi_disable = data & 0x01;
+	m_sndnmi_disable = data & 0x01;
 }
 
 WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
@@ -184,10 +183,9 @@ WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( input_port_4_f0_w )
+WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
 {
-	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->m_input_port_4_f0 = data >> 4;
+	m_input_port_4_f0 = data >> 4;
 }
 
 CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
@@ -1731,18 +1729,18 @@ static const UINT8 voltable[256] =
 };
 
 
-static WRITE8_DEVICE_HANDLER( dac_out_w )
+WRITE8_MEMBER(taitosj_state::dac_out_w)
 {
-	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->m_dac_out = data - 0x80;
-	dac_signed_data_16_w(device,state->m_dac_out * state->m_dac_vol + 0x8000);
+	device_t *device = machine().device("dac");
+	m_dac_out = data - 0x80;
+	dac_signed_data_16_w(device,m_dac_out * m_dac_vol + 0x8000);
 }
 
-static WRITE8_DEVICE_HANDLER( dac_vol_w )
+WRITE8_MEMBER(taitosj_state::dac_vol_w)
 {
-	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->m_dac_vol = voltable[data];
-	dac_signed_data_16_w(device,state->m_dac_out * state->m_dac_vol + 0x8000);
+	device_t *device = machine().device("dac");
+	m_dac_vol = voltable[data];
+	dac_signed_data_16_w(device,m_dac_out * m_dac_vol + 0x8000);
 }
 
 
@@ -1762,8 +1760,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("dac", dac_out_w),	/* port Awrite */
-	DEVCB_DEVICE_HANDLER("dac", dac_vol_w)	/* port Bwrite */
+	DEVCB_DRIVER_MEMBER(taitosj_state,dac_out_w),	/* port Awrite */
+	DEVCB_DRIVER_MEMBER(taitosj_state,dac_vol_w)	/* port Bwrite */
 };
 
 static const ay8910_interface ay8910_interface_3 =
@@ -1772,7 +1770,7 @@ static const ay8910_interface ay8910_interface_3 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(input_port_4_f0_w),
+	DEVCB_DRIVER_MEMBER(taitosj_state,input_port_4_f0_w),
 	DEVCB_NULL
 };
 
@@ -1783,7 +1781,7 @@ static const ay8910_interface ay8910_interface_4 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(taitosj_sndnmi_msk_w)	/* port Bwrite */
+	DEVCB_DRIVER_MEMBER(taitosj_state,taitosj_sndnmi_msk_w)	/* port Bwrite */
 };
 
 

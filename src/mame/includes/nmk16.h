@@ -93,6 +93,8 @@ public:
 	DECLARE_WRITE16_MEMBER(nmk_tilebank_w);
 	DECLARE_WRITE16_MEMBER(bioship_scroll_w);
 	DECLARE_WRITE16_MEMBER(bioship_bank_w);
+	DECLARE_WRITE8_MEMBER(spec2k_oki1_banking_w);
+	DECLARE_WRITE8_MEMBER(twinactn_oki_bank_w);
 };
 
 

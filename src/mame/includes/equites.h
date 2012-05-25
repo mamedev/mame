@@ -85,6 +85,8 @@ public:
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_status);
+	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
+	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
 };
 
 

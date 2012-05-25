@@ -155,6 +155,24 @@ public:
 	DECLARE_WRITE8_MEMBER(artic_gfxbank_w);
 	DECLARE_READ8_MEMBER(tenspot_dsw_read);
 	DECLARE_INPUT_CHANGED_MEMBER(gmgalax_game_changed);
+	DECLARE_WRITE8_MEMBER(konami_sound_control_w);
+	DECLARE_READ8_MEMBER(konami_sound_timer_r);
+	DECLARE_WRITE8_MEMBER(konami_portc_0_w);
+	DECLARE_WRITE8_MEMBER(konami_portc_1_w);
+	DECLARE_WRITE8_MEMBER(theend_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(scramble_protection_w);
+	DECLARE_READ8_MEMBER(scramble_protection_r);
+	DECLARE_READ8_MEMBER(explorer_sound_latch_r);
+	DECLARE_WRITE8_MEMBER(sfx_sample_control_w);
+	DECLARE_WRITE8_MEMBER(monsterz_porta_1_w);
+	DECLARE_WRITE8_MEMBER(monsterz_portb_1_w);
+	DECLARE_WRITE8_MEMBER(monsterz_portc_1_w);
+	DECLARE_READ8_MEMBER(frogger_sound_timer_r);
+	DECLARE_READ8_MEMBER(scorpion_protection_r);
+	DECLARE_WRITE8_MEMBER(scorpion_protection_w);
+	DECLARE_WRITE8_MEMBER(scorpion_digitalker_control_w);
+	DECLARE_WRITE8_MEMBER(kingball_dac_w);
+	DECLARE_WRITE8_MEMBER(moonwar_port_select_w);
 };
 
 

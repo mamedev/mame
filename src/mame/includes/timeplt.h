@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(timeplt_flipscreen_w);
 	DECLARE_READ8_MEMBER(timeplt_scanline_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
+	DECLARE_WRITE8_MEMBER(chkun_sound_w);
 };
 
 

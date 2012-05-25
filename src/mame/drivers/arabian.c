@@ -58,9 +58,8 @@
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
+WRITE8_MEMBER(arabian_state::ay8910_porta_w)
 {
-	arabian_state *state = device->machine().driver_data<arabian_state>();
 
 	/*
         bit 7 = ENA
@@ -69,11 +68,11 @@ static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
         bit 4 = /AGHF
         bit 3 = /ARHF
     */
-	state->m_video_control = data;
+	m_video_control = data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
+WRITE8_MEMBER(arabian_state::ay8910_portb_w)
 {
 	/*
         bit 5 = /IREQ to custom CPU
@@ -82,12 +81,12 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
         bit 0 = coin 1 counter
     */
 
-	cputag_set_input_line(device->machine(), "mcu", MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "mcu", MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* clock the coin counters */
-	coin_counter_w(device->machine(), 1, ~data & 0x02);
-	coin_counter_w(device->machine(), 0, ~data & 0x01);
+	coin_counter_w(machine(), 1, ~data & 0x02);
+	coin_counter_w(machine(), 0, ~data & 0x01);
 }
 
 
@@ -329,8 +328,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ay8910_porta_w),
-	DEVCB_HANDLER(ay8910_portb_w)
+	DEVCB_DRIVER_MEMBER(arabian_state,ay8910_porta_w),
+	DEVCB_DRIVER_MEMBER(arabian_state,ay8910_portb_w)
 };
 
 

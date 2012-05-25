@@ -115,8 +115,9 @@ static Z80DMA_INTERFACE( mario_dma )
 	DEVCB_NULL
 };
 
-static WRITE8_DEVICE_HANDLER( mario_z80dma_rdy_w )
+WRITE8_MEMBER(mario_state::mario_z80dma_rdy_w)
 {
+	device_t *device = machine().device("z80dma");
 	z80dma_rdy_w(device, data & 0x01);
 }
 
@@ -144,7 +145,7 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE_LEGACY("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
@@ -164,7 +165,7 @@ static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE_LEGACY("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM

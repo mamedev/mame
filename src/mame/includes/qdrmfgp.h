@@ -27,6 +27,12 @@ public:
 	DECLARE_READ16_MEMBER(gp2_ide_std_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(inputs_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
+	DECLARE_READ16_MEMBER(ide_std_r);
+	DECLARE_WRITE16_MEMBER(ide_std_w);
+	DECLARE_READ16_MEMBER(ide_alt_r);
+	DECLARE_WRITE16_MEMBER(ide_alt_w);
+	DECLARE_WRITE_LINE_MEMBER(qdrmfgp_irq3_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(qdrmfgp_irq4_ack_w);
 };
 
 /*----------- defined in video/qdrmfgp.c -----------*/

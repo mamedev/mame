@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skydiver_lamp_y_w);
 	DECLARE_WRITE8_MEMBER(skydiver_lamp_d_w);
 	DECLARE_WRITE8_MEMBER(skydiver_2000_201F_w);
+	DECLARE_WRITE8_MEMBER(skydiver_sound_enable_w);
+	DECLARE_WRITE8_MEMBER(skydiver_whistle_w);
 };
 
 

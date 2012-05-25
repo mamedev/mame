@@ -93,6 +93,13 @@ public:
 	void jpm_draw_lamps(int data, int lamp_strobe);
 	DECLARE_WRITE16_MEMBER(jpmimpct_bt477_w);
 	DECLARE_READ16_MEMBER(jpmimpct_bt477_r);
+	DECLARE_WRITE16_MEMBER(volume_w);
+	DECLARE_WRITE16_MEMBER(upd7759_w);
+	DECLARE_READ16_MEMBER(upd7759_r);
+	DECLARE_READ8_MEMBER(hopper_b_r);
+	DECLARE_READ8_MEMBER(hopper_c_r);
+	DECLARE_WRITE8_MEMBER(payen_a_w);
+	DECLARE_WRITE8_MEMBER(display_c_w);
 };
 
 

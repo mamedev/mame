@@ -35,6 +35,9 @@ public:
 	DECLARE_READ8_MEMBER(freekick_ff_r);
 	DECLARE_WRITE8_MEMBER(freekick_ff_w);
 	DECLARE_WRITE8_MEMBER(freek_videoram_w);
+	DECLARE_WRITE8_MEMBER(snd_rom_addr_l_w);
+	DECLARE_WRITE8_MEMBER(snd_rom_addr_h_w);
+	DECLARE_READ8_MEMBER(snd_rom_r);
 };
 
 

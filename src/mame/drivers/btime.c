@@ -177,15 +177,14 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( ay_audio_nmi_enable_w )
+WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 {
-	btime_state *state = device->machine().driver_data<btime_state>();
 
 	/* port A bit 0, when 1, inhibits the NMI */
-	if (state->m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
+	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
 	{
-		state->m_audio_nmi_enabled = ~data & 1;
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		m_audio_nmi_enabled = ~data & 1;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1319,7 +1318,7 @@ static const ay8910_interface ay1_intf =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5), RES_K(5), RES_K(5)},
-	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(ay_audio_nmi_enable_w), DEVCB_NULL
+	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(btime_state,ay_audio_nmi_enable_w), DEVCB_NULL
 };
 
 static const ay8910_interface ay2_intf =

@@ -246,8 +246,9 @@ WRITE16_MEMBER(moo_state::moo_prot_w)
 }
 
 
-static WRITE16_DEVICE_HANDLER( moobl_oki_bank_w )
+WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	logerror("%x to OKI bank\n", data);
 
 	downcast<okim6295_device *>(device)->set_bank_base((data & 0x0f) * 0x40000);
@@ -299,7 +300,7 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)       /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY		            /* CCU regs (ignored) */
-	AM_RANGE(0x0d6ffc, 0x0d6ffd) AM_DEVWRITE_LEGACY("oki", moobl_oki_bank_w)
+	AM_RANGE(0x0d6ffc, 0x0d6ffd) AM_WRITE(moobl_oki_bank_w)
 	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)     /* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")

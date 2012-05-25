@@ -401,18 +401,18 @@ READ8_MEMBER(tx1_state::ts_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( tx1_coin_cnt_w )
+WRITE8_MEMBER(tx1_state::tx1_coin_cnt_w)
 {
-	coin_counter_w(device->machine(), 0, data & 0x80);
-	coin_counter_w(device->machine(), 1, data & 0x40);
-//  coin_counter_w(device->machine(), 2, data & 0x40);
+	coin_counter_w(machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 1, data & 0x40);
+//  coin_counter_w(machine(), 2, data & 0x40);
 }
 
-static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
+WRITE8_MEMBER(tx1_state::bb_coin_cnt_w)
 {
-	coin_counter_w(device->machine(), 0, data & 0x01);
-	coin_counter_w(device->machine(), 1, data & 0x02);
-//  coin_counter_w(device->machine(), 2, data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
+//  coin_counter_w(machine(), 2, data & 0x04);
 }
 
 WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)
@@ -421,16 +421,14 @@ WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)
 	m_ppi_latch_b = ioport("AN_STEERING")->read();
 }
 
-static READ8_DEVICE_HANDLER( tx1_ppi_porta_r )
+READ8_MEMBER(tx1_state::tx1_ppi_porta_r)
 {
-	tx1_state *state = device->machine().driver_data<tx1_state>();
-	return state->m_ppi_latch_a;
+	return m_ppi_latch_a;
 }
 
-static READ8_DEVICE_HANDLER( tx1_ppi_portb_r )
+READ8_MEMBER(tx1_state::tx1_ppi_portb_r)
 {
-	tx1_state *state = device->machine().driver_data<tx1_state>();
-	return state->ioport("PPI_PORTD")->read() | state->m_ppi_latch_b;
+	return ioport("PPI_PORTD")->read() | m_ppi_latch_b;
 }
 
 
@@ -472,19 +470,19 @@ static I8255A_INTERFACE( buggyboy_ppi8255_intf )
 	DEVCB_INPUT_PORT("PPI_PORTA"),		/* Port A read */
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(bb_coin_cnt_w),		/* Port B write */
+	DEVCB_DRIVER_MEMBER(tx1_state,bb_coin_cnt_w),		/* Port B write */
 	DEVCB_INPUT_PORT("PPI_PORTC"),		/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 
 static I8255A_INTERFACE( tx1_ppi8255_intf )
 {
-	DEVCB_HANDLER(tx1_ppi_porta_r),		/* Port A read */
+	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_porta_r),		/* Port A read */
 	DEVCB_NULL,							/* Port A write */
-	DEVCB_HANDLER(tx1_ppi_portb_r),		/* Port B read */
+	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_portb_r),		/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_INPUT_PORT("PPI_PORTC"),		/* Port C read */
-	DEVCB_HANDLER(tx1_coin_cnt_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(tx1_state,tx1_coin_cnt_w)		/* Port C write */
 };
 
 

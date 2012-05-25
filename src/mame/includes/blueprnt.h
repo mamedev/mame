@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blueprnt_videoram_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_colorram_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(dipsw_w);
 };
 
 

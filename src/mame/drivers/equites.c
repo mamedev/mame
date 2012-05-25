@@ -472,62 +472,62 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( equites_8910porta_w )
+WRITE8_MEMBER(equites_state::equites_8910porta_w)
 {
-	equites_state *state = device->machine().driver_data<equites_state>();
+	device_t *device = machine().device("samples");
 	samples_device *samples = downcast<samples_device *>(device);
 
 	// bongo 1
 	samples->set_volume(0, ((data & 0x30) >> 4) * 0.33);
-	if (data & ~state->m_ay_port_a & 0x80)
+	if (data & ~m_ay_port_a & 0x80)
 		samples->start(0, 0);
 
 	// bongo 2
 	samples->set_volume(1, (data & 0x03) * 0.33);
-	if (data & ~state->m_ay_port_a & 0x08)
+	if (data & ~m_ay_port_a & 0x08)
 		samples->start(1, 1);
 
-	state->m_ay_port_a = data;
+	m_ay_port_a = data;
 
 #if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)", state->m_hihat, BIT(state->m_ay_port_b, 6), state->m_cymbal, state->m_ay_port_b & 3);
+popmessage("HH %d(%d) CYM %d(%d)", m_hihat, BIT(m_ay_port_b, 6), m_cymbal, m_ay_port_b & 3);
 #endif
 }
 
-static WRITE8_DEVICE_HANDLER( equites_8910portb_w )
+WRITE8_MEMBER(equites_state::equites_8910portb_w)
 {
-	equites_state *state = device->machine().driver_data<equites_state>();
+	device_t *device = machine().device("samples");
 	samples_device *samples = downcast<samples_device *>(device);
 #if POPDRUMKIT
-if (data & ~state->m_ay_port_b & 0x08) state->m_cymbal++;
-if (data & ~state->m_ay_port_b & 0x04) state->m_hihat++;
+if (data & ~m_ay_port_b & 0x08) m_cymbal++;
+if (data & ~m_ay_port_b & 0x04) m_hihat++;
 #endif
 
 	// bongo 3
 	samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
-	if (data & ~state->m_ay_port_b & 0x80)
+	if (data & ~m_ay_port_b & 0x80)
 		samples->start(2, 2);
 
 	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
 	// of the analog circuitry should be done instead.
-//  if (data & ~state->m_ay_port_b & 0x08)   cymbal hit trigger
-//  if (data & ~state->m_ay_port_b & 0x04)   hi-hat hit trigger
+//  if (data & ~m_ay_port_b & 0x08)   cymbal hit trigger
+//  if (data & ~m_ay_port_b & 0x04)   hi-hat hit trigger
 //  data & 3   cymbal volume
 //  data & 0x40  hi-hat enable
 
-	if (data & ~state->m_ay_port_b & 0x08)
-		state->m_cymvol = 1.0f;
+	if (data & ~m_ay_port_b & 0x08)
+		m_cymvol = 1.0f;
 
-	if (data & ~state->m_ay_port_b & 0x04)
-		state->m_hihatvol = 0.8f;
+	if (data & ~m_ay_port_b & 0x04)
+		m_hihatvol = 0.8f;
 
 	if (~data & 0x40)
-		state->m_hihatvol = 0.0f;
+		m_hihatvol = 0.0f;
 
-	state->m_ay_port_b = data;
+	m_ay_port_b = data;
 
 #if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)",state->m_hihat,BIT(state->m_ay_port_b,6),state->m_cymbal,state->m_ay_port_b & 3);
+popmessage("HH %d(%d) CYM %d(%d)",m_hihat,BIT(m_ay_port_b,6),m_cymbal,m_ay_port_b & 3);
 #endif
 }
 
@@ -1123,8 +1123,8 @@ static const ay8910_interface equites_8910intf =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("samples", equites_8910porta_w),
-	DEVCB_DEVICE_HANDLER("samples", equites_8910portb_w)
+	DEVCB_DRIVER_MEMBER(equites_state,equites_8910porta_w),
+	DEVCB_DRIVER_MEMBER(equites_state,equites_8910portb_w)
 };
 
 

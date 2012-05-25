@@ -30,11 +30,30 @@ public:
 	required_shared_ptr<UINT8> m_scroll;
 	int m_bghide;
 	int m_spritectrl[9];
+	DECLARE_WRITE8_MEMBER(p2a_w);
+	DECLARE_WRITE8_MEMBER(p2b_w);
+	DECLARE_WRITE8_MEMBER(p2c_w);
+	DECLARE_WRITE8_MEMBER(p3a_w);
+	DECLARE_WRITE8_MEMBER(p3b_w);
+	DECLARE_WRITE8_MEMBER(p3c_w);
+	DECLARE_WRITE8_MEMBER(p4a_w);
+	DECLARE_WRITE8_MEMBER(p4b_w);
+	DECLARE_WRITE8_MEMBER(p4c_w);
+	DECLARE_READ8_MEMBER(p0a_r);
+	DECLARE_READ8_MEMBER(p0c_r);
+	DECLARE_WRITE8_MEMBER(p0b_w);
+	DECLARE_WRITE8_MEMBER(p0c_w);
+	DECLARE_READ8_MEMBER(p1b_r);
+	DECLARE_READ8_MEMBER(p1c_r);
+	DECLARE_WRITE8_MEMBER(p1a_w);
+	DECLARE_WRITE8_MEMBER(p1c_w);
+	DECLARE_READ8_MEMBER(p8910_0a_r);
+	DECLARE_READ8_MEMBER(p8910_1a_r);
+	DECLARE_WRITE8_MEMBER(p8910_0b_w);
+	DECLARE_WRITE8_MEMBER(taxidriv_spritectrl_w);
 };
 
 
 /*----------- defined in video/taxidriv.c -----------*/
-
-WRITE8_DEVICE_HANDLER( taxidriv_spritectrl_w );
 
 SCREEN_UPDATE_IND16( taxidriv );

@@ -83,34 +83,31 @@ WRITE8_MEMBER(shangkid_state::shangkid_sound_enable_w)
 	m_bbx_sound_enable = data;
 }
 
-static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
+WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
 {
-	shangkid_state *state = device->machine().driver_data<shangkid_state>();
-	if( state->m_bbx_sound_enable )
+	if( m_bbx_sound_enable )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cputag_set_input_line(device->machine(), "audiocpu", 0, HOLD_LINE );
+			cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE );
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
+WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
 {
-	shangkid_state *state = device->machine().driver_data<shangkid_state>();
-	if( state->m_bbx_sound_enable )
+	if( m_bbx_sound_enable )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cputag_set_input_line(device->machine(), "audiocpu", 0, HOLD_LINE );
+			cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE );
 	}
 	else
-		state->membank("bank2")->set_entry(data ? 0 : 1);
+		membank("bank2")->set_entry(data ? 0 : 1);
 }
 
-static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
+WRITE8_MEMBER(shangkid_state::ay8910_portb_w)
 {
-	shangkid_state *state = device->machine().driver_data<shangkid_state>();
-	state->m_sound_latch = data;
+	m_sound_latch = data;
 }
 
 /***************************************************************************************/
@@ -347,8 +344,8 @@ static const ay8910_interface chinhero_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(chinhero_ay8910_porta_w),
-	DEVCB_HANDLER(ay8910_portb_w)
+	DEVCB_DRIVER_MEMBER(shangkid_state,chinhero_ay8910_porta_w),
+	DEVCB_DRIVER_MEMBER(shangkid_state,ay8910_portb_w)
 };
 
 
@@ -358,8 +355,8 @@ static const ay8910_interface shangkid_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(shangkid_ay8910_porta_w),
-	DEVCB_HANDLER(ay8910_portb_w)
+	DEVCB_DRIVER_MEMBER(shangkid_state,shangkid_ay8910_porta_w),
+	DEVCB_DRIVER_MEMBER(shangkid_state,ay8910_portb_w)
 };
 
 

@@ -458,20 +458,21 @@ static ADDRESS_MAP_START( sound_7759_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
+WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
-	int offs, size = device->machine().root_device().memregion("soundcpu")->bytes() - 0x10000;
+	device_t *device = machine().device("7759");
+	int offs, size = machine().root_device().memregion("soundcpu")->bytes() - 0x10000;
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	device->machine().root_device().membank("bank1")->set_base(device->machine().root_device().memregion("soundcpu")->base() + offs);
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("soundcpu")->base() + offs);
 }
 
 
 static ADDRESS_MAP_START( sound_7759_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("7759", upd7759_bank_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(upd7759_bank_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("7759", upd7759_port_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END

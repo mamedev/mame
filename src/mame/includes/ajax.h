@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ajax_bankswitch_2_w);
 	DECLARE_WRITE8_MEMBER(ajax_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(ajax_lamps_w);
+	DECLARE_WRITE8_MEMBER(k007232_extvol_w);
 };
 
 

@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(system1_paletteram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
+	DECLARE_WRITE8_MEMBER(sound_control_w);
 };
 
 

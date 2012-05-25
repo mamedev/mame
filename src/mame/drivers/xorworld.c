@@ -44,22 +44,25 @@ EEPROM chip: 93C46
                 EEPROM read/write/control
 ****************************************************************/
 
-static WRITE16_DEVICE_HANDLER( eeprom_chip_select_w )
+WRITE16_MEMBER(xorworld_state::eeprom_chip_select_w)
 {
+	device_t *device = machine().device("eeprom");
 	/* bit 0 is CS (active low) */
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE16_DEVICE_HANDLER( eeprom_serial_clock_w )
+WRITE16_MEMBER(xorworld_state::eeprom_serial_clock_w)
 {
+	device_t *device = machine().device("eeprom");
 	/* bit 0 is SK (active high) */
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE16_DEVICE_HANDLER( eeprom_data_w )
+WRITE16_MEMBER(xorworld_state::eeprom_data_w)
 {
+	device_t *device = machine().device("eeprom");
 	/* bit 0 is EEPROM data (DIN) */
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data & 0x01);
@@ -82,9 +85,9 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00008, 0xa00009) AM_DEVWRITE_LEGACY("eeprom", eeprom_chip_select_w)
-	AM_RANGE(0xa0000a, 0xa0000b) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_clock_w)
-	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE_LEGACY("eeprom", eeprom_data_w)
+	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
+	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
+	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_SHARE("videoram")
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_SHARE("spriteram")
 	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(xorworld_irq2_ack_w)

@@ -65,6 +65,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(high_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(low_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
+	DECLARE_WRITE8_MEMBER(out_0);
+	DECLARE_WRITE8_MEMBER(out_1);
+	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
+	DECLARE_READ8_MEMBER(namco_52xx_si_r);
+	DECLARE_READ8_MEMBER(namco_53xx_k_r);
+	DECLARE_READ8_MEMBER(steering_changed_r);
+	DECLARE_READ8_MEMBER(steering_delta_r);
 };
 
 

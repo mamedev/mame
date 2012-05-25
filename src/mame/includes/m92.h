@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE16_MEMBER(m92_pf3_control_w);
 	DECLARE_WRITE16_MEMBER(m92_master_control_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(m92_sprite_busy_r);
+	DECLARE_WRITE16_MEMBER(oki_bank_w);
 };
 
 

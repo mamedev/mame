@@ -5688,26 +5688,23 @@ static I8255A_INTERFACE( cm_ppi8255_1_intf )
 
 
 
-static WRITE8_DEVICE_HANDLER( system_outputa_w )
+WRITE8_MEMBER(goldstar_state::system_outputa_w)
 {
-	//goldstar_state *state = device->machine().driver_data<goldstar_state>();
 	//popmessage("system_outputa_w %02x",data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( system_outputb_w )
+WRITE8_MEMBER(goldstar_state::system_outputb_w)
 {
-	//goldstar_state *state = device->machine().driver_data<goldstar_state>();
 	//popmessage("system_outputb_w %02x",data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( system_outputc_w )
+WRITE8_MEMBER(goldstar_state::system_outputc_w)
 {
-	goldstar_state *state = device->machine().driver_data<goldstar_state>();
 
-	state->m_lucky8_nmi_enable = data & 8;
-	state->m_unkch_vidreg = data & 2;
+	m_lucky8_nmi_enable = data & 8;
+	m_unkch_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
 }
 
@@ -5735,11 +5732,11 @@ static I8255A_INTERFACE( lucky8_ppi8255_1_intf )
 static I8255A_INTERFACE( lucky8_ppi8255_2_intf )
 {
 	DEVCB_INPUT_PORT("DSW2"),			/* Port A read */
-	DEVCB_HANDLER(system_outputa_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(goldstar_state,system_outputa_w),	/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(system_outputb_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(goldstar_state,system_outputb_w),	/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(system_outputc_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(goldstar_state,system_outputc_w)		/* Port C write */
 };
 
 static I8255A_INTERFACE( kkotnoli_ppi8255_0_intf )
@@ -5813,15 +5810,13 @@ static const ay8910_interface cm_ay8910_config =
 	DEVCB_NULL
 };
 
-static WRITE8_DEVICE_HANDLER( ay8910_outputa_w )
+WRITE8_MEMBER(goldstar_state::ay8910_outputa_w)
 {
-	//goldstar_state *state = device->machine().driver_data<goldstar_state>();
 	//popmessage("ay8910_outputa_w %02x",data);
 }
 
-static WRITE8_DEVICE_HANDLER( ay8910_outputb_w )
+WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 {
-	//goldstar_state *state = device->machine().driver_data<goldstar_state>();
 	//popmessage("ay8910_outputb_w %02x",data);
 }
 
@@ -5831,8 +5826,8 @@ static const ay8910_interface lucky8_ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW3"),
 	DEVCB_INPUT_PORT("DSW4"),
-	DEVCB_HANDLER(ay8910_outputa_w),
-	DEVCB_HANDLER(ay8910_outputb_w)
+	DEVCB_DRIVER_MEMBER(goldstar_state,ay8910_outputa_w),
+	DEVCB_DRIVER_MEMBER(goldstar_state,ay8910_outputb_w)
 };
 
 static const ay8910_interface ladylinr_ay8910_config =

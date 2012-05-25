@@ -53,6 +53,9 @@ public:
 	DECLARE_READ8_MEMBER(qx0_r);
 	DECLARE_READ8_MEMBER(qx1_r);
 	DECLARE_READ8_MEMBER(f6a3_r);
+	DECLARE_WRITE8_MEMBER(gladiator_int_control_w);
+	DECLARE_WRITE8_MEMBER(glad_adpcm_w);
+	DECLARE_READ8_MEMBER(f1_r);
 };
 
 /*----------- defined in video/gladiatr.c -----------*/

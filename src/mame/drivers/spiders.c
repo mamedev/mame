@@ -209,9 +209,9 @@
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
-static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w );
-static READ8_DEVICE_HANDLER( gfx_rom_r );
+
+
+
 
 
 
@@ -221,28 +221,28 @@ static READ8_DEVICE_HANDLER( gfx_rom_r );
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
+WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
 {
-	pia6821_device *pia1 = device->machine().device<pia6821_device>("pia1");
-	pia6821_device *pia2 = device->machine().device<pia6821_device>("pia2");
-	pia6821_device *pia3 = device->machine().device<pia6821_device>("pia3");
+	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
+	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
+	pia6821_device *pia3 = machine().device<pia6821_device>("pia3");
 	int combined_state = pia1->irq_a_state() | pia1->irq_b_state() |
 											      pia2->irq_b_state() |
 						 pia3->irq_a_state() | pia3->irq_b_state();
 
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
+WRITE_LINE_MEMBER(spiders_state::main_cpu_firq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( audio_cpu_irq )
+WRITE_LINE_MEMBER(spiders_state::audio_cpu_irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -265,8 +265,8 @@ static const pia6821_interface pia_1_intf =
 	DEVCB_NULL,		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(main_cpu_irq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
 };
 
 static INTERRUPT_GEN( update_pia_1 )
@@ -296,18 +296,18 @@ static INTERRUPT_GEN( update_pia_1 )
 
 static const pia6821_interface pia_2_intf =
 {
-	DEVCB_HANDLER(gfx_rom_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(gfx_rom_intf_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_intf_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(flipscreen_w),		/* port CB2 out */
-	DEVCB_LINE(main_cpu_firq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,flipscreen_w),		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_firq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
 };
 
 
@@ -330,8 +330,8 @@ static const pia6821_interface pia_3_intf =
 	DEVCB_DEVICE_HANDLER("pia4", spiders_audio_command_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(main_cpu_irq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
 };
 
 
@@ -354,7 +354,7 @@ static const pia6821_interface pia_4_intf =
 	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_b_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(audio_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,audio_cpu_irq),		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
 
@@ -418,10 +418,9 @@ static MACHINE_START( spiders )
  *************************************/
 
 
-static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
+WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
 {
-	spiders_state *drvstate = device->machine().driver_data<spiders_state>();
-	drvstate->m_flipscreen = state;
+	m_flipscreen = state;
 }
 
 
@@ -500,9 +499,9 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
+WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
 {
-	ttl74123_a_w(device->machine().device("ic60"), 0, state);
+	ttl74123_a_w(machine().device("ic60"), 0, state);
 }
 
 
@@ -513,7 +512,7 @@ static const mc6845_interface mc6845_intf =
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
 	NULL,					/* after pixel update callback */
-	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,display_enable_changed),	/* callback for display state changes */
 	DEVCB_NULL,				/* callback for cursor state changes */
 	DEVCB_NULL,				/* HSYNC callback */
 	DEVCB_NULL,				/* VSYNC callback */
@@ -529,32 +528,30 @@ static const mc6845_interface mc6845_intf =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w )
+WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
 {
-	spiders_state *state = device->machine().driver_data<spiders_state>();
-	state->m_gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
-	state->m_gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
-	state->m_gfx_rom_ctrl_data  = (~data >> 0) & 0x0f;
+	m_gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
+	m_gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
+	m_gfx_rom_ctrl_data  = (~data >> 0) & 0x0f;
 }
 
 
-static READ8_DEVICE_HANDLER( gfx_rom_r )
+READ8_MEMBER(spiders_state::gfx_rom_r)
 {
-	spiders_state *state = device->machine().driver_data<spiders_state>();
 	UINT8 ret;
 
-	if (state->m_gfx_rom_ctrl_mode)
+	if (m_gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = state->memregion("gfx1")->base();
+		UINT8 *rom = memregion("gfx1")->base();
 
-		ret = rom[state->m_gfx_rom_address];
+		ret = rom[m_gfx_rom_address];
 
-		state->m_gfx_rom_address = state->m_gfx_rom_address + 1;
+		m_gfx_rom_address = m_gfx_rom_address + 1;
 	}
 	else
 	{
-		UINT8 shift_count = state->m_gfx_rom_ctrl_latch << 2;
-		state->m_gfx_rom_address = (state->m_gfx_rom_address & ~(0x0f << shift_count)) | (state->m_gfx_rom_ctrl_data << shift_count);
+		UINT8 shift_count = m_gfx_rom_ctrl_latch << 2;
+		m_gfx_rom_address = (m_gfx_rom_address & ~(0x0f << shift_count)) | (m_gfx_rom_ctrl_data << shift_count);
 
 		ret = 0;
 	}

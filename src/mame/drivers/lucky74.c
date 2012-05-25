@@ -698,17 +698,16 @@ WRITE8_MEMBER(lucky74_state::custom_09R81P_port_w)
 	m_adpcm_reg[offset] = data;
 }
 
-static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
+WRITE8_MEMBER(lucky74_state::ym2149_portb_w)
 {
-	lucky74_state *state = device->machine().driver_data<lucky74_state>();
 /*  when is in game mode writes 0x0a.
     when is in test mode writes 0x0e.
     after reset writes 0x16.
 
     bit 0 contains the screen orientation.
 */
-	state->m_ym2149_portb = data;
-	state->flip_screen_set(data & 0x01);
+	m_ym2149_portb = data;
+	flip_screen_set(data & 0x01);
 }
 
 READ8_MEMBER(lucky74_state::usart_8251_r)
@@ -744,7 +743,7 @@ WRITE8_MEMBER(lucky74_state::copro_sm7831_w)
 *    Lamps    *
 **************/
 
-static WRITE8_DEVICE_HANDLER(lamps_a_w)
+WRITE8_MEMBER(lucky74_state::lamps_a_w)
 {
 /*  LAMPSA:
 
@@ -759,7 +758,7 @@ static WRITE8_DEVICE_HANDLER(lamps_a_w)
 	output_set_lamp_value(11, (data >> 3) & 1);		/* SMALL */
 }
 
-static WRITE8_DEVICE_HANDLER(lamps_b_w)
+WRITE8_MEMBER(lucky74_state::lamps_b_w)
 {
 /*  LAMPSB:
 
@@ -1198,9 +1197,9 @@ static I8255A_INTERFACE( ppi8255_3_intf )
 	DEVCB_INPUT_PORT("DSW4"),			/* Port A read */
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(lamps_a_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(lucky74_state,lamps_a_w),			/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(lamps_b_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(lucky74_state,lamps_b_w)			/* Port C write */
 };
 
 
@@ -1215,7 +1214,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_INPUT_PORT("IN3"),
 	DEVCB_NULL,	/* a sort of status byte */
 	DEVCB_NULL,
-	DEVCB_HANDLER(ym2149_portb_w)
+	DEVCB_DRIVER_MEMBER(lucky74_state,ym2149_portb_w)
 };
 
 static const msm5205_interface msm5205_config =

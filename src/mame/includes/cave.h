@@ -156,6 +156,14 @@ public:
 	DECLARE_WRITE16_MEMBER(cave_vram_3_8x8_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
+	DECLARE_WRITE16_MEMBER(cave_eeprom_msb_w);
+	DECLARE_WRITE16_MEMBER(sailormn_eeprom_msb_w);
+	DECLARE_WRITE16_MEMBER(hotdogst_eeprom_msb_w);
+	DECLARE_WRITE16_MEMBER(cave_eeprom_lsb_w);
+	DECLARE_WRITE16_MEMBER(metmqstr_eeprom_msb_w);
+	DECLARE_WRITE16_MEMBER(korokoro_eeprom_msb_w);
+	DECLARE_READ16_MEMBER(pwrinst2_eeprom_r);
+	DECLARE_WRITE16_MEMBER(tjumpman_eeprom_lsb_w);
 };
 
 /*----------- defined in video/cave.c -----------*/

@@ -98,6 +98,7 @@ public:
 	DECLARE_WRITE16_MEMBER(taitof2_sprite_extension_w);
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
+	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
 };
 
 /*----------- defined in video/taito_f2.c -----------*/

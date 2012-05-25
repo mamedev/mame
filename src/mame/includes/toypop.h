@@ -37,6 +37,13 @@ public:
 	DECLARE_WRITE16_MEMBER(toypop_flipscreen_w);
 	DECLARE_READ16_MEMBER(toypop_merged_background_r);
 	DECLARE_WRITE16_MEMBER(toypop_merged_background_w);
+	DECLARE_READ8_MEMBER(dipA_l);
+	DECLARE_READ8_MEMBER(dipA_h);
+	DECLARE_READ8_MEMBER(dipB_l);
+	DECLARE_READ8_MEMBER(dipB_h);
+	DECLARE_WRITE8_MEMBER(out_coin0);
+	DECLARE_WRITE8_MEMBER(out_coin1);
+	DECLARE_WRITE8_MEMBER(flip);
 };
 
 

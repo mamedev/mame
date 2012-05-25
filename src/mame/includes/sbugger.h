@@ -12,6 +12,7 @@ public:
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(sbugger_videoram_w);
 	DECLARE_WRITE8_MEMBER(sbugger_videoram_attr_w);
+	DECLARE_WRITE_LINE_MEMBER(sbugger_interrupt);
 };
 
 

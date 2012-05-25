@@ -159,18 +159,18 @@ REF. 970429
 
 static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data);
 
-static WRITE_LINE_DEVICE_HANDLER( ser_irq )
+WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 {
 	if (state)
-		cputag_set_input_line(device->machine(), "maincpu", 6, ASSERT_LINE);
+		cputag_set_input_line(machine(), "maincpu", 6, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine(), "maincpu", 6, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
 }
 
 
 static const gaelco_serial_interface serial_interface =
 {
-	DEVCB_LINE( ser_irq )
+	DEVCB_DRIVER_LINE_MEMBER(gaelco3d_state, ser_irq)
 };
 
 
@@ -284,8 +284,9 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
  *
  *************************************/
 
-static READ16_DEVICE_HANDLER( eeprom_data_r )
+READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 {
+	device_t *device = machine().device("eeprom");
 	UINT32 result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
@@ -293,7 +294,7 @@ static READ16_DEVICE_HANDLER( eeprom_data_r )
 		/* bit 0 is clock */
 		/* bit 1 active */
 		result &= ~GAELCOSER_EXT_STATUS_MASK;
-		result |= gaelco_serial_status_r(device->machine().device("serial"), 0);
+		result |= gaelco_serial_status_r(machine().device("serial"), 0);
 	}
 
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -304,26 +305,27 @@ static READ16_DEVICE_HANDLER( eeprom_data_r )
 	return result;
 }
 
-static READ32_DEVICE_HANDLER( eeprom_data32_r )
+READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 {
 	if (ACCESSING_BITS_16_31)
-		return (eeprom_data_r(device, 0, mem_mask >> 16) << 16) | 0xffff;
+		return (eeprom_data_r(space, 0, mem_mask >> 16) << 16) | 0xffff;
 	else if (ACCESSING_BITS_0_7)
 	{
-		UINT8 data = gaelco_serial_data_r(device->machine().device("serial"),0);
+		UINT8 data = gaelco_serial_data_r(machine().device("serial"),0);
 		if (LOG)
-			logerror("%06X:read(%02X) = %08X & %08X\n", cpu_get_pc(device->machine().device("maincpu")), offset, data, mem_mask);
+			logerror("%06X:read(%02X) = %08X & %08X\n", cpu_get_pc(machine().device("maincpu")), offset, data, mem_mask);
 		return  data | 0xffffff00;
 	}
 	else
-		logerror("%06X:read(%02X) = mask %08X\n", cpu_get_pc(device->machine().device("maincpu")), offset, mem_mask);
+		logerror("%06X:read(%02X) = mask %08X\n", cpu_get_pc(machine().device("maincpu")), offset, mem_mask);
 
 	return 0xffffffff;
 }
 
 
-static WRITE16_DEVICE_HANDLER( eeprom_data_w )
+WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -334,8 +336,9 @@ static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 }
 
 
-static WRITE16_DEVICE_HANDLER( eeprom_clock_w )
+WRITE16_MEMBER(gaelco3d_state::eeprom_clock_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -344,8 +347,9 @@ static WRITE16_DEVICE_HANDLER( eeprom_clock_w )
 }
 
 
-static WRITE16_DEVICE_HANDLER( eeprom_cs_w )
+WRITE16_MEMBER(gaelco3d_state::eeprom_cs_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -776,16 +780,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	AM_RANGE(0x51003c, 0x51003d) AM_READ_PORT("IN3")
 	AM_RANGE(0x510040, 0x510041) AM_WRITE(sound_data_w)
 	AM_RANGE(0x510042, 0x510043) AM_READ(sound_status_r)
-	AM_RANGE(0x510100, 0x510101) AM_DEVREAD_LEGACY("eeprom", eeprom_data_r)
+	AM_RANGE(0x510100, 0x510101) AM_READ(eeprom_data_r)
 	AM_RANGE(0x510100, 0x510101) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x510102, 0x510103) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_tr_w, 0x00ff)
 	AM_RANGE(0x510102, 0x510103) AM_DEVREAD8_LEGACY("serial", gaelco_serial_data_r, 0x00ff)
 	AM_RANGE(0x510104, 0x510105) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_data_w, 0x00ff)
 	AM_RANGE(0x51010a, 0x51010b) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_rts_w, 0x00ff)
-	AM_RANGE(0x510110, 0x510113) AM_DEVWRITE_LEGACY("eeprom", eeprom_data_w)
+	AM_RANGE(0x510110, 0x510113) AM_WRITE(eeprom_data_w)
 	AM_RANGE(0x510116, 0x510117) AM_WRITE(tms_control3_w)
-	AM_RANGE(0x510118, 0x51011b) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
-	AM_RANGE(0x510120, 0x510123) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
+	AM_RANGE(0x510118, 0x51011b) AM_WRITE(eeprom_clock_w)
+	AM_RANGE(0x510120, 0x510123) AM_WRITE(eeprom_cs_w)
 	AM_RANGE(0x51012a, 0x51012b) AM_WRITE(tms_reset_w)
 	AM_RANGE(0x510132, 0x510133) AM_WRITE(tms_irq_w)
 	AM_RANGE(0x510146, 0x510147) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_irq_enable, 0x00ff)
@@ -806,14 +810,14 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x51003c, 0x51003f) AM_READ_PORT("IN3")
 	AM_RANGE(0x510040, 0x510043) AM_READ16(sound_status_r, 0x0000ffff)
 	AM_RANGE(0x510040, 0x510043) AM_WRITE16(sound_data_w, 0xffff0000)
-	AM_RANGE(0x510100, 0x510103) AM_DEVREAD_LEGACY("eeprom", eeprom_data32_r)
+	AM_RANGE(0x510100, 0x510103) AM_READ(eeprom_data32_r)
 	AM_RANGE(0x510100, 0x510103) AM_WRITE(irq_ack32_w)
 	AM_RANGE(0x510104, 0x510107) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_data_w, 0x00ff0000)
 	AM_RANGE(0x510108, 0x51010b) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_rts_w, 0x000000ff)
-	AM_RANGE(0x510110, 0x510113) AM_DEVWRITE16_LEGACY("eeprom", eeprom_data_w, 0x0000ffff)
+	AM_RANGE(0x510110, 0x510113) AM_WRITE16(eeprom_data_w, 0x0000ffff)
 	AM_RANGE(0x510114, 0x510117) AM_WRITE16(tms_control3_w, 0x0000ffff)
-	AM_RANGE(0x510118, 0x51011b) AM_DEVWRITE16_LEGACY("eeprom", eeprom_clock_w, 0x0000ffff)
-	AM_RANGE(0x510120, 0x510123) AM_DEVWRITE16_LEGACY("eeprom", eeprom_cs_w, 0x0000ffff)
+	AM_RANGE(0x510118, 0x51011b) AM_WRITE16(eeprom_clock_w, 0x0000ffff)
+	AM_RANGE(0x510120, 0x510123) AM_WRITE16(eeprom_cs_w, 0x0000ffff)
 	AM_RANGE(0x510124, 0x510127) AM_WRITE(radikalb_lamp_w)
 	AM_RANGE(0x510128, 0x51012b) AM_WRITE16(tms_reset_w, 0x0000ffff)
 	AM_RANGE(0x510130, 0x510133) AM_WRITE16(tms_irq_w, 0x0000ffff)

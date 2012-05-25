@@ -409,6 +409,12 @@ public:
 	DECLARE_WRITE8_MEMBER(daimyojn_palette_sel_w);
 	DECLARE_WRITE8_MEMBER(daimyojn_blitter_data_palette_w);
 	DECLARE_READ8_MEMBER(daimyojn_year_hack_r);
+	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
+	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
+	DECLARE_READ8_MEMBER(htengoku_dsw_r);
+	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
+	DECLARE_READ8_MEMBER(tenkai_dsw_r);
+	DECLARE_WRITE_LINE_MEMBER(tenkai_rtc_irq);
 };
 
 //----------- defined in drivers/dynax.c -----------

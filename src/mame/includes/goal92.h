@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(goal92_text_w);
 	DECLARE_WRITE16_MEMBER(goal92_background_w);
 	DECLARE_WRITE16_MEMBER(goal92_foreground_w);
+	DECLARE_WRITE8_MEMBER(adpcm_control_w);
 };
 
 

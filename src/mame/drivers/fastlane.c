@@ -56,17 +56,29 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 
-static READ8_DEVICE_HANDLER( fastlane_k007232_r )
+READ8_MEMBER(fastlane_state::fastlane_k1_k007232_r)
 {
+	device_t *device = machine().device("konami1");
 	return k007232_r(device, offset ^ 1);
 }
 
-static WRITE8_DEVICE_HANDLER( fastlane_k007232_w )
+WRITE8_MEMBER(fastlane_state::fastlane_k1_k007232_w)
 {
+	device_t *device = machine().device("konami1");
 	k007232_w(device, offset ^ 1, data);
 }
 
+READ8_MEMBER(fastlane_state::fastlane_k2_k007232_r)
+{
+	device_t *device = machine().device("konami2");
+	return k007232_r(device, offset ^ 1);
+}
 
+WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
+{
+	device_t *device = machine().device("konami2");
+	k007232_w(device, offset ^ 1, data);
+}
 static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_SHARE("k007121_regs")	/* 007121 registers */
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
@@ -77,8 +89,8 @@ static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0901, 0x0901) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0b00, 0x0b00) AM_WRITE(watchdog_reset_w)											/* watchdog reset */
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)									/* bankswitch control */
-	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE_LEGACY("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
-	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE_LEGACY("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */
+	AM_RANGE(0x0d00, 0x0d0d) AM_READWRITE(fastlane_k1_k007232_r, fastlane_k1_k007232_w)	/* 007232 registers (chip 1) */
+	AM_RANGE(0x0e00, 0x0e0d) AM_READWRITE(fastlane_k2_k007232_r, fastlane_k2_k007232_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)									/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("paletteram")										/* Palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM																/* Work RAM */

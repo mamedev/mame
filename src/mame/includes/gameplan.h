@@ -51,6 +51,14 @@ public:
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_device<via6522_device> m_via_2;
+	DECLARE_WRITE8_MEMBER(io_select_w);
+	DECLARE_READ8_MEMBER(io_port_r);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_WRITE8_MEMBER(audio_reset_w);
+	DECLARE_WRITE8_MEMBER(audio_cmd_w);
+	DECLARE_WRITE8_MEMBER(audio_trigger_w);
+	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
+	DECLARE_WRITE8_MEMBER(r6532_soundlatch_w);
 };
 
 

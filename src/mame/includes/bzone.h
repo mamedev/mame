@@ -21,6 +21,8 @@ public:
 	DECLARE_READ8_MEMBER(analog_data_r);
 	DECLARE_WRITE8_MEMBER(analog_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ8_MEMBER(redbaron_joy_r);
+	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
 };
 
 

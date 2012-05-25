@@ -134,8 +134,15 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 }
 
 
-static READ8_DEVICE_HANDLER( overdriv_sound_r )
+READ8_MEMBER(overdriv_state::overdriv_1_sound_r)
 {
+	device_t *device = machine().device("k053260_1");
+	return k053260_r(device, 2 + offset);
+}
+
+READ8_MEMBER(overdriv_state::overdriv_2_sound_r)
+{
+	device_t *device = machine().device("k053260_2");
 	return k053260_r(device, 2 + offset);
 }
 
@@ -167,8 +174,8 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0xff00)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0xff00)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
-	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREADWRITE8_LEGACY("k053260_1", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
-	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREADWRITE8_LEGACY("k053260_2", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
+	AM_RANGE(0x1d8000, 0x1d8003) AM_READ8(overdriv_1_sound_r, 0x00ff) AM_DEVWRITE8_LEGACY("k053260_1", k053260_w, 0x00ff)	/* K053260 */
+	AM_RANGE(0x1e0000, 0x1e0003) AM_READ8(overdriv_2_sound_r, 0x00ff) AM_DEVWRITE8_LEGACY("k053260_2", k053260_w, 0x00ff)	/* K053260 */
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)

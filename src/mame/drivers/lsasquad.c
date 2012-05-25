@@ -544,7 +544,7 @@ static void irqhandler(device_t *device, int irq)
 	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( unk )
+WRITE8_MEMBER(lsasquad_state::unk)
 {
 
 }
@@ -557,8 +557,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(unk),
-		DEVCB_HANDLER(unk),
+		DEVCB_DRIVER_MEMBER(lsasquad_state,unk),
+		DEVCB_DRIVER_MEMBER(lsasquad_state,unk),
 	},
 	irqhandler
 };

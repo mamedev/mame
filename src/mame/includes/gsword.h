@@ -31,6 +31,12 @@ public:
 	DECLARE_WRITE8_MEMBER(gsword_scroll_w);
 	DECLARE_READ8_MEMBER(gsword_hack_r);
 	DECLARE_WRITE8_MEMBER(adpcm_soundcommand_w);
+	DECLARE_WRITE8_MEMBER(gsword_nmi_set_w);
+	DECLARE_WRITE8_MEMBER(gsword_AY8910_control_port_0_w);
+	DECLARE_WRITE8_MEMBER(gsword_AY8910_control_port_1_w);
+	DECLARE_READ8_MEMBER(gsword_fake_0_r);
+	DECLARE_READ8_MEMBER(gsword_fake_1_r);
+	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
 };
 
 

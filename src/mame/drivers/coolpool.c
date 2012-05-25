@@ -556,8 +556,9 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 }
 
 
-static WRITE16_DEVICE_HANDLER( dsp_dac_w )
+WRITE16_MEMBER(coolpool_state::dsp_dac_w)
 {
+	device_t *device = machine().device("dac");
 	dac_signed_data_16_w(device, (INT16)(data << 4) + 0x8000);
 }
 
@@ -688,7 +689,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac", dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(dsp_dac_w)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
@@ -706,7 +707,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac", dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(dsp_dac_w)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")

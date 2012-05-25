@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sslam_md_tileram_w);
 	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);
 	DECLARE_WRITE16_MEMBER(powerbls_bg_tileram_w);
+	DECLARE_WRITE16_MEMBER(sslam_snd_w);
 };
 
 

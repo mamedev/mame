@@ -49,21 +49,21 @@ static TIMER_CALLBACK( dac_irq )
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static WRITE8_DEVICE_HANDLER( audio_dac_w )
+WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
-	trucocl_state *state = device->machine().driver_data<trucocl_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	device_t *device = machine().device("dac");
+	UINT8 *rom = memregion("maincpu")->base();
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
-	if ( state->m_cur_dac_address != dac_address )
+	if ( m_cur_dac_address != dac_address )
 	{
-		state->m_cur_dac_address_index = 0;
-		state->m_cur_dac_address = dac_address;
+		m_cur_dac_address_index = 0;
+		m_cur_dac_address = dac_address;
 	}
 	else
 	{
-		state->m_cur_dac_address_index++;
+		m_cur_dac_address_index++;
 	}
 
 	if ( sel & 1 )
@@ -74,9 +74,9 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 
 	dac_address += 0x10000;
 
-	dac_data_w( device, rom[dac_address+state->m_cur_dac_address_index] );
+	dac_data_w( device, rom[dac_address+m_cur_dac_address_index] );
 
-	device->machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
+	machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
-	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE_LEGACY("dac", audio_dac_w)
+	AM_RANGE(0x5080, 0x5080) AM_WRITE(audio_dac_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(megazone_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(megazone_flipscreen_w);
+	DECLARE_READ8_MEMBER(megazone_port_a_r);
+	DECLARE_WRITE8_MEMBER(megazone_port_b_w);
 };
 
 

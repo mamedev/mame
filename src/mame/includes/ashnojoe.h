@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ashnojoe_tileram7_w);
 	DECLARE_WRITE16_MEMBER(joe_tilemaps_xscroll_w);
 	DECLARE_WRITE16_MEMBER(joe_tilemaps_yscroll_w);
+	DECLARE_WRITE8_MEMBER(ym2203_write_a);
+	DECLARE_WRITE8_MEMBER(ym2203_write_b);
 };
 
 

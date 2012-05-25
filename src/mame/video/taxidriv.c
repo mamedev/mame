@@ -2,10 +2,9 @@
 #include "includes/taxidriv.h"
 
 
-WRITE8_DEVICE_HANDLER( taxidriv_spritectrl_w )
+WRITE8_MEMBER(taxidriv_state::taxidriv_spritectrl_w)
 {
-	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	state->m_spritectrl[offset] = data;
+	m_spritectrl[offset] = data;
 }
 
 

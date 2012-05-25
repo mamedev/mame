@@ -289,17 +289,18 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( cave_eeprom_msb_w )
+WRITE16_MEMBER(cave_state::cave_eeprom_msb_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (data & ~0xfe00)
-		logerror("%s: Unknown EEPROM bit written %04X\n", device->machine().describe_context(), data);
+		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
-		coin_lockout_w(device->machine(), 1,~data & 0x8000);
-		coin_lockout_w(device->machine(), 0,~data & 0x4000);
-		coin_counter_w(device->machine(), 1, data & 0x2000);
-		coin_counter_w(device->machine(), 0, data & 0x1000);
+		coin_lockout_w(machine(), 1,~data & 0x8000);
+		coin_lockout_w(machine(), 0,~data & 0x4000);
+		coin_counter_w(machine(), 1, data & 0x2000);
+		coin_counter_w(machine(), 0, data & 0x1000);
 
 		// latch the bit
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -313,14 +314,15 @@ static WRITE16_DEVICE_HANDLER( cave_eeprom_msb_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( sailormn_eeprom_msb_w )
+WRITE16_MEMBER(cave_state::sailormn_eeprom_msb_w)
 {
-	sailormn_tilebank_w(device->machine(), data & 0x0100);
-	cave_eeprom_msb_w(device, offset, data & ~0x0100, mem_mask);
+	sailormn_tilebank_w(machine(), data & 0x0100);
+	cave_eeprom_msb_w(space, offset, data & ~0x0100, mem_mask);
 }
 
-static WRITE16_DEVICE_HANDLER( hotdogst_eeprom_msb_w )
+WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_8_15)  // even address
 	{
 		// latch the bit
@@ -335,17 +337,18 @@ static WRITE16_DEVICE_HANDLER( hotdogst_eeprom_msb_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( cave_eeprom_lsb_w )
+WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (data & ~0x00ef)
-		logerror("%s: Unknown EEPROM bit written %04X\n",device->machine().describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
-		coin_lockout_w(device->machine(), 1, ~data & 0x0008);
-		coin_lockout_w(device->machine(), 0, ~data & 0x0004);
-		coin_counter_w(device->machine(), 1,  data & 0x0002);
-		coin_counter_w(device->machine(), 0,  data & 0x0001);
+		coin_lockout_w(machine(), 1, ~data & 0x0008);
+		coin_lockout_w(machine(), 0, ~data & 0x0004);
+		coin_counter_w(machine(), 1,  data & 0x0002);
+		coin_counter_w(machine(), 0,  data & 0x0001);
 
 		// latch the bit
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -371,15 +374,16 @@ WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
 
 /*  - No coin lockouts
     - Writing 0xcf00 shouldn't send a 1 bit to the eeprom   */
-static WRITE16_DEVICE_HANDLER( metmqstr_eeprom_msb_w )
+WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (data & ~0xff00)
-		logerror("%s: Unknown EEPROM bit written %04X\n", device->machine().describe_context(), data);
+		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
-		coin_counter_w(device->machine(), 1, data & 0x2000);
-		coin_counter_w(device->machine(), 0, data & 0x1000);
+		coin_counter_w(machine(), 1, data & 0x2000);
+		coin_counter_w(machine(), 0, data & 0x1000);
 
 		if (~data & 0x0100)
 		{
@@ -445,7 +449,7 @@ static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -470,7 +474,7 @@ static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -521,7 +525,7 @@ static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)								//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")														// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")														// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
 ADDRESS_MAP_END
 
 
@@ -546,7 +550,7 @@ static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0" )													// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1" )													// Inputs + EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -600,7 +604,7 @@ static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
 /**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")													// Inputs
-	AM_RANGE(0xd00010, 0xd00011) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_lsb_w)								// EEPROM
+	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(cave_eeprom_lsb_w)								// EEPROM
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")													// Inputs + EEPROM
 //  AM_RANGE(0xd00012, 0xd00013) AM_WRITENOP                                                            // ?
 //  AM_RANGE(0xd00014, 0xd00015) AM_WRITENOP                                                            // ? $800068 in dfeveron ? probably Watchdog
@@ -627,7 +631,7 @@ static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("eeprom", hotdogst_eeprom_msb_w)							// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(hotdogst_eeprom_msb_w)							// EEPROM
 	AM_RANGE(0xd00002, 0xd00003) AM_WRITENOP															// ???
 /**/AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram")		// Sprites
 /**/AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
@@ -670,19 +674,19 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 }
 
 
-static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
+WRITE16_MEMBER(cave_state::korokoro_eeprom_msb_w)
 {
-	cave_state *state = device->machine().driver_data<cave_state>();
+	device_t *device = machine().device("eeprom");
 	if (data & ~0x7000)
 	{
-		logerror("%s: Unknown EEPROM bit written %04X\n",device->machine().describe_context(),data);
-		COMBINE_DATA(&state->m_leds[1]);
-		show_leds(device->machine());
+		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
+		COMBINE_DATA(&m_leds[1]);
+		show_leds(machine());
 	}
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
-		state->m_hopper = data & 0x0100;	// ???
+		m_hopper = data & 0x0100;	// ???
 
 		// latch the bit
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -715,7 +719,7 @@ static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)													// Leds
-	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE_LEGACY("eeprom", korokoro_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0x28000a, 0x28000b) AM_WRITE(korokoro_eeprom_msb_w)								// EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP																// 0 (watchdog?)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																		// RAM
 ADDRESS_MAP_END
@@ -730,7 +734,7 @@ static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)													// Leds
-	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE_LEGACY("eeprom", korokoro_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0x28000a, 0x28000b) AM_WRITE(korokoro_eeprom_msb_w)								// EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP																// 0 (watchdog?)
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)													// IRQ Cause
 	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")							// Video Regs
@@ -756,7 +760,7 @@ static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(cave_eeprom_msb_w)								// EEPROM
 /**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00000, 0xd7ffff) AM_ROMBANK("bank1")													// ROM
 ADDRESS_MAP_END
@@ -788,7 +792,7 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("eeprom", metmqstr_eeprom_msb_w)							// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(metmqstr_eeprom_msb_w)							// EEPROM
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram")		// Sprites
 	AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2")							// RAM
 ADDRESS_MAP_END
@@ -798,8 +802,9 @@ ADDRESS_MAP_END
                                 Power Instinct 2
 ***************************************************************************/
 
-static READ16_DEVICE_HANDLER( pwrinst2_eeprom_r )
+READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return ~8 + ((eeprom->read_bit() & 1) ? 8 : 0);
 }
@@ -832,7 +837,7 @@ static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")														// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")														//
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("user1", 0)												// extra data ROM space
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
 	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")				// Layer 2
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")				// Layer 0
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")				// Layer 1
@@ -847,7 +852,7 @@ static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xc80000, 0xc80005) AM_RAM_WRITE(pwrinst2_vctrl_3_w) AM_SHARE("vctrl.3")		// Layer 3 Control
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(soundlatch_ack_r)													// ? From Sound CPU
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_cmd_w)														// To Sound CPU
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVREAD_LEGACY("eeprom", pwrinst2_eeprom_r)									// EEPROM
+	AM_RANGE(0xe80000, 0xe80001) AM_READ(pwrinst2_eeprom_r)									// EEPROM
 	AM_RANGE(0xf00000, 0xf04fff) AM_RAM AM_SHARE("paletteram")		// Palette
 ADDRESS_MAP_END
 
@@ -876,7 +881,7 @@ static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x510000, 0x510001) AM_RAM																	// (agallet)
 	AM_RANGE(0x600000, 0x600001) AM_READ(sailormn_input0_r)												// Inputs + Watchdog!
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE_LEGACY("eeprom", sailormn_eeprom_msb_w)							// EEPROM
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(sailormn_eeprom_msb_w)							// EEPROM
 	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
@@ -896,10 +901,11 @@ ADDRESS_MAP_END
                             Tobikose! Jumpman
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( tjumpman_eeprom_lsb_w )
+WRITE16_MEMBER(cave_state::tjumpman_eeprom_lsb_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (data & ~0x0038)
-		logerror("%s: Unknown EEPROM bit written %04X\n",device->machine().describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
@@ -953,7 +959,7 @@ static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)												// Leds + Hopper
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)							// EEPROM
 ADDRESS_MAP_END
 
 
@@ -992,7 +998,7 @@ static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("IN1")													// Inputs
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(pacslot_leds_w)												// Leds + Hopper
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)							// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1013,7 +1019,7 @@ static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 

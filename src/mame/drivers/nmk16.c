@@ -4671,8 +4671,9 @@ WRITE16_MEMBER(nmk16_state::twinactn_flipscreen_w)
 
 
 ***************************************************************************/
-static WRITE8_DEVICE_HANDLER( spec2k_oki1_banking_w )
+WRITE8_MEMBER(nmk16_state::spec2k_oki1_banking_w)
 {
+	device_t *device = machine().device("oki2");
 	if(data == 0xfe)
 		downcast<okim6295_device *>(device)->set_bank_base(0);
 	else if(data == 0xff)
@@ -4693,19 +4694,20 @@ static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfff0, 0xfff0) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xfff2, 0xfff2) AM_DEVWRITE_LEGACY("oki2", spec2k_oki1_banking_w )
+	AM_RANGE(0xfff2, 0xfff2) AM_WRITE(spec2k_oki1_banking_w )
 	AM_RANGE(0xfff8, 0xfff8) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0xfffa, 0xfffa) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_RAM // not used, only tested
 ADDRESS_MAP_END
 
 
-static WRITE8_DEVICE_HANDLER( twinactn_oki_bank_w )
+WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
 {
+	device_t *device = machine().device("oki1");
 	downcast<okim6295_device *>(device)->set_bank_base((data & 3) * 0x40000);
 
 	if (data & (~3))
-		logerror("%s: invalid oki bank %02x\n", device->machine().describe_context(), data);
+		logerror("%s: invalid oki bank %02x\n", machine().describe_context(), data);
 
 //  logerror("%04x: oki bank %02x\n", cpu_get_pc(&space->device()), data);
 }
@@ -4713,7 +4715,7 @@ static WRITE8_DEVICE_HANDLER( twinactn_oki_bank_w )
 static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki1", twinactn_oki_bank_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(twinactn_oki_bank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)		// From Main CPU
 ADDRESS_MAP_END

@@ -20,6 +20,9 @@ public:
 	DECLARE_WRITE8_MEMBER(shangkid_sound_enable_w);
 	DECLARE_READ8_MEMBER(shangkid_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(shangkid_videoram_w);
+	DECLARE_WRITE8_MEMBER(chinhero_ay8910_porta_w);
+	DECLARE_WRITE8_MEMBER(shangkid_ay8910_porta_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 };
 
 

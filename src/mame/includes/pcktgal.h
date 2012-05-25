@@ -12,6 +12,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pcktgal_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(pcktgal_sound_w);
 	DECLARE_WRITE8_MEMBER(pcktgal_adpcm_data_w);
+	DECLARE_READ8_MEMBER(pcktgal_adpcm_reset_r);
 };
 
 

@@ -28,6 +28,11 @@ public:
 	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
 	DECLARE_READ16_MEMBER(suna16_paletteram16_r);
 	DECLARE_WRITE16_MEMBER(suna16_paletteram16_w);
+	DECLARE_WRITE8_MEMBER(bssoccer_DAC1_w);
+	DECLARE_WRITE8_MEMBER(bssoccer_DAC2_w);
+	DECLARE_WRITE8_MEMBER(bssoccer_DAC3_w);
+	DECLARE_WRITE8_MEMBER(bssoccer_DAC4_w);
+	DECLARE_WRITE8_MEMBER(bestbest_ay8910_port_a_w);
 };
 
 

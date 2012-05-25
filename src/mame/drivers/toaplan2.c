@@ -767,14 +767,23 @@ WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 }
 
 
-static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
+WRITE16_MEMBER(toaplan2_state::oki_bankswitch_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 	}
 }
 
+WRITE16_MEMBER(toaplan2_state::oki1_bankswitch_w)
+{
+	device_t *device = machine().device("oki1");
+	if (ACCESSING_BITS_0_7)
+	{
+		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
+	}
+}
 
 WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 {
@@ -1102,7 +1111,7 @@ static ADDRESS_MAP_START( kbash2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x200020, 0x200021) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x200024, 0x200025) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x200028, 0x200029) AM_DEVWRITE_LEGACY("oki1", oki_bankswitch_w)
+	AM_RANGE(0x200028, 0x200029) AM_WRITE(oki1_bankswitch_w)
 	AM_RANGE(0x20002c, 0x20002d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -1257,7 +1266,7 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("IN3")
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("IN4")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
-	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
+	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)
 ADDRESS_MAP_END
 

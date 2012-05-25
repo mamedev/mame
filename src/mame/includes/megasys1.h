@@ -78,6 +78,10 @@ public:
 	DECLARE_WRITE16_MEMBER(megasys1_vregs_C_w);
 	DECLARE_WRITE16_MEMBER(megasys1_vregs_D_w);
 	void megasys1_set_vreg_flag(int which, int data);
+	DECLARE_READ8_MEMBER(oki_status_1_r);
+	DECLARE_READ8_MEMBER(oki_status_2_r);
+	DECLARE_WRITE16_MEMBER(okim6295_both_1_w);
+	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
 };
 
 

@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
 	DECLARE_WRITE8_MEMBER(z80_irq_w);
 	DECLARE_READ8_MEMBER(vendetta_sound_interrupt_r);
+	DECLARE_READ8_MEMBER(vendetta_sound_r);
 };
 
 /*----------- defined in video/vendetta.c -----------*/

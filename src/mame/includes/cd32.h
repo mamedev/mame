@@ -27,6 +27,9 @@ public:
 	int m_oldstate[2];
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_WRITE32_MEMBER(aga_overlay_w);
+	DECLARE_WRITE8_MEMBER(cd32_cia_0_porta_w);
+	DECLARE_READ8_MEMBER(cd32_cia_0_portb_r);
+	DECLARE_WRITE8_MEMBER(cd32_cia_0_portb_w);
 };
 
 /*----------- defined in machine/cd32.c -----------*/

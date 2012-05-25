@@ -79,7 +79,7 @@ const pia6821_interface zwackery_pia0_intf =
 const pia6821_interface zwackery_pia1_intf =
 {
 	DEVCB_HANDLER(zwackery_port_1_r),		/* port A in */
-	DEVCB_HANDLER(zwackery_port_2_r),		/* port B in */
+	DEVCB_DRIVER_MEMBER(mcr68_state, zwackery_port_2_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */

@@ -100,8 +100,9 @@ WRITE8_MEMBER(battlera_state::battlera_adpcm_data_w)
 	m_msm5205next = data;
 }
 
-static WRITE8_DEVICE_HANDLER( battlera_adpcm_reset_w )
+WRITE8_MEMBER(battlera_state::battlera_adpcm_reset_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, 0);
 }
 
@@ -111,7 +112,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE_LEGACY("c6280", c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank7") /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("msm", battlera_adpcm_reset_w)
+	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_byte_r) AM_WRITE(battlera_adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 

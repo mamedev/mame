@@ -63,7 +63,7 @@ READ8_MEMBER(bking_state::bking3_extrarom_r)
 	return rom[m_addr_h * 256 + m_addr_l];
 }
 
-static WRITE8_DEVICE_HANDLER( unk_w )
+WRITE8_MEMBER(bking_state::unk_w)
 {
 /*
     0 = finished reading extra rom
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0x4f, 0x4f) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_status_r, unk_w)
+	AM_RANGE(0x4f, 0x4f) AM_DEVREAD_LEGACY("bmcu", buggychl_mcu_status_r) AM_WRITE(unk_w)
 	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
 	AM_RANGE(0x6f, 0x6f) AM_READWRITE(bking3_ext_check_r, bking3_addr_h_w)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
@@ -371,7 +371,7 @@ static GFXDECODE_START( bking )
 GFXDECODE_END
 
 
-static WRITE8_DEVICE_HANDLER( port_b_w )
+WRITE8_MEMBER(bking_state::port_b_w)
 {
 	/* don't know what this is... could be a filter */
 	if (data != 0x00)
@@ -385,7 +385,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("dac", dac_signed_w),
-	DEVCB_HANDLER(port_b_w)
+	DEVCB_DRIVER_MEMBER(bking_state,port_b_w)
 };
 
 static MACHINE_START( bking )

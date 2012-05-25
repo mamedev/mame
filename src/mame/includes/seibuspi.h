@@ -85,6 +85,10 @@ public:
 	DECLARE_READ32_MEMBER(viprp1o_speedup_r);
 	DECLARE_READ32_MEMBER(rf2_speedup_r);
 	DECLARE_READ32_MEMBER(rfjet_speedup_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(flashrom_read);
+	DECLARE_WRITE8_MEMBER(flashrom_write);
+	DECLARE_WRITE32_MEMBER(sys386f2_eeprom_w);
 };
 
 

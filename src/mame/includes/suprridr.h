@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(suprridr_bgram_w);
 	DECLARE_WRITE8_MEMBER(suprridr_fgram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(suprridr_control_r);
+	DECLARE_READ8_MEMBER(sound_data_r);
 };
 
 

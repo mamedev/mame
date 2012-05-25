@@ -65,6 +65,9 @@ public:
 	DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
 	DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
 	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
 };
 
 

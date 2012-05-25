@@ -379,15 +379,23 @@ static void megasys1_sound_irq(device_t *device, int irq)
 		cputag_set_input_line(device->machine(), "soundcpu", 4, HOLD_LINE);
 }
 
-static READ8_DEVICE_HANDLER( oki_status_r )
+READ8_MEMBER(megasys1_state::oki_status_1_r)
 {
-	megasys1_state *state = device->machine().driver_data<megasys1_state>();
-	if (state->m_ignore_oki_status == 1)
+	device_t *device = machine().device("oki1");
+	if (m_ignore_oki_status == 1)
 		return 0;
 	else
 		return downcast<okim6295_device *>(device)->read_status();
 }
 
+READ8_MEMBER(megasys1_state::oki_status_2_r)
+{
+	device_t *device = machine().device("oki1");
+	if (m_ignore_oki_status == 1)
+		return 0;
+	else
+		return downcast<okim6295_device *>(device)->read_status();
+}
 /***************************************************************************
                             [ Sound CPU - System A ]
 ***************************************************************************/
@@ -398,9 +406,9 @@ static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8_LEGACY("oki1", oki_status_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8_LEGACY("oki2", oki_status_r, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ8(oki_status_2_r, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -416,9 +424,9 @@ static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8_LEGACY("oki1", oki_status_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8_LEGACY("oki2", oki_status_r, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ8(oki_status_2_r, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0effff) AM_RAM
 ADDRESS_MAP_END
@@ -3872,17 +3880,21 @@ static DRIVER_INIT( iganinju )
 								// not like lev 3 interrupts
 }
 
-static WRITE16_DEVICE_HANDLER( okim6295_both_w )
+WRITE16_MEMBER(megasys1_state::okim6295_both_1_w)
 {
-	okim6295_device *oki = downcast<okim6295_device *>(device);
+	okim6295_device *oki = machine().device<okim6295_device>("oki1");
+	if (ACCESSING_BITS_0_7)	oki->write_command((data >> 0) & 0xff );
+	else				oki->write_command((data >> 8) & 0xff );
+}
+WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
+{
+	okim6295_device *oki = machine().device<okim6295_device>("oki2");
 	if (ACCESSING_BITS_0_7)	oki->write_command((data >> 0) & 0xff );
 	else				oki->write_command((data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )
 {
-	device_t *oki1 = machine.device("oki1");
-	device_t *oki2 = machine.device("oki2");
 	//UINT16 *RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 
 	astyanax_rom_decode(machine, "maincpu");		// Code
@@ -3894,8 +3906,8 @@ static DRIVER_INIT( jitsupro )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),state));
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xa0000, 0xa0003, FUNC(okim6295_both_w));
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki2, 0xc0000, 0xc0003, FUNC(okim6295_both_w));
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),state));
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),state));
 }
 
 static DRIVER_INIT( peekaboo )

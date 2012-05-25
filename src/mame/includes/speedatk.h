@@ -23,6 +23,7 @@ public:
 	DECLARE_WRITE8_MEMBER(speedatk_videoram_w);
 	DECLARE_WRITE8_MEMBER(speedatk_colorram_w);
 	DECLARE_WRITE8_MEMBER(speedatk_6845_w);
+	DECLARE_WRITE8_MEMBER(speedatk_output_w);
 };
 
 

@@ -206,9 +206,9 @@ INPUT_PORTS_END
 
 /* machine driver */
 
-static WRITE_LINE_DEVICE_HANDLER(sbugger_interrupt)
+WRITE_LINE_MEMBER(sbugger_state::sbugger_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(machine(), "maincpu", I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static I8156_INTERFACE(i8156_intf)
@@ -220,7 +220,7 @@ static I8156_INTERFACE(i8156_intf)
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("DSW2"),
 	DEVCB_NULL,
-	DEVCB_LINE(sbugger_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(sbugger_state,sbugger_interrupt)
 };
 
 static MACHINE_CONFIG_START( sbugger, sbugger_state )

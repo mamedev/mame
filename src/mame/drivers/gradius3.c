@@ -142,8 +142,9 @@ WRITE16_MEMBER(gradius3_state::sound_irq_w)
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bank_w )
+WRITE8_MEMBER(gradius3_state::sound_bank_w)
 {
+	device_t *device = machine().device("k007232");
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
@@ -190,7 +191,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", sound_bank_w)				/* 007232 bankswitch */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)

@@ -21,6 +21,7 @@ public:
 	DECLARE_WRITE16_MEMBER(galpanic_bgvideoram_mirror_w);
 	DECLARE_READ16_MEMBER(comad_timer_r);
 	DECLARE_READ16_MEMBER(zipzap_random_read);
+	DECLARE_READ8_MEMBER(comad_okim6295_r);
 };
 
 

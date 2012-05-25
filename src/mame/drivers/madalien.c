@@ -66,12 +66,14 @@ READ8_MEMBER(madalien_state::madalien_sound_command_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( madalien_portA_w )
+WRITE8_MEMBER(madalien_state::madalien_portA_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, MADALIEN_8910_PORTA, data);
 }
-static WRITE8_DEVICE_HANDLER( madalien_portB_w )
+WRITE8_MEMBER(madalien_state::madalien_portB_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, MADALIEN_8910_PORTB, data);
 }
 
@@ -163,8 +165,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("discrete", madalien_portA_w),
-	DEVCB_DEVICE_HANDLER("discrete", madalien_portB_w)
+	DEVCB_DRIVER_MEMBER(madalien_state,madalien_portA_w),
+	DEVCB_DRIVER_MEMBER(madalien_state,madalien_portB_w)
 };
 
 

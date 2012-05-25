@@ -252,9 +252,9 @@ WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
+WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 {
-	device->machine().root_device().membank("bank1")->set_entry(data & 0x03);
+	machine().root_device().membank("bank1")->set_entry(data & 0x03);
 }
 
 
@@ -281,16 +281,17 @@ WRITE8_MEMBER(asuka_state::asuka_msm5205_address_w)
 	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
 }
 
-static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
+WRITE8_MEMBER(asuka_state::asuka_msm5205_start_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
+WRITE8_MEMBER(asuka_state::asuka_msm5205_stop_w)
 {
-	asuka_state *state = device->machine().driver_data<asuka_state>();
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, 1);
-	state->m_adpcm_pos &= 0xff00;
+	m_adpcm_pos &= 0xff00;
 }
 
 static UINT8 *cadash_shared_ram;
@@ -400,8 +401,8 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(asuka_msm5205_address_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", asuka_msm5205_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", asuka_msm5205_stop_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(asuka_msm5205_start_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(asuka_msm5205_stop_w)
 ADDRESS_MAP_END
 
 /* no MSM5205 */
@@ -782,7 +783,7 @@ static const ym2610_interface ym2610_config =
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(irq_handler),
-	DEVCB_HANDLER(sound_bankswitch_2151_w)
+	DEVCB_DRIVER_MEMBER(asuka_state,sound_bankswitch_2151_w)
 };
 
 static const msm5205_interface msm5205_config =

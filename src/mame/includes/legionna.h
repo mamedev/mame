@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
+	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 };
 
 

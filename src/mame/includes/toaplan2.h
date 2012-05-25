@@ -99,6 +99,8 @@ public:
 	DECLARE_WRITE16_MEMBER(batrider_unknown_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_objectbank_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
+	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(oki1_bankswitch_w);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/

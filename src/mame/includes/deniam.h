@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE16_MEMBER(deniam_palette_w);
 	DECLARE_READ16_MEMBER(deniam_coinctrl_r);
 	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
+	DECLARE_WRITE8_MEMBER(deniam16b_oki_rom_bank_w);
+	DECLARE_WRITE16_MEMBER(deniam16c_oki_rom_bank_w);
 };
 
 

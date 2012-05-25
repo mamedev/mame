@@ -56,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(n8080_dac_w);
 	DECLARE_WRITE8_MEMBER(helifire_dac_w);
 	DECLARE_WRITE8_MEMBER(helifire_sound_ctrl_w);
+	DECLARE_WRITE_LINE_MEMBER(n8080_inte_callback);
+	DECLARE_WRITE8_MEMBER(n8080_status_callback);
 };
 
 

@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(compgolf_ctrl_w);
 	DECLARE_WRITE8_MEMBER(compgolf_video_w);
 	DECLARE_WRITE8_MEMBER(compgolf_back_w);
+	DECLARE_WRITE8_MEMBER(compgolf_scrollx_lo_w);
+	DECLARE_WRITE8_MEMBER(compgolf_scrolly_lo_w);
 };
 
 

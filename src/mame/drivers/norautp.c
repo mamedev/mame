@@ -624,7 +624,7 @@ static PALETTE_INIT( norautp )
 *      R/W Handlers      *
 *************************/
 
-static WRITE8_DEVICE_HANDLER( mainlamps_w )
+WRITE8_MEMBER(norautp_state::mainlamps_w)
 {
 /*  PPI-0 (60h-63h); PortB OUT.
     Lamps:
@@ -651,7 +651,7 @@ static WRITE8_DEVICE_HANDLER( mainlamps_w )
 //  popmessage("lamps: %02x", data);
 }
 
-static WRITE8_DEVICE_HANDLER( soundlamps_w )
+WRITE8_MEMBER(norautp_state::soundlamps_w)
 {
 /*  PPI-1 (a0h-a3h); PortC OUT.
     Sound & Lamps:
@@ -664,7 +664,7 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
   xxxx ----  * Discrete Sound Lines.
 */
 
-	device_t *discrete = device->machine().device("discrete");
+	device_t *discrete = machine().device("discrete");
 
 	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
 	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
@@ -676,7 +676,7 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
 //  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
 }
 
-static WRITE8_DEVICE_HANDLER( counterlamps_w )
+WRITE8_MEMBER(norautp_state::counterlamps_w)
 {
 /*  PPI-0 (60h-63h); PortC OUT.
     Lamps & Coin Counters:
@@ -694,9 +694,9 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 	output_set_lamp_value(10, (data >> 0) & 1);	/* HI lamp */
 	output_set_lamp_value(11, (data >> 1) & 1);	/* LO lamp */
 
-	coin_counter_w(device->machine(), 0, data & 0x10);	/* Coin1/3 counter */
-	coin_counter_w(device->machine(), 1, data & 0x20);	/* Coin2 counter */
-	coin_counter_w(device->machine(), 2, data & 0x08);	/* Payout pulse */
+	coin_counter_w(machine(), 0, data & 0x10);	/* Coin1/3 counter */
+	coin_counter_w(machine(), 1, data & 0x20);	/* Coin2 counter */
+	coin_counter_w(machine(), 2, data & 0x08);	/* Payout pulse */
 }
 
 
@@ -1208,9 +1208,9 @@ static I8255_INTERFACE (ppi8255_intf_0)
 	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
 	DEVCB_NULL,						/* Port A write */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(mainlamps_w),		/* Port B write */
+	DEVCB_DRIVER_MEMBER(norautp_state,mainlamps_w),		/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(counterlamps_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(norautp_state,counterlamps_w)	/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_1)
@@ -1221,7 +1221,7 @@ static I8255_INTERFACE (ppi8255_intf_1)
 	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(soundlamps_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(norautp_state,soundlamps_w)		/* Port C write */
 };
 
 //static I8255A_INTERFACE (ppi8255_intf_2)

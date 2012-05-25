@@ -27,8 +27,8 @@
  *
  *************************************/
 
-static READ16_DEVICE_HANDLER( vertigo_pit8254_lsb_r ) { return pit8253_r( device, offset ); }
-static WRITE16_DEVICE_HANDLER( vertigo_pit8254_lsb_w ) { if (ACCESSING_BITS_0_7) pit8253_w(device, offset, data); }
+READ16_MEMBER(vertigo_state::vertigo_pit8254_lsb_r){ device_t * device = machine().device("pit8254"); return pit8253_r( device, offset ); }
+WRITE16_MEMBER(vertigo_state::vertigo_pit8254_lsb_w){ device_t * device = machine().device("pit8254"); if (ACCESSING_BITS_0_7) pit8253_w(device, offset, data); }
 
 static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x004050, 0x00405f) AM_RAM_WRITE(vertigo_audio_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004060, 0x00406f) AM_WRITE(vertigo_motor_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004070, 0x00407f) AM_WRITE(vertigo_wsot_w) AM_MIRROR(0x001000)
-	AM_RANGE(0x006000, 0x006007) AM_DEVREADWRITE_LEGACY("pit8254", vertigo_pit8254_lsb_r, vertigo_pit8254_lsb_w)
+	AM_RANGE(0x006000, 0x006007) AM_READWRITE(vertigo_pit8254_lsb_r, vertigo_pit8254_lsb_w)
 	AM_RANGE(0x007000, 0x0073ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END

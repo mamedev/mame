@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sf_bg_scroll_w);
 	DECLARE_WRITE16_MEMBER(sf_fg_scroll_w);
 	DECLARE_WRITE16_MEMBER(sf_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(msm1_5205_w);
+	DECLARE_WRITE8_MEMBER(msm2_5205_w);
 };
 
 

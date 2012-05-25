@@ -64,8 +64,9 @@ bootleg todo:
 
 /**********************************************************************************/
 
-static WRITE16_DEVICE_HANDLER(pktgaldx_oki_bank_w)
+WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 {
+	device_t *device = machine().device("oki2");
 	downcast<okim6295_device *>(device)->set_bank_base((data & 3) * 0x40000);
 }
 
@@ -88,7 +89,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
 
 	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE_LEGACY("oki2", pktgaldx_oki_bank_w)
+	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
 	AM_RANGE(0x167800, 0x167fff) AM_READWRITE_LEGACY(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END
@@ -134,7 +135,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
-	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE_LEGACY("oki2", pktgaldx_oki_bank_w)
+	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
 	AM_RANGE(0x160000, 0x167fff) AM_WRITENOP
 	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
 

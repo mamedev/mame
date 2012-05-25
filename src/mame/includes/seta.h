@@ -156,6 +156,8 @@ public:
 	DECLARE_WRITE16_MEMBER(downtown_protection_w);
 	DECLARE_READ16_MEMBER(arbalest_debug_r);
 	DECLARE_WRITE16_MEMBER(magspeed_lights_w);
+	DECLARE_READ8_MEMBER(dsw1_r);
+	DECLARE_READ8_MEMBER(dsw2_r);
 };
 
 /*----------- defined in video/seta.c -----------*/

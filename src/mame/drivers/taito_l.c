@@ -484,22 +484,20 @@ WRITE8_MEMBER(taitol_state::control2_w)
 	coin_counter_w(machine(), 1, data & 0x08);
 }
 
-static READ8_DEVICE_HANDLER( portA_r )
+READ8_MEMBER(taitol_state::portA_r)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return state->ioport((state->m_extport == 0) ? state->m_porte0_tag : state->m_porte1_tag)->read();
+	return ioport((m_extport == 0) ? m_porte0_tag : m_porte1_tag)->read();
 }
 
-static READ8_DEVICE_HANDLER( portB_r )
+READ8_MEMBER(taitol_state::portB_r)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return state->ioport((state->m_extport == 0) ? state->m_portf0_tag : state->m_portf1_tag)->read();
+	return ioport((m_extport == 0) ? m_portf0_tag : m_portf1_tag)->read();
 }
 
-static READ8_DEVICE_HANDLER( extport_select_and_ym2203_r )
+READ8_MEMBER(taitol_state::extport_select_and_ym2203_r)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
-	state->m_extport = (offset >> 1) & 1;
+	device_t *device = machine().device("ymsnd");
+	m_extport = (offset >> 1) & 1;
 	return ym2203_r(device, offset & 1);
 }
 
@@ -612,21 +610,23 @@ WRITE8_MEMBER(taitol_state::champwr_msm5205_hi_w)
 	m_adpcm_pos = ((m_adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
 }
 
-static WRITE8_DEVICE_HANDLER( champwr_msm5205_start_w )
+WRITE8_MEMBER(taitol_state::champwr_msm5205_start_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( champwr_msm5205_stop_w )
+WRITE8_MEMBER(taitol_state::champwr_msm5205_stop_w)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
+	device_t *device = machine().device("msm");
 
 	msm5205_reset_w(device, 1);
-	state->m_adpcm_pos &= 0x1ff00;
+	m_adpcm_pos &= 0x1ff00;
 }
 
-static WRITE8_DEVICE_HANDLER( champwr_msm5205_volume_w )
+WRITE8_MEMBER(taitol_state::champwr_msm5205_volume_w)
 {
+	device_t *device = machine().device("msm");
 	device_sound_interface *sound;
 	device->interface(sound);
 	sound->set_output_gain(0, data / 255.0);
@@ -684,7 +684,7 @@ READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 
 #define COMMON_SINGLE_MAP \
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ymsnd", extport_select_and_ym2203_r, ym2203_w)	\
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	\
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 
@@ -792,8 +792,8 @@ static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", champwr_msm5205_start_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", champwr_msm5205_stop_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(champwr_msm5205_start_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(champwr_msm5205_stop_w)
 ADDRESS_MAP_END
 
 
@@ -1777,19 +1777,18 @@ static void irqhandler( device_t *device, int irq )
 	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( portA_w )
+WRITE8_MEMBER(taitol_state::portA_w)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
 
-	if (state->m_cur_bank != (data & 0x03))
+	if (m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		UINT8 *RAM = state->memregion("audiocpu")->base();
+		UINT8 *RAM = memregion("audiocpu")->base();
 
-		state->m_cur_bank = data & 0x03;
-		bankaddress = 0x10000 + (state->m_cur_bank - 1) * 0x4000;
-		state->membank("bank7")->set_base(&RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->m_cur_bank, cpu_get_pc(&space->device()) );
+		m_cur_bank = data & 0x03;
+		bankaddress = 0x10000 + (m_cur_bank - 1) * 0x4000;
+		membank("bank7")->set_base(&RAM[bankaddress]);
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_bank, cpu_get_pc(&space->device()) );
 	}
 }
 
@@ -1800,7 +1799,7 @@ static const ym2203_interface ym2203_interface_triple =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(portA_w),
+		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
 		DEVCB_NULL,
 	},
 	irqhandler
@@ -1813,8 +1812,8 @@ static const ym2203_interface ym2203_interface_champwr =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(portA_w),
-		DEVCB_DEVICE_HANDLER("msm", champwr_msm5205_volume_w),
+		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
+		DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
 	},
 	irqhandler
 };
@@ -1836,8 +1835,8 @@ static const ym2203_interface ym2203_interface_single =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(portA_r),
-		DEVCB_HANDLER(portB_r),
+		DEVCB_DRIVER_MEMBER(taitol_state,portA_r),
+		DEVCB_DRIVER_MEMBER(taitol_state,portB_r),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},

@@ -68,15 +68,16 @@ static void toki_adpcm_int (device_t *device)
 		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
+WRITE8_MEMBER(toki_state::toki_adpcm_control_w)
 {
+	device_t *device = machine().device("msm");
 	int bankaddress;
-	UINT8 *RAM = device->machine().root_device().memregion("audiocpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("audiocpu")->base();
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	device->machine().root_device().membank("bank1")->set_base(&RAM[bankaddress]);
+	machine().root_device().membank("bank1")->set_base(&RAM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
@@ -132,7 +133,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
 	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

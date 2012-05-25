@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mainevt_sh_bankswitch_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	DECLARE_READ8_MEMBER(mainevt_sh_busy_r);
+	DECLARE_WRITE8_MEMBER(dv_sh_bankswitch_w);
 };
 
 /*----------- defined in video/mainevt.c -----------*/

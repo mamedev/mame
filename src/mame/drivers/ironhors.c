@@ -43,8 +43,9 @@ WRITE8_MEMBER(ironhors_state::ironhors_sh_irqtrigger_w)
 	device_set_input_line_and_vector(m_soundcpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
+WRITE8_MEMBER(ironhors_state::ironhors_filter_w)
 {
+	device_t *device = machine().device("disc_ih");
 	discrete_sound_w(device, NODE_11, (data & 0x04) >> 2);
 	discrete_sound_w(device, NODE_12, (data & 0x02) >> 1);
 	discrete_sound_w(device, NODE_13, (data & 0x01) >> 0);
@@ -348,7 +349,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER("disc_ih", ironhors_filter_w),
+		DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
 		DEVCB_NULL
 	},
 	NULL
@@ -438,11 +439,10 @@ static TIMER_DEVICE_CALLBACK( farwest_irq )
 	}
 }
 
-static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
+READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
-	ironhors_state *state = device->machine().driver_data<ironhors_state>();
 
-	return state->soundlatch_byte_r(*state->m_soundcpu->memory().space(AS_PROGRAM), 0);
+	return soundlatch_byte_r(*m_soundcpu->memory().space(AS_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =
@@ -451,8 +451,8 @@ static const ym2203_interface farwest_ym2203_config =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
-		DEVCB_HANDLER(farwest_soundlatch_r),
-		DEVCB_DEVICE_HANDLER("disc_ih", ironhors_filter_w),
+		DEVCB_DRIVER_MEMBER(ironhors_state,farwest_soundlatch_r),
+		DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
 		DEVCB_NULL
 	},
 	NULL

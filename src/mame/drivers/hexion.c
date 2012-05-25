@@ -102,14 +102,14 @@ WRITE8_MEMBER(hexion_state::coincntr_w)
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( hexion_irq_ack_w )
+WRITE_LINE_MEMBER(hexion_state::hexion_irq_ack_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( hexion_nmi_ack_w )
+WRITE_LINE_MEMBER(hexion_state::hexion_nmi_ack_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
@@ -215,8 +215,8 @@ static const k053252_interface hexion_k053252_intf =
 	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(hexion_irq_ack_w),
-	DEVCB_LINE(hexion_nmi_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(hexion_state,hexion_irq_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(hexion_state,hexion_nmi_ack_w),
 	0, 0
 };
 

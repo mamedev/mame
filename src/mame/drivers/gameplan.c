@@ -89,43 +89,41 @@ TODO:
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( io_select_w )
+WRITE8_MEMBER(gameplan_state::io_select_w)
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
 	switch (data)
 	{
-	case 0x01: state->m_current_port = 0; break;
-	case 0x02: state->m_current_port = 1; break;
-	case 0x04: state->m_current_port = 2; break;
-	case 0x08: state->m_current_port = 3; break;
-	case 0x80: state->m_current_port = 4; break;
-	case 0x40: state->m_current_port = 5; break;
+	case 0x01: m_current_port = 0; break;
+	case 0x02: m_current_port = 1; break;
+	case 0x04: m_current_port = 2; break;
+	case 0x08: m_current_port = 3; break;
+	case 0x80: m_current_port = 4; break;
+	case 0x40: m_current_port = 5; break;
 	}
 }
 
 
-static READ8_DEVICE_HANDLER( io_port_r )
+READ8_MEMBER(gameplan_state::io_port_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	return state->ioport(portnames[state->m_current_port])->read();
+	return ioport(portnames[m_current_port])->read();
 }
 
 
-static WRITE8_DEVICE_HANDLER( coin_w )
+WRITE8_MEMBER(gameplan_state::coin_w)
 {
-	coin_counter_w(device->machine(), 0, ~data & 1);
+	coin_counter_w(machine(), 0, ~data & 1);
 }
 
 
 static const via6522_interface via_1_interface =
 {
-	DEVCB_HANDLER(io_port_r), DEVCB_NULL,	 /*inputs : A/B         */
+	DEVCB_DRIVER_MEMBER(gameplan_state,io_port_r), DEVCB_NULL,	 /*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		 /*inputs : CA/B1,CA/B2 */
-	DEVCB_NULL, DEVCB_HANDLER(io_select_w),	 /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(coin_w), /*outputs: CA/B1,CA/B2 */
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,io_select_w),	 /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,coin_w), /*outputs: CA/B1,CA/B2 */
 	DEVCB_NULL				 /*irq                  */
 };
 
@@ -137,31 +135,28 @@ static const via6522_interface via_1_interface =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( audio_reset_w )
+WRITE8_MEMBER(gameplan_state::audio_reset_w)
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
 	{
-		state->m_riot->reset();
-		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		m_riot->reset();
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 	}
 }
 
 
-static WRITE8_DEVICE_HANDLER( audio_cmd_w )
+WRITE8_MEMBER(gameplan_state::audio_cmd_w)
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
-	riot6532_porta_in_set(state->m_riot, data, 0x7f);
+	riot6532_porta_in_set(m_riot, data, 0x7f);
 }
 
 
-static WRITE8_DEVICE_HANDLER( audio_trigger_w )
+WRITE8_MEMBER(gameplan_state::audio_trigger_w)
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
-	riot6532_porta_in_set(state->m_riot, data << 7, 0x80);
+	riot6532_porta_in_set(m_riot, data << 7, 0x80);
 }
 
 
@@ -169,8 +164,8 @@ static const via6522_interface via_2_interface =
 {
 	DEVCB_NULL, DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),				  /*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,							  /*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(audio_cmd_w), DEVCB_NULL,						  /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(audio_trigger_w), DEVCB_HANDLER(audio_reset_w), /*outputs: CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(gameplan_state,audio_cmd_w), DEVCB_NULL,						  /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,audio_trigger_w), DEVCB_DRIVER_MEMBER(gameplan_state,audio_reset_w), /*outputs: CA/B1,CA/B2 */
 	DEVCB_NULL									  /*irq                  */
 };
 
@@ -182,21 +177,18 @@ static const via6522_interface via_2_interface =
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
+WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 {
-	gameplan_state *gameplan = device->machine().driver_data<gameplan_state>();
-
-	device_set_input_line(gameplan->m_audiocpu, 0, state);
+	device_set_input_line(m_audiocpu, 0, state);
 	if (state == ASSERT_LINE)
-		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
-static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
+WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 {
-	gameplan_state *gameplan = device->machine().driver_data<gameplan_state>();
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	gameplan->soundlatch_byte_w(*space, 0, data);
+	address_space *progspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	soundlatch_byte_w(*progspace, 0, data);
 }
 
 
@@ -205,8 +197,8 @@ static const riot6532_interface r6532_interface =
 	DEVCB_NULL,							/* port A read handler */
 	DEVCB_NULL,							/* port B read handler */
 	DEVCB_NULL,							/* port A write handler */
-	DEVCB_HANDLER(r6532_soundlatch_w),	/* port B write handler */
-	DEVCB_LINE(r6532_irq)				/* IRQ callback */
+	DEVCB_DRIVER_MEMBER(gameplan_state,r6532_soundlatch_w),	/* port B write handler */
+	DEVCB_DRIVER_LINE_MEMBER(gameplan_state,r6532_irq)				/* IRQ callback */
 };
 
 

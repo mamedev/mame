@@ -71,12 +71,19 @@ WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( munchmo_ayreset_r )
+READ8_MEMBER(munchmo_state::munchmo_ay1reset_r)
 {
+	device_t *device = machine().device("ay1");
 	ay8910_reset_w(device,0,0);
 	return 0;
 }
 
+READ8_MEMBER(munchmo_state::munchmo_ay2reset_r)
+{
+	device_t *device = machine().device("ay2");
+	ay8910_reset_w(device,0,0);
+	return 0;
+}
 /*************************************
  *
  *  Address maps
@@ -115,8 +122,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE_LEGACY("ay1", munchmo_ayreset_r, ay8910_reset_w)
-	AM_RANGE(0xa000, 0xbfff) AM_DEVREADWRITE_LEGACY("ay2", munchmo_ayreset_r, ay8910_reset_w)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(munchmo_ay1reset_r) AM_DEVWRITE_LEGACY("ay1",ay8910_reset_w)
+	AM_RANGE(0xa000, 0xbfff) AM_READ(munchmo_ay2reset_r) AM_DEVWRITE_LEGACY("ay2",ay8910_reset_w)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(sound_nmi_ack_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM // is mirror ok?
 ADDRESS_MAP_END

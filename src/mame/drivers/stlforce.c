@@ -74,8 +74,9 @@ TO DO :
 #include "includes/stlforce.h"
 
 
-static WRITE16_DEVICE_HANDLER( eeprom_w )
+WRITE16_MEMBER(stlforce_state::eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if( ACCESSING_BITS_0_7 )
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -85,8 +86,9 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( oki_bank_w )
+WRITE16_MEMBER(stlforce_state::oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data>>8) & 3));
 }
 
@@ -107,8 +109,8 @@ static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUT")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400010, 0x400011) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
-	AM_RANGE(0x400012, 0x400013) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
+	AM_RANGE(0x400010, 0x400011) AM_WRITE(eeprom_w)
+	AM_RANGE(0x400012, 0x400013) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x40001e, 0x40001f) AM_WRITENOP // sprites buffer commands
 	AM_RANGE(0x410000, 0x410001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END

@@ -421,14 +421,14 @@ static void ym2203_irq(device_t *device, int irq)
 	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE8_DEVICE_HANDLER( ym2203_out_b )
+WRITE8_MEMBER(lockon_state::ym2203_out_b)
 {
-	coin_counter_w(device->machine(), 0, data & 0x80);
-	coin_counter_w(device->machine(), 1, data & 0x40);
-	coin_counter_w(device->machine(), 2, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 1, data & 0x40);
+	coin_counter_w(machine(), 2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	set_led_status(device->machine(), 1, !(data & 0x10));
+	set_led_status(machine(), 1, !(data & 0x10));
 }
 
 static const ym2203_interface ym2203_config =
@@ -439,7 +439,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_INPUT_PORT("YM2203"),
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(ym2203_out_b),
+		DEVCB_DRIVER_MEMBER(lockon_state,ym2203_out_b),
 	},
 	ym2203_irq
 };

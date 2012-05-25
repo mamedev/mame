@@ -30,8 +30,9 @@ READ16_MEMBER(othldrby_state::othldrby_scanline_r)
 }
 
 
-static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
+WRITE16_MEMBER(othldrby_state::oki_bankswitch_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
@@ -97,7 +98,7 @@ static ADDRESS_MAP_START( othldrby_map, AS_PROGRAM, 16, othldrby_state )
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
+	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x700034, 0x700035) AM_WRITE(coinctrl_w)
 ADDRESS_MAP_END
 

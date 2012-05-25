@@ -87,6 +87,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lastmisn_scrollx_w);
 	DECLARE_WRITE8_MEMBER(lastmisn_scrolly_w);
 	DECLARE_WRITE8_MEMBER(gondo_scroll_w);
+	DECLARE_READ8_MEMBER(csilver_adpcm_reset_r);
 };
 
 /*----------- defined in video/dec8.c -----------*/

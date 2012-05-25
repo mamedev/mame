@@ -56,6 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(lsasquad_mcu_r);
 	DECLARE_READ8_MEMBER(lsasquad_mcu_status_r);
 	DECLARE_READ8_MEMBER(daikaiju_mcu_status_r);
+	DECLARE_WRITE8_MEMBER(unk);
 };
 
 /*----------- defined in machine/lsasquad.c -----------*/

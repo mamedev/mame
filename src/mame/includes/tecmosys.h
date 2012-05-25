@@ -68,6 +68,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bg0_tilemap_lineram_w);
 	DECLARE_WRITE16_MEMBER(bg1_tilemap_lineram_w);
 	DECLARE_WRITE16_MEMBER(bg2_tilemap_lineram_w);
+	DECLARE_READ16_MEMBER(eeprom_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
 };
 
 

@@ -31,6 +31,7 @@ public:
 	DECLARE_READ32_MEMBER(mlc_vram_r);
 	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
 	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
+	DECLARE_WRITE32_MEMBER(avengrs_eprom_w);
 };
 
 

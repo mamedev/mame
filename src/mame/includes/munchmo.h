@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(mnchmobl_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(mnchmobl_flipscreen_w);
+	DECLARE_READ8_MEMBER(munchmo_ay1reset_r);
+	DECLARE_READ8_MEMBER(munchmo_ay2reset_r);
 };
 
 

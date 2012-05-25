@@ -347,18 +347,18 @@ CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 	return m_auto_start_mask;
 }
 
-static WRITE8_DEVICE_HANDLER( out_0 )
+WRITE8_MEMBER(polepos_state::out_0)
 {
 // no start lamps in pole position
-//  set_led_status(device->machine(), 1,data & 1);
-//  set_led_status(device->machine(), 0,data & 2);
-	coin_counter_w(device->machine(), 1,~data & 4);
-	coin_counter_w(device->machine(), 0,~data & 8);
+//  set_led_status(machine(), 1,data & 1);
+//  set_led_status(machine(), 0,data & 2);
+	coin_counter_w(machine(), 1,~data & 4);
+	coin_counter_w(machine(), 0,~data & 8);
 }
 
-static WRITE8_DEVICE_HANDLER( out_1 )
+WRITE8_MEMBER(polepos_state::out_1)
 {
-	coin_lockout_global_w(device->machine(), data & 1);
+	coin_lockout_global_w(machine(), data & 1);
 }
 
 static const namco_51xx_interface namco_51xx_intf =
@@ -370,20 +370,20 @@ static const namco_51xx_interface namco_51xx_intf =
 		DEVCB_INPUT_PORT("DSWB_HI")
 	},
 	{	/* port write handlers */
-		DEVCB_HANDLER(out_0),
-		DEVCB_HANDLER(out_1)
+		DEVCB_DRIVER_MEMBER(polepos_state,out_0),
+		DEVCB_DRIVER_MEMBER(polepos_state,out_1)
 	}
 };
 
 
-static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
+READ8_MEMBER(polepos_state::namco_52xx_rom_r)
 {
-	UINT32 length = device->machine().root_device().memregion("52xx")->bytes();
+	UINT32 length = machine().root_device().memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
-	return (offset < length) ? device->machine().root_device().memregion("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? machine().root_device().memregion("52xx")->base()[offset] : 0xff;
 }
 
-static READ8_DEVICE_HANDLER( namco_52xx_si_r )
+READ8_MEMBER(polepos_state::namco_52xx_si_r)
 {
 	/* pulled to +5V */
 	return 1;
@@ -394,52 +394,50 @@ static const namco_52xx_interface namco_52xx_intf =
 	"discrete",							/* name of the discrete sound device */
 	NODE_04,							/* index of the first node */
 	0,									/* external clock rate */
-	DEVCB_HANDLER(namco_52xx_rom_r),	/* ROM read handler */
-	DEVCB_HANDLER(namco_52xx_si_r)		/* SI (pin 6) read handler */
+	DEVCB_DRIVER_MEMBER(polepos_state,namco_52xx_rom_r),	/* ROM read handler */
+	DEVCB_DRIVER_MEMBER(polepos_state,namco_52xx_si_r)		/* SI (pin 6) read handler */
 };
 
 
-static READ8_DEVICE_HANDLER( namco_53xx_k_r )
+READ8_MEMBER(polepos_state::namco_53xx_k_r)
 {
 	/* hardwired to 0 */
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER( steering_changed_r )
+READ8_MEMBER(polepos_state::steering_changed_r)
 {
-	polepos_state *state = device->machine().driver_data<polepos_state>();
 	/* read the current steering value and update our delta */
-	UINT8 steer_new = state->ioport("STEER")->read();
-	state->m_steer_accum += (INT8)(steer_new - state->m_steer_last) * 2;
-	state->m_steer_last = steer_new;
+	UINT8 steer_new = ioport("STEER")->read();
+	m_steer_accum += (INT8)(steer_new - m_steer_last) * 2;
+	m_steer_last = steer_new;
 
 	/* if we have delta, clock things */
-	if (state->m_steer_accum < 0)
+	if (m_steer_accum < 0)
 	{
-		state->m_steer_delta = 0;
-		state->m_steer_accum++;
+		m_steer_delta = 0;
+		m_steer_accum++;
 	}
-	else if (state->m_steer_accum > 0)
+	else if (m_steer_accum > 0)
 	{
-		state->m_steer_delta = 1;
-		state->m_steer_accum--;
+		m_steer_delta = 1;
+		m_steer_accum--;
 	}
 
-	return state->m_steer_accum & 1;
+	return m_steer_accum & 1;
 }
 
-static READ8_DEVICE_HANDLER( steering_delta_r )
+READ8_MEMBER(polepos_state::steering_delta_r)
 {
-	polepos_state *state = device->machine().driver_data<polepos_state>();
-	return state->m_steer_delta;
+	return m_steer_delta;
 }
 
 static const namco_53xx_interface namco_53xx_intf =
 {
-	DEVCB_HANDLER(namco_53xx_k_r),			/* K port */
+	DEVCB_DRIVER_MEMBER(polepos_state,namco_53xx_k_r),			/* K port */
 	{
-		DEVCB_HANDLER(steering_changed_r),	/* R0 port */
-		DEVCB_HANDLER(steering_delta_r),	/* R1 port */
+		DEVCB_DRIVER_MEMBER(polepos_state,steering_changed_r),	/* R0 port */
+		DEVCB_DRIVER_MEMBER(polepos_state,steering_delta_r),	/* R1 port */
 		DEVCB_INPUT_PORT("DSWA"),			/* R2 port */
 		DEVCB_INPUT_PORT("DSWA_HI")			/* R3 port */
 	},

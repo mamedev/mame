@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(aliens_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	DECLARE_WRITE8_MEMBER(aliens_snd_bankswitch_w);
 };
 
 /*----------- defined in video/aliens.c -----------*/

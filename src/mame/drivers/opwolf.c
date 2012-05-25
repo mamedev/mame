@@ -344,9 +344,9 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
                 SOUND
 ******************************************************/
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 {
-	device->machine().root_device().membank("bank10")->set_entry((data - 1) & 0x03);
+	machine().root_device().membank("bank10")->set_entry((data - 1) & 0x03);
 }
 
 /***********************************************************
@@ -482,22 +482,22 @@ static void opwolf_msm5205_vck( device_t *device )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( opwolf_adpcm_b_w )
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 {
-	opwolf_state *state = device->machine().driver_data<opwolf_state>();
+	device_t *device = machine().device("msm1");
 	int start;
 	int end;
 
-	state->m_adpcm_b[offset] = data;
+	m_adpcm_b[offset] = data;
 
 	if (offset == 0x04) //trigger ?
 	{
-		start = state->m_adpcm_b[0] + state->m_adpcm_b[1] * 256;
-		end   = state->m_adpcm_b[2] + state->m_adpcm_b[3] * 256;
+		start = m_adpcm_b[0] + m_adpcm_b[1] * 256;
+		end   = m_adpcm_b[2] + m_adpcm_b[3] * 256;
 		start *= 16;
 		end   *= 16;
-		state->m_adpcm_pos[0] = start;
-		state->m_adpcm_end[0] = end;
+		m_adpcm_pos[0] = start;
+		m_adpcm_end[0] = end;
 		msm5205_reset_w(device, 0);
 	}
 
@@ -505,22 +505,22 @@ static WRITE8_DEVICE_HANDLER( opwolf_adpcm_b_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER( opwolf_adpcm_c_w )
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 {
-	opwolf_state *state = device->machine().driver_data<opwolf_state>();
+	device_t *device = machine().device("msm2");
 	int start;
 	int end;
 
-	state->m_adpcm_c[offset] = data;
+	m_adpcm_c[offset] = data;
 
 	if (offset == 0x04) //trigger ?
 	{
-		start = state->m_adpcm_c[0] + state->m_adpcm_c[1] * 256;
-		end   = state->m_adpcm_c[2] + state->m_adpcm_c[3] * 256;
+		start = m_adpcm_c[0] + m_adpcm_c[1] * 256;
+		end   = m_adpcm_c[2] + m_adpcm_c[3] * 256;
 		start *= 16;
 		end   *= 16;
-		state->m_adpcm_pos[1] = start;
-		state->m_adpcm_end[1] = end;
+		m_adpcm_pos[1] = start;
+		m_adpcm_end[1] = end;
 		msm5205_reset_w(device, 0);
 	}
 
@@ -546,8 +546,8 @@ static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x9002, 0x9100) AM_READNOP
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb006) AM_DEVWRITE_LEGACY("msm1", opwolf_adpcm_b_w)
-	AM_RANGE(0xc000, 0xc006) AM_DEVWRITE_LEGACY("msm2", opwolf_adpcm_c_w)
+	AM_RANGE(0xb000, 0xb006) AM_WRITE(opwolf_adpcm_b_w)
+	AM_RANGE(0xc000, 0xc006) AM_WRITE(opwolf_adpcm_c_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(opwolf_adpcm_d_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(opwolf_adpcm_e_w)
 ADDRESS_MAP_END
@@ -700,7 +700,7 @@ static void irq_handler( device_t *device, int irq )
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(irq_handler),
-	DEVCB_HANDLER(sound_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(opwolf_state,sound_bankswitch_w)
 };
 
 

@@ -46,6 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(centiped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(milliped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
+	DECLARE_READ8_MEMBER(caterplr_rand_r);
+	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
+	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
 };
 
 

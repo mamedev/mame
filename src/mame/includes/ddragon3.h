@@ -41,6 +41,7 @@ public:
 	DECLARE_READ16_MEMBER(ddragon3_scroll_r);
 	DECLARE_WRITE16_MEMBER(ddragon3_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 };
 
 

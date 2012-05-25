@@ -120,14 +120,15 @@ WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( adpcm_control_w )
+WRITE8_MEMBER(wc90b_state::adpcm_control_w)
 {
+	device_t *device = machine().device("msm");
 	int bankaddress;
-	UINT8 *ROM = device->machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	device->machine().root_device().membank("bank3")->set_base(&ROM[bankaddress]);
+	machine().root_device().membank("bank3")->set_base(&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
@@ -174,7 +175,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", adpcm_control_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

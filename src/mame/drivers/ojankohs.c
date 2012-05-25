@@ -56,13 +56,13 @@ WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 	msm5205_reset_w(m_msm, !m_adpcm_reset);
 }
 
-static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
 {
-	ojankohs_state *state = device->machine().driver_data<ojankohs_state>();
-	state->m_adpcm_reset = BIT(data, 0);
-	state->m_vclk_left = 0;
+	device_t *device = machine().device("msm");
+	m_adpcm_reset = BIT(data, 0);
+	m_vclk_left = 0;
 
-	msm5205_reset_w(device, !state->m_adpcm_reset);
+	msm5205_reset_w(device, !m_adpcm_reset);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
@@ -153,20 +153,20 @@ READ8_MEMBER(ojankohs_state::ojankoc_keymatrix_r)
 	return (ret & 0x3f) | (ioport(offset ? "IN1" : "IN0")->read() & 0xc0);
 }
 
-static READ8_DEVICE_HANDLER( ojankohs_ay8910_0_r )
+READ8_MEMBER(ojankohs_state::ojankohs_ay8910_0_r)
 {
 	// DIPSW 1
-	device_t &root = device->machine().root_device();
+	device_t &root = machine().root_device();
 	return (((root.ioport("DSW1")->read() & 0x01) << 7) | ((root.ioport("DSW1")->read() & 0x02) << 5) |
 	        ((root.ioport("DSW1")->read() & 0x04) << 3) | ((root.ioport("DSW1")->read() & 0x08) << 1) |
 	        ((root.ioport("DSW1")->read() & 0x10) >> 1) | ((root.ioport("DSW1")->read() & 0x20) >> 3) |
 	        ((root.ioport("DSW1")->read() & 0x40) >> 5) | ((root.ioport("DSW1")->read() & 0x80) >> 7));
 }
 
-static READ8_DEVICE_HANDLER( ojankohs_ay8910_1_r )
+READ8_MEMBER(ojankohs_state::ojankohs_ay8910_1_r)
 {
 	// DIPSW 1
-	device_t &root = device->machine().root_device();
+	device_t &root = machine().root_device();
 	return (((root.ioport("DSW2")->read() & 0x01) << 7) | ((root.ioport("DSW2")->read() & 0x02) << 5) |
 	        ((root.ioport("DSW2")->read() & 0x04) << 3) | ((root.ioport("DSW2")->read() & 0x08) << 1) |
 	        ((root.ioport("DSW2")->read() & 0x10) >> 1) | ((root.ioport("DSW2")->read() & 0x20) >> 3) |
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ojankohs_gfxreg_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("msm", ojankohs_adpcm_reset_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_DEVWRITE_LEGACY("msm", ojankohs_adpcm_reset_w)
+	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
@@ -762,8 +762,8 @@ static const ay8910_interface ojankohs_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(ojankohs_ay8910_0_r),	/* read port #0 */
-	DEVCB_HANDLER(ojankohs_ay8910_1_r)	/* read port #1 */
+	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_0_r),	/* read port #0 */
+	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_1_r)	/* read port #1 */
 };
 
 static const ay8910_interface ojankoy_ay8910_interface =

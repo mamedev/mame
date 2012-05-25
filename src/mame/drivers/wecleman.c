@@ -615,8 +615,9 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 
 ** sample playing ends when a byte with bit 7 set is reached **/
 
-static WRITE8_DEVICE_HANDLER( wecleman_K00723216_bank_w )
+WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 {
+	device_t *device = machine().device("konami");
 	k007232_set_bank(device, 0, ~data&1 );	//* (wecleman062gre)
 }
 
@@ -630,7 +631,7 @@ static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)	// From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)	// K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("konami", wecleman_K00723216_bank_w)	// Samples banking
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)	// Samples banking
 ADDRESS_MAP_END
 
 
@@ -703,21 +704,47 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
-static READ8_DEVICE_HANDLER( hotchase_k007232_r )
+READ8_MEMBER(wecleman_state::hotchase_1_k007232_r)
 {
+	device_t *device = machine().device("konami1");
 	return k007232_r(device, offset ^ 1);
 }
 
-static WRITE8_DEVICE_HANDLER( hotchase_k007232_w )
+WRITE8_MEMBER(wecleman_state::hotchase_1_k007232_w)
 {
+	device_t *device = machine().device("konami1");
+	k007232_w(device, offset ^ 1, data);
+}
+
+READ8_MEMBER(wecleman_state::hotchase_2_k007232_r)
+{
+	device_t *device = machine().device("konami2");
+	return k007232_r(device, offset ^ 1);
+}
+
+WRITE8_MEMBER(wecleman_state::hotchase_2_k007232_w)
+{
+	device_t *device = machine().device("konami2");
+	k007232_w(device, offset ^ 1, data);
+}
+
+READ8_MEMBER(wecleman_state::hotchase_3_k007232_r)
+{
+	device_t *device = machine().device("konami3");
+	return k007232_r(device, offset ^ 1);
+}
+
+WRITE8_MEMBER(wecleman_state::hotchase_3_k007232_w)
+{
+	device_t *device = machine().device("konami3");
 	k007232_w(device, offset ^ 1, data);
 }
 
 static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x100d) AM_DEVREADWRITE_LEGACY("konami1", hotchase_k007232_r, hotchase_k007232_w)	// 3 x K007232
-	AM_RANGE(0x2000, 0x200d) AM_DEVREADWRITE_LEGACY("konami2", hotchase_k007232_r, hotchase_k007232_w)
-	AM_RANGE(0x3000, 0x300d) AM_DEVREADWRITE_LEGACY("konami3", hotchase_k007232_r, hotchase_k007232_w)
+	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_1_k007232_r, hotchase_1_k007232_w)	// 3 x K007232
+	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_2_k007232_r, hotchase_2_k007232_w)
+	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_3_k007232_r, hotchase_3_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w)	// Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// ? (written with 0 on IRQ, 1 on FIRQ)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)	// From main CPU (Read on IRQ)

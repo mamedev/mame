@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(senjyo_bg3videoram_w);
 	DECLARE_WRITE8_MEMBER(senjyo_bgstripes_w);
 	DECLARE_WRITE8_MEMBER(senjyo_volume_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 };
 
 

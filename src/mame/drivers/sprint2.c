@@ -209,30 +209,33 @@ WRITE8_MEMBER(sprint2_state::sprint2_wram_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( sprint2_attract_w )
+WRITE8_MEMBER(sprint2_state::sprint2_attract_w)
 {
-	sprint2_state *state = device->machine().driver_data<sprint2_state>();
-	state->m_attract = offset & 1;
+	device_t *device = machine().device("discrete");
+	m_attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(device, SPRINT2_ATTRACT_EN, state->m_attract);
+	discrete_sound_w(device, SPRINT2_ATTRACT_EN, m_attract);
 }
 
 
-static WRITE8_DEVICE_HANDLER( sprint2_noise_reset_w )
+WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, SPRINT2_NOISE_RESET, 0);
 }
 
 
-static WRITE8_DEVICE_HANDLER( sprint2_skid1_w )
+WRITE8_MEMBER(sprint2_state::sprint2_skid1_w)
 {
+	device_t *device = machine().device("discrete");
 	// also DOMINOS_TUMBLE_EN
 	discrete_sound_w(device, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
-static WRITE8_DEVICE_HANDLER( sprint2_skid2_w )
+WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
@@ -257,9 +260,9 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0880, 0x08bf) AM_READ(sprint2_steering1_r)
 	AM_RANGE(0x08c0, 0x08ff) AM_READ(sprint2_steering2_r)
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
-	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE_LEGACY("discrete", sprint2_attract_w)
-	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE_LEGACY("discrete", sprint2_skid1_w)
-	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE_LEGACY("discrete", sprint2_skid2_w)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(sprint2_attract_w)
+	AM_RANGE(0x0c10, 0x0c1f) AM_WRITE(sprint2_skid1_w)
+	AM_RANGE(0x0c20, 0x0c2f) AM_WRITE(sprint2_skid2_w)
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
@@ -268,7 +271,7 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_WRITE(sprint2_steering_reset2_w)
-	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE_LEGACY("discrete", sprint2_noise_reset_w)
+	AM_RANGE(0x0f00, 0x0f7f) AM_WRITE(sprint2_noise_reset_w)
 	AM_RANGE(0x1000, 0x13ff) AM_READ(sprint2_collision1_r)
 	AM_RANGE(0x1400, 0x17ff) AM_READ(sprint2_collision2_r)
 	AM_RANGE(0x1800, 0x1800) AM_READNOP  /* debugger ROM location? */

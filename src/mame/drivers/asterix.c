@@ -64,8 +64,9 @@ static INTERRUPT_GEN( asterix_interrupt )
 	device_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-static READ8_DEVICE_HANDLER( asterix_sound_r )
+READ8_MEMBER(asterix_state::asterix_sound_r)
 {
+	device_t *device = machine().device("k053260");
 	return k053260_r(device, 2 + offset);
 }
 
@@ -179,7 +180,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
 	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
-	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8_LEGACY("k053260", asterix_sound_r, k053260_w, 0x00ff)
+	AM_RANGE(0x380200, 0x380203) AM_READ8(asterix_sound_r, 0x00ff) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
 	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)

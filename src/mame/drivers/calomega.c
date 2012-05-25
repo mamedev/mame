@@ -657,86 +657,82 @@
 *               Read/Write Handlers               *
 **************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
+WRITE_LINE_MEMBER(calomega_state::tx_rx_clk)
 {
 	int trx_clk;
-	UINT8 dsw2 = device->machine().root_device().ioport("SW2")->read();
+	UINT8 dsw2 = machine().root_device().ioport("SW2")->read();
 	trx_clk = UART_CLOCK * dsw2 / 128;
-	acia6850_device *acia = downcast<acia6850_device *>(device);
+	acia6850_device *acia = machine().device<acia6850_device>("acia6850_0");
 	acia->set_rx_clock(trx_clk);
 	acia->set_tx_clock(trx_clk);
 }
 
 
-static READ8_DEVICE_HANDLER( s903_mux_port_r )
+READ8_MEMBER(calomega_state::s903_mux_port_r)
 {
-	calomega_state *state = device->machine().driver_data<calomega_state>();
-	switch( state->m_s903_mux_data & 0xf0 )	/* bits 4-7 */
+	switch( m_s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return state->ioport("IN0-0")->read();
-		case 0x20: return state->ioport("IN0-1")->read();
-		case 0x40: return state->ioport("IN0-2")->read();
-		case 0x80: return state->ioport("IN0-3")->read();
+		case 0x10: return ioport("IN0-0")->read();
+		case 0x20: return ioport("IN0-1")->read();
+		case 0x40: return ioport("IN0-2")->read();
+		case 0x80: return ioport("IN0-3")->read();
 	}
 
-	return device->machine().root_device().ioport("FRQ")->read();	/* bit7 used for 50/60 Hz selector */
+	return machine().root_device().ioport("FRQ")->read();	/* bit7 used for 50/60 Hz selector */
 }
 
-static WRITE8_DEVICE_HANDLER( s903_mux_w )
+WRITE8_MEMBER(calomega_state::s903_mux_w)
 {
-	calomega_state *state = device->machine().driver_data<calomega_state>();
-	state->m_s903_mux_data = data ^ 0xff;	/* inverted */
+	m_s903_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
 
-static READ8_DEVICE_HANDLER( s905_mux_port_r )
+READ8_MEMBER(calomega_state::s905_mux_port_r)
 {
-	calomega_state *state = device->machine().driver_data<calomega_state>();
-	switch( state->m_s905_mux_data & 0x0f )	/* bits 0-3 */
+	switch( m_s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return state->ioport("IN0-0")->read();
-		case 0x02: return state->ioport("IN0-1")->read();
-		case 0x04: return state->ioport("IN0-2")->read();
-		case 0x08: return state->ioport("IN0-3")->read();
+		case 0x01: return ioport("IN0-0")->read();
+		case 0x02: return ioport("IN0-1")->read();
+		case 0x04: return ioport("IN0-2")->read();
+		case 0x08: return ioport("IN0-3")->read();
 	}
 
-	return device->machine().root_device().ioport("FRQ")->read();	/* bit6 used for 50/60 Hz selector */
+	return machine().root_device().ioport("FRQ")->read();	/* bit6 used for 50/60 Hz selector */
 }
 
-static WRITE8_DEVICE_HANDLER( s905_mux_w )
+WRITE8_MEMBER(calomega_state::s905_mux_w)
 {
-	calomega_state *state = device->machine().driver_data<calomega_state>();
-	state->m_s905_mux_data = data ^ 0xff;	/* inverted */
+	m_s905_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
 /********* 906III PIAs debug *********/
 
-static READ8_DEVICE_HANDLER( pia0_ain_r )
+READ8_MEMBER(calomega_state::pia0_ain_r)
 {
 	/* Valid input port. Each polled value is stored at $0538 */
 	logerror("PIA0: Port A in\n");
-	return device->machine().root_device().ioport("IN0")->read();
+	return machine().root_device().ioport("IN0")->read();
 }
 
-static READ8_DEVICE_HANDLER( pia0_bin_r )
+READ8_MEMBER(calomega_state::pia0_bin_r)
 {
 	logerror("PIA0: Port B in\n");
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( pia0_aout_w )
+WRITE8_MEMBER(calomega_state::pia0_aout_w)
 {
 	logerror("PIA0: Port A out: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( pia0_bout_w )
+WRITE8_MEMBER(calomega_state::pia0_bout_w)
 {
 	logerror("PIA0: Port B out: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( pia0_ca2_w )
+WRITE8_MEMBER(calomega_state::pia0_ca2_w)
 {
 	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
 	logerror("PIA0: CA2: %02X\n", data);
@@ -744,35 +740,35 @@ static WRITE8_DEVICE_HANDLER( pia0_ca2_w )
 
 
 
-static READ8_DEVICE_HANDLER( pia1_ain_r )
+READ8_MEMBER(calomega_state::pia1_ain_r)
 {
 	logerror("PIA1: Port A in\n");
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( pia1_bin_r )
+READ8_MEMBER(calomega_state::pia1_bin_r)
 {
 	logerror("PIA1: Port B in\n");
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( pia1_aout_w )
+WRITE8_MEMBER(calomega_state::pia1_aout_w)
 {
 	logerror("PIA1: Port A out: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( pia1_bout_w )
+WRITE8_MEMBER(calomega_state::pia1_bout_w)
 {
 	logerror("PIA1: Port B out: %02X\n", data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( ay_aout_w )
+WRITE8_MEMBER(calomega_state::ay_aout_w)
 {
 	logerror("AY8910: Port A out: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( ay_bout_w )
+WRITE8_MEMBER(calomega_state::ay_bout_w)
 {
 	logerror("AY8910: Port B out: %02X\n", data);
 }
@@ -798,7 +794,7 @@ static WRITE8_DEVICE_HANDLER( ay_bout_w )
     0xff    0x7b    = Take
 
 */
-static WRITE8_DEVICE_HANDLER( lamps_903a_w )
+WRITE8_MEMBER(calomega_state::lamps_903a_w)
 {
 	/* First 5 bits of PIA0 port B */
 	output_set_lamp_value(1, 1-((data) & 1));		/* L1 (Hold 1) */
@@ -808,7 +804,7 @@ static WRITE8_DEVICE_HANDLER( lamps_903a_w )
 	output_set_lamp_value(5, 1-((data >> 4) & 1));	/* L5 (Hold 5) */
 }
 
-static WRITE8_DEVICE_HANDLER( lamps_903b_w )
+WRITE8_MEMBER(calomega_state::lamps_903b_w)
 {
 	/* First 4 bits of PIA1 port A */
 	output_set_lamp_value(6, 1-((data) & 1));		/* L6 (Cancel) */
@@ -817,7 +813,7 @@ static WRITE8_DEVICE_HANDLER( lamps_903b_w )
 	output_set_lamp_value(9, 1-((data >> 3) & 1));	/* L9 (Door?) */
 }
 
-static WRITE8_DEVICE_HANDLER( lamps_905_w )
+WRITE8_MEMBER(calomega_state::lamps_905_w)
 {
 	/* Whole 8 bits of PIA0 port B */
 	output_set_lamp_value(1, 1-((data) & 1));		/* L1 (Hold 1) */
@@ -2415,14 +2411,14 @@ GFXDECODE_END
 */
 static const pia6821_interface sys903_pia0_intf =
 {
-	DEVCB_HANDLER(s903_mux_port_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(calomega_state,s903_mux_port_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(lamps_903a_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(calomega_state,lamps_903a_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -2483,8 +2479,8 @@ static const pia6821_interface sys903_pia1_intf =
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_HANDLER(lamps_903b_w),	/* port A out */
-	DEVCB_HANDLER(s903_mux_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(calomega_state,lamps_903b_w),	/* port A out */
+	DEVCB_DRIVER_MEMBER(calomega_state,s903_mux_w),		/* port B out */
 	DEVCB_NULL,						/* line CA2 out */
 	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_NULL,						/* IRQA */
@@ -2539,14 +2535,14 @@ static const pia6821_interface sys903_pia1_intf =
 */
 static const pia6821_interface sys905_pia0_intf =
 {
-	DEVCB_HANDLER(s905_mux_port_r),	/* port A in */
+	DEVCB_DRIVER_MEMBER(calomega_state,s905_mux_port_r),	/* port A in */
 	DEVCB_NULL,						/* port B in */
 	DEVCB_NULL,						/* line CA1 in */
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
 	DEVCB_NULL,						/* port A out */
-	DEVCB_HANDLER(lamps_905_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(calomega_state,lamps_905_w),		/* port B out */
 	DEVCB_NULL,						/* line CA2 out */
 	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_NULL,						/* IRQA */
@@ -2608,7 +2604,7 @@ static const pia6821_interface sys905_pia1_intf =
 	DEVCB_NULL,					/* line CA2 in */
 	DEVCB_NULL,					/* line CB2 in */
 	DEVCB_NULL,					/* port A out */
-	DEVCB_HANDLER(s905_mux_w),	/* port B out */
+	DEVCB_DRIVER_MEMBER(calomega_state,s905_mux_w),	/* port B out */
 	DEVCB_NULL,					/* line CA2 out */
 	DEVCB_NULL,					/* port CB2 out */
 	DEVCB_NULL,					/* IRQA */
@@ -2619,15 +2615,15 @@ static const pia6821_interface sys905_pia1_intf =
 /********** System 906 PIA-0  **********/
 static const pia6821_interface sys906_pia0_intf =
 {
-	DEVCB_HANDLER(pia0_ain_r),		/* port A in */		/* Valid input port. Each polled value is stored at $0538 */
-	DEVCB_HANDLER(pia0_bin_r),		/* port B in */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia0_ain_r),		/* port A in */		/* Valid input port. Each polled value is stored at $0538 */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia0_bin_r),		/* port B in */
 	DEVCB_NULL,						/* line CA1 in */
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_HANDLER(pia0_aout_w),		/* port A out */
-	DEVCB_HANDLER(pia0_bout_w),		/* port B out */
-	DEVCB_HANDLER(pia0_ca2_w),		/* line CA2 out */	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia0_aout_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia0_bout_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia0_ca2_w),		/* line CA2 out */	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
 	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_NULL,						/* IRQA */
 	DEVCB_NULL						/* IRQB */
@@ -2636,14 +2632,14 @@ static const pia6821_interface sys906_pia0_intf =
 /********** System 906 PIA-1  **********/
 static const pia6821_interface sys906_pia1_intf =
 {
-	DEVCB_HANDLER(pia1_ain_r),		/* port A in */
-	DEVCB_HANDLER(pia1_bin_r),		/* port B in */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia1_ain_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia1_bin_r),		/* port B in */
 	DEVCB_NULL,						/* line CA1 in */
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_HANDLER(pia1_aout_w),		/* port A out */
-	DEVCB_HANDLER(pia1_bout_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia1_aout_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(calomega_state,pia1_bout_w),		/* port B out */
 	DEVCB_NULL,						/* line CA2 out */
 	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_NULL,						/* IRQA */
@@ -2655,28 +2651,26 @@ static const pia6821_interface sys906_pia1_intf =
 *                 ACIA Interface                 *
 *************************************************/
 
-static READ_LINE_DEVICE_HANDLER( acia_rx_r )
+READ_LINE_MEMBER(calomega_state::acia_rx_r)
 {
-	calomega_state *state = device->machine().driver_data<calomega_state>();
-	return state->m_rx_line;
+	return m_rx_line;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( acia_tx_w )
+WRITE_LINE_MEMBER(calomega_state::acia_tx_w)
 {
-	calomega_state *drvstate = device->machine().driver_data<calomega_state>();
-	drvstate->m_tx_line = state;
+	m_tx_line = state;
 }
 
 static ACIA6850_INTERFACE( acia6850_intf )
 {
 	UART_CLOCK,
 	UART_CLOCK,
-	DEVCB_LINE(acia_rx_r), /*&rx_line,*/
-	DEVCB_LINE(acia_tx_w), /*&tx_line,*/
+	DEVCB_DRIVER_LINE_MEMBER(calomega_state,acia_rx_r), /*&rx_line,*/
+	DEVCB_DRIVER_LINE_MEMBER(calomega_state,acia_tx_w), /*&tx_line,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(tx_rx_clk)
+	DEVCB_DRIVER_LINE_MEMBER(calomega_state,tx_rx_clk)
 };
 
 
@@ -2710,8 +2704,8 @@ static const ay8910_interface sys906_ay8912_intf =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("SW2"),	/* From PCB pic. Value is stored at $0539 */
 	DEVCB_NULL,
-	DEVCB_HANDLER(ay_aout_w),
-	DEVCB_HANDLER(ay_bout_w)
+	DEVCB_DRIVER_MEMBER(calomega_state,ay_aout_w),
+	DEVCB_DRIVER_MEMBER(calomega_state,ay_bout_w)
 };
 
 

@@ -356,8 +356,9 @@ WRITE8_MEMBER(thunderx_state::thunderx_sh_irqtrigger_w)
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( scontra_snd_bankswitch_w )
+WRITE8_MEMBER(thunderx_state::scontra_snd_bankswitch_w)
 {
+	device_t *device = machine().device("k007232");
 	/* b3-b2: bank for chanel B */
 	/* b1-b0: bank for chanel A */
 
@@ -441,7 +442,7 @@ static ADDRESS_MAP_START( scontra_sound_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", scontra_snd_bankswitch_w)	/* 007232 bank select */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(scontra_snd_bankswitch_w)	/* 007232 bank select */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_sound_map, AS_PROGRAM, 8, thunderx_state )

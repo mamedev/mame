@@ -127,8 +127,9 @@ READ32_MEMBER(deco_mlc_state::test3_r)
 	return 0xffffffff;
 }
 
-static WRITE32_DEVICE_HANDLER( avengrs_eprom_w )
+WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_8_15) {
 		UINT8 ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
@@ -142,7 +143,7 @@ static WRITE32_DEVICE_HANDLER( avengrs_eprom_w )
 		//volume control todo
 	}
 	else
-		logerror("%s:  eprom_w %08x mask %08x\n",device->machine().describe_context(),data,mem_mask);
+		logerror("%s:  eprom_w %08x mask %08x\n",machine().describe_context(),data,mem_mask);
 }
 
 WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
@@ -271,7 +272,7 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
-	AM_RANGE(0x0500000, 0x0500003) AM_DEVWRITE_LEGACY("eeprom", avengrs_eprom_w) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
 	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ_LEGACY(stadhr96_prot_146_w) AM_BASE_LEGACY(&deco32_prot_ram)

@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_select_w);
 	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
+	DECLARE_WRITE16_MEMBER(gotcha_oki_bank_w);
 };
 
 

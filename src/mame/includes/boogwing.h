@@ -44,6 +44,7 @@ public:
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
 
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 

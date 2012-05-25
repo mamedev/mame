@@ -37,6 +37,11 @@ public:
 	DECLARE_WRITE8_MEMBER(tehkanwc_flipscreen_y_w);
 	DECLARE_WRITE8_MEMBER(gridiron_led0_w);
 	DECLARE_WRITE8_MEMBER(gridiron_led1_w);
+	DECLARE_READ8_MEMBER(tehkanwc_portA_r);
+	DECLARE_READ8_MEMBER(tehkanwc_portB_r);
+	DECLARE_WRITE8_MEMBER(tehkanwc_portA_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_portB_w);
+	DECLARE_WRITE8_MEMBER(msm_reset_w);
 };
 
 

@@ -90,8 +90,9 @@ WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( voice_w )
+WRITE8_MEMBER(tceptor_state::voice_w)
 {
+	device_t *device = machine().device("dac");
 	dac_signed_data_16_w(device, data ? (data + 1) * 0x100 : 0x8000);
 }
 
@@ -191,7 +192,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("dac", voice_w)			// voice data
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(voice_w)			// voice data
 	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY			// voice ctrl??
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

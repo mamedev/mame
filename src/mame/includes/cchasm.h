@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cchasm_io_w);
 	DECLARE_READ16_MEMBER(cchasm_io_r);
 	INPUT_CHANGED_MEMBER(cchasm_set_coin_flag);
+	DECLARE_WRITE_LINE_MEMBER(cchasm_6840_irq);
 };
 
 

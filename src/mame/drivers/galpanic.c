@@ -250,13 +250,14 @@ READ16_MEMBER(galpanic_state::comad_timer_r)
 }
 
 /* a kludge! */
-static READ8_DEVICE_HANDLER( comad_okim6295_r )
+READ8_MEMBER(galpanic_state::comad_okim6295_r)
 {
+//  device_t *device = machine().device("oki");
 	UINT16 retvalue;
 //  okim6295_device *oki = downcast<okim6295_device *>(device);
 
 //  retvalue = oki->read_status(); // doesn't work, causes lockups when girls change..
-	retvalue = device->machine().rand();
+	retvalue = machine().rand();
 
 	return retvalue;
 }
@@ -276,8 +277,8 @@ static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM				/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM				/* fantasia, newfant */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* newfant */
+	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
+	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* newfant */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, galpanic_state )
@@ -293,7 +294,7 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* coin counters, + ? */
-	AM_RANGE(0xc80000, 0xc80001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
+	AM_RANGE(0xc80000, 0xc80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -340,7 +341,7 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, galpanic_state )
 
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
 
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
+	AM_RANGE(0xc00000, 0xc00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
 
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM		// main ram
 ADDRESS_MAP_END
@@ -365,7 +366,7 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
 	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
+	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
 ADDRESS_MAP_END
 
 

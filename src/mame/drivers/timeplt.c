@@ -94,19 +94,18 @@ READ8_MEMBER(timeplt_state::psurge_protection_r)
 }
 
 // chkun has access to an extra soundchip via ay2 port a
-static WRITE8_DEVICE_HANDLER(chkun_sound_w)
+WRITE8_MEMBER(timeplt_state::chkun_sound_w)
 {
-	timeplt_state *state = device->machine().driver_data<timeplt_state>();
 
 	// d0-d3: P0-P3
 	// d5: /R (unused?)
 	// d6: /W
 	if (~data & 0x40)
-		state->m_tc8830f->write_p(data & 0xf);
+		m_tc8830f->write_p(data & 0xf);
 
 	// d4 (or d7?): /ACL
 	if (~data & 0x10)
-		state->m_tc8830f->reset();
+		m_tc8830f->reset();
 }
 
 static const ay8910_interface chkun_ay2_interface =
@@ -115,7 +114,7 @@ static const ay8910_interface chkun_ay2_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(chkun_sound_w),
+	DEVCB_DRIVER_MEMBER(timeplt_state,chkun_sound_w),
 	DEVCB_NULL
 };
 

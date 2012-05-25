@@ -9,6 +9,11 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_battery_ram;
 	int m_trigger;
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ca2_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(pia_irqa_w);
+	DECLARE_WRITE8_MEMBER(pia_irqb_w);
 };
 
 

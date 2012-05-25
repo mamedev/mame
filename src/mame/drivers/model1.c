@@ -977,11 +977,16 @@ READ16_MEMBER(model1_state::m1_snd_v60_ready_r)
 	return 1;
 }
 
-static WRITE16_DEVICE_HANDLER( m1_snd_mpcm_bnk_w )
+WRITE16_MEMBER(model1_state::m1_snd_mpcm_bnk1_w)
 {
+	device_t *device = machine().device("sega1");
 	multipcm_set_bank(device, 0x100000 * (data & 3), 0x100000 * (data & 3));
 }
-
+WRITE16_MEMBER(model1_state::m1_snd_mpcm_bnk2_w)
+{
+	device_t *device = machine().device("sega2");
+	multipcm_set_bank(device, 0x100000 * (data & 3), 0x100000 * (data & 3));
+}
 WRITE16_MEMBER(model1_state::m1_snd_68k_latch1_w)
 {
 }
@@ -996,9 +1001,9 @@ static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
 	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY("sega1", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE_LEGACY("sega1", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w )
 	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8_LEGACY("sega2", multipcm_r, multipcm_w, 0x00ff )
-	AM_RANGE(0xc70000, 0xc70001) AM_DEVWRITE_LEGACY("sega2", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w )
 	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3438_r, ym3438_w, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END

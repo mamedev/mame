@@ -118,14 +118,14 @@ Notes:
 
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER ( unknown_port_1_w )
+WRITE8_MEMBER(chaknpop_state::unknown_port_1_w)
 {
-	//logerror("%s: write to unknow port 1: 0x%02x\n", device->machine().describe_context(), data);
+	//logerror("%s: write to unknow port 1: 0x%02x\n", machine().describe_context(), data);
 }
 
-static WRITE8_DEVICE_HANDLER ( unknown_port_2_w )
+WRITE8_MEMBER(chaknpop_state::unknown_port_2_w)
 {
-	//logerror("%s: write to unknow port 2: 0x%02x\n", device->machine().describe_context(), data);
+	//logerror("%s: write to unknow port 2: 0x%02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(chaknpop_state::coinlock_w)
@@ -177,8 +177,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(unknown_port_1_w),	// ??
-	DEVCB_HANDLER(unknown_port_2_w)	// ??
+	DEVCB_DRIVER_MEMBER(chaknpop_state,unknown_port_1_w),	// ??
+	DEVCB_DRIVER_MEMBER(chaknpop_state,unknown_port_2_w)	// ??
 };
 
 

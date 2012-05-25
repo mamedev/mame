@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE32_MEMBER(deco32_nonbuffered_palette_w);
 	DECLARE_WRITE32_MEMBER(deco32_buffered_palette_w);
 	DECLARE_WRITE32_MEMBER(deco32_palette_dma_w);
+	DECLARE_READ32_MEMBER(dragngun_eeprom_r);
+	DECLARE_WRITE32_MEMBER(dragngun_eeprom_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 class dragngun_state : public deco32_state

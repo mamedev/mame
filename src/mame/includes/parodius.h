@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(parodius_3fc0_w);
 	DECLARE_WRITE8_MEMBER(parodius_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	DECLARE_READ8_MEMBER(parodius_sound_r);
 };
 
 /*----------- defined in video/parodius.c -----------*/

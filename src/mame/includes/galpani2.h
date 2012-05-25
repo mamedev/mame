@@ -38,6 +38,10 @@ public:
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi2_w);
 	DECLARE_WRITE8_MEMBER(galpani2_coin_lockout_w);
 	DECLARE_READ16_MEMBER(galpani2_bankedrom_r);
+	DECLARE_READ16_MEMBER(galpani2_eeprom_r);
+	DECLARE_WRITE16_MEMBER(galpani2_eeprom_w);
+	DECLARE_WRITE8_MEMBER(galpani2_oki1_bank_w);
+	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
 };
 
 

@@ -45,23 +45,27 @@ WRITE8_MEMBER(tank8_state::tank8_int_reset_w)
 	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( tank8_crash_w )
+WRITE8_MEMBER(tank8_state::tank8_crash_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, TANK8_CRASH_EN, data);
 }
 
-static WRITE8_DEVICE_HANDLER( tank8_explosion_w )
+WRITE8_MEMBER(tank8_state::tank8_explosion_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, TANK8_EXPLOSION_EN, data);
 }
 
-static WRITE8_DEVICE_HANDLER( tank8_bugle_w )
+WRITE8_MEMBER(tank8_state::tank8_bugle_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, TANK8_BUGLE_EN, data);
 }
 
-static WRITE8_DEVICE_HANDLER( tank8_bug_w )
+WRITE8_MEMBER(tank8_state::tank8_bug_w)
 {
+	device_t *device = machine().device("discrete");
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
@@ -84,13 +88,15 @@ static WRITE8_DEVICE_HANDLER( tank8_bug_w )
 
 }
 
-static WRITE8_DEVICE_HANDLER( tank8_attract_w )
+WRITE8_MEMBER(tank8_state::tank8_attract_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, TANK8_ATTRACT_EN, data);
 }
 
-static WRITE8_DEVICE_HANDLER( tank8_motor_w )
+WRITE8_MEMBER(tank8_state::tank8_motor_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
@@ -121,13 +127,13 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(tank8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(tank8_int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE_LEGACY("discrete", tank8_crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE_LEGACY("discrete", tank8_explosion_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_DEVWRITE_LEGACY("discrete", tank8_bugle_w)
-	AM_RANGE(0x1d04, 0x1d04) AM_DEVWRITE_LEGACY("discrete", tank8_bug_w)
+	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(tank8_crash_w)
+	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(tank8_explosion_w)
+	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(tank8_bugle_w)
+	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(tank8_bug_w)
 	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
-	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE_LEGACY("discrete", tank8_attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE_LEGACY("discrete", tank8_motor_w)
+	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(tank8_attract_w)
+	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(tank8_motor_w)
 
 ADDRESS_MAP_END
 

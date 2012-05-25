@@ -675,15 +675,14 @@ static SAMPLES_START( kageki_init_samples )
 }
 
 
-static READ8_DEVICE_HANDLER( kageki_csport_r )
+READ8_MEMBER(tnzs_state::kageki_csport_r)
 {
-	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	int dsw, dsw1, dsw2;
 
-	dsw1 = state->ioport("DSWA")->read();
-	dsw2 = state->ioport("DSWB")->read();
+	dsw1 = ioport("DSWA")->read();
+	dsw2 = ioport("DSWB")->read();
 
-	switch (state->m_kageki_csport_sel)
+	switch (m_kageki_csport_sel)
 	{
 		case	0x00:			// DSW2 5,1 / DSW1 5,1
 			dsw = (((dsw2 & 0x10) >> 1) | ((dsw2 & 0x01) << 2) | ((dsw1 & 0x10) >> 3) | ((dsw1 & 0x01) >> 0));
@@ -699,21 +698,21 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 			break;
 		default:
 			dsw = 0x00;
-		//  logerror("kageki_csport_sel error !! (0x%08X)\n", state->m_kageki_csport_sel);
+		//  logerror("kageki_csport_sel error !! (0x%08X)\n", m_kageki_csport_sel);
 	}
 
 	return (dsw & 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( kageki_csport_w )
+WRITE8_MEMBER(tnzs_state::kageki_csport_w)
 {
-	tnzs_state *state = device->machine().driver_data<tnzs_state>();
+	device_t *device = machine().device("samples");
 	char mess[80];
 
 	if (data > 0x3f)
 	{
 		// read dipsw port
-		state->m_kageki_csport_sel = (data & 0x03);
+		m_kageki_csport_sel = (data & 0x03);
 	}
 	else
 	{
@@ -727,22 +726,23 @@ static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 		else
 		{
 			// play samples
-			samples->start_raw(0, state->m_sampledata[data], state->m_samplesize[data], 7000);
+			samples->start_raw(0, m_sampledata[data], m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
 		}
 	//  popmessage(mess);
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
+WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		device->machine().root_device().membank("bank3")->set_entry(data & 0x07);
+		machine().root_device().membank("bank3")->set_entry(data & 0x07);
 }
 
-static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
+WRITE8_MEMBER(tnzs_state::kabukiz_sample_w)
 {
+	device_t *device = machine().device("dac");
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
 		dac_data_w(device, data);
@@ -1577,10 +1577,10 @@ static const ym2203_interface kageki_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(kageki_csport_r),
+		DEVCB_DRIVER_MEMBER(tnzs_state,kageki_csport_r),
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER("samples", kageki_csport_w)
+		DEVCB_DRIVER_MEMBER(tnzs_state,kageki_csport_w)
 	},
 };
 
@@ -1601,8 +1601,8 @@ static const ym2203_interface kabukiz_ym2203_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(kabukiz_sound_bank_w),
-		DEVCB_DEVICE_HANDLER("dac", kabukiz_sample_w)
+		DEVCB_DRIVER_MEMBER(tnzs_state,kabukiz_sound_bank_w),
+		DEVCB_DRIVER_MEMBER(tnzs_state,kabukiz_sample_w)
 	},
 	irqhandler
 };

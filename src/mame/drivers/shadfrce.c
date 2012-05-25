@@ -391,8 +391,9 @@ ADDRESS_MAP_END
 
 /* and the sound cpu */
 
-static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
+WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
@@ -402,7 +403,7 @@ static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

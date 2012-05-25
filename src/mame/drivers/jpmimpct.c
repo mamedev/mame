@@ -463,8 +463,9 @@ READ16_MEMBER(jpmimpct_state::inputs1_r)
  *  Sound control
  *
  *************************************/
-static WRITE16_DEVICE_HANDLER( volume_w )
+WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
+	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
 		upd7759_set_bank_base(device, 0x20000 * ((data >> 1) & 3));
@@ -472,8 +473,9 @@ static WRITE16_DEVICE_HANDLER( volume_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( upd7759_w )
+WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
+	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
 		upd7759_port_w(device, 0, data);
@@ -482,8 +484,9 @@ static WRITE16_DEVICE_HANDLER( upd7759_w )
 	}
 }
 
-static READ16_DEVICE_HANDLER( upd7759_r )
+READ16_MEMBER(jpmimpct_state::upd7759_r)
 {
+	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
 		return upd7759_busy_r(device);
@@ -596,9 +599,9 @@ static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE_LEGACY("upd", upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE_LEGACY("upd", volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD_LEGACY("upd", upd7759_r)
+	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
+	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
+	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
 	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
 	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
@@ -864,9 +867,8 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( hopper_b_r )
+READ8_MEMBER(jpmimpct_state::hopper_b_r)
 {
-	jpmimpct_state *state = device->machine().driver_data<jpmimpct_state>();
 
 	int retval;
 	// B0 = 100p Hopper Out Verif
@@ -877,13 +879,13 @@ static READ8_DEVICE_HANDLER( hopper_b_r )
 	// Always return hoppers full
    retval=0xed; // 1110 1101
 
-   if (!state->m_hopinhibit)//if inhibited, we don't change these flags
+   if (!m_hopinhibit)//if inhibited, we don't change these flags
    {
-		if (state->m_hopper[0] && state->m_motor[0]) //&& ((state->m_hopflag1 & 0x20)==0x20))
+		if (m_hopper[0] && m_motor[0]) //&& ((m_hopflag1 & 0x20)==0x20))
 		{//100p
 			retval &= ~0x01;
 		}
-		if (((state->m_hopper[1] && state->m_motor[1]) || (state->m_hopper[2] && state->m_slidesout))) //&& ((state->m_hopflag2 & 0x20)==0x20))
+		if (((m_hopper[1] && m_motor[1]) || (m_hopper[2] && m_slidesout))) //&& ((m_hopflag2 & 0x20)==0x20))
 		{
 			retval &= ~0x08;
 		}
@@ -892,9 +894,8 @@ static READ8_DEVICE_HANDLER( hopper_b_r )
    return retval;
 }
 
-static READ8_DEVICE_HANDLER( hopper_c_r )
+READ8_MEMBER(jpmimpct_state::hopper_c_r)
 {
-	jpmimpct_state *state = device->machine().driver_data<jpmimpct_state>();
 
 	int retval;
    // C0-C2 = Alpha
@@ -910,20 +911,20 @@ static READ8_DEVICE_HANDLER( hopper_c_r )
 //    retval &= ~0x20;
 
 	// Which hoppers are present
-	if (state->m_hopper[0])
+	if (m_hopper[0])
 	{
 		retval &= ~0x40;
 	}
-	if (state->m_hopper[1])
+	if (m_hopper[1])
 	{
 		retval &= ~0x10;
 	}
 
-	if (!state->m_hopinhibit)
+	if (!m_hopinhibit)
 	{
-		if ((state->m_slidesout==1) && ((state->m_hopper[2]==0)))
+		if ((m_slidesout==1) && ((m_hopper[2]==0)))
 		{
-			state->m_slidesout=0;
+			m_slidesout=0;
 			retval &= ~0x80;
 		}
 	}
@@ -931,32 +932,30 @@ static READ8_DEVICE_HANDLER( hopper_c_r )
 	return retval;
 }
 
-static WRITE8_DEVICE_HANDLER( payen_a_w )
+WRITE8_MEMBER(jpmimpct_state::payen_a_w)
 {
-	jpmimpct_state *state = device->machine().driver_data<jpmimpct_state>();
 
-	state->m_motor[0] = (data & 0x01);
-	state->m_payen = (data & 0x10);
-	state->m_slidesout = (data & 0x10);
-	state->m_motor[1] = (data & 0x40);
-	state->m_hopinhibit = (data & 0x80);
+	m_motor[0] = (data & 0x01);
+	m_payen = (data & 0x10);
+	m_slidesout = (data & 0x10);
+	m_motor[1] = (data & 0x40);
+	m_hopinhibit = (data & 0x80);
 }
 
-static WRITE8_DEVICE_HANDLER( display_c_w )
+WRITE8_MEMBER(jpmimpct_state::display_c_w)
 {
-	jpmimpct_state *state = device->machine().driver_data<jpmimpct_state>();
 
 	if(data & 0x04)
 	{
-		state->m_alpha_data_line = ((data >> 1) & 1);
-		if (state->m_alpha_clock != (data & 1))
+		m_alpha_data_line = ((data >> 1) & 1);
+		if (m_alpha_clock != (data & 1))
 		{
-			if (!state->m_alpha_clock)//falling edge
+			if (!m_alpha_clock)//falling edge
 			{
-				ROC10937_shift_data(0, state->m_alpha_data_line?0:1);
+				ROC10937_shift_data(0, m_alpha_data_line?0:1);
 			}
 		}
-		state->m_alpha_clock = (data & 1);
+		m_alpha_clock = (data & 1);
 	}
 	else
 	{
@@ -969,11 +968,11 @@ static WRITE8_DEVICE_HANDLER( display_c_w )
 static I8255_INTERFACE (ppi8255_intf)
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(payen_a_w),
-	DEVCB_HANDLER(hopper_b_r),
+	DEVCB_DRIVER_MEMBER(jpmimpct_state,payen_a_w),
+	DEVCB_DRIVER_MEMBER(jpmimpct_state,hopper_b_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(hopper_c_r),
-	DEVCB_HANDLER(display_c_w)
+	DEVCB_DRIVER_MEMBER(jpmimpct_state,hopper_c_r),
+	DEVCB_DRIVER_MEMBER(jpmimpct_state,display_c_w)
 };
 
 static MACHINE_START( impctawp )
@@ -1226,9 +1225,9 @@ static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
 	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
 	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write,0x00ff)
-	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE_LEGACY("upd", upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE_LEGACY("upd",volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD_LEGACY("upd", upd7759_r)
+	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
+	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
+	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
 	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
 	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
 //  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)

@@ -188,7 +188,7 @@ WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offs
 WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(&space, offset), data); }
 WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(&space, offset), data); }
 WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(&space, offset), data); }
-static WRITE8_DEVICE_HANDLER( usb_ram_w )         { sega_usb_ram_w(device, decrypt_offset(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("usbsnd"); sega_usb_ram_w(device, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 
 
 
@@ -283,26 +283,30 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
+WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	state->soundlatch_byte_w(*space, 0, data);
-	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+	soundlatch_byte_w(space, 0, data);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
 
-static WRITE8_DEVICE_HANDLER( sindbadm_misc_w )
+WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 {
-	coin_counter_w(device->machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x02);
 //  mame_printf_debug("Unknown = %02X\n", data);
 }
 
 
 /* the data lines are flipped */
-static WRITE8_DEVICE_HANDLER( sindbadm_SN76496_w )
+WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
 {
+	device_t *device = machine().device("sn1");
+	sn76496_w(device, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+}
+WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
+{
+	device_t *device = machine().device("sn2");
 	sn76496_w(device, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
@@ -317,11 +321,11 @@ static WRITE8_DEVICE_HANDLER( sindbadm_SN76496_w )
 static I8255A_INTERFACE( sindbadm_ppi_intf )
 {
 	DEVCB_NULL,								/* Port A read */
-	DEVCB_HANDLER(sindbadm_soundport_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_soundport_w),	/* Port A write */
 	DEVCB_INPUT_PORT("FC"),					/* Port B read */
 	DEVCB_NULL,								/* Port B write */
 	DEVCB_NULL,								/* Port C read */
-	DEVCB_HANDLER(sindbadm_misc_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_misc_w)			/* Port C write */
 };
 
 
@@ -380,8 +384,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("sn1", sindbadm_SN76496_w)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("sn2", sindbadm_SN76496_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn1_SN76496_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn2_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -1542,7 +1546,8 @@ static DRIVER_INIT( pignewt )
 
 	/* install Universal sound board */
 	iospace->install_legacy_readwrite_handler(*usbsnd, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
+	pgmspace->install_legacy_read_handler(*usbsnd, 0xd000, 0xdfff, FUNC(sega_usb_ram_r));
+	pgmspace->install_write_handler(0xd000, 0xdfff, write8_delegate(FUNC(segag80r_state::usb_ram_w),state));
 }
 
 

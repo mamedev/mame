@@ -120,8 +120,9 @@ WRITE8_MEMBER(fuuki16_state::fuuki16_sound_rombank_w)
 		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space.device()), data);
 }
 
-static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
+WRITE8_MEMBER(fuuki16_state::fuuki16_oki_banking_w)
 {
+	device_t *device = machine().device("oki");
 	/*
         data & 0x06 is always equals to data & 0x60
         data & 0x10 is always set
@@ -141,7 +142,7 @@ static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
 	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_byte_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("oki", fuuki16_oki_banking_w)	// Oki Banking
+	AM_RANGE(0x20, 0x20) AM_WRITE(fuuki16_oki_banking_w)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITENOP	// ? In the NMI routine
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)

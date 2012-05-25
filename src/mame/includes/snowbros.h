@@ -32,5 +32,7 @@ public:
 	DECLARE_READ16_MEMBER(_4in1_02_read);
 	DECLARE_READ16_MEMBER(_3in1_read);
 	DECLARE_READ16_MEMBER(cookbib3_read);
+	DECLARE_WRITE8_MEMBER(twinadv_oki_bank_w);
+	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 };
 

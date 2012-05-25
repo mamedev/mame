@@ -83,15 +83,16 @@ WRITE32_MEMBER(cd32_state::aga_overlay_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
+WRITE8_MEMBER(cd32_state::cd32_cia_0_porta_w)
 {
+	device_t *device = machine().device("cia_0");
 	/* bit 1 = cd audio mute */
-	device->machine().device<cdda_device>("cdda")->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
+	machine().device<cdda_device>("cdda")->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(device->machine(), 0, (data & 2) ? 0 : 1);
+	set_led_status(machine(), 0, (data & 2) ? 0 : 1);
 
-	handle_cd32_joystick_cia(device->machine(), data, mos6526_r(device, 2));
+	handle_cd32_joystick_cia(machine(), data, mos6526_r(device, 2));
 }
 
 /*************************************
@@ -109,17 +110,17 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( cd32_cia_0_portb_r )
+READ8_MEMBER(cd32_state::cd32_cia_0_portb_r)
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_r\n", device->machine().describe_context());
+	logerror("%s:CIA0_portb_r\n", machine().describe_context());
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
+WRITE8_MEMBER(cd32_state::cd32_cia_0_portb_w)
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
+	logerror("%s:CIA0_portb_w(%02x)\n", machine().describe_context(), data);
 }
 
 static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32, cd32_state )
@@ -732,9 +733,9 @@ static const mos6526_interface cia_0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("CIA0PORTA"),
-	DEVCB_HANDLER(cd32_cia_0_porta_w),		/* port A */
-	DEVCB_HANDLER(cd32_cia_0_portb_r),
-	DEVCB_HANDLER(cd32_cia_0_portb_w)		/* port B */
+	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_porta_w),		/* port A */
+	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_portb_r),
+	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_portb_w)		/* port B */
 };
 
 static const mos6526_interface cia_1_intf =

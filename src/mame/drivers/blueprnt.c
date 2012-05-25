@@ -57,10 +57,9 @@
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( dipsw_w )
+WRITE8_MEMBER(blueprnt_state::dipsw_w)
 {
-	blueprnt_state *state = device->machine().driver_data<blueprnt_state>();
-	state->m_dipsw = data;
+	m_dipsw = data;
 }
 
 READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
@@ -255,7 +254,7 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_HANDLER(dipsw_w),
+	DEVCB_DRIVER_MEMBER(blueprnt_state,dipsw_w),
 	DEVCB_NULL
 };
 

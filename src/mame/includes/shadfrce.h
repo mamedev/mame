@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE16_MEMBER(shadfrce_bg0scrolly_w);
 	DECLARE_WRITE16_MEMBER(shadfrce_bg1scrollx_w);
 	DECLARE_WRITE16_MEMBER(shadfrce_bg1scrolly_w);
+	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 };
 
 

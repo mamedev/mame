@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
+	DECLARE_READ8_MEMBER(asterix_sound_r);
 };
 
 

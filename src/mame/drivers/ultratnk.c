@@ -127,20 +127,24 @@ WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( ultratnk_fire_1_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_fire_1_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, ULTRATNK_FIRE_EN_1, offset & 1);
 }
-static WRITE8_DEVICE_HANDLER( ultratnk_fire_2_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_fire_2_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, ULTRATNK_FIRE_EN_2, offset & 1);
 }
-static WRITE8_DEVICE_HANDLER( ultratnk_attract_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_attract_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, ULTRATNK_ATTRACT_EN, data & 1);
 }
-static WRITE8_DEVICE_HANDLER( ultratnk_explosion_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_explosion_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
@@ -161,16 +165,16 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
 	AM_RANGE(0x2040, 0x2047) AM_MIRROR(0x718) AM_READ(ultratnk_collision_r)
 	AM_RANGE(0x2060, 0x2063) AM_MIRROR(0x71c) AM_READ(ultratnk_options_r)
 
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x71f) AM_DEVWRITE_LEGACY("discrete", ultratnk_attract_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x71f) AM_WRITE(ultratnk_attract_w)
 	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_WRITE(ultratnk_collision_reset_w)
 	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE(ultratnk_da_latch_w)
-	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_DEVWRITE_LEGACY("discrete", ultratnk_explosion_w)
+	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_WRITE(ultratnk_explosion_w)
 	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2066, 0x2067) AM_MIRROR(0x710) AM_WRITE(ultratnk_lockout_w)
 	AM_RANGE(0x2068, 0x2069) AM_MIRROR(0x710) AM_WRITE(ultratnk_led_1_w)
 	AM_RANGE(0x206a, 0x206b) AM_MIRROR(0x710) AM_WRITE(ultratnk_led_2_w)
-	AM_RANGE(0x206c, 0x206d) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", ultratnk_fire_2_w)
-	AM_RANGE(0x206e, 0x206f) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", ultratnk_fire_1_w)
+	AM_RANGE(0x206c, 0x206d) AM_MIRROR(0x710) AM_WRITE(ultratnk_fire_2_w)
+	AM_RANGE(0x206e, 0x206f) AM_MIRROR(0x710) AM_WRITE(ultratnk_fire_1_w)
 
 	AM_RANGE(0x2800, 0x2fff) AM_NOP /* diagnostic ROM */
 	AM_RANGE(0x3000, 0x3fff) AM_ROM

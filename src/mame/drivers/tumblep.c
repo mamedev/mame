@@ -55,7 +55,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 /******************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_DEVICE_HANDLER( tumblep_oki_w )
+WRITE16_MEMBER(tumblep_state::tumblep_oki_w)
 {
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->write(0, data & 0xff);

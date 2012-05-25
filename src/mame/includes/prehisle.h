@@ -21,6 +21,8 @@ public:
 	DECLARE_WRITE16_MEMBER(prehisle_fg_videoram16_w);
 	DECLARE_READ16_MEMBER(prehisle_control16_r);
 	DECLARE_WRITE16_MEMBER(prehisle_control16_w);
+	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
+	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
 };
 
 

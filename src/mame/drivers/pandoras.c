@@ -321,24 +321,22 @@ static MACHINE_RESET( pandoras )
 	state->m_flipscreen = 0;
 }
 
-static READ8_DEVICE_HANDLER( pandoras_portA_r )
+READ8_MEMBER(pandoras_state::pandoras_portA_r)
 {
-	pandoras_state *state = device->machine().driver_data<pandoras_state>();
-	return state->m_i8039_status;
+	return m_i8039_status;
 }
 
-static READ8_DEVICE_HANDLER( pandoras_portB_r )
+READ8_MEMBER(pandoras_state::pandoras_portB_r)
 {
-	pandoras_state *state = device->machine().driver_data<pandoras_state>();
-	return (state->m_audiocpu->total_cycles() / 512) & 0x0f;
+	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
 
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(pandoras_portA_r),	// not used
-	DEVCB_HANDLER(pandoras_portB_r),
+	DEVCB_DRIVER_MEMBER(pandoras_state,pandoras_portA_r),	// not used
+	DEVCB_DRIVER_MEMBER(pandoras_state,pandoras_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

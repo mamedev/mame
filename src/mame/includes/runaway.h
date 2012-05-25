@@ -17,6 +17,7 @@ public:
 	DECLARE_WRITE8_MEMBER(runaway_paletteram_w);
 	DECLARE_WRITE8_MEMBER(runaway_video_ram_w);
 	DECLARE_WRITE8_MEMBER(runaway_tile_bank_w);
+	DECLARE_READ8_MEMBER(runaway_pot_r);
 };
 
 

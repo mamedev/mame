@@ -32,6 +32,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lucky74_fg_colorram_w);
 	DECLARE_WRITE8_MEMBER(lucky74_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(lucky74_bg_colorram_w);
+	DECLARE_WRITE8_MEMBER(ym2149_portb_w);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(lamps_b_w);
 };
 
 

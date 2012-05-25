@@ -35,20 +35,18 @@ WRITE8_MEMBER(tankbust_state::tankbust_soundlatch_w)
 	machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
 }
 
-static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
+READ8_MEMBER(tankbust_state::tankbust_soundlatch_r)
 {
-	tankbust_state *state = device->machine().driver_data<tankbust_state>();
-	return state->m_latch;
+	return m_latch;
 }
 
 //port B of ay8910#0
-static READ8_DEVICE_HANDLER( tankbust_soundtimer_r )
+READ8_MEMBER(tankbust_state::tankbust_soundtimer_r)
 {
-	tankbust_state *state = device->machine().driver_data<tankbust_state>();
 	int ret;
 
-	state->m_timer1++;
-	ret = state->m_timer1;
+	m_timer1++;
+	ret = m_timer1;
 	return ret;
 }
 
@@ -308,8 +306,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(tankbust_soundlatch_r),
-	DEVCB_HANDLER(tankbust_soundtimer_r),
+	DEVCB_DRIVER_MEMBER(tankbust_state,tankbust_soundlatch_r),
+	DEVCB_DRIVER_MEMBER(tankbust_state,tankbust_soundtimer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

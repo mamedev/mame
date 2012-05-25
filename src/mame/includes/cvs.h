@@ -89,6 +89,11 @@ public:
 	DECLARE_READ8_MEMBER(cvs_collision_r);
 	DECLARE_READ8_MEMBER(cvs_collision_clear);
 	DECLARE_WRITE8_MEMBER(cvs_scroll_w);
+	DECLARE_READ8_MEMBER(tms_clock_r);
+	DECLARE_WRITE8_MEMBER(cvs_4_bit_dac_data_w);
+	DECLARE_WRITE8_MEMBER(cvs_unknown_w);
+	DECLARE_WRITE8_MEMBER(cvs_tms5110_ctl_w);
+	DECLARE_WRITE8_MEMBER(cvs_tms5110_pdc_w);
 };
 
 

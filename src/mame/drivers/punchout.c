@@ -125,18 +125,21 @@ CUSTOM_INPUT_MEMBER(punchout_state::punchout_vlm5030_busy_r)
 	return (vlm5030_bsy(machine().device("vlm"))) ? 0x00 : 0x01;
 }
 
-static WRITE8_DEVICE_HANDLER( punchout_speech_reset_w )
+WRITE8_MEMBER(punchout_state::punchout_speech_reset_w)
 {
+	device_t *device = machine().device("vlm");
 	vlm5030_rst( device, data & 0x01 );
 }
 
-static WRITE8_DEVICE_HANDLER( punchout_speech_st_w )
+WRITE8_MEMBER(punchout_state::punchout_speech_st_w)
 {
+	device_t *device = machine().device("vlm");
 	vlm5030_st( device, data & 0x01 );
 }
 
-static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
+WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
 {
+	device_t *device = machine().device("vlm");
 	vlm5030_vcu( device, data & 0x01 );
 }
 
@@ -359,9 +362,9 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x09, 0x09) AM_WRITENOP	/* watchdog reset, seldom used because 08 clears the watchdog as well */
 	AM_RANGE(0x0a, 0x0a) AM_WRITENOP	/* ?? */
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("vlm", punchout_speech_reset_w)	/* VLM5030 */
-	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE_LEGACY("vlm", punchout_speech_st_w)	/* VLM5030 */
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_LEGACY("vlm", punchout_speech_vcu_w)	/* VLM5030 */
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(punchout_speech_reset_w)	/* VLM5030 */
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w)	/* VLM5030 */
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)	/* VLM5030 */
 	AM_RANGE(0x0f, 0x0f) AM_WRITENOP	/* enable NVRAM ? */
 
 	/* protection ports - Super Punchout only (move to install handler?) */

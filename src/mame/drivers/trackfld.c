@@ -191,7 +191,6 @@ MAIN BOARD:
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
 #include "machine/nvram.h"
-#include "includes/yiear.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz
@@ -257,11 +256,28 @@ WRITE8_MEMBER(trackfld_state::yieartf_nmi_mask_w)
 	m_yieartf_nmi_mask = data & 1;
 }
 
+READ8_MEMBER(trackfld_state::trackfld_speech_r)
+{
+	device_t *device = machine().device("vlm");
+	if (vlm5030_bsy(device))
+		return 1;
+	else
+		return 0;
+}
+
+WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
+{
+	device_t *device = machine().device("vlm");
+	/* bit 0 is latch direction */
+	vlm5030_st(device, (data >> 1) & 1);
+	vlm5030_rst(device, (data >> 2) & 1);
+}
+
 
 static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
-	AM_RANGE(0x0000, 0x0000) AM_DEVREAD_LEGACY("vlm", yiear_speech_r) AM_WRITE_LEGACY(konami_SN76496_latch_w)
+	AM_RANGE(0x0000, 0x0000) AM_READ(trackfld_speech_r) AM_WRITE_LEGACY(konami_SN76496_latch_w)
 	AM_RANGE(0x0001, 0x0001) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w)
-	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE_LEGACY("vlm", yiear_VLM5030_control_w)
+	AM_RANGE(0x0002, 0x0002) AM_WRITE(trackfld_VLM5030_control_w)
 	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
@@ -380,8 +396,9 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 ADDRESS_MAP_END
 
 
-READ8_DEVICE_HANDLER( trackfld_SN76496_r )
+READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
 {
+	device_t *device = machine().device("snsnd");
 	konami_SN76496_w(device, 0, 0);
 	return 0xff; // ?
 }
@@ -392,7 +409,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ_LEGACY(trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE_LEGACY(konami_SN76496_latch_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVREADWRITE_LEGACY("snsnd", trackfld_SN76496_r, konami_SN76496_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_DEVWRITE_LEGACY("snsnd",konami_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD_LEGACY("vlm", trackfld_speech_r)
@@ -406,7 +423,7 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ_LEGACY(trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE_LEGACY(konami_SN76496_latch_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVREADWRITE_LEGACY("snsnd", trackfld_SN76496_r, konami_SN76496_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_DEVWRITE_LEGACY("snsnd",konami_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_busy_r)

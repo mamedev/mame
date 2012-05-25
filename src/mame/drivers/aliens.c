@@ -73,9 +73,8 @@ WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
+WRITE8_MEMBER(aliens_state::aliens_snd_bankswitch_w)
 {
-	aliens_state *state = device->machine().driver_data<aliens_state>();
 
 	/* b1: bank for chanel A */
 	/* b0: bank for chanel B */
@@ -83,7 +82,7 @@ static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 	int bank_A = BIT(data, 1);
 	int bank_B = BIT(data, 0);
 
-	k007232_set_bank(state->m_k007232, bank_A, bank_B);
+	k007232_set_bank(m_k007232, bank_A, bank_B);
 }
 
 
@@ -207,7 +206,7 @@ static const k007232_interface k007232_config =
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(aliens_snd_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(aliens_state,aliens_snd_bankswitch_w)
 };
 
 

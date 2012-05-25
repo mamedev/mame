@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE16_MEMBER(stlforce_mlow_videoram_w);
 	DECLARE_WRITE16_MEMBER(stlforce_mhigh_videoram_w);
 	DECLARE_WRITE16_MEMBER(stlforce_tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE16_MEMBER(oki_bank_w);
 };
 
 

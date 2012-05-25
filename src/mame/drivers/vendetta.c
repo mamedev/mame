@@ -222,8 +222,9 @@ READ8_MEMBER(vendetta_state::vendetta_sound_interrupt_r)
 	return 0x00;
 }
 
-static READ8_DEVICE_HANDLER( vendetta_sound_r )
+READ8_MEMBER(vendetta_state::vendetta_sound_r)
 {
+	device_t *device = machine().device("k053260");
 	return k053260_r(device, 2 + offset);
 }
 
@@ -244,7 +245,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_READ(vendetta_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD_LEGACY("k053246", k053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
@@ -268,7 +269,7 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)		// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_READ(vendetta_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)		// Sound
 	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD_LEGACY("k053246", k053246_r)				// 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */

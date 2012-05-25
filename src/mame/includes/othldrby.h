@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE16_MEMBER(othldrby_videoram_w);
 	DECLARE_WRITE16_MEMBER(othldrby_vreg_addr_w);
 	DECLARE_WRITE16_MEMBER(othldrby_vreg_w);
+	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
 };
 
 

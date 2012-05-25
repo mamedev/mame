@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(soundirq_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 	DECLARE_READ8_MEMBER(pip_r);
+	DECLARE_READ8_MEMBER(rollerg_sound_r);
+	DECLARE_WRITE_LINE_MEMBER(rollerg_irq_ack_w);
 };
 
 /*----------- defined in video/rollerg.c -----------*/

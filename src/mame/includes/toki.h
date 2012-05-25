@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(toki_foreground_videoram16_w);
 	DECLARE_WRITE16_MEMBER(toki_background1_videoram16_w);
 	DECLARE_WRITE16_MEMBER(toki_background2_videoram16_w);
+	DECLARE_WRITE8_MEMBER(toki_adpcm_control_w);
 };
 
 

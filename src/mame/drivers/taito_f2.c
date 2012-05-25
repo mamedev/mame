@@ -2799,7 +2799,7 @@ static const ym2610_interface ym2610_config =
 };
 
 
-static WRITE8_DEVICE_HANDLER( cameltrya_porta_w )
+WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
 {
 	// Implement //
 }
@@ -2811,7 +2811,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,				/* portA read */
 		DEVCB_NULL,
-		DEVCB_HANDLER(cameltrya_porta_w),	/* portA write - not implemented */
+		DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),	/* portA write - not implemented */
 		DEVCB_NULL,				/* portB write */
 	},
 	irq_handler

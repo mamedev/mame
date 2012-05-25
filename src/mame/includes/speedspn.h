@@ -18,6 +18,7 @@ public:
 	DECLARE_READ8_MEMBER(speedspn_vidram_r);
 	DECLARE_WRITE8_MEMBER(speedspn_banked_vidram_change);
 	DECLARE_WRITE8_MEMBER(speedspn_global_display_w);
+	DECLARE_WRITE8_MEMBER(oki_banking_w);
 };
 
 

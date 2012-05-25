@@ -88,15 +88,15 @@ static const int gyruss_timer[10] =
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x09, 0x0a, 0x0b, 0x0a, 0x0d
 };
 
-static READ8_DEVICE_HANDLER( gyruss_portA_r )
+READ8_MEMBER(gyruss_state::gyruss_portA_r)
 {
-	gyruss_state *state = device->machine().driver_data<gyruss_state>();
-	return gyruss_timer[(state->m_audiocpu->total_cycles() / 1024) % 10];
+	return gyruss_timer[(m_audiocpu->total_cycles() / 1024) % 10];
 }
 
 
-static WRITE8_DEVICE_HANDLER( gyruss_dac_w )
+WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 {
+	device_t *device = machine().device("discrete");
 	discrete_sound_w(device, NODE(16), data);
 }
 
@@ -119,13 +119,15 @@ static void filter_w( device_t *device, int chip, int data )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( gyruss_filter0_w )
+WRITE8_MEMBER(gyruss_state::gyruss_filter0_w)
 {
+	device_t *device = machine().device("discrete");
 	filter_w(device, 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( gyruss_filter1_w )
+WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
 {
+	device_t *device = machine().device("discrete");
 	filter_w(device, 1, data);
 }
 
@@ -212,7 +214,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("discrete", gyruss_dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(gyruss_dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
@@ -338,7 +340,7 @@ static const ay8910_interface ay8910_interface_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("discrete", gyruss_filter0_w)
+	DEVCB_DRIVER_MEMBER(gyruss_state,gyruss_filter0_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
@@ -348,14 +350,14 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("discrete", gyruss_filter1_w)
+	DEVCB_DRIVER_MEMBER(gyruss_state,gyruss_filter1_w)
 };
 
 static const ay8910_interface ay8910_interface_3 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	DEVCB_HANDLER(gyruss_portA_r),
+	DEVCB_DRIVER_MEMBER(gyruss_state,gyruss_portA_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

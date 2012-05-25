@@ -1560,37 +1560,34 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( dipA_l )	{ return device->machine().root_device().ioport("DSW1")->read(); }		// dips A
-static READ8_DEVICE_HANDLER( dipA_h )	{ return device->machine().root_device().ioport("DSW1")->read() >> 4; }	// dips A
+READ8_MEMBER(mappy_state::dipA_l){ return machine().root_device().ioport("DSW1")->read(); }		// dips A
+READ8_MEMBER(mappy_state::dipA_h){ return machine().root_device().ioport("DSW1")->read() >> 4; }	// dips A
 
-static READ8_DEVICE_HANDLER( dipB_mux )	// dips B
+READ8_MEMBER(mappy_state::dipB_mux)// dips B
 {
-	mappy_state *state = device->machine().driver_data<mappy_state>();
 
-	return state->ioport("DSW2")->read() >> (4 * state->m_mux);
+	return ioport("DSW2")->read() >> (4 * m_mux);
 }
 
-static READ8_DEVICE_HANDLER( dipB_muxi )	// dips B
+READ8_MEMBER(mappy_state::dipB_muxi)// dips B
 {
-	mappy_state *state = device->machine().driver_data<mappy_state>();
 
 	// bits are interleaved in Phozon
-	return BITSWAP8(state->ioport("DSW2")->read(),6,4,2,0,7,5,3,1) >> (4 * state->m_mux);
+	return BITSWAP8(ioport("DSW2")->read(),6,4,2,0,7,5,3,1) >> (4 * m_mux);
 }
 
-static WRITE8_DEVICE_HANDLER( out_mux )
+WRITE8_MEMBER(mappy_state::out_mux)
 {
-	mappy_state *state = device->machine().driver_data<mappy_state>();
 
-	state->m_mux = data & 1;
+	m_mux = data & 1;
 }
 
-static WRITE8_DEVICE_HANDLER( out_lamps )
+WRITE8_MEMBER(mappy_state::out_lamps)
 {
-	set_led_status(device->machine(), 0, data & 1);
-	set_led_status(device->machine(), 1, data & 2);
-	coin_lockout_global_w(device->machine(), data & 4);
-	coin_counter_w(device->machine(), 0, ~data & 8);
+	set_led_status(machine(), 0, data & 1);
+	set_led_status(machine(), 1, data & 2);
+	coin_lockout_global_w(machine(), data & 4);
+	coin_counter_w(machine(), 0, ~data & 8);
 }
 
 /* chip #0: player inputs, buttons, coins */
@@ -1604,22 +1601,22 @@ static const namcoio_interface intf0 =
 static const namcoio_interface intf0_lamps =
 {
 	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
-	{ DEVCB_HANDLER(out_lamps), DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,out_lamps), DEVCB_NULL },					/* port write handlers */
 	NULL
 };
 
 /* chip #1: dip switches, test/cocktail, optional buttons */
 static const namcoio_interface intf1 =
 {
-	{ DEVCB_HANDLER(dipB_mux), DEVCB_HANDLER(dipA_l), DEVCB_HANDLER(dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
-	{ DEVCB_HANDLER(out_mux), DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_mux), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },					/* port write handlers */
 	NULL
 };
 
 static const namcoio_interface intf1_interleave =
 {
-	{ DEVCB_HANDLER(dipB_muxi), DEVCB_HANDLER(dipA_l), DEVCB_HANDLER(dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
-	{ DEVCB_HANDLER(out_mux), DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_muxi), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },					/* port write handlers */
 	NULL
 };
 
@@ -2255,8 +2252,9 @@ ROM_END
 
 
 
-static WRITE8_DEVICE_HANDLER( grobda_DAC_w )
+WRITE8_MEMBER(mappy_state::grobda_DAC_w)
 {
+	device_t *device = machine().device("dac");
 	dac_data_w(device, (data << 4) | data);
 }
 
@@ -2270,8 +2268,8 @@ static DRIVER_INIT( grobda )
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-	device_t *dac = machine.device("dac");
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x0002, 0x0002, FUNC(grobda_DAC_w) );
+	mappy_state *state = machine.driver_data<mappy_state>();
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),state));
 }
 
 static DRIVER_INIT( digdug2 )

@@ -128,10 +128,9 @@ WRITE8_MEMBER(suprridr_state::sound_data_w)
 }
 
 
-static READ8_DEVICE_HANDLER( sound_data_r )
+READ8_MEMBER(suprridr_state::sound_data_r)
 {
-	suprridr_state *state = device->machine().driver_data<suprridr_state>();
-	return state->m_sound_data;
+	return m_sound_data;
 }
 
 
@@ -341,7 +340,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(sound_data_r),
+	DEVCB_DRIVER_MEMBER(suprridr_state,sound_data_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dassault_irq_w);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 

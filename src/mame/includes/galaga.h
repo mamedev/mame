@@ -43,6 +43,11 @@ public:
 	DECLARE_WRITE8_MEMBER(bosco_latch_w);
 	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
 	DECLARE_WRITE8_MEMBER(gatsbee_bank_w);
+	DECLARE_WRITE8_MEMBER(out_0);
+	DECLARE_WRITE8_MEMBER(out_1);
+	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
+	DECLARE_READ8_MEMBER(namco_52xx_si_r);
+	DECLARE_READ8_MEMBER(custom_mod_r);
 };
 
 class xevious_state : public galaga_state
