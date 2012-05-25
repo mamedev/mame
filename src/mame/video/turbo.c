@@ -347,9 +347,8 @@ static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, 
 }
 
 
-static UINT32 turbo_get_sprite_bits(running_machine &machine, UINT8 road, sprite_info *sprinfo)
+static UINT32 turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 road, sprite_info *sprinfo)
 {
-	const UINT8 *sprite_gfxdata = machine.root_device().memregion("gfx1")->base();
 	UINT8 sprlive = sprinfo->lst;
 	UINT32 sprdata = 0;
 	int level;
@@ -531,7 +530,7 @@ SCREEN_UPDATE_IND16( turbo )
 				/*    CDG0-7 = D8 -D15 */
 				/*    CDR0-7 = D16-D23 */
 				/*    PLB0-7 = D24-D31 */
-				sprbits = turbo_get_sprite_bits(screen.machine(), road, &sprinfo);
+				sprbits = turbo_get_sprite_bits(state->m_gfx1->base(), road, &sprinfo);
 
 				/* perform collision detection here via lookup in IC20/PR1116 (p. 144) */
 				state->m_turbo_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
@@ -700,7 +699,7 @@ static void subroc3d_prepare_sprites(running_machine &machine, turbo_state *stat
 }
 
 
-static UINT32 subroc3d_get_sprite_bits(running_machine &machine, sprite_info *sprinfo, UINT8 *plb)
+static UINT32 subroc3d_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
         END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
@@ -708,7 +707,6 @@ static UINT32 subroc3d_get_sprite_bits(running_machine &machine, sprite_info *sp
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,2, 1,1,1,1, 1,1,1,1, 0,1,1,2 };
-	const UINT8 *sprite_gfxdata = machine.root_device().memregion("gfx1")->base();
 	UINT32 sprdata = 0;
 	int level;
 
@@ -817,7 +815,7 @@ SCREEN_UPDATE_IND16( subroc3d )
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = subroc3d_get_sprite_bits(screen.machine(), &sprinfo, &plb);
+				sprbits = subroc3d_get_sprite_bits(state->m_gfx1->base(), &sprinfo, &plb);
 
 				/* MUX0-3 is selected by PLY0-3 and the sprite enable bits, and is the output */
 				/* of IC21/PR1450 (p. 141), unless MPLB = 0, in which case the values are grounded (p. 141) */
@@ -920,7 +918,7 @@ static void buckrog_prepare_sprites(running_machine &machine, turbo_state *state
 }
 
 
-static UINT32 buckrog_get_sprite_bits(running_machine &machine, sprite_info *sprinfo, UINT8 *plb)
+static UINT32 buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
         END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
@@ -928,7 +926,6 @@ static UINT32 buckrog_get_sprite_bits(running_machine &machine, sprite_info *spr
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,2 };
-	const UINT8 *sprite_gfxdata = machine.root_device().memregion("gfx1")->base();
 	UINT32 sprdata = 0;
 	int level;
 
@@ -1034,7 +1031,7 @@ SCREEN_UPDATE_IND16( buckrog )
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = buckrog_get_sprite_bits(screen.machine(), &sprinfo, &plb);
+				sprbits = buckrog_get_sprite_bits(state->m_gfx1->base(), &sprinfo, &plb);
 
 				/* the PLB bits go into an LS148 8-to-1 decoder and become MUX0-3 (PROM board SH 2/10) */
 				if (plb == 0)

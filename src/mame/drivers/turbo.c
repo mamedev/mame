@@ -391,7 +391,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi0c_w)
 	/* bit   6 = /IOREQ on the 2nd CPU */
 	/* bit   7 = /INT on the 2nd CPU */
 	m_buckrog_fchg = data & 0x07;
-	cputag_set_input_line(machine(), "sub", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_subcpu, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -613,8 +613,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("spritepos")	// CONT RAM
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_SHARE("spriteram")			// CONT RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("spritepos")							// CONT RAM
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_SHARE("spriteram")							// CONT RAM
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")					// INPUT 253
 	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")					// INPUT 253
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07fc) AM_READ_PORT("DSW2")					// INPUT 253
@@ -639,14 +639,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")		// FIX PAGE
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")	// FIX PAGE
 	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVWRITE_LEGACY("ppi8255_0", ppi8255_r) AM_WRITE(buckrog_ppi8255_0_w)	// 8255
 	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)			// 8255
 	AM_RANGE(0xd800, 0xd800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xd801, 0xd801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("spritepos")				// CONT RAM
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")						// CONT RAM
-	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")								// INPUT
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("spritepos")							// CONT RAM
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")							// CONT RAM
+	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")					// INPUT
 	AM_RANGE(0xe801, 0xe801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")
 	AM_RANGE(0xe802, 0xe802) AM_MIRROR(0x07fc) AM_READ(buckrog_port_2_r)
 	AM_RANGE(0xe803, 0xe803) AM_MIRROR(0x07fc) AM_READ(buckrog_port_3_r)
@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_CPU_PROGRAM_MAP(buckrog_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("subcpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_cpu2_map)
 	MCFG_CPU_IO_MAP(buckrog_cpu2_portmap)
 
@@ -1240,7 +1240,7 @@ ROM_START( buckrog )
 	ROM_LOAD( "cpu-ic3", 0x0000, 0x4000, CRC(f0055e97) SHA1(f6ee2afd6fef710949087d1cb04cbc242d1fa9f5) )	/* encrypted */
 	ROM_LOAD( "cpu-ic4", 0x4000, 0x4000, CRC(7d084c39) SHA1(ef2c0a2a59e14d9e196fd3837139fc5acf0f63be) )	/* encrypted */
 
-	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66", 0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* sprite data */
@@ -1278,7 +1278,7 @@ ROM_START( buckrogn )
 	ROM_LOAD( "cpu-ic3.bin", 0x0000, 0x4000, CRC(7f1910af) SHA1(22d37750282676d8fd1f602e928c174f823245c9) )
 	ROM_LOAD( "cpu-ic4.bin", 0x4000, 0x4000, CRC(5ecd393b) SHA1(d069f12326644f2c685e516d91d33b97ec162c56) )
 
-	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66", 0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* sprite data */
@@ -1315,7 +1315,7 @@ ROM_START( buckrogn2 )
 	ROM_LOAD( "epr-5204", 0x0000, 0x4000, CRC(c2d43741) SHA1(ad435278de101b32e931a2a1a6cdba9be7b7da73) )
 	ROM_LOAD( "epr-5205", 0x4000, 0x4000, CRC(648f3546) SHA1(2eefdab44aea5fe6fa8e302032c725615b9fdb8a) )
 
-	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66", 0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* sprite data */
@@ -1486,7 +1486,7 @@ ROM_START( zoom909 )
 	ROM_LOAD( "epr-5217b.cpu-ic3",  0x0000, 0x4000, CRC(1b56e7dd) SHA1(ccf638c318ebce754ac9628271d2064e05ced35c) )	/* encrypted */
 	ROM_LOAD( "epr-5218b.cpu-ic4",  0x4000, 0x4000, CRC(77dfd911) SHA1(cc1d4aac863b2d6b52eff7de2b8233be21aac3c9) )	/* encrypted */
 
-	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66",  0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* sprite data */
