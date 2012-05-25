@@ -477,6 +477,11 @@ public:
 	DECLARE_WRITE32_MEMBER(asic_fifo_w);
 	DECLARE_READ32_MEMBER(status_leds_r);
 	DECLARE_WRITE32_MEMBER(status_leds_w);
+	DECLARE_READ32_MEMBER(ethernet_r);
+	DECLARE_WRITE32_MEMBER(ethernet_w);
+	DECLARE_READ32_MEMBER(widget_r);
+	DECLARE_WRITE32_MEMBER(widget_w);
+	DECLARE_READ32_MEMBER(seattle_ide_r);
 };
 
 
@@ -1505,8 +1510,9 @@ WRITE32_MEMBER(seattle_state::carnevil_gun_w)
  *
  *************************************/
 
-static READ32_DEVICE_HANDLER( ethernet_r )
+READ32_MEMBER(seattle_state::ethernet_r)
 {
+	device_t *device = machine().device("ethernet");
 	if (!(offset & 8))
 		return smc91c9x_r(device, offset & 7, mem_mask & 0xffff);
 	else
@@ -1514,8 +1520,9 @@ static READ32_DEVICE_HANDLER( ethernet_r )
 }
 
 
-static WRITE32_DEVICE_HANDLER( ethernet_w )
+WRITE32_MEMBER(seattle_state::ethernet_w)
 {
+	device_t *device = machine().device("ethernet");
 	if (!(offset & 8))
 		smc91c9x_w(device, offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
@@ -1552,28 +1559,28 @@ static void update_widget_irq(running_machine &machine)
 }
 
 
-static READ32_DEVICE_HANDLER( widget_r )
+READ32_MEMBER(seattle_state::widget_r)
 {
-	seattle_state *state = device->machine().driver_data<seattle_state>();
+    device_t *device = machine().device("ethernet");
 	UINT32 result = ~0;
 
 	switch (offset)
 	{
 		case WREG_ETHER_ADDR:
-			result = state->m_widget.ethernet_addr;
+			result = m_widget.ethernet_addr;
 			break;
 
 		case WREG_INTERRUPT:
-			result = state->m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
+			result = m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
 			result = ~result;
 			break;
 
 		case WREG_ANALOG:
-			result = state->analog_port_r(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, mem_mask);
+			result = analog_port_r(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
-			result = smc91c9x_r(device, state->m_widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = smc91c9x_r(device, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -1583,29 +1590,29 @@ static READ32_DEVICE_HANDLER( widget_r )
 }
 
 
-static WRITE32_DEVICE_HANDLER( widget_w )
+WRITE32_MEMBER(seattle_state::widget_w)
 {
-	seattle_state *state = device->machine().driver_data<seattle_state>();
+    device_t *device = machine().device("ethernet");
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
 	switch (offset)
 	{
 		case WREG_ETHER_ADDR:
-			state->m_widget.ethernet_addr = data;
+			m_widget.ethernet_addr = data;
 			break;
 
 		case WREG_INTERRUPT:
-			state->m_widget.irq_mask = data;
-			update_widget_irq(device->machine());
+			m_widget.irq_mask = data;
+			update_widget_irq(machine());
 			break;
 
 		case WREG_ANALOG:
-			state->analog_port_w(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, data, mem_mask);
+			analog_port_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
-			smc91c9x_w(device, state->m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			smc91c9x_w(device, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }
@@ -1762,11 +1769,12 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-static READ32_DEVICE_HANDLER( seattle_ide_r )
+READ32_MEMBER(seattle_state::seattle_ide_r)
 {
+	device_t *device = machine().device("ide");
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
-		device_eat_cycles(device->machine().device("maincpu"), 100);
+		device_eat_cycles(machine().device("maincpu"), 100);
 	return ide_controller32_r(device, offset, mem_mask);
 }
 
@@ -1774,7 +1782,7 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase")	// wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
-	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE_LEGACY("ide", seattle_ide_r, ide_controller32_w)
+	AM_RANGE(0x0a000000, 0x0a0003ff) AM_READ(seattle_ide_r) AM_DEVWRITE_LEGACY("ide", ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE_LEGACY("ide", ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
@@ -2818,7 +2826,6 @@ ROM_END
 static void init_common(running_machine &machine, int ioasic, int serialnum, int yearoffs, int config)
 {
 	seattle_state *state = machine.driver_data<seattle_state>();
-	device_t *device;
 
 	/* initialize the subsystems */
 	midway_ioasic_init(machine, ioasic, serialnum, yearoffs, ioasic_irq);
@@ -2834,8 +2841,7 @@ static void init_common(running_machine &machine, int ioasic, int serialnum, int
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			device = machine.device("ethernet");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x16c00000, 0x16c0001f, FUNC(widget_r), FUNC(widget_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),state), write32_delegate(FUNC(seattle_state::widget_w),state));
 			break;
 
 		case FLAGSTAFF_CONFIG:
@@ -2843,8 +2849,7 @@ static void init_common(running_machine &machine, int ioasic, int serialnum, int
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),state), write32_delegate(FUNC(seattle_state::analog_port_w),state));
 
 			/* set up the ethernet controller */
-			device = machine.device("ethernet");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x16c00000, 0x16c0003f, FUNC(ethernet_r), FUNC(ethernet_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),state), write32_delegate(FUNC(seattle_state::ethernet_w),state));
 			break;
 	}
 }

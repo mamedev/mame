@@ -122,6 +122,7 @@ public:
 	UINT8 m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
+	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 };
 
 
@@ -636,9 +637,9 @@ static PALETTE_INIT( vpoker )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
+WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -646,7 +647,7 @@ static const ptm6840_interface ptm_intf =
 	XTAL_4MHz,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_LINE(ptm_irq)
+	DEVCB_DRIVER_LINE_MEMBER(vpoker_state,ptm_irq)
 };
 
 static MACHINE_CONFIG_START( vpoker, vpoker_state )

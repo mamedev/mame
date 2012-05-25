@@ -265,6 +265,7 @@ public:
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
+	DECLARE_WRITE8_MEMBER(oki_banking_w);
 };
 
 
@@ -320,8 +321,9 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
-static WRITE8_DEVICE_HANDLER( oki_banking_w )
+WRITE8_MEMBER(nmg5_state::oki_banking_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base((data & 1) ? 0x40000 : 0);
 }
 
@@ -388,7 +390,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)

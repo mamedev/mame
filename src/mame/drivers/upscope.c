@@ -42,6 +42,11 @@ public:
 	UINT8 m_parallel_data;
 	UINT8 m_nvram_address_latch;
 	UINT8 m_nvram_data_latch;
+	DECLARE_WRITE8_MEMBER(upscope_cia_0_porta_w);
+	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);
+	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
+	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
+	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
 };
 
 
@@ -84,19 +89,19 @@ static void upscope_reset(running_machine &machine)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
+WRITE8_MEMBER(upscope_state::upscope_cia_0_porta_w)
 {
 	/* switch banks as appropriate */
-	device->machine().root_device().membank("bank1")->set_entry(data & 1);
+	machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
 }
 
 
@@ -116,16 +121,14 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( upscope_cia_0_portb_w )
+WRITE8_MEMBER(upscope_state::upscope_cia_0_portb_w)
 {
-	upscope_state *state = device->machine().driver_data<upscope_state>();
-	state->m_parallel_data = data;
+	m_parallel_data = data;
 }
 
-static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
+READ8_MEMBER(upscope_state::upscope_cia_0_portb_r)
 {
-	upscope_state *state = device->machine().driver_data<upscope_state>();
-	return state->m_nvram_data_latch;
+	return m_nvram_data_latch;
 }
 
 
@@ -145,29 +148,27 @@ static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( upscope_cia_1_porta_r )
+READ8_MEMBER(upscope_state::upscope_cia_1_porta_r)
 {
-	upscope_state *state = device->machine().driver_data<upscope_state>();
-	return 0xf8 | (state->m_prev_cia1_porta & 0x07);
+	return 0xf8 | (m_prev_cia1_porta & 0x07);
 }
 
-static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
+WRITE8_MEMBER(upscope_state::upscope_cia_1_porta_w)
 {
-	upscope_state *state = device->machine().driver_data<upscope_state>();
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
-	if ((state->m_prev_cia1_porta & 2) && !(data & 2))
+	if ((m_prev_cia1_porta & 2) && !(data & 2))
 	{
 		/* if SEL == 1 && BUSY == 0, we latch an address */
 		if ((data & 5) == 4)
 		{
-			if (LOG_IO) logerror("Latch address: %02X\n", state->m_parallel_data);
-			state->m_nvram_address_latch = state->m_parallel_data;
+			if (LOG_IO) logerror("Latch address: %02X\n", m_parallel_data);
+			m_nvram_address_latch = m_parallel_data;
 		}
 
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			switch (state->m_nvram_address_latch)
+			switch (m_nvram_address_latch)
 			{
 				case 0x01:
 					/* lamps:
@@ -184,7 +185,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 
 				case 0x02:
 					/* coin counter */
-					coin_counter_w(device->machine(), 0, data & 1);
+					coin_counter_w(machine(), 0, data & 1);
 					break;
 
 				case 0x03:
@@ -192,7 +193,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 					break;
 
 				default:
-					logerror("Internal register (%d) = %02X\n", state->m_nvram_address_latch, state->m_parallel_data);
+					logerror("Internal register (%d) = %02X\n", m_nvram_address_latch, m_parallel_data);
 					break;
 			}
 		}
@@ -200,8 +201,8 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
 		else if ((data & 5) == 1)
 		{
-			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", state->m_nvram_address_latch, state->m_parallel_data);
-			state->m_nvram[state->m_nvram_address_latch] = state->m_parallel_data;
+			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", m_nvram_address_latch, m_parallel_data);
+			m_nvram[m_nvram_address_latch] = m_parallel_data;
 		}
 
 		/* if SEL == 0 && BUSY == 0, who knows? */
@@ -212,25 +213,25 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 	}
 
 	/* on a low transition of BUSY, we latch stuff for reading */
-	else if ((state->m_prev_cia1_porta & 1) && !(data & 1))
+	else if ((m_prev_cia1_porta & 1) && !(data & 1))
 	{
 		/* if SEL == 1, we read internal data registers */
 		if (data & 4)
 		{
-			if (LOG_IO) logerror("Internal register (%d) read\n", state->m_nvram_address_latch);
-			state->m_nvram_data_latch = (state->m_nvram_address_latch == 0) ? device->machine().root_device().ioport("IO0")->read() : 0xff;
+			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
+			m_nvram_data_latch = (m_nvram_address_latch == 0) ? machine().root_device().ioport("IO0")->read() : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */
 		else
 		{
-			state->m_nvram_data_latch = state->m_nvram[state->m_nvram_address_latch];
-			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", state->m_nvram_address_latch, state->m_nvram_data_latch);
+			m_nvram_data_latch = m_nvram[m_nvram_address_latch];
+			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", m_nvram_address_latch, m_nvram_data_latch);
 		}
 	}
 
 	/* remember the previous value */
-	state->m_prev_cia1_porta = data;
+	m_prev_cia1_porta = data;
 }
 
 
@@ -289,9 +290,9 @@ static const mos6526_interface cia_0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(upscope_cia_0_porta_w),					/* port A */
-	DEVCB_HANDLER(upscope_cia_0_portb_r),
-	DEVCB_HANDLER(upscope_cia_0_portb_w)	/* port B */
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_porta_w),					/* port A */
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_portb_r),
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_portb_w)	/* port B */
 };
 
 static const mos6526_interface cia_1_intf =
@@ -301,8 +302,8 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(upscope_cia_1_porta_r),
-	DEVCB_HANDLER(upscope_cia_1_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_1_porta_r),
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_1_porta_w),	/* port A */
 	DEVCB_NULL,
 	DEVCB_NULL
 };

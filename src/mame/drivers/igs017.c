@@ -134,6 +134,7 @@ public:
 	DECLARE_WRITE16_MEMBER(slqz2_paletteram_w);
 	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
 	DECLARE_READ16_MEMBER(slqz2_magic_r);
+	DECLARE_READ8_MEMBER(mgcs_keys_r);
 };
 
 
@@ -1369,16 +1370,15 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 	return 0xffff;
 }
 
-static READ8_DEVICE_HANDLER( mgcs_keys_r )
+READ8_MEMBER(igs017_state::mgcs_keys_r)
 {
-	igs017_state *state = device->machine().driver_data<igs017_state>();
-	if (~state->m_input_select & 0x08)	return state->ioport("KEY0")->read();
-	if (~state->m_input_select & 0x10)	return state->ioport("KEY1")->read();
-	if (~state->m_input_select & 0x20)	return state->ioport("KEY2")->read();
-	if (~state->m_input_select & 0x40)	return state->ioport("KEY3")->read();
-	if (~state->m_input_select & 0x80)	return state->ioport("KEY4")->read();
+	if (~m_input_select & 0x08)	return ioport("KEY0")->read();
+	if (~m_input_select & 0x10)	return ioport("KEY1")->read();
+	if (~m_input_select & 0x20)	return ioport("KEY2")->read();
+	if (~m_input_select & 0x40)	return ioport("KEY3")->read();
+	if (~m_input_select & 0x80)	return ioport("KEY4")->read();
 
-	logerror("%s: warning, reading key with input_select = %02x\n", device->machine().describe_context(), state->m_input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
 }
 
@@ -3302,7 +3302,7 @@ static I8255A_INTERFACE( mgcs_ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("COINS"),			/* Port A read */
 	DEVCB_NULL,							/* Port A write */
-	DEVCB_HANDLER(mgcs_keys_r),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(igs017_state,mgcs_keys_r),			/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_NULL,							/* Port C read */
 	DEVCB_NULL							/* Port C write */

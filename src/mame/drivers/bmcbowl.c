@@ -127,6 +127,13 @@ public:
 	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_offset_w);
 	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_color_w);
 	DECLARE_WRITE16_MEMBER(scroll_w);
+	DECLARE_READ8_MEMBER(via_b_in);
+	DECLARE_WRITE8_MEMBER(via_a_out);
+	DECLARE_WRITE8_MEMBER(via_b_out);
+	DECLARE_WRITE8_MEMBER(via_ca2_out);
+	DECLARE_WRITE8_MEMBER(via_irq);
+	DECLARE_READ8_MEMBER(dips1_r);
+	DECLARE_WRITE8_MEMBER(input_mux_w);
 };
 
 
@@ -228,31 +235,31 @@ WRITE16_MEMBER(bmcbowl_state::scroll_w)
 }
 
 
-static READ8_DEVICE_HANDLER(via_b_in)
+READ8_MEMBER(bmcbowl_state::via_b_in)
 {
-	return device->machine().root_device().ioport("IN3")->read();
+	return machine().root_device().ioport("IN3")->read();
 }
 
 
-static WRITE8_DEVICE_HANDLER(via_a_out)
+WRITE8_MEMBER(bmcbowl_state::via_a_out)
 {
 	// related to video hw ? BG scroll ?
 }
 
-static WRITE8_DEVICE_HANDLER(via_b_out)
+WRITE8_MEMBER(bmcbowl_state::via_b_out)
 {
 	//used
 }
 
-static WRITE8_DEVICE_HANDLER(via_ca2_out)
+WRITE8_MEMBER(bmcbowl_state::via_ca2_out)
 {
 	//used
 }
 
 
-static WRITE8_DEVICE_HANDLER(via_irq)
+WRITE8_MEMBER(bmcbowl_state::via_irq)
 {
-       cputag_set_input_line(device->machine(), "maincpu", 4, data ? ASSERT_LINE : CLEAR_LINE);
+       cputag_set_input_line(machine(), "maincpu", 4, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -448,23 +455,21 @@ static INPUT_PORTS_START( bmcbowl )
 
 INPUT_PORTS_END
 
-static READ8_DEVICE_HANDLER(dips1_r)
+READ8_MEMBER(bmcbowl_state::dips1_r)
 {
-	bmcbowl_state *state = device->machine().driver_data<bmcbowl_state>();
-	switch(state->m_bmc_input)
+	switch(m_bmc_input)
 	{
-			case 0x00:	return  state->ioport("IN1")->read();
-			case 0x40:	return  state->ioport("IN2")->read();
+			case 0x00:	return  ioport("IN1")->read();
+			case 0x40:	return  ioport("IN2")->read();
 	}
-	logerror("%s:unknown input - %X\n",device->machine().describe_context(),state->m_bmc_input);
+	logerror("%s:unknown input - %X\n",machine().describe_context(),m_bmc_input);
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER(input_mux_w)
+WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 {
-	bmcbowl_state *state = device->machine().driver_data<bmcbowl_state>();
-	state->m_bmc_input=data;
+	m_bmc_input=data;
 }
 
 
@@ -472,20 +477,20 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(dips1_r),
+	DEVCB_DRIVER_MEMBER(bmcbowl_state,dips1_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(input_mux_w)
+	DEVCB_DRIVER_MEMBER(bmcbowl_state,input_mux_w)
 };
 
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVCB_NULL, DEVCB_HANDLER(via_b_in),
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(bmcbowl_state,via_b_in),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_HANDLER(via_a_out), DEVCB_HANDLER(via_b_out),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(via_ca2_out), DEVCB_NULL,
-	/*irq                  */ DEVCB_HANDLER(via_irq)
+	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(bmcbowl_state,via_a_out), DEVCB_DRIVER_MEMBER(bmcbowl_state,via_b_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bmcbowl_state,via_ca2_out), DEVCB_NULL,
+	/*irq                  */ DEVCB_DRIVER_MEMBER(bmcbowl_state,via_irq)
 };
 
 static MACHINE_RESET( bmcbowl )

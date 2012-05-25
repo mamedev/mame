@@ -83,6 +83,8 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
 	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
 	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
+	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
+	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
 };
 
 
@@ -340,24 +342,22 @@ GFXDECODE_END
 /***************************************************************************/
 
 
-static WRITE8_DEVICE_HANDLER( chanbara_ay_out_0_w )
+WRITE8_MEMBER(chanbara_state::chanbara_ay_out_0_w)
 {
-	chanbara_state *state = device->machine().driver_data<chanbara_state>();
 	//printf("chanbara_ay_out_0_w %02x\n",data);
 
-	state->m_scroll = data;
+	m_scroll = data;
 }
 
-static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
+WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
 {
-	chanbara_state *state = device->machine().driver_data<chanbara_state>();
 	//printf("chanbara_ay_out_1_w %02x\n",data);
 
-	state->m_scrollhi = data & 0x01;
+	m_scrollhi = data & 0x01;
 
-	state->flip_screen_set(data & 0x02);
+	flip_screen_set(data & 0x02);
 
-	state->membank("bank1")->set_entry((data & 0x04) >> 2);
+	membank("bank1")->set_entry((data & 0x04) >> 2);
 
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
@@ -376,8 +376,8 @@ static const ym2203_interface ym2203_config =
 			AY8910_DEFAULT_LOADS,
 			DEVCB_NULL,
 			DEVCB_NULL,
-			DEVCB_HANDLER(chanbara_ay_out_0_w),
-			DEVCB_HANDLER(chanbara_ay_out_1_w),
+			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_0_w),
+			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_1_w),
 	},
 	sound_irq
 };

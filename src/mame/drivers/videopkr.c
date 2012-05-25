@@ -353,6 +353,9 @@ public:
 	DECLARE_READ8_MEMBER(baby_sound_p1_r);
 	DECLARE_WRITE8_MEMBER(baby_sound_p1_w);
 	DECLARE_READ8_MEMBER(baby_sound_p2_r);
+	DECLARE_WRITE8_MEMBER(baby_sound_p2_w);
+	DECLARE_READ8_MEMBER(baby_sound_p3_r);
+	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
 };
 
 
@@ -878,48 +881,47 @@ READ8_MEMBER(videopkr_state::baby_sound_p2_r)
 	return m_sbp2;
 }
 
-static WRITE8_DEVICE_HANDLER(baby_sound_p2_w)
+WRITE8_MEMBER(videopkr_state::baby_sound_p2_w)
 {
-	videopkr_state *state = device->machine().driver_data<videopkr_state>();
-	state->m_sbp2 = data;
+	device_t *device = machine().device("dac");
+	m_sbp2 = data;
 	dac_data_w(device, data);
 }
 
-static READ8_DEVICE_HANDLER(baby_sound_p3_r)
+READ8_MEMBER(videopkr_state::baby_sound_p3_r)
 {
-	videopkr_state *state = device->machine().driver_data<videopkr_state>();
-	return state->m_sbp3;
+	return m_sbp3;
 }
 
-static WRITE8_DEVICE_HANDLER(baby_sound_p3_w)
+WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 {
-	videopkr_state *state = device->machine().driver_data<videopkr_state>();
+	device_t *device = machine().device("aysnd");
 	UINT8 lmp_ports, ay_intf;
-	state->m_sbp3 = data;
-	lmp_ports = state->m_sbp3 >> 1 & 0x07;
+	m_sbp3 = data;
+	lmp_ports = m_sbp3 >> 1 & 0x07;
 
 	output_set_value("TOP_1", (lmp_ports >> 0) & 1);
 	output_set_value("TOP_2", (lmp_ports >> 1) & 1);
 	output_set_value("TOP_3", (lmp_ports >> 2) & 1);
 
-	if (!(state->m_sbp3 & 0x10))
+	if (!(m_sbp3 & 0x10))
 	{
-		device->reset();
+		reset();
 		logerror("AY3-8910: Reset\n");
 	}
 
-	ay_intf = (state->m_sbp3 >> 5) & 0x07;
+	ay_intf = (m_sbp3 >> 5) & 0x07;
 
 	switch (ay_intf)
 	{
 		case 0x00:	break;
 		case 0x01:	break;
 		case 0x02:	break;
-		case 0x03:	ay8910_data_w(device, 1, state->m_sbp0); break;
+		case 0x03:	ay8910_data_w(device, 1, m_sbp0); break;
 		case 0x04:	break;
-		case 0x05:	state->m_sbp0 = ay8910_r(device, state->m_sbp0); break;
+		case 0x05:	m_sbp0 = ay8910_r(device, m_sbp0); break;
 		case 0x06:	break;
-		case 0x07:	ay8910_address_w(device, 0, state->m_sbp0); break;
+		case 0x07:	ay8910_address_w(device, 0, m_sbp0); break;
 	}
 }
 
@@ -974,8 +976,8 @@ static ADDRESS_MAP_START( i8051_sound_port, AS_IO, 8, videopkr_state )
 	/* ports */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ(baby_sound_p2_r) AM_DEVWRITE_LEGACY("dac", baby_sound_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_DEVREADWRITE_LEGACY("aysnd", baby_sound_p3_r, baby_sound_p3_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ(baby_sound_p2_r) AM_WRITE(baby_sound_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(baby_sound_p3_r, baby_sound_p3_w)
 ADDRESS_MAP_END
 
 

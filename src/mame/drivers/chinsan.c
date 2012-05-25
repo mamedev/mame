@@ -67,6 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
 	DECLARE_READ8_MEMBER(chinsan_input_port_0_r);
 	DECLARE_READ8_MEMBER(chinsan_input_port_1_r);
+	DECLARE_WRITE8_MEMBER(ym_port_w1);
+	DECLARE_WRITE8_MEMBER(ym_port_w2);
+	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
 };
 
 
@@ -122,13 +125,13 @@ WRITE8_MEMBER(chinsan_state::ctrl_w)
 	membank("bank1")->set_entry(data >> 6);
 }
 
-static WRITE8_DEVICE_HANDLER( ym_port_w1 )
+WRITE8_MEMBER(chinsan_state::ym_port_w1)
 {
 	logerror("ym_write port 1 %02x\n", data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( ym_port_w2 )
+WRITE8_MEMBER(chinsan_state::ym_port_w2)
 {
 	logerror("ym_write port 2 %02x\n", data);
 }
@@ -141,8 +144,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_INPUT_PORT("DSW1"),
 		DEVCB_INPUT_PORT("DSW2"),
-		DEVCB_HANDLER(ym_port_w1),
-		DEVCB_HANDLER(ym_port_w2)
+		DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w1),
+		DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w2)
 	},
 };
 
@@ -225,11 +228,11 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
 	return machine().rand();
 }
 
-static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
+WRITE8_MEMBER(chinsan_state::chin_adpcm_w)
 {
-	chinsan_state *state = device->machine().driver_data<chinsan_state>();
-	state->m_adpcm_pos = (data & 0xff) * 0x100;
-	state->m_adpcm_idle = 0;
+	device_t *device = machine().device("adpcm");
+	m_adpcm_pos = (data & 0xff) * 0x100;
+	m_adpcm_idle = 0;
 	msm5205_reset_w(device, 0);
 }
 
@@ -252,7 +255,7 @@ static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("adpcm", chin_adpcm_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(chin_adpcm_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 

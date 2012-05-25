@@ -55,6 +55,8 @@ public:
 	DECLARE_READ8_MEMBER(mcu_tcr_r);
 	DECLARE_WRITE8_MEMBER(mcu_tcr_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pa_r);
+	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
 };
 
 
@@ -369,21 +371,21 @@ static const pokey_interface pokey_config = {
 	atari_interrupt_cb
 };
 
-READ8_DEVICE_HANDLER(maxaflex_atari_pia_pa_r)
+READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pa_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : device->machine().root_device().ioport("djoy_0_1")->read_safe(0);
+	return atari_input_disabled(machine()) ? 0xFF : machine().root_device().ioport("djoy_0_1")->read_safe(0);
 }
 
-READ8_DEVICE_HANDLER(maxaflex_atari_pia_pb_r)
+READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : device->machine().root_device().ioport("djoy_2_3")->read_safe(0);
+	return atari_input_disabled(machine()) ? 0xFF : machine().root_device().ioport("djoy_2_3")->read_safe(0);
 }
 
 
 const pia6821_interface maxaflex_atarixl_pia_interface =
 {
-	DEVCB_HANDLER(maxaflex_atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(maxaflex_atari_pia_pb_r),	/* port B in */
+	DEVCB_DRIVER_MEMBER(maxaflex_state,maxaflex_atari_pia_pa_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(maxaflex_state,maxaflex_atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */

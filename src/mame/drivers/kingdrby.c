@@ -97,6 +97,14 @@ public:
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(led_array_w);
 	DECLARE_WRITE8_MEMBER(kingdrbb_lamps_w);
+	DECLARE_READ8_MEMBER(hopper_io_r);
+	DECLARE_WRITE8_MEMBER(hopper_io_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(outport2_w);
+	DECLARE_READ8_MEMBER(input_mux_r);
+	DECLARE_READ8_MEMBER(key_matrix_r);
+	DECLARE_READ8_MEMBER(sound_cmd_r);
+	DECLARE_WRITE8_MEMBER(outportb_w);
 };
 
 
@@ -264,54 +272,49 @@ WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 
 /* hopper I/O */
 
-static READ8_DEVICE_HANDLER( hopper_io_r )
+READ8_MEMBER(kingdrby_state::hopper_io_r)
 {
-	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	return (state->ioport("HPIO")->read() & 0x3f) | state->m_p1_hopper | state->m_p2_hopper;
+	return (ioport("HPIO")->read() & 0x3f) | m_p1_hopper | m_p2_hopper;
 }
 
-static WRITE8_DEVICE_HANDLER( hopper_io_w )
+WRITE8_MEMBER(kingdrby_state::hopper_io_w)
 {
-	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	state->m_p1_hopper = (data & 0x8)<<3;
-	state->m_p2_hopper = (data & 0x4)<<5;
+	m_p1_hopper = (data & 0x8)<<3;
+	m_p2_hopper = (data & 0x4)<<5;
 //  printf("%02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_cmd_w )
+WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 {
-	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
-	state->m_sound_cmd = data;
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// soundlatch_byte_w(space,0, data);
 }
 
 
 /* No idea about what's this (if it's really a mux etc.)*/
-static WRITE8_DEVICE_HANDLER( outport2_w )
+WRITE8_MEMBER(kingdrby_state::outport2_w)
 {
-	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 //  popmessage("PPI1 port C(upper) out: %02X", data);
-	state->m_mux_data = data & 0x80;
+	m_mux_data = data & 0x80;
 }
 
-static READ8_DEVICE_HANDLER( input_mux_r )
+READ8_MEMBER(kingdrby_state::input_mux_r)
 {
-	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	if(state->m_mux_data & 0x80)
-		return state->ioport("MUX0")->read();
+	if(m_mux_data & 0x80)
+		return ioport("MUX0")->read();
 	else
-		return state->ioport("MUX1")->read();
+		return ioport("MUX1")->read();
 }
 
-static READ8_DEVICE_HANDLER( key_matrix_r )
+READ8_MEMBER(kingdrby_state::key_matrix_r)
 {
 	UINT16 p1_val,p2_val;
 	UINT8 p1_res,p2_res;
 
-	p1_val = device->machine().root_device().ioport("KEY_1P")->read();
-	p2_val = device->machine().root_device().ioport("KEY_2P")->read();
+	p1_val = machine().root_device().ioport("KEY_1P")->read();
+	p2_val = machine().root_device().ioport("KEY_2P")->read();
 
 	p1_res = 0;
 	p2_res = 0;
@@ -357,10 +360,9 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 	return p1_res | (p2_res<<4);
 }
 
-static READ8_DEVICE_HANDLER( sound_cmd_r )
+READ8_MEMBER(kingdrby_state::sound_cmd_r)
 {
-	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	return state->m_sound_cmd;
+	return m_sound_cmd;
 }
 
 static const UINT8 led_map[16] =
@@ -476,26 +478,26 @@ ADDRESS_MAP_END
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	/* A & B as input, C (all) as output */
-	DEVCB_HANDLER(hopper_io_r),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_r),			/* Port A read */
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(hopper_io_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	/* B & C (lower) as input, A & C (upper) as output */
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
-	DEVCB_HANDLER(key_matrix_r),		/* Port B read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,key_matrix_r),		/* Port B read */
 	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(input_mux_r),			/* Port C read */
-	DEVCB_HANDLER(outport2_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,input_mux_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,outport2_w)			/* Port C write */
 };
 
-static WRITE8_DEVICE_HANDLER( outportb_w )
+WRITE8_MEMBER(kingdrby_state::outportb_w)
 {
 //  printf("%02x B\n",data);
 }
@@ -505,9 +507,9 @@ static I8255A_INTERFACE( ppi8255_1986_0_intf )
 {
 	/* C as input, (all) as output */
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),			/* Port A write */
 	DEVCB_INPUT_PORT("IN0"),			/* Port B read */
-	DEVCB_HANDLER(outportb_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,outportb_w),			/* Port B write */
 	DEVCB_INPUT_PORT("IN1"),			/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
@@ -932,7 +934,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(sound_cmd_r),
+	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_r),
 	DEVCB_NULL, /* discrete read? */
 	DEVCB_NULL,
 	DEVCB_NULL /* discrete write? */
@@ -943,7 +945,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(sound_cmd_r),									// read A
+		DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_r),									// read A
 		DEVCB_DEVICE_MEMBER("oki", okim6295_device, read),			// read B
 		DEVCB_NULL,													// write A
 		DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)			// write B

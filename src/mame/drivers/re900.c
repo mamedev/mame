@@ -99,6 +99,11 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
 	DECLARE_WRITE8_MEMBER(re900_watchdog_reset_w);
+	DECLARE_READ8_MEMBER(re_psg_portA_r);
+	DECLARE_READ8_MEMBER(re_psg_portB_r);
+	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
+	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 };
 
 
@@ -106,9 +111,9 @@ public:
 * Read Handlers *
 ****************/
 
-static READ8_DEVICE_HANDLER (re_psg_portA_r)
+READ8_MEMBER(re900_state::re_psg_portA_r)
 {
-	if ((device->machine().root_device().ioport("IN0")->read() & 0x01) == 0)
+	if ((machine().root_device().ioport("IN0")->read() & 0x01) == 0)
 	{
 		output_set_lamp_value(0,1);		// Operator Key ON
 	}
@@ -118,21 +123,20 @@ static READ8_DEVICE_HANDLER (re_psg_portA_r)
 		output_set_lamp_value(0,0);		// Operator Key OFF
 	}
 
-	return device->machine().root_device().ioport("IN0")->read();
+	return machine().root_device().ioport("IN0")->read();
 }
 
-static READ8_DEVICE_HANDLER (re_psg_portB_r)
+READ8_MEMBER(re900_state::re_psg_portB_r)
 {
-	re900_state *state = device->machine().driver_data<re900_state>();
 	UINT8 retval = 0xff;
 	logerror("llamada a re_psg_portB_r\n");
 	/* This is a hack to select the active player due to Keyboard size restrictions  */
 
-	output_set_lamp_value(state->m_player,1);
+	output_set_lamp_value(m_player,1);
 
-	if (state->ioport("IN_S")->read())
+	if (ioport("IN_S")->read())
 	{
-		if (!state->m_stat_a)
+		if (!m_stat_a)
 		{
 			output_set_lamp_value(1, 0);
 			output_set_lamp_value(2, 0);
@@ -140,33 +144,33 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 			output_set_lamp_value(4, 0);
 			output_set_lamp_value(5, 0);
 			output_set_lamp_value(6, 0);
-			state->m_player++;
+			m_player++;
 
-			if (state->m_player == 7)
+			if (m_player == 7)
 			{
-				state->m_player = 1;
+				m_player = 1;
 			}
 
-			output_set_lamp_value(state->m_player, 1); /* It shows active player via layout buttons   */
-			state->m_stat_a = 1;
+			output_set_lamp_value(m_player, 1); /* It shows active player via layout buttons   */
+			m_stat_a = 1;
 		}
 	}
 
 	else
 	{
-		state->m_stat_a = 0;
+		m_stat_a = 0;
 	}
 	/* End of Select Player Hack */
 
 	/* "INA": Unified port to share the player Keys among all players - Key In & Key Out have their own buttons on keyboard. */
-	switch( state->m_mux_data )
+	switch( m_mux_data )
 	{
-		case 0x01: retval = (state->ioport("IN6")->read() | 0x80 ) - (( state->m_player == 6 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
-		case 0x02: retval = (state->ioport("IN5")->read() | 0x80 ) - (( state->m_player == 5 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
-		case 0x04: retval = (state->ioport("IN4")->read() | 0x80 ) - (( state->m_player == 4 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
-		case 0x08: retval = (state->ioport("IN3")->read() | 0x80 ) - (( state->m_player == 3 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
-		case 0x10: retval = (state->ioport("IN2")->read() | 0x80 ) - (( state->m_player == 2 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
-		case 0x20: retval = (state->ioport("IN1")->read() | 0x80 ) - (( state->m_player == 1 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
+		case 0x01: retval = (ioport("IN6")->read() | 0x80 ) - (( m_player == 6 ) ? (ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
+		case 0x02: retval = (ioport("IN5")->read() | 0x80 ) - (( m_player == 5 ) ? (ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
+		case 0x04: retval = (ioport("IN4")->read() | 0x80 ) - (( m_player == 4 ) ? (ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
+		case 0x08: retval = (ioport("IN3")->read() | 0x80 ) - (( m_player == 3 ) ? (ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
+		case 0x10: retval = (ioport("IN2")->read() | 0x80 ) - (( m_player == 2 ) ? (ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
+		case 0x20: retval = (ioport("IN1")->read() | 0x80 ) - (( m_player == 1 ) ? (ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
 	}
 
 	return retval;
@@ -182,28 +186,26 @@ READ8_MEMBER(re900_state::rom_r)
 *    Write Handlers    *
 ***********************/
 
-static WRITE8_DEVICE_HANDLER (re_mux_port_A_w)
+WRITE8_MEMBER(re900_state::re_mux_port_A_w)
 {
-	re900_state *state = device->machine().driver_data<re900_state>();
-	state->m_psg_pa = data;
-	state->m_mux_data = ((data >> 2) & 0x3f) ^ 0x3f;
+	m_psg_pa = data;
+	m_mux_data = ((data >> 2) & 0x3f) ^ 0x3f;
 }
 
-static WRITE8_DEVICE_HANDLER (re_mux_port_B_w)
+WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 {
-	re900_state *state = device->machine().driver_data<re900_state>();
 	UINT8 led;
-	state->m_psg_pb = data;
-	led = (state->m_psg_pa >> 2) & 0x3f;
+	m_psg_pb = data;
+	led = (m_psg_pa >> 2) & 0x3f;
 
 	if (data == 0x7f)
 	{
 		output_set_lamp_value(20 + led, 1);
 
-		if (led != state->m_ledant)
+		if (led != m_ledant)
 		{
-			output_set_lamp_value(20 + state->m_ledant, 0);
-			state->m_ledant = led;
+			output_set_lamp_value(20 + m_ledant, 0);
+			m_ledant = led;
 		}
 	}
 }
@@ -242,9 +244,9 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )
 ADDRESS_MAP_END
 
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(re900_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -370,7 +372,7 @@ static TMS9928A_INTERFACE(re900_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(re900_state,vdp_interrupt)
 };
 
 
@@ -382,10 +384,10 @@ static const ay8910_interface ay8910_re900 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(re_psg_portA_r),
-	DEVCB_HANDLER(re_psg_portB_r),
-	DEVCB_HANDLER(re_mux_port_A_w),
-	DEVCB_HANDLER(re_mux_port_B_w)
+	DEVCB_DRIVER_MEMBER(re900_state,re_psg_portA_r),
+	DEVCB_DRIVER_MEMBER(re900_state,re_psg_portB_r),
+	DEVCB_DRIVER_MEMBER(re900_state,re_mux_port_A_w),
+	DEVCB_DRIVER_MEMBER(re900_state,re_mux_port_B_w)
 };
 
 static const ay8910_interface ay8910_bs94 =

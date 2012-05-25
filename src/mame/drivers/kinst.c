@@ -154,6 +154,10 @@ public:
 	const UINT8 *m_control_map;
 	DECLARE_READ32_MEMBER(kinst_control_r);
 	DECLARE_WRITE32_MEMBER(kinst_control_w);
+	DECLARE_READ32_MEMBER(kinst_ide_r);
+	DECLARE_WRITE32_MEMBER(kinst_ide_w);
+	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
+	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
 };
 
 
@@ -295,26 +299,30 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static READ32_DEVICE_HANDLER( kinst_ide_r )
+READ32_MEMBER(kinst_state::kinst_ide_r)
 {
+	device_t *device = machine().device("ide");
 	return midway_ide_asic_r(device, offset / 2, mem_mask);
 }
 
 
-static WRITE32_DEVICE_HANDLER( kinst_ide_w )
+WRITE32_MEMBER(kinst_state::kinst_ide_w)
 {
+	device_t *device = machine().device("ide");
 	midway_ide_asic_w(device, offset / 2, data, mem_mask);
 }
 
 
-static READ32_DEVICE_HANDLER( kinst_ide_extra_r )
+READ32_MEMBER(kinst_state::kinst_ide_extra_r)
 {
+	device_t *device = machine().device("ide");
 	return ide_controller32_r(device, 0x3f6/4, 0x00ff0000) >> 16;
 }
 
 
-static WRITE32_DEVICE_HANDLER( kinst_ide_extra_w )
+WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
 {
+	device_t *device = machine().device("ide");
 	ide_controller32_w(device, 0x3f6/4, data << 16, 0x00ff0000);
 }
 
@@ -406,8 +414,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
 	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_SHARE("control")
-	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_r, kinst_ide_w)
-	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_extra_r, kinst_ide_extra_w)
+	AM_RANGE(0x10000100, 0x1000013f) AM_READWRITE(kinst_ide_r, kinst_ide_w)
+	AM_RANGE(0x10000170, 0x10000173) AM_READWRITE(kinst_ide_extra_r, kinst_ide_extra_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 

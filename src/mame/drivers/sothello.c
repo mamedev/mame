@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(soundcpu_int_clear_w);
 	DECLARE_WRITE8_MEMBER(subcpu_status_w);
 	DECLARE_READ8_MEMBER(subcpu_status_r);
+	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 };
 
 
@@ -153,8 +154,9 @@ ADDRESS_MAP_END
 
 /* sound Z80 */
 
-static WRITE8_DEVICE_HANDLER(msm_cfg_w)
+WRITE8_MEMBER(sothello_state::msm_cfg_w)
 {
+	device_t *device = machine().device("msm");
 /*
      bit 0 = RESET
      bit 1 = 4B/3B 0
@@ -195,7 +197,7 @@ static ADDRESS_MAP_START( soundcpu_io_map, AS_IO, 8, sothello_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
     AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
-    AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("msm", msm_cfg_w)
+    AM_RANGE(0x02, 0x02) AM_WRITE(msm_cfg_w)
     AM_RANGE(0x03, 0x03) AM_WRITE(soundcpu_busyflag_set_w)
     AM_RANGE(0x04, 0x04) AM_WRITE(soundcpu_busyflag_reset_w)
     AM_RANGE(0x05, 0x05) AM_WRITE(soundcpu_int_clear_w)

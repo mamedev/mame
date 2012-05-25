@@ -59,6 +59,8 @@ public:
 
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
+	DECLARE_READ8_MEMBER(input_1_r);
+	DECLARE_READ8_MEMBER(input_2_r);
 };
 
 
@@ -78,15 +80,15 @@ READ16_MEMBER(quantum_state::trackball_r)
 }
 
 
-static READ8_DEVICE_HANDLER( input_1_r )
+READ8_MEMBER(quantum_state::input_1_r)
 {
-	return (device->machine().root_device().ioport("DSW0")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
+	return (machine().root_device().ioport("DSW0")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
 }
 
 
-static READ8_DEVICE_HANDLER( input_2_r )
+READ8_MEMBER(quantum_state::input_2_r)
 {
-	return (device->machine().root_device().ioport("DSW1")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
+	return (machine().root_device().ioport("DSW1")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
 }
 
 
@@ -205,28 +207,28 @@ INPUT_PORTS_END
 static const pokey_interface pokey_interface_1 =
 {
 	{
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r),
-		DEVCB_HANDLER(input_1_r)
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_1_r)
 	}
 };
 
 static const pokey_interface pokey_interface_2 =
 {
 	{
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r),
-		DEVCB_HANDLER(input_2_r)
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r),
+		DEVCB_DRIVER_MEMBER(quantum_state,input_2_r)
 	}
 };
 

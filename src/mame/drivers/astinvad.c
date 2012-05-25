@@ -72,6 +72,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
 	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
+	DECLARE_WRITE8_MEMBER(astinvad_sound1_w);
+	DECLARE_WRITE8_MEMBER(astinvad_sound2_w);
 };
 
 
@@ -81,8 +83,8 @@ public:
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( astinvad_sound1_w );
-static WRITE8_DEVICE_HANDLER( astinvad_sound2_w );
+
+
 
 
 static I8255A_INTERFACE( ppi8255_0_intf )
@@ -98,9 +100,9 @@ static I8255A_INTERFACE( ppi8255_0_intf )
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(astinvad_sound1_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(astinvad_state,astinvad_sound1_w),	/* Port A write */
 	DEVCB_INPUT_PORT("CABINET"),		/* Port B read */
-	DEVCB_HANDLER(astinvad_sound2_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(astinvad_state,astinvad_sound2_w),	/* Port B write */
 	DEVCB_NULL,							/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
@@ -322,36 +324,34 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
+WRITE8_MEMBER(astinvad_state::astinvad_sound1_w)
 {
-	astinvad_state *state = device->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->m_sound_state[0];
-	state->m_sound_state[0] = data;
+	int bits_gone_hi = data & ~m_sound_state[0];
+	m_sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) state->m_samples->start(0, SND_UFO, true);
-	if (!(data & 0x01))      state->m_samples->stop(0);
-	if (bits_gone_hi & 0x02) state->m_samples->start(1, SND_SHOT);
-	if (bits_gone_hi & 0x04) state->m_samples->start(2, SND_BASEHIT);
-	if (bits_gone_hi & 0x08) state->m_samples->start(3, SND_INVADERHIT);
+	if (bits_gone_hi & 0x01) m_samples->start(0, SND_UFO, true);
+	if (!(data & 0x01))      m_samples->stop(0);
+	if (bits_gone_hi & 0x02) m_samples->start(1, SND_SHOT);
+	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
+	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
 
-	device->machine().sound().system_enable(data & 0x20);
-	state->m_screen_red = data & 0x04;
+	machine().sound().system_enable(data & 0x20);
+	m_screen_red = data & 0x04;
 }
 
 
-static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
+WRITE8_MEMBER(astinvad_state::astinvad_sound2_w)
 {
-	astinvad_state *state = device->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->m_sound_state[1];
-	state->m_sound_state[1] = data;
+	int bits_gone_hi = data & ~m_sound_state[1];
+	m_sound_state[1] = data;
 
-	if (bits_gone_hi & 0x01) state->m_samples->start(5, SND_FLEET1);
-	if (bits_gone_hi & 0x02) state->m_samples->start(5, SND_FLEET2);
-	if (bits_gone_hi & 0x04) state->m_samples->start(5, SND_FLEET3);
-	if (bits_gone_hi & 0x08) state->m_samples->start(5, SND_FLEET4);
-	if (bits_gone_hi & 0x10) state->m_samples->start(4, SND_UFOHIT);
+	if (bits_gone_hi & 0x01) m_samples->start(5, SND_FLEET1);
+	if (bits_gone_hi & 0x02) m_samples->start(5, SND_FLEET2);
+	if (bits_gone_hi & 0x04) m_samples->start(5, SND_FLEET3);
+	if (bits_gone_hi & 0x08) m_samples->start(5, SND_FLEET4);
+	if (bits_gone_hi & 0x10) m_samples->start(4, SND_UFOHIT);
 
-	state->m_screen_flip = (state->ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
+	m_screen_flip = (ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
 }
 
 

@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(discoboy_ram_att_w);
 	DECLARE_READ8_MEMBER(discoboy_port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
+	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
 };
 
 
@@ -324,15 +325,16 @@ ADDRESS_MAP_END
 
 /* Sound */
 
-static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
+WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 {
+	device_t *device = machine().device("msm");
 	/* Note: this is bit 5 on yunsung8.c */
 	msm5205_reset_w(device, (data & 0x08) >> 3);
 
-	device->machine().root_device().membank("sndbank")->set_entry(data & 0x07);
+	machine().root_device().membank("sndbank")->set_entry(data & 0x07);
 
 	if (data != (data & (~0x0f)))
-		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
+		logerror("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(discoboy_state::yunsung8_adpcm_w)
@@ -345,7 +347,7 @@ WRITE8_MEMBER(discoboy_state::yunsung8_adpcm_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm",yunsung8_sound_bankswitch_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

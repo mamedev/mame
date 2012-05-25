@@ -74,6 +74,9 @@ public:
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
 	DECLARE_WRITE8_MEMBER(page3_w);
+	DECLARE_READ8_MEMBER(ppi_port_b_r);
+	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
+	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 };
 
 
@@ -86,16 +89,15 @@ public:
 #define MASTER_CLOCK	XTAL_21_4772MHz
 
 
-static READ8_DEVICE_HANDLER( ppi_port_b_r )
+READ8_MEMBER(sfkick_state::ppi_port_b_r)
 {
-	sfkick_state *state = device->machine().driver_data<sfkick_state>();
-	switch(state->m_input_mux&0x0f)
+	switch(m_input_mux&0x0f)
 	{
-		case 0: return state->ioport("IN0")->read();
-		case 1: return state->ioport("IN1")->read();
-		case 2: return BITSWAP8(state->ioport("DIAL")->read(),4,5,6,7,3,2,1,0);
-		case 3: return state->ioport("DSW2")->read();
-		case 4: return state->ioport("DSW1")->read();
+		case 0: return ioport("IN0")->read();
+		case 1: return ioport("IN1")->read();
+		case 2: return BITSWAP8(ioport("DIAL")->read(),4,5,6,7,3,2,1,0);
+		case 3: return ioport("DSW2")->read();
+		case 4: return ioport("DSW1")->read();
 	}
 	return 0xff;
 }
@@ -226,11 +228,10 @@ static void sfkick_remap_banks(running_machine &machine)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER ( ppi_port_a_w )
+WRITE8_MEMBER(sfkick_state::ppi_port_a_w)
 {
-	sfkick_state *state = device->machine().driver_data<sfkick_state>();
-	state->m_bank_cfg=data;
-	sfkick_remap_banks(device->machine());
+	m_bank_cfg=data;
+	sfkick_remap_banks(machine());
 }
 
 static void sfkick_bank_set(running_machine &machine,int num, int data)
@@ -349,20 +350,19 @@ static ADDRESS_MAP_START( sfkick_sound_io_map, AS_IO, 8, sfkick_state )
 	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER ( ppi_port_c_w )
+WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
 {
-	sfkick_state *state = device->machine().driver_data<sfkick_state>();
-	state->m_input_mux=data;
+	m_input_mux=data;
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(ppi_port_a_w),		/* Port A write */
-	DEVCB_HANDLER(ppi_port_b_r),		/* Port B read */
+	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_a_w),		/* Port A write */
+	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_b_r),		/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(ppi_port_c_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_c_w)			/* Port C write */
 };
 
 

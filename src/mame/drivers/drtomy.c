@@ -34,6 +34,7 @@ public:
 	int       m_oki_bank;
 	DECLARE_WRITE16_MEMBER(drtomy_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(drtomy_vram_bg_w);
+	DECLARE_WRITE16_MEMBER(drtomy_okibank_w);
 };
 
 
@@ -150,14 +151,14 @@ WRITE16_MEMBER(drtomy_state::drtomy_vram_bg_w)
 	m_tilemap_bg->mark_tile_dirty(offset);
 }
 
-static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
+WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
 {
-	drtomy_state *state = device->machine().driver_data<drtomy_state>();
-	if (state->m_oki_bank != (data & 3))
+	device_t *device = machine().device("oki");
+	if (m_oki_bank != (data & 3))
 	{
-		state->m_oki_bank = data & 3;
+		m_oki_bank = data & 3;
 		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(state->m_oki_bank * 0x40000);
+		oki->set_bank_base(m_oki_bank * 0x40000);
 	}
 
 	/* unknown bit 2 -> (data & 4) */
@@ -173,7 +174,7 @@ static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE_LEGACY("oki", drtomy_okibank_w) /* OKI banking */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(drtomy_okibank_w) /* OKI banking */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) /* OKI 6295*/
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END

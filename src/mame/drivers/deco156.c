@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE32_MEMBER(wcvol95_pf1_rowscroll_w);
 	DECLARE_WRITE32_MEMBER(wcvol95_pf2_rowscroll_w);
 	DECLARE_WRITE32_MEMBER(wcvol95_spriteram_w);
+	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
 };
 
 
@@ -93,8 +94,9 @@ WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 	}
 }
 
-static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
+WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
 {
+	device_t *device = machine().device("oki1");
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base((data & 1) * 0x40000);
 }
@@ -134,7 +136,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x120000, 0x120003) AM_WRITENOP // Volume control in low byte
 	AM_RANGE(0x120004, 0x120007) AM_WRITE(hvysmsh_eeprom_w)
 	AM_RANGE(0x120008, 0x12000b) AM_WRITENOP // IRQ ack?
-	AM_RANGE(0x12000c, 0x12000f) AM_DEVWRITE_LEGACY("oki1", hvysmsh_oki_0_bank_w)
+	AM_RANGE(0x12000c, 0x12000f) AM_WRITE(hvysmsh_oki_0_bank_w)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x160000, 0x160003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)

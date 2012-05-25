@@ -335,6 +335,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
+	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
+	DECLARE_READ8_MEMBER(ppi0_portc_r);
+	DECLARE_WRITE8_MEMBER(ayporta_w);
+	DECLARE_WRITE8_MEMBER(ayportb_w);
 };
 
 
@@ -422,8 +426,9 @@ R = 82 Ohms Pull Down.
 }
 
 
-static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
+WRITE8_MEMBER(fortecar_state::ppi0_portc_w)
 {
+	device_t *device = machine().device("eeprom");
 /*
 NM93CS56N Serial EEPROM
 
@@ -438,9 +443,10 @@ DOUT PPI_PC4
 	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( ppi0_portc_r )
+READ8_MEMBER(fortecar_state::ppi0_portc_r)
 {
-//  popmessage("%s",device->machine().describe_context());
+	device_t *device = machine().device("eeprom");
+//  popmessage("%s",machine().describe_context());
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return ((eeprom->read_bit()<<4) & 0x10);
 }
@@ -453,12 +459,12 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL,										/* Port A write */
 	DEVCB_INPUT_PORT("INPUT"),						/* Port B read */
 	DEVCB_NULL,										/* Port B write */
-	DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_r),	/* Port C read */
-	DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_r),	/* Port C read */
+	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_w)	/* Port C write */
 };
 
 
-static WRITE8_DEVICE_HANDLER( ayporta_w )
+WRITE8_MEMBER(fortecar_state::ayporta_w)
 {
 /*  System Lamps...
 
@@ -490,7 +496,7 @@ static WRITE8_DEVICE_HANDLER( ayporta_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER( ayportb_w )
+WRITE8_MEMBER(fortecar_state::ayportb_w)
 {
 /*
 
@@ -507,7 +513,7 @@ Seems to work properly, but must be checked closely...
 */
 	if (((data >> 7) & 0x01) == 0)		/* check for bit7 */
 	{
-		device->machine().watchdog_reset();
+		machine().watchdog_reset();
 	}
 
 //  logerror("AY port B write %02x\n",data);
@@ -520,8 +526,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ayporta_w),
-	DEVCB_HANDLER(ayportb_w)
+	DEVCB_DRIVER_MEMBER(fortecar_state,ayporta_w),
+	DEVCB_DRIVER_MEMBER(fortecar_state,ayportb_w)
 };
 
 

@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(unknown_w);
 };
 
 
@@ -156,16 +158,15 @@ WRITE8_MEMBER(koikoi_state::vram_w)
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
-static READ8_DEVICE_HANDLER( input_r )
+READ8_MEMBER(koikoi_state::input_r)
 {
-	koikoi_state *state = device->machine().driver_data<koikoi_state>();
 
-	if (state->m_inputcnt < 0)
+	if (m_inputcnt < 0)
 		return 0;
 
-	if (!state->m_inputcnt)
+	if (!m_inputcnt)
 	{
-		int key = state->ioport("IN1")->read();
+		int key = ioport("IN1")->read();
 		int keyval = 0; //we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
 
 		if (key)
@@ -177,24 +178,24 @@ static READ8_DEVICE_HANDLER( input_r )
 			}
 		}
 
-		state->m_inputval = input_tab[keyval] & 0x1f;
-		state->m_inputlen = input_tab[keyval] >> 5;
+		m_inputval = input_tab[keyval] & 0x1f;
+		m_inputlen = input_tab[keyval] >> 5;
 	}
 
-	if (state->m_inputlen == ++state->m_inputcnt) //return expected value
+	if (m_inputlen == ++m_inputcnt) //return expected value
 	{
-		return state->m_inputval ^ 0xff;
+		return m_inputval ^ 0xff;
 	}
 
-	if (state->m_inputcnt > 4) //end of cycle
+	if (m_inputcnt > 4) //end of cycle
 	{
-		state->m_inputcnt = -1;
+		m_inputcnt = -1;
 	}
 
 	return 0xff; //return 0^0xff
 }
 
-static WRITE8_DEVICE_HANDLER( unknown_w )
+WRITE8_MEMBER(koikoi_state::unknown_w)
 {
 	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
@@ -323,8 +324,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,					DEVCB_HANDLER(input_r),
-	DEVCB_HANDLER(unknown_w),	DEVCB_NULL
+	DEVCB_NULL,					DEVCB_DRIVER_MEMBER(koikoi_state,input_r),
+	DEVCB_DRIVER_MEMBER(koikoi_state,unknown_w),	DEVCB_NULL
 };
 
 

@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(rbmk_mcu_io_r);
 	DECLARE_WRITE8_MEMBER(rbmk_mcu_io_w);
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
 };
 
 
@@ -98,8 +99,9 @@ WRITE16_MEMBER(rbmk_state::gms_write3)
 {
 }
 
-static WRITE16_DEVICE_HANDLER( eeprom_w )
+WRITE16_MEMBER(rbmk_state::eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -120,7 +122,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
 	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("gms_vidram")
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
 	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
 	AM_RANGE(0xC10000, 0xC10001) AM_READ_PORT("IN3")

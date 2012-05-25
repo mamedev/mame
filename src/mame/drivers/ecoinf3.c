@@ -18,6 +18,9 @@ public:
 
 
 
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a);
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b);
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c);
 };
 
 
@@ -61,7 +64,7 @@ static I8255_INTERFACE (ppi8255_intf_d)
 	DEVCB_NULL						/* Port C write */
 };
 
-static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_a )
+WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a)
 {
 	// writes the 'PYRAMID' string from RAM (copied from ROM) here...
 	// along with port 40/41/42 accesses
@@ -85,12 +88,12 @@ static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_a )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_b )
+WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_b)
 {
 //  printf("\nwrite b %02x\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_c )
+WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_c)
 {
 //  printf("\nwrite c %02x\n", data);
 
@@ -99,11 +102,11 @@ static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_c )
 static I8255_INTERFACE (ppi8255_intf_e)
 {
 	DEVCB_NULL,						/* Port A read */
-	DEVCB_HANDLER(ppi8255_intf_e_write_a),						/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_a),						/* Port A write */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(ppi8255_intf_e_write_b),						/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_b),						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(ppi8255_intf_e_write_c)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_c)						/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_f)

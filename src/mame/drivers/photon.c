@@ -28,6 +28,12 @@ public:
 	photon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
+	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
+	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
+	DECLARE_READ8_MEMBER(pk8000_84_porta_r);
+	DECLARE_WRITE8_MEMBER(pk8000_84_porta_w);
+	DECLARE_WRITE8_MEMBER(pk8000_84_portc_w);
 };
 
 
@@ -90,53 +96,53 @@ static void pk8000_set_bank(running_machine &machine,UINT8 data)
 				break;
 	}
 }
-static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
+WRITE8_MEMBER(photon_state::pk8000_80_porta_w)
 {
-	pk8000_set_bank(device->machine(),data);
+	pk8000_set_bank(machine(),data);
 }
 
-static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
+READ8_MEMBER(photon_state::pk8000_80_portb_r)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
+WRITE8_MEMBER(photon_state::pk8000_80_portc_w)
 {
-	speaker_level_w(device->machine().device("speaker"), BIT(data,7));
+	speaker_level_w(machine().device("speaker"), BIT(data,7));
 }
 
 static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(pk8000_80_porta_w),
-	DEVCB_HANDLER(pk8000_80_portb_r),
+	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_porta_w),
+	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_portb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pk8000_80_portc_w)
+	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_portc_w)
 };
 
-static READ8_DEVICE_HANDLER(pk8000_84_porta_r)
+READ8_MEMBER(photon_state::pk8000_84_porta_r)
 {
 	return pk8000_video_mode;
 }
 
-static WRITE8_DEVICE_HANDLER(pk8000_84_porta_w)
+WRITE8_MEMBER(photon_state::pk8000_84_porta_w)
 {
 	pk8000_video_mode = data;
 }
 
-static WRITE8_DEVICE_HANDLER(pk8000_84_portc_w)
+WRITE8_MEMBER(photon_state::pk8000_84_portc_w)
 {
 	pk8000_video_enable = BIT(data,4);
 }
 static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
 {
-	DEVCB_HANDLER(pk8000_84_porta_r),
-	DEVCB_HANDLER(pk8000_84_porta_w),
+	DEVCB_DRIVER_MEMBER(photon_state,pk8000_84_porta_r),
+	DEVCB_DRIVER_MEMBER(photon_state,pk8000_84_porta_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pk8000_84_portc_w)
+	DEVCB_DRIVER_MEMBER(photon_state,pk8000_84_portc_w)
 };
 
 static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, photon_state )

@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(egghunt_gfx_banking_w);
 	DECLARE_WRITE8_MEMBER(egghunt_vidram_bank_w);
 	DECLARE_WRITE8_MEMBER(egghunt_soundlatch_w);
+	DECLARE_READ8_MEMBER(egghunt_okibanking_r);
+	DECLARE_WRITE8_MEMBER(egghunt_okibanking_w);
 };
 
 
@@ -204,17 +206,15 @@ WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ8_DEVICE_HANDLER( egghunt_okibanking_r )
+READ8_MEMBER(egghunt_state::egghunt_okibanking_r)
 {
-	egghunt_state *state = device->machine().driver_data<egghunt_state>();
-	return state->m_okibanking;
+	return m_okibanking;
 }
 
-static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
+WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 {
-	egghunt_state *state = device->machine().driver_data<egghunt_state>();
-	state->m_okibanking = data;
-	okim6295_device *oki = downcast<okim6295_device *>(device);
+	okim6295_device *oki = machine().device<okim6295_device>("oki");
+	m_okibanking = data;
 	oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
 }
 
@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE_LEGACY("oki", egghunt_okibanking_r, egghunt_okibanking_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(egghunt_okibanking_r, egghunt_okibanking_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END

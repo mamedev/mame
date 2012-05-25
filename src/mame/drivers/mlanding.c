@@ -72,6 +72,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ml_dotram_w);
 	DECLARE_READ16_MEMBER(dsp_HOLD_signal_r);
 	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(ml_msm_start_lsb_w);
 };
 
 
@@ -268,10 +270,10 @@ WRITE16_MEMBER(mlanding_state::ml_output_w)
 	m_pal_fg_bank = (data & 0x80)>>7;
 }
 
-static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
 {
 	data=0;
-	device->machine().root_device().membank("bank1")->set_base(device->machine().root_device().memregion("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(device_t *device)
@@ -517,13 +519,13 @@ static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("ml_dotram")
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( ml_msm_start_lsb_w )
+WRITE8_MEMBER(mlanding_state::ml_msm_start_lsb_w)
 {
-	mlanding_state *state = device->machine().driver_data<mlanding_state>();
-	state->m_adpcm_pos = (state->m_adpcm_pos & 0x0f0000) | ((data & 0xff)<<8) | 0x20;
-	state->m_adpcm_idle = 0;
+	device_t *device = machine().device("msm");
+	m_adpcm_pos = (m_adpcm_pos & 0x0f0000) | ((data & 0xff)<<8) | 0x20;
+	m_adpcm_idle = 0;
 	msm5205_reset_w(device,0);
-	state->m_adpcm_end = (state->m_adpcm_pos+0x800);
+	m_adpcm_end = (m_adpcm_pos+0x800);
 }
 
 WRITE8_MEMBER(mlanding_state::ml_msm_start_msb_w)
@@ -543,7 +545,7 @@ static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 //  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_start_w)
 //  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_stop_w)
 
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("msm",ml_msm_start_lsb_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ml_msm_start_lsb_w)
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_msm_start_msb_w)
 ADDRESS_MAP_END
 
@@ -739,7 +741,7 @@ static const msm5205_interface msm5205_config =
 static const ym2151_interface ym2151_config =
 {
 	DEVCB_LINE(irq_handler),
-	DEVCB_HANDLER(sound_bankswitch_w)
+	DEVCB_DRIVER_MEMBER(mlanding_state,sound_bankswitch_w)
 };
 
 static const tc0140syt_interface mlanding_tc0140syt_intf =

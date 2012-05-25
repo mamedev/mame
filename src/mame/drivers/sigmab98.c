@@ -165,6 +165,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tdoboon_c000_w);
 	void show_outputs();
 	void show_3_outputs();
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(sammymdl_eeprom_r);
+	DECLARE_WRITE8_MEMBER(sammymdl_eeprom_w);
 };
 
 
@@ -427,21 +430,21 @@ void sigmab98_state::show_outputs()
 }
 
 // Port c0
-static WRITE8_DEVICE_HANDLER( eeprom_w )
+WRITE8_MEMBER(sigmab98_state::eeprom_w)
 {
-	sigmab98_state *state = device->machine().driver_data<sigmab98_state>();
+	device_t *device = machine().device("eeprom");
 	// latch the bit
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
-//  if ((state->m_c0 ^ data) & 0x20)
+//  if ((m_c0 ^ data) & 0x20)
 		eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
 	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	state->m_c0 = data;
+	m_c0 = data;
 	//show_outputs(state);
 }
 
@@ -514,7 +517,7 @@ static ADDRESS_MAP_START( gegege_io_map, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE(regs2_r, regs2_w )
 
 	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" )
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(eeprom_w)
 
 	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "IN1" )
 
@@ -628,14 +631,16 @@ READ8_MEMBER(sigmab98_state::animalc_rambank_r)
 }
 
 
-static READ8_DEVICE_HANDLER( sammymdl_eeprom_r )
+READ8_MEMBER(sigmab98_state::sammymdl_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return eeprom->read_bit() ? 0x80 : 0;
 }
 
-static WRITE8_DEVICE_HANDLER( sammymdl_eeprom_w )
+WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	// latch the bit
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data & 0x40);
@@ -647,7 +652,7 @@ static WRITE8_DEVICE_HANDLER( sammymdl_eeprom_w )
 	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x8f)
-		logerror("%s: unknown eeeprom bits written %02x\n", device->machine().describe_context(), data);
+		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(sigmab98_state::unk_34_r)
@@ -752,7 +757,7 @@ static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(animalc_rombank_r, animalc_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(animalc_rambank_r, animalc_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY("eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
@@ -985,7 +990,7 @@ static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(haekaka_rombank_r, haekaka_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(haekaka_rambank_r, haekaka_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY("eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(haekaka_coin_w )
@@ -1224,7 +1229,7 @@ static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(itazuram_rombank_r, itazuram_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(itazuram_rambank_r, itazuram_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY("eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
@@ -1438,7 +1443,7 @@ static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(tdoboon_rombank_r, tdoboon_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(tdoboon_rambank_r, tdoboon_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY("eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
 	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )

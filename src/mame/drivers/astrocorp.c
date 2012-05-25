@@ -59,6 +59,8 @@ public:
 	DECLARE_WRITE16_MEMBER(astrocorp_screen_enable_w);
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
 	DECLARE_WRITE16_MEMBER(astrocorp_palette_w);
+	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
+	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
 };
 
 /***************************************************************************
@@ -181,8 +183,9 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_eeprom_w)
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( astrocorp_sound_bank_w )
+WRITE16_MEMBER(astrocorp_state::astrocorp_sound_bank_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -191,8 +194,9 @@ static WRITE16_DEVICE_HANDLER( astrocorp_sound_bank_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( skilldrp_sound_bank_w )
+WRITE16_MEMBER(astrocorp_state::skilldrp_sound_bank_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -297,7 +301,7 @@ static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram")	// battery
-	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE_LEGACY("oki", astrocorp_sound_bank_w)
+	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE(astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
@@ -305,7 +309,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
-	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE_LEGACY("oki", astrocorp_sound_bank_w)
+	AM_RANGE( 0x070000, 0x070001 ) AM_WRITE(astrocorp_sound_bank_w)
 	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
@@ -328,7 +332,7 @@ static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram")	// battery
-	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE_LEGACY("oki", skilldrp_sound_bank_w)
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -343,7 +347,7 @@ static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x38e000, 0x38e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x500000, 0x500001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE_LEGACY("oki", skilldrp_sound_bank_w)
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 

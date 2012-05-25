@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 	DECLARE_READ8_MEMBER(prot_r);
 	DECLARE_WRITE8_MEMBER(prot_w);
+	DECLARE_READ8_MEMBER(sound_r);
 };
 
 
@@ -310,17 +311,16 @@ static GFXDECODE_START( wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
-static READ8_DEVICE_HANDLER( sound_r )
+READ8_MEMBER(wink_state::sound_r)
 {
-	wink_state *state = device->machine().driver_data<wink_state>();
-	return state->m_sound_flag;
+	return m_sound_flag;
 }
 
 static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(sound_r),
+	DEVCB_DRIVER_MEMBER(wink_state,sound_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

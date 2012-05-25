@@ -74,6 +74,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_coin_w);
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(hammer_led_w);
+	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 };
 
 
@@ -206,8 +207,9 @@ static SCREEN_UPDATE_IND16( midas )
 	return 0;
 }
 
-static WRITE16_DEVICE_HANDLER( midas_eeprom_w )
+WRITE16_MEMBER(midas_state::midas_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
@@ -271,7 +273,7 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 
 	AM_RANGE(0x980000, 0x980001) AM_WRITE(livequiz_coin_w )
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
 
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
 
@@ -350,7 +352,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE(hammer_led_w )
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
 
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
 

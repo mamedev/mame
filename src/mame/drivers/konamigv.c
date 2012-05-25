@@ -158,12 +158,14 @@ public:
 	DECLARE_READ32_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE32_MEMBER(tokimeki_serial_w);
 	DECLARE_WRITE32_MEMBER(kdeadeye_0_w);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 };
 
 /* EEPROM handlers */
 
-static WRITE32_DEVICE_HANDLER( eeprom_w )
+WRITE32_MEMBER(konamigv_state::eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit((data&0x01) ? 1 : 0);
 	eeprom->set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -185,7 +187,7 @@ static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
 	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x1f180000, 0x1f180003) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */

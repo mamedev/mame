@@ -33,6 +33,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_input_mask;
+	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
+	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 };
 
 
@@ -69,40 +72,38 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-static READ8_DEVICE_HANDLER(forte2_ay8910_read_input)
+READ8_MEMBER(forte2_state::forte2_ay8910_read_input)
 {
-	forte2_state *state = device->machine().driver_data<forte2_state>();
-	return state->ioport("IN0")->read() | (state->m_input_mask&0x3f);
+	return ioport("IN0")->read() | (m_input_mask&0x3f);
 }
 
-static WRITE8_DEVICE_HANDLER( forte2_ay8910_set_input_mask )
+WRITE8_MEMBER(forte2_state::forte2_ay8910_set_input_mask)
 {
-	forte2_state *state = device->machine().driver_data<forte2_state>();
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
-	state->m_input_mask = data;
+	m_input_mask = data;
 }
 
 static const ay8910_interface forte2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(forte2_ay8910_read_input),
+	DEVCB_DRIVER_MEMBER(forte2_state,forte2_ay8910_read_input),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(forte2_ay8910_set_input_mask)
+	DEVCB_DRIVER_MEMBER(forte2_state,forte2_ay8910_set_input_mask)
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(forte2_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(forte2_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(forte2_state,vdp_interrupt)
 };
 
 static MACHINE_RESET( forte2 )

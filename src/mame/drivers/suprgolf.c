@@ -55,6 +55,15 @@ public:
 	DECLARE_WRITE8_MEMBER(suprgolf_pen_w);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(rom2_bank_select_w);
+	DECLARE_READ8_MEMBER(suprgolf_vregs_r);
+	DECLARE_WRITE8_MEMBER(suprgolf_vregs_w);
+	DECLARE_READ8_MEMBER(rom_bank_select_r);
+	DECLARE_WRITE8_MEMBER(rom_bank_select_w);
+	DECLARE_READ8_MEMBER(pedal_extra_bits_r);
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_READ8_MEMBER(p2_r);
+	DECLARE_WRITE8_MEMBER(suprgolf_writeA);
+	DECLARE_WRITE8_MEMBER(suprgolf_writeB);
 };
 
 static TILE_GET_INFO( get_tile_info )
@@ -160,25 +169,23 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 	}
 }
 
-static READ8_DEVICE_HANDLER( suprgolf_vregs_r )
+READ8_MEMBER(suprgolf_state::suprgolf_vregs_r)
 {
-	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
-	return state->m_vreg_bank;
+	return m_vreg_bank;
 }
 
-static WRITE8_DEVICE_HANDLER( suprgolf_vregs_w )
+WRITE8_MEMBER(suprgolf_state::suprgolf_vregs_w)
 {
-	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
 	//printf("%02x\n",data);
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
-	state->m_vreg_bank = data;
-	state->m_palette_switch = (data & 0x80);
-	state->m_bg_bank = (data & 0x1f);
+	m_vreg_bank = data;
+	m_palette_switch = (data & 0x80);
+	m_bg_bank = (data & 0x1f);
 
-	state->m_bg_vreg_test = data & 0x20;
+	m_bg_vreg_test = data & 0x20;
 
 	//if(data & 0x60)
 	//  printf("Video regs with data %02x activated\n",data);
@@ -247,27 +254,25 @@ WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-static READ8_DEVICE_HANDLER( rom_bank_select_r )
+READ8_MEMBER(suprgolf_state::rom_bank_select_r)
 {
-	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
-	return state->m_rom_bank;
+	return m_rom_bank;
 }
 
-static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
+WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 {
-	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
-	UINT8 *region_base = state->memregion("user1")->base();
+	UINT8 *region_base = memregion("user1")->base();
 
-	state->m_rom_bank = data;
+	m_rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 //  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
-	state->membank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
+	membank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
 
-	state->m_msm_nmi_mask = data & 0x40;
-	state->flip_screen_set(data & 0x80);
+	m_msm_nmi_mask = data & 0x40;
+	flip_screen_set(data & 0x80);
 }
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
@@ -281,24 +286,24 @@ WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
-static READ8_DEVICE_HANDLER( pedal_extra_bits_r )
+READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
 {
 	UINT8 p1_sht_sw,p2_sht_sw;
 
-	p1_sht_sw = (device->machine().root_device().ioport("P1_RELEASE")->read() & 0x80)>>7;
-	p2_sht_sw = (device->machine().root_device().ioport("P2_RELEASE")->read() & 0x80)>>6;
+	p1_sht_sw = (machine().root_device().ioport("P1_RELEASE")->read() & 0x80)>>7;
+	p2_sht_sw = (machine().root_device().ioport("P2_RELEASE")->read() & 0x80)>>6;
 
 	return p1_sht_sw | p2_sht_sw;
 }
 
-static READ8_DEVICE_HANDLER( p1_r )
+READ8_MEMBER(suprgolf_state::p1_r)
 {
-	return (device->machine().root_device().ioport("P1")->read() & 0xf0) | ((device->machine().root_device().ioport("P1_ANALOG")->read() & 0xf));
+	return (machine().root_device().ioport("P1")->read() & 0xf0) | ((machine().root_device().ioport("P1_ANALOG")->read() & 0xf));
 }
 
-static READ8_DEVICE_HANDLER( p2_r )
+READ8_MEMBER(suprgolf_state::p2_r)
 {
-	return (device->machine().root_device().ioport("P2")->read() & 0xf0) | ((device->machine().root_device().ioport("P2_ANALOG")->read() & 0xf));
+	return (machine().root_device().ioport("P2")->read() & 0xf0) | ((machine().root_device().ioport("P2_ANALOG")->read() & 0xf));
 }
 
 static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
@@ -405,12 +410,12 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
-static WRITE8_DEVICE_HANDLER( suprgolf_writeA )
+WRITE8_MEMBER(suprgolf_state::suprgolf_writeA)
 {
 	mame_printf_debug("ymwA\n");
 }
 
-static WRITE8_DEVICE_HANDLER( suprgolf_writeB )
+WRITE8_MEMBER(suprgolf_state::suprgolf_writeB)
 {
 	mame_printf_debug("ymwA\n");
 }
@@ -427,8 +432,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_INPUT_PORT("DSW0"),
 		DEVCB_INPUT_PORT("DSW1"),
-		DEVCB_HANDLER(suprgolf_writeA),
-		DEVCB_HANDLER(suprgolf_writeB),
+		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeA),
+		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeB),
 	},
 	irqhandler
 };
@@ -482,11 +487,11 @@ static MACHINE_RESET( suprgolf )
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_HANDLER(p1_r),						/* Port A read */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,p1_r),						/* Port A read */
 	DEVCB_NULL,									/* Port A write */
-	DEVCB_HANDLER(p2_r),						/* Port B read */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,p2_r),						/* Port B read */
 	DEVCB_NULL,									/* Port B write */
-	DEVCB_HANDLER(pedal_extra_bits_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,pedal_extra_bits_r),			/* Port C read */
 	DEVCB_NULL									/* Port C write */
 };
 
@@ -494,10 +499,10 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 {
 	DEVCB_INPUT_PORT("SYSTEM"),					/* Port A read */
 	DEVCB_NULL,									/* Port A write */
-	DEVCB_HANDLER(rom_bank_select_r),			/* Port B read */
-	DEVCB_HANDLER(rom_bank_select_w),			/* Port B write */
-	DEVCB_HANDLER(suprgolf_vregs_r),			/* Port C read */
-	DEVCB_HANDLER(suprgolf_vregs_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,rom_bank_select_r),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,rom_bank_select_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_vregs_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_vregs_w)				/* Port C write */
 };
 
 

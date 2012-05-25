@@ -45,6 +45,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
+	DECLARE_WRITE8_MEMBER(alg_cia_0_porta_w);
+	DECLARE_READ8_MEMBER(alg_cia_0_porta_r);
+	DECLARE_READ8_MEMBER(alg_cia_0_portb_r);
+	DECLARE_WRITE8_MEMBER(alg_cia_0_portb_w);
+	DECLARE_READ8_MEMBER(alg_cia_1_porta_r);
+	DECLARE_WRITE8_MEMBER(alg_cia_1_porta_w);
 };
 
 static TIMER_CALLBACK( response_timer );
@@ -220,54 +226,52 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
+WRITE8_MEMBER(alg_state::alg_cia_0_porta_w)
 {
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-
 	/* switch banks as appropriate */
-	device->machine().root_device().membank("bank1")->set_entry(data & 1);
+	machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		space->install_write_bank(0x000000, 0x07ffff, "bank1");
+		space.install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		space->unmap_write(0x000000, 0x07ffff);
+		space.unmap_write(0x000000, 0x07ffff);
 }
 
 
-static READ8_DEVICE_HANDLER( alg_cia_0_porta_r )
+READ8_MEMBER(alg_state::alg_cia_0_porta_r)
 {
-	return device->machine().root_device().ioport("FIRE")->read() | 0x3f;
+	return machine().root_device().ioport("FIRE")->read() | 0x3f;
 }
 
 
-static READ8_DEVICE_HANDLER( alg_cia_0_portb_r )
+READ8_MEMBER(alg_state::alg_cia_0_portb_r)
 {
-	logerror("%s:alg_cia_0_portb_r\n", device->machine().describe_context());
+	logerror("%s:alg_cia_0_portb_r\n", machine().describe_context());
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER( alg_cia_0_portb_w )
+WRITE8_MEMBER(alg_state::alg_cia_0_portb_w)
 {
 	/* parallel port */
-	logerror("%s:alg_cia_0_portb_w(%02x)\n", device->machine().describe_context(), data);
+	logerror("%s:alg_cia_0_portb_w(%02x)\n", machine().describe_context(), data);
 }
 
 
-static READ8_DEVICE_HANDLER( alg_cia_1_porta_r )
+READ8_MEMBER(alg_state::alg_cia_1_porta_r)
 {
-	logerror("%s:alg_cia_1_porta_r\n", device->machine().describe_context());
+	logerror("%s:alg_cia_1_porta_r\n", machine().describe_context());
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER( alg_cia_1_porta_w )
+WRITE8_MEMBER(alg_state::alg_cia_1_porta_w)
 {
-	logerror("%s:alg_cia_1_porta_w(%02x)\n", device->machine().describe_context(), data);
+	logerror("%s:alg_cia_1_porta_w(%02x)\n", machine().describe_context(), data);
 }
 
 
@@ -408,10 +412,10 @@ static const mos6526_interface cia_0_intf =
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(alg_cia_0_porta_r),
-	DEVCB_HANDLER(alg_cia_0_porta_w),	/* port A */
-	DEVCB_HANDLER(alg_cia_0_portb_r),
-	DEVCB_HANDLER(alg_cia_0_portb_w)	/* port B */
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_r),
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_r),
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_w)	/* port B */
 };
 
 static const mos6526_interface cia_1_intf =
@@ -421,8 +425,8 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(alg_cia_1_porta_r),
-	DEVCB_HANDLER(alg_cia_1_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_r),
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_w),	/* port A */
 	DEVCB_NULL,
 	DEVCB_NULL								/* port B */
 };

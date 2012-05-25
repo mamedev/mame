@@ -339,6 +339,16 @@ public:
 	DECLARE_READ64_MEMBER(e00008_r);
 	DECLARE_WRITE64_MEMBER(e00008_w);
 	DECLARE_READ64_MEMBER(e00000_r);
+	DECLARE_READ64_MEMBER(pci_config_addr_r);
+	DECLARE_WRITE64_MEMBER(pci_config_addr_w);
+	DECLARE_READ64_MEMBER(pci_config_data_r);
+	DECLARE_WRITE64_MEMBER(pci_config_data_w);
+	DECLARE_READ64_MEMBER(cf_card_data_r);
+	DECLARE_WRITE64_MEMBER(cf_card_data_w);
+	DECLARE_READ64_MEMBER(cf_card_r);
+	DECLARE_WRITE64_MEMBER(cf_card_w);
+	DECLARE_READ64_MEMBER(ata_r);
+	DECLARE_WRITE64_MEMBER(ata_w);
 };
 
 UINT32 m_mpc8240_regs[256/4];
@@ -372,23 +382,27 @@ static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, i
 }
 
 
-static READ64_DEVICE_HANDLER( pci_config_addr_r )
+READ64_MEMBER(viper_state::pci_config_addr_r)
 {
+	device_t *device = machine().device("pcibus");
 	return pci_64be_r(device, 0, U64(0xffffffff00000000));
 }
 
-static WRITE64_DEVICE_HANDLER( pci_config_addr_w )
+WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
+	device_t *device = machine().device("pcibus");
 	pci_64be_w(device, 0, data, U64(0xffffffff00000000));
 }
 
-static READ64_DEVICE_HANDLER( pci_config_data_r )
+READ64_MEMBER(viper_state::pci_config_data_r)
 {
+	device_t *device = machine().device("pcibus");
 	return pci_64be_r(device, 1, U64(0x00000000ffffffff)) << 32;
 }
 
-static WRITE64_DEVICE_HANDLER( pci_config_data_w )
+WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
+	device_t *device = machine().device("pcibus");
 	pci_64be_w(device, 1, data >> 32, U64(0x00000000ffffffff));
 }
 
@@ -1168,8 +1182,9 @@ static const UINT8 cf_card_tuples[] =
 	0x00, 0x01, 0x00, 0x00,		// CCR base (0x00000100)
 };
 
-static READ64_DEVICE_HANDLER(cf_card_data_r)
+READ64_MEMBER(viper_state::cf_card_data_r)
 {
+	device_t *device = machine().device("ide");
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_16_31)
@@ -1184,15 +1199,16 @@ static READ64_DEVICE_HANDLER(cf_card_data_r)
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_r: IDE reg %02X\n", device->machine().describe_context(), offset & 0xf);
+				fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context(), offset & 0xf);
 			}
 		}
 	}
 	return r;
 }
 
-static WRITE64_DEVICE_HANDLER(cf_card_data_w)
+WRITE64_MEMBER(viper_state::cf_card_data_w)
 {
+	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_16_31)
 	{
 		switch (offset & 0xf)
@@ -1205,21 +1221,20 @@ static WRITE64_DEVICE_HANDLER(cf_card_data_w)
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", device->machine().describe_context(), offset & 0xf, (UINT16)(data >> 16));
+				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context(), offset & 0xf, (UINT16)(data >> 16));
 			}
 		}
 	}
 }
 
-static READ64_DEVICE_HANDLER(cf_card_r)
+READ64_MEMBER(viper_state::cf_card_r)
 {
-	viper_state *state = device->machine().driver_data<viper_state>();
-
+	device_t *device = machine().device("ide");
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
-		if (state->m_cf_card_ide)
+		if (m_cf_card_ide)
 		{
 			switch (offset & 0xf)
 			{
@@ -1253,7 +1268,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 				default:
 				{
-					printf("%s:compact_flash_r: IDE reg %02X\n", device->machine().describe_context(), offset & 0xf);
+					printf("%s:compact_flash_r: IDE reg %02X\n", machine().describe_context(), offset & 0xf);
 				}
 			}
 		}
@@ -1269,19 +1284,19 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 			}
 			else
 			{
-				fatalerror("%s:compact_flash_r: reg %02X\n", device->machine().describe_context(), reg);
+				fatalerror("%s:compact_flash_r: reg %02X\n", machine().describe_context(), reg);
 			}
 		}
 	}
 	return r;
 }
 
-static WRITE64_DEVICE_HANDLER(cf_card_w)
+WRITE64_MEMBER(viper_state::cf_card_w)
 {
-	viper_state *state = device->machine().driver_data<viper_state>();
+	device_t *device = machine().device("ide");
 
 	#ifdef VIPER_DEBUG_LOG
-	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", device->machine().describe_context(), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 	#endif
 
 	if (ACCESSING_BITS_16_31)
@@ -1320,7 +1335,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 
 				default:
 				{
-					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", device->machine().describe_context(), offset & 0xf, (UINT16)((data >> 16) & 0xffff));
+					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context(), offset & 0xf, (UINT16)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1332,7 +1347,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 				{
 					if ((data >> 16) & 0x80)
 					{
-						state->m_cf_card_ide = 1;
+						m_cf_card_ide = 1;
 
 						// soft reset
 						// sector count register is set to 0x01
@@ -1351,7 +1366,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 				}
 				default:
 				{
-					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", device->machine().describe_context(), offset, (UINT16)((data >> 16) & 0xffff));
+					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context(), offset, (UINT16)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1370,8 +1385,9 @@ WRITE64_MEMBER(viper_state::unk2_w)
 
 
 
-static READ64_DEVICE_HANDLER(ata_r)
+READ64_MEMBER(viper_state::ata_r)
 {
+	device_t *device = machine().device("ide");
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_16_31)
@@ -1384,8 +1400,9 @@ static READ64_DEVICE_HANDLER(ata_r)
 	return r;
 }
 
-static WRITE64_DEVICE_HANDLER(ata_w)
+WRITE64_MEMBER(viper_state::ata_w)
 {
+	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_16_31)
 	{
 		int reg = (offset >> 4) & 0x7;
@@ -1824,11 +1841,11 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
 	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
 	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
-	AM_RANGE(0xfec00000, 0xfedfffff) AM_DEVREADWRITE_LEGACY("pcibus", pci_config_addr_r, pci_config_addr_w)
-	AM_RANGE(0xfee00000, 0xfeefffff) AM_DEVREADWRITE_LEGACY("pcibus", pci_config_data_r, pci_config_data_w)
+	AM_RANGE(0xfec00000, 0xfedfffff) AM_READWRITE(pci_config_addr_r, pci_config_addr_w)
+	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
-	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE_LEGACY("ide", ata_r, ata_w)
+	AM_RANGE(0xff300000, 0xff300fff) AM_READWRITE(ata_r, ata_w)
 	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
 	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
@@ -1995,12 +2012,11 @@ static DRIVER_INIT(viper)
 
 static DRIVER_INIT(vipercf)
 {
-	device_t *ide = machine.device("ide");
-
+	viper_state *state = machine.driver_data<viper_state>();
 	DRIVER_INIT_CALL(viper);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( *ide, 0xff000000, 0xff000fff, FUNC(cf_card_data_r), FUNC(cf_card_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( *ide, 0xff200000, 0xff200fff, FUNC(cf_card_r), FUNC(cf_card_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), state), write64_delegate(FUNC(viper_state::cf_card_data_w), state) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), state), write64_delegate(FUNC(viper_state::cf_card_w), state) );
 }
 
 

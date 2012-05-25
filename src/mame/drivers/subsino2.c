@@ -150,6 +150,8 @@ public:
 	DECLARE_WRITE8_MEMBER(saklove_outputs_w);
 	DECLARE_WRITE8_MEMBER(xplan_outputs_w);
 	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
+	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
+	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
 };
 
 
@@ -802,15 +804,17 @@ READ8_MEMBER(subsino2_state::vblank_bit6_r)
 	return machine().primary_screen->vblank() ? 0x40 : 0x00;
 }
 
-static WRITE8_DEVICE_HANDLER( oki_bank_bit0_w )
+WRITE8_MEMBER(subsino2_state::oki_bank_bit0_w)
 {
+	device_t *device = machine().device("oki");
 	// it writes 0x32 or 0x33
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE8_DEVICE_HANDLER( oki_bank_bit4_w )
+WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
 {
+	device_t *device = machine().device("oki");
 	// it writes 0x23 or 0x33
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base(((data >> 4) & 1) * 0x40000);
@@ -1140,7 +1144,7 @@ static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE( 0x09147, 0x09147 ) AM_READ(dsw_r )
 	AM_RANGE( 0x09148, 0x09148 ) AM_WRITE(dsw_mask_w )
 
-	AM_RANGE( 0x09152, 0x09152 ) AM_READ(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
+	AM_RANGE( 0x09152, 0x09152 ) AM_READ(vblank_bit2_r ) AM_WRITE(oki_bank_bit0_w )
 
 	AM_RANGE( 0x09158, 0x0915e ) AM_READ(mtrain_prot_r )
 
@@ -1233,7 +1237,7 @@ static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0307, 0x0307) AM_READ(dsw_r )
 	AM_RANGE(0x0308, 0x0308) AM_WRITE(dsw_mask_w )
 
-	AM_RANGE(0x0312, 0x0312) AM_READ(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
+	AM_RANGE(0x0312, 0x0312) AM_READ(vblank_bit2_r ) AM_WRITE(oki_bank_bit0_w )
 
 	// Peripheral Control Block
 	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_SHARE("am188em_regs")
@@ -1326,7 +1330,7 @@ static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
 
 	AM_RANGE(0x0235, 0x0235) AM_NOP	// INT0 Ack.?
 
-	AM_RANGE(0x0300, 0x0300) AM_READ(vblank_bit6_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit4_w )
+	AM_RANGE(0x0300, 0x0300) AM_READ(vblank_bit6_r ) AM_WRITE(oki_bank_bit4_w )
 	AM_RANGE(0x0301, 0x0301) AM_WRITE(dsw_mask_w )
 	AM_RANGE(0x0302, 0x0302) AM_READ(dsw_r )
 	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN C" )

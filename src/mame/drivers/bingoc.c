@@ -44,6 +44,7 @@ public:
 	DECLARE_READ16_MEMBER(bingoc_rand_r);
 	DECLARE_READ8_MEMBER(sound_test_r);
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
+	DECLARE_WRITE8_MEMBER(bingoc_play_w);
 };
 
 
@@ -94,13 +95,14 @@ WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 }
 #endif
 
-static WRITE8_DEVICE_HANDLER( bingoc_play_w )
+WRITE8_MEMBER(bingoc_state::bingoc_play_w)
 {
+	device_t *device = machine().device("upd");
 	/*
     ---- --x- sound rom banking
     ---- ---x start-stop sample
     */
-	UINT8 *upd = device->machine().root_device().memregion("upd")->base();
+	UINT8 *upd = machine().root_device().memregion("upd")->base();
 	memcpy(&upd[0x00000], &upd[0x20000 + (((data & 2)>>1) * 0x20000)], 0x20000);
 	upd7759_start_w(device, data & 1);
 //  printf("%02x\n",data);
@@ -124,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("upd", bingoc_play_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(bingoc_play_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 #if !SOUND_TEST
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r) //soundlatch

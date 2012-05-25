@@ -62,6 +62,8 @@ public:
 	DECLARE_READ8_MEMBER(namco_30test_mux_r);
 	DECLARE_READ8_MEMBER(hc11_mux_r);
 	DECLARE_WRITE8_MEMBER(hc11_mux_w);
+	DECLARE_READ8_MEMBER(hc11_okibank_r);
+	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
 };
 
 
@@ -112,18 +114,16 @@ WRITE8_MEMBER(namco_30test_state::hc11_mux_w)
 	m_mux_data = data;
 }
 
-static READ8_DEVICE_HANDLER( hc11_okibank_r )
+READ8_MEMBER(namco_30test_state::hc11_okibank_r)
 {
-	namco_30test_state *state = device->machine().driver_data<namco_30test_state>();
-	return state->m_oki_bank;
+	return m_oki_bank;
 }
 
-static WRITE8_DEVICE_HANDLER( hc11_okibank_w )
+WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 {
-	namco_30test_state *state = device->machine().driver_data<namco_30test_state>();
-	okim6295_device *oki = downcast<okim6295_device *>(device);
+	okim6295_device *oki = machine().device<okim6295_device>("oki");
 
-	state->m_oki_bank = data;
+	m_oki_bank = data;
 	oki->set_bank_base((data & 1) ? 0x40000 : 0);
 }
 
@@ -131,7 +131,7 @@ static WRITE8_DEVICE_HANDLER( hc11_okibank_w )
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
 	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
-	AM_RANGE(0x007e, 0x007e) AM_DEVREADWRITE_LEGACY("oki",hc11_okibank_r,hc11_okibank_w)
+	AM_RANGE(0x007e, 0x007e) AM_READWRITE(hc11_okibank_r,hc11_okibank_w)
 	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there

@@ -34,6 +34,9 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_color_ram;
 	UINT8 m_output;
+	DECLARE_READ8_MEMBER(horse_input_r);
+	DECLARE_WRITE8_MEMBER(horse_output_w);
+	DECLARE_WRITE_LINE_MEMBER(horse_timer_out);
 };
 
 
@@ -89,46 +92,44 @@ static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
 ADDRESS_MAP_END
 
 
-static READ8_DEVICE_HANDLER(horse_input_r)
+READ8_MEMBER(horse_state::horse_input_r)
 {
-	horse_state *state = device->machine().driver_data<horse_state>();
 
-	switch (state->m_output >> 6 & 3)
+	switch (m_output >> 6 & 3)
 	{
-		case 0: return state->ioport("IN0")->read();
-		case 1: return state->ioport("IN1")->read();
-		case 2: return state->ioport("IN2")->read();
+		case 0: return ioport("IN0")->read();
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
 		default: break;
 	}
 
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER(horse_output_w)
+WRITE8_MEMBER(horse_state::horse_output_w)
 {
-	horse_state *state = device->machine().driver_data<horse_state>();
-	state->m_output = data;
+	m_output = data;
 
 	// d4: payout related
 	// d6-d7: input mux
 	// other bits: ?
 }
 
-static WRITE_LINE_DEVICE_HANDLER(horse_timer_out)
+WRITE_LINE_MEMBER(horse_state::horse_timer_out)
 {
-	dac_signed_w(device->machine().device("dac"), 0, state ? 0x7f : 0);
+	dac_signed_w(machine().device("dac"), 0, state ? 0x7f : 0);
 }
 
 static I8155_INTERFACE(i8155_intf)
 {
 	// port A input, port B output, port C output (but unused)
-	DEVCB_HANDLER(horse_input_r),
+	DEVCB_DRIVER_MEMBER(horse_state,horse_input_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(horse_output_w),
+	DEVCB_DRIVER_MEMBER(horse_state,horse_output_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(horse_timer_out)
+	DEVCB_DRIVER_LINE_MEMBER(horse_state,horse_timer_out)
 };
 
 

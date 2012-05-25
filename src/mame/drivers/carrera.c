@@ -60,6 +60,7 @@ public:
 		m_tileram(*this, "tileram"){ }
 
 	required_shared_ptr<UINT8> m_tileram;
+	DECLARE_READ8_MEMBER(unknown_r);
 };
 
 
@@ -265,9 +266,9 @@ static SCREEN_UPDATE_IND16(carrera)
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER( unknown_r )
+READ8_MEMBER(carrera_state::unknown_r)
 {
-	return device->machine().rand();
+	return machine().rand();
 }
 
 /* these are set as input, but I have no idea which input port it uses is for the AY */
@@ -275,8 +276,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(unknown_r),
-	DEVCB_HANDLER(unknown_r),
+	DEVCB_DRIVER_MEMBER(carrera_state,unknown_r),
+	DEVCB_DRIVER_MEMBER(carrera_state,unknown_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

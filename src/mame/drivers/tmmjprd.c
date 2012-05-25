@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE32_MEMBER(tmmjprd_paletteram_dword_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_1_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_2_w);
+	DECLARE_WRITE32_MEMBER(tmmjprd_eeprom_write);
 };
 
 
@@ -490,13 +491,13 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_blitter_w)
 #endif
 
 
-static WRITE32_DEVICE_HANDLER( tmmjprd_eeprom_write )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_eeprom_write)
 {
-	tmmjprd_state *state = device->machine().driver_data<tmmjprd_state>();
+	device_t *device = machine().device("eeprom");
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
 	if (mem_mask == 0x000000ff)
-		state->m_mux_data = (~data & 0xff);
+		m_mux_data = (~data & 0xff);
 
 	if (mem_mask == 0xff000000)
 	{
@@ -695,7 +696,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_DEVWRITE_LEGACY("eeprom", tmmjprd_eeprom_write)
+	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_WRITE(tmmjprd_eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -34,6 +34,7 @@ public:
 
 	UINT8 *m_code_base;
 	DECLARE_READ8_MEMBER(io_read_missing_dips);
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 };
 
 
@@ -133,16 +134,16 @@ static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8, kingpin_state )
 ADDRESS_MAP_END
 
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
 }
 
 static TMS9928A_INTERFACE(kingpin_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(kingpin_state,vdp_interrupt)
 };
 
 static MACHINE_CONFIG_START( kingpin, kingpin_state )

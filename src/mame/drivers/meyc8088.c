@@ -55,6 +55,12 @@ public:
 	DECLARE_READ8_MEMBER(video5_flip_r);
 	DECLARE_WRITE8_MEMBER(screen_flip_w);
 	DECLARE_READ8_MEMBER(screen_flip_r);
+	DECLARE_READ8_MEMBER(meyc8088_input_r);
+	DECLARE_READ8_MEMBER(meyc8088_status_r);
+	DECLARE_WRITE8_MEMBER(meyc8088_lights1_w);
+	DECLARE_WRITE8_MEMBER(meyc8088_lights2_w);
+	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
+	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
 };
 
 
@@ -216,23 +222,21 @@ static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
 ADDRESS_MAP_END
 
 
-static READ8_DEVICE_HANDLER(meyc8088_input_r)
+READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 {
-	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
 	UINT8 ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~state->m_common & 1) ret &= state->ioport("C0")->read_safe(0); // bit switches
-	if (~state->m_common & 2) ret &= state->ioport("C1")->read_safe(0); // control switches
-	if (~state->m_common & 4) ret &= state->ioport("C2")->read_safe(0); // light switches
-	if (~state->m_common & 8) ret &= state->ioport("C3")->read_safe(0); // light switches
+	if (~m_common & 1) ret &= ioport("C0")->read_safe(0); // bit switches
+	if (~m_common & 2) ret &= ioport("C1")->read_safe(0); // control switches
+	if (~m_common & 4) ret &= ioport("C2")->read_safe(0); // light switches
+	if (~m_common & 8) ret &= ioport("C3")->read_safe(0); // light switches
 
 	return ret;
 }
 
-static READ8_DEVICE_HANDLER(meyc8088_status_r)
+READ8_MEMBER(meyc8088_state::meyc8088_status_r)
 {
-	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
 
 	// d0: /CR2
 	// d1: screen on
@@ -240,41 +244,40 @@ static READ8_DEVICE_HANDLER(meyc8088_status_r)
 	// d3: N/C
 	// d4: battery ok
 	// d5: /drive on
-	return (state->m_status & 0x27) | 0x18;
+	return (m_status & 0x27) | 0x18;
 }
 
 
-static WRITE8_DEVICE_HANDLER(meyc8088_lights1_w)
+WRITE8_MEMBER(meyc8088_state::meyc8088_lights1_w)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i, ~data >> i & 1);
 }
 
-static WRITE8_DEVICE_HANDLER(meyc8088_lights2_w)
+WRITE8_MEMBER(meyc8088_state::meyc8088_lights2_w)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i + 8, ~data >> i & 1);
 }
 
-static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
+WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
 {
-	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
 
 	// d0: /CR2
-	state->m_status = (state->m_status & ~1) | (data & 1);
+	m_status = (m_status & ~1) | (data & 1);
 
 	// d1: battery on
-	state->m_status = (state->m_status & ~0x10) | (data << 3 & 0x10);
+	m_status = (m_status & ~0x10) | (data << 3 & 0x10);
 
 	// d2-d5: /common
-	state->m_common = data >> 2 & 0xf;
+	m_common = data >> 2 & 0xf;
 }
 
-static WRITE_LINE_DEVICE_HANDLER(meyc8088_sound_out)
+WRITE_LINE_MEMBER(meyc8088_state::meyc8088_sound_out)
 {
-	dac_signed_w(device->machine().device("dac"), 0, state ? 0x7f : 0);
+	dac_signed_w(machine().device("dac"), 0, state ? 0x7f : 0);
 }
 
 
@@ -282,23 +285,23 @@ static const i8155_interface i8155_intf[2] =
 {
 	{
 		// all ports set to input
-		DEVCB_HANDLER(meyc8088_input_r),
+		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_input_r),
 		DEVCB_NULL,
 		DEVCB_INPUT_PORT("SW"), // filtered switch inputs
 		DEVCB_NULL,
-		DEVCB_HANDLER(meyc8088_status_r),
+		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_status_r),
 		DEVCB_NULL,
 		DEVCB_NULL // i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 	},
 	{
 		// all ports set to output
 		DEVCB_NULL,
-		DEVCB_HANDLER(meyc8088_lights2_w),
+		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_lights2_w),
 		DEVCB_NULL,
-		DEVCB_HANDLER(meyc8088_lights1_w),
+		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_lights1_w),
 		DEVCB_NULL,
-		DEVCB_HANDLER(meyc8088_common_w),
-		DEVCB_LINE(meyc8088_sound_out)
+		DEVCB_DRIVER_MEMBER(meyc8088_state,meyc8088_common_w),
+		DEVCB_DRIVER_LINE_MEMBER(meyc8088_state,meyc8088_sound_out)
 	}
 };
 

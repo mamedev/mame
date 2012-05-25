@@ -145,6 +145,10 @@ public:
 	DECLARE_WRITE8_MEMBER(maxidbl_mcu2_w);
 	void show_leds123();
 	void show_leds12();
+	DECLARE_WRITE16_MEMBER(crtc_lpen_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
 };
 
 /*************************************************************************************************************
@@ -868,8 +872,9 @@ WRITE8_MEMBER(blitz68k_state::crtc_w)
 		mc6845->address_w(space, 0, data);
 }
 
-static WRITE16_DEVICE_HANDLER( crtc_lpen_w )
+WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 {
+	device_t *device = machine().device("crtc");
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
 		downcast<mc6845_device *>(device)->assert_light_pen_input();
@@ -921,7 +926,7 @@ static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x8fe004, 0x8fe005) AM_WRITEONLY
-	AM_RANGE(0x8fe006, 0x8fe007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
+	AM_RANGE(0x8fe006, 0x8fe007) AM_WRITE(crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
 
 	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
@@ -1020,7 +1025,7 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x89e004, 0x89e005) AM_WRITEONLY
-	AM_RANGE(0x89e006, 0x89e007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
+	AM_RANGE(0x89e006, 0x89e007) AM_WRITE(crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
 
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
@@ -1088,7 +1093,7 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x280000, 0x280001) AM_READ8(blit_status_r, 0xff00)
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(crtc_lpen_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP	// 1->0 (MCU related?)
@@ -1194,7 +1199,7 @@ static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x9f0004, 0x9f0005) AM_WRITEONLY
-	AM_RANGE(0x9f0006, 0x9f0007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
+	AM_RANGE(0x9f0006, 0x9f0007) AM_WRITE(crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)	// triggered by MCU?
 
@@ -1618,19 +1623,19 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync_irq1)
+WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq1)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync_irq3)
+WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq3)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 3, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync_irq5)
+WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 const mc6845_interface mc6845_intf_irq1 =
@@ -1643,7 +1648,7 @@ const mc6845_interface mc6845_intf_irq1 =
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_LINE(crtc_vsync_irq1),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq1),	/* VSYNC callback */
 	crtc_addr				/* update address callback */
 };
 
@@ -1657,7 +1662,7 @@ const mc6845_interface mc6845_intf_irq3 =
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_LINE(crtc_vsync_irq3),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq3),	/* VSYNC callback */
 	crtc_addr				/* update address callback */
 };
 
@@ -1671,7 +1676,7 @@ const mc6845_interface mc6845_intf_irq5 =
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_LINE(crtc_vsync_irq5),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq5),	/* VSYNC callback */
 	crtc_addr				/* update address callback */
 };
 

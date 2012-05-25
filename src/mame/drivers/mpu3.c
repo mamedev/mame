@@ -156,6 +156,27 @@ emu_timer *m_ic21_timer;
 	DECLARE_READ8_MEMBER(characteriser_r);
 	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
 	DECLARE_READ8_MEMBER(mpu3ptm_r);
+	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
+	DECLARE_WRITE8_MEMBER(ic2_o1_callback);
+	DECLARE_WRITE8_MEMBER(ic2_o2_callback);
+	DECLARE_WRITE8_MEMBER(ic2_o3_callback);
+	DECLARE_READ8_MEMBER(pia_ic3_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_ic3_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
+	DECLARE_READ8_MEMBER(pia_ic4_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_ic4_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic4_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic5_porta_w);
+	DECLARE_READ8_MEMBER(pia_ic5_portb_r);
+	DECLARE_WRITE8_MEMBER(pia_ic5_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	DECLARE_READ8_MEMBER(pia_ic6_porta_r);
+	DECLARE_READ8_MEMBER(pia_ic6_portb_r);
+	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
 };
 
 #define DISPLAY_PORT 0
@@ -208,13 +229,13 @@ static MACHINE_RESET( mpu3 )
 }
 
 /* 6808 IRQ handler */
-static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
+WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
 {
-	pia6821_device *pia3 = device->machine().device<pia6821_device>("pia_ic3");
-	pia6821_device *pia4 = device->machine().device<pia6821_device>("pia_ic4");
-	pia6821_device *pia5 = device->machine().device<pia6821_device>("pia_ic5");
-	pia6821_device *pia6 = device->machine().device<pia6821_device>("pia_ic6");
-	ptm6840_device *ptm2 = device->machine().device<ptm6840_device>("ptm_ic2");
+	pia6821_device *pia3 = machine().device<pia6821_device>("pia_ic3");
+	pia6821_device *pia4 = machine().device<pia6821_device>("pia_ic4");
+	pia6821_device *pia5 = machine().device<pia6821_device>("pia_ic5");
+	pia6821_device *pia6 = machine().device<pia6821_device>("pia_ic6");
+	ptm6840_device *ptm2 = machine().device<ptm6840_device>("ptm_ic2");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = pia3->irq_a_state() | pia3->irq_b_state() |
@@ -223,23 +244,23 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 						 pia6->irq_a_state() | pia6->irq_b_state() |
 						 ptm2->irq_state();
 
-		cputag_set_input_line(device->machine(), "maincpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6808 int%d \n", combined_state));
 }
 
 
 /* IC2 6840 PTM handler probably clocked from elsewhere*/
-static WRITE8_DEVICE_HANDLER( ic2_o1_callback )
+WRITE8_MEMBER(mpu3_state::ic2_o1_callback)
 {
 }
 
 //FIXME FROM HERE
-static WRITE8_DEVICE_HANDLER( ic2_o2_callback )
+WRITE8_MEMBER(mpu3_state::ic2_o2_callback)
 {
 }
 
 
-static WRITE8_DEVICE_HANDLER( ic2_o3_callback )
+WRITE8_MEMBER(mpu3_state::ic2_o3_callback)
 {
 }
 
@@ -248,10 +269,10 @@ static const ptm6840_interface ptm_ic2_intf =
 {
 	MPU3_MASTER_CLOCK,///4,
 	{ 0, 0, 0 },
-	{ DEVCB_HANDLER(ic2_o1_callback),
-	  DEVCB_HANDLER(ic2_o2_callback),
-	  DEVCB_HANDLER(ic2_o3_callback) },
-	DEVCB_LINE(cpu0_irq)
+	{ DEVCB_DRIVER_MEMBER(mpu3_state,ic2_o1_callback),
+	  DEVCB_DRIVER_MEMBER(mpu3_state,ic2_o2_callback),
+	  DEVCB_DRIVER_MEMBER(mpu3_state,ic2_o3_callback) },
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq)
 };
 
 /*
@@ -332,27 +353,26 @@ static TIMER_CALLBACK( ic21_timeout )
 	ic21_output(state,0);
 }
 
-static READ8_DEVICE_HANDLER( pia_ic3_porta_r )
+READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "DIL1", "DIL1", "DIL2", "DIL2" };
 	int data=0,swizzle;
-	LOG(("%s: IC3 PIA Read of Port A (MUX input data)\n", device->machine().describe_context()));
-	//popmessage("%x",state->m_input_strobe);
-	switch (state->m_input_strobe)
+	LOG(("%s: IC3 PIA Read of Port A (MUX input data)\n", machine().describe_context()));
+	//popmessage("%x",m_input_strobe);
+	switch (m_input_strobe)
 	{
 		case 0:
 		case 1:
 		case 2:
 		case 3:
 		{
-			data = (device->machine().root_device().ioport(portnames[state->m_input_strobe])->read()<<2);
+			data = (machine().root_device().ioport(portnames[m_input_strobe])->read()<<2);
 			break;
 		}
 		case 4://DIL1
 		case 6://DIL2
 		{
-			swizzle = (device->machine().root_device().ioport(portnames[state->m_input_strobe])->read());
+			swizzle = (machine().root_device().ioport(portnames[m_input_strobe])->read());
 			data = (((swizzle & 0x01) << 7) + ((swizzle & 0x02) << 5) + ((swizzle & 0x04) << 3)
 					+ ((swizzle & 0x08) << 1) +((swizzle & 0x10) >> 1) + ((swizzle & 0x20) >> 3));
 			break;
@@ -360,12 +380,12 @@ static READ8_DEVICE_HANDLER( pia_ic3_porta_r )
 		case 5://DIL1
 		case 7://DIL2
 		{
-			swizzle = (device->machine().root_device().ioport(portnames[state->m_input_strobe])->read());
+			swizzle = (machine().root_device().ioport(portnames[m_input_strobe])->read());
 			data = (((swizzle & 0x80) >> 1) + ((swizzle & 0x40) << 1));
 			break;
 		}
 	}
-	if (state->m_signal_50hz)
+	if (m_signal_50hz)
 	{
 		data |= 0x02;
 	}
@@ -376,78 +396,75 @@ static READ8_DEVICE_HANDLER( pia_ic3_porta_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
+WRITE8_MEMBER(mpu3_state::pia_ic3_portb_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC3 PIA Port B Set to %2x (Triac)\n", device->machine().describe_context(),data));
-	state->m_triac_ic3 =data;
+	LOG(("%s: IC3 PIA Port B Set to %2x (Triac)\n", machine().describe_context(),data));
+	m_triac_ic3 =data;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
+WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
 {
-	mpu3_state *mstate = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", device->machine().describe_context(),state));
-	mstate->m_IC11GA = state;
+	mpu3_state *mstate = machine().driver_data<mpu3_state>();
+	LOG(("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", machine().describe_context(),state));
+	m_IC11GA = state;
 	ic21_setup(mstate);
 	ic11_update(mstate);
 }
 
 static const pia6821_interface pia_ic3_intf =
 {
-	DEVCB_HANDLER(pia_ic3_porta_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic3_porta_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(pia_ic3_portb_w),		/* port B out */
-	DEVCB_LINE(pia_ic3_ca2_w),			/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic3_portb_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic3_ca2_w),			/* line CA2 out */
 	DEVCB_NULL,							/* port CB2 out */
 	DEVCB_NULL,							/* IRQA */
-	DEVCB_LINE(cpu0_irq)				/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq)				/* IRQB */
 };
 
-static READ8_DEVICE_HANDLER( pia_ic4_porta_r )
+READ8_MEMBER(mpu3_state::pia_ic4_porta_r)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	if (state->m_ic11_active)
+	if (m_ic11_active)
 	{
-		state->m_ic4_input_a|=0x80;
+		m_ic4_input_a|=0x80;
 	}
 	else
 	{
-		state->m_ic4_input_a&=~0x80;
+		m_ic4_input_a&=~0x80;
 	}
-	return state->m_ic4_input_a;
+	return m_ic4_input_a;
 }
 
 /*  IC4, 7 seg leds */
-static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
+WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
 	int meter,swizzle;
-	LOG(("%s: IC4 PIA Port A Set to %2x (DISPLAY PORT)\n", device->machine().describe_context(),data));
-	state->m_ic4_input_a=data;
-	switch (state->m_disp_func)
+	LOG(("%s: IC4 PIA Port A Set to %2x (DISPLAY PORT)\n", machine().describe_context(),data));
+	m_ic4_input_a=data;
+	switch (m_disp_func)
 	{
 		case DISPLAY_PORT:
-		if(state->m_ic11_active)
+		if(m_ic11_active)
 		{
-			if(state->m_led_strobe != state->m_input_strobe)
+			if(m_led_strobe != m_input_strobe)
 			{
-				swizzle = ((state->m_ic4_input_a & 0x01) << 2)+(state->m_ic4_input_a & 0x02)+((state->m_ic4_input_a & 0x4) >> 2)+(state->m_ic4_input_a & 0x08)+((state->m_ic4_input_a & 0x10) << 2)+(state->m_ic4_input_a & 0x20)+((state->m_ic4_input_a & 0x40) >> 2);
-				output_set_digit_value(7 - state->m_input_strobe,swizzle);
+				swizzle = ((m_ic4_input_a & 0x01) << 2)+(m_ic4_input_a & 0x02)+((m_ic4_input_a & 0x4) >> 2)+(m_ic4_input_a & 0x08)+((m_ic4_input_a & 0x10) << 2)+(m_ic4_input_a & 0x20)+((m_ic4_input_a & 0x40) >> 2);
+				output_set_digit_value(7 - m_input_strobe,swizzle);
 			}
-			state->m_led_strobe = state->m_input_strobe;
+			m_led_strobe = m_input_strobe;
 		}
 		break;
 
 		case METER_PORT:
 		for (meter = 0; meter < 6; meter ++)
 		{
-			swizzle = ((state->m_ic4_input_a ^ 0xff) & 0x3f);
+			swizzle = ((m_ic4_input_a ^ 0xff) & 0x3f);
 			MechMtr_update(meter, (swizzle & (1 << meter)));
 		}
 		break;
@@ -459,14 +476,13 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
+WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC4 PIA Port B Set to %2x (Lamp)\n", device->machine().describe_context(),data));
+	LOG(("%s: IC4 PIA Port B Set to %2x (Lamp)\n", machine().describe_context(),data));
 	int i;
-	if(state->m_ic11_active)
+	if(m_ic11_active)
 	{
-		if (state->m_lamp_strobe != state->m_input_strobe)
+		if (m_lamp_strobe != m_input_strobe)
 		{
 			// Because of the nature of the lamping circuit, there is an element of persistance where the lamp retains residual charge
 			// As a consequence, the lamp column data can change before the input strobe (effectively writing 0 to the previous strobe)
@@ -474,50 +490,48 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 
 			for (i = 0; i < 8; i++)
 			{
-				output_set_lamp_value((8*state->m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				output_set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
 			}
-			state->m_lamp_strobe = state->m_input_strobe;
+			m_lamp_strobe = m_input_strobe;
 		}
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
+WRITE_LINE_MEMBER(mpu3_state::pia_ic4_ca2_w)
 {
-	mpu3_state *mstate = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", device->machine().describe_context(),state));
-	mstate->m_IC11GB = state;
+	mpu3_state *mstate = machine().driver_data<mpu3_state>();
+	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", machine().describe_context(),state));
+	m_IC11GB = state;
 	ic11_update(mstate);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pia_ic4_cb2_w )
+WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
 {
-	mpu3_state *mstate = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Triac)\n", device->machine().describe_context(),state));
-	mstate->m_triac_ic4=state;
+	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Triac)\n", machine().describe_context(),state));
+	m_triac_ic4=state;
 }
 
 static const pia6821_interface pia_ic4_intf =
 {
-	DEVCB_HANDLER(pia_ic4_porta_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic4_porta_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(pia_ic4_porta_w),		/* port A out */
-	DEVCB_HANDLER(pia_ic4_portb_w),		/* port B out */
-	DEVCB_LINE(pia_ic4_ca2_w),		/* line CA2 out */
-	DEVCB_LINE(pia_ic4_cb2_w),		/* line CB2 out */
-	DEVCB_LINE(cpu0_irq),		/* IRQA */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic4_porta_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic4_portb_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic4_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic4_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq),		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
 
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
-static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
+WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
 
-	LOG(("%s: IC5 PIA Port A Set to %2x (Reel)\n", device->machine().describe_context(),data));
+	LOG(("%s: IC5 PIA Port A Set to %2x (Reel)\n", machine().describe_context(),data));
 	stepper_update(0, data & 0x03 );
 	stepper_update(1, (data>>2) & 0x03 );
 	stepper_update(2, (data>>4) & 0x03 );
@@ -528,125 +542,118 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 	awp_draw_reel(3);
 
 	{
-		if ( stepper_optic_state(0) ) state->m_optic_pattern |=  0x01;
-		else                          state->m_optic_pattern &= ~0x01;
+		if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
+		else                          m_optic_pattern &= ~0x01;
 
-		if ( stepper_optic_state(1) ) state->m_optic_pattern |=  0x02;
-		else                          state->m_optic_pattern &= ~0x02;
-		if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
-		else                          state->m_optic_pattern &= ~0x04;
+		if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
+		else                          m_optic_pattern &= ~0x02;
+		if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
+		else                          m_optic_pattern &= ~0x04;
 
-		if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
-		else                          state->m_optic_pattern &= ~0x08;
+		if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
+		else                          m_optic_pattern &= ~0x08;
 
 	}
 
 }
 
-static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
+READ8_MEMBER(mpu3_state::pia_ic5_portb_r)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	if (state->m_ic3_data & 0x80 )
+	if (m_ic3_data & 0x80 )
 	{
-		return state->m_optic_pattern;
+		return m_optic_pattern;
 	}
 	else
 	{
-		return state->m_ic3_data;
+		return m_ic3_data;
 	}
 }
 
 
 
-static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
+WRITE8_MEMBER(mpu3_state::pia_ic5_portb_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	state->m_ic3_data = data;
+	m_ic3_data = data;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pia_ic5_ca2_w )
+WRITE_LINE_MEMBER(mpu3_state::pia_ic5_ca2_w)
 {
-	mpu3_state *mstate = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC5 PIA Port CA2 Set to %2x (C)\n", device->machine().describe_context(),state));
-	mstate->m_IC11GC = state;
+	mpu3_state *mstate = machine().driver_data<mpu3_state>();
+	LOG(("%s: IC5 PIA Port CA2 Set to %2x (C)\n", machine().describe_context(),state));
+	m_IC11GC = state;
 	ic11_update(mstate);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pia_ic5_cb2_w )
+WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)
 {
-	mpu3_state *mstate = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC5 PIA Port CB2 Set to %2x (Triac)\n", device->machine().describe_context(),state));
-	mstate->m_triac_ic5 = state;
+	LOG(("%s: IC5 PIA Port CB2 Set to %2x (Triac)\n", machine().describe_context(),state));
+	m_triac_ic5 = state;
 }
 
 static const pia6821_interface pia_ic5_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_HANDLER(pia_ic5_portb_r),	/* port B in */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic5_portb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(pia_ic5_porta_w),	/* port A out */
-	DEVCB_HANDLER(pia_ic5_portb_w),	/* port B out */
-	DEVCB_LINE(pia_ic5_ca2_w),		/* line CA2 out */
-	DEVCB_LINE(pia_ic5_cb2_w),		/* port CB2 out */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic5_porta_w),	/* port A out */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic5_portb_w),	/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic5_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic5_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,			/* IRQA */
 	DEVCB_NULL			/* IRQB */
 };
 
 
 /* IC6, AUX ports*/
-static READ8_DEVICE_HANDLER( pia_ic6_porta_r )
+READ8_MEMBER(mpu3_state::pia_ic6_porta_r)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	return (state->ioport("AUX1")->read())|state->m_aux1_input;
+	return (ioport("AUX1")->read())|m_aux1_input;
 }
 
 
-static READ8_DEVICE_HANDLER( pia_ic6_portb_r )
+READ8_MEMBER(mpu3_state::pia_ic6_portb_r)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	return (state->ioport("AUX2")->read())|state->m_aux2_input;
+	return (ioport("AUX2")->read())|m_aux2_input;
 }
 
-static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
+WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", device->machine().describe_context(),data));
+	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data));
 	if ( data & 0x08 ) ROC10937_reset(0);
 
-	state->m_alpha_data_line = ((data & 0x20) >> 5);
-	if ( !state->m_alpha_clock && (data & 0x10) )
+	m_alpha_data_line = ((data & 0x20) >> 5);
+	if ( !m_alpha_clock && (data & 0x10) )
 	{
-		ROC10937_shift_data(0, state->m_alpha_data_line&0x01?0:1);
+		ROC10937_shift_data(0, m_alpha_data_line&0x01?0:1);
 	}
-	state->m_alpha_clock = (data & 0x10);
+	m_alpha_clock = (data & 0x10);
 
 	ROC10937_draw_16seg(0);
 }
 
-static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
+WRITE8_MEMBER(mpu3_state::pia_ic6_portb_w)
 {
-	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	LOG(("%s: IC6 PIA Port B Set to %2x (AUX2)\n", device->machine().describe_context(),data));
-	state->m_aux2_input = data;
+	LOG(("%s: IC6 PIA Port B Set to %2x (AUX2)\n", machine().describe_context(),data));
+	m_aux2_input = data;
 }
 
 static const pia6821_interface pia_ic6_intf =
 {
-	DEVCB_HANDLER(pia_ic6_porta_r),		/* port A in */
-	DEVCB_HANDLER(pia_ic6_portb_r),		/* port B in */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_porta_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_portb_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(pia_ic6_porta_w),		/* port A out */
-	DEVCB_HANDLER(pia_ic6_portb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_porta_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_portb_w),		/* port B out */
 	DEVCB_NULL,			/* line CA2 out */
 	DEVCB_NULL,			/* port CB2 out */
-	DEVCB_LINE(cpu0_irq),				/* IRQA */
-	DEVCB_LINE(cpu0_irq)				/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq),				/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq)				/* IRQB */
 };
 
 static INPUT_PORTS_START( mpu3 )

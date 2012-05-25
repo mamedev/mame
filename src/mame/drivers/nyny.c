@@ -120,6 +120,13 @@ public:
 	DECLARE_WRITE8_MEMBER(audio_2_command_w);
 	DECLARE_READ8_MEMBER(nyny_pia_1_2_r);
 	DECLARE_WRITE8_MEMBER(nyny_pia_1_2_w);
+	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
+	DECLARE_WRITE8_MEMBER(pia_2_port_a_w);
+	DECLARE_WRITE8_MEMBER(pia_2_port_b_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
 };
 
 
@@ -129,7 +136,7 @@ public:
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
+
 
 
 
@@ -139,19 +146,17 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
+WRITE_LINE_MEMBER(nyny_state::main_cpu_irq)
 {
-	nyny_state *driver_state = device->machine().driver_data<nyny_state>();
-	int combined_state = driver_state->m_pia1->irq_a_state() | driver_state->m_pia1->irq_b_state() | driver_state->m_pia2->irq_b_state();
+	int combined_state = m_pia1->irq_a_state() | m_pia1->irq_b_state() | m_pia2->irq_b_state();
 
-	device_set_input_line(driver_state->m_maincpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
+WRITE_LINE_MEMBER(nyny_state::main_cpu_firq)
 {
-	nyny_state *driver_state = device->machine().driver_data<nyny_state>();
-	device_set_input_line(driver_state->m_maincpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -193,8 +198,8 @@ static const pia6821_interface pia_1_intf =
 	DEVCB_NULL,						/* port B out */
 	DEVCB_NULL,						/* line CA2 out */
 	DEVCB_NULL,						/* port CB2 out */
-	DEVCB_LINE(main_cpu_irq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)		/* IRQB */
 };
 
 
@@ -205,25 +210,23 @@ static const pia6821_interface pia_1_intf =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( pia_2_port_a_w )
+WRITE8_MEMBER(nyny_state::pia_2_port_a_w)
 {
-	nyny_state *state = device->machine().driver_data<nyny_state>();
-	state->m_star_delay_counter = (state->m_star_delay_counter & 0x0f00) | data;
+	m_star_delay_counter = (m_star_delay_counter & 0x0f00) | data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( pia_2_port_b_w )
+WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 {
-	nyny_state *state = device->machine().driver_data<nyny_state>();
 
 	/* bits 0-3 go to bits 8-11 of the star delay counter */
-	state->m_star_delay_counter = (state->m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
+	m_star_delay_counter = (m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
 
 	/* bit 4 is star field enable */
-	state->m_star_enable = data & 0x10;
+	m_star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	state->audio_2_command_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
+	audio_2_command_w(*m_maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
 }
 
 
@@ -235,12 +238,12 @@ static const pia6821_interface pia_2_intf =
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_HANDLER(pia_2_port_a_w),	/* port A out */
-	DEVCB_HANDLER(pia_2_port_b_w),	/* port B out */
-	DEVCB_LINE(flipscreen_w),		/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_a_w),	/* port A out */
+	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_b_w),	/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,flipscreen_w),		/* line CA2 out */
 	DEVCB_NULL,						/* port CB2 out */
-	DEVCB_LINE(main_cpu_firq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_firq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)		/* IRQB */
 };
 
 
@@ -284,10 +287,9 @@ static const ttl74123_interface ic48_1_config =
  *************************************/
 
 
-static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
+WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 {
-	nyny_state *driver_state = device->machine().driver_data<nyny_state>();
-	driver_state->m_flipscreen = state ? 0 : 1;
+	m_flipscreen = state ? 0 : 1;
 }
 
 
@@ -414,10 +416,9 @@ static MC6845_END_UPDATE( end_update )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
+WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 {
-	nyny_state *driver_state = device->machine().driver_data<nyny_state>();
-	ttl74123_a_w(driver_state->m_ic48_1, 0, state);
+	ttl74123_a_w(m_ic48_1, 0, state);
 }
 
 
@@ -428,7 +429,7 @@ static const mc6845_interface mc6845_intf =
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
 	end_update,				/* after pixel update callback */
-	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,display_enable_changed),	/* callback for display state changes */
 	DEVCB_NULL,				/* callback for cursor state changes */
 	DEVCB_NULL,				/* HSYNC callback */
 	DEVCB_NULL,				/* VSYNC callback */
@@ -459,7 +460,7 @@ WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( nyny_ay8910_37_port_a_w )
+WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 {
 	/* not sure what this does */
 
@@ -473,7 +474,7 @@ static const ay8910_interface ay8910_37_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(nyny_ay8910_37_port_a_w),
+	DEVCB_DRIVER_MEMBER(nyny_state,nyny_ay8910_37_port_a_w),
 	DEVCB_DEVICE_HANDLER("dac", dac_w)
 };
 

@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bestleag_txram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_bgram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_fgram_w);
+	DECLARE_WRITE16_MEMBER(oki_bank_w);
 };
 
 
@@ -222,8 +223,9 @@ WRITE16_MEMBER(bestleag_state::bestleag_fgram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_DEVICE_HANDLER( oki_bank_w )
+WRITE16_MEMBER(bestleag_state::oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->set_bank_base(0x40000 * ((data & 3) - 1));
 }
@@ -245,7 +247,7 @@ static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
 	AM_RANGE(0x300016, 0x300017) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("DSWB")
-	AM_RANGE(0x30001c, 0x30001d) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
+	AM_RANGE(0x30001c, 0x30001d) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x30001e, 0x30001f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM

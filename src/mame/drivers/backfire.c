@@ -74,6 +74,8 @@ public:
 	DECLARE_READ32_MEMBER(backfire_unknown_wheel_r);
 	DECLARE_READ32_MEMBER(backfire_wheel1_r);
 	DECLARE_READ32_MEMBER(backfire_wheel2_r);
+	DECLARE_READ32_MEMBER(backfire_eeprom_r);
+	DECLARE_WRITE32_MEMBER(backfire_eeprom_w);
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -172,14 +174,15 @@ static SCREEN_UPDATE_IND16( backfire_right )
 
 
 
-static READ32_DEVICE_HANDLER( backfire_eeprom_r )
+READ32_MEMBER(backfire_state::backfire_eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
-	int backfire_screen = device->machine().rand() & 1;
+	int backfire_screen = machine().rand() & 1;
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return ((eeprom->read_bit() << 24) | device->machine().root_device().ioport("IN0")->read()
-			| ((device->machine().root_device().ioport("IN2")->read() & 0xbf) << 16)
-			| ((device->machine().root_device().ioport("IN3")->read() & 0x40) << 16)) ^ (backfire_screen << 26) ;
+	return ((eeprom->read_bit() << 24) | machine().root_device().ioport("IN0")->read()
+			| ((machine().root_device().ioport("IN2")->read() & 0xbf) << 16)
+			| ((machine().root_device().ioport("IN3")->read() & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
 READ32_MEMBER(backfire_state::backfire_control2_r)
@@ -199,9 +202,10 @@ READ32_MEMBER(backfire_state::backfire_control3_r)
 #endif
 
 
-static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
+WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
 {
-	logerror("%s:write eprom %08x (%08x) %08x\n",device->machine().describe_context(),offset<<1,mem_mask,data);
+	device_t *device = machine().device("eeprom");
+	logerror("%s:write eprom %08x (%08x) %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -296,9 +300,9 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 
 	AM_RANGE(0x184000, 0x185fff) AM_READWRITE(backfire_spriteram1_r, backfire_spriteram1_w)
 	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE(backfire_spriteram2_r, backfire_spriteram2_w)
-	AM_RANGE(0x190000, 0x190003) AM_DEVREAD_LEGACY("eeprom", backfire_eeprom_r)
+	AM_RANGE(0x190000, 0x190003) AM_READ(backfire_eeprom_r)
 	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
-	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE_LEGACY("eeprom", backfire_eeprom_w)
+	AM_RANGE(0x1a4000, 0x1a4003) AM_WRITE(backfire_eeprom_w)
 
 	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_SHARE("left_priority")
 	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_SHARE("right_priority")

@@ -970,6 +970,13 @@ public:
 	UINT8 m_pia0_PA_data;
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
+	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(mux_port_w);
+	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 };
 
 
@@ -1194,47 +1201,43 @@ static PALETTE_INIT( wcrdxtnd )
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-static READ8_DEVICE_HANDLER( goldnpkr_mux_port_r )
+READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
 {
-	goldnpkr_state *state = device->machine().driver_data<goldnpkr_state>();
-	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
+	switch( m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return state->ioport("IN0-0")->read();
-		case 0x20: return state->ioport("IN0-1")->read();
-		case 0x40: return state->ioport("IN0-2")->read();
-		case 0x80: return state->ioport("IN0-3")->read();
+		case 0x10: return ioport("IN0-0")->read();
+		case 0x20: return ioport("IN0-1")->read();
+		case 0x40: return ioport("IN0-2")->read();
+		case 0x80: return ioport("IN0-3")->read();
 	}
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( pottnpkr_mux_port_r )
+READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 {
-	goldnpkr_state *state = device->machine().driver_data<goldnpkr_state>();
 	UINT8 pa_0_4 = 0xff, pa_7;	/* Temporary place holder for bits 0 to 4 & 7 */
 
-	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
+	switch( m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return state->ioport("IN0-0")->read();
-		case 0x20: return state->ioport("IN0-1")->read();
-		case 0x40: return state->ioport("IN0-2")->read();
-		case 0x80: return state->ioport("IN0-3")->read();
+		case 0x10: return ioport("IN0-0")->read();
+		case 0x20: return ioport("IN0-1")->read();
+		case 0x40: return ioport("IN0-2")->read();
+		case 0x80: return ioport("IN0-3")->read();
 	}
 
-	pa_7 = (state->m_pia0_PA_data >> 7) & 1;	/* To do: bit PA5 to pin CB1 */
+	pa_7 = (m_pia0_PA_data >> 7) & 1;	/* To do: bit PA5 to pin CB1 */
 
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
 
-static WRITE8_DEVICE_HANDLER( mux_w )
+WRITE8_MEMBER(goldnpkr_state::mux_w)
 {
-	goldnpkr_state *state = device->machine().driver_data<goldnpkr_state>();
-	state->m_mux_data = data ^ 0xff;	/* inverted */
+	m_mux_data = data ^ 0xff;	/* inverted */
 }
 
-static WRITE8_DEVICE_HANDLER( mux_port_w )
+WRITE8_MEMBER(goldnpkr_state::mux_port_w)
 {
-	goldnpkr_state *state = device->machine().driver_data<goldnpkr_state>();
-	state->m_pia0_PA_data = data;
+	m_pia0_PA_data = data;
 }
 
 
@@ -1242,15 +1245,15 @@ static WRITE8_DEVICE_HANDLER( mux_port_w )
 
 UINT8 wcfalcon_flag = 0;
 
-static WRITE8_DEVICE_HANDLER( wcfalcon_snd_w )
+WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
 	if (wcfalcon_flag == 0)
 	{
-		ay8910_data_address_w(device->machine().device("ay8910"), 0, data);
+		ay8910_data_address_w(machine().device("ay8910"), 0, data);
 	}
 	else
 	{
-		ay8910_data_address_w(device->machine().device("ay8910"), 1, data);
+		ay8910_data_address_w(machine().device("ay8910"), 1, data);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;
@@ -1301,7 +1304,7 @@ static WRITE8_DEVICE_HANDLER( wcfalcon_snd_w )
 
 */
 
-static WRITE8_DEVICE_HANDLER( lamps_a_w )
+WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 {
 	output_set_lamp_value(0, 1 - ((data) & 1));			/* Lamp 0 */
 	output_set_lamp_value(1, 1 - ((data >> 1) & 1));	/* Lamp 1 */
@@ -1309,9 +1312,9 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 	output_set_lamp_value(3, 1 - ((data >> 3) & 1));	/* Lamp 3 */
 	output_set_lamp_value(4, 1 - ((data >> 4) & 1));	/* Lamp 4 */
 
-	coin_counter_w(device->machine(), 0, data & 0x40);	/* counter1 */
-	coin_counter_w(device->machine(), 1, data & 0x80);	/* counter2 */
-	coin_counter_w(device->machine(), 2, data & 0x20);	/* counter3 */
+	coin_counter_w(machine(), 0, data & 0x40);	/* counter1 */
+	coin_counter_w(machine(), 1, data & 0x80);	/* counter2 */
+	coin_counter_w(machine(), 2, data & 0x20);	/* counter3 */
 
 //  popmessage("written : %02X", (0xff - data));
 
@@ -1328,8 +1331,9 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 */
 }
 
-static WRITE8_DEVICE_HANDLER( sound_w )
+WRITE8_MEMBER(goldnpkr_state::sound_w)
 {
+	device_t *device = machine().device("discrete");
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
@@ -3285,14 +3289,14 @@ GFXDECODE_END
 
 static const pia6821_interface goldnpkr_pia0_intf =
 {
-	DEVCB_HANDLER(goldnpkr_mux_port_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,goldnpkr_mux_port_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,lamps_a_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -3307,8 +3311,8 @@ static const pia6821_interface goldnpkr_pia1_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("discrete", sound_w),		/* port A out */
-	DEVCB_HANDLER(mux_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,sound_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -3319,14 +3323,14 @@ static const pia6821_interface goldnpkr_pia1_intf =
 
 static const pia6821_interface pottnpkr_pia0_intf =
 {
-	DEVCB_HANDLER(pottnpkr_mux_port_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,pottnpkr_mux_port_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(mux_port_w),		/* port A out */
-	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_port_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,lamps_a_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -3337,14 +3341,14 @@ static const pia6821_interface pottnpkr_pia0_intf =
 
 static const pia6821_interface wcfalcon_pia0_intf =
 {
-	DEVCB_HANDLER(pottnpkr_mux_port_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,pottnpkr_mux_port_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(mux_port_w),		/* port A out */
-	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_port_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,lamps_a_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -3359,8 +3363,8 @@ static const pia6821_interface wcfalcon_pia1_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(wcfalcon_snd_w),	/* port A out, custom handler due to address + data are muxed */
-	DEVCB_HANDLER(mux_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,wcfalcon_snd_w),	/* port A out, custom handler due to address + data are muxed */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */

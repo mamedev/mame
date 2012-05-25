@@ -68,6 +68,10 @@ public:
 	int polybuffer_ptr;
 
 	POLYENTRY polybuffer[4096];
+	DECLARE_READ64_MEMBER(main_mpc106_r);
+	DECLARE_WRITE64_MEMBER(main_mpc106_w);
+	DECLARE_READ32_MEMBER(sub_ata_r);
+	DECLARE_WRITE32_MEMBER(sub_ata_w);
 };
 
 #if 0
@@ -482,14 +486,16 @@ static void mpc106_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 	COMBINE_DATA(mpc106_regs + (reg/4));
 }
 
-static READ64_DEVICE_HANDLER(main_mpc106_r)
+READ64_MEMBER(cobra_state::main_mpc106_r)
 {
+	device_t *device = machine().device("pcibus");
 	//return pci_64be_r(offset, mem_mask);
 	return pci_64be_r(device, offset, mem_mask);
 }
 
-static WRITE64_DEVICE_HANDLER(main_mpc106_w)
+WRITE64_MEMBER(cobra_state::main_mpc106_w)
 {
+	device_t *device = machine().device("pcibus");
 	//pci_64be_w(offset, data, mem_mask);
 	pci_64be_w(device, offset, data, mem_mask);
 }
@@ -685,7 +691,7 @@ WRITE64_MEMBER(cobra_state::main_comram_w)
 static ADDRESS_MAP_START( cobra_main_map, AS_PROGRAM, 64, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM
-	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVREADWRITE_LEGACY("pcibus", main_mpc106_r, main_mpc106_w)
+	AM_RANGE(0x80000cf8, 0x80000cff) AM_READWRITE(main_mpc106_r, main_mpc106_w)
 	AM_RANGE(0xc0000000, 0xc03fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc0400000, 0xc07fffff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xc7800000, 0xc7bfffff) AM_RAM AM_SHARE("share1")
@@ -887,8 +893,9 @@ WRITE32_MEMBER(cobra_state::sub_config_w)
 
 }
 
-static READ32_DEVICE_HANDLER(sub_ata_r)
+READ32_MEMBER(cobra_state::sub_ata_r)
 {
+	device_t *device = machine().device("ide");
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_16_31)
@@ -905,8 +912,9 @@ static READ32_DEVICE_HANDLER(sub_ata_r)
 	return r;
 }
 
-static WRITE32_DEVICE_HANDLER(sub_ata_w)
+WRITE32_MEMBER(cobra_state::sub_ata_w)
 {
+	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_16_31)
 	{
 		ide_bus_w(device, 0, (offset << 1) + 0, (UINT16)(data >> 24));
@@ -967,7 +975,7 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_sound_r, sub_sound_w)
-	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("ide", sub_ata_r, sub_ata_w)
+	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata_r, sub_ata_w)
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)

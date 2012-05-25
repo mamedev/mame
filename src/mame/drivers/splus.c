@@ -99,6 +99,8 @@ public:
 	DECLARE_READ8_MEMBER(splus_duart_r);
 	DECLARE_READ8_MEMBER(splus_watchdog_r);
 	DECLARE_READ8_MEMBER(splus_registers_r);
+	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
+	DECLARE_READ8_MEMBER(splus_reel_optics_r);
 };
 
 /* Static Variables */
@@ -356,11 +358,11 @@ WRITE8_MEMBER(splus_state::splus_duart_w)
 	// Used for Slot Accounting System Communication
 }
 
-static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
+WRITE8_MEMBER(splus_state::i2c_nvram_w)
 {
-	splus_state *state = device->machine().driver_data<splus_state>();
+	device_t *device = machine().device("i2cmem");
 	i2cmem_scl_write(device,BIT(data, 2));
-	state->m_sda_dir = BIT(data, 1);
+	m_sda_dir = BIT(data, 1);
 	i2cmem_sda_write(device,BIT(data, 0));
 }
 
@@ -540,9 +542,9 @@ READ8_MEMBER(splus_state::splus_registers_r)
 	return 0xff; // Reset Registers in Real Time Clock
 }
 
-static READ8_DEVICE_HANDLER( splus_reel_optics_r )
+READ8_MEMBER(splus_state::splus_reel_optics_r)
 {
-	splus_state *state = device->machine().driver_data<splus_state>();
+	device_t *device = machine().device("i2cmem");
 
 /*
         Bit 0 = REEL #1
@@ -558,9 +560,9 @@ static READ8_DEVICE_HANDLER( splus_reel_optics_r )
 	UINT8 sda = 0;
 
     // Return Reel Positions
-    reel_optics = (optics[199-(state->m_stepper_pos[4])] & 0x10) | (optics[199-(state->m_stepper_pos[3])] & 0x08) | (optics[199-(state->m_stepper_pos[2])] & 0x04) | (optics[199-(state->m_stepper_pos[1])] & 0x02) | (optics[199-(state->m_stepper_pos[0])] & 0x01);
+    reel_optics = (optics[199-(m_stepper_pos[4])] & 0x10) | (optics[199-(m_stepper_pos[3])] & 0x08) | (optics[199-(m_stepper_pos[2])] & 0x04) | (optics[199-(m_stepper_pos[1])] & 0x02) | (optics[199-(m_stepper_pos[0])] & 0x01);
 
-	if(!state->m_sda_dir)
+	if(!m_sda_dir)
 	{
 		sda = i2cmem_sda_read(device);
 	}
@@ -611,7 +613,7 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
     AM_RANGE(0x4001, 0x4001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 
     // Reel Optics, EEPROM
-    AM_RANGE(0x5000, 0x5000) AM_DEVREAD_LEGACY("i2cmem", splus_reel_optics_r) AM_DEVWRITE_LEGACY("i2cmem", i2c_nvram_w)
+    AM_RANGE(0x5000, 0x5000) AM_READ(splus_reel_optics_r) AM_WRITE(i2c_nvram_w)
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)

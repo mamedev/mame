@@ -90,6 +90,7 @@ public:
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 };
 
 
@@ -99,9 +100,9 @@ public:
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
+WRITE_LINE_MEMBER(guab_state::ptm_irq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INT_6840PTM, state);
+	cputag_set_input_line(machine(), "maincpu", INT_6840PTM, state);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -109,7 +110,7 @@ static const ptm6840_interface ptm_intf =
 	1000000,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	DEVCB_LINE(ptm_irq)
+	DEVCB_DRIVER_LINE_MEMBER(guab_state,ptm_irq)
 };
 
 

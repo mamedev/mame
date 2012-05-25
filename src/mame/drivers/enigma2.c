@@ -84,6 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
+	DECLARE_READ8_MEMBER(sound_latch_r);
+	DECLARE_WRITE8_MEMBER(protection_data_w);
 };
 
 
@@ -396,18 +398,16 @@ WRITE8_MEMBER(enigma2_state::sound_data_w)
 }
 
 
-static READ8_DEVICE_HANDLER( sound_latch_r )
+READ8_MEMBER(enigma2_state::sound_latch_r)
 {
-	enigma2_state *state = device->machine().driver_data<enigma2_state>();
-	return BITSWAP8(state->m_sound_latch,0,1,2,3,4,5,6,7);
+	return BITSWAP8(m_sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
-static WRITE8_DEVICE_HANDLER( protection_data_w )
+WRITE8_MEMBER(enigma2_state::protection_data_w)
 {
-	enigma2_state *state = device->machine().driver_data<enigma2_state>();
-	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", device->machine().describe_context(), data);
-	state->m_protection_data = data;
+	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", machine().describe_context(), data);
+	m_protection_data = data;
 }
 
 
@@ -437,10 +437,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(sound_latch_r),
+	DEVCB_DRIVER_MEMBER(enigma2_state,sound_latch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(protection_data_w)
+	DEVCB_DRIVER_MEMBER(enigma2_state,protection_data_w)
 };
 
 

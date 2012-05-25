@@ -62,6 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
 	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
 	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
+	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
 };
 
 
@@ -201,11 +203,10 @@ WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
 	m_layer = data;
 }
 
-static READ8_DEVICE_HANDLER( flipjack_soundlatch_r )
+READ8_MEMBER(flipjack_state::flipjack_soundlatch_r)
 {
-	flipjack_state *state = device->machine().driver_data<flipjack_state>();
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
-	return state->m_soundlatch;
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	return m_soundlatch;
 }
 
 WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
@@ -219,7 +220,7 @@ WRITE8_MEMBER(flipjack_state::flipjack_sound_nmi_ack_w)
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( flipjack_portc_w )
+WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
 {
 	// watchdog?
 }
@@ -344,7 +345,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_INPUT_PORT("P2"),				/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_INPUT_PORT("P3"),				/* Port C read */
-	DEVCB_HANDLER(flipjack_portc_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_portc_w)		/* Port C write */
 };
 
 
@@ -352,7 +353,7 @@ static AY8910_INTERFACE( ay8910_config_1 )
 {
 	AY8910_LEGACY_OUTPUT,					/* Flags */
 	AY8910_DEFAULT_LOADS,					/* Load on channel in ohms */
-	DEVCB_HANDLER(flipjack_soundlatch_r),	/* Port A read */
+	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_soundlatch_r),	/* Port A read */
 	DEVCB_NULL,								/* Port B read */
 	DEVCB_NULL,								/* Port A write */
 	DEVCB_NULL								/* Port B write */

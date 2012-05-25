@@ -125,6 +125,8 @@ public:
 	sg1000a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
 };
 
 
@@ -234,21 +236,21 @@ static INPUT_PORTS_START( dokidoki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(sg1000a_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, state);
 }
 
 static TMS9928A_INTERFACE(sg1000a_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(sg1000a_state,vdp_interrupt)
 };
 
-static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
+WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 {
-	coin_counter_w(device->machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 0, data & 0x01);
 }
 
 static I8255_INTERFACE( ppi8255_intf )
@@ -258,7 +260,7 @@ static I8255_INTERFACE( ppi8255_intf )
 	DEVCB_INPUT_PORT("P2"),
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_HANDLER(sg1000a_coin_counter_w)
+	DEVCB_DRIVER_MEMBER(sg1000a_state,sg1000a_coin_counter_w)
 };
 
 /*************************************

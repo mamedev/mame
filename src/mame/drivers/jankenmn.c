@@ -152,6 +152,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(jankenmn_hopper_status_r);
+	DECLARE_WRITE8_MEMBER(jankenmn_lamps1_w);
+	DECLARE_WRITE8_MEMBER(jankenmn_lamps2_w);
+	DECLARE_WRITE8_MEMBER(jankenmn_lamps3_w);
 };
 
 
@@ -162,7 +165,7 @@ public:
 static const UINT8 led_map[16] = // 7748 IC?
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-static WRITE8_DEVICE_HANDLER( jankenmn_lamps1_w )
+WRITE8_MEMBER(jankenmn_state::jankenmn_lamps1_w)
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
 	output_set_lamp_value(8, (data & 7) != 0);
@@ -178,7 +181,7 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps1_w )
 	// d3: ? (only set if game is over)
 }
 
-static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
+WRITE8_MEMBER(jankenmn_state::jankenmn_lamps2_w)
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
 	output_set_lamp_value(2, data >> 3 & 1);
@@ -197,20 +200,20 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 	output_set_digit_value(0, led_map[data & 1]);
 }
 
-static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
+WRITE8_MEMBER(jankenmn_state::jankenmn_lamps3_w)
 {
 	// d1: blue rotating lamp on top of cab
 	output_set_lamp_value(15, data >> 1 & 1);
 
 	// d2: payout (waits for hopper status)
-	coin_counter_w(device->machine(), 2, data & 0x04);
+	coin_counter_w(machine(), 2, data & 0x04);
 
 	// d3: right multiplier lamp(2), d4: left multiplier lamp(1)
 	output_set_lamp_value(0, data >> 4 & 1);
 	output_set_lamp_value(1, data >> 3 & 1);
 
 	// d5: assume coin lockout
-	coin_lockout_global_w(device->machine(), ~data & 0x20);
+	coin_lockout_global_w(machine(), ~data & 0x20);
 
 	// d0, d6, d7: N/C?
 }
@@ -316,7 +319,7 @@ static I8255_INTERFACE (ppi8255_intf_0)
 	DEVCB_INPUT_PORT("IN0"),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(jankenmn_lamps3_w)
+	DEVCB_DRIVER_MEMBER(jankenmn_state,jankenmn_lamps3_w)
 };
 
 static I8255_INTERFACE (ppi8255_intf_1)
@@ -325,9 +328,9 @@ static I8255_INTERFACE (ppi8255_intf_1)
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("dac", dac_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(jankenmn_lamps1_w),
+	DEVCB_DRIVER_MEMBER(jankenmn_state,jankenmn_lamps1_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(jankenmn_lamps2_w)
+	DEVCB_DRIVER_MEMBER(jankenmn_state,jankenmn_lamps2_w)
 };
 
 

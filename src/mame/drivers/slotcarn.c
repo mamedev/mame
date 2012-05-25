@@ -46,6 +46,8 @@ public:
 	UINT8 *m_ram_palette;
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 };
 
 
@@ -152,15 +154,15 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER(hsync_changed)
+WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
 {
 	/* update any video up to the current scanline */
-	device->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 }
 
-static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
+WRITE_LINE_MEMBER(slotcarn_state::vsync_changed)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -172,8 +174,8 @@ static const mc6845_interface mc6845_intf =
 	NULL,						/* after pixel update callback */
 	DEVCB_NULL,					/* callback for display state changes */
 	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_LINE(hsync_changed),	/* HSYNC callback */
-	DEVCB_LINE(vsync_changed),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(slotcarn_state,hsync_changed),	/* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(slotcarn_state,vsync_changed),	/* VSYNC callback */
 	NULL						/* update address callback */
 };
 

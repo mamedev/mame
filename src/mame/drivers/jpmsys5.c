@@ -79,6 +79,21 @@ public:
 	DECLARE_WRITE16_MEMBER(mux_w);
 	DECLARE_READ16_MEMBER(mux_r);
 	DECLARE_INPUT_CHANGED_MEMBER(touchscreen_press);
+	DECLARE_WRITE16_MEMBER(jpm_upd7759_w);
+	DECLARE_READ16_MEMBER(jpm_upd7759_r);
+	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	DECLARE_WRITE8_MEMBER(u26_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(acia_irq);
+	DECLARE_READ_LINE_MEMBER(a0_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(a0_tx_w);
+	DECLARE_READ_LINE_MEMBER(a0_dcd_r);
+	DECLARE_READ_LINE_MEMBER(a1_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(a1_tx_w);
+	DECLARE_READ_LINE_MEMBER(a1_dcd_r);
+	DECLARE_READ_LINE_MEMBER(a2_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
+	DECLARE_READ_LINE_MEMBER(a2_dcd_r);
+	void sys5_draw_lamps();
 };
 
 
@@ -230,14 +245,14 @@ static SCREEN_UPDATE_RGB32( jpmsys5v )
 	return 0;
 }
 
-static void sys5_draw_lamps(jpmsys5_state *state)
+void jpmsys5_state::sys5_draw_lamps()
 {
 	int i;
 	for (i = 0; i <8; i++)
 	{
-		output_set_lamp_value( (16*state->m_lamp_strobe)+i,  (state->m_muxram[(4*state->m_lamp_strobe)] & (1 << i)) !=0);
-		output_set_lamp_value((16*state->m_lamp_strobe)+i+8, (state->m_muxram[(4*state->m_lamp_strobe) +1 ] & (1 << i)) !=0);
-		output_set_indexed_value("sys5led",(8*state->m_lamp_strobe)+i,(state->m_muxram[(4*state->m_lamp_strobe) +2 ] & (1 << i)) !=0);
+		output_set_lamp_value( (16*m_lamp_strobe)+i,  (m_muxram[(4*m_lamp_strobe)] & (1 << i)) !=0);
+		output_set_lamp_value((16*m_lamp_strobe)+i+8, (m_muxram[(4*m_lamp_strobe) +1 ] & (1 << i)) !=0);
+		output_set_indexed_value("sys5led",(8*m_lamp_strobe)+i,(m_muxram[(4*m_lamp_strobe) +2 ] & (1 << i)) !=0);
 	}
 }
 
@@ -285,8 +300,9 @@ READ16_MEMBER(jpmsys5_state::mux_r)
 	return 0xffff;
 }
 
-static WRITE16_DEVICE_HANDLER( jpm_upd7759_w )
+WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 {
+	device_t *device = machine().device("upd7759");
 	if (offset == 0)
 	{
 		upd7759_port_w(device, 0, data & 0xff);
@@ -300,12 +316,13 @@ static WRITE16_DEVICE_HANDLER( jpm_upd7759_w )
 	}
 	else
 	{
-		logerror("%s: upd7759: Unknown write to %x with %x\n", device->machine().describe_context(),  offset, data);
+		logerror("%s: upd7759: Unknown write to %x with %x\n", machine().describe_context(),  offset, data);
 	}
 }
 
-static READ16_DEVICE_HANDLER( jpm_upd7759_r )
+READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
 {
+	device_t *device = machine().device("upd7759");
 	return 0x14 | upd7759_busy_r(device);
 }
 
@@ -340,7 +357,7 @@ static ADDRESS_MAP_START( 68000_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x0460e0, 0x0460e5) AM_WRITE(ramdac_w)
 	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w)
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
-	AM_RANGE(0x04c100, 0x04c105) AM_DEVREADWRITE_LEGACY("upd7759", jpm_upd7759_r, jpm_upd7759_w)
+	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w)
 	AM_RANGE(0x800000, 0xcfffff) AM_READWRITE(sys5_tms34061_r, sys5_tms34061_w)
 ADDRESS_MAP_END
 
@@ -497,27 +514,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
+WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER(u26_o1_callback)
+WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	if (state->m_mpxclk !=data)
+	if (m_mpxclk !=data)
 	{
 		if (!data) //falling edge
 		{
-			state->m_lamp_strobe++;
-			if (state->m_lamp_strobe >15)
+			m_lamp_strobe++;
+			if (m_lamp_strobe >15)
 			{
-				state->m_lamp_strobe =0;
+				m_lamp_strobe =0;
 			}
 		}
-		sys5_draw_lamps(state);
+		sys5_draw_lamps();
 	}
-	state->m_mpxclk = data;
+	m_mpxclk = data;
 }
 
 
@@ -525,8 +541,8 @@ static const ptm6840_interface ptm_intf =
 {
 	1000000,
 	{ 0, 0, 0 },
-	{ DEVCB_HANDLER(u26_o1_callback), DEVCB_NULL, DEVCB_NULL },
-	DEVCB_LINE(ptm_irq)
+	{ DEVCB_DRIVER_MEMBER(jpmsys5_state,u26_o1_callback), DEVCB_NULL, DEVCB_NULL },
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,ptm_irq)
 };
 
 
@@ -536,101 +552,92 @@ static const ptm6840_interface ptm_intf =
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( acia_irq )
+WRITE_LINE_MEMBER(jpmsys5_state::acia_irq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Clocks are incorrect */
 
-static READ_LINE_DEVICE_HANDLER( a0_rx_r )
+READ_LINE_MEMBER(jpmsys5_state::a0_rx_r)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	return state->m_a0_data_in;
+	return m_a0_data_in;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( a0_tx_w )
+WRITE_LINE_MEMBER(jpmsys5_state::a0_tx_w)
 {
-	jpmsys5_state *drvstate = device->machine().driver_data<jpmsys5_state>();
-	drvstate->m_a0_data_out = state;
+	m_a0_data_out = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( a0_dcd_r )
+READ_LINE_MEMBER(jpmsys5_state::a0_dcd_r)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	return state->m_a0_acia_dcd;
+	return m_a0_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia0_if )
 {
 	10000,
 	10000,
-	DEVCB_LINE(a0_rx_r), /*&a0_data_in,*/
-	DEVCB_LINE(a0_tx_w), /*&a0_data_out,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a0_rx_r), /*&a0_data_in,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a0_tx_w), /*&a0_data_out,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(a0_dcd_r), /*&a0_acia_dcd,*/
-	DEVCB_LINE(acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a0_dcd_r), /*&a0_acia_dcd,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,acia_irq)
 };
 
-static READ_LINE_DEVICE_HANDLER( a1_rx_r )
+READ_LINE_MEMBER(jpmsys5_state::a1_rx_r)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	return state->m_a1_data_in;
+	return m_a1_data_in;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( a1_tx_w )
+WRITE_LINE_MEMBER(jpmsys5_state::a1_tx_w)
 {
-	jpmsys5_state *drvstate = device->machine().driver_data<jpmsys5_state>();
-	drvstate->m_a1_data_out = state;
+	m_a1_data_out = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( a1_dcd_r )
+READ_LINE_MEMBER(jpmsys5_state::a1_dcd_r)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	return state->m_a1_acia_dcd;
+	return m_a1_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia1_if )
 {
 	10000,
 	10000,
-	DEVCB_LINE(a1_rx_r), /*&state->m_a1_data_in,*/
-	DEVCB_LINE(a1_tx_w), /*&state->m_a1_data_out,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a1_rx_r), /*&state->m_a1_data_in,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a1_tx_w), /*&state->m_a1_data_out,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(a1_dcd_r), /*&state->m_a1_acia_dcd,*/
-	DEVCB_LINE(acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a1_dcd_r), /*&state->m_a1_acia_dcd,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,acia_irq)
 };
 
-static READ_LINE_DEVICE_HANDLER( a2_rx_r )
+READ_LINE_MEMBER(jpmsys5_state::a2_rx_r)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	return state->m_a2_data_in;
+	return m_a2_data_in;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( a2_tx_w )
+WRITE_LINE_MEMBER(jpmsys5_state::a2_tx_w)
 {
-	jpmsys5_state *drvstate = device->machine().driver_data<jpmsys5_state>();
-	drvstate->m_a2_data_out = state;
+	m_a2_data_out = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( a2_dcd_r )
+READ_LINE_MEMBER(jpmsys5_state::a2_dcd_r)
 {
-	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
-	return state->m_a2_acia_dcd;
+	return m_a2_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia2_if )
 {
 	10000,
 	10000,
-	DEVCB_LINE(a2_rx_r), /*&state->m_a2_data_in,*/
-	DEVCB_LINE(a2_tx_w), /*&state->m_a2_data_out,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a2_rx_r), /*&state->m_a2_data_in,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a2_tx_w), /*&state->m_a2_data_out,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(a2_dcd_r), /*&state->m_a2_acia_dcd,*/
-	DEVCB_LINE(acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a2_dcd_r), /*&state->m_a2_acia_dcd,*/
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,acia_irq)
 };
 
 
@@ -722,7 +729,7 @@ static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP
 	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w)
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
-	AM_RANGE(0x04c100, 0x04c105) AM_DEVREADWRITE_LEGACY("upd7759", jpm_upd7759_r, jpm_upd7759_w)
+	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w)
 ADDRESS_MAP_END
 
 /*************************************

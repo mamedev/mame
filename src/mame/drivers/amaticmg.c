@@ -437,6 +437,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(out_a_w);
+	DECLARE_WRITE8_MEMBER(out_c_w);
 };
 
 
@@ -557,7 +559,7 @@ WRITE8_MEMBER( amaticmg_state::nmi_mask_w )
 	m_nmi_mask = (data & 1) ^ 1;
 }
 
-static WRITE8_DEVICE_HANDLER(out_a_w)
+WRITE8_MEMBER(amaticmg_state::out_a_w)
 {
 /*  LAMPS A:
 
@@ -577,7 +579,7 @@ static WRITE8_DEVICE_HANDLER(out_a_w)
 	logerror("port A: %2X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(out_c_w)
+WRITE8_MEMBER(amaticmg_state::out_c_w)
 {
 /*  LAMPS B:
 
@@ -813,11 +815,11 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 static I8255A_INTERFACE( ppi8255_intf_1 )
 {
 	DEVCB_NULL,						/* Port A read */
-	DEVCB_HANDLER(out_a_w),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(amaticmg_state,out_a_w),			/* Port A write */
 	DEVCB_INPUT_PORT("SW1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(out_c_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(amaticmg_state,out_c_w)			/* Port C write */
 };
 
 static MACHINE_START( amaticmg )

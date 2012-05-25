@@ -179,6 +179,7 @@ public:
 	DECLARE_WRITE16_MEMBER(wh2_w);
 	DECLARE_WRITE8_MEMBER(ramdac_io_w);
 	DECLARE_READ8_MEMBER(h63484_rom_r);
+	DECLARE_READ8_MEMBER(t2_r);
 };
 
 
@@ -426,20 +427,20 @@ WRITE16_MEMBER(adp_state::wh2_w)
 	m_register_active = data;
 }
 
-static READ8_DEVICE_HANDLER(t2_r)
+READ8_MEMBER(adp_state::t2_r)
 {
 	UINT8 res;
 	int h,w;
 	res = 0;
-	h = device->machine().primary_screen->height();
-	w = device->machine().primary_screen->width();
+	h = machine().primary_screen->height();
+	w = machine().primary_screen->width();
 
 //  popmessage("%d %d",h,w);
 
-	if (device->machine().primary_screen->hpos() > h)
+	if (machine().primary_screen->hpos() > h)
 		res|= 0x20; //hblank
 
-	if (device->machine().primary_screen->vpos() > w)
+	if (machine().primary_screen->vpos() > w)
 		res|= 0x40; //vblank
 
 	return res;
@@ -629,7 +630,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(t2_r),
+	DEVCB_DRIVER_MEMBER(adp_state,t2_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

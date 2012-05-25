@@ -342,6 +342,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output1_w);
 	DECLARE_WRITE8_MEMBER(output2_w);
 	DECLARE_READ8_MEMBER(qc_b8_r);
+	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 };
 
 
@@ -847,10 +848,9 @@ static SCREEN_UPDATE_IND16( dwarfd )
 	return 0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( dwarfd_sod_callback )
+WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
 {
-	dwarfd_state *driver_state = device->machine().driver_data<dwarfd_state>();
-	driver_state->m_crt_access = state;
+	m_crt_access = state;
 }
 
 
@@ -859,7 +859,7 @@ static I8085_CONFIG( dwarfd_i8085_config )
 	DEVCB_NULL,						/* STATUS changed callback */
 	DEVCB_NULL,						/* INTE changed callback */
 	DEVCB_NULL,						/* SID changed callback (8085A only) */
-	DEVCB_LINE(dwarfd_sod_callback)	/* SOD changed callback (8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(dwarfd_state,dwarfd_sod_callback)	/* SOD changed callback (8085A only) */
 };
 
 

@@ -344,6 +344,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	DECLARE_WRITE8_MEMBER(wc_meters_w);
 	void blitter_execute(int x, int y, int color, int width, int flag);
+	DECLARE_WRITE8_MEMBER(ay_port_a_out);
+	DECLARE_WRITE8_MEMBER(ay_port_b_out);
 };
 
 
@@ -565,12 +567,12 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
 //  popmessage("meters: %02x", (data ^ 0xff));
 }
 
-static WRITE8_DEVICE_HANDLER(ay_port_a_out)
+WRITE8_MEMBER(corona_state::ay_port_a_out)
 {
 	logerror("AY port A write: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(ay_port_b_out)
+WRITE8_MEMBER(corona_state::ay_port_b_out)
 {
 	logerror("AY port B write: %02X\n", data);
 }
@@ -1341,8 +1343,8 @@ static const ay8910_interface aysnd_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,						/* Port A read */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(ay_port_a_out),	/* Port A write */
-	DEVCB_HANDLER(ay_port_b_out)	/* Port B write */
+	DEVCB_DRIVER_MEMBER(corona_state,ay_port_a_out),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(corona_state,ay_port_b_out)	/* Port B write */
 };
 
 

@@ -212,6 +212,8 @@ public:
 	DECLARE_WRITE8_MEMBER(multfish_f3_w);
 	DECLARE_WRITE8_MEMBER(multfish_dispenable_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(multfish_hopper_r);
+	DECLARE_READ8_MEMBER(multfish_timekeeper_r);
+	DECLARE_WRITE8_MEMBER(multfish_timekeeper_w);
 };
 
 static TILE_GET_INFO( get_multfish_tile_info )
@@ -336,13 +338,15 @@ WRITE8_MEMBER(multfish_state::multfish_bank_w)
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-static READ8_DEVICE_HANDLER( multfish_timekeeper_r )
+READ8_MEMBER(multfish_state::multfish_timekeeper_r)
 {
+	device_t *device = machine().device("m48t35");
 	return timekeeper_r(device, offset + 0x6000);
 }
 
-static WRITE8_DEVICE_HANDLER( multfish_timekeeper_w )
+WRITE8_MEMBER(multfish_state::multfish_timekeeper_w)
 {
+	device_t *device = machine().device("m48t35");
 	timekeeper_w(device, offset + 0x6000, data);
 }
 
@@ -681,7 +685,7 @@ DRIVER_INIT( lhauntent )
 static ADDRESS_MAP_START( multfish_map, AS_PROGRAM, 8, multfish_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE(multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("m48t35", multfish_timekeeper_r, multfish_timekeeper_w)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(multfish_timekeeper_r, multfish_timekeeper_w)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
 ADDRESS_MAP_END
 

@@ -124,6 +124,12 @@ public:
 	DECLARE_READ8_MEMBER(signature_r);
 	DECLARE_WRITE8_MEMBER(signature_w);
 	DECLARE_WRITE8_MEMBER(signature2_w);
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(sound2_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE8_MEMBER(nmi_w);
+	DECLARE_READ8_MEMBER(portC_r);
 };
 
 
@@ -186,74 +192,68 @@ UINT32 gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( lamps_w )
+WRITE8_MEMBER(gei_state::lamps_w)
 {
 	/* 5 button lamps */
-	set_led_status(device->machine(), 0,data & 0x01);
-	set_led_status(device->machine(), 1,data & 0x02);
-	set_led_status(device->machine(), 2,data & 0x04);
-	set_led_status(device->machine(), 3,data & 0x08);
-	set_led_status(device->machine(), 4,data & 0x10);
+	set_led_status(machine(), 0,data & 0x01);
+	set_led_status(machine(), 1,data & 0x02);
+	set_led_status(machine(), 2,data & 0x04);
+	set_led_status(machine(), 3,data & 0x08);
+	set_led_status(machine(), 4,data & 0x10);
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
     lamp order verified in poker and selection self tests */
-	set_led_status(device->machine(), 7,data & 0x20);
-	set_led_status(device->machine(), 5,data & 0x40);
-	set_led_status(device->machine(), 6,data & 0x80);
+	set_led_status(machine(), 7,data & 0x20);
+	set_led_status(machine(), 5,data & 0x40);
+	set_led_status(machine(), 6,data & 0x80);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_w )
+WRITE8_MEMBER(gei_state::sound_w)
 {
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	gei_state *state = space->machine().driver_data<gei_state>();
-
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
-	coin_lockout_global_w(device->machine(), ~data & 0x08);
-	set_led_status(device->machine(), 9,data & 0x08);
+	coin_lockout_global_w(machine(), ~data & 0x08);
+	set_led_status(machine(), 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, (data & 0x20)<< 2);
+	machine().device<ticket_dispenser_device>("ticket")->write(*machine().memory().first_space(), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	state->m_nmi_mask = data & 0x40;
+	m_nmi_mask = data & 0x40;
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(device->machine().device("dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(machine().device("dac"), ((data & 0x80) >> 7) * 255);
 }
 
-static WRITE8_DEVICE_HANDLER( sound2_w )
+WRITE8_MEMBER(gei_state::sound2_w)
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
-	coin_lockout_w(device->machine(), 0, ~data & 0x08);
-	coin_lockout_w(device->machine(), 1, ~data & 0x40);
-	set_led_status(device->machine(), 9,data & 0x08);
-	set_led_status(device->machine(), 10,data & 0x40);
+	coin_lockout_w(machine(), 0, ~data & 0x08);
+	coin_lockout_w(machine(), 1, ~data & 0x40);
+	set_led_status(machine(), 9,data & 0x08);
+	set_led_status(machine(), 10,data & 0x40);
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
     12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	set_led_status(device->machine(), 11,data & 0x10);
-	set_led_status(device->machine(), 12,data & 0x20);
+	set_led_status(machine(), 11,data & 0x10);
+	set_led_status(machine(), 12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(device->machine().device("dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(machine().device("dac"), ((data & 0x80) >> 7) * 255);
 }
 
-static WRITE8_DEVICE_HANDLER( lamps2_w )
+WRITE8_MEMBER(gei_state::lamps2_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	set_led_status(device->machine(), 8,data & 0x10);
+	set_led_status(machine(), 8,data & 0x10);
 }
 
-static WRITE8_DEVICE_HANDLER( nmi_w )
+WRITE8_MEMBER(gei_state::nmi_w)
 {
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	gei_state *state = space->machine().driver_data<gei_state>();
-
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	set_led_status(device->machine(), 8,data & 0x10);
+	set_led_status(machine(), 8,data & 0x10);
 
 	/* bit 6 enables NMI */
-	state->m_nmi_mask = data & 0x40;
+	m_nmi_mask = data & 0x40;
 }
 
 READ8_MEMBER(gei_state::catchall)
@@ -266,7 +266,7 @@ READ8_MEMBER(gei_state::catchall)
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( portC_r )
+READ8_MEMBER(gei_state::portC_r)
 {
 	return 4;
 }
@@ -1057,7 +1057,7 @@ static I8255A_INTERFACE( getrivia_ppi8255_0_intf )
 	DEVCB_INPUT_PORT("IN0"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(sound_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(gei_state,sound_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( getrivia_ppi8255_1_intf )
@@ -1065,9 +1065,9 @@ static I8255A_INTERFACE( getrivia_ppi8255_1_intf )
 	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
 	DEVCB_NULL,						/* Port A write */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(lamps_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(gei_state,lamps_w),			/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(lamps2_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(gei_state,lamps2_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( gselect_ppi8255_0_intf )
@@ -1077,7 +1077,7 @@ static I8255A_INTERFACE( gselect_ppi8255_0_intf )
 	DEVCB_INPUT_PORT("IN0"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(sound2_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(gei_state,sound2_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( gselect_ppi8255_1_intf )
@@ -1085,9 +1085,9 @@ static I8255A_INTERFACE( gselect_ppi8255_1_intf )
 	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
 	DEVCB_NULL,						/* Port A write */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(lamps_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(gei_state,lamps_w),			/* Port B write */
 	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_HANDLER(nmi_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(gei_state,nmi_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( findout_ppi8255_1_intf )
@@ -1095,8 +1095,8 @@ static I8255A_INTERFACE( findout_ppi8255_1_intf )
 	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
 	DEVCB_NULL,						/* Port A write */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(lamps_w),			/* Port B write */
-	DEVCB_HANDLER(portC_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(gei_state,lamps_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(gei_state,portC_r),			/* Port C read */
 	DEVCB_NULL						/* Port C write */
 };
 

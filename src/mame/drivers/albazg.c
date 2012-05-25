@@ -69,6 +69,9 @@ public:
 	DECLARE_READ8_MEMBER(custom_ram_r);
 	DECLARE_WRITE8_MEMBER(custom_ram_w);
 	DECLARE_WRITE8_MEMBER(prot_lock_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
 };
 
 static TILE_GET_INFO( y_get_bg_tile_info )
@@ -149,50 +152,47 @@ WRITE8_MEMBER(albazg_state::prot_lock_w)
 	m_prot_lock = data;
 }
 
-static READ8_DEVICE_HANDLER( mux_r )
+READ8_MEMBER(albazg_state::mux_r)
 {
-	albazg_state *state = device->machine().driver_data<albazg_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x00: return state->ioport("IN0")->read();
-		case 0x01: return state->ioport("IN1")->read();
-		case 0x02: return state->ioport("IN2")->read();
-		case 0x04: return state->ioport("IN3")->read();
-		case 0x08: return state->ioport("IN4")->read();
-		case 0x10: return state->ioport("IN5")->read();
-		case 0x20: return state->ioport("IN6")->read();
+		case 0x00: return ioport("IN0")->read();
+		case 0x01: return ioport("IN1")->read();
+		case 0x02: return ioport("IN2")->read();
+		case 0x04: return ioport("IN3")->read();
+		case 0x08: return ioport("IN4")->read();
+		case 0x10: return ioport("IN5")->read();
+		case 0x20: return ioport("IN6")->read();
 	}
 
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( mux_w )
+WRITE8_MEMBER(albazg_state::mux_w)
 {
-	albazg_state *state = device->machine().driver_data<albazg_state>();
 	int new_bank = (data & 0xc0) >> 6;
 
 	//0x10000 "Learn Mode"
 	//0x12000 gameplay
 	//0x14000 bonus game
 	//0x16000 ?
-	if( state->m_bank != new_bank)
+	if( m_bank != new_bank)
 	{
-		state->m_bank = new_bank;
-		state->membank("bank1")->set_entry(state->m_bank);
+		m_bank = new_bank;
+		membank("bank1")->set_entry(m_bank);
 	}
 
-	state->m_mux_data = data & ~0xc0;
+	m_mux_data = data & ~0xc0;
 }
 
-static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
+WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 {
-	albazg_state *state = device->machine().driver_data<albazg_state>();
-	coin_counter_w(device->machine(), 0, ~data & 4);
-	coin_counter_w(device->machine(), 1, ~data & 2);
-	coin_lockout_global_w(device->machine(), data & 1);
+	coin_counter_w(machine(), 0, ~data & 4);
+	coin_counter_w(machine(), 1, ~data & 2);
+	coin_lockout_global_w(machine(), data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
-	state->flip_screen_set(~data & 0x20);
+	flip_screen_set(~data & 0x20);
 }
 
 static const ay8910_interface ay8910_config =
@@ -201,7 +201,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW1"),
 	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_HANDLER(yumefuda_output_w),
+	DEVCB_DRIVER_MEMBER(albazg_state,yumefuda_output_w),
 	DEVCB_NULL
 };
 
@@ -222,10 +222,10 @@ static const mc6845_interface mc6845_intf =
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,						/* Port A read */
-	DEVCB_HANDLER(mux_w),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(albazg_state,mux_w),			/* Port A write */
 	DEVCB_INPUT_PORT("SYSTEM"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
-	DEVCB_HANDLER(mux_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(albazg_state,mux_r),			/* Port C read */
 	DEVCB_NULL						/* Port C write */
 };
 

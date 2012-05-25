@@ -188,6 +188,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mjvegasa_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(mjvegasa_12400_w);
 	DECLARE_READ8_MEMBER(mjvegasa_12500_r);
+	DECLARE_READ8_MEMBER(royalmah_player_1_port_r);
+	DECLARE_READ8_MEMBER(royalmah_player_2_port_r);
+	DECLARE_WRITE_LINE_MEMBER(janptr96_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
 };
 
 
@@ -323,30 +327,28 @@ WRITE8_MEMBER(royalmah_state::input_port_select_w)
 	m_input_port_select = data;
 }
 
-static READ8_DEVICE_HANDLER( royalmah_player_1_port_r )
+READ8_MEMBER(royalmah_state::royalmah_player_1_port_r)
 {
-	royalmah_state *state = device->machine().driver_data<royalmah_state>();
-	int ret = (state->ioport("KEY0")->read() & 0xc0) | 0x3f;
+	int ret = (ioport("KEY0")->read() & 0xc0) | 0x3f;
 
-	if ((state->m_input_port_select & 0x01) == 0)  ret &= state->ioport("KEY0")->read();
-	if ((state->m_input_port_select & 0x02) == 0)  ret &= state->ioport("KEY1")->read();
-	if ((state->m_input_port_select & 0x04) == 0)  ret &= state->ioport("KEY2")->read();
-	if ((state->m_input_port_select & 0x08) == 0)  ret &= state->ioport("KEY3")->read();
-	if ((state->m_input_port_select & 0x10) == 0)  ret &= state->ioport("KEY4")->read();
+	if ((m_input_port_select & 0x01) == 0)  ret &= ioport("KEY0")->read();
+	if ((m_input_port_select & 0x02) == 0)  ret &= ioport("KEY1")->read();
+	if ((m_input_port_select & 0x04) == 0)  ret &= ioport("KEY2")->read();
+	if ((m_input_port_select & 0x08) == 0)  ret &= ioport("KEY3")->read();
+	if ((m_input_port_select & 0x10) == 0)  ret &= ioport("KEY4")->read();
 
 	return ret;
 }
 
-static READ8_DEVICE_HANDLER( royalmah_player_2_port_r )
+READ8_MEMBER(royalmah_state::royalmah_player_2_port_r)
 {
-	royalmah_state *state = device->machine().driver_data<royalmah_state>();
-	int ret = (state->ioport("KEY5")->read() & 0xc0) | 0x3f;
+	int ret = (ioport("KEY5")->read() & 0xc0) | 0x3f;
 
-	if ((state->m_input_port_select & 0x01) == 0)  ret &= state->ioport("KEY5")->read();
-	if ((state->m_input_port_select & 0x02) == 0)  ret &= state->ioport("KEY6")->read();
-	if ((state->m_input_port_select & 0x04) == 0)  ret &= state->ioport("KEY7")->read();
-	if ((state->m_input_port_select & 0x08) == 0)  ret &= state->ioport("KEY8")->read();
-	if ((state->m_input_port_select & 0x10) == 0)  ret &= state->ioport("KEY9")->read();
+	if ((m_input_port_select & 0x01) == 0)  ret &= ioport("KEY5")->read();
+	if ((m_input_port_select & 0x02) == 0)  ret &= ioport("KEY6")->read();
+	if ((m_input_port_select & 0x04) == 0)  ret &= ioport("KEY7")->read();
+	if ((m_input_port_select & 0x08) == 0)  ret &= ioport("KEY8")->read();
+	if ((m_input_port_select & 0x10) == 0)  ret &= ioport("KEY9")->read();
 
 	return ret;
 }
@@ -3153,8 +3155,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(royalmah_player_1_port_r),
-	DEVCB_HANDLER(royalmah_player_2_port_r)
+	DEVCB_DRIVER_MEMBER(royalmah_state,royalmah_player_1_port_r),
+	DEVCB_DRIVER_MEMBER(royalmah_state,royalmah_player_2_port_r)
 };
 
 static MACHINE_CONFIG_START( royalmah, royalmah_state )
@@ -3297,16 +3299,14 @@ static TIMER_DEVICE_CALLBACK( janptr96_interrupt )
 		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x84);	// demo
 }
 
-static WRITE_LINE_DEVICE_HANDLER(janptr96_rtc_irq)
+WRITE_LINE_MEMBER(royalmah_state::janptr96_rtc_irq)
 {
-	royalmah_state *drvstate = device->machine().driver_data<royalmah_state>();
-
-	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0x82);	// rtc
+	device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0x82);	// rtc
 }
 
 static MSM6242_INTERFACE( janptr96_rtc_intf )
 {
-	DEVCB_LINE(janptr96_rtc_irq)
+	DEVCB_DRIVER_LINE_MEMBER(royalmah_state,janptr96_rtc_irq)
 };
 
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
@@ -3354,17 +3354,15 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);	// vblank
 }
 
-static WRITE_LINE_DEVICE_HANDLER(mjtensin_rtc_irq)
+WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
 {
-	royalmah_state *drvstate = device->machine().driver_data<royalmah_state>();
-
-	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);	// rtc
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);	// rtc
 }
 
 
 static MSM6242_INTERFACE( mjtensin_rtc_intf )
 {
-	DEVCB_LINE(mjtensin_rtc_irq)
+	DEVCB_DRIVER_LINE_MEMBER(royalmah_state,mjtensin_rtc_irq)
 };
 
 

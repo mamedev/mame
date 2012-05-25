@@ -121,10 +121,19 @@ public:
 	DECLARE_READ16_MEMBER(toyland_speedup_r);
 	DECLARE_READ16_MEMBER(boonggab_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
+	DECLARE_READ16_MEMBER(eeprom_r);
+	DECLARE_READ32_MEMBER(eeprom32_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE32_MEMBER(eeprom32_w);
+	DECLARE_WRITE32_MEMBER(finalgdr_eeprom_w);
+	DECLARE_WRITE32_MEMBER(finalgdr_oki_bank_w);
+	DECLARE_WRITE32_MEMBER(aoh_oki_bank_w);
+	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
 };
 
-static READ16_DEVICE_HANDLER( eeprom_r )
+READ16_MEMBER(vamphalf_state::eeprom_r)
 {
+	device_t *device = machine().device("eeprom");
 	if(offset)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -134,14 +143,16 @@ static READ16_DEVICE_HANDLER( eeprom_r )
 		return 0;
 }
 
-static READ32_DEVICE_HANDLER( eeprom32_r )
+READ32_MEMBER(vamphalf_state::eeprom32_r)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	return eeprom->read_bit();
 }
 
-static WRITE16_DEVICE_HANDLER( eeprom_w )
+WRITE16_MEMBER(vamphalf_state::eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if(offset)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -153,16 +164,18 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 	}
 }
 
-static WRITE32_DEVICE_HANDLER( eeprom32_w )
+WRITE32_MEMBER(vamphalf_state::eeprom32_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data & 0x01);
 	eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
 	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE32_DEVICE_HANDLER( finalgdr_eeprom_w )
+WRITE32_MEMBER(vamphalf_state::finalgdr_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data & 0x4000);
 	eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
@@ -235,8 +248,9 @@ F94B
 	m_semicom_prot_idx = 8;
 }
 
-static WRITE32_DEVICE_HANDLER( finalgdr_oki_bank_w )
+WRITE32_MEMBER(vamphalf_state::finalgdr_oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data & 0x300) >> 8));
 }
 
@@ -273,13 +287,15 @@ WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
 	}
 }
 
-static WRITE32_DEVICE_HANDLER( aoh_oki_bank_w )
+WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
 {
+	device_t *device = machine().device("oki_2");
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
 }
 
-static WRITE16_DEVICE_HANDLER( boonggab_oki_bank_w )
+WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	if(offset)
 		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x7));
 }
@@ -341,42 +357,42 @@ static ADDRESS_MAP_START( vamphalf_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140, 0x143) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
-	AM_RANGE(0x1c0, 0x1c3) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x1c0, 0x1c3) AM_READ(eeprom_r)
 	AM_RANGE(0x240, 0x243) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x600, 0x603) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x604, 0x607) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x608, 0x60b) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x608, 0x60b) AM_WRITE(eeprom_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( misncrft_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x100, 0x103) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x200, 0x203) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
-	AM_RANGE(0x580, 0x583) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
+	AM_RANGE(0x580, 0x583) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x308, 0x30b) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x308, 0x30b) AM_WRITE(eeprom_w)
 	AM_RANGE(0x4c0, 0x4c1) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x544, 0x547) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
-	AM_RANGE(0x7c0, 0x7c3) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suplup_io, AS_IO, 16, vamphalf_state )
-	AM_RANGE(0x020, 0x023) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x020, 0x023) AM_WRITE(eeprom_w)
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
-	AM_RANGE(0x100, 0x103) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wyvernwg_io, AS_IO, 32, vamphalf_state )
@@ -385,8 +401,8 @@ static ADDRESS_MAP_START( wyvernwg_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x2800, 0x2803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3000, 0x3003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x5400, 0x5403) AM_WRITENOP // soundlatch
-	AM_RANGE(0x7000, 0x7003) AM_DEVWRITE_LEGACY("eeprom", eeprom32_w)
-	AM_RANGE(0x7c00, 0x7c03) AM_DEVREAD_LEGACY("eeprom", eeprom32_r)
+	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom32_w)
+	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom32_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( finalgdr_io, AS_IO, 32, vamphalf_state )
@@ -397,22 +413,22 @@ static ADDRESS_MAP_START( finalgdr_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4400, 0x4403) AM_DEVREAD_LEGACY("eeprom", eeprom32_r)
+	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
 	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
-	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE_LEGACY("eeprom", finalgdr_eeprom_w)
+	AM_RANGE(0x6000, 0x6003) AM_WRITE(finalgdr_eeprom_w)
 	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
 	AM_RANGE(0x6060, 0x6063) AM_WRITE(finalgdr_prize_w)
-	AM_RANGE(0x60a0, 0x60a3) AM_DEVWRITE_LEGACY("oki", finalgdr_oki_bank_w)
+	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrkicker_io, AS_IO, 32, vamphalf_state )
-	AM_RANGE(0x2400, 0x2403) AM_DEVREAD_LEGACY("eeprom", eeprom32_r)
+	AM_RANGE(0x2400, 0x2403) AM_READ(eeprom32_r)
 	AM_RANGE(0x4000, 0x4003) AM_READNOP //?
-	AM_RANGE(0x4000, 0x4003) AM_DEVWRITE_LEGACY("eeprom", finalgdr_eeprom_w)
+	AM_RANGE(0x4000, 0x4003) AM_WRITE(finalgdr_eeprom_w)
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(finalgdr_prot_w)
 	AM_RANGE(0x4084, 0x4087) AM_WRITENOP //?
-	AM_RANGE(0x40a0, 0x40a3) AM_DEVWRITE_LEGACY("oki", finalgdr_oki_bank_w)
+	AM_RANGE(0x40a0, 0x40a3) AM_WRITE(finalgdr_oki_bank_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
 	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x0000ff00)
@@ -424,8 +440,8 @@ static ADDRESS_MAP_START( jmpbreak_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x0c0, 0x0c3) AM_NOP // ?
 	AM_RANGE(0x100, 0x103) AM_WRITENOP // ?
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280, 0x283) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
-	AM_RANGE(0x2c0, 0x2c3) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x280, 0x283) AM_WRITE(eeprom_w)
+	AM_RANGE(0x2c0, 0x2c3) AM_READ(eeprom_r)
 	AM_RANGE(0x440, 0x441) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
@@ -435,8 +451,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrdig_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x500, 0x503) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
-	AM_RANGE(0x180, 0x183) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
+	AM_RANGE(0x180, 0x183) AM_READ(eeprom_r)
 	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
@@ -454,23 +470,23 @@ static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_io, AS_IO, 32, vamphalf_state )
-	AM_RANGE(0x0480, 0x0483) AM_DEVWRITE_LEGACY("eeprom", eeprom32_w)
+	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
 	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki_2", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
-	AM_RANGE(0x0680, 0x0683) AM_DEVWRITE_LEGACY("oki_2", aoh_oki_bank_w)
+	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0x0c0, 0x0c3) AM_READ(eeprom_r)
 	AM_RANGE(0x200, 0x203) AM_NOP // seems unused
 	AM_RANGE(0x300, 0x303) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x400, 0x403) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x404, 0x407) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x408, 0x40b) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x408, 0x40b) AM_WRITE(eeprom_w)
 	AM_RANGE(0x410, 0x413) AM_WRITE(boonggab_prize_w)
 	AM_RANGE(0x414, 0x41b) AM_WRITE(boonggab_lamps_w)
-	AM_RANGE(0x600, 0x603) AM_DEVWRITE_LEGACY("oki", boonggab_oki_bank_w)
+	AM_RANGE(0x600, 0x603) AM_WRITE(boonggab_oki_bank_w)
 	AM_RANGE(0x700, 0x701) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x702, 0x703) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x740, 0x743) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)

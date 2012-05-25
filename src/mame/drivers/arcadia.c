@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
+	DECLARE_WRITE8_MEMBER(arcadia_cia_0_porta_w);
+	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
 };
 
 
@@ -101,22 +103,22 @@ WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
+WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_porta_w)
 {
 	/* switch banks as appropriate */
-	device->machine().root_device().membank("bank1")->set_entry(data & 1);
+	machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x000000, 0x07ffff);
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(device->machine(), 0, (data & 2) ? 0 : 1);
+	set_led_status(machine(), 0, (data & 2) ? 0 : 1);
 }
 
 
@@ -136,12 +138,11 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
+WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
 {
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)
 	{
-		UINT8 *coin_counter = device->machine().driver_data<arcadia_amiga_state>()->coin_counter;
 
 		if (coin_counter[0] > 0)
 			coin_counter[0]--;
@@ -280,9 +281,9 @@ static const mos6526_interface cia_0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("CIA0PORTA"),
-	DEVCB_HANDLER(arcadia_cia_0_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(arcadia_amiga_state,arcadia_cia_0_porta_w),	/* port A */
 	DEVCB_INPUT_PORT("CIA0PORTB"),
-	DEVCB_HANDLER(arcadia_cia_0_portb_w)	/* port B */
+	DEVCB_DRIVER_MEMBER(arcadia_amiga_state,arcadia_cia_0_portb_w)	/* port B */
 };
 
 static const mos6526_interface cia_1_intf =

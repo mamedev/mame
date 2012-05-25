@@ -194,6 +194,10 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
+	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
+	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
+	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
+	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 };
 
 
@@ -306,37 +310,37 @@ static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER(tourvision_i8155_a_w)
+WRITE8_MEMBER(tourvision_state::tourvision_i8155_a_w)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(tourvision_i8155_b_w)
+WRITE8_MEMBER(tourvision_state::tourvision_i8155_b_w)
 {
 	// Selects game slot in bits 0 - 1
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(tourvision_i8155_c_w)
+WRITE8_MEMBER(tourvision_state::tourvision_i8155_c_w)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(tourvision_timer_out)
+WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 {
-	cputag_set_input_line(device->machine(), "subcpu", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(machine(), "subcpu", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
 }
 
 static I8155_INTERFACE(i8155_intf)
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(tourvision_i8155_a_w),
+	DEVCB_DRIVER_MEMBER(tourvision_state,tourvision_i8155_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tourvision_i8155_b_w),
+	DEVCB_DRIVER_MEMBER(tourvision_state,tourvision_i8155_b_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(tourvision_i8155_c_w),
-	DEVCB_LINE(tourvision_timer_out)
+	DEVCB_DRIVER_MEMBER(tourvision_state,tourvision_i8155_c_w),
+	DEVCB_DRIVER_LINE_MEMBER(tourvision_state,tourvision_timer_out)
 };
 
 static const c6280_interface c6280_config =

@@ -474,6 +474,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mastboy_irq0_ack_w);
 	DECLARE_READ8_MEMBER(mastboy_port_38_read);
 	DECLARE_READ8_MEMBER(mastboy_nmi_read);
+	DECLARE_WRITE8_MEMBER(mastboy_msm5205_reset_w);
 };
 
 
@@ -651,10 +652,10 @@ WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit1_w)
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( mastboy_msm5205_reset_w )
+WRITE8_MEMBER(mastboy_state::mastboy_msm5205_reset_w)
 {
-	mastboy_state *state = device->machine().driver_data<mastboy_state>();
-	state->m_m5205_part = 0;
+	device_t *device = machine().device("msm");
+	m_m5205_part = 0;
 	msm5205_reset_w(device,data&1);
 }
 
@@ -725,7 +726,7 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0xff838, 0xff838) AM_WRITE(mastboy_irq0_ack_w)
 	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_mastboy_m5205_sambit0_w)
 	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_mastboy_m5205_sambit1_w)
-	AM_RANGE(0xff83b, 0xff83b) AM_DEVWRITE_LEGACY("msm", mastboy_msm5205_reset_w)
+	AM_RANGE(0xff83b, 0xff83b) AM_WRITE(mastboy_msm5205_reset_w)
 	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
 
 	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM

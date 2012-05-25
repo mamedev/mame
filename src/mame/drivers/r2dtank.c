@@ -68,6 +68,13 @@ public:
 	DECLARE_READ8_MEMBER(audio_answer_r);
 	DECLARE_WRITE8_MEMBER(audio_answer_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
+	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	DECLARE_WRITE8_MEMBER(AY8910_select_w);
+	DECLARE_READ8_MEMBER(AY8910_port_r);
+	DECLARE_WRITE8_MEMBER(AY8910_port_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	DECLARE_WRITE8_MEMBER(pia_comp_w);
 };
 
 
@@ -78,7 +85,7 @@ public:
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
+
 
 
 
@@ -88,14 +95,14 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
+WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 {
-	pia6821_device *pia0 = device->machine().device<pia6821_device>("pia_main");
-	pia6821_device *pia1 = device->machine().device<pia6821_device>("pia_audio");
+	pia6821_device *pia0 = machine().device<pia6821_device>("pia_main");
+	pia6821_device *pia1 = machine().device<pia6821_device>("pia_audio");
 	int combined_state = pia0->irq_a_state() | pia0->irq_b_state() |
 						 pia1->irq_a_state() | pia1->irq_b_state();
 
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -147,9 +154,8 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc
 }
 
 
-static WRITE8_DEVICE_HANDLER( AY8910_select_w )
+WRITE8_MEMBER(r2dtank_state::AY8910_select_w)
 {
-	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
 	/* not sure what all the bits mean:
        D0 - ????? definetely used
        D1 - not used?
@@ -157,35 +163,33 @@ static WRITE8_DEVICE_HANDLER( AY8910_select_w )
        D3 - selects ay8910 #0
        D4 - selects ay8910 #1
        D5-D7 - not used */
-	state->m_AY8910_selected = data;
+	m_AY8910_selected = data;
 
-if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", device->machine().describe_context(), data);
+if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().describe_context(), data);
 }
 
 
-static READ8_DEVICE_HANDLER( AY8910_port_r )
+READ8_MEMBER(r2dtank_state::AY8910_port_r)
 {
-	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
 	UINT8 ret = 0;
 
-	if (state->m_AY8910_selected & 0x08)
-		ret = ay8910_r(device->machine().device("ay1"), 0);
+	if (m_AY8910_selected & 0x08)
+		ret = ay8910_r(machine().device("ay1"), 0);
 
-	if (state->m_AY8910_selected & 0x10)
-		ret = ay8910_r(device->machine().device("ay2"), 0);
+	if (m_AY8910_selected & 0x10)
+		ret = ay8910_r(machine().device("ay2"), 0);
 
 	return ret;
 }
 
 
-static WRITE8_DEVICE_HANDLER( AY8910_port_w )
+WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
 {
-	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
-	if (state->m_AY8910_selected & 0x08)
-		ay8910_data_address_w(device->machine().device("ay1"), state->m_AY8910_selected >> 2, data);
+	if (m_AY8910_selected & 0x08)
+		ay8910_data_address_w(machine().device("ay1"), m_AY8910_selected >> 2, data);
 
-	if (state->m_AY8910_selected & 0x10)
-		ay8910_data_address_w(device->machine().device("ay2"), state->m_AY8910_selected >> 2, data);
+	if (m_AY8910_selected & 0x10)
+		ay8910_data_address_w(machine().device("ay2"), m_AY8910_selected >> 2, data);
 }
 
 
@@ -269,26 +273,26 @@ static const pia6821_interface pia_main_intf =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_NULL,		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(flipscreen_w),		/* port CB2 out */
-	DEVCB_LINE(main_cpu_irq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,flipscreen_w),		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq)		/* IRQB */
 };
 
 
 static const pia6821_interface pia_audio_intf =
 {
-	DEVCB_HANDLER(AY8910_port_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_port_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(AY8910_port_w),		/* port A out */
-	DEVCB_HANDLER(AY8910_select_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_port_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_select_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(main_cpu_irq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq)		/* IRQB */
 };
 
 
@@ -310,10 +314,9 @@ static MACHINE_START( r2dtank )
  *************************************/
 
 
-static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
+WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
 {
-	r2dtank_state *drvstate = device->machine().driver_data<r2dtank_state>();
-	drvstate->m_flipscreen = !state;
+	m_flipscreen = !state;
 }
 
 
@@ -382,9 +385,9 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
+WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 {
-	ttl74123_a_w(device->machine().device("74123"), 0, state);
+	ttl74123_a_w(machine().device("74123"), 0, state);
 }
 
 
@@ -395,7 +398,7 @@ static const mc6845_interface mc6845_intf =
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
 	NULL,					/* after pixel update callback */
-	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,display_enable_changed),	/* callback for display state changes */
 	DEVCB_NULL,				/* callback for cursor state changes */
 	DEVCB_NULL,				/* HSYNC callback */
 	DEVCB_NULL,				/* VSYNC callback */
@@ -410,9 +413,10 @@ static const mc6845_interface mc6845_intf =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( pia_comp_w )
+WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 {
-	downcast<pia6821_device *>(device)->write(*device->machine().memory().first_space(), offset, ~data);
+	device_t *device = machine().device("pia_main");
+	downcast<pia6821_device *>(device)->write(*machine().memory().first_space(), offset, ~data);
 }
 
 
@@ -421,7 +425,7 @@ static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_DEVWRITE_LEGACY("pia_main", pia_comp_w)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_WRITE(pia_comp_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)

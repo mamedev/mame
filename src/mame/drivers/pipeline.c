@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
 	DECLARE_READ8_MEMBER(mcu_portA_r);
 	DECLARE_WRITE8_MEMBER(mcu_ddrA_w);
+	DECLARE_WRITE8_MEMBER(vidctrl_w);
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(protection_w);
 };
 
 
@@ -140,10 +143,9 @@ static SCREEN_UPDATE_IND16( pipeline )
 }
 
 
-static WRITE8_DEVICE_HANDLER(vidctrl_w)
+WRITE8_MEMBER(pipeline_state::vidctrl_w)
 {
-	pipeline_state *state = device->machine().driver_data<pipeline_state>();
-	state->m_vidctrl=data;
+	m_vidctrl=data;
 }
 
 WRITE8_MEMBER(pipeline_state::vram2_w)
@@ -170,10 +172,9 @@ WRITE8_MEMBER(pipeline_state::vram1_w)
 	m_vram1[offset]=data;
 }
 
-static READ8_DEVICE_HANDLER(protection_r)
+READ8_MEMBER(pipeline_state::protection_r)
 {
-	pipeline_state *state = device->machine().driver_data<pipeline_state>();
-	return state->m_fromMCU;
+	return m_fromMCU;
 }
 
 static TIMER_CALLBACK( protection_deferred_w )
@@ -182,10 +183,10 @@ static TIMER_CALLBACK( protection_deferred_w )
 	state->m_toMCU = param;
 }
 
-static WRITE8_DEVICE_HANDLER(protection_w)
+WRITE8_MEMBER(pipeline_state::protection_w)
 {
-	device->machine().scheduler().synchronize(FUNC(protection_deferred_w), data);
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().synchronize(FUNC(protection_deferred_w), data);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8, pipeline_state )
@@ -333,7 +334,7 @@ static I8255A_INTERFACE( ppi8255_0_intf )
 	DEVCB_NULL,							/* Port B read */
 	DEVCB_NULL,							/* Port B write */  // related to sound/music : check code at 0x1c0a
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(vidctrl_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(pipeline_state,vidctrl_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
@@ -342,8 +343,8 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
 	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(protection_r),		/* Port C read */
-	DEVCB_HANDLER(protection_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(pipeline_state,protection_r),		/* Port C read */
+	DEVCB_DRIVER_MEMBER(pipeline_state,protection_w)			/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_2_intf )

@@ -130,6 +130,7 @@ public:
 	DECLARE_READ32_MEMBER(randomrabbits);
 	DECLARE_WRITE32_MEMBER(rabbit_rombank_w);
 	DECLARE_WRITE32_MEMBER(rabbit_blitter_w);
+	DECLARE_WRITE32_MEMBER(rabbit_eeprom_write);
 };
 
 
@@ -649,8 +650,9 @@ WRITE32_MEMBER(rabbit_state::rabbit_blitter_w)
 	}
 }
 
-static WRITE32_DEVICE_HANDLER( rabbit_eeprom_write )
+WRITE32_MEMBER(rabbit_state::rabbit_eeprom_write)
 {
+	device_t *device = machine().device("eeprom");
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
 	if (mem_mask == 0xff000000)
@@ -673,7 +675,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000024, 0x000027) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x00719c, 0x00719f) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_DEVWRITE_LEGACY("eeprom", rabbit_eeprom_write)
+	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_WRITE(rabbit_eeprom_write)
 	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
 	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_SHARE("viewregs0" )

@@ -74,6 +74,13 @@ public:
 	UINT32 m_adpcm_pos[2];
 	UINT8 m_adpcm_data[2];
 	UINT8 m_adpcm_sel[2];
+	DECLARE_WRITE8_MEMBER(kungfur_output_w);
+	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
+	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
+	DECLARE_WRITE8_MEMBER(kungfur_latch3_w);
+	DECLARE_WRITE8_MEMBER(kungfur_control_w);
+	DECLARE_WRITE8_MEMBER(kungfur_adpcm1_w);
+	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
 };
 
 
@@ -91,9 +98,8 @@ static INTERRUPT_GEN( kungfur_irq )
 
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( kungfur_output_w )
+WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 
 	// d0-d2: output led7seg
 	static const int lut_digits[24] =
@@ -106,14 +112,14 @@ static WRITE8_DEVICE_HANDLER( kungfur_output_w )
 	{
 		int offs = i << 3 | (data & 7);
 		if (lut_digits[offs])
-			output_set_digit_value(lut_digits[offs] - 1, state->m_latch[i]);
+			output_set_digit_value(lut_digits[offs] - 1, m_latch[i]);
 	}
 
 	// 2.6 goes to level lamps
 	if ((data & 7) == 6)
 	{
 		for (int i = 0; i < 5; i++)
-			output_set_lamp_value(i, state->m_latch[2] >> i & 1);
+			output_set_lamp_value(i, m_latch[2] >> i & 1);
 	}
 
 	// d7: game-over lamp, d3-d4: marquee lamps
@@ -123,68 +129,62 @@ static WRITE8_DEVICE_HANDLER( kungfur_output_w )
 
 	// d5: N/C?
 	// d6: coincounter
-	coin_counter_w(device->machine(), 0, data & 0x40);
+	coin_counter_w(machine(), 0, data & 0x40);
 }
 
 
 // lamp output latches
-static WRITE8_DEVICE_HANDLER( kungfur_latch1_w )
+WRITE8_MEMBER(kungfur_state::kungfur_latch1_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->m_latch[0] = data;
+	m_latch[0] = data;
 }
 
-static WRITE8_DEVICE_HANDLER( kungfur_latch2_w )
+WRITE8_MEMBER(kungfur_state::kungfur_latch2_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->m_latch[1] = data;
+	m_latch[1] = data;
 }
 
-static WRITE8_DEVICE_HANDLER( kungfur_latch3_w )
+WRITE8_MEMBER(kungfur_state::kungfur_latch3_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->m_latch[2] = data;
+	m_latch[2] = data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( kungfur_control_w )
+WRITE8_MEMBER(kungfur_state::kungfur_control_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 
 	// d0-d3: N/C
 	// d4: irq ack
 	if (~data & 0x10)
-		cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 
 	// d5: ?
 	// d6-d7: sound trigger (edge)
-	if ((data ^ state->m_control) & 0x40)
+	if ((data ^ m_control) & 0x40)
 	{
-		msm5205_reset_w(device->machine().device("adpcm1"), data >> 6 & 1);
-		state->m_adpcm_pos[0] = state->m_adpcm_data[0] * 0x400;
-		state->m_adpcm_sel[0] = 0;
+		msm5205_reset_w(machine().device("adpcm1"), data >> 6 & 1);
+		m_adpcm_pos[0] = m_adpcm_data[0] * 0x400;
+		m_adpcm_sel[0] = 0;
 	}
-	if ((data ^ state->m_control) & 0x80)
+	if ((data ^ m_control) & 0x80)
 	{
-		msm5205_reset_w(device->machine().device("adpcm2"), data >> 7 & 1);
-		state->m_adpcm_pos[1] = state->m_adpcm_data[1] * 0x400;
-		state->m_adpcm_sel[1] = 0;
+		msm5205_reset_w(machine().device("adpcm2"), data >> 7 & 1);
+		m_adpcm_pos[1] = m_adpcm_data[1] * 0x400;
+		m_adpcm_sel[1] = 0;
 	}
 
-	state->m_control = data;
+	m_control = data;
 }
 
 // adpcm latches
-static WRITE8_DEVICE_HANDLER( kungfur_adpcm1_w )
+WRITE8_MEMBER(kungfur_state::kungfur_adpcm1_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->m_adpcm_data[0] = data;
+	m_adpcm_data[0] = data;
 }
 
-static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
+WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->m_adpcm_data[1] = data;
+	m_adpcm_data[1] = data;
 }
 
 // adpcm callbacks
@@ -213,8 +213,8 @@ static void kfr_adpcm2_int(device_t *device)
 
 static ADDRESS_MAP_START( kungfur_map, AS_PROGRAM, 8, kungfur_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("adpcm1", kungfur_adpcm1_w)
-	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE_LEGACY("adpcm2", kungfur_adpcm2_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(kungfur_adpcm1_w)
+	AM_RANGE(0x4004, 0x4004) AM_WRITE(kungfur_adpcm2_w)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -263,22 +263,22 @@ static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(kungfur_output_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(kungfur_state,kungfur_output_w),	/* Port A write */
 	DEVCB_INPUT_PORT("IN0"),			/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_INPUT_PORT("IN1"),			/* Port C read */
-	DEVCB_HANDLER(kungfur_control_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(kungfur_state,kungfur_control_w)	/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	// $400c - always $80 (PPI mode 0, all ports as output)
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(kungfur_latch1_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(kungfur_state,kungfur_latch1_w),	/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(kungfur_latch2_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(kungfur_state,kungfur_latch2_w),	/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(kungfur_latch3_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(kungfur_state,kungfur_latch3_w)		/* Port C write */
 };
 
 

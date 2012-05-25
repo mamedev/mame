@@ -19,31 +19,35 @@ public:
 	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
+	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
+	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
 };
 
 
 #define MASTER_CLOCK	XTAL_3_579545MHz
 
 
-static WRITE8_DEVICE_HANDLER( tourtabl_led_w )
+WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 {
-	set_led_status(device->machine(), 0, data & 0x40); /* start 1 */
-	set_led_status(device->machine(), 1, data & 0x20); /* start 2 */
-	set_led_status(device->machine(), 2, data & 0x10); /* start 4 */
-	set_led_status(device->machine(), 3, data & 0x80); /* select game */
+	set_led_status(machine(), 0, data & 0x40); /* start 1 */
+	set_led_status(machine(), 1, data & 0x20); /* start 2 */
+	set_led_status(machine(), 2, data & 0x10); /* start 4 */
+	set_led_status(machine(), 3, data & 0x80); /* select game */
 
-	coin_lockout_global_w(device->machine(), !(data & 0x80));
+	coin_lockout_global_w(machine(), !(data & 0x80));
 }
 
 
-static READ16_DEVICE_HANDLER( tourtabl_read_input_port )
+READ16_MEMBER(tourtabl_state::tourtabl_read_input_port)
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
-	return device->machine().root_device().ioport(tianames[offset])->read();
+	return machine().root_device().ioport(tianames[offset])->read();
 }
 
-static READ8_DEVICE_HANDLER( tourtabl_get_databus_contents )
+READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
 {
 	return offset;
 }
@@ -60,9 +64,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_DEVICE_HANDLER( watchdog_w )
+WRITE8_MEMBER(tourtabl_state::watchdog_w)
 {
-	device->machine().watchdog_reset();
+	machine().watchdog_reset();
 }
 
 static const riot6532_interface r6532_interface_0 =
@@ -70,7 +74,7 @@ static const riot6532_interface r6532_interface_0 =
 	DEVCB_INPUT_PORT("RIOT0_SWA"),	/* Port 6 */
 	DEVCB_INPUT_PORT("RIOT0_SWB"),	/* Port 7 */
 	DEVCB_NULL,
-	DEVCB_HANDLER(watchdog_w),
+	DEVCB_DRIVER_MEMBER(tourtabl_state,watchdog_w),
 	DEVCB_NULL
 };
 
@@ -80,15 +84,15 @@ static const riot6532_interface r6532_interface_1 =
 	DEVCB_INPUT_PORT("RIOT1_SWA"),	/* Port 8 */
 	DEVCB_INPUT_PORT("RIOT1_SWB"),	/* Port 9 */
 	DEVCB_NULL,
-	DEVCB_HANDLER(tourtabl_led_w),
+	DEVCB_DRIVER_MEMBER(tourtabl_state,tourtabl_led_w),
 	DEVCB_NULL
 };
 
 
 static const struct tia_interface tourtabl_tia_interface =
 {
-	DEVCB_HANDLER(tourtabl_read_input_port),
-	DEVCB_HANDLER(tourtabl_get_databus_contents),
+	DEVCB_DRIVER_MEMBER16(tourtabl_state,tourtabl_read_input_port),
+	DEVCB_DRIVER_MEMBER(tourtabl_state,tourtabl_get_databus_contents),
 	DEVCB_NULL
 };
 

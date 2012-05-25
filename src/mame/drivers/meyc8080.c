@@ -80,6 +80,10 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
+	DECLARE_WRITE8_MEMBER(meyc8080_dac_1_w);
+	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
+	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
+	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
 };
 
 
@@ -265,26 +269,30 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( meyc8080_dac_1_w )
+WRITE8_MEMBER(meyc8080_state::meyc8080_dac_1_w)
 {
+	device_t *device = machine().device("dac");
 	dac_data_w(device, 0x00);
 }
 
 
-static WRITE8_DEVICE_HANDLER( meyc8080_dac_2_w )
+WRITE8_MEMBER(meyc8080_state::meyc8080_dac_2_w)
 {
+	device_t *device = machine().device("dac");
 	dac_data_w(device, 0x55);
 }
 
 
-static WRITE8_DEVICE_HANDLER( meyc8080_dac_3_w )
+WRITE8_MEMBER(meyc8080_state::meyc8080_dac_3_w)
 {
+	device_t *device = machine().device("dac");
 	dac_data_w(device, 0xaa);
 }
 
 
-static WRITE8_DEVICE_HANDLER( meyc8080_dac_4_w )
+WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
 {
+	device_t *device = machine().device("dac");
 	dac_data_w(device, 0xff);
 }
 
@@ -304,13 +312,13 @@ static ADDRESS_MAP_START( meyc8080_map, AS_PROGRAM, 8, meyc8080_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("vram2")
 //  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BSW") AM_DEVWRITE_LEGACY("dac", meyc8080_dac_1_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BSW") AM_WRITE(meyc8080_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2") AM_WRITE(lights_2_w)
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(counters_w)
-	AM_RANGE(0xf00f, 0xf00f) AM_DEVWRITE_LEGACY("dac", meyc8080_dac_2_w)
-	AM_RANGE(0xf0f0, 0xf0f0) AM_DEVWRITE_LEGACY("dac", meyc8080_dac_3_w)
-	AM_RANGE(0xf0ff, 0xf0ff) AM_DEVWRITE_LEGACY("dac", meyc8080_dac_4_w)
+	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(meyc8080_dac_2_w)
+	AM_RANGE(0xf0f0, 0xf0f0) AM_WRITE(meyc8080_dac_3_w)
+	AM_RANGE(0xf0ff, 0xf0ff) AM_WRITE(meyc8080_dac_4_w)
 ADDRESS_MAP_END
 
 

@@ -165,6 +165,7 @@ public:
 	DECLARE_READ16_MEMBER(galgames_cart_data_r);
 	DECLARE_WRITE16_MEMBER(galgames_cart_data_w);
 	DECLARE_READ16_MEMBER(dummy_read_01);
+	DECLARE_WRITE16_MEMBER(tmaster_oki_bank_w);
 };
 
 
@@ -174,14 +175,14 @@ public:
 
 ***************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
+WRITE16_MEMBER(tmaster_state::tmaster_oki_bank_w)
 {
-	tmaster_state *state = device->machine().driver_data<tmaster_state>();
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
 		// data & 0x0800?
-		state->m_okibank = ((data >> 8) & 3);
-		downcast<okim6295_device *>(device)->set_bank_base(state->m_okibank * 0x40000);
+		m_okibank = ((data >> 8) & 3);
+		downcast<okim6295_device *>(device)->set_bank_base(m_okibank * 0x40000);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -530,7 +531,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff )
 
-	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE_LEGACY("oki", tmaster_oki_bank_w )
+	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE(tmaster_oki_bank_w )
 
 	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE(tmaster_addr_w )
 

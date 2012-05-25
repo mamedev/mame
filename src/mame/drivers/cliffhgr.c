@@ -107,6 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cliff_coin_counter_w);
 	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
+	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 };
 
 
@@ -163,8 +165,9 @@ READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 	return 0x00;
 }
 
-static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
+WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 {
+	device_t *device = machine().device("discrete");
 	/* audio */
 	discrete_sound_w(device, CLIFF_ENABLE_SND_1, data & 1);
 	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
@@ -208,9 +211,9 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(cliffhgr_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -241,7 +244,7 @@ static ADDRESS_MAP_START( mainport, AS_IO, 8, cliffhgr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x44, 0x44) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
 	AM_RANGE(0x45, 0x45) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("discrete", cliff_sound_overlay_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(cliff_sound_overlay_w)
 	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
 	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
 	AM_RANGE(0x54, 0x54) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
@@ -673,7 +676,7 @@ static TMS9928A_INTERFACE(cliffhgr_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(cliffhgr_state,vdp_interrupt)
 };
 
 DISCRETE_SOUND_EXTERN( cliffhgr );

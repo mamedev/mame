@@ -38,6 +38,11 @@ public:
 	UINT8 m_mem_map;
 	UINT8 m_mem_banks[4];
 	DECLARE_WRITE8_MEMBER(mem_w);
+	DECLARE_READ8_MEMBER(pengadvb_psg_port_a_r);
+	DECLARE_READ8_MEMBER(pengadvb_ppi_port_a_r);
+	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_a_w);
+	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 };
 
 
@@ -176,67 +181,64 @@ static INPUT_PORTS_START( pengadvb )
 INPUT_PORTS_END
 
 
-static READ8_DEVICE_HANDLER( pengadvb_psg_port_a_r )
+READ8_MEMBER(pengadvb_state::pengadvb_psg_port_a_r)
 {
-	return device->machine().root_device().ioport("IN0")->read();
+	return machine().root_device().ioport("IN0")->read();
 }
 
 static const ay8910_interface pengadvb_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(pengadvb_psg_port_a_r),
+	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_psg_port_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-static READ8_DEVICE_HANDLER( pengadvb_ppi_port_a_r )
+READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_r)
 {
-	pengadvb_state *state = device->machine().driver_data<pengadvb_state>();
-	return state->m_mem_map;
+	return m_mem_map;
 }
 
-static WRITE8_DEVICE_HANDLER ( pengadvb_ppi_port_a_w )
+WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 {
-	pengadvb_state *state = device->machine().driver_data<pengadvb_state>();
-	if (data != state->m_mem_map)
+	if (data != m_mem_map)
 	{
-		state->m_mem_map = data;
-		mem_map_banks(device->machine());
+		m_mem_map = data;
+		mem_map_banks(machine());
 	}
 }
 
-static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
+READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
 {
-	i8255_device *ppi = device->machine().device<i8255_device>("ppi8255");
-	address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
-	if ((ppi->read(*space, 2) & 0x0f) == 0)
-		return device->machine().root_device().ioport("IN1")->read();
+	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+	if ((ppi->read(space, 2) & 0x0f) == 0)
+		return machine().root_device().ioport("IN1")->read();
 
 	return 0xff;
 }
 
 static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 {
-	DEVCB_HANDLER(pengadvb_ppi_port_a_r),
-	DEVCB_HANDLER(pengadvb_ppi_port_a_w),
-	DEVCB_HANDLER(pengadvb_ppi_port_b_r),
+	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_a_r),
+	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_a_w),
+	DEVCB_DRIVER_MEMBER(pengadvb_state,pengadvb_ppi_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(pengadvb_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? ASSERT_LINE : CLEAR_LINE));
+	cputag_set_input_line(machine(), "maincpu", 0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(pengadvb_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(pengadvb_state,vdp_interrupt)
 };
 
 static void pengadvb_postload(running_machine &machine)

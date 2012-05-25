@@ -264,6 +264,8 @@ public:
 	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
 	DECLARE_READ16_MEMBER(shared_68k_r);
 	DECLARE_WRITE16_MEMBER(shared_68k_w);
+	DECLARE_READ16_MEMBER(twinkle_ide_r);
+	DECLARE_WRITE16_MEMBER(twinkle_ide_w);
 };
 
 /* RTC */
@@ -658,8 +660,9 @@ static void ide_interrupt(device_t *device, int state_)
 	}
 }
 
-static READ16_DEVICE_HANDLER( twinkle_ide_r )
+READ16_MEMBER(twinkle_state::twinkle_ide_r)
 {
+	device_t *device = machine().device("ide");
 	if (offset == 0)
 	{
 		return ide_controller_r(device, offset+0x1f0, 2);
@@ -670,8 +673,9 @@ static READ16_DEVICE_HANDLER( twinkle_ide_r )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( twinkle_ide_w )
+WRITE16_MEMBER(twinkle_state::twinkle_ide_w)
 {
+	device_t *device = machine().device("ide");
 	ide_controller_w(device, offset+0x1f0, 1, data);
 }
 
@@ -751,7 +755,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	// 250000 = write to initiate DMA?
 	// 260000 = ???
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w )
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("ide", twinkle_ide_r, twinkle_ide_w)
+	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM

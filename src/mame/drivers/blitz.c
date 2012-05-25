@@ -306,6 +306,10 @@ public:
 	int m_mux_data;
 	DECLARE_WRITE8_MEMBER(megadpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(megadpkr_colorram_w);
+	DECLARE_READ8_MEMBER(megadpkr_mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 };
 
 
@@ -417,24 +421,22 @@ static PALETTE_INIT( megadpkr )
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
+READ8_MEMBER(blitz_state::megadpkr_mux_port_r)
 {
-	blitz_state *state = device->machine().driver_data<blitz_state>();
-	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
+	switch( m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return state->ioport("IN0-0")->read();
-		case 0x20: return state->ioport("IN0-1")->read();
-		case 0x40: return state->ioport("IN0-2")->read();
-		case 0x80: return state->ioport("IN0-3")->read();
+		case 0x10: return ioport("IN0-0")->read();
+		case 0x20: return ioport("IN0-1")->read();
+		case 0x40: return ioport("IN0-2")->read();
+		case 0x80: return ioport("IN0-3")->read();
 	}
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER( mux_w )
+WRITE8_MEMBER(blitz_state::mux_w)
 {
-	blitz_state *state = device->machine().driver_data<blitz_state>();
-	state->m_mux_data = data ^ 0xff;	/* inverted */
+	m_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
@@ -443,7 +445,7 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 */
 
-static WRITE8_DEVICE_HANDLER( lamps_a_w )
+WRITE8_MEMBER(blitz_state::lamps_a_w)
 {
 //  output_set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
 //  output_set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
@@ -452,16 +454,16 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 //  output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-//  coin_counter_w(device->machine(), 0, data & 0x40);    /* counter1 */
-//  coin_counter_w(device->machine(), 1, data & 0x80);    /* counter2 */
-//  coin_counter_w(device->machine(), 2, data & 0x20);    /* counter3 */
+//  coin_counter_w(machine(), 0, data & 0x40);    /* counter1 */
+//  coin_counter_w(machine(), 1, data & 0x80);    /* counter2 */
+//  coin_counter_w(machine(), 2, data & 0x20);    /* counter3 */
 
 /*  Counters:
 
 */
 }
 
-static WRITE8_DEVICE_HANDLER( sound_w )
+WRITE8_MEMBER(blitz_state::sound_w)
 {
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
@@ -700,14 +702,14 @@ GFXDECODE_END
 
 static const pia6821_interface megadpkr_pia0_intf =
 {
-	DEVCB_HANDLER(megadpkr_mux_port_r),	/* port A in */
+	DEVCB_DRIVER_MEMBER(blitz_state,megadpkr_mux_port_r),	/* port A in */
 	DEVCB_NULL,					/* port B in */
 	DEVCB_NULL,					/* line CA1 in */
 	DEVCB_NULL,					/* line CB1 in */
 	DEVCB_NULL,					/* line CA2 in */
 	DEVCB_NULL,					/* line CB2 in */
 	DEVCB_NULL,					/* port A out */
-	DEVCB_HANDLER(lamps_a_w),	/* port B out */
+	DEVCB_DRIVER_MEMBER(blitz_state,lamps_a_w),	/* port B out */
 	DEVCB_NULL,					/* line CA2 out */
 	DEVCB_NULL,					/* port CB2 out */
 	DEVCB_NULL,					/* IRQA */
@@ -722,8 +724,8 @@ static const pia6821_interface megadpkr_pia1_intf =
 	DEVCB_NULL,					/* line CB1 in */
 	DEVCB_NULL,					/* line CA2 in */
 	DEVCB_NULL,					/* line CB2 in */
-	DEVCB_HANDLER(sound_w),		/* port A out */
-	DEVCB_HANDLER(mux_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(blitz_state,sound_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(blitz_state,mux_w),		/* port B out */
 	DEVCB_NULL,					/* line CA2 out */
 	DEVCB_NULL,					/* port CB2 out */
 	DEVCB_NULL,					/* IRQA */

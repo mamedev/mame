@@ -159,6 +159,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vid_uart_ctrl_w);
 	DECLARE_READ8_MEMBER(vid_uart_rx_r);
 	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
+	DECLARE_READ8_MEMBER(nec_r);
+	DECLARE_WRITE8_MEMBER(nec_reset_w);
+	DECLARE_WRITE8_MEMBER(nec_latch_w);
 };
 
 #define VFD_RESET  0x20
@@ -325,7 +328,7 @@ READ8_MEMBER(bfm_sc1_state::dipcoin_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_DEVICE_HANDLER( nec_r )
+READ8_MEMBER(bfm_sc1_state::nec_r)
 {
 	return 1;
 }
@@ -581,15 +584,16 @@ READ8_MEMBER(bfm_sc1_state::triac_r)
 
 /////////////////////////////////////////////////////////////////////////////////////
 #ifdef UNUSED_FUNCTION
-static WRITE8_DEVICE_HANDLER( nec_reset_w )
+WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
 {
 	upd7759_start_w(device, 0);
 	upd7759_reset_w(device, data);
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////////
-static WRITE8_DEVICE_HANDLER( nec_latch_w )
+WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_port_w (device, 0, data&0x3F);	// setup sample
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);			// start
@@ -735,8 +739,8 @@ static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
-	AM_RANGE(0x3801, 0x3801) AM_DEVREAD_LEGACY("upd", nec_r)
-	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE_LEGACY("upd", nec_latch_w)
+	AM_RANGE(0x3801, 0x3801) AM_READ(nec_r)
+	AM_RANGE(0x3800, 0x39FF) AM_WRITE(nec_latch_w)
 ADDRESS_MAP_END
 
 // input ports for scorpion1 board //////////////////////////////////////////////////

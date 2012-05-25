@@ -34,6 +34,7 @@ public:
 	required_shared_ptr<UINT8> m_bg_paletteram;
 	DECLARE_WRITE8_MEMBER(bg_paletteram_RRRRGGGGBBBBxxxx_be_w);
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -411,15 +412,15 @@ GFXDECODE_END
 /* Sound Interfaces */
 
 // Handler called by the 3526 emulator when the internal timers cause an IRQ
-static WRITE_LINE_DEVICE_HANDLER( irqhandler )
+WRITE_LINE_MEMBER(missb2_state::irqhandler)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(missb2_state,irqhandler)
 };
 
 /* Interrupt Generator */

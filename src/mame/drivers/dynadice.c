@@ -58,6 +58,7 @@ public:
 	int      m_ay_data;
 	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_WRITE8_MEMBER(sound_control_w);
 };
 
 
@@ -73,9 +74,9 @@ WRITE8_MEMBER(dynadice_state::sound_data_w)
 	m_ay_data = data;
 }
 
-static WRITE8_DEVICE_HANDLER( sound_control_w )
+WRITE8_MEMBER(dynadice_state::sound_control_w)
 {
-	dynadice_state *state = device->machine().driver_data<dynadice_state>();
+	device_t *device = machine().device("aysnd");
 /*
     AY 3-8910 :
 
@@ -86,10 +87,10 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 */
 	if ((data & 7) == 7)
-		ay8910_address_w(device, 0, state->m_ay_data);
+		ay8910_address_w(device, 0, m_ay_data);
 
 	if ((data & 7) == 6)
-		ay8910_data_w(device, 0, state->m_ay_data);
+		ay8910_data_w(device, 0, m_ay_data);
 }
 
 
@@ -118,7 +119,7 @@ static ADDRESS_MAP_START( dynadice_sound_io_map, AS_IO, 8, dynadice_state )
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dynadice )

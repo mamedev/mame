@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
 	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
+	DECLARE_READ8_MEMBER(superwng_sound_byte_r);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -130,15 +131,15 @@ static SCREEN_UPDATE_IND16( superwng )
 	for (int i = 0x3e; i >= 0; i -= 2)
 	{
 		/*      76543210
-		video0: xxxxxx    code
-		              x   /flip
-		               x  enable?
-		video1: xxxxxxxx  x
-		color0: xxxxxxxx  y
-		color1: xxx       unused?
-		           x      ?
-		            xxxx  color
-		*/
+        video0: xxxxxx    code
+                      x   /flip
+                       x  enable?
+        video1: xxxxxxxx  x
+        color0: xxxxxxxx  y
+        color1: xxx       unused?
+                   x      ?
+                    xxxx  color
+        */
 		if (~state->m_videoram_bg[i] & 1)
 			continue;
 
@@ -214,11 +215,10 @@ WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
 	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 }
 
-static READ8_DEVICE_HANDLER( superwng_sound_byte_r )
+READ8_MEMBER(superwng_state::superwng_sound_byte_r)
 {
-	superwng_state *state = device->machine().driver_data<superwng_state>();
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
-	return state->m_sound_byte;
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	return m_sound_byte;
 }
 
 WRITE8_MEMBER(superwng_state::superwng_sound_nmi_clear_w)
@@ -444,7 +444,7 @@ static const ay8910_interface ay8910_config_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(superwng_sound_byte_r),
+	DEVCB_DRIVER_MEMBER(superwng_state,superwng_sound_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

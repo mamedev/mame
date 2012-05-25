@@ -111,6 +111,8 @@ public:
 	DECLARE_READ16_MEMBER(varia_dips_bit3_r);
 	DECLARE_READ16_MEMBER(varia_dips_bit2_r);
 	DECLARE_READ16_MEMBER(varia_dips_bit1_r);
+	DECLARE_WRITE8_MEMBER(vmetal_control_w);
+	DECLARE_WRITE8_MEMBER(vmetal_es8712_w);
 };
 
 
@@ -173,17 +175,18 @@ READ16_MEMBER(vmetal_state::varia_dips_bit3_r){ return ((ioport("DSW2")->read() 
 READ16_MEMBER(vmetal_state::varia_dips_bit2_r){ return ((ioport("DSW2")->read() & 0x02) << 6) | ((ioport("DSW1")->read() & 0x02) << 5); }
 READ16_MEMBER(vmetal_state::varia_dips_bit1_r){ return ((ioport("DSW2")->read() & 0x01) << 7) | ((ioport("DSW1")->read() & 0x01) << 6); }
 
-static WRITE8_DEVICE_HANDLER( vmetal_control_w )
+WRITE8_MEMBER(vmetal_state::vmetal_control_w)
 {
+	device_t *device = machine().device("essnd");
 	/* Lower nibble is the coin control bits shown in
        service mode, but in game mode they're different */
-	coin_counter_w(device->machine(), 0, data & 0x04);
-	coin_counter_w(device->machine(), 1, data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
-//  coin_lockout_w(device->machine(), 0, data & 0x01);  /* always on in game mode?? */
-	coin_lockout_w(device->machine(), 1, data & 0x02);	/* never activated in game mode?? */
+	coin_counter_w(machine(), 0, data & 0x04);
+	coin_counter_w(machine(), 1, data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
+//  coin_lockout_w(machine(), 0, data & 0x01);  /* always on in game mode?? */
+	coin_lockout_w(machine(), 1, data & 0x02);	/* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
-		device->reset();
+		reset();
 	else
 		es8712_play(device);
 
@@ -193,11 +196,12 @@ static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 		es8712_set_bank_base(device, 0x000000);
 
 	if (data & 0xa0)
-		logerror("%s:Writing unknown bits %04x to $200000\n",device->machine().describe_context(),data);
+		logerror("%s:Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
 }
 
-static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
+WRITE8_MEMBER(vmetal_state::vmetal_es8712_w)
 {
+	device_t *device = machine().device("essnd");
 	/* Many samples in the ADPCM ROM are actually not used.
 
     Snd         Offset Writes                 Sample Range
@@ -229,7 +233,7 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
     */
 
 	es8712_w(device, offset, data);
-	logerror("%s:Writing %04x to ES8712 offset %02x\n", device->machine().describe_context(), data, offset);
+	logerror("%s:Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
 }
 
 
@@ -248,7 +252,7 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_SHARE("vmetal_regs")
 	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")	// Metro sprite chip Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8_LEGACY("essnd", vmetal_control_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_WRITE8(vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* same weird way to read Dip Switches as in many games in metro.c driver - use balcube_dsw_r read handler once the driver is merged */
@@ -271,7 +275,7 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)	// Volume/channel info
-	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8_LEGACY("essnd", vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x500000, 0x50000d) AM_WRITE8(vmetal_es8712_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

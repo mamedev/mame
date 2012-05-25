@@ -77,6 +77,8 @@ public:
 	device_t	*m_dma8237_2;
 
 	UINT32		*m_pc_ram;
+	DECLARE_WRITE_LINE_MEMBER(su2000_pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
 };
 
 
@@ -177,29 +179,28 @@ static READ8_HANDLER( vga_setting )
  *
  *************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( su2000_pic8259_1_set_int_line )
+WRITE_LINE_MEMBER(su2000_state::su2000_pic8259_1_set_int_line)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(su2000_state::get_slave_ack)
 {
-	su2000_state *state = device->machine().driver_data<su2000_state>();
 
 	if (offset == 2)
 	{
 		// IRQ = 2
 		logerror("pic8259_slave_ACK!\n");
-		return pic8259_acknowledge(state->m_pic8259_2);
+		return pic8259_acknowledge(m_pic8259_2);
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface su2000_pic8259_1_config =
 {
-	DEVCB_LINE(su2000_pic8259_1_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(su2000_state,su2000_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(su2000_state,get_slave_ack)
 };
 
 static const struct pic8259_interface su2000_pic8259_2_config =

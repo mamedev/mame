@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(samples_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(themj_rombank_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
 };
 
 
@@ -158,8 +159,9 @@ READ8_MEMBER(rmhaihai_state::samples_r)
 	return memregion("adpcm")->base()[offset];
 }
 
-static WRITE8_DEVICE_HANDLER( adpcm_w )
+WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 {
+	device_t *device = machine().device("msm");
 	msm5205_data_w(device,data);         /* bit0..3  */
 	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
 	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
@@ -213,7 +215,7 @@ static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
 	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE_LEGACY("msm", adpcm_w)
+	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
@@ -236,7 +238,7 @@ static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
 	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE_LEGACY("msm", adpcm_w)
+	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)

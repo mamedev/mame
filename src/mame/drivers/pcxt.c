@@ -106,6 +106,21 @@ public:
 	DECLARE_READ8_MEMBER(dma_page_select_r);
 	DECLARE_WRITE8_MEMBER(dma_page_select_w);
 	DECLARE_WRITE8_MEMBER(tetriskr_bg_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
+	DECLARE_READ8_MEMBER(port_a_r);
+	DECLARE_READ8_MEMBER(port_b_r);
+	DECLARE_READ8_MEMBER(port_c_r);
+	DECLARE_WRITE8_MEMBER(port_b_w);
+	DECLARE_WRITE8_MEMBER(wss_1_w);
+	DECLARE_WRITE8_MEMBER(wss_2_w);
+	DECLARE_WRITE8_MEMBER(sys_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
 };
 
 static SCREEN_UPDATE_RGB32( tetriskr )
@@ -239,9 +254,9 @@ void pcxt_speaker_set_input(running_machine &machine, UINT8 data)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( ibm5150_pit8253_out2_changed )
+WRITE_LINE_MEMBER(pcxt_state::ibm5150_pit8253_out2_changed)
 {
-	pcxt_speaker_set_input( device->machine(), state );
+	pcxt_speaker_set_input( machine(), state );
 }
 
 
@@ -259,16 +274,15 @@ static const struct pit8253_config pc_pit8253_config =
 		}, {
 			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(ibm5150_pit8253_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pcxt_state,ibm5150_pit8253_out2_changed)
 		}
 	}
 };
 
 
-static READ8_DEVICE_HANDLER( port_a_r )
+READ8_MEMBER(pcxt_state::port_a_r)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	if(!(state->m_port_b_data & 0x80))//???
+	if(!(m_port_b_data & 0x80))//???
 	{
 		/*
         x--- ---- Undefined (Always 0)
@@ -278,90 +292,85 @@ static READ8_DEVICE_HANDLER( port_a_r )
         ---- --x- 8087 NDP installed
         ---- ---x Undefined (Always 1)
         */
-		return state->m_wss1_data;
+		return m_wss1_data;
 	}
 	else//keyboard emulation
 	{
-		//cputag_set_input_line(device->machine(), "maincpu", 1, PULSE_LINE);
+		//cputag_set_input_line(machine(), "maincpu", 1, PULSE_LINE);
 		return 0x00;//Keyboard is disconnected
 		//return 0xaa;//Keyboard code
 	}
 }
 
-static READ8_DEVICE_HANDLER( port_b_r )
+READ8_MEMBER(pcxt_state::port_b_r)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	return state->m_port_b_data;
+	return m_port_b_data;
 }
 
-static READ8_DEVICE_HANDLER( port_c_r )
+READ8_MEMBER(pcxt_state::port_c_r)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	int timer2_output = pit8253_get_output( state->m_pit8253, 2 );
-	if ( state->m_port_b_data & 0x01 )
+	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	if ( m_port_b_data & 0x01 )
 	{
-		state->m_wss2_data = ( state->m_wss2_data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+		m_wss2_data = ( m_wss2_data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
 	}
-	state->m_wss2_data = ( state->m_wss2_data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+	m_wss2_data = ( m_wss2_data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
 
-	return state->m_wss2_data;//TODO
+	return m_wss2_data;//TODO
 }
 
 /*'buzzer' sound routes here*/
 /* Filetto uses this for either beep and um5100 sound routing,probably there's a mux somewhere.*/
 /* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
-static WRITE8_DEVICE_HANDLER( port_b_w )
+WRITE8_MEMBER(pcxt_state::port_b_w)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
 
 	/* PPI controller port B*/
-	pit8253_gate2_w(state->m_pit8253, BIT(data, 0));
-	pcxt_speaker_set_spkrdata( device->machine(), data & 0x02 );
-	state->m_port_b_data = data;
-// device_t *beep = device->machine().device("beep");
-// device_t *cvsd = device->machine().device("cvsd");
+	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	pcxt_speaker_set_spkrdata( machine(), data & 0x02 );
+	m_port_b_data = data;
+// device_t *beep = machine().device("beep");
+// device_t *cvsd = machine().device("cvsd");
 //  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
 //  beep_set_state(beep, 0);
 //  beep_set_state(beep, 1);
-//  beep_set_frequency(beep, state->m_port_b_data);
+//  beep_set_frequency(beep, m_port_b_data);
 }
 
-static WRITE8_DEVICE_HANDLER( wss_1_w )
+WRITE8_MEMBER(pcxt_state::wss_1_w)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	state->m_wss1_data = data;
+	m_wss1_data = data;
 }
 
-static WRITE8_DEVICE_HANDLER( wss_2_w )
+WRITE8_MEMBER(pcxt_state::wss_2_w)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	state->m_wss2_data = data;
+	m_wss2_data = data;
 }
 
-static WRITE8_DEVICE_HANDLER( sys_reset_w )
+WRITE8_MEMBER(pcxt_state::sys_reset_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_HANDLER(port_a_r),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_a_r),			/* Port A read */
 	DEVCB_NULL,							/* Port A write */
-	DEVCB_HANDLER(port_b_r),			/* Port B read */
-	DEVCB_HANDLER(port_b_w),			/* Port B write */
-	DEVCB_HANDLER(port_c_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_r),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_c_r),			/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(wss_1_w),				/* Port A write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,wss_1_w),				/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(wss_2_w),				/* Port B write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,wss_2_w),				/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(sys_reset_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,sys_reset_w)			/* Port C write */
 };
 
 
@@ -410,12 +419,12 @@ DMA8237 Controller
 ******************/
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+WRITE_LINE_MEMBER(pcxt_state::pc_dma_hrq_changed)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	i8237_hlda_w( m_dma8237_1, state );
 }
 
 
@@ -484,45 +493,44 @@ static void set_dma_channel(device_t *device, int channel, int state)
 	if (!state) drvstate->m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(pcxt_state::pc_dack0_w){ set_dma_channel(m_dma8237_1, 0, state); }
+WRITE_LINE_MEMBER(pcxt_state::pc_dack1_w){ set_dma_channel(m_dma8237_1, 1, state); }
+WRITE_LINE_MEMBER(pcxt_state::pc_dack2_w){ set_dma_channel(m_dma8237_1, 2, state); }
+WRITE_LINE_MEMBER(pcxt_state::pc_dack3_w){ set_dma_channel(m_dma8237_1, 3, state); }
 
 static I8237_INTERFACE( dma8237_1_config )
 {
-	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dma_hrq_changed),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pcxt_state, pc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(pcxt_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pc_dack3_w) }
 };
 
 /******************
 8259 IRQ controller
 ******************/
 
-static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
+WRITE_LINE_MEMBER(pcxt_state::pic8259_1_set_int_line)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(pcxt_state::get_slave_ack)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(state->m_pic8259_2);
+		return pic8259_acknowledge(m_pic8259_2);
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface pic8259_1_config =
 {
-	DEVCB_LINE(pic8259_1_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(pcxt_state,pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(pcxt_state,get_slave_ack)
 };
 
 static const struct pic8259_interface pic8259_2_config =

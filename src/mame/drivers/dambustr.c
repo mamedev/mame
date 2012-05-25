@@ -61,16 +61,17 @@ public:
 		: galaxold_state(mconfig, type, tag) { }
 
 	int m_noise_data;
+	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 };
 
 
 
 /* FIXME: Really needed? - Should be handled by either interface */
-static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
+WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 {
-	dambustr_state *state = device->machine().driver_data<dambustr_state>();
-	if (data != state->m_noise_data) {
-		state->m_noise_data = data;
+	device_t *device = machine().device("GAL_AUDIO");
+	if (data != m_noise_data) {
+		m_noise_data = data;
 		galaxian_noise_enable_w(device, offset, data);
 	}
 }
@@ -98,7 +99,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 
 	AM_RANGE(0xe800, 0xefff) AM_READ_PORT("IN1")
 	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
-	AM_RANGE(0xe803, 0xe803) AM_DEVWRITE_LEGACY(GAL_AUDIO, dambustr_noise_enable_w)
+	AM_RANGE(0xe803, 0xe803) AM_WRITE(dambustr_noise_enable_w)
 	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)	// probably louder than normal shot
 	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)	// normal shot (like Galaxian)
 	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)

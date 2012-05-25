@@ -81,6 +81,12 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE8_MEMBER(casino5_bank_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	DECLARE_WRITE8_MEMBER(led1_w);
+	DECLARE_WRITE8_MEMBER(led2_w);
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(misc_couple_w);
 };
 
 
@@ -260,15 +266,15 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER(hsync_changed)
+WRITE_LINE_MEMBER(merit_state::hsync_changed)
 {
 	/* update any video up to the current scanline */
-	device->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 }
 
-static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
+WRITE_LINE_MEMBER(merit_state::vsync_changed)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -280,55 +286,53 @@ static const mc6845_interface mc6845_intf =
 	NULL,						/* after pixel update callback */
 	DEVCB_NULL,					/* callback for display state changes */
 	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_LINE(hsync_changed),	/* HSYNC callback */
-	DEVCB_LINE(vsync_changed),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(merit_state,hsync_changed),	/* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(merit_state,vsync_changed),	/* VSYNC callback */
 	NULL						/* update address callback */
 };
 
-static WRITE8_DEVICE_HANDLER( led1_w )
+WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	set_led_status(device->machine(), 0,~data & 0x01);
-	set_led_status(device->machine(), 1,~data & 0x02);
-	set_led_status(device->machine(), 2,~data & 0x04);
-	set_led_status(device->machine(), 3,~data & 0x08);
-	set_led_status(device->machine(), 4,~data & 0x10);
+	set_led_status(machine(), 0,~data & 0x01);
+	set_led_status(machine(), 1,~data & 0x02);
+	set_led_status(machine(), 2,~data & 0x04);
+	set_led_status(machine(), 3,~data & 0x08);
+	set_led_status(machine(), 4,~data & 0x10);
 }
 
-static WRITE8_DEVICE_HANDLER( led2_w )
+WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	set_led_status(device->machine(), 5,~data & 0x01);
-	set_led_status(device->machine(), 6,~data & 0x02);
-	set_led_status(device->machine(), 7,~data & 0x04);
-	set_led_status(device->machine(), 8,~data & 0x08);
-	set_led_status(device->machine(), 9,~data & 0x10);
+	set_led_status(machine(), 5,~data & 0x01);
+	set_led_status(machine(), 6,~data & 0x02);
+	set_led_status(machine(), 7,~data & 0x04);
+	set_led_status(machine(), 8,~data & 0x08);
+	set_led_status(machine(), 9,~data & 0x10);
 
 	/* coin counter */
-	coin_counter_w(device->machine(),0,0x80-(data & 0x80));
+	coin_counter_w(machine(),0,0x80-(data & 0x80));
 }
 
-static WRITE8_DEVICE_HANDLER( misc_w )
+WRITE8_MEMBER(merit_state::misc_w)
 {
-	merit_state *state = device->machine().driver_data<merit_state>();
-	state->flip_screen_set(~data & 0x10);
-	state->m_extra_video_bank_bit = (data & 2) << 8;
-	state->m_lscnblk = (data >> 3) & 1;
+	flip_screen_set(~data & 0x10);
+	m_extra_video_bank_bit = (data & 2) << 8;
+	m_lscnblk = (data >> 3) & 1;
 
 	/* other bits unknown */
 }
 
-static WRITE8_DEVICE_HANDLER( misc_couple_w )
+WRITE8_MEMBER(merit_state::misc_couple_w)
 {
-	merit_state *state = device->machine().driver_data<merit_state>();
-	state->flip_screen_set(~data & 0x10);
-	state->m_extra_video_bank_bit = (data & 2) << 8;
-	state->m_lscnblk = (data >> 3) & 1;
+	flip_screen_set(~data & 0x10);
+	m_extra_video_bank_bit = (data & 2) << 8;
+	m_lscnblk = (data >> 3) & 1;
 
 	/* other bits unknown */
 
 	/*kludge to avoid jumps on ram area in The Couples*/
-	state->m_backup_ram[0x1011] = 0xc9; //ret
+	m_backup_ram[0x1011] = 0xc9; //ret
 }
 
 WRITE8_MEMBER(merit_state::casino5_bank_w)
@@ -1173,9 +1177,9 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 	DEVCB_INPUT_PORT("DSW"),	/* Port A read */
 	DEVCB_NULL,					/* Port A write */
 	DEVCB_NULL,					/* Port B read */
-	DEVCB_HANDLER(led1_w),		/* Port B write */
+	DEVCB_DRIVER_MEMBER(merit_state,led1_w),		/* Port B write */
 	DEVCB_NULL,					/* Port C read */
-	DEVCB_HANDLER(misc_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(merit_state,misc_w)		/* Port C write */
 };
 
 static I8255A_INTERFACE( couple_ppi8255_1_intf )
@@ -1183,9 +1187,9 @@ static I8255A_INTERFACE( couple_ppi8255_1_intf )
 	DEVCB_INPUT_PORT("DSW"),	/* Port A read */
 	DEVCB_NULL,					/* Port A write */
 	DEVCB_NULL,					/* Port B read */
-	DEVCB_HANDLER(led1_w),		/* Port B write */
+	DEVCB_DRIVER_MEMBER(merit_state,led1_w),		/* Port B write */
 	DEVCB_NULL,					/* Port C read */
-	DEVCB_HANDLER(misc_couple_w)/* Port C write */
+	DEVCB_DRIVER_MEMBER(merit_state,misc_couple_w)/* Port C write */
 };
 
 
@@ -1194,7 +1198,7 @@ static const ay8910_interface merit_ay8912_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(led2_w), DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(merit_state,led2_w), DEVCB_NULL
 };
 
 void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)

@@ -89,6 +89,7 @@ public:
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_READ8_MEMBER(n7751_t1_r);
+	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 };
 
 
@@ -291,16 +292,16 @@ READ8_MEMBER(othello_state::n7751_command_r)
 	return 0x80 | ((m_n7751_command & 0x07) << 4);
 }
 
-static WRITE8_DEVICE_HANDLER( n7751_p2_w )
+WRITE8_MEMBER(othello_state::n7751_p2_w)
 {
-	othello_state *state = device->machine().driver_data<othello_state>();
+	device_t *device = machine().device("n7751_8243");
 
 	/* write to P2; low 4 bits go to 8243 */
 	i8243_p2_w(device, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
-	state->m_n7751_busy = data;
+	m_n7751_busy = data;
 }
 
 READ8_MEMBER(othello_state::n7751_t1_r)
@@ -314,7 +315,7 @@ static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE_LEGACY("n7751_8243", n7751_p2_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("n7751_8243", i8243_prog_w)
 ADDRESS_MAP_END
 

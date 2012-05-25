@@ -125,6 +125,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mirax_coin_counter0_w);
 	DECLARE_WRITE8_MEMBER(mirax_coin_counter1_w);
 	DECLARE_WRITE8_MEMBER(mirax_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(ay1_sel);
+	DECLARE_WRITE8_MEMBER(ay2_sel);
 };
 
 
@@ -235,11 +237,17 @@ WRITE8_MEMBER(mirax_state::audio_w)
 	m_nAyCtrl=offset;
 }
 
-static WRITE8_DEVICE_HANDLER(ay_sel)
+WRITE8_MEMBER(mirax_state::ay1_sel)
 {
-	mirax_state *state = device->machine().driver_data<mirax_state>();
+	device_t *device = machine().device("ay1");
+	ay8910_address_w(device,0,m_nAyCtrl);
+	ay8910_data_w(device,0,data);
+}
 
-	ay8910_address_w(device,0,state->m_nAyCtrl);
+WRITE8_MEMBER(mirax_state::ay2_sel)
+{
+	device_t *device = machine().device("ay2");
+	ay8910_address_w(device,0,m_nAyCtrl);
 	ay8910_data_w(device,0,data);
 }
 
@@ -303,11 +311,11 @@ static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP
 	AM_RANGE(0xe001, 0xe001) AM_WRITENOP
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE_LEGACY("ay1", ay_sel) //1st ay ?
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ay1_sel) //1st ay ?
 
 	AM_RANGE(0xe400, 0xe400) AM_WRITENOP
 	AM_RANGE(0xe401, 0xe401) AM_WRITENOP
-	AM_RANGE(0xe403, 0xe403) AM_DEVWRITE_LEGACY("ay2", ay_sel) //2nd ay ?
+	AM_RANGE(0xe403, 0xe403) AM_WRITE(ay2_sel) //2nd ay ?
 
 	AM_RANGE(0xf900, 0xf9ff) AM_WRITE(audio_w)
 ADDRESS_MAP_END

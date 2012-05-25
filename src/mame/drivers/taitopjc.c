@@ -80,6 +80,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_common_w);
 	DECLARE_READ8_MEMBER(tlcs_sound_r);
 	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
+	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to1);
+	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to3);
 };
 
 static VIDEO_START( taitopjc )
@@ -383,11 +385,11 @@ ADDRESS_MAP_END
 
 
 
-static WRITE8_DEVICE_HANDLER( taitopjc_tlcs900_to1 )
+WRITE8_MEMBER(taitopjc_state::taitopjc_tlcs900_to1)
 {
 }
 
-static WRITE8_DEVICE_HANDLER( taitopjc_tlcs900_to3 )
+WRITE8_MEMBER(taitopjc_state::taitopjc_tlcs900_to3)
 {
 }
 
@@ -405,8 +407,8 @@ static const powerpc_config ppc603e_config =
 
 static const tlcs900_interface taitopjc_tlcs900_interface =
 {
-	DEVCB_HANDLER( taitopjc_tlcs900_to1 ),
-	DEVCB_HANDLER( taitopjc_tlcs900_to3 )
+	DEVCB_DRIVER_MEMBER(taitopjc_state,taitopjc_tlcs900_to1 ),
+	DEVCB_DRIVER_MEMBER(taitopjc_state,taitopjc_tlcs900_to3 )
 };
 
 static MACHINE_CONFIG_START( taitopjc, taitopjc_state )

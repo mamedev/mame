@@ -148,6 +148,20 @@ public:
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bios_ram_w);
+	DECLARE_READ32_MEMBER(ide_r);
+	DECLARE_WRITE32_MEMBER(ide_w);
+	DECLARE_READ32_MEMBER(fdc_r);
+	DECLARE_WRITE32_MEMBER(fdc_w);
+	DECLARE_READ8_MEMBER(at_dma8237_2_r);
+	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_READ8_MEMBER(io20_r);
+	DECLARE_WRITE8_MEMBER(io20_w);
+	DECLARE_WRITE_LINE_MEMBER(funkball_pic8259_1_set_int_line);
 };
 
 void funkball_state::video_start()
@@ -228,23 +242,27 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 }
 
 #if 0
-static READ32_DEVICE_HANDLER( ide_r )
+READ32_MEMBER(funkball_state::ide_r)
 {
+	device_t *device = machine().device("ide");
 	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
 }
 
-static WRITE32_DEVICE_HANDLER( ide_w )
+WRITE32_MEMBER(funkball_state::ide_w)
 {
+	device_t *device = machine().device("ide");
 	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
 }
 
-static READ32_DEVICE_HANDLER( fdc_r )
+READ32_MEMBER(funkball_state::fdc_r)
 {
+	device_t *device = machine().device("ide");
 	return ide_controller32_r(device, 0x3f0/4 + offset, mem_mask);
 }
 
-static WRITE32_DEVICE_HANDLER( fdc_w )
+WRITE32_MEMBER(funkball_state::fdc_w)
 {
+	device_t *device = machine().device("ide");
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
 	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
 }
@@ -314,22 +332,24 @@ WRITE8_MEMBER(funkball_state::at_page8_w)
 }
 
 
-static READ8_DEVICE_HANDLER(at_dma8237_2_r)
+READ8_MEMBER(funkball_state::at_dma8237_2_r)
 {
+	device_t *device = machine().device("dma8237_2");
 	return i8237_r(device, offset / 2);
 }
 
-static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
+WRITE8_MEMBER(funkball_state::at_dma8237_2_w)
 {
+	device_t *device = machine().device("dma8237_2");
 	i8237_w(device, offset / 2, data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+WRITE_LINE_MEMBER(funkball_state::pc_dma_hrq_changed)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	i8237_hlda_w( m_dma8237_1, state );
 }
 
 
@@ -356,20 +376,20 @@ static void set_dma_channel(device_t *device, int channel, int state)
 	if (!state) drvstate->m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(funkball_state::pc_dack0_w){ set_dma_channel(m_dma8237_1, 0, state); }
+WRITE_LINE_MEMBER(funkball_state::pc_dack1_w){ set_dma_channel(m_dma8237_1, 1, state); }
+WRITE_LINE_MEMBER(funkball_state::pc_dack2_w){ set_dma_channel(m_dma8237_1, 2, state); }
+WRITE_LINE_MEMBER(funkball_state::pc_dack3_w){ set_dma_channel(m_dma8237_1, 3, state); }
 
 static I8237_INTERFACE( dma8237_1_config )
 {
-	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(funkball_state,pc_dma_hrq_changed),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(funkball_state, pc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(funkball_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_DRIVER_LINE_MEMBER(funkball_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(funkball_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(funkball_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(funkball_state,pc_dack3_w) }
 };
 
 static I8237_INTERFACE( dma8237_2_config )
@@ -399,8 +419,9 @@ static void funkball_config_reg_w(device_t *device, UINT8 data)
 	state->m_funkball_config_regs[state->m_funkball_config_reg_sel] = data;
 }
 
-static READ8_DEVICE_HANDLER( io20_r )
+READ8_MEMBER(funkball_state::io20_r)
 {
+	device_t *device = machine().device("pic8259_1");
 	UINT8 r = 0;
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -418,14 +439,14 @@ static READ8_DEVICE_HANDLER( io20_r )
 	return r;
 }
 
-static WRITE8_DEVICE_HANDLER( io20_w )
+WRITE8_MEMBER(funkball_state::io20_w)
 {
-	funkball_state *state = device->machine().driver_data<funkball_state>();
+	device_t *device = machine().device("pic8259_1");
 
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x02)
 	{
-		state->m_funkball_config_reg_sel = data;
+		m_funkball_config_reg_sel = data;
 	}
 	else if (offset == 0x03)
 	{
@@ -568,17 +589,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", io20_r, io20_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_READWRITE8(io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
-//  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
-//  AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
+//  AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+//  AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
@@ -1012,10 +1033,9 @@ static const struct pit8253_config funkball_pit8254_config =
 	}
 };
 
-static WRITE_LINE_DEVICE_HANDLER( funkball_pic8259_1_set_int_line )
+WRITE_LINE_MEMBER(funkball_state::funkball_pic8259_1_set_int_line)
 {
-	funkball_state *drvstate = device->machine().driver_data<funkball_state>();
-	device_set_input_line(drvstate->m_maincpu, 0, state ? HOLD_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( funkball_state::get_slave_ack )
@@ -1029,7 +1049,7 @@ READ8_MEMBER( funkball_state::get_slave_ack )
 
 static const struct pic8259_interface funkball_pic8259_1_config =
 {
-	DEVCB_LINE(funkball_pic8259_1_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(funkball_state,funkball_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
 	DEVCB_MEMBER(funkball_state,get_slave_ack)
 };

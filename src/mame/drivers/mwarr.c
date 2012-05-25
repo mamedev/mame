@@ -91,6 +91,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(sprites_commands_w);
 	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
+	DECLARE_WRITE16_MEMBER(oki1_bank_w);
 };
 
 
@@ -128,8 +129,9 @@ WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_DEVICE_HANDLER( oki1_bank_w )
+WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 {
+	device_t *device = machine().device("oki2");
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
 
@@ -206,7 +208,7 @@ static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x110004, 0x110005) AM_READ_PORT("DSW")
-	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE_LEGACY("oki2", oki1_bank_w)
+	AM_RANGE(0x110010, 0x110011) AM_WRITE(oki1_bank_w)
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("mwarr_ram")

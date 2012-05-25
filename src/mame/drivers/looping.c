@@ -133,6 +133,10 @@ public:
 	DECLARE_READ8_MEMBER(cop_io_r);
 	DECLARE_WRITE8_MEMBER(cop_io_w);
 	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
+	DECLARE_WRITE8_MEMBER(looping_sound_sw);
+	DECLARE_WRITE8_MEMBER(ay_enable_w);
+	DECLARE_WRITE8_MEMBER(speech_enable_w);
 };
 
 
@@ -354,9 +358,9 @@ WRITE8_MEMBER(looping_state::looping_souint_clr)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( looping_spcint )
+WRITE_LINE_MEMBER(looping_state::looping_spcint)
 {
-	cputag_set_input_line_and_vector(device->machine(), "audiocpu", 0, !state, 6);
+	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, !state, 6);
 }
 
 
@@ -374,8 +378,9 @@ WRITE8_MEMBER(looping_state::looping_soundlatch_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( looping_sound_sw )
+WRITE8_MEMBER(looping_state::looping_sound_sw)
 {
+	device_t *device = machine().device("dac");
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
         0001 = ASOV
@@ -387,9 +392,8 @@ static WRITE8_DEVICE_HANDLER( looping_sound_sw )
         0007 = AFA
     */
 
-	looping_state *state = device->machine().driver_data<looping_state>();
-	state->m_sound[offset + 1] = data ^ 1;
-	dac_data_w(device, ((state->m_sound[2] << 7) + (state->m_sound[3] << 6)) * state->m_sound[7]);
+	m_sound[offset + 1] = data ^ 1;
+	dac_data_w(device, ((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
 }
 
 
@@ -400,8 +404,9 @@ static WRITE8_DEVICE_HANDLER( looping_sound_sw )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ay_enable_w )
+WRITE8_MEMBER(looping_state::ay_enable_w)
 {
+	device_t *device = machine().device("aysnd");
 	int output;
 
 	device_sound_interface *sound;
@@ -411,8 +416,9 @@ static WRITE8_DEVICE_HANDLER( ay_enable_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER( speech_enable_w )
+WRITE8_MEMBER(looping_state::speech_enable_w)
 {
+	device_t *device = machine().device("tms");
 	device_sound_interface *sound;
 	device->interface(sound);
 	sound->set_output_gain(0, (data & 1) ? 1.0 : 0.0);
@@ -546,9 +552,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
 	AM_RANGE(0x000, 0x000) AM_WRITE(looping_souint_clr)
-	AM_RANGE(0x001, 0x007) AM_DEVWRITE_LEGACY("dac", looping_sound_sw)
-	AM_RANGE(0x008, 0x008) AM_DEVWRITE_LEGACY("aysnd", ay_enable_w)
-	AM_RANGE(0x009, 0x009) AM_DEVWRITE_LEGACY("tms", speech_enable_w)
+	AM_RANGE(0x001, 0x007) AM_WRITE(looping_sound_sw)
+	AM_RANGE(0x008, 0x008) AM_WRITE(ay_enable_w)
+	AM_RANGE(0x009, 0x009) AM_WRITE(speech_enable_w)
 	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
 	AM_RANGE(0x00b, 0x00f) AM_NOP
 ADDRESS_MAP_END
@@ -601,7 +607,7 @@ GFXDECODE_END
 
 static const tms5220_interface tms5220_config =
 {
-	DEVCB_LINE(looping_spcint),		// IRQ
+	DEVCB_DRIVER_LINE_MEMBER(looping_state,looping_spcint),		// IRQ
 	DEVCB_NULL						// READYQ
 };
 

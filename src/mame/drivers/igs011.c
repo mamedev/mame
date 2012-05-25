@@ -175,6 +175,9 @@ public:
 	DECLARE_WRITE16_MEMBER(vbowl_link_3_w);
 	UINT16 igs_dips_r(int NUM);
 	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
+	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
+	DECLARE_READ16_MEMBER(ics2115_word_r);
+	DECLARE_WRITE16_MEMBER(ics2115_word_w);
 };
 
 
@@ -2196,8 +2199,9 @@ WRITE16_MEMBER(igs011_state::lhb_irq_enable_w)
 	COMBINE_DATA( &m_lhb_irq_enable );
 }
 
-static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
+WRITE16_MEMBER(igs011_state::lhb_okibank_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -2205,7 +2209,7 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 	}
 
 	if ( data & (~0x200) )
-		logerror("%s: warning, unknown bits written in oki bank = %02x\n", device->machine().describe_context(), data);
+		logerror("%s: warning, unknown bits written in oki bank = %02x\n", machine().describe_context(), data);
 
 //  popmessage("oki %04x",data);
 }
@@ -2215,7 +2219,7 @@ static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
 
-	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE_LEGACY("oki", lhb_okibank_w )
+	AM_RANGE( 0x010000, 0x010001 ) AM_WRITE(lhb_okibank_w )
 
 	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)
 	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)
@@ -2255,7 +2259,7 @@ static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
 
-	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE_LEGACY("oki", lhb_okibank_w )
+	AM_RANGE( 0x010000, 0x010001 ) AM_WRITE(lhb_okibank_w )
 
 	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc  (33)
 	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)	// swap (33)
@@ -2369,9 +2373,9 @@ ADDRESS_MAP_END
 /* trap15's note:
  * TODO: change this horrible device-> chain to be proper.
  */
-static READ16_DEVICE_HANDLER( ics2115_word_r )
+READ16_MEMBER(igs011_state::ics2115_word_r)
 {
-	ics2115_device* ics2115 = device->machine().device<ics2115_device>("ics");
+	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
 		case 0:	return ics2115_device::read(ics2115, (offs_t)0);
@@ -2381,9 +2385,9 @@ static READ16_DEVICE_HANDLER( ics2115_word_r )
 	return 0xff;
 }
 
-static WRITE16_DEVICE_HANDLER( ics2115_word_w )
+WRITE16_MEMBER(igs011_state::ics2115_word_w)
 {
-	ics2115_device* ics2115 = device->machine().device<ics2115_device>("ics");
+	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
 		case 1:
@@ -2462,7 +2466,7 @@ static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE_LEGACY("ics", ics2115_word_r, ics2115_word_w )
+	AM_RANGE( 0x600000, 0x600007 ) AM_READWRITE(ics2115_word_r, ics2115_word_w )
 	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_SHARE("vbowl_trackball")
 	AM_RANGE( 0x700004, 0x700005 ) AM_WRITE(vbowl_pen_hi_w )
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(vbowl_igs003_w )

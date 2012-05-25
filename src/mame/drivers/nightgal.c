@@ -72,6 +72,8 @@ public:
 	DECLARE_READ8_MEMBER(blit_vregs_r);
 	DECLARE_WRITE8_MEMBER(blit_true_vregs_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(input_1p_r);
+	DECLARE_READ8_MEMBER(input_2p_r);
 };
 
 
@@ -417,44 +419,42 @@ WRITE8_MEMBER(nightgal_state::mux_w)
 	//printf("%02x\n", m_mux_data);
 }
 
-static READ8_DEVICE_HANDLER( input_1p_r )
+READ8_MEMBER(nightgal_state::input_1p_r)
 {
-	nightgal_state *state = device->machine().driver_data<nightgal_state>();
-	UINT8 cr_clear = state->ioport("CR_CLEAR")->read();
+	UINT8 cr_clear = ioport("CR_CLEAR")->read();
 
-	switch (state->m_mux_data)
+	switch (m_mux_data)
 	{
-		case 0x01: return state->ioport("PL1_1")->read() | cr_clear;
-		case 0x02: return state->ioport("PL1_2")->read() | cr_clear;
-		case 0x04: return state->ioport("PL1_3")->read() | cr_clear;
-		case 0x08: return state->ioport("PL1_4")->read() | cr_clear;
-		case 0x10: return state->ioport("PL1_5")->read() | cr_clear;
-		case 0x20: return state->ioport("PL1_6")->read() | cr_clear;
+		case 0x01: return ioport("PL1_1")->read() | cr_clear;
+		case 0x02: return ioport("PL1_2")->read() | cr_clear;
+		case 0x04: return ioport("PL1_3")->read() | cr_clear;
+		case 0x08: return ioport("PL1_4")->read() | cr_clear;
+		case 0x10: return ioport("PL1_5")->read() | cr_clear;
+		case 0x20: return ioport("PL1_6")->read() | cr_clear;
 	}
-	//printf("%04x\n", state->m_mux_data);
+	//printf("%04x\n", m_mux_data);
 
-	return (state->ioport("PL1_1")->read() & state->ioport("PL1_2")->read() & state->ioport("PL1_3")->read() &
-	       state->ioport("PL1_4")->read() & state->ioport("PL1_5")->read() & state->ioport("PL1_6")->read()) | cr_clear;
+	return (ioport("PL1_1")->read() & ioport("PL1_2")->read() & ioport("PL1_3")->read() &
+	       ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
 }
 
-static READ8_DEVICE_HANDLER( input_2p_r )
+READ8_MEMBER(nightgal_state::input_2p_r)
 {
-	nightgal_state *state = device->machine().driver_data<nightgal_state>();
-	UINT8 coin_port = state->ioport("COINS")->read();
+	UINT8 coin_port = ioport("COINS")->read();
 
-	switch (state->m_mux_data)
+	switch (m_mux_data)
 	{
-		case 0x01: return state->ioport("PL2_1")->read() | coin_port;
-		case 0x02: return state->ioport("PL2_2")->read() | coin_port;
-		case 0x04: return state->ioport("PL2_3")->read() | coin_port;
-		case 0x08: return state->ioport("PL2_4")->read() | coin_port;
-		case 0x10: return state->ioport("PL2_5")->read() | coin_port;
-		case 0x20: return state->ioport("PL2_6")->read() | coin_port;
+		case 0x01: return ioport("PL2_1")->read() | coin_port;
+		case 0x02: return ioport("PL2_2")->read() | coin_port;
+		case 0x04: return ioport("PL2_3")->read() | coin_port;
+		case 0x08: return ioport("PL2_4")->read() | coin_port;
+		case 0x10: return ioport("PL2_5")->read() | coin_port;
+		case 0x20: return ioport("PL2_6")->read() | coin_port;
 	}
-	//printf("%04x\n", state->m_mux_data);
+	//printf("%04x\n", m_mux_data);
 
-	return (state->ioport("PL2_1")->read() & state->ioport("PL2_2")->read() & state->ioport("PL2_3")->read() &
-	       state->ioport("PL2_4")->read() & state->ioport("PL2_5")->read() & state->ioport("PL2_6")->read()) | coin_port;
+	return (ioport("PL2_1")->read() & ioport("PL2_2")->read() & ioport("PL2_3")->read() &
+	       ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
 }
 
 /********************************************
@@ -821,8 +821,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(input_1p_r),
-	DEVCB_HANDLER(input_2p_r),
+	DEVCB_DRIVER_MEMBER(nightgal_state,input_1p_r),
+	DEVCB_DRIVER_MEMBER(nightgal_state,input_2p_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

@@ -97,6 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(microtouch_in);
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
+	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 };
 
 
@@ -116,9 +117,9 @@ WRITE_LINE_MEMBER(magtouch_state::microtouch_in)
 	m_uart->rx_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_1 )
+WRITE_LINE_MEMBER(magtouch_state::at_com_interrupt_1)
 {
-	pic8259_ir4_w(device->machine().device("pic8259_1"), state);
+	pic8259_ir4_w(machine().device("pic8259_1"), state);
 }
 
 static const ins8250_interface magtouch_com0_interface =
@@ -126,7 +127,7 @@ static const ins8250_interface magtouch_com0_interface =
 	DEVCB_DRIVER_LINE_MEMBER(magtouch_state, microtouch_out),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(at_com_interrupt_1),
+	DEVCB_DRIVER_LINE_MEMBER(magtouch_state,at_com_interrupt_1),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

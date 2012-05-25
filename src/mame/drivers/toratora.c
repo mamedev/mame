@@ -46,6 +46,15 @@ public:
 	DECLARE_WRITE8_MEMBER(clear_tv_w);
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(clear_timer_w);
+	DECLARE_WRITE_LINE_MEMBER(cb2_u3_w);
+	DECLARE_WRITE8_MEMBER(port_b_u1_w);
+	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	DECLARE_WRITE8_MEMBER(sn1_port_a_u2_u3_w);
+	DECLARE_WRITE8_MEMBER(sn1_port_b_u2_u3_w);
+	DECLARE_WRITE_LINE_MEMBER(sn1_ca2_u2_u3_w);
+	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_u3_w);
+	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_u3_w);
+	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_u3_w);
 };
 
 
@@ -56,7 +65,7 @@ public:
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( cb2_u3_w )
+WRITE_LINE_MEMBER(toratora_state::cb2_u3_w)
 {
 	logerror("DIP tristate %sactive\n",(state & 1) ? "in" : "");
 }
@@ -113,12 +122,13 @@ WRITE8_MEMBER(toratora_state::clear_tv_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( port_b_u1_w )
+WRITE8_MEMBER(toratora_state::port_b_u1_w)
 {
-	if (downcast<pia6821_device *>(device)->port_b_z_mask() & 0x20)
-		coin_counter_w(device->machine(), 0, 1);
+	pia6821_device *pia = machine().device<pia6821_device>("pia_u1");
+	if (pia->port_b_z_mask() & 0x20)
+		coin_counter_w(machine(), 0, 1);
 	else
-		coin_counter_w(device->machine(), 0, data & 0x20);
+		coin_counter_w(machine(), 0, data & 0x20);
 }
 
 
@@ -128,14 +138,13 @@ static WRITE8_DEVICE_HANDLER( port_b_u1_w )
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
+WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
 {
-	toratora_state *toratora = device->machine().driver_data<toratora_state>();
-	pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia6821_device *pia = machine().device<pia6821_device>("pia_u1");
 	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	logerror("GEN IRQ: %x\n", combined_state);
-	device_set_input_line(toratora->m_maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -204,15 +213,17 @@ static const sn76477_interface sn76477_intf =
 };
 
 
-static WRITE8_DEVICE_HANDLER( port_a_u2_u3_w )
+WRITE8_MEMBER(toratora_state::sn1_port_a_u2_u3_w)
 {
+	device_t *device = machine().device("sn1");
 	sn76477_vco_voltage_w(device, 2.35 * (data & 0x7f) / 128.0);
 	sn76477_enable_w(device, (data >> 7) & 0x01);
 }
 
 
-static WRITE8_DEVICE_HANDLER( port_b_u2_u3_w )
+WRITE8_MEMBER(toratora_state::sn1_port_b_u2_u3_w)
 {
+	device_t *device = machine().device("sn1");
 	static const double resistances[] =
 	{
 	  0,  /* N/C */
@@ -234,11 +245,49 @@ static WRITE8_DEVICE_HANDLER( port_b_u2_u3_w )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( ca2_u2_u3_w )
+WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u2_u3_w)
 {
+	device_t *device = machine().device("sn1");
 	sn76477_vco_w(device, state);
 }
 
+WRITE8_MEMBER(toratora_state::sn2_port_a_u2_u3_w)
+{
+	device_t *device = machine().device("sn2");
+	sn76477_vco_voltage_w(device, 2.35 * (data & 0x7f) / 128.0);
+	sn76477_enable_w(device, (data >> 7) & 0x01);
+}
+
+
+WRITE8_MEMBER(toratora_state::sn2_port_b_u2_u3_w)
+{
+	device_t *device = machine().device("sn2");
+	static const double resistances[] =
+	{
+	  0,  /* N/C */
+	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
+	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
+	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
+	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
+	  RES_K(47) + RES_K(47) + RES_K(91),
+	  RES_K(47) + RES_K(47) + RES_K(91),
+	  RES_K(47)
+	};
+
+	sn76477_mixer_a_w      (device, (data >> 0) & 0x01);
+	sn76477_mixer_b_w      (device, (data >> 1) & 0x01);
+	sn76477_mixer_c_w      (device, (data >> 2) & 0x01);
+	sn76477_envelope_1_w   (device, (data >> 3) & 0x01);
+	sn76477_envelope_2_w   (device, (data >> 4) & 0x01);
+	sn76477_amplitude_res_w(device, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+}
+
+
+WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_u3_w)
+{
+	device_t *device = machine().device("sn2");
+	sn76477_vco_w(device, state);
+}
 
 /*************************************
  *
@@ -255,11 +304,11 @@ static const pia6821_interface pia_u1_intf =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(port_b_u1_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(toratora_state,port_b_u1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(main_cpu_irq),		/* IRQA */
-	DEVCB_LINE(main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq)		/* IRQB */
 };
 
 
@@ -271,9 +320,9 @@ static const pia6821_interface pia_u2_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("sn1", port_a_u2_u3_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER("sn1", port_b_u2_u3_w),		/* port B out */
-	DEVCB_DEVICE_LINE("sn1", ca2_u2_u3_w),				/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_a_u2_u3_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_b_u2_u3_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn1_ca2_u2_u3_w),				/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
@@ -288,10 +337,10 @@ static const pia6821_interface pia_u3_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("sn2", port_a_u2_u3_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER("sn2", port_b_u2_u3_w),		/* port B out */
-	DEVCB_DEVICE_LINE("sn2", ca2_u2_u3_w),				/* line CA2 out */
-	DEVCB_LINE(cb2_u3_w),								/* port CB2 out */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_a_u2_u3_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_b_u2_u3_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn2_ca2_u2_u3_w),				/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,cb2_u3_w),								/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };

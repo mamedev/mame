@@ -150,6 +150,8 @@ public:
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
+	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
 };
 
 
@@ -165,18 +167,18 @@ static const eeprom_interface eeprom_intf =
 };
 
 
-static READ16_DEVICE_HANDLER( pntnpuzl_eeprom_r )
+READ16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_r)
 {
-	pntnpuzl_state *state = device->machine().driver_data<pntnpuzl_state>();
+	device_t *device = machine().device("eeprom");
 	/* bit 11 is EEPROM data */
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (state->m_eeprom & 0xf4ff) | (eeprom->read_bit()<<11) | (state->ioport("IN1")->read() & 0x0300);
+	return (m_eeprom & 0xf4ff) | (eeprom->read_bit()<<11) | (ioport("IN1")->read() & 0x0300);
 }
 
-static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
+WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
 {
-	pntnpuzl_state *state = device->machine().driver_data<pntnpuzl_state>();
-	state->m_eeprom = data;
+	device_t *device = machine().device("eeprom");
+	m_eeprom = data;
 
 	/* bit 12 is data */
 	/* bit 13 is clock (active high) */
@@ -294,9 +296,9 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
 	AM_RANGE(0x180000, 0x180001) AM_READ(irq4_ack_r)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
-	AM_RANGE(0x280000, 0x280001) AM_DEVREAD_LEGACY("eeprom", pntnpuzl_eeprom_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ(pntnpuzl_eeprom_r)
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN2")
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE_LEGACY("eeprom", pntnpuzl_eeprom_w)
+	AM_RANGE(0x280000, 0x280001) AM_WRITE(pntnpuzl_eeprom_w)
 	AM_RANGE(0x280008, 0x280009) AM_WRITENOP
 	AM_RANGE(0x28000a, 0x28000b) AM_WRITENOP
 	AM_RANGE(0x280010, 0x280011) AM_WRITENOP

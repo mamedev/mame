@@ -295,6 +295,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ8_MEMBER(input_port_1_bit_r);
+	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 };
 
 
@@ -350,15 +352,15 @@ CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 }
 
 
-static READ8_DEVICE_HANDLER( input_port_1_bit_r )
+READ8_MEMBER(tempest_state::input_port_1_bit_r)
 {
-	return (device->machine().root_device().ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
+	return (machine().root_device().ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
 }
 
 
-static READ8_DEVICE_HANDLER( input_port_2_bit_r )
+READ8_MEMBER(tempest_state::input_port_2_bit_r)
 {
-	return (device->machine().root_device().ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
+	return (machine().root_device().ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
 }
 
 
@@ -548,28 +550,28 @@ INPUT_PORTS_END
 static const pokey_interface pokey_interface_1 =
 {
 	{
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r),
-		DEVCB_HANDLER(input_port_1_bit_r)
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_1_bit_r)
 	}
 };
 
 static const pokey_interface pokey_interface_2 =
 {
 	{
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r),
-		DEVCB_HANDLER(input_port_2_bit_r)
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r),
+		DEVCB_DRIVER_MEMBER(tempest_state,input_port_2_bit_r)
 	}
 };
 

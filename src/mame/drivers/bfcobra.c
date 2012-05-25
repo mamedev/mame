@@ -286,6 +286,16 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(fd_op_w);
 	DECLARE_WRITE8_MEMBER(fd_ctrl_w);
+	DECLARE_READ8_MEMBER(upd_r);
+	DECLARE_WRITE8_MEMBER(upd_w);
+	DECLARE_READ_LINE_MEMBER(z80_acia_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(z80_acia_tx_w);
+	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
+	DECLARE_READ_LINE_MEMBER(m6809_acia_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(m6809_acia_tx_w);
+	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
+	DECLARE_READ_LINE_MEMBER(data_acia_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
 };
 
 
@@ -1450,13 +1460,15 @@ WRITE8_MEMBER(bfcobra_state::latch_w)
 	}
 }
 
-static READ8_DEVICE_HANDLER( upd_r )
+READ8_MEMBER(bfcobra_state::upd_r)
 {
+	device_t *device = machine().device("upd");
 	return 2 | upd7759_busy_r(device);
 }
 
-static WRITE8_DEVICE_HANDLER( upd_w )
+WRITE8_MEMBER(bfcobra_state::upd_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_reset_w(device, data & 0x80);
 	upd7759_port_w(device, 0, data & 0x3f);
 	upd7759_start_w(device, data & 0x40 ? 0 : 1);
@@ -1479,7 +1491,7 @@ static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
-	AM_RANGE(0x3801, 0x3801) AM_DEVREADWRITE_LEGACY("upd", upd_r, upd_w)
+	AM_RANGE(0x3801, 0x3801) AM_READWRITE(upd_r, upd_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* Watchdog */
 ADDRESS_MAP_END
@@ -1604,76 +1616,69 @@ static void init_ram(running_machine &machine)
     What are the correct ACIA clocks ?
 */
 
-static READ_LINE_DEVICE_HANDLER( z80_acia_rx_r )
+READ_LINE_MEMBER(bfcobra_state::z80_acia_rx_r)
 {
-	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	return state->m_m6809_z80_line;
+	return m_m6809_z80_line;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( z80_acia_tx_w )
+WRITE_LINE_MEMBER(bfcobra_state::z80_acia_tx_w)
 {
-	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	drvstate->m_z80_m6809_line = state;
+	m_z80_m6809_line = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( z80_acia_irq )
+WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
 {
-	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	drvstate->m_acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
-	update_irqs(device->machine());
+	m_acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
+	update_irqs(machine());
 }
 
 static ACIA6850_INTERFACE( z80_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_LINE(z80_acia_rx_r), /*&m6809_z80_line,*/
-	DEVCB_LINE(z80_acia_tx_w), /*&z80_m6809_line,*/
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,z80_acia_rx_r), /*&m6809_z80_line,*/
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,z80_acia_tx_w), /*&z80_m6809_line,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(z80_acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,z80_acia_irq)
 };
 
-static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
+READ_LINE_MEMBER(bfcobra_state::m6809_acia_rx_r)
 {
-	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	return state->m_z80_m6809_line;
+	return m_z80_m6809_line;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
+WRITE_LINE_MEMBER(bfcobra_state::m6809_acia_tx_w)
 {
-	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	drvstate->m_m6809_z80_line = state;
+	m_m6809_z80_line = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m6809_data_irq )
+WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_LINE(m6809_acia_rx_r),/*&z80_m6809_line,*/
-	DEVCB_LINE(m6809_acia_tx_w),/*&m6809_z80_line,*/
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,m6809_acia_rx_r),/*&z80_m6809_line,*/
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,m6809_acia_tx_w),/*&m6809_z80_line,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-static READ_LINE_DEVICE_HANDLER( data_acia_rx_r )
+READ_LINE_MEMBER(bfcobra_state::data_acia_rx_r)
 {
-	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	return state->m_data_r;
+	return m_data_r;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( data_acia_tx_w )
+WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
 {
-	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	 drvstate->m_data_t = state;
+	 m_data_t = state;
 }
 
 
@@ -1681,12 +1686,12 @@ static ACIA6850_INTERFACE( data_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_LINE(data_acia_rx_r),/*data_r,*/
-	DEVCB_LINE(data_acia_tx_w),/*data_t,*/
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,data_acia_rx_r),/*data_r,*/
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,data_acia_tx_w),/*data_t,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(m6809_data_irq)
+	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,m6809_data_irq)
 };
 
 

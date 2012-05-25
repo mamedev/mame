@@ -230,6 +230,9 @@ public:
 	DECLARE_READ8_MEMBER(read_a00x);
 	DECLARE_WRITE8_MEMBER(write_a00x);
 	DECLARE_READ8_MEMBER(prot_read_700x);
+	DECLARE_READ8_MEMBER(read_8010);
+	DECLARE_WRITE8_MEMBER(xscroll_w);
+	DECLARE_WRITE8_MEMBER(yscroll_w);
 };
 
 
@@ -426,17 +429,15 @@ READ8_MEMBER(witch_state::prot_read_700x)
  * Status from ES8712?
  * BIT1 is zero when no sample is playing?
  */
-static READ8_DEVICE_HANDLER(read_8010) {	return 0x00; }
+READ8_MEMBER(witch_state::read_8010){	return 0x00; }
 
-static WRITE8_DEVICE_HANDLER(xscroll_w)
+WRITE8_MEMBER(witch_state::xscroll_w)
 {
-	witch_state *state = device->machine().driver_data<witch_state>();
-	state->m_scrollx=data;
+	m_scrollx=data;
 }
-static WRITE8_DEVICE_HANDLER(yscroll_w)
+WRITE8_MEMBER(witch_state::yscroll_w)
 {
-	witch_state *state = device->machine().driver_data<witch_state>();
-	state->m_scrolly=data;
+	m_scrolly=data;
 }
 
 static const ym2203_interface ym2203_interface_0 =
@@ -459,8 +460,8 @@ static const ym2203_interface ym2203_interface_1 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(xscroll_w),
-		DEVCB_HANDLER(yscroll_w)
+		DEVCB_DRIVER_MEMBER(witch_state,xscroll_w),
+		DEVCB_DRIVER_MEMBER(witch_state,yscroll_w)
 	},
 	NULL
 };
@@ -488,7 +489,7 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE_LEGACY("essnd", read_8010, es8712_w)
+	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE_LEGACY("essnd", es8712_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")

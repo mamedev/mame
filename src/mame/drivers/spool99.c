@@ -111,6 +111,9 @@ public:
 	DECLARE_WRITE8_MEMBER(spool99_cram_w);
 	DECLARE_READ8_MEMBER(spool99_io_r);
 	DECLARE_READ8_MEMBER(vcarn_io_r);
+	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
+	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
+	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 };
 
 static TILE_GET_INFO( get_spool99_tile_info )
@@ -190,22 +193,25 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( eeprom_resetline_w )
+WRITE8_MEMBER(spool99_state::eeprom_resetline_w)
 {
+	device_t *device = machine().device("eeprom");
 	// reset line asserted: reset.
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-static WRITE8_DEVICE_HANDLER( eeprom_clockline_w )
+WRITE8_MEMBER(spool99_state::eeprom_clockline_w)
 {
+	device_t *device = machine().device("eeprom");
 	// clock line asserted: write latch or select next bit to read
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
+WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
 {
+	device_t *device = machine().device("eeprom");
 	// latch the bit
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit(data & 0x01);
@@ -215,9 +221,9 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
-	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
-	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE_LEGACY("eeprom", eeprom_clockline_w )
-	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE_LEGACY("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xafed, 0xafed) AM_WRITE(eeprom_resetline_w )
+	AM_RANGE(0xafee, 0xafee) AM_WRITE(eeprom_clockline_w )
+	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
 
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
@@ -261,9 +267,9 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
-	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
-	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE_LEGACY("eeprom", eeprom_clockline_w )
-	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE_LEGACY("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xa745, 0xa745) AM_WRITE(eeprom_resetline_w )
+	AM_RANGE(0xa746, 0xa746) AM_WRITE(eeprom_clockline_w )
+	AM_RANGE(0xa747, 0xa747) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
 
 	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")

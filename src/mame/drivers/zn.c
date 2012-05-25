@@ -92,6 +92,9 @@ public:
 	DECLARE_READ8_MEMBER(cbaj_z80_latch_r);
 	DECLARE_WRITE8_MEMBER(cbaj_z80_latch_w);
 	DECLARE_READ8_MEMBER(cbaj_z80_ready_r);
+	DECLARE_READ32_MEMBER(jdredd_idestat_r);
+	DECLARE_READ32_MEMBER(jdredd_ide_r);
+	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -2028,13 +2031,15 @@ static void jdredd_ide_interrupt(device_t *device, int state)
 	}
 }
 
-static READ32_DEVICE_HANDLER( jdredd_idestat_r )
+READ32_MEMBER(zn_state::jdredd_idestat_r)
 {
+	device_t *device = machine().device("ide");
 	return ide_controller_r( device, 0x1f7, 1 );
 }
 
-static READ32_DEVICE_HANDLER( jdredd_ide_r )
+READ32_MEMBER(zn_state::jdredd_ide_r)
 {
+	device_t *device = machine().device("ide");
 	UINT32 data = 0;
 
 	if( ACCESSING_BITS_0_7 )
@@ -2057,8 +2062,9 @@ static READ32_DEVICE_HANDLER( jdredd_ide_r )
 	return data;
 }
 
-static WRITE32_DEVICE_HANDLER( jdredd_ide_w )
+WRITE32_MEMBER(zn_state::jdredd_ide_w)
 {
+	device_t *device = machine().device("ide");
 	if( ACCESSING_BITS_0_7 )
 	{
 		ide_controller_w( device, 0x1f0 + ( offset * 2 ), 1, data >> 0 );
@@ -2164,11 +2170,9 @@ static DRIVER_INIT( coh1000a )
 	if( ( !strcmp( machine.system().name, "jdredd" ) ) ||
 		( !strcmp( machine.system().name, "jdreddb" ) ) )
 	{
-		device_t *ide = machine.device("ide");
-
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( *ide, 0x1fbfff8c, 0x1fbfff8f, FUNC(jdredd_idestat_r) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1fbfff8c, 0x1fbfff8f,read32_delegate(FUNC(zn_state::jdredd_idestat_r),state) );
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write                    ( 0x1fbfff8c, 0x1fbfff8f);
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( *ide, 0x1fbfff90, 0x1fbfff9f, FUNC(jdredd_ide_r), FUNC(jdredd_ide_w) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1fbfff90, 0x1fbfff9f, read32_delegate(FUNC(zn_state::jdredd_ide_r),state), write32_delegate(FUNC(zn_state::jdredd_ide_w),state) );
 	}
 
 	zn_driver_init(machine);

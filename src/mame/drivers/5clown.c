@@ -475,6 +475,13 @@ public:
 	DECLARE_READ8_MEMBER(snd_e06_r);
 	DECLARE_WRITE8_MEMBER(snd_800_w);
 	DECLARE_WRITE8_MEMBER(snd_a02_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(counters_w);
+	DECLARE_WRITE8_MEMBER(trigsnd_w);
+	DECLARE_READ8_MEMBER(pia0_b_r);
+	DECLARE_READ8_MEMBER(pia1_b_r);
+	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
 };
 
 
@@ -586,29 +593,27 @@ static PALETTE_INIT( fclown )
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-static READ8_DEVICE_HANDLER( mux_port_r )
+READ8_MEMBER(_5clown_state::mux_port_r)
 {
-	_5clown_state *state = device->machine().driver_data<_5clown_state>();
-	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
+	switch( m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return state->ioport("IN0-0")->read();
-		case 0x20: return state->ioport("IN0-1")->read();
-		case 0x40: return state->ioport("IN0-2")->read();
-		case 0x80: return state->ioport("IN0-3")->read();
+		case 0x10: return ioport("IN0-0")->read();
+		case 0x20: return ioport("IN0-1")->read();
+		case 0x40: return ioport("IN0-2")->read();
+		case 0x80: return ioport("IN0-3")->read();
 	}
 
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER( mux_w )
+WRITE8_MEMBER(_5clown_state::mux_w)
 {
-	_5clown_state *state = device->machine().driver_data<_5clown_state>();
-	state->m_mux_data = data ^ 0xff;	/* Inverted */
+	m_mux_data = data ^ 0xff;	/* Inverted */
 }
 
 
-static WRITE8_DEVICE_HANDLER( counters_w )
+WRITE8_MEMBER(_5clown_state::counters_w)
 {
 /*  Counters:
 
@@ -619,15 +624,15 @@ static WRITE8_DEVICE_HANDLER( counters_w )
     -x-- ----   Unknown (increments at start).
     x--- ----   Unknown (increments at start).
 */
-	coin_counter_w(device->machine(), 0, data & 0x10);	/* Key In */
-	coin_counter_w(device->machine(), 1, data & 0x20);	/* Payout */
-	coin_counter_w(device->machine(), 2, data & 0x40);	/* unknown */
-	coin_counter_w(device->machine(), 3, data & 0x80);	/* unknown */
+	coin_counter_w(machine(), 0, data & 0x10);	/* Key In */
+	coin_counter_w(machine(), 1, data & 0x20);	/* Payout */
+	coin_counter_w(machine(), 2, data & 0x40);	/* unknown */
+	coin_counter_w(machine(), 3, data & 0x80);	/* unknown */
 
 }
 
 
-static WRITE8_DEVICE_HANDLER( trigsnd_w )
+WRITE8_MEMBER(_5clown_state::trigsnd_w)
 {
 	/************ Interrupts trigger **************
 
@@ -635,23 +640,23 @@ static WRITE8_DEVICE_HANDLER( trigsnd_w )
 
 	if ( (data & 0x0f) == 0x07 )
 	{
-		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE );
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE );
 	}
 
 	else
 	{
-		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE );
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE );
 	}
 
 }
 
-static READ8_DEVICE_HANDLER( pia0_b_r )
+READ8_MEMBER(_5clown_state::pia0_b_r)
 {
 	/* often read the port */
 	return 0x00;
 }
 
-static READ8_DEVICE_HANDLER( pia1_b_r )
+READ8_MEMBER(_5clown_state::pia1_b_r)
 {
 	/* constantly read the port */
 	return 0x00;	/* bit 2 shouldn't be active to allow work the key out system */
@@ -677,10 +682,10 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-static WRITE8_DEVICE_HANDLER( fclown_ay8910_w )
+WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
 {
-	ay8910_address_w(device, 0, offset);
-	ay8910_data_w(device, 0, data);
+	ay8910_address_w(m_ay8910, 0, offset);
+	ay8910_data_w(m_ay8910, 0, data);
 }
 
 
@@ -705,7 +710,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 
 	if (m_snd_latch_0a02 == 0x00)
 	{
-		fclown_ay8910_w( m_ay8910, m_ay8910_addr, m_snd_latch_0800);
+		fclown_ay8910_w(space, m_ay8910_addr, m_snd_latch_0800);
 	}
 }
 
@@ -1003,14 +1008,14 @@ static const mc6845_interface mc6845_intf =
 
 static const pia6821_interface fclown_pia0_intf =
 {
-	DEVCB_HANDLER(mux_port_r),	/* Port A IN        Multiplexed Ports read */
-	DEVCB_HANDLER(pia0_b_r),	/* Port B IN        unknown (used) */
+	DEVCB_DRIVER_MEMBER(_5clown_state,mux_port_r),	/* Port A IN        Multiplexed Ports read */
+	DEVCB_DRIVER_MEMBER(_5clown_state,pia0_b_r),	/* Port B IN        unknown (used) */
 	DEVCB_NULL,					/* Line CA1 IN */
 	DEVCB_NULL,					/* Line CB1 IN */
 	DEVCB_NULL,					/* Line CA2 IN */
 	DEVCB_NULL,					/* Line CA2 IN */
 	DEVCB_NULL,					/* Port A OUT       NULL */
-	DEVCB_HANDLER(counters_w),	/* Port B OUT       Counters */
+	DEVCB_DRIVER_MEMBER(_5clown_state,counters_w),	/* Port B OUT       Counters */
 	DEVCB_NULL,					/* Line CA2 OUT */
 	DEVCB_NULL,					/* Line CB2 OUT */
 	DEVCB_NULL,					/* IRQA */
@@ -1020,13 +1025,13 @@ static const pia6821_interface fclown_pia0_intf =
 static const pia6821_interface fclown_pia1_intf =
 {
 	DEVCB_INPUT_PORT("SW4"),	/* Port A IN        4th DIP Switchs bank */
-	DEVCB_HANDLER(pia1_b_r),	/* Port B IN        Check bit 2 to allow key out system to work */
+	DEVCB_DRIVER_MEMBER(_5clown_state,pia1_b_r),	/* Port B IN        Check bit 2 to allow key out system to work */
 	DEVCB_NULL,					/* Line CA1 IN */
 	DEVCB_NULL,					/* Line CB1 IN */
 	DEVCB_NULL,					/* Line CA2 IN */
 	DEVCB_NULL,					/* Line CB2 IN */
-	DEVCB_HANDLER(trigsnd_w),	/* Port A OUT       Trigger the audio CPU interrupts */
-	DEVCB_HANDLER(mux_w),		/* Port B OUT       Multiplexed Ports selector */
+	DEVCB_DRIVER_MEMBER(_5clown_state,trigsnd_w),	/* Port A OUT       Trigger the audio CPU interrupts */
+	DEVCB_DRIVER_MEMBER(_5clown_state,mux_w),		/* Port B OUT       Multiplexed Ports selector */
 	DEVCB_NULL,					/* Line CA2 OUT */
 	DEVCB_NULL,					/* Line CB2 OUT */
 	DEVCB_NULL,					/* IRQA */

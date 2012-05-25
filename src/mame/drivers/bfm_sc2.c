@@ -275,6 +275,8 @@ public:
 	DECLARE_READ8_MEMBER(sc3_expansion_r);
 	DECLARE_WRITE8_MEMBER(sc3_expansion_w);
 	int recdata(int changed, int data);
+	DECLARE_WRITE8_MEMBER(nec_reset_w);
+	DECLARE_WRITE8_MEMBER(nec_latch_w);
 };
 
 
@@ -690,21 +692,22 @@ WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_DEVICE_HANDLER( nec_reset_w )
+WRITE8_MEMBER(bfm_sc2_state::nec_reset_w)
 {
+	device_t *device = machine().device("upd");
 	upd7759_start_w(device, 0);
 	upd7759_reset_w(device, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_DEVICE_HANDLER( nec_latch_w )
+WRITE8_MEMBER(bfm_sc2_state::nec_latch_w)
 {
-	bfm_sc2_state *state = device->machine().driver_data<bfm_sc2_state>();
+	device_t *device = machine().device("upd");
 	int bank = 0;
 
 	if ( data & 0x80 )         bank |= 0x01;
-	if ( state->m_expansion_latch & 2 ) bank |= 0x02;
+	if ( m_expansion_latch & 2 ) bank |= 0x02;
 
 	upd7759_set_bank_base(device, bank*0x20000);
 
@@ -1475,8 +1478,8 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2700, 0x2700) AM_READWRITE(uart2data_r, uart2data_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
-	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE_LEGACY("upd", nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE_LEGACY("upd", nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
 	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */

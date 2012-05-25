@@ -155,6 +155,15 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_bank_w);
 	DECLARE_WRITE8_MEMBER(meritm_ds1644_w);
 	DECLARE_READ8_MEMBER(meritm_ds1644_r);
+	DECLARE_READ8_MEMBER(meritm_8255_port_c_r);
+	DECLARE_WRITE8_MEMBER(meritm_crt250_port_b_w);
+	DECLARE_WRITE8_MEMBER(meritm_ay8930_port_b_w);
+	DECLARE_READ8_MEMBER(meritm_audio_pio_port_a_r);
+	DECLARE_READ8_MEMBER(meritm_audio_pio_port_b_r);
+	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_a_w);
+	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_b_w);
+	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
+	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
 };
 
 
@@ -754,13 +763,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER(meritm_8255_port_c_r)
+READ8_MEMBER(meritm_state::meritm_8255_port_c_r)
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 };
 
-static WRITE8_DEVICE_HANDLER(meritm_crt250_port_b_w)
+WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output_set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -778,7 +787,7 @@ static I8255A_INTERFACE( crt260_ppi8255_intf )
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_NULL,							/* Port B read */
 	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(meritm_8255_port_c_r),/* Port C read */
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_8255_port_c_r),/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 
@@ -787,8 +796,8 @@ static I8255A_INTERFACE( crt250_ppi8255_intf )
 	DEVCB_NULL,							/* Port A read */
 	DEVCB_NULL,							/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(meritm_crt250_port_b_w),/* Port B write (used LMP x DRIVE) */
-	DEVCB_HANDLER(meritm_8255_port_c_r),/* Port C read */
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_crt250_port_b_w),/* Port B write (used LMP x DRIVE) */
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_8255_port_c_r),/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 
@@ -803,7 +812,7 @@ static I8255A_INTERFACE( crt250_ppi8255_intf )
  Port B: Bits 0,1 used
 */
 
-static WRITE8_DEVICE_HANDLER(meritm_ay8930_port_b_w)
+WRITE8_MEMBER(meritm_state::meritm_ay8930_port_b_w)
 {
 	// lamps
 };
@@ -815,7 +824,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_INPUT_PORT("DSW"), /* Port A read */
 	DEVCB_NULL, /* Port B read */
 	DEVCB_NULL, /* Port A write */
-	DEVCB_HANDLER(meritm_ay8930_port_b_w)  /* Port B write */
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_ay8930_port_b_w)  /* Port B write */
 };
 
 /*************************************
@@ -824,9 +833,8 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER(meritm_audio_pio_port_a_r)
+READ8_MEMBER(meritm_state::meritm_audio_pio_port_a_r)
 {
-	meritm_state *state = device->machine().driver_data<meritm_state>();
 	/*
 
         bit     signal      description
@@ -842,12 +850,11 @@ static READ8_DEVICE_HANDLER(meritm_audio_pio_port_a_r)
 
     */
 
-	return state->m_vint;
+	return m_vint;
 };
 
-static READ8_DEVICE_HANDLER(meritm_audio_pio_port_b_r)
+READ8_MEMBER(meritm_state::meritm_audio_pio_port_b_r)
 {
-	meritm_state *state = device->machine().driver_data<meritm_state>();
 	/*
 
         bit     description
@@ -863,12 +870,11 @@ static READ8_DEVICE_HANDLER(meritm_audio_pio_port_b_r)
 
     */
 
-	return ds1204_r(&state->m_ds1204);
+	return ds1204_r(&m_ds1204);
 };
 
-static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_a_w)
+WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_a_w)
 {
-	meritm_state *state = device->machine().driver_data<meritm_state>();
 	/*
 
         bit     signal      description
@@ -884,13 +890,12 @@ static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_a_w)
 
     */
 
-	state->m_bank = (data & 7) | ((data >> 2) & 0x18);
-	//logerror("Writing BANK with %x (raw = %x)\n", state->m_bank, data);
+	m_bank = (data & 7) | ((data >> 2) & 0x18);
+	//logerror("Writing BANK with %x (raw = %x)\n", m_bank, data);
 };
 
-static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_b_w)
+WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_b_w)
 {
-	meritm_state *drvstate = device->machine().driver_data<meritm_state>();
 	/*
 
         bit     description
@@ -906,10 +911,10 @@ static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_b_w)
 
     */
 
-	ds1204_w(&drvstate->m_ds1204, (data & 0x4) >> 2, (data & 0x2) >> 1, data & 0x01);
+	ds1204_w(&m_ds1204, (data & 0x4) >> 2, (data & 0x2) >> 1, data & 0x01);
 };
 
-static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_a_w)
+WRITE8_MEMBER(meritm_state::meritm_io_pio_port_a_w)
 {
 	/*
 
@@ -927,7 +932,7 @@ static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_a_w)
     */
 };
 
-static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_b_w)
+WRITE8_MEMBER(meritm_state::meritm_io_pio_port_b_w)
 {
 	/*
 
@@ -948,11 +953,11 @@ static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_b_w)
 static Z80PIO_INTERFACE( meritm_audio_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_HANDLER(meritm_audio_pio_port_a_r),
-	DEVCB_HANDLER(meritm_audio_pio_port_a_w),
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_a_r),
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(meritm_audio_pio_port_b_r),
-	DEVCB_HANDLER(meritm_audio_pio_port_b_w),
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_b_r),
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_audio_pio_port_b_w),
 	DEVCB_NULL
 };
 
@@ -960,10 +965,10 @@ static Z80PIO_INTERFACE( meritm_io_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_INPUT_PORT("PIO1_PORTA"),
-	DEVCB_HANDLER(meritm_io_pio_port_a_w),
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_io_pio_port_a_w),
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("PIO1_PORTB"),
-	DEVCB_HANDLER(meritm_io_pio_port_b_w),
+	DEVCB_DRIVER_MEMBER(meritm_state,meritm_io_pio_port_b_w),
 	DEVCB_NULL
 };
 

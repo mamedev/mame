@@ -118,6 +118,10 @@ public:
 	DECLARE_WRITE16_MEMBER(brasil_status_w);
 	DECLARE_READ16_MEMBER(ciclone_status_r);
 	DECLARE_WRITE16_MEMBER(fashion_output_w);
+	DECLARE_WRITE16_MEMBER(tv_oki6376_w);
+	DECLARE_READ16_MEMBER(tv_oki6376_r);
+	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_w);
+	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
 };
 
 
@@ -252,8 +256,9 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 }
 
 
-static WRITE16_DEVICE_HANDLER( tv_oki6376_w )
+WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 {
+	device_t *device = machine().device("oki");
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data)
 	{
@@ -263,8 +268,9 @@ static WRITE16_DEVICE_HANDLER( tv_oki6376_w )
 	}
 }
 
-static READ16_DEVICE_HANDLER( tv_oki6376_r )
+READ16_MEMBER(highvdeo_state::tv_oki6376_r)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		return okim6376_busy_r(device);
@@ -305,12 +311,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ(read3_r )
 	AM_RANGE(0x0010, 0x0015) AM_WRITE(tv_vcf_paletteram_w )
-	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_vcf_bankselect_w ) AM_DEVREAD_LEGACY("oki", tv_oki6376_r )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_vcf_bankselect_w ) AM_READ(tv_oki6376_r )
 ADDRESS_MAP_END
 
 
@@ -325,8 +331,9 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read2_r)
 	return (ioport("IN1")->read() & 0xbf) | resetpulse;
 }
 
-static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_w )
+WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
 {
+	device_t *device = machine().device("oki");
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data) {
 		okidata = data;
@@ -334,8 +341,9 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_st_w )
+WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
 {
+	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6376_st_w(device, (data & 0x80) );
@@ -352,8 +360,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE_LEGACY("oki", tv_ncf_oki6376_w )
-	AM_RANGE(0x000a, 0x000b) AM_DEVWRITE_LEGACY("oki", tv_ncf_oki6376_st_w )
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
+	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
 	AM_RANGE(0x000c, 0x000d) AM_READ(read1_r )
 	AM_RANGE(0x0010, 0x0011) AM_READ(tv_ncf_read2_r )
 	AM_RANGE(0x0012, 0x0013) AM_READ(read3_r )
@@ -397,7 +405,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_tcf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
 	AM_RANGE(0x0030, 0x0031) AM_READ(read3_r ) AM_WRITE(tv_tcf_bankselect_w )
@@ -457,7 +465,7 @@ static ADDRESS_MAP_START( newmcard_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(newmcard_vblank_w )
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ(newmcard_vblank_r )
@@ -523,7 +531,7 @@ static ADDRESS_MAP_START( brasil_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE(brasil_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ(read3_r )

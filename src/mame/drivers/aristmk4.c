@@ -297,6 +297,24 @@ public:
 	DECLARE_READ8_MEMBER(cashcade_r);
 	DECLARE_WRITE8_MEMBER(mk4_printer_w);
 	DECLARE_READ8_MEMBER(mk4_printer_r);
+	DECLARE_WRITE8_MEMBER(mkiv_pia_ca2);
+	DECLARE_WRITE8_MEMBER(mkiv_pia_cb2);
+	DECLARE_WRITE8_MEMBER(mkiv_pia_outb);
+	DECLARE_READ8_MEMBER(via_a_r);
+	DECLARE_READ8_MEMBER(via_b_r);
+	DECLARE_WRITE8_MEMBER(via_a_w);
+	DECLARE_WRITE8_MEMBER(via_b_w);
+	DECLARE_READ8_MEMBER(via_ca2_r);
+	DECLARE_READ8_MEMBER(via_cb2_r);
+	DECLARE_WRITE8_MEMBER(via_ca2_w);
+	DECLARE_WRITE8_MEMBER(via_cb2_w);
+	DECLARE_WRITE8_MEMBER(pblp_out);
+	DECLARE_WRITE8_MEMBER(pbltlp_out);
+	DECLARE_WRITE8_MEMBER(zn434_w);
+	DECLARE_WRITE8_MEMBER(firq);
+	DECLARE_READ8_MEMBER(pa1_r);
+	DECLARE_READ8_MEMBER(pb1_r);
+	DECLARE_READ8_MEMBER(pc1_r);
 };
 
 /* Partial Cashcade protocol */
@@ -548,25 +566,22 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
 }
 
 //output ca2
-static WRITE8_DEVICE_HANDLER(mkiv_pia_ca2)
+WRITE8_MEMBER(aristmk4_state::mkiv_pia_ca2)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-	state->m_rtc_address_strobe = data;
+	m_rtc_address_strobe = data;
 	// logerror("address strobe %02X\n", address_strobe);
 }
 
 //output cb2
-static WRITE8_DEVICE_HANDLER(mkiv_pia_cb2)
+WRITE8_MEMBER(aristmk4_state::mkiv_pia_cb2)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-	state->m_rtc_data_strobe = data;
+	m_rtc_data_strobe = data;
 	//logerror("data strobe: %02X\n", data);
 }
 
 //output b
-static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
+WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
 	UINT8 emet[5];
 	int i = 0;
@@ -583,7 +598,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
 		if(emet[i])
 		{
 		//logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-		state->m_samples->start(i,0); // pulse sound for mechanical meters
+		m_samples->start(i,0); // pulse sound for mechanical meters
 		}
 	}
 }
@@ -622,30 +637,28 @@ static TIMER_CALLBACK(hopper_reset)
 }
 
 // Port A read (SW1)
-static READ8_DEVICE_HANDLER(via_a_r)
+READ8_MEMBER(aristmk4_state::via_a_r)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	int psg_ret=0;
 
-	if (state->m_ay8910_1&0x03) // SW1 read.
+	if (m_ay8910_1&0x03) // SW1 read.
 	{
-	psg_ret = ay8910_r(device->machine().device("ay1"), 0);
+	psg_ret = ay8910_r(machine().device("ay1"), 0);
 	//logerror("PSG porta ay1 returned %02X\n",psg_ret);
 	}
 
-	else if (state->m_ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
+	else if (m_ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
-		psg_ret = ay8910_r(device->machine().device("ay2"), 0);
+		psg_ret = ay8910_r(machine().device("ay2"), 0);
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
 	}
 	return psg_ret;
 }
 
-static READ8_DEVICE_HANDLER(via_b_r)
+READ8_MEMBER(aristmk4_state::via_b_r)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
-	int ret=state->ioport("via_port_b")->read();
+	int ret=ioport("via_port_b")->read();
 
 // Not expecting to read anything from port B on the AY8910's ( controls BC1, BC2 and BDIR )
 // However there are extra 4 bits not going to the AY8910's on the schematics, which get read from here.
@@ -656,18 +669,18 @@ static READ8_DEVICE_HANDLER(via_b_r)
 /* Coin input... CBOPT2 goes LOW, then the optic detectors OPTA1 / OPTB1 detect the coin passing */
 /* The timer causes one credit, per 150ms or so... */
 
-	switch(state->m_inscrd)
+	switch(m_inscrd)
 	{
 	case 0x00:
 		break;
 	case 0x01:
 		ret=ret^0x10;
-		state->m_inscrd++;
+		m_inscrd++;
 		break;
 	case 0x02:
 		ret=ret^0x20;
-		state->m_inscrd++;
-		device->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
+		m_inscrd++;
+		machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
 		break;
 	default:
 		break; //timer will reset the input
@@ -675,12 +688,12 @@ static READ8_DEVICE_HANDLER(via_b_r)
 
 // if user presses collect.. send coins to hopper.
 
-	switch(state->m_hopper_motor)
+	switch(m_hopper_motor)
 	{
 	case 0x00:
 		ret=ret^0x40;
-		device->machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
-		state->m_hopper_motor=0x02;
+		machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
+		m_hopper_motor=0x02;
 		break;
 	case 0x01:
 		break; //default
@@ -693,39 +706,37 @@ static READ8_DEVICE_HANDLER(via_b_r)
 	return ret;
 }
 
-static WRITE8_DEVICE_HANDLER(via_a_w)
+WRITE8_MEMBER(aristmk4_state::via_a_w)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();   //via_b_w will handle sending the data to the ay8910, so just write the data for it to use later
 
 	//logerror("VIA port A write %02X\n",data);
-	state->m_psg_data = data;
+	m_psg_data = data;
 }
 
-static WRITE8_DEVICE_HANDLER(via_b_w)
+WRITE8_MEMBER(aristmk4_state::via_b_w)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-	state->m_ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
+	m_ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
 		//NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
-	state->m_ay8910_2 = state->m_ay8910_1;
+	m_ay8910_2 = m_ay8910_1;
 
-	if ( state->m_ay8910_2 & 0x08 ) // is bit 4 on ?
+	if ( m_ay8910_2 & 0x08 ) // is bit 4 on ?
 	{
-	state->m_ay8910_2  = (state->m_ay8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
-	state->m_ay8910_1  = 0x00; // write only to ay2
+	m_ay8910_2  = (m_ay8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
+	m_ay8910_1  = 0x00; // write only to ay2
 	}
 	else
 	{
-		state->m_ay8910_2 = 0x00; // write only to ay1
+		m_ay8910_2 = 0x00; // write only to ay1
 	}
 
 	//only need bc1/bc2 and bdir so drop bit 4.
 
-	state->m_ay8910_1 = (state->m_ay8910_1 & 0x07);
-	state->m_ay8910_2 = (state->m_ay8910_2 & 0x07);
+	m_ay8910_1 = (m_ay8910_1 & 0x07);
+	m_ay8910_2 = (m_ay8910_2 & 0x07);
 
 	//PSG ay1
 
-	switch(state->m_ay8910_1)
+	switch(m_ay8910_1)
 	{
 	case 0x00:	//INACT -Nothing to do here. Inactive PSG
 		break;
@@ -733,24 +744,24 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 		break;
 	case 0x06:	//WRITE
 	{
-		ay8910_data_w( device->machine().device("ay1"), 0 , state->m_psg_data );
-		//logerror("VIA Port A write data ay1: %02X\n",state->m_psg_data);
+		ay8910_data_w( machine().device("ay1"), 0 , m_psg_data );
+		//logerror("VIA Port A write data ay1: %02X\n",m_psg_data);
 		break;
 	}
 	case 0x07:	//LATCH Address (set register)
 	{
-		ay8910_address_w( device->machine().device("ay1"), 0 , state->m_psg_data );
-		//logerror("VIA Port B write register ay1: %02X\n",state->m_psg_data);
+		ay8910_address_w( machine().device("ay1"), 0 , m_psg_data );
+		//logerror("VIA Port B write register ay1: %02X\n",m_psg_data);
 		break;
 	}
 	default:
-		//logerror("Unknown PSG state on ay1: %02X\n",state->m_ay8910_1);
+		//logerror("Unknown PSG state on ay1: %02X\n",m_ay8910_1);
 		break;
 	}
 
 	//PSG ay2
 
-	switch(state->m_ay8910_2)
+	switch(m_ay8910_2)
 	{
 	case 0x00:	//INACT - Nothing to do here. Inactive PSG
 		break;
@@ -760,23 +771,23 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 		break;
 	case 0x06:	//WRITE
 	{
-		ay8910_data_w( device->machine().device("ay2"), 0 , state->m_psg_data );
-		//logerror("VIA Port A write data ay2: %02X\n",state->m_psg_data);
+		ay8910_data_w( machine().device("ay2"), 0 , m_psg_data );
+		//logerror("VIA Port A write data ay2: %02X\n",m_psg_data);
 		break;
 	}
 	case 0x07:	//LATCH Address (set register)
 	{
-		ay8910_address_w( device->machine().device("ay2"), 0 , state->m_psg_data );
-		//logerror("VIA Port B write register ay2: %02X\n",state->m_psg_data);
+		ay8910_address_w( machine().device("ay2"), 0 , m_psg_data );
+		//logerror("VIA Port B write register ay2: %02X\n",m_psg_data);
 		break;
 	}
 		default:
-		//logerror("Unknown PSG state on ay2: %02X\n",state->m_ay8910_2);
+		//logerror("Unknown PSG state on ay2: %02X\n",m_ay8910_2);
 		break;
 	}
 }
 
-static READ8_DEVICE_HANDLER(via_ca2_r)
+READ8_MEMBER(aristmk4_state::via_ca2_r)
 {
 	//logerror("Via Port CA2 read %02X\n",0) ;
 	// CA2 is connected to CDSOL1 on schematics ?
@@ -784,7 +795,7 @@ static READ8_DEVICE_HANDLER(via_ca2_r)
 	return 0 ;
 }
 
-static READ8_DEVICE_HANDLER(via_cb2_r)
+READ8_MEMBER(aristmk4_state::via_cb2_r)
 {
 	//logerror("Via Port CB2 read %02X\n",0) ;
 	// CB2 is connected to HOPMO1 on schematics ?
@@ -792,27 +803,26 @@ static READ8_DEVICE_HANDLER(via_cb2_r)
 	return 0 ;
 }
 
-static WRITE8_DEVICE_HANDLER(via_ca2_w)
+WRITE8_MEMBER(aristmk4_state::via_ca2_w)
 {
 	//logerror("Via Port CA2 write %02X\n",data) ;
 }
 
-static WRITE8_DEVICE_HANDLER(via_cb2_w)
+WRITE8_MEMBER(aristmk4_state::via_cb2_w)
 {
-	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
 	if (data==0x01)
-		state->m_hopper_motor=data;
-	else if (state->m_hopper_motor<0x02)
-		state->m_hopper_motor=data;
+		m_hopper_motor=data;
+	else if (m_hopper_motor<0x02)
+		m_hopper_motor=data;
 }
 
 // Lamp output
 
-static WRITE8_DEVICE_HANDLER(pblp_out)
+WRITE8_MEMBER(aristmk4_state::pblp_out)
 {
 	output_set_lamp_value(1, (data) & 1);
 	output_set_lamp_value(5, (data >> 1) & 1);
@@ -825,7 +835,7 @@ static WRITE8_DEVICE_HANDLER(pblp_out)
 	//logerror("Lights port A %02X\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER(pbltlp_out)
+WRITE8_MEMBER(aristmk4_state::pbltlp_out)
 {
 	output_set_lamp_value(8,  (data) & 1);
 	output_set_lamp_value(12, (data >> 1) & 1);
@@ -845,7 +855,7 @@ WRITE8_MEMBER(aristmk4_state::mlamps)
 	output_set_lamp_value(13, (data >> 6) & 1);
 }
 
-static WRITE8_DEVICE_HANDLER(zn434_w)
+WRITE8_MEMBER(aristmk4_state::zn434_w)
 {
 
 	// Introducted to prevent warning in log for write to AY1 PORT B
@@ -1495,7 +1505,7 @@ static const ay8910_interface ay8910_config1 =
 	DEVCB_INPUT_PORT("DSW1"),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(zn434_w) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
+	DEVCB_DRIVER_MEMBER(aristmk4_state,zn434_w) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
 };
 
 static const ay8910_interface ay8910_config2 =
@@ -1504,22 +1514,22 @@ static const ay8910_interface ay8910_config2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL, // Port A read
 	DEVCB_NULL, // Port B read
-	DEVCB_HANDLER(pblp_out),   // Port A write - goes to lamps on the buttons x8
-	DEVCB_HANDLER(pbltlp_out)  // Port B write - goes to lamps on the buttons x4 and light tower x4
+	DEVCB_DRIVER_MEMBER(aristmk4_state,pblp_out),   // Port A write - goes to lamps on the buttons x8
+	DEVCB_DRIVER_MEMBER(aristmk4_state,pbltlp_out)  // Port B write - goes to lamps on the buttons x4 and light tower x4
 };
 
-static WRITE8_DEVICE_HANDLER(firq)
+WRITE8_MEMBER(aristmk4_state::firq)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B      */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
-	/*inputs : CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
-	/*outputs: A/B      */ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
-	/*outputs: CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),
-	/*irq           */ DEVCB_HANDLER(firq)
+	/*inputs : A/B      */ DEVCB_DRIVER_MEMBER(aristmk4_state,via_a_r),DEVCB_DRIVER_MEMBER(aristmk4_state,via_b_r),
+	/*inputs : CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_DRIVER_MEMBER(aristmk4_state,via_ca2_r),DEVCB_DRIVER_MEMBER(aristmk4_state,via_cb2_r),
+	/*outputs: A/B      */ DEVCB_DRIVER_MEMBER(aristmk4_state,via_a_w), DEVCB_DRIVER_MEMBER(aristmk4_state,via_b_w),
+	/*outputs: CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_DRIVER_MEMBER(aristmk4_state,via_ca2_w),DEVCB_DRIVER_MEMBER(aristmk4_state,via_cb2_w),
+	/*irq           */ DEVCB_DRIVER_MEMBER(aristmk4_state,firq)
 
 	// CA1 is connected to +5V, CB1 is not connected.
 };
@@ -1533,9 +1543,9 @@ static const pia6821_interface aristmk4_pia1_intf =
 	DEVCB_NULL,	// line CA2 in
 	DEVCB_NULL,	// line CB2 in
 	DEVCB_DRIVER_MEMBER(aristmk4_state, mkiv_pia_outa),	// port A out
-	DEVCB_HANDLER(mkiv_pia_outb),	// port B out
-	DEVCB_HANDLER(mkiv_pia_ca2),	// line CA2 out
-	DEVCB_HANDLER(mkiv_pia_cb2),	// port CB2 out
+	DEVCB_DRIVER_MEMBER(aristmk4_state,mkiv_pia_outb),	// port B out
+	DEVCB_DRIVER_MEMBER(aristmk4_state,mkiv_pia_ca2),	// line CA2 out
+	DEVCB_DRIVER_MEMBER(aristmk4_state,mkiv_pia_cb2),	// port CB2 out
 	DEVCB_NULL,	// IRQA
 	DEVCB_NULL	// IRQB
 };
@@ -1559,28 +1569,28 @@ static const mc6845_interface mc6845_intf =
 
 /* read m/c number */
 
-static READ8_DEVICE_HANDLER(pa1_r)
+READ8_MEMBER(aristmk4_state::pa1_r)
 {
-	return (device->machine().root_device().ioport("SW3")->read() << 4) + device->machine().root_device().ioport("SW4")->read();
+	return (machine().root_device().ioport("SW3")->read() << 4) + machine().root_device().ioport("SW4")->read();
 }
 
-static READ8_DEVICE_HANDLER(pb1_r)
+READ8_MEMBER(aristmk4_state::pb1_r)
 {
-	return (device->machine().root_device().ioport("SW5")->read() << 4) + device->machine().root_device().ioport("SW6")->read();
+	return (machine().root_device().ioport("SW5")->read() << 4) + machine().root_device().ioport("SW6")->read();
 }
 
-static READ8_DEVICE_HANDLER(pc1_r)
+READ8_MEMBER(aristmk4_state::pc1_r)
 {
 	return 0;
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_HANDLER(pa1_r),				/* Port A read */
+	DEVCB_DRIVER_MEMBER(aristmk4_state,pa1_r),				/* Port A read */
 	DEVCB_NULL,							/* Port A write */
-	DEVCB_HANDLER(pb1_r),				/* Port B read */
+	DEVCB_DRIVER_MEMBER(aristmk4_state,pb1_r),				/* Port B read */
 	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(pc1_r),				/* Port C read */
+	DEVCB_DRIVER_MEMBER(aristmk4_state,pc1_r),				/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 

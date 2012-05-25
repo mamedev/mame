@@ -125,6 +125,7 @@ public:
 	DECLARE_READ8_MEMBER(jantotsu_mux_r);
 	DECLARE_WRITE8_MEMBER(jantotsu_mux_w);
 	DECLARE_READ8_MEMBER(jantotsu_dsw2_r);
+	DECLARE_WRITE8_MEMBER(jan_adpcm_w);
 };
 
 
@@ -263,15 +264,15 @@ READ8_MEMBER(jantotsu_state::jantotsu_dsw2_r)
 	return (ioport("DSW2")->read() & 0x3f) | 0x80;
 }
 
-static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
+WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
 {
-	jantotsu_state *state = device->machine().driver_data<jantotsu_state>();
+	device_t *device = machine().device("adpcm");
 
 	switch (offset)
 	{
 		case 0:
-			state->m_adpcm_pos = (data & 0xff) * 0x100;
-			state->m_adpcm_idle = 0;
+			m_adpcm_pos = (data & 0xff) * 0x100;
+			m_adpcm_idle = 0;
 			msm5205_reset_w(device, 0);
 			/* I don't think that this will ever happen, it's there just to be sure
                (i.e. I'll probably never do a "nagare" in my entire life ;-) ) */
@@ -281,7 +282,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 			break;
 		/*same write as port 2? MSM sample ack? */
 		case 1:
-//          state->m_adpcm_idle = 1;
+//          m_adpcm_idle = 1;
 //          msm5205_reset_w(device, 1);
 //          printf("%02x 1\n", data);
 			break;
@@ -331,7 +332,7 @@ static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8, jantotsu_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("adpcm", jan_adpcm_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(jan_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r, jantotsu_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
 ADDRESS_MAP_END

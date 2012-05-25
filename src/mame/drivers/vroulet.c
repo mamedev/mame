@@ -57,6 +57,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vroulet_paletteram_w);
 	DECLARE_WRITE8_MEMBER(vroulet_videoram_w);
 	DECLARE_WRITE8_MEMBER(vroulet_colorram_w);
+	DECLARE_WRITE8_MEMBER(ppi8255_a_w);
+	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
+	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
 };
 
 
@@ -253,9 +256,9 @@ static const ay8910_interface ay8910_config =
 
 /* PPI8255 Interface */
 
-static WRITE8_DEVICE_HANDLER( ppi8255_a_w ){}// watchdog ?
-static WRITE8_DEVICE_HANDLER( ppi8255_b_w ){}// lamps ?
-static WRITE8_DEVICE_HANDLER( ppi8255_c_w ){}
+WRITE8_MEMBER(vroulet_state::ppi8255_a_w){}// watchdog ?
+WRITE8_MEMBER(vroulet_state::ppi8255_b_w){}// lamps ?
+WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
@@ -270,11 +273,11 @@ static I8255A_INTERFACE( ppi8255_0_intf )
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(ppi8255_a_w),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_a_w),			/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(ppi8255_b_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_b_w),			/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(ppi8255_c_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_c_w)			/* Port C write */
 };
 
 

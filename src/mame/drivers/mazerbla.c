@@ -135,6 +135,8 @@ public:
 	DECLARE_WRITE8_MEMBER(main_sound_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_clear_w);
+	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
+	DECLARE_READ8_MEMBER(soundcommand_r);
 };
 
 
@@ -922,10 +924,10 @@ WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 	set_led_status(machine(), 2, BIT(data, 7));
 }
 
-static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
+WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
 {
 	/* bit 0, bit 1 - led on */
-	set_led_status(device->machine(), 1, BIT(data, 0));
+	set_led_status(machine(), 1, BIT(data, 0));
 }
 
 
@@ -943,10 +945,9 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	set_led_status(machine(), 1, BIT(data, 5));
 }
 
-static READ8_DEVICE_HANDLER( soundcommand_r )
+READ8_MEMBER(mazerbla_state::soundcommand_r)
 {
-	mazerbla_state *state = device->machine().driver_data<mazerbla_state>();
-	return state->m_soundlatch;
+	return m_soundlatch;
 }
 
 static TIMER_CALLBACK( delayed_sound_w )
@@ -1382,7 +1383,7 @@ static const ay8910_interface ay8912_interface_1 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_HANDLER(soundcommand_r),
+	DEVCB_DRIVER_MEMBER(mazerbla_state,soundcommand_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1394,7 +1395,7 @@ static const ay8910_interface ay8912_interface_2 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(gg_led_ctrl_w)
+	DEVCB_DRIVER_MEMBER(mazerbla_state,gg_led_ctrl_w)
 };
 
 static IRQ_CALLBACK(irq_callback)

@@ -257,6 +257,7 @@ public:
 	DECLARE_READ8_MEMBER(coin_lockout_r);
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
+	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
 };
 
 
@@ -1605,10 +1606,9 @@ WRITE8_MEMBER(halleys_state::firq_ack_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
+WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
 {
-	halleys_state *state = device->machine().driver_data<halleys_state>();
-	state->m_sndnmi_mask = data & 1;
+	m_sndnmi_mask = data & 1;
 }
 
 
@@ -1949,7 +1949,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(sndnmi_msk_w) // port Bwrite
+	DEVCB_DRIVER_MEMBER(halleys_state,sndnmi_msk_w) // port Bwrite
 };
 
 

@@ -84,6 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(debug7c00_w);
 	DECLARE_WRITE8_MEMBER(coinin_w);
 	DECLARE_WRITE8_MEMBER(payout_w);
+	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
+	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
 };
 
 
@@ -410,12 +412,12 @@ GFXDECODE_END
                          Sound Interface
 **********************************************************************/
 
-static WRITE8_DEVICE_HANDLER( ay8910_outputa_w )
+WRITE8_MEMBER(supdrapo_state::ay8910_outputa_w)
 {
 //  popmessage("ay8910_outputa_w %02x",data);
 }
 
-static WRITE8_DEVICE_HANDLER( ay8910_outputb_w )
+WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
 {
 //  popmessage("ay8910_outputb_w %02x",data);
 }
@@ -427,8 +429,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ay8910_outputa_w),
-	DEVCB_HANDLER(ay8910_outputb_w)
+	DEVCB_DRIVER_MEMBER(supdrapo_state,ay8910_outputa_w),
+	DEVCB_DRIVER_MEMBER(supdrapo_state,ay8910_outputb_w)
 };
 
 

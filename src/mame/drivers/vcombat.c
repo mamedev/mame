@@ -118,6 +118,8 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_0_direct_handler);
 	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_1_direct_handler);
+	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_update);
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -323,8 +325,9 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 	m_crtc_select ^= 1;
 }
 
-static WRITE16_DEVICE_HANDLER( vcombat_dac_w )
+WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 {
+	device_t *device = machine().device("dac");
 	INT16 newval = ((INT16)data - 0x6000) << 2;
 	dac_signed_data_16_w(device, newval + 0x8000);
 }
@@ -389,7 +392,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, vcombat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE_LEGACY("dac", vcombat_dac_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(vcombat_dac_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(sound_resetmain_r)   /* Ping M0's reset line */
 	AM_RANGE(0x180000, 0x180001) AM_RAM AM_SHARE("share4")   /* M1<-M0 */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_RAM AM_SHARE("share5")   /* M1->M0 */
@@ -553,10 +556,10 @@ static INPUT_PORTS_START( shadfgtr )
 INPUT_PORTS_END
 
 
-static WRITE_LINE_DEVICE_HANDLER(sound_update)
+WRITE_LINE_MEMBER(vcombat_state::sound_update)
 {
 	/* Seems reasonable */
-	device_set_input_line(device->machine().device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(machine().device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -568,7 +571,7 @@ static const mc6845_interface mc6845_intf =
 	NULL,						/* after pixel update callback */
 	DEVCB_NULL,					/* callback for display state changes */
 	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_LINE(sound_update),	/* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(vcombat_state,sound_update),	/* HSYNC callback */
 	DEVCB_NULL,					/* VSYNC callback */
 	NULL						/* update address callback */
 };

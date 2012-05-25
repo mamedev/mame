@@ -44,6 +44,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tugboat_hd46505_0_w);
 	DECLARE_WRITE8_MEMBER(tugboat_hd46505_1_w);
 	DECLARE_WRITE8_MEMBER(tugboat_score_w);
+	DECLARE_READ8_MEMBER(tugboat_input_r);
+	DECLARE_READ8_MEMBER(tugboat_ctrl_r);
+	DECLARE_WRITE8_MEMBER(tugboat_ctrl_w);
 };
 
 
@@ -141,36 +144,33 @@ static SCREEN_UPDATE_IND16( tugboat )
 
 
 
-static READ8_DEVICE_HANDLER( tugboat_input_r )
+READ8_MEMBER(tugboat_state::tugboat_input_r)
 {
-	tugboat_state *state = device->machine().driver_data<tugboat_state>();
-	if (~state->m_ctrl & 0x80)
-		return state->ioport("IN0")->read();
-	else if (~state->m_ctrl & 0x40)
-		return state->ioport("IN1")->read();
-	else if (~state->m_ctrl & 0x20)
-		return state->ioport("IN2")->read();
-	else if (~state->m_ctrl & 0x10)
-		return state->ioport("IN3")->read();
+	if (~m_ctrl & 0x80)
+		return ioport("IN0")->read();
+	else if (~m_ctrl & 0x40)
+		return ioport("IN1")->read();
+	else if (~m_ctrl & 0x20)
+		return ioport("IN2")->read();
+	else if (~m_ctrl & 0x10)
+		return ioport("IN3")->read();
 	else
-		return state->ioport("IN4")->read();
+		return ioport("IN4")->read();
 }
 
-static READ8_DEVICE_HANDLER( tugboat_ctrl_r )
+READ8_MEMBER(tugboat_state::tugboat_ctrl_r)
 {
-	tugboat_state *state = device->machine().driver_data<tugboat_state>();
-	return state->m_ctrl;
+	return m_ctrl;
 }
 
-static WRITE8_DEVICE_HANDLER( tugboat_ctrl_w )
+WRITE8_MEMBER(tugboat_state::tugboat_ctrl_w)
 {
-	tugboat_state *state = device->machine().driver_data<tugboat_state>();
-	state->m_ctrl = data;
+	m_ctrl = data;
 }
 
 static const pia6821_interface pia0_intf =
 {
-	DEVCB_HANDLER(tugboat_input_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(tugboat_state,tugboat_input_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
@@ -187,13 +187,13 @@ static const pia6821_interface pia0_intf =
 static const pia6821_interface pia1_intf =
 {
 	DEVCB_INPUT_PORT("DSW"),			/* port A in */
-	DEVCB_HANDLER(tugboat_ctrl_r),		/* port B in */
+	DEVCB_DRIVER_MEMBER(tugboat_state,tugboat_ctrl_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(tugboat_ctrl_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(tugboat_state,tugboat_ctrl_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */

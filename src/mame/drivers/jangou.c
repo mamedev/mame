@@ -77,6 +77,8 @@ public:
 	DECLARE_READ8_MEMBER(slave_com_r);
 	DECLARE_WRITE8_MEMBER(slave_com_w);
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
+	DECLARE_READ8_MEMBER(input_mux_r);
+	DECLARE_READ8_MEMBER(input_system_r);
 };
 
 
@@ -272,25 +274,24 @@ WRITE8_MEMBER(jangou_state::output_w)
 //  coin_lockout_w(machine(), 0, ~data & 0x20);
 }
 
-static READ8_DEVICE_HANDLER( input_mux_r )
+READ8_MEMBER(jangou_state::input_mux_r)
 {
-	jangou_state *state = device->machine().driver_data<jangou_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return state->ioport("PL1_1")->read();
-		case 0x02: return state->ioport("PL1_2")->read();
-		case 0x04: return state->ioport("PL2_1")->read();
-		case 0x08: return state->ioport("PL2_2")->read();
-		case 0x10: return state->ioport("PL1_3")->read();
-		case 0x20: return state->ioport("PL2_3")->read();
+		case 0x01: return ioport("PL1_1")->read();
+		case 0x02: return ioport("PL1_2")->read();
+		case 0x04: return ioport("PL2_1")->read();
+		case 0x08: return ioport("PL2_2")->read();
+		case 0x10: return ioport("PL1_3")->read();
+		case 0x20: return ioport("PL2_3")->read();
 	}
 
-	return device->machine().root_device().ioport("IN_NOMUX")->read();
+	return machine().root_device().ioport("IN_NOMUX")->read();
 }
 
-static READ8_DEVICE_HANDLER( input_system_r )
+READ8_MEMBER(jangou_state::input_system_r)
 {
-	return device->machine().root_device().ioport("SYSTEM")->read();
+	return machine().root_device().ioport("SYSTEM")->read();
 }
 
 
@@ -880,8 +881,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(input_mux_r),
-	DEVCB_HANDLER(input_system_r),
+	DEVCB_DRIVER_MEMBER(jangou_state,input_mux_r),
+	DEVCB_DRIVER_MEMBER(jangou_state,input_system_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

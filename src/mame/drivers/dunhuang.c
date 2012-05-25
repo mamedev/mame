@@ -116,6 +116,7 @@ public:
 	DECLARE_READ8_MEMBER(dunhuang_input_r);
 	DECLARE_WRITE8_MEMBER(dunhuang_rombank_w);
 	DECLARE_WRITE8_MEMBER(dunhuang_82_w);
+	DECLARE_READ8_MEMBER(dunhuang_dsw_r);
 };
 
 
@@ -438,15 +439,14 @@ READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 	;
 }
 
-static READ8_DEVICE_HANDLER( dunhuang_dsw_r )
+READ8_MEMBER(dunhuang_state::dunhuang_dsw_r)
 {
-	dunhuang_state *state = device->machine().driver_data<dunhuang_state>();
-	if (!(state->m_input & 0x01))	return state->ioport("DSW1")->read();
-	if (!(state->m_input & 0x02))	return state->ioport("DSW2")->read();
-	if (!(state->m_input & 0x04))	return state->ioport("DSW3")->read();
-	if (!(state->m_input & 0x08))	return state->ioport("DSW4")->read();
-	if (!(state->m_input & 0x10))	return state->ioport("DSW5")->read();
-	logerror("%s: warning, unknown dsw bits read, input = %02x\n", device->machine().describe_context(), state->m_input);
+	if (!(m_input & 0x01))	return ioport("DSW1")->read();
+	if (!(m_input & 0x02))	return ioport("DSW2")->read();
+	if (!(m_input & 0x04))	return ioport("DSW3")->read();
+	if (!(m_input & 0x08))	return ioport("DSW4")->read();
+	if (!(m_input & 0x10))	return ioport("DSW5")->read();
+	logerror("%s: warning, unknown dsw bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }
 READ8_MEMBER(dunhuang_state::dunhuang_input_r)
@@ -757,7 +757,7 @@ static const ay8910_interface dunhuang_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	//  A                   B
-	DEVCB_NULL,							DEVCB_HANDLER(dunhuang_dsw_r),	// R
+	DEVCB_NULL,							DEVCB_DRIVER_MEMBER(dunhuang_state,dunhuang_dsw_r),	// R
 	DEVCB_DRIVER_MEMBER(dunhuang_state, dunhuang_input_w),	DEVCB_NULL						// W
 };
 

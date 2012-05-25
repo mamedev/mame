@@ -54,6 +54,10 @@ public:
 	DECLARE_READ8_MEMBER(paranoia_z80_io_02_r);
 	DECLARE_WRITE8_MEMBER(paranoia_z80_io_17_w);
 	DECLARE_WRITE8_MEMBER(paranoia_z80_io_37_w);
+	DECLARE_WRITE8_MEMBER(paranoia_i8155_a_w);
+	DECLARE_WRITE8_MEMBER(paranoia_i8155_b_w);
+	DECLARE_WRITE8_MEMBER(paranoia_i8155_c_w);
+	DECLARE_WRITE_LINE_MEMBER(paranoia_i8155_timer_out);
 };
 
 
@@ -132,24 +136,24 @@ static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
 	AM_RANGE( 0x37, 0x37 ) AM_WRITE(paranoia_z80_io_37_w )
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER(paranoia_i8155_a_w)
+WRITE8_MEMBER(paranoia_state::paranoia_i8155_a_w)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(paranoia_i8155_b_w)
+WRITE8_MEMBER(paranoia_state::paranoia_i8155_b_w)
 {
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER(paranoia_i8155_c_w)
+WRITE8_MEMBER(paranoia_state::paranoia_i8155_c_w)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(paranoia_i8155_timer_out)
+WRITE_LINE_MEMBER(paranoia_state::paranoia_i8155_timer_out)
 {
-	//cputag_set_input_line(device->machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	//cputag_set_input_line(machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
 }
 
@@ -157,12 +161,12 @@ static I8155_INTERFACE(i8155_intf)
 {
 	// all ports set to output
 	DEVCB_NULL,
-	DEVCB_HANDLER(paranoia_i8155_a_w),
+	DEVCB_DRIVER_MEMBER(paranoia_state,paranoia_i8155_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(paranoia_i8155_b_w),
+	DEVCB_DRIVER_MEMBER(paranoia_state,paranoia_i8155_b_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(paranoia_i8155_c_w),
-	DEVCB_LINE(paranoia_i8155_timer_out)
+	DEVCB_DRIVER_MEMBER(paranoia_state,paranoia_i8155_c_w),
+	DEVCB_DRIVER_LINE_MEMBER(paranoia_state,paranoia_i8155_timer_out)
 };
 
 static const c6280_interface c6280_config =

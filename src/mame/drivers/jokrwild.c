@@ -111,6 +111,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
 	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
 	DECLARE_READ8_MEMBER(rng_r);
+	DECLARE_WRITE8_MEMBER(testa_w);
+	DECLARE_WRITE8_MEMBER(testb_w);
 };
 
 
@@ -405,12 +407,12 @@ GFXDECODE_END
 *    PIA Interfaces    *
 ***********************/
 
-static WRITE8_DEVICE_HANDLER( testa_w )
+WRITE8_MEMBER(jokrwild_state::testa_w)
 {
 //  printf("%02x A\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( testb_w )
+WRITE8_MEMBER(jokrwild_state::testb_w)
 {
 //  printf("%02x B\n",data);
 }
@@ -423,8 +425,8 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(testa_w),		/* port A out */
-	DEVCB_HANDLER(testb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(jokrwild_state,testa_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(jokrwild_state,testb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */

@@ -235,6 +235,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
+	DECLARE_READ8_MEMBER(b_read);
+	DECLARE_WRITE8_MEMBER(b_writ);
 };
 
 
@@ -965,13 +967,13 @@ static void data_from_i8031(device_t *device, int data)
 	duart68681_rx_data(state->m_duart68681, 0, data);
 }
 
-static READ8_DEVICE_HANDLER( b_read )
+READ8_MEMBER(maygayv1_state::b_read)
 {
 	// Meters - upper nibble?
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( b_writ )
+WRITE8_MEMBER(maygayv1_state::b_writ)
 {
 	logerror("B WRITE %x\n",data);
 }
@@ -980,14 +982,14 @@ static WRITE8_DEVICE_HANDLER( b_writ )
 /* U25 ST 2 9148 EF68B21P */
 static const pia6821_interface pia_intf =
 {
-	DEVCB_HANDLER(b_read),		/* port A in */
-	DEVCB_HANDLER(b_read),		/* port B in */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),		/* port A in */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(b_writ),		/* port A out */
-	DEVCB_HANDLER(b_writ),		/* port B out */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),		/* port A out */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */

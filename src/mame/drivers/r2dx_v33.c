@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_prog_w);
 	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
 	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
+	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 };
 
 
@@ -246,8 +247,9 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 	return 0;
 }
 
-WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
+WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -390,7 +392,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 //  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
 
-	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
+	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
 //  AM_RANGE(0x00740, 0x00741) AM_READ_LEGACY(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
@@ -463,7 +465,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE_LEGACY(bbbbll_w) // scroll?
 //  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
-	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
+	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")

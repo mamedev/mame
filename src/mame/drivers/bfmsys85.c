@@ -104,6 +104,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_enable_w);
 	DECLARE_WRITE8_MEMBER(triac_w);
 	DECLARE_READ8_MEMBER(triac_r);
+	DECLARE_READ_LINE_MEMBER(sys85_data_r);
+	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 };
 
 
@@ -118,24 +120,22 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 
-static READ_LINE_DEVICE_HANDLER( sys85_data_r )
+READ_LINE_MEMBER(bfmsys85_state::sys85_data_r)
 {
-	bfmsys85_state *state = device->machine().driver_data<bfmsys85_state>();
-	return state->m_sys85_data_line_r;
+	return m_sys85_data_line_r;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( sys85_data_w )
+WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
 {
-	bfmsys85_state *drvstate = device->machine().driver_data<bfmsys85_state>();
-	drvstate->m_sys85_data_line_t = state;
+	m_sys85_data_line_t = state;
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_LINE(sys85_data_r),
-	DEVCB_LINE(sys85_data_w),
+	DEVCB_DRIVER_LINE_MEMBER(bfmsys85_state,sys85_data_r),
+	DEVCB_DRIVER_LINE_MEMBER(bfmsys85_state,sys85_data_w),
 	DEVCB_NULL
 };
 

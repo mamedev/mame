@@ -53,6 +53,7 @@ public:
 	DECLARE_READ16_MEMBER(ff7f_r);
 	DECLARE_WRITE16_MEMBER(ff7f_w);
 	DECLARE_WRITE16_MEMBER(rapidfir_control_w);
+	DECLARE_WRITE16_MEMBER(sound_bank_w);
 };
 
 
@@ -348,8 +349,9 @@ WRITE16_MEMBER(tickee_state::rapidfir_control_w)
  *
  *************************************/
 
-static WRITE16_DEVICE_HANDLER( sound_bank_w )
+WRITE16_MEMBER(tickee_state::sound_bank_w)
 {
+	device_t *device = machine().device("oki");
 	switch (data & 0xff)
 	{
 		case 0x2c:
@@ -442,7 +444,7 @@ static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0xfc000400, 0xfc00040f) AM_READ(ffff_r)
 	AM_RANGE(0xfc000500, 0xfc00050f) AM_NOP
 	AM_RANGE(0xfc000600, 0xfc00060f) AM_WRITE(rapidfir_control_w)
-	AM_RANGE(0xfc000700, 0xfc00070f) AM_DEVWRITE_LEGACY("oki", sound_bank_w)
+	AM_RANGE(0xfc000700, 0xfc00070f) AM_WRITE(sound_bank_w)
 	AM_RANGE(0xfc000800, 0xfc00080f) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc000900, 0xfc00090f) AM_READ_PORT("IN1")
 	AM_RANGE(0xfc000a00, 0xfc000a0f) AM_READ_PORT("IN2")

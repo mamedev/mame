@@ -176,6 +176,7 @@ public:
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
 	UINT8 m_ibutton_subkey_data[0x40];
+	DECLARE_READ8_MEMBER(soundram_r);
 };
 
 
@@ -1781,16 +1782,15 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static READ8_DEVICE_HANDLER( soundram_r )
+READ8_MEMBER(firebeat_state::soundram_r)
 {
-	firebeat_state *state = device->machine().driver_data<firebeat_state>();
 	if (offset >= 0 && offset < 0x200000)
 	{
-		return state->m_flash[1]->read(offset & 0x1fffff);
+		return m_flash[1]->read(offset & 0x1fffff);
 	}
 	else if (offset >= 0x200000 && offset < 0x400000)
 	{
-		return state->m_flash[2]->read(offset & 0x1fffff);
+		return m_flash[2]->read(offset & 0x1fffff);
 	}
 	return 0;
 }
@@ -1802,7 +1802,7 @@ static void sound_irq_callback(device_t *device, int state)
 static const ymz280b_interface ymz280b_intf =
 {
 	sound_irq_callback,			// irq
-	DEVCB_HANDLER(soundram_r)
+	DEVCB_DRIVER_MEMBER(firebeat_state,soundram_r)
 };
 
 static INPUT_PORTS_START(ppp)

@@ -138,6 +138,9 @@ public:
 	DECLARE_READ8_MEMBER(latch_st_lo);
 	DECLARE_WRITE8_MEMBER(m1ab_no_oki_w);
 	void m1_draw_lamps(int data,int strobe, int col);
+	DECLARE_WRITE8_MEMBER(m1_pia_porta_w);
+	DECLARE_WRITE8_MEMBER(m1_pia_portb_w);
+	DECLARE_WRITE8_MEMBER(m1_meter_w);
 };
 
 
@@ -565,22 +568,21 @@ static void cpu0_nmi(running_machine &machine, int state)
     6821 PIA
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( m1_pia_porta_w )
+WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
-	maygay1b_state *state = device->machine().driver_data<maygay1b_state>();
 	if ( data & 0x40 ) ROC10937_reset(0);
 
-	if ( !state->m_alpha_clock && (data & 0x20) )
+	if ( !m_alpha_clock && (data & 0x20) )
 	{
 		ROC10937_shift_data(0, ( data & 0x10 )?0:1);
 	}
 
-	state->m_alpha_clock = data & 0x20;
+	m_alpha_clock = data & 0x20;
 
 	ROC10937_draw_16seg(0);
 }
 
-static WRITE8_DEVICE_HANDLER( m1_pia_portb_w )
+WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 {
 	int i;
 	for (i=0; i<8; i++)
@@ -595,8 +597,8 @@ static const pia6821_interface m1_pia_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(m1_pia_porta_w),		/* port A out */
-	DEVCB_HANDLER(m1_pia_portb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_porta_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_portb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -784,7 +786,7 @@ static UINT8 m1_duart_r (device_t *device)
 	return (state->m_optic_pattern);
 }
 
-static WRITE8_DEVICE_HANDLER( m1_meter_w )
+WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 {
 	int i;
 
@@ -886,7 +888,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(m1_meter_w),
+	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_meter_w),
 	DEVCB_NULL,
 };
 

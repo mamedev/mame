@@ -100,6 +100,7 @@ public:
 	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
 	DECLARE_WRITE32_MEMBER(jclub2_tileram_w);
+	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
 };
 
 
@@ -259,10 +260,11 @@ static const eeprom_interface eeprom_intf =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-static WRITE32_DEVICE_HANDLER( darkhors_eeprom_w )
+WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (data & ~0xff000000)
-		logerror("%s: Unknown EEPROM bit written %08X\n",device->machine().describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %08X\n",machine().describe_context(),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
@@ -327,7 +329,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x490040, 0x490043) AM_DEVWRITE_LEGACY("eeprom", darkhors_eeprom_w)
+	AM_RANGE(0x490040, 0x490043) AM_WRITE(darkhors_eeprom_w)
 	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
 
 	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
@@ -362,7 +364,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x490040, 0x490043) AM_DEVWRITE_LEGACY("eeprom", darkhors_eeprom_w)
+	AM_RANGE(0x490040, 0x490043) AM_WRITE(darkhors_eeprom_w)
 	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
 
 	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")

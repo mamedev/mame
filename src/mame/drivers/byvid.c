@@ -34,6 +34,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
 
 	UINT8 m_sound_port2;
+	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(by133_firq);
+	DECLARE_WRITE_LINE_MEMBER(by133_cb2);
+	DECLARE_READ8_MEMBER(by133_portb_r);
+	DECLARE_WRITE8_MEMBER(by133_portb_w);
 };
 
 
@@ -96,59 +101,56 @@ static INPUT_PORTS_START( by133 )
 INPUT_PORTS_END
 
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(by133_state::vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), "videocpu", M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "videocpu", M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TMS9928A_INTERFACE(byvid_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,vdp_interrupt)
 };
 
-static WRITE_LINE_DEVICE_HANDLER(by133_firq)
+WRITE_LINE_MEMBER(by133_state::by133_firq)
 {
-	by133_state *drv_state = device->machine().driver_data<by133_state>();
-	device_set_input_line(drv_state->m_videocpu, M6809_FIRQ_LINE, (drv_state->m_videopia->irq_a_state() || drv_state->m_videopia->irq_b_state()) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_videocpu, M6809_FIRQ_LINE, (m_videopia->irq_a_state() || m_videopia->irq_b_state()) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(by133_cb2)
+WRITE_LINE_MEMBER(by133_state::by133_cb2)
 {
 	// to M6803 port 2 d0?
-//  by133_state *drv_state = device->machine().driver_data<by133_state>();
-//  device_set_input_line(drv_state->m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+//  device_set_input_line(m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER(by133_portb_r)
+READ8_MEMBER(by133_state::by133_portb_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(by133_portb_w)
+WRITE8_MEMBER(by133_state::by133_portb_w)
 {
-	by133_state *state = device->machine().driver_data<by133_state>();
-	device->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 
 	// d0-d3 to m6803 d1-d4
-	state->m_sound_port2 = data << 1 & 0x1f;
+	m_sound_port2 = data << 1 & 0x1f;
 }
 
 static const pia6821_interface videopia_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_HANDLER(by133_portb_r),		/* port B in */
+	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(by133_portb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(by133_cb2),		/* line CB2 out */
-	DEVCB_LINE(by133_firq),		/* IRQA */
-	DEVCB_LINE(by133_firq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_cb2),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq)		/* IRQB */
 };
 
 

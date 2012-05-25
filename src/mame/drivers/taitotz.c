@@ -102,6 +102,8 @@ public:
 	DECLARE_WRITE64_MEMBER(video_chip_w);
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);
+	DECLARE_WRITE8_MEMBER(taitotz_tlcs900_to1);
+	DECLARE_WRITE8_MEMBER(taitotz_tlcs900_to3);
 };
 
 
@@ -363,11 +365,11 @@ ADDRESS_MAP_END
 
 
 
-static WRITE8_DEVICE_HANDLER( taitotz_tlcs900_to1 )
+WRITE8_MEMBER(taitotz_state::taitotz_tlcs900_to1)
 {
 }
 
-static WRITE8_DEVICE_HANDLER( taitotz_tlcs900_to3 )
+WRITE8_MEMBER(taitotz_state::taitotz_tlcs900_to3)
 {
 }
 
@@ -408,8 +410,8 @@ static const powerpc_config ppc603e_config =
 
 static const tlcs900_interface taitotz_tlcs900_interface =
 {
-	DEVCB_HANDLER( taitotz_tlcs900_to1 ),
-	DEVCB_HANDLER( taitotz_tlcs900_to3 )
+	DEVCB_DRIVER_MEMBER(taitotz_state,taitotz_tlcs900_to1 ),
+	DEVCB_DRIVER_MEMBER(taitotz_state,taitotz_tlcs900_to3 )
 };
 
 

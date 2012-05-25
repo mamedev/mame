@@ -242,6 +242,10 @@ public:
 	DECLARE_READ8_MEMBER(peplus_dropdoor_r);
 	DECLARE_READ8_MEMBER(peplus_watchdog_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
+	DECLARE_WRITE8_MEMBER(peplus_crtc_mode_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
+	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
 };
 
 
@@ -260,7 +264,7 @@ static const i2cmem_interface i2cmem_interface =
 };
 
 /* prototypes */
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync);
+
 static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 static const mc6845_interface mc6845_intf =
@@ -273,7 +277,7 @@ static const mc6845_interface mc6845_intf =
 	DEVCB_NULL,				/* callback for display state changes */
 	DEVCB_NULL,				/* callback for cursor state changes */
 	DEVCB_NULL,				/* HSYNC callback */
-	DEVCB_LINE(crtc_vsync),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(peplus_state,crtc_vsync),	/* VSYNC callback */
 	crtc_addr				/* update address callback */
 };
 
@@ -340,7 +344,7 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 	state->m_vid_address = address;
 }
 
-static WRITE8_DEVICE_HANDLER( peplus_crtc_mode_w )
+WRITE8_MEMBER(peplus_state::peplus_crtc_mode_w)
 {
 	/* Reset timing logic */
 }
@@ -363,9 +367,10 @@ static void handle_lightpen( device_t *device )
      device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), FUNC(assert_lp_cb), 0, device);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
+WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	device_t *device = machine().device("crtc");
+	cputag_set_input_line(machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen(device);
 }
 
@@ -476,11 +481,11 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
 	output_set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
 }
 
-static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
+WRITE8_MEMBER(peplus_state::i2c_nvram_w)
 {
-	peplus_state *state = device->machine().driver_data<peplus_state>();
+	device_t *device = machine().device("i2cmem");
 	i2cmem_scl_write(device,BIT(data, 2));
-	state->m_sda_dir = BIT(data, 1);
+	m_sda_dir = BIT(data, 1);
 	i2cmem_sda_write(device,BIT(data, 0));
 }
 
@@ -551,9 +556,9 @@ READ8_MEMBER(peplus_state::peplus_watchdog_r)
 	return 0x00; // Watchdog
 }
 
-static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
+READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 {
-	peplus_state *state = device->machine().driver_data<peplus_state>();
+	device_t *device = machine().device("i2cmem");
 /*
         Bit 0 = COIN DETECTOR A
         Bit 1 = COIN DETECTOR B
@@ -567,29 +572,29 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
     UINT8 coin_out = 0x00;
-	UINT64 curr_cycles = device->machine().firstcpu->total_cycles();
+	UINT64 curr_cycles = machine().firstcpu->total_cycles();
 	UINT16 door_wait = 500;
 
 	UINT8 sda = 0;
-	if(!state->m_sda_dir)
+	if(!m_sda_dir)
 	{
 		sda = i2cmem_sda_read(device);
 	}
 
-	if ((state->ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
-		state->m_coin_state = 1; // Start Coin Cycle
-		state->m_last_cycles = device->machine().firstcpu->total_cycles();
+	if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+		m_coin_state = 1; // Start Coin Cycle
+		m_last_cycles = machine().firstcpu->total_cycles();
 	} else {
 		/* Process Next Coin Optic State */
-		if (curr_cycles - state->m_last_cycles > 600000/6 && state->m_coin_state != 0) {
-			state->m_coin_state++;
-			if (state->m_coin_state > 5)
-				state->m_coin_state = 0;
-			state->m_last_cycles = device->machine().firstcpu->total_cycles();
+		if (curr_cycles - m_last_cycles > 600000/6 && m_coin_state != 0) {
+			m_coin_state++;
+			if (m_coin_state > 5)
+				m_coin_state = 0;
+			m_last_cycles = machine().firstcpu->total_cycles();
 		}
 	}
 
-	switch (state->m_coin_state)
+	switch (m_coin_state)
 	{
 		case 0x00: // No Coin
 			coin_optics = 0x00;
@@ -611,29 +616,29 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 			break;
 	}
 
-	if (state->m_wingboard)
+	if (m_wingboard)
 		door_wait = 12345;
 
-	if (curr_cycles - state->m_last_door > door_wait) {
-		if ((state->ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
-			state->m_door_open = (!state->m_door_open & 0x01);
+	if (curr_cycles - m_last_door > door_wait) {
+		if ((ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
+			m_door_open = (!m_door_open & 0x01);
 		} else {
-			state->m_door_open = 1;
+			m_door_open = 1;
 		}
-		state->m_last_door = device->machine().firstcpu->total_cycles();
+		m_last_door = machine().firstcpu->total_cycles();
 	}
 
-	if (curr_cycles - state->m_last_coin_out > 600000/12 && state->m_coin_out_state != 0) { // Guessing with 600000
-		if (state->m_coin_out_state != 2) {
-            state->m_coin_out_state = 2; // Coin-Out Off
+	if (curr_cycles - m_last_coin_out > 600000/12 && m_coin_out_state != 0) { // Guessing with 600000
+		if (m_coin_out_state != 2) {
+            m_coin_out_state = 2; // Coin-Out Off
         } else {
-            state->m_coin_out_state = 3; // Coin-Out On
+            m_coin_out_state = 3; // Coin-Out On
         }
 
-		state->m_last_coin_out = device->machine().firstcpu->total_cycles();
+		m_last_coin_out = machine().firstcpu->total_cycles();
 	}
 
-    switch (state->m_coin_out_state)
+    switch (m_coin_out_state)
     {
         case 0x00: // No Coin-Out
 	        coin_out = 0x00;
@@ -649,7 +654,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 	        break;
     }
 
-	bank_a = (sda<<7) | bank_a | (state->m_door_open<<5) | coin_optics | coin_out;
+	bank_a = (sda<<7) | bank_a | (m_door_open<<5) | coin_optics | coin_out;
 
 	return bank_a;
 }
@@ -758,7 +763,7 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_SHARE("cmos")
 
 	// CRT Controller
-	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE_LEGACY("crtc", peplus_crtc_mode_w)
+	AM_RANGE(0x2008, 0x2008) AM_WRITE(peplus_crtc_mode_w)
 	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
@@ -783,10 +788,10 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_SHARE("s7000_ram")
 
 	// Input Bank A, Output Bank C
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD_LEGACY("i2cmem",peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ(peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
 
 	// Drop Door, I2C EEPROM Writes
-	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_DEVWRITE_LEGACY("i2cmem",i2c_nvram_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_WRITE(i2c_nvram_w)
 
 	// Input Banks B & C, Output Bank B
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)

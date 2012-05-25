@@ -39,6 +39,8 @@ public:
 
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
+	DECLARE_WRITE8_MEMBER(ay_aout_w);
+	DECLARE_WRITE8_MEMBER(ay_bout_w);
 };
 
 #define MAIN_CLOCK XTAL_21_4772MHz
@@ -207,12 +209,12 @@ static TIMER_DEVICE_CALLBACK( tonton_interrupt )
 }
 
 
-static WRITE8_DEVICE_HANDLER( ay_aout_w )
+WRITE8_MEMBER(tonton_state::ay_aout_w)
 {
 	logerror("AY8910: Port A out: %02X\n", data);
 }
 
-static WRITE8_DEVICE_HANDLER( ay_bout_w )
+WRITE8_MEMBER(tonton_state::ay_bout_w)
 {
 	logerror("AY8910: Port B out: %02X\n", data);
 }
@@ -236,8 +238,8 @@ static const ay8910_interface ay8910_intf =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,					/* Seems unused */
 	DEVCB_NULL,					/* Seems unused */
-	DEVCB_HANDLER(ay_aout_w),	/* Write all bits twice, and then reset them at boot */
-	DEVCB_HANDLER(ay_bout_w)	/* Write all bits twice, and then reset them at boot */
+	DEVCB_DRIVER_MEMBER(tonton_state,ay_aout_w),	/* Write all bits twice, and then reset them at boot */
+	DEVCB_DRIVER_MEMBER(tonton_state,ay_bout_w)	/* Write all bits twice, and then reset them at boot */
 };
 
 

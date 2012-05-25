@@ -42,6 +42,15 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(dma_page_select_r);
 	DECLARE_WRITE8_MEMBER(dma_page_select_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
 };
 
 
@@ -51,12 +60,12 @@ DMA8237 Controller
 ******************/
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+WRITE_LINE_MEMBER(photoply_state::pc_dma_hrq_changed)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	i8237_hlda_w( m_dma8237_1, state );
 }
 
 
@@ -127,20 +136,20 @@ static void set_dma_channel(device_t *device, int channel, int state)
 	if (!state) drvstate->m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(photoply_state::pc_dack0_w){ set_dma_channel(m_dma8237_1, 0, state); }
+WRITE_LINE_MEMBER(photoply_state::pc_dack1_w){ set_dma_channel(m_dma8237_1, 1, state); }
+WRITE_LINE_MEMBER(photoply_state::pc_dack2_w){ set_dma_channel(m_dma8237_1, 2, state); }
+WRITE_LINE_MEMBER(photoply_state::pc_dack3_w){ set_dma_channel(m_dma8237_1, 3, state); }
 
 static I8237_INTERFACE( dma8237_1_config )
 {
-	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(photoply_state,pc_dma_hrq_changed),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(photoply_state, pc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(photoply_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_DRIVER_LINE_MEMBER(photoply_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(photoply_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(photoply_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(photoply_state,pc_dack3_w) }
 };
 
 static I8237_INTERFACE( dma8237_2_config )
@@ -159,25 +168,24 @@ static I8237_INTERFACE( dma8237_2_config )
 8259 IRQ controller
 ******************/
 
-static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
+WRITE_LINE_MEMBER(photoply_state::pic8259_1_set_int_line)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(photoply_state::get_slave_ack)
 {
-	photoply_state *state = device->machine().driver_data<photoply_state>();
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(state->m_pic8259_2);
+		return pic8259_acknowledge(m_pic8259_2);
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface pic8259_1_config =
 {
-	DEVCB_LINE(pic8259_1_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(photoply_state,pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(photoply_state,get_slave_ack)
 };
 
 static const struct pic8259_interface pic8259_2_config =
@@ -193,17 +201,16 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge(state->m_pic8259_1);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
+WRITE_LINE_MEMBER(photoply_state::at_pit8254_out0_changed)
 {
-	photoply_state *drvstate = device->machine().driver_data<photoply_state>();
-	if ( drvstate->m_pic8259_1 )
+	if ( m_pic8259_1 )
 	{
-		pic8259_ir0_w(drvstate->m_pic8259_1, state);
+		pic8259_ir0_w(m_pic8259_1, state);
 	}
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out2_changed )
+WRITE_LINE_MEMBER(photoply_state::at_pit8254_out2_changed)
 {
 	//at_speaker_set_input( state ? 1 : 0 );
 }
@@ -215,7 +222,7 @@ static const struct pit8253_config at_pit8254_config =
 		{
 			4772720/4,				/* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_LINE(at_pit8254_out0_changed)
+			DEVCB_DRIVER_LINE_MEMBER(photoply_state,at_pit8254_out0_changed)
 		}, {
 			4772720/4,				/* dram refresh */
 			DEVCB_NULL,
@@ -223,7 +230,7 @@ static const struct pit8253_config at_pit8254_config =
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(at_pit8254_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(photoply_state,at_pit8254_out2_changed)
 		}
 	}
 };

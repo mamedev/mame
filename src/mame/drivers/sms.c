@@ -237,6 +237,9 @@ public:
 	DECLARE_READ8_MEMBER(p03_r);
 	DECLARE_WRITE8_MEMBER(p03_w);
 	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_READ8_MEMBER(ppi0_c_r);
+	DECLARE_WRITE8_MEMBER(ppi0_a_w);
+	DECLARE_WRITE8_MEMBER(ppi0_b_w);
 };
 
 
@@ -367,7 +370,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER(ppi0_c_r)
+READ8_MEMBER(smsmfg_state::ppi0_c_r)
 {
 /*
   PC7 - unused
@@ -385,7 +388,7 @@ static READ8_DEVICE_HANDLER(ppi0_c_r)
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(ppi0_a_w)
+WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
 	output_set_lamp_value(0, !BIT(data,7));	/* Display Light 1 */
@@ -398,23 +401,23 @@ static WRITE8_DEVICE_HANDLER(ppi0_a_w)
 	output_set_lamp_value(7, !BIT(data,0)); /* Draw Light */
 }
 
-static WRITE8_DEVICE_HANDLER(ppi0_b_w)
+WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 {
 	output_set_lamp_value(8, !BIT(data,7)); /* Stand Light */
 	output_set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
 
-	coin_counter_w(device->machine(), 0, BIT(data,1));
-	coin_lockout_w(device->machine(), 0, BIT(data,5));
-	coin_lockout_w(device->machine(), 1, BIT(data,4));
+	coin_counter_w(machine(), 0, BIT(data,1));
+	coin_lockout_w(machine(), 0, BIT(data,5));
+	coin_lockout_w(machine(), 1, BIT(data,4));
 }
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(ppi0_a_w),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_a_w),			/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(ppi0_b_w),			/* Port B write */
-	DEVCB_HANDLER(ppi0_c_r),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_b_w),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_c_r),			/* Port C read */
 	DEVCB_NULL							/* Port C write */
 };
 

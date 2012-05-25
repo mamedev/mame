@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bsmt_data_lo_w);
 	DECLARE_WRITE8_MEMBER(bsmt_data_hi_w);
 	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 };
 
 WRITE16_MEMBER(tapatune_state::palette_w)
@@ -355,9 +356,9 @@ static VIDEO_START( tapatune )
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
+WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface h46505_intf =
@@ -370,7 +371,7 @@ static const mc6845_interface h46505_intf =
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_LINE(crtc_vsync),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(tapatune_state,crtc_vsync),	/* VSYNC callback */
 	NULL		/* update address callback */
 };
 

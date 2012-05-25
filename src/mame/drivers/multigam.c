@@ -131,6 +131,9 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
+	DECLARE_READ8_MEMBER(psg_4015_r);
+	DECLARE_WRITE8_MEMBER(psg_4015_w);
+	DECLARE_WRITE8_MEMBER(psg_4017_w);
 };
 
 
@@ -226,18 +229,21 @@ WRITE8_MEMBER(multigam_state::sprite_dma_w)
 	ppu->spriteram_dma(&space, source);
 }
 
-static READ8_DEVICE_HANDLER( psg_4015_r )
+READ8_MEMBER(multigam_state::psg_4015_r)
 {
+	device_t *device = machine().device("nes");
 	return nes_psg_r(device, 0x15);
 }
 
-static WRITE8_DEVICE_HANDLER( psg_4015_w )
+WRITE8_MEMBER(multigam_state::psg_4015_w)
 {
+	device_t *device = machine().device("nes");
 	nes_psg_w(device, 0x15, data);
 }
 
-static WRITE8_DEVICE_HANDLER( psg_4017_w )
+WRITE8_MEMBER(multigam_state::psg_4017_w)
 {
+	device_t *device = machine().device("nes");
 	nes_psg_w(device, 0x17, data);
 }
 
@@ -343,9 +349,9 @@ static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
@@ -363,9 +369,9 @@ static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
@@ -629,9 +635,9 @@ static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(multigm3_switch_prg_rom)
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigm3_switch_gfx_rom)
@@ -941,9 +947,9 @@ static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_WRITE(psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x4fff, 0x4fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x5000, 0x5fff) AM_ROM
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP

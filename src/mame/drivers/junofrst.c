@@ -113,6 +113,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(junofrst_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(junofrst_irq_enable_w);
+	DECLARE_READ8_MEMBER(junofrst_portA_r);
+	DECLARE_WRITE8_MEMBER(junofrst_portB_w);
 };
 
 
@@ -194,27 +196,25 @@ WRITE8_MEMBER(junofrst_state::junofrst_bankselect_w)
 }
 
 
-static READ8_DEVICE_HANDLER( junofrst_portA_r )
+READ8_MEMBER(junofrst_state::junofrst_portA_r)
 {
-	junofrst_state *state = device->machine().driver_data<junofrst_state>();
 	int timer;
 
 	/* main xtal 14.318MHz, divided by 8 to get the CPU clock, further */
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (state->m_soundcpu->total_cycles() / (1024 / 2)) & 0x0f;
+	timer = (m_soundcpu->total_cycles() / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
-	return (timer << 4) | state->m_i8039_status;
+	return (timer << 4) | m_i8039_status;
 }
 
 
-static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
+WRITE8_MEMBER(junofrst_state::junofrst_portB_w)
 {
-	junofrst_state *state = device->machine().driver_data<junofrst_state>();
-	device_t *filter[3] = { state->m_filter_0_0, state->m_filter_0_1, state->m_filter_0_2 };
+	device_t *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
 	int i;
 
 	for (i = 0; i < 3; i++)
@@ -376,10 +376,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(junofrst_portA_r),
+	DEVCB_DRIVER_MEMBER(junofrst_state,junofrst_portA_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(junofrst_portB_w)
+	DEVCB_DRIVER_MEMBER(junofrst_state,junofrst_portB_w)
 };
 
 

@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ticket_w);
 	DECLARE_WRITE16_MEMBER(video_regs_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE16_MEMBER(oki_bank_w);
 };
 
 
@@ -157,8 +159,9 @@ WRITE16_MEMBER(pzletime_state::txt_videoram_w)
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_DEVICE_HANDLER( eeprom_w )
+WRITE16_MEMBER(pzletime_state::eeprom_w)
 {
+	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
@@ -203,8 +206,9 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( oki_bank_w )
+WRITE16_MEMBER(pzletime_state::oki_bank_w)
 {
+	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
 }
 
@@ -223,9 +227,9 @@ static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_SHARE("mid_videoram")
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_WRITE(eeprom_w)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
-	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(oki_bank_w)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 

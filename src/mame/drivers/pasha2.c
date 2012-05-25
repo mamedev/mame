@@ -103,6 +103,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bitmap_1_w);
 	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
+	DECLARE_WRITE16_MEMBER(oki1_bank_w);
+	DECLARE_WRITE16_MEMBER(oki2_bank_w);
 };
 
 
@@ -189,8 +191,16 @@ WRITE16_MEMBER(pasha2_state::bitmap_1_w)
 	COMBINE_DATA(&m_bitmap1[offset + m_vbuffer * 0x20000 / 2]);
 }
 
-static WRITE16_DEVICE_HANDLER( oki_bank_w )
+WRITE16_MEMBER(pasha2_state::oki1_bank_w)
 {
+	device_t *device = machine().device("oki1");
+	if (offset)
+		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
+}
+
+WRITE16_MEMBER(pasha2_state::oki2_bank_w)
+{
+	device_t *device = machine().device("oki2");
 	if (offset)
 		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
@@ -237,8 +247,8 @@ static ADDRESS_MAP_START( pasha2_io, AS_IO, 16, pasha2_state )
 	AM_RANGE(0xc0, 0xc3) AM_WRITE(pasha2_misc_w)
 	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xe8, 0xeb) AM_DEVWRITE_LEGACY("oki1", oki_bank_w)
-	AM_RANGE(0xec, 0xef) AM_DEVWRITE_LEGACY("oki2", oki_bank_w)
+	AM_RANGE(0xe8, 0xeb) AM_WRITE(oki1_bank_w)
+	AM_RANGE(0xec, 0xef) AM_WRITE(oki2_bank_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pasha2 )

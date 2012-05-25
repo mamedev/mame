@@ -97,6 +97,7 @@ public:
 	DECLARE_READ8_MEMBER(laserdisc_io_r);
 	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
+	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
 };
 
 
@@ -253,12 +254,11 @@ CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
+WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
 {
-	statriv2_state *state = device->machine().driver_data<statriv2_state>();
 	data >>= 4;
 	if (data != 0x0f)
-		state->m_latched_coin = 0;
+		m_latched_coin = 0;
 }
 
 
@@ -280,7 +280,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
 	DEVCB_NULL,							/* Port B write */
 	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_HANDLER(ppi_portc_hi_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(statriv2_state,ppi_portc_hi_w)		/* Port C write */
 };
 
 

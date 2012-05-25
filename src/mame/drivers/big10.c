@@ -73,6 +73,7 @@ public:
 	required_device<v9938_device> m_v9938;
 	UINT8 m_mux_data;
 	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
 };
 
 
@@ -109,10 +110,9 @@ static MACHINE_RESET(big10)
 ****************************************/
 
 
-static WRITE8_DEVICE_HANDLER( mux_w )
+WRITE8_MEMBER(big10_state::mux_w)
 {
-	big10_state *state = device->machine().driver_data<big10_state>();
-	state->m_mux_data = ~data;
+	m_mux_data = ~data;
 }
 
 READ8_MEMBER(big10_state::mux_r)
@@ -231,7 +231,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW2"),
 	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_HANDLER(mux_w),
+	DEVCB_DRIVER_MEMBER(big10_state,mux_w),
 	DEVCB_NULL
 };
 
