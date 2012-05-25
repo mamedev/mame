@@ -683,7 +683,7 @@ READ8_MEMBER(centiped_state::caterplr_AY8910_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
+static ADDRESS_MAP_START( centiped_base_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
@@ -694,7 +694,6 @@ static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x0c02, 0x0c02) AM_READ(centiped_IN2_r)	/* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("IN3")		/* IN3 */
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0x1400, 0x140f) AM_WRITE(centiped_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1600, 0x163f) AM_DEVWRITE("earom",atari_vg_earom_device, write)
 	AM_RANGE(0x1680, 0x1680) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
@@ -705,6 +704,23 @@ static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x1c07, 0x1c07) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
+	AM_IMPORT_FROM(centiped_base_map)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( magworm_map, AS_PROGRAM, 8, centiped_state )
+	AM_IMPORT_FROM(centiped_base_map)
+	AM_RANGE(0x1001, 0x1001) AM_DEVWRITE_LEGACY("pokey", ay8910_address_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREADWRITE_LEGACY("pokey", ay8910_r, ay8910_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( caterplr_map, AS_PROGRAM, 8, centiped_state )
+	AM_IMPORT_FROM(centiped_base_map)
+	AM_RANGE(0x1780, 0x1780) AM_READ(caterplr_rand_r)
+	AM_RANGE(0x1000, 0x100f) AM_READWRITE(caterplr_AY8910_r, caterplr_AY8910_w)
 ADDRESS_MAP_END
 
 
@@ -1595,11 +1611,10 @@ static const pokey_interface warlords_pokey_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( centiped, centiped_state )
+static MACHINE_CONFIG_START( centiped_base, centiped_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
-	MCFG_CPU_PROGRAM_MAP(centiped_map)
 
 	MCFG_MACHINE_START(centiped)
 	MCFG_MACHINE_RESET(centiped)
@@ -1621,21 +1636,33 @@ static MACHINE_CONFIG_START( centiped, centiped_state )
 
 	MCFG_VIDEO_START(centiped)
 
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(centiped_map)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("pokey", POKEYN, 12096000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( caterplr, centiped )
+static MACHINE_CONFIG_DERIVED( caterplr, centiped_base )
 
 	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(caterplr_map)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("pokey", AY8910, 12096000/8)
+
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1652,15 +1679,20 @@ static MACHINE_CONFIG_DERIVED( centipdb, centiped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magworm, centiped )
+static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
 
 	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(magworm_map)
 	MCFG_MACHINE_RESET(magworm)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("pokey", AY8910, 12096000/8)
 	MCFG_SOUND_CONFIG(centipdb_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+
 MACHINE_CONFIG_END
 
 
@@ -1978,24 +2010,6 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( caterplr )
-{
-	centiped_state *state = machine.driver_data<centiped_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_readwrite_handler(0x1000, 0x100f, read8_delegate(FUNC(centiped_state::caterplr_AY8910_r),state), write8_delegate(FUNC(centiped_state::caterplr_AY8910_w),state));
-	space->install_read_handler(0x1780, 0x1780, read8_delegate(FUNC(centiped_state::caterplr_rand_r),state));
-}
-
-
-static DRIVER_INIT( magworm )
-{
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *device = machine.device("pokey");
-	space->install_legacy_write_handler(*device, 0x1001, 0x1001, FUNC(ay8910_address_w));
-	space->install_legacy_readwrite_handler(*device, 0x1003, 0x1003, FUNC(ay8910_r), FUNC(ay8910_data_w));
-}
-
-
 static DRIVER_INIT( bullsdrt )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
@@ -2016,9 +2030,9 @@ GAME( 1980, centiped2,centiped, centiped, centiped, 0,        ROT270, "Atari",  
 GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",   "Centipede (1 player, timed)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack",    "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1980, caterplr, centiped, caterplr, caterplr, caterplr, ROT270, "bootleg", "Caterpillar", GAME_SUPPORTS_SAVE )
+GAME( 1980, caterplr, centiped, caterplr, caterplr, 0,        ROT270, "bootleg", "Caterpillar", GAME_SUPPORTS_SAVE )
 GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac", GAME_SUPPORTS_SAVE )
-GAME( 1980, magworm,  centiped, magworm,  magworm,  magworm,  ROT270, "bootleg", "Magic Worm (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, magworm,  centiped, magworm,  magworm,  0,        ROT270, "bootleg", "Magic Worm (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
 GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack",    "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
 
