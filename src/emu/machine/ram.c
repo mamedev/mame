@@ -164,6 +164,11 @@ void ram_device::device_validity_check(validity_checker &valid) const
 			output.catprintf(").\n");
 
 		mame_printf_error("%s", output.cstr());
+
+		mame_printf_warning("Setting value to default %s\n",m_default_size);
+		astring error;
+		mconfig().options().set_value(OPTION_RAMSIZE, m_default_size, OPTION_PRIORITY_CMDLINE, error);
+		assert(!error);	
 	}
 }
 
