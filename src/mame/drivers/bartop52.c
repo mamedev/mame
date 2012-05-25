@@ -114,6 +114,7 @@ static const pokey_interface atari_pokey_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	atari_interrupt_cb,
+	DEVCB_HANDLER(atari_a5200_keypads)
 };
 
 static MACHINE_CONFIG_START( a5200, bartop52_state )

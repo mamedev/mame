@@ -21,8 +21,6 @@
 
 #include "devlegcy.h"
 
-#define POKEY_EXEC_INTERFACE
-
 /* CONSTANT DEFINITIONS */
 
 /* exact 1.79 MHz clock freq (of the Atari 800 that is) */
@@ -47,6 +45,9 @@ struct _pokey_interface
 	devcb_read8 serin_r;
 	devcb_write8 serout_w;
 	void (*interrupt_cb)(pokeyn_device *device, int mask);
+	/* offset = k0 ... k5 , bit0: kr1, bit1: kr2 */
+	/* all are, in contrast to actual hardware, ACTIVE_HIGH */
+	devcb_read8 kbd_r;
 };
 
 
@@ -57,12 +58,18 @@ struct _pokey_interface
 // ======================> pokey_device
 
 class pokeyn_device : public device_t,
-					  public device_sound_interface
-#ifdef POKEY_EXEC_INTERFACE
-					  ,public device_execute_interface
-#endif
+					  public device_sound_interface,
+					  public device_execute_interface,
+					  public device_execute_state
 {
 public:
+
+	enum
+	{
+		POK_KEY_BREAK = 0x30,
+		POK_KEY_SHIFT = 0x20,
+		POK_KEY_CTRL  = 0x00
+	};
 
 	enum
 	{
@@ -103,6 +110,14 @@ public:
 		SKSTAT_C =  0x0F
 	};
 
+	enum /* sync-operations */
+	{
+		SYNC_NOOP 		= 11,
+		SYNC_SET_IRQST 	= 12,
+		SYNC_POT		= 13,
+		SYNC_WRITE		= 14
+	};
+
 	// construction/destruction
 	pokeyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -113,8 +128,6 @@ public:
 	void  write(offs_t offset, UINT8 data);
 
 	void serin_ready(int after);
-	void break_w(int shift);
-	void kbcode_w(int kbcode, int make);
 
 protected:
 	// device-level overrides
@@ -127,9 +140,7 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-#ifdef POKEY_EXEC_INTERFACE
 	virtual void execute_run();
-#endif
 
 	// configuration state
 	pokey_interface m_intf;
@@ -153,6 +164,7 @@ private:
     	UINT32 m_volume;		/* channel volume - derived */
     	UINT8 m_output;			/* channel output signal (1 active, 0 inactive) */
     	UINT8 m_filter_sample;  /* high-pass filter sample */
+    	UINT8 m_div2;			/* division by 2 */
 
     	inline void sample(void)			{ m_filter_sample = m_output; }
     	inline void reset_channel(void)		{ m_counter = m_AUDF ^ 0xff; }
@@ -165,7 +177,8 @@ private:
     			m_borrow_cnt = 3;
     			if (m_parent->m_IRQEN & m_INTMask)
     			{
-    				m_parent->m_IRQST |= m_INTMask;
+    				/* Exposed state has changed: This should only be updated after a resync ... */
+    				m_parent->synchronize(SYNC_SET_IRQST, m_INTMask);
     			}
     		}
     	}
@@ -184,6 +197,8 @@ private:
 	static const int POKEY_CHANNELS = 4;
 
 	UINT32 step_one_clock();
+	void step_keyboard();
+	void step_pot();
 
 	void poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert);
 	void poly_init_9_17(UINT32 *poly, int size);
@@ -208,16 +223,12 @@ private:
 	UINT32 m_p17;             /* poly17 index */
 	UINT32 m_clockmult;		/* clock multiplier */
 
-	emu_timer *m_ptimer[8];	/* pot timers */
-
-#ifdef POKEY_EXEC_INTERFACE
-	emu_timer *m_write_timer;	/* timer for sync operation */
-#endif
-
 	devcb_resolved_read8 m_pot_r[8];
 	devcb_resolved_read8 m_allpot_r;
 	devcb_resolved_read8 m_serin_r;
 	devcb_resolved_write8 m_serout_w;
+	devcb_resolved_read8 m_kbd_r;
+
 	void (*m_interrupt_cb)(pokeyn_device *device, int mask);
 
 	UINT8 m_POTx[8];		/* POTx   (R/D200-D207) */
@@ -231,9 +242,12 @@ private:
 	UINT8 m_SKSTAT;			/* SKSTAT (R/D20F) */
 	UINT8 m_SKCTL;			/* SKCTL  (W/D20F) */
 
+	UINT8 m_pot_counter;
+	UINT8 m_kbd_cnt;
+	UINT8 m_kbd_latch;
+	UINT8 m_kbd_state;
+
 	attotime m_clock_period;
-	attotime m_ad_time_fast;
-	attotime m_ad_time_slow;
 
 	UINT32 m_poly4[0x0f];
 	UINT32 m_poly5[0x1f];
