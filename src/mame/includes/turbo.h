@@ -17,9 +17,10 @@ class turbo_state : public driver_device
 public:
 	turbo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoram(*this, "videoram"),
-		  m_spriteram(*this, "spriteram"),
-		  m_sprite_position(*this, "sprite_position") { }
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_sprite_position(*this, "spritepos")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
