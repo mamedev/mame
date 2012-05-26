@@ -477,22 +477,14 @@ static MACHINE_RESET( mpu4 )
 /* 6809 IRQ handler */
 WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
 {
-	pia6821_device *pia3 = machine().device<pia6821_device>("pia_ic3");
-	pia6821_device *pia4 = machine().device<pia6821_device>("pia_ic4");
-	pia6821_device *pia5 = machine().device<pia6821_device>("pia_ic5");
-	pia6821_device *pia6 = machine().device<pia6821_device>("pia_ic6");
-	pia6821_device *pia7 = machine().device<pia6821_device>("pia_ic7");
-	pia6821_device *pia8 = machine().device<pia6821_device>("pia_ic8");
-	ptm6840_device *ptm2 = machine().device<ptm6840_device>("ptm_ic2");
-
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
-	int combined_state = pia3->irq_a_state() | pia3->irq_b_state() |
-						 pia4->irq_a_state() | pia4->irq_b_state() |
-						 pia5->irq_a_state() | pia5->irq_b_state() |
-						 pia6->irq_a_state() | pia6->irq_b_state() |
-						 pia7->irq_a_state() | pia7->irq_b_state() |
-						 pia8->irq_a_state() | pia8->irq_b_state() |
-						 ptm2->irq_state();
+	int combined_state = m_pia3->irq_a_state() | m_pia3->irq_b_state() |
+						 m_pia4->irq_a_state() | m_pia4->irq_b_state() |
+						 m_pia5->irq_a_state() | m_pia5->irq_b_state() |
+						 m_pia6->irq_a_state() | m_pia6->irq_b_state() |
+						 m_pia7->irq_a_state() | m_pia7->irq_b_state() |
+						 m_pia8->irq_a_state() | m_pia8->irq_b_state() |
+						 m_6840ptm->irq_state();
 
 	if (!m_link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
@@ -541,10 +533,7 @@ WRITE8_MEMBER(mpu4_state::bankset_w)
 /* IC2 6840 PTM handler */
 WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
 {
-	device_t *device = machine().device("pia_ic2");
-	downcast<ptm6840_device *>(device)->set_c2(data);
-
-	/* copy output value to IC2 c2
+	m_6840ptm->set_c2(data);	/* copy output value to IC2 c2
     this output is the clock for timer2 */
 	/* 1200Hz System interrupt timer */
 }
@@ -552,22 +541,19 @@ WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
 
 WRITE8_MEMBER(mpu4_state::ic2_o2_callback)
 {
-	device_t *device = machine().device("pia_ic2");
-	pia6821_device *pia = machine().device<pia6821_device>("pia_ic3");
-	pia->ca1_w(data); /* copy output value to IC3 ca1 */
+	m_pia3->ca1_w(data);	/* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
 	/* miscellaneous interrupts generated here */
-	downcast<ptm6840_device *>(device)->set_c3(data);
+	m_6840ptm->set_c3(data);
 }
 
 
 WRITE8_MEMBER(mpu4_state::ic2_o3_callback)
 {
-	device_t *device = machine().device("pia_ic2");
 	/* the output from timer3 is used as a square wave for the alarm output
     and as an external clock source for timer 1! */
 	/* also runs lamp fade */
-	downcast<ptm6840_device *>(device)->set_c1(data);
+	m_6840ptm->set_c1(data);
 }
 
 

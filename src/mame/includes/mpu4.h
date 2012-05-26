@@ -97,6 +97,13 @@ class mpu4_state : public driver_device
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_6840ptm(*this, "ptm_ic2"),
+		  m_pia3(*this, "pia_ic3"),
+		  m_pia4(*this, "pia_ic4"),
+		  m_pia5(*this, "pia_ic5"),
+		  m_pia6(*this, "pia_ic6"),
+		  m_pia7(*this, "pia_ic7"),
+		  m_pia8(*this, "pia_ic8"),
 		  m_vid_vidram(*this, "vid_vidram"),
 		  m_vid_mainram(*this, "vid_mainram"),
 		  m_dealem_videoram(*this, "dealem_videoram")
@@ -107,6 +114,13 @@ public:
 		return 0;
 	}
 
+	optional_device<ptm6840_device> m_6840ptm;
+	optional_device<pia6821_device> m_pia3;
+	optional_device<pia6821_device> m_pia4;
+	optional_device<pia6821_device> m_pia5;
+	optional_device<pia6821_device> m_pia6;
+	optional_device<pia6821_device> m_pia7;
+	optional_device<pia6821_device> m_pia8;
 	int m_mod_number;
 	int m_mmtr_data;
 	int m_alpha_data_line;
