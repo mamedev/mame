@@ -431,7 +431,21 @@ static GFXDECODE_START( timeplt )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   32*4, 64 )
 GFXDECODE_END
 
+static const gfx_layout chkun_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ STEP4(0,1), STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1) },
+	{ STEP8(0,8), STEP8(32*8,8) },
+	64*8
+};
 
+static GFXDECODE_START( chkun )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, chkun_spritelayout,   32*4, 64 )
+GFXDECODE_END
 
 /*************************************
  *
@@ -493,6 +507,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )
 
+	MCFG_GFXDECODE(chkun)
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chkun_main_map)
@@ -501,6 +517,8 @@ static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chkun, bikkuric )
+
+	MCFG_GFXDECODE(chkun)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay2")
@@ -703,5 +721,5 @@ GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari licen
 GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
 GAME( 1988, psurge,   0,       psurge,  psurge,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
 // ROM says manufactured by Peni Soft for these two ... no, I'm not going to add THAT -.-"
-GAME( 1988, chkun,    0,       chkun,   chkun,   0, ROT90,  "<unknown>", "Chance Kun (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1988, chkun,    0,       chkun,   chkun,   0, ROT90,  "<unknown>", "Chance Kun (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1987, bikkuric, 0,       bikkuric,bikkuric,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE )
