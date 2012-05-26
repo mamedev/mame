@@ -60,6 +60,8 @@
 #include "emu.h"
 #include "pokey.h"
 
+#include "debugger.h"
+
 /* Four channels with a range of 0..32767 and volume 0..15 */
 //#define POKEY_DEFAULT_GAIN (32767/15/4)
 
@@ -179,6 +181,7 @@ pokeyn_device::pokeyn_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, POKEYN, "POKEYN", tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_execute_interface(mconfig, *this),
+	  device_state_interface(mconfig, *this),
 	  m_icount(0),
 	  m_stream(NULL)
 {
@@ -286,6 +289,26 @@ void pokeyn_device::device_start()
 	save_item(NAME(m_SKSTAT));
 	save_item(NAME(m_SKCTL));
 
+	// State support
+
+	state_add(AUDF1_C, "AUDF1", m_channel[0].m_AUDF);
+	state_add(AUDC1_C, "AUDC1", m_channel[0].m_AUDC);
+	state_add(AUDF2_C, "AUDF2", m_channel[1].m_AUDF);
+	state_add(AUDC2_C, "AUDC2", m_channel[1].m_AUDC);
+	state_add(AUDF3_C, "AUDF3", m_channel[2].m_AUDF);
+	state_add(AUDC3_C, "AUDC3", m_channel[2].m_AUDC);
+	state_add(AUDF4_C, "AUDF4", m_channel[3].m_AUDF);
+	state_add(AUDC4_C, "AUDC4", m_channel[3].m_AUDC);
+	state_add(AUDCTL_C, "AUDCTL", m_AUDCTL);
+#if 0
+	state_add(STIMER_C, "STIMER", m_STIMER);
+	state_add(SKREST_C, "SKREST_C", m_SKREST);
+	state_add(POTGO_C, "POTGO", m_POTGO_C);
+#endif
+	state_add(SEROUT_C, "SEROUT", m_SEROUT);
+	state_add(IRQEN_C, "IRQEN", m_IRQEN);
+	state_add(SKCTL_C, "SKCTL", m_SKCTL);
+
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
@@ -382,14 +405,14 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	void pokeyn_device::execute_run()
 	{
-		//bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+		bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 		do
 		{
 			// debugging
 			//m_ppc = m_pc;	// copy PC to previous PC
-			//if (check_debugger)
-				//debugger_instruction_hook(this, m_pc);
+			if (check_debugger)
+				debugger_instruction_hook(this, 0); //m_pc);
 
 			// instruction fetch
 			//UINT16 op = opcode_read();

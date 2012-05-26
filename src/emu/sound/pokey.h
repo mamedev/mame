@@ -60,7 +60,7 @@ struct _pokey_interface
 class pokeyn_device : public device_t,
 					  public device_sound_interface,
 					  public device_execute_interface,
-					  public device_execute_state
+					  public device_state_interface
 {
 public:
 
