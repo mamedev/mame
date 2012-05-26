@@ -1807,24 +1807,33 @@ MACHINE_CONFIG_END
     1B or 6B e
 */
 
-ROM_START( suprmrio ) /* Vs. Super Mario Bros. (Set ?) */
+
+/* Notes for Super Mario:
+
+mds-sm4-4 e.1c or 6c CRC32 0x5E3FB550 verified on 3 PCBs / dumped sets
+mds-sm4-4.1c or 6c   CRC32 0x0011FC5A differs by 2 bytes: 0x1634 = 0x0D (vs 0x11) & 0x163B = 0x11 (vs 0x14)
+                     Each change is part of a LDA #$ statement IE: A9 0D  LDA #$0D (vs A9 11  LDA #$11)
+                     It's unknown if it's an official alt version or hack.
+*/
+
+ROM_START( suprmrio ) /* Vs. Super Mario Bros. (Set E) */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-sm4.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
-	ROM_LOAD( "mds-sm4.1c or 6c", 0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) )
-	ROM_LOAD( "mds-sm4.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
-	ROM_LOAD( "mds-sm4.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
+	ROM_LOAD( "mds-sm4-4 e.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
+	ROM_LOAD( "mds-sm4-4 e.1c or 6c", 0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) )
+	ROM_LOAD( "mds-sm4-4 e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
+	ROM_LOAD( "mds-sm4-4 e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
 	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
-	ROM_LOAD( "mds-sm4.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
-	ROM_LOAD( "mds-sm4.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
+	ROM_LOAD( "mds-sm4-4 e.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
+	ROM_LOAD( "mds-sm4-4 e.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
 	PALETTE_2C04_0004
 ROM_END
 
-ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set E) */
+ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set unknown) */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4-4 e.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
-	ROM_LOAD( "mds-sm4-4 e.1c or 6c", 0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) ) /* this rom differs by TWO BYTES from the other version in suprmrio. this version has been dumped/observed on two known boards and one anonymous board */
+	ROM_LOAD( "mds-sm4-4.1c or 6c",   0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-sm4-4 e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
 	ROM_LOAD( "mds-sm4-4 e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
@@ -1887,10 +1896,10 @@ ROM_END
 
 ROM_START( skatekds )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000,CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
-	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000,CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) )
-	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000,CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
-	ROM_LOAD( "mds-sm4.1a",  0xe000, 0x2000,CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
+	ROM_LOAD( "mds-sm4-4 e.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
+	ROM_LOAD( "mds-sm4-4 e.1c or 6c", 0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) )
+	ROM_LOAD( "mds-sm4-4 e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
+	ROM_LOAD( "mds-sm4-4 e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
 	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
 	ROM_LOAD( "mds-sm4.2b",  0x0000, 0x2000,CRC(f3980303) SHA1(b9a25c906d1861c89e2e40e878a34d318daf6619) )
@@ -1901,28 +1910,28 @@ ROM_END
 
 ROM_START( iceclimb )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "ic-1d",  0x8000, 0x2000, CRC(65e21765) SHA1(900f1efe5e8005ee8cdccbf5039914dfe466aa3d) )
-	ROM_LOAD( "ic-1c",  0xa000, 0x2000, CRC(a7909c51) SHA1(04708a9e429cbddab6988ff7b3ec5aa0109f6228) )
-	ROM_LOAD( "ic-1b",  0xc000, 0x2000, CRC(7fb3cc21) SHA1(bed673211f2251d4112ea41c4a1f917fee32d93c) )
-	ROM_LOAD( "ic-1a",  0xe000, 0x2000, CRC(bf196bf7) SHA1(7d7b34894caab41ac51ca9c89d09e72053798784) )
+	ROM_LOAD( "mds-ic4-4 b.6d",  0x8000, 0x2000, CRC(0ea5f9cb) SHA1(3ba6228ac8011371fc36ce9dde4fc158a81a99a2) )
+	ROM_LOAD( "mds-ic4-4 b.6c",  0xa000, 0x2000, CRC(51fe438e) SHA1(f40812d4275dabaac6f9539e1300c08d07992654) )
+	ROM_LOAD( "mds-ic4-4 b-1.6b",0xc000, 0x2000, CRC(a8afdc62) SHA1(f798da6c107926790026d4a4d384961dbff2380e) )
+	ROM_LOAD( "mds-ic4-4 b.6a",  0xe000, 0x2000, CRC(96505d4d) SHA1(0fb913853decebec1d5d15ee5adc8027cd66f016) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "ic-2b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
-	ROM_LOAD( "ic-2a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
+	ROM_LOAD( "mds-ic4-4 b.8b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) ) /* Matches Ice Climber Dual screen rev A rom */
+	ROM_LOAD( "mds-ic4-4 b.8a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) ) /* Matches Ice Climber Dual screen rev A rom */
 
 	PALETTE_2C04_0004
 ROM_END
 
-ROM_START( iceclimbj )
+ROM_START( iceclimba ) /* Version A? */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ic4-4_6d b.bin",  0x8000, 0x2000, CRC(0ea5f9cb) SHA1(3ba6228ac8011371fc36ce9dde4fc158a81a99a2) )
-	ROM_LOAD( "mds-ic4-4_6c b.bin",  0xa000, 0x2000, CRC(51fe438e) SHA1(f40812d4275dabaac6f9539e1300c08d07992654) )
-	ROM_LOAD( "mds-ic4-4_6b b-1.bin",0xc000, 0x2000, CRC(a8afdc62) SHA1(f798da6c107926790026d4a4d384961dbff2380e) )
-	ROM_LOAD( "mds-ic4-4_6a b.bin",  0xe000, 0x2000, CRC(96505d4d) SHA1(0fb913853decebec1d5d15ee5adc8027cd66f016) )
+	ROM_LOAD( "mds-ic4-4.1d",  0x8000, 0x2000, CRC(65e21765) SHA1(900f1efe5e8005ee8cdccbf5039914dfe466aa3d) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-ic4-4.1c",  0xa000, 0x2000, CRC(a7909c51) SHA1(04708a9e429cbddab6988ff7b3ec5aa0109f6228) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-ic4-4.1b",  0xc000, 0x2000, CRC(7fb3cc21) SHA1(bed673211f2251d4112ea41c4a1f917fee32d93c) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-ic4-4.1a",  0xe000, 0x2000, CRC(bf196bf7) SHA1(7d7b34894caab41ac51ca9c89d09e72053798784) ) /* Need to verify correct label */
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ic4-4_8b b.bin",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
-	ROM_LOAD( "mds-ic4-4_8a b.bin",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
+	ROM_LOAD( "mds-ic4-4 b.8b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) ) /* Matches Ice Climber Dual screen rev A rom */
+	ROM_LOAD( "mds-ic4-4 b.8a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) ) /* Matches Ice Climber Dual screen rev A rom */
 
 	PALETTE_2C04_0004
 ROM_END
@@ -1944,22 +1953,34 @@ ROM_END
 
 ROM_START( hogalley )
 	ROM_REGION( 0x10000, "maincpu",0  ) /* 6502 memory */
-	ROM_LOAD( "mds-ha4-1_1d or 6d e-1.bin",  0x8000, 0x2000, CRC(2089e166) SHA1(7db09b5b6bcd87589bed89a5fc1a4b772155a0f3) )
-	ROM_LOAD( "mds-ha4-1_1c or 6c e-1.bin",  0xa000, 0x2000, CRC(a85934ae) SHA1(f26af4f60a4072c45e900dff7f74d9907bc2e1e0) )
-	ROM_LOAD( "mds-ha4-1_1b or 6b e-1.bin",  0xc000, 0x2000, CRC(718e25b3) SHA1(2710827931d3cd55984c3107c3b8e0f691965eaa) )
-	ROM_LOAD( "mds-ha4-1_1a or 6a e-1.bin",  0xe000, 0x2000, CRC(f9526852) SHA1(244c6a12801d4aa774a416f7c3dd8465d01dbca2) )
+	ROM_LOAD( "mds-ha4-1 e-1.1d or 6d",  0x8000, 0x2000, CRC(2089e166) SHA1(7db09b5b6bcd87589bed89a5fc1a4b772155a0f3) )
+	ROM_LOAD( "mds-ha4-1 e-1.1c or 6c",  0xa000, 0x2000, CRC(a85934ae) SHA1(f26af4f60a4072c45e900dff7f74d9907bc2e1e0) )
+	ROM_LOAD( "mds-ha4-1 e-1.1b or 6b",  0xc000, 0x2000, CRC(718e25b3) SHA1(2710827931d3cd55984c3107c3b8e0f691965eaa) )
+	ROM_LOAD( "mds-ha4-1 e-1.1a or 6a",  0xe000, 0x2000, CRC(f9526852) SHA1(244c6a12801d4aa774a416f7c3dd8465d01dbca2) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ha4-1_2b or 8b e-1.bin",  0x0000, 0x2000, CRC(fc5a91ad) SHA1(7ce6c64d81a9626d0b34bdc0a2a28fee457ebcb1) ) // there is another dump ( CRC 0x7623e954 ) where 0xFE1 = 04, the dump we use is probably the correct one
-	ROM_LOAD( "mds-ha4-1_2a or 8a e-1.bin",  0x2000, 0x2000, CRC(78c842b6) SHA1(39f2a7fc1f1cbe2378a369e45b5cbb05057db3f0) )
+	ROM_LOAD( "mds-ha4-1 e-1.2b or 8b",  0x0000, 0x2000, CRC(fc5a91ad) SHA1(7ce6c64d81a9626d0b34bdc0a2a28fee457ebcb1) )
+	// there is another dump of mds-ha4-1 e-1.2b or 8b ( CRC 0x7623e954 ) where 0xFE1 = 04,  the dump we use is probably the correct one
+	ROM_LOAD( "mds-ha4-1 e-1.2a or 8a",  0x2000, 0x2000, CRC(78c842b6) SHA1(39f2a7fc1f1cbe2378a369e45b5cbb05057db3f0) )
 
 	PALETTE_2C04_0001
 ROM_END
 
+/* From Gumshoe readme:
+
+NOTE:  There is a small board modification which consists of 2 extra jumpers added. 
+They appear to be:
+
+pin 26 of 6D to pin 1, 74ls04 at 5E. 
+pin 26 of 1D to pin 12, 74s32 at 4b.
+
+possibly an extra address?
+*/
+
 ROM_START( vsgshoe )
 	ROM_REGION( 0x14000,"maincpu", 0 ) /* 6502 memory */
 	/* 2 banks mapped at 0x8000 */
-	ROM_LOAD( "mds-gm5.1d",  0x10000, 0x4000, CRC(063b342f) SHA1(66f69de27db5b08969f9250d0a6760e7311bd9bf)  ) // its probably not bad .. just banked somehow
+	ROM_LOAD( "mds-gm5.1d",  0x10000, 0x4000, CRC(063b342f) SHA1(66f69de27db5b08969f9250d0a6760e7311bd9bf) ) // its probably not bad .. just banked somehow
 	ROM_LOAD( "mds-gm5.1c",  0x0a000, 0x2000, CRC(e1b7915e) SHA1(ed0fdf74b05a3ccd1645c4f580436fd439f81dea) )
 	ROM_LOAD( "mds-gm5.1b",  0x0c000, 0x2000, CRC(5b73aa3c) SHA1(4069a6139091fbff48758953bd894808a8356d46) )
 	ROM_LOAD( "mds-gm5.1a",  0x0e000, 0x2000, CRC(70e606bc) SHA1(8207ded20cb9109d605ce73deb722de3514ed9bf) )
@@ -2031,32 +2052,32 @@ ROM_START( cluclu )
 	PALETTE_2C04_0004
 ROM_END
 
-ROM_START( excitebk )
+ROM_START( excitebk ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-eb4.1d",  0x8000, 0x2000, CRC(7e54df1d) SHA1(38d878041976386e8608c73133040b18d0e4b9cd) )
-	ROM_LOAD( "mds-eb4.1c",  0xa000, 0x2000, CRC(89baae91) SHA1(6aebf13c415e3246edf7daa847533b7e3ae0425f) )
-	ROM_LOAD( "mds-eb4.1b",  0xc000, 0x2000, CRC(4c0c2098) SHA1(078f24ce02f5fb91d7ed7fa59aec8efbec38aed1) )
-	ROM_LOAD( "mds-eb4.1a",  0xe000, 0x2000, CRC(b9ab7110) SHA1(89e3bd5f42b5b5e869ee46afe4f25a1a17d3814d) )
+	ROM_LOAD( "mds-eb4-4 a.6d",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
+	ROM_LOAD( "mds-eb4-4 a.6c",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
+	ROM_LOAD( "mds-eb4-4 a.6b",  0xc000, 0x2000, CRC(d1afe2dd) SHA1(ef0f44d98464b7dab7c51be4379242f7a4e4fcdd) )
+	ROM_LOAD( "mds-eb4-4 a.6a",  0xe000, 0x2000, CRC(46711d0e) SHA1(6ce2f395b3f407671a87c6e1133ab63a637022f2) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-eb4.2b",  0x0000, 0x2000, CRC(80be1f50) SHA1(d8544b9a0a9d8719ab601fa9c68c4305385b14c7) )
-	ROM_LOAD( "mds-eb4.2a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
-
-	PALETTE_2C04_0003
-ROM_END
-
-ROM_START( excitebkj )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-eb4-4_6d a.bin",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
-	ROM_LOAD( "mds-eb4-4_6c a.bin",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
-	ROM_LOAD( "mds-eb4-4_6b a.bin",  0xc000, 0x2000, CRC(d1afe2dd) SHA1(ef0f44d98464b7dab7c51be4379242f7a4e4fcdd) )
-	ROM_LOAD( "mds-eb4-4_6a a.bin",  0xe000, 0x2000, CRC(46711d0e) SHA1(6ce2f395b3f407671a87c6e1133ab63a637022f2) )
-
-	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-eb4-4_8b a.bin",  0x0000, 0x2000, CRC(62a76c52) SHA1(7ebd0dac976abe8636f4f75a3b2a473d7a54934d) )
-	ROM_LOAD( "mds-eb4-4_8a a.bin",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
+	ROM_LOAD( "mds-eb4-4 a.8b",  0x0000, 0x2000, CRC(62a76c52) SHA1(7ebd0dac976abe8636f4f75a3b2a473d7a54934d) )
+	ROM_LOAD( "mds-eb4-4 a.8a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
 
 	PALETTE_2C04_0004
+ROM_END
+
+ROM_START( excitebka ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-eb4-3.1d",  0x8000, 0x2000, CRC(7e54df1d) SHA1(38d878041976386e8608c73133040b18d0e4b9cd) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-eb4-3.1c",  0xa000, 0x2000, CRC(89baae91) SHA1(6aebf13c415e3246edf7daa847533b7e3ae0425f) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-eb4-3.1b",  0xc000, 0x2000, CRC(4c0c2098) SHA1(078f24ce02f5fb91d7ed7fa59aec8efbec38aed1) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-eb4-3.1a",  0xe000, 0x2000, CRC(b9ab7110) SHA1(89e3bd5f42b5b5e869ee46afe4f25a1a17d3814d) ) /* Need to verify correct label */
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-eb4-3.2b",  0x0000, 0x2000, CRC(80be1f50) SHA1(d8544b9a0a9d8719ab601fa9c68c4305385b14c7) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-eb4-3.2a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) ) /* Need to verify correct label */
+
+	PALETTE_2C04_0003
 ROM_END
 
 ROM_START( jajamaru )
@@ -2073,18 +2094,46 @@ ROM_START( jajamaru )
 	PALETTE_STANDARD
 ROM_END
 
-ROM_START( ladygolf )
-	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
-	ROM_LOAD( "lg-1d",  0x8000, 0x2000, CRC(8b2ab436) SHA1(145a75f30f1fab5b1babf01ada9ed23f59c2c18d) )
-	ROM_LOAD( "lg-1c",  0xa000, 0x2000, CRC(bda6b432) SHA1(c8322f07df0adbd70cb49f2284b046478a3a57c1) )
-	ROM_LOAD( "lg-1b",  0xc000, 0x2000, CRC(dcdd8220) SHA1(563028f8db9ad221d8ac8f8096b4587b822eedb7) )
-	ROM_LOAD( "lg-1a",  0xe000, 0x2000, CRC(26a3cb3b) SHA1(00131637eb76154c4f04eb54707e0e7b453d4580) )
+ROM_START( smgolf )
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-gf4-2 f.1d or 6d",  0x8000, 0x2000, CRC(4a723087) SHA1(87dc063d295f55871598a1e1eb4e62ce298b2f0c) )
+	ROM_LOAD( "mds-gf4-2 f.1c or 6c",  0xa000, 0x2000, CRC(2debda63) SHA1(33b42eb5641ec947b2f2dcbc632ee6c81fa2ffe3) )
+	ROM_LOAD( "mds-gf4-2 f.1b or 6b",  0xc000, 0x2000, CRC(6783652f) SHA1(7165ee59d3787cb56eed4791351da07f4bcc68ed) )
+	ROM_LOAD( "mds-gf4-2 f.1a or 6a",  0xe000, 0x2000, CRC(bfc17263) SHA1(9e3b46fe08be893935138247ed3168d19d55312e) )
 
-	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "lg-2b",  0x0000, 0x2000, CRC(95618947) SHA1(e8f09bffa3fa1a1cac8fa25df9fba962951c1fb3) )
-	ROM_LOAD( "lg-2a",  0x2000, 0x2000, CRC(d07407b1) SHA1(b998b46fe83e76fac3d7b71495d1da8580a731f9) )
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-gf4-2 f.2b or 8b",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) )
+	ROM_LOAD( "mds-gf4-2 f.2a or 8a",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) )
 
 	PALETTE_2C04_0002
+ROM_END
+
+ROM_START( smgolfb ) /* Set ID should be something like MDS-GF4-2 xx */
+	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
+	ROM_LOAD( "mds-gf4-2.1d",  0x8000, 0x2000, CRC(a3e286d3) SHA1(ee7539a46e0e062ffd63d84e8b83de29b860a501) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-gf4-2.1c",  0xa000, 0x2000, CRC(e477e48b) SHA1(2ebcc548ac8defc521860d2d2f585be0eee6620e) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-gf4-2.1b",  0xc000, 0x2000, CRC(7d80b511) SHA1(52aa7e798ff8d933b023bcade81a39f7e27d02c5) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-gf4-2.1a",  0xe000, 0x2000, CRC(7b767da6) SHA1(0f0f3a24b844265c304b10016f33e91b323a9a98) ) /* Need to verify correct label */
+
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-gf4-2 f.2b or 8b",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-gf4-2 f.2a or 8a",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) ) /* Need to verify correct label */
+
+	PALETTE_2C04_0002
+ROM_END
+
+ROM_START( smgolfj )
+	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
+	ROM_LOAD( "mds-gf3 b.6d",  0x8000, 0x2000, CRC(8ce375b6) SHA1(f787f5ebe584cc95428b63660cd41e2b3df6ddf2) )
+	ROM_LOAD( "mds-gf3 b.6c",  0xa000, 0x2000, CRC(50a938d3) SHA1(5f5c5e50024fe113240f1b0b3b6d38cbf9130133) )
+	ROM_LOAD( "mds-gf3 b.6b",  0xc000, 0x2000, CRC(7dc39f1f) SHA1(12ff2f0ec7418754f9b6e600746e15f345e3ddaa) )
+	ROM_LOAD( "mds-gf3 b.6a",  0xe000, 0x2000, CRC(9b8a2106) SHA1(008ab9098f9ce564bcb4beb17285c2bc18b529ff) )
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-gf3 b.8b",  0x0000, 0x2000, CRC(7ef68029) SHA1(a639e463fd0abfb1bff0dd17aa0c9f70a72ee139) )
+	ROM_LOAD( "mds-gf3 b.8a",  0x2000, 0x2000, CRC(f2285878) SHA1(e0d34161a1879975f51c12222cf366228170b0e3) )
+
+	PALETTE_STANDARD
 ROM_END
 
 ROM_START( ladygolfe ) /* Vs. Stroke & Match Golf (Ladies Version, set E) */
@@ -2101,77 +2150,49 @@ ROM_START( ladygolfe ) /* Vs. Stroke & Match Golf (Ladies Version, set E) */
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( smgolfj )
+ROM_START( ladygolf )
 	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
-	ROM_LOAD( "mds-gf3_6d b.bin",  0x8000, 0x2000, CRC(8ce375b6) SHA1(f787f5ebe584cc95428b63660cd41e2b3df6ddf2) )
-	ROM_LOAD( "mds-gf3_6c b.bin",  0xa000, 0x2000, CRC(50a938d3) SHA1(5f5c5e50024fe113240f1b0b3b6d38cbf9130133) )
-	ROM_LOAD( "mds-gf3_6b b.bin",  0xc000, 0x2000, CRC(7dc39f1f) SHA1(12ff2f0ec7418754f9b6e600746e15f345e3ddaa) )
-	ROM_LOAD( "mds-gf3_6a b.bin",  0xe000, 0x2000, CRC(9b8a2106) SHA1(008ab9098f9ce564bcb4beb17285c2bc18b529ff) )
+	ROM_LOAD( "lg-1d",  0x8000, 0x2000, CRC(8b2ab436) SHA1(145a75f30f1fab5b1babf01ada9ed23f59c2c18d) ) /* Need to verify correct label */
+	ROM_LOAD( "lg-1c",  0xa000, 0x2000, CRC(bda6b432) SHA1(c8322f07df0adbd70cb49f2284b046478a3a57c1) ) /* Need to verify correct label */
+	ROM_LOAD( "lg-1b",  0xc000, 0x2000, CRC(dcdd8220) SHA1(563028f8db9ad221d8ac8f8096b4587b822eedb7) ) /* Need to verify correct label */
+	ROM_LOAD( "lg-1a",  0xe000, 0x2000, CRC(26a3cb3b) SHA1(00131637eb76154c4f04eb54707e0e7b453d4580) ) /* Need to verify correct label */
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-gf3_8b b.bin",  0x0000, 0x2000, CRC(7ef68029) SHA1(a639e463fd0abfb1bff0dd17aa0c9f70a72ee139) )
-	ROM_LOAD( "mds-gf3_8a b.bin",  0x2000, 0x2000, CRC(f2285878) SHA1(e0d34161a1879975f51c12222cf366228170b0e3) )
-
-	PALETTE_STANDARD
-ROM_END
-
-ROM_START( machridr )
-	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
-	ROM_LOAD( "mr-1d",  0x8000, 0x2000, CRC(379c44b9) SHA1(7b148ba7f7eea64509733f94b4eaafe5bfcf3527) )
-	ROM_LOAD( "mr-1c",  0xa000, 0x2000, CRC(cb864802) SHA1(65f06a8eaca3347432f3f2f673a24692415d869f) )
-	ROM_LOAD( "mr-1b",  0xc000, 0x2000, CRC(5547261f) SHA1(aedb7ab1ef0cd32f325ec9fc948ca1e21a78aa7a) )
-	ROM_LOAD( "mr-1a",  0xe000, 0x2000, CRC(e3e3900d) SHA1(c66807ca372d2e5ac11030fdf3d30e30617d4e72) )
-
-	ROM_REGION( 0x4000,"gfx1" , 0) /* PPU memory */
-	ROM_LOAD( "mr-2b",  0x0000, 0x2000, CRC(33a2b41a) SHA1(671f37bce742e63250296e62c143f8a82f860b04) )
-	ROM_LOAD( "mr-2a",  0x2000, 0x2000, CRC(685899d8) SHA1(02b6a9bc21367c481d0091fa8a8f2d1b841244bf) )
+	ROM_LOAD( "mds-lg4 e.2b or 8b", 0x0000, 0x2000, CRC(95618947) SHA1(e8f09bffa3fa1a1cac8fa25df9fba962951c1fb3) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-lg4 e.2a or 8a", 0x2000, 0x2000, CRC(d07407b1) SHA1(b998b46fe83e76fac3d7b71495d1da8580a731f9) ) /* Need to verify correct label */
 
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( machridrj )
+ROM_START( machridr ) /* Set ID should be something like MDS-MR4-2 xx */
 	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
-	ROM_LOAD( "mds-mr4-1_1d or 6d a.bin",  0x8000, 0x2000, CRC(ab7e0594) SHA1(fc5982a93791608a20e5ec9e3a4b71d702bda354) )
-	ROM_LOAD( "mds-mr4-1_1c or 6c a.bin",  0xa000, 0x2000, CRC(d4a341c3) SHA1(c799e40d0ebd1447032d8767fb2caeee6b33f31a) )
-	ROM_LOAD( "mds-mr4-1_1b or 6b a.bin",  0xc000, 0x2000, CRC(cbdcfece) SHA1(91f3a0e1e91bdbb61721e9777009299f7e8efa96) )
-	ROM_LOAD( "mds-mr4-1_1a or 6a a.bin",  0xe000, 0x2000, CRC(e5b1e350) SHA1(ab30f84597cbf470a02a2d083587cdc589a29a3c) )
+	ROM_LOAD( "mr-1d",  0x8000, 0x2000, CRC(379c44b9) SHA1(7b148ba7f7eea64509733f94b4eaafe5bfcf3527) ) /* Need to verify correct label */
+	ROM_LOAD( "mr-1c",  0xa000, 0x2000, CRC(cb864802) SHA1(65f06a8eaca3347432f3f2f673a24692415d869f) ) /* Need to verify correct label */
+	ROM_LOAD( "mr-1b",  0xc000, 0x2000, CRC(5547261f) SHA1(aedb7ab1ef0cd32f325ec9fc948ca1e21a78aa7a) ) /* Need to verify correct label */
+	ROM_LOAD( "mr-1a",  0xe000, 0x2000, CRC(e3e3900d) SHA1(c66807ca372d2e5ac11030fdf3d30e30617d4e72) ) /* Need to verify correct label */
 
 	ROM_REGION( 0x4000,"gfx1" , 0) /* PPU memory */
-	ROM_LOAD( "mds-mr4-1_2b or 8b a.bin",  0x0000, 0x2000, CRC(59867e36) SHA1(2b5546aa9f140277d611d6d5516b1343e5e672a0) )
-	ROM_LOAD( "mds-mr4-1_2a or 8a a.bin",  0x2000, 0x2000, CRC(ccfedc5a) SHA1(3d6321681fbe256d7c71037205d45d22fc264569) )
+	ROM_LOAD( "mr-2b",  0x0000, 0x2000, CRC(33a2b41a) SHA1(671f37bce742e63250296e62c143f8a82f860b04) ) /* Need to verify correct label */
+	ROM_LOAD( "mr-2a",  0x2000, 0x2000, CRC(685899d8) SHA1(02b6a9bc21367c481d0091fa8a8f2d1b841244bf) ) /* Need to verify correct label */
+
+	PALETTE_2C04_0002
+ROM_END
+
+ROM_START( machridra )
+	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
+	ROM_LOAD( "mds-mr4-1 a.1d or 6d",  0x8000, 0x2000, CRC(ab7e0594) SHA1(fc5982a93791608a20e5ec9e3a4b71d702bda354) )
+	ROM_LOAD( "mds-mr4-1 a.1c or 6c",  0xa000, 0x2000, CRC(d4a341c3) SHA1(c799e40d0ebd1447032d8767fb2caeee6b33f31a) )
+	ROM_LOAD( "mds-mr4-1 a.1b or 6b",  0xc000, 0x2000, CRC(cbdcfece) SHA1(91f3a0e1e91bdbb61721e9777009299f7e8efa96) )
+	ROM_LOAD( "mds-mr4-1 a.1a or 6a",  0xe000, 0x2000, CRC(e5b1e350) SHA1(ab30f84597cbf470a02a2d083587cdc589a29a3c) )
+
+	ROM_REGION( 0x4000,"gfx1" , 0) /* PPU memory */
+	ROM_LOAD( "mds-mr4-1 a.2b or 8b",  0x0000, 0x2000, CRC(59867e36) SHA1(2b5546aa9f140277d611d6d5516b1343e5e672a0) )
+	ROM_LOAD( "mds-mr4-1 a.2a or 8a",  0x2000, 0x2000, CRC(ccfedc5a) SHA1(3d6321681fbe256d7c71037205d45d22fc264569) )
 
 	PALETTE_2C04_0001
 ROM_END
 
-ROM_START( smgolf )
-	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
-	ROM_LOAD( "golf-1d",  0x8000, 0x2000, CRC(a3e286d3) SHA1(ee7539a46e0e062ffd63d84e8b83de29b860a501) )
-	ROM_LOAD( "golf-1c",  0xa000, 0x2000, CRC(e477e48b) SHA1(2ebcc548ac8defc521860d2d2f585be0eee6620e) )
-	ROM_LOAD( "golf-1b",  0xc000, 0x2000, CRC(7d80b511) SHA1(52aa7e798ff8d933b023bcade81a39f7e27d02c5) )
-	ROM_LOAD( "golf-1a",  0xe000, 0x2000, CRC(7b767da6) SHA1(0f0f3a24b844265c304b10016f33e91b323a9a98) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "golf-2b",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) )
-	ROM_LOAD( "golf-2a",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) )
-
-	PALETTE_2C04_0002
-ROM_END
-
-ROM_START( smgolfb )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-gf4-2_1d_or_6d_f",  0x8000, 0x2000, CRC(4a723087) SHA1(87dc063d295f55871598a1e1eb4e62ce298b2f0c) )
-	ROM_LOAD( "mds-gf4-2_1c_or_6c_f",  0xa000, 0x2000, CRC(2debda63) SHA1(33b42eb5641ec947b2f2dcbc632ee6c81fa2ffe3) )
-	ROM_LOAD( "mds-gf4-2_1b_or_6b_f",  0xc000, 0x2000, CRC(6783652f) SHA1(7165ee59d3787cb56eed4791351da07f4bcc68ed) )
-	ROM_LOAD( "mds-gf4-2_1a_or_6a_f",  0xe000, 0x2000, CRC(bfc17263) SHA1(9e3b46fe08be893935138247ed3168d19d55312e) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-gf4-2_2b_or_8b_f",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) )
-	ROM_LOAD( "mds-gf4-2_2a_or_8a_f",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) )
-
-	PALETTE_2C04_0002
-ROM_END
-
-ROM_START( vspinbal )
+ROM_START( vspinbal ) /* Set ID should be something like MDS-PN3-1 xx or MDS-PN4-1 xx */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "pb-6d",  0x8000, 0x2000, CRC(69fc575e) SHA1(d5165959c3569f5ebccd03d2cad4714f9240cc4c) )
 	ROM_LOAD( "pb-6c",  0xa000, 0x2000, CRC(fa9472d2) SHA1(d20ffb156bea1f474ad7d9776e217cb05048f00f) )
@@ -2187,14 +2208,14 @@ ROM_END
 
 ROM_START( vspinbalj )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-pn3_6d b.bin",  0x8000, 0x2000, CRC(fd50c42e) SHA1(4a3ea9e85b60caf8b6975fd2798bc59e86ec257f) )
-	ROM_LOAD( "mds-pn3_6c b.bin",  0xa000, 0x2000, CRC(59beb9e5) SHA1(682b31dfbdf1ee44fd5d5d63169ab35409e93546) )
-	ROM_LOAD( "mds-pn3_6b b.bin",  0xc000, 0x2000, CRC(ce7f47ce) SHA1(c548c1b94d3807b4968629c7fdce8aae3a61e6e0) )
-	ROM_LOAD( "mds-pn3_6a b.bin",  0xe000, 0x2000, CRC(5685e2ee) SHA1(a38fbf25c93dfc73658d3837b2b6397736e8d2f2) )
+	ROM_LOAD( "mds-pn3 b.6d",  0x8000, 0x2000, CRC(fd50c42e) SHA1(4a3ea9e85b60caf8b6975fd2798bc59e86ec257f) )
+	ROM_LOAD( "mds-pn3 b.6c",  0xa000, 0x2000, CRC(59beb9e5) SHA1(682b31dfbdf1ee44fd5d5d63169ab35409e93546) )
+	ROM_LOAD( "mds-pn3 b.6b",  0xc000, 0x2000, CRC(ce7f47ce) SHA1(c548c1b94d3807b4968629c7fdce8aae3a61e6e0) )
+	ROM_LOAD( "mds-pn3 b.6a",  0xe000, 0x2000, CRC(5685e2ee) SHA1(a38fbf25c93dfc73658d3837b2b6397736e8d2f2) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-pn3_8b b.bin",  0x0000, 0x2000, CRC(1e3fec3e) SHA1(aef18cee358af202ec48c1c36986e42e134466b1) )
-	ROM_LOAD( "mds-pn3_8a b.bin",  0x2000, 0x2000, CRC(6f963a65) SHA1(af69564b51aa42ef0815c952e0d0d0d928651685) )
+	ROM_LOAD( "mds-pn3 b.8b",  0x0000, 0x2000, CRC(1e3fec3e) SHA1(aef18cee358af202ec48c1c36986e42e134466b1) )
+	ROM_LOAD( "mds-pn3 b.8a",  0x2000, 0x2000, CRC(6f963a65) SHA1(af69564b51aa42ef0815c952e0d0d0d928651685) )
 
 	PALETTE_STANDARD
 ROM_END
@@ -2214,30 +2235,30 @@ ROM_END
 
 ROM_START( vssoccer )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "soccer1d",  0x8000, 0x2000, CRC(0ac52145) SHA1(148d9850cd80fb64e28f478891c16dac71e67e96) )
-	ROM_LOAD( "soccer1c",  0xa000, 0x2000, CRC(f132e794) SHA1(f289f5acec7e2a62fc569a401e7ab5200df302f5) )
-	ROM_LOAD( "soccer1b",  0xc000, 0x2000, CRC(26bb7325) SHA1(80e97a36c364a07cf9862202454651fb2872cd51) )
-	ROM_LOAD( "soccer1a",  0xe000, 0x2000, CRC(e731635a) SHA1(8089bc49a0115225d26c4cbaaf08431376eafa59) )
+	ROM_LOAD( "mds-sc4-2 a.1d or 6d",  0x8000, 0x2000, CRC(722fc5bc) SHA1(1ac06ade7412c476b834190034d94420863fe301) )
+	ROM_LOAD( "mds-sc4-2 a.1c or 6c",  0xa000, 0x2000, CRC(6407cb08) SHA1(95e79633dfa4468e2a2af6d0a2cf5a23e4f23eb1) )
+	ROM_LOAD( "mds-sc4-2 a.1b or 6b",  0xc000, 0x2000, CRC(d156b824) SHA1(2b7916805a0f09c10a334ba3c13481ce1da82be1) )
+	ROM_LOAD( "mds-sc4-2 a.1a or 6a",  0xe000, 0x2000, CRC(2d75ca32) SHA1(9509bd984ca1ca6fce83874a6e13e75cdf91726b) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "soccer2b",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) )
-	ROM_LOAD( "soccer2a",  0x2000, 0x2000, CRC(7263613a) SHA1(aa5673b57833d1f32c2cb0230a809397ec6103b4) )
-
-	PALETTE_2C04_0003
-ROM_END
-
-ROM_START( vssoccerj )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-sc4-2_1d or 6d a.bin",  0x8000, 0x2000, CRC(722fc5bc) SHA1(1ac06ade7412c476b834190034d94420863fe301) )
-	ROM_LOAD( "mds-sc4-2_1c or 6c a.bin",  0xa000, 0x2000, CRC(6407cb08) SHA1(95e79633dfa4468e2a2af6d0a2cf5a23e4f23eb1) )
-	ROM_LOAD( "mds-sc4-2_1b or 6b a.bin",  0xc000, 0x2000, CRC(d156b824) SHA1(2b7916805a0f09c10a334ba3c13481ce1da82be1) )
-	ROM_LOAD( "mds-sc4-2_1a or 6a a.bin",  0xe000, 0x2000, CRC(2d75ca32) SHA1(9509bd984ca1ca6fce83874a6e13e75cdf91726b) )
-
-	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-sc4-2_2b or 8b a.bin",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) )
-	ROM_LOAD( "mds-sc4-2_2a or 8a a.bin",  0x2000, 0x2000, CRC(7263613a) SHA1(aa5673b57833d1f32c2cb0230a809397ec6103b4) )
+	ROM_LOAD( "mds-sc4-2 a.2b or 8b",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) )
+	ROM_LOAD( "mds-sc4-2 a.2a or 8a",  0x2000, 0x2000, CRC(7263613a) SHA1(aa5673b57833d1f32c2cb0230a809397ec6103b4) )
 
 	PALETTE_2C04_0002
+ROM_END
+
+ROM_START( vssoccera ) /* Set ID should be something like MDS-SC4-3 xx */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-sc4-3.1d",  0x8000, 0x2000, CRC(0ac52145) SHA1(148d9850cd80fb64e28f478891c16dac71e67e96) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-sc4-3.1c",  0xa000, 0x2000, CRC(f132e794) SHA1(f289f5acec7e2a62fc569a401e7ab5200df302f5) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-sc4-3.1b",  0xc000, 0x2000, CRC(26bb7325) SHA1(80e97a36c364a07cf9862202454651fb2872cd51) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-sc4-3.1a",  0xe000, 0x2000, CRC(e731635a) SHA1(8089bc49a0115225d26c4cbaaf08431376eafa59) ) /* Need to verify correct label */
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-sc4-3.2b",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) ) /* Need to verify correct label */
+	ROM_LOAD( "mds-sc4-3.2a",  0x2000, 0x2000, CRC(7263613a) SHA1(aa5673b57833d1f32c2cb0230a809397ec6103b4) ) /* Need to verify correct label */
+
+	PALETTE_2C04_0003
 ROM_END
 
 ROM_START( starlstr )
@@ -2353,17 +2374,17 @@ ROM_END
 
 ROM_START( bnglngby )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-rb4-2_6d b.bin", 0x8000, 0x2000, CRC(d152d8c2) SHA1(d127195be8219df1c6f7bdd86658ed26c658470e) )
-	ROM_LOAD( "mds-rb4-2_6c b.bin", 0xa000, 0x2000, CRC(c3383935) SHA1(8ed1e8ed36069e5e6f2f3c672aae5e1f3dabbdd0) )
-	ROM_LOAD( "mds-rb4-2_6b b.bin", 0xc000, 0x2000, CRC(e2a24af8) SHA1(89cca4188b859882487fe64776c1ca0173fee142) )
-	ROM_LOAD( "mds-rb4-2_6a b.bin", 0xe000, 0x2000, CRC(024ad874) SHA1(b02241c3d2ae90ccd5402410fa650741034a2f78) )
+	ROM_LOAD( "mds-rb4-2 b.6d", 0x8000, 0x2000, CRC(d152d8c2) SHA1(d127195be8219df1c6f7bdd86658ed26c658470e) )
+	ROM_LOAD( "mds-rb4-2 b.6c", 0xa000, 0x2000, CRC(c3383935) SHA1(8ed1e8ed36069e5e6f2f3c672aae5e1f3dabbdd0) )
+	ROM_LOAD( "mds-rb4-2 b.6b", 0xc000, 0x2000, CRC(e2a24af8) SHA1(89cca4188b859882487fe64776c1ca0173fee142) )
+	ROM_LOAD( "mds-rb4-2 b.6a", 0xe000, 0x2000, CRC(024ad874) SHA1(b02241c3d2ae90ccd5402410fa650741034a2f78) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-rb4-2_8b b.bin", 0x0000, 0x2000, CRC(d3d946ab) SHA1(e2ed8af0cf6edb925c1ff47fccb5caabd0b8c09f) )
-	ROM_LOAD( "mds-rb4-2_8a b.bin", 0x2000, 0x2000, CRC(ca08126a) SHA1(48b315e3e90b19b2d74dcd88c734dcdf3539d6ca) )
+	ROM_LOAD( "mds-rb4-2 b.8b", 0x0000, 0x2000, CRC(d3d946ab) SHA1(e2ed8af0cf6edb925c1ff47fccb5caabd0b8c09f) )
+	ROM_LOAD( "mds-rb4-2 b.8a", 0x2000, 0x2000, CRC(ca08126a) SHA1(48b315e3e90b19b2d74dcd88c734dcdf3539d6ca) )
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* unknown */
-	ROM_LOAD( "mds-rb4-2_1a b.bin", 0x0000, 0x2000, CRC(b49939ad) SHA1(ebaab2864d9ff9876e9d2666746c4bab57e49ec3) ) /* Unknown, maps at 0xe000, maybe from another set, but we have other roms? */
+	ROM_LOAD( "mds-rb4-2 b.1a", 0x0000, 0x2000, CRC(b49939ad) SHA1(ebaab2864d9ff9876e9d2666746c4bab57e49ec3) ) /* Unknown, maps at 0xe000, maybe from another set, but we have other roms? */
 
 	PALETTE_2C04_0002
 ROM_END
@@ -2397,24 +2418,24 @@ ROM_END
 
 ROM_START( balonfgt )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-bf4_1d a-3.bin",  0x08000, 0x02000, CRC(1248a6d6) SHA1(0f6c586e8e021a0710ec4e967750b55a74229d74) )
-	ROM_LOAD( "mds-bf4_1c a-3.bin",  0x0a000, 0x02000, CRC(14af0e42) SHA1(ceb749eca2dfe81fddc6cb57e4aa87a4bfac0316) )
-	ROM_LOAD( "mds-bf4_1b a-3.bin",  0x0c000, 0x02000, CRC(a420babf) SHA1(ab296a86132bb9103cbb107518b4ac9beb8b2e11) )
-	ROM_LOAD( "mds-bf4_1a a-3.bin",  0x0e000, 0x02000, CRC(9c31f94d) SHA1(19bccd6b79423f495b0ee49dd3b219ffc4676470) )
+	ROM_LOAD( "mds-bf4 a-3.1d",  0x08000, 0x02000, CRC(1248a6d6) SHA1(0f6c586e8e021a0710ec4e967750b55a74229d74) )
+	ROM_LOAD( "mds-bf4 a-3.1c",  0x0a000, 0x02000, CRC(14af0e42) SHA1(ceb749eca2dfe81fddc6cb57e4aa87a4bfac0316) )
+	ROM_LOAD( "mds-bf4 a-3.1b",  0x0c000, 0x02000, CRC(a420babf) SHA1(ab296a86132bb9103cbb107518b4ac9beb8b2e11) )
+	ROM_LOAD( "mds-bf4 a-3.1a",  0x0e000, 0x02000, CRC(9c31f94d) SHA1(19bccd6b79423f495b0ee49dd3b219ffc4676470) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-bf4_2b a-3.bin",  0x0000, 0x2000, CRC(f27d9aa0) SHA1(429a1ad2a07947e4c4809495bfab55bf0f0e428f) )
-	ROM_LOAD( "mds-bf4_2a a-3.bin",  0x2000, 0x2000, CRC(76e6bbf8) SHA1(a4cae3a129a787162050187453b1583c8735fb46) )
+	ROM_LOAD( "mds-bf4 a-3.2b",  0x0000, 0x2000, CRC(f27d9aa0) SHA1(429a1ad2a07947e4c4809495bfab55bf0f0e428f) )
+	ROM_LOAD( "mds-bf4 a-3.2a",  0x2000, 0x2000, CRC(76e6bbf8) SHA1(a4cae3a129a787162050187453b1583c8735fb46) )
 
 	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory */
-	ROM_LOAD( "mds-bf4_6d a-3.bin",  0x08000, 0x02000, CRC(ef4ebff1) SHA1(17153ad44a402f05f7ddfe3ac364a0e4adb6f16b) )
-	ROM_LOAD( "mds-bf4_6c a-3.bin",  0x0a000, 0x02000, CRC(14af0e42) SHA1(ceb749eca2dfe81fddc6cb57e4aa87a4bfac0316) )
-	ROM_LOAD( "mds-bf4_6b a-3.bin",  0x0c000, 0x02000, CRC(a420babf) SHA1(ab296a86132bb9103cbb107518b4ac9beb8b2e11) )
-	ROM_LOAD( "mds-bf4_6a a-3.bin",  0x0e000, 0x02000, CRC(3aa5c095) SHA1(3815016e5615c9327200150e0181357f16f3d636) )
+	ROM_LOAD( "mds-bf4 a-3.6d",  0x08000, 0x02000, CRC(ef4ebff1) SHA1(17153ad44a402f05f7ddfe3ac364a0e4adb6f16b) )
+	ROM_LOAD( "mds-bf4 a-3.6c",  0x0a000, 0x02000, CRC(14af0e42) SHA1(ceb749eca2dfe81fddc6cb57e4aa87a4bfac0316) )
+	ROM_LOAD( "mds-bf4 a-3.6b",  0x0c000, 0x02000, CRC(a420babf) SHA1(ab296a86132bb9103cbb107518b4ac9beb8b2e11) )
+	ROM_LOAD( "mds-bf4 a-3.6a",  0x0e000, 0x02000, CRC(3aa5c095) SHA1(3815016e5615c9327200150e0181357f16f3d636) )
 
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-bf4_8b a-3.bin",  0x0000, 0x2000, CRC(f27d9aa0) SHA1(429a1ad2a07947e4c4809495bfab55bf0f0e428f) )
-	ROM_LOAD( "mds-bf4_8a a-3.bin",  0x2000, 0x2000, CRC(76e6bbf8) SHA1(a4cae3a129a787162050187453b1583c8735fb46) )
+	ROM_LOAD( "mds-bf4 a-3.8b",  0x0000, 0x2000, CRC(f27d9aa0) SHA1(429a1ad2a07947e4c4809495bfab55bf0f0e428f) )
+	ROM_LOAD( "mds-bf4 a-3.8a",  0x2000, 0x2000, CRC(76e6bbf8) SHA1(a4cae3a129a787162050187453b1583c8735fb46) )
 
 	PALETTE_2C04_0003
 ROM_END
@@ -2441,111 +2462,125 @@ ROM_END
 
 ROM_START( vsbball )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "bb-1d",  0x08000, 0x02000, CRC(0cc5225f) SHA1(a8eb3153ce3f1282901c305177347112df0fb3b2) )
-	ROM_LOAD( "bb-1c",  0x0a000, 0x02000, CRC(9856ac60) SHA1(f033171c3dea6af63f1f328fee74e695c67adc92) )
-	ROM_LOAD( "bb-1b",  0x0c000, 0x02000, CRC(d1312e63) SHA1(0fc46a4ef0fb8a304320f8b3cac3edd1cd9ed286) )
-	ROM_LOAD( "bb-1a",  0x0e000, 0x02000, CRC(28199b4d) SHA1(e63d69662d3b70b883028d3103c8f65de8f5edda) )
+	ROM_LOAD( "mds-ba e-1.1d",  0x08000, 0x02000, CRC(0cc5225f) SHA1(a8eb3153ce3f1282901c305177347112df0fb3b2) )
+	ROM_LOAD( "mds-ba e-1.1c",  0x0a000, 0x02000, CRC(9856ac60) SHA1(f033171c3dea6af63f1f328fee74e695c67adc92) )
+	ROM_LOAD( "mds-ba e-1.1b",  0x0c000, 0x02000, CRC(d1312e63) SHA1(0fc46a4ef0fb8a304320f8b3cac3edd1cd9ed286) )
+	ROM_LOAD( "mds-ba e-1.1a",  0x0e000, 0x02000, CRC(28199b4d) SHA1(e63d69662d3b70b883028d3103c8f65de8f5edda) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "bb-2b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) )
-	ROM_LOAD( "bb-2a",  0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) )
-
-/*  ROM_LOAD( "bb-2a",  0x2000, 0x2000, CRC(ebb88502) SHA1(010fdffbd1cddcde8176aaaae5ca8e9c3411c02a) )
-This rom dump is suspected either bad or an operator hacked version.  The GFX roms for all the other Vs. Baseball sets have mirrored
-GFX roms.  In this case, the bb-8a "gfx2" dump was placed in this slot to allow the Service Mode to green light all the roms.
-
-FC /b shows:
-Comparing files bb-2a and bb-8a.
-00000E0A: 40 00
-00000E79: 40 00
-*/
+	ROM_LOAD( "mds-ba e.2b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) ) /* Only had "e" not "e-1" */
+	ROM_LOAD( "mds-ba.2a",    0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) ) /* Did not have any red letter stamped */
 
 	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory */
-	ROM_LOAD( "bb-6d",  0x08000, 0x02000, CRC(7ec792bc) SHA1(92d1f8809db89a8d99f7ea1d2ba3f9be69195866) )
-	ROM_LOAD( "bb-6c",  0x0a000, 0x02000, CRC(b631f8aa) SHA1(0ee8a8def9512552037fdac1a14a3ea9393bb943) )
-	ROM_LOAD( "bb-6b",  0x0c000, 0x02000, CRC(c856b45a) SHA1(7f15613120d72859ea1ed647c9eee3074f63f0b9) )
-	ROM_LOAD( "bb-6a",  0x0e000, 0x02000, CRC(06b74c18) SHA1(9a61161b4856b88e40eee6edb39e0a608748cf0b) )
+	ROM_LOAD( "mds-ba e-1.6d",  0x08000, 0x02000, CRC(7ec792bc) SHA1(92d1f8809db89a8d99f7ea1d2ba3f9be69195866) )
+	ROM_LOAD( "mds-ba e-1.6c",  0x0a000, 0x02000, CRC(b631f8aa) SHA1(0ee8a8def9512552037fdac1a14a3ea9393bb943) )
+	ROM_LOAD( "mds-ba e-1.6b",  0x0c000, 0x02000, CRC(c856b45a) SHA1(7f15613120d72859ea1ed647c9eee3074f63f0b9) )
+	ROM_LOAD( "mds-ba e-1.6a",  0x0e000, 0x02000, CRC(06b74c18) SHA1(9a61161b4856b88e40eee6edb39e0a608748cf0b) )
 
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "bb-8b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) )
-	ROM_LOAD( "bb-8a",  0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) )
+	ROM_LOAD( "mds-ba e.8b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) ) /* Only had "e" not "e-1" */
+	ROM_LOAD( "mds-ba.8a",    0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) ) /* Did not have any red letter stamped */
 
 	PALETTE_2C04_0001
 ROM_END
 
 ROM_START( vsbballj )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba_1d a-1.bin",  0x08000, 0x02000, CRC(6dbc129b) SHA1(3e786632563364bf7ae13c7d25c522999f237009) )
-	ROM_LOAD( "mds-ba_1c a-1.bin",  0x0a000, 0x02000, CRC(2a684b3a) SHA1(316aa1051a5ff33e5a2369f9e984b34f637595ff) )
-	ROM_LOAD( "mds-ba_1b a-1.bin",  0x0c000, 0x02000, CRC(7ca0f715) SHA1(cf87e530c15c142efa48d6462870bbdf44002f45) )
-	ROM_LOAD( "mds-ba_1a a-1.bin",  0x0e000, 0x02000, CRC(926bb4fc) SHA1(b9b8611b90d73f39f65166010058e03d0aad5bb0) )
+	ROM_LOAD( "mds-ba a-3.1d",  0x08000, 0x02000, CRC(e234d609) SHA1(a148d6b57fbc9d5f91737fa30c2df2c2b66df404) )
+	ROM_LOAD( "mds-ba a-3.1c",  0x0a000, 0x02000, CRC(ca1a9591) SHA1(3544f244c59d3dab40c2745e84775b7c1defaf54) )
+	ROM_LOAD( "mds-ba a-3.1b",  0x0c000, 0x02000, CRC(50e1f6cf) SHA1(8eb4ccb4817295084280ffd1ee5261eee02485c5) )
+	ROM_LOAD( "mds-ba a-3.1a",  0x0e000, 0x02000, CRC(f796df5b) SHA1(7e7e1c69b27f2fe41c509107abbe802877e3a92e) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba_2b a.bin",  0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
-	ROM_LOAD( "mds-ba_2a a.bin",  0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
+	ROM_LOAD( "mds-ba a.2b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
+	ROM_LOAD( "mds-ba a.2a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
 	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba_6d a-1.bin",  0x08000, 0x02000, CRC(d534dca4) SHA1(6d454a2b5944f98c95d3a1bdeee8e8e52524cb21) )
-	ROM_LOAD( "mds-ba_6c a-1.bin",  0x0a000, 0x02000, CRC(73904bbc) SHA1(d32a0f659d628b98a0b06f846842432f83e79a07) )
-	ROM_LOAD( "mds-ba_6b a-1.bin",  0x0c000, 0x02000, CRC(7c130724) SHA1(99134180e158eaa4b260d1dacf9aa56a6d48ad73) )
-	ROM_LOAD( "mds-ba_6a a-1.bin",  0x0e000, 0x02000, CRC(d938080e) SHA1(35e00bd76364ec88fb3bb8908bc9171df9cd26de) )
+	ROM_LOAD( "mds-ba a-3.6d",  0x08000, 0x02000, CRC(6eb9e36e) SHA1(3877dee54a1a11417296150f7e7a1ae2c2847484) )
+	ROM_LOAD( "mds-ba a-3.6c",  0x0a000, 0x02000, CRC(dca4dc75) SHA1(231819edb58caf96b4f5c56a44163fbb666dc67d) )
+	ROM_LOAD( "mds-ba a-3.6b",  0x0c000, 0x02000, CRC(46cf6f84) SHA1(125af20e1e9066e4b92174ba0a7f59271ef57557) )
+	ROM_LOAD( "mds-ba a-3.6a",  0x0e000, 0x02000, CRC(4cbc2cac) SHA1(90bed7694836075738d99aa8fe672dbffa7bbd6d) )
 
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba_8b a.bin",  0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
-	ROM_LOAD( "mds-ba_8a a.bin",  0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
+	ROM_LOAD( "mds-ba a.8b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
+	ROM_LOAD( "mds-ba a.8a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
 	PALETTE_2C04_0001
 ROM_END
 
 ROM_START( vsbballja )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba_1d a-2.bin",  0x08000, 0x02000, CRC(f3820b70) SHA1(c50d0c2e34f646dd186ee0f2774e94add733f21d) )
-	ROM_LOAD( "mds-ba_1c a-2.bin",  0x0a000, 0x02000, CRC(39fbbf28) SHA1(9941defda548f2c51cf62f0ad62a041ee9a69c37) )
-	ROM_LOAD( "mds-ba_1b a-2.bin",  0x0c000, 0x02000, CRC(b1377b12) SHA1(9afca83f343b768de8ac51c5967f8825de9d7883) )
-	ROM_LOAD( "mds-ba_1a a-2.bin",  0x0e000, 0x02000, CRC(08fab347) SHA1(b6ecd1464c47afac922355b8d5e961892e58a0ed) )
+	ROM_LOAD( "mds-ba a-2.1d",  0x08000, 0x02000, CRC(f3820b70) SHA1(c50d0c2e34f646dd186ee0f2774e94add733f21d) )
+	ROM_LOAD( "mds-ba a-2.1c",  0x0a000, 0x02000, CRC(39fbbf28) SHA1(9941defda548f2c51cf62f0ad62a041ee9a69c37) )
+	ROM_LOAD( "mds-ba a-2.1b",  0x0c000, 0x02000, CRC(b1377b12) SHA1(9afca83f343b768de8ac51c5967f8825de9d7883) )
+	ROM_LOAD( "mds-ba a-2.1a",  0x0e000, 0x02000, CRC(08fab347) SHA1(b6ecd1464c47afac922355b8d5e961892e58a0ed) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba_2b a.bin",  0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
-	ROM_LOAD( "mds-ba_2a a.bin",  0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
+	ROM_LOAD( "mds-ba a.2b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
+	ROM_LOAD( "mds-ba a.2a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
 	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba_6d a-2.bin",  0x08000, 0x02000, CRC(c69561b0) SHA1(4234d88ffa957e7f70ef9da8c61db4e251c3bc66) )
-	ROM_LOAD( "mds-ba_6c a-2.bin",  0x0a000, 0x02000, CRC(17d1ca39) SHA1(2fa61a2c39495b72a22f001a72e4526e86d9544e) )
-	ROM_LOAD( "mds-ba_6b a-2.bin",  0x0c000, 0x02000, CRC(37481900) SHA1(dbab48d6c95e365ee4ab6ca4c61224b2c813e538) )
-	ROM_LOAD( "mds-ba_6a a-2.bin",  0x0e000, 0x02000, CRC(a44ffc4b) SHA1(ec65c3b52659dacfd2b7afe1e744e7bbd61fd6e1) )
+	ROM_LOAD( "mds-ba a-2.6d",  0x08000, 0x02000, CRC(c69561b0) SHA1(4234d88ffa957e7f70ef9da8c61db4e251c3bc66) )
+	ROM_LOAD( "mds-ba a-2.6c",  0x0a000, 0x02000, CRC(17d1ca39) SHA1(2fa61a2c39495b72a22f001a72e4526e86d9544e) )
+	ROM_LOAD( "mds-ba a-2.6b",  0x0c000, 0x02000, CRC(37481900) SHA1(dbab48d6c95e365ee4ab6ca4c61224b2c813e538) )
+	ROM_LOAD( "mds-ba a-2.6a",  0x0e000, 0x02000, CRC(a44ffc4b) SHA1(ec65c3b52659dacfd2b7afe1e744e7bbd61fd6e1) )
 
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba_8b a.bin",  0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
-	ROM_LOAD( "mds-ba_8a a.bin",  0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
+	ROM_LOAD( "mds-ba a.8b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
+	ROM_LOAD( "mds-ba a.8a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
 	PALETTE_2C04_0001
 ROM_END
 
 ROM_START( vsbballjb )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba_1d a-3.bin",  0x08000, 0x02000, CRC(e234d609) SHA1(a148d6b57fbc9d5f91737fa30c2df2c2b66df404) )
-	ROM_LOAD( "mds-ba_1c a-3.bin",  0x0a000, 0x02000, CRC(ca1a9591) SHA1(3544f244c59d3dab40c2745e84775b7c1defaf54) )
-	ROM_LOAD( "mds-ba_1b a-3.bin",  0x0c000, 0x02000, CRC(50e1f6cf) SHA1(8eb4ccb4817295084280ffd1ee5261eee02485c5) )
-	ROM_LOAD( "mds-ba_1a a-3.bin",  0x0e000, 0x02000, CRC(f796df5b) SHA1(7e7e1c69b27f2fe41c509107abbe802877e3a92e) )
+	ROM_LOAD( "mds-ba a-1.1d",  0x08000, 0x02000, CRC(6dbc129b) SHA1(3e786632563364bf7ae13c7d25c522999f237009) )
+	ROM_LOAD( "mds-ba a-1.1c",  0x0a000, 0x02000, CRC(2a684b3a) SHA1(316aa1051a5ff33e5a2369f9e984b34f637595ff) )
+	ROM_LOAD( "mds-ba a-1.1b",  0x0c000, 0x02000, CRC(7ca0f715) SHA1(cf87e530c15c142efa48d6462870bbdf44002f45) )
+	ROM_LOAD( "mds-ba a-1.1a",  0x0e000, 0x02000, CRC(926bb4fc) SHA1(b9b8611b90d73f39f65166010058e03d0aad5bb0) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba_2b a.bin",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
-	ROM_LOAD( "mds-ba_2a a.bin",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
+	ROM_LOAD( "mds-ba a.2b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
+	ROM_LOAD( "mds-ba a.2a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
 	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba_6d a-3.bin",  0x08000, 0x02000, CRC(6eb9e36e) SHA1(3877dee54a1a11417296150f7e7a1ae2c2847484) )
-	ROM_LOAD( "mds-ba_6c a-3.bin",  0x0a000, 0x02000, CRC(dca4dc75) SHA1(231819edb58caf96b4f5c56a44163fbb666dc67d) )
-	ROM_LOAD( "mds-ba_6b a-3.bin",  0x0c000, 0x02000, CRC(46cf6f84) SHA1(125af20e1e9066e4b92174ba0a7f59271ef57557) )
-	ROM_LOAD( "mds-ba_6a a-3.bin",  0x0e000, 0x02000, CRC(4cbc2cac) SHA1(90bed7694836075738d99aa8fe672dbffa7bbd6d) )
+	ROM_LOAD( "mds-ba a-1.6d",  0x08000, 0x02000, CRC(d534dca4) SHA1(6d454a2b5944f98c95d3a1bdeee8e8e52524cb21) )
+	ROM_LOAD( "mds-ba a-1.6c",  0x0a000, 0x02000, CRC(73904bbc) SHA1(d32a0f659d628b98a0b06f846842432f83e79a07) )
+	ROM_LOAD( "mds-ba a-1.6b",  0x0c000, 0x02000, CRC(7c130724) SHA1(99134180e158eaa4b260d1dacf9aa56a6d48ad73) )
+	ROM_LOAD( "mds-ba a-1.6a",  0x0e000, 0x02000, CRC(d938080e) SHA1(35e00bd76364ec88fb3bb8908bc9171df9cd26de) )
 
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba_8b a.bin",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
-	ROM_LOAD( "mds-ba_8a a.bin",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
+	ROM_LOAD( "mds-ba a.8b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
+	ROM_LOAD( "mds-ba a.8a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
 	PALETTE_2C04_0001
 ROM_END
 
 ROM_START( vstennis )
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-te a-3.1d", 0x08000, 0x2000, CRC(8d88fbe5) SHA1(1aa172d02d0d47325edf2f5ea4fc3c1c52f1efbe) )
+	ROM_LOAD( "mds-te a-2.1c", 0x0a000, 0x2000, CRC(5f00c129) SHA1(e9954ebedc037be0a177286bbfc2ecdaa9223d85) )
+	ROM_LOAD( "mds-te a-2.1b", 0x0c000, 0x2000, CRC(4b57910c) SHA1(1baeb31e0e9085ac6a9406a1802dfa47952d833e) )
+	ROM_LOAD( "mds-te a-2.1a", 0x0e000, 0x2000, CRC(41097060) SHA1(aec457f7780dcd693dd93076cc185d5db38d5b93) )
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-te a.2b",  0x0000, 0x2000, CRC(9de19c9c) SHA1(1cb65e423a6c2d2a56c67ad08ecf7e746551c322) )
+	ROM_LOAD( "mds-te a.2a",  0x2000, 0x2000, CRC(67a5800e) SHA1(7bad1b486d9dac962fa8c87984038be4ac6b699b) )
+
+	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-te a-3.6d", 0x08000, 0x2000, CRC(b18fd769) SHA1(152413e065d1f5af0a70f9272a908dfbd162fe65) )
+	ROM_LOAD( "mds-te a-2.6c", 0x0a000, 0x2000, CRC(315d8178) SHA1(2165c8a42004fb5b1e6b8904a59159cd4157538e) )
+	ROM_LOAD( "mds-te a-2.6b", 0x0c000, 0x2000, CRC(18114f8d) SHA1(351894e0cc791028a43da0ec27d78d669cdeea27) )
+	ROM_LOAD( "mds-te a-2.6a", 0x0e000, 0x2000, CRC(50a2de11) SHA1(3e22e50c9ae2521dc7f4416ac834cdbd3988369e) )
+
+	ROM_REGION( 0x4000,"gfx2" , 0) /* PPU memory */
+	ROM_LOAD( "mds-te a.8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
+	ROM_LOAD( "mds-te a.8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
+
+	PALETTE_STANDARD
+ROM_END
+
+ROM_START( vstennisa )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-te.1d",  0x08000, 0x02000, CRC(f4e9fca0) SHA1(05b91f578bc0a118ab75ce487b14adcd1fb6e714) )
 	ROM_LOAD( "mds-te.1c",  0x0a000, 0x02000, CRC(7e52df58) SHA1(a5ddebfa1f7f1a2b6b46d4b4a7f2c36477158e7e) )
@@ -2553,8 +2588,8 @@ ROM_START( vstennis )
 	ROM_LOAD( "mds-te.1a",  0x0e000, 0x02000, CRC(8483a612) SHA1(c854f72d86fe4e99c4c6426cfc5ea6f2997bfc8c) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-te.2b",  0x0000, 0x2000, CRC(9de19c9c) SHA1(1cb65e423a6c2d2a56c67ad08ecf7e746551c322) )
-	ROM_LOAD( "mds-te.2a",  0x2000, 0x2000, CRC(67a5800e) SHA1(7bad1b486d9dac962fa8c87984038be4ac6b699b) )
+	ROM_LOAD( "mds-te a.2b",  0x0000, 0x2000, CRC(9de19c9c) SHA1(1cb65e423a6c2d2a56c67ad08ecf7e746551c322) )
+	ROM_LOAD( "mds-te a.2a",  0x2000, 0x2000, CRC(67a5800e) SHA1(7bad1b486d9dac962fa8c87984038be4ac6b699b) )
 
 	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-te.6d",  0x08000, 0x02000, CRC(3131b1bf) SHA1(ed26df260df3a295b5c9747530428efec29676c0) )
@@ -2563,32 +2598,8 @@ ROM_START( vstennis )
 	ROM_LOAD( "mds-te.6a",  0x0e000, 0x02000, CRC(b6bfee07) SHA1(658458931efbb260faec3a11ee530326c56e63a9) )
 
 	ROM_REGION( 0x4000,"gfx2" , 0) /* PPU memory */
-	ROM_LOAD( "mds-te.8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
-	ROM_LOAD( "mds-te.8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
-
-	PALETTE_STANDARD
-ROM_END
-
-ROM_START( vstennisj )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-te_1d a-3.bin", 0x08000, 0x2000, CRC(8d88fbe5) SHA1(1aa172d02d0d47325edf2f5ea4fc3c1c52f1efbe) )
-	ROM_LOAD( "mds-te_1c a-2.bin", 0x0a000, 0x2000, CRC(5f00c129) SHA1(e9954ebedc037be0a177286bbfc2ecdaa9223d85) )
-	ROM_LOAD( "mds-te_1b a-2.bin", 0x0c000, 0x2000, CRC(4b57910c) SHA1(1baeb31e0e9085ac6a9406a1802dfa47952d833e) )
-	ROM_LOAD( "mds-te_1a a-2.bin", 0x0e000, 0x2000, CRC(41097060) SHA1(aec457f7780dcd693dd93076cc185d5db38d5b93) )
-
-	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-te_2b a.bin",  0x0000, 0x2000, CRC(9de19c9c) SHA1(1cb65e423a6c2d2a56c67ad08ecf7e746551c322) )
-	ROM_LOAD( "mds-te_2a a.bin",  0x2000, 0x2000, CRC(67a5800e) SHA1(7bad1b486d9dac962fa8c87984038be4ac6b699b) )
-
-	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-te_6d a-3.bin", 0x08000, 0x2000, CRC(b18fd769) SHA1(152413e065d1f5af0a70f9272a908dfbd162fe65) )
-	ROM_LOAD( "mds-te_6c a-2.bin", 0x0a000, 0x2000, CRC(315d8178) SHA1(2165c8a42004fb5b1e6b8904a59159cd4157538e) )
-	ROM_LOAD( "mds-te_6b a-2.bin", 0x0c000, 0x2000, CRC(18114f8d) SHA1(351894e0cc791028a43da0ec27d78d669cdeea27) )
-	ROM_LOAD( "mds-te_6a a-2.bin", 0x0e000, 0x2000, CRC(50a2de11) SHA1(3e22e50c9ae2521dc7f4416ac834cdbd3988369e) )
-
-	ROM_REGION( 0x4000,"gfx2" , 0) /* PPU memory */
-	ROM_LOAD( "mds-te_8b a.bin",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
-	ROM_LOAD( "mds-te_8a a.bin",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
+	ROM_LOAD( "mds-te a.8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
+	ROM_LOAD( "mds-te a.8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
 
 	PALETTE_STANDARD
 ROM_END
@@ -2617,87 +2628,92 @@ ROM_START( wrecking )
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( iceclmrj )
+ROM_START( iceclmrd )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ic4-4_1d a.bin",  0x08000, 0x02000, CRC(94e3197d) SHA1(414156809a3fe2c072d8947a91708f3ed40008b2) )
-	ROM_LOAD( "mds-ic4-4_1c a.bin",  0x0a000, 0x02000, CRC(b253011e) SHA1(abc2c84e342d1f8e8d0dbb580370733ef4b38413) )
-	ROM_LOAD( "mds-ic4-4_1b or 6b a-1.bin",0x0c000, 0x02000, CRC(f3795874) SHA1(f22f786960a27ab886a7fad7e312bdf28ffa5362) )
-	ROM_LOAD( "mds-ic4-4_1a a.bin",  0x0e000, 0x02000, CRC(094c246c) SHA1(82aba548706041c2de0cda02d21409fe8a09338c) )
+	ROM_LOAD( "mds-ic4-4 a.1d",  0x08000, 0x02000, CRC(94e3197d) SHA1(414156809a3fe2c072d8947a91708f3ed40008b2) )
+	ROM_LOAD( "mds-ic4-4 a.1c",  0x0a000, 0x02000, CRC(b253011e) SHA1(abc2c84e342d1f8e8d0dbb580370733ef4b38413) )
+	ROM_LOAD( "mds-ic4-4 a-1.1b",0x0c000, 0x02000, CRC(f3795874) SHA1(f22f786960a27ab886a7fad7e312bdf28ffa5362) )
+	ROM_LOAD( "mds-ic4-4 a.1a",  0x0e000, 0x02000, CRC(094c246c) SHA1(82aba548706041c2de0cda02d21409fe8a09338c) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ic4-4_2b a.bin",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
-	ROM_LOAD( "mds-ic4-4_2a a.bin",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
+	ROM_LOAD( "mds-ic4-4 a.2b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
+	ROM_LOAD( "mds-ic4-4 a.2a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
 
 	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ic4-4_6d a.bin",  0x08000, 0x02000, CRC(94e3197d) SHA1(414156809a3fe2c072d8947a91708f3ed40008b2) )
-	ROM_LOAD( "mds-ic4-4_6c a.bin",  0x0a000, 0x02000, CRC(b253011e) SHA1(abc2c84e342d1f8e8d0dbb580370733ef4b38413) )
-	ROM_LOAD( "mds-ic4-4_6b a.bin",  0x0c000, 0x02000, CRC(2ee9c1f9) SHA1(71619cff6d41cf5a8f74a689e30c2a24020f7d06) )
-	ROM_LOAD( "mds-ic4-4_6a a.bin",  0x0e000, 0x02000, CRC(094c246c) SHA1(82aba548706041c2de0cda02d21409fe8a09338c) )
+	ROM_LOAD( "mds-ic4-4 a.6d",  0x08000, 0x02000, CRC(94e3197d) SHA1(414156809a3fe2c072d8947a91708f3ed40008b2) )
+	ROM_LOAD( "mds-ic4-4 a.6c",  0x0a000, 0x02000, CRC(b253011e) SHA1(abc2c84e342d1f8e8d0dbb580370733ef4b38413) )
+	ROM_LOAD( "mds-ic4-4 a.6b",  0x0c000, 0x02000, CRC(2ee9c1f9) SHA1(71619cff6d41cf5a8f74a689e30c2a24020f7d06) )
+	ROM_LOAD( "mds-ic4-4 a.6a",  0x0e000, 0x02000, CRC(094c246c) SHA1(82aba548706041c2de0cda02d21409fe8a09338c) )
 
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ic4-4_8b a.bin",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
-	ROM_LOAD( "mds-ic4-4_8a a.bin",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
+	ROM_LOAD( "mds-ic4-4 a.8b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
+	ROM_LOAD( "mds-ic4-4 a.8a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
 
 	PALETTE_2C04_0004
 ROM_END
 
 /******************************************************************************/
+/* Sets by region:
+   World (C) Nintendo
+   US    (C) Nintendo of America
+   Japan (C) Nintendo Co., Ltd.
+*/
 
 /*    YEAR  NAME      PARENT    MACHINE  INPUT     INIT      MONITOR  */
-GAME( 1985, btlecity, 0,        vsnes,   btlecity, vsnormal, ROT0, "Namco",     "Vs. Battle City", 0 )
-GAME( 1985, starlstr, 0,        vsnes,   starlstr, vsnormal, ROT0, "Namco",     "Vs. Star Luster", 0 )
-GAME( 1987, cstlevna, 0,        vsnes,   cstlevna, vsvram,   ROT0, "Konami",    "Vs. Castlevania", 0 )
-GAME( 1984, cluclu,   0,        vsnes,   cluclu,   vsnormal, ROT0, "Nintendo",  "Vs. Clu Clu Land", 0 )
-GAME( 1990, drmario,  0,        vsnes,   drmario,  drmario,  ROT0, "Nintendo",  "Vs. Dr. Mario", 0 )
-GAME( 1984, excitebk, 0,        vsnes,   excitebk, vsnormal, ROT0, "Nintendo",  "Vs. Excitebike", 0 )
-GAME( 1984, excitebkj,excitebk, vsnes,   excitebk, vsnormal, ROT0, "Nintendo",  "Vs. Excitebike (Japan)", 0 )
-GAME( 1986, goonies,  0,        vsnes,   goonies,  vskonami, ROT0, "Konami",    "Vs. The Goonies (set E)", 0 )
-GAME( 1984, iceclimb, 0,        vsnes,   iceclimb, vsnormal, ROT0, "Nintendo",  "Vs. Ice Climber", 0 )
-GAME( 1984, iceclimbj,iceclimb, vsnes,   iceclmbj, vsnormal, ROT0, "Nintendo",  "Vs. Ice Climber (Japan)", 0 )
-GAME( 1985, machridr, 0,        vsnes,   machridr, vsnormal, ROT0, "Nintendo",  "Vs. Mach Rider (Endurance Course Version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, machridrj,machridr, vsnes,   machridj, vsnormal, ROT0, "Nintendo",  "Vs. Mach Rider (Japan, Fighting Course Version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, rbibb,    0,        vsnes,   rbibb,    rbibb,    ROT0, "Namco",     "Vs. Atari R.B.I. Baseball (set 1)", 0 )
-GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb,    rbibb,    ROT0, "Namco",     "Vs. Atari R.B.I. Baseball (set 2)", 0 )
-GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",  "Vs. Super Mario Bros. (set ?)", 0 )
-GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",  "Vs. Super Mario Bros. (set E)", 0 )
-GAME( 1986, suprmriobl,suprmrio,vsnes,   suprmrio, vsnormal, ROT0, "bootleg",   "Vs. Super Mario Bros. (bootleg with Z80, set 1)", GAME_NOT_WORKING )
-GAME( 1986, suprmriobl2,suprmrio,vsnes,  suprmrio, vsnormal, ROT0, "bootleg",   "Vs. Super Mario Bros. (bootleg with Z80, set 2)", GAME_NOT_WORKING )
-GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "hack",      "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
-GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, MMC3,     ROT0, "Namco",     "Vs. Super SkyKid" , 0 )
-GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, tkoboxng, ROT0, "Namco / Data East USA","Vs. T.K.O. Boxing", 0 )
-GAME( 1984, smgolf,   0,        vsnes,   golf4s,   vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Men Version, set 1)", 0 )
-GAME( 1984, smgolfb,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",	"Vs. Stroke & Match Golf (Men Version, set 2)", 0 )
-GAME( 1984, smgolfj,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Men Version) (Japan)", 0 )
-GAME( 1984, ladygolf, smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version, set ?)", 0 )
-GAME( 1984, ladygolfe,smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version, set E)", 0 )
-GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnormal, ROT0, "Nintendo",  "Vs. Pinball", 0 )
-GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnormal, ROT0, "Nintendo",  "Vs. Pinball (Japan)", 0 )
-GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnormal, ROT0, "Rare",      "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnormal, ROT0, "Nintendo",  "Vs. Soccer", 0 )
-GAME( 1985, vssoccerj,vssoccer, vsnes,   vssoccer, bnglngby, ROT0, "Nintendo",  "Vs. Soccer (Japan)", 0 )
-GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vskonami, ROT0, "Konami",    "Vs. Gradius", 0 )
+GAME( 1985, btlecity, 0,        vsnes,   btlecity, vsnormal, ROT0, "Namco",                  "Vs. Battle City", 0 )
+GAME( 1985, starlstr, 0,        vsnes,   starlstr, vsnormal, ROT0, "Namco",                  "Vs. Star Luster", 0 )
+GAME( 1987, cstlevna, 0,        vsnes,   cstlevna, vsvram,   ROT0, "Konami",                 "Vs. Castlevania", 0 )
+GAME( 1984, cluclu,   0,        vsnes,   cluclu,   vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land", 0 )
+GAME( 1990, drmario,  0,        vsnes,   drmario,  drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario", 0 )
+GAME( 1984, excitebk, 0,        vsnes,   excitebk, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)", 0 )
+GAME( 1984, excitebka,excitebk, vsnes,   excitebk, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)", 0 )
+GAME( 1986, goonies,  0,        vsnes,   goonies,  vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)", 0 )
+GAME( 1984, iceclimb, 0,        vsnes,   iceclimb, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1", 0 )
+GAME( 1984, iceclimba,iceclimb, vsnes,   iceclmbj, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)", 0 )
+GAME( 1985, machridr, 0,        vsnes,   machridr, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, machridra,machridr, vsnes,   machridj, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, rbibb,    0,        vsnes,   rbibb,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
+GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
+GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
+GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?)", 0 )
+GAME( 1986, suprmriobl,suprmrio,vsnes,   suprmrio, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", GAME_NOT_WORKING )
+GAME( 1986, suprmriobl2,suprmrio,vsnes,  suprmrio, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", GAME_NOT_WORKING )
+GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "hack",                   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
+GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid" , 0 )
+GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
+GAME( 1984, smgolf,   0,        vsnes,   golf4s,   vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)", 0 )
+GAME( 1984, smgolfb,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",	             "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)", 0 )
+GAME( 1984, smgolfj,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
+GAME( 1984, ladygolfe,smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)", 0 )
+GAME( 1984, ladygolf, smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)", 0 )
+GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (set ?)", 0 )
+GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
+GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
+GAME( 1985, vssoccera,vssoccer, vsnes,   vssoccer, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
+GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vskonami, ROT0, "Konami",                 "Vs. Gradius", 0 )
 GAME( 1987, platoon,  0,        vsnes,   platoon,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
-GAME( 1987, vstetris, 0,        vsnes,   vstetris, vsnormal, ROT0, "Academysoft-Elorg", "Vs. Tetris" , 0 )
-GAME( 1986, mightybj, 0,        mightybj,mightybj, vsnormal, ROT0, "Tecmo",     "Vs. Mighty Bomb Jack (Japan)", 0 )
-GAME( 1985, jajamaru, 0,        jajamaru,jajamaru, vsnormal, ROT0, "Jaleco",    "Vs. Ninja Jajamaru Kun (Japan)", 0 )
-GAME( 1987, topgun,   0,        topgun,  topgun,   vsvram,   ROT0, "Konami",    "Vs. Top Gun", 0)
-GAME( 1985, bnglngby, 0,        vsnes,   bnglngby, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (Japan)", 0 )
-GAME( 1986, supxevs,  0,        vsnes,   supxevs,  supxevs,  ROT0, "Namco",		"Vs. Super Xevious", 0 )
+GAME( 1987, vstetris, 0,        vsnes,   vstetris, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
+GAME( 1986, mightybj, 0,        mightybj,mightybj, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
+GAME( 1985, jajamaru, 0,        jajamaru,jajamaru, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
+GAME( 1987, topgun,   0,        topgun,  topgun,   vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
+GAME( 1985, bnglngby, 0,        vsnes,   bnglngby, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
+GAME( 1986, supxevs,  0,        vsnes,   supxevs,  supxevs,  ROT0, "Namco",		     "Vs. Super Xevious", 0 )
 
 /* Light Gun games */
-GAME( 1985, duckhunt, 0,        vsnes,   duckhunt, vsgun,    ROT0, "Nintendo",  "Vs. Duck Hunt (set E)", 0 )
-GAME( 1985, hogalley, 0,        vsnes,   hogalley, vsgun,    ROT0, "Nintendo",  "Vs. Hogan's Alley", 0 )
-GAME( 1986, vsgshoe,  0,        vsgshoe, vsgshoe,  vsgshoe,  ROT0, "Nintendo",  "Vs. Gumshoe", 0 )
-GAME( 1988, vsfdf,    0,        vsnes,   vsfdf,    vsfdf,    ROT0, "Sunsoft",	"Vs. Freedom Force", 0 )
+GAME( 1985, duckhunt, 0,        vsnes,   duckhunt, vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)", 0 )
+GAME( 1985, hogalley, 0,        vsnes,   hogalley, vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
+GAME( 1986, vsgshoe,  0,        vsgshoe, vsgshoe,  vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)", 0 )
+GAME( 1988, vsfdf,    0,        vsnes,   vsfdf,    vsfdf,    ROT0, "Sunsoft",	             "Vs. Freedom Force", 0 )
 
 /* Dual games */
-GAME( 1984, vstennis, 0,        vsdual,  vstennis, vsdual,   ROT0, "Nintendo",  "Vs. Tennis" , 0 )
-GAME( 1984, vstennisj,vstennis, vsdual,  vstennis, vsdual,   ROT0, "Nintendo",  "Vs. Tennis (Japan)" , 0 )
-GAME( 1984, wrecking, 0,        vsdual,  wrecking, vsdual,   ROT0, "Nintendo",  "Vs. Wrecking Crew", 0 )
-GAME( 1984, balonfgt, 0,        vsdual,  balonfgt, vsdual,   ROT0, "Nintendo",  "Vs. Balloon Fight", 0 )
-GAME( 1984, vsmahjng, 0,        vsdual,  vsmahjng, vsdual,   ROT0, "Nintendo",  "Vs. Mahjang (Japan)" , 0 )
-GAME( 1984, vsbball,  0,        vsdual,  vsbball,  vsdual,   ROT0, "Nintendo of America",  "Vs. BaseBall", 0 )
-GAME( 1984, vsbballj, vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo",  "Vs. BaseBall (Japan set 1)", 0 )
-GAME( 1984, vsbballja,vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo",  "Vs. BaseBall (Japan set 2)", 0 )
-GAME( 1984, vsbballjb,vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo",  "Vs. BaseBall (Japan set 3)", 0 )
-GAME( 1984, iceclmrj, 0,        vsdual,  iceclmrj, vsdual,   ROT0, "Nintendo",  "Vs. Ice Climber Dual (Japan)" , 0 )
+GAME( 1984, vstennis, 0,        vsdual,  vstennis, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" , 0 )
+GAME( 1984, vstennisa,vstennis, vsdual,  vstennis, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set ?)" , 0 )
+GAME( 1984, wrecking, 0,        vsdual,  wrecking, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew", 0 )
+GAME( 1984, balonfgt, 0,        vsdual,  balonfgt, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)", 0 )
+GAME( 1984, vsmahjng, 0,        vsdual,  vsmahjng, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjang (Japan)" , 0 )
+GAME( 1984, vsbball,  0,        vsdual,  vsbball,  vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)", 0 )
+GAME( 1984, vsbballj, vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)", 0 )
+GAME( 1984, vsbballja,vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)", 0 )
+GAME( 1984, vsbballjb,vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)", 0 )
+GAME( 1984, iceclmrd, 0,        vsdual,  iceclmrj, vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)" , 0 )

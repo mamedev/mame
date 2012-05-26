@@ -1229,20 +1229,23 @@ pc_moglf		// (c) 1991 Nintendo
 // Nintendo VS games
 btlecity		// (c) 1985 Namco
 starlstr		// (c) 1985 Namco
-cstlevna		// (c) 1987 Konami
+cstlevna		// (c) 1987 Konami licensed to Nintendo
 cluclu			// (c) 1984 Nintendo
 drmario			// (c) 1990 Nintendo
 duckhunt		// (c) 1985 Nintendo
 excitebk		// (c) 1984 Nintendo
-excitebkj		// (c) 1984 Nintendo
+excitebka		// (c) 1984 Nintendo
 goonies			// (c) 1986 Konami
 hogalley		// (c) 1985 Nintendo
 iceclimb		// (c) 1984 Nintendo
-iceclimbj		// (c) 1984 Nintendo
+iceclimba		// (c) 1984 Nintendo
+smgolf			// (c) 1984 Nintendo
+smgolfb			// (c) 1984 Nintendo
+smgolfj			// (c) 1984 Nintendo Co., Ltd.
 ladygolf		// (c) 1984 Nintendo
 ladygolfe		// (c) 1984 Nintendo
 machridr		// (c) 1985 Nintendo
-machridrj		// (c) 1985 Nintendo
+machridra		// (c) 1985 Nintendo
 rbibb			// (c) 1987 Namco
 rbibba			// (c) 1987 Namco
 suprmrio		// (c) 1986 Nintendo
@@ -1252,34 +1255,31 @@ suprmriobl2		// bootleg
 skatekds		// (c) 1988 (hack)
 vsskykid		// (c) 1986 Namco
 tkoboxng		// (c) 1987 Data East
-smgolf			// (c) 1984 Nintendo
-smgolfj			// (c) 1984 Nintendo
 vspinbal		// (c) 1984 Nintendo
-vspinbalj		// (c) 1984 Nintendo
-vsslalom		// (c) 1986 Nintendo
+vspinbalj		// (c) 1984 Nintendo Co., Ltd.
+vsslalom		// (c) 1986 Rare Coin-It Inc. licensed to Nintendo
 vssoccer		// (c) 1985 Nintendo
-vssoccerj		// (c) 1985 Nintendo
-vsgradus		// (c) 1986 Konami
+vssoccera		// (c) 1985 Nintendo
+vsgradus		// (c) 1986 Konami licensed to Nintendo
 platoon			// (c) 1987 Ocean
 vstetris		// (c) 1988 Atari
 mightybj		// (c) 1986 Tecmo
 jajamaru		// (c) 1985 Jaleco
 topgun			// (c) 1987 Konami
-bnglngby		// (c) 1985 Nintendo / Broderbund Software Inc.
-vstennis		// (c) 1984 Nintendo
-vstennisj		// (c) 1984 Nintendo
+bnglngby		// (c) 1985 Nintendo licensed by Broderbund Software Inc.
+vstennis		// (c) 1984 Nintendo Co., Ltd. / Nintendo of America
+vstennisa		// (c) 1984 Nintendo Co., Ltd. / Nintendo of America
 wrecking		// (c) 1984 Nintendo
 balonfgt		// (c) 1984 Nintendo
-vsmahjng		// (c) 1984 Nintendo
-vsbball			// (c) 1984 Nintendo
-vsbballj		// (c) 1984 Nintendo
-vsbballja		// (c) 1984 Nintendo
-vsbballjb		// (c) 1984 Nintendo
-iceclmrj		// (c) 1984 Nintendo
+vsmahjng		// (c) 1984 Nintendo Co., Ltd.
+vsbball			// (c) 1984 Nintendo of America
+vsbballj		// (c) 1984 Nintendo Co., Ltd.
+vsbballja		// (c) 1984 Nintendo Co., Ltd.
+vsbballjb		// (c) 1984 Nintendo Co., Ltd.
+iceclmrd		// (c) 1984 Nintendo (Dual game version)
 vsgshoe			// (c) 1986 Nintendo
 supxevs			// (c) 1986 Nintendo
-vsfdf			// (c) 1986 Sunsoft
-smgolfb			// (c) 1985 Nintendo
+vsfdf			// (c) 1986 Sunsoft licensed by Nintendo of America
 
 // NES-based hacks
 multigam		// 1992
