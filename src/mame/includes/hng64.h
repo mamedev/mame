@@ -50,6 +50,7 @@ public:
 	int m_mcu_type;
 
 	UINT16 *m_soundram;
+	UINT16 *m_soundram2;
 
 	/* Communications stuff */
 	UINT8  *m_com_op_base;
@@ -139,7 +140,15 @@ public:
 	DECLARE_READ32_MEMBER(tcram_r);
 	DECLARE_READ32_MEMBER(unk_vreg_r);
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
+
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
+	
+	// not actually used, but left in code so you can turn it and see the (possibly undesired?) behavior, see notes in memory map
+	DECLARE_WRITE32_MEMBER(hng64_soundram2_w);
+	DECLARE_READ32_MEMBER(hng64_soundram2_r);
+
+	DECLARE_WRITE32_MEMBER(hng64_soundcpu_enable_w);
+
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
 	DECLARE_READ8_MEMBER(hng64_comm_memory_r);

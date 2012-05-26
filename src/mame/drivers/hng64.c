@@ -439,6 +439,8 @@ And the Korean board only plays Samurai Shodown games (wont play Buriki One
 or Fatal Fury for example).
 */
 
+#define DUMP_SOUNDPRG  0
+
 #define MASTER_CLOCK 50000000
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -942,9 +944,61 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 	return ++m_unk_vreg_toggle;
 }
 
+/***** I don't think there is a soundram2, having it NOT hooked up causes xrally to copy the sound program to the expected location, see memory map note *****/
+
+WRITE32_MEMBER(hng64_state::hng64_soundram2_w)
+{
+	// xrally uploads the sound program here, and 00 in the usual hng64_soundram_w straight after it??
+	logerror("hng64_soundram2_w %08x: %08x %08x\n", offset, data, mem_mask);
+
+	UINT32 mem_mask32 = mem_mask;
+	UINT32 data32 = data;
+
+	/* swap data around.. keep the v55 happy */
+	data = data32 >> 16;
+	data = FLIPENDIAN_INT16(data);
+	mem_mask = mem_mask32 >> 16;
+	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	COMBINE_DATA(&m_soundram2[offset * 2 + 0]);
+
+	data = data32 & 0xffff;
+	data = FLIPENDIAN_INT16(data);
+	mem_mask = mem_mask32 & 0xffff;
+	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	COMBINE_DATA(&m_soundram2[offset * 2 + 1]);
+
+	if (DUMP_SOUNDPRG)
+	{
+		if (offset==0x7ffff)
+		{
+			logerror("dumping sound program in m_soundram2\n");
+			FILE *fp;
+			char filename[256];
+			sprintf(filename,"soundram2_%s", space.machine().system().name);
+			fp=fopen(filename, "w+b");
+			if (fp)
+			{
+				fwrite((UINT8*)m_soundram2, 0x80000*4, 1, fp);
+				fclose(fp);
+			}
+		}
+	}
+}
+
+READ32_MEMBER(hng64_state::hng64_soundram2_r)
+{
+	UINT16 datalo = m_soundram2[offset * 2 + 0];
+	UINT16 datahi = m_soundram2[offset * 2 + 1];
+
+	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
+}
+
+/************************************************************************************************************/
 
 WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 {
+	//logerror("hng64_soundram_w %08x: %08x %08x\n", offset, data, mem_mask);
+
 	UINT32 mem_mask32 = mem_mask;
 	UINT32 data32 = data;
 
@@ -960,7 +1014,25 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 	mem_mask = mem_mask32 & 0xffff;
 	mem_mask = FLIPENDIAN_INT16(mem_mask);
 	COMBINE_DATA(&m_soundram[offset * 2 + 1]);
+
+	if (DUMP_SOUNDPRG)
+	{
+		if (offset==0x7ffff)
+		{
+			logerror("dumping sound program in m_soundram\n");
+			FILE *fp;
+			char filename[256];
+			sprintf(filename,"soundram_%s", space.machine().system().name);
+			fp=fopen(filename, "w+b");
+			if (fp)
+			{
+				fwrite((UINT8*)m_soundram, 0x80000*4, 1, fp);
+				fclose(fp);
+			}
+		}
+	}
 }
+
 
 READ32_MEMBER(hng64_state::hng64_soundram_r)
 {
@@ -968,6 +1040,36 @@ READ32_MEMBER(hng64_state::hng64_soundram_r)
 	UINT16 datahi = m_soundram[offset * 2 + 1];
 
 	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
+}
+
+WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
+{
+	if (mem_mask&0xffff0000)
+	{
+		int cmd = data >> 16;
+		// I guess it's only one of the bits, the commands are inverse of each other
+		if (cmd==0x55AA)
+		{
+			printf("soundcpu ON\n");
+			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		}
+		else if (cmd==0xAA55)
+		{
+			printf("soundcpu OFF\n");
+			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		}
+		else
+		{
+			printf("unknown hng64_soundcpu_enable_w cmd %04x\n", cmd); 
+		}
+	}
+
+	if (mem_mask&0x0000ffff)
+	{
+			printf("unknown hng64_soundcpu_enable_w %08x %08x\n", data, mem_mask); 
+	}
 }
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
@@ -1063,14 +1165,14 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_SHARE("3d_2")	// 3D Display Buffer B
 
 	// Sound
-	AM_RANGE(0x60000000, 0x601fffff) AM_RAM												// Sound ??
+//	AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // if this area acts as RAM then xrally will copy the sound program here and blank out the usual area below.  None of the other games test this as sound ram (usually just write to the first byte) -- maybe it's actually unmapped?
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)	// uploads the v53 sound program here, elsewhere on ss64-2
 
 	// These are sound ports of some sort
 //  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP    // ??
 //  AM_RANGE(0x68000004, 0x68000007) AM_READNOP     // ??
 //  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP    // ??
-//  AM_RANGE(0x6f000000, 0x6f000003) AM_WRITENOP    // halt / reset line for the sound CPU
+	AM_RANGE(0x6f000000, 0x6f000003) AM_WRITE(hng64_soundcpu_enable_w)
 
 	// Communications
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_SHARE("com_ram")
@@ -1262,8 +1364,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe0000, 0xfffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank2")
+	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -1561,6 +1663,8 @@ static DRIVER_INIT( hng64 )
 	state->m_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
 
 	state->m_soundram = auto_alloc_array(machine, UINT16, 0x200000/2);
+	state->m_soundram2 = auto_alloc_array(machine, UINT16, 0x200000/2);
+
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
 
@@ -1665,8 +1769,8 @@ static MACHINE_RESET(hyperneo)
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)state->m_soundram;
-	state->membank("bank1")->set_base(&RAM[0x1e0000]);
-	state->membank("bank2")->set_base(&RAM[0x001000]); // where..
+	state->membank("bank1")->set_base(&RAM[0x1f0000]); // allows us to boot
+	state->membank("bank2")->set_base(&RAM[0x1f0000]); // seems to be the right default for most games (initial area jumps to a DI here)
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
