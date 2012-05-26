@@ -156,104 +156,6 @@ typedef device_delegate<UINT32 (screen_device &, bitmap_rgb32 &, const rectangle
 typedef device_delegate<void (screen_device &, bool)> screen_vblank_delegate;
 
 
-// ======================> monitor_device
-
-
-class crt_monitor
-{
-public:
-
-	typedef enum
-	{
-		PASSTHROUGHX = 0, // PASSTHROUGH somewhere defined in win32 environment
-		SHADOW_MASK = 1,
-		CROMA_CLEAR = 2,
-//		APERTURE_GRILLE,
-	} crt_monitor_type;
-
-	typedef struct
-	{
-		crt_monitor_type		m_type;
-		INT16 r_off;
-		INT16 g_off;
-		INT16 b_off;
-		UINT16 r_gain;
-		UINT16 b_gain;
-		UINT16 g_gain;
-		UINT16 focus;
-		UINT16 decay;
-		UINT16 bandwidth;
-		UINT8  source_cie;
-	} crt_monitor_param;
-
-	crt_monitor(void);
-	~crt_monitor(void);
-
-	void resize(int new_width, int new_height);
-
-	bitmap_t &final_bitmap(int cur_bm) { return m_phos_bm[cur_bm]; }
-
-	void get_param(crt_monitor_param &param) { param = m_param; }
-	void set_param(crt_monitor_param &param);
-
-	crt_monitor_type type(void) const { return m_param.m_type; }
-	//void set_type(crt_monitor_type new_type) { m_type = new_type; }
-
-	//void set_horz_pixel(int num) { m_horz_pixel = num; }
-
-	void process(running_machine &machine, screen_bitmap &src_bm, int cur_bm, rectangle &clip);
-
-	const rectangle &get_visible() const { return m_visible; }
-
-	int get_cie_count(void);
-	const char * get_cie_name(void);
-
-	int get_type_count(void) { return 3; }
-	const char * get_type_name(void)
-	{
-		switch (m_param.m_type)
-		{
-		case PASSTHROUGHX:
-			return "Passthrough";
-		case CROMA_CLEAR:
-			return "Croma Clear";
-		case SHADOW_MASK:
-			return "Shadow Mask";
-		}
-		return "";
-	}
-
-
-private:
-	INT16 *					m_amplifier_r;
-	INT16 *					m_amplifier_g;
-	INT16 *					m_amplifier_b;
-	bitmap_rgb32 			m_mask_bm;
-	bitmap_rgb32			m_phos_bm[2];
-
-	crt_monitor_param   	m_param;
-	rectangle				m_visible;
-	//rectangle				m_src_visible;
-
-	int						m_vert_pixel;
-	int						m_horz_pixel;
-	int						m_width;
-	int						m_height;
-
-	void free_bitmaps(void);
-	void scale_and_bandwith(running_machine &machine, bitmap_t &bm_src, const rectangle &cliprect);
-	void copyonly(bitmap_rgb32 &bm_dst, rectangle &clip);
-	void copy_shadow_mask(bitmap_rgb32 &bm_dst, const rectangle &clip);
-	void copy_chroma(bitmap_rgb32 &bm_dst, const rectangle &clip);
-	void phosphor(bitmap_rgb32 &bm_dst, bitmap_rgb32 &bm_phos, bitmap_rgb32 &bm_src, const rectangle &cliprect);
-
-	rgb_t				   base_red[768];
-	rgb_t				   base_green[768];
-	rgb_t				   base_blue[768];
-	int					   m_exp[256];
-};
-
-
 // ======================> screen_device
 
 class screen_device : public device_t
@@ -269,7 +171,7 @@ public:
 	screen_type_enum screen_type() const { return m_type; }
 	int width() const { return m_width; }
 	int height() const { return m_height; }
-	const rectangle &visible_area() const;// { return m_visarea; }
+	const rectangle &visible_area() const { return m_visarea; }
 	const rectangle &cliprect() const { return m_bitmap[0].cliprect(); }
 	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
 	attoseconds_t refresh_attoseconds() const { return m_refresh; }
@@ -322,8 +224,6 @@ public:
 	void update_now();
 	void reset_partial_updates();
 
-	void set_render_size(int width, int height);
-
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	void register_screen_bitmap(bitmap_t &bitmap);
@@ -332,10 +232,6 @@ public:
 	// internal to the video system
 	bool update_quads();
 	void update_burnin();
-
-	// access to crt
-
-	crt_monitor &crt(void)	{ return m_crt; }
 
 	// globally accessible constants
 	static const int DEFAULT_FRAME_RATE = 60;
@@ -410,10 +306,6 @@ private:
 	UINT64				m_frame_number;				// the current frame number
 	UINT32				m_partial_updates_this_frame;// partial update counter this frame
 
-	// render size
-	INT32					m_render_width;
-	INT32					m_render_height;
-
 	// VBLANK callbacks
 	class callback_item
 	{
@@ -441,10 +333,6 @@ private:
 		bitmap_t &					m_bitmap;
 	};
 	simple_list<auto_bitmap_item> m_auto_bitmap_list; // list of registered bitmaps
-
-	// monitor emulation
-
-	crt_monitor				m_crt;
 };
 
 // device type definition

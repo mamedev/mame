@@ -139,15 +139,6 @@ do																					\
 }																					\
 while (0)																			\
 
-#define PIXEL_OP_REMAP_TRANSPEN_IND16(DEST, PRIORITY, SOURCE)						\
-do																					\
-{																					\
-	UINT32 srcdata = (SOURCE);														\
-	if (srcdata != transpen)														\
-		(DEST) = srcdata + palbase;													\
-}																					\
-while (0)																			\
-
 #define PIXEL_OP_REMAP_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)					\
 do																					\
 {																					\
