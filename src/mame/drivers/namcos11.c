@@ -43,10 +43,11 @@ ptblank2ua Point Blank 2 (GNB3/VER.A)              COH-100 / COH-110   SYSTEM11 
 
 Not Dumped Yet
 --------------
-Point Blank 3           (C) Namco, 2001
-Soul Edge Ver. III      (C) Namco, 1996
-Tekken Ver.C            (C) Namco, 1995
-Tekken II Ver.C         (C) Namco, 1995
+Point Blank 3                         (C) Namco, 2001
+Soul Edge Ver. III                    (C) Namco, 1996
+Tekken Ver.C                          (C) Namco, 1995
+Tekken II Ver.C                       (C) Namco, 1995
+Kosodate Quiz My Angel 3 (KQT1/VER.B) (C) Namco, 1998
 
 If you can help with the remaining undumped S11 games, please contact http://guru.mameworld.info/
 
