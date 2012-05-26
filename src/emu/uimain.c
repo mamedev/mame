@@ -1182,6 +1182,9 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	ioport_field *field = (ioport_field *)selectedref;
 	dip_descriptor *dip;
 
+	if (field->first_diplocation() == NULL)
+		return;
+
 	/* add borders */
 	y1 = y2 + UI_BOX_TB_BORDER;
 	y2 = y1 + bottom;
