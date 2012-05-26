@@ -160,6 +160,20 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, astring *st
 static INT32 slider_flicker(running_machine &machine, void *arg, astring *string, INT32 newval);
 static INT32 slider_beam(running_machine &machine, void *arg, astring *string, INT32 newval);
 static char *slider_get_screen_desc(screen_device &screen);
+
+static INT32 slider_crt_red_off(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_green_off(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_blue_off(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_red_gain(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_green_gain(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_blue_gain(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_decay(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_bandwidth(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_focus(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_cie(running_machine &machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crt_type(running_machine &machine, void *arg, astring *string, INT32 newval);
+
+
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine &machine, void *arg, astring *string, INT32 newval);
 static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *string, INT32 newval);
@@ -1769,6 +1783,54 @@ static slider_state *slider_init(running_machine &machine)
 			break;
 		}
 
+	screen_device_iterator iter(machine.root_device());
+	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+		if (screen->screen_type() != SCREEN_TYPE_VECTOR)
+		{
+			void *param = (void *)screen;
+
+			string.printf("%s Red Offset", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, -256, 0, 256, 5, slider_crt_red_off, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("%s Green Offset", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, -256, 0, 256, 5, slider_crt_green_off, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("%s Blue Offset", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, -256, 0, 256, 5, slider_crt_blue_off, param);
+			tailptr = &(*tailptr)->next;
+
+			string.printf("%s Red Gain", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 256, 767, 5, slider_crt_red_gain, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("%s Green Gain", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 256, 767, 5, slider_crt_green_gain, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("%s Blue Gain", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 256, 767, 5, slider_crt_blue_gain, param);
+			tailptr = &(*tailptr)->next;
+
+			string.printf("%s Phosphor decay", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 0, 256, 5, slider_crt_decay, param);
+			tailptr = &(*tailptr)->next;
+
+			string.printf("%s Bandwidth", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 0, 256, 5, slider_crt_bandwidth, param);
+			tailptr = &(*tailptr)->next;
+
+			string.printf("%s Focus", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 256, 256, 5, slider_crt_focus, param);
+			tailptr = &(*tailptr)->next;
+
+			string.printf("%s CIE", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 0, screen->crt().get_cie_count()-1, 1, slider_crt_cie, param);
+			tailptr = &(*tailptr)->next;
+
+			string.printf("%s Monitor type", slider_get_screen_desc(*screen));
+			*tailptr = slider_alloc(machine, string, 0, 0, screen->crt().get_type_count()-1, 1, slider_crt_type, param);
+			tailptr = &(*tailptr)->next;
+
+		}
+
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
@@ -1788,6 +1850,185 @@ static slider_state *slider_init(running_machine &machine)
 	return listhead;
 }
 
+/*-------------------------------------------------
+    slider_crt_* - CRT Monitor sliders
+-------------------------------------------------*/
+
+static INT32 slider_crt_red_off(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.r_off = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.r_off / 256.0f);
+	return param.r_off;
+}
+
+static INT32 slider_crt_green_off(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.g_off = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.g_off / 256.0f);
+	return param.g_off;
+}
+
+static INT32 slider_crt_blue_off(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.b_off = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.b_off / 256.0f);
+	return param.b_off;
+}
+
+static INT32 slider_crt_red_gain(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.r_gain = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.r_gain / 256.0f);
+	return param.r_gain;
+}
+
+static INT32 slider_crt_green_gain(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.g_gain = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.g_gain / 256.0f);
+	return param.g_gain;
+}
+
+static INT32 slider_crt_blue_gain(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.b_gain = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.b_gain / 256.0f);
+	return param.b_gain;
+}
+
+static INT32 slider_crt_decay(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.decay = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.decay / 256.0f);
+	return param.decay;
+}
+
+static INT32 slider_crt_bandwidth(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.bandwidth = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.bandwidth / 256.0f);
+	return param.bandwidth;
+}
+
+static INT32 slider_crt_focus(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.focus = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%.2f", (double) param.focus / 256.0f);
+	return param.focus;
+}
+
+static INT32 slider_crt_cie(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.source_cie = newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%s", screen->crt().get_cie_name());
+	return param.source_cie;
+}
+
+static INT32 slider_crt_type(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	screen_device *screen = reinterpret_cast<screen_device *>(arg);
+	crt_monitor::crt_monitor_param param;
+
+	screen->crt().get_param(param);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		param.m_type = (crt_monitor::crt_monitor_type) newval;
+		screen->crt().set_param(param);
+	}
+	if (string != NULL)
+		string->printf("%s", screen->crt().get_type_name());
+	return param.m_type;
+}
 
 /*-------------------------------------------------
     slider_volume - global volume slider callback

@@ -1487,7 +1487,7 @@ static void antic_scanline_dma(running_machine &machine, int param)
  *
  *****************************************************************************/
 
-static void generic_atari_interrupt(running_machine &machine, void (*handle_keyboard)(running_machine &machine), int button_count)
+static void generic_atari_interrupt(running_machine &machine, int button_count)
 {
 	int button_port, i;
 
@@ -1518,8 +1518,6 @@ static void generic_atari_interrupt(running_machine &machine, void (*handle_keyb
 			gtia.r.but[3] = 0; /* 1 if external cartridge is inserted */
 		}
 
-		handle_keyboard(machine);
-
 		/* do nothing new for the rest of the frame */
 		antic.modelines = machine.primary_screen->height() - VBL_START;
 		antic.renderer = antic_mode_0_xx;
@@ -1542,22 +1540,22 @@ static void generic_atari_interrupt(running_machine &machine, void (*handle_keyb
 
 TIMER_DEVICE_CALLBACK( a400_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), a800_handle_keyboard, 4);
+	generic_atari_interrupt(timer.machine(), 4);
 }
 
 TIMER_DEVICE_CALLBACK( a800_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), a800_handle_keyboard, 4);
+	generic_atari_interrupt(timer.machine(), 4);
 }
 
 TIMER_DEVICE_CALLBACK( a800xl_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), a800_handle_keyboard, 2);
+	generic_atari_interrupt(timer.machine(), 2);
 }
 
 TIMER_DEVICE_CALLBACK( a5200_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), a5200_handle_keypads, 4);
+	generic_atari_interrupt(timer.machine(), 4);
 }
 
 /**************************************************************

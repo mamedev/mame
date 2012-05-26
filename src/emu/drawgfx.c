@@ -495,6 +495,7 @@ void drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_e
 	// special case invalid pens to opaque
 	if (transpen > 0xff)
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
+//	int palbase;
 
 	// use pen usage to optimize
 	code %= gfx->total_elements;
@@ -526,6 +527,11 @@ void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_e
 
 	// use pen usage to optimize
 	code %= gfx->total_elements;
+	color %= gfx->total_colors;
+	int palbase = gfx->color_base + gfx->color_granularity * color;
+	const pen_t *paldata = &gfx->machine().pens[palbase];
+
+	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		// fully transparent; do nothing
@@ -538,10 +544,14 @@ void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_e
 			return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 	}
 
-	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	/* render based on dest bitmap depth */
 	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
+	if (dest.format() == BITMAP_FORMAT_IND16)
+		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_IND16, NO_PRIORITY);
+	else if (dest.bpp() == 16)
+		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
+	else
+		DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
 }
 
 

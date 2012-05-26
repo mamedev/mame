@@ -434,7 +434,7 @@ void render_texture::release()
 
 void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format)
 {
-	assert(bitmap.cliprect().contains(sbounds));
+	//assert(bitmap.cliprect().contains(sbounds));
 
 	// ensure we have a valid palette for palettized modes
 	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
@@ -1377,7 +1377,10 @@ render_primitive_list &render_target::get_primitives()
 
 					// if there is no associated element, it must be a screen element
 					if (curitem->screen() != NULL)
+					{
 						add_container_primitives(list, item_xform, curitem->screen()->container(), blendmode);
+						curitem->screen()->set_render_size((int) item_xform.xscale, (int) item_xform.yscale);
+					}
 					else
 						add_element_primitives(list, item_xform, *curitem->element(), curitem->state(), blendmode);
 				}
@@ -1740,7 +1743,6 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 			prim->bounds.x1 = render_round_nearest(container_xform.xoffs + bounds.x1 * container_xform.xscale);
 			prim->bounds.y1 = render_round_nearest(container_xform.yoffs + bounds.y1 * container_xform.yscale);
 		}
-
 		// compute the color of the primitive
 		prim->color.r = container_xform.color.r * curitem->color().r;
 		prim->color.g = container_xform.color.g * curitem->color().g;

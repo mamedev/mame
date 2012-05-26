@@ -112,7 +112,7 @@ inline void adsp21xx_device::update_mstat()
 
 inline UINT32 adsp21xx_device::pc_stack_top()
 {
-	if (m_pc_sp > 0)
+	if (EXPECTED(m_pc_sp > 0))
 		return m_pc_stack[m_pc_sp - 1];
 	else
 		return m_pc_stack[0];
@@ -120,7 +120,7 @@ inline UINT32 adsp21xx_device::pc_stack_top()
 
 inline void adsp21xx_device::set_pc_stack_top(UINT32 top)
 {
-	if (m_pc_sp > 0)
+	if (EXPECTED(m_pc_sp > 0))
 		m_pc_stack[m_pc_sp - 1] = top;
 	else
 		m_pc_stack[0] = top;
@@ -128,7 +128,7 @@ inline void adsp21xx_device::set_pc_stack_top(UINT32 top)
 
 inline void adsp21xx_device::pc_stack_push()
 {
-	if (m_pc_sp < PC_STACK_DEPTH)
+	if (EXPECTED(m_pc_sp < PC_STACK_DEPTH))
 	{
 		m_pc_stack[m_pc_sp] = m_pc;
 		m_pc_sp++;
@@ -140,7 +140,7 @@ inline void adsp21xx_device::pc_stack_push()
 
 inline void adsp21xx_device::pc_stack_push_val(UINT32 val)
 {
-	if (m_pc_sp < PC_STACK_DEPTH)
+	if (EXPECTED(m_pc_sp < PC_STACK_DEPTH))
 	{
 		m_pc_stack[m_pc_sp] = val;
 		m_pc_sp++;
@@ -152,10 +152,10 @@ inline void adsp21xx_device::pc_stack_push_val(UINT32 val)
 
 inline void adsp21xx_device::pc_stack_pop()
 {
-	if (m_pc_sp > 0)
+	if (EXPECTED(m_pc_sp > 0))
 	{
 		m_pc_sp--;
-		if (m_pc_sp == 0)
+		if (UNEXPECTED(m_pc_sp == 0))
 			m_sstat |= PC_EMPTY;
 	}
 	m_pc = m_pc_stack[m_pc_sp];
@@ -163,7 +163,7 @@ inline void adsp21xx_device::pc_stack_pop()
 
 inline UINT32 adsp21xx_device::pc_stack_pop_val()
 {
-	if (m_pc_sp > 0)
+	if (EXPECTED(m_pc_sp > 0))
 	{
 		m_pc_sp--;
 		if (m_pc_sp == 0)
@@ -179,7 +179,7 @@ inline UINT32 adsp21xx_device::pc_stack_pop_val()
 
 inline UINT32 adsp21xx_device::cntr_stack_top()
 {
-	if (m_cntr_sp > 0)
+	if (EXPECTED(m_cntr_sp > 0))
 		return m_cntr_stack[m_cntr_sp - 1];
 	else
 		return m_cntr_stack[0];
@@ -187,7 +187,7 @@ inline UINT32 adsp21xx_device::cntr_stack_top()
 
 inline void adsp21xx_device::cntr_stack_push()
 {
-	if (m_cntr_sp < CNTR_STACK_DEPTH)
+	if (EXPECTED(m_cntr_sp < CNTR_STACK_DEPTH))
 	{
 		m_cntr_stack[m_cntr_sp] = m_cntr;
 		m_cntr_sp++;
@@ -199,7 +199,7 @@ inline void adsp21xx_device::cntr_stack_push()
 
 inline void adsp21xx_device::cntr_stack_pop()
 {
-	if (m_cntr_sp > 0)
+	if (EXPECTED(m_cntr_sp > 0))
 	{
 		m_cntr_sp--;
 		if (m_cntr_sp == 0)
@@ -215,7 +215,7 @@ inline void adsp21xx_device::cntr_stack_pop()
 
 inline UINT32 adsp21xx_device::loop_stack_top()
 {
-	if (m_loop_sp > 0)
+	if (EXPECTED(m_loop_sp > 0))
 		return m_loop_stack[m_loop_sp - 1];
 	else
 		return m_loop_stack[0];
@@ -223,7 +223,7 @@ inline UINT32 adsp21xx_device::loop_stack_top()
 
 inline void adsp21xx_device::loop_stack_push(UINT32 value)
 {
-	if (m_loop_sp < LOOP_STACK_DEPTH)
+	if (EXPECTED(m_loop_sp < LOOP_STACK_DEPTH))
 	{
 		m_loop_stack[m_loop_sp] = value;
 		m_loop_sp++;
@@ -237,10 +237,10 @@ inline void adsp21xx_device::loop_stack_push(UINT32 value)
 
 inline void adsp21xx_device::loop_stack_pop()
 {
-	if (m_loop_sp > 0)
+	if (EXPECTED(m_loop_sp > 0))
 	{
 		m_loop_sp--;
-		if (m_loop_sp == 0)
+		if (UNEXPECTED(m_loop_sp == 0))
 		{
 			m_loop = 0xffff;
 			m_loop_condition = 0;
@@ -261,7 +261,7 @@ inline void adsp21xx_device::loop_stack_pop()
 
 inline void adsp21xx_device::stat_stack_push()
 {
-	if (m_stat_sp < STAT_STACK_DEPTH)
+	if (EXPECTED(m_stat_sp < STAT_STACK_DEPTH))
 	{
 		m_stat_stack[m_stat_sp][0] = m_mstat;
 		m_stat_stack[m_stat_sp][1] = m_imask;
@@ -275,7 +275,7 @@ inline void adsp21xx_device::stat_stack_push()
 
 inline void adsp21xx_device::stat_stack_pop()
 {
-	if (m_stat_sp > 0)
+	if (EXPECTED(m_stat_sp > 0))
 	{
 		m_stat_sp--;
 		if (m_stat_sp == 0)
