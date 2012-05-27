@@ -16,6 +16,62 @@ TODO:
 - remaining gfx/color issues
 - measure clocks
 
+
+--------------------------------------------------------------------
+    DipSwitch Title   |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+--------------------------------------------------------------------
+     Demo Sounds      |     Off    |off|                           |
+                      |     On     |on |                           |*
+--------------------------------------------------------------------
+       Coinage        |   1C / 1C  |   |off|                       |*
+                      |   1C / 2C  |   |on |                       |
+--------------------------------------------------------------------
+     Drop Target      |     On     |       |off|                   |*
+                      |     Off    |       |on |                   |
+--------------------------------------------------------------------
+     Cabinet Type     |  Cocktail  |           |off|               |
+                      |  Upright   |           |on |               |*
+--------------------------------------------------------------------
+Additional Bonus Balls| Every 70K  |               |off|           |*
+ after 1st bonus ball | Every 100K |               |on |           |
+--------------------------------------------------------------------
+   First Bonus Ball   |  100,000   |                   |off|       |*
+                      |  200,000   |                   |on |       |
+--------------------------------------------------------------------
+  Bonus Ball Feature  |     On     |                       |off|   |*
+                      |     Off    |                       |on |   |
+--------------------------------------------------------------------
+   Number of Balls    |     3      |                           |off|*
+                      |     5      |                           |on |
+--------------------------------------------------------------------
+
+
+            Solder Side | Parts Side
+________________________|___________________________
+                 GND  | 1 |  GND
+                 GND  | 2 |  GND
+                 GND  | 3 |  GND
+                 +5V  | 4 |  +5V
+                 +5V  | 5 |  +5V
+                +12V  | 6 |  +12V
+                      | 7 |  Sound (+)
+                      | 8 |  Sound (-)
+                      | 9 |  Coin
+                      | 10|
+            2P Shoot  | 11|  1P Shoot
+     2P Flipper Left  | 12|  1P Flipper Left
+             2P Tilt  | 13|  1P Tilt
+    2P Flipper Right  | 14|  1P Flipper Right
+            2P Start  | 15|  1P Start
+                      | 16|
+                      | 17|
+                      | 18|
+                      | 19|
+         Video Green  | 20|  Video Blue
+          Video Sync  | 21|  Video Red
+                 GND  | 22|  GRD
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -313,18 +369,18 @@ static INPUT_PORTS_START( flipjack )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coinage ) )		PORT_DIPLOCATION("A0:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Drop Target" )			PORT_DIPLOCATION("A0:3")
+	PORT_DIPNAME( 0x04, 0x04, "Drop Target" )		PORT_DIPLOCATION("A0:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("A0:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("A0:5,6,7")
-	PORT_DIPSETTING(	0x70, "150K & Every 70K" )
-	PORT_DIPSETTING(	0x60, "150K & Every 100K" )
-	PORT_DIPSETTING(	0x50, "200K & Every 70K" )
-	PORT_DIPSETTING(	0x40, "200K & Every 100K" )
-	PORT_DIPSETTING(	0x00, "None" )
+	PORT_DIPSETTING(    0x70, "150K & Every 70K" )
+	PORT_DIPSETTING(    0x60, "150K & Every 100K" )
+	PORT_DIPSETTING(    0x50, "200K & Every 70K" )
+	PORT_DIPSETTING(    0x40, "200K & Every 100K" )
+	PORT_DIPSETTING(    0x00, "None" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )		PORT_DIPLOCATION("A0:8")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
