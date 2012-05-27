@@ -336,7 +336,7 @@ ROM_START( yiear )
 	ROM_LOAD( "407_d04.15h", 0x0c000, 0x4000, CRC(cc187c22) SHA1(555ba18a9648681e5140b3fd84af16959ee5296d) ) /* was listed as g05_4 */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "407c10.1g", 0x00000, 0x0020, CRC(c283d71f) SHA1(10cd39f4e951ba6ca5610081c8c1fcd9d68b34d2) )
+	ROM_LOAD( "407c10.1g", 0x00000, 0x0020, CRC(c283d71f) SHA1(10cd39f4e951ba6ca5610081c8c1fcd9d68b34d2) )	/* Color BPROM type is TBP18S030N or compatible */
 
 	ROM_REGION( 0x2000, "vlm", 0 )	/* 8k for the VLM5030 data */
 	ROM_LOAD( "407_c09.8b", 0x00000, 0x2000, CRC(f75a1539) SHA1(f139f6cb41351eb81ee47d777db03012aa5fadb1) ) /* was listed as a12_9 */
@@ -358,7 +358,7 @@ ROM_START( yiear2 )
 	ROM_LOAD( "407_d04.15h", 0x0c000, 0x4000, CRC(cc187c22) SHA1(555ba18a9648681e5140b3fd84af16959ee5296d) ) /* was listed as g05_4 */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "407c10.1g", 0x00000, 0x0020, CRC(c283d71f) SHA1(10cd39f4e951ba6ca5610081c8c1fcd9d68b34d2) )
+	ROM_LOAD( "407c10.1g", 0x00000, 0x0020, CRC(c283d71f) SHA1(10cd39f4e951ba6ca5610081c8c1fcd9d68b34d2) )	/* Color BPROM type is TBP18S030N or compatible */
 
 	ROM_REGION( 0x2000, "vlm", 0 )	/* 8k for the VLM5030 data */
 	ROM_LOAD( "407_c09.8b", 0x00000, 0x2000, CRC(f75a1539) SHA1(f139f6cb41351eb81ee47d777db03012aa5fadb1) ) /* was listed as a12_9 */
@@ -366,5 +366,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (Program Code I)", GAME_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (Program Code G)", GAME_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", GAME_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", GAME_SUPPORTS_SAVE )
