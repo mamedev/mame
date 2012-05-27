@@ -342,7 +342,7 @@
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
 				<!-- Hitachi HD6301V1 MCU -->
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP ) -->
+				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />				<!-- TC531000 -->
@@ -382,7 +382,7 @@
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
 				<!-- Hitachi HD6301V1 MCU -->
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP ) -->
+				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />				<!-- TC531000 -->
@@ -981,7 +981,7 @@
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
 				<!-- Hitachi HD6301V1 MCU -->
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP ) -->
+				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="019-s1.s1" crc="5fcdc0ed" sha1="86415077e7adc3ba6153eeb4fb0c62cf36e903fa" />				<!-- TC531000 -->
@@ -1761,7 +1761,7 @@
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
 				<!-- Hitachi HD6301V1 MCU -->
-				<!-- <rom name="hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP ) -->
+				<!-- <rom name="hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP /> -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="038-s1.s1" crc="fff62ae3" sha1="6510a762ea41557a8938cbfc0557cd5921306061" />				<!-- TC531000 -->
