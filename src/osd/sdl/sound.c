@@ -74,7 +74,7 @@ static void			sdl_kill(running_machine &machine);
 static int			sdl_create_buffers(void);
 static void			sdl_destroy_buffers(void);
 static void			sdl_cleanup_audio(running_machine &machine);
-static void			sdl_callback(void *userdata, Uint8 *stream, int len);
+static void			SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len);
 
 
 
