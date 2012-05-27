@@ -1353,7 +1353,7 @@ ROM_START( a51site4 )
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "drive_0" )
-	DISK_IMAGE( "a51site4", 0, SHA1(48496666d1613700ae9274f9a5361ea5bbaebea0) )
+	DISK_IMAGE( "a51site4-2_01", 0, SHA1(48496666d1613700ae9274f9a5361ea5bbaebea0) ) /* Happ replacement drive "A-22509", sticker on drive shows REV 2.01 and Test Mode screen shows the date September 7, 1998 */
 ROM_END
 
 ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders were 4968 and heads were 16 */
@@ -1367,11 +1367,11 @@ ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders we
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "drive_0" )
-	DISK_IMAGE( "a51site4a", 0, SHA1(4de421e4d1708ecbdfb50730000814a1ea36a044) )
+	DISK_IMAGE( "a51site4-2_0", 0, SHA1(4de421e4d1708ecbdfb50730000814a1ea36a044) ) /* Stock drive, sticker on drive shows REV 2.0 and Test Mode screen shows the date September 11, 1998 */
 ROM_END
 
 
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0       , mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4", GAME_NOT_WORKING )
-GAME( 1998, a51site4a,a51site4,	mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4 (September 11, 1998)", GAME_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", GAME_NOT_WORKING )
+GAME( 1998, a51site4a,a51site4,	mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", GAME_NOT_WORKING )
