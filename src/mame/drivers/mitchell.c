@@ -1107,7 +1107,7 @@ static TIMER_DEVICE_CALLBACK( mitchell_irq )
 	{
 		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 
-		state->m_irq_source = (scanline == 0);
+		state->m_irq_source = (scanline == 240);
 	}
 }
 
