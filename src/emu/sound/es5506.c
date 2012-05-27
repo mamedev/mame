@@ -177,7 +177,7 @@ struct _es5506_state
 	UINT32		read_latch;				/* currently accumulated data for read */
 	UINT32		master_clock;			/* master clock frequency */
 	void		(*irq_callback)(device_t *, int);	/* IRQ callback */
-	UINT16		(*port_read)(void);		/* input port read */
+	UINT16		(*port_read)(device_t *);		/* input port read */
 
 	UINT8		current_page;			/* current register page */
 	UINT8		active_voices;			/* number of active voices */
@@ -922,6 +922,7 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 	chip->device = device;
 	chip->master_clock = device->clock();
 	chip->irq_callback = intf->irq_callback;
+	chip->port_read = intf->read_port;
 	chip->irqv = 0x80;
 
 	/* compute the tables */
@@ -1393,7 +1394,7 @@ INLINE UINT32 es5506_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_
 
 		case 0x68/8:	/* PAR */
 			if (chip->port_read)
-				result = (*chip->port_read)();
+				result = (*chip->port_read)(chip->device);
 			break;
 
 		case 0x70/8:	/* IRQV */
@@ -1469,7 +1470,7 @@ INLINE UINT32 es5506_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 
 		case 0x68/8:	/* PAR */
 			if (chip->port_read)
-				result = (*chip->port_read)();
+				result = (*chip->port_read)(chip->device);
 			break;
 
 		case 0x70/8:	/* IRQV */
@@ -1492,7 +1493,7 @@ INLINE UINT32 es5506_reg_read_test(es5506_state *chip, es5506_voice *voice, offs
 	{
 		case 0x68/8:	/* PAR */
 			if (chip->port_read)
-				result = (*chip->port_read)();
+				result = (*chip->port_read)(chip->device);
 			break;
 
 		case 0x70/8:	/* IRQV */
@@ -2101,7 +2102,7 @@ INLINE UINT16 es5505_reg_read_test(es5506_state *chip, es5506_voice *voice, offs
 
 		case 0x09:	/* PAR */
 			if (chip->port_read)
-				result = (*chip->port_read)();
+				result = (*chip->port_read)(chip->device);
 			break;
 
 		case 0x0f:	/* PAGE */
