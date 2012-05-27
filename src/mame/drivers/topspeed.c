@@ -37,6 +37,15 @@ in shared ram to relieve CPUA. There is also a Z80, which takes over
 sound duties.
 
 
+PCB contents (from CPU PCB photo)
+-------------
+
+XTAL: 16000.00KHZ and 26686.00KHZ
+CPU: 2 * 68000-8, Z80 + Z80 CTC
+Sound: YM2151, YM3012(DAC), 2 * OKI M5205
+Taito: 2 * PC080SN, PC060HA, TC0040IOC, 2 * TC0060DCA, PC050CM
+
+
 Dumper's info (topspedu)
 -------------
 
@@ -46,9 +55,7 @@ Sound: YM2151, OKI M5205
 Some of the custom Taito chips look like Rastan Hardware
 
 Comments: Note b14-06, and b14-07, are duplicated twice on this board
-for some type of hardware graphics reasons. (DG: that's because of
-the twin tilemap generator chips. Can someone confirm they are
-PC080SN's please...?)
+for some type of hardware graphics reasons.
 
 There is a weird chip that is probably a Microcontroller made by Sharp.
 Part number: b14-31 - Sharp LH763J-70
@@ -57,26 +64,13 @@ Part number: b14-31 - Sharp LH763J-70
 TODO Lists
 ==========
 
-(Want to verify 68000 clocks)
+Want to verify 68000 clocks - 8MHz causes slowdowns
 
-I don't know about the MSM5205 playback frequency, I set it to 4kHz because
-otherwise the samples plays at the beginning of a game would play past the end.
-The samples are stopped by the Z80, they don't stop automatically. So, if they
-should play at a higher frequency, the Z80 should stop them sooner - which
-would mean a higher interrupt rate, therefore a higher YM2151 clock rate.
+Understand how the MSM5202's are hooked up exactly, and also
+implement volume adjusts ($dxxx). The 2nd chip is disabled
+for now.
 
-I haven't found how the second MSM5205 ROM is selected (I haven't even found
-when samples from that ROM should be played)
-
-Many unknown writes from the Z80: c000, c400, c800, cc00, d000, d200, d400, d600, b400.
-
-Accel and brake bits work differently depending on cab DSW
-Mame cannot yet support this, so accel/brake are not hooked up
-sensibly when upright cabinet is selected.
-
-The 8 level brake and accel inputs for the cockpit version
-should be mapped to a pedal for analogue pedal control.
-(Warlock did this but his changes need remerging.)
+Where is the Z80 CTC mapped to?
 
 Minor black glitches on the road: these are all on the right
 hand edge of the tilemap making up the "left" half: this is
@@ -90,8 +84,6 @@ single-stepping. A sync issue?
 CPUA (on all variants) could have a spin_until_int at $63a.
 
 Motor CPU: appears to be identical to one in ChaseHQ.
-
-DIPs
 
 
 Raster line color control
@@ -227,6 +219,55 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Game name : "Full Throttle"
   - Same other notes as for 'topspeed'
 
+Main board
+    V  Connector                 G  Connector
+    ------------                 ------------
+    1  Video GND                Solder   Parts
+    2  Video RED                GND  A   1  GND
+    3  Video GREEN              GND  B   2  GND
+    4  Video BLUE               +5V  C   3  +5V
+    5  Video SYNC               +5V  D   4  +5V
+                                -5V  E   5  -5V
+                               +13V  F   6  +12V
+    H  Connector                ---  H   7  ---
+    ------------     Coin Counter 2  J   8  Coin Counter 1
+    1  GND           Coin Lockout 2  K   9  Coin Lockout 1
+    2  GND          Speaker CH1 [-]  L  10  Speaker CH1 [+]
+    3  GND          Speaker CH2 [-]  M  11  Speaker CH2 [+]
+    4  GND                 Volume 1  N  12  Volume 3
+    5  +5V                      ---  P  13  Volume 2
+    6  +5V               Service SW  R  14  GND
+    7  +5V               Brake SW 1  S  15  GND
+    8  +5V                Coin SW 2  T  16  Coin SW 1
+    9  -5V               Brake SW 3  U  17  Brake SW 2
+    10 ---                  Tilt SW  V  18  Nitro SW
+    11 +12V             1P Start SW  W  19  Handle Center SW
+    12 ---               Accel SW 1  X  20  Shift SW
+                         Accel SW 3  Y  21  Accel SW 2
+                                ---  Z  22  ---
+                                ---  a  23  ---
+                                ---  b  24  ---
+                                ---  c  25  ---
+                  Handle Sensor [-]  d  26  Handle Sensor [+]
+                                GND  e  27  GND
+                                GND  f  28  GND
+
+Handle Sensor board
+    1  Handle Sensor [-]
+    2  +5V
+    3  GND
+    4  Handle Sensor [+]
+
+Sound Volume Connection
+    Sound Volume 1  1  ----   -\
+    Sound Volume 2  2  ----   -----| short with only one pin
+    Sound Volume 3  3  ----   -/   |
+               GND  4  ------------|
+
+From JP manual
+    If Cabinet is Upright (see DSWA:1,2), These SWs are unused.
+        Accel SW 2 (21), Accel SW 3 (Y), Brake SW 2 (17), Brake SW 3 (U) and Handle Center SW (19)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -264,7 +305,6 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 
 WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 {
-
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
@@ -317,36 +357,10 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
                        GAME INPUTS
 **********************************************************/
 
-#define STEER_PORT_TAG   "STEER"
-#define FAKE_PORT_TAG    "FAKE"
-
 READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 {
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
-	int steer = 0;
-	int analogue_steer = ioport(STEER_PORT_TAG)->read_safe(0x00);
-	int fake = ioport(FAKE_PORT_TAG)->read_safe(0x00);
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		steer = analogue_steer;
-
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x08)	/* pressing down */
-			steer = 0xff40;
-
-		if (fake & 0x02)	/* pressing right */
-			steer = 0x007f;
-
-		if (fake & 0x01)	/* pressing left */
-			steer = 0xff80;
-
-		/* To allow hiscore input we must let you return to continuous input type while you press up */
-		if (fake & 0x04)	/* pressing up */
-			steer = analogue_steer;
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0);
 
 	switch (port)
 	{
@@ -361,6 +375,12 @@ READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 	}
 }
 
+CUSTOM_INPUT_MEMBER(topspeed_state::topspeed_pedal_r)
+{
+	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	const char *tag = (const char *)param;
+	return retval[ioport(tag)->read_safe(0) & 7];
+}
 
 READ16_MEMBER(topspeed_state::topspeed_motor_r)
 {
@@ -401,34 +421,77 @@ WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)/* assumes Z80 sandwiched betwe
 	reset_sound_region(machine());
 }
 
-static void topspeed_msm5205_vck( device_t *device )
+static WRITE8_DEVICE_HANDLER( topspeed_tc0140syt_comm_w )
+{
+	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	tc0140syt_comm_w(device, 0, data);
+}
+
+static void topspeed_msm5205_clock( device_t *device, int chip )
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	if (state->m_adpcm_data != -1)
-	{
-		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
-		state->m_adpcm_data = -1;
-	}
-	else
-	{
-		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
-		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0x1ffff;
-		msm5205_data_w(device, state->m_adpcm_data >> 4);
-	}
+	UINT8 data = state->m_msm_rom[chip][state->m_msm_pos[chip]];
+
+	msm5205_data_w(device, state->m_msm_sel[chip] ? data & 0xf : data >> 4 & 0xf);
+	state->m_msm_pos[chip] += state->m_msm_sel[chip];
+	state->m_msm_sel[chip] ^= 1;
+	
+	if ((state->m_msm_pos[chip]) == state->m_msm_loop[chip])
+		state->m_msm_pos[chip] = state->m_msm_start[chip];
 }
 
-WRITE8_MEMBER(topspeed_state::topspeed_msm5205_address_w)
+static void topspeed_msm5205_vck_1( device_t *device )
 {
-	device_t *device = machine().device("msm");
-	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
-	msm5205_reset_w(device, 0);
+	topspeed_msm5205_clock(device, 0);
 }
 
-WRITE8_MEMBER(topspeed_state::topspeed_msm5205_stop_w)
+static void topspeed_msm5205_vck_2( device_t *device )
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device, 1);
-	m_adpcm_pos &= 0xff00;
+	topspeed_msm5205_clock(device, 1);
+}
+
+
+WRITE8_MEMBER(topspeed_state::topspeed_msm5205_command_w)
+{
+	int chip = offset >> 12 & 1;
+	
+	// disable 2nd chip for now... it doesn't work yet
+	if (chip == 1) return;
+	
+	switch (offset >> 8 & 0x2e)
+	{
+		// $b000 / $c000: start
+		case 0x00:
+			m_msm_start[chip] = data << 8;
+			m_msm_pos[chip] = m_msm_start[chip];
+			m_msm_sel[chip] = 0;
+			msm5205_reset_w(m_msm_chip[chip], 0);
+			break;
+
+		// $b400 / $c400: apply volume now
+		// or start?
+		case 0x04:
+			break;
+
+		// $b800 / $c800: stop?
+		case 0x08:
+			msm5205_reset_w(m_msm_chip[chip], 1);
+			break;
+
+		// $bc00 / $cc00: set loop?
+		case 0x0c:
+			m_msm_loop[chip] = data << 8;
+			break;
+
+		// $d000 / $d200: set volume latch
+		case 0x20:
+			break;
+		case 0x22:
+			break;
+		
+		default:
+			break;
+	}
 }
 
 
@@ -443,7 +506,7 @@ static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, topspeed_tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_SHARE("raster_ctrl")
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE_LEGACY("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
@@ -476,14 +539,9 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(topspeed_msm5205_address_w)
-//  AM_RANGE(0xb400, 0xb400) // msm5205 start? doesn't seem to work right
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(topspeed_msm5205_stop_w)
-//  AM_RANGE(0xc000, 0xc000) // ??
-//  AM_RANGE(0xc400, 0xc400) // ??
-//  AM_RANGE(0xc800, 0xc800) // ??
-//  AM_RANGE(0xcc00, 0xcc00) // ??
-//  AM_RANGE(0xd000, 0xd000) // ??
+	AM_RANGE(0xb000, 0xd3ff) AM_WRITE(topspeed_msm5205_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITENOP // ym2151 volume
+	AM_RANGE(0xd600, 0xd600) AM_WRITENOP // ym2151 volume
 ADDRESS_MAP_END
 
 
@@ -494,33 +552,33 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( topspeed )
 	/* 0x880000 (port 0) -> 0x400852 (-$77ae,A5) (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x03, "Deluxe Motorized Cockpit" )
-	PORT_DIPSETTING(    0x02, "Upright (?)" )
-	PORT_DIPSETTING(    0x01, "Upright (alt?)" )
-	PORT_DIPSETTING(    0x00, "Standard Cockpit" )
-	TAITO_DSWA_BITS_2_TO_3
-	TAITO_COINAGE_WORLD
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(    0x03, "Deluxe" )	// analog pedals, racing wheel, motor (tilt disabled)
+	PORT_DIPSETTING(    0x02, "Standard" )	// digital pedals, continuous wheel
+//	PORT_DIPSETTING(    0x01, "Standard" )
+	PORT_DIPSETTING(    0x00, "Mini" )		// analog pedals, racing wheel
+	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
+	TAITO_COINAGE_WORLD_LOC(SWA)
 
 	/* 0x880000 (port 1) -> 0x400850 (-$77b0,A5) (shared RAM) */
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )				PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "40 seconds" )
 	PORT_DIPSETTING(    0x04, "50 seconds" )
 	PORT_DIPSETTING(    0x0c, "60 seconds" )
 	PORT_DIPSETTING(    0x08, "70 seconds" )
-	PORT_DIPNAME( 0x30, 0x30, "Nitros" )
+	PORT_DIPNAME( 0x30, 0x30, "Nitros" )					PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Continue_Price ) )        /* see notes */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x80, "Same as Start" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SWB:8") // "KEEP OFF" in manual, see notes
+ 	PORT_DIPSETTING(    0x80, "Same as Start" )
+	PORT_DIPSETTING(    0x00, "Half of Start" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -528,48 +586,36 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	/* Next bit is brake key (active low) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)                     /* 3 for brake [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)                     /* main brake key */
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, topspeed_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)                     /* nitro */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)                     /* gear shift lo/hi */
-	/* Next bit is accel key (active low/high, depends on cab DSW) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)                     /* 3 for accel [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)                     /* main accel key */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, topspeed_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN2")	/* unused */
 
-	/* Note that sensitivity is chosen to suit keyboard control
-       (for sound selection in test mode and hi score name entry).
-       With an analogue wheel, the user will need to adjust this. */
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)	// racing wheel (absolute)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)  PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, EQUALS,    0x02)	// continuous (relative)
 
-	/* continuous steer */
-	PORT_START(STEER_PORT_TAG)
-	PORT_BIT( 0xffff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff7f,0x80) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_PLAYER(1)
+	PORT_START("GAS")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 
-	/* fake inputs, allowing digital steer etc. */
-	PORT_START(FAKE_PORT_TAG)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(1)
-	PORT_CONFNAME( 0x10, 0x10, "Steering type" )
-	PORT_CONFSETTING(    0x10, "Digital" )
-	PORT_CONFSETTING(    0x00, "Analogue" )
+	PORT_START("BRAKE")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Brake Pedal") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fullthrl )
 	PORT_INCLUDE(topspeed)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_OLD
+	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
 INPUT_PORTS_END
 
 
@@ -624,9 +670,15 @@ static const ym2151_interface ym2151_config =
 	DEVCB_DRIVER_MEMBER(topspeed_state,sound_bankswitch_w)
 };
 
-static const msm5205_interface msm5205_config =
+static const msm5205_interface msm5205_config_1 =
 {
-	topspeed_msm5205_vck,	/* VCK function */
+	topspeed_msm5205_vck_1,	/* VCK function */
+	MSM5205_S48_4B			/* 8 kHz */
+};
+
+static const msm5205_interface msm5205_config_2 =
+{
+	topspeed_msm5205_vck_2,	/* VCK function */
 	MSM5205_S48_4B			/* 8 kHz */
 };
 
@@ -648,11 +700,16 @@ static MACHINE_START( topspeed )
 	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device("subcpu");
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_tc0220ioc = machine.device("tc0220ioc");
 	state->m_pc080sn_1 = machine.device("pc080sn_1");
 	state->m_pc080sn_2 = machine.device("pc080sn_2");
+
+	state->m_msm_chip[0] = machine.device("msm1");
+	state->m_msm_chip[1] = machine.device("msm2");
+	state->m_msm_rom[0] = state->memregion("adpcm")->base();
+	state->m_msm_rom[1] = state->memregion("adpcm")->base() + 0x10000;
 
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_ioc220_port));
@@ -667,8 +724,11 @@ static MACHINE_RESET( topspeed )
 	state->m_cpua_ctrl = 0xff;
 	state->m_ioc220_port = 0;
 	state->m_banknum = -1;
-	state->m_adpcm_pos = 0;
-	state->m_adpcm_data = -1;
+	
+	msm5205_reset_w(state->m_msm_chip[0], 1);
+	msm5205_reset_w(state->m_msm_chip[1], 1);
+	state->m_msm_loop[0] = 0;
+	state->m_msm_loop[1] = 0;
 }
 
 static const pc080sn_interface topspeed_pc080sn_intf =
@@ -695,10 +755,10 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_CPU_PROGRAM_MAP(topspeed_map)
 	MCFG_CPU_VBLANK_INT("screen", topspeed_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
+	MCFG_CPU_ADD("subcpu", M68000, 12000000)	/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(topspeed_cpub_map)
 	MCFG_CPU_VBLANK_INT("screen", topspeed_cpub_interrupt)
 
@@ -722,16 +782,22 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_PC080SN_ADD("pc080sn_2", topspeed_pc080sn_intf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz / 4)
 	MCFG_SOUND_CONFIG(ym2151_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+
+	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", topspeed_tc0140syt_intf)
 MACHINE_CONFIG_END
@@ -753,7 +819,7 @@ ROM_START( topspeed )
 	ROM_LOAD16_BYTE( "b14-55.23",   0xc0000, 0x20000, CRC(a1f15499) SHA1(72f99108713773782fc72aae5a3f6e9e2a1e347c) )
 	ROM_LOAD16_BYTE( "b14-53.25",   0xc0001, 0x20000, CRC(04a04f5f) SHA1(09c15c33967bb141cc504b70d01c154bedb7fa33) )
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_REGION( 0x20000, "subcpu", 0 )	/* 128K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b14-69.80",   0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-70.81",   0x00001, 0x10000, CRC(b720592b) SHA1(13298b498a198dcc1a56e533d106545dd77e1bbc) )
 
@@ -804,7 +870,7 @@ ROM_START( topspeedu )
 	ROM_LOAD16_BYTE     ( "b14-24", 0x00001, 0x10000, CRC(acdf08d4) SHA1(506d48d27fc26684a3f884919665cf65a1b3062f) )
 	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )	/* data rom */
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_REGION( 0x20000, "subcpu", 0 )	/* 128K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b14-26", 0x00000, 0x10000, CRC(659dc872) SHA1(0a168122fe6324510c830e21a56eace9c8a2c189) )
 	ROM_LOAD16_BYTE( "b14-56", 0x00001, 0x10000, CRC(d165cf1b) SHA1(bfbb8699c5671d3841d4057678ef4085c1927684) )
 
@@ -839,7 +905,7 @@ ROM_START( fullthrl )
 	ROM_LOAD16_BYTE     ( "b14-68", 0x00001, 0x10000, CRC(54cf6196) SHA1(0e86a7bf7d43526222160f4cd09f8d29fa9abdc4) )
 	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )	/* data rom */
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_REGION( 0x20000, "subcpu", 0 )	/* 128K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b14-69.80", 0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-71",    0x00001, 0x10000, CRC(f7081727) SHA1(f0ab6ce9975dd7a1fadd439fd3dfd2f1bf88796c) )
 
@@ -869,6 +935,6 @@ ROM_START( fullthrl )
 ROM_END
 
 
-GAMEL( 1987, topspeed, 0,        topspeed, topspeed, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)", GAME_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", GAME_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", GAME_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed, 0,        topspeed, topspeed, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
