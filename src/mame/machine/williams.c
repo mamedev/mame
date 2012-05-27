@@ -985,7 +985,7 @@ static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 
 MACHINE_START( joust2 )
 {
-	williams_state *state = machine.driver_data<williams_state>();
+	joust2_state *state = machine.driver_data<joust2_state>();
 	MACHINE_START_CALL(williams2);
 	state_save_register_global(machine, state->m_joust2_current_sound_data);
 }
@@ -1006,7 +1006,7 @@ static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
+	joust2_state *state = device->machine().driver_data<joust2_state>();
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
 	state->m_cvsd_sound->write(*device->machine().memory().first_space(), 0, state->m_joust2_current_sound_data);
 }
@@ -1014,7 +1014,7 @@ static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 
 static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
+	joust2_state *state = device->machine().driver_data<joust2_state>();
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0xff) | (data & 0xff);
 	state->m_cvsd_sound->write(*device->machine().memory().first_space(), 0, state->m_joust2_current_sound_data);
 	device->machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->m_joust2_current_sound_data);

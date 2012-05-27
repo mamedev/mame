@@ -1690,7 +1690,7 @@ static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( joust2, williams2 )
+static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 
 	/* basic machine hardware */
 	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
