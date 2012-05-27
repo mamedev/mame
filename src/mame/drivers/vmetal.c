@@ -186,7 +186,7 @@ WRITE8_MEMBER(vmetal_state::vmetal_control_w)
 	coin_lockout_w(machine(), 1, data & 0x02);	/* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
-		reset();
+		device->reset();
 	else
 		es8712_play(device);
 
