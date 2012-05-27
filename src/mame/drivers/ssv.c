@@ -1417,53 +1417,47 @@ static INPUT_PORTS_START( gdfs )
 	PORT_INCLUDE(ssv_joystick)
 
 	PORT_MODIFY("DSW1")	// IN0 - $210002
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Controls ) )	PORT_DIPLOCATION( "DSW1:1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Light_Gun ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Light Gun Calibration" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Light Gun Calibration" )	PORT_DIPLOCATION( "DSW1:2" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) ) /* Manual lists this dip as "Unused" */
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) )	PORT_DIPLOCATION( "DSW1:3" ) /* Manual lists this dip as "Unused" */
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coinage ) )	PORT_DIPLOCATION( "DSW1:4,5" )
 //  PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) ) /* 2 Coins to Start, 1 Coin to Continue??? */
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Save Scores" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )	// Clear NVRAM on boot
+	PORT_DIPNAME( 0x0020, 0x0020, "Save Scores" )		PORT_DIPLOCATION( "DSW1:6" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )		// Clear NVRAM on boot
 	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION( "DSW1:7" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) /* Manual lists this dip as "Unused" */
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "DSW1:8" )	/* Manual lists this dip as "Unused" */
 
 	PORT_MODIFY("DSW2")	// IN1 - $210004
-	PORT_DIPNAME( 0x0001, 0x0001, "Invert X Axis" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Invert X Axis" )		PORT_DIPLOCATION( "DSW2:1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) ) /* Manual lists this dip as "Unused" */
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) ) /* Manual lists this dip as "Unused" */
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Language ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "DSW2:2" )	/* Manual lists this dip as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "DSW2:3" )	/* Manual lists this dip as "Unused" */
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Language ) )	PORT_DIPLOCATION( "DSW2:4" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION( "DSW2:5" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Damage From Machine Gun" )	// F76E34
+	PORT_DIPNAME( 0x0020, 0x0020, "Damage From Machine Gun" )	PORT_DIPLOCATION( "DSW2:6" )	// F76E34
 	PORT_DIPSETTING(      0x0020, "Light" )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Damage From Beam Cannon" )	// F77487
+	PORT_DIPNAME( 0x0040, 0x0040, "Damage From Beam Cannon" )	PORT_DIPLOCATION( "DSW2:7" )	// F77487
 	PORT_DIPSETTING(      0x0040, "Light" )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Damage From Missle" )	// F77255
+	PORT_DIPNAME( 0x0080, 0x0080, "Damage From Missle" )	PORT_DIPLOCATION( "DSW2:8" )	// F77255
 	PORT_DIPSETTING(      0x0080, "Light" )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
 
