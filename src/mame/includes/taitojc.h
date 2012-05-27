@@ -4,13 +4,14 @@ class taitojc_state : public driver_device
 {
 public:
 	taitojc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
-		m_f3_shared_ram(*this, "f3_shared_ram"),
+		m_f3_shared_ram(*this, "f3_shared"),
 		m_main_ram(*this, "main_ram"),
-		m_dsp_shared_ram(*this, "dsp_shared_ram"),
-		m_palette_ram(*this, "palette_ram") { }
+		m_dsp_shared_ram(*this, "dsp_shared"),
+		m_palette_ram(*this, "palette_ram")
+	{ }
 
 	int m_texture_x;
 	int m_texture_y;

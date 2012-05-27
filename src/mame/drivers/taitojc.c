@@ -744,7 +744,7 @@ static void debug_dsp_command(running_machine &machine)
 WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 {
 
-	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(&space.device()));
+	//mame_printf_debug("dsp_shared: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(&space.device()));
 	if (ACCESSING_BITS_24_31)
 	{
 		m_dsp_shared_ram[offset] &= 0x00ff;
@@ -1113,7 +1113,7 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared_ram")
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
