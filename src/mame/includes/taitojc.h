@@ -5,6 +5,8 @@ class taitojc_state : public driver_device
 public:
 	taitojc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_dsp(*this,"dsp"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
 		m_f3_shared_ram(*this, "f3_shared"),
@@ -47,6 +49,8 @@ public:
 
 	poly_manager *m_poly;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp;
 	optional_shared_ptr<UINT32> m_f3_shared_ram;
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT16> m_dsp_shared_ram;

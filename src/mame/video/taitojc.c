@@ -41,26 +41,22 @@ static TILE_GET_INFO( taitojc_tile_info )
 
 READ32_MEMBER(taitojc_state::taitojc_tile_r)
 {
-
 	return m_tile_ram[offset];
 }
 
 READ32_MEMBER(taitojc_state::taitojc_char_r)
 {
-
 	return m_char_ram[offset];
 }
 
 WRITE32_MEMBER(taitojc_state::taitojc_tile_w)
 {
-
 	COMBINE_DATA(m_tile_ram + offset);
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE32_MEMBER(taitojc_state::taitojc_char_w)
 {
-
 	COMBINE_DATA(m_char_ram + offset);
 	gfx_element_mark_dirty(machine().gfx[m_gfx_index], offset/32);
 }
