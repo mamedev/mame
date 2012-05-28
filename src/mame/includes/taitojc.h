@@ -36,9 +36,6 @@ public:
 	bitmap_ind16 m_framebuffer;
 	bitmap_ind16 m_zbuffer;
 
-	required_shared_ptr<UINT32> m_vram;
-	required_shared_ptr<UINT32> m_objlist;
-
 	//int debug_tex_pal;
 
 	int m_gfx_index;
@@ -51,6 +48,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_objlist;
 	optional_shared_ptr<UINT32> m_f3_shared_ram;
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT16> m_dsp_shared_ram;
