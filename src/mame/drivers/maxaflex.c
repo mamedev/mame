@@ -431,6 +431,7 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)
 	MCFG_POKEY_CONFIG(pokey_config)
 	MCFG_POKEY_INTERRUPT_HANDLER(atari_interrupt_cb)
+	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.0), 5.0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

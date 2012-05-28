@@ -406,9 +406,11 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 
 	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
 	MCFG_POKEY_CONFIG(pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

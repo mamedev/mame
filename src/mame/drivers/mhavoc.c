@@ -499,17 +499,27 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	/* FIXME: Outputs 1,2,3 are tied together
+	 * This signal and Output 4 are processed separately.
+	 * Later they are mixed together again.
+	 * ==> DISCRETE emulation, below is just an approximation.
+	 */
+
 	MCFG_POKEY_ADD("pokey1", MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_POKEY_ADD("pokey2", MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_POKEY_ADD("pokey3", MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_POKEY_ADD("pokey4", MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

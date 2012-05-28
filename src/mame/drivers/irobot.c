@@ -317,6 +317,9 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	/* FIXME: I-Robot has all channels of the quad-pokey tied together
+	 *        This needs to be taken into account in the design.
+	 */
 	MCFG_POKEY_ADD("pokey1", MAIN_CLOCK/8)
 	MCFG_POKEY_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

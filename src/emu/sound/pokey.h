@@ -21,19 +21,42 @@
 
 #include "machine/rescap.h"
 
+/*
+ *  ATARI Pokey (CO12294) pin-out
+ *
+                 +-----------------+
+        VSS      |  1           40 |  D2
+        D3       |  2           39 |  D1
+        D4       |  3           38 |  D0
+        D5       |  4           37 |  AUD
+        D6       |  5           36 |  A0
+        D7       |  6           35 |  A1
+        PHI2     |  7           34 |  A2
+        P6       |  8           33 |  A3
+        P7       |  9           32 |  R / /W
+        P4       | 10           31 |  CS1
+        P5       | 11           30 |  /CS0
+        P2       | 12           29 |  IRQ
+        P3       | 13           28 |  SOD
+        P0       | 14           27 |  ACLK
+        P1       | 15           26 |  BCLK
+        /KR2     | 16           25 |  /KR1
+        VCC      | 17           24 |  SID
+        /K5      | 18           23 |  /K0
+        /K4      | 19           22 |  /K1
+        /K3      | 20           21 |  /K2
+                 +-----------------+
+ *
+ */
+
 /* CONSTANT DEFINITIONS */
 
 /* exact 1.79 MHz clock freq (of the Atari 800 that is) */
 #define FREQ_17_EXACT   1789790
 
-
-/*****************************************************************************
- * pot0_r to pot7_r:
- *  Handlers for reading the pot values. Some Atari games use
- *  ALLPOT to return dipswitch settings and other things.
- * serin_r, serout_w, interrupt_cb:
- *  New function pointers for serial input/output and a interrupt callback.
- *****************************************************************************/
+//**************************************************************************
+//  CALLBACK HANDLERS
+//**************************************************************************
 
 #define POKEY_KEYBOARD_HANDLER(_name) UINT8 _name(pokey_device *device, UINT8 k543210)
 #define POKEY_INTERRUPT_HANDLER(_name) void _name(pokey_device *device, int mask)
@@ -66,8 +89,16 @@
 	(downcast<pokey_device *>(device))->m_cap = (_C); \
 	(downcast<pokey_device *>(device))->m_v_ref = (_V);
 
+/* C ignored, please see pokey.c */
+
 #define MCFG_POKEY_OUTPUT_OPAMP(_R, _C, _V) \
-	(downcast<pokey_device *>(device))->m_output_type = pokey_device::OPAMP_LOWPASS; \
+	(downcast<pokey_device *>(device))->m_output_type = pokey_device::OPAMP_C_TO_GROUND; \
+	(downcast<pokey_device *>(device))->m_r_pullup = (_R); \
+	(downcast<pokey_device *>(device))->m_cap = (_C); \
+	(downcast<pokey_device *>(device))->m_v_ref = (_V);
+
+#define MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(_R, _C, _V) \
+	(downcast<pokey_device *>(device))->m_output_type = pokey_device::OPAMP_LOW_PASS; \
 	(downcast<pokey_device *>(device))->m_r_pullup = (_R); \
 	(downcast<pokey_device *>(device))->m_cap = (_C); \
 	(downcast<pokey_device *>(device))->m_v_ref = (_V);
@@ -80,8 +111,6 @@
 //**************************************************************************
 
 // ======================> pokey_interface
-
-class pokey_device;
 
 typedef struct _pokey_interface pokey_interface;
 struct _pokey_interface
@@ -161,7 +190,8 @@ public:
 	{
 		LEGACY_LINEAR = 0,
 		RC_LOWPASS,
-		OPAMP_LOWPASS,
+		OPAMP_C_TO_GROUND,
+		OPAMP_LOW_PASS,
 		DISCRETE_VAR_R
 	};
 

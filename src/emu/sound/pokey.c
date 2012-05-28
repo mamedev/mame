@@ -55,6 +55,9 @@
  *  - reworked pot analog/digital conversion timing.
  *  - optional non-indexing pokey update functions.
  *
+ *  TODO:  liberatr clipping
+ *
+ *
  *****************************************************************************/
 
 #include "emu.h"
@@ -732,23 +735,44 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 		}
 	}
-	else if (m_output_type == OPAMP_LOWPASS)
+	else if (m_output_type == OPAMP_C_TO_GROUND)
 	{
 		double rTot = m_voltab[m_output];
-       	/* This post-pokey stage usually has a low-pass filter behind it
+       	/* In this configuration there is a capacitor in parallel to the pokey output to ground.
+       	 * With a LM324 in LTSpice this causes the opamp circuit to oscillate at around 100 kHz.
+       	 * We are ignoring the capacitor here, since this oscillation would not be audible.
+       	 */
+
+       	/* This post-pokey stage usually has a high-pass filter behind it
        	 * It is approximated by eliminating m_v_ref ( -1.0 term)
        	 */
 
 		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0 * 32767.0;
-		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
+
+		while( samples > 0 )
+		{
+	       	/* store sum of output signals into the buffer */
+	       	*buffer++ = V0;
+	       	samples--;
+
+		}
+	}
+	else if (m_output_type == OPAMP_LOW_PASS)
+	{
+		double rTot = m_voltab[m_output];
+       	/* This post-pokey stage usually has a low-pass filter behind it
+       	 * It is approximated by not adding in VRef below.
+       	 */
+
+		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0 * 32767.0;
+		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-1.0 / (m_cap * m_r_pullup) * m_clock_period.as_double());
 
 		while( samples > 0 )
 		{
 	       	/* store sum of output signals into the buffer */
 	       	m_out_filter += (V0 - m_out_filter) * mult;
-	       	*buffer++ = m_out_filter;
+	       	*buffer++ = m_out_filter /* + m_v_ref */;		// see above
 	       	samples--;
-
 		}
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
