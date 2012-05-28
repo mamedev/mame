@@ -5346,9 +5346,10 @@ sidepcktj		// (c) 1986 Data East Corporation
 sidepcktb		// bootleg
 exprraid		// (c) 1986 Data East USA (US)
 exprraida		// (c) 1986 Data East USA (US)
-wexpress		// (c) 1986 Data East Corporation (World?)
+exprraidi		// (c) 1986 Data East Corporation PCB manufactured by Gecas under license
 wexpressb		// bootleg
 wexpressb2		// bootleg
+wexpressb3		// bootleg
 pcktgal			// (c) 1987 Data East Corporation (Japan)
 pcktgalb		// bootleg
 pcktgal2		// (c) 1989 Data East Corporation (World?)
