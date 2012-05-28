@@ -74,8 +74,8 @@
 #define F_SEG	0x8000				/* segmented mode (Z8001 only) */
 #define F_S_N	0x4000				/* system / normal mode */
 #define F_EPU	0x2000				/* extension processor unit? */
-#define F_NVIE	0x1000				/* non vectored interrupt enable */
-#define F_VIE	0x0800				/* vectored interrupt enable */
+#define F_VIE	0x1000				/* vectored interrupt enable */
+#define F_NVIE	0x0800				/* non vectored interrupt enable */
 #define F_10	0x0400				/* unused */
 #define F_9 	0x0200				/* unused */
 #define F_8 	0x0100				/* unused */

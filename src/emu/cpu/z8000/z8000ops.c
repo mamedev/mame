@@ -2438,15 +2438,14 @@ static void Z39_ssN0_0000(z8000_state *cpustate)
  flags:  ---V--
  ******************************************/
 static void Z3A_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
-{//@@@@
+{
     CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
     GET_DST(OP1,NIB2);
     GET_CCC(OP1,NIB3);
-    WRMEM_B(cpustate,  cpustate->RW(dst), RDPORT_B(cpustate,  0, cpustate->RW(src)));
-    cpustate->RW(dst)++;
-    cpustate->RW(src)++;
+    WRMEM_B(cpustate, addr_from_reg(cpustate, dst), RDPORT_B(cpustate,  0, cpustate->RW(src)));
+	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -2474,15 +2473,14 @@ static void Z3A_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  flags:  ---V--
  ******************************************/
 static void Z3A_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
-{//@@@@
+{
     CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
     GET_DST(OP1,NIB2);
     GET_CCC(OP1,NIB3);
-    WRPORT_B(cpustate,  0, cpustate->RW(dst), RDMEM_B(cpustate,  cpustate->RW(src)));
-    cpustate->RW(dst)++;
-    cpustate->RW(src)++;
+    WRPORT_B(cpustate,  0, cpustate->RW(dst), RDMEM_B(cpustate, addr_from_reg(cpustate, src)));
+	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -4614,7 +4612,7 @@ static void Z7C_0000_00ii(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_IMM2(OP0,NIB3);
 	UINT16 fcw = cpustate->fcw;
-	fcw &= ~(imm2 << 11);
+	fcw &= (imm2 << 11) | 0xe7ff;
 	CHANGE_FCW(cpustate, fcw);
 }
 
@@ -4627,7 +4625,7 @@ static void Z7C_0000_01ii(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_IMM2(OP0,NIB3);
 	UINT16 fcw = cpustate->fcw;
-	fcw |= imm2 << 11;
+	fcw |= ((~imm2) << 11) & 0x1800;
 	CHANGE_FCW(cpustate, fcw);
 }
 
@@ -4641,7 +4639,7 @@ static void Z7D_dddd_0ccc(z8000_state *cpustate)
 	GET_IMM3(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	switch (imm3) {
-		case 0:
+		case 2:
 			cpustate->RW(dst) = cpustate->fcw;
 			break;
 		case 3:
@@ -4674,7 +4672,7 @@ static void Z7D_ssss_1ccc(z8000_state *cpustate)
 	GET_IMM3(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	switch (imm3) {
-		case 0:
+		case 2:
 			{
 				UINT16 fcw;
 				fcw = cpustate->RW(src);
@@ -6013,7 +6011,7 @@ static void ZBA_ssN0_0001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);	/* repeat? */
-    WRMEM_B(cpustate,  cpustate->RW(dst), RDMEM_B(cpustate, addr_from_reg(cpustate, src)));
+    WRMEM_B(cpustate,  addr_from_reg(cpustate, dst), RDMEM_B(cpustate, addr_from_reg(cpustate, src)));
 	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
 	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
