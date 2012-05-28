@@ -751,9 +751,10 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		{
 			for (i=0; i<256;i++)
 			{
-				palette_set_color_rgb(machine, i,(vga.dac.color[i].red & 0x3f) << 2,
-									 (vga.dac.color[i].green & 0x3f) << 2,
-									 (vga.dac.color[i].blue & 0x3f) << 2);
+				/* TODO: color shifters? */
+				palette_set_color_rgb(machine, i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
+									 (vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
+									 (vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
 			}
 			vga.dac.dirty = 0;
 		}
@@ -1646,6 +1647,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		break;
 	case 6:
 		vga.dac.mask=data;
+		vga.dac.dirty=1;
 		break;
 	case 7:
 		vga.dac.read_index=data;
