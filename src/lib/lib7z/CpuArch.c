@@ -73,6 +73,7 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
   #else
 
     #ifdef __PIC__
+  __asm__ __volatile__ (
 	"mov %%ebx, %%edi;"
     "cpuid;"
 	"xchgl %%ebx, %%edi;"
