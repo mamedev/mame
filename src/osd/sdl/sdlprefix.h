@@ -59,6 +59,11 @@
 #define SDLMAME_BSD 1
 #endif
 
+#if defined(__HAIKU__)
+#define SDLMAME_HAIKU 1
+#define SDLMAME_NO64BITIO 1
+#endif
+
 // fix for Ubuntu 8.10
 #ifdef _FORTIFY_SOURCE
 #undef _FORTIFY_SOURCE

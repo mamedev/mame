@@ -24,6 +24,8 @@
 # include <util.h>
 #elif defined(SDLMAME_LINUX)
 # include <pty.h>
+#elif defined(SDLMAME_HAIKU)
+# include <bsd/pty.h>
 #endif
 
 #include "sdlfile.h"

@@ -189,6 +189,13 @@ DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
 SYNC_IMPLEMENTATION = tc
 endif
 
+ifeq ($(TARGETOS),haiku)
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = ntc
+NO_X11 = 1
+LIBS += -lnetwork -lbsd
+endif
+
 ifeq ($(TARGETOS),macosx)
 BASE_TARGETOS = unix
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
@@ -377,7 +384,8 @@ endif
 
 INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
 CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
-LIBS += -lm `$(SDL_CONFIG) --libs`
+
+LIBS += `$(SDL_CONFIG) --libs`
 
 ifeq ($(SDL_LIBVER),sdl2)
 ifdef SDL_INSTALL_ROOT
@@ -390,9 +398,14 @@ INCPATH += `pkg-config --cflags fontconfig`
 LIBS += `pkg-config --libs fontconfig`
 
 ifeq ($(SDL_LIBVER),sdl2)
-LIBS += -lSDL2_ttf -lutil
+LIBS += -lSDL2_ttf
 else
-LIBS += -lSDL_ttf -lutil
+LIBS += -lSDL_ttf
+endif
+
+# libs that Haiku doesn't want but are mandatory on *IX
+ifneq ($(TARGETOS),haiku)
+LIBS += -lm -lutil
 endif
 
 endif # not Mac OS X

@@ -17,7 +17,9 @@
 #else
 #include <SDL/SDL_ttf.h>
 #endif
+#ifndef SDLMAME_HAIKU
 #include <fontconfig/fontconfig.h>
+#endif
 #endif
 #ifdef SDLMAME_MACOSX
 #include <Carbon/Carbon.h>
@@ -315,7 +317,7 @@ int main(int argc, char *argv[])
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
 	#ifdef SDLMAME_UNIX
-	#ifndef SDLMAME_MACOSX
+	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU))
 	if (TTF_Init() == -1)
 	{
 		printf("SDL_ttf failed: %s\n", TTF_GetError());
@@ -365,7 +367,7 @@ int main(int argc, char *argv[])
 	//SDL_Quit();
 
 	#ifdef SDLMAME_UNIX
-	#ifndef SDLMAME_MACOSX
+	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU))
 	TTF_Quit();
 	FcFini();
 	#endif
@@ -877,6 +879,7 @@ static bool BDF_Check_Magic(astring name)
     return false;
 }
 
+#ifndef SDLMAME_HAIKU
 static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles)
 {
 	TTF_Font *font = (TTF_Font *)NULL;
@@ -984,6 +987,7 @@ static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool u
 	FcFontSetDestroy(fontset);
 	return font;
 }
+#endif
 
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
@@ -1028,10 +1032,12 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	}
 
 	// if that didn't work, crank up the FontConfig database
+#ifndef SDLMAME_HAIKU
 	if (!font)
 	{
 		font = search_font_config(name, bold, italic, underline, bakedstyles);
 	}
+#endif
 
 	if (!font)
 	{

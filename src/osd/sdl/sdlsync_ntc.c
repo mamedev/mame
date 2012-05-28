@@ -470,7 +470,9 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
 	pthread_attr_init(&attr);
+#ifndef SDLMAME_HAIKU
 	pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
+#endif
 	if ( pthread_create(&thread->thread, &attr, callback, cbparam) != 0 )
 	{
 		free(thread);
