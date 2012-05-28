@@ -48,6 +48,7 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
+#include "sound/discrete.h"
 #include "machine/nvram.h"
 
 
@@ -232,6 +233,53 @@ static const pokey_interface pokey_interface_2 =
 	}
 };
 
+/*************************************
+ *
+ *  Discrete Sound Blocks
+ *
+ *************************************/
+
+static discrete_op_amp_filt_info pokey1_info = {
+		RES_K(220), 0, 0, 0, /* r1 .. r4 */
+		RES_K(220),          /* rF */
+		CAP_U(0.022),		 /* C1 */
+		CAP_U(0.1),		 	 /* C2 */
+		0,		 		 	 /* C3 */
+		0.0,				 /* vRef */
+		15.0,				 /* vP */
+		-15.0,				 /* vN */
+};
+
+static discrete_mixer_desc quantum_mixer = {
+		DISC_MIXER_IS_OP_AMP, /* type */
+		{ RES_K(220), RES_K(220) }, /* r{} */
+		{},							/* r_node */
+		{ CAP_U(0.1), CAP_U(0.1) }, /* c{} */
+		0,							/* rI  */
+		RES_K(220),					/* rF  */
+		0,							/* cF  */
+		0,							/* cAmp */
+		0,							/* vRef */
+		1.0							/* gain */
+};
+
+static DISCRETE_SOUND_START(quantum)
+
+	/************************************************/
+	/* FINAL MIX                                    */
+	/************************************************/
+
+	/* Convert Pokey output to 5V Signal */
+	DISCRETE_INPUTX_STREAM(NODE_100, 0, 5.0 / 32768, 0)
+	DISCRETE_INPUTX_STREAM(NODE_110, 1, 5.0 / 32768, 0)
+
+	DISCRETE_OP_AMP_FILTER(NODE_150, 1, NODE_100, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1, &pokey1_info)
+
+	DISCRETE_MIXER2(NODE_290, 1, NODE_150, NODE_110, &quantum_mixer)
+	//DISCRETE_ADDER2(NODE_290, 1, NODE_150, NODE_110)
+	DISCRETE_OUTPUT(NODE_290, 8192)
+
+DISCRETE_SOUND_END
 
 
 /*************************************
@@ -264,11 +312,16 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	MCFG_POKEY_ADD("pokey1", 600000)
 	MCFG_POKEY_CONFIG(pokey_interface_1)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 
 	MCFG_POKEY_ADD("pokey2", 600000)
 	MCFG_POKEY_CONFIG(pokey_interface_2)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
+	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 1)
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(quantum)
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
