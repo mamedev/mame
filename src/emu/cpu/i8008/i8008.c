@@ -276,7 +276,7 @@ void i8008_device::execute_run()
 		if (m_irq_state != CLEAR_LINE) {
 			take_interrupt();
 		}
-		debugger_instruction_hook(*this, m_PC.d);
+		debugger_instruction_hook(this, m_PC.d);
 		execute_one(rop());
 	} while (m_icount > 0);
 }
