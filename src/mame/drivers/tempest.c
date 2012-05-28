@@ -415,8 +415,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x6060, 0x6060) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
 	AM_RANGE(0x6070, 0x6070) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
 	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE_LEGACY("mathbox", mathbox_go_w)
-	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
-	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
+	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
@@ -610,13 +610,17 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_CLOCK / 8)
-	MCFG_SOUND_CONFIG(pokey_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK / 8)
+	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_CLOCK / 8)
-	MCFG_SOUND_CONFIG(pokey_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK / 8)
+	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
+
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 

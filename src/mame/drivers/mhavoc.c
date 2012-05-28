@@ -206,9 +206,9 @@ READ8_MEMBER(mhavoc_state::dual_pokey_r)
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return machine().device<pokeyn_device>("pokey1")->read(pokey_reg);
+		return machine().device<pokey_device>("pokey1")->read(pokey_reg);
 	else
-		return machine().device<pokeyn_device>("pokey2")->read(pokey_reg);
+		return machine().device<pokey_device>("pokey2")->read(pokey_reg);
 }
 
 
@@ -219,9 +219,9 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		machine().device<pokeyn_device>("pokey1")->write(pokey_reg, data);
+		machine().device<pokey_device>("pokey1")->write(pokey_reg, data);
 	else
-		machine().device<pokeyn_device>("pokey2")->write(pokey_reg, data);
+		machine().device<pokey_device>("pokey2")->write(pokey_reg, data);
 }
 
 
@@ -499,17 +499,17 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEYN, MHAVOC_CLOCK_1_25M)
-	MCFG_SOUND_CONFIG(pokey_config)
+	MCFG_POKEY_ADD("pokey1", MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_ADD("pokey2", MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEYN, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_ADD("pokey3", MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEYN, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_ADD("pokey4", MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -532,10 +532,10 @@ static MACHINE_CONFIG_DERIVED( alphaone, mhavoc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey1", POKEYN, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_REPLACE("pokey1", MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_REPLACE("pokey2", POKEYN, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_REPLACE("pokey2", MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_REMOVE("pokey3")

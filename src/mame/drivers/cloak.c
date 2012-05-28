@@ -167,8 +167,8 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)		/* DSW0 also */
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)		/* DSW1 also */
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)		/* DSW0 also */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)		/* DSW1 also */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
@@ -359,12 +359,12 @@ static MACHINE_CONFIG_START( cloak, cloak_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEYN, XTAL_10MHz/8)		/* Accurate to recording */
-	MCFG_SOUND_CONFIG(pokey_interface_1)
+	MCFG_POKEY_ADD("pokey1", XTAL_10MHz/8)		/* Accurate to recording */
+	MCFG_POKEY_CONFIG(pokey_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, XTAL_10MHz/8)		/* Accurate to recording */
-	MCFG_SOUND_CONFIG(pokey_interface_2)
+	MCFG_POKEY_ADD("pokey2", XTAL_10MHz/8)		/* Accurate to recording */
+	MCFG_POKEY_CONFIG(pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

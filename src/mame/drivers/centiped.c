@@ -708,7 +708,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
 	AM_IMPORT_FROM(centiped_base_map)
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magworm_map, AS_PROGRAM, 8, centiped_state )
@@ -761,8 +761,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
-	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
@@ -800,7 +800,7 @@ static ADDRESS_MAP_START( warlords_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")	/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("IN1")	/* IN1 */
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1c00, 0x1c02) AM_WRITE(coin_count_w)
 	AM_RANGE(0x1c03, 0x1c06) AM_WRITE(led_w)
@@ -819,8 +819,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazeinv_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
-	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
@@ -1645,7 +1645,8 @@ static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEYN, 12096000/8)
+	/* Pokey sound needs filtering with discrete op-amp mixer */
+	MCFG_POKEY_ADD("pokey", 12096000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1711,12 +1712,12 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 	MCFG_SCREEN_UPDATE_STATIC(milliped)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey", POKEYN, 12096000/8)
-	MCFG_SOUND_CONFIG(milliped_pokey_interface_1)
+	MCFG_POKEY_REPLACE("pokey", 12096000/8)
+	MCFG_POKEY_CONFIG(milliped_pokey_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, 12096000/8)
-	MCFG_SOUND_CONFIG(milliped_pokey_interface_2)
+	MCFG_POKEY_ADD("pokey2", 12096000/8)
+	MCFG_POKEY_CONFIG(milliped_pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1737,8 +1738,8 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped )
 	MCFG_SCREEN_UPDATE_STATIC(warlords)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey", POKEYN, 12096000/8)
-	MCFG_SOUND_CONFIG(warlords_pokey_interface)
+	MCFG_POKEY_REPLACE("pokey", 12096000/8)
+	MCFG_POKEY_CONFIG(warlords_pokey_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

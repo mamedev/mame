@@ -82,13 +82,13 @@ READ16_MEMBER(quantum_state::trackball_r)
 
 READ8_MEMBER(quantum_state::input_1_r)
 {
-	return (machine().root_device().ioport("DSW0")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
+	return (machine().root_device().ioport("DSW0")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 
 READ8_MEMBER(quantum_state::input_2_r)
 {
-	return (machine().root_device().ioport("DSW1")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
+	return (machine().root_device().ioport("DSW1")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 
@@ -131,8 +131,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x01cfff) AM_RAM
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE_LEGACY((UINT16 **)&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size)
-	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8("pokey1", pokeyn_device, read, write, 0x00ff)
-	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8("pokey2", pokeyn_device, read, write, 0x00ff)
+	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8("pokey1", pokey_device, read, write, 0x00ff)
+	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8("pokey2", pokey_device, read, write, 0x00ff)
 	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x940000, 0x940001) AM_READ(trackball_r) /* trackball */
 	AM_RANGE(0x948000, 0x948001) AM_READ_PORT("SYSTEM")
@@ -261,12 +261,14 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEYN, 600000)
-	MCFG_SOUND_CONFIG(pokey_interface_1)
+	MCFG_POKEY_ADD("pokey1", 600000)
+	MCFG_POKEY_CONFIG(pokey_interface_1)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, 600000)
-	MCFG_SOUND_CONFIG(pokey_interface_2)
+	MCFG_POKEY_ADD("pokey2", 600000)
+	MCFG_POKEY_CONFIG(pokey_interface_2)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

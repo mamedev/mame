@@ -31,10 +31,10 @@ void atari_machine_start(running_machine &machine);
 
 MACHINE_START( atarixl );
 
-void atari_interrupt_cb(pokeyn_device *device, int mask);
+void atari_interrupt_cb(pokey_device *device, int mask);
 
-READ8_DEVICE_HANDLER(atari_a800_keyboard);
-READ8_DEVICE_HANDLER(atari_a5200_keypads);
+POKEY_KEYBOARD_HANDLER(atari_a800_keyboard);
+POKEY_KEYBOARD_HANDLER(atari_a5200_keypads);
 
 /* video */
 

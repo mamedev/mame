@@ -57,7 +57,7 @@ static cpu_device *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
 
-static pokeyn_device *pokey;
+static pokey_device *pokey;
 static ym2151_device *ym2151;
 static device_t *tms5220;
 static okim6295_device *oki6295;
@@ -140,14 +140,14 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 	/* determine which sound hardware is installed */
 	tms5220 = machine.device("tms");
 	ym2151 = machine.device<ym2151_device>("ymsnd");
-	pokey = machine.device<pokeyn_device>("pokey");
+	pokey = machine.device<pokey_device>("pokey");
 	oki6295 = machine.device<okim6295_device>("adpcm");
 	oki6295_l = machine.device<okim6295_device>("adpcml");
 	oki6295_r = machine.device<okim6295_device>("adpcmr");
 
 	/* install POKEY memory handlers */
 	if (pokey != NULL)
-		jsacpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2c00, 0x2c0f, read8_delegate(FUNC(pokeyn_device::read),pokey), write8_delegate(FUNC(pokeyn_device::write),pokey));
+		jsacpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2c00, 0x2c0f, read8_delegate(FUNC(pokey_device::read),pokey), write8_delegate(FUNC(pokey_device::write),pokey));
 
 	init_save_state(machine);
 	atarijsa_reset();
@@ -839,7 +839,7 @@ MACHINE_CONFIG_DERIVED( jsa_i_stereo_pokey, jsa_i_stereo )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("pokey", POKEYN, JSA_MASTER_CLOCK/2)
+	MCFG_POKEY_ADD("pokey", JSA_MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END

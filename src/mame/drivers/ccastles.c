@@ -333,8 +333,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
 	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
 	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
-	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
+	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
 	AM_RANGE(0x9c80, 0x9cff) AM_WRITE(ccastles_hscroll_w)
 	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE(ccastles_vscroll_w)
@@ -495,12 +495,16 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK/8)
+	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_CLOCK/8)
-	MCFG_SOUND_CONFIG(pokey_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK/8)
+	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
+	MCFG_POKEY_CONFIG(pokey_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
 

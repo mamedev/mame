@@ -74,7 +74,7 @@
 
 #define POKEY_DEFAULT_GAIN (32767/11/4)
 
-#define VERBOSE 		1
+#define VERBOSE 		0
 #define VERBOSE_SOUND	0
 #define VERBOSE_TIMER	0
 #define VERBOSE_POLY	0
@@ -167,7 +167,7 @@ static const int clock_divisors[3] = {1, DIV_64, DIV_15};
 
 
 // device type definition
-const device_type POKEYN = &device_creator<pokeyn_device>;
+const device_type POKEY = &device_creator<pokey_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -177,14 +177,42 @@ const device_type POKEYN = &device_creator<pokeyn_device>;
 //  okim9810_device - constructor
 //-------------------------------------------------
 
-pokeyn_device::pokeyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, POKEYN, "POKEYN", tag, owner, clock),
+pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, POKEY, "POKEY", tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_execute_interface(mconfig, *this),
 	  device_state_interface(mconfig, *this),
+	  m_kbd_r(NULL),
+	  m_irq_f(NULL),
+	  m_output_type(LEGACY_LINEAR),
 	  m_icount(0),
 	  m_stream(NULL)
 {
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pokey_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const pokey_interface *intf = reinterpret_cast<const pokey_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<pokey_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_allpot_r_cb, 0, sizeof(m_allpot_r_cb));
+		memset(&m_pot_r_cb, 0, sizeof(m_pot_r_cb));
+		memset(&m_serin_r_cb, 0, sizeof(m_serin_r_cb));
+		memset(&m_serout_w_cb, 0, sizeof(m_serout_w_cb));
+	}
 }
 
 
@@ -192,13 +220,11 @@ pokeyn_device::pokeyn_device(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pokeyn_device::device_start()
+void pokey_device::device_start()
 {
 	//int sample_rate = clock();
 	int i;
 
-	if (static_config())
-		memcpy(&m_intf, static_config(), sizeof(pokey_interface));
 	m_clock_period = attotime::from_hz(clock());
 
 	/* Setup channels */
@@ -226,6 +252,7 @@ void pokeyn_device::device_start()
 	/* initialize 9 / 17 arrays */
 	poly_init_9_17(m_poly9,   9);
 	poly_init_9_17(m_poly17, 17);
+	vol_init();
 
 	m_clockmult = DIV_64;
 	m_KBCODE = 0x09;		 /* Atari 800 'no key' */
@@ -243,14 +270,12 @@ void pokeyn_device::device_start()
 
 	for (i=0; i<8; i++)
 	{
-		m_pot_r[i].resolve(m_intf.pot_r[i], *this);
+		m_pot_r[i].resolve(m_pot_r_cb[i], *this);
 	}
 
-	m_allpot_r.resolve(m_intf.allpot_r, *this);
-	m_serin_r.resolve(m_intf.serin_r, *this);
-	m_serout_w.resolve(m_intf.serout_w, *this);
-	m_interrupt_cb = m_intf.interrupt_cb;
-	m_kbd_r.resolve(m_intf.kbd_r, *this);
+	m_allpot_r.resolve(m_allpot_r_cb, *this);
+	m_serin_r.resolve(m_serin_r_cb, *this);
+	m_serout_w.resolve(m_serout_w_cb, *this);
 
 	m_stream = stream_alloc(0, 1, clock());
 
@@ -278,6 +303,10 @@ void pokeyn_device::device_start()
 	save_item(NAME(m_p17));
 	save_item(NAME(m_clockmult));
 	save_item(NAME(m_pot_counter));
+	save_item(NAME(m_kbd_cnt));
+	save_item(NAME(m_kbd_latch));
+	save_item(NAME(m_kbd_state));
+
 	save_item(NAME(m_POTx));
 	save_item(NAME(m_AUDCTL));
 	save_item(NAME(m_ALLPOT));
@@ -319,7 +348,7 @@ void pokeyn_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pokeyn_device::device_reset()
+void pokey_device::device_reset()
 {
 	m_stream->update();
 }
@@ -329,7 +358,7 @@ void pokeyn_device::device_reset()
 //  device_post_load - device-specific post-load
 //-------------------------------------------------
 
-void pokeyn_device::device_post_load()
+void pokey_device::device_post_load()
 {
 }
 
@@ -339,7 +368,7 @@ void pokeyn_device::device_post_load()
 //  changes
 //-------------------------------------------------
 
-void pokeyn_device::device_clock_changed()
+void pokey_device::device_clock_changed()
 {
 }
 
@@ -348,7 +377,7 @@ void pokeyn_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -357,8 +386,8 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	    if( m_IRQEN & IRQ_SEROR )
 		{
 			m_IRQST |= IRQ_SEROR;
-			if( m_interrupt_cb )
-				(m_interrupt_cb)(this, IRQ_SEROR);
+			if( m_irq_f )
+				(m_irq_f)(this, IRQ_SEROR);
 		}
 	    break;
 	case 4:
@@ -366,8 +395,8 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	    if( m_IRQEN & IRQ_SEROC )
 		{
 			m_IRQST |= IRQ_SEROC;
-			if( m_interrupt_cb )
-				(m_interrupt_cb)(this, IRQ_SEROC);
+			if( m_irq_f )
+				(m_irq_f)(this, IRQ_SEROC);
 		}
 	    break;
 	case 5:
@@ -377,8 +406,8 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			/* set the enabled timer irq status bits */
 			m_IRQST |= IRQ_SERIN;
 			/* call back an application supplied function to handle the interrupt */
-			if( m_interrupt_cb )
-				(m_interrupt_cb)(this, IRQ_SERIN);
+			if( m_irq_f )
+				(m_irq_f)(this, IRQ_SERIN);
 		}
 	    break;
 	case SYNC_WRITE:
@@ -403,31 +432,31 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-	void pokeyn_device::execute_run()
+void pokey_device::execute_run()
+{
+	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+
+	do
 	{
-		bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+		// debugging
+		//m_ppc = m_pc;	// copy PC to previous PC
+		if (check_debugger)
+			debugger_instruction_hook(this, 0); //m_pc);
 
-		do
+		// instruction fetch
+		//UINT16 op = opcode_read();
+
+		UINT32 new_out = step_one_clock();
+		if (m_output != new_out)
 		{
-			// debugging
-			//m_ppc = m_pc;	// copy PC to previous PC
-			if (check_debugger)
-				debugger_instruction_hook(this, 0); //m_pc);
+			m_stream->update();
+			m_output = new_out;
+		}
 
-			// instruction fetch
-			//UINT16 op = opcode_read();
+		m_icount--;
+	} while (m_icount > 0);
 
-			UINT32 new_out = step_one_clock();
-			if (m_output != new_out)
-			{
-				m_stream->update();
-				m_output = new_out;
-			}
-
-	        m_icount--;
-	    } while (m_icount > 0);
-
-	}
+}
 
 
 //-------------------------------------------------
@@ -435,12 +464,12 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 //  clock cycle.
 //-------------------------------------------------
 
-void pokeyn_device::step_keyboard()
+void pokey_device::step_keyboard()
 {
 	if (++m_kbd_cnt > 63)
 		m_kbd_cnt = 0;
-	if (!m_kbd_r.isnull()) {
-		UINT8 ret = m_kbd_r(m_kbd_cnt);
+	if (m_kbd_r) {
+		UINT8 ret = m_kbd_r(this, m_kbd_cnt);
 		switch (m_kbd_cnt)
 		{
 		case POK_KEY_BREAK:
@@ -451,8 +480,8 @@ void pokeyn_device::step_keyboard()
 				{
 					/* set break IRQ status and call back the interrupt handler */
 					m_IRQST |= IRQ_BREAK;
-					if( m_interrupt_cb )
-						(*m_interrupt_cb)(this, IRQ_BREAK);
+					if( m_irq_f )
+						(*m_irq_f)(this, IRQ_BREAK);
 				}
 			}
 			break;
@@ -490,8 +519,8 @@ void pokeyn_device::step_keyboard()
 						if( m_IRQST & IRQ_KEYBD )
 							m_SKSTAT |= SK_KBERR;
 						m_IRQST |= IRQ_KEYBD;
-						if( m_interrupt_cb )
-							(*m_interrupt_cb)(this, IRQ_KEYBD);
+						if( m_irq_f )
+							(*m_irq_f)(this, IRQ_KEYBD);
 					}
 					m_kbd_state++;
 				}
@@ -524,7 +553,7 @@ void pokeyn_device::step_keyboard()
 	}
 }
 
-void pokeyn_device::step_pot()
+void pokey_device::step_pot()
 {
 	int pot;
 	UINT8 upd = 0;
@@ -548,7 +577,7 @@ void pokeyn_device::step_pot()
  *
  */
 
-UINT32 pokeyn_device::step_one_clock(void)
+UINT32 pokey_device::step_one_clock(void)
 {
 	int ch, clk;
 	UINT32 sum = 0;
@@ -608,8 +637,8 @@ UINT32 pokeyn_device::step_one_clock(void)
 		process_channel(CHAN2);
 
 		/* check if some of the requested timer interrupts are enabled */
-	    if ((m_IRQST & IRQ_TIMR2) && m_interrupt_cb )
-			(*m_interrupt_cb)(this, IRQ_TIMR2);
+	    if ((m_IRQST & IRQ_TIMR2) && m_irq_f )
+			(*m_irq_f)(this, IRQ_TIMR2);
 	}
 
 	if (m_channel[CHAN1].check_borrow())
@@ -621,8 +650,8 @@ UINT32 pokeyn_device::step_one_clock(void)
 			m_channel[CHAN1].reset_channel();
 		process_channel(CHAN1);
 		/* check if some of the requested timer interrupts are enabled */
-	    if ((m_IRQST & IRQ_TIMR1) && m_interrupt_cb )
-			(*m_interrupt_cb)(this, IRQ_TIMR1);
+	    if ((m_IRQST & IRQ_TIMR1) && m_irq_f )
+			(*m_irq_f)(this, IRQ_TIMR1);
 	}
 
 	/* do CHAN4 before CHAN3 because CHAN3 may set borrow! */
@@ -638,8 +667,8 @@ UINT32 pokeyn_device::step_one_clock(void)
 			m_channel[CHAN2].sample();
 		else
 			m_channel[CHAN2].m_filter_sample = 1;
-	    if ((m_IRQST & IRQ_TIMR4) && m_interrupt_cb )
-			(*m_interrupt_cb)(this, IRQ_TIMR4);
+	    if ((m_IRQST & IRQ_TIMR4) && m_irq_f )
+			(*m_irq_f)(this, IRQ_TIMR4);
 	}
 
 	if (m_channel[CHAN3].check_borrow())
@@ -659,7 +688,7 @@ UINT32 pokeyn_device::step_one_clock(void)
 
 	for (ch = 0; ch < 4; ch++)
 	{
-		sum += (((m_channel[ch].m_output ^ m_channel[ch].m_filter_sample) || (m_channel[ch].m_AUDC & VOLUME_ONLY)) ? m_channel[ch].m_volume : 0 );
+		sum |= (((((m_channel[ch].m_output ^ m_channel[ch].m_filter_sample) || (m_channel[ch].m_AUDC & VOLUME_ONLY)) ? (m_channel[ch].m_AUDC & VOLUME_MASK) : 0 )) << (ch * 4));
 	}
 	return sum;
 }
@@ -670,17 +699,66 @@ UINT32 pokeyn_device::step_one_clock(void)
 //-------------------------------------------------
 
 
-void pokeyn_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 
-	while( samples > 0 )
+	if (m_output_type == LEGACY_LINEAR)
 	{
-       	/* store sum of output signals into the buffer */
+		INT32 out = 0;
+		for (int i = 0; i < 4; i++)
+			out += ((m_output >> (4*i)) & 0x0f);
+		out *= POKEY_DEFAULT_GAIN;
+		out = (out > 0x7fff) ? 0x7fff : out;
+		while( samples > 0 )
+		{
+	       	*buffer++ = out;
+	       	samples--;
+		}
+	}
+	else if (m_output_type == RC_LOWPASS)
+	{
+		double rTot = m_voltab[m_output];
 
-       	*buffer++ = (m_output > 0x7fff) ? 0x7fff : m_output;
-       	samples--;
+		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0 * 32767.0;
+		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
 
+		while( samples > 0 )
+		{
+	       	/* store sum of output signals into the buffer */
+	       	m_out_filter += (V0 - m_out_filter) * mult;
+	       	*buffer++ = m_out_filter;
+	       	samples--;
+
+		}
+	}
+	else if (m_output_type == OPAMP_LOWPASS)
+	{
+		double rTot = m_voltab[m_output];
+       	/* This post-pokey stage usually has a low-pass filter behind it
+       	 * It is approximated by eliminating m_v_ref ( -1.0 term)
+       	 */
+
+		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0 * 32767.0;
+		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
+
+		while( samples > 0 )
+		{
+	       	/* store sum of output signals into the buffer */
+	       	m_out_filter += (V0 - m_out_filter) * mult;
+	       	*buffer++ = m_out_filter;
+	       	samples--;
+
+		}
+	}
+	else if (m_output_type == DISCRETE_VAR_R)
+	{
+		INT32 out = m_voltab[m_output];
+		while( samples > 0 )
+		{
+	       	*buffer++ = out;
+	       	samples--;
+		}
 	}
 }
 
@@ -688,12 +766,12 @@ void pokeyn_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //  read - memory interface for reading the active status
 //-------------------------------------------------
 
-READ8_MEMBER( pokeyn_device::read )
+READ8_MEMBER( pokey_device::read )
 {
 	return read(offset);
 }
 
-UINT8 pokeyn_device::read(offs_t offset)
+UINT8 pokey_device::read(offs_t offset)
 {
 	int data = 0, pot;
 
@@ -792,17 +870,17 @@ UINT8 pokeyn_device::read(offs_t offset)
 //  write - memory interface for write
 //-------------------------------------------------
 
-void pokeyn_device::write(offs_t offset, UINT8 data)
+void pokey_device::write(offs_t offset, UINT8 data)
 {
 	synchronize(SYNC_WRITE, (offset<<8) | data);
 }
 
-WRITE8_MEMBER( pokeyn_device::write )
+WRITE8_MEMBER( pokey_device::write )
 {
 	write(offset, data);
 }
 
-void pokeyn_device::write_internal(offs_t offset, UINT8 data)
+void pokey_device::write_internal(offs_t offset, UINT8 data)
 {
     /* determine which address was changed */
 	switch (offset & 15)
@@ -953,7 +1031,7 @@ void pokeyn_device::write_internal(offs_t offset, UINT8 data)
 
 }
 
-void pokeyn_device::serin_ready(int after)
+void pokey_device::serin_ready(int after)
 {
 	timer_set(m_clock_period * after, 5, 0);
 }
@@ -962,7 +1040,7 @@ void pokeyn_device::serin_ready(int after)
 //  private stuff
 //-------------------------------------------------
 
-inline void pokeyn_device::process_channel(int ch)
+inline void pokey_device::process_channel(int ch)
 {
 	if ((m_channel[ch].m_AUDC & NOTPOLY5) || (m_poly5[m_p5] & 1))
 	{
@@ -978,7 +1056,7 @@ inline void pokeyn_device::process_channel(int ch)
 }
 
 
-void pokeyn_device::pokey_potgo(void)
+void pokey_device::pokey_potgo(void)
 {
     int pot;
 
@@ -1013,8 +1091,49 @@ void pokeyn_device::pokey_potgo(void)
 	}
 }
 
+void pokey_device::vol_init()
+{
+	double resistors[4] = {90000, 26500, 8050, 3400};
+	double pull_up = 10000;
+	/* just a guess, there has to be a resistance since the doc specifies that
+	 * Vout is at least 4.2V if all channels turned off.
+	 */
+	double r_off = 8e6;
+	double r_chan[16];
+	double rTot;
 
-void pokeyn_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert)
+	for (int j=0; j<16; j++)
+	{
+		rTot = 1.0 / 1e12; /* avoid div by 0 */;
+		for (int i=0; i<4; i++)
+		{
+			if (j & (1 << i))
+				rTot += 1.0 / resistors[i];
+			else
+				rTot += 1.0 / r_off;
+		}
+		r_chan[j] = 1.0 / rTot;
+	}
+	for (int j=0; j<16; j++)
+	{
+		rTot = 1.0 / r_chan[j] + 3.0 / r_chan[0];
+		rTot = 1.0 / rTot;
+		printf("%d : %4.3f\n", j, rTot / (rTot+pull_up)*4.75);
+	}
+	for (int j=0; j<0x10000; j++)
+	{
+		rTot = 0;
+		for (int i=0; i<4; i++)
+		{
+			rTot += 1.0 / r_chan[(j>>(i*4)) & 0x0f];
+		}
+		rTot = 1.0 / rTot;
+		m_voltab[j] = rTot;
+	}
+
+}
+
+void pokey_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert)
 {
 	int mask = (1 << size) - 1;
     int i;
@@ -1032,7 +1151,7 @@ void pokeyn_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert
 	}
 }
 
-void pokeyn_device::poly_init_9_17(UINT32 *poly, int size)
+void pokey_device::poly_init_9_17(UINT32 *poly, int size)
 {
     int mask = (1 << size) - 1;
     int i;
@@ -1071,7 +1190,7 @@ void pokeyn_device::poly_init_9_17(UINT32 *poly, int size)
 
 }
 
-char *pokeyn_device::audc2str(int val)
+char *pokey_device::audc2str(int val)
 {
 	static char buff[80];
 	if( val & NOTPOLY5 )
@@ -1097,7 +1216,7 @@ char *pokeyn_device::audc2str(int val)
 	return buff;
 }
 
-char *pokeyn_device::audctl2str(int val)
+char *pokey_device::audctl2str(int val)
 {
 	static char buff[80];
 	if( val & POLY9 )
@@ -1121,7 +1240,7 @@ char *pokeyn_device::audctl2str(int val)
     return buff;
 }
 
-pokeyn_device::pokey_channel::pokey_channel()
+pokey_device::pokey_channel::pokey_channel()
 	:	m_AUDF(0),
 	 	m_AUDC(0),
 		m_borrow_cnt(0),
@@ -1144,7 +1263,7 @@ READ8_HANDLER( quad_pokeyn_r )
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
-	pokeyn_device *pokey = space->machine().device<pokeyn_device>(devname[pokey_num]);
+	pokey_device *pokey = space->machine().device<pokey_device>(devname[pokey_num]);
 
 	return pokey->read(pokey_reg);
 }
@@ -1155,7 +1274,7 @@ WRITE8_HANDLER( quad_pokeyn_w )
     int pokey_num = (offset >> 3) & ~0x04;
     int control = (offset & 0x20) >> 2;
     int pokey_reg = (offset % 8) | control;
-	pokeyn_device *pokey = space->machine().device<pokeyn_device>(devname[pokey_num]);
+	pokey_device *pokey = space->machine().device<pokey_device>(devname[pokey_num]);
 
     pokey->write(pokey_reg, data);
 }

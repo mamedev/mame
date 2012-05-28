@@ -19,7 +19,7 @@
 #ifndef __POKEY_H__
 #define __POKEY_H__
 
-#include "devlegcy.h"
+#include "machine/rescap.h"
 
 /* CONSTANT DEFINITIONS */
 
@@ -35,32 +35,71 @@
  *  New function pointers for serial input/output and a interrupt callback.
  *****************************************************************************/
 
-class pokeyn_device;
+#define POKEY_KEYBOARD_HANDLER(_name) UINT8 _name(pokey_device *device, UINT8 k543210)
+#define POKEY_INTERRUPT_HANDLER(_name) void _name(pokey_device *device, int mask)
 
-typedef struct _pokey_interface pokey_interface;
-struct _pokey_interface
-{
-	devcb_read8 pot_r[8];
-	devcb_read8 allpot_r;
-	devcb_read8 serin_r;
-	devcb_write8 serout_w;
-	void (*interrupt_cb)(pokeyn_device *device, int mask);
-	/* offset = k0 ... k5 , bit0: kr1, bit1: kr2 */
-	/* all are, in contrast to actual hardware, ACTIVE_HIGH */
-	devcb_read8 kbd_r;
-};
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_POKEY_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, POKEY, _clock)
+
+#define MCFG_POKEY_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, POKEY, _clock)
+
+#define MCFG_POKEY_CONFIG(_intf) \
+	MCFG_DEVICE_CONFIG(_intf)
+
+/* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
+/* all are, in contrast to actual hardware, ACTIVE_HIGH */
+#define MCFG_POKEY_KEYBOARD_HANDLER(_kbd) \
+	(downcast<pokey_device *>(device))->m_kbd_r = _kbd;
+
+#define MCFG_POKEY_INTERRUPT_HANDLER(_irqf) \
+	(downcast<pokey_device *>(device))->m_irq_f = _irqf;
+
+#define MCFG_POKEY_OUTPUT_RC(_R, _C, _V) \
+	(downcast<pokey_device *>(device))->m_output_type = pokey_device::RC_LOWPASS; \
+	(downcast<pokey_device *>(device))->m_r_pullup = (_R); \
+	(downcast<pokey_device *>(device))->m_cap = (_C); \
+	(downcast<pokey_device *>(device))->m_v_ref = (_V);
+
+#define MCFG_POKEY_OUTPUT_OPAMP(_R, _C, _V) \
+	(downcast<pokey_device *>(device))->m_output_type = pokey_device::OPAMP_LOWPASS; \
+	(downcast<pokey_device *>(device))->m_r_pullup = (_R); \
+	(downcast<pokey_device *>(device))->m_cap = (_C); \
+	(downcast<pokey_device *>(device))->m_v_ref = (_V);
+
+#define MCFG_POKEY_OUTPUT_DISCRETE() \
+	(downcast<pokey_device *>(device))->m_output_type = pokey_device::DISCRETE_VAR_R;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> pokey_interface
+
+class pokey_device;
+
+typedef struct _pokey_interface pokey_interface;
+struct _pokey_interface
+{
+	devcb_read8 m_pot_r_cb[8];
+	devcb_read8 m_allpot_r_cb;
+	devcb_read8 m_serin_r_cb;
+	devcb_write8 m_serout_w_cb;
+};
+
+
 // ======================> pokey_device
 
-class pokeyn_device : public device_t,
+class pokey_device : public device_t,
 					  public device_sound_interface,
 					  public device_execute_interface,
-					  public device_state_interface
+					  public device_state_interface,
+					  public pokey_interface
 {
 public:
 
@@ -118,8 +157,16 @@ public:
 		SYNC_WRITE		= 14
 	};
 
+	enum output_type
+	{
+		LEGACY_LINEAR = 0,
+		RC_LOWPASS,
+		OPAMP_LOWPASS,
+		DISCRETE_VAR_R
+	};
+
 	// construction/destruction
-	pokeyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -129,8 +176,21 @@ public:
 
 	void serin_ready(int after);
 
+	// internal configuration
+
+	POKEY_KEYBOARD_HANDLER((*m_kbd_r));
+	POKEY_INTERRUPT_HANDLER((*m_irq_f));
+
+	// analog output configuration
+
+	output_type  m_output_type;
+	double m_r_pullup;
+	double m_cap;
+	double m_v_ref;
+
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
@@ -142,9 +202,6 @@ protected:
 
 	virtual void execute_run();
 
-	// configuration state
-	pokey_interface m_intf;
-
 	// other internal states
     int m_icount;
 
@@ -155,7 +212,7 @@ private:
     {
     public:
     	pokey_channel();
-    	pokeyn_device *m_parent;
+    	pokey_device *m_parent;
     	UINT8 m_INTMask;
     	UINT8 m_AUDF;           /* AUDFx (D200, D202, D204, D206) */
     	UINT8 m_AUDC;			/* AUDCx (D201, D203, D205, D207) */
@@ -202,6 +259,8 @@ private:
 
 	void poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert);
 	void poly_init_9_17(UINT32 *poly, int size);
+	void vol_init();
+
 	inline void process_channel(int ch);
 	void pokey_potgo(void);
 	char *audc2str(int val);
@@ -214,7 +273,8 @@ private:
 
 	pokey_channel m_channel[POKEY_CHANNELS];
 
-	UINT32 m_output;
+	UINT32 m_output;		/* raw output */
+	double m_out_filter;	/* filtered output */
 
 	INT32 m_clock_cnt[3];		/* clock counters */
 	UINT32 m_p4;              /* poly4 index */
@@ -227,9 +287,6 @@ private:
 	devcb_resolved_read8 m_allpot_r;
 	devcb_resolved_read8 m_serin_r;
 	devcb_resolved_write8 m_serout_w;
-	devcb_resolved_read8 m_kbd_r;
-
-	void (*m_interrupt_cb)(pokeyn_device *device, int mask);
 
 	UINT8 m_POTx[8];		/* POTx   (R/D200-D207) */
 	UINT8 m_AUDCTL;			/* AUDCTL (W/D208) */
@@ -253,11 +310,12 @@ private:
 	UINT32 m_poly5[0x1f];
 	UINT32 m_poly9[0x1ff];
 	UINT32 m_poly17[0x1ffff];
+	UINT32 m_voltab[0x10000];
 };
 
 
 // device type definition
-extern const device_type POKEYN;
+extern const device_type POKEY;
 
 
 /* fix me: eventually this should be a single device with pokey subdevices */

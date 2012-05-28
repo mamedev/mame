@@ -332,8 +332,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
 	AM_RANGE(0x30e0, 0x30e0) AM_NOP // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
 	AM_RANGE(0x5000, 0x507f) AM_RAM	// 6532 ram
 	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
-	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
+	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_NOP // main sound program rom
 ADDRESS_MAP_END
 
@@ -428,10 +428,10 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_VIDEO_START(avg_tomcat)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("pokey1", POKEYN, XTAL_14_31818MHz / 8)
+	MCFG_POKEY_ADD("pokey1", XTAL_14_31818MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 
-	MCFG_SOUND_ADD("pokey2", POKEYN, XTAL_14_31818MHz / 8)
+	MCFG_POKEY_ADD("pokey2", XTAL_14_31818MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 
 	MCFG_SOUND_ADD("tms", TMS5220, 325000)

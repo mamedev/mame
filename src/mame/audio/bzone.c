@@ -366,18 +366,18 @@ static DISCRETE_SOUND_START(bzone)
 	/* FINAL MIX                                    */
 	/************************************************/
 	/* We won't bother emulating the final gain of op-amp IC K5, pin 14.
-     * There signal never reaches a value where it clips, so we will
+     * This signal never reaches a value where it clips, so we will
      * just output the final 16-bit level.
      */
 
-	/* not sure about pokey output levels - below is just a estimate to get a 5V signal */
-	DISCRETE_INPUTX_STREAM(BZ_POKEY_SND, 0, 5.0 / 11000, 0)
+	/* Convert Pokey output to 5V Signal */
+	DISCRETE_INPUTX_STREAM(BZ_POKEY_SND, 0, 5.0 / 32768, 0)
 
 	DISCRETE_MIXER4(NODE_280,
 		BZ_INP_SOUNDEN,
 		BZ_SHELL_SND, BZ_EXPLOSION_SND, BZ_ENGINE_SND, BZ_POKEY_SND,
 		&bzone_final_mixer_desc)
-	DISCRETE_OUTPUT(NODE_280, 50000 * BZ_FINAL_GAIN)
+	DISCRETE_OUTPUT(NODE_280, 48000)
 
 DISCRETE_SOUND_END
 
@@ -400,12 +400,13 @@ MACHINE_CONFIG_FRAGMENT( bzone_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey",  POKEYN, BZONE_MASTER_CLOCK / 8)
-	MCFG_SOUND_CONFIG(bzone_pokey_interface)
+	MCFG_POKEY_ADD("pokey", BZONE_MASTER_CLOCK / 8)
+	MCFG_POKEY_CONFIG(bzone_pokey_interface)
+	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(bzone)
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0 / BZ_FINAL_GAIN)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

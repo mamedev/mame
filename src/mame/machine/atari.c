@@ -24,7 +24,7 @@ static void a600xl_mmu(running_machine &machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine &machine);
 
-void atari_interrupt_cb(pokeyn_device *device, int mask)
+void atari_interrupt_cb(pokey_device *device, int mask)
 {
 
 	if (VERBOSE_POKEY)
@@ -155,7 +155,7 @@ void a600xl_mmu(running_machine &machine, UINT8 new_mmu)
 
  **************************************************************/
 
-READ8_DEVICE_HANDLER(atari_a800_keyboard)
+POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 {
 	int ipt;
 	static const char *const tag[] = {
@@ -165,30 +165,30 @@ READ8_DEVICE_HANDLER(atari_a800_keyboard)
 	UINT8 ret = 0x00;
 
 	/* decode special */
-	switch (offset)
+	switch (k543210)
 	{
-	case pokeyn_device::POK_KEY_BREAK:
+	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
 		ret |= ((device->machine().root_device().ioport(tag[0])->read_safe(0) & 0x04) ? 0x02 : 0x00);
 		break;
-	case pokeyn_device::POK_KEY_CTRL:
+	case pokey_device::POK_KEY_CTRL:
 		/* CTRL */
 		ret |= ((device->machine().root_device().ioport("fake")->read_safe(0) & 0x02) ? 0x02 : 0x00);
 		break;
-	case pokeyn_device::POK_KEY_SHIFT:
+	case pokey_device::POK_KEY_SHIFT:
 		/* SHIFT */
 		ret |= ((device->machine().root_device().ioport("fake")->read_safe(0) & 0x01) ? 0x02 : 0x00);
 		break;
 	}
 
 	/* return on BREAK key now! */
-	if (offset == AKEY_BREAK || offset == AKEY_NONE)
+	if (k543210 == AKEY_BREAK || k543210 == AKEY_NONE)
 		return ret;
 
 	/* decode regular key */
-	ipt = device->machine().root_device().ioport(tag[offset >> 3])->read_safe(0);
+	ipt = device->machine().root_device().ioport(tag[k543210 >> 3])->read_safe(0);
 
-	if (ipt & (1 << (offset & 0x07)))
+	if (ipt & (1 << (k543210 & 0x07)))
 		ret |= 0x01;
 
 	return ret;
@@ -223,38 +223,38 @@ READ8_DEVICE_HANDLER(atari_a800_keyboard)
 
  **************************************************************/
 
-READ8_DEVICE_HANDLER(atari_a5200_keypads)
+POKEY_KEYBOARD_HANDLER(atari_a5200_keypads)
 {
 	int ipt;
 	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
 	UINT8 ret = 0x00;
 
 	/* decode special */
-	switch (offset)
+	switch (k543210)
 	{
-	case pokeyn_device::POK_KEY_BREAK:
+	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
 		ret |= ((device->machine().root_device().ioport(tag[0])->read_safe(0) & 0x01) ? 0x02 : 0x00);
 		break;
-	case pokeyn_device::POK_KEY_CTRL:
-	case pokeyn_device::POK_KEY_SHIFT:
+	case pokey_device::POK_KEY_CTRL:
+	case pokey_device::POK_KEY_SHIFT:
 		break;
 	}
 
 	/* decode regular key */
 	/* if kr5 and kr0 not set just return */
-	if ((offset & 0x21) != 0x21)
+	if ((k543210 & 0x21) != 0x21)
 		return ret;
 
-	offset = (offset >> 1) & 0x0f;
+	k543210 = (k543210 >> 1) & 0x0f;
 
 	/* return on BREAK key now! */
-	if (offset == 0)
+	if (k543210 == 0)
 		return ret;
 
-	ipt = device->machine().root_device().ioport(tag[offset >> 2])->read_safe(0);
+	ipt = device->machine().root_device().ioport(tag[k543210 >> 2])->read_safe(0);
 
-	if (ipt & (1 <<(offset & 0x03)))
+	if (ipt & (1 <<(k543210 & 0x03)))
 		ret |= 0x01;
 
 	return ret;
@@ -270,7 +270,7 @@ READ8_DEVICE_HANDLER(atari_a5200_keypads)
 
 static void pokey_reset(running_machine &machine)
 {
-	pokeyn_device *pokey = downcast<pokeyn_device *>(machine.device("pokey"));
+	pokey_device *pokey = downcast<pokey_device *>(machine.device("pokey"));
 	pokey->write(15,0);
 }
 
