@@ -298,10 +298,25 @@ ROM_START( battlnts )
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "777_c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
+	ROM_LOAD( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "777_c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
+	ROM_LOAD( "777c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
+ROM_END
+
+ROM_START( battlntsa )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "777_f02.7e", 0x08000, 0x08000, CRC(9f1dc5c1) SHA1(86ae471b276d90bbebb97747b673cd5c31ff9043) ) /* fixed ROM */
+	ROM_LOAD( "777_f03.8e", 0x10000, 0x10000, CRC(040d00bf) SHA1(433afd38a80d79d6a95f2ef0b195a92688ace555) ) /* banked ROM */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "777c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
 ROM_END
 
 ROM_START( battlntsj )
@@ -313,10 +328,10 @@ ROM_START( battlntsj )
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "777_c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
+	ROM_LOAD( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "777_c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
+	ROM_LOAD( "777c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
 ROM_END
 
 ROM_START( rackemup )
@@ -415,8 +430,9 @@ static DRIVER_INIT( rackemup )
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", GAME_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (program code G)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (program code F)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan, program code E)",  GAME_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, rackemup, ROT90, "Konami", "Rack 'em Up (program code L)",        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, 0,        ROT90, "Konami", "The Hustler (Japan, program code M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, 0,        ROT90, "Konami", "The Hustler (Japan, program code J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
