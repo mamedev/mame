@@ -5,6 +5,9 @@
 // Emulates : Stepper motors driven with full step or half step          //
 //            also emulates the index optic                              //
 //                                                                       //
+// 26-05-2012: J. Wallace - Implemented proper phase alignment, we no    //
+//                          longer need reverse interfaces here, the     // 
+//                          layout will suffice. Added belt reel handler.//
 // 09-04-2012: J. Wallace - Studied some old reel motors and added a     //
 //                          number of new stepper types. I am yet to     //
 //                          add them to drivers, but barring some init   //
@@ -27,6 +30,12 @@
 // TODO:  add further types of stepper motors if needed (Konami/IGT?)    //
 //        Someone who understands the device system may want to convert  //
 //        this                                                           //
+//        200 Step reels can alter their relative opto tab position,     //
+//        may be worth adding the phase setting to the interface         //
+//        There are reports that some games use a pulse that is too short//
+//        to give a 'judder' effect for holds, etc. We'll need to time   //
+//        the pulses to keep tack of this without going out of sync.     //
+//        Check 20RM and Starpoint 200 step                              //
 ///////////////////////////////////////////////////////////////////////////
 
 #include "emu.h"
@@ -43,10 +52,10 @@ typedef struct _stepper
 	const stepper_interface *intf;
 	UINT8	 pattern,	/* coil pattern */
 		 old_pattern,	/* old coil pattern */
+		   initphase,
 		       phase,	/* motor phase */
 		   old_phase,	/* old phase */
-			    type,	/* reel type */
-			 reverse;	/* Does reel spin backwards (construction of unit, not wiring) */
+			    type;	/* reel type */
 	INT16	step_pos,	/* step position 0 - max_steps */
 			max_steps;	/* maximum step position */
 
@@ -60,32 +69,30 @@ typedef struct _stepper
 static stepper step[MAX_STEPPERS];
 
 /* useful interfaces (Starpoint is a very common setup)*/
-/* step table, use active coils as row, phase as column*/
 const stepper_interface starpoint_interface_48step =
 {
 	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x09,//Starpoint tech specs say that the only coil pattern guaranteed to line up the opto is this one
-	0
+	1,
+	3,
+	0x09,
+	4
 };
 
-const stepper_interface starpoint_interface_48step_reverse =
+const stepper_interface starpointrm20_interface_48step =
 {
 	STARPOINT_48STEP_REEL,
 	16,
 	24,
 	0x09,
-	1
+	7
 };
-
 const stepper_interface starpoint_interface_200step_reel =
 {
 	STARPOINT_200STEP_REEL,
 	12,
 	24,
 	0x09,
-	0
+	7
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -101,13 +108,14 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 	step[which].index_start = intf->index_start;/* location of first index value in half steps */
 	step[which].index_end	= intf->index_end;	/* location of last index value in half steps */
 	step[which].index_patt	= intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
-	step[which].reverse     = intf->reverse;
+	step[which].initphase	= intf->initphase; /* Phase at 0 steps, for alignment) */
 
 
-	step[which].phase       = 0;
 	step[which].pattern     = 0;
 	step[which].old_pattern = 0;
 	step[which].step_pos    = 0;
+	step[which].phase = step[which].initphase;
+	step[which].old_phase = step[which].initphase;
 
 
 	switch ( step[which].type )
@@ -136,6 +144,7 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 	state_save_register_item(machine, "stepper", NULL, which, step[which].index_start);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].index_end);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].index_patt);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].initphase);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].phase);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].old_phase);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].pattern);
@@ -143,7 +152,6 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 	state_save_register_item(machine, "stepper", NULL, which, step[which].step_pos);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].max_steps);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].type);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].reverse);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -200,13 +208,8 @@ void stepper_reset_position(int which)
 	step[which].step_pos    = 0x00;
 	step[which].pattern     = 0x00;
 	step[which].old_pattern = 0x00;
-	step[which].phase		= 0x00;
-	if ((step[which].type == STARPOINT_48STEP_REEL)||(step[which].type == STARPOINT_144STEP_DICE)||(step[which].type == STARPOINT_200STEP_REEL))
-	{//Starpoint motor power on partially energises reel to a known state (straight up)-  Bellfruit games rely on this behaviour.
-		step[which].phase = 0x07;
-		step[which].old_phase = 0x07;
-	}
-
+	step[which].phase = step[which].initphase;
+	step[which].old_phase = step[which].initphase;
 	update_optic(which);
 }
 
@@ -254,11 +257,10 @@ int stepper_update(int which, UINT8 pattern)
 		default:
 		logerror("No reel type specified for %x!\n",which);
 		break;
-
 		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
-		case STARPOINT_200STEP_REEL :
 		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
+		case STARPOINT_200STEP_REEL :/* STARPOINT 1DCU DICE mechanism */
 		//Standard drive table is 2,6,4,5,1,9,8,a
 		//NOTE: This runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
 		//The Heber 'Pluto' controller runs this in reverse
@@ -323,7 +325,7 @@ int stepper_update(int which, UINT8 pattern)
 		//Gamesman 48 step uses this pattern shifted one place forward, though this shouldn't matter
 		switch (pattern)
 		{
-		 //             Yellow   Black  Orange Brown
+		 //             Yellow   Brown  Orange Black
 			case 0x01://  0        0      0      1
 			step[which].phase = 7;
 			break;
@@ -350,7 +352,7 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 
 			// The below values should not be used by anything sane, as they effectively ignore one stator side entirely
-		    //          Yellow   Black  Orange Brown
+		    //          Yellow   Brown  Orange Black
 			case 0x05://   0       1       0     1
 			{
 				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
@@ -386,7 +388,7 @@ int stepper_update(int which, UINT8 pattern)
          */
 		switch (pattern)
 		{
-		//             Yellow(2)   Black(1)  Orange(!2) Brown(!1)
+		//             Yellow(2)   Brown(1)  Orange(!2) Black(!1)
 			case 0x00 :// 0          0          1         1
 			step[which].phase = 6;
 			break;
@@ -539,14 +541,7 @@ int stepper_update(int which, UINT8 pattern)
 
 	if (max!=0)
 	{
-		if (step[which].reverse)
-		{
-			pos = (step[which].step_pos - steps + max) % max;
-		}
-		else
-		{
-			pos = (step[which].step_pos + steps + max) % max;
-		}
+		pos = (step[which].step_pos + steps + max) % max;
 	}
 	else
 	{

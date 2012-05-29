@@ -2253,18 +2253,10 @@ INPUT_PORTS_END
 static const stepper_interface barcrest_reel_interface =
 {
 	BARCREST_48STEP_REEL,
-	92,
-	4,
-	0x00
-};
-
-static const stepper_interface barcrest_reelrev_interface =
-{
-	BARCREST_48STEP_REEL,
-	92,
-	4,
+	1,
+	3,
 	0x00,
-	1
+	2
 };
 
 static const stepper_interface barcrest_opto1_interface =
@@ -2272,7 +2264,8 @@ static const stepper_interface barcrest_opto1_interface =
 	BARCREST_48STEP_REEL,
 	4,
 	12,
-	0x00
+	0x00,
+	2
 };
 
 static const stepper_interface barcrest_opto2_interface =
@@ -2280,7 +2273,8 @@ static const stepper_interface barcrest_opto2_interface =
 	BARCREST_48STEP_REEL,
 	92,
 	3,
-	0x00
+	0x00,
+	2
 };
 
 static const stepper_interface barcrest_opto3_interface =
@@ -2288,7 +2282,8 @@ static const stepper_interface barcrest_opto3_interface =
 	BARCREST_48STEP_REEL,
 	0,
 	5,
-	0x00
+	0x00,
+	2
 };
 
 static const stepper_interface bwb_opto1_interface =
@@ -2296,7 +2291,8 @@ static const stepper_interface bwb_opto1_interface =
 	BARCREST_48STEP_REEL,
 	96,
 	3,
-	0x00
+	0x00,
+	2
 };
 
 /*
@@ -2776,8 +2772,7 @@ static DRIVER_INIT (m_grtecp)
 	state->m_reels = 5;
 	state->m_lamp_extender=SMALL_CARD;
 	// setup 4 default 96 half step reels with the mux board
-	mpu4_config_common_reels(machine,4);
-	stepper_config(machine, 4, &barcrest_reelrev_interface);
+	mpu4_config_common_reels(machine,5);
 	state->m_current_chr_table = grtecp_data;
 }
 

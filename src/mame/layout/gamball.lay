@@ -255,28 +255,28 @@
 	</element>
 
 	<element name="SteppersReel1" defstate="0">
-	<reel stateoffset="0" symbollist="3.00 RPT:300p.png,2.40:240.png,2.20:220.png,2.00:200.png,1.60:160.png,1.20:120.png,1.00:100p.png,80p:80p.png,60p:60p.png,LOSE:lose.png,JACK:jack.png,POT:pot.png" reelreversed="1" numsymbolsvisible="2">
+	<reel stateoffset="-1364" symbollist="3.00 RPT:300p.png,2.40:240.png,2.20:220.png,2.00:200.png,1.60:160.png,1.20:120.png,1.00:100p.png,80p:80p.png,60p:60p.png,LOSE:lose.png,JACK:jack.png,POT:pot.png"  numsymbolsvisible="2">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel2" defstate="0">
-	<reel stateoffset="0" symbollist="Melon:melon.png,7:7.png,Cherry:cherry.png,Bar:bar.png,Melon:melon.png,7:7.png,Bar:bar.png,Bell:bell.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,7:7.png,Bar:bar.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png" reelreversed="1" numsymbolsvisible="3">
+	<reel stateoffset="2732" symbollist="7:7.png,Cherry:cherry.png,Bar:bar.png,Melon:melon.png,7:7.png,Bar:bar.png,Bell:bell.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,7:7.png,Bar:bar.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png,Melon:melon.png"  numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel3" defstate="0">
-	<reel stateoffset="0" symbollist="Bell:bell.png,7:7.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,Bell:bell.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,7:7.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,Melon:melon.png,Cherry:cherry.png" reelreversed="1" numsymbolsvisible="3">
+	<reel stateoffset="2732" symbollist="7:7.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,Bell:bell.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,7:7.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png" numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel4" defstate="0">
-	<reel stateoffset="0" symbollist="Melon:melon.png,Bell:bell.png,7:7.png,Bell:bell.png,Bar:bar.png,7:7.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,7:7.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png" reelreversed="1" numsymbolsvisible="3">
+	<reel stateoffset="2732" symbollist="Bell:bell.png,7:7.png,Bell:bell.png,Bar:bar.png,7:7.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,7:7.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png,Melon:melon.png" numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>

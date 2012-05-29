@@ -766,9 +766,10 @@ INPUT_PORTS_END
 static const stepper_interface mpu3_reel_interface =
 {
 	MPU3_48STEP_REEL,
-	92,
-	2,
-	0x00
+	1,
+	3,
+	0x00,
+	2
 };
 
 /* Common configurations */

@@ -189,12 +189,12 @@ static const bfmdm01_interface dm01_interface =
 /* default reels */
 const stepper_interface* default_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 /* default inputs */
@@ -23331,9 +23331,9 @@ GAME( 200?, sc4pstatq	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (
 
 const stepper_interface* sc4cvani_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
 	0,
@@ -23360,10 +23360,10 @@ GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps
 
 const stepper_interface* sc4cvclb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
 };
@@ -23764,11 +23764,11 @@ GAME( 200?, sc4colos	,0,			sc4, sc4, sc4, ROT0, "BFM","Colossus (Bellfruit) (Sco
 
 const stepper_interface* sc4crcc_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -24089,11 +24089,11 @@ GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bel
 
 const stepper_interface* sc4fcc_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -24733,9 +24733,9 @@ GAME( 200?, sc4luck7d	,sc4luck7,	sc4, sc4, sc4, ROT0, "Mazooma","Lucky 7s (Mazoo
 
 const stepper_interface* sc4luckb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 	0,
 	0,
@@ -24856,9 +24856,9 @@ GAME( 200?, sc4mbagsc	,sc4mbags,	sc4, sc4, sc4, ROT0, "BFM","Money Bags (Bellfru
 
 const stepper_interface* sc4mgr_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 	0,
 	0,
@@ -25105,10 +25105,10 @@ GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4, ROT0, "BFM","Pay Time (Bellfruit) (Sco
 
 const stepper_interface* sc4pgold_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 	0,
 };
@@ -25416,9 +25416,9 @@ GAME( 200?, sc4rbankc	,sc4rbank,	sc4, sc4, sc4, ROT0, "BFM","Royle Banker (Bellf
 
 const stepper_interface* sc4royle_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
 	0,
@@ -25784,11 +25784,11 @@ GAME( 200?, sc4tload	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Top Loader (Mazooma) 
 
 const stepper_interface* sc4ticlb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -26112,12 +26112,12 @@ GAME( 200?, sc4bbust	,sc4blokq,	sc4, sc4, sc4, ROT0, "Mazooma","Blockbuster (Maz
 
 const stepper_interface* sc4clbtm_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4clbtm )
@@ -26282,9 +26282,9 @@ GAME( 200?, sc4bobi		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Maz
 
 const stepper_interface* sc4bull_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
 	0,
@@ -26467,12 +26467,12 @@ GAME( 200?, sc4crnjwa	,sc4crnjw,	sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellf
 
 const stepper_interface* sc4dnd_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dnd )
@@ -26516,12 +26516,12 @@ GAME( 200?, sc4dndm		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Dea
 
 const stepper_interface* sc4dndcs_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndcs )
@@ -26548,12 +26548,12 @@ GAME( 200?, sc4dndcse	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or 
 
 const stepper_interface* sc4dndbb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndbb )
@@ -26592,12 +26592,12 @@ GAME( 200?, sc4dndbbi	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndcl_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndcl )
@@ -26633,12 +26633,12 @@ GAME( 200?, sc4dndclf	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal O
 
 const stepper_interface* sc4dnddd_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dnddd )
@@ -26675,12 +26675,12 @@ GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndhf_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndhf )
@@ -26721,12 +26721,12 @@ GAME( 200?, sc4dndhfl	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndys_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndys )
@@ -26760,11 +26760,11 @@ GAME( 200?, sc4dndysc	,sc4dndys,	sc4, sc4dndys35, sc4dndys, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndlp_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -26794,12 +26794,12 @@ GAME( 200?, sc4dndlpe	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndra_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndra )
@@ -26833,11 +26833,11 @@ GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4dndra70, sc4dndra, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndbd_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -26873,12 +26873,12 @@ GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4dndbd70, sc4dndbd, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndbr_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndbr )
@@ -26915,11 +26915,11 @@ GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4dndbr70, sc4dndbr, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndcc_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -26956,11 +26956,11 @@ GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4dndcc70, sc4dndcc, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dnddw_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 };
 
@@ -26997,12 +26997,12 @@ GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4dnddw70, sc4dnddw, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dnddf_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dnddf )
@@ -27036,11 +27036,11 @@ GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4dnddf70, sc4dnddf, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndpg_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -27076,11 +27076,11 @@ GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndtp_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -27117,12 +27117,12 @@ GAME( 200?, sc4dndtpk	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndww_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndww )
@@ -27150,12 +27150,12 @@ GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndcw_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndcw )
@@ -27181,12 +27181,12 @@ GAME( 200?, sc4dndcwc	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or 
 
 const stepper_interface* sc4dndtr_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndtr )
@@ -27210,11 +27210,11 @@ GAME( 200?, sc4dndtra	,sc4dndtr,	sc4, sc4dndtr70, sc4dndtr, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndwb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 };
 
@@ -27244,12 +27244,12 @@ GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndbe_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4dndbe )
@@ -27291,11 +27291,11 @@ GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or
 
 const stepper_interface* sc4dndbc_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -27385,12 +27385,12 @@ GAME( 200?, sc4evolg	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scor
 
 const stepper_interface* sc4fguy_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4fguy )
@@ -27446,10 +27446,10 @@ GAME( 200?, sc4gladg	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazoom
 
 const stepper_interface* sc4gd_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 	0,
 };
@@ -27477,11 +27477,11 @@ GAME( 200?, sc4gdmza	,sc4gdmz,	sc4, sc4, sc4, ROT0, "Mazooma","Gold Diggers? / G
 
 const stepper_interface* sc4gdclb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 };
 
@@ -27509,9 +27509,9 @@ GAME( 200?, sc4gdclbk	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Cl
 
 const stepper_interface* sc4gbcas_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 	0,
 	0,
@@ -27534,11 +27534,11 @@ GAME( 200?, sc4gbcasc	,sc4gbcas,	sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls C
 
 const stepper_interface* sc4gball_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -27558,12 +27558,12 @@ GAME( 200?, sc4gballc	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (
 
 const stepper_interface* sc4gunp_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4gunp )
@@ -27585,11 +27585,11 @@ GAME( 200?, sc4gunpg	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (B
 
 const stepper_interface* sc4hapnt_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 };
 
@@ -27610,10 +27610,10 @@ GAME( 200?, sc4hapnte	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (B
 
 const stepper_interface* sc4hntcs_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	0,
 };
@@ -27676,9 +27676,9 @@ GAME( 200?, sc4hellbj	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR
 
 const stepper_interface* sc4hill_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
 	0,
@@ -28317,11 +28317,11 @@ GAME( 200?, sc4mwwtbd	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel 
 
 const stepper_interface* sc4bwow_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 	0,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
 };
 
@@ -28459,12 +28459,12 @@ GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Gam
 
 const stepper_interface* sc4gggtb_reel_configs[6] =
 {
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
-	&starpoint_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
 };
 
 static DRIVER_INIT( sc4gggtb )

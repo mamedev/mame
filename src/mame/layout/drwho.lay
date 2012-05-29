@@ -22,28 +22,28 @@
 
 
 	<element name="SteppersReel1" defstate="0">
-	<reel stateoffset="-6826" symbollist="Double Bar:DW_DBar.png,Blue 7:DW_Blue7.png,Single Bar (K9):DW_SBar_K9.png,Cherry:DW_Cherry.png,Red 7:DW_Red7.png,Cherry (2):DW_Cherry_2.png,Triple Bar:DW_TBar.png,Double Bar:DW_DBar.png,Single Bar (2):DW_SBar_2.png,Cherry:DW_Cherry.png,Double Bar:DW_DBar.png,Blue 7:DW_Blue7.png,Triple Bar (1):DW_TBar_1.png,Single Bar:DW_SBar.png,Red 7:DW_Red7.png,Cherry (3):DW_Cherry_3.png" reelreversed="1">
+	<reel stateoffset="2730" symbollist="Cherry (3):DW_Cherry_3.png,Double Bar:DW_DBar.png,Blue 7:DW_Blue7.png,Single Bar (K9):DW_SBar_K9.png,Cherry:DW_Cherry.png,Red 7:DW_Red7.png,Cherry (2):DW_Cherry_2.png,Triple Bar:DW_TBar.png,Double Bar:DW_DBar.png,Single Bar (2):DW_SBar_2.png,Cherry:DW_Cherry.png,Double Bar:DW_DBar.png,Blue 7:DW_Blue7.png,Triple Bar (1):DW_TBar_1.png,Single Bar:DW_SBar.png,Red 7:DW_Red7.png" >
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel2" defstate="0">
-	<reel stateoffset="-6826" symbollist="Double Bar:DW_DBar.png,Triple Bar:DW_TBar.png,Single Bar (1):DW_Sbar_1.png,Cherry:DW_Cherry.png,Red 7:DW_Red7.png,Single Bar:DW_Sbar.png,Triple Bar:DW_TBar.png,Double Bar (3):DW_DBar_3.png,Single Bar:DW_Sbar.png,Cherry (K9):DW_Cherry_K9.png,Double Bar:DW_DBar.png,Blue 7:DW_Blue7.png,Triple Bar (1):DW_TBar_1.png,Single Bar:DW_Sbar.png,Blue 7:DW_Blue7.png,Cherry (2):DW_Cherry_2.png"  reelreversed="1">
+	<reel stateoffset="2730" symbollist="Cherry (2):DW_Cherry_2.png,Double Bar:DW_DBar.png,Triple Bar:DW_TBar.png,Single Bar (1):DW_Sbar_1.png,Cherry:DW_Cherry.png,Red 7:DW_Red7.png,Single Bar:DW_Sbar.png,Triple Bar:DW_TBar.png,Double Bar (3):DW_DBar_3.png,Single Bar:DW_Sbar.png,Cherry (K9):DW_Cherry_K9.png,Double Bar:DW_DBar.png,Blue 7:DW_Blue7.png,Triple Bar (1):DW_TBar_1.png,Single Bar:DW_Sbar.png,Blue 7:DW_Blue7.png"  >
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel3" defstate="0">
-	<reel stateoffset="-6826" symbollist="Double Bar (3):DW_DBar_3.png,Blue 7:DW_Blue7.png,Single Bar:DW_SBar.png,Cherry (2):DW_Cherry_2.png,Red 7:DW_Red7.png,Cherry:DW_Cherry.png,Triple Bar:DW_TBar.png,Double Bar (1):DW_DBar_1.png,Single Bar:DW_SBar.png,Cherry:DW_Cherry.png,Double Bar (2):DW_DBar_2.png,Blue 7:DW_Blue7.png,Triple Bar:DW_TBar.png,Single Bar (1):DW_SBar_1.png,Red 7:DW_Red7.png,Cherry:DW_Cherry.png"  reelreversed="1">
+	<reel stateoffset="2730" symbollist="Cherry:DW_Cherry.png,Double Bar (3):DW_DBar_3.png,Blue 7:DW_Blue7.png,Single Bar:DW_SBar.png,Cherry (2):DW_Cherry_2.png,Red 7:DW_Red7.png,Cherry:DW_Cherry.png,Triple Bar:DW_TBar.png,Double Bar (1):DW_DBar_1.png,Single Bar:DW_SBar.png,Cherry:DW_Cherry.png,Double Bar (2):DW_DBar_2.png,Blue 7:DW_Blue7.png,Triple Bar:DW_TBar.png,Single Bar (1):DW_SBar_1.png,Red 7:DW_Red7.png"  >
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel4" defstate="0">
-	<reel stateoffset="-8192" symbollist="5:dice5.png,4:dice4.png,3:dice3.png,2:dice2.png,1:dice1.png,6:dice6.png,5:dice5.png,4:dice4.png,3:dice3.png,2:dice2.png,1:dice1.png,6:dice6.png" reelreversed="1" numsymbolsvisible="1">
+	<reel stateoffset="-682" symbollist="6:dice6.png,5:dice5.png,4:dice4.png,3:dice3.png,2:dice2.png,1:dice1.png,6:dice6.png,5:dice5.png,4:dice4.png,3:dice3.png,2:dice2.png,1:dice1.png" numsymbolsvisible="1">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
