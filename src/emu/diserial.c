@@ -340,11 +340,9 @@ UINT8 device_serial_interface::transmit_register_get_data_bit()
 	return bit;
 }
 
-void device_serial_interface::transmit_register_send_bit()
+UINT8 device_serial_interface::transmit_register_send_bit()
 {
-	int data;
-
-	data = transmit_register_get_data_bit();
+	UINT8 data = transmit_register_get_data_bit();
 
 	/* set tx data bit */
 	m_connection_state &=~SERIAL_STATE_TX_DATA;
@@ -352,6 +350,8 @@ void device_serial_interface::transmit_register_send_bit()
 
 	/* state out through connection */
 	serial_connection_out();
+
+	return data;
 }
 
 

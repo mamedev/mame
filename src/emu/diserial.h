@@ -98,7 +98,7 @@ public:
 	void transmit_register_add_bit(int bit);
 	void transmit_register_setup(UINT8 data_byte);
 	UINT8 transmit_register_get_data_bit();
-	void transmit_register_send_bit();
+	UINT8 transmit_register_send_bit();
 
 	UINT8 serial_helper_get_parity(UINT8 data) { return m_serial_parity_table[data]; }
 

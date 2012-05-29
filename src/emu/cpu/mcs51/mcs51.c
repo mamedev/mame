@@ -952,6 +952,7 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 				SET_SBUF(data);
 				//Flag the IRQ
 				SET_RI(1);
+				SET_RB8(1); // HACK force 2nd stop bit
 			}
 		}
 	}
@@ -1221,7 +1222,7 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data)
 
 	//Flag that we're sending data
 	mcs51_state->uart.data_out = data;
-	LOG(("serial_tansmit: %x %x\n", mode, data));
+	LOG(("serial_transmit: %x %x\n", mode, data));
 	switch(mode) {
 		//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 		case 0:
@@ -1234,7 +1235,7 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data)
 		//9 bit uart
 		case 2:
 		case 3:
-			LOG(("Serial mode %d not supported in mcs51!\n", mode));
+			mcs51_state->uart.bits_to_send = 8+3;
 			break;
 	}
 }
@@ -1256,7 +1257,7 @@ INLINE void serial_receive(mcs51_state_t *mcs51_state)
 			//9 bit uart
 			case 2:
 			case 3:
-				LOG(("Serial mode %d not supported in mcs51!\n", mode));
+				mcs51_state->uart.delay_cycles = 8+3;
 				break;
 		}
 	}
@@ -1727,7 +1728,7 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 	LOG(("Request: %d\n", priority_request));
 	if (mcs51_state->irq_active && (priority_request <= mcs51_state->cur_irq_prio))
 	{
-		LOG(("higher or equal priority irq in progress already, skipping ...\n"));
+		LOG(("higher or equal priority irq (%u) in progress already, skipping ...\n", mcs51_state->cur_irq_prio));
 		return;
 	}
 
@@ -2191,6 +2192,10 @@ static CPU_RESET( mcs51 )
 		mcs51_state->ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
 	}
 
+	mcs51_state->uart.rx_clk = 0;
+	mcs51_state->uart.tx_clk = 0;
+	mcs51_state->uart.bits_to_send = 0;
+	mcs51_state->uart.delay_cycles = 0;
 }
 
 /* Shut down CPU core */

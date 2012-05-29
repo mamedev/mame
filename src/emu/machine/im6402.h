@@ -129,8 +129,11 @@ private:
 	inline void receive();
 	inline void transmit();
 
-	static const device_timer_id TIMER_RX = 0;
-	static const device_timer_id TIMER_TX = 1;
+	enum 
+	{
+		TIMER_RX,
+		TIMER_TX
+	};
 
 	devcb_resolved_read_line	m_in_rri_func;
 	devcb_resolved_write_line	m_out_tro_func;
