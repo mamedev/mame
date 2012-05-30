@@ -25,7 +25,7 @@ const floppy_image_format_t::desc_e esqimg_format::esq_10_desc[] = {
 	{     MFM, 0xfe, 1 },
 	{     TRACK_ID },
 	{     HEAD_ID },
-	{     SECTOR_ID_ZEROBASED },
+	{     SECTOR_ID },
 	{     SIZE_ID },
 	{   CRC_END, 1 },
 	{   CRC, 1 },
@@ -98,12 +98,12 @@ bool esqimg_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
-	UINT8 sectdata[11*512];
-	desc_s sectors[11];
+	UINT8 sectdata[10*512];
+	desc_s sectors[10];
 	for(int i=0; i<sector_count; i++) {
 		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
-		sectors[i].sector_id = i + 1;
+		sectors[i].sector_id = i;
 	}
 
 	int track_size = sector_count*512;

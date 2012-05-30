@@ -1366,10 +1366,6 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, 8, sect[sector_idx].sector_id);
 			break;
 
-        case SECTOR_ID_ZEROBASED:
-			mfm_w(buffer, offset, 8, sect[sector_idx].sector_id-1);
-			break;
-
 		case SECTOR_ID_GCR6:
 			raw_w(buffer, offset, 8, gcr6fw_tb[sect[sector_idx].sector_id]);
 			break;
