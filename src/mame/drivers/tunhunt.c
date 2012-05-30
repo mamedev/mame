@@ -22,16 +22,11 @@
 
     Known Issues:
 
-    Coin Input seems unresponsive.
-
     Colors:
     - Hues are hardcoded.  There doesn't appear to be any logical way to
         map the color proms so that the correct colors appear.
         See last page of schematics for details.  Are color proms bad?
         (shouldn't be, both sets were the same)
-
-    Alphanumeric Layer:
-    - placement for some characters seems strange (but may well be correct).
 
     Shell Objects:
     - vstretch/placement/color handling isn't confirmed
