@@ -25,7 +25,7 @@ const floppy_image_format_t::desc_e esqimg_format::esq_10_desc[] = {
 	{     MFM, 0xfe, 1 },
 	{     TRACK_ID },
 	{     HEAD_ID },
-	{     SECTOR_ID },
+	{     SECTOR_ID_ZEROBASED },
 	{     SIZE_ID },
 	{   CRC_END, 1 },
 	{   CRC, 1 },
@@ -77,7 +77,6 @@ void esqimg_format::find_size(io_generic *io, int &track_count, int &head_count,
 
     if (size == 512*track_count*head_count*sector_count)
     {
-        printf("Identified Ensoniq .img\n");
         return;
     }
 
@@ -99,8 +98,6 @@ bool esqimg_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
-    printf("esqimg_format::load (trks %d heads %d sectors %d)\n", track_count, head_count, sector_count);
-
 	UINT8 sectdata[11*512];
 	desc_s sectors[11];
 	for(int i=0; i<sector_count; i++) {
@@ -118,8 +115,6 @@ bool esqimg_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 	}
 
 	image->set_variant(floppy_image::DSDD);
-
-    printf("esqimg_format::OK\n");
 
 	return true;
 }

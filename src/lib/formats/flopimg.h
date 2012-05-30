@@ -311,6 +311,7 @@ protected:
 		HEAD_ID,                //!< Head id byte, mfm-encoded
 		TRACK_HEAD_ID_GCR6,     //!< Track id 7th bit + head, gc6-encoded
 		SECTOR_ID,              //!< Sector id byte, mfm-encoded
+        SECTOR_ID_ZEROBASED,    //!< Sector id byte, mfm-encoded, first sector is 0, not 1
 		SECTOR_ID_GCR6,         //!< Sector id byte, gcr6-encoded
 		SIZE_ID,                //!< Sector size code on one byte [log2(size/128)], mfm-encoded
 		SECTOR_INFO_GCR6,       //!< Sector info byte, gcr6-encoded
