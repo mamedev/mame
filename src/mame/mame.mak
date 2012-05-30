@@ -855,7 +855,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/bottom9.o $(VIDEO)/bottom9.o \
 	$(DRIVERS)/chqflag.o $(VIDEO)/chqflag.o \
 	$(DRIVERS)/circusc.o $(VIDEO)/circusc.o \
-    $(DRIVERS)/cobra.o \
+	$(DRIVERS)/cobra.o \
 	$(DRIVERS)/combatsc.o $(VIDEO)/combatsc.o \
 	$(DRIVERS)/contra.o $(VIDEO)/contra.o \
 	$(DRIVERS)/crimfght.o $(VIDEO)/crimfght.o \
@@ -886,6 +886,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/konamigx.o $(MACHINE)/konamigx.o $(VIDEO)/konamigx.o \
 	$(DRIVERS)/konamim2.o \
 	$(DRIVERS)/kongambl.o \
+	$(DRIVERS)/kontest.o \
 	$(DRIVERS)/konendev.o \
 	$(DRIVERS)/ksys573.o $(MACHINE)/zs01.o \
 	$(DRIVERS)/labyrunr.o $(VIDEO)/labyrunr.o \

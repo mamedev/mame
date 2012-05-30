@@ -2584,6 +2584,7 @@ src/mame/drivers/konamigx.c svneol=native#text/plain
 src/mame/drivers/konamim2.c svneol=native#text/plain
 src/mame/drivers/konendev.c svneol=native#text/plain
 src/mame/drivers/kongambl.c svneol=native#text/plain
+src/mame/drivers/kontest.c svneol=native#text/plain
 src/mame/drivers/kopunch.c svneol=native#text/plain
 src/mame/drivers/ksayakyu.c svneol=native#text/plain
 src/mame/drivers/ksys573.c svneol=native#text/plain
