@@ -33,22 +33,31 @@ class namcos22_state : public driver_device
 public:
 	namcos22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this,"spriteram"),
-		  m_shareram(*this,"shareram"),
-		  m_system_controller(*this,"syscontrol"),
-		  m_nvmem(*this,"nvmem"),
-		  m_mpSlaveExternalRAM(*this,"mpslaveextram"),
-		  m_mpMasterExternalRAM(*this,"mpmasterextram"),
-		  m_cgram(*this,"cgram"),
-		  m_textram(*this,"textram"),
-		  m_polygonram(*this,"polygonram"),
-		  m_gamma(*this,"gamma"),
-		  m_vics_data(*this,"vics_data"),
-		  m_vics_control(*this,"vics_control"),
-		  m_czattr(*this,"czattr"),
-		  m_tilemapattr(*this,"tilemapattr"),
-		  m_czram(*this,"czram") { }
+		m_maincpu(*this,"maincpu"),
+		m_master(*this,"master"),
+		m_slave(*this,"slave"),
+		m_mcu(*this,"mcu"),
+		m_spriteram(*this,"spriteram"),
+		m_shareram(*this,"shareram"),
+		m_system_controller(*this,"syscontrol"),
+		m_nvmem(*this,"nvmem"),
+		m_mpSlaveExternalRAM(*this,"slaveextram"),
+		m_mpMasterExternalRAM(*this,"masterextram"),
+		m_cgram(*this,"cgram"),
+		m_textram(*this,"textram"),
+		m_polygonram(*this,"polygonram"),
+		m_gamma(*this,"gamma"),
+		m_vics_data(*this,"vics_data"),
+		m_vics_control(*this,"vics_control"),
+		m_czattr(*this,"czattr"),
+		m_tilemapattr(*this,"tilemapattr"),
+		m_czram(*this,"czram")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_master;
+	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_mcu;
 	optional_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_shareram;
 	required_shared_ptr<UINT32> m_system_controller;
@@ -228,17 +237,6 @@ public:
 
 
 /*----------- defined in video/namcos22.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
 
 VIDEO_START( namcos22 );
 SCREEN_UPDATE_RGB32( namcos22 );

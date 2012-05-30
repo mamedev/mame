@@ -1819,7 +1819,6 @@ WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 
 READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
 {
-
 	switch (offset)
 	{
 		case 2:
@@ -2820,7 +2819,7 @@ SCREEN_UPDATE_RGB32( namcos22s )
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 			if (1) // czram
 			{
@@ -2885,7 +2884,7 @@ SCREEN_UPDATE_RGB32( namcos22 )
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 			//Dump(space, f,0x90000000, 0x90000003, "led?" );
 			Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
