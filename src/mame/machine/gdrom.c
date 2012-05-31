@@ -11,21 +11,6 @@
 #include "imagedev/chd_cd.h"
 #include "gdrom.h"
 
-typedef struct
-{
-	UINT32 lba;
-	UINT32 blocks;
-	UINT32 last_lba;
-	UINT32 bytes_per_sector;
-	UINT32 num_subblocks;
-	UINT32 cur_subblock;
-	UINT32 play_err_flag;
-	UINT32 read_type;	// for command 0x30 only
-	UINT32 data_select;	// for command 0x30 only
-	cdrom_file *cdrom;
-	bool is_file;
-} SCSIGd;
-
 static const UINT8 GDROM_Cmd11_Reply[32] =
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20,
@@ -40,147 +25,225 @@ static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 	*f = phys_frame % 75;
 }
 
+// device type definition
+const device_type GDROM = &device_creator<gdrom_device>;
+
+gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: scsidev_device(mconfig, GDROM, "GDROM", tag, owner, clock)
+{
+}
+
+void gdrom_device::device_start()
+{
+	save_item( NAME( lba ) );
+	save_item( NAME( blocks ) );
+	save_item( NAME( last_lba ) );
+	save_item( NAME( bytes_per_sector ) );
+	save_item( NAME( num_subblocks ) );
+	save_item( NAME( cur_subblock ) );
+	save_item( NAME( play_err_flag ) );
+}
+
+void gdrom_device::device_reset()
+{
+	scsidev_device::device_reset();
+
+	is_file = TRUE;
+	cdrom = subdevice<cdrom_image_device>("image")->get_cdrom_file();
+	if( !cdrom )
+	{
+		// try to locate the CHD from a DISK_REGION
+		chd_file *chd = get_disk_handle( machine(), tag() );
+		if( chd != NULL )
+		{
+			is_file = FALSE;
+			cdrom = cdrom_open( chd );
+		}
+	}
+
+	if (!cdrom)
+	{
+		logerror("GDROM: no CD found!\n");
+	}
+
+	lba = 0;
+	blocks = 0;
+	last_lba = 0;
+	bytes_per_sector = 2048;
+	num_subblocks = 1;
+	cur_subblock = 0;
+	play_err_flag = 0;
+}
+
+void gdrom_device::device_stop()
+{
+	if (!is_file)
+	{
+		if( cdrom )
+		{
+			cdrom_close( cdrom );
+		}
+	}
+}
+
+cdrom_interface gdrom_device::cd_intf = { 0, 0 };
+
+static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
+	MCFG_CDROM_ADD("image", gdrom_device::cd_intf)
+MACHINE_CONFIG_END
+
+machine_config_constructor gdrom_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(scsi_cdrom);
+}
 
 // scsicd_exec_command
 //
 // Execute a SCSI command.
 
-static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
+void gdrom_device::ExecCommand( int *transferLength )
 {
 	UINT8 *command;
 	int commandLength;
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
 
-	cdrom_file *cdrom = our_this->cdrom;
 	device_t *cdda;
 	int trk;
 
-	SCSIGetCommand( scsiInstance, &command, &commandLength );
+	GetCommand( &command, &commandLength );
 
 	switch ( command[0] )
 	{
-
-
 		case 0x03: // REQUEST SENSE
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return SCSILengthFromUINT8( &command[ 4 ] );
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			break;
 
 		case 0x11: // REQ_MODE
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
+			SetPhase( SCSI_PHASE_DATAIN );
 			printf("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
 				command[0], command[1],
 				command[2], command[3],
 				command[4], command[5]);
 //          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
-			return 32; //SCSILengthFromUINT8( &command[ 4 ] );
+			*transferLength = 32; //SCSILengthFromUINT8( &command[ 4 ] );
+			break;
 
 		case 0x12: // INQUIRY
 			logerror("GDROM: REQUEST SENSE\n");
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return SCSILengthFromUINT8( &command[ 4 ] );
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			break;
 
 		case 0x15: // MODE SELECT(6)
 			logerror("GDROM: MODE SELECT(6) length %x control %x\n", command[4], command[5]);
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAOUT );
-			return SCSILengthFromUINT8( &command[ 4 ] );
+			SetPhase( SCSI_PHASE_DATAOUT );
+			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			break;
 
 		case 0x1a: // MODE SENSE(6)
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return SCSILengthFromUINT8( &command[ 4 ] );
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			break;
 
 		case 0x1b: // START STOP UNIT
-			cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+			cdda = cdda_from_cdrom( machine(), cdrom);
 			if (cdda != NULL)
 			{
 				cdda_stop_audio(cdda);
 			}
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0x1e: // PREVENT ALLOW MEDIUM REMOVAL
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0x25: // READ CAPACITY
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return 8;
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = 8;
+			break;
 
 		case 0x28: // READ(10)
 
-			our_this->lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			our_this->blocks = SCSILengthFromUINT16( &command[7] );
+			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+			blocks = SCSILengthFromUINT16( &command[7] );
 
-			logerror("GDROM: READ(10) at LBA %x for %d blocks (%d bytes)\n", our_this->lba, our_this->blocks, our_this->blocks * our_this->bytes_per_sector);
+			logerror("GDROM: READ(10) at LBA %x for %d blocks (%d bytes)\n", lba, blocks, blocks * bytes_per_sector);
 
-			if (our_this->num_subblocks > 1)
+			if (num_subblocks > 1)
 			{
-				our_this->cur_subblock = our_this->lba % our_this->num_subblocks;
-				our_this->lba /= our_this->num_subblocks;
+				cur_subblock = lba % num_subblocks;
+				lba /= num_subblocks;
 			}
 			else
 			{
-				our_this->cur_subblock = 0;
+				cur_subblock = 0;
 			}
 
-			cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+			cdda = cdda_from_cdrom(machine(), cdrom);
 			if (cdda != NULL)
 			{
 				cdda_stop_audio(cdda);
 			}
 
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return our_this->blocks * our_this->bytes_per_sector;
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = blocks * bytes_per_sector;
+			break;
 
 		case 0x30: // CD_READ
 			if (command[1] & 1)
 			{
 				fatalerror("GDROM: MSF mode used for CD_READ, unsupported");
-				return 0;
+				*transferLength = 0;
 			}
 			else
 			{
-				our_this->lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;
-				our_this->blocks = command[8]<<16 | command[9]<<8 | command[10];
+				lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;
+				blocks = command[8]<<16 | command[9]<<8 | command[10];
 
-				our_this->read_type = (command[1] >> 1) & 7;
-				our_this->data_select = (command[1]>>4) & 0xf;
+				read_type = (command[1] >> 1) & 7;
+				data_select = (command[1]>>4) & 0xf;
 
-				if (our_this->read_type != 2)	// mode 1
+				if (read_type != 2)	// mode 1
 				{
-					fatalerror("GDROM: Unhandled read_type %d", our_this->read_type);
+					fatalerror("GDROM: Unhandled read_type %d", read_type);
 				}
 
-				if (our_this->data_select != 2)	// just sector data
+				if (data_select != 2)	// just sector data
 				{
-					fatalerror("GDROM: Unhandled data_select %d", our_this->data_select);
+					fatalerror("GDROM: Unhandled data_select %d", data_select);
 				}
 
-				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", our_this->lba, our_this->blocks, our_this->blocks * our_this->bytes_per_sector, our_this->read_type, our_this->data_select);
+				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", lba, blocks, blocks * bytes_per_sector, read_type, data_select);
 
-				if (our_this->num_subblocks > 1)
+				if (num_subblocks > 1)
 				{
-					our_this->cur_subblock = our_this->lba % our_this->num_subblocks;
-					our_this->lba /= our_this->num_subblocks;
+					cur_subblock = lba % num_subblocks;
+					lba /= num_subblocks;
 				}
 				else
 				{
-					our_this->cur_subblock = 0;
+					cur_subblock = 0;
 				}
 
-				cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+				cdda = cdda_from_cdrom(machine(), cdrom);
 				if (cdda != NULL)
 				{
 					cdda_stop_audio(cdda);
 				}
 
-				SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-				return our_this->blocks * our_this->bytes_per_sector;
+				SetPhase( SCSI_PHASE_DATAIN );
+				*transferLength = blocks * bytes_per_sector;
 			}
+			break;
 
 		case 0x42: // READ SUB-CHANNEL
 //                      logerror("GDROM: READ SUB-CHANNEL type %d\n", command[3]);
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return SCSILengthFromUINT16( &command[ 7 ] );
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = SCSILengthFromUINT16( &command[ 7 ] );
+			break;
 
 		case 0x43: // READ TOC
 		{
@@ -208,161 +271,171 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 				length = 4;
 			}
 
-			cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+			cdda = cdda_from_cdrom(machine(), cdrom);
 			if (cdda != NULL)
 			{
 				cdda_stop_audio(cdda);
 			}
 
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return length;
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = length;
+			break;
 		}
 		case 0x45: // PLAY AUDIO(10)
-			our_this->lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			our_this->blocks = SCSILengthFromUINT16( &command[7] );
+			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+			blocks = SCSILengthFromUINT16( &command[7] );
 
 			// special cases: lba of 0 means MSF of 00:02:00
-			if (our_this->lba == 0)
+			if (lba == 0)
 			{
-				our_this->lba = 150;
+				lba = 150;
 			}
-			else if (our_this->lba == 0xffffffff)
+			else if (lba == 0xffffffff)
 			{
 				logerror("GDROM: play audio from current not implemented!\n");
 			}
 
-			logerror("GDROM: PLAY AUDIO(10) at LBA %x for %x blocks\n", our_this->lba, our_this->blocks);
+			logerror("GDROM: PLAY AUDIO(10) at LBA %x for %x blocks\n", lba, blocks);
 
-			trk = cdrom_get_track(cdrom, our_this->lba);
+			trk = cdrom_get_track(cdrom, lba);
 
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
-				our_this->play_err_flag = 0;
-				cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+				play_err_flag = 0;
+				cdda = cdda_from_cdrom(machine(), cdrom);
 				if (cdda != NULL)
-					cdda_start_audio(cdda, our_this->lba, our_this->blocks);
+					cdda_start_audio(cdda, lba, blocks);
 			}
 			else
 			{
 				logerror("GDROM: track is NOT audio!\n");
-				our_this->play_err_flag = 1;
+				play_err_flag = 1;
 			}
 
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0x48: // PLAY AUDIO TRACK/INDEX
 			// be careful: tracks here are zero-based, but the SCSI command
 			// uses the real CD track number which is 1-based!
-			our_this->lba = cdrom_get_track_start(cdrom, command[4]-1);
-			our_this->blocks = cdrom_get_track_start(cdrom, command[7]-1) - our_this->lba;
+			lba = cdrom_get_track_start(cdrom, command[4]-1);
+			blocks = cdrom_get_track_start(cdrom, command[7]-1) - lba;
 			if (command[4] > command[7])
 			{
-				our_this->blocks = 0;
+				blocks = 0;
 			}
 
 			if (command[4] == command[7])
 			{
-				our_this->blocks = cdrom_get_track_start(cdrom, command[4]) - our_this->lba;
+				blocks = cdrom_get_track_start(cdrom, command[4]) - lba;
 			}
 
-			if (our_this->blocks && cdrom)
+			if (blocks && cdrom)
 			{
-				cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+				cdda = cdda_from_cdrom(machine(), cdrom);
 				if (cdda != NULL)
-					cdda_start_audio(cdda, our_this->lba, our_this->blocks);
+					cdda_start_audio(cdda, lba, blocks);
 			}
 
-			logerror("GDROM: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], our_this->blocks);
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			logerror("GDROM: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], blocks);
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0x4b: // PAUSE/RESUME
 			if (cdrom)
 			{
-				cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+				cdda = cdda_from_cdrom(machine(), cdrom);
 				if (cdda != NULL)
 					cdda_pause_audio(cdda, (command[8] & 0x01) ^ 0x01);
 			}
 
 			logerror("GDROM: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0x55: // MODE SELECT(10)
 			logerror("GDROM: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAOUT );
-			return SCSILengthFromUINT16( &command[ 7 ] );
+			SetPhase( SCSI_PHASE_DATAOUT );
+			*transferLength = SCSILengthFromUINT16( &command[ 7 ] );
+			break;
 
 		case 0x5a: // MODE SENSE(10)
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return SCSILengthFromUINT16( &command[ 7 ] );
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = SCSILengthFromUINT16( &command[ 7 ] );
+			break;
 
 		case 0xa5: // PLAY AUDIO(12)
-			our_this->lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			our_this->blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
+			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+			blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
 
 			// special cases: lba of 0 means MSF of 00:02:00
-			if (our_this->lba == 0)
+			if (lba == 0)
 			{
-				our_this->lba = 150;
+				lba = 150;
 			}
-			else if (our_this->lba == 0xffffffff)
+			else if (lba == 0xffffffff)
 			{
 				logerror("GDROM: play audio from current not implemented!\n");
 			}
 
-			logerror("GDROM: PLAY AUDIO(12) at LBA %x for %x blocks\n", our_this->lba, our_this->blocks);
+			logerror("GDROM: PLAY AUDIO(12) at LBA %x for %x blocks\n", lba, blocks);
 
-			trk = cdrom_get_track(cdrom, our_this->lba);
+			trk = cdrom_get_track(cdrom, lba);
 
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
-				our_this->play_err_flag = 0;
-				cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+				play_err_flag = 0;
+				cdda = cdda_from_cdrom(machine(), cdrom);
 				if (cdda != NULL)
-					cdda_start_audio(cdda, our_this->lba, our_this->blocks);
+					cdda_start_audio(cdda, lba, blocks);
 			}
 			else
 			{
 				logerror("GDROM: track is NOT audio!\n");
-				our_this->play_err_flag = 1;
+				play_err_flag = 1;
 			}
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0xa8: // READ(12)
-			our_this->lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			our_this->blocks = command[7]<<16 | command[8]<<8 | command[9];
+			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+			blocks = command[7]<<16 | command[8]<<8 | command[9];
 
-			logerror("GDROM: READ(12) at LBA %x for %x blocks (%x bytes)\n", our_this->lba, our_this->blocks, our_this->blocks * our_this->bytes_per_sector);
+			logerror("GDROM: READ(12) at LBA %x for %x blocks (%x bytes)\n", lba, blocks, blocks * bytes_per_sector);
 
-			if (our_this->num_subblocks > 1)
+			if (num_subblocks > 1)
 			{
-				our_this->cur_subblock = our_this->lba % our_this->num_subblocks;
-				our_this->lba /= our_this->num_subblocks;
+				cur_subblock = lba % num_subblocks;
+				lba /= num_subblocks;
 			}
 			else
 			{
-				our_this->cur_subblock = 0;
+				cur_subblock = 0;
 			}
 
-			cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+			cdda = cdda_from_cdrom(machine(), cdrom);
 			if (cdda != NULL)
 			{
 				cdda_stop_audio(cdda);
 			}
 
-			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return our_this->blocks * our_this->bytes_per_sector;
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = blocks * bytes_per_sector;
+			break;
 
 		case 0xbb: // SET CD SPEED
 			logerror("GDROM: SET CD SPEED to %d kbytes/sec.\n", command[2]<<8 | command[3]);
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		default:
-			return SCSIBase( &SCSIClassGDROM, SCSIOP_EXEC_COMMAND, scsiInstance, 0, NULL );
+			scsidev_device::ExecCommand( transferLength );
+			break;
 	}
 }
 
@@ -370,20 +443,18 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 //
 // Read data from the device resulting from the execution of a command
 
-static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataLength )
+void gdrom_device::ReadData( UINT8 *data, int dataLength )
 {
 	UINT8 *command;
 	int commandLength;
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
 
 	int i;
 	UINT32 last_phys_frame;
-	cdrom_file *cdrom = our_this->cdrom;
 	UINT32 temp;
 	UINT8 tmp_buffer[2048];
 	device_t *cdda;
 
-	SCSIGetCommand( scsiInstance, &command, &commandLength );
+	GetCommand( &command, &commandLength );
 
 	switch ( command[0] )
 	{
@@ -394,15 +465,15 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 
 			data[0] = 0x71;	// deferred error
 
-			cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+			cdda = cdda_from_cdrom(machine(), cdrom);
 			if (cdda != NULL && cdda_audio_active(cdda))
 			{
 				data[12] = 0x00;
 				data[13] = 0x11;	// AUDIO PLAY OPERATION IN PROGRESS
 			}
-			else if (our_this->play_err_flag)
+			else if (play_err_flag)
 			{
-				our_this->play_err_flag = 0;
+				play_err_flag = 0;
 				data[12] = 0x64;	// ILLEGAL MODE FOR THIS TRACK
 				data[13] = 0x00;
 			}
@@ -439,69 +510,69 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 			data[3] = (temp & 0xff);
 			data[4] = 0;
 			data[5] = 0;
-			data[6] = (our_this->bytes_per_sector>>8)&0xff;
-			data[7] = (our_this->bytes_per_sector & 0xff);
+			data[6] = (bytes_per_sector>>8)&0xff;
+			data[7] = (bytes_per_sector & 0xff);
 			break;
 
 		case 0x28: // READ(10)
 		case 0xa8: // READ(12)
 			logerror("GDROM: read %x dataLength, \n", dataLength);
-			if ((our_this->cdrom) && (our_this->blocks))
+			if ((cdrom) && (blocks))
 			{
 				while (dataLength > 0)
 				{
-					if (!cdrom_read_data(our_this->cdrom, our_this->lba, tmp_buffer, CD_TRACK_MODE1))
+					if (!cdrom_read_data(cdrom, lba, tmp_buffer, CD_TRACK_MODE1))
 					{
 						logerror("GDROM: CD read error!\n");
 					}
 
-					logerror("True LBA: %d, buffer half: %d\n", our_this->lba, our_this->cur_subblock * our_this->bytes_per_sector);
+					logerror("True LBA: %d, buffer half: %d\n", lba, cur_subblock * bytes_per_sector);
 
-					memcpy(data, &tmp_buffer[our_this->cur_subblock * our_this->bytes_per_sector], our_this->bytes_per_sector);
+					memcpy(data, &tmp_buffer[cur_subblock * bytes_per_sector], bytes_per_sector);
 
-					our_this->cur_subblock++;
-					if (our_this->cur_subblock >= our_this->num_subblocks)
+					cur_subblock++;
+					if (cur_subblock >= num_subblocks)
 					{
-						our_this->cur_subblock = 0;
+						cur_subblock = 0;
 
-						our_this->lba++;
-						our_this->blocks--;
+						lba++;
+						blocks--;
 					}
 
-					our_this->last_lba = our_this->lba;
-					dataLength -= our_this->bytes_per_sector;
-					data += our_this->bytes_per_sector;
+					last_lba = lba;
+					dataLength -= bytes_per_sector;
+					data += bytes_per_sector;
 				}
 			}
 			break;
 
 		case 0x30: // CD_READ
 			logerror("GDROM: read %x dataLength, \n", dataLength);
-			if ((our_this->cdrom) && (our_this->blocks))
+			if ((cdrom) && (blocks))
 			{
 				while (dataLength > 0)
 				{
-					if (!cdrom_read_data(our_this->cdrom, our_this->lba, tmp_buffer, CD_TRACK_MODE1))
+					if (!cdrom_read_data(cdrom, lba, tmp_buffer, CD_TRACK_MODE1))
 					{
 						logerror("GDROM: CD read error!\n");
 					}
 
-					logerror("True LBA: %d, buffer half: %d\n", our_this->lba, our_this->cur_subblock * our_this->bytes_per_sector);
+					logerror("True LBA: %d, buffer half: %d\n", lba, cur_subblock * bytes_per_sector);
 
-					memcpy(data, &tmp_buffer[our_this->cur_subblock * our_this->bytes_per_sector], our_this->bytes_per_sector);
+					memcpy(data, &tmp_buffer[cur_subblock * bytes_per_sector], bytes_per_sector);
 
-					our_this->cur_subblock++;
-					if (our_this->cur_subblock >= our_this->num_subblocks)
+					cur_subblock++;
+					if (cur_subblock >= num_subblocks)
 					{
-						our_this->cur_subblock = 0;
+						cur_subblock = 0;
 
-						our_this->lba++;
-						our_this->blocks--;
+						lba++;
+						blocks--;
 					}
 
-					our_this->last_lba = our_this->lba;
-					dataLength -= our_this->bytes_per_sector;
-					data += our_this->bytes_per_sector;
+					last_lba = lba;
+					dataLength -= bytes_per_sector;
+					data += bytes_per_sector;
 				}
 			}
 
@@ -522,7 +593,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 
 					msf = command[1] & 0x2;
 
-					cdda = cdda_from_cdrom(scsiInstance->machine(), cdrom);
+					cdda = cdda_from_cdrom(machine(), cdrom);
 					audio_active = cdda != NULL && cdda_audio_active(cdda);
 					if (audio_active)
 					{
@@ -551,21 +622,21 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 					// if audio is playing, get the latest LBA from the CDROM layer
 					if (audio_active)
 					{
-						our_this->last_lba = cdda_get_audio_lba(cdda);
+						last_lba = cdda_get_audio_lba(cdda);
 					}
 					else
 					{
-						our_this->last_lba = 0;
+						last_lba = 0;
 					}
 
 					data[2] = 0;
 					data[3] = 12;		// data length
 					data[4] = 0x01;	// sub-channel format code
 					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = cdrom_get_track(cdrom, our_this->last_lba) + 1;	// track
+					data[6] = cdrom_get_track(cdrom, last_lba) + 1;	// track
 					data[7] = 0;	// index
 
-					last_phys_frame = our_this->last_lba;
+					last_phys_frame = last_lba;
 
 					if (msf)
 					{
@@ -715,7 +786,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 			break;
 
 		default:
-			SCSIBase( &SCSIClassGDROM, SCSIOP_READ_DATA, scsiInstance, dataLength, data );
+			scsidev_device::ReadData( data, dataLength );
 			break;
 	}
 }
@@ -724,12 +795,11 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 //
 // Write data to the CD-ROM device as part of the execution of a command
 
-static void scsicd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataLength )
+void gdrom_device::WriteData( UINT8 *data, int dataLength )
 {
 	UINT8 *command;
 	int commandLength;
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
-	SCSIGetCommand( scsiInstance, &command, &commandLength );
+	GetCommand( &command, &commandLength );
 
 	switch (command[ 0 ])
 	{
@@ -745,8 +815,8 @@ static void scsicd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 					{
 						logerror("GDROM: Experimental SGI 512-byte block extension enabled\n");
 
-						our_this->bytes_per_sector = 512;
-						our_this->num_subblocks = 4;
+						bytes_per_sector = 512;
+						num_subblocks = 4;
 					}
 					else
 					{
@@ -764,112 +834,17 @@ static void scsicd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 			break;
 
 		default:
-			SCSIBase( &SCSIClassGDROM, SCSIOP_WRITE_DATA, scsiInstance, dataLength, data );
+			scsidev_device::WriteData( data, dataLength );
 			break;
 	}
 }
 
-static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
+void gdrom_device::GetDevice( void **_cdrom )
 {
-	running_machine &machine = scsiInstance->machine();
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
-
-	our_this->lba = 0;
-	our_this->blocks = 0;
-	our_this->last_lba = 0;
-	our_this->bytes_per_sector = 2048;
-	our_this->num_subblocks = 1;
-	our_this->cur_subblock = 0;
-	our_this->play_err_flag = 0;
-
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->lba );
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->blocks );
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->last_lba );
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->bytes_per_sector );
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->num_subblocks );
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->cur_subblock );
-	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->play_err_flag );
-
-	if (machine.device( diskregion )) {
-		our_this->is_file = TRUE;
-		cdrom_image_device *cdrom = machine.device<cdrom_image_device>(diskregion);
-		our_this->cdrom = cdrom->get_cdrom_file();
-	} else {
-		our_this->is_file = FALSE;
-		our_this->cdrom = cdrom_open(get_disk_handle( machine, diskregion ));
-	}
-
-	if (!our_this->cdrom)
-	{
-		logerror("GDROM: no CD found!\n");
-	}
+	*(cdrom_file **)_cdrom = cdrom;
 }
 
-static void scsicd_delete_instance( SCSIInstance *scsiInstance )
+void gdrom_device::SetDevice( void *_cdrom )
 {
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
-	if (!our_this->is_file) {
-		if( our_this->cdrom )
-		{
-			cdrom_close( our_this->cdrom );
-		}
-	}
+	cdrom = (cdrom_file *) _cdrom;
 }
-
-static void scsicd_get_device( SCSIInstance *scsiInstance, cdrom_file **cdrom )
-{
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
-	*cdrom = our_this->cdrom;
-}
-
-static void scsicd_set_device( SCSIInstance *scsiInstance, cdrom_file *cdrom )
-{
-	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
-	our_this->cdrom = cdrom;
-}
-
-static int scsigd_dispatch(int operation, void *file, INT64 intparm, void *ptrparm)
-{
-	SCSIAllocInstanceParams *params;
-
-	switch (operation)
-	{
-		case SCSIOP_EXEC_COMMAND:
-			return scsicd_exec_command( (SCSIInstance *)file, (UINT8 *)ptrparm );
-
-		case SCSIOP_READ_DATA:
-			scsicd_read_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
-			return 0;
-
-		case SCSIOP_WRITE_DATA:
-			scsicd_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
-			return 0;
-
-		case SCSIOP_ALLOC_INSTANCE:
-			params = (SCSIAllocInstanceParams *)ptrparm;
-			SCSIBase( &SCSIClassGDROM, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
-			scsicd_alloc_instance( params->instance, params->diskregion );
-			return 0;
-
-		case SCSIOP_DELETE_INSTANCE:
-			scsicd_delete_instance( (SCSIInstance *)file );
-			break;
-
-		case SCSIOP_GET_DEVICE:
-			scsicd_get_device( (SCSIInstance *)file, (cdrom_file **)ptrparm );
-			return 0;
-
-		case SCSIOP_SET_DEVICE:
-			scsicd_set_device( (SCSIInstance *)file, (cdrom_file *)ptrparm );
-			return 0;
-	}
-
-	return SCSIBase( &SCSIClassGDROM, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
-}
-
-const SCSIClass SCSIClassGDROM =
-{
-	&SCSIClassDevice,
-	scsigd_dispatch,
-	sizeof( SCSIGd )
-};

@@ -12,7 +12,6 @@ struct LSI53C810interface
 };
 
 extern void lsi53c810_init(running_machine &machine, const struct LSI53C810interface *interface);
-extern void lsi53c810_exit(const struct LSI53C810interface *interface);
 
 extern void lsi53c810_read_data(int bytes, UINT8 *pData);
 extern void lsi53c810_write_data(int bytes, UINT8 *pData);

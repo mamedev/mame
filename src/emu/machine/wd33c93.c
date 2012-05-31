@@ -13,11 +13,12 @@
 
 #include "emu.h"
 #include "wd33c93.h"
+#include "machine/scsidev.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-static SCSIInstance *devices[8];	// SCSI IDs 0-7
+static scsidev_device *devices[8];	// SCSI IDs 0-7
 static const struct WD33C93interface *intf;
 
 /* wd register names */
@@ -227,7 +228,7 @@ static void wd33c93_read_data(int bytes, UINT8 *pData)
 
 	if ( devices[unit] )
 	{
-		SCSIReadData( devices[unit], pData, bytes );
+		devices[unit]->ReadData( pData, bytes );
 	}
 	else
 	{
@@ -379,9 +380,9 @@ static CMD_HANDLER( wd33c93_selectxfer_cmd )
 			int phase;
 
 			/* do the request */
-			SCSISetCommand( devices[unit], &scsi_data.regs[WD_CDB_1], 12 );
-			SCSIExecCommand( devices[unit], &xfercount );
-			SCSIGetPhase( devices[unit], &phase );
+			devices[unit]->SetCommand( &scsi_data.regs[WD_CDB_1], 12 );
+			devices[unit]->ExecCommand( &xfercount );
+			devices[unit]->GetPhase( &phase );
 
 			/* set transfer count */
 			if ( wd33c93_get_xfer_count() > TEMP_INPUT_LEN )
@@ -592,9 +593,9 @@ WRITE8_HANDLER(wd33c93_w)
 								int phase;
 
 								/* Execute the command. Depending on the command, we'll move to data in or out */
-								SCSISetCommand( devices[unit], &scsi_data.fifo[0], 12 );
-								SCSIExecCommand( devices[unit], &xfercount );
-								SCSIGetPhase( devices[unit], &phase );
+								devices[unit]->SetCommand( &scsi_data.fifo[0], 12 );
+								devices[unit]->ExecCommand( &xfercount );
+								devices[unit]->GetPhase( &phase );
 
 								/* reset fifo */
 								scsi_data.fifo_pos = 0;
@@ -791,7 +792,7 @@ void wd33c93_init( running_machine &machine, const struct WD33C93interface *inte
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( machine, interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
+		devices[interface->scsidevs->devices[i].scsiID] = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
 	}
 
 	/* allocate a timer for commands */
@@ -800,16 +801,6 @@ void wd33c93_init( running_machine &machine, const struct WD33C93interface *inte
 	scsi_data.temp_input = auto_alloc_array( machine, UINT8, TEMP_INPUT_LEN );
 
 //  state_save_register_item_array(machine, "wd33c93", NULL, 0, scsi_data);
-}
-
-void wd33c93_exit( const struct WD33C93interface *interface )
-{
-	int i;
-
-	for (i = 0; i < interface->scsidevs->devs_present; i++)
-	{
-		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
-	}
 }
 
 void wd33c93_get_dma_data( int bytes, UINT8 *pData )
@@ -843,7 +834,7 @@ void wd33c93_write_data(int bytes, UINT8 *pData)
 
 	if (devices[unit])
 	{
-		SCSIWriteData( devices[unit], pData, bytes );
+		devices[unit]->WriteData( pData, bytes );
 	}
 	else
 	{
@@ -857,7 +848,7 @@ void *wd33c93_get_device(int id)
 
 	if (devices[id])
 	{
-		SCSIGetDevice( devices[id], &ret );
+		devices[id]->GetDevice( &ret );
 		return ret;
 	}
 

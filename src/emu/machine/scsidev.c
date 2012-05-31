@@ -5,156 +5,94 @@
 ***************************************************************************/
 
 #include "emu.h"
-	#include "scsidev.h"
+#include "scsidev.h"
 
-typedef struct
+scsidev_device::scsidev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, type, name, tag, owner, clock)
 {
-	UINT8 command[16];
-	int commandLength;
-	int phase;
-} SCSIDev;
+}
 
-static int scsidev_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
+void scsidev_device::device_start()
+{
+	save_item( NAME( command ) );
+	save_item( NAME( commandLength ) );
+	save_item( NAME( phase ) );
+}
+
+void scsidev_device::ExecCommand( int *transferLength )
 {
 	UINT8 *command;
 	int commandLength;
-//  SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-	SCSIGetCommand( scsiInstance, &command, &commandLength );
+	GetCommand( &command, &commandLength );
 
 	switch( command[ 0 ] )
 	{
 		case 0x00: // TEST UNIT READY
-			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
-			return 0;
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		default:
-			logerror( "%s: SCSIDEV unknown command %02x\n", scsiInstance->machine().describe_context(), command[ 0 ] );
-			return 0;
-	}
-}
-
-static void scsidev_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataLength )
-{
-	UINT8 *command;
-	int commandLength;
-//  SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-	SCSIGetCommand( scsiInstance, &command, &commandLength );
-
-	switch( command[ 0 ] )
-	{
-		default:
-			logerror( "%s: SCSIDEV unknown read %02x\n", scsiInstance->machine().describe_context(), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown command %02x\n", machine().describe_context(), command[ 0 ] );
+			*transferLength = 0;
 			break;
 	}
 }
 
-static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataLength )
+void scsidev_device::ReadData( UINT8 *data, int dataLength )
 {
 	UINT8 *command;
 	int commandLength;
-//  SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-	SCSIGetCommand( scsiInstance, &command, &commandLength );
+	GetCommand( &command, &commandLength );
 
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%s: SCSIDEV unknown write %02x\n", scsiInstance->machine().describe_context(), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown read %02x\n", machine().describe_context(), command[ 0 ] );
 			break;
 	}
 }
 
-static void scsidev_set_phase( SCSIInstance *scsiInstance, int phase )
+void scsidev_device::WriteData( UINT8 *data, int dataLength )
 {
-	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-	our_this->phase = phase;
+	UINT8 *command;
+	int commandLength;
+	GetCommand( &command, &commandLength );
+
+	switch( command[ 0 ] )
+	{
+		default:
+			logerror( "%s: SCSIDEV unknown write %02x\n", machine().describe_context(), command[ 0 ] );
+			break;
+	}
 }
 
-static int scsidev_get_phase( SCSIInstance *scsiInstance )
+void scsidev_device::SetPhase( int _phase )
 {
-	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-	return our_this->phase;
+	phase = _phase;
 }
 
-static void scsidev_set_command( SCSIInstance *scsiInstance, void *command, int commandLength )
+void scsidev_device::GetPhase( int *_phase)
 {
-	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
+	*_phase = phase;
+}
 
-	if( commandLength > sizeof( our_this->command ) )
+void scsidev_device::SetCommand( UINT8 *_command, int _commandLength )
+{
+	if( _commandLength > sizeof( command ) )
 	{
 		/// TODO: output an error.
 		return;
 	}
 
-	memcpy( our_this->command, command, commandLength );
-	our_this->commandLength = commandLength;
+	memcpy( command, _command, _commandLength );
+	commandLength = _commandLength;
 
-	SCSISetPhase( scsiInstance, SCSI_PHASE_COMMAND );
+	SetPhase( SCSI_PHASE_COMMAND );
 }
 
-static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
+void scsidev_device::GetCommand( UINT8 **_command, int *_commandLength )
 {
-	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-	*command = our_this->command;
-	return our_this->commandLength;
+	*_command = command;
+	*_commandLength = commandLength;
 }
-
-static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
-{
-	running_machine &machine = scsiInstance->machine();
-	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
-
-	state_save_register_item_array( machine, "scsidev", diskregion, 0, our_this->command );
-	state_save_register_item( machine, "scsidev", diskregion, 0, our_this->commandLength );
-	state_save_register_item( machine, "scsidev", diskregion, 0, our_this->phase );
-}
-
-static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )
-{
-	SCSIAllocInstanceParams *params;
-
-	switch( operation )
-	{
-		case SCSIOP_EXEC_COMMAND:
-			return scsidev_exec_command( (SCSIInstance *)file, (UINT8 *)ptrparm );
-
-		case SCSIOP_READ_DATA:
-			scsidev_read_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
-			break;
-
-		case SCSIOP_WRITE_DATA:
-			scsidev_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
-			break;
-
-		case SCSIOP_SET_PHASE:
-			scsidev_set_phase( (SCSIInstance *)file, intparm );
-			return 0;
-
-		case SCSIOP_GET_PHASE:
-			return scsidev_get_phase( (SCSIInstance *)file );
-
-		case SCSIOP_SET_COMMAND:
-			scsidev_set_command( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
-			return 0;
-
-		case SCSIOP_GET_COMMAND:
-			return scsidev_get_command( (SCSIInstance *)file, (void **)ptrparm );
-
-		case SCSIOP_ALLOC_INSTANCE:
-			params = (SCSIAllocInstanceParams *)ptrparm;
-			params->instance = SCSIMalloc( params->machine(), (const SCSIClass *)file );
-			scsidev_alloc_instance( params->instance, params->diskregion );
-			return 0;
-
-		case SCSIOP_DELETE_INSTANCE:
-			auto_free( ((SCSIInstance *)file)->machine(), file );
-			return 0;
-	}
-	return 0;
-}
-
-const SCSIClass SCSIClassDevice =
-{
-	NULL,
-	scsidev_dispatch,
-	sizeof( SCSIDev )
-};

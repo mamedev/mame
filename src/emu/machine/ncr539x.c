@@ -160,10 +160,8 @@ void ncr539x_device::device_start()
 	// try to open the devices
 	for (i = 0; i < scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( machine(),
-				scsidevs->devices[i].scsiClass,
-				&m_scsi_devices[scsidevs->devices[i].scsiID],
-				scsidevs->devices[i].diskregion );
+		m_scsi_devices[scsidevs->devices[i].scsiID] = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		assert( m_scsi_devices[scsidevs->devices[i].scsiID] != NULL );
 	}
 
 	m_operation_timer = timer_alloc(0, NULL);
@@ -197,27 +195,13 @@ void ncr539x_device::device_reset()
 	scan_devices();
 }
 
-//-------------------------------------------------
-//  device_stop - device-specific stop/shutdown
-//-------------------------------------------------
-void ncr539x_device::device_stop()
-{
-	int i;
-
-	// clean up the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
-	{
-		SCSIDeleteInstance( m_scsi_devices[scsidevs->devices[i].scsiID] );
-	}
-}
-
 void ncr539x_device::dma_read_data(int bytes, UINT8 *pData)
 {
 	if (m_scsi_devices[m_last_id])
 	{
 		if (VERBOSE)
 			logerror("NCR539x: issuing read for %d bytes\n", bytes);
-		SCSIReadData(m_scsi_devices[m_last_id], pData, bytes);
+		m_scsi_devices[m_last_id]->ReadData(pData, bytes);
 	}
 	else
 	{
@@ -232,7 +216,7 @@ void ncr539x_device::dma_write_data(int bytes, UINT8 *pData)
 	{
 		if (m_scsi_devices[m_last_id])
 		{
-			SCSIWriteData(m_scsi_devices[m_last_id], pData, bytes);
+			m_scsi_devices[m_last_id]->WriteData(pData, bytes);
 		}
 		else
 		{
@@ -251,10 +235,7 @@ void ncr539x_device::scan_devices()
 		// if a device wasn't already allocated
 		if (!m_scsi_devices[scsidevs->devices[i].scsiID])
 		{
-			SCSIAllocInstance( machine(),
-					scsidevs->devices[i].scsiClass,
-					&m_scsi_devices[scsidevs->devices[i].scsiID],
-					scsidevs->devices[i].diskregion );
+			m_scsi_devices[scsidevs->devices[i].scsiID] = machine().device<scsidev_device>( scsidevs->devices[i].tag );
 		}
 	}
 }
@@ -589,7 +570,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_irq_status = IRQ_STATUS_SUCCESS;
 
 					int phase;
-					SCSIGetPhase( m_scsi_devices[m_last_id], &phase );
+					m_scsi_devices[m_last_id]->GetPhase( &phase );
 
 					#if VERBOSE
 					printf("Information transfer: phase %d buffer remaining %x\n", phase, m_buffer_remaining);
@@ -613,7 +594,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 
 							if (amtToGet > 0)
 							{
-								SCSIReadData(m_scsi_devices[m_last_id], m_buffer, amtToGet);
+								m_scsi_devices[m_last_id]->ReadData(m_buffer, amtToGet);
 
 								m_total_data -= amtToGet;
 								m_buffer_offset = 0;
@@ -811,9 +792,9 @@ void ncr539x_device::exec_fifo()
 {
 	int length, phase;
 
-	SCSISetCommand(m_scsi_devices[m_last_id], &m_fifo[0], 12);
-	SCSIExecCommand(m_scsi_devices[m_last_id], &length);
-	SCSIGetPhase(m_scsi_devices[m_last_id], &phase);
+	m_scsi_devices[m_last_id]->SetCommand(&m_fifo[0], 12);
+	m_scsi_devices[m_last_id]->ExecCommand(&length);
+	m_scsi_devices[m_last_id]->GetPhase(&phase);
 
 	#if VERBOSE
 	printf("Command executed (id %d), new phase %d, length %x\n", m_last_id, phase, length);
@@ -874,7 +855,7 @@ void ncr539x_device::fifo_write(UINT8 data)
 			#if VERBOSE
 			printf("Flushing buffer to device, %x bytes left in buffer (%x total)\n", m_xfer_count, m_total_data);
 			#endif
-			SCSIWriteData(m_scsi_devices[m_last_id], m_buffer, flush_size);
+			m_scsi_devices[m_last_id]->WriteData(m_buffer, flush_size);
 			m_buffer_offset = 0;
 
 			// need a service request here too

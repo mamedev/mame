@@ -1197,9 +1197,8 @@ static const eeprom_interface eeprom_intf =
 
 static const SCSIConfigTable scsi_dev_table =
 {
-	1, /* 1 SCSI device */
+	0, /* no SCSI device */
 	{
-		{ SCSI_ID_0, "disk", SCSI_DEVICE_HARDDISK } /* SCSI ID 0, using HD 0, HD */
 	}
 };
 
@@ -1210,11 +1209,6 @@ static const struct LSI53C810interface scsi_intf =
 	&real3d_dma_callback,
 	&scsi_fetch,
 };
-
-static void model3_exit(running_machine &machine)
-{
-	lsi53c810_exit(&scsi_intf);
-}
 
 static void configure_fast_ram(running_machine &machine)
 {
@@ -1239,7 +1233,6 @@ static TIMER_CALLBACK(model3_sound_timer_tick)
 static MACHINE_START(model3_10)
 {
 	lsi53c810_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 	configure_fast_ram(machine);
 
 	model3_state *state = machine.driver_data<model3_state>();
@@ -1248,7 +1241,6 @@ static MACHINE_START(model3_10)
 static MACHINE_START(model3_15)
 {
 	lsi53c810_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 	configure_fast_ram(machine);
 
 	model3_state *state = machine.driver_data<model3_state>();

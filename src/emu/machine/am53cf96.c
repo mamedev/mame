@@ -11,11 +11,12 @@
 
 #include "emu.h"
 #include "am53cf96.h"
+#include "machine/scsidev.h"
 
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;
 static const struct AM53CF96interface *intf;
 
-static SCSIInstance *devices[8];	// SCSI IDs 0-7
+static scsidev_device *devices[8];	// SCSI IDs 0-7
 
 // 53CF96 register set
 enum
@@ -147,7 +148,7 @@ WRITE32_HANDLER( am53cf96_w )
 				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, cpu_get_pc(&space->device()));
 				if (devices[last_id])
 				{
-					SCSIReset( devices[last_id] );
+					devices[last_id]->reset();
 				}
 				else
 				{
@@ -177,8 +178,8 @@ WRITE32_HANDLER( am53cf96_w )
 				{
 					int length;
 
-					SCSISetCommand( devices[last_id], &fifo[1], 12 );
-					SCSIExecCommand( devices[last_id], &length );
+					devices[last_id]->SetCommand( &fifo[1], 12 );
+					devices[last_id]->ExecCommand( &length );
 				}
 				else
 				{
@@ -221,7 +222,7 @@ void am53cf96_init( running_machine &machine, const struct AM53CF96interface *in
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( machine, interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
+		devices[interface->scsidevs->devices[i].scsiID] = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
 	}
 
 	state_save_register_global_array(machine, scsi_regs);
@@ -231,16 +232,6 @@ void am53cf96_init( running_machine &machine, const struct AM53CF96interface *in
 	state_save_register_global(machine, last_id);
 }
 
-void am53cf96_exit( const struct AM53CF96interface *interface )
-{
-	int i;
-
-	for (i = 0; i < interface->scsidevs->devs_present; i++)
-	{
-		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
-	}
-}
-
 // retrieve data from the SCSI controller
 void am53cf96_read_data(int bytes, UINT8 *pData)
 {
@@ -248,7 +239,7 @@ void am53cf96_read_data(int bytes, UINT8 *pData)
 
 	if (devices[last_id])
 	{
-		SCSIReadData( devices[last_id], pData, bytes );
+		devices[last_id]->ReadData( pData, bytes );
 	}
 	else
 	{
@@ -265,7 +256,7 @@ void am53cf96_write_data(int bytes, UINT8 *pData)
 
 	if (devices[last_id])
 	{
-		SCSIWriteData( devices[last_id], pData, bytes );
+		devices[last_id]->WriteData( pData, bytes );
 	}
 	else
 	{
@@ -281,7 +272,7 @@ void *am53cf96_get_device(int id)
 	if (devices[id])
 	{
 		logerror("53cf96: fetching dev pointer for SCSI ID %d\n", id);
-		SCSIGetDevice( devices[id], &ret );
+		devices[id]->GetDevice( &ret );
 		return ret;
 	}
 

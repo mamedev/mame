@@ -125,6 +125,7 @@ Notes:
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
 #include "machine/am53cf96.h"
+#include "machine/scsicd.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
 
@@ -289,7 +290,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_4, ":cdrom", SCSI_DEVICE_CDROM } /* SCSI ID 4, using CHD 0, and it's a CD-ROM */
+		{ SCSI_ID_4, ":cdrom", } /* SCSI ID 4, CD-ROM */
 	}
 };
 
@@ -299,18 +300,12 @@ static const struct AM53CF96interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static void konamigv_exit(running_machine &machine)
-{
-	am53cf96_exit(&scsi_intf);
-}
-
 static DRIVER_INIT( konamigv )
 {
 	psx_driver_init(machine);
 
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(konamigv_exit), &machine));
 }
 
 static MACHINE_START( konamigv )
@@ -351,6 +346,8 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_MACHINE_RESET( konamigv )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL_53_693175MHz )

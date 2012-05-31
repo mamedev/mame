@@ -53,7 +53,7 @@
 #include "includes/konamigx.h"
 #include "machine/eeprom.h"
 #include "machine/am53cf96.h"
-#include "harddisk.h"
+#include "machine/scsihd.h"
 #include "sound/k054539.h"
 
 class konamigq_state : public psx_state
@@ -305,7 +305,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, ":disk", SCSI_DEVICE_HARDDISK } /* SCSI ID 0, using CHD 0, and it's a HDD */
+		{ SCSI_ID_0, ":disk" } /* SCSI ID 0, HDD */
 	}
 };
 
@@ -324,18 +324,12 @@ static DRIVER_INIT( konamigq )
 	state->m_p_n_pcmram = state->memregion( "shared" )->base() + 0x80000;
 }
 
-static void konamigq_exit(running_machine &machine)
-{
-	am53cf96_exit(&scsi_intf);
-}
-
 static MACHINE_START( konamigq )
 {
 	konamigq_state *state = machine.driver_data<konamigq_state>();
 
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(konamigq_exit), &machine));
 
 	state->save_pointer(NAME(state->m_p_n_pcmram), 0x380000);
 	state->save_item(NAME(state->m_sndto000));
@@ -363,6 +357,8 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_MACHINE_RESET( konamigq )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
+
+	MCFG_DEVICE_ADD("disk", SCSIHD, 0)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )

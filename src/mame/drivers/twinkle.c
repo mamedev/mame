@@ -232,6 +232,7 @@ Notes:
 #include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/am53cf96.h"
+#include "machine/scsicd.h"
 #include "machine/rtc65271.h"
 #include "machine/i2cmem.h"
 #include "machine/idectrl.h"
@@ -850,7 +851,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_4, "cdrom0", SCSI_DEVICE_CDROM } /* SCSI ID 4, using CHD 0, and it's a CD-ROM */
+		{ SCSI_ID_4, "cdrom0" } /* SCSI ID 4, CD-ROM */
 	}
 };
 
@@ -911,6 +912,8 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 
 	MCFG_MACHINE_RESET( twinkle )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)
+
+	MCFG_DEVICE_ADD("cdrom0", SCSICD, 0)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)

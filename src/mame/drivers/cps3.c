@@ -389,6 +389,7 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/cps3.h"
 #include "machine/wd33c93.h"
+#include "machine/scsicd.h"
 
 #define MASTER_CLOCK	42954500
 
@@ -2292,7 +2293,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 static const SCSIConfigTable dev_table =
 {
 	1,                                      /* 1 SCSI device */
-	{ { SCSI_ID_1, ":cdrom", SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
+	{ { SCSI_ID_1, ":cdrom" } } /* SCSI ID 2, CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =
@@ -2301,15 +2302,9 @@ static const struct WD33C93interface scsi_intf =
 	NULL			/* command completion IRQ */
 };
 
-static void cps3_exit(running_machine &machine)
-{
-	wd33c93_exit(&scsi_intf);
-}
-
 static MACHINE_START( cps3 )
 {
 	wd33c93_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cps3_exit), &machine));
 }
 
 static MACHINE_RESET( cps3 )
@@ -2545,6 +2540,8 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_CPU_VBLANK_INT("screen", cps3_vbl_interrupt)
 	MCFG_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 	MCFG_CPU_CONFIG(sh2_conf_cps3)
+
+	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3467,9 +3464,3 @@ GAME( 1999, jojobane,  jojoba,   jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", 
 GAME( 1999, jojobar1,  jojoba,   jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
-
-
-
-
-
-

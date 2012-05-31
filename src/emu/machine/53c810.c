@@ -2,11 +2,12 @@
 
 #include "emu.h"
 #include "53c810.h"
+#include "machine/scsidev.h"
 
 #define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */
 #define DASM_OPCODES 0
 
-static SCSIInstance *devices[8];	/* SCSI IDs 0-7 */
+static scsidev_device *devices[8];	/* SCSI IDs 0-7 */
 static const struct LSI53C810interface *intf;
 static UINT8 last_id;
 
@@ -707,17 +708,7 @@ void lsi53c810_init(running_machine &machine, const struct LSI53C810interface *i
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( machine, interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
-	}
-}
-
-void lsi53c810_exit(const struct LSI53C810interface *interface)
-{
-	int i;
-
-	for (i = 0; i < interface->scsidevs->devs_present; i++)
-	{
-		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
+		devices[interface->scsidevs->devices[i].scsiID] = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
 	}
 }
 
@@ -725,7 +716,7 @@ void lsi53c810_read_data(int bytes, UINT8 *pData)
 {
 	if (devices[last_id])
 	{
-		SCSIReadData( devices[last_id], pData, bytes);
+		devices[last_id]->ReadData( pData, bytes);
 	}
 	else
 	{
@@ -737,7 +728,7 @@ void lsi53c810_write_data(int bytes, UINT8 *pData)
 {
 	if (devices[last_id])
 	{
-		SCSIWriteData( devices[last_id], pData, bytes );
+		devices[last_id]->WriteData( pData, bytes );
 	}
 	else
 	{
@@ -752,7 +743,7 @@ void *lsi53c810_get_device(int id)
 	if (devices[id])
 	{
 		logerror("lsi53c810: fetching dev pointer for SCSI ID %d\n", id);
-		SCSIGetDevice( devices[id], &ret );
+		devices[id]->GetDevice( &ret );
 
 		return ret;
 	}

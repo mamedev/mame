@@ -158,7 +158,7 @@ public:
 	int m_tick;
 	int m_layer;
 	UINT8 m_atapi_regs[16];
-	SCSIInstance *m_atapi_device_data[2];
+	scsidev_device *m_atapi_device_data[2];
 	UINT16 m_atapi_data[32*1024];
 	UINT8 m_atapi_scsi_packet[32*1024];
 	int m_atapi_data_ptr;
@@ -912,13 +912,6 @@ static void atapi_clear_irq(running_machine &machine)
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
-static void atapi_exit(running_machine& machine)
-{
-	firebeat_state *state = machine.driver_data<firebeat_state>();
-	SCSIDeleteInstance(state->m_atapi_device_data[1]);
-	SCSIDeleteInstance(state->m_atapi_device_data[0]);
-}
-
 static void atapi_init(running_machine &machine)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
@@ -932,11 +925,8 @@ static void atapi_init(running_machine &machine)
 	state->m_atapi_data_ptr = 0;
 	state->m_atapi_cdata_wait = 0;
 
-	// allocate two SCSI CD-ROM devices
-	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &state->m_atapi_device_data[0], "scsi0" );
-	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
-	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &state->m_atapi_device_data[1], "scsi1" );
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(atapi_exit), &machine));
+	state->m_atapi_device_data[0] = machine.device<scsidev_device>( "scsi0" );
+	state->m_atapi_device_data[1] = machine.device<scsidev_device>( "scsi1" );
 }
 
 static void atapi_reset(running_machine &machine)
@@ -972,7 +962,7 @@ static UINT16 atapi_command_reg_r(running_machine &machine, int reg)
 			state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 			// get the data from the device
-			SCSIReadData( state->m_atapi_device_data[state->m_atapi_drivesel], state->m_temp_data, state->m_atapi_xferlen );
+			state->m_atapi_device_data[state->m_atapi_drivesel]->ReadData( state->m_temp_data, state->m_atapi_xferlen );
 
 			// fix it up in an endian-safe way
 			for (i = 0; i < state->m_atapi_xferlen; i += 2)
@@ -1042,7 +1032,7 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 				}
 
 				// send it to the device
-				SCSIWriteData( state->m_atapi_device_data[state->m_atapi_drivesel], state->m_atapi_scsi_packet, state->m_atapi_cdata_wait );
+				state->m_atapi_device_data[state->m_atapi_drivesel]->WriteData( state->m_atapi_scsi_packet, state->m_atapi_cdata_wait );
 
 				// assert IRQ
 				atapi_cause_irq(machine);
@@ -1072,9 +1062,9 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 			}
 
 			// send it to the SCSI device
-			SCSISetCommand( state->m_atapi_device_data[state->m_atapi_drivesel], state->m_atapi_scsi_packet, 12 );
-			SCSIExecCommand( state->m_atapi_device_data[state->m_atapi_drivesel], &state->m_atapi_xferlen );
-			SCSIGetPhase( state->m_atapi_device_data[state->m_atapi_drivesel], &phase );
+			state->m_atapi_device_data[state->m_atapi_drivesel]->SetCommand( state->m_atapi_scsi_packet, 12 );
+			state->m_atapi_device_data[state->m_atapi_drivesel]->ExecCommand( &state->m_atapi_xferlen );
+			state->m_atapi_device_data[state->m_atapi_drivesel]->GetPhase( &phase );
 
 			if (state->m_atapi_xferlen != -1)
 			{
@@ -1964,7 +1954,7 @@ static MACHINE_RESET( firebeat )
 		sound[i+0x200000] = state->m_flash[2]->read(i);
 	}
 
-	SCSIGetDevice( state->m_atapi_device_data[1], &cd );
+	state->m_atapi_device_data[1]->GetDevice( &cd );
 	cdda_set_cdrom(machine.device("cdda"), cd);
 }
 
@@ -1988,6 +1978,9 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_FUJITSU_29F016A_ADD("flash0")
 	MCFG_FUJITSU_29F016A_ADD("flash1")
 	MCFG_FUJITSU_29F016A_ADD("flash2")
+
+	MCFG_DEVICE_ADD("scsi0", SCSICD, 0)
+	MCFG_DEVICE_ADD("scsi1", SCSICD, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

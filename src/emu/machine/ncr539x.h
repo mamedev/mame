@@ -6,6 +6,7 @@
 #ifndef _NCR539x_H_
 #define _NCR539x_H_
 
+#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 struct NCR539Xinterface
@@ -46,7 +47,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_stop();
 	virtual void device_config_complete();
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -56,7 +56,7 @@ private:
     void exec_fifo();
     void update_fifo_internal_state(int bytes);
 
-	SCSIInstance *m_scsi_devices[8];
+	scsidev_device *m_scsi_devices[8];
 
     UINT32 m_xfer_count;
     UINT32 m_dma_size;

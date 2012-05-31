@@ -488,8 +488,8 @@ public:
 	UINT32 m_control;
 
 	emu_timer *m_atapi_timer;
-	SCSIInstance *m_inserted_cdrom;
-	SCSIInstance *m_available_cdroms[ 2 ];
+	scsidev_device *m_inserted_cdrom;
+	scsidev_device *m_available_cdroms[ 2 ];
 	int m_atapi_data_ptr;
 	int m_atapi_data_len;
 	int m_atapi_xferlen;
@@ -696,7 +696,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	while( state->m_atapi_xferlen > 0 )
 	{
 		// get a sector from the SCSI device
-		SCSIReadData( state->m_inserted_cdrom, sector_buffer, 2048 );
+		state->m_inserted_cdrom->ReadData( sector_buffer, 2048 );
 
 		state->m_atapi_xferlen -= 2048;
 
@@ -762,7 +762,7 @@ READ32_MEMBER(ksys573_state::atapi_r)
 			// get the data from the device
 			if( m_atapi_xferlen > 0 )
 			{
-				SCSIReadData( m_inserted_cdrom, m_atapi_data, m_atapi_xferlen );
+				m_inserted_cdrom->ReadData( m_atapi_data, m_atapi_xferlen );
 				m_atapi_data_len = m_atapi_xferlen;
 			}
 
@@ -891,7 +891,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
-				SCSIWriteData( m_inserted_cdrom, atapi_data, m_atapi_cdata_wait );
+				m_inserted_cdrom->WriteData( atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
 				psx_irq_set(machine(), 0x400);
@@ -912,9 +912,9 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			m_atapi_data_len = 0;
 
 			// send it to the SCSI device
-			SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
-			SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
-			SCSIGetPhase( m_inserted_cdrom, &phase );
+			m_inserted_cdrom->SetCommand( m_atapi_data, 12 );
+			m_inserted_cdrom->ExecCommand( &m_atapi_xferlen );
+			m_inserted_cdrom->GetPhase( &phase );
 
 			if (m_atapi_xferlen != -1)
 			{
@@ -1104,20 +1104,6 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 	}
 }
 
-static void atapi_exit(running_machine& machine)
-{
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	int i;
-
-	for( i = 0; i < 2; i++ )
-	{
-		if( get_disk_handle( machine, diskregions[i] ) != NULL )
-		{
-			SCSIDeleteInstance( state->m_available_cdroms[ i ] );
-		}
-	}
-}
-
 static void atapi_init(running_machine &machine)
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
@@ -1139,15 +1125,13 @@ static void atapi_init(running_machine &machine)
 	{
 		if( get_disk_handle( machine, diskregions[i] ) != NULL )
 		{
-			SCSIAllocInstance( machine, &SCSIClassCr589, &state->m_available_cdroms[ i ], diskregions[i] );
+			state->m_available_cdroms[ i ] = machine.device<scsidev_device>( diskregions[i] );
 		}
 		else
 		{
 			state->m_available_cdroms[ i ] = NULL;
 		}
 	}
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(atapi_exit), &machine));
-
 
 	state->save_item( NAME(state->m_atapi_regs) );
 	state->save_item( NAME(state->m_atapi_data) );
@@ -1361,16 +1345,16 @@ static void *atapi_get_device(running_machine &machine)
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
 	void *ret;
-	SCSIGetDevice( state->m_inserted_cdrom, &ret );
+	state->m_inserted_cdrom->GetDevice( &ret );
 	return ret;
-}
+	}
 
 static void update_mode( running_machine &machine )
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
 	int cart = state->ioport("CART")->read();
 	int cd = state->ioport( "CD" )->read();
-	SCSIInstance *new_cdrom;
+	scsidev_device *new_cdrom;
 
 	if( state->machine().device<device_secure_serial_flash>("game_eeprom") )
 	{
@@ -3066,6 +3050,10 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( cdrom_dma_write ), (ksys573_state *) owner ) )
 
 	MCFG_MACHINE_RESET( konami573 )
+
+	// multiple cd's are handled by switching drives instead of discs.
+	MCFG_DEVICE_ADD("cdrom0", CR589, 0)
+	MCFG_DEVICE_ADD("cdrom1", CR589, 0)
 
 	// onboard flash
 	MCFG_FUJITSU_29F016A_ADD("onboard.0")
