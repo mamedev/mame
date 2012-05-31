@@ -5,9 +5,10 @@
 	driver by Angelo Salese
 
 	TODO:
-	- inputs (I've setted up vertical orientation while WIPing the driver);
+	- I/O port 8 (irq/screen enable)
 
 	Notes:
+ 	Z80, 8KB RAM, 2 * SN76489AN for sound, LSIs for video/misc
  	There are 5 x 005273 (Konami custom resistor array (SIL10)) on the PCB,
  	also seen on Jail Break HW
 
@@ -124,7 +125,6 @@ static INPUT_PORTS_START( kontest )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -140,7 +140,9 @@ static INPUT_PORTS_START( kontest )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x80,   0x80, "Orientation" )
+	PORT_DIPSETTING(      0x80, "Horizontal" )
+	PORT_DIPSETTING(      0x00, "Vertical" )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -230,4 +232,4 @@ ROM_START( kontest )
     ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
-GAME( 199?, kontest,  0,   kontest,  kontest,  0,       ROT0, "Konami",      "Konami Test Board GX800 (Japan)", GAME_NOT_WORKING )
+GAME( 1987?, kontest,  0,   kontest,  kontest,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", 0 ) // late 1987 or early 1988
