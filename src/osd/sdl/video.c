@@ -31,7 +31,7 @@
 #endif
 
 #ifdef SDLMAME_OS2
-#define INCL_WIN
+#define INCL_WINSYS
 #include <os2.h>
 #endif
 
