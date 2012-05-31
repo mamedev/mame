@@ -4,16 +4,19 @@
 
 	driver by Angelo Salese
 
-	TODO:
-	- I/O port 8 (irq/screen enable)
-
 	Notes:
- 	Z80, 8KB RAM, 2 * SN76489AN for sound, LSIs for video/misc
+ 	Z80, 8KB RAM, 2 * SN76489AN for sound, TTLs for video/misc
  	There are 5 x 005273 (Konami custom resistor array (SIL10)) on the PCB,
  	also seen on Jail Break HW
+ 	
+ 	menu translation:
+ 	* screen distortion adjustment normal
+ 	* screen distortion adjustment wide
+ 	* input/output check
+ 	* color check
+ 	* sound check
 
 ***************************************************************************/
-
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -37,6 +40,11 @@ public:
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	// driver state
+	UINT8 m_control;
+
+	// member functions
+	DECLARE_WRITE8_MEMBER(control_w);
 
 protected:
 	// driver_device overrides
@@ -45,6 +53,39 @@ protected:
 
 	virtual void video_start();
 };
+
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
+
+static PALETTE_INIT( kontest )
+{
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x40; ++i)
+	{
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
 
 void kontest_state::video_start()
 {
@@ -101,6 +142,22 @@ UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap
 }
 
 
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+WRITE8_MEMBER(kontest_state::control_w)
+{
+	// d3: irq mask
+	// d2: ? (reset during 1st grid test and color test)
+	// other bits: ?
+	m_control = data;
+	
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( kontest_map, AS_PROGRAM, 8, kontest_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram")
@@ -110,12 +167,19 @@ static ADDRESS_MAP_START( kontest_io, AS_IO, 8, kontest_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x08, 0x08) AM_WRITENOP // bit 3: irq mask, bit 2 screen enable
+	AM_RANGE(0x08, 0x08) AM_WRITE(control_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("IN0")
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("IN1")
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("IN2")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("IN3")
 ADDRESS_MAP_END
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( kontest )
 	PORT_START("IN0")
@@ -153,48 +217,37 @@ static INPUT_PORTS_START( kontest )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
+static INTERRUPT_GEN( kontest_interrupt )
+{
+	kontest_state *state = device->machine().driver_data<kontest_state>();
+	if (state->m_control & 8)
+		device_set_input_line(device, 0, ASSERT_LINE);
+}
+
 void kontest_state::machine_start()
 {
+	// save state
+	save_item(NAME(m_control));
 }
 
 void kontest_state::machine_reset()
 {
-}
-
-
-static PALETTE_INIT( kontest )
-{
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
-
-	for (i = 0; i < 0x40; ++i)
-	{
-		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
-	}
+	m_control = 0;
 }
 
 static MACHINE_CONFIG_START( kontest, kontest_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/8)
+	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(kontest_map)
 	MCFG_CPU_IO_MAP(kontest_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", kontest_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -232,4 +285,4 @@ ROM_START( kontest )
     ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
-GAME( 1987?, kontest,  0,   kontest,  kontest,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", 0 ) // late 1987 or early 1988
+GAME( 1987?, kontest,  0,   kontest,  kontest,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", GAME_SUPPORTS_SAVE ) // late 1987 or early 1988
