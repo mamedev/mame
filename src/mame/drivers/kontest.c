@@ -67,23 +67,22 @@ static PALETTE_INIT( kontest )
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
-	for (i = 0; i < 0x40; ++i)
+	for (i = 0; i < 0x20; ++i)
 	{
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -278,10 +277,10 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( kontest )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "800b01.10d",   0x000000, 0x008000, CRC(520f83dc) SHA1(abc23c586864c2ecbc5b16614e27faafc93287de) )
 
-	ROM_REGION( 0x20, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20, "proms", 0 )
     ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
