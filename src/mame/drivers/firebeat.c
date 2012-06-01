@@ -1983,6 +1983,9 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_DEVICE_ADD("scsi1", SCSICD, 0)
 
 	/* video hardware */
+	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1990,9 +1993,6 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_STATIC(firebeat_0)
 
-	MCFG_PALETTE_LENGTH(32768)
-
-	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 	MCFG_VIDEO_START(firebeat)
 
 	/* sound hardware */
@@ -2025,6 +2025,9 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_FUJITSU_29F016A_ADD("flash1")
 	MCFG_FUJITSU_29F016A_ADD("flash2")
 
+	MCFG_DEVICE_ADD("scsi0", SCSICD, 0)
+	MCFG_DEVICE_ADD("scsi1", SCSICD, 0)
+
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
@@ -2056,6 +2059,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
