@@ -423,7 +423,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/blstroid.o $(VIDEO)/blstroid.o \
 	$(DRIVERS)/boxer.o \
 	$(DRIVERS)/bsktball.o $(MACHINE)/bsktball.o $(AUDIO)/bsktball.o $(VIDEO)/bsktball.o \
-	$(DRIVERS)/bwidow.o \
+	$(DRIVERS)/bwidow.o $(AUDIO)/bwidow.o \
 	$(DRIVERS)/bzone.o $(AUDIO)/bzone.o \
 	$(DRIVERS)/canyon.o $(AUDIO)/canyon.o $(VIDEO)/canyon.o \
 	$(DRIVERS)/cball.o \

@@ -232,6 +232,7 @@ protected:
 
 	virtual void execute_run();
 
+	//virtual UINT32 execute_min_cycles() const { return 114; }
 	// other internal states
     int m_icount;
 
@@ -248,7 +249,6 @@ private:
     	UINT8 m_AUDC;			/* AUDCx (D201, D203, D205, D207) */
     	INT32 m_borrow_cnt;		/* borrow counter */
     	INT32 m_counter;		/* channel counter */
-    	UINT32 m_volume;		/* channel volume - derived */
     	UINT8 m_output;			/* channel output signal (1 active, 0 inactive) */
     	UINT8 m_filter_sample;  /* high-pass filter sample */
     	UINT8 m_div2;			/* division by 2 */
@@ -311,7 +311,6 @@ private:
 	UINT32 m_p5;              /* poly5 index */
 	UINT32 m_p9;              /* poly9 index */
 	UINT32 m_p17;             /* poly17 index */
-	UINT32 m_clockmult;		/* clock multiplier */
 
 	devcb_resolved_read8 m_pot_r[8];
 	devcb_resolved_read8 m_allpot_r;

@@ -222,24 +222,12 @@
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
+#include "sound/discrete.h"
+
+#include "includes/bwidow.h"
 
 
-class bwidow_state : public driver_device
-{
-public:
-	bwidow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
 
-	int m_lastdata;
-	DECLARE_READ8_MEMBER(spacduel_IN3_r);
-	DECLARE_WRITE8_MEMBER(bwidow_misc_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-};
-
-
-#define MASTER_CLOCK (12096000)
-#define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
 #define IN_LEFT	(1 << 0)
 #define IN_RIGHT (1 << 1)
@@ -696,26 +684,6 @@ INPUT_PORTS_END
 
 
 
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const pokey_interface pokey_interface_1 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW0")
-};
-
-
-static const pokey_interface pokey_interface_2 =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("DSW1")
-};
-
-
 
 /*************************************
  *
@@ -741,23 +709,10 @@ static MACHINE_CONFIG_START( bwidow, bwidow_state )
 
 	MCFG_VIDEO_START(avg)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+    /* sound hardware */
+    MCFG_FRAGMENT_ADD(bwidow_audio)
 
-	/* FIXME: There are a number of other filters missing */
-	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK / 8)
-	MCFG_POKEY_CONFIG(pokey_interface_1)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.015), 5.0)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK / 8)
-	MCFG_POKEY_CONFIG(pokey_interface_2)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.015), 5.0)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
 
@@ -766,6 +721,9 @@ static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
+
+    /* sound hardware */
+	MCFG_FRAGMENT_ADD(gravitar_audio)
 MACHINE_CONFIG_END
 
 

@@ -498,13 +498,13 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_POKEY_ADD("pokey1", MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_POKEY_ADD("pokey2", MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_POKEY_CONFIG(pokey_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

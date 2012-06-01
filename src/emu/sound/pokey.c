@@ -185,6 +185,7 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 	  device_sound_interface(mconfig, *this),
 	  device_execute_interface(mconfig, *this),
 	  device_state_interface(mconfig, *this),
+	  pokey_interface(),
 	  m_kbd_r(NULL),
 	  m_irq_f(NULL),
 	  m_output_type(LEGACY_LINEAR),
@@ -257,13 +258,25 @@ void pokey_device::device_start()
 	poly_init_9_17(m_poly17, 17);
 	vol_init();
 
-	m_clockmult = DIV_64;
+	/* The pokey does not have a reset line. These should be initialized
+	 * with random values.
+	 */
+
 	m_KBCODE = 0x09;		 /* Atari 800 'no key' */
 	m_SKCTL = SK_RESET;	 /* let the RNG run after reset */
-
 	m_SKSTAT = 0;
 	m_IRQST = 0;
 	m_IRQEN = 0;
+	m_AUDCTL = 0;
+	m_p4 = 0;
+	m_p5 = 0;
+	m_p9 = 0;
+	m_p17 = 0;
+
+	m_pot_counter = 0;
+	m_kbd_cnt = 0;
+	m_out_filter = 0;
+	m_output =0;
 
 	/* reset more internal state */
 	for (i=0; i<3; i++)
@@ -274,6 +287,7 @@ void pokey_device::device_start()
 	for (i=0; i<8; i++)
 	{
 		m_pot_r[i].resolve(m_pot_r_cb[i], *this);
+		m_POTx[i] = 0;
 	}
 
 	m_allpot_r.resolve(m_allpot_r_cb, *this);
@@ -293,7 +307,6 @@ void pokey_device::device_start()
 		save_item(NAME(m_channel[i].m_counter), i);
 		save_item(NAME(m_channel[i].m_filter_sample), i);
 		save_item(NAME(m_channel[i].m_output), i);
-		save_item(NAME(m_channel[i].m_volume), i);
 		save_item(NAME(m_channel[i].m_AUDF), i);
 		save_item(NAME(m_channel[i].m_AUDC), i);
 	}
@@ -304,7 +317,6 @@ void pokey_device::device_start()
 	save_item(NAME(m_p5));
 	save_item(NAME(m_p9));
 	save_item(NAME(m_p17));
-	save_item(NAME(m_clockmult));
 	save_item(NAME(m_pot_counter));
 	save_item(NAME(m_kbd_cnt));
 	save_item(NAME(m_kbd_latch));
@@ -452,6 +464,7 @@ void pokey_device::execute_run()
 		UINT32 new_out = step_one_clock();
 		if (m_output != new_out)
 		{
+			//printf("forced update %08d %08x\n", m_icount, m_output);
 			m_stream->update();
 			m_output = new_out;
 		}
@@ -917,7 +930,6 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
     case AUDC1_C:
 		LOG_SOUND(("POKEY '%s' AUDC1  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN1].m_AUDC = data;
-		m_channel[CHAN1].m_volume = (data & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         break;
 
     case AUDF2_C:
@@ -928,7 +940,6 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
     case AUDC2_C:
 		LOG_SOUND(("POKEY '%s' AUDC2  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN2].m_AUDC = data;
-		m_channel[CHAN2].m_volume = (data & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         break;
 
     case AUDF3_C:
@@ -939,7 +950,6 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
     case AUDC3_C:
 		LOG_SOUND(("POKEY '%s' AUDC3  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN3].m_AUDC = data;
-		m_channel[CHAN3].m_volume = (data & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         break;
 
     case AUDF4_C:
@@ -950,7 +960,6 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
     case AUDC4_C:
 		LOG_SOUND(("POKEY '%s' AUDC4  $%02x (%s)\n", tag(), data, audc2str(data)));
 		m_channel[CHAN4].m_AUDC = data;
-		m_channel[CHAN4].m_volume = (data & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         break;
 
     case AUDCTL_C:
@@ -958,9 +967,8 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
             return;
 		LOG_SOUND(("POKEY '%s' AUDCTL $%02x (%s)\n", tag(), data, audctl2str(data)));
 		m_AUDCTL = data;
-        /* determine the base multiplier for the 'div by n' calculations */
-		m_clockmult = (m_AUDCTL & CLK_15KHZ) ? DIV_15 : DIV_64;
-        break;
+
+		break;
 
     case STIMER_C:
 		LOG_TIMER(("POKEY '%s' STIMER $%02x\n", tag(), data));
@@ -1138,12 +1146,13 @@ void pokey_device::vol_init()
 		}
 		r_chan[j] = 1.0 / rTot;
 	}
-	for (int j=0; j<16; j++)
-	{
-		rTot = 1.0 / r_chan[j] + 3.0 / r_chan[0];
-		rTot = 1.0 / rTot;
-		LOG(("%d : %4.3f\n", j, rTot / (rTot+pull_up)*4.75));
-	}
+	if (VERBOSE)
+		for (int j=0; j<16; j++)
+		{
+			rTot = 1.0 / r_chan[j] + 3.0 / r_chan[0];
+			rTot = 1.0 / rTot;
+			LOG(("%s: %3d - %4.3f\n", tag(), j, rTot / (rTot+pull_up)*4.75));
+		}
 	for (int j=0; j<0x10000; j++)
 	{
 		rTot = 0;
@@ -1270,7 +1279,6 @@ pokey_device::pokey_channel::pokey_channel()
 	 	m_AUDC(0),
 		m_borrow_cnt(0),
 	 	m_counter(0),
-	 	m_volume(0),
 	 	m_output(0),
 	 	m_filter_sample(0),
 	 	m_div2(0)

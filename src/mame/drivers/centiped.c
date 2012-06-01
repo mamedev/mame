@@ -1645,9 +1645,9 @@ static MACHINE_CONFIG_DERIVED( centiped, centiped_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	/* Pokey sound needs filtering with discrete op-amp mixer */
 	MCFG_POKEY_ADD("pokey", 12096000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(3.3), CAP_U(0.01), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 MACHINE_CONFIG_END
 
