@@ -10,14 +10,6 @@
 
 **********************************************************************************************/
 
-/* Some logging defines */
-#if 0
-#define REPORT_SLAVE_MODE_CHANGE
-#define REPORT_SLAVE_MODE_READ_ITSELF
-#define REPORT_MAIN_MODE_READ_SLAVE
-#define REPORT_DATA_FLOW
-#endif
-
 #define TC0140SYT_PORT01_FULL         (0x01)
 #define TC0140SYT_PORT23_FULL         (0x02)
 #define TC0140SYT_PORT01_FULL_MASTER  (0x04)
@@ -118,9 +110,7 @@ WRITE8_DEVICE_HANDLER( tc0140syt_comm_w )
 			break;
 
 		case 0x04:		// port status
-//#ifdef REPORT_DATA_FLOW
 			//logerror("taitosnd: Master issued control value %02x (PC = %08x) \n",data, cpu_get_pc(&space->device()) );
-//#endif
 			/* this does a hi-lo transition to reset the sound cpu */
 			if (data)
 				device_set_input_line(tc0140syt->slavecpu, INPUT_LINE_RESET, ASSERT_LINE);
@@ -132,7 +122,8 @@ WRITE8_DEVICE_HANDLER( tc0140syt_comm_w )
 			break;
 
 		default:
-			logerror("taitosnd: Master cpu written in mode [%02x] data[%02x]\n", tc0140syt->mainmode, data);
+			//logerror("taitosnd: Master cpu written in mode [%02x] data[%02x]\n", tc0140syt->mainmode, data);
+			break;
 	}
 
 }
@@ -166,7 +157,7 @@ READ8_DEVICE_HANDLER( tc0140syt_comm_r )
 			return tc0140syt->status;
 
 		default:
-			logerror("tc0140syt : Master cpu read in mode [%02x]\n", tc0140syt->mainmode);
+			//logerror("tc0140syt : Master cpu read in mode [%02x]\n", tc0140syt->mainmode);
 			return 0;
 	}
 }
@@ -229,7 +220,8 @@ WRITE8_DEVICE_HANDLER( tc0140syt_slave_comm_w )
 			break;
 
 		default:
-			logerror("tc0140syt: Slave cpu written in mode [%02x] data[%02x]\n" , tc0140syt->submode, data & 0xff);
+			//logerror("tc0140syt: Slave cpu written in mode [%02x] data[%02x]\n" , tc0140syt->submode, data & 0xff);
+			break;
 	}
 
 	interrupt_controller(device);
@@ -271,8 +263,9 @@ READ8_DEVICE_HANDLER( tc0140syt_slave_comm_r )
 			break;
 
 		default:
-			logerror("tc0140syt : Slave cpu read in mode [%02x]\n", tc0140syt->submode);
+			//logerror("tc0140syt : Slave cpu read in mode [%02x]\n", tc0140syt->submode);
 			res = 0;
+			break;
 	}
 
 	interrupt_controller(device);
