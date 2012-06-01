@@ -13,11 +13,11 @@ class metro_state : public driver_device
 public:
 	metro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_oki(*this, "oki"),
-		  m_ymsnd(*this, "ymsnd"),
-		  m_k053936(*this, "k053936") ,
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki"),
+		m_ymsnd(*this, "ymsnd"),
+		m_k053936(*this, "k053936") ,
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_vram_2(*this, "vram_2"),
@@ -33,7 +33,8 @@ public:
 		m_videoregs(*this, "videoregs"),
 		m_screenctrl(*this, "screenctrl"),
 		m_input_sel(*this, "input_sel"),
-		m_k053936_ram(*this, "k053936_ram"){ }
+		m_k053936_ram(*this, "k053936_ram")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -77,10 +78,9 @@ public:
 
 	UINT8 *		m_expanded_gfx1;
 
-	/* blitter */
-	int         m_blitter_bit;
-
 	/* irq_related */
+	int         m_vblank_bit;
+	int         m_blitter_bit;
 	int         m_irq_line;
 	UINT8       m_requested_int[8];
 	emu_timer   *m_mouja_irq_timer;

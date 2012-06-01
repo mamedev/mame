@@ -97,17 +97,6 @@ driver modified by Eisuke Watanabe
 #include "sound/ymf278b.h"
 #include "video/konicdev.h"
 
-/* TODO: NOT measured! */
-#define PIXEL_CLOCK			(XTAL_14_31818MHz/2)
-
-#define HTOTAL				(456)
-#define HBEND				(0)
-#define HBSTART				(320)
-
-#define VTOTAL				(262)
-#define VBEND				(0)
-#define VBSTART				(240)
-
 
 /***************************************************************************
 
@@ -119,24 +108,24 @@ driver modified by Eisuke Watanabe
 
 READ16_MEMBER(metro_state::metro_irq_cause_r)
 {
-	int res,i;
-
-	res = 0;
-	for(i=0;i<8;i++)
+	/* interrupt cause, used by
+	
+	int[0] vblank
+	int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
+	int[2] blitter
+	int[3] ?            KARATOUR
+	int[4] ?
+	int[5] ?            KARATOUR, BLZNTRND
+	int[6] unused
+	int[7] unused
+	
+	*/
+	
+	UINT16 res = 0;
+	for (int i = 0; i < 8; i++)
 		res |= (m_requested_int[i] << i);
 
 	return res;
-
-	#if 0
-	return	m_requested_int[0] * 0x01 +	// vblank
-			m_requested_int[1] * 0x02 +
-			m_requested_int[2] * 0x04 +	// blitter
-			m_requested_int[3] * 0x08 +
-			m_requested_int[4] * 0x10 +
-			m_requested_int[5] * 0x20 +
-			m_requested_int[6] * 0x40 +	// unused
-			m_requested_int[7] * 0x80 ;	// unused
-	#endif
 }
 
 
@@ -185,99 +174,54 @@ static IRQ_CALLBACK( metro_irq_callback )
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	int i;
-
 	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", cpu_get_pc(&space.device()), data);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= ~*m_irq_enable;
 
-		for(i=0;i<8;i++)
-			if (BIT(data, i))  m_requested_int[i] = 0;
-
-		#if 0
-		if (BIT(data, 0))  m_requested_int[0] = 0;
-		if (BIT(data, 1))  m_requested_int[1] = 0;	// DAITORIDE, BALCUBE, KARATOUR, MOUJA
-		if (BIT(data, 2))  m_requested_int[2] = 0;
-		if (BIT(data, 3))  m_requested_int[3] = 0;	// KARATOUR
-		if (BIT(data, 4))  m_requested_int[4] = 0;
-		if (BIT(data, 5))  m_requested_int[5] = 0;	// KARATOUR, BLZNTRND
-		if (BIT(data, 6))  m_requested_int[6] = 0;
-		if (BIT(data, 7))  m_requested_int[7] = 0;
-		#endif
+		for (int i = 0; i < 8; i++)
+			if (BIT(data, i)) m_requested_int[i] = 0;
 	}
 
 	update_irq_state(machine());
 }
 
-static TIMER_DEVICE_CALLBACK( metro_interrupt )
+static INTERRUPT_GEN( metro_vblank_interrupt )
 {
-	metro_state *state = timer.machine().driver_data<metro_state>();
-	int scanline = param;
+	metro_state *state = device->machine().driver_data<metro_state>();
 
-	if(scanline == 240)
-	{
-		state->m_requested_int[0] = 1;
-		update_irq_state(timer.machine());
-	}
-
-	if(scanline == 0)
-	{
-		state->m_requested_int[4] = 1;
-		update_irq_state(timer.machine());
-	}
+	state->m_requested_int[state->m_vblank_bit] = 1;
+	update_irq_state(device->machine());
 }
 
-static TIMER_DEVICE_CALLBACK( msgogo_interrupt )
+static INTERRUPT_GEN( metro_periodic_interrupt )
 {
-	metro_state *state = timer.machine().driver_data<metro_state>();
-	int scanline = param;
+	metro_state *state = device->machine().driver_data<metro_state>();
 
-	if(scanline == 224-16) // TODO: timing quirk
-	{
-		state->m_requested_int[0] = 1;
-		update_irq_state(timer.machine());
-	}
-
-	if(scanline == 0)
-	{
-		state->m_requested_int[4] = 1;
-		update_irq_state(timer.machine());
-	}
+	state->m_requested_int[4] = 1;
+	update_irq_state(device->machine());
 }
 
+static TIMER_CALLBACK( karatour_irq_callback )
+{
+	metro_state *state = machine.driver_data<metro_state>();
+	state->m_requested_int[5] = 0;
+}
 
 /* lev 2-7 (lev 1 seems sound related) */
-/* TODO: fix this arrangement (various things still doesn't work with this) */
-static TIMER_DEVICE_CALLBACK( karatour_interrupt )
+static INTERRUPT_GEN( karatour_interrupt )
 {
-	metro_state *state = timer.machine().driver_data<metro_state>();
-	int scanline = param;
+	metro_state *state = device->machine().driver_data<metro_state>();
 
-	if(scanline == 224)
-	{
-		state->m_requested_int[0] = 1;
-		state->m_requested_int[4] = 0;
-		//state->m_requested_int[5] = 0;
-		update_irq_state(timer.machine());
-	}
-	else if(scanline == 240)
-	{
-		state->m_requested_int[0] = 1;
-		state->m_requested_int[4] = 0;
-		state->m_requested_int[5] = 1;
-		update_irq_state(timer.machine());
-	}
-	else if(scanline == 0)
-	{
-		//state->m_requested_int[0] = 0;
-		state->m_requested_int[4] = 1;
-		state->m_requested_int[5] = 0;
-		update_irq_state(timer.machine());
-	}
+	state->m_requested_int[state->m_vblank_bit] = 1;
+
+	/* write to scroll registers, the duration is a guess */
+	device->machine().scheduler().timer_set(attotime::from_usec(2500), FUNC(karatour_irq_callback));
+	state->m_requested_int[5] = 1;
+
+	update_irq_state(device->machine());
 }
-
 
 static TIMER_CALLBACK( mouja_irq_callback )
 {
@@ -289,44 +233,19 @@ static TIMER_CALLBACK( mouja_irq_callback )
 
 WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
 {
-	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
+	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2; /* 0xff=58Hz, 0x80=116Hz? */
 
 	m_mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
-static INTERRUPT_GEN( mouja_interrupt )
+static INTERRUPT_GEN( puzzlet_interrupt )
 {
 	metro_state *state = device->machine().driver_data<metro_state>();
 
-	state->m_requested_int[1] = 1;
+	state->m_requested_int[state->m_vblank_bit] = 1;
 	update_irq_state(device->machine());
-}
 
-
-static INTERRUPT_GEN( gakusai_interrupt )
-{
-	metro_state *state = device->machine().driver_data<metro_state>();
-
-	state->m_requested_int[1] = 1;
-	update_irq_state(device->machine());
-}
-
-static TIMER_DEVICE_CALLBACK( dokyusei_interrupt )
-{
-	metro_state *state = timer.machine().driver_data<metro_state>();
-	int scanline = param;
-
-	if(scanline == 240)
-	{
-		state->m_requested_int[1] = 1;
-		update_irq_state(timer.machine());
-	}
-	else if(scanline == 0)
-	{
-		// needed?
-		state->m_requested_int[5] = 1;
-		update_irq_state(timer.machine());
-	}
+	device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static void ymf278b_interrupt( device_t *device, int active )
@@ -334,6 +253,7 @@ static void ymf278b_interrupt( device_t *device, int active )
 	metro_state *state = device->machine().driver_data<metro_state>();
 	device_set_input_line(state->m_maincpu, 2, active);
 }
+
 
 /***************************************************************************
 
@@ -365,7 +285,6 @@ static int metro_io_callback( device_t *device, int ioline, int state )
 
 WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -388,7 +307,6 @@ CUSTOM_INPUT_MEMBER(metro_state::custom_soundstatus_r)
 
 WRITE16_MEMBER(metro_state::metro_soundstatus_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_soundstatus = data & 0x01;
 }
@@ -1813,7 +1731,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		*m_irq_enable = data ^ 0xffff;
 }
@@ -3509,14 +3426,18 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3539,14 +3460,18 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3569,14 +3494,18 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(msgogo_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", msgogo_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt) // timing is off, shaking sprites in intro
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3599,14 +3528,18 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3629,14 +3562,18 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3658,7 +3595,8 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(daitorid_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3670,7 +3608,10 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3697,7 +3638,8 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dharma_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3709,7 +3651,10 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -3735,7 +3680,8 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(karatour_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", karatour_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3747,7 +3693,10 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -3773,7 +3722,8 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kokushi_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", karatour_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3785,7 +3735,10 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4220)
@@ -3811,7 +3764,8 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lastfort_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3823,7 +3777,10 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART  + 40, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(360, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -3848,7 +3805,8 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lastforg_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", karatour_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3860,7 +3818,10 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, 224) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(360, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -3885,14 +3846,17 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", dokyusei_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4300)
@@ -3917,7 +3881,7 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
-	MCFG_CPU_VBLANK_INT("screen", gakusai_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
@@ -3925,7 +3889,10 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, 384, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(384, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4300)
@@ -3951,7 +3918,7 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(gakusai_map)
-	MCFG_CPU_VBLANK_INT("screen", gakusai_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
@@ -3959,7 +3926,10 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4300)
@@ -3985,7 +3955,7 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(gakusai2_map)
-	MCFG_CPU_VBLANK_INT("screen", gakusai_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
@@ -3993,7 +3963,10 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4300)
@@ -4019,7 +3992,8 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pangpoms_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4031,7 +4005,10 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(360, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -4057,7 +4034,8 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(poitto_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4069,7 +4047,10 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(360, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -4095,8 +4076,8 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)		/* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
-//  MCFG_TIMER_ADD_SCANLINE("scantimer", msgogo_interrupt, "screen", 0, 1) /* fixes the title screen scroll in GunMaster, but makes the game painfully slow */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1) /* ? */
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)		/* Not confiremd */
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4108,7 +4089,10 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -4135,7 +4119,8 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(skyalert_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4147,7 +4132,10 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(360, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -4173,7 +4161,8 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(toride2g_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", metro_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4185,7 +4174,10 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4100)
@@ -4211,14 +4203,17 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
-	MCFG_CPU_VBLANK_INT("screen", mouja_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4300)
@@ -4248,7 +4243,8 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", karatour_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
@@ -4259,7 +4255,10 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(blzntrnd)
@@ -4292,7 +4291,8 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", karatour_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
@@ -4303,7 +4303,10 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(gstrik2)
@@ -4324,40 +4327,6 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-//1770e
-static TIMER_DEVICE_CALLBACK( puzzlet_interrupt )
-{
-	metro_state *state = timer.machine().driver_data<metro_state>();
-	int scanline = param;
-
-	if(scanline == 224)
-	{
-		state->m_requested_int[1] = 1;
-		update_irq_state(timer.machine());
-	}
-
-	if(scanline == 0)
-	{
-		state->m_requested_int[2] = 1;
-		update_irq_state(timer.machine());
-	}
-
-	if(scanline == 64)
-	{
-		state->m_requested_int[5] = 1;
-		update_irq_state(timer.machine());
-	}
-
-	if(scanline == 128)
-	{
-		state->m_requested_int[3] = 1;
-		update_irq_state(timer.machine());
-	}
-
-	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
-}
-
 
 static MACHINE_CONFIG_START( puzzlet, metro_state )
 
@@ -4365,14 +4334,17 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", puzzlet_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", puzzlet_interrupt)
 
 	MCFG_MACHINE_START(metro)
 	MCFG_MACHINE_RESET(metro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224) // was 58fps?
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
 	MCFG_GFXDECODE(i4300)
@@ -5945,8 +5917,9 @@ static void metro_common( running_machine &machine )
 	metro_state *state = machine.driver_data<metro_state>();
 
 	memset(state->m_requested_int, 0, ARRAY_LENGTH(state->m_requested_int));
-	state->m_irq_line = 2;
+	state->m_vblank_bit = 0;
 	state->m_blitter_bit = 2;
+	state->m_irq_line = 2;
 
 	*state->m_irq_enable = 0;
 }
@@ -6051,6 +6024,7 @@ static DRIVER_INIT( mouja )
 	metro_state *state = machine.driver_data<metro_state>();
 	metro_common(machine);
 	state->m_irq_line = -1;	/* split interrupt handlers */
+	state->m_vblank_bit = 1;
 	state->m_mouja_irq_timer = machine.scheduler().timer_alloc(FUNC(mouja_irq_callback));
 }
 
@@ -6059,6 +6033,7 @@ static DRIVER_INIT( gakusai )
 	metro_state *state = machine.driver_data<metro_state>();
 	metro_common(machine);
 	state->m_irq_line = -1;
+	state->m_vblank_bit = 1;
 	state->m_blitter_bit = 3;
 }
 
@@ -6067,6 +6042,7 @@ static DRIVER_INIT( puzzlet )
 	metro_state *state = machine.driver_data<metro_state>();
 	metro_common(machine);
 	state->m_irq_line = 0;
+	state->m_vblank_bit = 1;
 	state->m_blitter_bit = 0;
 }
 
