@@ -5977,6 +5977,8 @@ static DRIVER_INIT( karatour )
 		state->m_vram_1[i] = machine.rand();
 		state->m_vram_2[i] = machine.rand();
 	}
+	
+	DRIVER_INIT_CALL(metro);
 }
 
 static DRIVER_INIT( daitorid )
