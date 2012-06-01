@@ -304,7 +304,8 @@ void i8237_device::i8237_timerproc()
 			m_out_hrq_func(m_hrq);
 			m_state = DMA8237_S0;
 
-			m_timer->enable( true );
+			//m_timer->enable( true );
+			m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 		}
 		else if (m_command == 3 && (m_drq & 1))
 		{
@@ -314,7 +315,8 @@ void i8237_device::i8237_timerproc()
 		}
 		else
 		{
-			m_timer->enable( false );
+			//m_timer->enable( false );
+			m_timer->reset();
 		}
 		break;
 	}
@@ -607,7 +609,11 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_w)
 	case 8:
 		/* DMA command register */
 		m_command = data;
-		m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
+//		m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
+		if ( m_command & 0x04 )
+			m_timer->reset();
+		else
+			m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 		break;
 
 	case 9:
@@ -617,7 +623,12 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_w)
 		if ( data & 0x04 )
 		{
 			m_drq |= 0x01 << channel;
-			m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
+			//m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
+			if ( m_command & 0x04 )
+				m_timer->reset();
+			else
+				m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+			
 		}
 		else
 		{
@@ -692,7 +703,11 @@ void i8237_device::i8237_drq_write(int channel, int state)
 		m_drq &= ~( 0x01 << channel );
 	}
 
-	m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
+	//m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
+	if ( m_command & 0x04 )
+		m_timer->reset();
+	else
+		m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 }
 
