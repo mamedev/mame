@@ -1142,7 +1142,7 @@ void pokey_device::vol_init()
 	{
 		rTot = 1.0 / r_chan[j] + 3.0 / r_chan[0];
 		rTot = 1.0 / rTot;
-		printf("%d : %4.3f\n", j, rTot / (rTot+pull_up)*4.75);
+		LOG(("%d : %4.3f\n", j, rTot / (rTot+pull_up)*4.75));
 	}
 	for (int j=0; j<0x10000; j++)
 	{
@@ -1172,6 +1172,7 @@ void pokey_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert)
     	lfsr = (in << (size-1)) | lfsr;
 		*poly = lfsr ^ invert;
         LOG_POLY(("%05x: %02x\n", i, *poly));
+        poly++;
 	}
 }
 
