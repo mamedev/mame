@@ -582,8 +582,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-static const char *const diskregions[] = { ":cdrom0", ":cdrom1" };
-
 WRITE32_MEMBER(ksys573_state::mb89371_w)
 {
 	verboselog( machine(), 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
@@ -1107,7 +1105,6 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 static void atapi_init(running_machine &machine)
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
-	int i;
 
 	state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	state->m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
@@ -1121,16 +1118,14 @@ static void atapi_init(running_machine &machine)
 	state->m_atapi_timer = machine.scheduler().timer_alloc(FUNC(atapi_xfer_end));
 	state->m_atapi_timer->adjust(attotime::never);
 
-	for( i = 0; i < 2; i++ )
+	state->m_available_cdroms[ 0 ] = machine.device<scsidev_device>( ":cdrom0" );
+	if( get_disk_handle( machine, ":cdrom1" ) != NULL )
 	{
-		if( get_disk_handle( machine, diskregions[i] ) != NULL )
-		{
-			state->m_available_cdroms[ i ] = machine.device<scsidev_device>( diskregions[i] );
-		}
-		else
-		{
-			state->m_available_cdroms[ i ] = NULL;
-		}
+		state->m_available_cdroms[ 1 ] = machine.device<scsidev_device>( ":cdrom1" );
+	}
+	else
+	{
+		state->m_available_cdroms[ 1 ] = NULL;
 	}
 
 	state->save_item( NAME(state->m_atapi_regs) );
@@ -1347,7 +1342,7 @@ static void *atapi_get_device(running_machine &machine)
 	void *ret;
 	state->m_inserted_cdrom->GetDevice( &ret );
 	return ret;
-	}
+}
 
 static void update_mode( running_machine &machine )
 {
