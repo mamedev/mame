@@ -1196,7 +1196,7 @@ MACHINE_CONFIG_END
 
 /*************************************
  *
- *  War of the Worlds (B&W)
+ *  War of the Worlds
  *
  *************************************/
 
@@ -1303,120 +1303,6 @@ MACHINE_CONFIG_FRAGMENT( wotw_sound )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SAMPLES_ADD("samples", wotw_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  War of the Worlds (color)
- *
- *************************************/
-
-static const char *const wotwc_sample_names[] =
-{
-	"*wotwc",
-	"cfire",
-	"shield",
-	"star",
-	"thrust",
-	"drone",
-	"lexplode",
-	"sexplode",
-	"pfire",
-    0
-};
-
-static const samples_interface wotwc_samples_interface =
-{
-	8,
-	wotwc_sample_names
-};
-
-static void wotwc_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_changed)
-{
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	samples_device *samples = machine.device<samples_device>("samples");
-	UINT32 target_pitch;
-
-	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
-	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7f) | (sound_val & 0x80);
-
-	/* execute on the rising edge of bit 0x01 */
-	if (SOUNDVAL_RISING_EDGE(0x01))
-	{
-		/* fireball - falling edge */
-		if (SHIFTREG_FALLING_EDGE(0x80))
-			samples->start(0, 0);
-
-		/* shield hit - falling edge */
-		if (SHIFTREG_FALLING_EDGE(0x40))
-			samples->start(1, 1);
-
-		/* star sound - 0=off, 1=on */
-		if (SHIFTREG_RISING_EDGE(0x20))
-			samples->start(2, 2, true);
-		if (SHIFTREG_FALLING_EDGE(0x20))
-			samples->stop(2);
-
-		/* thrust sound - 1=off, 0=on*/
-		if (SHIFTREG_FALLING_EDGE(0x10))
-			samples->start(3, 3, true);
-		if (SHIFTREG_RISING_EDGE(0x10))
-			samples->stop(3);
-
-		/* drone - 1=off, 0=on */
-		if (SHIFTREG_FALLING_EDGE(0x08))
-			samples->start(4, 4, true);
-		if (SHIFTREG_RISING_EDGE(0x08))
-			samples->stop(4);
-
-		/* latch the drone pitch */
-		target_pitch = (state->m_current_shift & 7) + ((state->m_current_shift & 2) << 2);
-        target_pitch = 0x10000 + (target_pitch << 12);
-
-        /* once per frame slide the pitch toward the target */
-        if (machine.primary_screen->frame_number() > state->m_last_frame)
-        {
-            if (state->m_current_pitch > target_pitch)
-                state->m_current_pitch -= 300;
-            if (state->m_current_pitch < target_pitch)
-                state->m_current_pitch += 200;
-            samples->set_frequency(4, state->m_current_pitch);
-            state->m_last_frame = machine.primary_screen->frame_number();
-        }
-
-		/* remember the previous value */
-		state->m_last_shift = state->m_current_shift;
-	}
-
-	/* loud explosion - falling edge */
-	if (SOUNDVAL_FALLING_EDGE(0x02))
-		samples->start(5, 5);
-
-	/* soft explosion - falling edge */
-	if (SOUNDVAL_FALLING_EDGE(0x04))
-		samples->start(6, 6);
-
-	/* player fire - falling edge */
-	if (SOUNDVAL_FALLING_EDGE(0x08))
-		samples->start(7, 7);
-}
-
-static MACHINE_RESET( wotwc )
-{
-	generic_init(machine, wotwc_sound_w);
-}
-
-MACHINE_CONFIG_FRAGMENT( wotwc_sound )
-	MCFG_MACHINE_START(generic)
-	MCFG_MACHINE_RESET(wotwc)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SAMPLES_ADD("samples", wotwc_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
