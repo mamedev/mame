@@ -25,11 +25,10 @@ To Do:
 
 - raster effects (rabbit only?, see left side of one of the levels in rabbit)
 - clean up zoom code and make zoom effect more accurate
-- status bar in rabbit is the wrong colour, timing of blitter / interrupts?
 
 Notes:
 
-(1) This is currently in it's own driver "tmmjprd.c" because it uses the
+(1) This is currently in its own driver "tmmjprd.c" because it uses the
     chip in a completely different way to Rabbit.  They should be merged
     again later, once the chip is better understood.
 
@@ -75,7 +74,7 @@ Board:  VG5550-B
 
 CPU:    MC68EC020FG25
 OSC:    40.00000MHz
-    24.00000MHz
+        24.00000MHz
 
 Custom: Imagetek I5000 (2ch video & 2ch sound)
 
@@ -92,15 +91,16 @@ class rabbit_state : public driver_device
 public:
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_viewregs0(*this, "viewregs0"),
-		  m_viewregs6(*this, "viewregs6"),
-		  m_viewregs7(*this, "viewregs7"),
-		  m_viewregs9(*this, "viewregs9"),
-		  m_viewregs10(*this, "viewregs10"),
-		  m_tilemap_regs(*this, "tilemap_regs"),
-		  m_spriteregs(*this, "spriteregs"),
-		  m_blitterregs(*this, "blitterregs"),
-		  m_spriteram(*this, "spriteram") { }
+		m_viewregs0(*this, "viewregs0"),
+		m_viewregs6(*this, "viewregs6"),
+		m_viewregs7(*this, "viewregs7"),
+		m_viewregs9(*this, "viewregs9"),
+		m_viewregs10(*this, "viewregs10"),
+		m_tilemap_regs(*this, "tilemap_regs"),
+		m_spriteregs(*this, "spriteregs"),
+		m_blitterregs(*this, "blitterregs"),
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	required_shared_ptr<UINT32> m_viewregs0;
 	required_shared_ptr<UINT32> m_viewregs6;
@@ -138,18 +138,28 @@ public:
 INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize)
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
-	int tileno,colour,flipxy, depth;
-	int bank;
-	depth = (state->m_tilemap_ram[whichtilemap][tile_index]&0x10000000)>>28;
-	tileno = state->m_tilemap_ram[whichtilemap][tile_index]&0xffff;
-	bank = (state->m_tilemap_ram[whichtilemap][tile_index]&0x000f0000)>>16;
-	colour =  (state->m_tilemap_ram[whichtilemap][tile_index]>>20)&0xff;
-	flipxy =  (state->m_tilemap_ram[whichtilemap][tile_index]>>29)&3;
+    /* fedcba98 76543210 fedcba98 76543210
+       x                                    color mask? how exactly does it relate to color bits?
+        xx                                  flip
+          x                                 depth
+           xxxx xxxx                        color
+                    xxxx                    bank
+                         xxxxxxxx xxxxxxxx  tile
+    */
+	int depth = (state->m_tilemap_ram[whichtilemap][tile_index]&0x10000000)>>28;
+	int tileno = state->m_tilemap_ram[whichtilemap][tile_index]&0xffff;
+	int bank = (state->m_tilemap_ram[whichtilemap][tile_index]&0x000f0000)>>16;
+	int colour = (state->m_tilemap_ram[whichtilemap][tile_index]>>20)&0xff;
+	int cmask = state->m_tilemap_ram[whichtilemap][tile_index]>>31&1;
+	int flipxy = (state->m_tilemap_ram[whichtilemap][tile_index]>>29)&3;
 
-	if(state->m_banking)
+	if (state->m_banking)
 	{
 		switch (bank)
 		{
+			case 0x0:
+				break;
+
 			case 0x8:
 				tileno += 0x10000;
 				break;
@@ -157,24 +167,30 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinf
 			case 0xc:
 				tileno += 0x20000;
 				break;
+			
+			default:
+				//printf("tilebank %x\n",bank);
+				break;
 		}
 	}
 	else
+	{
 		tileno += (bank << 16);
+	}
 
 	if (depth)
 	{
 		tileno >>=(1+tilesize*2);
-		colour&=0x0f;
-		colour+=0x20;
+		colour &= 0x0f;
+		colour += 0x20;
 		tileinfo.group = 1;
 		SET_TILE_INFO(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
 	{
 		tileno >>=(0+tilesize*2);
-		//colour&=0x3f; // fixes status bar.. but breaks other stuff
-		colour+=0x200;
+		if (cmask) colour&=0x3f; // see health bars
+		colour += 0x200;
 		tileinfo.group = 0;
 		SET_TILE_INFO(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
@@ -195,8 +211,6 @@ static TILE_GET_INFO( get_rabbit_tilemap2_tile_info )
 	get_rabbit_tilemap_info(machine,tileinfo,tile_index,2,1);
 }
 
-/* some bad colours on life bars for this layer .. fix them ..
-    (needs mask of 0x3f but this breaks other gfx..) */
 static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
 {
 	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
@@ -631,7 +645,7 @@ static void rabbit_do_blit(running_machine &machine)
 				break;
 
 			default: /* unknown / illegal */
-				if(BLITLOG) mame_printf_debug("uknown blit command %02x\n",blt_commnd);
+				if(BLITLOG) mame_printf_debug("unknown blit command %02x\n",blt_commnd);
 				break;
 		}
 	}
@@ -732,30 +746,7 @@ static INPUT_PORTS_START( rabbit )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -873,21 +864,16 @@ GFXDECODE_END
 
   */
 
-static TIMER_DEVICE_CALLBACK( rabbit_scanline )
+static INTERRUPT_GEN( rabbit_vblank_interrupt )
 {
-	rabbit_state *state = timer.machine().driver_data<rabbit_state>();
-	int scanline = param;
-
-	if(scanline == 224) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", state->m_vblirqlevel, HOLD_LINE);
-
+	rabbit_state *state = device->machine().driver_data<rabbit_state>();
+	cputag_set_input_line(device->machine(), "maincpu", state->m_vblirqlevel, HOLD_LINE);
 }
-
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_24MHz)
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", rabbit_scanline, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", rabbit_vblank_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -903,7 +889,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_SCREEN_UPDATE_STATIC(rabbit)
 
 	MCFG_PALETTE_LENGTH(0x4000)
-	MCFG_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
+	MCFG_PALETTE_INIT( all_black )
 
 	MCFG_VIDEO_START(rabbit)
 
