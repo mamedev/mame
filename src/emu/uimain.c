@@ -1182,7 +1182,7 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	ioport_field *field = (ioport_field *)selectedref;
 	dip_descriptor *dip;
 
-	if (field!=NULL && field->first_diplocation() == NULL)
+	if (field==NULL || field->first_diplocation() == NULL)
 		return;
 
 	/* add borders */
