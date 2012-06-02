@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(funcube_leds_w);
 	DECLARE_READ8_MEMBER(funcube_outputs_r);
 	DECLARE_WRITE8_MEMBER(funcube_outputs_w);
+	DECLARE_READ8_MEMBER(funcube_battery_r);
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 	DECLARE_READ32_MEMBER(oki_read);

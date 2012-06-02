@@ -6,13 +6,13 @@
 
 
 CPU    :    TMP68301*
-            ColdFire + H8/3007 + PIC12C508 (for FUNCUBE)
+            or ColdFire + H8/3007 + PIC12C508 (for EVA2 & EVA3 PCBs)
 
 Video  :    DX-101
             DX-102 x3
 
 Sound  :    X1-010
-            OKI M9810 for later EVA2 & EVA3 PCBs
+            or OKI M9810 (for EVA2 & EVA3 PCBs)
 
 OSC    :    50.00000MHz
             32.53047MHz
@@ -25,18 +25,17 @@ OSC    :    50.00000MHz
 Ordered by Board        Year    Game                                    By
 -------------------------------------------------------------------------------------------
 P-FG01-1                1995    Guardians / Denjin Makai II             Banpresto
-PO-113A                 1994    Mobile Suit Gundam EX Revue             Banpresto
+P0-113A                 1994    Mobile Suit Gundam EX Revue             Banpresto
 P0-123A                 1996    Wakakusamonogatari Mahjong Yonshimai    Maboroshi Ware
 P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
+P0-140B                 2000    Funcube                                 Namco
 P0-140B                 2000    Namco Stars                             Namco
 P0-142A                 1999    Puzzle De Bowling                       Nihon System / Moss
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
-B0-006B                 2001    Funcube 2                               Namco
-B0-006B?                2001    Funcube 3                               Namco
-B0-006B                 2001    Funcube 4                               Namco
+B0-006B                 2001-2  Funcube 2 - 5                           Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 P-FG-02                 ????    Reel'N Quake                            <unknown>
@@ -88,9 +87,9 @@ trophyh:
   This is probably due to a couple of frames with an odd or corrupt sprites list,
   taking a long time to render.
 
-funcube:
+funcube series:
 - Hacked to run, as they use a ColdFire CPU.
-- Pay-out key causes "unknown error".
+- Pay-out key causes "unknown error" after coin count reaches 0.
 
 reelquak:
 - Needs an x offset for tilemap sprites.
@@ -508,7 +507,7 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-                                  Funcube
+                               Funcube series
 ***************************************************************************/
 
 // Bus conversion functions:
@@ -534,13 +533,11 @@ WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
 
 WRITE16_MEMBER(seta2_state::spriteram16_word_w)
 {
-
 	COMBINE_DATA( &m_spriteram[offset] );
 }
 
 READ16_MEMBER(seta2_state::spriteram16_word_r)
 {
-
 	return m_spriteram[offset];
 }
 
@@ -605,8 +602,26 @@ WRITE32_MEMBER(seta2_state::oki_write)
     }
 }
 
-
 static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
+	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
+	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
+
+	AM_RANGE( 0x00400000, 0x00400003 ) AM_READ(funcube_debug_r)
+	AM_RANGE( 0x00400004, 0x00400007 ) AM_READ(watchdog_reset32_r ) AM_WRITENOP
+
+	AM_RANGE( 0x00500000, 0x00500003 ) AM_READWRITE(oki_read, oki_write)
+
+	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_SHARE("spriteram")
+	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_dword_be_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(seta2_vregs_w, 0xffffffff ) AM_SHARE("vregs")
+
+	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
+
+	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE(coldfire_regs_r, coldfire_regs_w ) AM_SHARE("coldfire_regs")	// Module
+	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM	// SRAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( funcube2_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
@@ -737,8 +752,21 @@ WRITE8_MEMBER(seta2_state::funcube_outputs_w)
 	funcube_debug_outputs(space.machine());
 }
 
+READ8_MEMBER(seta2_state::funcube_battery_r)
+{
+	return ioport("BATTERY")->read() ? 0x40 : 0x00;
+}
 
 static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 8, seta2_state )
+	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ(funcube_coins_r )
+	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_READ(funcube_battery_r )
+	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
+	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
+//  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
+	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ(funcube_serial_r )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( funcube2_sub_io, AS_IO, 8, seta2_state )
 	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ(funcube_coins_r )
 	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
 	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
@@ -1730,7 +1758,7 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                                  Funcube
+                               Funcube series
 ***************************************************************************/
 
 static INPUT_PORTS_START( funcube )
@@ -1746,12 +1774,12 @@ static INPUT_PORTS_START( funcube )
 	PORT_START("SWITCH")	// c00030.l
 	PORT_BIT(     0x01, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(1)	// coin solenoid 1
 	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_SPECIAL  )					// coin solenoid 2
-	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// hopper sensor
-	PORT_BIT(     0x08, IP_ACTIVE_LOW,  IPT_BUTTON2  )	// game select
-	PORT_BIT(     0x10, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CODE(KEYCODE_O) PORT_NAME( "Pay Out" )
+	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_SPECIAL  )					// hopper sensor
+	PORT_BIT(     0x08, IP_ACTIVE_LOW,  IPT_BUTTON2  )					// game select
+	PORT_BIT(     0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT(     0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME( "Reset Key" )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW   )
-	PORT_BIT(     0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW   )
 
 	PORT_START("BATTERY")
 	PORT_DIPNAME( 0x10, 0x10, "Battery" )
@@ -1890,7 +1918,7 @@ static GFXDECODE_START( seta2 )
 GFXDECODE_END
 
 /***************************************************************************
-                                  Funcube
+                               Funcube series
 ***************************************************************************/
 
 static const gfx_layout funcube_layout_4bpp_lo =
@@ -2131,7 +2159,7 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
-                                  Funcube
+                               Funcube series
 ***************************************************************************/
 
 static TIMER_DEVICE_CALLBACK( funcube_interrupt )
@@ -2203,7 +2231,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))	// not accurate
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta2)
 	MCFG_SCREEN_VBLANK_STATIC(seta2)
 
@@ -2220,11 +2248,26 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( funcube3, funcube )
+
+static MACHINE_CONFIG_DERIVED( funcube2, funcube )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(funcube2_map)
+
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_IO_MAP(funcube2_sub_io)
+
+	// video hardware
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( funcube3, funcube2 )
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)	// !! TMP68301 !!
@@ -2265,7 +2308,35 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-               FUNCUBE (BET) Series, includes 2 through 5?
+FUNCUBE
+EVA2E PCB
+
+It's the same PCB as Namco Stars (P0-140B). It's a lot more complicated to dump
+than the others because there are several surface mounted flash ROMs spread across
+multiple daughterboards instead of simple socketed 32M DIP42 mask roms all on one PCB.
+
+***************************************************************************/
+
+ROM_START( funcube )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // XCF5206 Code
+	ROM_LOAD( "fcu1_prg0-f.u08", 0x00000, 0x80000, CRC(57f4f340) SHA1(436fc66409b254aba68ae33fc994bc270ce803a6) )
+
+	ROM_REGION( 0x20000, "sub", 0 )		// H8/3007 Code
+	ROM_LOAD( "fcu_0_iopr-0b.1b", 0x00000, 0x20000, CRC(87e3690f) SHA1(1b9dc573de31543884678df2dba2d6a74d6a2496) )
+
+	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "fcu1_obj-0a.u12", 0x000000, 0x200000, CRC(908b6baf) SHA1(cb5aa8c9b16abb17d8cc16d0d3b2f690a48ee503) )
+	ROM_LOAD32_BYTE( "fcu1_obj-0a.u13", 0x000001, 0x200000, CRC(8c31ca21) SHA1(e497ab1d7d30b41928a0c3db1ea7c3420376ad8c) )
+	ROM_LOAD32_BYTE( "fcu1_obj-0a.u14", 0x000002, 0x200000, CRC(4298d599) SHA1(d245206bc78de5f17da85ae6063b662cf9cf67aa) )
+	ROM_LOAD32_BYTE( "fcu1_obj-0a.u15", 0x000003, 0x200000, CRC(0669c78e) SHA1(0158fc4f90efa12d795b97873b8646c352864c69) )
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "fcu1_snd-0a.u40", 0x000000, 0x200000, CRC(448539bc) SHA1(9e53bd5e29d1a88bf634e58bfeebccd3a1c2d866) )
+ROM_END
+
+/***************************************************************************
+
+              FUNCUBE (BET) Series PCB for chapters 2 through 5
 
 PCB Number: B0-006B (also known as EVA3_A system and is non-JAMMA)
 +------------------------------------------------+
@@ -2428,6 +2499,17 @@ ROM_START( funcube5 )
 	ROM_LOAD( "fc51_snd-0.u47", 0x000000, 0x200000, CRC(2a504fe1) SHA1(911ad650bf48aa78d9cb3c64284aa526ceb519ba) )
 ROM_END
 
+static DRIVER_INIT( funcube )
+{
+	UINT32 *main_cpu = (UINT32 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) machine.root_device().memregion("sub")->base();
+
+	main_cpu[0x064/4] = 0x0000042a;	// PIC protection?
+
+	// Sub CPU
+	sub_cpu[0x506/2] = 0x5470;	// rte -> rts
+}
+
 static DRIVER_INIT( funcube2 )
 {
 	UINT32 *main_cpu = (UINT32 *) machine.root_device().memregion("maincpu")->base();
@@ -2534,7 +2616,7 @@ This game runs on Seta/Allumer hardware
 PCB Layout
 ----------
 
-PO-113A   BP949KA
+P0-113A   BP949KA
 |----------------------------------|
 |  X1-010  6264  U28               |
 |                     581001   U19 |
@@ -3290,8 +3372,9 @@ GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0,        ROT0, "Sammy USA C
 GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_COCKTAIL )
+GAME( 2000, funcube,  0,        funcube,  funcube,  funcube,  ROT0, "Namco",                 "Funcube (v1.5)",                               GAME_NO_COCKTAIL )
+GAME( 2001, funcube2, 0,        funcube2, funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_COCKTAIL )
 GAME( 2001, funcube3, 0,        funcube3, funcube,  funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NO_COCKTAIL )
-GAME( 2001, funcube4, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_COCKTAIL )
-GAME( 2002, funcube5, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 5 (v1.0)",                             GAME_NO_COCKTAIL )
+GAME( 2001, funcube4, 0,        funcube2, funcube,  funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_COCKTAIL )
+GAME( 2002, funcube5, 0,        funcube2, funcube,  funcube2, ROT0, "Namco",                 "Funcube 5 (v1.0)",                             GAME_NO_COCKTAIL )
 GAME( ????, reelquak, 0,        reelquak, reelquak, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
