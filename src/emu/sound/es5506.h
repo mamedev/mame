@@ -24,7 +24,6 @@ struct _es5505_interface
 READ16_DEVICE_HANDLER( es5505_r );
 WRITE16_DEVICE_HANDLER( es5505_w );
 void es5505_voice_bank_w(device_t *device, int voice, int bank);
-void es5505_set_channel_volume(device_t *device, int channel, int volume);
 
 DECLARE_LEGACY_SOUND_DEVICE(ES5505, es5505);
 
