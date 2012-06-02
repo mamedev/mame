@@ -166,6 +166,9 @@ CPPONLYFLAGS += /wd4548
 # disable macro redefinition warning
 CCOMFLAGS += /wd4005
 
+# disable behavior change: 'member1' called instead of 'member2' warning
+CCOMFLAGS += /wd4350
+
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
