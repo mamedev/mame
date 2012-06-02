@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)			//AM_SHARE("f3_pivot_ram")
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("snd_shared")
 	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
@@ -403,7 +403,7 @@ static INTERRUPT_GEN( f3_interrupt2 )
 
 static SOUND_RESET( f3 )
 {
-	SOUND_RESET_CALL( taito_f3_soundsystem_reset );
+	SOUND_RESET_CALL( taito_en_soundsystem_reset );
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_VIDEO_START(f3)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_en_sound)
 	MCFG_SOUND_RESET(f3)
 MACHINE_CONFIG_END
 

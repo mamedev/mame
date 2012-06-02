@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)									/* eerom etc. */
 	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("f3_shared")								/* Sound shared ram */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("snd_shared")								/* Sound shared ram */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)								/* TC0110PCR */
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_en_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

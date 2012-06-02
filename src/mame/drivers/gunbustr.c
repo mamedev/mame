@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")										/* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_SHARE("spriteram")				/* Sprite ram */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
-	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("f3_shared")										/* Sound shared ram */
+	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("snd_shared")										/* Sound shared ram */
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)											/* eerom etc. */
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_en_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

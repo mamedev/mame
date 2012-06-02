@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x500000, 0x500007) AM_WRITE(groundfx_input_w)	/* eeprom etc. */
 	AM_RANGE(0x600000, 0x600003) AM_READWRITE(groundfx_adc_r,groundfx_adc_w)
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("f3_shared")
+	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)	  /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)	// debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)	/* piv tilemaps */
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_en_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************

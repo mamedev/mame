@@ -9,7 +9,7 @@ public:
 		m_dsp(*this,"dsp"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
-		m_f3_shared_ram(*this, "f3_shared"),
+		m_snd_shared_ram(*this, "snd_shared"),
 		m_main_ram(*this, "main_ram"),
 		m_dsp_shared_ram(*this, "dsp_shared"),
 		m_palette_ram(*this, "palette_ram")
@@ -50,7 +50,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_shared_ptr<UINT32> m_vram;
 	required_shared_ptr<UINT32> m_objlist;
-	optional_shared_ptr<UINT32> m_f3_shared_ram;
+	optional_shared_ptr<UINT32> m_snd_shared_ram;
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT16> m_dsp_shared_ram;
 	required_shared_ptr<UINT32> m_palette_ram;
@@ -81,8 +81,8 @@ public:
 	DECLARE_READ8_MEMBER(jc_pcbid_r);
 	DECLARE_READ32_MEMBER(dsp_shared_r);
 	DECLARE_WRITE32_MEMBER(dsp_shared_w);
-	DECLARE_READ32_MEMBER(f3_share_r);
-	DECLARE_WRITE32_MEMBER(f3_share_w);
+	DECLARE_READ32_MEMBER(snd_share_r);
+	DECLARE_WRITE32_MEMBER(snd_share_w);
 	DECLARE_WRITE32_MEMBER(jc_meters_w);
 	DECLARE_READ32_MEMBER(jc_lan_r);
 	DECLARE_READ8_MEMBER(hc11_comm_r);
