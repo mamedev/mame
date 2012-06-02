@@ -93,6 +93,7 @@ typedef struct
 	UINT8 IP_last_state; /* last state of IP bits */
 
 	/* timer */
+	UINT8 half_period;
 	emu_timer *duart_timer;
 
 	/* UART channels */
@@ -244,20 +245,89 @@ static void duart68681_update_interrupts(duart68681_state *duart68681)
     }
 };
 
+double duart68681_get_ct_rate(duart68681_state *duart68681)
+{
+	double rate;
+
+	if (duart68681->ACR & 0x40)
+	{
+		// Timer mode
+		switch ((duart68681->ACR >> 4) & 3)
+		{
+			case 0: // IP2
+			case 1: // IP2 / 16
+				//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", duart68681->tag(), (duart68681->ACR >> 4) & 3);
+				rate = duart68681->device->clock();
+				break;
+			case 2: // X1/CLK
+				rate = duart68681->device->clock();
+				break;
+			case 3: // X1/CLK / 16
+				rate = duart68681->device->clock() / 16;
+				break;
+		}
+	}
+	else
+	{
+		// Counter mode
+		switch ((duart68681->ACR >> 4) & 3)
+		{
+			case 0: // IP2
+			case 1: // TxCA
+			case 2: // TxCB
+				//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (duart68681->ACR >> 4) & 3);
+				rate = duart68681->device->clock();
+				break;
+			case 3: // X1/CLK / 16
+				rate = duart68681->device->clock() / 16;
+				break;
+		}
+	}
+
+	return rate;
+}
+
+UINT16 duart68681_get_ct_count(duart68681_state *duart68681)
+{
+	double clock = duart68681_get_ct_rate(duart68681);	
+	return (duart68681->duart_timer->remaining() * clock).as_double();
+}
+
+void duart68681_start_ct(duart68681_state *duart68681, int count)
+{
+	double clock = duart68681_get_ct_rate(duart68681);	
+	duart68681->duart_timer->adjust(attotime::from_hz(clock) * count, 0);
+}
+
 static TIMER_CALLBACK( duart_timer_callback )
 {
 	device_t *device = (device_t *)ptr;
-	duart68681_state	*duart68681 = get_safe_token(device);
+	duart68681_state *duart68681 = get_safe_token(device);
 
-	duart68681->ISR |= INT_COUNTER_READY;
-	duart68681_update_interrupts(duart68681);
+	if (duart68681->ACR & 0x40)
+	{
+		// Timer mode
+		duart68681->half_period ^= 1;
 
-//  if ((duart68681->OPCR & 0x0c)== 0x04) {
-//      duart68681->OPR ^= 0x08;
-//      if (duart68681->duart_config->output_port_write)
-//          duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
-//
-//  }
+		// TODO: Set OP3
+
+		if (!duart68681->half_period)
+		{
+			duart68681->ISR |= INT_COUNTER_READY;
+			duart68681_update_interrupts(duart68681);
+		}
+
+		int count = MAX(duart68681->CTR.w.l, 1);
+		duart68681_start_ct(duart68681, count);
+	}
+	else
+	{
+		// Counter mode
+		duart68681->ISR |= INT_COUNTER_READY;
+		duart68681_update_interrupts(duart68681);
+		duart68681_start_ct(duart68681, 0xffff);
+	}
+
 };
 
 static void duart68681_write_MR(duart68681_state *duart68681, int ch, UINT8 data)
@@ -481,7 +551,7 @@ static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data
 
 };
 
-READ8_DEVICE_HANDLER(duart68681_r)
+READ8_DEVICE_HANDLER( duart68681_r )
 {
 	duart68681_state* duart68681 = get_safe_token(device);
 	UINT8 r = 0xff;
@@ -503,29 +573,42 @@ READ8_DEVICE_HANDLER(duart68681_r)
 				r = duart68681->channel[0].MR2;
 			}
 			break;
+
 		case 0x01: /* SRA */
 			r = duart68681->channel[0].SR;
 			break;
+
 		case 0x03: /* Rx Holding Register A */
 			r = duart68681_read_rx_fifo(duart68681, 0);
 			break;
-		case 0x04: /* IPCR */
-			{
-				UINT8 IP;
-				if ( duart68681->duart_config->input_port_read != NULL )
-					IP = duart68681->duart_config->input_port_read(duart68681->device);
-				else
-					IP = 0x0;
 
-				r = (((duart68681->IP_last_state ^ IP) & 0x0f) << 4) | (IP & 0x0f);
-				duart68681->IP_last_state = IP;
-				duart68681->ISR &= ~INT_INPUT_PORT_CHANGE;
-				duart68681_update_interrupts(duart68681);
-			}
-			break;
+		case 0x04: /* IPCR */
+		{
+			UINT8 IP;
+			if ( duart68681->duart_config->input_port_read != NULL )
+				IP = duart68681->duart_config->input_port_read(duart68681->device);
+			else
+				IP = 0x0;
+
+			r = (((duart68681->IP_last_state ^ IP) & 0x0f) << 4) | (IP & 0x0f);
+			duart68681->IP_last_state = IP;
+			duart68681->ISR &= ~INT_INPUT_PORT_CHANGE;
+			duart68681_update_interrupts(duart68681);
+		}
+		break;
+
 		case 0x05: /* ISR */
 			r = duart68681->ISR;
 			break;
+			
+		case 0x06: /* CUR */
+			r = duart68681_get_ct_count(duart68681) >> 8;
+			break;
+
+		case 0x07: /* CLR */
+			r = duart68681_get_ct_count(duart68681) & 0xff;
+			break;
+				
 		case 0x08: /* MR1B/MR2B */
 			if ( duart68681->channel[1].MR_ptr == 0 )
 			{
@@ -537,48 +620,58 @@ READ8_DEVICE_HANDLER(duart68681_r)
 				r = duart68681->channel[1].MR2;
 			}
 			break;
+
 		case 0x09: /* SRB */
 			r = duart68681->channel[1].SR;
 			break;
+
 		case 0x0b: /* RHRB */
 			r = duart68681_read_rx_fifo(duart68681, 1);
 			break;
+
 		case 0x0d: /* IP */
 			if ( duart68681->duart_config->input_port_read != NULL )
 				r = duart68681->duart_config->input_port_read(duart68681->device);
 			else
-				{
-					r = 0xff;
-#if 0
-					if (device->machine().input().code_pressed(KEYCODE_1)) r ^= 0x0001;
-					if (device->machine().input().code_pressed(KEYCODE_2)) r ^= 0x0002;
-					if (device->machine().input().code_pressed(KEYCODE_3)) r ^= 0x0004;
-					if (device->machine().input().code_pressed(KEYCODE_4)) r ^= 0x0008;
-					if (device->machine().input().code_pressed(KEYCODE_5)) r ^= 0x0010;
-					if (device->machine().input().code_pressed(KEYCODE_6)) r ^= 0x0020;
-					if (device->machine().input().code_pressed(KEYCODE_7)) r ^= 0x0040;
-					if (device->machine().input().code_pressed(KEYCODE_8)) r ^= 0x0080;
-#endif
-				}
-			break;
-		case 0x0e: /* Start counter command */
-			switch( (duart68681->ACR >> 4) & 0x07 )
 			{
-				/* TODO: implement modes 0,1,2,4,5 */
-				case 0x03: /* Counter, CLK/16 */
-					{
-						attotime rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
-						duart68681->duart_timer->adjust(rate, 0, rate);
-					}
-					break;
+				r = 0xff;
+#if 0
+				if (device->machine().input().code_pressed(KEYCODE_1)) r ^= 0x0001;
+				if (device->machine().input().code_pressed(KEYCODE_2)) r ^= 0x0002;
+				if (device->machine().input().code_pressed(KEYCODE_3)) r ^= 0x0004;
+				if (device->machine().input().code_pressed(KEYCODE_4)) r ^= 0x0008;
+				if (device->machine().input().code_pressed(KEYCODE_5)) r ^= 0x0010;
+				if (device->machine().input().code_pressed(KEYCODE_6)) r ^= 0x0020;
+				if (device->machine().input().code_pressed(KEYCODE_7)) r ^= 0x0040;
+				if (device->machine().input().code_pressed(KEYCODE_8)) r ^= 0x0080;
+#endif
 			}
 			break;
+
+		case 0x0e: /* Start counter command */
+		{
+			if (duart68681->ACR & 0x40)
+			{
+				// Reset the timer
+				duart68681->half_period = 0;
+				// TODO: Set OP3 to 1
+			}
+
+			int count = MAX(duart68681->CTR.w.l, 1);
+			duart68681_start_ct(duart68681, count);
+			break;
+		}
+
 		case 0x0f: /* Stop counter command */
 			duart68681->ISR &= ~INT_COUNTER_READY;
-			if (((duart68681->ACR >>4)& 0x07) < 4) // if in counter mode...
-			duart68681->duart_timer->adjust(attotime::never); // shut down timer
+
+			// Stop the counter only
+			if (!(duart68681->ACR & 0x40))
+				duart68681->duart_timer->adjust(attotime::never);
+
 			duart68681_update_interrupts(duart68681);
 			break;
+
 		default:
 			LOG(( "Reading unhandled 68681 reg %x\n", offset ));
 			break;
@@ -588,7 +681,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 	return r;
 }
 
-WRITE8_DEVICE_HANDLER(duart68681_w)
+WRITE8_DEVICE_HANDLER( duart68681_w )
 {
 	duart68681_state* duart68681 = get_safe_token(device);
 
@@ -600,112 +693,94 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 		case 0x00: /* MRA */
 			duart68681_write_MR(duart68681, 0, data);
 			break;
+
 		case 0x01: /* CSRA */
 			duart68681_write_CSR(duart68681, 0, data, duart68681->ACR);
 			break;
+
 		case 0x02: /* CRA */
 			duart68681_write_CR(duart68681, 0, data);
 			break;
+
 		case 0x03: /* THRA */
 			duart68681_write_TX(duart68681, 0, data);
 			break;
+
 		case 0x04: /* ACR */
+		{
+			UINT8 old_acr = duart68681->ACR;
 			duart68681->ACR = data;
+
 			//       bits 6-4: Counter/Timer Mode And Clock Source Select
 			//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
-			switch ((data >> 4) & 0x07)
+			if ((old_acr ^ data) & 0x40)
 			{
-				case 0: case 1: case 2: case 4: case 5: // TODO: handle these cases!
-				logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (data >> 4) & 0x07);
-				break;
-            case 3:
-				break;
-            case 0x06: /* Timer, CLK/1 */       // Timer modes start without reading address 0xe, as per the Freescale 68681 manual
-                {
-                    attotime rate;
-                    if (duart68681->CTR.w.l > 0)
-                    {
-                        rate = attotime::from_hz(2*device->clock()/(2*16*duart68681->CTR.w.l));
-                    }
-                    else
-                    {
-                        rate = attotime::from_hz(2*device->clock()/(2*16*0x10000));
-                    }
-                    duart68681->duart_timer->adjust(rate, 0, rate);
-                }
-                break;
-            case 0x07: /* Timer, CLK/16 */
-                {
-                    //double hz;
-                    //attotime rate = attotime::from_hz(duart68681->clock) * (16*duart68681->CTR.w.l);
-                    attotime rate;
-                    if (duart68681->CTR.w.l > 0)
-                    {
-                        rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
+				if (data & 0x40)
+				{
+					// Entering timer mode
+					UINT16 count = MAX(duart68681->CTR.w.l, 1);
+					duart68681->half_period = 0;
 
-                        // workaround for maygay1b locking up MAME
-                        if ((2*device->clock()/(2*16*16*duart68681->CTR.w.l)) == 0)
-                        {
-                            rate = attotime::from_hz(1);
-                        }
-                    }
-                    else
-                    {
-                        if (2*device->clock()/(2*16*16*0x10000) == 0)
-                        {
-                            rate = attotime::from_hz(1);
-                        }
-                        else
-                        {
-                            rate = attotime::from_hz(2*device->clock()/(2*16*16*0x10000));
-                        }
-                    }
-
-                    //hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
-
-                    duart68681->duart_timer->adjust(rate, 0, rate);
-                }
-                break;
+					// TODO: Set OP3
+					duart68681_start_ct(duart68681, count);
+				}
+				else
+				{
+					// Leaving timer mode (TODO: is this correct?)
+					duart68681->duart_timer->adjust(attotime::never);
+				}
 			}
+
 			duart68681_write_CSR(duart68681, 0, duart68681->channel[0].CSR, data);
 			duart68681_write_CSR(duart68681, 1, duart68681->channel[1].CSR, data);
 			duart68681_update_interrupts(duart68681); // need to add ACR checking for IP delta ints
 			break;
+		}
 		case 0x05: /* IMR */
 			duart68681->IMR = data;
 			duart68681_update_interrupts(duart68681);
 			break;
+
 		case 0x06: /* CTUR */
 			duart68681->CTR.b.h = data;
 			break;
+
 		case 0x07: /* CTLR */
 			duart68681->CTR.b.l = data;
 			break;
+
 		case 0x08: /* MRB */
 			duart68681_write_MR(duart68681, 1, data);
 			break;
+
 		case 0x09: /* CSRB */
 			duart68681_write_CSR(duart68681, 1, data, duart68681->ACR);
 			break;
+
 		case 0x0a: /* CRB */
 			duart68681_write_CR(duart68681, 1, data);
 			break;
+
 		case 0x0b: /* THRB */
 			duart68681_write_TX(duart68681, 1, data);
 			break;
+
 		case 0x0c: /* IVR */
 			duart68681->IVR = data;
 			break;
+
 		case 0x0d: /* OPCR */
 			if (data != 0x00)
 				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", device->tag(), data);
 			duart68681->OPCR = data;
 			break;
+
 		case 0x0e: /* Set Output Port Bits */
 			duart68681->OPR |= data;
 			if (duart68681->duart_config->output_port_write)
 				duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
 			break;
+
 		case 0x0f: /* Reset Output Port Bits */
 			duart68681->OPR &= ~data;
 			if (duart68681->duart_config->output_port_write)
@@ -761,6 +836,7 @@ static DEVICE_START(duart68681)
 	device->save_item(NAME(duart68681->OPCR));
 	device->save_item(NAME(duart68681->CTR));
 	device->save_item(NAME(duart68681->IP_last_state));
+	device->save_item(NAME(duart68681->half_period));
 
 	device->save_item(NAME(duart68681->channel[0].CR));
 	device->save_item(NAME(duart68681->channel[0].CSR));
