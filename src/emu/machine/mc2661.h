@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Philips SCN2661 Enhanced Programmable Communications Interface emulation
+    Motorola MC2661/MC68661 Enhanced Programmable Communications Interface
 
     Copyright the MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -13,8 +13,8 @@
                    GND   4 |             | 25  _RxC/BKDET
                     D4   5 |             | 24  _DTR
                     D5   6 |             | 23  _RTS
-                    D6   7 |   SCN2661   | 22  _DSR
-                    D7   8 |             | 21  RESET
+                    D6   7 |   MC2661    | 22  _DSR
+                    D7   8 |   MC68661   | 21  RESET
             _TxC/XSYNC   9 |             | 20  BRCLK
                     A1  10 |             | 19  TxD
                    _CE  11 |             | 18  _TxEMT/DSCHG
@@ -26,8 +26,8 @@
 
 #pragma once
 
-#ifndef __SCN2661__
-#define __SCN2661__
+#ifndef __MC2661__
+#define __MC2661__
 
 #include "emu.h"
 
@@ -37,13 +37,13 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_SCN2661_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, SCN2661, _clock) \
+#define MCFG_MC2661_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MC2661, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
-#define SCN2661_INTERFACE(_name) \
-	const scn2661_interface (_name) =
+#define MC2661_INTERFACE(_name) \
+	const mc2661_interface (_name) =
 
 
 
@@ -51,9 +51,9 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> scn2661_interface
+// ======================> mc2661_interface
 
-struct scn2661_interface
+struct mc2661_interface
 {
 	int m_rxc;
 	int m_txc;
@@ -71,15 +71,15 @@ struct scn2661_interface
 };
 
 
-// ======================> scn2661_device
+// ======================> mc2661_device
 
-class scn2661_device :  public device_t,
+class mc2661_device :  public device_t,
 					    public device_serial_interface,
-					    public scn2661_interface
+					    public mc2661_interface
 {
 public:
 	// construction/destruction
-	scn2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -129,13 +129,10 @@ private:
 	UINT8 m_thr;
 	UINT8 m_cr;
 	UINT8 m_sr;
-	UINT8 m_mr1;
-	UINT8 m_mr2;
-	UINT8 m_syn1;
-	UINT8 m_syn2;
-	UINT8 m_dle;
+	UINT8 m_mr[2];
+	UINT8 m_sync[3];
 
-	int m_mr_index;
+	int m_mode_index;
 	int m_sync_index;
 
 	// timers
@@ -145,7 +142,7 @@ private:
 
 
 // device type definition
-extern const device_type SCN2661;
+extern const device_type MC2661;
 
 
 

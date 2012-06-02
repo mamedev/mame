@@ -126,6 +126,7 @@ private:
 	inline void set_dr(int state);
 	inline void set_tbre(int state);
 	inline void set_tre(int state);
+	inline void receive_bit(int state);
 	inline void receive();
 	inline void transmit();
 

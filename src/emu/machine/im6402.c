@@ -23,7 +23,7 @@ const device_type IM6402 = &device_creator<im6402_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 
@@ -68,6 +68,33 @@ inline void im6402_device::set_tre(int state)
 
 
 //-------------------------------------------------
+//  receive_bit -
+//-------------------------------------------------
+
+inline void im6402_device::receive_bit(int state)
+{
+	if (LOG) logerror("IM6402 '%s' Receive Bit %u\n", tag(), state);
+	
+	receive_register_update_bit(state);
+
+	if (is_receive_register_full())
+	{
+		receive_register_extract();
+		m_rbr = get_received_char();
+		
+		if (LOG) logerror("IM6402 '%s' Receive Data %02x\n", tag(), m_rbr);
+
+		if (m_dr)
+		{
+			m_oe = 1;
+		}
+
+		set_dr(ASSERT_LINE);
+	}	
+}
+
+
+//-------------------------------------------------
 //  receive -
 //-------------------------------------------------
 
@@ -84,24 +111,7 @@ inline void im6402_device::receive()
 		bit = m_in_rri_func();
 	}
 
-//	if (LOG) logerror("IM6402 '%s' Receive Bit %u\n", tag(), bit);
-	
-	receive_register_update_bit(bit);
-
-	if (is_receive_register_full())
-	{
-		receive_register_extract();
-		m_rbr = get_received_char();
-		
-		if (LOG) logerror("IM6402 '%s' Receive Data %02x\n", tag(), m_rbr);
-
-		if (m_dr)
-		{
-			m_oe = 1;
-		}
-
-		set_dr(ASSERT_LINE);
-	}
+	receive_bit(bit);
 }
 
 
@@ -272,6 +282,9 @@ void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void im6402_device::input_callback(UINT8 state)
 {
+	int bit = (state & SERIAL_STATE_RX_DATA) ? 1 : 0;
+	
+	receive_bit(bit);
 }
 
 
@@ -452,7 +465,7 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 		if (LOG) logerror("IM6402 '%s' Control Register Load\n", tag());
 
 		int word_length = 5 + ((m_cls2 << 1) | m_cls1);
-		int stop_bits = 1 + (m_sbs ? ((word_length == 5) ? 0.5 : 1) : 0);
+		float stop_bits = 1 + (m_sbs ? ((word_length == 5) ? 0.5 : 1) : 0);
 		int parity_code;
 
 		if (m_pi) parity_code = SERIAL_PARITY_NONE;

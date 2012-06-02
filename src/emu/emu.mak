@@ -208,6 +208,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/mb3773.o		\
 	$(EMUMACHINE)/mb87078.o		\
 	$(EMUMACHINE)/mc146818.o	\
+	$(EMUMACHINE)/mc2661.o		\
 	$(EMUMACHINE)/mc6852.o		\
 	$(EMUMACHINE)/mc68901.o		\
 	$(EMUMACHINE)/mccs1850.o	\
@@ -239,7 +240,6 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/s3c2400.o		\
 	$(EMUMACHINE)/s3c2410.o		\
 	$(EMUMACHINE)/s3c2440.o		\
-	$(EMUMACHINE)/scn2661.o		\
 	$(EMUMACHINE)/scsi.o		\
 	$(EMUMACHINE)/scsicd.o		\
 	$(EMUMACHINE)/scsidev.o		\
