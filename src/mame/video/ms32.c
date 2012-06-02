@@ -709,7 +709,8 @@ SCREEN_UPDATE_RGB32( ms32 )
 
 				else
 				{
-					fatalerror("unhandled priority type %02x\n",primask);
+					dstptr_bitmap[xx] = 0;
+					logerror("unhandled priority type %02x\n",primask);
 				}
 
 
