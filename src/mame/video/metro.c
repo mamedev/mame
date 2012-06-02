@@ -448,10 +448,9 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *base_gfx4 = state->m_expanded_gfx1;
 	UINT8 *base_gfx8 = state->memregion("gfx1")->base();
 	UINT32 gfx_size = state->memregion("gfx1")->bytes();
-	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	int max_x = visarea.max_x + 1;
-	int max_y = visarea.max_y + 1;
+	int max_x = machine.primary_screen->width();
+	int max_y = machine.primary_screen->height();
 
 	int max_sprites = state->m_spriteram.bytes() / 8;
 	int sprites     = state->m_videoregs[0x00/2] % max_sprites;
@@ -729,10 +728,9 @@ SCREEN_UPDATE_IND16( metro )
 	metro_state *state = screen.machine().driver_data<metro_state>();
 	int pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->m_screenctrl;
-	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - (visarea.max_x + 1)  / 2;
-	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - (visarea.max_y + 1) / 2;
+	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - screen.width()  / 2;
+	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen.height() / 2;
 
 	/* The background color is selected by a register */
 	screen.machine().priority_bitmap.fill(0, cliprect);
