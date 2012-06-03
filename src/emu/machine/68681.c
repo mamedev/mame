@@ -247,7 +247,7 @@ static void duart68681_update_interrupts(duart68681_state *duart68681)
 
 double duart68681_get_ct_rate(duart68681_state *duart68681)
 {
-	double rate;
+	double rate = 0.0f;
 
 	if (duart68681->ACR & 0x40)
 	{
