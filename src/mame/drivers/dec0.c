@@ -220,11 +220,11 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 }
 
 
-WRITE16_MEMBER(dec0_state::automat_control_w)
+WRITE16_MEMBER(automat_state::automat_control_w)
 {
 	switch (offset << 1)
 	{
-		case 0xe: /* 6502 sound cpu */
+		case 0xe: /* z80 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
@@ -233,7 +233,7 @@ WRITE16_MEMBER(dec0_state::automat_control_w)
 			break;
 
 		case 12: /* DMA flag */
-			dec0_update_sprites_w(space, 0, 0, mem_mask);
+			//dec0_update_sprites_w(space, 0, 0, mem_mask);
 			break;
 #if 0
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
@@ -611,27 +611,27 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
+static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, automat_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)			/* text layer */
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x242000, 0x24207f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x242400, 0x2427ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x242800, 0x243fff) AM_RAM 								/* Robocop only */
-	AM_RANGE(0x244000, 0x245fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x240000, 0x240007) AM_RAM			/* text layer */
+	AM_RANGE(0x240010, 0x240017) AM_RAM
+	AM_RANGE(0x242000, 0x24207f) AM_RAM
+	AM_RANGE(0x242400, 0x2427ff) AM_RAM
+	AM_RANGE(0x242800, 0x243fff) AM_RAM
+	AM_RANGE(0x244000, 0x245fff) AM_RAM
 
-	AM_RANGE(0x246000, 0x246007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)			/* first tile layer */
-	AM_RANGE(0x246010, 0x246017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x248400, 0x2487ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x24a000, 0x24a7ff)  AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x246000, 0x246007) AM_RAM			/* first tile layer */
+	AM_RANGE(0x246010, 0x246017) AM_RAM
+	AM_RANGE(0x248000, 0x24807f) AM_RAM
+	AM_RANGE(0x248400, 0x2487ff) AM_RAM
+	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM
 
-	AM_RANGE(0x24c000, 0x24c007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)			/* second tile layer */
-	AM_RANGE(0x24c010, 0x24c017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x24c800, 0x24c87f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x24c000, 0x24c007) AM_RAM			/* second tile layer */
+	AM_RANGE(0x24c010, 0x24c017) AM_RAM
+	AM_RANGE(0x24c800, 0x24c87f) AM_RAM
+	AM_RANGE(0x24cc00, 0x24cfff) AM_RAM
+	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM
 
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
@@ -643,12 +643,12 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")			/* Sprites */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(dec0_state::automat_adpcm_w)
+WRITE8_MEMBER(automat_state::automat_adpcm_w)
 {
 	m_automat_adpcm_byte = data;
 }
 
-static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_state )
+static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, automat_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 //  AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(ym2203_control_port_0_w)
 //  AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(ym2203_write_port_0_w)
@@ -1332,27 +1332,6 @@ static const ym3812_interface ym3812b_interface =
 /******************************************************************************/
 
 
-static void automat_vclk_cb(device_t *device)
-{
-	dec0_state *state = device->machine().driver_data<dec0_state>();
-	if (state->m_automat_msm5205_vclk_toggle == 0)
-	{
-		msm5205_data_w(device, state->m_automat_adpcm_byte & 0xf);
-	}
-	else
-	{
-		msm5205_data_w(device, state->m_automat_adpcm_byte >> 4);
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-	}
-
-	state->m_automat_msm5205_vclk_toggle ^= 1;
-}
-
-static const msm5205_interface msm5205_config =
-{
-	automat_vclk_cb,
-	MSM5205_S48_4B
-};
 
 
 static MACHINE_CONFIG_START( dec0_base, dec0_state )
@@ -1420,7 +1399,30 @@ MACHINE_CONFIG_END
 #define DEC0_VBSTART 256-8
 
 
-static MACHINE_CONFIG_DERIVED( automat, dec0_base )
+static void automat_vclk_cb(device_t *device)
+{
+	automat_state *state = device->machine().driver_data<automat_state>();
+	if (state->m_automat_msm5205_vclk_toggle == 0)
+	{
+		msm5205_data_w(device, state->m_automat_adpcm_byte & 0xf);
+	}
+	else
+	{
+		msm5205_data_w(device, state->m_automat_adpcm_byte >> 4);
+	//	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	}
+
+	state->m_automat_msm5205_vclk_toggle ^= 1;
+}
+
+static const msm5205_interface msm5205_config =
+{
+	automat_vclk_cb,
+	MSM5205_S48_4B
+};
+
+
+static MACHINE_CONFIG_START( automat, automat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1435,8 +1437,9 @@ static MACHINE_CONFIG_DERIVED( automat, dec0_base )
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
-	MCFG_SCREEN_UPDATE_STATIC(robocop)
+	MCFG_SCREEN_UPDATE_STATIC(automat)
 
+	MCFG_PALETTE_LENGTH(1024)
 	MCFG_GFXDECODE(automat)
 
 	/* sound hardware */

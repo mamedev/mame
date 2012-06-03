@@ -7,8 +7,6 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_robocop_shared_ram(*this, "robocop_shared"){ }
 
-	UINT8 m_automat_adpcm_byte;
-	int m_automat_msm5205_vclk_toggle;
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT8> m_robocop_shared_ram;
@@ -25,11 +23,9 @@ public:
 	UINT16 *m_buffered_spriteram;
 	UINT16 m_pri;
 	DECLARE_WRITE16_MEMBER(dec0_control_w);
-	DECLARE_WRITE16_MEMBER(automat_control_w);
 	DECLARE_WRITE16_MEMBER(slyspy_control_w);
 	DECLARE_WRITE16_MEMBER(midres_sound_w);
 	DECLARE_WRITE16_MEMBER(unmapped_w);
-	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_protection_r);
 	DECLARE_WRITE16_MEMBER(slyspy_state_w);
@@ -55,24 +51,37 @@ public:
 };
 
 
+class automat_state : public dec0_state
+{
+public:
+	automat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dec0_state(mconfig, type, tag) {
+
+	}
+
+	UINT8 m_automat_adpcm_byte;
+	int m_automat_msm5205_vclk_toggle;
+	DECLARE_WRITE16_MEMBER(automat_control_w);
+	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
+
+};
+
+
 /*----------- defined in video/dec0.c -----------*/
 
 /* Video emulation definitions */
 VIDEO_START( dec0 );
 VIDEO_START( dec0_nodma );
+VIDEO_START( automat );
 SCREEN_UPDATE_IND16( hbarrel );
 SCREEN_UPDATE_IND16( baddudes );
 SCREEN_UPDATE_IND16( birdtry );
 SCREEN_UPDATE_IND16( robocop );
+SCREEN_UPDATE_IND16( automat );
 SCREEN_UPDATE_IND16( hippodrm );
 SCREEN_UPDATE_IND16( slyspy );
 SCREEN_UPDATE_IND16( midres );
 
-
-
-READ8_HANDLER( dec0_pf3_data_8bit_r );
-WRITE8_HANDLER( dec0_pf3_data_8bit_w );
-WRITE8_HANDLER( dec0_pf3_control_8bit_w );
 
 /*----------- defined in machine/dec0.c -----------*/
 

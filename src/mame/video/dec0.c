@@ -147,6 +147,12 @@ SCREEN_UPDATE_IND16( robocop )
 	return 0;
 }
 
+
+SCREEN_UPDATE_IND16( automat )
+{
+	return 0;
+}
+
 /******************************************************************************/
 
 SCREEN_UPDATE_IND16( birdtry )
@@ -265,6 +271,11 @@ VIDEO_START( dec0 )
 	dec0_state *state = machine.driver_data<dec0_state>();
 	VIDEO_START_CALL(dec0_nodma);
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
+}
+
+VIDEO_START( automat )
+{
+//	dec0_state *state = machine.driver_data<dec0_state>();
 }
 
 /******************************************************************************/
