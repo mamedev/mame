@@ -401,7 +401,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 		// remove any existing device options
 		remove_device_options();
 		result = parse_slot_devices(argc, argv, error_string, NULL, NULL);
-		if (exists(OPTION_RAMSIZE))
+		if (exists(OPTION_RAMSIZE) && old_system_name.len()!=0)
 			set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
 	}
 	return result;
