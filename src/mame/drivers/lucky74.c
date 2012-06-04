@@ -10,6 +10,7 @@
 
     * Lucky 74 (bootleg, set 1), 1988, Wing Co.,Ltd.
     * Lucky 74 (bootleg, set 2), 1988, Wing Co.,Ltd.
+    * Exciting Black Jack,       198?, Sega.
 
 
     Special thanks to Grull Osgo that helped a lot with the whole audio system and custom IC's
@@ -58,8 +59,8 @@
 
     Silkscreened: 'B 0L2'
 
-    Sticker:      'WE8703 1992.10'
-                    'LUCKY 74-7'
+    Sticker:      '7' 'WE8703 1992.10'
+                      'LUCKY 74-7'
 
 
     PCB is original from WING Co.,Ltd.
@@ -1061,6 +1062,11 @@ static INPUT_PORTS_START( lucky74 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( excitbj )
+
+INPUT_PORTS_END
+
+
 /*************************
 *    Graphics Layouts    *
 *************************/
@@ -1315,8 +1321,9 @@ ROM_START( lucky74 )
 	ROM_LOAD( "luckychi.18",	0x10000, 0x8000, CRC(f2d45e76) SHA1(46df7bf98434c836fd38539575a35bf67c9ec2c6) )
 	ROM_LOAD( "luckychi.19",	0x18000, 0x8000, CRC(6b0196f3) SHA1(277049279dcfcf07189dbdb20935c2a71b2f6061) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* 4-bit ADPCM samples @ 8kHz */
-	ROM_LOAD( "luckyson.15",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )
+	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "luckyson.15",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )	/* location 2n */
+	ROM_FILL(					0x10000, 0x10000, 0xff )															/* empty socket @ 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "luckyprom.e6",	0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
@@ -1333,7 +1340,8 @@ ROM_END
     - All the co-processor routines were erased.
 
     - The program ROM seems incomplete or encrypted in some smart way.
-      At start, just pop some registers and make a RTI. Maybe protection...
+      At start, just pop some registers and make a RTI. Maybe the 1st
+      part of the program is inside the original CPU box...
 
 */
 ROM_START( lucky74a )
@@ -1352,8 +1360,9 @@ ROM_START( lucky74a )
 	ROM_LOAD( "luckygde.18",	0x10000, 0x8000, CRC(717e5f4e) SHA1(0f14c9525bf77bbc4de0d9695648acb40870a176) )
 	ROM_LOAD( "luckygde.19",	0x18000, 0x8000, CRC(bb4608ae) SHA1(cc8ec596f445fe0364f254241227de368f309ebb) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* 4-bit ADPCM samples @ 8kHz */
-	ROM_LOAD( "luckyson.15",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )
+	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "luckyson.15",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )	/* location 2n */
+	ROM_FILL(					0x10000, 0x10000, 0xff )															/* empty socket @ 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "luckyprom.e6",	0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
@@ -1364,11 +1373,59 @@ ROM_START( lucky74a )
 	ROM_LOAD( "luckyprom.c7",	0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
 ROM_END
 
+/*
+    
+    Exciting Black Jack.
+    Sega (Wing?), 1992. (game say 198?).
+
+    Program is inside a CPU box, and is not dumped.
+    S5 and S10 are banked 4 bits ADPCM samples.
+
+    ebj_s1.2f           1ST AND 2ND HALF IDENTICAL
+    ebj_s2.2j           1ST AND 2ND HALF IDENTICAL
+    ebj_s3.2k           1ST AND 2ND HALF IDENTICAL
+    ebj_s4.2l           1ST AND 2ND HALF IDENTICAL
+    ebj_s6.1f           1ST AND 2ND HALF IDENTICAL
+    ebj_s7.1j           1ST AND 2ND HALF IDENTICAL
+    ebj_s8.1k           1ST AND 2ND HALF IDENTICAL
+    ebj_s9.1l           1ST AND 2ND HALF IDENTICAL
+
+*/
+ROM_START( excitbj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ebj_prg.box",	0x0000, 0x10000, NO_DUMP )	/* someone will try to do some magic to extract this one */
+
+	ROM_REGION( 0x40000, "fgtiles", 0 )
+	ROM_LOAD( "ebj_s2.2j",	0x00000, 0x10000, CRC(a9d432f1) SHA1(25ff00a1fecc9bc767c4c417ab7dac0a32378884) )
+	ROM_LOAD( "ebj_s1.2f",	0x10000, 0x10000, CRC(955e9631) SHA1(68ae0d6502fabc5746d16043f9699315465acffb) )
+	ROM_LOAD( "ebj_s3.2k",	0x20000, 0x10000, CRC(2f887c83) SHA1(ca9407e9967c673c35f649320d3c3ae18c61b379) )
+	ROM_LOAD( "ebj_s4.2l",	0x30000, 0x10000, CRC(7e14a279) SHA1(bddbaa6cfbe86c59a7da6999ab88da878666cc1d) )
+
+	ROM_REGION( 0x40000, "bgtiles", 0 )
+	ROM_LOAD( "ebj_s7.1j",	0x00000, 0x10000, CRC(7dba6ae2) SHA1(d995482cb8d8bcdfe0f77aae99f23f1c55b7c339) )
+	ROM_LOAD( "ebj_s6.1f",	0x10000, 0x10000, CRC(aad2eb77) SHA1(9c4d82bd81d10cdd32af2f4ec376cead9a5a4e78) )
+	ROM_LOAD( "ebj_s8.1k",	0x20000, 0x10000, CRC(297443a7) SHA1(3a20498dcf69412f5bd3156391a55d3b1273c0b4) )
+	ROM_LOAD( "ebj_s9.1l",	0x30000, 0x10000, CRC(79ba7d75) SHA1(7301143a019d5e79eff7941a1a34fe96036acffa) )
+
+	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "ebj_s5.2n",	0x00000, 0x10000, CRC(9b4a10a2) SHA1(843ab5955ba96bb1b1a5367652d0f6424ba23bdf) )	/* location 2n */
+	ROM_LOAD( "ebj_s10.1n",	0x10000, 0x10000, CRC(2fa7401d) SHA1(80a5dfd2b7c183acd2fc124d220de4a4921178b2) )	/* location 1n */
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "6e-a.6e",	0x0000, 0x0100, CRC(bcaa7a0d) SHA1(75554d539bf67effb862234cdf89e4df4e2193ed) )
+	ROM_LOAD( "7e.7e",		0x0100, 0x0100, CRC(09c3f397) SHA1(d8fd8faf3d9534e44e65efcef82a6d691c0e8c3f) )
+	ROM_LOAD( "6d-a.6d",	0x0200, 0x0100, CRC(5290798a) SHA1(90f0af6d9fe362d8fac672b56e443e1edcf59e13) )
+	ROM_LOAD( "7d.7d",		0x0300, 0x0100, CRC(ddef8e23) SHA1(27c975174dc9a7a9deaf34322083183033d3aba3) )
+	ROM_LOAD( "6c-a.6c",	0x0400, 0x0100, CRC(e74c63a0) SHA1(0abd56296baeef7dae5f8cff04f23de2d26ffac1) )
+	ROM_LOAD( "7c.7c",		0x0500, 0x0100, CRC(d8f90e92) SHA1(b1fa72bb6d32db3bfd95f5f1c502758f302f3053) )
+ROM_END
+
 
 /*********************************************
 *                Game Drivers                *
 **********************************************
 
-       YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY          FULLNAME                     FLAGS             LAYOUT  */
+       YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
 GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
 GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
+GAME(  198?, excitbj,  0,       lucky74, excitbj,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
