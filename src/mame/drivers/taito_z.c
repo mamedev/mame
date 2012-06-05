@@ -1375,6 +1375,7 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 		output_set_value("Motor_2_Speed",(data & 60)/4);
 
 		break;
+
 	case 8:
 		output_set_value("Motor_3_Direction",0);
 		if (data & 1) output_set_value("Motor_3_Direction",1);
@@ -1382,8 +1383,10 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 		output_set_value("Motor_3_Speed",(data & 60)/4);
 
 		break;
+
 	default:
 		output_set_value("motor_debug",data);
+		break;
 	}
 
 }
@@ -1472,12 +1475,6 @@ READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
 {
 	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
-
-	offset = offset & 3;
-
-//  m_pandata[offset] = data;
-//  popmessage(" pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3] );
-
 	flt_volume_set_volume(machine().device(fltname[offset & 3]), data / 255.0f);
 }
 
@@ -2922,38 +2919,6 @@ static const ym2610_interface ym2610_interfaceb =
 };
 
 
-/**************************************************************
-                         SUBWOOFER (SOUND)
-**************************************************************/
-
-#if 0
-static DEVICE_START( subwoofer )
-{
-	/* Adjust the lowpass filter of the first three YM2610 channels */
-
-	/* 150 Hz is a common top frequency played by a generic */
-	/* subwoofer, the real Arcade Machine may differs */
-
-	mixer_set_lowpass_frequency(0, 20);
-	mixer_set_lowpass_frequency(1, 20);
-	mixer_set_lowpass_frequency(2, 20);
-}
-
-static DEVICE_GET_INFO( subwoofer )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(subwoofer);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Subwoofer");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-#endif
-
-
 /***********************************************************
                       MACHINE DRIVERS
 
@@ -3017,17 +2982,7 @@ static const tc0100scn_interface spacegun_tc0100scn_intf =
 	0, 0
 };
 
-static const tc0480scp_interface dblaxle_tc0480scp_intf =
-{
-	1, 2,		/* gfxnum, txnum */
-	0,			/* pixels */
-	0x21, 0x08,	/* x_offset, y_offset */
-	4, 0,		/* text_xoff, text_yoff */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0			/* col_base */
-};
-
-static const tc0480scp_interface racingb_tc0480scp_intf =
+static const tc0480scp_interface taitoz_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
 	0,			/* pixels */
@@ -3173,8 +3128,6 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
-
 	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
 MACHINE_CONFIG_END
 
@@ -3299,8 +3252,6 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
 MACHINE_CONFIG_END
@@ -3656,7 +3607,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 
 	MCFG_VIDEO_START(taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", dblaxle_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
@@ -3718,7 +3669,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 
 	MCFG_VIDEO_START(taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", racingb_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
@@ -3756,10 +3707,6 @@ ROM_START( contcirc )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "ic25", 0x00000, 0x20000, CRC(f5c92e42) SHA1(42dfa1895e601df76d7022b83f05c4e5c843fd12) )
 	ROM_LOAD16_BYTE( "ic26", 0x00001, 0x20000, CRC(e7c1d1fa) SHA1(75e851629a54facb8804ee8a953ab3265633bbf4) )
-// this was bogus and has been removed.
-// someone hacked the copyright year from 1987 to 1989, and changed an unused byte from FF to F3 to keep
-// the checksum the same. There are no other differences.
-//  ROM_LOAD16_BYTE( "cc_26.bin", 0x00001, 0x20000, CRC(1345ebe6) SHA1(88b9cc8ba2f7061beb8f6b763583cd45b03bcea1) )
 
 	ROM_REGION( 0x40000, "sub", 0 )	/* 256K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "ic35",      0x00000, 0x20000, CRC(16522f2d) SHA1(1d2823d61518936d342df3ed712da5bdfdf6e55a) )

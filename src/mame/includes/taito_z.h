@@ -17,7 +17,6 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int         m_sci_spriteframe;
@@ -29,8 +28,6 @@ public:
 	INT32       m_sci_int6;
 	INT32       m_ioc220_port;
 	UINT16      m_eep_latch;
-
-//  UINT8       pandata[4];
 
 	/* devices */
 	device_t *m_maincpu;
