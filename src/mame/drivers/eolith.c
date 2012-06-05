@@ -83,8 +83,8 @@
 
   - linkypip (Linky Pipe)
 
-      Game will seems to randomly hang for unknown reasons.  Gets cought
-      up here:
+      Game seems to randomly hang for unknown reasons at the "Round 1" screen
+      just before you can actually start playing.  Gets cought up here:
 
       40008176: MOV L10, L11
       40008178: LDW.P L5, L8
