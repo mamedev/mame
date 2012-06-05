@@ -39,6 +39,7 @@ static const struct
 } eolith_speedup_table[] =
 {
 	/* eolith.c */
+	{ "linkypip", 0x4000825c, 240 },
 	{ "ironfort", 0x40020854, 240 },
 	{ "hidnctch", 0x4000bba0, 240 },
 	{ "raccoon",  0x40008204, 240 },
@@ -52,11 +53,11 @@ static const struct
 	{ "fort2b",   0x000081e0, 240 },
 	{ "fort2ba",  0x000081e0, 240 },
 	{ "penfan",   0x4001FA66, 240 },
-	{ "candy",	  0x4001990C, 240 },
+	{ "candy",    0x4001990C, 240 },
 	/* eolith16.c */
 	{ "klondkp",  0x0001a046, 240 },
 	/* vegaeo.c */
-	{ "crazywar",  0x00008cf8, 240 },
+	{ "crazywar", 0x00008cf8, 240 },
 	{ NULL, 0, 0 }
 };
 
