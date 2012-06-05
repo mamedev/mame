@@ -48,24 +48,44 @@
 		</disk>
 	</element>
 
-	<!-- Super Chase used a widescreen monitor, see http://flyers.arcade-museum.com/?page=thumbs&db=videodb&id=1118 -->
+	<!-- Super Chase (Deluxe/Cockpit cab) used a widescreen monitor, see http://flyers.arcade-museum.com/?page=thumbs&db=videodb&id=1118 -->
 
-	<view name="Shifter-R">
+	<view name="Deluxe (16:9), Shifter-R">
 		<screen index="0">
-			<bounds left="0" top="0" right="864" bottom="486" />
+			<bounds left="0" top="0" right="800" bottom="450" />
 		</screen>
 		<bezel element="shifter" inputtag="INPUTS" inputmask="0x00002000">
-			<bounds x="830" y="414" width="32" height="64" />
+			<bounds x="766" y="384" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
 	</view>
-	<view name="Shifter-L">
+	<view name="Deluxe (16:9), Shifter-L">
 		<screen index="0">
-			<bounds left="0" top="0" right="864" bottom="486" />
+			<bounds left="0" top="0" right="800" bottom="450" />
+		</screen>
+		<bezel element="shifter" inputtag="INPUTS" inputmask="0x00002000">
+			<bounds x="2" y="384" width="32" height="64" />
+			<color alpha="0.6" />
+		</bezel>
+	</view>
+
+	<view name="Upright (4:3), Shifter-R">
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<bezel element="shifter" inputtag="INPUTS" inputmask="0x00002000">
+			<bounds x="606" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</bezel>
+	</view>
+	<view name="Upright (4:3), Shifter-L">
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
 		<bezel element="shifter" inputtag="INPUTS" inputmask="0x00002000">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
 	</view>
+
 </mamelayout>

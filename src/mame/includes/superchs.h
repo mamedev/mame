@@ -15,14 +15,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
-		m_shared_ram(*this,"shared_ram") { }
+		m_shared_ram(*this,"shared_ram")
+	{ }
 
 	UINT16 m_coin_word;
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_shared_ram;
 
-	int m_steer;
 	struct tempsprite *m_spritelist;
 	UINT32 m_mem[2];
 

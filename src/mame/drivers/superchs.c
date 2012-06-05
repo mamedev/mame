@@ -44,7 +44,6 @@
 #include "includes/superchs.h"
 
 
-
 /*********************************************************************/
 
 READ16_MEMBER(superchs_state::shared_ram_r)
@@ -169,43 +168,8 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 
 READ32_MEMBER(superchs_state::superchs_stick_r)
 {
-	int fake = ioport("FAKE")->read();
-	int accel;
-
-	if (!(fake &0x10))	/* Analogue steer (the real control method) */
-	{
-		m_steer = ioport("WHEEL")->read();
-	}
-	else	/* Digital steer, with smoothing - speed depends on how often stick_r is called */
-	{
-		int delta;
-		int goal = 0x80;
-		if (fake &0x04) goal = 0xff;		/* pressing left */
-		if (fake &0x08) goal = 0x0;		/* pressing right */
-
-		if (m_steer!=goal)
-		{
-			delta = goal - m_steer;
-			if (m_steer < goal)
-			{
-				if (delta >2) delta = 2;
-			}
-			else
-			{
-				if (delta < (-2)) delta = -2;
-			}
-			m_steer += delta;
-		}
-	}
-
-	/* Accelerator is an analogue input but the game treats it as digital (on/off) */
-	if (ioport("FAKE")->read() & 0x1)	/* pressing B1 */
-		accel = 0x0;
-	else
-		accel = 0xff;
-
 	/* Todo: Verify brake - and figure out other input */
-	return (m_steer << 24) | (accel << 16) | (ioport("SOUND")->read() << 8) | ioport("UNKNOWN")->read();
+	return (ioport("WHEEL")->read() << 24) | (ioport("ACCEL")->read() << 16) | (ioport("SOUND")->read() << 8) | ioport("UNKNOWN")->read();
 }
 
 WRITE32_MEMBER(superchs_state::superchs_stick_w)
@@ -255,13 +219,13 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* reserved for EEROM */
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Seat Center")	/* seat center (cockpit only) */
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Seat Center")	/* seat center (cockpit only) */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Gear Shift")
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch")	/* upright doesn't have brake? */
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW,  IPT_START1 )
 
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -284,24 +248,16 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("WHEEL")		/* steering wheel */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_NAME("Steering Wheel")
 
-	PORT_START("ACCEL")		/* accel [effectively also brake for the upright] */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_START("ACCEL")		/* accel */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_NAME("Gas Pedal")
 
 	PORT_START("SOUND")		/* sound volume */
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("UNKNOWN")	/* unknown */
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("FAKE")		/* inputs and DSW all fake */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Accelerator")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
 /***********************************************************
@@ -355,25 +311,25 @@ static const eeprom_interface superchs_eeprom_interface =
 static const tc0480scp_interface superchs_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	0,		/* pixels */
-	0x20, 0x08,		/* x_offset, y_offset */
+	0,			/* pixels */
+	0x20, 0x08,	/* x_offset, y_offset */
 	-1, 0,		/* text_xoff, text_yoff */
 	0, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	0			/* col_base */
 };
 
 static MACHINE_CONFIG_START( superchs, superchs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superchs_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
 	MCFG_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 
