@@ -127,7 +127,6 @@ nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, NSCSI_CONNECTOR, "NSCSI device connector abstraction", tag, owner, clock),
 	device_slot_interface(mconfig, *this)
 {
-	fixed_subtag = 0;
 }
 
 nscsi_connector::~nscsi_connector()
@@ -140,14 +139,8 @@ void nscsi_connector::device_start()
 
 nscsi_device *nscsi_connector::get_device()
 {
-	return dynamic_cast<nscsi_device *>(fixed_subtag ? subdevice(fixed_subtag) : get_card_device());
+	return dynamic_cast<nscsi_device *>(get_card_device());
 }
-
-void nscsi_connector::set_fixed_device(const char *subtag)
-{
-	fixed_subtag = subtag;
-}
-
 
 nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),

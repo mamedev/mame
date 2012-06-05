@@ -4,9 +4,6 @@
 #include "machine/nscsi_bus.h"
 #include "cdrom.h"
 
-#define MCFG_NSCSI_CDROM_ADD(_tag, _subtag)						\
-	MCFG_NSCSI_FULL_DEVICE_ADD(_tag, _subtag, NSCSI_CDROM, 0)
-
 class nscsi_cdrom_device : public nscsi_full_device
 {
 public:

@@ -6,17 +6,9 @@
 #define MCFG_NSCSI_BUS_ADD(_tag)		\
 	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
 
-#define MCFG_NSCSI_DEVICE_ADD(_tag, _subtag, _type, _clock)			\
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)						\
-	downcast<nscsi_connector *>(device)->set_fixed_device(_subtag);	\
-	MCFG_DEVICE_ADD(_tag ":" _subtag, _type, _clock)
-
-#define MCFG_NSCSI_FULL_DEVICE_ADD(_tag, _subtag, _type, _clock)	\
-	MCFG_NSCSI_DEVICE_ADD(_tag, _subtag, _type, _clock)
-
-#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _def_inp)	\
+#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)	\
 	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)					\
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE_FULL(_slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)
 
 class nscsi_device;
 
@@ -61,13 +53,9 @@ public:
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
-	void set_fixed_device(const char *subtag);
 
 protected:
 	virtual void device_start();
-
-private:
-	const char *fixed_subtag;
 };
 
 class nscsi_device : public device_t,

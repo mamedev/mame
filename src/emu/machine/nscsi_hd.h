@@ -4,9 +4,6 @@
 #include "machine/nscsi_bus.h"
 #include "harddisk.h"
 
-#define MCFG_NSCSI_HARDDISK_ADD(_tag, _subtag)						\
-	MCFG_NSCSI_FULL_DEVICE_ADD(_tag, _subtag, NSCSI_HARDDISK, 0)
-
 class nscsi_harddisk_device : public nscsi_full_device
 {
 public:
