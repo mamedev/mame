@@ -11,7 +11,7 @@ class taitoz_state : public driver_device
 {
 public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
@@ -74,6 +74,7 @@ public:
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 };
 
 /*----------- defined in video/taito_z.c -----------*/

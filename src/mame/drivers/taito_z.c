@@ -637,9 +637,6 @@ Continental Circus
 Road priority incompletely understood - e.g. start barrier should
 be darkening LH edge of road as well as RH edge.
 
-The 8 level accel / brake should be possible to control with
-analogue pedal. Don't think mame can do this.
-
 Junk (?) stuff often written in high byte of sound word.
 
 Speculative YM2610 a/b/c channel filtering as these may be
@@ -902,7 +899,6 @@ static void parse_control( running_machine &machine )
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 {
-
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
@@ -1034,7 +1030,6 @@ READ16_MEMBER(taitoz_state::eep_latch_r)
 
 WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 {
-
 	switch (offset)
 	{
 		case 0x03:
@@ -1059,31 +1054,20 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
                        GAME INPUTS
 **********************************************************/
 
+CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
+{
+	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	const char *tag = (const char *)param;
+	return retval[ioport(tag)->read_safe(0) & 7];
+}
+
+
 READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero and reduce span to 0xc0 */
-		steer = ((ioport("STEER")->read() - 0x80) * 0xc0) / 0x100;
-
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0x60;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0xff9f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
 	{
@@ -1104,25 +1088,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 	/* Bypass TC0220IOC controller for extra inputs */
 
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero */
-		steer = ioport("STEER")->read() - 0x80;
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0xff80;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0x7f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
 	{
@@ -1209,25 +1175,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 
 READ16_MEMBER(taitoz_state::sci_steer_input_r)
 {
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero and reduce span to 0xc0 */
-		steer = ((ioport("STEER")->read() - 0x80) * 0xc0) / 0x100;
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0xffa0;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0x5f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1246,7 +1194,6 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 
 READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 {
-
 	switch (offset)
 	{
 		case 0x03:
@@ -1299,25 +1246,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 
 READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 {
-	int steer = 0;
-	int fake = ioport("FAKE")->read();
-
-	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
-	{
-		/* center around zero and reduce span to 0x80 */
-		steer = ((ioport("STEER")->read() - 0x80) * 0x80) / 0x100;
-	}
-	else	/* Digital steer */
-	{
-		if (fake & 0x04)
-		{
-			steer = 0xffc0;
-		}
-		else if (fake & 0x08)
-		{
-			steer = 0x3f;
-		}
-	}
+	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1368,7 +1297,6 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&
 
 WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 {
-
 	/* Despite the informative notes at the top, the high end of the word doesn't seem to output any useful data. */
 	/* I've added this so someone else can finish it.  */
 	switch (offset)
@@ -1422,14 +1350,12 @@ static void reset_sound_region( running_machine &machine )
 
 WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
 {
-
 	m_banknum = data & 7;
 	reset_sound_region(machine());
 }
 
 WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 {
-
 	if (offset == 0)
 		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
@@ -1448,7 +1374,6 @@ WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 
 READ16_MEMBER(taitoz_state::taitoz_sound_r)
 {
-
 	if (offset == 1)
 		return (tc0140syt_comm_r(m_tc0140syt, 0) & 0xff);
 	else
@@ -1458,7 +1383,6 @@ READ16_MEMBER(taitoz_state::taitoz_sound_r)
 #if 0
 WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 {
-
 	if (offset == 0)
 		tc0140syt_port_w(m_tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
@@ -1477,7 +1401,6 @@ WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 
 READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 {
-
 	if (offset == 1)
 		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff) << 8);
 	else
@@ -1913,7 +1836,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x7d, "-03" ) \
 	PORT_DIPSETTING(    0x7e, "-02" ) \
 	PORT_DIPSETTING(    0x7f, "-01" ) \
-	PORT_DIPSETTING(    0x80, "+-00" ) \
+	PORT_DIPSETTING(    0x80, "+00" ) \
 	PORT_DIPSETTING(    0x81, "+01" ) \
 	PORT_DIPSETTING(    0x82, "+02" ) \
 	PORT_DIPSETTING(    0x83, "+03" ) \
@@ -2045,31 +1968,33 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( contcirc )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, "Cockpit" )	// analogue accelerator pedal
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW A:1")
+	PORT_DIPSETTING(    0x01, "Cockpit" )			// analog pedals
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )	// digital pedals, no brake?, allow free steering wheel
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW A:2")
+ 	PORT_DIPSETTING(    0x02, "Same as Start" )
+	PORT_DIPSETTING(    0x00, "Discount" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" ) PORT_DIPLOCATION("SW B:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" )	PORT_DIPLOCATION("SW B:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" )	PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, "Steering wheel" ) PORT_DIPLOCATION("SW B:5")	//not sure what effect this has
+	PORT_DIPNAME( 0x10, 0x00, "Steering Wheel" )			PORT_DIPLOCATION("SW B:5") // no function in Cockpit cabinet?
 	PORT_DIPSETTING(    0x10, "Free" )
 	PORT_DIPSETTING(    0x00, "Locked" )
-	PORT_DIPNAME( 0x20, 0x00, "Enable 3d alternate frames" ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPNAME( 0x20, 0x00, "3D Effect" )					PORT_DIPLOCATION("SW B:6") // unlisted in manual
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
@@ -2081,32 +2006,30 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00)
 
-	PORT_START("IN1")	/* b3 not mapped: standardized on holding b4=lo gear */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_TOGGLE	/* gear shift lo/hi */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00) // no function?
 
 	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STEER")	/* "handle" i.e. steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x10, EQUALS, 0x00)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_REVERSE PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x10, EQUALS, 0x10)
 
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_START("GAS")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Brake Pedal") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( contcrcu )
@@ -2118,34 +2041,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1,2")	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
-	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )
-	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )
-	PORT_DIPSETTING(    0x01, "Full Throttle Convert, Cockpit" )
-	PORT_DIPSETTING(    0x00, "Full Throttle Convert, Deluxe" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW A:1,2") /* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
+	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )			// digital pedals, locked steering wheel
+	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )		// digital pedals, free steering wheel
+	PORT_DIPSETTING(    0x01, "Full Throttle Convert, Cockpit" )	// analog pedals, locked steering wheel
+	PORT_DIPSETTING(    0x00, "Full Throttle Convert, Deluxe" )		// analog pedals, locked steering wheel, motor
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )				PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )			PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Discounted Continue Play" ) PORT_DIPLOCATION("SW B:6")	/* Full coin price to start, 1 coin to continue */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW B:6")
+ 	PORT_DIPSETTING(    0x20, "Same as Start" )
+	PORT_DIPSETTING(    0x00, "Discount" )
+	PORT_DIPNAME( 0x40, 0x40, "Clear Damage on Continue" )	PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -2155,19 +2078,17 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_TOGGLE	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN2")	/* unused */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2212,15 +2133,15 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("STEER")	/* steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_START("GAS")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Brake Pedal") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehqj )
@@ -2399,53 +2320,53 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sci )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" ) /* Manual states "MUST REMAIN OFF" */
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW A)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW B)
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )				PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )			PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" )			PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(    0x00, "270 Degree" )
 	PORT_DIPSETTING(    0x20, "360 Degree" )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPNAME( 0x40, 0x40, "Clear Damage on Continue" )	PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" ) PORT_DIPLOCATION("SW B:8")
+	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" )				PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* fire */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Gun Trigger")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake Switch")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* turbo */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* "center" */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Center")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_TOGGLE	/* gear */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2453,14 +2374,7 @@ static INPUT_PORTS_START( sci )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEER")	/* steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
-
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sciu )
@@ -2776,14 +2690,7 @@ static INPUT_PORTS_START( dblaxle )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEER")	/* steering */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("FAKE")	/* fake allowing digital steer */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwheelsj )
