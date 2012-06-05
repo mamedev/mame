@@ -4035,58 +4035,6 @@ ROM_END
 // bfe4b800
 ROM_START( crszone )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x400000, 0x400000, CRC(4cb26465) SHA1(078dfd0d8c920707df14e9a26658fa63421fcb0b))
-	ROM_CONTINUE( 0x000000, 0x400000 )
-
-	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
-
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
-	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
-
-	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
-	ROM_LOAD16_BYTE( "csz1mtah.2j",  0x0000000, 0x800000, CRC(66b076ad) SHA1(edd32e0b380f01a9626d32f5eec860f841c8be8a) )
-	ROM_LOAD16_BYTE( "csz1mtal.2h",  0x0000001, 0x800000, CRC(38dc639a) SHA1(aa9b5b35174c1b007a57a4bd7a53bc3f479b5b71) )
-	ROM_LOAD16_BYTE( "csz1mtbh.2m",  0x1000000, 0x800000, CRC(bdec4188) SHA1(a098651fbd8a69a0afc17f4b6c93350926cacd6b) )
-	ROM_LOAD16_BYTE( "csz1mtbl.2f",  0x1000001, 0x800000, CRC(9c8f8d7a) SHA1(f61bcc9763df15428c82931a605ee40334d5ad98) )
-
-	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
-	ROM_LOAD( "csz1cgll.4m",  0x0000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
-	ROM_LOAD( "csz1cglm.4k",  0x0800000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
-	ROM_LOAD( "csz1cgum.4j",  0x1000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
-	ROM_LOAD( "csz1cguu.5f",  0x1800000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
-
-	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )	/* texture tilemap 0-15 */
-	ROM_LOAD( "csz1ccrl.7f",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
-
-	ROM_REGION( 0x200000, "textilemaph", 0 )		/* texture tilemap 16-17 + attr */
-	ROM_LOAD( "csz1ccrh.7e",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
-
-	ROM_REGION32_BE( 0x2000000, "pointrom", 0 )	/* 3D model data */
-	ROM_LOAD32_WORD_SWAP( "csz1pt0h.7a",  0x0000000, 0x400000, CRC(e82f1abb) SHA1(b1c57152cc27835e06e429fd1659fe0973638142) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt0l.7c",  0x0000002, 0x400000, CRC(b0d66afe) SHA1(7cda4eebf1bb1191d17e4b5e616be2fbe4ae9328) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt1h.5a",  0x0800000, 0x400000, CRC(e54f80ad) SHA1(3b3fbb3001e630d800b02ec8e653d74878ac5116) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt1l.5c",  0x0800002, 0x400000, CRC(527171c8) SHA1(0b2ce3858f40bdedf1543309a6bc28d780415250) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt2h.4a",  0x1000000, 0x400000, CRC(e295137a) SHA1(37b18af1b3d9f0e69b45135f89b49a1ceec79127) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt2l.4c",  0x1000002, 0x400000, CRC(c87d6dbd) SHA1(686f39073c521d6b21ef8bc1161b41b680697c63) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt3h.3a",  0x1800000, 0x400000, CRC(05f65bdf) SHA1(0c349fe5381fe7aeb81f9365a2b44a212f6bd33e) )
-	ROM_LOAD32_WORD_SWAP( "csz1pt3l.3c",  0x1800002, 0x400000, CRC(5d077c0f) SHA1(a4fd0167d89bf9417766405726e0334e7c7eaec3) )
-
-	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
-	ROM_LOAD( "csz1wavel.2c", 0x000000, 0x800000, CRC(d0d74132) SHA1(a293d93bca8e12e388a088a592cfa7bcb9a976f7) )
-	ROM_LOAD( "csz1waveh.2a", 0x800000, 0x800000, CRC(de9d14a8) SHA1(e5006861928bb1d29bf80c7304f1a6d044b094fd) )
-
-	ROM_REGION( 0x800000, "dups", 0 )	/* duplicate roms */
-	ROM_LOAD( "csz1cguu.4f",  0x000000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
-	ROM_LOAD( "csz1cgum.5j",  0x000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
-	ROM_LOAD( "csz1cgll.5m",  0x000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
-	ROM_LOAD( "csz1cglm.5k",  0x000000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
-	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
-	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
-ROM_END
-
-ROM_START( crszoneb )
-	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo4verb.ic4", 0x400000, 0x400000, CRC(6192533d) SHA1(d102b91fe193bf255ea4e57a2bd964aa1cdfd21d) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
 
@@ -4138,6 +4086,111 @@ ROM_START( crszoneb )
 ROM_END
 
 ROM_START( crszonea )
+	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x400000, 0x400000, CRC(4cb26465) SHA1(078dfd0d8c920707df14e9a26658fa63421fcb0b) )
+	ROM_CONTINUE( 0x000000, 0x400000 )
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+	ROM_LOAD16_BYTE( "csz1mtah.2j",  0x0000000, 0x800000, CRC(66b076ad) SHA1(edd32e0b380f01a9626d32f5eec860f841c8be8a) )
+	ROM_LOAD16_BYTE( "csz1mtal.2h",  0x0000001, 0x800000, CRC(38dc639a) SHA1(aa9b5b35174c1b007a57a4bd7a53bc3f479b5b71) )
+	ROM_LOAD16_BYTE( "csz1mtbh.2m",  0x1000000, 0x800000, CRC(bdec4188) SHA1(a098651fbd8a69a0afc17f4b6c93350926cacd6b) )
+	ROM_LOAD16_BYTE( "csz1mtbl.2f",  0x1000001, 0x800000, CRC(9c8f8d7a) SHA1(f61bcc9763df15428c82931a605ee40334d5ad98) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
+	ROM_LOAD( "csz1cgll.4m",  0x0000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
+	ROM_LOAD( "csz1cglm.4k",  0x0800000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
+	ROM_LOAD( "csz1cgum.4j",  0x1000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
+	ROM_LOAD( "csz1cguu.5f",  0x1800000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )	/* texture tilemap 0-15 */
+	ROM_LOAD( "csz1ccrl.7f",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )		/* texture tilemap 16-17 + attr */
+	ROM_LOAD( "csz1ccrh.7e",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "csz1pt0h.7a",  0x0000000, 0x400000, CRC(e82f1abb) SHA1(b1c57152cc27835e06e429fd1659fe0973638142) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt0l.7c",  0x0000002, 0x400000, CRC(b0d66afe) SHA1(7cda4eebf1bb1191d17e4b5e616be2fbe4ae9328) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt1h.5a",  0x0800000, 0x400000, CRC(e54f80ad) SHA1(3b3fbb3001e630d800b02ec8e653d74878ac5116) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt1l.5c",  0x0800002, 0x400000, CRC(527171c8) SHA1(0b2ce3858f40bdedf1543309a6bc28d780415250) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt2h.4a",  0x1000000, 0x400000, CRC(e295137a) SHA1(37b18af1b3d9f0e69b45135f89b49a1ceec79127) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt2l.4c",  0x1000002, 0x400000, CRC(c87d6dbd) SHA1(686f39073c521d6b21ef8bc1161b41b680697c63) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt3h.3a",  0x1800000, 0x400000, CRC(05f65bdf) SHA1(0c349fe5381fe7aeb81f9365a2b44a212f6bd33e) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt3l.3c",  0x1800002, 0x400000, CRC(5d077c0f) SHA1(a4fd0167d89bf9417766405726e0334e7c7eaec3) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "csz1wavel.2c", 0x000000, 0x800000, CRC(d0d74132) SHA1(a293d93bca8e12e388a088a592cfa7bcb9a976f7) )
+	ROM_LOAD( "csz1waveh.2a", 0x800000, 0x800000, CRC(de9d14a8) SHA1(e5006861928bb1d29bf80c7304f1a6d044b094fd) )
+
+	ROM_REGION( 0x800000, "dups", 0 )	/* duplicate roms */
+	ROM_LOAD( "csz1cguu.4f",  0x000000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
+	ROM_LOAD( "csz1cgum.5j",  0x000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
+	ROM_LOAD( "csz1cgll.5m",  0x000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
+	ROM_LOAD( "csz1cglm.5k",  0x000000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
+	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
+	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
+ROM_END
+
+ROM_START( crszoneb )
+	ROM_REGION32_BE( 0x80000f, "user1", 0 ) /* 4 megs for main R4650 code */
+//	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(fa73aa40) SHA1(669eb53168f29947bef432935fda039fdc986e42) ) /* dumped as 0x800000 + 0x0f bytes of ???  */
+	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(09b0c91e) SHA1(226c3788d6a50272e2544d04d9ca20df81014fb6) )
+	ROM_CONTINUE( 0x000000, 0x400000 )
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+	ROM_LOAD16_BYTE( "csz1mtah.2j",  0x0000000, 0x800000, CRC(66b076ad) SHA1(edd32e0b380f01a9626d32f5eec860f841c8be8a) )
+	ROM_LOAD16_BYTE( "csz1mtal.2h",  0x0000001, 0x800000, CRC(38dc639a) SHA1(aa9b5b35174c1b007a57a4bd7a53bc3f479b5b71) )
+	ROM_LOAD16_BYTE( "csz1mtbh.2m",  0x1000000, 0x800000, CRC(bdec4188) SHA1(a098651fbd8a69a0afc17f4b6c93350926cacd6b) )
+	ROM_LOAD16_BYTE( "csz1mtbl.2f",  0x1000001, 0x800000, CRC(9c8f8d7a) SHA1(f61bcc9763df15428c82931a605ee40334d5ad98) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
+	ROM_LOAD( "csz1cgll.4m",  0x0000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
+	ROM_LOAD( "csz1cglm.4k",  0x0800000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
+	ROM_LOAD( "csz1cgum.4j",  0x1000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
+	ROM_LOAD( "csz1cguu.5f",  0x1800000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )	/* texture tilemap 0-15 */
+	ROM_LOAD( "csz1ccrl.7f",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )		/* texture tilemap 16-17 + attr */
+	ROM_LOAD( "csz1ccrh.7e",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "csz1pt0h.7a",  0x0000000, 0x400000, CRC(e82f1abb) SHA1(b1c57152cc27835e06e429fd1659fe0973638142) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt0l.7c",  0x0000002, 0x400000, CRC(b0d66afe) SHA1(7cda4eebf1bb1191d17e4b5e616be2fbe4ae9328) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt1h.5a",  0x0800000, 0x400000, CRC(e54f80ad) SHA1(3b3fbb3001e630d800b02ec8e653d74878ac5116) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt1l.5c",  0x0800002, 0x400000, CRC(527171c8) SHA1(0b2ce3858f40bdedf1543309a6bc28d780415250) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt2h.4a",  0x1000000, 0x400000, CRC(e295137a) SHA1(37b18af1b3d9f0e69b45135f89b49a1ceec79127) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt2l.4c",  0x1000002, 0x400000, CRC(c87d6dbd) SHA1(686f39073c521d6b21ef8bc1161b41b680697c63) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt3h.3a",  0x1800000, 0x400000, CRC(05f65bdf) SHA1(0c349fe5381fe7aeb81f9365a2b44a212f6bd33e) )
+	ROM_LOAD32_WORD_SWAP( "csz1pt3l.3c",  0x1800002, 0x400000, CRC(5d077c0f) SHA1(a4fd0167d89bf9417766405726e0334e7c7eaec3) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "csz1wavel.2c", 0x000000, 0x800000, CRC(d0d74132) SHA1(a293d93bca8e12e388a088a592cfa7bcb9a976f7) )
+	ROM_LOAD( "csz1waveh.2a", 0x800000, 0x800000, CRC(de9d14a8) SHA1(e5006861928bb1d29bf80c7304f1a6d044b094fd) )
+
+	ROM_REGION( 0x800000, "dups", 0 )	/* duplicate roms */
+	ROM_LOAD( "csz1cguu.4f",  0x000000, 0x800000, CRC(e1d1bf24) SHA1(daf2c68e2d9a8f313d262d221cc990c93dfdf22f) )
+	ROM_LOAD( "csz1cgum.5j",  0x000000, 0x800000, CRC(913c98b5) SHA1(b952dbc19053796077d4f33e8da836893e933b12) )
+	ROM_LOAD( "csz1cgll.5m",  0x000000, 0x800000, CRC(0bcd41f2) SHA1(80b74f9398e8bd074f79a14490d06cfeb875c874) )
+	ROM_LOAD( "csz1cglm.5k",  0x000000, 0x800000, CRC(d4af93d1) SHA1(0df37b793ce8da02d14f714722382786ae5d3ce2) )
+	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
+	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
+ROM_END
+
+ROM_START( crszonec )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo2vera.ic4", 0x400000, 0x400000, CRC(1426d8d0) SHA1(e8049df1b2db1180f9edf6e5fa9fe8692ae81086) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -4192,22 +4245,23 @@ ROM_END
 /* Games */
 #define GAME_FLAGS (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT, MNTR,  COMPANY, FULLNAME,                         FLAGS
-GAME( 1997, rapidrvr, 0,        gorgon,   gorgon,   ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",		GAME_FLAGS )
-GAME( 1997, rapidrvr2,rapidrvr, gorgon,   gorgon,   ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",		GAME_FLAGS )
-GAME( 1997, finlflng, 0,        gorgon,   gorgon,   ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",		GAME_FLAGS )
-GAME( 1997, downhill, 0,        s23,      s23,      ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)",	GAME_FLAGS )
-GAME( 1997, motoxgo,  0,        s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",		GAME_FLAGS )
-GAME( 1997, motoxgoa, motoxgo,  s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",		GAME_FLAGS )
-GAME( 1997, timecrs2, 0,        timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS3 Ver. B)",	GAME_FLAGS )
-GAME( 1997, timecrs2b,timecrs2, timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)",	GAME_FLAGS )
-GAME( 1997, timecrs2c,timecrs2, timecrs2c,timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)",	GAME_FLAGS )
-GAME( 1998, panicprk, 0,        s23,      s23,      ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",		GAME_FLAGS )
-GAME( 1998, gunwars,  0,        gmen,     ss23,     ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",		GAME_FLAGS )
-GAME( 1998, raceon,   0,        gmen,     ss23,     ss23, ROT0, "Namco", "Race On! (RO2 Ver. A)",			GAME_FLAGS )
-GAME( 1998, 500gp,    0,        ss23,     ss23,     ss23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",			GAME_FLAGS )
-GAME( 1999, finfurl2, 0,        gmen,     ss23,     ss23, ROT0, "Namco", "Final Furlong 2 (World)",			GAME_FLAGS )
-GAME( 1999, finfurl2j,finfurl2, gmen,     ss23,     ss23, ROT0, "Namco", "Final Furlong 2 (Japan)",			GAME_FLAGS )
-GAME( 2000, crszone,  0,        ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",		GAME_FLAGS )
-GAME( 2000, crszonea, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",		GAME_FLAGS )
-GAME( 2000, crszoneb, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",		GAME_FLAGS )
+GAME( 1997, rapidrvr, 0,        gorgon,   gorgon,   ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS )
+GAME( 1997, rapidrvr2,rapidrvr, gorgon,   gorgon,   ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS )
+GAME( 1997, finlflng, 0,        gorgon,   gorgon,   ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, downhill, 0,        s23,      s23,      ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
+GAME( 1997, motoxgo,  0,        s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
+GAME( 1997, motoxgoa, motoxgo,  s23,      s23,      ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, timecrs2, 0,        timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS3 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2b,timecrs2, timecrs2, timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2c,timecrs2, timecrs2c,timecrs2, ss23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)", GAME_FLAGS )
+GAME( 1998, panicprk, 0,        s23,      s23,      ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",     GAME_FLAGS )
+GAME( 1998, gunwars,  0,        gmen,     ss23,     ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, raceon,   0,        gmen,     ss23,     ss23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
+GAME( 1998, 500gp,    0,        ss23,     ss23,     ss23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1999, finfurl2, 0,        gmen,     ss23,     ss23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
+GAME( 1999, finfurl2j,finfurl2, gmen,     ss23,     ss23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
+GAME( 2000, crszone,  0,        ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )
+GAME( 2000, crszonea, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",   GAME_FLAGS )
+GAME( 2000, crszoneb, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. A)",   GAME_FLAGS )
+GAME( 2000, crszonec, crszone,  ss23e2,   ss23,     ss23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",   GAME_FLAGS )
 
