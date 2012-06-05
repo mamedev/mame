@@ -3105,6 +3105,7 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine.system().name, "crszone")) ||
 	    (!strcmp(machine.system().name, "crszonea")) ||
 	    (!strcmp(machine.system().name, "crszoneb")) ||
+	    (!strcmp(machine.system().name, "crszonec")) ||
 	    (!strcmp(machine.system().name, "timecrs2b")) ||
 	    (!strcmp(machine.system().name, "timecrs2")))
 	{
@@ -4139,7 +4140,6 @@ ROM_END
 
 ROM_START( crszoneb )
 	ROM_REGION32_BE( 0x80000f, "user1", 0 ) /* 4 megs for main R4650 code */
-//	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(fa73aa40) SHA1(669eb53168f29947bef432935fda039fdc986e42) ) /* dumped as 0x800000 + 0x0f bytes of ???  */
 	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(09b0c91e) SHA1(226c3788d6a50272e2544d04d9ca20df81014fb6) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
 
