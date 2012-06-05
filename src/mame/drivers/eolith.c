@@ -197,6 +197,38 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( linkypip )
+	PORT_INCLUDE(common)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x00000001, 0x00000001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000008, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000020, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED	)
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ironfort )
 	PORT_START("IN0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
@@ -578,6 +610,34 @@ ROM_START( ironfortj )
 
 	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
 	ROM_LOAD( "u97", 0x00000, 0x80000, CRC(47b9d43a) SHA1(e0bc42892480cb563dc694fcefa8ca0b984749dd) ) /* 27C040 eprom with no label */
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
+/* Linky Pipe */
+
+ROM_START( linkypip )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "u43.bin", 0x00000, 0x80000, CRC(9ef937de) SHA1(b121d683898311baaa1e2aba199dec0c1d59f55a) )
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "lp00.u39", 0x0000000, 0x400000, CRC(c1e71bbc) SHA1(f54b374b05ce6044944ba10ba8a634eb661b092d) )
+	ROM_LOAD32_WORD_SWAP( "lp01.u34", 0x0000002, 0x400000, CRC(30780c08) SHA1(15d7bf1397c25eb813c79fc9cea88ac427b1d9c7) )
+	ROM_LOAD32_WORD_SWAP( "lp02.u40", 0x0800000, 0x400000, CRC(3381bd2c) SHA1(78b30f3940e5c9887ab4ad398bde356671deabb5) )
+	ROM_LOAD32_WORD_SWAP( "lp03.u35", 0x0800002, 0x400000, CRC(459008f3) SHA1(c59e58c3afc1b7466df306c1b57110a6b644cdf4) )
+
+	ROM_REGION( 0x008000, "cpu1", 0 ) /* QDSP ('51) Code */
+	ROM_LOAD( "u107.bin", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+
+	ROM_REGION( 0x08000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
+	ROM_LOAD( "u111.bin", 0x0000, 0x8000, CRC(52f419ea) SHA1(79c9f135b0cf8b1928411faed9b447cd98a83287) )
+
+	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
+	ROM_LOAD( "u108.bin", 0x00000, 0x80000, CRC(ca65856f) SHA1(f45868552389ccd637b5ccb1067b94e1226001ce) )
+
+	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
+	ROM_LOAD( "u97.bin", 0x00000, 0x80000, CRC(4465fe8d) SHA1(4d77169fff2fee5424e8da833088a544318b2981) )
 
 	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
@@ -1339,13 +1399,13 @@ static DRIVER_INIT( hidctch3 )
 
 	init_eolith_speedup(machine);
 }
-
+GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith,     ROT0, "Eolith", "Linky Pipe", GAME_NO_SOUND )
 GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith,   ROT0, "Eolith", "Iron Fortress", GAME_NO_SOUND )
 GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", "Iron Fortress (Japan)", GAME_NO_SOUND )
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
-GAME( 1999, candy,     0,        eolith50, candy,	  eolith,   ROT0, "Eolith", "Candy Candy",  GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1999, candy,     0,        eolith50, candy,     eolith,   ROT0, "Eolith", "Candy Candy",  GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", GAME_NO_SOUND )
 GAME( 1999, hidctch2a, hidctch2, eolith50, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", GAME_NO_SOUND )
 GAME( 1999, landbrk,   0,        eolith45, landbrk,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
