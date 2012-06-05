@@ -1350,7 +1350,7 @@ static DRIVER_INIT( hidctch3 )
 	init_eolith_speedup(machine);
 }
 
-GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith,   ROT0, "Eolith", "Linky Pipe", GAME_NO_SOUND )
+GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith,   ROT0, "Eolith", "Linky Pipe", GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith,   ROT0, "Eolith", "Iron Fortress", GAME_NO_SOUND )
 GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", "Iron Fortress (Japan)", GAME_NO_SOUND )
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
