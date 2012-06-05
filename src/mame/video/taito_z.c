@@ -821,7 +821,6 @@ static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
 
 WRITE16_MEMBER(taitoz_state::contcirc_out_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = reset sub CPU */
@@ -1028,5 +1027,39 @@ SCREEN_UPDATE_IND16( dblaxle )
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 4);
 
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* Text layer */
+	return 0;
+}
+
+
+SCREEN_UPDATE_IND16( racingb )
+{
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
+	UINT8 layer[5];
+	UINT16 priority;
+
+	tc0480scp_tilemap_update(state->m_tc0480scp);
+
+	priority = tc0480scp_get_bg_priority(state->m_tc0480scp);
+
+	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority & 0x0f00) >>  8;
+	layer[2] = (priority & 0x00f0) >>  4;
+	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[4] = 4;   /* text layer always over bg layers */
+
+	screen.machine().priority_bitmap.fill(0, cliprect);
+
+	/* Ensure screen blanked - this shouldn't be necessary! */
+	bitmap.fill(0, cliprect);
+
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 0);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 1);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 1);
+
+	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0xc0, 0, 0, 1, 2);
+	sci_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 7);
+
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 3);
 	return 0;
 }

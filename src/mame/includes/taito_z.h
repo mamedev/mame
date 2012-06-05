@@ -27,7 +27,6 @@ public:
 	INT32       m_banknum;
 	UINT16      m_cpua_ctrl;
 	INT32       m_sci_int6;
-	INT32       m_dblaxle_int6;
 	INT32       m_ioc220_port;
 	UINT16      m_eep_latch;
 
@@ -89,3 +88,4 @@ SCREEN_UPDATE_IND16( sci );
 SCREEN_UPDATE_IND16( aquajack );
 SCREEN_UPDATE_IND16( spacegun );
 SCREEN_UPDATE_IND16( dblaxle );
+SCREEN_UPDATE_IND16( racingb );
