@@ -91,11 +91,16 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 					{
 						if ((!intf[i].internal) || (isdefault && intf[i].internal))
 						{
-							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, 0);
-							found = true;
 							const char *def = slot->get_default_card(*this, options);
-							if (def != NULL && strcmp(def, selval) == 0)
-								device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
+							bool is_default = (def != NULL && strcmp(def, selval) == 0);
+							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, is_default ? slot->default_clock() : 0);
+							found = true;
+							if (is_default) {
+								device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());								
+								if (slot->default_config()) {
+									device_t::static_set_static_config(*new_dev, slot->default_config());
+								}
+							}
 						}
 					}
 				}

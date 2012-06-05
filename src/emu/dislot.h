@@ -21,7 +21,11 @@ struct slot_interface
 };
 
 #define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
-	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_slot, DEVICE_INPUT_DEFAULTS_NAME(_def_inp), _fixed);
+	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_slot, DEVICE_INPUT_DEFAULTS_NAME(_def_inp), NULL, 0, _fixed);
+
+#define MCFG_DEVICE_SLOT_INTERFACE_FULL(_slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed) \
+	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_slot, DEVICE_INPUT_DEFAULTS_NAME(_def_inp), _def_config, _def_clock, _fixed);
+
 
 #define SLOT_INTERFACE_NAME(name)	slot_interface_##name
 
@@ -50,17 +54,21 @@ public:
 	device_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_slot_interface();
 
-	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input, bool fixed);
+	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input, const void *default_config, UINT32 default_clock, bool fixed);
 	const slot_interface* get_slot_interfaces() const { return m_slot_interfaces; };
 	const char * get_default_card(const machine_config &config, emu_options &options) const { return m_default_card; };
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) { return NULL; };
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
+	const void *default_config() const { return m_default_config; }
+	const UINT32 default_clock() const { return m_default_clock; }
 	const bool fixed() const { return m_fixed; }
 	device_t* get_card_device();
 protected:
 	const char *m_default_card;
 	const input_device_default *m_input_defaults;
 	const slot_interface *m_slot_interfaces;
+	const void *m_default_config;
+	UINT32 m_default_clock;
 	bool m_fixed;
 };
 

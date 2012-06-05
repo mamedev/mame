@@ -20,7 +20,7 @@ device_slot_interface::~device_slot_interface()
 }
 
 
-void device_slot_interface::static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input, bool fixed)
+void device_slot_interface::static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input, const void *default_config, UINT32 default_clock, bool fixed)
 {
 	device_slot_interface *slot;
 	if (!device.interface(slot))
@@ -29,6 +29,8 @@ void device_slot_interface::static_set_slot_info(device_t &device, const slot_in
 	slot->m_slot_interfaces = slots_info;
 	slot->m_default_card = default_card;
 	slot->m_input_defaults = default_input;
+	slot->m_default_config = default_config;
+	slot->m_default_clock = default_clock;
 	slot->m_fixed = fixed;
 }
 
