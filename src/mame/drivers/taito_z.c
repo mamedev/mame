@@ -9,19 +9,7 @@ David Graves
 Nicola Salmoria. Thanks to Richard Bush and the Raine team, whose open
 source was very helpful in many areas particularly the sprites.)
 
-- Changes Log -
 
-05-01-04 Added Racing Beat
-01-26-02 Added Enforce
-10-17-01 TC0150ROD support improved (e.g. Aquajack)
-09-01-01 Preliminary TC0150ROD support
-08-28-01 Fixed uncentered steer inputs, Nightstr controls
-05-27-01 Inputs through taitoic ioc routines, contcirc subwoofer filter
-04-12-01 Centered steering AD inputs, added digital steer
-02-18-01 Added Spacegun gunsights (Insideoutboy)
-
-
-                *****
 
 The Taito Z system has a number of similarities with the Taito F2 system,
 and uses some of the same custom Taito components.
@@ -887,34 +875,37 @@ J1100256A VIDEO PCB
 #include "contcirc.lh"
 #include "dblaxle.lh"
 
-static void parse_control( running_machine &machine )
+static void parse_cpu_control( running_machine &machine )
 {
 	/* bit 0 enables cpu B */
-	/* however this fails when recovering from a save state
-       if cpu B is disabled !! */
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
-
 }
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 {
-	if ((data & 0xff00) && ((data & 0xff) == 0))
-		data = data >> 8;	/* for Wgp */
+	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+
+	if (mem_mask == 0xff00) data >>= 8;
+	data &= 0xff;
 
 	m_cpua_ctrl = data;
+	parse_cpu_control(machine());
+}
 
-	parse_control(machine());
+WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
+{
+	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	// Chase HQ: handle the lights
-	if (m_chasehq_lamps)
-	{
-		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
-		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
-	}
+	output_set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
+	output_set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
+}
 
-	if (m_dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
+{
+	cpua_ctrl_w(space, offset, data, mem_mask);
+
+	output_set_value("Wheel_Vibration", (data & 0x04)>>2);
 }
 
 
@@ -1463,7 +1454,7 @@ static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(chasehq_cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
@@ -1642,7 +1633,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)	/* could this be causing int6 ? */
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(dblaxle_cpua_ctrl_w)	/* could this be causing int6 ? */
 	AM_RANGE(0x620000, 0x620003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemap mirror */
@@ -2937,7 +2928,7 @@ static const tc0140syt_interface taitoz_tc0140syt_intf =
 
 static void taitoz_postload(running_machine &machine)
 {
-	parse_control(machine);
+	parse_cpu_control(machine);
 	reset_sound_region(machine);
 }
 
@@ -5043,34 +5034,19 @@ ROM_END
 
 static DRIVER_INIT( taitoz )
 {
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 0;
-	state->m_dblaxle_vibration = 0;
-}
+	//taitoz_state *state = machine.driver_data<taitoz_state>();
 
-static DRIVER_INIT( dblaxle )
-{
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 0;
-	state->m_dblaxle_vibration = 1;
+	machine.save().register_postload(save_prepost_delegate(FUNC(parse_cpu_control), &machine));
 }
 
 static DRIVER_INIT( bshark )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 0;
-	state->m_dblaxle_vibration = 0;
+	DRIVER_INIT_CALL(taitoz);
+
 	state->m_eep_latch = 0;
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(parse_control), &machine));
 	state->save_item(NAME(state->m_eep_latch));
-}
-
-static DRIVER_INIT( chasehq )
-{
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_chasehq_lamps = 1;
-	state->m_dblaxle_vibration = 0;
 }
 
 
@@ -5078,9 +5054,9 @@ static DRIVER_INIT( chasehq )
 GAMEL(1987, contcirc,   0,        contcirc, contcirc, taitoz,   ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
 GAMEL(1987, contcircu,  contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
 GAMEL(1987, contcircua, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehq,    0,        chasehq,  chasehq,  chasehq,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqj,   chasehq,  chasehq,  chasehqj, chasehq,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqu,   chasehq,  chasehq,  chasehq,  chasehq,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehq,    0,        chasehq,  chasehq,  taitoz,   ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,  chasehqj, taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqu,   chasehq,  chasehq,  chasehq,  taitoz,   ROT0,               "Taito America Corporation", "Chase H.Q. (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_contcirc )
 GAME( 1988, enforce,    0,        enforce,  enforce,  taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1989, bshark,     0,        bshark,   bshark,   bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1989, bsharku,    bshark,   bshark,   bsharku,  bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
@@ -5100,6 +5076,6 @@ GAME( 1990, aquajackj,  aquajack, aquajack, aquajckj, taitoz,   ROT0,           
 GAME( 1990, spacegun,   0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spacegunj,  spacegun, spacegun, spacegnj, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spacegunu,  spacegun, spacegun, spacegnu, bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", GAME_SUPPORTS_SAVE )
-GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  dblaxle,  ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
-GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, dblaxle,  ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, racingb,    0,        racingb,  dblaxle,  dblaxle,  ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
+GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, racingb,    0,        racingb,  dblaxle,  taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

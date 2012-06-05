@@ -12,7 +12,8 @@ class taitoz_state : public driver_device
 public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -23,7 +24,6 @@ public:
 	int         m_road_palbank;
 
 	/* misc */
-	int         m_chasehq_lamps;
 	INT32       m_banknum;
 	UINT16      m_cpua_ctrl;
 	INT32       m_sci_int6;
@@ -44,9 +44,9 @@ public:
 	device_t *m_tc0220ioc;
 	device_t *m_tc0140syt;
 
-	/* dblaxle motor flag */
-	int	    m_dblaxle_vibration;
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
