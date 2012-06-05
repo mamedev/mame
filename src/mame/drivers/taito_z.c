@@ -950,8 +950,9 @@ Racing Beat
 -----------
 
 Graphics problems:
-- tearing in the main road
-- car sprite palette flickering
+- tearing in the main road (tile layer 3 offset?)
+- car sprites palette flickering
+- some missing sprites (random?) ie. motor block sprite after inserting coin
 
 LAN board is unemulated
 
@@ -1331,7 +1332,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(&space.device()),offset);
+			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(&space.device()),offset);
 			return 0;
 	}
 }
@@ -1341,14 +1342,15 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 	/* Writes $e00000-25 and $e00200-219 */
 	switch (offset)
 	{
-	case 0x0:
-	break;
-	case 0x101:
-	/* outputs will go here, but driver is still broken */
-	break;
+		case 0x0:
+			break;
+	
+		case 0x101:
+			/* outputs will go here, but driver is still broken */
+			break;
 	}
-logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space.device()),data,offset);
-
+	
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space.device()),data,offset);
 }
 
 
@@ -3015,14 +3017,24 @@ static const tc0100scn_interface spacegun_tc0100scn_intf =
 	0, 0
 };
 
-static const tc0480scp_interface taitoz_tc0480scp_intf =
+static const tc0480scp_interface dblaxle_tc0480scp_intf =
 {
 	1, 2,		/* gfxnum, txnum */
-	0,		/* pixels */
-	0x21, 0x08,		/* x_offset, y_offset */
+	0,			/* pixels */
+	0x21, 0x08,	/* x_offset, y_offset */
 	4, 0,		/* text_xoff, text_yoff */
 	0, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	0			/* col_base */
+};
+
+static const tc0480scp_interface racingb_tc0480scp_intf =
+{
+	1, 2,		/* gfxnum, txnum */
+	0,			/* pixels */
+	0x1f, 0x08,	/* x_offset, y_offset */
+	0, 0,		/* text_xoff, text_yoff */
+	0, 0,		/* flip_xoff, flip_yoff */
+	0			/* col_base */
 };
 
 static const tc0110pcr_interface taitoz_tc0110pcr_intf = { 0 };
@@ -3644,7 +3656,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 
 	MCFG_VIDEO_START(taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", dblaxle_tc0480scp_intf)
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
@@ -3706,7 +3718,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 
 	MCFG_VIDEO_START(taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", racingb_tc0480scp_intf)
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
