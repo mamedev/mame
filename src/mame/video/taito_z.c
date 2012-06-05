@@ -1054,12 +1054,12 @@ SCREEN_UPDATE_IND16( racingb )
 
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 0);
-	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 1);
-	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 1);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 2);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 2);
 
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0xc0, 0, 0, 1, 2);
 	sci_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 7);
 
-	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 3);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 4);
 	return 0;
 }

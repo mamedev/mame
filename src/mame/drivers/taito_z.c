@@ -949,7 +949,13 @@ and it seems possible this should be causing int6's ?
 Racing Beat
 -----------
 
-Sprites (and main road) very wrong
+Graphics problems:
+- tearing in the main road
+- car sprite palette flickering
+
+LAN board is unemulated
+
+DIP switches are not verified
 
 
 ***************************************************************************/
@@ -2753,7 +2759,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( racingb )
 	PORT_START("DSWA")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW A:1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW A:1") // don't know what is what
+	PORT_DIPSETTING(    0x00, "Type 0" ) // free steering wheel
+	PORT_DIPSETTING(    0x01, "Type 1" ) // locked steering wheel
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW A:2" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW A:4")
@@ -2764,16 +2772,21 @@ static INPUT_PORTS_START( racingb )
 	PORT_START("DSWB")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW B:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW B:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW B:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW B:4" )
+	PORT_DIPNAME( 0x04, 0x04, "Steering Wheel Range" )	PORT_DIPLOCATION("SW B:3") // no function in Type 0 cabinet?
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x08, 0x08, "Steering Wheel Type" )	PORT_DIPLOCATION("SW B:4") // no function in Type 0 cabinet?
+	PORT_DIPSETTING(    0x00, "Free" )
+	PORT_DIPSETTING(    0x08, "Locked" )
 	PORT_DIPNAME( 0x10, 0x10, "Network" )				PORT_DIPLOCATION("SW B:5") // gives a LAN error
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Player Car" )			PORT_DIPLOCATION("SW B:6")
-	PORT_DIPSETTING(    0x20, "Red" )
-	PORT_DIPSETTING(    0x00, "Blue" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW B:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW B:8" )
+	PORT_DIPNAME( 0x60, 0x60, "Player Car" )			PORT_DIPLOCATION("SW B:6,7")
+	PORT_DIPSETTING(    0x60, "Red" )
+	PORT_DIPSETTING(    0x40, "Blue" )
+	PORT_DIPSETTING(    0x20, "Green" )
+	PORT_DIPSETTING(    0x00, "Yellow" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW B:8" ) // affects car color too?
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2799,7 +2812,8 @@ static INPUT_PORTS_START( racingb )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEER")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWB", 0x08, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
