@@ -168,8 +168,12 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 
 READ32_MEMBER(superchs_state::superchs_stick_r)
 {
-	/* Todo: Verify brake - and figure out other input */
-	return (ioport("WHEEL")->read() << 24) | (ioport("ACCEL")->read() << 16) | (ioport("SOUND")->read() << 8) | ioport("UNKNOWN")->read();
+	UINT8 b0 = ioport("UNKNOWN")->read();
+	UINT8 b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
+	UINT8 b2 = ioport("ACCEL")->read() ^ 0xff;
+	UINT8 b3 = ioport("WHEEL")->read();
+
+	return b3 << 24 | b2 << 16 | b1 << 8 | b0;
 }
 
 WRITE32_MEMBER(superchs_state::superchs_stick_w)
@@ -247,17 +251,18 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("WHEEL")		/* steering wheel */
+	// 4 analog ports
+	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_NAME("Steering Wheel")
 
-	PORT_START("ACCEL")		/* accel */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_NAME("Gas Pedal")
+	PORT_START("ACCEL")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Gas Pedal")	/* in upright cab, it is a digital (1 bit) switch instead */
 
-	PORT_START("SOUND")		/* sound volume */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+	PORT_START("SOUND")
+	PORT_ADJUSTER( 75, "PCB - Sound Volume" )
 
-	PORT_START("UNKNOWN")	/* unknown */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_START("UNKNOWN") // unused?
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***********************************************************
@@ -385,7 +390,7 @@ ROM_START( superchs )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d46-10.ic2", 0xc00000, 0x200000, CRC(306256be) SHA1(e6e5d4a4c0b98470f2aff2e94624dd19af73ec5d) )
 	ROM_LOAD16_BYTE( "d46-12.ic4", 0x000000, 0x200000, CRC(a24a53a8) SHA1(5d5fb87a94ceabda89360064d7d9b6d23c4c606b) )
-	ROM_RELOAD     (             0x400000, 0x200000 )
+	ROM_RELOAD     (               0x400000, 0x200000 )
 	ROM_LOAD16_BYTE( "d46-11.ic5", 0x800000, 0x200000, CRC(d4ea0f56) SHA1(dc8d2ed3c11d0b6f9ebdfde805188884320235e6) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -423,7 +428,7 @@ ROM_START( superchsj )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "d46-10.ic2", 0xc00000, 0x200000, CRC(306256be) SHA1(e6e5d4a4c0b98470f2aff2e94624dd19af73ec5d) )
 	ROM_LOAD16_BYTE( "d46-09.ic4", 0x000000, 0x200000, CRC(0acb8bc7) SHA1(62d66925f0eee4cee282c4e0972e08d12acf331c) )
-	ROM_RELOAD     (             0x400000, 0x200000 )
+	ROM_RELOAD     (               0x400000, 0x200000 )
 	ROM_LOAD16_BYTE( "d46-08.ic5", 0x800000, 0x200000, CRC(4677e820) SHA1(d6427844b08438e45af4c671589a270e46e6dead) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
