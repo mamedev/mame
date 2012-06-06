@@ -1176,7 +1176,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( excitbj )
-
+	PORT_INCLUDE( lucky74 )
 INPUT_PORTS_END
 
 
