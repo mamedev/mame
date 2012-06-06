@@ -136,6 +136,17 @@ INPUT_PORTS_START( pcvideo_pc1512 )
 	PORT_BIT ( 0xE0, 0x20, IPT_UNUSED ) /* Chipset is always PC1512 */
 INPUT_PORTS_END
 
+
+INPUT_PORTS_START( pcvideo_mc1502 )
+	PORT_START( "pcvideo_cga_config" )
+	PORT_BIT ( 0x03, 0x01, IPT_UNUSED ) /* via poisk2 */
+	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
+	PORT_CONFSETTING(0x00, "Colour RGB")
+	PORT_CONFSETTING(0x04, "Mono RGB")
+	PORT_BIT ( 0xE0, 0x00, IPT_UNUSED ) /* Chipset is always IBM */
+INPUT_PORTS_END
+
+
 /* Dipswitch for font selection */
 #define CGA_FONT        (cga.config_input_port->read()&3)
 
@@ -167,6 +178,7 @@ static SCREEN_UPDATE_RGB32( mc6845_pc1512 );
 
 static VIDEO_START( cga_poisk2 );
 static SCREEN_UPDATE_RGB32( cga_poisk2 );
+static VIDEO_START( cga_mc1502 );
 
 static const mc6845_interface mc6845_cga_intf =
 {
@@ -207,6 +219,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( pcvideo_poisk2 )
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_VIDEO_START( cga_poisk2 )
+	MCFG_SCREEN_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_UPDATE_STATIC( cga_poisk2 )
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( pcvideo_mc1502 )
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_VIDEO_START( cga_mc1502 )
 	MCFG_SCREEN_MODIFY(CGA_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE_STATIC( cga_poisk2 )
 MACHINE_CONFIG_END
@@ -402,6 +421,13 @@ SCREEN_UPDATE_RGB32( mc6845_cga )
 		break;
 	}
 	return 0;
+}
+
+
+static VIDEO_START( cga_mc1502 )
+{
+	VIDEO_START_CALL(pc_cga32k);
+	cga.chr_gen = machine.root_device().memregion("gfx1")->base();
 }
 
 

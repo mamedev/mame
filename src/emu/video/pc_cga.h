@@ -8,7 +8,9 @@
 
 MACHINE_CONFIG_EXTERN( pcvideo_cga );
 MACHINE_CONFIG_EXTERN( pcvideo_cga32k );
+MACHINE_CONFIG_EXTERN( pcvideo_mc1502 );
 INPUT_PORTS_EXTERN( pcvideo_cga );
+INPUT_PORTS_EXTERN( pcvideo_mc1502 );
 SCREEN_UPDATE_RGB32( mc6845_cga );
 VIDEO_START( pc_cga_superimpose );
 
