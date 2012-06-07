@@ -69,6 +69,7 @@ public:
 	static IRQ_CALLBACK(irq_callback_1);
 
 	void maple_w(const UINT32 *data, UINT32 in_size);
+	virtual void maple_reset();
 
 protected:
 	const char *gpio_name[8];

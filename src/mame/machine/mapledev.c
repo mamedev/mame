@@ -29,6 +29,11 @@ void maple_device::device_start()
 	save_item(NAME(reply_partial));
 }
 
+void maple_device::maple_reset()
+{
+	device_reset();
+}
+
 void maple_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if(id != TIMER_ID)

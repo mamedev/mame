@@ -13,6 +13,7 @@ public:
 	static void static_set_host(device_t &device, const char *_host_tag, int _host_port);
 	virtual void maple_w(const UINT32 *data, UINT32 in_size) = 0;
 	void maple_r(UINT32 *data, UINT32 &out_size, bool &partial);
+	virtual void maple_reset();
 
 protected:
 	enum { TIMER_ID = 1000 };

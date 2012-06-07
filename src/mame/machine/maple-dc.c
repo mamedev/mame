@@ -157,7 +157,7 @@ void maple_dc_device::dma_step()
 				break;
 			case 3: // reset
 				if(devices[dma_port])
-					devices[dma_port]->reset();
+					devices[dma_port]->maple_reset();
 				break;
 			case 4: // sdckb occupy cancel
 				logerror("MAPLE: sdckb occupy cancel\n");

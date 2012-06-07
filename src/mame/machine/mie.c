@@ -361,4 +361,6 @@ READ8_MEMBER(mie_device::jvs_sense_r)
 	return 0x8c | (jvs->get_address_set_line() ? 2 : 0) | (jvs->get_presence_line() ? 0 : 1);
 }
 
-
+void mie_device::maple_reset()
+{
+}
