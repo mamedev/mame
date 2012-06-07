@@ -6324,10 +6324,11 @@ astdelux		// 0351xx           (c) 1980
 astdelux2		// 0351xx           (c) 1980
 astdelux1		// 0351xx           (c) 1980
 bzone			// 0364xx           (c) 1980
-bzone2			// 0364xx           (c) 1980
+bzonea			// 0364xx           (c) 1980
 bzonec			// 0364xx           (c) 1980
 bradley			//     ??           (c) 1980
 redbaron		// 036995-037007    (c) 1980
+redbarona		// 036995-037007    (c) 1980
 tempest			// 136002           (c) 1980
 tempest3		// 136002           (c) 1980
 tempest2		// 136002           (c) 1980
