@@ -4201,7 +4201,7 @@ ROM_START( daytona2 )	/* Step 2.1, ROM board ID# 834-13428 DAYTONA USA2, Securit
 	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
 ROM_END
 
-ROM_START( dayto2pe )	/* Step 2.1, Sega game ID# is 833-13610 DAYTONA USA2 SP, ROM board ID# 834-13609 DAYTONA USA2 SP, Security board ID# 837-13507-COM */
+ROM_START( dayto2pe )	/* Step 2.1, Sega game ID# is 833-13610 DAYTONA USA2 SP, ROM board ID# 834-13609 DAYTONA USA2 SP, Security board ID# 837-13645-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21178.17", 0x000006, 0x200000, CRC(230bf8ac) SHA1(bc64c4f8a794ca59b5c488a34d1b5a2b67af8fec) )
