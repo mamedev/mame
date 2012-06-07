@@ -951,8 +951,11 @@ Racing Beat
 
 Graphics problems:
 - tearing in the main road (tile layer 3 offset?)
+  likely cause is mame/video/taitoic.c in tc0480scp_bg23_draw:
+      ** flawed calc ?? **
+      x_index -= (tc0480scp->x_offs - 0x1f + layer * 4) * ((row_zoom & 0xff) << 8);
 - car sprites palette flickering
-- some missing sprites (random?) ie. motor block sprite after inserting coin
+- layer missing sometimes (random?) ie. motor block sprite after inserting coin
 
 LAN board is unemulated
 
