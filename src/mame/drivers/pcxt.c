@@ -721,7 +721,7 @@ static MACHINE_RESET( filetto )
 
 	state->m_pc_spkrdata = 0;
 	state->m_pc_input = 0;
-
+	state->m_wss2_data = 0;
 	speaker_level_w( speaker, 0 );
 }
 
