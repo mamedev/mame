@@ -2329,6 +2329,16 @@ MACHINE_CONFIG_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Air Rescue
+    Sega Game ID codes:
+       Game BD: 833-8508-01 AIR RESCUE (US)
+                833-8508-02 AIR RESCUE (Export)
+                833-8508-03 AIR RESCUE (Japan)
+    Rom PCB No: 834-8526-01 (US)
+                834-8526-02 (Export)
+                834-8526-03 (Japan)
+
+Japan set not dumped, but program roms are EPR-14515.ic13 & EPR-14514.ic6
+
     requires 2 linked system32 pcbs
     requires additional math DSP to be emulated
 */
@@ -2611,8 +2621,8 @@ ROM_START( brivalj )
        are suspicious, the changes are very similar but the part numbers haven't changed.  We really
        need a 3rd board to verify */
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) )
-	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) )
+	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* Rom # matches tile rom # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* Rom # matchrs tile rom # from Arabian Fight ??? */
 
 	ROM_REGION32_BE( 0x1000000, "gfx2", 0 ) /* sprites */
 	ROMX_LOAD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -2727,9 +2737,9 @@ ROM_END
     to display the title screen this will require 2 linked system32 boards to be emulated
 
     Sega Game ID codes:
-     GAME BD NO. 833-8389-01 (USA)
-                 833-8389-02 (World)
-                 833-8389-03 (Japan)
+     GAME BD NO. 833-8389-01 EXHAUST NOTE (USA)
+                 833-8389-02 EXHAUST NOTE (World)
+                 833-8389-03 EXHAUST NOTE (Japan)
          ROM BD. 834-8439-01 (USA)
                  834-8439-02 (World)
                  834-8439-03 (Japan)
@@ -3221,10 +3231,12 @@ ROM_END
     not protected
 
     Sega Game ID codes:
-    GAME BD NO. 833-7738-01 (USA)
-                833-7738-02 (Export)
+    GAME BD NO. 833-7738-01 RAD MOBILE (USA)
+                833-7738-02 RAD MOBILE (Export)
+                833-7738-03 RAD MOBILE (Japan)
         ROM BD. 834-7739-01 (USA)
                 834-7739-02 (Export)
+                834-7739-03 (Japan)
       MAIN BD. 837-7428
     A/D BD NO. 837-7536
 
@@ -3237,7 +3249,7 @@ Exprot: EPR-13693.ic21 (dumped)
         EPR-13694.ic37 (not dumped)
         EPR-13695.ic38 (not dumped)
 
-    Japanese version is undumped. There is likely a Japanese specific sound rom at IC20
+    Japanese version is undumped. There is likely a Japanese specific sound rom at IC20 (EPR-13524.ic20 ??)
 */
 ROM_START( radm )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
@@ -3839,9 +3851,15 @@ ROM_END
     Title Fight (Multi-32)
     not protected
 
-    GAME BOARD NO. 834-9324-02
-     1. ROM BD NO. 834-9413-02
-     2. MAIN BD NO. 837-8676 (SYSTEM MULTI 32)
+    Sega Game ID codes:
+     Game: 834-9324-01 TITLE FIGHT (USA)
+           834-9324-02 TITLE FIGHT (Export)
+           834-9324-03 TITLE FIGHT (Japan)
+Rom board: 834-9413-01 (USA)
+           834-9413-02 (Export)
+           834-9413-03 (Japan)
+  Main BD: 837-8676 (SYSTEM MULTI 32)
+
 */
 ROM_START( titlef )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code */
@@ -3872,10 +3890,6 @@ ROM_END
 /**************************************************************************************************************************
     Title Fight (US)
     not protected
-
-    GAME BOARD NO. 834-9324-01
-     1. ROM BD NO. 834-9413-01
-     2. MAIN BD NO. 837-8676 (SYSTEM MULTI 32)
 */
 ROM_START( titlefu )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code */
