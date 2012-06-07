@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Destiny Horoscope (c) 1983 Data East Corporation
+Destiny (c) 1983 Data East Corporation
 
 driver by Angelo Salese
 
@@ -16,10 +16,10 @@ TODO:
 #include "cpu/m6809/m6809.h"
 
 
-class deshoros_state : public driver_device
+class destiny_state : public driver_device
 {
 public:
-	deshoros_state(const machine_config &mconfig, device_type type, const char *tag)
+	destiny_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_io_ram(*this, "io_ram"){ }
 
@@ -34,24 +34,24 @@ public:
 
 /*Temporary,to show something on screen...*/
 
-static VIDEO_START( deshoros )
+static VIDEO_START( destiny )
 {
-	deshoros_state *state = machine.driver_data<deshoros_state>();
+	destiny_state *state = machine.driver_data<destiny_state>();
 	UINT8 i;
 	for(i=0;i<20;i++)
 		state->m_led_array[i] = 0x20;
 	state->m_led_array[20] = 0;
 }
 
-static SCREEN_UPDATE_IND16( deshoros )
+static SCREEN_UPDATE_IND16( destiny )
 {
-	deshoros_state *state = screen.machine().driver_data<deshoros_state>();
+	destiny_state *state = screen.machine().driver_data<destiny_state>();
 	popmessage("%s",state->m_led_array);
 	return 0;
 }
 
 /*I don't know it this is 100% correct,might be different...*/
-void deshoros_state::update_led_array(UINT8 new_data)
+void destiny_state::update_led_array(UINT8 new_data)
 {
 	UINT8 i;
 	/*scroll the data*/
@@ -64,10 +64,10 @@ void deshoros_state::update_led_array(UINT8 new_data)
 
 static void answer_bankswitch(running_machine &machine,UINT8 new_bank)
 {
-	deshoros_state *state = machine.driver_data<deshoros_state>();
+	destiny_state *state = machine.driver_data<destiny_state>();
 	if(state->m_bank!=new_bank)
 	{
-		UINT8 *ROM = state->memregion("data")->base();
+		UINT8 *ROM = state->memregion("answers")->base();
 		UINT32 bankaddress;
 
 		state->m_bank = new_bank;
@@ -76,14 +76,15 @@ static void answer_bankswitch(running_machine &machine,UINT8 new_bank)
 	}
 }
 
-READ8_MEMBER(deshoros_state::io_r)
+READ8_MEMBER(destiny_state::io_r)
 {
 	switch(offset)
 	{
 		case 0x00: return 0xff; //printer read
-		case 0x03: return ioport("KEY0" )->read();
-		case 0x04: return ioport("KEY1" )->read();
-		case 0x05: return ioport("SYSTEM" )->read();
+		case 0x03: return ioport("KEY1")->read();
+		case 0x04: return ioport("KEY2")->read();
+		case 0x05: return ioport("DIPSW")->read();
+		case 0x07: return ioport("KEY3")->read();
 		case 0x0a: return m_io_ram[offset]; //"buzzer" 0 read
 		case 0x0b: return m_io_ram[offset]; //"buzzer" 1 read
 	}
@@ -92,7 +93,7 @@ READ8_MEMBER(deshoros_state::io_r)
 	return m_io_ram[offset];
 }
 
-WRITE8_MEMBER(deshoros_state::io_w)
+WRITE8_MEMBER(destiny_state::io_w)
 {
 	switch(offset)
 	{
@@ -108,7 +109,7 @@ WRITE8_MEMBER(deshoros_state::io_w)
 //  printf("%02x -> [%02x]\n",data,offset);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, deshoros_state )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x900f) AM_READWRITE(io_r,io_w) AM_SHARE("io_ram") //i/o area
@@ -116,8 +117,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, deshoros_state )
 ADDRESS_MAP_END
 
 
-static INPUT_PORTS_START( deshoros )
-	PORT_START("KEY0")
+static INPUT_PORTS_START( destiny )
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Key Male") PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )  PORT_NAME("Key 3")  PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )  PORT_NAME("Key 2")  PORT_CODE(KEYCODE_2_PAD)
@@ -126,7 +127,8 @@ static INPUT_PORTS_START( deshoros )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_NAME("Key 6")  PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_NAME("Key 5")  PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )  PORT_NAME("Key 4")  PORT_CODE(KEYCODE_4_PAD)
-	PORT_START("KEY1")
+
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Key 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_NAME("Key 9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_NAME("Key 8") PORT_CODE(KEYCODE_8_PAD)
@@ -136,7 +138,10 @@ static INPUT_PORTS_START( deshoros )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Key Cancel") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SYSTEM")
+	PORT_START("KEY3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DIPSW")
 	PORT_DIPNAME( 0x01,   0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x01, DEF_STR( On ) )
@@ -161,25 +166,25 @@ static INPUT_PORTS_START( deshoros )
 INPUT_PORTS_END
 
 /*Is it there an IRQ mask?*/
-static INTERRUPT_GEN( deshoros_irq )
+static INTERRUPT_GEN( timer_irq )
 {
 	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_RESET( deshoros )
+static MACHINE_RESET( destiny )
 {
-	deshoros_state *state = machine.driver_data<deshoros_state>();
+	destiny_state *state = machine.driver_data<destiny_state>();
 	state->m_bank = -1;
 }
 
-static MACHINE_CONFIG_START( deshoros, deshoros_state )
+static MACHINE_CONFIG_START( destiny, destiny_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809,2000000)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen",deshoros_irq)
+	MCFG_CPU_VBLANK_INT("screen", timer_irq)
 
-	MCFG_MACHINE_RESET(deshoros)
+	MCFG_MACHINE_RESET(destiny)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -187,10 +192,10 @@ static MACHINE_CONFIG_START( deshoros, deshoros_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(48*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(deshoros)
+	MCFG_SCREEN_UPDATE_STATIC(destiny)
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_VIDEO_START(deshoros)
+	MCFG_VIDEO_START(destiny)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -203,24 +208,24 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( deshoros )
+ROM_START( destiny )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ag12-4",   0xc000, 0x2000, CRC(03b2c850) SHA1(4e2c49a8d80bc559d0f406caddddb85bc107aac0) )
-	ROM_LOAD( "ag13-4",   0xe000, 0x2000, CRC(36959ef6) SHA1(9b3ed44416fcda6a8e89d11ad6e713abd4f63d83) )
+	ROM_LOAD( "ag12-4.16c", 0xc000, 0x2000, CRC(03b2c850) SHA1(4e2c49a8d80bc559d0f406caddddb85bc107aac0) )
+	ROM_LOAD( "ag13-4.17c", 0xe000, 0x2000, CRC(36959ef6) SHA1(9b3ed44416fcda6a8e89d11ad6e713abd4f63d83) )
 
-	ROM_REGION( 0x18000, "data", 0 ) //answers data
-	ROM_LOAD( "ag00",   0x00000, 0x2000, CRC(77f5bce0) SHA1(20b5257710c5e848893fec107f0d87a473a4ba24) )
-	ROM_LOAD( "ag01",   0x02000, 0x2000, CRC(c08e6a74) SHA1(88679ed8bd2b6b8698258baddf8433c0f60a1b64) )
-	ROM_LOAD( "ag02",   0x04000, 0x2000, CRC(687c72b5) SHA1(3f2768c9b6247e96d11b4159f6f5c0dfeb2c5075) )
-	ROM_LOAD( "ag03",   0x06000, 0x2000, CRC(535dbe83) SHA1(29336539c57d1fa7d42a0ce01884b29e1707e9ad) )
-	ROM_LOAD( "ag04",   0x08000, 0x2000, CRC(e6ae8eb7) SHA1(d0e20e438dcfeac9d844d1fd98701a443ea5e4f7) )
-	ROM_LOAD( "ag05",   0x0a000, 0x2000, CRC(c2485e40) SHA1(03f6d7c63a45d430a7965e28aaf07e053ecac7a1) )
-	ROM_LOAD( "ag06",   0x0c000, 0x2000, CRC(e6e0bbd1) SHA1(fe693d038b05ae18a3c0cfb25a4649dbb10ab2c7) )
-	ROM_LOAD( "ag07",   0x0e000, 0x2000, CRC(a62d879d) SHA1(94d07e774df4c9e4e34ae386714372b53b255530) )
-	ROM_LOAD( "ag08",   0x10000, 0x2000, CRC(f5822738) SHA1(afe53e875057317033cdd5f4b7614c96cd11193b) )
-	ROM_LOAD( "ag09",   0x12000, 0x2000, CRC(ad3c9f2c) SHA1(f665efb65c072a3d3d2e19844ebe0b352c0251d3) )
-	ROM_LOAD( "ag10",   0x14000, 0x2000, CRC(c498754a) SHA1(90e215e8e41d32237d1f4b074d93e20eade92e4e) )
-	ROM_LOAD( "ag11",   0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
+	ROM_REGION( 0x18000, "answers", 0 )
+	ROM_LOAD( "ag00.1a",    0x00000, 0x2000, CRC(77f5bce0) SHA1(20b5257710c5e848893fec107f0d87a473a4ba24) )
+	ROM_LOAD( "ag01.3a",    0x02000, 0x2000, CRC(c08e6a74) SHA1(88679ed8bd2b6b8698258baddf8433c0f60a1b64) )
+	ROM_LOAD( "ag02.4a",    0x04000, 0x2000, CRC(687c72b5) SHA1(3f2768c9b6247e96d11b4159f6f5c0dfeb2c5075) )
+	ROM_LOAD( "ag03.6a",    0x06000, 0x2000, CRC(535dbe83) SHA1(29336539c57d1fa7d42a0ce01884b29e1707e9ad) )
+	ROM_LOAD( "ag04.7a",    0x08000, 0x2000, CRC(e6ae8eb7) SHA1(d0e20e438dcfeac9d844d1fd98701a443ea5e4f7) )
+	ROM_LOAD( "ag05.9a",    0x0a000, 0x2000, CRC(c2485e40) SHA1(03f6d7c63a45d430a7965e28aaf07e053ecac7a1) )
+	ROM_LOAD( "ag06.10a",   0x0c000, 0x2000, CRC(e6e0bbd1) SHA1(fe693d038b05ae18a3c0cfb25a4649dbb10ab2c7) )
+	ROM_LOAD( "ag07.12a",   0x0e000, 0x2000, CRC(a62d879d) SHA1(94d07e774df4c9e4e34ae386714372b53b255530) )
+	ROM_LOAD( "ag08.13a",   0x10000, 0x2000, CRC(f5822738) SHA1(afe53e875057317033cdd5f4b7614c96cd11193b) )
+	ROM_LOAD( "ag09.15a",   0x12000, 0x2000, CRC(ad3c9f2c) SHA1(f665efb65c072a3d3d2e19844ebe0b352c0251d3) )
+	ROM_LOAD( "ag10.16a",   0x14000, 0x2000, CRC(c498754a) SHA1(90e215e8e41d32237d1f4b074d93e20eade92e4e) )
+	ROM_LOAD( "ag11.18a",   0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
 
-GAME( 1983, deshoros,  0,       deshoros,  deshoros,  0, ROT0, "Data East Corporation", "Destiny Horoscope", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1983, destiny,  0,       destiny,  destiny,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", GAME_NO_SOUND | GAME_NOT_WORKING )
