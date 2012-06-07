@@ -167,8 +167,6 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
-#include "video/decbac06.h"
-#include "video/decmxc06.h"
 
 
 /******************************************************************************/
@@ -220,7 +218,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 }
 
 
-WRITE16_MEMBER(automat_state::automat_control_w)
+WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 {
 	switch (offset << 1)
 	{
@@ -426,8 +424,8 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 	dec0_state *state = machine.driver_data<dec0_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen1");
-	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen2");
+	deco_bac06_device *tilegen1 = (deco_bac06_device*)state->m_tilegen1;
+	deco_bac06_device *tilegen2 = (deco_bac06_device*)state->m_tilegen2;
 
 	space->install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
 
@@ -610,8 +608,22 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 ADDRESS_MAP_END
 
+/* swizzle the palette writes around so we can use the same gfx plane ordering as the originals */
+READ16_MEMBER( dec0_automat_state::automat_palette_r )
+{
+	offset ^=0xf;
+	return m_generic_paletteram_16[offset];
+}
 
-static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, automat_state )
+WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
+{
+	offset ^=0xf;
+	paletteram_xxxxBBBBGGGGRRRR_word_w(space, offset, data, mem_mask);
+}
+
+
+
+static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_automat_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	AM_RANGE(0x240000, 0x240007) AM_RAM			/* text layer */
@@ -619,42 +631,44 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, automat_state )
 	AM_RANGE(0x242000, 0x24207f) AM_RAM
 	AM_RANGE(0x242400, 0x2427ff) AM_RAM
 	AM_RANGE(0x242800, 0x243fff) AM_RAM
-	AM_RANGE(0x244000, 0x245fff) AM_RAM
+	AM_RANGE(0x244000, 0x245fff) AM_RAM AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
 	AM_RANGE(0x246000, 0x246007) AM_RAM			/* first tile layer */
 	AM_RANGE(0x246010, 0x246017) AM_RAM
 	AM_RANGE(0x248000, 0x24807f) AM_RAM
 	AM_RANGE(0x248400, 0x2487ff) AM_RAM
-	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM
+	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
 	AM_RANGE(0x24c000, 0x24c007) AM_RAM			/* second tile layer */
 	AM_RANGE(0x24c010, 0x24c017) AM_RAM
 	AM_RANGE(0x24c800, 0x24c87f) AM_RAM
 	AM_RANGE(0x24cc00, 0x24cfff) AM_RAM
-	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM
+	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x310000, 0x3107ff) AM_READWRITE(automat_palette_r, automat_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)				// NEW
+
+	// video regs are moved to here..
+	AM_RANGE(0x400000, 0x400007) AM_WRITE(automat_scroll_w)
+	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)
+
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_SHARE("ram")				/* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")			/* Sprites */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(automat_state::automat_adpcm_w)
+WRITE8_MEMBER(dec0_automat_state::automat_adpcm_w)
 {
 	m_automat_adpcm_byte = data;
 }
 
-static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, automat_state )
+static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-//  AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(ym2203_control_port_0_w)
-//  AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(ym2203_write_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
-//  AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(ym2203_control_port_1_w)
-//  AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(ym2203_write_port_1_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("2203a", ym2203_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)	
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("2203b", ym2203_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1198,7 +1212,7 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
-static const gfx_layout automat_tilelayout =
+static const gfx_layout automat_spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
@@ -1244,7 +1258,7 @@ static GFXDECODE_START( automat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout3, 512, 16 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, automat_tilelayout2, 768, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, automat_tilelayout, 256, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, automat_spritelayout, 256, 16 )	/* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( midres )
@@ -1401,7 +1415,7 @@ MACHINE_CONFIG_END
 
 static void automat_vclk_cb(device_t *device)
 {
-	automat_state *state = device->machine().driver_data<automat_state>();
+	dec0_automat_state *state = device->machine().driver_data<dec0_automat_state>();
 	if (state->m_automat_msm5205_vclk_toggle == 0)
 	{
 		msm5205_data_w(device, state->m_automat_adpcm_byte & 0xf);
@@ -1422,7 +1436,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_CONFIG_START( automat, automat_state )
+static MACHINE_CONFIG_START( automat, dec0_automat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1439,19 +1453,27 @@ static MACHINE_CONFIG_START( automat, automat_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(automat)
 
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
+	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,1,0);
+	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,2,0);
+
+
 	MCFG_PALETTE_LENGTH(1024)
 	MCFG_GFXDECODE(automat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ADD("2203a", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1500000)
+	MCFG_SOUND_ADD("2203b", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
@@ -2297,20 +2319,20 @@ ROM_START( automat )
 	ROM_LOAD( "12.bin", 0x30000, 0x10000, CRC(00cd0990) SHA1(3fc498fcee2110001e376f5ee38d7dd361bd3ee3) ) // y
 
 	/* copy out the chars */
-	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT ) /* chars */
 	ROM_COPY( "gfxload1", 0x00000, 0x00000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x10000, 0x08000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x20000, 0x10000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x30000, 0x18000, 0x8000 )
 
-	ROM_REGION( 0x20000, "gfx3", 0 ) /* tiles */
+	ROM_REGION( 0x20000, "gfx3", ROMREGION_INVERT ) /* tiles */
 	ROM_COPY( "gfxload1", 0x08000, 0x00000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x18000, 0x08000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x28000, 0x10000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x38000, 0x18000, 0x8000 )
 
 	// we have to rearrange this with ROM_CONTINUE due to the way gfxdecode works */
-	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT ) /* tiles */
 	ROM_LOAD( "9.bin",  0x00000, 0x2000, CRC(ccf91ce0) SHA1(c976eddcea48da6e7fbd28a4d5c48706d61cabfb) )
 	ROM_CONTINUE(       0x04000, 0x2000 )
 	ROM_CONTINUE(       0x08000, 0x2000 )
@@ -2346,7 +2368,7 @@ ROM_START( automat )
 
 	// the sprite data is the same as robocop, but with the bits in each byte reversed
 	// 21.bin was repaired with this knowledge as the chip was faulty
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_INVERT) /* sprites */
+	ROM_REGION( 0x80000, "gfx4", 0) /* sprites */
 	ROM_LOAD( "16.bin", 0x00000, 0x10000, CRC(e42e8675) SHA1(5b964477de8278ea330ffc2366e5fc7e10122ef8) )
 	ROM_LOAD( "17.bin", 0x10000, 0x08000, CRC(9a414c56) SHA1(017eb5a238e24cd6de50afd029c239993fc61a21) )
 	ROM_LOAD( "20.bin", 0x20000, 0x10000, CRC(7c62a2a1) SHA1(43a40355cdcbb17506f9634e8f12673287e79bd7) )
@@ -3021,44 +3043,6 @@ ROM_START( bouldashj )
 	ROM_LOAD( "ta-16.21k",          0x0000, 0x0100, CRC(ad26e8d4) SHA1(827337aeb8904429a1c050279240ae38aa6ce064) )	/* Priority (not used) */
 ROM_END
 
-// helper function
-#if 0
-static void dump_to_file(running_machine& machine, UINT8* ROM, int offset, int size)
-{
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"%s_%08x_%08x", machine.system().name, offset, size);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(ROM+offset, size, 1, fp);
-			fclose(fp);
-		}
-	}
-}
-
-
-static DRIVER_INIT( convert_robocop_gfx4_to_automat )
-{
-	UINT8* R = machine.root_device().memregion("gfx4")->base();
-	int i;
-
-	for (i=0;i<0x80000;i++)
-	{
-		R[i] = BITSWAP8(R[i],0,1,2,3,4,5,6,7);
-	}
-
-	dump_to_file(machine,R, 0x00000, 0x10000);
-	dump_to_file(machine,R, 0x10000, 0x08000);
-	dump_to_file(machine,R, 0x20000, 0x10000);
-	dump_to_file(machine,R, 0x30000, 0x08000);
-	dump_to_file(machine,R, 0x40000, 0x10000);
-	dump_to_file(machine,R, 0x50000, 0x08000);
-	dump_to_file(machine,R, 0x60000, 0x10000);
-	dump_to_file(machine,R, 0x70000, 0x08000);
-}
-#endif
 
 static DRIVER_INIT( midresb )
 {
