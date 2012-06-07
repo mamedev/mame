@@ -93,6 +93,7 @@ public:
 	DECLARE_READ8_MEMBER(scramb2_port2_r);
 	DECLARE_WRITE8_MEMBER(harem_nmi_mask_w);
 	DECLARE_READ8_MEMBER(hexpoola_data_port_r);
+	DECLARE_READ8_MEMBER(bullsdrtg_data_port_r);
 	DECLARE_WRITE8_MEMBER(galaxold_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(galaxold_coin_lockout_w);
 	DECLARE_WRITE8_MEMBER(galaxold_coin_counter_w);
@@ -193,7 +194,7 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 
 DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
-
+DRIVER_INIT( bullsdrtg );
 
 MACHINE_RESET( galaxold );
 MACHINE_RESET( devilfsg );

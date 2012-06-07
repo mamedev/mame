@@ -425,3 +425,27 @@ DRIVER_INIT( ladybugg )
 	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),state));
 }
+
+DRIVER_INIT( bullsdrtg )
+{
+	int i;
+
+	// patch char supposed to be space
+	UINT8 *gfxrom = machine.root_device().memregion("gfx1")->base();
+	for (i = 0; i < 8; i++)
+	{
+		gfxrom[i] = 0;
+	}
+
+	// patch gfx for charset (seems to be 1bpp with bitplane data in correct rom)
+	for (i = 0*8; i < 27*8; i++)
+	{
+		gfxrom[0x1000 + i] = 0;
+	}
+
+	// patch gfx for digits (seems to be 1bpp with bitplane data in correct rom)
+	for (i = 48*8; i < (48+10)*8; i++ )
+	{
+		gfxrom[0x1000 + i] = 0;
+	}
+}

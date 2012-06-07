@@ -914,6 +914,33 @@ static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
+READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
+{
+	switch (cpu_get_pc(&space.device()))
+	{
+		case 0x0083:
+		case 0x008c:
+		case 0x0092:
+		case 0x6b54:
+			return 0;
+
+		case 0x009b:
+		case 0x6b58:
+			return 1;
+		default:
+			logerror("Reading data port at PC=%04X\n", cpu_get_pc(&space.device()));
+			break;
+	}
+
+    return 0;
+}
+
+static ADDRESS_MAP_START( bullsdrtg_io_map, AS_IO, 8, galaxold_state )
+	AM_RANGE(0x00, 0x00) AM_READNOP
+	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrtg_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+ADDRESS_MAP_END
 
 /* Lives Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::vpool_lives_r)
@@ -2461,6 +2488,11 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( bullsdrtg, hexpoola )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(bullsdrtg_io_map)
+
+MACHINE_CONFIG_END
 /***************************************************************************
 
   Game driver(s)
@@ -3111,6 +3143,54 @@ ROM_START( trvchlng )
 	ROM_LOAD( "senko1.bin",   0x0000, 0x0020, CRC(1434c7ff) SHA1(0ee5f5351dd84fbf8d3d8eaafbdbe86dd29960f8) )
 ROM_END
 
+
+/*
+Bulls Eye Darts conversion by Senko Industries Ltd (1984)
+
+The base board for the conversion dates from 1981.
+
+Base Board
+----------
+There are 2 x Toshiba 2114, 2 x Mitsubushi 2101 and 5 x Intel 2115 making up 
+the video RAM. There are 6 ROM sockets for the video ROM but the daughter card 
+only connects to two of them. I believe that this is a version of 
+Scramble/Galaxians video hardware.
+
+There are 4 x Toshiba 2114 that make up the CPU RAM. There are 8 ROM sockets
+for the CPU ROM. Tha daughter board does not connect to any of them but instead
+connects into the CPU socket (I'm guessing originally a Z80).
+
+Sound is provided at least by an AY-3-8910.
+
+Daughter Board
+--------------
+The daughter board houses a 2650A CPU and another 40-pin cermet coated uncased
+device with the number scratched off. There is an 82S153 and an 82S147 hooked
+into the 2650. Amongst the TTL near the video ROMS is a single 2114.
+
+
+Now the bad news...
+
+There are three EPROMS and one PROM on the board. Alas, one of the graphics
+EPROMS does not verify consistently so I have provided three reads. A quick
+compare suggest one data line is random :-(
+*/
+
+ROM_START( bullsdrtg )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "cpu.bin",   0x0000, 0x1000, CRC(db34f130) SHA1(691f8a69a7157df49460f5927728ba52660eeede) )
+	ROM_CONTINUE(			  0x2000, 0x1000 )
+	ROM_CONTINUE(			  0x4000, 0x1000 )
+	ROM_CONTINUE(			  0x6000, 0x1000 )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "vid_j1.bin",   0x0000, 0x4000, BAD_DUMP CRC(c2ad5c84) SHA1(8e3048607693afc40a775000f45790910e4d9312) )
+	ROM_LOAD( "vid_p.bin",    0x4000, 0x4000, CRC(535be505) SHA1(c20c7ac4e74e29e8954c443cca9dcc0df453a512) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(16b19bfa) SHA1(a0e9217f9bc5b06212d5f22dcc3dc4b2838788ba) )
+ROM_END
+
 /* Z80 games */
 GAME( 1980, vpool,    hustler,  mooncrst, vpool,    0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, rockclim, 0,        rockclim, rockclim, 0,	      ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
@@ -3138,3 +3218,4 @@ GAME( 1986, racknrol, 0,        racknrol, racknrol, 0,	      ROT0,   "Senko Indu
 GAME( 1986, hexpool,  racknrol, racknrol, racknrol, 0,	      ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
 GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, 0,	      ROT90,  "Senko Industries", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
 GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (Senko license)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1985, bullsdrtg,bullsdrt, bullsdrtg,racknrol, bullsdrtg,ROT90,  "Senko Industries", "Bulls Eye Darts (Galaxian conversion)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
