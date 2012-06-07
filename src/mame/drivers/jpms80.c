@@ -18,7 +18,7 @@
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
 
 class jpms80_state : public driver_device
@@ -66,7 +66,7 @@ static const ay8910_interface ay8910_interface_jpm =
 
 static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(jpms80_map)
 	MCFG_CPU_IO_MAP(jpms80_io_map)
 
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( jpms_older_e00, jpms80_state )
-	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(jpms_older_e00_map)
 	MCFG_CPU_IO_MAP(jpms_older_e00_io)
 MACHINE_CONFIG_END
@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( jpms_older_c00, jpms80_state )
-	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(jpms_older_c00_map)
 	MCFG_CPU_IO_MAP(jpms_older_c00_io)
 MACHINE_CONFIG_END

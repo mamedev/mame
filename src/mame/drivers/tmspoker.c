@@ -209,7 +209,7 @@
 #define MASTER_CLOCK	XTAL_6MHz	/* confirmed */
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
 
@@ -561,7 +561,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, MASTER_CLOCK/4)	/* guess */
+	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/4)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(tmspoker_map)
 	MCFG_CPU_IO_MAP(tmspoker_cru_map)
 	MCFG_CPU_VBLANK_INT("screen", tmspoker_interrupt)

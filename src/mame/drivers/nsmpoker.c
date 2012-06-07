@@ -60,7 +60,7 @@
 #define MASTER_CLOCK	XTAL_22_1184MHz
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
 
 
@@ -394,7 +394,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995, MASTER_CLOCK/2)	/* guess */
+	MCFG_CPU_ADD("maincpu", TMS9995L, MASTER_CLOCK/2)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(nsmpoker_map)
 	MCFG_CPU_IO_MAP(nsmpoker_portmap)
 	MCFG_CPU_VBLANK_INT("screen", nsmpoker_interrupt)

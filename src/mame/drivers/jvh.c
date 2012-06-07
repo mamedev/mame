@@ -1,6 +1,6 @@
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 
 class jvh_state : public driver_device
 {
@@ -38,7 +38,7 @@ static DRIVER_INIT( jvh )
 
 static MACHINE_CONFIG_START( jvh, jvh_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, 1000000)
+	MCFG_CPU_ADD("maincpu", TMS9980L, 1000000)
 	MCFG_CPU_PROGRAM_MAP(jvh_map)
 MACHINE_CONFIG_END
 

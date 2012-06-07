@@ -1,6 +1,6 @@
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 
 class nsm_state : public driver_device
 {
@@ -37,7 +37,7 @@ static DRIVER_INIT( nsm )
 
 static MACHINE_CONFIG_START( nsm, nsm_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995, 11052000)
+	MCFG_CPU_ADD("maincpu", TMS9995L, 11052000)
 	MCFG_CPU_PROGRAM_MAP(nsm_map)
 MACHINE_CONFIG_END
 

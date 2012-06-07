@@ -53,7 +53,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 */
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
@@ -637,12 +637,12 @@ static COP400_INTERFACE( looping_cop_intf )
 static MACHINE_CONFIG_START( looping, looping_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(looping_map)
 	MCFG_CPU_IO_MAP(looping_io_map)
 	MCFG_CPU_VBLANK_INT("screen", looping_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", TMS9980, SOUND_CLOCK/4)
+	MCFG_CPU_ADD("audiocpu", TMS9980L, SOUND_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(looping_sound_map)
 	MCFG_CPU_IO_MAP(looping_sound_io_map)
 

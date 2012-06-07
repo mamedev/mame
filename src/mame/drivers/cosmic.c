@@ -29,7 +29,7 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
@@ -1069,7 +1069,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, COSMICG_MASTER_CLOCK/8)
+	MCFG_CPU_ADD("maincpu", TMS9980L, COSMICG_MASTER_CLOCK/8)
 			/* 9.828 MHz Crystal */
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under

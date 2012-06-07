@@ -86,7 +86,7 @@
 #define MASTER_CLOCK	XTAL_8MHz	/* guess */
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "video/mc6845.h"
 
 
@@ -413,7 +413,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, MASTER_CLOCK/2)	/* guess */
+	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/2)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(jubileep_map)
 	MCFG_CPU_IO_MAP(jubileep_cru_map)
 	MCFG_CPU_VBLANK_INT("screen", jubileep_interrupt)

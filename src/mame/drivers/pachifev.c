@@ -78,7 +78,7 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "video/tms9928a.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
@@ -357,7 +357,7 @@ static const struct tms9995reset_param pachifev_processor_config =
 static MACHINE_CONFIG_START( pachifev, pachifev_state )
 
     /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", TMS9995, XTAL_12MHz)
+    MCFG_CPU_ADD("maincpu", TMS9995L, XTAL_12MHz)
     MCFG_CPU_CONFIG(pachifev_processor_config)
     MCFG_CPU_PROGRAM_MAP(pachifev_map)
     MCFG_CPU_IO_MAP(pachifev_cru)

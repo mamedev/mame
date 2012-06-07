@@ -23,7 +23,7 @@
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 
@@ -108,7 +108,7 @@ static I8255_INTERFACE (ppi8255_intf_ic25)
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995, MAIN_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(jpmmps_map)
 	MCFG_CPU_IO_MAP(jpmmps_io_map)
 

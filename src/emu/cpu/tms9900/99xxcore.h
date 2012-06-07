@@ -85,78 +85,78 @@ Other references can be found on spies.com:
 
 */
 
-#include "tms9900.h"
+#include "tms9900l.h"
 
 
 #if (TMS99XX_MODEL == TI990_10_ID)
 
 	#define TMS99XX_PREFIX ti990_10
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10 )
-	#define TMS99XX_device_get_name "TI990/10"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10l )
+	#define TMS99XX_device_get_name "TI990/10L"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900 )
-	#define TMS99XX_device_get_name "TMS9900"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900l )
+	#define TMS99XX_device_get_name "TMS9900L"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940 )
-	#define TMS99XX_device_get_name "TMS9940"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940l )
+	#define TMS99XX_device_get_name "TMS9940L"
 
 	#error "tms9940 is not yet supported"
 
 #elif (TMS99XX_MODEL == TMS9980_ID)
 
 	#define TMS99XX_PREFIX tms9980a
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980a )
-	#define TMS99XX_device_get_name "TMS9980A/TMS9981"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980al )
+	#define TMS99XX_device_get_name "TMS9980AL/TMS9981L"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985 )
-	#define TMS99XX_device_get_name "TMS9985"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985l )
+	#define TMS99XX_device_get_name "TMS9985L"
 
 	#error "tms9985 is not yet supported"
 
 #elif (TMS99XX_MODEL == TMS9989_ID)
 
 	#define TMS99XX_PREFIX tms9989
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989 )
-	#define TMS99XX_device_get_name "TMS9989"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989l )
+	#define TMS99XX_device_get_name "TMS9989L"
 
 	#error "tms9989 is not yet supported"
 
 #elif (TMS99XX_MODEL == TMS9995_ID)
 
 	#define TMS99XX_PREFIX tms9995
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995 )
-	#define TMS99XX_device_get_name "TMS9995"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995l )
+	#define TMS99XX_device_get_name "TMS9995L"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000 )
-	#define TMS99XX_device_get_name "TMS99000"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000l )
+	#define TMS99XX_device_get_name "TMS99000L"
 
 	#error "tms99000 is not yet supported"
 
 #elif (TMS99XX_MODEL == TMS99105A_ID)
 
 	#define TMS99XX_PREFIX tms99105a
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105a )
-	#define TMS99XX_device_get_name "TMS99105A"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105al )
+	#define TMS99XX_device_get_name "TMS99105AL"
 
 	#error "tms99105a is not yet supported"
 
 #elif (TMS99XX_MODEL == TMS99110A_ID)
 
 	#define TMS99XX_PREFIX tms99110a
-	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110a )
-	#define TMS99XX_device_get_name "TMS99110A"
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110al )
+	#define TMS99XX_device_get_name "TMS99110AL"
 
 	#error "tms99110a is not yet supported"
 
@@ -1485,7 +1485,7 @@ static CPU_EXECUTE( tms99xx )
 			}
 			else
 			{
-				logerror("tms9900.c : the interrupt_pending flag was set incorrectly\n");
+				logerror("tms9900l.c : the interrupt_pending flag was set incorrectly\n");
 				cpustate->interrupt_pending = 0;
 			}
 		}
@@ -4769,7 +4769,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, TMS99XX_device_get_name);		break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 9900"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 9900L"); break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "C TMS9900 emulator by Edward Swartz, initially converted for Mame by M.Coates, updated by R. Nabet"); break;

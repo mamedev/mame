@@ -1,13 +1,4 @@
 /*
-    Generate the tms9900 emulator
+    This file will contain the re-implementation of the ti990_10. The
+    previous implementation can be found as ti990_10l.
 */
-
-#include "emu.h"
-#include "debugger.h"
-#include "tms9900.h"
-
-#define TMS99XX_MODEL TI990_10_ID
-
-#include "99xxcore.h"
-
-DEFINE_LEGACY_CPU_DEVICE(TI990_10, ti990_10);

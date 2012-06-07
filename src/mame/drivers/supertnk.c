@@ -96,7 +96,7 @@ CRU lines:
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
+#include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
 
 
@@ -425,7 +425,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( supertnk, supertnk_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
+	MCFG_CPU_ADD("maincpu", TMS9980L, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
 	MCFG_CPU_PROGRAM_MAP(supertnk_map)
 	MCFG_CPU_IO_MAP(supertnk_io_map)
 	MCFG_CPU_VBLANK_INT("screen", supertnk_interrupt)
