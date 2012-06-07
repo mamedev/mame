@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP		/* coin out - Manual states this is "Watchdog Clear" */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP		/* coin out - Manual states this is "Coin Counter" */
 	AM_RANGE(0x1200, 0x1200) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE_LEGACY(avgdvg_reset_w)
