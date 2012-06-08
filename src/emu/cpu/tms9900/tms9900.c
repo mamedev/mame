@@ -1340,7 +1340,7 @@ void tms9900_device::acquire_instruction()
 	mem_read();
 	decode(m_current_value);
 	if (VERBOSE>3) LOG("tms9900: ===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC);
-	debugger_instruction_hook(*this, PC);
+	debugger_instruction_hook(this, PC);
 	PC = (PC + 2) & 0xfffe;
 	// IAQ will be cleared in the main loop
 }

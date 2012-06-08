@@ -1415,7 +1415,7 @@ void tms9995_device::next_command()
 		MPC = -1;
 		if (VERBOSE>3) LOG("tms9995: ===== Next operation %04x (%s) at %04x =====\n", m_instruction->IR, opname[m_instruction->command], PC-2);
 		PC_debug = PC - 2;
-		debugger_instruction_hook(*this, PC_debug);
+		debugger_instruction_hook(this, PC_debug);
 		m_first_cycle = m_icount;
 	}
 }
