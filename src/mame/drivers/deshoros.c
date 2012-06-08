@@ -5,6 +5,18 @@ Destiny (c) 1983 Data East Corporation
 driver by Angelo Salese
 
 A fortune-teller machine with 24 characters LED-array and a printer.
+M6809 CPU, 2KB RAM
+
+Rough cpanel sketch:
+
+    [LED-array dispay]          CLEAR ENTER
+                                7  8  9  0
+                                4  5  6  F
+                                1  2  3  M
+
+To control system buttons (SYSTEM, lower nibble), hold one down and then
+push the main service button F2.
+
 
 TODO:
 - Emulate the graphics with genuine artwork display;
@@ -182,10 +194,8 @@ static INPUT_PORTS_START( destiny )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key 9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key 7") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key Cancel") PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key Enter") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Key Clear") PORT_CODE(KEYCODE_PLUS_PAD)
 
 	PORT_START("DIPSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1")
