@@ -21,13 +21,13 @@ push the main service button F2.
 TODO:
 - Emulate the graphics with genuine artwork display;
 - Printer emulation;
-- Sound;
+- Exact sound & irq frequency;
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-
+#include "sound/beep.h"
 
 class destiny_state : public driver_device
 {
@@ -40,7 +40,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	char m_led_array[21];
-	
+
 	DECLARE_WRITE8_MEMBER(firq_ack_w);
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_READ8_MEMBER(printer_status_r);
@@ -48,6 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(sound_on_w);
+	DECLARE_WRITE8_MEMBER(sound_off_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -128,7 +130,7 @@ WRITE8_MEMBER(destiny_state::out_w)
 {
 	// d0: coin blocker
 	coin_lockout_w(machine(), 0, ~data & 1);
-	
+
 	// d1: paper cutter 1
 	// d2: paper cutter 2
 	// other bits: N/C?
@@ -145,10 +147,20 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 	// NMI on Coin SW or Service SW
 	if (oldval)
 		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-	
+
 	// coincounter on coin insert
 	if (((int)(FPTR)param) == 0)
 		coin_counter_w(machine(), 0, newval);
+}
+
+WRITE8_MEMBER(destiny_state::sound_on_w)
+{
+	beep_set_state(machine().device(BEEPER_TAG),1);
+}
+
+WRITE8_MEMBER(destiny_state::sound_off_w)
+{
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
@@ -162,8 +174,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
 	AM_RANGE(0x9005, 0x9005) AM_READ_PORT("DIPSW") AM_WRITE(out_w)
 //	AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
 //	AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
-//	AM_RANGE(0x900a, 0x900a) AM_NOP // sound on
-//	AM_RANGE(0x900b, 0x900b) AM_NOP // sound off
+	AM_RANGE(0x900a, 0x900a) AM_WRITE(sound_on_w)
+	AM_RANGE(0x900b, 0x900b) AM_WRITE(sound_off_w)
 	AM_RANGE(0x900c, 0x900c) AM_WRITE(bank_select_w)
 //	AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
 //	AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
@@ -238,6 +250,8 @@ INPUT_PORTS_END
 
 void destiny_state::machine_start()
 {
+	beep_set_frequency(machine().device(BEEPER_TAG),800); // TODO: determine exact frequency thru schematics
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
 void destiny_state::machine_reset()
@@ -265,7 +279,8 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 
@@ -296,4 +311,4 @@ ROM_START( destiny )
 	ROM_LOAD( "ag11.18a",  0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
 
-GAME( 1983, destiny,  0,       destiny,  destiny,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1983, destiny,  0,       destiny,  destiny,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
