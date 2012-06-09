@@ -84,7 +84,7 @@ static TIMER_DEVICE_CALLBACK( gx400_interrupt )
 
 	if(scanline == 240)
 	{
-		if ((state->m_irq_on) && ((timer.machine().primary_screen->frame_number() & 1) == 0))
+		if ((state->m_irq1_on) && ((timer.machine().primary_screen->frame_number() & 1) == 0))
 			device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
 	}
 
