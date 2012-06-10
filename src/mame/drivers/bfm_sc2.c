@@ -178,7 +178,13 @@ class bfm_sc2_state : public driver_device
 {
 public:
 	bfm_sc2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vfd0(*this, "vfd0"),
+		  m_vfd1(*this, "vfd1")
+		  { }
+
+  	optional_device<bfm_bd1_t> m_vfd0;
+	optional_device<bfm_bd1_t> m_vfd1;
 
 	int m_sc2gui_update_mmtr;
 	UINT8 *m_nvram;
@@ -186,8 +192,6 @@ public:
 	UINT8 m_e2ram[1024];
 	int m_mmtr_latch;
 	int m_triac_latch;
-	int m_vfd1_latch;
-	int m_vfd2_latch;
 	int m_irq_status;
 	int m_optic_pattern;
 	int m_uart1_data;
@@ -323,8 +327,6 @@ static void e2ram_reset(running_machine &machine);
 static void on_scorpion2_reset(running_machine &machine)
 {
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	state->m_vfd1_latch        = 0;
-	state->m_vfd2_latch        = 0;
 	state->m_mmtr_latch        = 0;
 	state->m_triac_latch       = 0;
 	state->m_irq_status        = 0;
@@ -350,9 +352,6 @@ static void on_scorpion2_reset(running_machine &machine)
 	state->m_slide_states[3] = 0;
 	state->m_slide_states[4] = 0;
 	state->m_slide_states[5] = 0;
-
-	BFM_BD1_reset(0);	// reset display1
-	BFM_BD1_reset(1);	// reset display2
 
 	e2ram_reset(machine);
 
@@ -944,19 +943,15 @@ WRITE8_MEMBER(bfm_sc2_state::payout_select_w)
 
 WRITE8_MEMBER(bfm_sc2_state::vfd2_data_w)
 {
-	m_vfd2_latch = data;
-	BFM_BD1_newdata(1, data);
-	BFM_BD1_draw(1);
+	m_vfd1->write_char(data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
 {
-	BFM_BD1_reset(0);	  // reset both VFD's
-	BFM_BD1_reset(1);
-	BFM_BD1_draw(0);
-	BFM_BD1_draw(1);
+	m_vfd0->reset();
+	m_vfd1->reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1177,7 +1172,6 @@ READ8_MEMBER(bfm_sc2_state::vfd_status_r)
 
 WRITE8_MEMBER(bfm_sc2_state::vfd1_data_w)
 {
-	m_vfd1_latch = data;
 
 	if (machine().device("matrix"))
 	{
@@ -1185,8 +1179,7 @@ WRITE8_MEMBER(bfm_sc2_state::vfd1_data_w)
 	}
 	else
 	{
-		BFM_BD1_newdata(0, data);
-		BFM_BD1_draw(0);
+		m_vfd0->write_char(data);
 	}
 }
 
@@ -1414,25 +1407,14 @@ static int read_e2ram(running_machine &machine)
 
 static MACHINE_RESET( init )
 {
-	// reset adder2
-	MACHINE_RESET_CALL(adder2);
+	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 
 	// reset the board //////////////////////////////////////////////////////
 
 	on_scorpion2_reset(machine);
-	BFM_BD1_init(0);
-	BFM_BD1_init(1);
-}
+	state->m_vfd0->reset();
+	state->m_vfd1->reset();
 
-static SCREEN_UPDATE_IND16( addersc2 )
-{
-	bfm_sc2_state *state = screen.machine().driver_data<bfm_sc2_state>();
-	if ( state->m_sc2_show_door )
-	{
-		output_set_value("door",( Scorpion2_GetSwitchState(screen.machine(),state->m_sc2_door_state>>4, state->m_sc2_door_state & 0x0F) ) );
-	}
-
-	return SCREEN_UPDATE16_CALL(adder2);
 }
 
 
@@ -2164,6 +2146,8 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
+	MCFG_BFMBD1_ADD("vfd0",0)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_HANDLER(bfm_sc2)
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
@@ -2172,9 +2156,9 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_STATIC(addersc2)
 
 	MCFG_VIDEO_START( adder2)
+	MCFG_SCREEN_UPDATE_STATIC(adder2)
 	MCFG_VIDEO_RESET( adder2)
 
 	MCFG_PALETTE_LENGTH(16)
@@ -2609,9 +2593,11 @@ static const bfmdm01_interface dm01_interface =
 /* machine init (called only once) */
 static MACHINE_RESET( awp_init )
 {
+	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
+
 	on_scorpion2_reset(machine);
-	BFM_BD1_init(0);
-	BFM_BD1_init(1);
+	state->m_vfd0->reset();
+	state->m_vfd1->reset();
 }
 
 
@@ -3700,6 +3686,9 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
+	MCFG_BFMBD1_ADD("vfd0",0)
+	MCFG_BFMBD1_ADD("vfd1",1)
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3730,7 +3719,6 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
-
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
@@ -3789,9 +3777,6 @@ static DRIVER_INIT (bbrkfst)
 	sc2awp_common_init(machine,5, 1);
 	MechMtr_config(machine,8);
 
-	BFM_BD1_init(0);
-	BFM_BD1_init(1);
-
 	state->m_has_hopper = 0;
 
 	Scorpion2_SetSwitchState(machine,4,0, 1);	  /* GBP1 Low Level Switch */
@@ -3811,9 +3796,6 @@ static DRIVER_INIT (drwho_common)
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 
 	MechMtr_config(machine,8);
-
-	BFM_BD1_init(0);
-	BFM_BD1_init(1);
 
 	state->m_has_hopper = 0;
 
@@ -3844,8 +3826,6 @@ static DRIVER_INIT (focus)
 {
 	sc2awp_common_init(machine,6, 1);
 	MechMtr_config(machine,5);
-
-	BFM_BD1_init(0);
 }
 
 static DRIVER_INIT (cpeno1)
@@ -3934,7 +3914,6 @@ static DRIVER_INIT (bfmcgslm)
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 	sc2awp_common_init(machine,6, 1);
 	MechMtr_config(machine,8);
-	BFM_BD1_init(0);
 	state->m_has_hopper = 0;
 }
 
