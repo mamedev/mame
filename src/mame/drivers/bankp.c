@@ -97,6 +97,22 @@
 #include "includes/bankp.h"
 
 
+#define MASTER_CLOCK	XTAL_15_468MHz
+
+// Video timing
+// PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
+// --> VTOTAL should be OK, HTOTAL not 100% certain
+#define PIXEL_CLOCK		MASTER_CLOCK/3
+
+#define HTOTAL			330
+#define HBEND			0+3*8
+#define HBSTART			224+3*8
+
+#define VTOTAL			256
+#define VBEND			0+2*8
+#define VBSTART			224+2*8
+
+
 /*************************************
  *
  *  Address maps
@@ -278,7 +294,7 @@ static INTERRUPT_GEN( vblank_irq )
 static MACHINE_CONFIG_START( bankp, bankp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, BANKP_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(bankp_map)
 	MCFG_CPU_IO_MAP(bankp_io_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
@@ -287,10 +303,7 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(bankp)
 
 	MCFG_GFXDECODE(bankp)
@@ -302,13 +315,13 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, BANKP_SN76496_CLOCK)
+	MCFG_SOUND_ADD("sn1", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, BANKP_SN76496_CLOCK)
+	MCFG_SOUND_ADD("sn2", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn3", SN76489, BANKP_SN76496_CLOCK)
+	MCFG_SOUND_ADD("sn3", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

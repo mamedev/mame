@@ -66,6 +66,23 @@ and 1 SFX channel controlled by an 8039:
 #include "includes/gyruss.h"
 
 
+#define MASTER_CLOCK	XTAL_18_432MHz
+#define SOUND_CLOCK		XTAL_14_31818MHz
+
+// Video timing
+// PCB measured: H = 15.50khz V = 60.56hz, +/- 0.01hz
+// --> VTOTAL should be OK, HTOTAL not 100% certain
+#define PIXEL_CLOCK		MASTER_CLOCK/3
+
+#define HTOTAL			396
+#define HBEND			0
+#define HBSTART			256
+
+#define VTOTAL			256
+#define VBEND			0+2*8
+#define VBSTART			224+2*8
+
+
 /* The timer clock which feeds the upper 4 bits of                      */
 /* AY-3-8910 port A is based on the same clock                          */
 /* feeding the sound CPU Z80.  It is a divide by                        */
@@ -503,19 +520,19 @@ static INTERRUPT_GEN( slave_vblank_irq )
 static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
 	MCFG_CPU_VBLANK_INT("screen", master_vblank_irq)
 
-	MCFG_CPU_ADD("sub", M6809, 2000000)        /* 2 MHz ??? */
+	MCFG_CPU_ADD("sub", M6809, MASTER_CLOCK/12)		/* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu2_map)
 	MCFG_CPU_VBLANK_INT("screen", slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)	/* 3.579545 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)
 	MCFG_CPU_IO_MAP(audio_cpu1_io_map)
 
-	MCFG_CPU_ADD("audio2", I8039,8000000)	/* 8MHz crystal */
+	MCFG_CPU_ADD("audio2", I8039, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(audio_cpu2_map)
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
 
@@ -525,10 +542,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(gyruss)
 
 	MCFG_GFXDECODE(gyruss)
@@ -540,31 +554,31 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_3)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 6)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 7)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 8)
 
-	MCFG_SOUND_ADD("ay4", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay4", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_4)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 9)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 10)
 	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 11)
 
-	MCFG_SOUND_ADD("ay5", AY8910, 14318180/8)
+	MCFG_SOUND_ADD("ay5", AY8910, SOUND_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_5)
 	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 12)
 	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 13)

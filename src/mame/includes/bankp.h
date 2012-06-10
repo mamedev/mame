@@ -4,11 +4,6 @@
 
 ***************************************************************************/
 
-
-#define BANKP_MASTER_CLOCK 15468000
-#define BANKP_CPU_CLOCK (BANKP_MASTER_CLOCK/6)
-#define BANKP_SN76496_CLOCK (BANKP_MASTER_CLOCK/6)
-
 class bankp_state : public driver_device
 {
 public:
