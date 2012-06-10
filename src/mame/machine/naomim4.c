@@ -99,7 +99,7 @@ void naomi_m4_board::device_reset()
 void naomi_m4_board::board_setup_address(UINT32 address, bool is_dma)
 {
 	rom_cur_address = address & 0x1fffffff;
-	encryption = !(address & 0x20000000);
+	encryption = (!is_dma) && !(address & 0x20000000);
 
 	if(encryption) {
 		enc_reset();
