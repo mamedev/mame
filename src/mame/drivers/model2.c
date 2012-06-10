@@ -3512,8 +3512,8 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C, Sega Game ID# 833-12861, RO
 	ROM_LOAD( "mpr-19505.34", 0x400000, 0x400000, CRC(eba7f41d) SHA1(f6e521bedf298808a768f6fdcb0b60b320a66d04) )
 ROM_END
 
-/* Sega Water Ski - There should be a version with program roms EPR-19965 & EPR-19966 (currently undumped), Sega Game ID# 833-13204, ROM board ID# 834-13205 */
-ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C */
+/* Sega Water Ski - There should be a version with program roms EPR-19965 & EPR-19966 (currently undumped) */
+ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-13204, ROM board ID# 834-13205 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19963a.15", 0x000000, 0x080000, CRC(89c9cb0d) SHA1(7f1f600222447effb28cf2d56193ea9f45fd0646) )
 	ROM_LOAD32_WORD("epr-19964a.16", 0x000002, 0x080000, CRC(c382cefe) SHA1(c0ccee4eb19d9626dee0f77f08060f1d9708b39d) )
@@ -4194,13 +4194,13 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, rom board stickered as 8
 	ROM_LOAD32_WORD( "mpr-19994.9",   0x800000, 0x400000, CRC(e691fbd5) SHA1(b99c2f3f2a682966d792917dfcb8ed8e53bc0b7a) )
 	ROM_LOAD32_WORD( "mpr-19995.10",  0x800002, 0x400000, CRC(82a7828e) SHA1(4336a12a07a67f94091b4a9b491bab02c375dd15) )
 
-	ROM_REGION( 0x800000, "cpu2", ROMREGION_ERASE00 ) // TGPx4 program (COPRO sockets)
+	ROM_REGION( 0x800000, "user5", ROMREGION_ERASE00 ) // Coprocessor Data ROM
 
-	ROM_REGION( 0x800000, "user2", 0 ) // Models (TGP sockets)
+	ROM_REGION( 0x800000, "user2", 0 ) // Models
 	ROM_LOAD32_WORD( "mpr-19998.17",  0x000000, 0x200000, CRC(6a834574) SHA1(8be19bf42dbb157d6acde62a2018ef4c0d41aab4) )
 	ROM_LOAD32_WORD( "mpr-19999.21",  0x000002, 0x200000, CRC(ff590a2d) SHA1(ad29e4270b4a2f82189fbab83358eb1200f43777) )
 
-	ROM_REGION( 0x400000, "user3", 0 ) // Textures (TEXTURE sockets)
+	ROM_REGION( 0x400000, "user3", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
