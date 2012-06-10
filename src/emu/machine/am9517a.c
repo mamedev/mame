@@ -12,7 +12,6 @@
 	TODO:
 
 	- memory-to-memory transfer
-	- cascade mode
 	- external EOP
 
 */
@@ -352,6 +351,8 @@ inline void am9517a_device::end_of_process()
 	// signal end of process
 	set_eop(0);
 	set_hreq(0);
+
+	m_current_channel = -1;
 	set_dack();
 
 	m_state = STATE_SI;
@@ -504,8 +505,18 @@ void am9517a_device::execute_run()
 
 			if (m_hack)
 			{
-				m_state = get_state1(true);
+				m_state = (MODE_MASK == MODE_CASCADE) ? STATE_SC : get_state1(true);
 			}
+			break;
+
+		case STATE_SC:
+			if (!is_request_active(m_current_channel))
+			{
+				m_current_channel = -1;
+				m_state = STATE_SI;
+			} 
+
+			set_dack();
 			break;
 
 		case STATE_S1:
@@ -707,7 +718,7 @@ WRITE8_MEMBER( am9517a_device::write )
 		case REGISTER_COMMAND:
 			m_command = data;
 
-			if (LOG) logerror("AM9517A '%s' Command Register: %01x\n", tag(), m_command);
+			if (LOG) logerror("AM9517A '%s' Command Register: %02x\n", tag(), m_command);
 			break;
 
 		case REGISTER_REQUEST:

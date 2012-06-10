@@ -190,6 +190,7 @@ enum
 	XTAL_49_152MHz  	= 49152000,		/* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
 	XTAL_50MHz  		= 50000000,		/* Williams/Midway T/W/V-unit system */
 	XTAL_52MHz  		= 52000000,		/* Cojag */
+	XTAL_52_832MHz		= 52832000, 	/* Wang PC TIG video controller */
 	XTAL_53_693175MHz	= 53693175,		/* PSX-based h/w, Sony ZN1-2-based */
 	XTAL_54MHz  		= 54000000,		/* Taito JC */
 	XTAL_57_2727MHz 	= 57272727,		/* Psikyo SH2 with /2 divider */
