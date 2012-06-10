@@ -4,13 +4,16 @@
 #include "machine/sec.h"
 #include "machine/steppers.h" // stepper motor
 
+#include "machine/bfm_bd1.h"
 
 class sc4_state : public driver_device
 {
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+		  m_maincpu(*this, "maincpu"),
+  		  m_vfd0(*this, "vfd0")
+
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;
@@ -22,6 +25,7 @@ public:
 	device_t* m_duart;
 	device_t* m_ymz;
 	required_device<cpu_device> m_maincpu;
+	optional_device<bfm_bd1_t> m_vfd0;
 
 	// serial vfd
 	int vfd_enabled;
