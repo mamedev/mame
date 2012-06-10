@@ -2698,7 +2698,40 @@ ROM_START( srallycb ) /* Sega Rally Championship Revision B, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( manxtt ) /* Manx TT Superbike Revision C, Model 2A */
+/*
+
+Manx TT
+
+837-10848-01-91  Model2 A-CRX CPU BD
+837-10849-02     Model2 A-CRX VIDEO BD
+837-12396        COMM BD MANX TT
+
+837-12279        SOUND BD MANX T.T (for DX only)
+
+Rom boards:
+ 834-12467  ROM BD MANX T.T TWIN
+ 834-12277  ROM BD MANX T.T DX
+
+Known missing roms:
+
+Manx TT DX
+EPR-18742 - Sound CPU rom (on Sound BD)
+MPR-18743 - Sound Samples (on Sound BD)
+EPR-18744.12 - Program rom
+EPR-18745.13 - Program rom
+EPR-18784.14 - Program rom*
+EPR-18785.15 - Program rom*
+EPR-18746.30 - Sound CPU rom*
+EPR-18767.5  - Data*
+EPR-18768.4  - Data*
+
+EPR-18763.31 & alt sound CPU code EPR-18924a.30 are dumped
+
+* Note: The manual scan was low-res and these numbers might be incorrect as they were VERY hard to read!
+
+*/
+
+ROM_START( manxtt ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) )
 	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) )
@@ -2735,21 +2768,25 @@ ROM_START( manxtt ) /* Manx TT Superbike Revision C, Model 2A */
 	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
-//  ROM_LOAD16_WORD_SWAP( "epr-18826.30",  0x080000, 0x040000, CRC(ed9fe4c1) SHA1(c3dd8a1324a4dc9b012bd9bf21d1f48578870f72) ) /* Alternate sound program */
-	ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x080000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) )
+	ROM_LOAD16_WORD_SWAP( "epr-18826.30",  0x080000, 0x040000, CRC(ed9fe4c1) SHA1(c3dd8a1324a4dc9b012bd9bf21d1f48578870f72) ) /* Sound program for Twin set */
+//	ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x080000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) ) /* Sound program for ?? set */
 
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
-//  ROM_LOAD( "mpr-18827.31", 0x000000, 0x200000, CRC(58d78ca1) SHA1(95275ed8315c044bfde2f23c10416f22627b34df) ) /* Alternate sound sample */
-	ROM_LOAD( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) )
+	ROM_LOAD( "mpr-18827.31", 0x000000, 0x200000, CRC(58d78ca1) SHA1(95275ed8315c044bfde2f23c10416f22627b34df) ) /* Sound sample for Twin set */
+//	ROM_LOAD( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) /* Sound sample for DX set */
 	ROM_LOAD( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
 	ROM_LOAD( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
 	ROM_LOAD( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
+//	ROM_LOAD16_WORD_SWAP( "epr-18643a.7", 0x000000, 0x020000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) ) /* COMM boards found with either revision */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( motoraid ) /* Motoraid, Model 2A */
+ROM_START( motoraid ) /* Motoraid, Model 2A, Sega game ID# 833-13232 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-20007.12",  0x000000, 0x080000, CRC(f040c108) SHA1(a6a0fa8fb9d62d0cc2ac84ea3ad457953952d980) )
 	ROM_LOAD32_WORD( "epr-20008.13",  0x000002, 0x080000, CRC(78976e1a) SHA1(fd15e8c81b3b2f3bdf3bb8d9414b9b8a6f1f000f) )
@@ -2854,7 +2891,7 @@ ROM_START( skytargt ) /* Sky Target, Model 2A */
 	ROM_LOAD( "mpr-18421.37",   0x600000, 0x200000, CRC(00522390) SHA1(5dbbf2ba008adad36929fcecb7c2c1e5ffd12618) )
 ROM_END
 
-ROM_START( vcop2 ) /* Virtua Cop 2, Model 2A */
+ROM_START( vcop2 ) /* Virtua Cop 2, Model 2A, Sega Game ID# 833-12266, ROM board ID# 834-12267 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18524.12", 0x000000, 0x080000, CRC(1858988b) SHA1(2979f8470cc31e6c5c32c6fec1a87dbd29b52309) )
 	ROM_LOAD32_WORD( "epr-18525.13", 0x000002, 0x080000, CRC(0c13df3f) SHA1(6b4188f04aad80b89f1826e8ca47cff763980410) )
@@ -3322,7 +3359,7 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) )
 ROM_END
 
-ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defaults to Japan, Twin & no "Default View" option */
+ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defaults to Japan, Twin & no "Default View" option - Sega ROM board ID# 834-12780 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19272a.15", 0x000000, 0x080000, CRC(20cedd05) SHA1(e465967c784de18caaaac77e164796e9779f576a) )
 	ROM_LOAD32_WORD("epr-19273a.16", 0x000002, 0x080000, CRC(1b0ab4d6) SHA1(142bcd53fa6632fcc866bbda817aa83470111ef1) )
@@ -3440,7 +3477,7 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision unknown, Model 2C -
 	ROM_LOAD( "epr-18261.ic9", 0x000000, 0x010000, CRC(0c7fac58) SHA1(68c1724c41401e28a5123022981c8919fd22656e) )
 ROM_END
 
-ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C */
+ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C, Sega Game ID# 833-12861, ROM board ID# 834-12862 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-19489.15", 0x000000, 0x080000, CRC(1df948a7) SHA1(a38faeb97c65b379ad05f7311b55217118c8d2be) )
 	ROM_LOAD32_WORD( "epr-19490.16", 0x000002, 0x080000, CRC(e6fc24d3) SHA1(1ac9172cf0b4d6a3488483ffa490a4ca5d410927) )
@@ -3475,7 +3512,7 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C */
 	ROM_LOAD( "mpr-19505.34", 0x400000, 0x400000, CRC(eba7f41d) SHA1(f6e521bedf298808a768f6fdcb0b60b320a66d04) )
 ROM_END
 
-/* Sega Water Ski - There should be a version with program roms EPR-19965 & EPR-19966 (currently undumped) */
+/* Sega Water Ski - There should be a version with program roms EPR-19965 & EPR-19966 (currently undumped), Sega Game ID# 833-13204, ROM board ID# 834-13205 */
 ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19963a.15", 0x000000, 0x080000, CRC(89c9cb0d) SHA1(7f1f600222447effb28cf2d56193ea9f45fd0646) )
@@ -3519,7 +3556,7 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C */
 	ROM_LOAD("mpr-19989.34", 0x400000, 0x400000, CRC(8074a4b3) SHA1(98dc1d122ffb9b5c52994dea2b5d8c4f004a5f8e) )
 ROM_END
 
-ROM_START( hotd ) /* House of the Dead, Model 2C */
+ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19696.15", 0x000000, 0x080000, CRC(03da5623) SHA1(be0bd34a9216375c7204445f084f6c74c4d3b0c8) )
 	ROM_LOAD32_WORD("epr-19697.16", 0x000002, 0x080000, CRC(a9722d87) SHA1(0b14f9a81272f79a5b294bc024711042c5fb2637) )
@@ -3736,7 +3773,7 @@ ROM_START( pltkids ) /* Pilot Kids Revision A, Model 2B */
 	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
 ROM_END
 
-ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode, Sega ROM board ID# 834-12362 */
+ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode, Sega Game ID# 833-12361, ROM board ID# 834-12362 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18598a.15", 0x000000, 0x080000, CRC(3cdcac0f) SHA1(2f616e363f4d246fece309e81325e5e3c4e9d9f8) ) /* Higher rom numbers indicate a newer version */
 	ROM_LOAD32_WORD("epr-18599a.16", 0x000002, 0x080000, CRC(32bde9a2) SHA1(0982952ab3c5b035f37beb9304ac950c0e78aea8) ) /* Different attract mode... what else??? */
@@ -3788,7 +3825,7 @@ ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits t
 	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
-ROM_START( indy500d ) /* Defaults to Deluxe (Stand Alone) Cab version.  3 credits to start - Can be set to Twin setting in service mode */
+ROM_START( indy500d ) /* Defaults to Deluxe (Stand Alone) Cab version. 3 credits to start - Can be set to Twin setting in service mode, Sega Game ID# 833-11992, ROM board ID# 834-11993 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18251a.15", 0x000000, 0x080000, CRC(fdabb40b) SHA1(e60a4814b54b76c7c0a4d9cf2b093c577c2f6ecf) )
 	ROM_LOAD32_WORD("epr-18252a.16", 0x000002, 0x080000, CRC(4935832a) SHA1(8fc9244fd0eaf93d016f4494604e5a70bf1f7303) )
@@ -3840,7 +3877,7 @@ ROM_START( indy500d ) /* Defaults to Deluxe (Stand Alone) Cab version.  3 credit
 	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
-ROM_START( indy500to ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode */
+ROM_START( indy500to ) /* Defaults to Twin (Stand Alone) Cab version. 2 credits to start - Can be set to Deluxe setting in service mode, Sega Game ID# 833-11994, ROM board ID# 834-11995 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18254a.15", 0x000000, 0x080000, CRC(ad0f1fc5) SHA1(0bff35fc1d892aaffbf1a3965bf3109c54839f4b) )
 	ROM_LOAD32_WORD("epr-18255a.16", 0x000002, 0x080000, CRC(784daab8) SHA1(299e87f8ec7bdefa6f94f4ab65e29e91f290611e) )
@@ -3892,7 +3929,7 @@ ROM_START( indy500to ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits
 	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
-ROM_START( waverunr ) /* Wave Runner Revision A (Japan), Model 2C */
+ROM_START( waverunr ) /* Wave Runner Revision A (Japan), Model 2C, Sega Game ID# 833-12838, ROM board ID# 834-12839 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19282a.15", 0x000000, 0x080000, CRC(5df58604) SHA1(a136bb80746f37450be51f98ca60791b4022035d) )
 	ROM_LOAD32_WORD("epr-19283a.16", 0x000002, 0x080000, CRC(bca188e1) SHA1(428f156f60e61ef314b7b50474abddf6d4dc2aca) )
@@ -4175,7 +4212,7 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, rom board stickered as 8
 	ROM_LOAD( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
 ROM_END
 
-ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C */
+ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C, Sega Game ID# 833-13080-02, ROM board ID# 834-13081-02 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19755a.15", 0x000000, 0x080000, CRC(b80633b9) SHA1(5396da414beeb918e6f38f25a43dd76345a0c8ed) )
 	ROM_LOAD32_WORD("epr-19756a.16", 0x000002, 0x080000, CRC(472046a2) SHA1(06d0f609257ba476e6bd3b956e0850e7167429ce) )
@@ -4215,7 +4252,7 @@ ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C */
 	ROM_LOAD("mpr-19750.24s", 0xc00000, 0x400000, CRC(cd95d0bf) SHA1(40e2a2980c89049c339fefd48bf7aac79962cd2e) )
 ROM_END
 
-ROM_START( topskatru ) /* Top Skater Revision A (USA), Model 2C */
+ROM_START( topskatru ) /* Top Skater Revision A (USA), Model 2C, Sega Game ID# 833-13080-01, ROM board ID# 834-13081-01 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-19753a.15", 0x000000, 0x080000, CRC(3b3028de) SHA1(717ebf0ccd87128a24776e618cf15f07aaf48537) )
 	ROM_LOAD32_WORD( "epr-19754a.16", 0x000002, 0x080000, CRC(17535b98) SHA1(a2329d09821900ec4f867caf1a93759085bd0a62) )
@@ -4255,7 +4292,7 @@ ROM_START( topskatru ) /* Top Skater Revision A (USA), Model 2C */
 	ROM_LOAD("mpr-19750.24s", 0xc00000, 0x400000, CRC(cd95d0bf) SHA1(40e2a2980c89049c339fefd48bf7aac79962cd2e) )
 ROM_END
 
-ROM_START( topskatrj ) /* Top Skater (Japan), Model 2C */
+ROM_START( topskatrj ) /* Top Skater (Japan), Model 2C, Sega Game ID# 833-13080-03, ROM board ID# 834-13081-03 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-19751.15", 0x000000, 0x080000, CRC(d615a15f) SHA1(ca998de446c4c423db186696f3478f3daa4f8373) )
 	ROM_LOAD32_WORD( "epr-19752.16", 0x000002, 0x080000, CRC(42f0ba8b) SHA1(f72f25cbd380918b919c11a7d2051948c8c484db) )
@@ -5264,7 +5301,7 @@ GAME( 1994, vcop,            0, model2o, daytona, 0,        ROT0, "Sega", "Virtu
 GAME( 1994, vcopa,           0, model2o, daytona, 0,        ROT0, "Sega", "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
-GAME( 1995, manxtt,          0, model2a, model2, 0,       ROT0, "Sega", "Manx TT Superbike (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, manxtt,          0, model2a, model2, 0,       ROT0, "Sega", "Manx TT Superbike - Twin (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallyc,         0, srallyc, srallyc,srallyc, ROT0, "Sega", "Sega Rally Championship (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallycb,  srallyc, srallyc, srallyc,srallyc, ROT0, "Sega", "Sega Rally Championship (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2,             0, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Version 2.1)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
@@ -5276,7 +5313,7 @@ GAME( 1995, skytargt,        0, model2a, model2, 0,       ROT0, "Sega", "Sky Tar
 GAME( 1996, doaa,          doa, model2a, model2, doa,     ROT0, "Sega", "Dead or Alive (Model 2A, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zeroguna,  zerogun, model2a, model2, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunaj, zerogun, model2a, model2, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, motoraid,        0, model2a, model2, 0,       ROT0, "Sega", "Motor Raid", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, motoraid,        0, model2a, model2, 0,       ROT0, "Sega", "Motor Raid - Twin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcop,        0, model2a, model2, genprot, ROT0, "Sega", "Dynamite Cop (Export, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2, dynamcop, model2a, model2, genprot, ROT0, "Sega", "Dynamite Deka 2 (Japan, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,  pltkids, model2a, model2, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
