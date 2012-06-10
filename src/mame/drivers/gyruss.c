@@ -515,7 +515,7 @@ static INTERRUPT_GEN( slave_vblank_irq )
 static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz (?) */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
 	MCFG_CPU_VBLANK_INT("screen", master_vblank_irq)
 
