@@ -5315,7 +5315,7 @@ GAME( 1996, stcca,        stcc, model2c, model2, 0,       ROT0, "Sega", "Sega To
 GAME( 1996, stccb,        stcc, model2c, model2, 0,       ROT0, "Sega", "Sega Touring Car Championship (Unknown Revision)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, waverunr,        0, model2c, model2, 0,       ROT0, "Sega", "Wave Runner (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,            0, model2c, model2, 0,       ROT0, "Sega", "House of the Dead", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, overrev,         0, model2c, srallyc,overrev, ROT0, "Jaleco", "Over Rev (Model, 2C Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, overrev,         0, model2c, srallyc,overrev, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,        0, model2c, model2, 0,       ROT0, "Sega", "Sega Water Ski (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c, model2, 0,       ROT0, "Sega", "Top Skater (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru,topskatr, model2c, model2, 0,       ROT0, "Sega", "Top Skater (USA, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
