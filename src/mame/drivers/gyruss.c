@@ -113,8 +113,7 @@ READ8_MEMBER(gyruss_state::gyruss_portA_r)
 
 WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 {
-	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, NODE(16), data);
+	discrete_sound_w(m_discrete, NODE(16), data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
@@ -138,14 +137,12 @@ static void filter_w( device_t *device, int chip, int data )
 
 WRITE8_MEMBER(gyruss_state::gyruss_filter0_w)
 {
-	device_t *device = machine().device("discrete");
-	filter_w(device, 0, data);
+	filter_w(m_discrete, 0, data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
 {
-	device_t *device = machine().device("discrete");
-	filter_w(device, 1, data);
+	filter_w(m_discrete, 1, data);
 }
 
 
@@ -162,13 +159,11 @@ WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
 
 WRITE8_MEMBER(gyruss_state::master_nmi_mask_w)
 {
-
 	m_master_nmi_mask = data & 1;
 }
 
 WRITE8_MEMBER(gyruss_state::slave_irq_mask_w)
 {
-
 	m_slave_irq_mask = data & 1;
 }
 
@@ -402,13 +397,13 @@ static const ay8910_interface ay8910_interface_5 =
 
 static const discrete_mixer_desc konami_right_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
-		{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
-		{0,0,0,0,0,0},	/* no variable resistors   */
-		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, 200,
-		CAP_U(0.1),
-		CAP_U(1),		/* DC - Removal, not in schematics */
-		0, 1};
+	{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
+	{0,0,0,0,0,0},	/* no variable resistors   */
+	{0,0,0,0,0,0},  /* no node capacitors      */
+	0, 200,
+	CAP_U(0.1),
+	CAP_U(1),		/* DC - Removal, not in schematics */
+	0, 1};
 
 static const discrete_mixer_desc konami_left_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
@@ -497,15 +492,15 @@ static MACHINE_START( gyruss )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
 
-	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_audiocpu_2 = machine.device<cpu_device>("audio2");
+	state->save_item(NAME(state->m_master_nmi_mask));
+	state->save_item(NAME(state->m_slave_irq_mask));
 }
 
 static INTERRUPT_GEN( master_vblank_irq )
 {
 	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
-	if(state->m_master_nmi_mask)
+	if (state->m_master_nmi_mask)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -513,7 +508,7 @@ static INTERRUPT_GEN( slave_vblank_irq )
 {
 	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
-	if(state->m_slave_irq_mask)
+	if (state->m_slave_irq_mask)
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -737,7 +732,7 @@ static DRIVER_INIT( gyruss )
 }
 
 
-GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss, ROT90, "Konami", "Gyruss (Konami)", GAME_SUPPORTS_SAVE )
+GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss, ROT90, "Konami", "Gyruss", GAME_SUPPORTS_SAVE )
 GAME( 1983, gyrussce, gyruss,   gyruss,   gyrussce, gyruss, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", GAME_SUPPORTS_SAVE )
-GAME( 1983, gyrussb,  gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Gyruss", GAME_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
-GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Venus", GAME_SUPPORTS_SAVE )
+GAME( 1983, gyrussb,  gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg?", "Gyruss (bootleg?)", GAME_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
+GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Venus (bootleg of Gyruss)", GAME_SUPPORTS_SAVE )
