@@ -84,10 +84,10 @@ romcmp$(EXE): $(ROMCMPOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(LIBOCORE)
 CHDMANOBJS = \
 	$(TOOLSOBJ)/chdman.o \
 
-chdman$(EXE): $(VERSIONOBJ) $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB) $(LIBOCORE)
+chdman$(EXE): $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB) $(LIBOCORE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) $(FLAC_LIB) -o $@
+	$(LD) $(LDFLAGS) $(VERSIONOBJ) $^ $(LIBS) $(FLAC_LIB) -o $@
 
 
 
