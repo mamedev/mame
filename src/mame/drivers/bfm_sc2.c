@@ -183,7 +183,7 @@ public:
 		  m_vfd1(*this, "vfd1")
 		  { }
 
-  	optional_device<bfm_bd1_t> m_vfd0;
+	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
 
 	int m_sc2gui_update_mmtr;

@@ -180,8 +180,8 @@ public:
 
 	enum /* sync-operations */
 	{
-		SYNC_NOOP 		= 11,
-		SYNC_SET_IRQST 	= 12,
+		SYNC_NOOP		= 11,
+		SYNC_SET_IRQST	= 12,
 		SYNC_POT		= 13,
 		SYNC_WRITE		= 14
 	};

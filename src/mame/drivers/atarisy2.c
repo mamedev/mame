@@ -654,19 +654,19 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 	/* these gains are cheesed up, but give an approximate effect */
 
 	/*
-	 * Before the volume adjustment, all channels pass through
-	 * a high-pass filter which removes DC components. The
-	 * filter frequency does also depend on the settings on
-	 * the resistors.
-	 *
-	 * The op-amp after the pokey feeds mixes the op-amp output voltage
-	 * with a low impedance back to the input. The internal resistance of the
-	 * pokey now is the ground pole of a three pole resistor mixer: ground,
-	 * 15V and op-amp output voltage.
-	 *
-	 * ==> DISCRETE candidate
-	 *
-	 */
+     * Before the volume adjustment, all channels pass through
+     * a high-pass filter which removes DC components. The
+     * filter frequency does also depend on the settings on
+     * the resistors.
+     *
+     * The op-amp after the pokey feeds mixes the op-amp output voltage
+     * with a low impedance back to the input. The internal resistance of the
+     * pokey now is the ground pole of a three pole resistor mixer: ground,
+     * 15V and op-amp output voltage.
+     *
+     * ==> DISCRETE candidate
+     *
+     */
 
 	/* bits 0-2 control the volume of the YM2151, using 22k, 47k, and 100k resistors */
 	rtop = 1.0/(1.0/100 + 1.0/100);

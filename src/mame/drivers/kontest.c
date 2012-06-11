@@ -1,20 +1,20 @@
 /***************************************************************************
 
-	GX800 (Konami Test board)
+    GX800 (Konami Test board)
 
-	driver by Angelo Salese
+    driver by Angelo Salese
 
-	Notes:
- 	Z80, 8KB RAM, 2 * SN76489AN for sound, TTLs for video/misc
- 	There are 5 x 005273 (Konami custom resistor array (SIL10)) on the PCB,
- 	also seen on Jail Break HW
- 	
- 	menu translation:
- 	* screen distortion adjustment normal
- 	* screen distortion adjustment wide
- 	* input/output check
- 	* color check
- 	* sound check
+    Notes:
+    Z80, 8KB RAM, 2 * SN76489AN for sound, TTLs for video/misc
+    There are 5 x 005273 (Konami custom resistor array (SIL10)) on the PCB,
+    also seen on Jail Break HW
+
+    menu translation:
+    * screen distortion adjustment normal
+    * screen distortion adjustment wide
+    * input/output check
+    * color check
+    * sound check
 
 ***************************************************************************/
 
@@ -153,7 +153,7 @@ WRITE8_MEMBER(kontest_state::control_w)
 	// d2: ? (reset during 1st grid test and color test)
 	// other bits: ?
 	m_control = data;
-	
+
 	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 

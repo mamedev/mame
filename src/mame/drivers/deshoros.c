@@ -172,13 +172,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("KEY1")
 	AM_RANGE(0x9004, 0x9004) AM_READ_PORT("KEY2")
 	AM_RANGE(0x9005, 0x9005) AM_READ_PORT("DIPSW") AM_WRITE(out_w)
-//	AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
-//	AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
+//  AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
+//  AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
 	AM_RANGE(0x900a, 0x900a) AM_WRITE(sound_on_w)
 	AM_RANGE(0x900b, 0x900b) AM_WRITE(sound_off_w)
 	AM_RANGE(0x900c, 0x900c) AM_WRITE(bank_select_w)
-//	AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
-//	AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
+//  AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
+//  AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( destiny )
 	PORT_DIPSETTING(      0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0,   0x00, "Operation Mode" )		PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(      0x00, "Normal Mode" )
-//	PORT_DIPSETTING(      0x40, "Normal Mode" ) // dupe
+//  PORT_DIPSETTING(      0x40, "Normal Mode" ) // dupe
 	PORT_DIPSETTING(      0x80, "Test Mode" )
 	PORT_DIPSETTING(      0xc0, "I/O Test" )
 

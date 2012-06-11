@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- memory-to-memory transfer
-	- external EOP
+    - memory-to-memory transfer
+    - external EOP
 
 */
 
@@ -271,7 +271,7 @@ inline void am9517a_device::dma_advance()
 		if (MODE_ADDRESS_DECREMENT)
 		{
 			m_channel[m_current_channel].m_address--;
-			
+
 			if ((m_channel[m_current_channel].m_address & 0xff) == 0xff)
 			{
 				msb_changed = true;
@@ -280,7 +280,7 @@ inline void am9517a_device::dma_advance()
 		else
 		{
 			m_channel[m_current_channel].m_address++;
-			
+
 			if ((m_channel[m_current_channel].m_address & 0xff) == 0x00)
 			{
 				msb_changed = true;
@@ -314,11 +314,11 @@ inline void am9517a_device::dma_advance()
 			set_dack();
 			m_state = STATE_SI;
 			break;
-			
+
 		case MODE_BLOCK:
 			m_state = get_state1(msb_changed);
 			break;
-			
+
 		case MODE_CASCADE:
 			break;
 		}
@@ -514,7 +514,7 @@ void am9517a_device::execute_run()
 			{
 				m_current_channel = -1;
 				m_state = STATE_SI;
-			} 
+			}
 
 			set_dack();
 			break;
@@ -527,13 +527,13 @@ void am9517a_device::execute_run()
 			set_dack();
 			m_state = COMMAND_COMPRESSED_TIMING ? STATE_S4 : STATE_S3;
 			break;
-			
+
 		case STATE_S3:
 			dma_read();
 
 			if (COMMAND_EXTENDED_WRITE)
 			{
-				dma_write();			
+				dma_write();
 			}
 
 			m_state = m_ready ? STATE_S4 : STATE_SW;
@@ -542,7 +542,7 @@ void am9517a_device::execute_run()
 		case STATE_SW:
 			m_state = m_ready ? STATE_S4 : STATE_SW;
 			break;
-			
+
 		case STATE_S4:
 			if (COMMAND_COMPRESSED_TIMING)
 			{
@@ -556,7 +556,7 @@ void am9517a_device::execute_run()
 
 			dma_advance();
 			break;
-			
+
 		case STATE_S11:
 			m_current_channel = 0;
 
@@ -570,27 +570,27 @@ void am9517a_device::execute_run()
 		case STATE_S13:
 			m_state = STATE_S14;
 			break;
-			
+
 		case STATE_S14:
 			dma_read();
 
 			m_state = STATE_S21;
 			break;
-			
+
 		case STATE_S21:
 			m_current_channel = 1;
 
 			m_state = STATE_S22;
 			break;
-			
+
 		case STATE_S22:
 			m_state = STATE_S23;
 			break;
-			
+
 		case STATE_S23:
 			m_state = STATE_S24;
 			break;
-			
+
 		case STATE_S24:
 			dma_write();
 			dma_advance();
@@ -603,7 +603,7 @@ void am9517a_device::execute_run()
 
 
 //-------------------------------------------------
-//  read - 
+//  read -
 //-------------------------------------------------
 
 READ8_MEMBER( am9517a_device::read )
@@ -655,7 +655,7 @@ READ8_MEMBER( am9517a_device::read )
 		case REGISTER_TEMPORARY:
 			data = m_temp;
 			break;
-		
+
 		case REGISTER_MASK:
 			data = m_mask;
 			break;
@@ -667,7 +667,7 @@ READ8_MEMBER( am9517a_device::read )
 
 
 //-------------------------------------------------
-//  write - 
+//  write -
 //-------------------------------------------------
 
 WRITE8_MEMBER( am9517a_device::write )
@@ -675,7 +675,7 @@ WRITE8_MEMBER( am9517a_device::write )
 	if (!BIT(offset, 3))
 	{
 		int channel = (offset >> 1) & 0x03;
-		
+
 		switch (offset & 0x01)
 		{
 		case REGISTER_ADDRESS:
@@ -737,7 +737,7 @@ WRITE8_MEMBER( am9517a_device::write )
 				if (LOG) logerror("AM9517A '%s' Request Register: %01x\n", tag(), m_request);
 			}
 			break;
-			
+
 		case REGISTER_SINGLE_MASK:
 			{
 				int channel = data & 0x03;
@@ -754,7 +754,7 @@ WRITE8_MEMBER( am9517a_device::write )
 				if (LOG) logerror("AM9517A '%s' Mask Register: %01x\n", tag(), m_mask);
 			}
 			break;
-			
+
 		case REGISTER_MODE:
 			{
 				int channel = data & 0x03;
@@ -767,25 +767,25 @@ WRITE8_MEMBER( am9517a_device::write )
 				if (LOG) logerror("AM9517A '%s' Channel %u Mode: %02x\n", tag(), channel, data & 0xfc);
 			}
 			break;
-			
+
 		case REGISTER_BYTE_POINTER:
 			if (LOG) logerror("AM9517A '%s' Clear Byte Pointer Flip-Flop\n", tag());
 
 			m_msb = 0;
 			break;
-			
+
 		case REGISTER_MASTER_CLEAR:
 			if (LOG) logerror("AM9517A '%s' Master Clear\n", tag());
-			
+
 			device_reset();
 			break;
-			
+
 		case REGISTER_CLEAR_MASK:
 			if (LOG) logerror("AM9517A '%s' Clear Mask Register\n", tag());
 
 			m_mask = 0;
 			break;
-			
+
 		case REGISTER_MASK:
 			m_mask = data & 0x0f;
 

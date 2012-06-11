@@ -167,7 +167,7 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinf
 			case 0xc:
 				tileno += 0x20000;
 				break;
-			
+
 			default:
 				//printf("tilebank %x\n",bank);
 				break;

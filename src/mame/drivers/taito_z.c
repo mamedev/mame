@@ -1347,12 +1347,12 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 	{
 		case 0x0:
 			break;
-	
+
 		case 0x101:
 			/* outputs will go here, but driver is still broken */
 			break;
 	}
-	
+
 	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space.device()),data,offset);
 }
 
@@ -2031,7 +2031,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_DIPSETTING(    0x01, "Cockpit" )			// analog pedals
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )	// digital pedals, no brake?, allow free steering wheel
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW A:2")
- 	PORT_DIPSETTING(    0x02, "Same as Start" )
+	PORT_DIPSETTING(    0x02, "Same as Start" )
 	PORT_DIPSETTING(    0x00, "Discount" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW A:3" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:4")
@@ -2122,7 +2122,7 @@ static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW B:6")
- 	PORT_DIPSETTING(    0x20, "Same as Start" )
+	PORT_DIPSETTING(    0x20, "Same as Start" )
 	PORT_DIPSETTING(    0x00, "Discount" )
 	PORT_DIPNAME( 0x40, 0x40, "Clear Damage on Continue" )	PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

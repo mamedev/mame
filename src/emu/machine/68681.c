@@ -289,13 +289,13 @@ double duart68681_get_ct_rate(duart68681_state *duart68681)
 
 UINT16 duart68681_get_ct_count(duart68681_state *duart68681)
 {
-	double clock = duart68681_get_ct_rate(duart68681);	
+	double clock = duart68681_get_ct_rate(duart68681);
 	return (duart68681->duart_timer->remaining() * clock).as_double();
 }
 
 void duart68681_start_ct(duart68681_state *duart68681, int count)
 {
-	double clock = duart68681_get_ct_rate(duart68681);	
+	double clock = duart68681_get_ct_rate(duart68681);
 	duart68681->duart_timer->adjust(attotime::from_hz(clock) * count, 0);
 }
 
@@ -600,7 +600,7 @@ READ8_DEVICE_HANDLER( duart68681_r )
 		case 0x05: /* ISR */
 			r = duart68681->ISR;
 			break;
-			
+
 		case 0x06: /* CUR */
 			r = duart68681_get_ct_count(duart68681) >> 8;
 			break;
@@ -608,7 +608,7 @@ READ8_DEVICE_HANDLER( duart68681_r )
 		case 0x07: /* CLR */
 			r = duart68681_get_ct_count(duart68681) & 0xff;
 			break;
-				
+
 		case 0x08: /* MR1B/MR2B */
 			if ( duart68681->channel[1].MR_ptr == 0 )
 			{

@@ -435,7 +435,7 @@ static void topspeed_msm5205_clock( device_t *device, int chip )
 	msm5205_data_w(device, state->m_msm_sel[chip] ? data & 0xf : data >> 4 & 0xf);
 	state->m_msm_pos[chip] += state->m_msm_sel[chip];
 	state->m_msm_sel[chip] ^= 1;
-	
+
 	if ((state->m_msm_pos[chip]) == state->m_msm_loop[chip])
 		state->m_msm_pos[chip] = state->m_msm_start[chip];
 }
@@ -454,10 +454,10 @@ static void topspeed_msm5205_vck_2( device_t *device )
 WRITE8_MEMBER(topspeed_state::topspeed_msm5205_command_w)
 {
 	int chip = offset >> 12 & 1;
-	
+
 	// disable 2nd chip for now... it doesn't work yet
 	if (chip == 1) return;
-	
+
 	switch (offset >> 8 & 0x2e)
 	{
 		// $b000 / $c000: start
@@ -488,7 +488,7 @@ WRITE8_MEMBER(topspeed_state::topspeed_msm5205_command_w)
 			break;
 		case 0x22:
 			break;
-		
+
 		default:
 			break;
 	}
@@ -555,7 +555,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x03, "Deluxe" )	// analog pedals, racing wheel, motor (tilt disabled)
 	PORT_DIPSETTING(    0x02, "Standard" )	// digital pedals, continuous wheel
-//	PORT_DIPSETTING(    0x01, "Standard" )
+//  PORT_DIPSETTING(    0x01, "Standard" )
 	PORT_DIPSETTING(    0x00, "Mini" )		// analog pedals, racing wheel
 	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
 	TAITO_COINAGE_WORLD_LOC(SWA)
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SWB:8") // "KEEP OFF" in manual, see notes
- 	PORT_DIPSETTING(    0x80, "Same as Start" )
+	PORT_DIPSETTING(    0x80, "Same as Start" )
 	PORT_DIPSETTING(    0x00, "Half of Start" )
 
 	PORT_START("IN0")
@@ -724,7 +724,7 @@ static MACHINE_RESET( topspeed )
 	state->m_cpua_ctrl = 0xff;
 	state->m_ioc220_port = 0;
 	state->m_banknum = -1;
-	
+
 	msm5205_reset_w(state->m_msm_chip[0], 1);
 	msm5205_reset_w(state->m_msm_chip[1], 1);
 	state->m_msm_loop[0] = 0;

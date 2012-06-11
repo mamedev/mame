@@ -142,7 +142,7 @@ public:
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
 
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
-	
+
 	// not actually used, but left in code so you can turn it and see the (possibly undesired?) behavior, see notes in memory map
 	DECLARE_WRITE32_MEMBER(hng64_soundram2_w);
 	DECLARE_READ32_MEMBER(hng64_soundram2_r);

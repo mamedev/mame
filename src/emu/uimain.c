@@ -412,7 +412,7 @@ const char *ui_menu_slot_devices::slot_get_prev(device_slot_interface *slot)
 		if (idx==-2) idx = slot_get_length(slot) -1;
 		if (idx==-1) return "";
 		if (slot->get_slot_interfaces()[idx].internal) idx--;
-	} while (slot->get_slot_interfaces()[idx].internal);	
+	} while (slot->get_slot_interfaces()[idx].internal);
 	return slot->get_slot_interfaces()[idx].name;
 }
 
@@ -479,7 +479,7 @@ void ui_menu_slot_devices::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
-			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;			
+			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? slot_get_prev(slot) : slot_get_next(slot);
 			set_slot_device(slot,val);
 			reset(UI_MENU_RESET_REMEMBER_REF);

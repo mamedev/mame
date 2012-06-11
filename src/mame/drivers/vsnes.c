@@ -1968,10 +1968,10 @@ ROM_END
 
 /* From Gumshoe readme:
 
-NOTE:  There is a small board modification which consists of 2 extra jumpers added. 
+NOTE:  There is a small board modification which consists of 2 extra jumpers added.
 They appear to be:
 
-pin 26 of 6D to pin 1, 74ls04 at 5E. 
+pin 26 of 6D to pin 1, 74ls04 at 5E.
 pin 26 of 1D to pin 12, 74s32 at 4b.
 
 possibly an extra address?

@@ -309,7 +309,7 @@ WRITE8_MEMBER( mc2661_device::write )
 
 	case REGISTER_SYNC:
 		if (LOG) logerror("MC2661 '%s' Sync Register %u: %02x\n", tag(), m_sync_index + 1, data);
-		
+
 		m_sync[m_sync_index] = data;
 
 		m_sync_index++;
@@ -329,16 +329,16 @@ WRITE8_MEMBER( mc2661_device::write )
 
 			switch (MODE_STOP_BITS)
 			{
-			case STOP_BITS_1: 	stop_bits = 1; 		break;
-			case STOP_BITS_1_5: stop_bits = 1.5; 	break;
-			case STOP_BITS_2: 	stop_bits = 2; 		break;
+			case STOP_BITS_1:	stop_bits = 1;		break;
+			case STOP_BITS_1_5: stop_bits = 1.5;	break;
+			case STOP_BITS_2:	stop_bits = 2;		break;
 			}
 
 			if (!MODE_PARITY) parity_code = SERIAL_PARITY_NONE;
 			else if (MODE_PARITY_EVEN) parity_code = SERIAL_PARITY_EVEN;
 			else parity_code = SERIAL_PARITY_ODD;
 
-			set_data_frame(word_length, stop_bits, parity_code);			
+			set_data_frame(word_length, stop_bits, parity_code);
 		}
 
 		m_mode_index++;

@@ -1962,10 +1962,10 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 			$(LAYOUT)/sltblgtk.lh
 
 $(DRIVERS)/bfm_sc4.o:	$(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh 
+			$(LAYOUT)/sc4_dmd.lh
 
 $(DRIVERS)/bfm_sc4h.o:	$(LAYOUT)/bfm_sc4.lh \
-			$(LAYOUT)/sc4_dmd.lh 
+			$(LAYOUT)/sc4_dmd.lh
 
 $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 

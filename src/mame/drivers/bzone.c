@@ -785,7 +785,7 @@ Rom Component Equivalents & Locations:
 
 Program rom locations as same as redbarona listed below
 */
-          
+
 
 ROM_START( redbaron ) /* Analog Vec Gen A035742-02 Rev. C+ */
 	ROM_REGION( 0x8000, "maincpu", 0 )

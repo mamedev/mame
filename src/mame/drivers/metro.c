@@ -109,18 +109,18 @@ driver modified by Eisuke Watanabe
 READ16_MEMBER(metro_state::metro_irq_cause_r)
 {
 	/* interrupt cause, used by
-	
-	int[0] vblank
-	int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
-	int[2] blitter
-	int[3] ?            KARATOUR
-	int[4] ?
-	int[5] ?            KARATOUR, BLZNTRND
-	int[6] unused
-	int[7] unused
-	
-	*/
-	
+
+    int[0] vblank
+    int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
+    int[2] blitter
+    int[3] ?            KARATOUR
+    int[4] ?
+    int[5] ?            KARATOUR, BLZNTRND
+    int[6] unused
+    int[7] unused
+
+    */
+
 	UINT16 res = 0;
 	for (int i = 0; i < 8; i++)
 		res |= (m_requested_int[i] << i);
@@ -5950,7 +5950,7 @@ static DRIVER_INIT( karatour )
 		state->m_vram_1[i] = machine.rand();
 		state->m_vram_2[i] = machine.rand();
 	}
-	
+
 	DRIVER_INIT_CALL(metro);
 }
 

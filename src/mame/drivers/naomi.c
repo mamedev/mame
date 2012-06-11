@@ -25,19 +25,19 @@ TODO (general):
     - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
     - games using "m4" decryption have never successfully worked, may be
       an issue there.
- 
+
     - Following games doesn't boot, any attempt makes it to return to the system test mode (note these are also "m4" type games)
     * Illvelo
     * Akatsuki Blitzkampf Ausf Achse
- 
+
     - Doesn't boot
     * Shootout Pool (all 3 Shootout Pool games show an animated loading screen and then lock up)
     * Shootout Pool Medal
     * Shootout Pool Prize
- 
+
     - Boots and accepts coin, but won't accept start button
     * Usagi Yamashiro Hen
- 
+
     - missing inputs (needs rotary channels):
     * Crakin' DJ
     * Dynamic Golf
@@ -52,11 +52,11 @@ TODO (general):
     - "com error occured between Naomi BD and I/O BD"
     * Samba de Amigo
     * Samba de Amigo Ver. 2000
- 
+
     - other issues:
     * Death Crimson OX (boots now, but dies in YUV-mode movie; coining up before it appears to freeze the game)
     * La Keyboard (boots fine & attract mode looks OK, but no keyboard)
- 
+
 TODO (game-specific):
     - 18th Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
     - Airline Pilots Deluxe: returns error 03
@@ -7941,7 +7941,7 @@ ROM_END
 /* Cart games on Namco custom ROM board */
 /* 25209801 */ GAME( 2000, wldkicks, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "World Kicks (WK2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25349801 */ GAME( 2000, toukon4,  naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
+/* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 

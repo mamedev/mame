@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( armora, cinemat_jmi_16k )
 	MCFG_FRAGMENT_ADD(armora_sound)
 MACHINE_CONFIG_END
- 
+
 
 static MACHINE_CONFIG_DERIVED( ripoff, cinemat_jmi_8k )
 	MCFG_FRAGMENT_ADD(ripoff_sound)

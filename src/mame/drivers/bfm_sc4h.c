@@ -480,7 +480,7 @@ void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, boo
 				if ( !clock )
 				{
 				//Should move to the internal serial process when DM01 is device-ified
-//					m_vfd0->shift_data(!data);
+//                  m_vfd0->shift_data(!data);
 					state->vfd_ser_value <<= 1;
 					if (data) state->vfd_ser_value |= 1;
 
@@ -491,7 +491,7 @@ void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, boo
 						if (machine.device("matrix"))
 						{
 							BFM_dm01_writedata(machine,state->vfd_ser_value);
-						}			
+						}
 						else
 						{
 							state->m_vfd0->write_char(state->vfd_ser_value);

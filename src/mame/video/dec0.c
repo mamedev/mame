@@ -181,7 +181,7 @@ SCREEN_UPDATE_IND16( automat )
 	deco_bac06_pf_control_1_w(state->m_tilegen3,1,state->m_automat_scroll_regs[0], 0xffff);
 
 	// sprites seem very different, probably need new functions
-	
+
 	state->flip_screen_set(state->m_tilegen1->get_flip_state());
 
 	if (state->m_pri & 0x04)
@@ -208,10 +208,10 @@ SCREEN_UPDATE_IND16( automat )
 		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-//	if (state->m_pri & 0x02)
-//		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
-//	else
-//		state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+//  if (state->m_pri & 0x02)
+//      state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
+//  else
+//      state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
@@ -339,7 +339,7 @@ VIDEO_START( dec0 )
 
 VIDEO_START( automat )
 {
-//	dec0_state *state = machine.driver_data<dec0_state>();
+//  dec0_state *state = machine.driver_data<dec0_state>();
 }
 
 /******************************************************************************/

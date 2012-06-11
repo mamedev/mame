@@ -95,7 +95,7 @@ void i8008_device::device_start()
 	astring tempstr;
 	for (int addrnum = 0; addrnum < 8; addrnum++)
 		state_add(I8008_ADDR1 + addrnum, tempstr.format("ADDR%d", addrnum + 1), m_ADDR[addrnum].w.l).mask(0xfff);
-	
+
 	init_tables();
 }
 

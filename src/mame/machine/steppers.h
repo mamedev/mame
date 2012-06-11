@@ -41,7 +41,7 @@ struct _stepper_interface
 	INT16 index_start;/* start position of index (in half steps) */
 	INT16 index_end;  /* end position of index (in half steps) */
 	INT16 index_patt; /* pattern needed on coils (0=don't care) */
-	UINT8 initphase; /* Phase at 0, for opto linkage */	
+	UINT8 initphase; /* Phase at 0, for opto linkage */
 };
 
 extern const stepper_interface starpoint_interface_48step;

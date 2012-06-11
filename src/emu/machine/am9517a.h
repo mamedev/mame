@@ -128,7 +128,7 @@ private:
 	devcb_resolved_write_line	m_out_eop_func;
 	devcb_resolved_read8		m_in_memr_func;
 	devcb_resolved_write8		m_out_memw_func;
-	
+
 	struct
 	{
 		devcb_resolved_read8		m_in_ior_func;
@@ -161,6 +161,6 @@ private:
 // device type definition
 extern const device_type AM9517A;
 
- 
+
 
 #endif

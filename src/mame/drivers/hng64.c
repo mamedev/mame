@@ -1062,13 +1062,13 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 		}
 		else
 		{
-			printf("unknown hng64_soundcpu_enable_w cmd %04x\n", cmd); 
+			printf("unknown hng64_soundcpu_enable_w cmd %04x\n", cmd);
 		}
 	}
 
 	if (mem_mask&0x0000ffff)
 	{
-			printf("unknown hng64_soundcpu_enable_w %08x %08x\n", data, mem_mask); 
+			printf("unknown hng64_soundcpu_enable_w %08x %08x\n", data, mem_mask);
 	}
 }
 
@@ -1165,7 +1165,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_SHARE("3d_2")	// 3D Display Buffer B
 
 	// Sound
-//	AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // if this area acts as RAM then xrally will copy the sound program here and blank out the usual area below.  None of the other games test this as sound ram (usually just write to the first byte) -- maybe it's actually unmapped?
+//  AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // if this area acts as RAM then xrally will copy the sound program here and blank out the usual area below.  None of the other games test this as sound ram (usually just write to the first byte) -- maybe it's actually unmapped?
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)	// uploads the v53 sound program here, elsewhere on ss64-2
 
 	// These are sound ports of some sort

@@ -53,11 +53,11 @@ static const pokey_interface pokey_interface_2 =
 #define BW_C33		CAP_U(0.22)
 
 static discrete_op_amp_filt_info stage1_bwidow_info = {
-		BW_R45, 0, 0, 0, 	/* r1 .. r4 */
+		BW_R45, 0, 0, 0,	/* r1 .. r4 */
 		BW_R43,				/* rF */
 		BW_C27,			    /* C1 */
 		BW_C30,				/* C2 */
-		0,		 		 	/* C3 */
+		0,					/* C3 */
 		0.0,				/* vRef */
 		15.0,				/* vP */
 		-15.0,				/* vN */
@@ -67,7 +67,7 @@ static discrete_op_amp_filt_info stage1_bwidow_info = {
 static discrete_op_amp_filt_info stage2_bwidow_info = {
 		BW_R48, 0, 0, 0,	/* r1 .. r4 */
 		BW_R44,				/* rF */
-		BW_C28,				/* C1 */  		/* on schematic, not on parts list, gravitar retrofit manual says not needed - so what? */
+		BW_C28,				/* C1 */		/* on schematic, not on parts list, gravitar retrofit manual says not needed - so what? */
 		0,					/* C2 */
 		0,					/* C3 */
 		0.0,				/* vRef */
@@ -76,7 +76,7 @@ static discrete_op_amp_filt_info stage2_bwidow_info = {
 };
 
 static discrete_mixer_desc bwidow_mixer = {
-		DISC_MIXER_IS_OP_AMP, 		/* type */
+		DISC_MIXER_IS_OP_AMP,		/* type */
 		{ BW_R49, BW_R46 },			/* r{} */
 		{},							/* r_node */
 		{ BW_C33, 0 },				/* c{} */
@@ -111,11 +111,11 @@ DISCRETE_SOUND_END
 #define GRAV_C27		CAP_N(1)
 
 static discrete_op_amp_filt_info stage1_gravitar_info = {
-		BW_R45, 0, 0, 0, 	/* r1 .. r4 */
+		BW_R45, 0, 0, 0,	/* r1 .. r4 */
 		BW_R43,				/* rF */
 		GRAV_C27,		    /* C1 */
 		BW_C30,				/* C2 */
-		0,		 		 	/* C3 */
+		0,					/* C3 */
 		0.0,				/* vRef */
 		15.0,				/* vP */
 		-15.0,				/* vN */
@@ -125,7 +125,7 @@ static discrete_op_amp_filt_info stage1_gravitar_info = {
 static discrete_op_amp_filt_info stage2_gravitar_info = {
 		BW_R48, 0, 0, 0,	/* r1 .. r4 */
 		BW_R44,				/* rF */
-		BW_C28,				/* C1 */  		/* on schematic, not on parts list, gravitar retrofit manual says not needed - so what? */
+		BW_C28,				/* C1 */		/* on schematic, not on parts list, gravitar retrofit manual says not needed - so what? */
 		0,					/* C2 */
 		0,					/* C3 */
 		0.0,				/* vRef */
@@ -134,7 +134,7 @@ static discrete_op_amp_filt_info stage2_gravitar_info = {
 };
 
 static discrete_mixer_desc gravitar_mixer = {
-		DISC_MIXER_IS_OP_AMP, 		/* type */
+		DISC_MIXER_IS_OP_AMP,		/* type */
 		{ BW_R49, GRAV_R46 },		/* r{} */
 		{},							/* r_node */
 		{ BW_C33, 0 },				/* c{} */

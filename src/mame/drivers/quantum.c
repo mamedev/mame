@@ -243,8 +243,8 @@ static discrete_op_amp_filt_info pokey1_info = {
 		RES_K(220), 0, 0, 0, /* r1 .. r4 */
 		RES_K(220),          /* rF */
 		CAP_U(0.022),		 /* C1 */
-		CAP_U(0.1),		 	 /* C2 */
-		0,		 		 	 /* C3 */
+		CAP_U(0.1),			 /* C2 */
+		0,					 /* C3 */
 		0.0,				 /* vRef */
 		15.0,				 /* vP */
 		-15.0,				 /* vN */
@@ -271,7 +271,7 @@ static DISCRETE_SOUND_START(quantum)
 
 	/* Convert Pokey output to 5V Signal */
 	DISCRETE_INPUTX_STREAM(NODE_100, 0, 5.0 / 32768, 5.0)	/* Add VRef again */
-	DISCRETE_INPUTX_STREAM(NODE_110, 1, 5.0 / 32768, 5.0) 	/* Add VRef again */
+	DISCRETE_INPUTX_STREAM(NODE_110, 1, 5.0 / 32768, 5.0)	/* Add VRef again */
 
 	DISCRETE_OP_AMP_FILTER(NODE_150, 1, NODE_100, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1, &pokey1_info)
 

@@ -500,10 +500,10 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* FIXME: Outputs 1,2,3 are tied together
-	 * This signal and Output 4 are processed separately.
-	 * Later they are mixed together again.
-	 * ==> DISCRETE emulation, below is just an approximation.
-	 */
+     * This signal and Output 4 are processed separately.
+     * Later they are mixed together again.
+     * ==> DISCRETE emulation, below is just an approximation.
+     */
 
 	MCFG_POKEY_ADD("pokey1", MHAVOC_CLOCK_1_25M)
 	MCFG_POKEY_CONFIG(pokey_config)

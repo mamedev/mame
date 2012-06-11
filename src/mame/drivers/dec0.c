@@ -667,7 +667,7 @@ WRITE8_MEMBER(dec0_automat_state::automat_adpcm_w)
 static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("2203a", ym2203_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)	
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("2203b", ym2203_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
@@ -1423,7 +1423,7 @@ static void automat_vclk_cb(device_t *device)
 	else
 	{
 		msm5205_data_w(device, state->m_automat_adpcm_byte >> 4);
-	//	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	//  cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	state->m_automat_msm5205_vclk_toggle ^= 1;

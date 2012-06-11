@@ -28,7 +28,7 @@ public:
 	UINT16 m_msm_loop[2];
 	UINT16 m_msm_pos[2];
 	UINT8 m_msm_sel[2];
-	
+
 	/* misc */
 	UINT16     m_cpua_ctrl;
 	INT32      m_ioc220_port;

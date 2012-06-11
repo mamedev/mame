@@ -3151,9 +3151,9 @@ The base board for the conversion dates from 1981.
 
 Base Board
 ----------
-There are 2 x Toshiba 2114, 2 x Mitsubushi 2101 and 5 x Intel 2115 making up 
-the video RAM. There are 6 ROM sockets for the video ROM but the daughter card 
-only connects to two of them. I believe that this is a version of 
+There are 2 x Toshiba 2114, 2 x Mitsubushi 2101 and 5 x Intel 2115 making up
+the video RAM. There are 6 ROM sockets for the video ROM but the daughter card
+only connects to two of them. I believe that this is a version of
 Scramble/Galaxians video hardware.
 
 There are 4 x Toshiba 2114 that make up the CPU RAM. There are 8 ROM sockets

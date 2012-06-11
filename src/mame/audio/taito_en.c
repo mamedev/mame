@@ -2,9 +2,9 @@
 
     Taito Ensoniq ES5505-based sound hardware
 
-	TODO:
+    TODO:
 
-	* Implement ES5510 ESP
+    * Implement ES5510 ESP
 
 ****************************************************************************/
 
@@ -20,7 +20,7 @@
  *  Statics
  *
  *************************************/
- 
+
 static UINT16   es5510_dsp_ram[0x200];
 static UINT32	es5510_gpr[0xc0];
 static UINT32   es5510_dram[1<<24];
@@ -37,7 +37,7 @@ static UINT32   *snd_shared_ram;
  *  Handlers
  *
  *************************************/
- 
+
 static READ16_HANDLER( en_68000_share_r )
 {
 	switch (offset & 3)
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
  *  Reset
  *
  *************************************/
- 
+
 SOUND_RESET( taito_en_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
@@ -251,7 +251,7 @@ static void mb87078_gain_changed( running_machine &machine, int channel, int per
 	if (channel < 2)
 	{
 		es5505_device *es5505 = machine.device<es5505_device>("ensoniq");
-	
+
 		es5505->set_output_gain(channel, percent / 100.0);
 	}
 }
@@ -262,17 +262,17 @@ static void mb87078_gain_changed( running_machine &machine, int channel, int per
  *  M68681 callback
  *
  *************************************/
- 
+
 static void taito_en_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	if (state == ASSERT_LINE)
-	{		
+	{
 		device_set_input_line_vector(device->machine().device("audiocpu"), M68K_IRQ_6, vector);
-		device_set_input_line(device->machine().device("audiocpu"), M68K_IRQ_6, ASSERT_LINE);		
+		device_set_input_line(device->machine().device("audiocpu"), M68K_IRQ_6, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line(device->machine().device("audiocpu"), M68K_IRQ_6, CLEAR_LINE);	
+		device_set_input_line(device->machine().device("audiocpu"), M68K_IRQ_6, CLEAR_LINE);
 	}
 }
 
@@ -282,7 +282,7 @@ static void taito_en_duart_irq_handler(device_t *device, int state, UINT8 vector
  *  Device interfaces
  *
  *************************************/
- 
+
 static const duart68681_config taito_en_duart68681_config =
 {
 	taito_en_duart_irq_handler,
@@ -309,7 +309,7 @@ static const es5505_interface es5505_taito_en_config =
  *  Machine driver
  *
  *************************************/
- 
+
 MACHINE_CONFIG_FRAGMENT( taito_en_sound )
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(en_sound_map)

@@ -96,7 +96,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, is_default ? slot->default_clock() : 0);
 							found = true;
 							if (is_default) {
-								device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());								
+								device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
 								if (slot->default_config()) {
 									device_t::static_set_static_config(*new_dev, slot->default_config());
 								}

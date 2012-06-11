@@ -1519,7 +1519,7 @@ static void HaltSlaveDSP( running_machine &machine )
 
 static void EnableSlaveDSP( running_machine &machine )
 {
-//	namcos22_state *state = machine.driver_data<namcos22_state>();
+//  namcos22_state *state = machine.driver_data<namcos22_state>();
 //  device_set_input_line(state->m_slave, INPUT_LINE_RESET, CLEAR_LINE);
 	namcos22_enable_slave_simulation(machine, 1);
 }

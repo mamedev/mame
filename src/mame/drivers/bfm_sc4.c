@@ -10,8 +10,8 @@
 
     This file contains the set lists only, for the actual hardware
     emulation see bfm_sc4h.c
-	However, the handlers for DMD are currently here, because we only
-	have it hooked up for one game, there must be more.
+    However, the handlers for DMD are currently here, because we only
+    have it hooked up for one game, there must be more.
 
 
     note: default Jackpot keys are set to whatever value the game

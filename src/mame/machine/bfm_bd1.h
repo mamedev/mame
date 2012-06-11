@@ -12,7 +12,7 @@
 
 #define MCFG_BFMBD1_REMOVE(_tag) \
     MCFG_DEVICE_REMOVE(_tag)
-	
+
 class bfm_bd1_t : public device_t
 {
 public:
@@ -61,8 +61,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);	
-	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 };
 
 extern const device_type BFM_BD1;

@@ -239,9 +239,9 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, clayshoo_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-//	AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
-//	AM_RANGE(0x50, 0x50) AM_NOP // ?
-//	AM_RANGE(0x60, 0x60) AM_NOP // ?
+//  AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
+//  AM_RANGE(0x50, 0x50) AM_NOP // ?
+//  AM_RANGE(0x60, 0x60) AM_NOP // ?
 ADDRESS_MAP_END
 
 

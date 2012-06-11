@@ -74,14 +74,14 @@ inline void im6402_device::set_tre(int state)
 inline void im6402_device::receive_bit(int state)
 {
 	if (LOG) logerror("IM6402 '%s' Receive Bit %u\n", tag(), state);
-	
+
 	receive_register_update_bit(state);
 
 	if (is_receive_register_full())
 	{
 		receive_register_extract();
 		m_rbr = get_received_char();
-		
+
 		if (LOG) logerror("IM6402 '%s' Receive Data %02x\n", tag(), m_rbr);
 
 		if (m_dr)
@@ -90,7 +90,7 @@ inline void im6402_device::receive_bit(int state)
 		}
 
 		set_dr(ASSERT_LINE);
-	}	
+	}
 }
 
 
@@ -283,7 +283,7 @@ void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void im6402_device::input_callback(UINT8 state)
 {
 	int bit = (state & SERIAL_STATE_RX_DATA) ? 1 : 0;
-	
+
 	receive_bit(bit);
 }
 
@@ -496,7 +496,7 @@ WRITE_LINE_MEMBER( im6402_device::pi_w )
 WRITE_LINE_MEMBER( im6402_device::sbs_w )
 {
 	if (LOG) logerror("IM6402 '%s' Stop Bit Select %u\n", tag(), state);
-	
+
 	m_sbs = state;
 }
 
@@ -520,7 +520,7 @@ WRITE_LINE_MEMBER( im6402_device::cls1_w )
 WRITE_LINE_MEMBER( im6402_device::cls2_w )
 {
 	if (LOG) logerror("IM6402 '%s' Character Length Select 2 %u\n", tag(), state);
-	
+
 	m_cls2 = state;
 }
 

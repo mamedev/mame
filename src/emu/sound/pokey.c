@@ -259,8 +259,8 @@ void pokey_device::device_start()
 	vol_init();
 
 	/* The pokey does not have a reset line. These should be initialized
-	 * with random values.
-	 */
+     * with random values.
+     */
 
 	m_KBCODE = 0x09;		 /* Atari 800 'no key' */
 	m_SKCTL = SK_RESET;	 /* let the RNG run after reset */
@@ -454,7 +454,7 @@ void pokey_device::execute_run()
 	do
 	{
 		// debugging
-		//m_ppc = m_pc;	// copy PC to previous PC
+		//m_ppc = m_pc; // copy PC to previous PC
 		if (check_debugger)
 			debugger_instruction_hook(this, 0); //m_pc);
 
@@ -728,8 +728,8 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		out = (out > 0x7fff) ? 0x7fff : out;
 		while( samples > 0 )
 		{
-	       	*buffer++ = out;
-	       	samples--;
+	    	*buffer++ = out;
+	    	samples--;
 		}
 	}
 	else if (m_output_type == RC_LOWPASS)
@@ -741,51 +741,51 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 		while( samples > 0 )
 		{
-	       	/* store sum of output signals into the buffer */
-	       	m_out_filter += (V0 - m_out_filter) * mult;
-	       	*buffer++ = m_out_filter;
-	       	samples--;
+	    	/* store sum of output signals into the buffer */
+	    	m_out_filter += (V0 - m_out_filter) * mult;
+	    	*buffer++ = m_out_filter;
+	    	samples--;
 
 		}
 	}
 	else if (m_output_type == OPAMP_C_TO_GROUND)
 	{
 		double rTot = m_voltab[m_output];
-       	/* In this configuration there is a capacitor in parallel to the pokey output to ground.
-       	 * With a LM324 in LTSpice this causes the opamp circuit to oscillate at around 100 kHz.
-       	 * We are ignoring the capacitor here, since this oscillation would not be audible.
-       	 */
+    	/* In this configuration there is a capacitor in parallel to the pokey output to ground.
+         * With a LM324 in LTSpice this causes the opamp circuit to oscillate at around 100 kHz.
+         * We are ignoring the capacitor here, since this oscillation would not be audible.
+         */
 
-       	/* This post-pokey stage usually has a high-pass filter behind it
-       	 * It is approximated by eliminating m_v_ref ( -1.0 term)
-       	 */
+    	/* This post-pokey stage usually has a high-pass filter behind it
+         * It is approximated by eliminating m_v_ref ( -1.0 term)
+         */
 
 		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0 * 32767.0;
 
 		while( samples > 0 )
 		{
-	       	/* store sum of output signals into the buffer */
-	       	*buffer++ = V0;
-	       	samples--;
+	    	/* store sum of output signals into the buffer */
+	    	*buffer++ = V0;
+	    	samples--;
 
 		}
 	}
 	else if (m_output_type == OPAMP_LOW_PASS)
 	{
 		double rTot = m_voltab[m_output];
-       	/* This post-pokey stage usually has a low-pass filter behind it
-       	 * It is approximated by not adding in VRef below.
-       	 */
+    	/* This post-pokey stage usually has a low-pass filter behind it
+         * It is approximated by not adding in VRef below.
+         */
 
 		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0 * 32767.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-1.0 / (m_cap * m_r_pullup) * m_clock_period.as_double());
 
 		while( samples > 0 )
 		{
-	       	/* store sum of output signals into the buffer */
-	       	m_out_filter += (V0 - m_out_filter) * mult;
-	       	*buffer++ = m_out_filter /* + m_v_ref */;		// see above
-	       	samples--;
+	    	/* store sum of output signals into the buffer */
+	    	m_out_filter += (V0 - m_out_filter) * mult;
+	    	*buffer++ = m_out_filter /* + m_v_ref */;		// see above
+	    	samples--;
 		}
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
@@ -793,8 +793,8 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		INT32 out = m_voltab[m_output];
 		while( samples > 0 )
 		{
-	       	*buffer++ = out;
-	       	samples--;
+	    	*buffer++ = out;
+	    	samples--;
 		}
 	}
 }
@@ -1112,8 +1112,8 @@ void pokey_device::pokey_potgo(void)
 			if (r == 0)
 			{
 				/* immediately set the ready - bit of m_ALLPOT
-				 * In this case, most likely no capacitor is connected
-				 */
+                 * In this case, most likely no capacitor is connected
+                 */
 				m_ALLPOT |= (1<<pot);
 			}
 
@@ -1128,8 +1128,8 @@ void pokey_device::vol_init()
 	double resistors[4] = {90000, 26500, 8050, 3400};
 	double pull_up = 10000;
 	/* just a guess, there has to be a resistance since the doc specifies that
-	 * Vout is at least 4.2V if all channels turned off.
-	 */
+     * Vout is at least 4.2V if all channels turned off.
+     */
 	double r_off = 8e6;
 	double r_chan[16];
 	double rTot;
@@ -1276,12 +1276,12 @@ char *pokey_device::audctl2str(int val)
 
 pokey_device::pokey_channel::pokey_channel()
 	:	m_AUDF(0),
-	 	m_AUDC(0),
+		m_AUDC(0),
 		m_borrow_cnt(0),
-	 	m_counter(0),
-	 	m_output(0),
-	 	m_filter_sample(0),
-	 	m_div2(0)
+		m_counter(0),
+		m_output(0),
+		m_filter_sample(0),
+		m_div2(0)
 {
 }
 

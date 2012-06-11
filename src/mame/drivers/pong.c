@@ -43,7 +43,7 @@ TODO:
  * http://www.youtube.com/watch?v=pDrRnJOCKZc
  */
 
-#define MASTER_CLOCK 	7139000
+#define MASTER_CLOCK	7139000
 #define V_TOTAL 		(0x105+1)
 #define	H_TOTAL			(0x1C6+1)   	// 454
 
@@ -284,13 +284,13 @@ private:
     /* some gates */
 
     inline UINT8 g_not(UINT8 in)	{return in ^ 1; }
-    inline UINT8 g_nand7(UINT8 in1, UINT8 in2, UINT8 in3, UINT8 in4, UINT8 in5, UINT8 in6, UINT8 in7) 	{ return (in1 && in2 && in3 && in4 && in5 && in6 && in7) ? 0 : 1; }
+    inline UINT8 g_nand7(UINT8 in1, UINT8 in2, UINT8 in3, UINT8 in4, UINT8 in5, UINT8 in6, UINT8 in7)	{ return (in1 && in2 && in3 && in4 && in5 && in6 && in7) ? 0 : 1; }
     inline UINT8 g_nand5(UINT8 in1, UINT8 in2, UINT8 in3, UINT8 in4, UINT8 in5) 	{ return (in1 && in2 && in3 && in4 && in5) ? 0 : 1; }
-    inline UINT8 g_nand3(UINT8 in1, UINT8 in2, UINT8 in3) 	{ return (in1 && in2 && in3) ? 0 : 1; }
-    inline UINT8 g_nand2(UINT8 in1, UINT8 in2) 	{ return (in1 && in2) ? 0 : 1; }
+    inline UINT8 g_nand3(UINT8 in1, UINT8 in2, UINT8 in3)	{ return (in1 && in2 && in3) ? 0 : 1; }
+    inline UINT8 g_nand2(UINT8 in1, UINT8 in2)	{ return (in1 && in2) ? 0 : 1; }
     inline UINT8 g_nor4(UINT8 in1, UINT8 in2, UINT8 in3, UINT8 in4) 	{ return (in1 || in2 || in3 || in4) ? 0 : 1; }
-    inline UINT8 g_nor3(UINT8 in1, UINT8 in2, UINT8 in3) 	{ return (in1 || in2 || in3) ? 0 : 1; }
-    inline UINT8 g_nor2(UINT8 in1, UINT8 in2) 				{ return (in1 || in2) ? 0 : 1; }
+    inline UINT8 g_nor3(UINT8 in1, UINT8 in2, UINT8 in3)	{ return (in1 || in2 || in3) ? 0 : 1; }
+    inline UINT8 g_nor2(UINT8 in1, UINT8 in2)				{ return (in1 || in2) ? 0 : 1; }
 
     inline UINT8 s_4H()			{ return ic_f8.QC(); }
     inline UINT8 s_8H()			{ return ic_f8.QD(); }
@@ -491,8 +491,8 @@ private:
 
     UINT8	m_jk_256;
     UINT8	m_ff_h3a;
-    ic7493 	ic_c7_score1;		/* FIXME: realized by 74LS90 and 74LS107, both falling edge, using a 93 for now ... */
-    ic7493 	ic_d7_score2;		/* FIXME: realized by 74LS90 and 74LS107, both falling edge, using a 93 for now ... */
+    ic7493	ic_c7_score1;		/* FIXME: realized by 74LS90 and 74LS107, both falling edge, using a 93 for now ... */
+    ic7493	ic_d7_score2;		/* FIXME: realized by 74LS90 and 74LS107, both falling edge, using a 93 for now ... */
 
     ic74107	ic_f3_topbot;
     icMonoFlop ic_g4_sc;
@@ -536,16 +536,16 @@ const device_type PONG = &device_creator<pong_device>;
 
 void pong_state::machine_start()
 {
-//	save_item(NAME(m_sound_nmi_enabled));
-//	save_item(NAME(m_nmi_enable));
+//  save_item(NAME(m_sound_nmi_enabled));
+//  save_item(NAME(m_nmi_enable));
 	dac_device *t = machine().device<dac_device>("dac");
 	downcast<pong_device *>(m_maincpu.target())->m_dac = t;
 }
 
 void pong_state::machine_reset()
 {
-//	m_sound_nmi_enabled = FALSE;
-//	m_nmi_enable = 0;
+//  m_sound_nmi_enabled = FALSE;
+//  m_nmi_enable = 0;
 }
 
 
@@ -616,9 +616,9 @@ void pong_device::execute_run()
 	do
 	{
 		// debugging
-		//m_ppc = m_pc;	// copy PC to previous PC
+		//m_ppc = m_pc; // copy PC to previous PC
 		//if (check_debugger)
-		//	debugger_instruction_hook(this, 0); //m_pc);
+		//  debugger_instruction_hook(this, 0); //m_pc);
 
 		// instruction fetch
 		//UINT16 op = opcode_read();
@@ -661,7 +661,7 @@ void pong_device::step_one_clock()
 	ic_ff_hb.process(s_hreset(), g_not(g_nand2(s_16H(),s_64H())));
 
 	//if (s_hblank() && ic_e8.count()==0)
-	//	printf("hblank %d\n", ic_f8.count());
+	//  printf("hblank %d\n", ic_f8.count());
 
 	{
 		/* move logic */

@@ -6,7 +6,7 @@
 //            also emulates the index optic                              //
 //                                                                       //
 // 26-05-2012: J. Wallace - Implemented proper phase alignment, we no    //
-//                          longer need reverse interfaces here, the     // 
+//                          longer need reverse interfaces here, the     //
 //                          layout will suffice. Added belt reel handler.//
 // 09-04-2012: J. Wallace - Studied some old reel motors and added a     //
 //                          number of new stepper types. I am yet to     //

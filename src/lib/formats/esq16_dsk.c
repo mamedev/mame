@@ -3,7 +3,7 @@
     formats/esq16_dsk.c
 
     Formats for 16-bit Ensoniq synthesizers and samplers
- 
+
     Disk is PC MFM, 80 tracks, double-sided, with 10 sectors per track
 
 *********************************************************************/

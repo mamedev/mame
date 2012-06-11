@@ -130,7 +130,7 @@ private:
 	inline void receive();
 	inline void transmit();
 
-	enum 
+	enum
 	{
 		TIMER_RX,
 		TIMER_TX

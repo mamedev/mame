@@ -575,7 +575,7 @@ const char *core_options::value(const char *name) const
 
 
 //-------------------------------------------------
-//  priority - return the priority of option 
+//  priority - return the priority of option
 //-------------------------------------------------
 
 int core_options::priority(const char *name) const

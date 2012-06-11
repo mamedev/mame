@@ -2,8 +2,8 @@
 
     Bellfruit BD1 VFD module interface and emulation by J.Wallace
 
-	TODO: Implement flashing (our only datasheet has that section 
-	completely illegible)
+    TODO: Implement flashing (our only datasheet has that section
+    completely illegible)
 **********************************************************************/
 
 #include "emu.h"
@@ -14,7 +14,7 @@ const device_type BFM_BD1 = &device_creator<bfm_bd1_t>;
 
 /*
    BD1 14 segment charset lookup table, according to datasheet (we rewire this later)
-   
+
         2
     ---------
    |\   |3  /|
@@ -27,8 +27,8 @@ const device_type BFM_BD1 = &device_creator<bfm_bd1_t>;
     ---------  C
         9
 
-		8 is flashing
-		
+        8 is flashing
+
   */
 
 static const UINT16 BD1charset[]=
@@ -115,7 +115,7 @@ void bfm_bd1_t::device_start()
 {
 	m_timer=timer_alloc(0);
 
-    save_item(NAME(m_cursor));	
+    save_item(NAME(m_cursor));
     save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));		// display window start pos 0-15
 	save_item(NAME(m_window_end));		// display window end   pos 0-15
@@ -131,9 +131,9 @@ void bfm_bd1_t::device_start()
 	save_item(NAME(m_flash_control));
     save_item(NAME(m_chars));
     save_item(NAME(m_attrs));
-	save_item(NAME(m_user_data)); 			// user defined character data (16 bit)
-	save_item(NAME(m_user_def));			// user defined character state	
-	
+	save_item(NAME(m_user_data));			// user defined character data (16 bit)
+	save_item(NAME(m_user_def));			// user defined character state
+
 	device_reset();
 }
 
@@ -200,7 +200,7 @@ UINT32 bfm_bd1_t::set_display(UINT16 segin)
 	else                    segout &= ~0x2000;
 	if ( segin & 0x1000 )	segout |=  0x4000;
 	else                    segout &= ~0x4000;
-	
+
 	return segout;
 }
 
@@ -286,7 +286,7 @@ int bfm_bd1_t::write_char(int data)
 		{
 			return 0;
 		}
-		 
+
 		setdata( m_user_data, data);
 		change ++;
 	}
@@ -318,7 +318,7 @@ int bfm_bd1_t::write_char(int data)
 				}
 
 				setdata(BD1charset[(data & 0x3F)], data);
-			}		
+			}
 		}
 		else
 		{
@@ -347,7 +347,7 @@ int bfm_bd1_t::write_char(int data)
 				case 0xA0:	// 0xA0 - 0xAF Set display mode
 				m_display_mode = data &0x03;
 				break;
-				
+
 				case 0xB0:	// 0xB0 - 0xBF Clear display area
 				switch ( data & 0x03 )
 				{
@@ -593,7 +593,7 @@ void bfm_bd1_t::setdata(int segdata, int data)
 void bfm_bd1_t::shift_data(int data)
 {
 	m_shift_data <<= 1;
-	
+
 	if ( !data ) m_shift_data |= 1;
 
 	if ( ++m_shift_count >= 8 )
