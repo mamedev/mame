@@ -1899,6 +1899,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/tmspoker.o \
 	$(DRIVERS)/manohman.o \
 	$(DRIVERS)/jankenmn.o \
+	$(DRIVERS)/wildpkr.o \
 
 
 #-------------------------------------------------
