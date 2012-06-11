@@ -415,6 +415,11 @@ public:
 	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
 	DECLARE_READ8_MEMBER(tenkai_dsw_r);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_rtc_irq);
+	DECLARE_WRITE8_MEMBER(janshinp_coincounter_w);
+	DECLARE_READ8_MEMBER(seljan2_busy_r);
+	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
+	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
+	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
 };
 
 //----------- defined in drivers/dynax.c -----------
