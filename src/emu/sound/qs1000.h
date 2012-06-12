@@ -124,7 +124,7 @@ public:
 	
 	// Wavetable engine
 	UINT8							m_serial_data_in;
-	UINT8							m_wave_regs[16];
+	UINT8							m_wave_regs[18];
 
 	struct qs1000_channel
 	{
