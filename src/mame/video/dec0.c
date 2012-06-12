@@ -180,7 +180,6 @@ SCREEN_UPDATE_IND16( automat )
 	deco_bac06_pf_control_1_w(state->m_tilegen3,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
 	deco_bac06_pf_control_1_w(state->m_tilegen3,1,state->m_automat_scroll_regs[0], 0xffff);
 
-	// sprites seem very different, probably need new functions
 
 	state->flip_screen_set(state->m_tilegen1->get_flip_state());
 
@@ -208,14 +207,62 @@ SCREEN_UPDATE_IND16( automat )
 		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-//  if (state->m_pri & 0x02)
-//      state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
-//  else
-//      state->m_spritegen->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+	if (state->m_pri & 0x02)
+		state->m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
+	else
+		state->m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
+
+SCREEN_UPDATE_IND16( secretab )
+{
+	dec0_automat_state *state = screen.machine().driver_data<dec0_automat_state>();
+
+	// layer enables seem different... where are they?
+
+	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
+	deco_bac06_pf_control_0_w(state->m_tilegen1,0,0x0003, 0x00ff); // 8x8
+	deco_bac06_pf_control_0_w(state->m_tilegen1,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen1,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen1,3,0x0001, 0x00ff); // dimensions
+
+	deco_bac06_pf_control_0_w(state->m_tilegen2,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(state->m_tilegen2,1,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen2,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen2,3,0x0001, 0x00ff); // dimensions
+
+	deco_bac06_pf_control_0_w(state->m_tilegen3,0,0x0082, 0x00ff); // 16x16
+	deco_bac06_pf_control_0_w(state->m_tilegen3,1,0x0003, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen3,2,0x0000, 0x00ff);
+	deco_bac06_pf_control_0_w(state->m_tilegen3,3,0x0001, 0x00ff); // dimensions
+
+	// scroll registers got written elsewhere, copy them across
+	deco_bac06_pf_control_1_w(state->m_tilegen1,0,0x0000, 0xffff); // no scroll?
+	deco_bac06_pf_control_1_w(state->m_tilegen1,1,0x0000, 0xffff); // no scroll?
+
+	deco_bac06_pf_control_1_w(state->m_tilegen2,0,state->m_automat_scroll_regs[3] - 0x010a, 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen2,1,state->m_automat_scroll_regs[2], 0xffff);
+
+	deco_bac06_pf_control_1_w(state->m_tilegen3,0,state->m_automat_scroll_regs[1] - 0x0108, 0xffff);
+	deco_bac06_pf_control_1_w(state->m_tilegen3,1,state->m_automat_scroll_regs[0], 0xffff);
+
+	state->flip_screen_set(state->m_tilegen1->get_flip_state());
+
+	state->m_tilegen3->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+
+	state->m_spritegen->draw_sprites_bootleg(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
+
+	/* Redraw top 8 pens of top 8 palettes over sprites */
+	if (state->m_pri&0x80)
+		state->m_tilegen2->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
+
+	state->m_tilegen1->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	return 0;
+}
+
 
 /******************************************************************************/
 
@@ -339,7 +386,7 @@ VIDEO_START( dec0 )
 
 VIDEO_START( automat )
 {
-//  dec0_state *state = machine.driver_data<dec0_state>();
+//	dec0_state *state = machine.driver_data<dec0_state>();
 }
 
 /******************************************************************************/

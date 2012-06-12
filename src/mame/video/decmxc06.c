@@ -157,6 +157,39 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 	}
 }
 
+/* this is used by the automat bootleg, it seems to have greatly simplified sprites compared to the real chip */
+/* spriteram is twice the size tho! */
+void deco_mxc06_device::draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+{
+	int offs;
+
+	offs = 0;
+	while (offs < 0x800 / 2)
+	{
+		int sx, sy, code, color, flipx, flipy;
+		
+		code =  spriteram[offs];
+		sy = 240-spriteram[offs + 1]; // 241- will align robocop with the ground but causes other issues too
+		sx = spriteram[offs + 2];
+		code |= (spriteram[offs + 3] &0x0f)<<8;
+		flipx = !(spriteram[offs + 3] &0x20);
+		flipy = (spriteram[offs + 3] &0x40);
+		color = (spriteram[offs + 0x400]&0xf0)>>4;
+		sx |= (spriteram[offs + 0x400]&0x01)<<8;
+		sx -= 16;
+		sx &=0x1ff;
+
+		sx -= 0x100;
+
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[m_gfxregion],
+			code,
+			color & col_mask,
+			flipx,flipy,
+			sx,sy,0);
+
+		offs += 4;
+	}
+}
 
 void deco_mxc06_device::device_start()
 {

@@ -99,11 +99,13 @@ SCREEN_UPDATE_IND16( hbarrel );
 SCREEN_UPDATE_IND16( baddudes );
 SCREEN_UPDATE_IND16( birdtry );
 SCREEN_UPDATE_IND16( robocop );
-SCREEN_UPDATE_IND16( automat );
 SCREEN_UPDATE_IND16( hippodrm );
 SCREEN_UPDATE_IND16( slyspy );
 SCREEN_UPDATE_IND16( midres );
 
+// bootlegs
+SCREEN_UPDATE_IND16( automat );
+SCREEN_UPDATE_IND16( secretab );
 
 /*----------- defined in machine/dec0.c -----------*/
 
