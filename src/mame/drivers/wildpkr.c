@@ -184,7 +184,7 @@ static VIDEO_START( wildpkr )
 
 static SCREEN_UPDATE_IND16( wildpkr )
 {
-	wildpkr_state *state = screen.machine().driver_data<wildpkr_state>();
+//	wildpkr_state *state = screen.machine().driver_data<wildpkr_state>();
 	return 0;
 }
 
