@@ -7,6 +7,7 @@
   - shanghai.c
   - adp.c
   - sigmab52.c
+  - wildpkr.c
 
   ACRTC memory map:
 
