@@ -39,6 +39,12 @@
 
  Boong-Ga Boong-Ga: the test mode is usable with a standard input configuration like the "common" one
 
+ The Semicom boards (at least) have a strange visible area, with the display output cutting off 4 lines
+ before you'd expect.  It has been confirmed on real hardware that these lines are simply never output,
+ no amount of stretching the screen renders them as visible.  The games are also programmed around this
+ assumption in many places, with visible sprite clipping issues at screen edges otherwise.  This does
+ result in some graphics also being cut off slightly, but that is correct.
+
  Undumped Semicom games on similar hardware:
    Wivern Wings - Semicom's orginal release with alt spelling of title
    Red Wyvern - A semi-sequel or update?
@@ -696,8 +702,28 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 }
 
 
+void vamphalf_handle_flipped_visible_area( screen_device &screen )
+{
+	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
+	// are there actually registers to handle this?
+	if(!state->m_flipscreen)
+	{
+		rectangle visarea;
+		visarea.set(31, 350, 16, 251);
+		screen.machine().primary_screen->configure(512, 256, visarea, HZ_TO_ATTOSECONDS(60));
+	}
+	else
+	{
+		rectangle visarea;
+		visarea.set(31, 350, 20, 255);
+		screen.machine().primary_screen->configure(512, 256, visarea, HZ_TO_ATTOSECONDS(60));
+	}
+}
+
+
 static SCREEN_UPDATE_IND16( common )
 {
+	vamphalf_handle_flipped_visible_area(screen);
 	bitmap.fill(0, cliprect);
 	draw_sprites(screen, bitmap);
 	return 0;
@@ -705,6 +731,7 @@ static SCREEN_UPDATE_IND16( common )
 
 static SCREEN_UPDATE_IND16( aoh )
 {
+//	vamphalf_handle_flipped_visible_area(screen); // not on this?
 	bitmap.fill(0, cliprect);
 	draw_sprites_aoh(screen, bitmap);
 	return 0;
@@ -919,6 +946,9 @@ static QS1000_INTERFACE( qs1000_intf )
 };
 
 
+
+
+
 static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
@@ -930,8 +960,8 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 255)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 251)
 	MCFG_SCREEN_UPDATE_STATIC(common)
 
 	MCFG_PALETTE_LENGTH(0x8000)

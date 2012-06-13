@@ -46,6 +46,8 @@ public:
 		m_janshi_widthflags(*this, "widthflags"),
 		m_janshi_unk2(*this, "unk2"),
 		m_janshi_vram2(*this, "vram2"),
+		m_janshi_paletteram(*this, "paletteram"),
+		m_janshi_paletteram2(*this, "paletteram2"),
 		m_janshi_crtc_regs(*this, "crtc_regs"){ }
 
 	required_shared_ptr<UINT8> m_janshi_back_vram;
@@ -54,6 +56,8 @@ public:
 	required_shared_ptr<UINT8> m_janshi_widthflags;
 	required_shared_ptr<UINT8> m_janshi_unk2;
 	required_shared_ptr<UINT8> m_janshi_vram2;
+	required_shared_ptr<UINT8> m_janshi_paletteram;
+	required_shared_ptr<UINT8> m_janshi_paletteram2;
 	required_shared_ptr<UINT8> m_janshi_crtc_regs;
 	UINT32 m_vram_addr;
 	int m_prev_writes;
@@ -73,24 +77,6 @@ public:
 };
 
 
-static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, pinkiri8_state )
-
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("back_vram") // bg tilemap?
-	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("vram1") // xpos, colour, tile number etc.
-
-	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_SHARE("unk1") // ?? height related?
-	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_SHARE("widthflags")
-	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_SHARE("unk2") // 2x increasing tables 00 10 20 30 etc.
-
-	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_SHARE("vram2") // y pos + unknown
-
-	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
-
-	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("crtc_regs")
-ADDRESS_MAP_END
-
-
 
 /* VDP device to give us our own memory map */
 
@@ -106,9 +92,32 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	address_space_config		m_space_config;
+
+
+
 };
 
+
+static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, janshi_vdp_device )
+
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("back_vram") // bg tilemap?
+	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("vram1") // xpos, colour, tile number etc.
+
+	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_SHARE("unk1") // ?? height related?
+	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_SHARE("widthflags")
+	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_SHARE("unk2") // 2x increasing tables 00 10 20 30 etc.
+
+	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_SHARE("vram2") // y pos + unknown
+
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM /*AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)*/ AM_SHARE("paletteram")
+	AM_RANGE(0xff2000, 0xff27ff) AM_RAM /*AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)*/ AM_SHARE("paletteram2")
+
+	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("crtc_regs")
+ADDRESS_MAP_END
+
 const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
+
+
 
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JANSHIVDP, "JANSHIVDP", tag, owner, clock),
@@ -116,6 +125,10 @@ janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *
 	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
 {
 }
+
+
+
+
 
 void janshi_vdp_device::device_config_complete()
 {
@@ -191,6 +204,16 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 	pinkiri8_state *state = screen.machine().driver_data<pinkiri8_state>();
 	int col_bank;
 	const gfx_element *gfx = screen.machine().gfx[0];
+
+	/* update palette */
+	for (int pen = 0; pen < 0x800 ; pen++)
+	{
+		UINT16 val = (state->m_janshi_paletteram[pen]) | (state->m_janshi_paletteram2[pen]<<8);
+		int r = (val & 0x001f) >> 0;
+		int g = (val & 0x03e0) >> 5;
+		int b = (val & 0x7c00) >> 10;
+		palette_set_color_rgb(screen.machine(), pen, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
 
 	int game_type_hack = 0;
 

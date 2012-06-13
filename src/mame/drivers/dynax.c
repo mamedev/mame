@@ -7223,5 +7223,5 @@ GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",  
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     GAME_SUPPORTS_SAVE )
 GAME( 1992, htengoku, 0,        htengoku, htengoku, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                 GAME_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
-GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_NO_COCKTAIL | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
 GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
