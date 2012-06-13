@@ -80,8 +80,10 @@
 
   - linkypip (Linky Pipe)
 
-      Game seems to randomly hang for unknown reasons at the "Round 1" screen
-      just before you can actually start playing.  Gets cought up here:
+      Linky Pipe seems to randomly hang based on the lower 2 bits of the
+      "dipswitches" at boot. Is this protection, some kind of left over
+      debug code, or a CPU bug? The game seems fine with those switches
+      left high. The code responsible for this issue is:
 
       40008176: MOV L10, L11
       40008178: LDW.P L5, L8
@@ -330,12 +332,11 @@ static INPUT_PORTS_START( linkypip )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x00000001, 0x00000001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000003, 0x00000003, "Don't Touch" ) PORT_DIPLOCATION("SW4:1,2") // See notes in header of source.
+	PORT_DIPSETTING(          0x00000000, "Fail (0)" )
+	PORT_DIPSETTING(          0x00000001, "Fail (1)" )
+	PORT_DIPSETTING(          0x00000002, "Fail (2)" )
+	PORT_DIPSETTING(          0x00000003, "Working (3)" )
 	PORT_DIPNAME( 0x0000000c, 0x0000000c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW4:3,4")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(          0x00000004, DEF_STR( 3C_1C ) )
@@ -1498,7 +1499,7 @@ static DRIVER_INIT( hidctch3 )
  *
  *************************************/
 
-GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith,   ROT0, "Eolith", "Linky Pipe", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith,   ROT0, "Eolith", "Linky Pipe", GAME_IMPERFECT_SOUND )
 GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith,   ROT0, "Eolith", "Iron Fortress", GAME_IMPERFECT_SOUND )
 GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", "Iron Fortress (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_IMPERFECT_SOUND ) // or Teurrin Geurim Chajgi '98
