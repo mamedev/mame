@@ -534,7 +534,7 @@ static MACHINE_START( doraemon )
 	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( doraemon, tnzs_state )
+static MACHINE_CONFIG_START( doraemon, champbwl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
