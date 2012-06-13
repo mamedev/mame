@@ -690,6 +690,12 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			}
 		}
 	}
+    else    // GCC 4.7.0 incorrectly claims these are uninitialized; humor it by initializing in the (hopefully rare) zero parameter case
+    {
+        param_start[0] = _BaseType(0.0);
+        param_dpdx[0] = _BaseType(0.0);
+        param_dpdy[0] = _BaseType(0.0);
+    }
 
 	// compute the X extents for each scanline
 	INT32 pixels = 0;

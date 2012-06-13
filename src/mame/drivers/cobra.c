@@ -288,7 +288,7 @@ static void fifo_push(const device_t *cpu, int id, UINT64 data)
 			printf("    ");
 			for (i=0; i < 4; i++)
 			{
-				UINT64 val;
+				UINT64 val = 0;
 				fifo_pop(cpu, id, &val);
 				printf("%08X ", (UINT32)(val));
 			}
@@ -368,7 +368,7 @@ static int fifo_pop(const device_t *cpu, int id, UINT64 *result)
 
 static int fifo_pop_float(const device_t *cpu, int id, float *result)
 {
-	UINT64 value;
+	UINT64 value = 0;
 	int status = fifo_pop(cpu, id, &value);
 	*result = u2f((UINT32)(value));
 	return status;
@@ -1063,7 +1063,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 
 	while (fifo_current_num(GFXFIFO_IN) >= 2)
 	{
-		UINT64 in1, in2;
+		UINT64 in1, in2 = 0;
 		UINT32 w1, w2;
 
 		if (gfx_re_status == RE_STATUS_IDLE)
@@ -1104,6 +1104,8 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				if (fifo_current_num(GFXFIFO_IN) < 6)
 				{
 					// wait until there's enough data in FIFO
+                    memset(param, 0, sizeof(param));
+                    memset(w, 0, sizeof(w));
 					return;
 				}
 
@@ -1151,7 +1153,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 			case 0x0f:
 			case 0xf0:
 			{
-				UINT64 in3, in4, ignore;
+				UINT64 in3 = 0, in4 = 0, ignore;
 
 				// check_mergebus_self(): 0x0F600000 0x10520C00
 
@@ -1346,7 +1348,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 
 					for (i=0; i < 3; i++)
 					{
-						UINT64 in;
+						UINT64 in = 0;
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 
 						fifo_pop(NULL, GFXFIFO_IN, &in);
@@ -1374,7 +1376,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				{
 					for (i=0; i < num; i+=2)
 					{
-						UINT64 in3, in4;
+						UINT64 in3 = 0, in4 = 0;
 						fifo_pop(NULL, GFXFIFO_IN, &in3);
 						fifo_pop(NULL, GFXFIFO_IN, &in4);
 						printf("                        %08X %08X (%f, %f)\n", (UINT32)(in3), (UINT32)(in4), u2f((UINT32)(in3)), u2f((UINT32)(in4)));
@@ -1501,7 +1503,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				// writes to n ram location starting from x?
 				for (i = 0; i < num; i++)
 				{
-					UINT64 value;
+					UINT64 value = 0;
 					fifo_pop(NULL, GFXFIFO_IN, &value);
 
 					gfx_gram[reg + (i*4) + 0] = (value >> 24) & 0xff;
@@ -1633,7 +1635,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 
 					for (i=0; i < num_left; i++)
 					{
-						UINT64 param;
+						UINT64 param = 0;
 						fifo_pop(NULL, GFXFIFO_IN, &param);
 						gfx_re_word_count++;
 
