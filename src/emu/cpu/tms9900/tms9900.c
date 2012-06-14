@@ -117,7 +117,7 @@ enum
 	ST_IM = 0x000f		// Interrupt mask
 };
 
-#define LOG printf
+#define LOG logerror
 #define VERBOSE 1
 
 /****************************************************************************
