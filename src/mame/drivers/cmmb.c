@@ -7,6 +7,8 @@ preliminary driver by Angelo Salese
 
 Earlier revisions of this cabinet did not include the bowling game.
  Known to exist "CMM Rev 1.03" (without Let's Go Bowling)
+ Let's Go Bowling is actually a completely new game by Cosmodog, not
+ a port or prototype of an old Atari game.
 
 TODO:
 - program banking;
@@ -31,12 +33,13 @@ Team Play
 
 Multipede 1.00 PCB by CosmoDog
 
-Flash ROM AT29C020
+U1  = WDC 65C02S8P-14
+U2  = Flash ROM AT29C020 (256KB)
+U4  = ISSI IS62LV256-45J (32KB)
+U5  = CY39100V208B (Cypress CPLD)
+U9  = CY37128-P100 (Cypress CPLD)
+U10 = CYC1399 (?)
 
-Cypress CY39100V208B
-CPU WDC 65C02S8P-14
-CY37128-P100
-CYC1399
 OSC @ 72.576MHz
 
 ***************************************************************************/
@@ -49,8 +52,9 @@ class cmmb_state : public driver_device
 {
 public:
 	cmmb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"){ }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram")
+	{ }
 
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_irq_mask;
@@ -298,7 +302,8 @@ GFXDECODE_END
 static INTERRUPT_GEN( cmmb_irq )
 {
 	//if(device->machine().input().code_pressed_once(KEYCODE_Z))
-	//  device_set_input_line(device, 0, HOLD_LINE);
+	//if(device->machine().input().code_pressed(KEYCODE_Z))
+//		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( cmmb )
@@ -308,7 +313,7 @@ static MACHINE_RESET( cmmb )
 static MACHINE_CONFIG_START( cmmb, cmmb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M65SC02,XTAL_72_576MHz/5) // Unknown clock, but chip rated for 14MHz
+	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_72_576MHz/5) // Unknown clock, but chip rated for 14MHz
 	MCFG_CPU_PROGRAM_MAP(cmmb_map)
 	MCFG_CPU_VBLANK_INT("screen",cmmb_irq)
 
@@ -347,4 +352,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2002, cmmb162,  0,       cmmb,  cmmb,  0, ROT270, "Infogrames / Cosmodog", "Multipede (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, cmmb162,  0,       cmmb,  cmmb,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Multipede (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
