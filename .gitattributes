@@ -563,6 +563,7 @@ src/emu/cpu/tms9900/tms9900.h svneol=native#text/plain
 src/emu/cpu/tms9900/tms9900l.c svneol=native#text/plain
 src/emu/cpu/tms9900/tms9900l.h svneol=native#text/plain
 src/emu/cpu/tms9900/tms9980a.c svneol=native#text/plain
+src/emu/cpu/tms9900/tms9980a.h svneol=native#text/plain
 src/emu/cpu/tms9900/tms9980al.c svneol=native#text/plain
 src/emu/cpu/tms9900/tms9995.c svneol=native#text/plain
 src/emu/cpu/tms9900/tms9995.h svneol=native#text/plain

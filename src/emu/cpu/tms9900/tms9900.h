@@ -49,6 +49,12 @@
 
 enum
 {
+	LOAD_INT = -1,
+	RESET_INT = -2
+};
+
+enum
+{
 	TI990_10_ID = 1,
 	TMS9900_ID = 3,
 	TMS9940_ID = 4,
@@ -61,7 +67,7 @@ enum
 	TMS99110A_ID = 12
 };
 
-#define MCFG_TMS9900_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)		\
+#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)		\
 	MCFG_DEVICE_ADD(_tag, _device, _clock)		\
 	MCFG_DEVICE_PROGRAM_MAP(_prgmap)			\
 	MCFG_DEVICE_IO_MAP(_iomap)					\
@@ -76,7 +82,18 @@ enum
 	LREX_OP = 7
 };
 
-typedef struct _tms9900_config
+static const char opname[][5] =
+{   "ILL ", "A   ", "AB  ", "ABS ", "AI  ", "ANDI", "B   ", "BL  ", "BLWP", "C   ",
+	"CI  ", "CB  ", "CKOF", "CKON", "CLR ", "COC ", "CZC ", "DEC ", "DECT", "DIV ",
+	"IDLE", "INC ", "INCT", "INV ", "JEQ ", "JGT ", "JH  ", "JHE ", "JL  ", "JLE ",
+	"JLT ", "JMP ", "JNC ", "JNE ", "JNO ", "JOC ", "JOP ", "LDCR", "LI  ", "LIMI",
+	"LREX", "LWPI", "MOV ", "MOVB", "MPY ", "NEG ", "ORI ", "RSET",	"RTWP", "S   ",
+	"SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ", "SOCB", "SRA ", "SRC ", "SRL ",
+	"STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB", "TB  ", "X   ", "XOP ", "XOR ",
+	"*int"
+};
+
+typedef struct _tms99xx_config
 {
 	devcb_write8		external_callback;
 	devcb_read8			irq_level;
@@ -84,15 +101,19 @@ typedef struct _tms9900_config
 	devcb_write_line	clock_out;
 	devcb_write_line	wait_line;
 	devcb_write_line	holda_line;
-} tms9900_config;
+} tms99xx_config;
 
-#define TMS9900_CONFIG(name) \
-	const tms9900_config(name) =
+#define TMS99xx_CONFIG(name) \
+	const tms99xx_config(name) =
 
-class tms9900_device : public cpu_device
+class tms99xx_device : public cpu_device
 {
 public:
-	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
+				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
+				device_t *owner, UINT32 clock);
+
+	~tms99xx_device();
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	void set_ready(int state);
@@ -122,7 +143,23 @@ protected:
 
 	const address_space_config* memory_space_config(address_spacenum spacenum) const;
 
-private:
+	// Let these methods be overloaded by the TMS9980.
+	virtual void		mem_read(void);
+	virtual void		mem_write(void);
+	virtual void		acquire_instruction(void);
+	void				decode(UINT16 inst);
+
+	const address_space_config	m_program_config;
+	const address_space_config	m_io_config;
+	address_space*			m_prgspace;
+	address_space*			m_cru;
+
+	virtual UINT16	read_workspace_register_debug(int reg);
+	virtual void	write_workspace_register_debug(int reg, UINT16 data);
+
+	// Cycle counter
+	int 	m_icount;
+
 	// TMS9900 hardware registers
 	UINT16	WP; 	// Workspace pointer
 	UINT16	PC; 	// Program counter
@@ -131,29 +168,65 @@ private:
 	// Internal register
 	UINT16	IR;		// Instruction register
 
+	// Stored address
+	UINT16	m_address;
+
+	// Stores the recently read word or the word to be written
+	UINT16	m_current_value;
+
 	// Decoded command
 	UINT16	m_command;
 
+	// Issue clock pulses. Note that each machine cycle has two clock cycles.
+	void pulse_clock(int count);
+
+	// For multi-pass operations. For instance, memory word accesses are
+	// executed as two consecutive byte accesses. CRU accesses are repeated
+	// single-bit accesses. (Needed for TMS9980)
+	int		m_pass;
+
+	// Data bus width. Needed for TMS9980.
+	int 	m_databus_width;
+
+	// Needed for TMS9980
+	bool	m_lowbyte;
+
+	// Check the READY line?
+	bool	m_check_ready;
+
+	// Max address
+	const UINT16  m_prgaddr_mask;
+	const UINT16  m_cruaddr_mask;
+
+	bool	m_load_state;
+	bool	m_irq_state;
+	bool	m_reset;
+
+	// Determine the interrupt level using the IC0-IC2/3 lines
+	virtual int get_intlevel(int state);
+
+	// Interrupt level as acquired from input lines (TMS9900: IC0-IC3, TMS9980: IC0-IC2)
+	// We assume all values right-justified, i.e. TMS9980 also counts up by one
+	int 	m_irq_level;
+
+	// Used to display the number of consumed cycles in the log.
+	int		m_first_cycle;
+
+	// Signal to the outside world that we are now getting an instruction
+	devcb_resolved_write_line	m_iaq_line;
+
+	// Get the value of the interrupt level lines
+	devcb_resolved_read8	m_get_intlevel;
+
+private:
 	// Indicates if this is a byte-oriented command
 	inline bool 	byte_operation();
 
-	const address_space_config		m_program_config;
-	const address_space_config		m_io_config;
-	address_space*					m_prgspace;
-	address_space*					m_cru;
-
 	// Processor states
 	bool	m_idle_state;
-	bool	m_load_state;
-	bool	m_irq_state;
 	bool	m_ready_state;
 	bool	m_wait_state;
 	bool	m_hold_state;
-
-	bool	m_reset;
-
-	int 	m_irq_level;	// Interrupt level as acquired from input lines IC0-IC3
-	int 	m_icount;		// Cycle counter
 
 	// State / debug management
 	UINT16	m_state_any;
@@ -161,8 +234,6 @@ private:
 	void	state_import(const device_state_entry &entry);
 	void	state_export(const device_state_entry &entry);
 	void	state_string_export(const device_state_entry &entry, astring &string);
-	UINT16	read_workspace_register_debug(int reg);
-	void	write_workspace_register_debug(int reg, UINT16 data);
 
 	// Interrupt handling
 	void service_interrupt();
@@ -176,7 +247,7 @@ private:
 	typedef const UINT8* microprogram;
 
 	// Method pointer
-	typedef void (tms9900_device::*ophandler)(void);
+	typedef void (tms99xx_device::*ophandler)(void);
 
 	// Opcode list entry
 	typedef struct _tms_instruction
@@ -201,18 +272,16 @@ private:
 	lookup_entry*	m_lotables[32];
 
 	// List of pointers for micro-operations
-	static const tms9900_device::ophandler s_microoperation[];
+	static const tms99xx_device::ophandler s_microoperation[];
 
 	// Opcode table
-	static const tms9900_device::tms_instruction s_command[];
+	static const tms99xx_device::tms_instruction s_command[];
 
 	// Micro-operation declarations
-	void	acquire_instruction(void);
-	void	mem_read(void);
-	void	mem_write(void);
 	void	register_read(void);
 	void	register_write(void);
-	void	cru_operation(void);
+	void	cru_input_operation(void);
+	void	cru_output_operation(void);
 	void	data_derivation_subprogram(void);
 	void	return_from_subprogram(void);
 	void	command_completed(void);
@@ -258,9 +327,6 @@ private:
 	void	alu_int(void);
 
 	void	abort_operation(void);
-	UINT16	pulse_and_read_memory(UINT16 address);
-	void	pulse_and_write_memory(UINT16 address, UINT16 data);
-	void	decode(UINT16 inst);
 
 	// Micro-operation
 	UINT8	m_op;
@@ -278,26 +344,14 @@ private:
 	// State of the micro-operation. Needed for repeated ALU calls.
 	int 	m_state;
 
-	// Check the READY line?
-	bool	m_check_ready;
-
 	// Has HOLD been acknowledged yet?
 	bool	m_hold_acknowledged;
-
-	// Issue clock pulses. Note that each machine cycle has two clock cycles.
-	inline void pulse_clock(int count);
 
 	// Signal the wait state via the external line
 	inline void set_wait_state(bool state);
 
 	// Used to acknowledge HOLD and enter the HOLD state
 	inline void acknowledge_hold();
-
-	// Stored address
-	UINT16	m_address;
-
-	// Stores the recently read word or the word to be written
-	UINT16	m_current_value;
 
 	// Was the source operand a byte from an even address?
 	bool m_source_even;
@@ -308,6 +362,10 @@ private:
 	// Intermediate storage for the source operand
 	UINT16 m_source_address;
 	UINT16 m_source_value;
+	UINT16	m_address_saved;
+
+	// Another copy of the address
+	UINT16	m_address_copy;
 
 	// Stores the recently read register contents
 	UINT16	m_register_contents;
@@ -315,14 +373,14 @@ private:
 	// Stores the register number for the next register access
 	int 	m_regnumber;
 
-	// CRU support: Indicates whether the CRU shall be configured to output mode
-	bool	m_cru_output;
-
 	// CRU support: Stores the CRU address
 	UINT16	m_cru_address;
 
 	// CRU support: Stores the number of bits to be transferred
 	int		m_count;
+
+	// Copy of the value
+	UINT16	m_value_copy;
 
 	// Another internal register, storing intermediate values
 	// Using 32 bits to support MPY
@@ -335,9 +393,6 @@ private:
 	inline void set_status_bit(int bit, bool state);
 	inline void compare_and_set_lae(UINT16 value1, UINT16 value2);
 	void set_status_parity(UINT8 value);
-
-	// Used to display the number of consumed cycles in the log.
-	int		m_first_cycle;
 
 	/************************************************************************/
 
@@ -363,12 +418,6 @@ private:
 	// chip emulations we use a dedicated callback.
 	devcb_resolved_write8	m_external_operation;
 
-	// Get the value of the interrupt level lines
-	devcb_resolved_read8	m_get_ic0123;
-
-	// Signal to the outside world that we are now getting an instruction
-	devcb_resolved_write_line	m_iaq_line;
-
 	// Clock output. This is not a pin of the TMS9900 because the TMS9900
 	// needs an external clock, and usually one of those external lines is
 	// used for this purpose.
@@ -380,6 +429,15 @@ private:
 	// HOLD Acknowledge line. When asserted (high), the CPU is in HOLD state.
 	devcb_resolved_write_line	m_holda_line;
 };
+
+/*****************************************************************************/
+
+class tms9900_device : public tms99xx_device
+{
+public:
+	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 unsigned Dasm9900(char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);
 

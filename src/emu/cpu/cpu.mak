@@ -1608,6 +1608,7 @@ ifneq ($(filter TMS9900,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms9900
 CPUOBJS += $(CPUOBJ)/tms9900/tms9900.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9900l.o
+CPUOBJS += $(CPUOBJ)/tms9900/tms9980a.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9980al.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9995.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9995l.o
@@ -1623,13 +1624,18 @@ $(CPUOBJ)/tms9900/tms9900l.o:	$(CPUSRC)/tms9900/tms9900l.c \
 								$(CPUSRC)/tms9900/99xxcore.h \
 								$(CPUSRC)/tms9900/99xxstat.h
 
+$(CPUOBJ)/tms9900/tms9980a.o:	$(CPUSRC)/tms9900/tms9980a.c \
+								$(CPUSRC)/tms9900/tms9980a.h \
+								$(CPUSRC)/tms9900/tms9900.c \
+								$(CPUSRC)/tms9900/tms9900.h
+
 $(CPUOBJ)/tms9900/tms9980al.o:	$(CPUSRC)/tms9900/tms9980al.c \
 								$(CPUSRC)/tms9900/tms9900l.h \
 								$(CPUSRC)/tms9900/99xxcore.h \
 								$(CPUSRC)/tms9900/99xxstat.h
 
 $(CPUOBJ)/tms9900/tms9995.o:	$(CPUSRC)/tms9900/tms9995.c \
-								$(CPUSRC)/tms9900/tms9900.h
+								$(CPUSRC)/tms9900/tms9995.h
 
 $(CPUOBJ)/tms9900/tms9995l.o:	$(CPUSRC)/tms9900/tms9995l.c \
 								$(CPUSRC)/tms9900/tms9900l.h \
