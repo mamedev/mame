@@ -18,7 +18,6 @@
   - Happy Hunter (shooting themed prize game)
 
   To Do:
-  - QDSP QS1000 sound core
   - Legend of Heroes link up, 2 cabinets can be linked for a 4 player game
 
 */
@@ -26,8 +25,8 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"
+#include "sound/qs1000.h"
 #include "sound/okim6295.h"
-#include "cpu/mcs51/mcs51.h"
 
 
 class limenko_state : public driver_device
@@ -64,6 +63,7 @@ public:
 	DECLARE_WRITE32_MEMBER(md_videoram_w);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(spotty_soundlatch_w);
+    DECLARE_WRITE32_MEMBER(limenko_soundlatch_w);
 	DECLARE_WRITE32_MEMBER(spriteram_buffer_w);
 	DECLARE_WRITE8_MEMBER(spotty_sound_cmd_w);
 	DECLARE_READ8_MEMBER(spotty_sound_cmd_r);
@@ -73,6 +73,11 @@ public:
 	DECLARE_READ32_MEMBER(sb2003_speedup_r);
 	DECLARE_READ32_MEMBER(spotty_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
+    
+    DECLARE_READ8_MEMBER(qs1000_p1_r);
+    DECLARE_WRITE8_MEMBER(qs1000_p1_w);
+    DECLARE_WRITE8_MEMBER(qs1000_p2_w);
+    DECLARE_WRITE8_MEMBER(qs1000_p3_w);    
 };
 
 
@@ -123,11 +128,6 @@ WRITE32_MEMBER(limenko_state::fg_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
-{
-	soundlatch_byte_w(space, 0, (data >> 16) & 0xff);
-}
-
 CUSTOM_INPUT_MEMBER(limenko_state::spriteram_bit_r)
 {
 	return m_spriteram_bit;
@@ -159,6 +159,54 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 }
 
 /*****************************************************************************************************
+ SOUND FUNCTIONS
+ *****************************************************************************************************/
+
+WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
+{
+	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");    
+	
+    soundlatch_byte_w(space, 0, data >> 16);
+    qs1000->set_irq(ASSERT_LINE);
+	
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));	    
+}
+
+WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
+{
+	soundlatch_byte_w(space, 0, data >> 16);
+}
+
+READ8_MEMBER(limenko_state::qs1000_p1_r)
+{    
+    return soundlatch_byte_r(space, 0);
+}
+
+WRITE8_MEMBER(limenko_state::qs1000_p1_w)
+{
+
+}
+
+WRITE8_MEMBER(limenko_state::qs1000_p2_w)
+{
+	// Unknown. Often written with 0
+}
+
+WRITE8_MEMBER(limenko_state::qs1000_p3_w)
+{
+	// .... .xxx - Data ROM bank (64kB)
+	// ...x .... - ?
+	// ..x. .... - /IRQ clear
+
+	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
+	
+	membank("qs1000:bank")->set_entry(data & 0x07);
+
+	if (!BIT(data, 5))
+		qs1000->set_irq(CLEAR_LINE);
+}
+
+/*****************************************************************************************************
   MEMORY MAPS
 *****************************************************************************************************/
 
@@ -183,7 +231,7 @@ static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32, limenko_state )
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(limenko_coincounter_w)
 	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x5000, 0x5003) AM_WRITENOP // sound latch
+	AM_RANGE(0x5000, 0x5003) AM_WRITE(limenko_soundlatch_w)
 ADDRESS_MAP_END
 
 
@@ -672,6 +720,26 @@ GFXDECODE_END
 
 
 /*****************************************************************************************************
+ INTERFACES
+ *****************************************************************************************************/
+
+static QS1000_INTERFACE( qs1000_intf )
+{
+	/* External ROM */
+	true,
+	
+	/* P1-P3 read handlers */
+	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_r),
+    DEVCB_NULL,
+	DEVCB_NULL,
+    
+	/* P1-P3 write handlers */
+	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_w),
+	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p2_w),
+	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p3_w),
+};
+
+/*****************************************************************************************************
   MACHINE DRIVERS
 *****************************************************************************************************/
 
@@ -698,6 +766,11 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_VIDEO_START(limenko)
 
 	/* sound hardware */
+    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+    MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+    MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+    MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spotty, limenko_state )
@@ -775,11 +848,9 @@ ROM_START( dynabomb )
 	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "rom.u5", 0x000000, 0x200000, CRC(7e837adf) SHA1(8613fa187b8d4574b3935aa439aec2515033d64c) )
 
-	ROM_REGION( 0x220000, "cpu1", 0 ) /* sound cpu + data */
-	ROM_LOAD( "rom.u16", 0x000000, 0x020000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a) )
-	ROM_LOAD( "rom.u17", 0x020000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
-	ROM_LOAD( "rom.u18", 0x020000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
-	// u19 empty
+	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
+	ROM_LOAD( "rom.u16", 0x00000, 0x20000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a) )
+	ROM_FILL(            0x20000, 0x60000, 0xff)
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "rom.u1", 0x000000, 0x200000, CRC(bf33eff6) SHA1(089b6d88d6d744bcfa036c6869f0444d6ceb26c9) )
@@ -787,10 +858,12 @@ ROM_START( dynabomb )
 	ROM_LOAD32_BYTE( "rom.u3", 0x000002, 0x200000, CRC(ec094b12) SHA1(13c105df066ff308cc7e1842907644790946e5b5) )
 	ROM_LOAD32_BYTE( "rom.u4", 0x000003, 0x200000, CRC(88b24e3c) SHA1(5f267f08144b413b55ef5e15c52e9cda096b80e7) )
 
-	ROM_REGION( 0x200000, "wavetable", 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
-
-	// u20 empty
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
+    ROM_LOAD( "rom.u18",  0x000000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
+    ROM_LOAD( "rom.u17",  0x080000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
+	ROM_LOAD( "qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	// U19 empty
+	// U20 empty
 ROM_END
 
 ROM_START( sb2003 ) /* No specific Country/Region */
@@ -800,11 +873,9 @@ ROM_START( sb2003 ) /* No specific Country/Region */
 	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASEFF )
 	// u5 empty
 
-	ROM_REGION( 0x220000, "cpu1", 0 ) /* sound cpu + data */
-	ROM_LOAD( "07.u16", 0x000000, 0x020000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
-	// u17 empty
-	ROM_LOAD( "06.u18", 0x020000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
-	// u19 empty
+	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
+	ROM_LOAD( "07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
+	ROM_FILL(           0x20000, 0x60000, 0xff)
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
@@ -812,10 +883,12 @@ ROM_START( sb2003 ) /* No specific Country/Region */
 	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
 	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
 
-	ROM_REGION( 0x200000, "wavetable", 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
-
-	// u20 (S-ROM) empty
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
+	ROM_LOAD( "06.u18",    0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
+	ROM_LOAD( "qs1003.u4", 0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+    // U17 empty
+	// U19 empty
+	// U20 (S-ROM) empty
 ROM_END
 
 ROM_START( sb2003a ) /* Asia Region */
@@ -825,11 +898,9 @@ ROM_START( sb2003a ) /* Asia Region */
 	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASEFF )
 	// u5 empty
 
-	ROM_REGION( 0x220000, "cpu1", 0 ) /* sound cpu + data */
-	ROM_LOAD( "07.u16", 0x000000, 0x020000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
-	// u17 empty
-	ROM_LOAD( "06.u18", 0x020000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
-	// u19 empty
+	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
+	ROM_LOAD( "07.u16", 0x00000, 0x20000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
+	ROM_FILL(           0x20000, 0x60000, 0xff)
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
@@ -837,10 +908,12 @@ ROM_START( sb2003a ) /* Asia Region */
 	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
 	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
 
-	ROM_REGION( 0x200000, "wavetable", 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
-
-	// u20 (S-ROM) empty
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROM */
+	ROM_LOAD( "06.u18",   0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
+	ROM_LOAD( "qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	// U17 empty
+	// U19 empty
+	// U20 (S-ROM) empty
 ROM_END
 
 /*
@@ -942,13 +1015,13 @@ ROM_START( legendoh )
 	ROM_LOAD32_BYTE( "04.cg_rom32",  0x1000002, 0x080000, CRC(3f486cab) SHA1(6507d4bb9b4aa7d43f1026e932c82629d4fa44dd) )
 	ROM_LOAD32_BYTE( "05.cg_rom42",  0x1000003, 0x080000, CRC(5d807bec) SHA1(c72c77ed0478f705018519cf68a54d22524d05fd) )
 
-	ROM_REGION( 0x200000, "sfx", 0 ) /* sounds */
-	ROM_LOAD( "sou_prg.06",   0x000000, 0x80000, CRC(bfafe7aa) SHA1(3e65869fe0970bafb59a0225642834042fdedfa6) )
-	ROM_LOAD( "sou_rom.07",   0x000000, 0x80000, CRC(4c6eb6d2) SHA1(58bced7bd944e03b0e3dfe1107c01819a33b2b31) )
-	ROM_LOAD( "sou_rom.08",   0x000000, 0x80000, CRC(42c32dd5) SHA1(4702771288ba40119de63feb67eed85667235d81) )
+	ROM_REGION( 0x80000, "qs1000:cpu", 0 ) /* QS1000 CPU */
+	ROM_LOAD( "sou_prg.06", 0x000000, 0x80000, CRC(bfafe7aa) SHA1(3e65869fe0970bafb59a0225642834042fdedfa6) )
 
-	ROM_REGION( 0x200000, "wavetable", 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
+	ROM_LOAD( "sou_rom.07", 0x000000, 0x080000, CRC(4c6eb6d2) SHA1(58bced7bd944e03b0e3dfe1107c01819a33b2b31) )
+	ROM_LOAD( "sou_rom.08", 0x080000, 0x080000, CRC(42c32dd5) SHA1(4702771288ba40119de63feb67eed85667235d81) )
+	ROM_LOAD( "qs1003.u4",  0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 ROM_END
 
 /*
@@ -1039,12 +1112,23 @@ READ32_MEMBER(limenko_state::spotty_speedup_r)
 	return m_mainram[0x6626c/4];
 }
 
+static DRIVER_INIT( common )
+{
+	limenko_state *state = machine.driver_data<limenko_state>();
+
+	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
+	machine.device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
+	state->membank("qs1000:bank")->configure_entries(0, 8, state->memregion("qs1000:cpu")->base()+0x100, 0x10000);	
+	
+	state->m_spriteram_bit = 1;
+}
+
 static DRIVER_INIT( dynabomb )
 {
 	limenko_state *state = machine.driver_data<limenko_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), state));
 
-	state->m_spriteram_bit = 1;
+	DRIVER_INIT_CALL(common);
 }
 
 static DRIVER_INIT( legendoh )
@@ -1052,7 +1136,7 @@ static DRIVER_INIT( legendoh )
 	limenko_state *state = machine.driver_data<limenko_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), state));
 
-	state->m_spriteram_bit = 1;
+	DRIVER_INIT_CALL(common);
 }
 
 static DRIVER_INIT( sb2003 )
@@ -1060,8 +1144,9 @@ static DRIVER_INIT( sb2003 )
 	limenko_state *state = machine.driver_data<limenko_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), state));
 
-	state->m_spriteram_bit = 1;
+	DRIVER_INIT_CALL(common);
 }
+
 
 static DRIVER_INIT( spotty )
 {
@@ -1084,10 +1169,10 @@ static DRIVER_INIT( spotty )
 	state->m_spriteram_bit = 1;
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_NO_SOUND )
-GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",                   GAME_NO_SOUND )
-GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", GAME_NO_SOUND )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_NO_SOUND )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_IMPERFECT_SOUND )
+GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",                   GAME_IMPERFECT_SOUND )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", GAME_IMPERFECT_SOUND )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_IMPERFECT_SOUND )
 
 // this game only use the same graphics chip used in limenko's system
 GAME( 2001, spotty,   0,      spotty,  spotty,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",             GAME_NO_SOUND )
