@@ -602,7 +602,7 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 //  AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 
 	AM_RANGE(0x0360, 0x0363) AM_WRITE8(flash_w,0xffffffff)
 

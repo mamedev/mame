@@ -384,26 +384,26 @@ static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, i
 
 READ64_MEMBER(viper_state::pci_config_addr_r)
 {
-	device_t *device = machine().device("pcibus");
-	return pci_64be_r(device, 0, U64(0xffffffff00000000));
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	return device->read_64be(space, 0, U64(0xffffffff00000000));
 }
 
 WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
-	device_t *device = machine().device("pcibus");
-	pci_64be_w(device, 0, data, U64(0xffffffff00000000));
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	device->write_64be(space, 0, data, U64(0xffffffff00000000));
 }
 
 READ64_MEMBER(viper_state::pci_config_data_r)
 {
-	device_t *device = machine().device("pcibus");
-	return pci_64be_r(device, 1, U64(0x00000000ffffffff)) << 32;
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	return device->read_64be(space, 1, U64(0x00000000ffffffff)) << 32;
 }
 
 WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
-	device_t *device = machine().device("pcibus");
-	pci_64be_w(device, 1, data >> 32, U64(0x00000000ffffffff));
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	device->write_64be(space, 1, data >> 32, U64(0x00000000ffffffff));
 }
 
 

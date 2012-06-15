@@ -540,7 +540,7 @@ static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32, gamecstl_state )
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

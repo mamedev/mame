@@ -70,50 +70,41 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "devconv.h"
 #include "machine/pci.h"
 
 #define LOG_PCI	0
 
-typedef struct _pci_bus_state pci_bus_state;
-struct _pci_bus_state
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type PCI_BUS = &device_creator<pci_bus_device>;
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  pci_bus_device - constructor
+//-------------------------------------------------
+pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
+		m_father(NULL)
 {
-	device_t *	busdevice;
-	const pci_bus_config *	config;
-	device_t *	device[32];
-	pci_bus_state *		siblings[8];
-	UINT8				siblings_busnum[8];
-	int					siblings_count;
-	offs_t					address;
-	INT8					devicenum; // device number we are addressing
-	INT8					busnum; // pci bus number we are addressing
-	pci_bus_state *		busnumaddr; // pci bus we are addressing
-};
-
-
+	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
+		m_devtag[i]= NULL;
+		m_read_callback[i] = NULL;
+		m_write_callback[i] = NULL;
+	}
+	m_siblings_count = 0;
+}
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    get_safe_token - makes sure that the passed
-    in device is, in fact, a PCI bus
--------------------------------------------------*/
-
-INLINE pci_bus_state *get_safe_token(device_t *device)
+READ32_MEMBER( pci_bus_device::read )
 {
-	assert(device != NULL);
-	assert(device->type() == PCI_BUS);
-
-	return (pci_bus_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-
-
-READ32_DEVICE_HANDLER( pci_32le_r )
-{
-	pci_bus_state *pcibus = get_safe_token(device);
 	UINT32 result = 0xffffffff;
 	int function, reg;
 
@@ -122,43 +113,43 @@ READ32_DEVICE_HANDLER( pci_32le_r )
 	switch (offset)
 	{
 		case 0:
-			result = pcibus->address;
+			result = m_address;
 			break;
 
 		case 1:
-			if (pcibus->devicenum != -1)
+			if (m_devicenum != -1)
 			{
-				pci_read_func read = pcibus->busnumaddr->config->device[pcibus->devicenum].read_callback;
+				pci_read_func read = m_busnumaddr->m_read_callback[m_devicenum];
 				if (read != NULL)
 				{
-					function = (pcibus->address >> 8) & 0x07;
-					reg = (pcibus->address >> 0) & 0xfc;
-					result = (*read)(pcibus->busnumaddr->busdevice, pcibus->busnumaddr->device[pcibus->devicenum], function, reg, mem_mask);
+					function = (m_address >> 8) & 0x07;
+					reg = (m_address >> 0) & 0xfc;
+					result = (*read)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, mem_mask);
 				}
 			}
 			break;
 	}
 
 	if (LOG_PCI)
-		logerror("pci_32le_r('%s'): offset=%d result=0x%08X\n", device->tag(), offset, result);
+		logerror("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
 
 	return result;
 }
 
 
 
-static pci_bus_state *pci_search_bustree(int busnum, int devicenum, pci_bus_state *pcibus)
+pci_bus_device *pci_bus_device::pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus)
 {
-int a;
-pci_bus_state *ret;
+	int a;
+	pci_bus_device *ret;
 
-	if (pcibus->config->busnum == busnum)
+	if (pcibus->m_busnum == busnum)
 	{
 		return pcibus;
 	}
-	for (a = 0; a < pcibus->siblings_count; a++)
+	for (a = 0; a < pcibus->m_siblings_count; a++)
 	{
-		ret = pci_search_bustree(busnum, devicenum, pcibus->siblings[a]);
+		ret = pci_search_bustree(busnum, devicenum, pcibus->m_siblings[a]);
 		if (ret != NULL)
 			return ret;
 	}
@@ -167,50 +158,48 @@ pci_bus_state *ret;
 
 
 
-WRITE32_DEVICE_HANDLER( pci_32le_w )
+WRITE32_MEMBER( pci_bus_device::write )
 {
-	pci_bus_state *pcibus = get_safe_token(device);
-
 	offset %= 2;
 
 	if (LOG_PCI)
-		logerror("pci_32le_w('%s'): offset=%d data=0x%08X\n", device->tag(), offset, data);
+		logerror("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
 
 	switch (offset)
 	{
 		case 0:
-			pcibus->address = data;
+			m_address = data;
 
 			/* lookup current device */
-			if (pcibus->address & 0x80000000)
+			if (m_address & 0x80000000)
 			{
-				int busnum = (pcibus->address >> 16) & 0xff;
-				int devicenum = (pcibus->address >> 11) & 0x1f;
-				pcibus->busnumaddr = pci_search_bustree(busnum, devicenum, pcibus);
-				if (pcibus->busnumaddr != NULL)
+				int busnum = (m_address >> 16) & 0xff;
+				int devicenum = (m_address >> 11) & 0x1f;
+				m_busnumaddr = pci_search_bustree(busnum, devicenum, this);
+				if (m_busnumaddr != NULL)
 				{
-					pcibus->busnum = busnum;
-					pcibus->devicenum = devicenum;
+					m_busnumber = busnum;
+					m_devicenum = devicenum;
 				}
 				else
-					pcibus->devicenum = -1;
+					m_devicenum = -1;
 				if (LOG_PCI)
 					logerror("  bus:%d device:%d\n", busnum, devicenum);
 			}
 			break;
 
 		case 1:
-			if (pcibus->devicenum != -1)
+			if (m_devicenum != -1)
 			{
-				pci_write_func write = pcibus->busnumaddr->config->device[pcibus->devicenum].write_callback;
+				pci_write_func write = m_busnumaddr->m_write_callback[m_devicenum];
 				if (write != NULL)
 				{
-					int function = (pcibus->address >> 8) & 0x07;
-					int reg = (pcibus->address >> 0) & 0xfc;
-					(*write)(pcibus->busnumaddr->busdevice, pcibus->busnumaddr->device[pcibus->devicenum], function, reg, data, mem_mask);
+					int function = (m_address >> 8) & 0x07;
+					int reg = (m_address >> 0) & 0xfc;
+					(*write)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, data, mem_mask);
 				}
 				if (LOG_PCI)
-					logerror("  function:%d register:%d\n", (pcibus->address >> 8) & 0x07, (pcibus->address >> 0) & 0xfc);
+					logerror("  function:%d register:%d\n", (m_address >> 8) & 0x07, (m_address >> 0) & 0xfc);
 			}
 			break;
 	}
@@ -218,118 +207,83 @@ WRITE32_DEVICE_HANDLER( pci_32le_w )
 
 
 
-READ64_DEVICE_HANDLER(pci_64be_r) { return read64be_with_32le_device_handler(pci_32le_r, device, offset, mem_mask); }
-WRITE64_DEVICE_HANDLER(pci_64be_w) { write64be_with_32le_device_handler(pci_32le_w, device, offset, data, mem_mask); }
+READ64_MEMBER(pci_bus_device::read_64be) 
+{ 
+	UINT64 result = 0;
+	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	if (ACCESSING_BITS_0_31)
+		result |= (UINT64)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
+	if (ACCESSING_BITS_32_63)
+		result |= (UINT64)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
+	return FLIPENDIAN_INT64(result);
+}
 
-
-int pci_add_sibling( running_machine &machine, char *pcitag, char *sibling )
-{
-	device_t *device1 = machine.device(pcitag);
-	device_t *device2 = machine.device(sibling);
-	pci_bus_state *pcibus1 = get_safe_token(device1);
-	pci_bus_state *pcibus2 = get_safe_token(device2);
-	pci_bus_config *config2;
-
-	if ((device1 == NULL) || (device2 == NULL) || (pcibus1 == NULL) || (pcibus2 == NULL))
-		return 0;
-	if (pcibus1->siblings_count == 8)
-		return 0;
-	config2 = (pci_bus_config *)downcast<const legacy_device_base *>(device2)->inline_config();
-	pcibus1->siblings[pcibus1->siblings_count] = get_safe_token(device2);
-	pcibus1->siblings_busnum[pcibus1->siblings_count] = config2->busnum;
-	pcibus1->siblings_count++;
-	return 1;
+WRITE64_MEMBER(pci_bus_device::write_64be)
+{ 
+	data = FLIPENDIAN_INT64(data);
+	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	if (ACCESSING_BITS_0_31)
+		write(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
+	if (ACCESSING_BITS_32_63)
+		write(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
-
-
-static void pci_bus_postload(pci_bus_state *pcibus)
+void pci_bus_device::add_sibling(pci_bus_device *sibling, int busnum)
 {
-	if (pcibus->devicenum != -1)
+	m_siblings[m_siblings_count] = sibling;
+	m_siblings_busnum[m_siblings_count] = busnum;
+	m_siblings_count++;
+}
+
+
+//-------------------------------------------------
+//  device_post_load - handle updating after a
+//  restore
+//-------------------------------------------------
+
+void pci_bus_device::device_post_load()
+{
+	if (m_devicenum != -1)
 	{
-		pcibus->busnumaddr = pci_search_bustree(pcibus->busnum, pcibus->devicenum, pcibus);
+		m_busnumaddr = pci_search_bustree(m_busnumber, m_devicenum, this);
 	}
 }
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
-
-static DEVICE_START( pci_bus )
+void pci_bus_device::device_start()
 {
-	pci_bus_state *pcibus = get_safe_token(device);
-	int devicenum;
-
-	/* validate some basic stuff */
-	assert(device != NULL);
-	assert(device->static_config() == NULL);
-	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
-
 	/* store a pointer back to the device */
-	pcibus->config = (const pci_bus_config *)downcast<const legacy_device_base *>(device)->inline_config();
-	pcibus->busdevice = device;
-	pcibus->devicenum = -1;
+	m_devicenum = -1;
 
 	/* find all our devices */
-	for (devicenum = 0; devicenum < ARRAY_LENGTH(pcibus->device); devicenum++)
-		if (pcibus->config->device[devicenum].devtag != NULL)
-			pcibus->device[devicenum] = device->machine().device(pcibus->config->device[devicenum].devtag);
+	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
+		if (m_devtag[i] != NULL)
+			m_device[i] = machine().device(m_devtag[i]);
 
-	if (pcibus->config->father != NULL)
-		pci_add_sibling(device->machine(), (char *)pcibus->config->father, (char *)device->tag());
+	if (m_father != NULL) {
+		pci_bus_device *father = machine().device<pci_bus_device>(m_father);
+		if (father)
+			father->add_sibling(this, m_busnum);
+	}
 
 	/* register pci states */
-	device->save_item(NAME(pcibus->address));
-	device->save_item(NAME(pcibus->devicenum));
-	device->save_item(NAME(pcibus->busnum));
-
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(pci_bus_postload), pcibus));
+	save_item(NAME(m_address));
+	save_item(NAME(m_devicenum));
+	save_item(NAME(m_busnum));
 }
 
 
-/*-------------------------------------------------
-    device reset callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-static DEVICE_RESET( pci_bus )
+void pci_bus_device::device_reset()
 {
-	pci_bus_state *pcibus = get_safe_token(device);
-
 	/* reset the drive state */
-	pcibus->devicenum = -1;
-	pcibus->address = 0;
+	m_devicenum = -1;
+	m_address = 0;
 }
-
-
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( pci_bus )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pci_bus_state);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(pci_bus_config);		break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pci_bus); break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(pci_bus);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "PCI Bus");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Peripherial Bus");		break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
-DEFINE_LEGACY_DEVICE(PCI_BUS, pci_bus);

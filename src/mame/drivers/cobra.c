@@ -469,7 +469,7 @@ static int m2sfifo_unk_flag = 0;
 static int s2mfifo_unk_flag = 0;
 
 static UINT32 mpc106_regs[256/4];
-static UINT32 mpc106_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 mpc106_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 	//printf("MPC106: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 
@@ -480,7 +480,7 @@ static UINT32 mpc106_pci_r(int function, int reg, UINT32 mem_mask)
 	return mpc106_regs[reg/4];
 }
 
-static void mpc106_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void mpc106_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	//printf("MPC106: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(mpc106_regs + (reg/4));
@@ -488,16 +488,16 @@ static void mpc106_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 
 READ64_MEMBER(cobra_state::main_mpc106_r)
 {
-	device_t *device = machine().device("pcibus");
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
 	//return pci_64be_r(offset, mem_mask);
-	return pci_64be_r(device, offset, mem_mask);
+	return device->read_64be(space, offset, mem_mask);
 }
 
 WRITE64_MEMBER(cobra_state::main_mpc106_w)
 {
-	device_t *device = machine().device("pcibus");
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
 	//pci_64be_w(offset, data, mem_mask);
-	pci_64be_w(device, offset, data, mem_mask);
+	device->write_64be(space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(cobra_state::main_fifo_r)

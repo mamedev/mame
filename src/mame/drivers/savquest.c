@@ -417,7 +417,7 @@ static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 
 //  AM_RANGE(0x5000, 0x5007) // routes to port $eb
 ADDRESS_MAP_END
