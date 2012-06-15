@@ -15,7 +15,7 @@ public:
 	UINT8 m_data_to_qs1000;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_soundcpu;
 
 	DECLARE_READ32_MEMBER(eolith_custom_r);
 	DECLARE_WRITE32_MEMBER(systemcontrol_w);
