@@ -2652,6 +2652,26 @@ time_t ioport_manager::initialize()
 			mame_printf_error("Input port errors:\n%s", errors.cstr());
 	}
 
+	// renumber player numbers for controller ports
+	int player_offset = 0;
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	{
+		int players = 0;		
+		for (ioport_port *port = first_port(); port != NULL; port = port->next())
+		{
+			if (&port->device()==device)
+			{
+				for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+					if (field->type_class()==INPUT_CLASS_CONTROLLER) 
+					{
+						if (players < field->player() + 1) players = field->player() + 1;
+						field->set_player(field->player() + player_offset);
+					}
+			}
+		}
+		player_offset += players;
+	}
+
 	// allocate live structures to mirror the configuration
 	for (ioport_port *port = first_port(); port != NULL; port = port->next())
 		port->init_live_state();

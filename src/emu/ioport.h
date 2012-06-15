@@ -1077,6 +1077,7 @@ public:
 	// setters
 	void set_crosshair_scale(double scale) { m_crosshair_scale = scale; }
 	void set_crosshair_offset(double offset) { m_crosshair_offset = offset; }
+	void set_player(UINT8 player) { m_player = player; }
 
 	// derived getters
 	ioport_type_class type_class() const;
