@@ -281,6 +281,17 @@ $(error $(TARGETOS) not supported !)
 endif
 
 #-------------------------------------------------
+# GCC 4.7 workaround (discrete audio needs type-safe rewrite to fix this for real)
+#-------------------------------------------------
+
+ifneq ($(BASE_TARGETOS),win32)
+CCVERS = $(shell gcc --version)
+ifneq (,$(findstring 4.7,$(CCVERS)))
+CCOMFLAGS += -Wno-narrowing -Wno-attributes
+endif
+endif
+
+#-------------------------------------------------
 # object and source roots
 #-------------------------------------------------
 
