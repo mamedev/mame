@@ -807,7 +807,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
 	/* video hardware */
-	MCFG_BFMBD1_REMOVE("vfd0")
 
 	MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )				/* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
