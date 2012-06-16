@@ -743,9 +743,11 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// check for underflow
 	if (exp <= -128)
 	{
+		// make sure a 0 result doesn't set underflow
+		if (man != 0 || exp < -128)
+			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 		man = 0x80000000;
 		exp = -128;
-		IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 	}
 
 	// check for overflow
@@ -1895,31 +1897,35 @@ void tms3203x_device::cmpi_imm(UINT32 op)
 void tms3203x_device::fix_reg(UINT32 op)
 {
 	int dreg = (op >> 16) & 31;
-	m_r[dreg] = m_r[op & 7];
-	float2int(m_r[dreg], dreg < 8);
+	m_r[TMR_TEMP1] = m_r[op & 7];
+	float2int(m_r[TMR_TEMP1], dreg < 8);
+	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
 void tms3203x_device::fix_dir(UINT32 op)
 {
 	UINT32 res = RMEM(DIRECT(op));
 	int dreg = (op >> 16) & 31;
-	LONG2FP(dreg, res);
-	float2int(m_r[dreg], dreg < 8);
+	LONG2FP(TMR_TEMP1, res);
+	float2int(m_r[TMR_TEMP1], dreg < 8);
+	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
 void tms3203x_device::fix_ind(UINT32 op)
 {
 	UINT32 res = RMEM(INDIRECT_D(op, op >> 8));
 	int dreg = (op >> 16) & 31;
-	LONG2FP(dreg, res);
-	float2int(m_r[dreg], dreg < 8);
+	LONG2FP(TMR_TEMP1, res);
+	float2int(m_r[TMR_TEMP1], dreg < 8);
+	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
 void tms3203x_device::fix_imm(UINT32 op)
 {
 	int dreg = (op >> 16) & 31;
-	SHORT2FP(dreg, op);
-	float2int(m_r[dreg], dreg < 8);
+	SHORT2FP(TMR_TEMP1, op);
+	float2int(m_r[TMR_TEMP1], dreg < 8);
+	m_r[dreg].set_mantissa(m_r[TMR_TEMP1].mantissa());
 }
 
 /*-----------------------------------------------------*/
