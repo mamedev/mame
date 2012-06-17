@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE32_MEMBER(md_videoram_w);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(spotty_soundlatch_w);
-    DECLARE_WRITE32_MEMBER(limenko_soundlatch_w);
+	DECLARE_WRITE32_MEMBER(limenko_soundlatch_w);
 	DECLARE_WRITE32_MEMBER(spriteram_buffer_w);
 	DECLARE_WRITE8_MEMBER(spotty_sound_cmd_w);
 	DECLARE_READ8_MEMBER(spotty_sound_cmd_r);
@@ -166,8 +166,8 @@ WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 {
 	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");    
 	
-    soundlatch_byte_w(space, 0, data >> 16);
-    qs1000->set_irq(ASSERT_LINE);
+	soundlatch_byte_w(space, 0, data >> 16);
+	qs1000->set_irq(ASSERT_LINE);
 	
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));	    
 }
@@ -179,7 +179,7 @@ WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
 
 READ8_MEMBER(limenko_state::qs1000_p1_r)
 {    
-    return soundlatch_byte_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(limenko_state::qs1000_p1_w)
@@ -730,7 +730,7 @@ static QS1000_INTERFACE( qs1000_intf )
 	
 	/* P1-P3 read handlers */
 	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_r),
-    DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
     
 	/* P1-P3 write handlers */
@@ -766,11 +766,11 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_VIDEO_START(limenko)
 
 	/* sound hardware */
-    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-    MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
-    MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-    MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spotty, limenko_state )
@@ -937,7 +937,7 @@ SEL : B3-06-00
 || |                             |SYS     |              | ||
 || |           |------|          |L2D_HYP |              | ||
 || | QS1003    |QS1000|          |VER1.0  |              | ||
-|| |           |      |24kHz     |--------| IC41C16256   | ||
+|| |           |      |24MHz     |--------| IC41C16256   | ||
 || |           |------|                                  | ||
 || |                             32MHz     20MHz         | ||
 || |                                                     | ||
