@@ -734,6 +734,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		{
 			/* parse the metadata */
 			type[0] = subtype[0] = 0;
+            pgtype[0] = pgsub[0] = 0;
 			if (sscanf(metadata, CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
 				return CHDERR_INVALID_DATA;
 			if (tracknum == 0 || tracknum > CD_MAX_TRACKS)

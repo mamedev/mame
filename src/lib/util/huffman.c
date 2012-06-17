@@ -535,7 +535,11 @@ int CLIB_DECL huffman_context_base::tree_node_compare(const void *item1, const v
 {
 	const node_t *node1 = *(const node_t **)item1;
 	const node_t *node2 = *(const node_t **)item2;
-	return node2->m_weight - node1->m_weight;
+	if (node2->m_weight != node1->m_weight)
+	    return node2->m_weight - node1->m_weight;
+	if (node2->m_bits - node1->m_bits == 0)
+	    fprintf(stderr, "identical node sort keys, should not happen!\n");
+	return (int)node1->m_bits - (int)node2->m_bits;
 }
 
 
@@ -555,16 +559,28 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 		{
 			list[listitems++] = &m_huffnode[curcode];
 			m_huffnode[curcode].m_count = m_datahisto[curcode];
+			m_huffnode[curcode].m_bits = curcode;
 
 			// scale the weight by the current effective length, ensuring we don't go to 0
 			m_huffnode[curcode].m_weight = UINT64(m_datahisto[curcode]) * UINT64(totalweight) / UINT64(totaldata);
 			if (m_huffnode[curcode].m_weight == 0)
 				m_huffnode[curcode].m_weight = 1;
 		}
-
+/*
+        fprintf(stderr, "Pre-sort:\n");
+        for (int i = 0; i < listitems; i++) {
+            fprintf(stderr, "weight: %d code: %d\n", list[i]->m_weight, list[i]->m_bits);
+        }
+*/
 	// sort the list by weight, largest weight first
 	qsort(list, listitems, sizeof(list[0]), tree_node_compare);
-
+/*
+        fprintf(stderr, "Post-sort:\n");
+        for (int i = 0; i < listitems; i++) {
+            fprintf(stderr, "weight: %d code: %d\n", list[i]->m_weight, list[i]->m_bits);
+        }
+        fprintf(stderr, "===================\n");
+*/
 	// now build the tree
 	int nextalloc = m_numcodes;
 	while (listitems > 1)
@@ -597,6 +613,7 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 	{
 		node_t &node = m_huffnode[curcode];
 		node.m_numbits = 0;
+		node.m_bits = 0;
 
 		// if we have a non-zero weight, compute the number of bits
 		if (node.m_weight > 0)

@@ -1788,6 +1788,7 @@ chd_error chd_file::compress_v5_map()
 		compressed[12] = lengthbits;
 		compressed[13] = selfbits;
 		compressed[14] = parentbits;
+        compressed[15] = 0;
 
 		// write the result
 		m_mapoffset = file_append(compressed, complen + 16);
