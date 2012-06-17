@@ -88,6 +88,7 @@ public:
 	struct nand_t m_nand;
 	DECLARE_WRITE32_MEMBER(sound_w);
 	DECLARE_READ32_MEMBER(bballoon_speedup_r);
+	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
 
 	int m_rom_pagesize;
 };
@@ -118,7 +119,7 @@ NAND Flash Controller (4KB internal buffer)
 
 // GPIO
 
-static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
+static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22, 0xFF, 0xFF, 0xFF, 0xFF };
 
 static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 {
@@ -361,6 +362,24 @@ WRITE32_MEMBER(ghosteo_state::sound_w)
 	}
 }
 
+READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
+{
+	ghosteo_state *state = machine().driver_data<ghosteo_state>();
+	UINT32 port_g = state->m_bballoon_port[S3C2410_GPIO_PORT_G];
+	UINT32 data = 0xFFFFFFFF;
+	switch (port_g)
+	{
+		case 0x8 : data = machine().root_device().ioport( "10000000-08")->read(); break;
+		case 0x9 : data = machine().root_device().ioport( "10000000-09")->read(); break;
+		case 0xA : data = machine().root_device().ioport( "10000000-0A")->read(); break;
+		case 0xB : data = machine().root_device().ioport( "10000000-0B")->read(); break;
+		case 0xC : data = machine().root_device().ioport( "10000000-0C")->read(); break;
+	}
+//	logerror( "touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
+	return data;
+}
+
+
 static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32, ghosteo_state )
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
@@ -368,6 +387,15 @@ static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32, ghosteo_state )
 	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( touryuu_map, AS_PROGRAM, 32, ghosteo_state )
+	AM_RANGE(0x10000000, 0x10000003) AM_READ(touryuu_port_10000000_r)
+	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
+	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
+	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
+	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
+ADDRESS_MAP_END
+
 
 /*
 static INPUT_PORTS_START( bballoon )
@@ -427,6 +455,75 @@ static INPUT_PORTS_START( bballoon )
 	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+/*
+
+  Touryuumon
+
+  +----+----+----+----+----+
+  | 1  | 1  | 1  | FF | 1  |
+  +----+----+----+----+----+
+  | C  | G  | K  | Ti | Rn |
+  +----+----+----+----+----+
+  | D  | H  | L  | Po | Be |
+  +----+----+----+----+----+
+  | A  | E  | I  | M  | Kn |
+  +----+----+----+----+----+
+  | B  | F  | J  | N  | Re |
+  +----+----+----+----+----+----+----+
+  | Sv | Ts | Be | 2s | 1s | 2c | 1c |
+  +----+----+----+----+----+----+----+
+
+*/
+
+static INPUT_PORTS_START( touryuu )
+	PORT_START("10000000-08")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (5)")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (3)")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (2)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (1)")
+	PORT_BIT( 0xFFFFFFE0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10000000-09")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) // labeled "Ti" in test mode
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0xFFFFFFE0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10000000-0A")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0xFFFFFFE0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10000000-0B")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0xFFFFFFE0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10000000-0C")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0xFFFFFFE0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10100000")
+	PORT_BIT( 0xFFFFFFFF, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10200000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static const s3c2410_interface bballoon_s3c2410_intf =
 {
 	// CORE (pin read / pin write)
@@ -443,11 +540,15 @@ static const s3c2410_interface bballoon_s3c2410_intf =
 	{ s3c2410_nand_command_w, s3c2410_nand_address_w, s3c2410_nand_data_r, s3c2410_nand_data_w }
 };
 
-static const i2cmem_interface i2cmem_interface =
+static const i2cmem_interface bballoon_i2cmem_interface =
 {
 	I2CMEM_SLAVE_ADDRESS, 0, 256
 };
 
+static const i2cmem_interface touryuu_i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, 0, 1024
+};
 
 device_t* s3c2410;
 
@@ -482,11 +583,10 @@ static MACHINE_RESET( bballoon )
 	s3c2410 = machine.device("s3c2410");
 }
 
-static MACHINE_CONFIG_START( bballoon, ghosteo_state )
+static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 200000000)
-	MCFG_CPU_PROGRAM_MAP(bballoon_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -507,10 +607,22 @@ static MACHINE_CONFIG_START( bballoon, ghosteo_state )
 //  MCFG_DEVICE_CONFIG(bballoon_nand_intf)
 
 //  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
-	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bballoon, ghosteo )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bballoon_map)
+	MCFG_I2CMEM_ADD("i2cmem", bballoon_i2cmem_interface)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( touryuu, ghosteo )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(touryuu_map)
+	MCFG_I2CMEM_ADD("i2cmem", touryuu_i2cmem_interface)
+MACHINE_CONFIG_END
+
 
 /*
 Balloon & Balloon
@@ -617,4 +729,4 @@ static DRIVER_INIT( touryuu )
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )
 GAME( 2005, hapytour, 0, bballoon, bballoon, bballoon, ROT0, "GAV Company", "Happy Tour", GAME_NO_SOUND )
-GAME( 200?, touryuu,  0, bballoon, bballoon, touryuu, ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", GAME_NOT_WORKING | GAME_NO_SOUND ) // no inputs, boots to test mode first time, endless reboot loop after that
+GAME( 2005, touryuu,  0, touryuu, touryuu, touryuu, ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", GAME_NO_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom

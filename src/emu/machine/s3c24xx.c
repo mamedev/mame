@@ -1166,36 +1166,41 @@ static void s3c24xx_check_pending_irq( device_t *device)
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 temp;
 	// normal irq
-	temp = (s3c24xx->irq.regs.srcpnd & ~s3c24xx->irq.regs.intmsk) & ~s3c24xx->irq.regs.intmod;
-	if (temp != 0)
+
+	if ((s3c24xx->irq.regs.intpnd == 0) && (s3c24xx->irq.regs.intoffset == 0)) // without this "touryuu" crashes
 	{
-		UINT32 int_type = 0;
-		verboselog( device->machine(), 5, "srcpnd %08X intmsk %08X intmod %08X\n", s3c24xx->irq.regs.srcpnd, s3c24xx->irq.regs.intmsk, s3c24xx->irq.regs.intmod);
-		while ((temp & 1) == 0)
+		temp = (s3c24xx->irq.regs.srcpnd & ~s3c24xx->irq.regs.intmsk) & ~s3c24xx->irq.regs.intmod;
+		if (temp != 0)
 		{
-			int_type++;
-			temp = temp >> 1;
-		}
-		verboselog( device->machine(), 5, "intpnd set bit %d\n", int_type);
-		s3c24xx->irq.regs.intpnd |= (1 << int_type);
-		s3c24xx->irq.regs.intoffset = int_type;
-		if (s3c24xx->irq.line_irq != ASSERT_LINE)
-		{
-			verboselog( device->machine(), 5, "ARM7_IRQ_LINE -> ASSERT_LINE\n");
-			cputag_set_input_line( device->machine(), "maincpu", ARM7_IRQ_LINE, ASSERT_LINE);
-			s3c24xx->irq.line_irq = ASSERT_LINE;
-		}
-	}
-	else
-	{
-		if (s3c24xx->irq.line_irq != CLEAR_LINE)
-		{
+			UINT32 int_type = 0;
 			verboselog( device->machine(), 5, "srcpnd %08X intmsk %08X intmod %08X\n", s3c24xx->irq.regs.srcpnd, s3c24xx->irq.regs.intmsk, s3c24xx->irq.regs.intmod);
-			verboselog( device->machine(), 5, "ARM7_IRQ_LINE -> CLEAR_LINE\n");
-			cputag_set_input_line( device->machine(), "maincpu", ARM7_IRQ_LINE, CLEAR_LINE);
-			s3c24xx->irq.line_irq = CLEAR_LINE;
+			while ((temp & 1) == 0)
+			{
+				int_type++;
+				temp = temp >> 1;
+			}
+			verboselog( device->machine(), 5, "intpnd set bit %d\n", int_type);
+			s3c24xx->irq.regs.intpnd |= (1 << int_type);
+			s3c24xx->irq.regs.intoffset = int_type;
+			if (s3c24xx->irq.line_irq != ASSERT_LINE)
+			{
+				verboselog( device->machine(), 5, "ARM7_IRQ_LINE -> ASSERT_LINE\n");
+				cputag_set_input_line( device->machine(), "maincpu", ARM7_IRQ_LINE, ASSERT_LINE);
+				s3c24xx->irq.line_irq = ASSERT_LINE;
+			}
+		}
+		else
+		{
+			if (s3c24xx->irq.line_irq != CLEAR_LINE)
+			{
+				verboselog( device->machine(), 5, "srcpnd %08X intmsk %08X intmod %08X\n", s3c24xx->irq.regs.srcpnd, s3c24xx->irq.regs.intmsk, s3c24xx->irq.regs.intmod);
+				verboselog( device->machine(), 5, "ARM7_IRQ_LINE -> CLEAR_LINE\n");
+				cputag_set_input_line( device->machine(), "maincpu", ARM7_IRQ_LINE, CLEAR_LINE);
+				s3c24xx->irq.line_irq = CLEAR_LINE;
+			}
 		}
 	}
+
 	// fast irq
 	temp = (s3c24xx->irq.regs.srcpnd & ~s3c24xx->irq.regs.intmsk) & s3c24xx->irq.regs.intmod;
 	if (temp != 0)
@@ -1330,6 +1335,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_irq_w )
 		{
 			s3c24xx->irq.regs.intpnd = (old_value & ~data); // clear only the bit positions of INTPND corresponding to those set to one in the data
 			s3c24xx->irq.regs.intoffset = 0; // "This bit can be cleared automatically by clearing SRCPND and INTPND."
+			s3c24xx_check_pending_irq( device);
 		}
 		break;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
