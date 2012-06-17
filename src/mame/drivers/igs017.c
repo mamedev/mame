@@ -1387,7 +1387,7 @@ WRITE16_MEMBER(igs017_state::irq1_enable_w)
 	if (ACCESSING_BITS_0_7)
 		m_irq1_enable = data & 1;
 
-	if (data != 0 && data != 0xff)
+	if (data != 0 && data != 1 && data != 0xff)
 		logerror("%s: irq1_enable = %04x\n", machine().describe_context(), data);
 }
 
@@ -1396,7 +1396,7 @@ WRITE16_MEMBER(igs017_state::irq2_enable_w)
 	if (ACCESSING_BITS_0_7)
 		m_irq2_enable = data & 1;
 
-	if (data != 0 && data != 0xff)
+	if (data != 0 && data != 1 && data != 0xff)
 		logerror("%s: irq2_enable = %04x\n", machine().describe_context(), data);
 }
 
@@ -4175,7 +4175,7 @@ GAME( 1997,  sdmg2,    0,       sdmg2,    sdmg2,    sdmg2,    ROT0, "IGS",      
 GAME( 1997,  tjsb,     0,       tjsb,     tjsb,     tjsb,     ROT0, "IGS",              "Mahjong Tian Jiang Shen Bing (V137C)",        GAME_UNEMULATED_PROTECTION )
 GAME( 1998,  mgcs,     0,       mgcs,     mgcs,     mgcs,     ROT0, "IGS",              "Mahjong Man Guan Cai Shen (V103CS)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998,  lhzb2,    0,       lhzb2,    lhzb2,     lhzb2,   ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 1)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,   lhzb2a,   lhzb2a,    lhzb2a,  ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (VS221M)",         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,   lhzb2a,   lhzb2a,    lhzb2a,  ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
 GAME( 1998,  slqz2,    0,       slqz2,    slqz2,    slqz2,    ROT0, "IGS",              "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1999?, tarzan,   0,       iqblocka, iqblocka, tarzan,   ROT0, "IGS",              "Tarzan (V109C)",                              GAME_NOT_WORKING )
 GAME( 1999?, tarzana,  tarzan,  iqblocka, iqblocka, tarzana,  ROT0, "IGS",              "Tarzan (V107)",                               GAME_NOT_WORKING )

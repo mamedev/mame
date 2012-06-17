@@ -32,13 +32,13 @@ Year + Game                PCB        Sound         Chips
 96 Long Hu Bang II V185H   NO-0115    M6295 YM2413  IGS011 8255
 96 Wan Li Chang Cheng      ?
 96 Xing Yen Man Guan       ?
-98 Mj Nenrikishu SP        NO-0115-5  M6295 YM2413  IGS011 8255
+98 Mj Nenrikishu SP V250J  NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
 To do:
 
 - Implement the I/O part of IGS003 as an 8255
-- IGS003 parametric bitswap protection in lhb2, vbowl (instead of patching the roms)
+- IGS003 parametric bitswap protection in lhb2, nkishusp, vbowl (instead of patching the roms)
 - Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
 - A few graphical bugs
 
@@ -432,12 +432,13 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
-	dest	=	m_layer[	   blitter.flags & 0x0007	];
+	dest	=	m_layer[   blitter.flags & 0x0007	];
 	opaque	=			 !(blitter.flags & 0x0008);
 	clear	=			   blitter.flags & 0x0010;
 	flipx	=			   blitter.flags & 0x0020;
 	flipy	=			   blitter.flags & 0x0040;
-	if					(!(blitter.flags & 0x0400)) return;
+	if					(!(blitter.flags & 0x0400))
+		return;
 
 	pen_hi	=	(m_lhb2_pen_hi & 0x07) << 5;
 
@@ -544,7 +545,8 @@ UINT16 igs011_state::igs_dips_r(int NUM)
 	for (i = 0; i < NUM; i++)
 		if ((~m_igs_dips_sel) & (1 << i) )
 			ret = ioport(dipnames[i])->read();
-	/* 0x0100 is blitter busy */
+
+	// 0x0100 is blitter busy
 	return	(ret & 0xff) | 0x0000;
 }
 
@@ -729,18 +731,9 @@ static void lhb2_decrypt(running_machine &machine)
 }
 
 
-// To be done (similar to lhb2?)
+// xor similar to ryukobou (both sets are Japan), address scrambling from lhb2
 static void nkishusp_decrypt(running_machine &machine)
 {
-//  lhb_decrypt(machine);
-//  dbc_decrypt(machine);
-//  lhb2_decrypt(machine);
-//  drgnwrld_type1_decrypt(machine);
-//  drgnwrld_type2_decrypt(machine);
-//  drgnwrld_type3_decrypt(machine);
-//  wlcc_decrypt(machine);
-//  vbowlj_decrypt(machine);
-
 	int i,j;
 	int rom_size = 0x80000;
 	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base());
@@ -750,16 +743,24 @@ static void nkishusp_decrypt(running_machine &machine)
 	{
 		UINT16 x = src[i];
 
-		if ((i & 0x0054) != 0x0000 && (i & 0x0056) != 0x0010)
-			x ^= 0x0004;
+		// lhb2 address scrambling
+		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
-//      if ((i & 0x0204) == 0x0000)
-//          x ^= 0x0008;
+		// ryukobou xor:
 
-		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
+//		if ( (j & 0x00100) && (j & 0x00400) )
+//			x ^= 0x0200;
+
+		if ( !(j & 0x00004) || !(j & 0x02000) || (!(j & 0x00080) && !(j & 0x00010) ) )
 			x ^= 0x0020;
 
-		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+		if ( (j & 0x00100) || (j & 0x00040) || ( (j & 0x00010)&&(j & 0x00002) ) )
+			x ^= 0x00004;
+
+		// additional xor:
+
+		if ( !(j & 0x4000) && (j & 0x1000) && (j & 0x00200) )
+			x ^= 0x0008;
 
 		result_data[j] = x;
 	}
@@ -1961,6 +1962,7 @@ static DRIVER_INIT( dbc )
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
+
     rom[0x08694/2]  =   0x6008;     // 008694: 6408         bcc 869e  (fills screen with characters otherwise)
     rom[0x0a05e/2]  =   0x4e71;     // 00A05E: 6408         bcc a068  (fills screen with characters otherwise)
     rom[0x0bec2/2]  =   0x6008;     // 00BEC2: 6408         bcc becc  (fills screen with characters otherwise)
@@ -2062,6 +2064,7 @@ static DRIVER_INIT( lhb2 )
 	// PROTECTION CHECKS
 	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
 	rom[0x03502/2]	=	0x6032;		// 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
+
 	rom[0x1afea/2]	=	0x6034;		// 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
 //  rom[0x24b8a/2]  =   0x6036;     // 024B8A: 6736    beq 24bc2  (fills palette with green otherwise)
 //  rom[0x29ef8/2]  =   0x6036;     // 029EF8: 6736    beq 29f30  (fills palette with red otherwise)
@@ -2123,9 +2126,31 @@ static DRIVER_INIT( vbowlj )
 
 static DRIVER_INIT( nkishusp )
 {
-	nkishusp_decrypt(machine);
+	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 
-	// PROTECTION CHECKS (similar to lhb2?)
+	nkishusp_decrypt(machine);
+	lhb2_decrypt_gfx(machine);
+
+	// PROTECTION CHECKS (similar to lhb2)
+
+	rom[0x03624/2]	=	0x6042;		// 003624: 660E      bne     $3634 (ROM test)
+
+	rom[0x1a9d2/2]	=	0x6034;		// 01A9D2: 6734      beq     $1aa08
+	rom[0x26306/2]	=	0x6036;		// 026306: 6736      beq     $2633e
+	rom[0x29190/2]	=	0x6038;		// 029190: 6E38      bgt     $291ca (system error)
+	rom[0x2b82a/2]	=	0x6036;		// 02B82A: 6736      beq     $2b862
+	rom[0x2ff20/2]	=	0x6036;		// 02FF20: 6736      beq     $2ff58
+	rom[0x3151c/2]	=	0x6036;		// 03151C: 6736      beq     $31554
+	rom[0x33dfc/2]	=	0x6036;		// 033DFC: 6736      beq     $33e34
+	rom[0x3460e/2]	=	0x6038;		// 03460E: 6E38      bgt     $34648 (system error)
+	rom[0x3f09e/2]	=	0x6034;		// 03F09E: 6734      beq     $3f0d4
+	rom[0x406a8/2]	=	0x6036;		// 0406A8: 6736      beq     $406e0
+	rom[0x4376a/2]	=	0x6034;		// 04376A: 6734      beq     $437a0
+	rom[0x462d6/2]	=	0x6034;		// 0462D6: 6734      beq     $4630c
+	rom[0x471ec/2]	=	0x6036;		// 0471EC: 6E36      bgt     $47224 (system error)
+	rom[0x49c46/2]	=	0x6000;		// 049C46: 6700 0444 beq     $4a08c
+	rom[0x4a2b6/2]	=	0x6036;		// 04A2B6: 6736      beq     $4a2ee
+	rom[0x4c67a/2]	=	0x6038;		// 04C67A: 6E38      bgt     $4c6b4 (system error)
 }
 
 
@@ -2262,7 +2287,7 @@ static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x010000, 0x010001 ) AM_WRITE(lhb_okibank_w )
 
 	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc  (33)
-	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)	// swap (33)
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w		)	// swap (33)
 	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r			)	// read
 	// no reset
 
@@ -2300,7 +2325,7 @@ static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x518000, 0x5181ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (33)
 	AM_RANGE( 0x518200, 0x5183ff ) AM_WRITE(wlcc_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x518800, 0x5189ff ) AM_READ(igs011_prot2_reset_r		)	// reset
+	AM_RANGE( 0x518800, 0x5189ff ) AM_READ(igs011_prot2_reset_r			)	// reset
 	AM_RANGE( 0x519000, 0x5195ff ) AM_READ(lhb_igs011_prot2_r			)	// read
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
@@ -2338,8 +2363,8 @@ static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
 
 	AM_RANGE( 0x020000, 0x0201ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (55)
-	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x020400, 0x0205ff ) AM_READ(lhb2_igs011_prot2_r		)	// read
+	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE(lhb_igs011_prot2_swap_w		)	// swap  (33)
+	AM_RANGE( 0x020400, 0x0205ff ) AM_READ(lhb2_igs011_prot2_r			)	// read
 	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (55)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
@@ -2369,6 +2394,50 @@ static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE(igs011_blit_depth_w )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_3_dips_r )
 ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( nkishusp, AS_PROGRAM, 16, igs011_state )
+//  nkishusp: IGS011 protection dynamically mapped at 1ff8x
+//  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE(igs011_prot1_w )
+//  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
+
+	// to be done:
+	AM_RANGE( 0x023000, 0x0231ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (55)
+	AM_RANGE( 0x023200, 0x0233ff ) AM_WRITE(lhb_igs011_prot2_swap_w		)	// swap  (33)
+	AM_RANGE( 0x023400, 0x0235ff ) AM_READ(lhb2_igs011_prot2_r			)	// read
+	AM_RANGE( 0x023600, 0x0237ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (55)
+
+	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff )
+	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE(lhb2_igs003_w )
+	AM_RANGE( 0x208002, 0x208003 ) AM_READ(lhb2_igs003_r )
+	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_SHARE("priority_ram")
+	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
+	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0xa38000, 0xa38001 ) AM_WRITE(lhb_irq_enable_w )
+	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE(igs_dips_w )
+
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
+
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE(igs011_blit_depth_w )
+	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_3_dips_r )
+ADDRESS_MAP_END
+
+
 
 /* trap15's note:
  * TODO: change this horrible device-> chain to be proper.
@@ -2450,12 +2519,12 @@ static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w				)	// dec   (33)
 	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
 	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w			)	// reset (33)
-	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r	)	// read
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r		)	// read
 
 	AM_RANGE( 0x50f000, 0x50f1ff ) AM_WRITE(igs011_prot2_dec_w			)	// dec   (33)
 	AM_RANGE( 0x50f200, 0x50f3ff ) AM_WRITE(vbowl_igs011_prot2_swap_w	)	// swap  (33)
 	AM_RANGE( 0x50f400, 0x50f5ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (33)
-	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ(vbowl_igs011_prot2_r		)	// read
+	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ(vbowl_igs011_prot2_r			)	// read
 
 	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w	)	// reset?
 //  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
@@ -2800,13 +2869,13 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x02, "70" )
 	PORT_DIPSETTING(    0x01, "74" )
 	PORT_DIPSETTING(    0x00, "78" )
-	PORT_DIPNAME( 0x08, 0x08, "Odds Rate" )
-	PORT_DIPSETTING(    0x08, "1,2,3,5,8,15,30,50" )
+	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )
 	PORT_DIPSETTING(    0x00, "1,2,3,4,5,6,7,8" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )
+	PORT_DIPSETTING(    0x08, "1,2,3,5,8,15,30,50" )
+	PORT_DIPNAME( 0x10, 0x00, "Max Bet" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
-	PORT_DIPNAME( 0x60, 0x60, "Min Credits To Start" )
+	PORT_DIPNAME( 0x60, 0x60, "Min Bet" )
 	PORT_DIPSETTING(    0x60, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
@@ -2920,6 +2989,136 @@ static INPUT_PORTS_START( lhb2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( nkishusp )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x02, "Pay Out (%)" )
+	PORT_DIPSETTING(    0x07, "74" )
+	PORT_DIPSETTING(    0x06, "77" )
+	PORT_DIPSETTING(    0x05, "80" )
+	PORT_DIPSETTING(    0x04, "83" )
+	PORT_DIPSETTING(    0x03, "86" )
+	PORT_DIPSETTING(    0x02, "89" )
+	PORT_DIPSETTING(    0x01, "92" )
+	PORT_DIPSETTING(    0x00, "95" )
+	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )
+	PORT_DIPSETTING(    0x00, "1,2,3,4,5,6,7,8" )
+	PORT_DIPSETTING(    0x08, "1,2,3,5,8,15,30,50" )
+	PORT_DIPNAME( 0x10, 0x00, "Max Bet" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPNAME( 0x60, 0x60, "Min Bet" )
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Timer" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	// Only when bit 3 = 1
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )	// Only when bit 3 = 0
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x08, 0x08, "Money Type" )	// Decides whether to use bits 0&1 or bit 2
+	PORT_DIPSETTING(    0x08, "Coins" )
+	PORT_DIPSETTING(    0x00, "Notes" )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Play" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Undress Girl" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Credit Limit" )
+	PORT_DIPSETTING(    0x03, "500" )
+	PORT_DIPSETTING(    0x02, "1000" )
+	PORT_DIPSETTING(    0x01, "2000" )
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x70, "1 : 1" )
+	PORT_DIPSETTING(    0x60, "1 : 2" )
+	PORT_DIPSETTING(    0x50, "1 : 5" )
+	PORT_DIPSETTING(    0x40, "1 : 6" )
+	PORT_DIPSETTING(    0x30, "1 : 7" )
+	PORT_DIPSETTING(    0x20, "1 : 8" )
+	PORT_DIPSETTING(    0x10, "1 : 9" )
+	PORT_DIPSETTING(    0x00, "1 : 10" )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )	// data clear
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)	// hopper switch
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// stats
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? set to 0 both
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? and you can't start a game
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( wlcc )
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
@@ -2937,7 +3136,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_DIPSETTING(    0x02, "1500" )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -3029,7 +3228,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x80, "Max Bet" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
@@ -3041,7 +3240,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -3424,7 +3623,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPSETTING(    0x02, "1500" )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -3610,7 +3809,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 MACHINE_CONFIG_END
 
 
-static TIMER_DEVICE_CALLBACK ( drgnworld_timer_irq_cb )
+static TIMER_DEVICE_CALLBACK ( lev5_timer_irq_cb )
 {
 	igs011_state *state = timer.machine().driver_data<igs011_state>();
 
@@ -3621,9 +3820,9 @@ static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgnwrld)
 	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", drgnworld_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3662,7 +3861,7 @@ MACHINE_CONFIG_END
 
 
 
-static TIMER_DEVICE_CALLBACK ( wlcc_timer_irq_cb )
+static TIMER_DEVICE_CALLBACK ( lev3_timer_irq_cb )
 {
 	igs011_state *state = timer.machine().driver_data<igs011_state>();
 
@@ -3674,7 +3873,7 @@ static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wlcc)
 	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", wlcc_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
 
@@ -3683,7 +3882,7 @@ static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xymg)
 	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", wlcc_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
 
@@ -3692,11 +3891,27 @@ static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lhb2)
 	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", drgnworld_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
 //  MCFG_GFXDECODE(igs011_hi)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+MACHINE_CONFIG_END
+
+
+
+static MACHINE_CONFIG_DERIVED( nkishusp, igs011_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nkishusp)
+	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+
+	// VSync 60.0052Hz, HSync 15.620kHz
+
+//  MCFG_GFXDECODE(igs011_hi)
+
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3711,7 +3926,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vbowl)
 	MCFG_CPU_VBLANK_INT("screen",irq6_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer_irq", wlcc_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
@@ -3985,9 +4200,9 @@ ROM_START( wlcc )
 	ROM_LOAD16_WORD_SWAP( "wlcc4096.rom", 0x00000, 0x80000, CRC(3b16729f) SHA1(4ef4e5cbd6ccc65775e36c2c8b459bc1767d6574) )
 	ROM_CONTINUE        (                 0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 
-	ROM_REGION( 0x280000, "blitter", ROMREGION_ERASE00 )
+	ROM_REGION( 0x280000, "blitter", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
-	ROM_LOAD( "wlcc.gfx",  0x200000, 0x080000, CRC(1f7ad299) SHA1(ab0a8fb31906519b9352ba172def48456e8d565c) )
+	ROM_LOAD( "wlcc.gfx",     0x200000, 0x080000, CRC(1f7ad299) SHA1(ab0a8fb31906519b9352ba172def48456e8d565c) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "040-c3c2.snd", 0x00000, 0x80000, CRC(220949aa) SHA1(1e0dba168a0687d32aaaed42714ae24358f4a3e7) ) // 2 banks
@@ -4245,7 +4460,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Nenrikishu SP
+Mahjong Nenrikishu SP (V250J)
 IGS/Alta, 1998
 
 PCB Layout
@@ -4282,12 +4497,15 @@ ROM_START( nkishusp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "v250j.u29", 0x00000, 0x80000, CRC(500cb919) SHA1(76eed80b59c43e8cc1e258056cfe08b33a651852) )
 
-	ROM_REGION( 0x200000, "blitter", 0 )
-	ROM_LOAD( "m0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) ) // Identical to igsm0501.u7
+	ROM_REGION( 0x800000, "blitter", ROMREGION_ERASEFF )
+	ROM_LOAD( "m0501.u7", 0x000000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) ) // Identical to igsm0501.u7
+	// empty
+	ROM_LOAD( "cg.u4",    0x400000, 0x080000, CRC(fe60f485) SHA1(d75e5f7a187161137a7f7b54d495d1cb3e1802a4) )
+	// empty
 
-	ROM_REGION( 0x80000, "blitter_hi", 0 ) // high order bit of graphics (5th bit)
-	ROM_LOAD( "m0502.u6", 0x000000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) ) // Identical to igsm0502.u4, igsm0502.u5
-	ROM_LOAD( "cg.u4",    0x000000, 0x80000, CRC(fe60f485) SHA1(d75e5f7a187161137a7f7b54d495d1cb3e1802a4) )
+	ROM_REGION( 0x200000, "blitter_hi", ROMREGION_ERASEFF ) // high order bit of graphics (5th bit)
+	ROM_LOAD( "m0502.u6", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) ) // Identical to igsm0502.u4, igsm0502.u5
+	// empty
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.u38", 0x00000, 0x80000, CRC(d80e28e2) SHA1(c03441686e770227db6a2a41922fbb4284710571) )
@@ -4404,4 +4622,4 @@ GAME( 1996, xymg,         0,        xymg,            xymg,      xymg,         RO
 GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
 GAME( 1996, vbowl,        0,        vbowl,           vbowl,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     lhb2,            lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                GAME_NOT_WORKING )
+GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP (Japan, V250J)", 0 )
