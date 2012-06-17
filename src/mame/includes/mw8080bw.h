@@ -35,11 +35,14 @@ class mw8080bw_state : public driver_device
 {
 public:
 	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram")
+	{ }
 
-	/* memory pointers */
+	/* device/memory pointers */
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_main_ram;
 	optional_shared_ptr<UINT8> m_colorram;
 
@@ -66,8 +69,7 @@ public:
 	/* timer */
 	emu_timer   *m_interrupt_timer;
 
-	/* devices */
-	device_t *m_maincpu;
+	/* other devices */
 	device_t *m_mb14241;
 	samples_device *m_samples;
 	samples_device *m_samples1;
@@ -76,6 +78,7 @@ public:
 	device_t *m_sn2;
 	device_t *m_sn;
 	device_t *m_discrete;
+
 	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
 	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);
 	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);
@@ -140,7 +143,9 @@ public:
 #define INVADERS_CAB_TYPE_PORT_TAG		("CAB")
 #define INVADERS_P1_CONTROL_PORT_TAG	("CONTP1")
 #define INVADERS_P2_CONTROL_PORT_TAG	("CONTP2")
-
+#define INVADERS_COIN_INPUT_PORT_TAG	("COIN")
+#define INVADERS_SW6_SW7_PORT_TAG		("SW6SW7")
+#define INVADERS_SW5_PORT_TAG			("SW5")
 
 #define BLUESHRK_SPEAR_PORT_TAG			("IN0")
 

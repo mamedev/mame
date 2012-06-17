@@ -32,6 +32,7 @@ public:
 	UINT8       m_screen_red;
 
 	device_t *m_speaker;
+
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
 	DECLARE_READ8_MEMBER(indianbt_r);
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
@@ -57,6 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_2_w);
+	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
+	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
+	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
 };
 
 
@@ -64,11 +68,7 @@ public:
 
 MACHINE_START( extra_8080bw_sh );
 
-
-
 extern const samples_interface lrescue_samples_interface;
-
-
 
 WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( indianbt );
@@ -82,12 +82,6 @@ MACHINE_RESET( schaser_sh );
 MACHINE_START( schaser_sh );
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
-
-
-
-
-
-
 
 
 /*----------- defined in video/8080bw.c -----------*/

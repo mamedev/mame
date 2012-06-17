@@ -2515,11 +2515,6 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define INVADERS_COIN_INPUT_PORT_TAG	("COIN")
-#define INVADERS_SW6_SW7_PORT_TAG		("SW6SW7")
-#define INVADERS_SW5_PORT_TAG			("SW5")
-
-
 static MACHINE_START( invaders )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();

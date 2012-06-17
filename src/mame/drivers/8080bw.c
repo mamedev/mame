@@ -184,6 +184,7 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/mb14241.h"
+#include "machine/eeprom.h"
 #include "sound/speaker.h"
 #include "includes/8080bw.h"
 
@@ -2004,8 +2005,6 @@ Another (same checksums) dump came from board labeled SI-7811M-2
 
 */
 
-
-
 static MACHINE_START( darthvdr )
 {
 	/* do nothing for now - different interrupt system */
@@ -2082,6 +2081,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( darthvdr, mw8080bw_root, _8080bw_state )
 	MCFG_MACHINE_RESET(darthvdr)
 
 MACHINE_CONFIG_END
+
+
 
 /*************************************
  *
@@ -2212,6 +2213,8 @@ static DRIVER_INIT( vortex )
 
 	auto_free(machine, buf1);
 }
+
+
 
 /* unknown gun game by Model Racing, possibly Gun Champ?
 
@@ -2356,6 +2359,8 @@ MACHINE_CONFIG_DERIVED_CLASS( modelr, invaders, _8080bw_state )
 
 MACHINE_CONFIG_END
 
+
+
 /* Taito Galactica / Space Missile
 This game was officially only distributed in Brazil.
 Not much information is avaliable. It is speculated that the original is "Space Missile", whose manufacturer was sued by Taito in Japan.
@@ -2410,6 +2415,155 @@ static INPUT_PORTS_START( galactic )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+
+/*****************************************************
+
+ Space Invaders Multigame kit, Braze Technologies,
+ produced from 2002(version 1A) to 2006(version 3D).
+ This is an 8-in-1 hack on a daughterboard, containing:
+
+ - 8080 CPU taken from main PCB
+ - SST 29EE010 or AM27C010 (or other similar) 128KB EEPROM
+   (EEPROM functionality not used)
+ - 93C46P E2PROM for saving highscore/settings
+ - PALCE22V10H-25PC/4
+
+ The kit is compatible with the original Midway boardset
+
+******************************************************/
+
+static INPUT_PORTS_START( invmulti )
+	/* same as Midway Space Invaders, except that SW is unused */
+	PORT_START("IN0")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:8" )
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_sw6_sw7_r, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in0_control_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_sw5_r, NULL)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_coin_input_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW:4" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW:2" )
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL)
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW:1" )
+
+	/* fake port for reading the coin input */
+	PORT_START(INVADERS_COIN_INPUT_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* fake port for cabinet type */
+	PORT_START(INVADERS_CAB_TYPE_PORT_TAG)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* fake ports for handling the various input ports based on cabinet type */
+	PORT_START(INVADERS_SW6_SW7_PORT_TAG)
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW:6" )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START(INVADERS_SW5_PORT_TAG)
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:5" )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START(INVADERS_P1_CONTROL_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START(INVADERS_P2_CONTROL_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static ADDRESS_MAP_START( invmulti_map, AS_PROGRAM, 8, _8080bw_state )
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x8000) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x4000, 0x5fff) AM_MIRROR(0x8000) AM_ROMBANK("bank2")
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READWRITE(invmulti_eeprom_r, invmulti_eeprom_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(invmulti_bank_w)
+ADDRESS_MAP_END
+
+READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
+{
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
+	return eeprom->read_bit();
+}
+
+WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
+{
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
+
+	// d0: latch bit
+	eeprom->write_bit(data & 1);
+
+	// d6: reset
+	eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	
+	// d4: write latch or select next bit to read
+	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
+{
+	// d0, d4, d6: bank
+	int bank = (data & 1) | (data >> 3 & 2) | (data >> 4 & 4);
+	membank("bank1")->set_base(memregion("maincpu")->base() + bank * 0x4000 + 0x0000);
+	membank("bank2")->set_base(memregion("maincpu")->base() + bank * 0x4000 + 0x2000);
+}
+
+static MACHINE_RESET( invmulti )
+{
+	_8080bw_state *state = machine.driver_data<_8080bw_state>();
+	
+	state->invmulti_bank_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, 0);
+
+	MACHINE_RESET_CALL(mw8080bw);
+}
+
+MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(invmulti_map)
+	
+	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
+	
+	MCFG_MACHINE_RESET(invmulti)
+
+MACHINE_CONFIG_END
+
+static DRIVER_INIT( invmulti )
+{
+	UINT8 *src = machine.root_device().memregion("user1")->base();
+	int len = machine.root_device().memregion("user1")->bytes();
+	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
+
+	// decrypt rom
+	for (int i = 0; i < len; i++)
+		dest[i] = BITSWAP8(src[(i & 0x100ff) | (BITSWAP8(i >> 8 & 0xff, 7,3,4,5,0,6,1,2) << 8)],0,6,5,7,4,3,1,2);
+}
+
+
+
+/**************************************************************************************************************/
 
 ROM_START( searthin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3127,6 +3281,70 @@ ROM_START( invasionrza )
 ROM_END
 
 
+ROM_START( invmulti )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) // decrypted rom goes here
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("m803d.bin", 0x00000, 0x20000, CRC(6a62cb3c) SHA1(eb7b567098ad596859f417dd5c59c2cf1ebf1154) )
+ROM_END
+
+ROM_START( invmultim3a )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("m803a.bin", 0x00000, 0x20000, CRC(6d538828) SHA1(9a80c67abd32c4c8cd04320501a2aa4e2a308fc9) )
+ROM_END
+
+ROM_START( invmultim2c )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("m802c.bin", 0x00000, 0x20000, CRC(5b537de5) SHA1(4d8a6b622b818e88383d011c25f8f34b7372db6d) )
+ROM_END
+
+ROM_START( invmultim2a )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("m802a.bin", 0x00000, 0x20000, CRC(8079b1d0) SHA1(b13d910f314550eef468ee819b92788d2a002d82) )
+ROM_END
+
+ROM_START( invmultim1a )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("m801a.bin", 0x00000, 0x20000, CRC(f28536d2) SHA1(08ef3ea3fac38c7a478f094bfa7c369ac39515c4) )
+ROM_END
+
+ROM_START( invmultit3d )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("t803d.bin", 0x00000, 0x20000, CRC(4d53173c) SHA1(a9caf7fd8e2fea86ca1cf7edc104bdacf09203f8) )
+ROM_END
+
+ROM_START( invmultis3a )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("s083a.bin", 0x00000, 0x20000, CRC(f426d43b) SHA1(a299472f1d65f356ec01ca7cc8d3039abac20019) )
+ROM_END
+
+ROM_START( invmultis2a )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("s082a.bin", 0x00000, 0x20000, CRC(25f0f17e) SHA1(a3ccf823399e23dd9fdb38fd58c0acfe80b57fe3) )
+ROM_END
+
+ROM_START( invmultis1a )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("s081a.bin", 0x00000, 0x20000, CRC(daa77345) SHA1(0fdc9c2a6d9c0aa3233c5d31433adb1ea4e5b250) )
+ROM_END
+
+
 ROM_START( rollingc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc01.bin",     0x0000, 0x0400, CRC(66fa50bf) SHA1(7451d4ff8d3b351a324aaecdbdc5b46672f5fdd0) )
@@ -3508,7 +3726,6 @@ GAME( 19??, galactic, 0,        invaders, galactic, 0, ROT270, "Taito do Brasil"
 GAME( 19??, spacmiss, galactic, invaders, galactic, 0, ROT270, "bootleg?", "Space Missile - Space Fighting Game", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 
 /* Misc. manufacturers */
-
 GAMEL(1980, searthin, invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, searthina,invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "bootleg? (Model Racing)", "Space Invaders (Model Racing)", GAME_SUPPORTS_SAVE, layout_invaders )
@@ -3554,3 +3771,13 @@ GAME( 1979, yosakdona,yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku T
 GAMEL(1979, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
 GAMEL(1979, skylove,  0,        shuttlei, skylove,  0, ROT270, "Omori Electric Co., Ltd.", "Sky Love", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
 GAME (19??, modelr,   0,        modelr,   invadrmr, 0, ROT0,   "Model Racing", "unknown Model Racing gun game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen
+
+GAME( 2002, invmulti,    0,        invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03D)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultim3a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultim2c, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.02C)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultim2a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.02A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultim1a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.01A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultit3d, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (T8.03D)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultis3a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.83A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultis2a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.82A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultis1a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.81A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
