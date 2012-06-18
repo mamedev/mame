@@ -391,10 +391,26 @@ static MACHINE_RESET( mschamp )
  *
  *************************************/
 
+static INTERRUPT_GEN( vblank_irq )
+{
+	pacman_state *state = device->machine().driver_data<pacman_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, 0, HOLD_LINE);
+}
+
+static INTERRUPT_GEN( vblank_nmi )
+{
+	pacman_state *state = device->machine().driver_data<pacman_state>();
+
+	if(state->m_irq_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 WRITE8_MEMBER(pacman_state::pacman_interrupt_vector_w)
 {
-	device_set_input_line_vector(machine().device("maincpu"), 0, data);
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	device_set_input_line_vector(m_maincpu, 0, data);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -458,7 +474,7 @@ WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	device_set_input_line_vector(machine().device("maincpu"), 0, data );
+	device_set_input_line_vector(m_maincpu, 0, data );
 }
 
 
@@ -467,7 +483,7 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	device_set_input_line_vector(machine().device("maincpu"), 0, data );
+	device_set_input_line_vector(m_maincpu, 0, data );
 }
 
 
@@ -1265,7 +1281,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
@@ -1273,13 +1289,13 @@ static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
 	AM_RANGE(0xe0, 0xe0) AM_READNOP
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( porky_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x01, 0x01) AM_READ(porky_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
@@ -1348,7 +1364,6 @@ static INPUT_PORTS_START( pacman )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 INPUT_PORTS_END
 
 
@@ -1402,7 +1417,6 @@ static INPUT_PORTS_START( mspacman )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 INPUT_PORTS_END
 
 
@@ -2203,7 +2217,7 @@ static INPUT_PORTS_START( vanvank )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Invulnerability (Cheat)" ) PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x02, 0x00, "Invulnerability (Cheat)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
@@ -2272,15 +2286,10 @@ static INPUT_PORTS_START( dremshpr )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 
 	PORT_START("DSW2")
-	/* turning this on crashes puts the */
-	/* emulated machine in an infinite loop once in a while */
-#if 0
-	PORT_DIPNAME(    0x01, 0x00,"Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x01, 0x00,"Invulnerability (Cheat)")		/* turning this on crashes the emulated machine in an infinite loop once in a while */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Unused ) )
-#endif
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -2805,7 +2814,7 @@ static INPUT_PORTS_START( drivfrcp )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("Sense")
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -2857,7 +2866,7 @@ static INPUT_PORTS_START( 8bpm )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("Sense")
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -2909,7 +2918,7 @@ static INPUT_PORTS_START( porky )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("Sense")
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -3124,22 +3133,6 @@ static const namco_interface namco_config =
  *  Machine drivers
  *
  *************************************/
-
-static INTERRUPT_GEN( vblank_irq )
-{
-	pacman_state *state = device->machine().driver_data<pacman_state>();
-
-	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
-}
-
-static INTERRUPT_GEN( vblank_nmi )
-{
-	pacman_state *state = device->machine().driver_data<pacman_state>();
-
-	if(state->m_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
 
 static MACHINE_CONFIG_START( pacman, pacman_state )
 
@@ -5510,7 +5503,8 @@ ROM_END
 
 static void maketrax_rom_decode(running_machine &machine)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	pacman_state *state = machine.driver_data<pacman_state>();
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
@@ -5535,15 +5529,16 @@ static DRIVER_INIT( maketrax )
 {
 	/* set up protection handlers */
 	pacman_state *state = machine.driver_data<pacman_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),state));
 
 	maketrax_rom_decode(machine);
 }
 
 static void korosuke_rom_decode(running_machine &machine)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	pacman_state *state = machine.driver_data<pacman_state>();
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
@@ -5568,8 +5563,8 @@ static DRIVER_INIT( korosuke )
 {
 	/* set up protection handlers */
 	pacman_state *state = machine.driver_data<pacman_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::korosuke_special_port3_r),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::korosuke_special_port3_r),state));
 
 	korosuke_rom_decode(machine);
 }
@@ -5662,7 +5657,6 @@ static void mspacman_install_patches(UINT8 *ROM)
 	int i;
 
 	/* copy forty 8-byte patches into Pac-Man code */
-
 	for (i = 0; i < 8; i++)
 	{
 		ROM[0x0410+i] = ROM[0x8008+i];
@@ -5873,12 +5867,11 @@ static DRIVER_INIT( mspacii )
 {
 	// protection
 	pacman_state *state = machine.driver_data<pacman_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), state));
 }
 
 READ8_MEMBER(pacman_state::cannonbp_protection_r)
 {
-
 	/* At 6p where a rom would usually be there is an epoxy resin chip with 'Novomatic Industrie' Cannon Ball tm 1984 label. */
 	/* As I have no clue about what shall be in this chip, what follows is only a simulation which is enough to play the game. */
 	switch (offset)
@@ -5923,12 +5916,13 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 
 static DRIVER_INIT( cannonbp )
 {
+	pacman_state *state = machine.driver_data<pacman_state>();
+
 	/* extra memory */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x4800, 0x4bff);
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_ram(0x4800, 0x4bff);
 
 	/* protection? */
-	pacman_state *state = machine.driver_data<pacman_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3fff, read8_delegate(FUNC(pacman_state::cannonbp_protection_r),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3fff, read8_delegate(FUNC(pacman_state::cannonbp_protection_r),state));
 }
 
 
@@ -6014,7 +6008,7 @@ GAME( 1983, bwcasino, 0,        acitya,   bwcasino, 0,        ROT90,  "Epos Corp
 GAME( 1983, acitya,   bwcasino, acitya,   acitya,   0,        ROT90,  "Epos Corporation", "Atlantic City Action", GAME_SUPPORTS_SAVE )
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "The Glob (Pac-Man hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, 0,        ROT90,  "bootleg", "Super Glob (Pac-Man hardware) German", GAME_SUPPORTS_SAVE )
+GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, 0,        ROT90,  "bootleg", "Super Glob (Pac-Man hardware) (German bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1984, beastf,   suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "Beastie Feastie", GAME_SUPPORTS_SAVE )
 GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, drivfrcp, ROT90,  "Shinkai Inc. (Magic Eletronics Inc. license)", "Driving Force (Pac-Man conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 8bpm,     8ballact, 8bpm,     8bpm,     8bpm,     ROT90,  "Seatongrove Ltd (Magic Eletronics USA license)", "Eight Ball Action (Pac-Man conversion)", GAME_SUPPORTS_SAVE )
@@ -6023,4 +6017,4 @@ GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, rocktrv2, ROT90,  "Triumph S
 GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", GAME_SUPPORTS_SAVE )
 GAME( 1992, mschamp,  mspacman, mschamp,  mschamp,  0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Zola-Puc Gal", GAME_SUPPORTS_SAVE ) /* Rayglo version */
 GAME( 1995, mschamps, mspacman, mschamp,  mschamp,  0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola-Puc Gal", GAME_SUPPORTS_SAVE )
-GAME( 198?, cannonbp, 0,        pacman,   cannonbp, cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pacman Hardware)", GAME_WRONG_COLORS|GAME_SUPPORTS_SAVE )
+GAME( 198?, cannonbp, 0,        pacman,   cannonbp, cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pac-Man Hardware)", GAME_WRONG_COLORS|GAME_SUPPORTS_SAVE )

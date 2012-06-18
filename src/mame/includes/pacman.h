@@ -9,14 +9,17 @@ class pacman_state : public driver_device
 public:
 	pacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2"),
-		  m_s2650_spriteram(*this, "s2650_spriteram") ,
+		m_maincpu(*this, "maincpu"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_s2650_spriteram(*this, "s2650_spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_s2650games_tileram(*this, "s2650_tileram"),
-		m_rocktrv2_prot_data(*this, "rocktrv2_prot"){ }
+		m_rocktrv2_prot_data(*this, "rocktrv2_prot")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
 	optional_shared_ptr<UINT8> m_s2650_spriteram;
@@ -106,20 +109,12 @@ PALETTE_INIT( pacman );
 VIDEO_START( pacman );
 SCREEN_UPDATE_IND16( pacman );
 
-
-
 VIDEO_START( pengo );
-
-
 
 VIDEO_START( s2650games );
 SCREEN_UPDATE_IND16( s2650games );
 
-
-
-
 VIDEO_START( jrpacman );
-
 
 VIDEO_START( birdiy );
 
