@@ -1806,7 +1806,7 @@ static MACHINE_CONFIG_START( jaguar, cojag_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jaguar, "abs,bin,cof,jag,prg", 0)
+	MCFG_QUICKLOAD_ADD("quickload", jaguar, "abs,bin,cof,jag,prg", 2)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
