@@ -474,6 +474,9 @@ ifeq ($(findstring 4.4,$(TEST_GCC)),)
 	#if we use new tools
 	LDFLAGS += -static-libstdc++
 endif
+ifeq ($(findstring 4.7,$(TEST_GCC)),4.7)
+	CCOMFLAGS += -Wno-narrowing -Wno-attributes
+endif
 LIBS += -lSDL.dll
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
