@@ -117,6 +117,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/dfi_dsk.o		\
 	$(LIBOBJ)/formats/dim_dsk.o		\
 	$(LIBOBJ)/formats/dsk_dsk.o		\
+	$(LIBOBJ)/formats/esq8_dsk.o	\
 	$(LIBOBJ)/formats/esq16_dsk.o	\
 	$(LIBOBJ)/formats/fdi_dsk.o		\
 	$(LIBOBJ)/formats/fm7_cas.o		\
