@@ -2474,12 +2474,6 @@ void ioport_port::frame_update(ioport_field *mouse_field)
 
 	// hook for MESS's natural keyboard support
 	manager().natkeyboard().frame_update(*this, m_live->digital);
-
-	// call device line write handlers
-	ioport_value newvalue = read();
-	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != NULL; dynfield = dynfield->next())
-		if (dynfield->field().type() != IPT_OUTPUT)
-			dynfield->write(newvalue);
 }
 
 
@@ -3065,6 +3059,12 @@ g_profiler.start(PROFILER_INPUT);
 		// handle playback/record
 		playback_port(*port);
 		record_port(*port);
+
+		// call device line write handlers
+		ioport_value newvalue = port->read();
+		for (dynamic_field *dynfield = port->live().writelist.first(); dynfield != NULL; dynfield = dynfield->next())
+			if (dynfield->field().type() != IPT_OUTPUT)
+				dynfield->write(newvalue);		
 	}
 
 g_profiler.stop();
