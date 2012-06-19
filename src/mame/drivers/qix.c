@@ -630,26 +630,26 @@ MACHINE_CONFIG_END
 
 ROM_START( qix )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u12", 0xc000, 0x0800, CRC(aad35508) SHA1(5fa72e00b4373de21e27a86b49a44a9769f769f4) )
-	ROM_LOAD( "u13", 0xc800, 0x0800, CRC(46c13504) SHA1(19c084c38b75f14bf5094b317afeecaca6870f7a) )
-	ROM_LOAD( "u14", 0xd000, 0x0800, CRC(5115e896) SHA1(8359a1700fff7a38e8ea4f92a4f18bc628cf1cb1) )
-	ROM_LOAD( "u15", 0xd800, 0x0800, CRC(ccd52a1b) SHA1(86d134cd769ef12820638b96a4ffedd8b15dffd2) )
-	ROM_LOAD( "u16", 0xe000, 0x0800, CRC(cd1c36ee) SHA1(b379b1fe3109947a12c9683cd0c2400c2ee845b3) )
-	ROM_LOAD( "u17", 0xe800, 0x0800, CRC(1acb682d) SHA1(a2c60964e8d838d09662f8a670c6da41ba850df9) )
-	ROM_LOAD( "u18", 0xf000, 0x0800, CRC(de77728b) SHA1(8e183bb27858aad9a996e4a2e5a95f0145d1f5b4) )
-	ROM_LOAD( "u19", 0xf800, 0x0800, CRC(c0994776) SHA1(9452a98c78a038679c4e58f4a9983adb28ea5e78) )
+	ROM_LOAD( "qq12_rev2.u12", 0xc000, 0x0800, CRC(aad35508) SHA1(5fa72e00b4373de21e27a86b49a44a9769f769f4) )
+	ROM_LOAD( "qq13_rev2.u13", 0xc800, 0x0800, CRC(46c13504) SHA1(19c084c38b75f14bf5094b317afeecaca6870f7a) )
+	ROM_LOAD( "qq14_rev2.u14", 0xd000, 0x0800, CRC(5115e896) SHA1(8359a1700fff7a38e8ea4f92a4f18bc628cf1cb1) )
+	ROM_LOAD( "qq15_rev2.u15", 0xd800, 0x0800, CRC(ccd52a1b) SHA1(86d134cd769ef12820638b96a4ffedd8b15dffd2) )
+	ROM_LOAD( "qq16_rev2.u16", 0xe000, 0x0800, CRC(cd1c36ee) SHA1(b379b1fe3109947a12c9683cd0c2400c2ee845b3) )
+	ROM_LOAD( "qq17_rev2.u17", 0xe800, 0x0800, CRC(1acb682d) SHA1(a2c60964e8d838d09662f8a670c6da41ba850df9) )
+	ROM_LOAD( "qq18_rev2.u18", 0xf000, 0x0800, CRC(de77728b) SHA1(8e183bb27858aad9a996e4a2e5a95f0145d1f5b4) )
+	ROM_LOAD( "qq19_rev2.u19", 0xf800, 0x0800, CRC(c0994776) SHA1(9452a98c78a038679c4e58f4a9983adb28ea5e78) )
 
 	ROM_REGION( 0x10000, "videocpu", 0 )
-	ROM_LOAD( "u4",  0xc800, 0x0800, CRC(5b906a09) SHA1(84a2e817d6718e0276fcea702811a91bc054a670) )
-	ROM_LOAD( "u5",  0xd000, 0x0800, CRC(254a3587) SHA1(66045c71cc1d04d4e03c728e578f570fbf7c650d) )
-	ROM_LOAD( "u6",  0xd800, 0x0800, CRC(ace30389) SHA1(50c6275d13cfbca7750d5a3e725faedba7574e04) )
-	ROM_LOAD( "u7",  0xe000, 0x0800, CRC(8ebcfa7c) SHA1(21ccf5e74424ab5470473d1059ee6a43d144f685) )
-	ROM_LOAD( "u8",  0xe800, 0x0800, CRC(b8a3c8f9) SHA1(32ba771913ef44b1133ecfaedaae7f96dcc84343) )
-	ROM_LOAD( "u9",  0xf000, 0x0800, CRC(26cbcd55) SHA1(2e55e222f850548cd1d461ab5337e98dd817b567) )
-	ROM_LOAD( "u10", 0xf800, 0x0800, CRC(568be942) SHA1(8b6a01d983d355a64372fa76af810ab53e09d5df) )
+	ROM_LOAD( "qq4_rev2.u4",   0xc800, 0x0800, CRC(5b906a09) SHA1(84a2e817d6718e0276fcea702811a91bc054a670) )
+	ROM_LOAD( "qq5_rev2.u5",   0xd000, 0x0800, CRC(254a3587) SHA1(66045c71cc1d04d4e03c728e578f570fbf7c650d) )
+	ROM_LOAD( "qq6_rev2.u6",   0xd800, 0x0800, CRC(ace30389) SHA1(50c6275d13cfbca7750d5a3e725faedba7574e04) )
+	ROM_LOAD( "qq7_rev2.u7",   0xe000, 0x0800, CRC(8ebcfa7c) SHA1(21ccf5e74424ab5470473d1059ee6a43d144f685) )
+	ROM_LOAD( "qq8_rev2.u8",   0xe800, 0x0800, CRC(b8a3c8f9) SHA1(32ba771913ef44b1133ecfaedaae7f96dcc84343) )
+	ROM_LOAD( "qq9_rev2.u9",   0xf000, 0x0800, CRC(26cbcd55) SHA1(2e55e222f850548cd1d461ab5337e98dd817b567) )
+	ROM_LOAD( "qq10_rev2.u10", 0xf800, 0x0800, CRC(568be942) SHA1(8b6a01d983d355a64372fa76af810ab53e09d5df) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "u27", 0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
+	ROM_LOAD( "qq27.u27", 0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
 ROM_END
 
 // original taito board 08-00003-001
@@ -675,7 +675,7 @@ ROM_START( qixa )
 	ROM_LOAD( "u10_", 0xf800, 0x0800, CRC(b40f084a) SHA1(16811b8f24b955a72f2a0950e9688cbd0e26afa4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "u27",     0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
+	ROM_LOAD( "qq27.u27", 0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
 ROM_END
 
 // same set as above, but with larger roms
@@ -693,20 +693,20 @@ ROM_START( qixb )
 	ROM_LOAD( "lk13.bin", 0xf000, 0x1000, CRC(51c9853b) SHA1(29a5221f2af866d2ee73110409ecddc2c96404fd) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "u27",      0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
+	ROM_LOAD( "qq27.u27", 0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
 ROM_END
 
 
-ROM_START( qixo )
+ROM_START( qixo ) /* ROMs might have the "QX" game prefix instead of "QU" this is verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qu12", 0xc000, 0x0800, CRC(1c55b44d) SHA1(6385e5e484e24cf396c14de86344170639c3cc65) )
 	ROM_LOAD( "qu13", 0xc800, 0x0800, CRC(20279e8c) SHA1(722da239636de3fe40318768ddbe687b19afcdb6) )
 	ROM_LOAD( "qu14", 0xd000, 0x0800, CRC(bafe3ce3) SHA1(648a54545a1b545c82c0ace5eb1ce17af5ea7391) )
 	/* d800-dfff empty */
-	ROM_LOAD( "qu16", 0xe000, 0x0800, CRC(db560753) SHA1(4acbe17f1e555f45606ddec197c5ab691ff46d39) )
+	ROM_LOAD( "qu16", 0xe000, 0x0800, CRC(db560753) SHA1(4acbe17f1e555f45606ddec197c5ab691ff46d39) ) /* The QX version labels this rom as QX16-1 */
 	ROM_LOAD( "qu17", 0xe800, 0x0800, CRC(8c7aeed8) SHA1(b7da2b0f34f72f9853cdf6ce55e604b09fcf4728) )
 	ROM_LOAD( "qu18", 0xf000, 0x0800, CRC(353be980) SHA1(a50e02fcc69771a13b238aa0e8dc3c56b01a58d5) )
-	ROM_LOAD( "qu19", 0xf800, 0x0800, CRC(f46a69ca) SHA1(dacb53c0318445da3fbb86f9a45914c5b7a4c4a1) )
+	ROM_LOAD( "qu19", 0xf800, 0x0800, CRC(f46a69ca) SHA1(dacb53c0318445da3fbb86f9a45914c5b7a4c4a1) ) /* The QX version labels this rom as QX19-1 */
 
 	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "qu3",  0xc000, 0x0800, CRC(8b4c0ef0) SHA1(6d18d1052f342e3b3313f2174b20f2a179e2c6bd) )
@@ -719,7 +719,7 @@ ROM_START( qixo )
 	ROM_LOAD( "qu10", 0xf800, 0x0800, CRC(88b45037) SHA1(e2e5fefe377def3f784026b921527898af8b83a9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "u27",  0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
+	ROM_LOAD( "qu27.u27", 0xf800, 0x0800, CRC(f3782bd0) SHA1(bfc6d29f9668e02857453e96c005c81568ae931d) )
 ROM_END
 
 
@@ -1326,7 +1326,7 @@ static DRIVER_INIT( slither )
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 1)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qix,      0,        qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (Rev 2)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
 GAME( 1981, qixa,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", GAME_SUPPORTS_SAVE )
 GAME( 1981, qixb,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", GAME_SUPPORTS_SAVE )
 GAME( 1981, qixo,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 3, earlier)", GAME_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
