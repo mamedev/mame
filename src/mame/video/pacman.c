@@ -344,7 +344,7 @@ WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
 	if (m_palettebank != data)
 	{
 		m_palettebank = data;
-		m_bg_tilemap ->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -353,7 +353,7 @@ WRITE8_MEMBER(pacman_state::pengo_colortablebank_w)
 	if (m_colortablebank != data)
 	{
 		m_colortablebank = data;
-		m_bg_tilemap ->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -363,7 +363,7 @@ WRITE8_MEMBER(pacman_state::pengo_gfxbank_w)
 	{
 		m_spritebank = data & 1;
 		m_charbank = data & 1;
-		m_bg_tilemap ->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -559,11 +559,6 @@ static void jrpacman_mark_tile_dirty( running_machine &machine, int offset )
 	}
 }
 
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
 VIDEO_START( jrpacman )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
