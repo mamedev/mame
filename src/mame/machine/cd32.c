@@ -112,7 +112,7 @@ static DEVICE_RESET( akiko )
 	else
 	{
 		// MAME case
-		state->m_cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+		state->m_cdrom = cdrom_open(get_disk_handle(machine, ":cdrom"));
 		state->m_cdrom_is_device = 0;
 	}
 
