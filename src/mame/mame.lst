@@ -2072,6 +2072,8 @@ kageki			// B35 (c) 1988 Taito America Corporation + Romstar license (US)
 kagekij			// B35 (c) 1988 Taito Corporation (Japan)
 kagekih			// B35 (c) 1992 (hack)
 chukatai		// B44 (c) 1988 Taito Corporation Japan (World)
+
+
 chukataiu		// B44 (c) 1988 Taito Corporation (US)
 chukataij		// B44 (c) 1988 Taito Corporation (Japan)
 kabukiz			// B50 (c) 1988 Taito Corporation Japan (World)
@@ -2778,6 +2780,7 @@ sfj				//  8/1987 (c) 1987 (Japan)
 sfp				//  8/1987 (c) 1987
 tigeroad		// 11/1987 (c) 1987 + Romstar (US)
 toramich		// 11/1987 (c) 1987 (Japan)
+
 tigeroadb		// bootleg
 f1dream			//  4/1988 (c) 1988 + Romstar
 f1dreamb		// bootleg
@@ -4248,6 +4251,7 @@ wrestwar1		// (c) 1989 (FD1094, decrypted)
 
 // Philko Boards
 atomicp			// (c) 1990 Philko - korean clone board
+
 snapper			// (c) 1990 Philko - korean clone board
 
 // S16 Bootlegs
@@ -5260,7 +5264,7 @@ cmissnx			// 21 1982.04 Mission-X/Zoar
 cptennis		// 22 1982.06 Pro Tennis
 				// 23 1982.?? 18 Hole Pro Golf
 				// 24 1982.07 Tsumego Kaisyou
-				// 25 1982.10 Angler Dangler? (fishing)
+cfishing		// 25 1982.10 Fishing / Angler Dangler
 cbtime			// 26 1982.08 Hamburger/Burger Time
 chamburger  		// 26 1982.08 Hamburger (Japan)
 cburnrub		// 27 1982.11 Burnin' Rubber
@@ -13062,6 +13066,7 @@ sc4cla7c	//
 sc4ccogs	// Clever Cogs (Qps)
 sc4cclas	// Club Class (Bellfruit)
 sc4cclasa	//
+
 sc4cclasb	//
 sc4cclasc	//
 sc4cclasd	//
@@ -14015,6 +14020,7 @@ sc4monobj	//
 sc4monobk	//
 sc4monobl	//
 sc4monobm	//
+
 sc4monod	// Monopoly (Mazooma) [German]
 sc4monoda	//
 sc4monodb	//
@@ -16742,6 +16748,7 @@ sc5dndtpg	//
 sc5dndtph	//
 sc5dndtpi	//
 sc5dndtpj	//
+
 sc5dndtpk	//
 sc5dndtpl	//
 sc5dndtpm	//
@@ -19960,7 +19967,9 @@ starshot
 
 
 // alvg.c
+
 agsoccer
+
 wrldtour
 wrldtour2
 usafootb

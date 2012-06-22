@@ -801,6 +801,12 @@ static MACHINE_CONFIG_DERIVED( cdsteljn, decocass )
 	MCFG_MACHINE_RESET(cdsteljn)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cfishing, decocass )
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET(cfishing)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( chwy, decocass )
 
@@ -1292,6 +1298,18 @@ ROM_END
 /* The Following use Dongle Type 3 (unknown part number?)
     (dongle data differs for each game)      */
 
+/* 25 Fishing / Angler Dangler */
+ROM_START( cfishing )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
+	ROM_LOAD( "dp-1250-a-0.pro", 0x0000, 0x1000, CRC(92a3b387) SHA1(e17a155d02e9ed806590b23a845dc7806b6720b1) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1250-a-0.cas",   0x0000, 0x7500, CRC(d4a16425) SHA1(25afaabdc8b2217d5e73606a36ea9ba408d7bc4b) )
+ROM_END
+
+
 /* 26 Hamburger / Burger Time */
 /* Photo of Dongle shows DP-126B with Cassette DT-1267B (the "7B" is in a seperate white box then the DP-126 label) */
 ROM_START( cbtime ) // version 7-B-0
@@ -1689,6 +1707,7 @@ static DRIVER_INIT( cdsteljn )
 /* 23 */ // 1982.?? 18 Hole Pro Golf
 /* 24 */ // 1982.07 Tsumego Kaisyou
 /* 25 */ // 1982.10 Angler Dangler? (fishing)
+/* 25 */ GAME( 1982, cfishing,  decocass, cfishing, decocass, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette)", 0 )
 /* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette)", 0 )
          GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette, Japan)", 0 )
 /* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )

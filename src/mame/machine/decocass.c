@@ -1563,6 +1563,17 @@ MACHINE_RESET( cptennis )
 	state->m_dongle_w = decocass_type2_w;
 }
 
+MACHINE_RESET( cfishing )
+{
+	decocass_state *state = machine.driver_data<decocass_state>();
+	decocass_reset_common(machine);
+	LOG(0,("dongle type #3 (PAL)\n"));
+	state->m_dongle_r = decocass_type3_r;
+	state->m_dongle_w = decocass_type3_w;
+	state->m_type3_swap = TYPE3_SWAP_01;
+
+}
+
 MACHINE_RESET( cbtime )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
@@ -1571,6 +1582,7 @@ MACHINE_RESET( cbtime )
 	state->m_dongle_r = decocass_type3_r;
 	state->m_dongle_w = decocass_type3_w;
 	state->m_type3_swap = TYPE3_SWAP_12;
+
 }
 
 MACHINE_RESET( cburnrub )

@@ -148,6 +148,7 @@ MACHINE_RESET( decocass );
 MACHINE_RESET( ctsttape );
 MACHINE_RESET( chwy );
 MACHINE_RESET( cdsteljn );
+MACHINE_RESET( cfishing );
 MACHINE_RESET( cterrani );
 MACHINE_RESET( castfant );
 MACHINE_RESET( csuperas );
