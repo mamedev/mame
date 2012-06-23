@@ -804,7 +804,7 @@ WRITE16_MEMBER(tx1_state::tx1_math_w)
 READ16_MEMBER(tx1_state::tx1_spcs_rom_r)
 {
 	math_t &math = m_math;
-	math.cpulatch = *(UINT16*)((UINT8*)machine().root_device().memregion("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)machine().root_device().memregion("math_cpu")->base() + 0x04000 + 0x1000 + offset*2);
 
 	if (math.mux == TX1_SEL_ILDEN)
 	{
@@ -1266,7 +1266,7 @@ WRITE16_MEMBER(tx1_state::buggyboy_math_w)
 READ16_MEMBER(tx1_state::buggyboy_spcs_rom_r)
 {
 	math_t &math = m_math;
-	math.cpulatch = *(UINT16*)((UINT8*)machine().root_device().memregion("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)machine().root_device().memregion("math_cpu")->base() + 0x04000 + 0x1000 + offset*2);
 
 	if (math.mux == BB_MUX_ILDEN)
 	{
