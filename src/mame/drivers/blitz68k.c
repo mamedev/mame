@@ -5,11 +5,21 @@ Blitter based gambling games
 
 Preliminary driver by David Haywood, Angelo Salese, Tomasz Slanina, Luca Elia
 
-Games:
-
-Il Pagliaccio (c) 19?? unknown
-Strip Teaser  (c) 1993 unknown
-Funny Fruit   (c) 1998 Cadillac Jack
+----------------------------------------------------------------------
+Year  Game                        Manufacturer
+----------------------------------------------------------------------
+1990  Mega Double Poker           Blitz Systems Inc.
+1990  Mega Double Poker Jackpot   Blitz Systems Inc.
+1993  Bank Robbery                Entertainment Technology Corp.
+1993? Poker 52                    Blitz Systems Inc.
+1993  Strip Teaser                <unknown>
+1995  Dual Games (proto)          Labtronix Technologies
+1995  The Hermit                  Dugamex
+1997  Deuces Wild 2               <unknown>
+1998  Funny Fruit                 Cadillac Jack
+1998  Triple Play                 Cadillac Jack
+199?  Il Pagliaccio               <unknown>
+----------------------------------------------------------------------
 
 Notes:
 
@@ -17,6 +27,8 @@ Notes:
   reset with F3 for doing it.
 - cjffruit: at start-up a "need coin adjustment" pops up. Press menu, go to page 1 with start, move to
   "price coin #1" with big, and set it with small, then exit with menu.
+- "I/O TEST" is available among the statistics pages.
+- ilpag: based on pSOS+ S68000 V1.2.3 (Integrated Systems).
 
 To Do:
 
@@ -2124,8 +2136,70 @@ ROM_END
 
 /*************************************************************************************************************
 
+Triple Play
+(c) 1997-1998 Cadillac Jack
+(FEBRUARY 24TH, 1999 in the ROMS)
+
+Board:
+  CJ-8L REV-B LEV-1 (USA)
+
+CPUs:
+  MC68EC000FN12 (Main CPU)
+  Osc. 22.1184 MHz
+  MC68HC705C8A (Sound MCU, internal ROM not dumped)
+  Osc. 4.000 MHz
+
+Video:
+  R6545AP (CRT Controller)
+  Bt476KPJ50 (RAMDAC)
+
+ROMs:
+  6 x 27C040 (JP6-9 configure the rom sizes for program, sound and graphics)
+  5 x GAL16V8d-15LP (read protected?)
+
+Other:
+  DSW8
+  DS14C232CN (Serial)
+  RS-232 (4 pin)
+  CDP68HC68T1E (Real-Time clock plus RAM with serial interface)
+  3.6V Lithium battery
+  36/72 pin edge connector
+  10/20 pin edge connector
+
+Note:
+  Game supports a Centronics iDP-3541 printer (and many others)
+
+*************************************************************************************************************/
+
+ROM_START( cj3play )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "cjtripleply-cj_1.10-a.u65", 0x00000, 0x80000, CRC(69ae3fd3) SHA1(50eed5130905b710f48b2086173448e999dc96e8) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )	// 68HC705C8A code
+	ROM_LOAD( "cj-tripleplay_2.4.c8", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-d.u68", 0x000000, 0x80000, CRC(8bbcf296) SHA1(e7e6e88f5f3065e7df7fff45429fdda1404418d6) )
+	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-c.u75", 0x000001, 0x80000, CRC(3dd101e0) SHA1(01241a880e72834282dd7447273ffc332a105ad1) )
+	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-f.u51", 0x100000, 0x80000, CRC(c8ccf1a7) SHA1(7a7b0f68d6ed5894fb4deb93fbf8053aff4fdb35) )
+	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-e.u61", 0x100001, 0x80000, CRC(ff59f0ae) SHA1(b9f9cdc90f44f75ace079ec08ab5d71b21ce98dd) )
+
+	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
+	ROM_LOAD( "cjtripleply-cj_1.10-g.u50", 0x00000, 0x80000, CRC(8129f700) SHA1(fc09e1e4694757b08570cc46c9536340fbce0ded) )
+
+    ROM_REGION( 0x117, "plds", 0 )
+    ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+/*************************************************************************************************************
+
 Funny Fruit
 (c) 1997-1998 Cadillac Jack
+(APRIL 21ST, 1999 in the ROMs)
 
 Board:
   CJ-8L REV-D
@@ -2723,6 +2797,22 @@ static DRIVER_INIT( bankroba )
 	ROM[0x178ec/2] = 0x4e71;
 }
 
+static DRIVER_INIT( cj3play )
+{
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	ROM[0x7064/2] = 0x6028;
+	ROM[0xa0d2/2] = 0x6024;
+
+	// loop
+	ROM[0x2773c/2] = 0x4e71;
+//	ROM[0x3491a/2] = 0x4e71;
+
+	// ERROR CHECKSUM ROM PROGRAM
+	ROM[0x20ab0/2] = 0x6050;
+}
+
 static DRIVER_INIT( cjffruit )
 {
 	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
@@ -2811,12 +2901,13 @@ static DRIVER_INIT( megadble )
 GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS )
 GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // JUNE 28TH, 1993
 GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1993,  steaser,  0,       steaser,  steaser,  0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Version 1.22)",             GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  steaser,  0,       steaser,  steaser,  0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
 GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // BLITZ SYSTEM INC APRIL 1995
 GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // BLITZ SYSTEM INC MAY 10TH, 1993
 GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // MARCH 10TH, 1994
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // SEPTEMBER 5TH, 1995
 GAME( 1995,  hermit,   0,       hermit,   hermit,   hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // APRIL 10TH, 1997
-GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Version 1.13)",                     GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Version 2.7C)",            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // FEBRUARY 24TH, 1999
+GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
