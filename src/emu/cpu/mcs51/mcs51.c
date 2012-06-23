@@ -1203,13 +1203,15 @@ INLINE void update_timer_t2(mcs51_state_t *mcs51_state, int cycles)
 
 INLINE void update_timers(mcs51_state_t *mcs51_state, int cycles)
 {
-	/* Update Timer 0 */
-	update_timer_t0(mcs51_state, cycles);
-	update_timer_t1(mcs51_state, cycles);
-
-	if (mcs51_state->features & FEATURE_I8052)
+	while (cycles--)
 	{
-		update_timer_t2(mcs51_state, cycles);
+		update_timer_t0(mcs51_state, 1);
+		update_timer_t1(mcs51_state, 1);
+
+		if (mcs51_state->features & FEATURE_I8052)
+		{
+			update_timer_t2(mcs51_state, 1);
+		}
 	}
 }
 
