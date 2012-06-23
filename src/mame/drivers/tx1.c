@@ -13,7 +13,7 @@
         * TX-1 V8 (1984)
 
     Notes:
-        * TX-1 tyre screech noises are not implemented yet.
+        * TX-1 tire screech noises are not implemented yet.
 
 ****************************************************************************
 
@@ -107,23 +107,29 @@ WRITE16_MEMBER(tx1_state::z80_shared_w)
 
 static INPUT_PORTS_START( tx1 )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )
+	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
+	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )			PORT_DIPLOCATION("DS.2:1,2")
 	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
 	PORT_DIPSETTING(      0x0004, "2 Coin Units for 1 Credit" )
 	PORT_DIPSETTING(      0x0008, "3 Coin Units for 1 Credit" )
 	PORT_DIPSETTING(      0x000c, "4 Coin Units for 1 Credit" )
 
-	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )		PORT_DIPLOCATION("DS.2:3")
 	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
 	PORT_DIPSETTING(      0x0010, "1 Coin for 2 Coin Units" )
 
-	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )
+	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )		PORT_DIPLOCATION("DS.2:4,5")
 	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
 	PORT_DIPSETTING(      0x0020, "1 Coin for 4 Coin Units" )
 	PORT_DIPSETTING(      0x0040, "1 Coin for 5 Coin Units" )
 	PORT_DIPSETTING(      0x0060, "1 Coin for 6 Coin Units" )
 
-	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DS.2:6") /* Manual states switches 6 to 8 unused (physically it's only 6 switches) */
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
+	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DS.1:1,2,3")
 	PORT_DIPSETTING(      0x0000, "A (Easiest)" )
 	PORT_DIPSETTING(      0x0100, "B" )
 	PORT_DIPSETTING(      0x0200, "C" )
@@ -133,13 +139,13 @@ static INPUT_PORTS_START( tx1 )
 	PORT_DIPSETTING(      0x0600, "G" )
 	PORT_DIPSETTING(      0x0700, "H (Hardest)" )
 
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Game_Time ) )
+	PORT_DIPNAME( 0x1800, 0x1000, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("DS.1:4,5")
 	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0800, "B" )
 	PORT_DIPSETTING(      0x1000, "C" )
 	PORT_DIPSETTING(      0x1800, "D (Shortest)" )
 
-	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )
+	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )		PORT_DIPLOCATION("DS.1:6,7,8")
 	PORT_DIPSETTING(      0x0000, "No Bonus" )
 	PORT_DIPSETTING(      0x2000, "2 Coin Units for 1 Credit" )
 	PORT_DIPSETTING(      0x4000, "3 Coin Units for 1 Credit" )
@@ -166,8 +172,8 @@ static INPUT_PORTS_START( tx1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
 
 	PORT_START("PPI_PORTD")
-	/* Wire jumper setting on sound PCB */
-	PORT_DIPNAME( 0xf0, 0x80,  DEF_STR( Unknown ) )
+	/* Wire jumper setting on sound PCB - actually unpopulated 4 switch DS.3 */
+	PORT_DIPNAME( 0xf0, 0x80, "Sound PCB Jumper (DS.3)" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
@@ -178,7 +184,8 @@ static INPUT_PORTS_START( tx1j )
 	PORT_INCLUDE(tx1)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )
+	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
+	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("DS.2:1,2,3") /* As silkscreened on the PCB */
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -188,7 +195,7 @@ static INPUT_PORTS_START( tx1j )
 	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("DS.2:4,5,6") /* As silkscreened on the PCB */
 	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -198,7 +205,8 @@ static INPUT_PORTS_START( tx1j )
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )
+	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DS.1:6,7,8")
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x2000, "1" )
 	PORT_DIPSETTING(      0x4000, "2" )
@@ -213,33 +221,33 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( buggyboy )
 	PORT_START("DSW")
 	/* Dipswitch 0 is unconnected */
-	PORT_DIPNAME( 0x0003, 0x0003, "Do not change 2" )
+	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )	PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0001, "1" )
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
 
-	PORT_DIPNAME( 0x0004, 0x0004, "Message" )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )	PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 
-	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change 3" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )	PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )		PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0010, "B" )
 	PORT_DIPSETTING(      0x0020, "C" )
 	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
 
-	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x0000, "A (Easy)")
 	PORT_DIPSETTING(      0x0040, "B" )
 	PORT_DIPSETTING(      0x0080, "C" )
 	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
 
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6")
 	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -249,13 +257,13 @@ static INPUT_PORTS_START( buggyboy )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0xe000, "Free-Play" )
 
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_5C ) )
 
-	PORT_DIPNAME( 0x0700, 0x0700, "Do not change 1" )
+	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )	PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0200, "2" )
@@ -297,33 +305,33 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( buggybjr )
 	PORT_START("DSW")
 	/* Dipswitch 0 is unconnected */
-	PORT_DIPNAME( 0x0003, 0x0003, "Do not change 2" )
+	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )	PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0001, "1" )
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
 
-	PORT_DIPNAME( 0x0004, 0x0004, "Message" )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )	PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 
-	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change 3" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )	PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )		PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0010, "B" )
 	PORT_DIPSETTING(      0x0020, "C" )
 	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
 
-	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x0000, "A (Easy)")
 	PORT_DIPSETTING(      0x0040, "B" )
 	PORT_DIPSETTING(      0x0080, "C" )
 	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
 
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6")
 	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -333,13 +341,13 @@ static INPUT_PORTS_START( buggybjr )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0xe000, "Free-Play" )
 
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0x0700, 0x0700, "Do not change 1" )
+	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )	PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0200, "2" )
@@ -721,7 +729,8 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_VIDEO_START(tx1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright") /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+
 
 	MCFG_SOUND_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
 	MCFG_SOUND_CONFIG(tx1_ay8910_interface)
@@ -836,6 +845,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
+/*
+    The TX-1 (Multi License (World)) game is comprised of three boards:
+    - Sound Board (labeled TC013B, top small board, different then the below mentioned TC013A)
+    - CPU Board   (labeled TC011A, middle board, uses 15.000 MHz xtal)
+    - Video Board (labeled TC012A, bottom board, uses 18.000 MHz xtal)
+*/
 ROM_START( tx1 )
 	ROM_REGION( 0x100000, "main_cpu", 0 )
 	ROM_LOAD16_BYTE( "8412-136027-244.22", 0x20000, 0x4000, CRC(2e9cefa2) SHA1(4ca04eae446e8df08ab793488a79217ed1a27875) )
@@ -917,6 +932,12 @@ ROM_START( tx1 )
 	ROM_LOAD( "136027-141.ic50", 0x1700, 0x200, CRC(6b424cea) SHA1(83127326c20116b0a4be1126e163f9c6755e19dc) )
 ROM_END
 
+/*
+    The TX-1 (Japan Rev B) game is comprised of three boards:
+    - Sound Board (labeled TC013A, top small board)
+    - CPU Board   (labeled TC011A, middle board, uses 15.000 MHz xtal)
+    - Video Board (labeled TC012A, bottom board, uses 18.000 MHz xtal)
+*/
 ROM_START( tx1jb )
 	ROM_REGION( 0x100000, "main_cpu", 0 )
 	ROM_LOAD16_BYTE( "tx1_1b.ic22", 0x20000, 0x4000, CRC(3dadb8fb) SHA1(ef99897161d559180abc7f4ce23e8f55fe3bb330) )
@@ -1011,7 +1032,7 @@ ROM_START( tx1jc )
 	ROM_LOAD16_BYTE( "tx1_8c.ic132", 0x04001, 0x2000, CRC(0d63dadc) SHA1(0954174b25c08967d3efb31f5721fd05502d66dd) )
 
 	ROM_REGION( 0x10000, "audio_cpu", 0 ) /* Label was missing */
-	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) )
+	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) ) /* Unconfirmed TC013A or the later TC013B */
 
 	ROM_REGION( 0x20000, "char_tiles", 0 )
 	ROM_LOAD( "tx1_21a.ic204", 0x0000, 0x4000, CRC(cd3441ad) SHA1(8e6597b3177b8aaa34ed3373d85fc4b6231e1333) )
