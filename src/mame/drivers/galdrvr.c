@@ -3332,7 +3332,7 @@ ROM_START( omega )
 ROM_END
 
 
-ROM_START( warofbug )
+ROM_START( warofbug )  /* Shows 20c as the base of currency.  I know of no US games that used dimes - unless it's another country? */
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "warofbug.u",   0x0000, 0x0800, CRC(b8dfb7e3) SHA1(c7c675b2638869a9cd7dbd554e6131d8c71b567a) )
 	ROM_LOAD( "warofbug.v",   0x0800, 0x0800, CRC(fd8854e0) SHA1(b39ab41b834f18341968dd780f0a3cd07d70c16c) )
@@ -3347,6 +3347,24 @@ ROM_START( warofbug )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
 ROM_END
+
+
+ROM_START( warofbugg )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) )
+	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) )
+	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) )
+	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) )
+	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "warofbug.1k",  0x0000, 0x0800, CRC(8100fa85) SHA1(06641c431cace36dec98b87555f62e72f3e53a31) )
+	ROM_LOAD( "warofbug.1j",  0x0800, 0x0800, CRC(d1220ae9) SHA1(e892bc8b0b71d8b07503e474e9c30e6cab460682) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
+ROM_END
+
 
 /*  Galaxian hardware mods for War of the Bugs warofbug/warofbugg
 
@@ -3368,21 +3386,23 @@ Join pins 21 of IC's 1H and 1K together and connect both to +5 volts
 (although I've seen one set of docs saying to connect to pin 1 of
 ic 2N (7408) instead)  */
 
-ROM_START( warofbugg )
+
+ROM_START( warofbugu )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) )
-	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) )
-	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) )
-	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) )
-	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) )
+	ROM_LOAD( "wb-prog-1.7d",   0x0000, 0x0800, CRC(b8dfb7e3) SHA1(c7c675b2638869a9cd7dbd554e6131d8c71b567a) )
+	ROM_LOAD( "wb-prog-2.7e",   0x0800, 0x0800, CRC(fd8854e0) SHA1(b39ab41b834f18341968dd780f0a3cd07d70c16c) )
+	ROM_LOAD( "wb-prog-3.7j",   0x1000, 0x0800, CRC(4495aa14) SHA1(f1be281db1d831770efa9cc41ea87eb348e70108) )
+	ROM_LOAD( "wb-prog-4.7n",   0x1800, 0x0800, CRC(e4bd257c) SHA1(e9a26a50cbc76bb339dfbf3d2817229fe9ff7fc4) )
+	ROM_LOAD( "wb-prog-5.7p",   0x2000, 0x0800, CRC(71257bb4) SHA1(3624becfda4e080795a15428a51dcda261f91210) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "warofbug.1k",  0x0000, 0x0800, CRC(8100fa85) SHA1(06641c431cace36dec98b87555f62e72f3e53a31) )
-	ROM_LOAD( "warofbug.1j",  0x0800, 0x0800, CRC(d1220ae9) SHA1(e892bc8b0b71d8b07503e474e9c30e6cab460682) )
+	ROM_LOAD( "warofbug.1k",  0x0000, 0x0800, CRC(8100fa85) SHA1(06641c431cace36dec98b87555f62e72f3e53a31) ) // wb-vid-1.1j
+	ROM_LOAD( "warofbug.1j",  0x0800, 0x0800, CRC(d1220ae9) SHA1(e892bc8b0b71d8b07503e474e9c30e6cab460682) ) // wb-vid-2.1l
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
 ROM_END
+
 
 ROM_START( redufo ) /* Galaxian bootleg hardware known as Artic Multi-System */
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -6384,7 +6404,8 @@ GAME( 1982, catacomb, 0,        galaxian, catacomb, galaxian, ROT90,  "MTM Games
 GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?", "Omega", GAME_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
-GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
+GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
+GAME( 1981, warofbugu,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia / Super Video Games", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (US)", GAME_SUPPORTS_SAVE )
 GAME( 1981, warofbugg,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT270, "Artic", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE ) // is this the original?
 GAME( 1981, redufob,  redufo,   galaxian, redufob,  nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg)", GAME_SUPPORTS_SAVE ) // rev A?
