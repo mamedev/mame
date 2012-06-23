@@ -2187,12 +2187,12 @@ ROM_START( cj3play )
 	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
 	ROM_LOAD( "cjtripleply-cj_1.10-g.u50", 0x00000, 0x80000, CRC(8129f700) SHA1(fc09e1e4694757b08570cc46c9536340fbce0ded) )
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2247,12 +2247,12 @@ ROM_START( cjffruit )
 	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
 	ROM_LOAD( "cjfunfruit-cj_1.13-g.u50", 0x00000, 0x80000, CRC(5fb53d3e) SHA1(f4a37b00a9417440685d198f1375b615848e7fb6) )
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2310,14 +2310,14 @@ ROM_START( deucesw2 )
 	ROM_REGION( 0x20000, "samples", 0 )	// 8 bit unsigned
 	ROM_LOAD( "cb2wild-ah-2.02f-k.u54", 0x00000, 0x20000, CRC(1eea618b) SHA1(65f3513d1a93a8afbfaeff27ebea5f0b5348e54b) )
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "gal16v8d_vdp.u23", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_ck2.u62", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_vdo.u65", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_ck1.u70", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_irq.u80", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_dec.u83", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "gal16v8d_pia.u86", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u23", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u62", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u65", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u70", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_irq.u80", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u83", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_pia.u86", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************

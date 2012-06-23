@@ -1,8 +1,8 @@
 /***************************************************************************
 
-                      -= IGS009 Based Games =-
+                          -= IGS009 Based Games =-
 
-                        driver by Luca Elia
+                   driver by Luca Elia and David Haywood
 
 CPU     :   Z180
 Sound   :   M6295 + YM2413
@@ -12,6 +12,13 @@ NVRAM   :   Battery for main RAM
 - The hardware is similar to other IGS002 + IGS003 based boards.
   The interesting part is the background tilemap, that is designed specifically
   for simulating the nine reels of a slot machine.
+
+----------------------------------------------------------------------
+Year  Game                Manufacturer    Notes
+----------------------------------------------------------------------
+1995? Jingle Bell         IGS
+1998  Grand Prix '98      Romtec          1 reel gfx rom is bad
+----------------------------------------------------------------------
 
 ***************************************************************************/
 
@@ -269,7 +276,6 @@ static VIDEO_START(gp98)
 	state->m_gp98_reel2_tilemap->set_scroll_cols(128);
 	state->m_gp98_reel3_tilemap->set_scroll_cols(128);
 	state->m_gp98_reel4_tilemap->set_scroll_cols(128);
-
 }
 
 
@@ -507,42 +513,98 @@ static INPUT_PORTS_START( jingbell )
 	PORT_DIPNAME( 0x02, 0x00, "W-Up Bonus" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	// it's shown in attract mode
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x04, 0x04, "Min Bet" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x08, 0x08, "Spin Speed" )
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPSETTING(    0x00, "Quick" )
+	PORT_DIPNAME( 0x10, 0x00, "Strip Girl" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Player's Panel" )
+	PORT_DIPSETTING(    0x00, "Type A" )
+	PORT_DIPSETTING(    0xc0, "Type A" )
+	PORT_DIPSETTING(    0x80, "Type B" )
+	PORT_DIPSETTING(    0x40, "Type C" )
 
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate (%)" )
+	PORT_DIPSETTING(    0x07, "89" )
+	PORT_DIPSETTING(    0x06, "90" )
+	PORT_DIPSETTING(    0x05, "91" )
+	PORT_DIPSETTING(    0x04, "92" )
+	PORT_DIPSETTING(    0x03, "93" )
+	PORT_DIPSETTING(    0x02, "94" )
+	PORT_DIPSETTING(    0x01, "95" )
+	PORT_DIPSETTING(    0x00, "96" )
+	PORT_DIPNAME( 0x38, 0x38, "W-Up Chance (%)" )
+	PORT_DIPSETTING(    0x38, "93" )
+	PORT_DIPSETTING(    0x30, "94" )
+	PORT_DIPSETTING(    0x28, "95" )
+	PORT_DIPSETTING(    0x20, "96" )
+	PORT_DIPSETTING(    0x18, "97" )
+	PORT_DIPSETTING(    0x10, "98" )
+	PORT_DIPSETTING(    0x08, "99" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Key In Limit" )
+	PORT_DIPSETTING(    0xc0, "1k" )
+	PORT_DIPSETTING(    0x80, "3k" )
+	PORT_DIPSETTING(    0x40, "5k" )
+	PORT_DIPSETTING(    0x00, "10k" )
 
 	PORT_START("DSW3")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPSETTING(    0x05, "10" )
+	PORT_DIPSETTING(    0x04, "30" )
+	PORT_DIPSETTING(    0x03, "50" )
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x01, "200" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x38, 0x38, "Coin 1 Rate" )
+	PORT_DIPSETTING(    0x38, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x28, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x18, "20" )
+	PORT_DIPSETTING(    0x10, "25" )
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0xc0, 0xc0, "System Limit" )
+	PORT_DIPSETTING(    0xc0, "5k" )
+	PORT_DIPSETTING(    0x80, "10k" )
+	PORT_DIPSETTING(    0x40, "30k" )
+	PORT_DIPSETTING(    0x00, "50k" )
 
 	PORT_START("DSW4")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x01, 0x01, "Min Play For Fever" )
+	PORT_DIPSETTING(    0x01, "8" )
+	PORT_DIPSETTING(    0x00, "16" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Coin 2 Rate" )
+	PORT_DIPSETTING(    0x1c, "1" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x14, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x0c, "20" )
+	PORT_DIPSETTING(    0x08, "40" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x60, 0x60, "Key Out Rate" )
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x80, 0x80, "Play Line" )
+	PORT_DIPSETTING(    0x80, "8" )
+	PORT_DIPSETTING(    0x00, "16" )
 
 	PORT_START("DSW5")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
@@ -556,40 +618,40 @@ static INPUT_PORTS_START( jingbell )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear")	// stats, memory
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")	// stats, memory
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, (void *)0 )	// hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )	// test (press during boot)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Records")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Records")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")	// pays out
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BUTTONS1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("Stop")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BUTTONS2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1  ) PORT_NAME("Start / H_Dup")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Bet / H_Dup")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1      ) PORT_NAME("Start / H_Dup")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW  ) PORT_NAME("Small")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1     ) PORT_NAME("Left Bet / D_Dup")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Bet / Dup")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2     ) PORT_NAME("Right Bet / Dup")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -626,8 +688,8 @@ static const gfx_layout layout_8x32x6 =
 };
 
 static GFXDECODE_START( jingbell )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x32x6, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x6,  0, 16 )
+	GFXDECODE_ENTRY( "reels", 0, layout_8x32x6, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, layout_8x8x6,  0, 16 )
 GFXDECODE_END
 
 static const gfx_layout tiles8x8_layout =
@@ -637,7 +699,7 @@ static const gfx_layout tiles8x8_layout =
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+1, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+1, RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+1 },
 	{ 8,10,12,14, 0, 2, 4, 6, },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -648,13 +710,13 @@ static const gfx_layout tiles8x32_layout =
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+1, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+1, RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+1 },
 	{ 8,10,12,14, 0, 2, 4, 6, },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16,16*16,17*16,18*16,19*16,20*16,21*16,22*16,23*16,24*16,25*16,26*16,27*16,28*16,29*16,30*16,31*16 },
+	{ STEP32(0,16) },
 	32*16
 };
 
 static GFXDECODE_START( gp98 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x32_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -720,7 +782,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
 Jingle Bell
-(C) 1998 IGS
+(C) IGS ("COPYRIGHT 1995" in ROM, "FEB. 23 1998" on sticker)
 
 CPU:
     1x HD64180RP8 (u18)(main)
@@ -760,12 +822,12 @@ ROM_START( jingbell )
 	ROM_REGION( 0x8000, "data", 0 )
 	ROM_LOAD( "jingle133i7.u43", 0x0000, 0x8000, CRC(a7affa15) SHA1(f9d33e32b57ad267d383e075663994e0af0b3016) )
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_REGION( 0x30000, "reels", 0 )
 	ROM_LOAD( "jingle133i1.u17", 0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
 	ROM_LOAD( "jingle133i2.u16", 0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
 	ROM_LOAD( "jingle133i3.u15", 0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
+	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_LOAD( "jingle133i4.u25", 0x00000, 0x40000, CRC(7aa1d344) SHA1(141e27df93cb35ab852d9022e0b08bd596f1186b) )
 	ROM_LOAD( "jingle133i5.u24", 0x40000, 0x40000, CRC(021261d1) SHA1(5b23f9bd818193c343f9f4c9317955b17efb8cfa) )
 	ROM_LOAD( "jingle133i6.u23", 0x80000, 0x40000, CRC(c40228fd) SHA1(4dc05337d64ed2b8d66fc5f0ca8ffbf96799f768) )
@@ -809,6 +871,39 @@ static DRIVER_INIT( jingbell )
 	rom[0x01f19] = 0x18;
 }
 
+/***************************************************************************
+
+Grand Prix '98
+
+PCB Layout
+----------
+
+|-----------------------------------------|
+|                 YM2413       DSW2  DSW4 |
+|                 3.579545MHz             |
+|   Z180                       DSW1  DSW3 |
+|                 PAL                     |
+|     PRG                                 |
+|   12MHz                                 |
+|J                   51        |-------|  |
+|A    6264                     |PLCC84 |  |
+|M                   50        |FPGA   |  |
+|M                             |       |  |
+|A                   49        |-------|  |
+|                                         |
+|                                         |
+|                                         |
+|                   6264                  |
+|                                         |
+|          62256                          |
+|-----------------------------------------|
+Z180 @ 12MHz
+YM2413 @ 3.579545MHz
+VSync 60Hz
+HSync 15.35kHz
+
+***************************************************************************/
+
 ROM_START( gp98 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "prg", 0x00000, 0x20000, CRC(1c02b8cc) SHA1(b8a29cbd96581f8ae1c1028279b8ee703be29f5f) )
@@ -821,20 +916,19 @@ ROM_START( gp98 )
 	ROM_LOAD( "50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
 	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_REGION( 0xc0000, "reels", 0 )
 	ROM_COPY( "tempgfx", 0x000000, 0x00000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x080000, 0x40000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x100000, 0x80000, 0x40000 )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
+	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_COPY( "tempgfx", 0x040000, 0x00000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x0c0000, 0x40000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x140000, 0x80000, 0x40000 )
 
-
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-	/* no OKI on this */
+	// no OKI on this
 ROM_END
 
-GAME( 1995?, jingbell, 0, jingbell, jingbell, jingbell, ROT0, "IGS", "Jingle Bell (Italy, V133I)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1998,  gp98,     0,     gp98, jingbell,        0, ROT0, "Romtec Co. Ltd", "Grand Prix '98",GAME_NOT_WORKING| GAME_NO_SOUND )
+GAME( 1995?, jingbell, 0, jingbell, jingbell, jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", 0 )
+GAME( 1998,  gp98,     0, gp98,     jingbell, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
