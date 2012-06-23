@@ -22,7 +22,7 @@
       136001-305.fh1
       136001-306.j1
 
-    Milipede:
+    Millipede:
       136013-109.5p
       136013-110.5r
 
@@ -428,6 +428,7 @@ each direction to assign the boundries.
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/eeprom.h"
 #include "machine/atari_vg.h"
 #include "includes/centiped.h"
 #include "sound/ay8910.h"
@@ -460,6 +461,7 @@ static MACHINE_START( centiped )
 	state->save_item(NAME(state->m_oldpos));
 	state->save_item(NAME(state->m_sign));
 	state->save_item(NAME(state->m_dsw_select));
+	state->save_item(NAME(state->m_prg_bank));
 }
 
 
@@ -470,6 +472,7 @@ static MACHINE_RESET( centiped )
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->m_dsw_select = 0;
 	state->m_control_select = 0;
+	state->m_prg_bank = 0;
 }
 
 
@@ -571,7 +574,8 @@ READ8_MEMBER(centiped_state::milliped_IN2_r)
      * the inputs, and has the good side effect of disabling
      * the actual Joy1 inputs while control_select is no zero.
      */
-	if (0 != m_control_select) {
+	if (m_control_select != 0)
+	{
 		/* Bottom 4 bits is our joystick inputs */
 		UINT8 joy2data = ioport("IN3")->read() & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
@@ -583,14 +587,12 @@ READ8_MEMBER(centiped_state::milliped_IN2_r)
 
 WRITE8_MEMBER(centiped_state::input_select_w)
 {
-
 	m_dsw_select = (~data >> 7) & 1;
 }
 
 /* used P2 controls if 1, P1 controls if 0 */
 WRITE8_MEMBER(centiped_state::control_select_w)
 {
-
 	m_control_select = (data >> 7) & 1;
 }
 
@@ -605,7 +607,6 @@ READ8_MEMBER(centiped_state::mazeinv_input_r)
 
 WRITE8_MEMBER(centiped_state::mazeinv_input_select_w)
 {
-
 	m_control_select = offset & 3;
 }
 
@@ -616,6 +617,9 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 		case 0x0033:
 		case 0x6b19:
 			return 0x01;
+		
+		default:
+			break;
 	}
 
 	return 0;
@@ -656,29 +660,6 @@ WRITE8_MEMBER(centiped_state::bullsdrt_coin_count_w)
 
 /*************************************
  *
- *  Bootleg sound
- *
- *************************************/
-
-WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
-{
-	device_t *device = machine().device("pokey");
-	ay8910_address_w(device, 0, offset);
-	ay8910_data_w(device, 0, data);
-}
-
-
-READ8_MEMBER(centiped_state::caterplr_AY8910_r)
-{
-	device_t *device = machine().device("pokey");
-	ay8910_address_w(device, 0, offset);
-	return ay8910_r(device, 0);
-}
-
-
-
-/*************************************
- *
  *  Centipede CPU memory handlers
  *
  *************************************/
@@ -706,23 +687,14 @@ static ADDRESS_MAP_START( centiped_base_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
 	AM_IMPORT_FROM(centiped_base_map)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magworm_map, AS_PROGRAM, 8, centiped_state )
-	AM_IMPORT_FROM(centiped_base_map)
-	AM_RANGE(0x1001, 0x1001) AM_DEVWRITE_LEGACY("pokey", ay8910_address_w)
-	AM_RANGE(0x1003, 0x1003) AM_DEVREADWRITE_LEGACY("pokey", ay8910_r, ay8910_data_w)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( caterplr_map, AS_PROGRAM, 8, centiped_state )
-	AM_IMPORT_FROM(centiped_base_map)
-	AM_RANGE(0x1780, 0x1780) AM_READ(caterplr_rand_r)
-	AM_RANGE(0x1000, 0x100f) AM_READWRITE(caterplr_AY8910_r, caterplr_AY8910_w)
-ADDRESS_MAP_END
-
+//// Centipede bootlegs ////
 
 static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
@@ -749,6 +721,34 @@ static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x2800, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_ROM
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( magworm_map, AS_PROGRAM, 8, centiped_state )
+	AM_IMPORT_FROM(centiped_base_map)
+	AM_RANGE(0x1001, 0x1001) AM_DEVWRITE_LEGACY("pokey", ay8910_address_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREADWRITE_LEGACY("pokey", ay8910_r, ay8910_data_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( caterplr_map, AS_PROGRAM, 8, centiped_state )
+	AM_IMPORT_FROM(centiped_base_map)
+	AM_RANGE(0x1780, 0x1780) AM_READ(caterplr_rand_r)
+	AM_RANGE(0x1000, 0x100f) AM_READWRITE(caterplr_AY8910_r, caterplr_AY8910_w)
+ADDRESS_MAP_END
+
+WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
+{
+	device_t *device = machine().device("pokey");
+	ay8910_address_w(device, 0, offset);
+	ay8910_data_w(device, 0, data);
+}
+
+READ8_MEMBER(centiped_state::caterplr_AY8910_r)
+{
+	device_t *device = machine().device("pokey");
+	ay8910_address_w(device, 0, offset);
+	return ay8910_r(device, 0);
+}
 
 
 
@@ -782,6 +782,101 @@ static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Multipede CPU memory handlers
+ *
+ *************************************/
+
+/*
+ Multipede is a daughterboard kit produced by Braze Technologies
+ from 2002(1st version) to 2007(1.2a). It allows users to play
+ Centipede and Millipede on one board.
+ The game can be switched at any time with P1+P2 start.
+
+ - M6502 CPU (from main pcb)
+ - 27C512 64KB EPROM
+ - 93C46P E2PROM for saving highscore/settings
+ - PALCE22V10H-25PC/4
+ - 74LS245
+ - 2*8KB gfx roms, on a separate smaller daughterboard
+
+ TODO: centiped does not work yet, the game reconfigures the memorymap
+*/
+
+static ADDRESS_MAP_START( multiped_map, AS_PROGRAM, 8, centiped_state )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
+	AM_RANGE(0x2001, 0x2001) AM_READ(milliped_IN1_r)
+	AM_RANGE(0x2010, 0x2010) AM_READ(milliped_IN2_r)
+	AM_RANGE(0x2011, 0x2011) AM_READ_PORT("IN3")
+	AM_RANGE(0x2030, 0x2030) AM_READNOP
+	AM_RANGE(0x2480, 0x249f) AM_WRITE(milliped_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2500, 0x2502) AM_WRITE(coin_count_w)
+	AM_RANGE(0x2503, 0x2504) AM_WRITE(led_w)
+	AM_RANGE(0x2505, 0x2505) AM_WRITE(input_select_w)
+	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
+	AM_RANGE(0x2507, 0x2507) AM_WRITE(control_select_w)
+	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2700, 0x2700) AM_WRITENOP
+	AM_RANGE(0x2780, 0x27bf) AM_WRITENOP
+	AM_RANGE(0x4000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(multiped_eeprom_w)
+	AM_RANGE(0xd800, 0xd800) AM_MIRROR(0x03ff) AM_READWRITE(multiped_eeprom_r, multiped_prgbank_w)
+	AM_RANGE(0xdc00, 0xdc00) AM_MIRROR(0x03ff) AM_WRITE(multiped_gfxbank_w)
+ADDRESS_MAP_END
+
+READ8_MEMBER(centiped_state::multiped_eeprom_r)
+{
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
+	return eeprom->read_bit() ? 0x80 : 0;
+}
+
+WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
+{
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
+
+	// a0: always high
+	// a3-a7: always low
+	// a8-a10: same as a0-a2
+	// d0-d6: N/C?
+
+	// a1 low: latch bit
+	if (~offset & 2)
+		eeprom->write_bit((data & 0x80) ? 1 : 0);
+
+	// a2 low: write latch or select next bit to read
+	if (~offset & 4)
+		eeprom->set_clock_line((~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+
+	// both high: reset
+	else if (offset & 2)
+		eeprom->set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE8_MEMBER(centiped_state::multiped_prgbank_w)
+{
+	// d0-d6: N/C?
+	// d7: prg (and gfx) rom bank
+	int bank = (data & 0x80) ? 1 : 0;
+	if (bank != m_prg_bank)
+	{
+		m_prg_bank = bank;
+		multiped_gfxbank_w(space, 0, m_gfx_bank << 6);
+		
+		// TODO: prg bankswitch and alt memory map layout for centiped
+	}
+}
 
 
 
@@ -1232,6 +1327,42 @@ static INPUT_PORTS_START( milliped )
 
 	PORT_START("TRACK1_Y")	/* IN9, fake trackball input port. */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( multiped )
+	// milliped board, but hard-dips are not used
+	PORT_INCLUDE( milliped )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "P8:!1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "P8:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "P8:!3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "P8:!4" )
+
+	PORT_MODIFY("IN1")
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "P8:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "P8:!8" )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "D5:!1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "D5:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "D5:!3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "D5:!4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "D5:!5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "D5:!6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "D5:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "D5:!8" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "B5:!1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "B5:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "B5:!3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "B5:!4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "B5:!5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "B5:!6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "B5:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "B5:!8" )
 INPUT_PORTS_END
 
 
@@ -1722,6 +1853,17 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( multiped, milliped )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(multiped_map)
+
+	MCFG_DEVICE_REMOVE("earom")
+	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( warlords, centiped )
 
 	/* basic machine hardware */
@@ -1806,7 +1948,7 @@ ROM_START( centiped )
 ROM_END
 
 
-ROM_START( centipdd ) /* Centipede "Dux" graphics hack by Two Bit Score */
+ROM_START( centipdd ) /* Centipede "Dux" graphics hack by Two-Bit Score in 1989 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136001-307.d1",  0x2000, 0x0800, CRC(5ab0d9de) SHA1(8ea6e3304202831aabaf31dbd0f970a7b3bfe421) )
 	ROM_LOAD( "136001-308.e1",  0x2800, 0x0800, CRC(4c07fd3e) SHA1(af4fdbf32c23b1864819d620a874e7f205da3cdb) )
@@ -1933,7 +2075,7 @@ ROM_START( milliped )
 ROM_END
 
 
-ROM_START( millipdd ) /* Millipede "Dux" graphics hack by Two Bit Score */
+ROM_START( millipdd ) /* Millipede "Dux" graphics hack by Two-Bit Score in 1989 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136013-104.1mn", 0x4000, 0x1000, CRC(40711675) SHA1(b595d6a0f5d3c611ade1b83a94c3b909d2124dc4) )
 	ROM_LOAD( "136013-103.1l",  0x5000, 0x1000, CRC(fb01baf2) SHA1(9c1d0bbc20bf25dd21761a311fd1ed80aa029241) )
@@ -1943,6 +2085,21 @@ ROM_START( millipdd ) /* Millipede "Dux" graphics hack by Two Bit Score */
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "mil-dux.5r", 0x0000, 0x0800, CRC(b6c617b6) SHA1(a672a9b35b773677aea6b9a5c4305939180f6854) )
 	ROM_LOAD( "mil-dux.5p", 0x0800, 0x0800, CRC(2a6ef4b0) SHA1(832dae8c1b1f959bb8582f9503d84bea9d50c08c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "136001-213.7e", 0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) ) /* not used */
+ROM_END
+
+
+ROM_START( multiped )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) // banked, decrypted rom goes here
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD("cm_12a.bin", 0x00000, 0x10000, CRC(8248d42c) SHA1(613f449de99659714abdf86d1be4d9d68f624da2) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cm_5r.bin", 0x0000, 0x2000, CRC(45613f22) SHA1(5d512a286ca9e008bd2f0fdbc2f8cb9c006e3ac7) )
+	ROM_LOAD( "cm_5p.bin", 0x2000, 0x2000, CRC(cfbc3622) SHA1(a22da8f9b28effcd90794cb87ebc2afdf3fc4282) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "136001-213.7e", 0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) ) /* not used */
@@ -2019,6 +2176,21 @@ static DRIVER_INIT( bullsdrt )
 }
 
 
+static DRIVER_INIT( multiped )
+{
+	UINT8 *src = machine.root_device().memregion("user1")->base();
+	UINT8 *dest = machine.root_device().memregion("maincpu")->base() + 0x10000;
+
+	// descramble rom
+	for (int i = 0; i < 0x10000; i++)
+		dest[i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400)] = BITSWAP8(src[BITSWAP16(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
+
+	// (this can be removed when prg bankswitch is implemented)
+	memmove(dest-0x8000, dest+0x0000, 0x4000);
+	memmove(dest-0xc000, dest+0x4000, 0x4000);
+}
+
+
 
 /*************************************
  *
@@ -2030,12 +2202,13 @@ GAME( 1980, centiped, 0,        centiped, centiped, 0,        ROT270, "Atari",  
 GAME( 1980, centiped2,centiped, centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",   "Centipede (1 player, timed)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack",    "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1980, caterplr, centiped, caterplr, caterplr, 0,        ROT270, "bootleg", "Caterpillar", GAME_SUPPORTS_SAVE )
+GAME( 1989, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack (Two-Bit Score)", "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
+GAME( 1980, caterplr, centiped, caterplr, caterplr, 0,        ROT270, "bootleg", "Caterpillar (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
 GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac", GAME_SUPPORTS_SAVE )
-GAME( 1980, magworm,  centiped, magworm,  magworm,  0,        ROT270, "bootleg", "Magic Worm (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, magworm,  centiped, magworm,  magworm,  0,        ROT270, "bootleg", "Magic Worm (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
 GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
-GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack",    "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
+GAME( 1989, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack (Two-Bit Score)", "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
+GAME( 2002, multiped, 0,        multiped, multiped, multiped, ROT270, "hack (Braze Technologies)", "Multipede (Centipede/Millipede multigame kit)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", GAME_SUPPORTS_SAVE )
 GAME( 1981, mazeinv,  0,        mazeinv,  mazeinv,  0,        ROT270, "Atari",   "Maze Invaders (prototype)", 0 )
