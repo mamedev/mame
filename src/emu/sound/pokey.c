@@ -436,7 +436,7 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		/* do nothing, caused by a forced resync */
 		break;
 	case SYNC_POT:
-		logerror("x %02x \n", (param & 0x20));
+		//logerror("x %02x \n", (param & 0x20));
 		m_ALLPOT |= (param & 0xff);
 		break;
 	case SYNC_SET_IRQST:
