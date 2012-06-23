@@ -311,7 +311,7 @@ static const es5505_interface es5505_taito_en_config =
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( taito_en_sound )
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(en_sound_map)
 
 	MCFG_DUART68681_ADD("duart68681", XTAL_16MHz / 4, taito_en_duart68681_config)
