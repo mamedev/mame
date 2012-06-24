@@ -134,7 +134,7 @@
     F1D400          R     xxxxxxxx xxxxxxxx   ROM_AMSINE - amplitude modulated sine wave
     F1D600          R     xxxxxxxx xxxxxxxx   ROM_12W - sine wave and second order harmonic
     F1D800          R     xxxxxxxx xxxxxxxx   ROM_CHIRP16 - chirp
-    F1DA00          R     xxxxxxxx xxxxxxxx   ROM_NTRI - traingle wave with noise
+    F1DA00          R     xxxxxxxx xxxxxxxx   ROM_NTRI - triangle wave with noise
     F1DC00          R     xxxxxxxx xxxxxxxx   ROM_DELTA - spike
     F1DE00          R     xxxxxxxx xxxxxxxx   ROM_NOISE - white noise
     ------------------------------------------------------------
@@ -250,7 +250,7 @@ void cojag_sound_init(running_machine &machine)
 		/* F1D800 = chirp (sine wave of increasing frequency) */
 		jaguar_wave_rom[0x200 + i] = (int)(32767. * sin(2.0 * M_PI * (double)i / (double)0x80));
 
-		/* F1DA00 = traingle wave with noise */
+		/* F1DA00 = triangle wave with noise */
 		jaguar_wave_rom[0x280 + i] = jaguar_wave_rom[0x000 + i] * (machine.rand() % 32768) / 32768;
 
 		/* F1DC00 = spike */
