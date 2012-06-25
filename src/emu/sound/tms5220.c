@@ -332,7 +332,6 @@ device), PES Speech adapter (serial port connection)
 // above debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 
 #define MAX_SAMPLE_CHUNK	512
-#define FIFO_SIZE 16
 
 /* Variants */
 
@@ -2039,3 +2038,1389 @@ DEFINE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
 DEFINE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);
 DEFINE_LEGACY_SOUND_DEVICE(TMC0285, tmc0285);
 DEFINE_LEGACY_SOUND_DEVICE(TMS5200, tms5200);
+
+
+/******************************************************************************
+   New class implementation
+******************************************************************************/
+
+#define M_INTERP_SHIFT >> m_coeff->interp_coeff[m_interp_period]
+
+tms52xx_device::tms52xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, const struct tms5100_coeffs* coeffs, const int var, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_variant(var),
+	  m_coeff(coeffs)
+{
+}
+
+
+tms5220n_device::tms5220n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms52xx_device(mconfig, TMS5220N, "TMS5220N", tag, &tms5220_coeff, TMS5220_IS_5220, owner, clock)
+{
+}
+
+tms5220cn_device::tms5220cn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms52xx_device(mconfig, TMS5220CN, "TMS5220CN", tag, &tms5220c_coeff, TMS5220_IS_5220C, owner, clock)
+{
+}
+
+tmc0285n_device::tmc0285n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms52xx_device(mconfig, TMC0285N, "TMC0285N", tag, &tms5200_coeff, TMS5220_IS_TMC0285, owner, clock)
+{
+}
+
+tms5200n_device::tms5200n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms52xx_device(mconfig, TMS5200N, "TMS5200N", tag, &tms5200_coeff, TMS5220_IS_5200, owner, clock)
+{
+}
+
+void tms52xx_device::device_start()
+{
+	const tms52xx_config *conf = reinterpret_cast<const tms52xx_config *>(static_config());
+	//m_table = region();
+
+	/* resolve irq and readyq line */
+	m_irq_func.resolve(conf->irq_func, *this);
+	m_readyq_func.resolve(conf->readyq_func, *this);
+	m_read_mem.resolve(conf->read_mem, *this);
+	m_load_address.resolve(conf->load_address, *this);
+	m_read_and_branch.resolve(conf->read_and_branch, *this);
+
+	/* initialize a stream */
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80, this);
+
+	/*if (m_table == NULL)
+    {
+        assert_always(m_conf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5220 to call for a new single bit\n  needed to generate the speech when in VSM mode\n  Aborting startup...\n");
+        m_M0_callback = conf->M0_callback;
+        m_set_load_address = conf->load_address;
+    }
+    else
+    {
+        m_M0_callback = speech_rom_read_bit;
+        m_set_load_address = speech_rom_set_addr;
+    }*/
+
+	/* not during reset which is called frm within a write! */
+	m_io_ready = true;
+	m_true_timing = false;
+	m_rs_ws = 0x03; // rs and ws are assumed to be inactive on device startup
+
+	m_ready_timer = timer_alloc(0);
+
+	register_for_save_states();
+}
+
+void tms52xx_device::device_reset()
+{
+	m_digital_select = FORCE_DIGITAL;			// assume analog output
+	// initialize the FIFO */
+	// memset(tms->fifo, 0, sizeof(tms->fifo));
+	m_fifo_head = 0;
+	m_fifo_tail = 0;
+	m_fifo_count = 0;
+	m_fifo_bits_taken = 0;
+
+	// initialize the chip state
+	// Note that we do not actually clear IRQ on start-up: IRQ is even raised
+	// if m_buffer_empty or m_buffer_low are 0
+	m_speaking_now = false;
+	m_speak_external = false;
+	m_talk_status = false;
+	m_irq_pin = 0;		// CLEAR_LINE
+	m_ready_pin = 0;	// CLEAR_LINE
+
+	set_interrupt_state(0);			// CLEAR_LINE
+	update_ready_state();
+	m_buffer_empty = true;
+	m_buffer_low = true;
+
+	m_RDB_flag = false;
+
+	/* initialize the energy/pitch/k states */
+#ifdef PERFECT_INTERPOLATION_HACK
+	m_old_frame_energy_idx = 0;
+	m_old_frame_pitch_idx = 0;
+	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
+#endif
+
+	m_new_frame_energy_idx = 0;
+	m_current_energy = 0;
+	m_target_energy = 0;
+	m_new_frame_pitch_idx = 0;
+	m_current_pitch = 0;
+	m_target_pitch = 0;
+
+	memset(m_new_frame_k_idx, 0, sizeof(m_new_frame_k_idx));
+	memset(m_current_k, 0, sizeof(m_current_k));
+	memset(m_target_k, 0, sizeof(m_target_k));
+
+	/* initialize the sample generators */
+	m_inhibit = true;
+	m_subcycle = 0;
+	m_tms5220c_rate = 0;
+	m_pitch_count = 0;
+	m_PC = 0;
+
+	m_subc_reload = FORCE_SUBC_RELOAD;
+	m_OLDE = 1;
+	m_OLDP = 1;
+
+	m_interp_period = reload_table[m_tms5220c_rate&0x3];
+	m_RNG = 0x1FFF;
+	memset(m_u, 0, sizeof(m_u));
+	memset(m_x, 0, sizeof(m_x));
+
+	m_load_address(0, 0);
+	m_schedule_dummy_read = true;
+}
+
+/******************************************************************************
+     set_interrupt_state -- generate an interrupt
+*******************************************************************************/
+
+void tms52xx_device::set_interrupt_state(int state)
+{
+#ifdef DEBUG_PIN_READS
+	logerror("tms52xx: irq pin set to state %d\n", state);
+#endif
+    if (state != m_irq_pin) m_irq_func(!state);
+    m_irq_pin = state;
+}
+
+/******************************************************************************
+     update_ready_state -- update the ready line
+*******************************************************************************/
+
+void tms52xx_device::update_ready_state()
+{
+	int state = ready_read();
+#ifdef DEBUG_PIN_READS
+	logerror("tms52xx: ready pin set to state %d\n", state);
+#endif
+	if (state != m_ready_pin) m_readyq_func(!state);
+	m_ready_pin = state;
+}
+
+/******************************************************************************
+     tms5220_set_frequency -- adjusts the playback frequency
+*******************************************************************************/
+
+void tms52xx_device::set_frequency(int frequency)
+{
+	m_stream->set_sample_rate(frequency / 80);
+	m_clock = frequency;
+}
+
+/******************************************************************************
+     tms5220_update -- update the sound chip so that it is in sync with CPU execution
+*******************************************************************************/
+
+void tms52xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	INT16 sample_data[MAX_SAMPLE_CHUNK];
+	stream_sample_t *buffer = outputs[0];
+
+	/* loop while we still have samples to generate */
+	while (samples>0)
+	{
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
+		int index;
+
+		/* generate the samples and copy to the target buffer */
+		process(sample_data, length);
+		for (index = 0; index < length; index++)
+			*buffer++ = sample_data[index];
+
+		/* account for the samples */
+		samples -= length;
+	}
+}
+
+/******************************************************************************
+    process -- fill the buffer with a specific number of samples
+*******************************************************************************/
+
+void tms52xx_device::process(INT16 *buffer, unsigned int size)
+{
+	int buf_count=0;
+	int i, bitout;
+	bool zpar;
+	INT32 this_sample;
+
+	// The following gotos are probably safe to remove
+	// if we're empty and still not speaking, fill with nothingness
+	if (!m_speaking_now) goto empty;
+
+	// if speak external is set, but talk status is not (yet) set,
+	// wait for buffer low to clear
+	if (!m_talk_status && m_speak_external && m_buffer_low) goto empty;
+
+	// loop until the buffer is full or we've stopped speaking
+	while ((size > 0) && m_speaking_now)
+	{
+		// if it is the appropriate time to update the old energy/pitch idxes,
+		// i.e. when IP=7, PC=12, T=17, subcycle=2, do so. Since IP=7 PC=12 T=17
+		// is JUST BEFORE the transition to IP=0 PC=0 T=0 sybcycle=(0 or 1),
+		// which happens 4 T-cycles later), we change on the latter.
+		if ((m_interp_period == 0) && (m_PC == 0) && (m_subcycle < 2))
+		{
+			m_OLDE = (m_new_frame_energy_idx == 0);
+			m_OLDP = (m_new_frame_pitch_idx == 0);
+		}
+
+		//if we're ready for a new frame to be applied, i.e. when IP=0, PC=12, Sub=1
+		// (In reality, the frame was really loaded incrementally during the
+		// entire IP=0 PC=x time period, but it doesn't affect anything until IP=0 PC=12 happens)
+		if ((m_interp_period == 0) && (m_PC == 12) && (m_subcycle == 1))
+		{
+			// HACK for regression testing, be sure to comment out before release!
+			// m_RNG = 0x1234;
+			// end HACK
+
+			// appropriately override the interp count if needed; this will be incremented after the frame parse!
+			m_interp_period = reload_table[m_tms5220c_rate & 0x3];
+
+#ifdef PERFECT_INTERPOLATION_HACK
+			// remember previous frame energy, pitch, and coefficients
+			m_old_frame_energy_idx = m_new_frame_energy_idx;
+			m_old_frame_pitch_idx = m_new_frame_pitch_idx;
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_old_frame_k_idx[i] = m_new_frame_k_idx[i];
+#endif
+
+			// if the talk status was clear last frame, halt speech now.
+			if (m_talk_status == false)
+			{
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
+#endif
+				m_speaking_now = false; // finally halt speech
+				goto empty;
+			}
+
+			// Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[]
+			parse_frame();
+#ifdef DEBUG_PARSE_FRAME_DUMP
+			fprintf(stderr,"\n");
+#endif
+			// if the new frame is a stop frame, set an interrupt and set talk status to 0
+			if (M_NEW_FRAME_STOP_FLAG == 1)
+			{
+				m_talk_status = false;
+				m_speak_external = false;
+				set_interrupt_state(1);
+				update_status_and_ints();
+			}
+
+			// in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
+			// Interpolation inhibit cases:
+			// * Old frame was voiced, new is unvoiced
+			// * Old frame was silence/zero energy, new has nonzero energy
+			// * Old frame was unvoiced, new is voiced
+
+			if ( ((M_OLD_FRAME_UNVOICED_FLAG == false) && (M_NEW_FRAME_UNVOICED_FLAG == true))
+				|| ((M_OLD_FRAME_UNVOICED_FLAG == true) && (M_NEW_FRAME_UNVOICED_FLAG == false))
+				|| ((M_OLD_FRAME_SILENCE_FLAG == true) && (M_NEW_FRAME_SILENCE_FLAG == false)) )
+				m_inhibit = true;
+			else // normal frame, normal interpolation
+				m_inhibit = false;
+
+			// load new frame targets from tables, using parsed indices
+			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx];
+			zpar = M_NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
+			for (i = 0; i < 4; i++)
+				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
+			for (i = 4; i < m_coeff->num_k; i++)
+				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
+
+#ifdef DEBUG_GENERATION
+			/* Debug info for current parsed frame */
+			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
+			fprintf(stderr,"Processing frame: ");
+			if (m_inhibit == 0)
+				fprintf(stderr, "Normal Frame\n");
+			else
+				fprintf(stderr,"Interpolation Inhibited\n");
+			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
+				m_current_energy, m_current_pitch,
+				m_current_k[0], m_current_k[1],	m_current_k[2], m_current_k[3],
+				m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7],
+				m_current_k[8], m_current_k[9]);
+			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
+				m_target_energy, m_new_frame_energy_idx, m_target_pitch,
+				m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3],
+				m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7],
+				m_target_k[8], m_target_k[9]);
+#endif
+
+			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
+			if (!m_talk_status)
+			{
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
+#endif
+				m_target_energy = 0;
+			}
+		}
+		else // Not a new frame, just interpolate the existing frame.
+		{
+			bool inhibit_state = (m_inhibit && (m_interp_period != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the tms->inhibit value
+#ifdef PERFECT_INTERPOLATION_HACK
+			int samples_per_frame = (m_subc_reload!=0)? 175:266;		// either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
+			//int samples_per_frame = (m_subc_reload!=0)?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
+			int current_sample = (tms->subcycle - tms->subc_reload)+(tms->PC*(3-tms->subc_reload))+((tms->subc_reload?25:38)*((tms->interp_period-1)&7));
+
+			zpar = M_OLD_FRAME_UNVOICED_FLAG;
+			//fprintf(stderr, "CS: %03d", current_sample);
+			// reset the current energy, pitch, etc to what it was at frame start
+			m_current_energy = m_coeff->energytable[m_old_frame_energy_idx];
+			m_current_pitch = m_coeff->pitchtable[m_old_frame_pitch_idx];
+			for (i = 0; i < 4; i++)
+				m_current_k[i] = m_coeff->ktable[i][m_old_frame_k_idx[i]];
+			for (i = 4; i < m_coeff->num_k; i++)
+				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-zpar));
+			// now adjust each value to be exactly correct for each of the samples per frame
+			if (m_interp_period != 0) // if we're still interpolating...
+			{
+				if (!inhibit_state)
+				{
+					m_current_energy += ((m_target_energy - m_current_energy)*current_sample)/samples_per_frame;
+					m_current_pitch += ((m_target_pitch - m_current_pitch)*current_sample)/samples_per_frame;
+					for (i = 0; i < m_coeff->num_k; i++)
+					{
+						m_current_k[i] += ((m_target_k[i] - m_current_k[i])*current_sample)/samples_per_frame;
+					}
+				}
+			}
+			else // we're done, play this frame for 1/8 frame.
+			{
+				m_current_energy = m_target_energy;
+				m_current_pitch = m_target_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_current_k[i] = m_target_k[i];
+			}
+#else
+			// Updates to parameters only happen on subcycle '2' (B cycle) of PCs.
+			if (m_subcycle == 2)
+			{
+				if (!inhibit_state)
+				{
+					switch(m_PC)
+					{
+					case 0: // PC = 0, B cycle, write updated energy
+						m_current_energy += ((m_target_energy - m_current_energy) M_INTERP_SHIFT);
+						break;
+					case 1: /* PC = 1, B cycle, write updated pitch */
+						m_current_pitch += ((m_target_pitch - m_current_pitch) M_INTERP_SHIFT);
+						break;
+					case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
+						/* PC = 2 through 11, B cycle, write updated K1 through K10 */
+						m_current_k[m_PC-2] += ((m_target_k[m_PC-2] - m_current_k[m_PC-2]) M_INTERP_SHIFT);
+						break;
+					case 12: /* PC = 12, do nothing */
+						break;
+					}
+				}
+			}
+#endif
+		}
+
+		// calculate the output
+		if (M_OLD_FRAME_UNVOICED_FLAG == true)
+		{
+			// generate unvoiced samples here
+#ifndef UNVOICED_HACK
+			if (m_RNG & 1)
+				m_excitation_data = ~0x3F; // according to the patent it is (either + or -) half of the maximum value in the chirp table, so either 01000000(0x40) or 11000000(0xC0)
+			else
+				m_excitation_data = 0x40;
+#else // hack to double unvoiced strength, doesn't match patent
+			if (m_RNG & 1)
+				m_excitation_data = ~0x7F;
+			else
+				m_excitation_data = 0x80;
+#endif
+		}
+		else // (M_OLD_FRAME_UNVOICED_FLAG == false)
+		{
+			// generate voiced samples here
+			// US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
+			// function has a chirp/peak and then a long chain of zeroes.
+			// The last entry of the chirp rom is at address 0b110011 (51d), the 52nd sample,
+			// and if the address reaches that point the ADDRESS incrementer is
+			// disabled, forcing all samples beyond 51d to be == 51d
+			// (address 51d holds zeroes, which may or may not be inverted to -1)
+
+			if (m_pitch_count >= 51)
+				m_excitation_data = m_coeff->chirptable[51];
+			else // tms->pitch_count < 51
+				m_excitation_data = m_coeff->chirptable[m_pitch_count];
+#ifdef VOICED_INV_HACK
+			// invert waveform
+			if (m_pitch_count >= 51)
+				m_excitation_data = ~m_coeff->chirptable[51];
+			else // tms->pitch_count < 51
+				m_excitation_data = ~m_coeff->chirptable[m_pitch_count];
+#endif
+#ifdef VOICED_ZERO_HACK
+			// 0 and >=51 are -128, as implied by qboxpro tables
+			if ((m_pitch_count == 0) | (m_pitch_count >= 51))
+				m_excitation_data = -128;
+			else /*tms->pitch_count < 51 && > 0*/
+				m_excitation_data = m_coeff->chirptable[m_pitch_count];
+#endif
+#ifdef VOICED_PULSE_HACK
+			// if pitch is between 1 and PWIDTH+1, out = PAMP, if between PWIDTH+1 and (2*PWIDTH)+1, out ~PAMP, else out = 0
+			if (m_pitch_count == 0)
+				m_excitation_data = 0;
+			else if (m_pitch_count < PWIDTH+1)
+				m_excitation_data = PAMP;
+			else if (m_pitch_count < (PWIDTH*2)+1)
+				m_excitation_data = ~PAMP;
+			else
+				m_excitation_data = 0;
+#endif
+#ifdef VOICED_PULSE_MONOPOLAR_HACK
+			// if pitch is between 1 and PWIDTH+1, out = PAMP, else out = 0
+			if (m_pitch_count == 0)
+				m_excitation_data = 0;
+			else if (m_pitch_count < PWIDTH+1)
+				m_excitation_data = PAMP;
+			else
+				m_excitation_data = 0;
+#endif
+		}
+
+		// Update LFSR *20* times every sample (once per T cycle), like patent shows
+		for (i=0; i<20; i++)
+		{
+			bitout = ((m_RNG >> 12) & 1) ^
+					((m_RNG >>  3) & 1) ^
+					((m_RNG >>  2) & 1) ^
+					((m_RNG >>  0) & 1);
+			m_RNG <<= 1;
+			m_RNG |= bitout;
+		}
+
+		this_sample = lattice_filter(); // execute lattice filter
+#ifdef DEBUG_GENERATION_VERBOSE
+		//fprintf(stderr,"C:%01d; ",tms->subcycle);
+		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_interp_period, m_PC,
+			m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
+		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
+		for (i=0; i<10; i++)
+			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
+		fprintf(stderr,"Out:%06d", this_sample);
+		fprintf(stderr,"\n");
+#endif
+		// next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed)
+		while (this_sample > 16383) this_sample -= 32768;
+		while (this_sample < -16384) this_sample += 32768;
+		if (!m_digital_select) // analog SPK pin output is only 8 bits, with clipping
+			buffer[buf_count] = clip_analog(this_sample);
+		else // digital I/O pin output is 12 bits
+		{
+#ifdef ALLOW_4_LSB
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn nnnn
+			// N taps:                       ^                 = 0x2000;
+			// output: ssss ssss ssss ssss snnn nnnn nnnn nnnN
+			buffer[buf_count] = (this_sample<<1)|((this_sample&0x2000)>>13);
+#else
+			this_sample &= ~0xF;
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn 0000
+			// N taps:                       ^^ ^^^            = 0x3E00;
+			// output: ssss ssss ssss ssss snnn nnnn nnnN NNNN
+			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
+#endif
+		}
+
+		// Update all counts
+		m_subcycle++;
+		if ((m_subcycle == 2) && (m_PC == 12))
+		{
+			m_subcycle = m_subc_reload;
+			m_PC = 0;
+			m_interp_period++;
+			m_interp_period &= 0x7;
+		}
+		else if (m_subcycle == 3)
+		{
+			m_subcycle = m_subc_reload;
+			m_PC++;
+		}
+		// Circuit 412 in the patent ensures that when INHIBIT is true,
+		// during the period from IP=7 PC=12 T12, to IP=0 PC=12 T12, the pitch
+		// count is forced to 0; since the initial stop happens right before
+		// the switch to IP=0 PC=0 and this code is located after the switch would
+		// happen, we check for ip=0 inhibit=1, which covers that whole range.
+		// The purpose of Circuit 412 is to prevent a spurious click caused by
+		// the voiced source being fed to the filter before all the values have
+		// been updated during ip=0 when interpolation was inhibited.
+
+		m_pitch_count++;
+		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0;
+		if ((m_interp_period == 0) && m_inhibit) m_pitch_count = 0;
+		m_pitch_count &= 0x1FF;
+		buf_count++;
+		size--;
+	}
+
+empty:
+
+	while (size > 0)
+	{
+		m_subcycle++;
+		if ((m_subcycle == 2) && (m_PC == 12))
+		{
+			m_subcycle = m_subc_reload;
+			m_PC = 0;
+			m_interp_period++;
+			m_interp_period &= 0x7;
+		}
+		else if (m_subcycle == 3)
+		{
+			m_subcycle = m_subc_reload;
+			m_PC++;
+		}
+		buffer[buf_count] = -1;	// should be just -1; actual chip outputs -1 every idle sample; (cf note in data sheet, p 10, table 4)
+		buf_count++;
+		size--;
+	}
+}
+
+/******************************************************************************
+    lattice_filter -- executes one 'full run' of the lattice filter on a
+    specific byte of excitation data, and specific values of all the current k
+    constants,  and returns the resulting sample.
+******************************************************************************/
+
+INT32 tms52xx_device::lattice_filter()
+{
+	// Lattice filter here */
+	// Aug/05/07: redone as unrolled loop, for clarity - LN
+	// Originally Copied verbatim from table I in US patent 4,209,804, now updated
+	// to be in same order as the actual chip does it, not that it matters.
+	// notation equivalencies from table:
+	//      Yn(i) == m_u[n-1]
+	//      Kn = m_current_k[n-1]
+	//      bn = m_x[n-1]
+
+	m_u[10] = matrix_multiply(m_previous_energy, (m_excitation_data<<6));  //Y(11)
+	m_u[9] = m_u[10] - matrix_multiply(m_current_k[9], m_x[9]);
+	m_u[8] = m_u[9] - matrix_multiply(m_current_k[8], m_x[8]);
+	m_u[7] = m_u[8] - matrix_multiply(m_current_k[7], m_x[7]);
+	m_u[6] = m_u[7] - matrix_multiply(m_current_k[6], m_x[6]);
+	m_u[5] = m_u[6] - matrix_multiply(m_current_k[5], m_x[5]);
+	m_u[4] = m_u[5] - matrix_multiply(m_current_k[4], m_x[4]);
+	m_u[3] = m_u[4] - matrix_multiply(m_current_k[3], m_x[3]);
+	m_u[2] = m_u[3] - matrix_multiply(m_current_k[2], m_x[2]);
+	m_u[1] = m_u[2] - matrix_multiply(m_current_k[1], m_x[1]);
+	m_u[0] = m_u[1] - matrix_multiply(m_current_k[0], m_x[0]);
+	m_x[9] = m_x[8] + matrix_multiply(m_current_k[8], m_u[8]);
+	m_x[8] = m_x[7] + matrix_multiply(m_current_k[7], m_u[7]);
+	m_x[7] = m_x[6] + matrix_multiply(m_current_k[6], m_u[6]);
+	m_x[6] = m_x[5] + matrix_multiply(m_current_k[5], m_u[5]);
+	m_x[5] = m_x[4] + matrix_multiply(m_current_k[4], m_u[4]);
+	m_x[4] = m_x[3] + matrix_multiply(m_current_k[3], m_u[3]);
+	m_x[3] = m_x[2] + matrix_multiply(m_current_k[2], m_u[2]);
+	m_x[2] = m_x[1] + matrix_multiply(m_current_k[1], m_u[1]);
+	m_x[1] = m_x[0] + matrix_multiply(m_current_k[0], m_u[0]);
+	m_x[0] = m_u[0];
+	m_previous_energy = m_current_energy;
+#ifdef DEBUG_LATTICE
+
+	int i;
+	fprintf(stderr,"V:%04d ", m_u[10]);
+	for (i = 9; i >= 0; i--)
+	{
+		fprintf(stderr,"Y%d:%04d ", i+1, m_u[i]);
+		fprintf(stderr,"b%d:%04d ", i+1, m_x[i]);
+		if ((i % 5) == 0) fprintf(stderr,"\n");
+	}
+#endif
+	return m_u[0];
+}
+
+/**********************************************************************************************
+    data_write -- handle a write to the TMS5220
+***********************************************************************************************/
+
+void tms52xx_device::data_write(int data)
+{
+#ifdef DEBUG_DUMP_INPUT_DATA
+	fprintf(stdout, "%c",data);
+#endif
+	if (m_speak_external) // If we're in speak external mode
+	{
+		/* add this byte to the FIFO */
+		if (m_fifo_count < FIFO_SIZE)
+		{
+			m_fifo[m_fifo_tail] = data;
+			m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
+			m_fifo_count++;
+#ifdef DEBUG_FIFO
+			logerror("tms52xx: data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
+#endif
+			update_status_and_ints();
+			if ((!m_talk_status) && (!m_buffer_low)) // we just unset buffer low with that last write, and talk status *was* zero...
+			{
+				int i;
+#ifdef DEBUG_FIFO
+				logerror("tms52xx: data_write triggered talk status to go active!\n");
+#endif
+				// ...then we now have enough bytes to start talking; clear out
+				// the new frame parameters (it will become old frame just before the first call to parse_frame())
+				// TODO: the 3 lines below (and others) are needed for victory
+				// to not fail its selftest due to a sample ending too late, may require additional investigation
+				m_subcycle = m_subc_reload;
+				m_PC = 0;
+				m_interp_period = reload_table[m_tms5220c_rate & 0x3]; // is this correct? should this be always 7 instead, so that the new frame is loaded quickly?
+				m_new_frame_energy_idx = 0;
+				m_new_frame_pitch_idx = 0;
+
+				for (i = 0; i < 4; i++)
+					m_new_frame_k_idx[i] = 0;
+				for (i = 4; i < 7; i++)
+					m_new_frame_k_idx[i] = 0xF;
+				for (i = 7; i < m_coeff->num_k; i++)
+					m_new_frame_k_idx[i] = 0x7;
+				m_talk_status = m_speaking_now = true;
+			}
+		}
+		else
+		{
+#ifdef DEBUG_FIFO
+			logerror("tms52xx: data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
+			// at this point, /READY should remain HIGH/inactive until the fifo has at least one byte open in it.
+#endif
+		}
+
+
+	}
+	else //(! m_speak_external)
+		/* R Nabet : we parse commands at once.  It is necessary for such commands as read. */
+		process_command(data);
+}
+
+/******************************************************************************
+    process_command -- extract a byte from the FIFO and interpret it as a command
+*******************************************************************************/
+
+void tms52xx_device::process_command(unsigned char cmd)
+{
+#ifdef DEBUG_COMMAND_DUMP
+	fprintf(stderr,"process_command called with parameter %02X\n",cmd);
+#endif
+	// parse the command
+	switch (cmd & 0x70)
+	{
+	case 0x10 : // read byte
+		if (!m_talk_status) // TALKST must be clear for RDBY
+		{
+			if (m_schedule_dummy_read)
+			{
+				m_schedule_dummy_read = false;
+				(void)m_read_mem(1);
+			}
+			m_data_register = m_read_mem(8);	// read one byte from speech ROM...
+			m_RDB_flag = true;
+		}
+		break;
+
+	case 0x00:
+	case 0x20: // set rate (tms5220c only), otherwise NOP
+		if (m_variant == SUBTYPE_TMS5220C)
+		{
+			m_tms5220c_rate = cmd & 0x0F;
+		}
+		break;
+
+	case 0x30: // read and branch
+		if (!m_talk_status) // TALKST must be clear for RB
+		{
+#ifdef VERBOSE
+			logerror("tms5520: read and branch command received\n");
+#endif
+			m_RDB_flag = false;
+			m_read_and_branch(0, 0);
+		}
+		break;
+
+	case 0x40 : // load address
+		if (!m_talk_status) // TALKST must be clear for LA
+		{
+			// tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
+			// This code does not care about this.
+			m_load_address(0, cmd & 0x0f);
+			m_schedule_dummy_read = true;
+		}
+		break;
+
+	case 0x50:	// speak
+		if (m_schedule_dummy_read)
+		{
+			m_schedule_dummy_read = false;
+			(void)m_read_mem(1);
+		}
+		m_speaking_now = true;
+		m_speak_external = false;
+		m_talk_status = true;  // start immediately
+		// clear out variables before speaking
+		// TODO: similar to the victory case described above, but for VSM speech
+		m_subcycle = m_subc_reload;
+		m_PC = 0;
+		m_interp_period = reload_table[m_tms5220c_rate & 0x3];
+		m_new_frame_energy_idx = 0;
+		m_new_frame_pitch_idx = 0;
+
+		int i;
+		for (i = 0; i < 4; i++)
+			m_new_frame_k_idx[i] = 0;
+		for (i = 4; i < 7; i++)
+			m_new_frame_k_idx[i] = 0xF;
+		for (i = 7; i < m_coeff->num_k; i++)
+			m_new_frame_k_idx[i] = 0x7;
+		break;
+
+	case 0x60: // speak external
+		if (!m_talk_status) // TALKST must be clear for SPKEXT
+		{
+			//SPKEXT going active activates SPKEE which clears the fifo
+			m_fifo_head = m_fifo_tail = 0;
+			m_fifo_count = m_fifo_bits_taken = 0;
+			m_speak_external = true;
+			m_RDB_flag = false;
+		}
+		break;
+
+	case 0x70: // reset
+		if (m_schedule_dummy_read)
+		{
+			m_schedule_dummy_read = false;
+			(void)m_read_mem(1);
+		}
+		device_reset();
+		break;
+	}
+
+	// update the buffer low state
+	update_status_and_ints();
+}
+
+/******************************************************************************
+    parse_frame -- parse a new frame's worth of data; returns 0 if not
+    enough bits in buffer
+*******************************************************************************/
+
+void tms52xx_device::parse_frame()
+{
+	int indx, i, rep_flag;
+
+	// We actually don't care how many bits are left in the fifo here; the
+	// frame subpart will be processed normally, and any bits extracted 'past
+	// the end' of the fifo will be read as zeroes; the fifo being emptied will
+	// set the /BE latch which will halt speech exactly as if a stop frame had
+	// been encountered (instead of whatever partial frame was read); the same
+	// exact circuitry is used for both on the real chip, see us patent 4335277
+	// sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS
+	// (decode disable) which is active during speak external).
+
+	// if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
+	// has a 2 bit rate preceding it, grab two bits here and store them as the rate;
+	if ((m_variant == SUBTYPE_TMS5220C) && (m_tms5220c_rate & 0x04))
+	{
+		indx = extract_bits(2);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(indx,2);
+		fprintf(stderr," ");
+#endif
+		m_interp_period = reload_table[indx];
+	}
+	else // non-5220C and 5220C in fixed rate mode
+		m_interp_period = reload_table[m_tms5220c_rate & 0x3];
+
+	update_status_and_ints();
+	if (!m_talk_status) goto ranout;
+
+	// attempt to extract the energy index
+	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
+	fprintf(stderr," ");
+#endif
+	update_status_and_ints();
+	if (!m_talk_status) goto ranout;
+	// if the energy index is 0 or 15, we're done
+	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
+		return;
+
+	// attempt to extract the repeat flag
+	rep_flag = extract_bits(1);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(rep_flag, 1);
+	fprintf(stderr," ");
+#endif
+
+	// attempt to extract the pitch
+	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(m_new_frame_pitch_idx, m_coeff->pitch_bits);
+	fprintf(stderr," ");
+#endif
+	update_status_and_ints();
+	if (!m_talk_status) goto ranout;
+	// if this is a repeat frame, just do nothing, it will reuse the
+	// old coefficients's
+	if (rep_flag) return;
+
+	// extract first 4 K coefficients
+	for (i = 0; i < 4; i++)
+	{
+		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(m_new_frame_k_idx[i], m_coeff->kbits[i]);
+		fprintf(stderr," ");
+#endif
+		update_status_and_ints();
+		if (!m_talk_status) goto ranout;
+	}
+
+	// if the pitch index was zero, we only need 4 K's...
+	if (m_new_frame_pitch_idx == 0)
+	{
+		// and the rest of the coefficients are zeroed, but that's done in the generator code
+		return;
+	}
+
+	// If we got here, we need the remaining 6 K's
+	for (i = 4; i < m_coeff->num_k; i++)
+	{
+		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(m_new_frame_k_idx[i], m_coeff->kbits[i]);
+		fprintf(stderr," ");
+#endif
+		update_status_and_ints();
+		if (!m_talk_status) goto ranout;
+	}
+#ifdef VERBOSE
+	if (m_speak_external)
+		logerror("tms52xx: Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
+	else
+		logerror("tms52xx: Parsed a frame successfully in ROM\n");
+#endif
+	return;
+
+	ranout:
+#ifdef DEBUG_FRAME_ERRORS
+	logerror("tms52xx: Ran out of bits on a parse!\n");
+#endif
+	return;
+}
+
+/**********************************************************************************************
+
+     update_status_and_ints -- check to see if the various flags should be on or off
+     Description of flags, and their position in the status register:
+      From the data sheet:
+        bit D0(bit 7) = TS - Talk Status is active (high) when the VSP is processing speech data.
+                Talk Status goes active at the initiation of a Speak command or after nine
+                bytes of data are loaded into the FIFO following a Speak External command. It
+                goes inactive (low) when the stop code (Energy=1111) is processed, or
+                immediately by a buffer empty condition or a reset command.
+        bit D1(bit 6) = BL - Buffer Low is active (high) when the FIFO buffer is more than half empty.
+                Buffer Low is set when the "Last-In" byte is shifted down past the half-full
+                boundary of the stack. Buffer Low is cleared when data is loaded to the stack
+                so that the "Last-In" byte lies above the half-full boundary and becomes the
+                eighth data byte of the stack.
+        bit D2(bit 5) = BE - Buffer Empty is active (high) when the FIFO buffer has run out of data
+                while executing a Speak External command. Buffer Empty is set when the last bit
+                of the "Last-In" byte is shifted out to the Synthesis Section. This causes
+                Talk Status to be cleared. Speed is terminated at some abnormal point and the
+                Speak External command execution is terminated.
+
+***********************************************************************************************/
+
+void tms52xx_device::update_status_and_ints()
+{
+	// update flags and set ints if needed
+	update_ready_state();
+
+	// BL is set if neither byte 9 nor 8 of the fifo are in use; this
+	// translates to having fifo_count (which ranges from 0 bytes in use to 16
+	// bytes used) being less than or equal to 8. Victory/Victorba depends on this.
+	if (m_fifo_count <= 8)
+	{
+		// generate an interrupt if necessary; if /BL was inactive and is now active, set int.
+		if (!m_buffer_low) set_interrupt_state(1);
+		m_buffer_low = true;
+	}
+	else
+		m_buffer_low = false;
+
+	// BE is set if neither byte 15 nor 14 of the fifo are in use; this
+	// translates to having fifo_count equal to exactly 0 */
+	if (m_fifo_count == 0)
+	{
+		// generate an interrupt if necessary; if /BE was inactive and is now active, set int.
+		if (!m_buffer_empty) set_interrupt_state(1);
+		m_buffer_empty = true;
+	}
+	else
+		m_buffer_empty = false;
+
+	// TS is talk status and is set elsewhere in the fifo parser and in
+	// the SPEAK command handler; however, if /BE is true during speak external
+	// mode, it is immediately unset here.
+	if (m_speak_external && m_buffer_empty)
+	{
+		// generate an interrupt: /TS was active, and is now inactive.
+		if (m_talk_status)
+		{
+			m_talk_status = m_speak_external = false;
+			set_interrupt_state(1);
+		}
+	}
+	// Note that TS being unset will also generate an interrupt when a STOP
+	// frame is encountered; this is handled in the sample generator code and not here */
+}
+
+/******************************************************************************
+    extract_bits -- extract a specific number of bits from the current input stream (FIFO or VSM)
+*******************************************************************************/
+
+int tms52xx_device::extract_bits(int count)
+{
+	int val = 0;
+
+	if (m_speak_external)
+	{
+		// extract from FIFO
+		while (count--)
+		{
+			val = (val << 1) | ((m_fifo[m_fifo_head] >> m_fifo_bits_taken) & 1);
+			m_fifo_bits_taken++;
+			if (m_fifo_bits_taken >= 8)
+			{
+				m_fifo_count--;
+				m_fifo[m_fifo_head] = 0; // zero the newly depleted fifo head byte
+				m_fifo_head = (m_fifo_head + 1) % FIFO_SIZE;
+				m_fifo_bits_taken = 0;
+				update_status_and_ints();
+			}
+		}
+	}
+	else
+	{
+		// extract from VSM (speech ROM)
+		val = m_read_mem(count);
+	}
+	return val;
+}
+
+/******************************************************************************
+    status_read -- read status or data from the TMS5220
+*******************************************************************************/
+
+int tms52xx_device::status_read()
+{
+	if (m_RDB_flag)
+	{	// if last command was read, return data register
+		m_RDB_flag = false;
+		return m_data_register;
+	}
+	else
+	{	// read status
+		// clear the interrupt pin on status read
+		set_interrupt_state(0);
+#ifdef DEBUG_PIN_READS
+		logerror("tms52xx: Status read: TS=%d BL=%d BE=%d\n", m_talk_status, m_buffer_low, m_buffer_empty);
+#endif
+
+		int retvalue = 0;
+		if (m_talk_status) retvalue |= 0x80;
+		if (m_buffer_low) retvalue |= 0x40;
+		if (m_buffer_empty) retvalue |= 0x20;
+		return retvalue;
+	}
+}
+
+/******************************************************************************
+    ready_read -- returns the ready state of the TMS5220
+*******************************************************************************/
+
+inline bool tms52xx_device::ready_read()
+{
+#ifdef DEBUG_PIN_READS
+	logerror("tms52xx: ready_read: ready pin read, io_ready is %d, fifo count is %d\n", m_io_ready, m_fifo_count);
+#endif
+	return ((m_fifo_count < FIFO_SIZE)||(!m_speak_external)) && m_io_ready;
+}
+
+/******************************************************************************
+    int_read -- returns the interrupt state of the TMS5220
+*******************************************************************************/
+
+inline int tms52xx_device::int_read()
+{
+#ifdef DEBUG_PIN_READS
+	logerror("tms52xx: int_read: irq pin read, state is %d\n", m_irq_pin);
+#endif
+	return m_irq_pin;
+}
+
+/******************************************************************************
+    cycles_to_ready -- returns the number of cycles until ready is asserted
+    NOTE: this function is deprecated and is known to be VERY inaccurate.
+    Use at your own peril!
+*******************************************************************************/
+
+int tms52xx_device::cycles_to_ready()
+{
+	int answer;
+
+	if (ready_read()) answer = 0;
+	else
+	{
+		int val;
+		int samples_per_frame = (m_subc_reload!=0)? 200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
+		int current_sample = ((m_PC * (3-m_subc_reload)) + (((m_subc_reload!=0)? 38:25) * m_interp_period));
+		answer = samples_per_frame - current_sample + 8;
+
+		// total number of bits available in current byte is (8 - tms->fifo_bits_taken)
+		// if more than 4 are available, we need to check the energy
+		if (m_fifo_bits_taken < 4)
+		{
+			// read energy
+			val = (m_fifo[m_fifo_head] >> m_fifo_bits_taken) & 0xf;
+			if (val == 0)
+				// 0 -> silence frame: we will only read 4 bits, and we will
+				// therefore need to read another frame before the FIFO is not
+				// full any more
+				answer += 200;
+			// 15 -> stop frame, we will only read 4 bits, but the FIFO will
+			// we cleared
+			//otherwise, we need to parse the repeat flag (1 bit) and the
+			// pitch (6 bits), so everything will be OK.
+		}
+	}
+	return answer;
+}
+
+/******************************************************************************
+    True timing
+*******************************************************************************/
+
+void tms52xx_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (param)
+	{
+		switch (m_rs_ws)
+		{
+		case 0x02:
+			// Write
+			// bring up to date first
+#ifdef DEBUG_IO_READY
+			logerror("tms52xx: Serviced write: %02x\n", tms->write_latch);
+			//fprintf(stderr, "Processed write data: %02X\n", tms->write_latch);
+#endif
+			m_stream->update();
+			data_write(m_write_latch);
+		    break;
+		case 0x01:
+			// Read
+			// bring up to date first
+			m_stream->update();
+			m_read_latch = status_read();
+			break;
+		case 0x03:
+			// High Impedance
+		case 0x00:
+			// illegal
+			break;
+		}
+	}
+	m_io_ready = param;
+	update_ready_state();
+}
+
+/*****************************************************
+    /RS line write handler
+*****************************************************/
+
+WRITE_LINE_MEMBER( tms52xx_device::rsq_w )
+{
+	UINT8 new_val;
+
+	m_true_timing = true;
+	state &= 0x01;
+#ifdef DEBUG_RS_WS
+	logerror("tms52xx: /RS written with data: %d\n", state);
+#endif
+	new_val = (m_rs_ws & 0x01) | (state<<1);
+	if (new_val != m_rs_ws)
+	{
+		m_rs_ws = new_val;
+		if (new_val == 0)
+		{
+			if (m_variant == SUBTYPE_TMS5220C)
+				reset();
+#ifdef DEBUG_RS_WS
+			else
+				// illegal
+				logerror("tms52xx: illegal line setting /RS=0 and /WS=0\n");
+#endif
+			return;
+		}
+		else if (new_val == 3)
+		{
+			// high impedance
+			m_read_latch = 0xff;
+			return;
+		}
+		if (state)
+		{
+			// low to high
+		}
+		else
+		{
+			// high to low - schedule ready cycle
+#ifdef DEBUG_RS_WS
+			logerror("tms52xx: Scheduling ready cycle for /RS...\n");
+#endif
+			// upon /RS being activated, /READY goes inactive after 100 nsec from
+			// data sheet, through 3 asynchronous gates on patent. This is effectively
+			// within one clock, so we immediately set io_ready to 0 and activate the callback. */
+			m_io_ready = 0;
+			update_ready_state();
+			// How long does /READY stay inactive, when /RS is pulled low?
+			// I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet)
+			m_ready_timer->adjust(attotime::from_hz(clock()/16));
+		}
+	}
+}
+
+/*****************************************************
+    /WS line write handler
+*****************************************************/
+
+WRITE_LINE_MEMBER( tms52xx_device::wsq_w )
+{
+	UINT8 new_val;
+
+	m_true_timing = true;
+	state &= 0x01;
+#ifdef DEBUG_RS_WS
+	logerror("tms52xx: /WS written with data: %d\n", state);
+#endif
+	new_val = (m_rs_ws & 0x02) | (state<<0);
+	if (new_val != m_rs_ws)
+	{
+		m_rs_ws = new_val;
+		if (new_val == 0)
+		{
+			if (m_variant == SUBTYPE_TMS5220C)
+				reset();
+#ifdef DEBUG_RS_WS
+			else
+				// illegal
+				logerror("tms52xx: illegal line setting /RS=0 and /WS=0\n");
+#endif
+			return;
+		}
+		else if ( new_val == 3)
+		{
+			// high impedance
+			m_read_latch = 0xff;
+			return;
+		}
+		if (state)
+		{
+			// low to high
+		}
+		else
+		{
+			// high to low - schedule ready cycle
+#ifdef DEBUG_RS_WS
+			logerror("tms52xx: Scheduling ready cycle for /WS...\n");
+#endif
+			// upon /WS being activated, /READY goes inactive after 100 nsec
+			// from data sheet, through 3 asynchronous gates on patent.
+			// This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback.
+			m_io_ready = 0;
+			update_ready_state();
+			// Now comes the complicated part: long does /READY stay inactive
+			// when /WS is pulled low? This depends ENTIRELY on the command written,
+			// or whether the chip is in speak external mode or not...
+			// Speak external mode: ~16 cycles
+			// Command Mode:
+			// SPK: ? cycles
+			// SPKEXT: ? cycles
+			// RDBY: between 60 and 140 cycles
+			// RB: ? cycles (80?)
+			// RST: between 60 and 140 cycles
+			// SET RATE (5220C only): ? cycles (probably ~16)
+
+			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
+			m_ready_timer->adjust(attotime::from_hz(clock()/16));
+		}
+	}
+}
+
+/*****************************************************************************
+    write -- write data to the sound chip
+*******************************************************************************/
+
+WRITE8_MEMBER( tms52xx_device::write )
+{
+#ifdef DEBUG_RS_WS
+	logerror("tms52xx: write data %02x\n", data);
+#endif
+	if (!m_true_timing)
+	{
+		// bring up to date first
+		m_stream->update();
+		data_write(data);
+	}
+	else
+	{
+		// actually in a write?
+#ifdef DEBUG_RS_WS
+		if (!(m_rs_ws == 0x02))
+			logerror("tms52xx: write data written outside ws, status: %02x!\n", m_rs_ws);
+#endif
+		m_write_latch = data;
+	}
+}
+
+/******************************************************************************
+    read -- read status or data from the sound chip
+*******************************************************************************/
+
+READ8_MEMBER( tms52xx_device::read )
+{
+	if (!m_true_timing)
+	{
+		// bring up-to-date first
+		m_stream->update();
+		return status_read();
+	}
+	else
+	{
+		// actually in a read?
+		if (m_rs_ws == 0x01)
+			return m_read_latch;
+#ifdef DEBUG_RS_WS
+		else
+			logerror("tms52xx: data read outside rs!\n");
+#endif
+		return 0xff;
+	}
+}
+
+/*******************************************************************************
+    ready -- return the not ready status from the sound chip
+*******************************************************************************/
+
+READ_LINE_MEMBER( tms52xx_device::readyq )
+{
+	// bring up-to-date first
+	m_stream->update();
+	return !ready_read();
+}
+
+
+/******************************************************************************
+    time_to_ready -- return the time in seconds until the
+    ready line is asserted
+*******************************************************************************/
+
+double tms52xx_device::time_to_ready()
+{
+	double cycles;
+
+	// bring up-to-date
+	m_stream->update();
+	cycles = cycles_to_ready();
+	return cycles * 80.0 / m_clock;
+}
+
+/******************************************************************************
+    intq -- return the interrupt status from the sound chip
+******************************************************************************/
+
+READ_LINE_MEMBER( tms52xx_device::intq )
+{
+	// bring up-to-date first
+	m_stream->update();
+	return !int_read();
+}
+
+void tms52xx_device::register_for_save_states()
+{
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_head));
+	save_item(NAME(m_fifo_tail));
+	save_item(NAME(m_fifo_count));
+	save_item(NAME(m_fifo_bits_taken));
+
+	save_item(NAME(m_speaking_now));
+	save_item(NAME(m_speak_external));
+	save_item(NAME(m_talk_status));
+	save_item(NAME(m_buffer_low));
+	save_item(NAME(m_buffer_empty));
+	save_item(NAME(m_irq_pin));
+	save_item(NAME(m_ready_pin));
+
+	save_item(NAME(m_OLDE));
+	save_item(NAME(m_OLDP));
+
+	save_item(NAME(m_new_frame_energy_idx));
+	save_item(NAME(m_new_frame_pitch_idx));
+	save_item(NAME(m_new_frame_k_idx));
+#ifdef PERFECT_INTERPOLATION_HACK
+	save_item(NAME(m_old_frame_energy_idx));
+	save_item(NAME(m_old_frame_pitch_idx));
+	save_item(NAME(m_old_frame_k_idx));
+#endif
+	save_item(NAME(m_current_energy));
+	save_item(NAME(m_current_pitch));
+	save_item(NAME(m_current_k));
+
+	save_item(NAME(m_target_energy));
+	save_item(NAME(m_target_pitch));
+	save_item(NAME(m_target_k));
+
+	save_item(NAME(m_previous_energy));
+
+	save_item(NAME(m_subcycle));
+	save_item(NAME(m_subc_reload));
+	save_item(NAME(m_PC));
+	save_item(NAME(m_interp_period));
+	save_item(NAME(m_inhibit));
+	save_item(NAME(m_tms5220c_rate));
+	save_item(NAME(m_pitch_count));
+
+	save_item(NAME(m_u));
+	save_item(NAME(m_x));
+
+	save_item(NAME(m_RNG));
+	save_item(NAME(m_excitation_data));
+
+	save_item(NAME(m_schedule_dummy_read));
+	save_item(NAME(m_data_register));
+	save_item(NAME(m_RDB_flag));
+	save_item(NAME(m_digital_select));
+
+	save_item(NAME(m_io_ready));
+}
+
+
+const device_type TMS5220N = &device_creator<tms5220n_device>;
+const device_type TMS5220CN = &device_creator<tms5220cn_device>;
+const device_type TMC0285N = &device_creator<tmc0285n_device>;
+const device_type TMS5200N = &device_creator<tms5200n_device>;
+
