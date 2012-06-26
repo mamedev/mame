@@ -8,13 +8,13 @@
 
  TODO:
  - where are mapped the unused dip switches?
- - sound & sound cpu
 
  *********************************************************************/
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/at28c16.h"
+#include "sound/qs1000.h"
 #include "includes/eolith.h"
 #include "includes/eolithsp.h"
 
@@ -32,10 +32,43 @@ public:
 	DECLARE_WRITE32_MEMBER(vega_palette_w);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);
 	DECLARE_READ32_MEMBER(vegaeo_custom_read);
+	DECLARE_WRITE32_MEMBER(soundlatch_w);
+
+	DECLARE_READ8_MEMBER(qs1000_p1_r);
+
+	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
+	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
+	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 };
 
+READ8_MEMBER( vegaeo_state::qs1000_p1_r )
+{
+	return soundlatch_byte_r(space, 0);
+}
 
+WRITE8_MEMBER( vegaeo_state::qs1000_p1_w )
+{
 
+}
+
+WRITE8_MEMBER( vegaeo_state::qs1000_p2_w )
+{
+
+}
+
+WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
+{
+	// .... .xxx - Data ROM bank (64kB)
+	// ...x .... - ?
+	// ..x. .... - /IRQ clear
+
+	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
+
+	membank("qs1000:bank")->set_entry(data & 0x07);	
+
+	if (!BIT(data, 5))
+		qs1000->set_irq(CLEAR_LINE);
+}
 
 WRITE32_MEMBER(vegaeo_state::vega_vram_w)
 {
@@ -96,13 +129,24 @@ READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 	return ioport("SYSTEM")->read();
 }
 
+WRITE32_MEMBER(vegaeo_state::soundlatch_w)
+{
+	qs1000_device *qs1000 = space.machine().device<qs1000_device>("qs1000");
+
+	soundlatch_byte_w(space, 0, data);
+	qs1000->set_irq(ASSERT_LINE);
+
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+}
+
+
 static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x000000ff)
 	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
-	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITENOP // soundlatch
+	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
 	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ(vegaeo_custom_read)
 	AM_RANGE(0xfce00000, 0xfce00003) AM_READ_PORT("P1_P2")
@@ -179,12 +223,36 @@ static SCREEN_UPDATE_IND16( vega )
 }
 
 
+
+/*************************************
+ *
+ *  QS1000 interface
+ *
+ *************************************/
+
+static QS1000_INTERFACE( qs1000_intf )
+{
+	/* External ROM */
+	true,
+
+	/* P1-P3 read handlers */
+	DEVCB_DRIVER_MEMBER(vegaeo_state, qs1000_p1_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	/* P1-P3 write handlers */
+	DEVCB_DRIVER_MEMBER(vegaeo_state, qs1000_p1_w),
+	DEVCB_DRIVER_MEMBER(vegaeo_state, qs1000_p2_w),
+	DEVCB_DRIVER_MEMBER(vegaeo_state, qs1000_p3_w)
+};
+
+
 static MACHINE_CONFIG_START( vega, vegaeo_state )
-	MCFG_CPU_ADD("maincpu", GMS30C2132, 55000000)	/* 55 MHz */
+	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_55MHz)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
 
-	/* sound cpu */
+	MCFG_AT28C16_ADD("at28c16", NULL)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -199,7 +267,12 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_VIDEO_START(vega)
 
 	/* sound hardware */
-	MCFG_AT28C16_ADD( "at28c16", NULL )
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -270,19 +343,23 @@ ROM_START( crazywar )
 	ROM_LOAD32_WORD_SWAP( "14", 0x1c00000, 0x200000, CRC(38ede322) SHA1(9496685a1280885a61a568047c4a8c2cd70d1b83) )
 	ROM_LOAD32_WORD_SWAP( "15", 0x1c00002, 0x200000, CRC(d35e630a) SHA1(8c220f1baddd39cc978e3e5a874cc58e78b74c62) )
 
-	ROM_REGION( 0x080000, "cpu1", 0 )  /* QDSP ('51) Code ? */
+	ROM_REGION( 0x080000, "qs1000:cpu", 0 )  /* QDSP (8052) Code */
 	ROM_LOAD( "bgm.u84",      0x000000, 0x080000, CRC(13aa7778) SHA1(131f74e1b73dd7a7038864593dc7ca24af0ffc30) )
 
-	ROM_REGION( 0x100000, "music", 0 )
+	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "effect.u85",   0x000000, 0x100000, CRC(9159fcc6) SHA1(2be9a197a51303a0da9484dced12a3f6d3b0d867) )
-
-	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1001a.u86",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+	ROM_LOAD( "qs1001a.u86",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
 static DRIVER_INIT( vegaeo )
 {
+	vegaeo_state *state = machine.driver_data<vegaeo_state>();
+
+	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
+	machine.device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
+	state->membank("qs1000:bank")->configure_entries(0, 8, state->memregion("qs1000:cpu")->base()+0x100, 0x10000);
+
 	init_eolith_speedup(machine);
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo, ROT0, "Eolith", "Crazy War",  GAME_NO_SOUND )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND )
