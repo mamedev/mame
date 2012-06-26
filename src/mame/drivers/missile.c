@@ -6,7 +6,7 @@
         * Missile Command
 
     Known issues:
-        * none at this time
+        * bootleg sets don't work yet
 
 ******************************************************************************************
 
@@ -320,10 +320,10 @@ Notes:
                                 On  ( Unused )
                                 Off ( Unused )
 
-    -there are 2 different versions of the Super Missile Attack board.  It's not known if
+    There are 2 different versions of the Super Missile Attack board.  It's not known if
     the roms are different.  The SMA manual mentions a set 3(035822-03E) that will work
     as well as set 2. Missile Command set 1 will not work with the SMA board. It would
-        appear set 1 and set 2 as labeled by mame are reversed.
+    appear set 1 and set 2 as labeled by mame are reversed.
 
 ****************************************************************************
 
@@ -356,10 +356,14 @@ class missile_state : public driver_device
 {
 public:
 	missile_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"){ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_videoram(*this, "videoram")
+	{ }
 
+	required_device<m6502_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
+
 	const UINT8 *m_writeprom;
 	emu_timer *m_irq_timer;
 	emu_timer *m_cpu_timer;
@@ -368,6 +372,7 @@ public:
 	UINT8 m_flipscreen;
 	UINT8 m_madsel_delay;
 	UINT16 m_madsel_lastpc;
+
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
@@ -385,16 +390,6 @@ public:
 #define VTOTAL			(256)
 #define VBSTART			(256)
 #define VBEND			(25)	/* 24 causes a garbage line at the top of the screen */
-
-
-/*************************************
- *
- *  Globals
- *
- *************************************/
-
-
-
 
 
 
@@ -443,7 +438,7 @@ static TIMER_CALLBACK( clock_irq )
 
 	/* assert the IRQ if not already asserted */
 	state->m_irq_state = (~curv >> 5) & 1;
-	cputag_set_input_line(machine, "maincpu", 0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
 	machine.primary_screen->update_partial(v_to_scanline(state, curv));
@@ -475,9 +470,9 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK/16);
+		state->m_maincpu->set_unscaled_clock(MASTER_CLOCK/16);
 	else
-		machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK/8);
+		state->m_maincpu->set_unscaled_clock(MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
@@ -513,12 +508,13 @@ DIRECT_UPDATE_MEMBER(missile_state::missile_direct_handler)
 static MACHINE_START( missile )
 {
 	missile_state *state = machine.driver_data<missile_state>();
+
 	/* initialize globals */
 	state->m_writeprom = state->memregion("proms")->base();
 	state->m_flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	address_space *space = machine.device<m6502_device>("maincpu")->space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	space->set_direct_update_handler(direct_update_delegate(FUNC(missile_state::missile_direct_handler), state));
 
 	/* create a timer to speed/slow the CPU */
@@ -542,7 +538,7 @@ static MACHINE_START( missile )
 static MACHINE_RESET( missile )
 {
 	missile_state *state = machine.driver_data<missile_state>();
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 	state->m_irq_state = 0;
 }
 
@@ -761,7 +757,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 	{
 		if (m_irq_state)
 		{
-			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 			m_irq_state = 0;
 		}
 	}
@@ -1293,6 +1289,6 @@ GAME( 1981, suprmatk, missile, missile, suprmatk, suprmatk, ROT0, "Atari / Gener
 GAME( 1981, suprmatkd,missile, missile, suprmatk,        0, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
 
 /* the bootlegs are on different hardware and don't work */
-GAME( 198?, mcombat,  missile, missile, missile,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
-GAME( 198?, mcombata, missile, missile, missile,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )
-GAME( 198?, mcombats, missile, missile, missile,         0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", GAME_NOT_WORKING )
+GAME( 1980, mcombat,  missile, missile, missile,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
+GAME( 1980, mcombata, missile, missile, missile,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )
+GAME( 1980, mcombats, missile, missile, missile,         0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", GAME_NOT_WORKING )

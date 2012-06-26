@@ -793,7 +793,7 @@ ADDRESS_MAP_END
 
 /*
  Multipede is a daughterboard kit produced by Braze Technologies
- from 2002(1st version) to 2007(1.2a). It allows users to play
+ from 2002(1st version) to 2004(1.2a). It allows users to play
  Centipede and Millipede on one board.
  The game can be switched at any time with P1+P2 start.
 
@@ -2179,15 +2179,15 @@ static DRIVER_INIT( bullsdrt )
 static DRIVER_INIT( multiped )
 {
 	UINT8 *src = machine.root_device().memregion("user1")->base();
-	UINT8 *dest = machine.root_device().memregion("maincpu")->base() + 0x10000;
+	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
 
-	// descramble rom
+	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)
-		dest[i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400)] = BITSWAP8(src[BITSWAP16(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
+		dest[0x10000 + (i ^ (~i << 4 & 0x1000) ^ (~i >> 3 & 0x400))] = BITSWAP8(src[BITSWAP16(i,15,14,13,1,8,11,4,7,10,5,6,9,12,0,3,2)],0,2,1,3,4,5,6,7);
 
 	// (this can be removed when prg bankswitch is implemented)
-	memmove(dest-0x8000, dest+0x0000, 0x4000);
-	memmove(dest-0xc000, dest+0x4000, 0x4000);
+	memmove(dest+0x0000, dest+0x10000, 0x8000);
+	memmove(dest+0x8000, dest+0x10000, 0x8000);
 }
 
 
@@ -2204,7 +2204,7 @@ GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",  
 GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1989, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack (Two-Bit Score)", "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1980, caterplr, centiped, caterplr, caterplr, 0,        ROT270, "bootleg", "Caterpillar (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
-GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac", GAME_SUPPORTS_SAVE )
+GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
 GAME( 1980, magworm,  centiped, magworm,  magworm,  0,        ROT270, "bootleg", "Magic Worm (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
 GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
 GAME( 1989, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack (Two-Bit Score)", "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
