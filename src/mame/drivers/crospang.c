@@ -141,7 +141,7 @@ static INPUT_PORTS_START( crospang )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )       /* table at 0x02e88c */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )         /* table at 0x02f96c */
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hardest ) )      /* table at 0x02f3cc */
-	PORT_DIPNAME( 0x0010, 0x0010, "Bonus Power (Points)" )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0010, 0x0010, "Bonus Power (Points)" )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, "5k 20k 15k+" )
 	PORT_DIPSETTING(      0x0000, "8k 23k 15k+" )
 	PORT_DIPNAME( 0x0020, 0x0020, "Number of Powers" )      PORT_DIPLOCATION("SW1:6")
