@@ -7,7 +7,7 @@
     Games supported:
         * Cruis'n USA (1994)        [3 sets]
         * Cruis'n World (1996)      [4 sets]
-        * War Gods (1996)
+        * War Gods (1996)           [3 sets]
         * Off Road Challenge (1997) [4 sets]
 
     Known bugs:
@@ -15,6 +15,10 @@
         * rendering needs to be looked at a little more closely to fix some holes
         * in Cruis'n World attract mode, right side of sky looks like it has wrapped
         * Off Road Challenge has polygon sorting issues, among other problems
+        * Issues for the Wargods sets:
+           Sound D/RAM      ERROR EE (during boot diag)
+           Listen for Tone  ERROR E1 (during boot diag)
+           All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
 
 **************************************************************************/
 
@@ -564,32 +568,35 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0000, "Link Status" )
+	/* DSW2 at U97 */
+	PORT_DIPNAME( 0x0001, 0x0000, "Link Status" )		PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, "Master" )
 	PORT_DIPSETTING(      0x0001, "Slave" )
-	PORT_DIPNAME( 0x0002, 0x0002, "Link???" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Link???" )		PORT_DIPLOCATION("SW2:7") /* Listed as Not Used in the manual */
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "Linking" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Linking" )		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:5") /* Listed as Not Used in the manual */
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Freeze" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Freeze" )		PORT_DIPLOCATION("SW2:4") /* Listed as Not Used in the manual */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, "Sitdown" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Enable Motion" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Enable Motion" )		PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0100, 0x0100, "Coin Counters" )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW2:1" ) /* Listed as Not Used in the manual */
+
+	/* DSW3 at U19 */
+	PORT_DIPNAME( 0x0100, 0x0100, "Coin Counters" )		PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW3:7,6,5,4,3,2,1")
 	PORT_DIPSETTING(      0xfe00, "USA-1" )
 	PORT_DIPSETTING(      0xfa00, "USA-3" )
 	PORT_DIPSETTING(      0xfc00, "USA-7" )
@@ -696,29 +703,30 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0000, "Link Number" )
+	/* DSW2 at U97 */
+	PORT_DIPNAME( 0x0003, 0x0000, "Link Number" )		PORT_DIPLOCATION("SW2:8,7")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0001, "2" )
 	PORT_DIPSETTING(      0x0002, "3" )
 	PORT_DIPSETTING(      0x0003, "4" )
-	PORT_DIPNAME( 0x0004, 0x0004, "Linking" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Linking" )		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0018, 0x0008, "Games Linked" )
+	PORT_DIPNAME( 0x0018, 0x0008, "Games Linked" )		PORT_DIPLOCATION("SW2:5,4")
 	PORT_DIPSETTING(      0x0008, "2" )
 	PORT_DIPSETTING(      0x0010, "3" )
 	PORT_DIPSETTING(      0x0018, "4" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, "Sitdown" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0100, 0x0100, "Coin Counters" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:2" )	 	/* Manual shows Not Used */
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW2:1" )
+
+	/* DSW3 at U19 */
+	PORT_DIPNAME( 0x0100, 0x0100, "Coin Counters" )		PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xfe00, 0xf800, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW3:7,6,5,4,3,2,1")
 	PORT_DIPSETTING(      0xfe00, "USA-1" )
 	PORT_DIPSETTING(      0xfa00, "USA-3" )
 	PORT_DIPSETTING(      0xfc00, "USA-7" )
@@ -825,39 +833,32 @@ static INPUT_PORTS_START( offroadc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, "Shifter" )
-	PORT_DIPSETTING(      0x0002, "Closed" )
-	PORT_DIPSETTING(      0x0000, "Open" )
-	PORT_DIPNAME( 0x0004, 0x0004, "Girls" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Road Kill" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Link" )
+	/* DSW2 at U97 */
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:8" )	 	/* Manual shows Not Used & "No Effect" for both On & Off */
+	PORT_DIPNAME( 0x0002, 0x0000, "Gear Shifter Switch" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0002, "Normally Closed" )
+	PORT_DIPSETTING(      0x0000, "Normally Open" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Added Attractions" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0004, "Girls Present" )
+	PORT_DIPSETTING(      0x0000, "Girls Missing" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Graphic Effects" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x0008, "Roadkill Present" )
+	PORT_DIPSETTING(      0x0000, "Roadkill Missing" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:4" )	 	/* Manual shows Not Used & "No Effect" for both On & Off */
+	PORT_DIPNAME( 0x0020, 0x0020, "Link" )				PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, "Disabled" )
 	PORT_DIPSETTING(      0x0000, "Enabled" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, "Link Machine" )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Link Machine" )			PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(      0x00c0, "1" )
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_DIPSETTING(      0x0040, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0xf800, 0xf800, DEF_STR( Coinage ) )
+
+	/* DSW3 at U19 */
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW3:8" )	/* Manual states "Switches 6, 7 and 8 are not active. We recommend */
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW3:7" )	/* they be set to the facorty default (OFF) positions."            */
+	PORT_DIPUNUSED_DIPLOC( 0x0400, 0x0400, "SW3:6" )
+	PORT_DIPNAME( 0xf800, 0xf800, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW3:5,4,3,2,1")
 	PORT_DIPSETTING(      0xf800, "USA 1" )
 	PORT_DIPSETTING(      0xf000, "German 1" )
 	PORT_DIPSETTING(      0xe800, "French 1" )
@@ -891,34 +892,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wargods )
 	PORT_START("DIPS")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0001, 0x0001, "CRT Type / Resolution" )		PORT_DIPLOCATION("SW1:1") /* This only works for the Dual Res version */
+	PORT_DIPSETTING(      0x0001, "Medium Res (24Khz)" )
+	PORT_DIPSETTING(      0x0000, "Standard Res (15Khz)" )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2") /* Manual shows Not Used (must be Off) */
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* Manual shows Not Used (must be Off) */
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Blood" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Blood" )				PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Graphics" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Graphics" )			PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Family" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6") /* Manual shows Not Used */
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7") /* Manual shows Not Used */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8") /* Manual shows Not Used */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "Coinage Source" )
+	PORT_DIPNAME( 0x0100, 0x0100, "Coinage Source" )		PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, "Dipswitch" )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
-	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:2,3,4,5,6")
 	PORT_DIPSETTING(      0x3e00, "USA-1" )
 	PORT_DIPSETTING(      0x3c00, "USA-2" )
 	PORT_DIPSETTING(      0x3a00, "USA-3" )
@@ -940,10 +941,10 @@ static INPUT_PORTS_START( wargods )
 	PORT_DIPSETTING(      0x1200, "French-12" )
 	PORT_DIPSETTING(      0x1600, "French-ECA" )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:7") /* Manual shows Not Used */
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
+	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )			PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -993,6 +994,14 @@ static INPUT_PORTS_START( wargods )
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wargodsa ) /* For Medium Res only versions */
+	PORT_INCLUDE(wargods)
+
+	PORT_MODIFY("DIPS")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1") /* Manual shows Not Used (must be Off) */
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
 /*************************************
@@ -1597,7 +1606,7 @@ PCB LAYOUT
 |-----------------------------|  |---------------------------------------|  |---------------------------------------|
 */
 
-ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
+ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (10/09/1996) */
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* sound data */
 	ROM_LOAD16_BYTE( "u2.rom",   0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
@@ -1605,7 +1614,29 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
 	DISK_REGION( "drive_0" )
-	DISK_IMAGE( "wargods", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
+	DISK_IMAGE( "wargods_10-09-1996", 0, SHA1(7585bc65b1038589cb59d3e7c56e08ca9d7015b8) )
+ROM_END
+
+ROM_START( wargodsa ) /* Boot EPROM Version 1.0, Game Type: 452 (08/15/1996) */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* sound data */
+	ROM_LOAD16_BYTE( "u2.rom",   0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
+
+	DISK_REGION( "drive_0" )
+	DISK_IMAGE( "wargods_08-15-1996", 0, SHA1(5dee00be40c315fbb1d6e3994dae8e498ab87fb2) )
+ROM_END
+
+ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* sound data */
+	ROM_LOAD16_BYTE( "u2.rom",   0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
+
+	DISK_REGION( "drive_0" )
+	DISK_IMAGE( "wargods_12-11-1995", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
 ROM_END
 
 
@@ -1734,4 +1765,6 @@ GAME( 1997, offroadc4, offroadc, midvunit, offroadc, offroadc, ROT0, "Midway", "
 GAME( 1997, offroadc3, offroadc, midvunit, offroadc, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", GAME_SUPPORTS_SAVE )
 GAME( 1997, offroadc1, offroadc, midvunit, offroadc, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", GAME_SUPPORTS_SAVE )
 
-GAME( 1995, wargods,  0,        midvplus, wargods,  wargods,  ROT0, "Midway", "War Gods", GAME_SUPPORTS_SAVE )
+GAME( 1995, wargods,   0,        midvplus, wargods,  wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", GAME_SUPPORTS_SAVE )
+GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", GAME_SUPPORTS_SAVE )
+GAME( 1995, wargodsb,  wargods,  midvplus, wargodsa, wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", GAME_SUPPORTS_SAVE )
