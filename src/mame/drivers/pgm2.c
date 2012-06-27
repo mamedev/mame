@@ -1,14 +1,21 @@
-
-
 /* PGM 2 hardware.
 
  Motherboard is bare bones stuff, probably only contains the video processor, no ROMs.
 
- Makes use of internal ROM ASICS, newer than those found on the best protected PGM games.  Games actually boot to a warning screen even if you remove all program roms!
+ Makes use of internal ROM ASICS, newer than those found on the best protected PGM games.
+ Games actually boot to a warning screen even if you remove all program roms!
 
  Encrypted.
 
- I'm guessing it's ARM based, but not sure.
+ Likely ARM based, but until we can obtain decrypted data, we will not know for sure.
+
+
+PGM2 Motherboard Components:
+
+ IS61LV25616AL(SRAM) 
+ IGS037(GFX PROCESSOR) 
+ YMZ774-S(SOUND) 
+ R5F21256SN(extra MCU for protection and ICcard communication) 
 
 */
 
@@ -137,7 +144,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_VIDEO_START(pgm2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-    MCFG_YMZ770_ADD("ymz770", 16384000)
+    MCFG_YMZ770_ADD("ymz770", 16384000)  // Actually a YMZ774 on-board
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
