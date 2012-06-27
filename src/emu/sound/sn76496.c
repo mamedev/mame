@@ -111,7 +111,7 @@
         * Test the NCR7496; Smspower says the whitenoise taps are A and E,
           but this needs verification on real hardware.
         * Factor out common code so that the SAA1099 can share some code.
-        * Convert to modern device
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -613,3 +613,301 @@ DEFINE_LEGACY_SOUND_DEVICE(SN94624, sn94624);
 DEFINE_LEGACY_SOUND_DEVICE(NCR7496, ncr7496);
 DEFINE_LEGACY_SOUND_DEVICE(GAMEGEAR, gamegear);
 DEFINE_LEGACY_SOUND_DEVICE(SEGAPSG, segapsg);
+
+/*****************************************************************
+    New class implementation
+    Michael Zapf, June 2012
+*****************************************************************/
+
+sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name,
+	const char *tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int freq0,
+	device_t *owner, UINT32 clock)
+
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_feedback_mask(feedbackmask),
+	  m_whitenoise_tap1(noisetap1),
+	  m_whitenoise_tap2(noisetap2),
+	  m_negate(negate),
+	  m_stereo(stereo),
+	  m_clock_divider(clockdivider),
+	  m_freq0_is_max(freq0)
+{
+}
+
+void sn76496_base_device::device_start()
+{
+	int sample_rate = clock()/2;
+	int i;
+	double out;
+	int gain;
+
+	const sn76496_config *conf = reinterpret_cast<const sn76496_config *>(static_config());
+	m_ready.resolve(conf->ready, *this);
+
+	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate, this);
+
+	for (i = 0; i < 4; i++) m_volume[i] = 0;
+
+	m_last_register = 0;
+	for (i = 0; i < 8; i+=2)
+	{
+		m_register[i] = 0;
+		m_register[i + 1] = 0x0f;	// volume = 0
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		m_output[i] = 0;
+		m_period[i] = 0;
+		m_count[i] = 0;
+	}
+
+	m_RNG = m_feedback_mask;
+	m_output[3] = m_RNG & 1;
+
+	m_cycles_to_ready = 1;			// assume ready is not active immediately on init. is this correct?
+	m_stereo_mask = 0xFF;			// all channels enabled
+	m_current_clock = m_clock_divider-1;
+
+	// set gain
+	gain = 0;
+
+	gain &= 0xff;
+
+	// increase max output basing on gain (0.2 dB per step)
+	out = MAX_OUTPUT / 4; // four channels, each gets 1/4 of the total range
+	while (gain-- > 0)
+		out *= 1.023292992;	// = (10 ^ (0.2/20))
+
+	// build volume table (2dB per step)
+	for (i = 0; i < 15; i++)
+	{
+		// limit volume to avoid clipping
+		if (out > MAX_OUTPUT / 4) m_vol_table[i] = MAX_OUTPUT / 4;
+		else m_vol_table[i] = out;
+
+		out /= 1.258925412;	/* = 10 ^ (2/20) = 2dB */
+	}
+	m_vol_table[15] = 0;
+
+	m_ready_state = true;
+
+	register_for_save_states();
+}
+
+READ_LINE_MEMBER( sn76496_base_device::ready_r )
+{
+	m_sound->update();
+	return (m_cycles_to_ready > 0)? FALSE : TRUE;
+}
+
+WRITE8_MEMBER( sn76496_base_device::stereo_w )
+{
+	m_sound->update();
+	if (m_stereo) m_stereo_mask = data;
+	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
+}
+
+WRITE8_MEMBER( sn76496_base_device::write )
+{
+	int n, r, c;
+
+	// update the output buffer before changing the registers
+	m_sound->update();
+
+	// set number of cycles until READY is active; this is always one
+	// 'sample', i.e. it equals the clock divider exactly; until the
+	// clock divider is fully supported, we delay until one sample has
+	// played. The fact that this below is '2' and not '1' is because
+	// of a ?race condition? in the mess crvision driver, where after
+	// any sample is played at all, no matter what, the cycles_to_ready
+	// ends up never being not ready, unless this value is greater than
+	// 1. Once the full clock divider stuff is written, this should no
+	// longer be an issue.
+
+	m_cycles_to_ready = 2;
+
+	if (data & 0x80)
+	{
+		r = (data & 0x70) >> 4;
+		m_last_register = r;
+		m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
+	}
+	else
+	{
+		r = m_last_register;
+	}
+
+	c = r >> 1;
+	switch (r)
+	{
+		case 0:	// tone 0: frequency
+		case 2:	// tone 1: frequency
+		case 4:	// tone 2: frequency
+			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x0f) | ((data & 0x3f) << 4);
+			if ((m_register[r] != 0) || (!m_freq0_is_max)) m_period[c] = m_register[r];
+			else m_period[c] = 0x400;
+
+			if (r == 4)
+			{
+				// update noise shift frequency
+				if ((m_register[6] & 0x03) == 0x03)	m_period[3] = m_period[2]<<1;
+			}
+			break;
+		case 1:	// tone 0: volume
+		case 3:	// tone 1: volume
+		case 5:	// tone 2: volume
+		case 7:	// noise: volume
+			m_volume[c] = m_vol_table[data & 0x0f];
+			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
+			break;
+		case 6:	// noise: frequency, mode
+			{
+				if ((data & 0x80) == 0) logerror("sn76496_base_device: write to reg 6 with bit 7 clear; data was %03x, new write is %02x! report this to LN!\n", m_register[6], data);
+				if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
+				n = m_register[6];
+				// N/512,N/1024,N/2048,Tone #3 output
+				m_period[3] = ((n&3) == 3)? (m_period[2]<<1) : (1 << (5+(n&3)));
+				m_RNG = m_feedback_mask;
+			}
+			break;
+	}
+}
+
+inline bool sn76496_base_device::in_noise_mode()
+{
+	return ((m_register[6] & 4)!=0);
+}
+
+void sn76496_base_device::countdown_cycles()
+{
+	if (m_cycles_to_ready > 0)
+	{
+		m_cycles_to_ready--;
+		if (m_ready_state==true) m_ready(CLEAR_LINE);
+		m_ready_state = false;
+	}
+	else
+	{
+		if (m_ready_state==false) m_ready(ASSERT_LINE);
+		m_ready_state = true;
+	}
+}
+
+void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	int i;
+	stream_sample_t *lbuffer = outputs[0];
+	stream_sample_t *rbuffer = (m_stereo)? outputs[1] : NULL;
+
+	INT16 out = 0;
+	INT16 out2 = 0;
+
+	while (samples > 0)
+	{
+		// clock chip once
+		if (m_current_clock > 0) // not ready for new divided clock
+		{
+			m_current_clock--;
+		}
+		else // ready for new divided clock, make a new sample
+		{
+			m_current_clock = m_clock_divider-1;
+			// decrement Cycles to READY by one
+			countdown_cycles();
+
+			// handle channels 0,1,2
+			for (i = 0; i < 3; i++)
+			{
+				m_count[i]--;
+				if (m_count[i] <= 0)
+				{
+					m_output[i] ^= 1;
+					m_count[i] = m_period[i];
+				}
+			}
+
+			// handle channel 3
+			m_count[3]--;
+			if (m_count[3] <= 0)
+			{
+				// if noisemode is 1, both taps are enabled
+				// if noisemode is 0, the lower tap, whitenoisetap2, is held at 0
+				// The != was a bit-XOR (^) before
+				if (((m_RNG & m_whitenoise_tap1)!=0) != (((m_RNG & m_whitenoise_tap2)!=0) && in_noise_mode()))
+				{
+					m_RNG >>= 1;
+					m_RNG |= m_feedback_mask;
+				}
+				else
+				{
+					m_RNG >>= 1;
+				}
+				m_output[3] = m_RNG & 1;
+
+				m_count[3] = m_period[3];
+			}
+		}
+
+		if (m_stereo)
+		{
+			out = ((((m_stereo_mask & 0x10)!=0) && (m_output[0]!=0))? m_volume[0] : 0)
+				+ ((((m_stereo_mask & 0x20)!=0) && (m_output[1]!=0))? m_volume[1] : 0)
+				+ ((((m_stereo_mask & 0x40)!=0) && (m_output[2]!=0))? m_volume[2] : 0)
+				+ ((((m_stereo_mask & 0x80)!=0) && (m_output[3]!=0))? m_volume[3] : 0);
+
+			out2= ((((m_stereo_mask & 0x1)!=0) && (m_output[0]!=0))? m_volume[0] : 0)
+				+ ((((m_stereo_mask & 0x2)!=0) && (m_output[1]!=0))? m_volume[1] : 0)
+				+ ((((m_stereo_mask & 0x4)!=0) && (m_output[2]!=0))? m_volume[2] : 0)
+				+ ((((m_stereo_mask & 0x8)!=0) && (m_output[3]!=0))? m_volume[3] : 0);
+		}
+		else
+		{
+			out= ((m_output[0]!=0)? m_volume[0]:0)
+				+((m_output[1]!=0)? m_volume[1]:0)
+				+((m_output[2]!=0)? m_volume[2]:0)
+				+((m_output[3]!=0)? m_volume[3]:0);
+		}
+
+		if (m_negate) { out = -out; out2 = -out2; }
+
+		*(lbuffer++) = out;
+		if (m_stereo) *(rbuffer++) = out2;
+		samples--;
+	}
+}
+
+void sn76496_base_device::register_for_save_states()
+{
+	save_item(NAME(m_vol_table));
+	save_item(NAME(m_register));
+	save_item(NAME(m_last_register));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_RNG));
+//  save_item(NAME(m_clock_divider));
+	save_item(NAME(m_current_clock));
+//  save_item(NAME(m_feedback_mask));
+//  save_item(NAME(m_whitenoise_tap1));
+//  save_item(NAME(m_whitenoise_tap2));
+//  save_item(NAME(m_negate));
+//  save_item(NAME(m_stereo));
+	save_item(NAME(m_stereo_mask));
+	save_item(NAME(m_period));
+	save_item(NAME(m_count));
+	save_item(NAME(m_output));
+	save_item(NAME(m_cycles_to_ready));
+//  save_item(NAME(m_freq0_is_max));
+}
+
+const device_type SN76496N = &device_creator<sn76496n_device>;
+const device_type U8106N = &device_creator<u8106n_device>;
+const device_type Y2404N = &device_creator<y2404n_device>;
+const device_type SN76489N = &device_creator<sn76489n_device>;
+const device_type SN76489AN = &device_creator<sn76489an_device>;
+const device_type SN76494N = &device_creator<sn76494n_device>;
+const device_type SN94624N = &device_creator<sn94624n_device>;
+const device_type NCR7496N = &device_creator<ncr7496n_device>;
+const device_type GAMEGEARN = &device_creator<gamegearn_device>;
+const device_type SEGAPSGN = &device_creator<segapsgn_device>;
+
