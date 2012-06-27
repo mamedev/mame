@@ -164,6 +164,8 @@ WRITE32_MEMBER( eolith_state::sound_w )
 //	printf("CPU Command: %x\n", m_sound_data);
 	m_sound_data = data;
 	m_soundcpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+
+	space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 
@@ -579,6 +581,10 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_MACHINE_RESET(eolith)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C66)
+
+//	for testing sound sync
+//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+//	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
