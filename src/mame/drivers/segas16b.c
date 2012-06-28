@@ -891,16 +891,17 @@ CPU  - 317-0092  |--------------------------------------------------------------
  *
  *************************************/
 
-#define MASTER_CLOCK_10MHz		XTAL_10MHz
-#define MASTER_CLOCK_8MHz		XTAL_8MHz
-#define MASTER_CLOCK_25MHz		XTAL_25_1748MHz
+#define MASTER_CLOCK_10MHz				XTAL_10MHz
+#define MASTER_CLOCK_8MHz				XTAL_8MHz
+#define MASTER_CLOCK_25MHz				XTAL_25_1748MHz
 
-#define ROM_BOARD_171_5358_SMALL    (0)	/* 171-5358 with smaller ROMs */
-#define ROM_BOARD_171_5358          (1)		/* 171-5358 */
-#define ROM_BOARD_171_5521          (2)		/* 171-5521 */
-#define ROM_BOARD_171_5704          (2)		/* 171-5704 - don't know any diff between this and 171-5521 */
-#define ROM_BOARD_ATOMICP           (3)		/* (custom Korean) */
-#define ROM_BOARD_171_5797          (4)		/* 171-5797 */
+#define ROM_BOARD_171_5358_SMALL		(0)		/* 171-5358 with smaller ROMs */
+#define ROM_BOARD_171_5358				(1)		/* 171-5358 */
+#define ROM_BOARD_171_5521				(2)		/* 171-5521 */
+#define ROM_BOARD_171_5704				(2)		/* 171-5704 - don't know any diff between this and 171-5521 */
+#define ROM_BOARD_ATOMICP				(3)		/* (custom Korean) */
+#define ROM_BOARD_171_5797				(4)		/* 171-5797 */
+#define ROM_BOARD_171_5704_EXTRA_RAM	(5)		/* System 16C */
 
 
 /*************************************
@@ -943,7 +944,7 @@ static const segaic16_memory_map_entry rom_171_5358_info_small[] =
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,       "bank11", FUNC(segaic16_tileram_0_w),  NULL,     &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,       "bank12", FUNC(segaic16_textram_0_w),  NULL,     &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, FUNC_NULL,       "bank13", FUNC_NULL,                   "bank13", &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,     "work RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x20000, FUNC_NULL,       "bank15", FUNC_NULL,                   NULL,     NULL,                  "ROM 2" },
 	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x10000, FUNC_NULL,       "bank16", FUNC_NULL,                   NULL,     NULL,                  "ROM 1" },
 	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, FUNC_NULL,       "bank17", FUNC_NULL,                   NULL,     NULL,                  "ROM 0" },
@@ -957,7 +958,7 @@ static const segaic16_memory_map_entry rom_171_5358_info[] =
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,       "bank11", FUNC(segaic16_tileram_0_w),  NULL,     &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,       "bank12", FUNC(segaic16_textram_0_w),  NULL,     &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, FUNC_NULL,       "bank13", FUNC_NULL,                   "bank13", &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,     "work RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x40000, FUNC_NULL,       "bank15", FUNC_NULL,                   NULL,     NULL,                  "ROM 2" },
 	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x20000, FUNC_NULL,       "bank16", FUNC_NULL,                   NULL,     NULL,                  "ROM 1" },
 	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, FUNC_NULL,       "bank17", FUNC_NULL,                   NULL,     NULL,                  "ROM 0" },
@@ -971,7 +972,21 @@ static const segaic16_memory_map_entry rom_171_5704_info[] =
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,       "bank11", FUNC(segaic16_tileram_0_w),  NULL,     &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,       "bank12", FUNC(segaic16_textram_0_w),  NULL,     &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, FUNC_NULL,       "bank13", FUNC_NULL,                   "bank13", &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,     "work RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, FUNC_NULL,       NULL,     FUNC(rom_5704_bank_w),       NULL,     NULL,                  "tile bank" },
+	{ 0x25/2, 0x00000, 0x80000, 0xfc0000, 0x80000, FUNC_NULL,       "bank16", FUNC_NULL,                   NULL,     NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, FUNC_NULL,       "bank17", FUNC_NULL,                   NULL,     NULL,                  "ROM 0" },
+	{ 0 }
+};
+
+static const segaic16_memory_map_entry rom_171_5704_extra_ram_info[] =
+{
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC(misc_io_r), NULL,     FUNC(misc_io_w),             NULL,     NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, FUNC_NULL,       "bank10", FUNC(segaic16_paletteram_w), NULL,     &segaic16_paletteram,  "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,       "bank11", FUNC(segaic16_tileram_0_w),  NULL,     &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,       "bank12", FUNC(segaic16_textram_0_w),  NULL,     &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, FUNC_NULL,       "bank13", FUNC_NULL,                   "bank13", &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x40000, 0xfc0000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, FUNC_NULL,       NULL,     FUNC(rom_5704_bank_w),       NULL,     NULL,                  "tile bank" },
 	{ 0x25/2, 0x00000, 0x80000, 0xfc0000, 0x80000, FUNC_NULL,       "bank16", FUNC_NULL,                   NULL,     NULL,                  "ROM 1" },
 	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, FUNC_NULL,       "bank17", FUNC_NULL,                   NULL,     NULL,                  "ROM 0" },
@@ -985,7 +1000,7 @@ static const segaic16_memory_map_entry rom_atomicp_info[] =
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,       "bank11", FUNC(segaic16_tileram_0_w),  NULL,     &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,       "bank12", FUNC(segaic16_textram_0_w),  NULL,     &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, FUNC_NULL,       "bank13", FUNC_NULL,                   "bank13", &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,     "work RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,       "bank14", FUNC_NULL,                   "bank14", &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, FUNC_NULL,       NULL,     FUNC(rom_5704_bank_w),       NULL,     NULL,                  "tile bank" },
 	{ 0x25/2, 0x00000, 0x10000, 0xff0000,      ~0, FUNC_NULL,       NULL,     FUNC(atomicp_sound_w),       NULL,     NULL,                  "sound" },
 	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, FUNC_NULL,       "bank17", FUNC_NULL,                   NULL,     NULL,                  "ROM 0" },
@@ -999,7 +1014,7 @@ static const segaic16_memory_map_entry rom_171_5797_info[] =
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,                  "bank11", FUNC(segaic16_tileram_0_w),  NULL,     &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,                  "bank12", FUNC(segaic16_textram_0_w),  NULL,     &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, FUNC_NULL,                  "bank13", FUNC_NULL,                   "bank13", &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,                  "bank14", FUNC_NULL,                   "bank14", &workram,     "work RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC_NULL,                  "bank14", FUNC_NULL,                   "bank14", &workram,              "work RAM" },
 	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, FUNC(unknown_rgn2_r),       NULL,     FUNC(unknown_rgn2_w),        NULL,     NULL,                  "???" },
 	{ 0x25/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC(rom_5797_bank_math_r), NULL,     FUNC(rom_5797_bank_math_w),  NULL,     NULL,                  "tile bank/math" },
 	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, FUNC_NULL,                  "bank17", FUNC_NULL,                   NULL,     NULL,                  "ROM 0" },
@@ -1012,7 +1027,8 @@ static const segaic16_memory_map_entry *const region_info_list[] =
 	&rom_171_5358_info[0],
 	&rom_171_5704_info[0],
 	&rom_atomicp_info[0],
-	&rom_171_5797_info[0]
+	&rom_171_5797_info[0],
+	&rom_171_5704_extra_ram_info[0]
 };
 
 
@@ -1069,15 +1085,22 @@ static void system16b_common_init(running_machine& machine, int _rom_board)
 static void system16b_generic_init(running_machine &machine, int _rom_board)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
+	int workram_size;
 
 	system16b_common_init(machine, _rom_board);
+
+	/* System 16C board has more workram */
+	if (_rom_board == ROM_BOARD_171_5704_EXTRA_RAM)
+		workram_size = 0x40000;
+	else
+		workram_size = 0x04000;
 
 	/* allocate memory for regions not autmatically assigned */
 	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x00800 / 2);
 	segaic16_paletteram  = auto_alloc_array(machine, UINT16, 0x01000 / 2);
 	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000 / 2);
 	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000 / 2);
-	workram              = auto_alloc_array(machine, UINT16, 0x04000 / 2);
+	workram              = auto_alloc_array(machine, UINT16, workram_size / 2);
 
 	/* init the memory mapper */
 	segaic16_memory_mapper_init(machine.device("maincpu"), region_info_list[state->m_rom_board], sound_w, NULL);
@@ -1085,13 +1108,13 @@ static void system16b_generic_init(running_machine &machine, int _rom_board)
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
 
-	machine.device<nvram_device>("nvram")->set_base(workram, 0x4000);
+	machine.device<nvram_device>("nvram")->set_base(workram, workram_size);
 
 	state_save_register_global_pointer(machine, segaic16_spriteram_0, 0x00800/2);
 	state_save_register_global_pointer(machine, segaic16_paletteram,  0x01000/2);
 	state_save_register_global_pointer(machine, segaic16_tileram_0,   0x10000/2);
 	state_save_register_global_pointer(machine, segaic16_textram_0,   0x01000/2);
-	state_save_register_global_pointer(machine, workram,              0x04000/2);
+	state_save_register_global_pointer(machine, workram,              workram_size/2);
 }
 
 
@@ -1320,6 +1343,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 {
 	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 	int size = state->memregion("soundcpu")->bytes() - 0x10000;
+
 	if (size > 0)
 	{
 		int bankoffs = 0;
@@ -1350,6 +1374,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 				break;
 
 			case ROM_BOARD_171_5521:
+			case ROM_BOARD_171_5704_EXTRA_RAM:
 				/*
                     D5 : Unused
                     D4 : Unused
@@ -1592,6 +1617,7 @@ static void wb3_i8751_sim(running_machine &machine)
 static READ16_HANDLER( aceattac_custom_io_r )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
@@ -3193,6 +3219,37 @@ static INPUT_PORTS_START( wrestwar )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fz2 )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "240 (Cheat)")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 
@@ -6394,6 +6451,52 @@ ROM_START( wrestwar1 )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 ROM_END
 
+/**************************************************************************************************************************
+    Fantasy Zone II, Sega System 16C
+    CPU: 68000 (has Sega part number?)
+    ROM Board type: 171-5704 + Extra RAM
+
+    Sega operated this game on actual System 16 PCBs for various events,
+    it was also included in the PS2 Sega Ages collection Vol 33.
+    Various bootlegs were sourced from this version. The dump will have to
+    be verified if the official PCB ever gets into MAME friendly hands.
+
+    There is also a demo version of the game available on the PC, but
+    attempting to use those ROMs on a real PCB / emulator will result
+    in the game failing after a few stages.
+*/
+ROM_START( fantzn2x )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "fz2.a7", 0x00000, 0x20000, CRC(94c05f0b) SHA1(53da68a919776a46ae96dbc094ff941308d13613) )
+	ROM_LOAD16_BYTE( "fz2.a5", 0x00001, 0x20000, CRC(f3526895) SHA1(3197956608138601192f111d3bcc26662a7d6ec1) )
+	/* empty 0x40000 - 0x80000 */
+	ROM_LOAD16_BYTE( "fz2.a8", 0x80000, 0x20000, CRC(b2ebb209) SHA1(bd40c90a372ab92a869bdd28d12cf52b45ecc80e) )
+	ROM_LOAD16_BYTE( "fz2.a6", 0x80001, 0x20000, CRC(6833f546) SHA1(b4503cdb5bdb1322c34b9da3ff4227c740dad707) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "fz2.a14", 0x00000, 0x20000, CRC(1c0a4537) SHA1(3abdf51ea81780309bcfaf12c04efdf7cb15a649) )
+	ROM_LOAD( "fz2.a15", 0x20000, 0x20000, CRC(2b933344) SHA1(5b53ea8d58cc3d157aec6926db048359984e4276) )
+	ROM_LOAD( "fz2.a16", 0x40000, 0x20000, CRC(e63281a1) SHA1(72379c579484c1ef7784a9598d373446ef0a472b) )
+
+	ROM_REGION16_BE( 0x180000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "fz2.b1",  0x000001, 0x20000, CRC(46bba615) SHA1(b291df4a83d7155eb7606f86ed733c24362a4db3) )
+	ROM_LOAD16_BYTE( "fz2.b5",  0x000000, 0x20000, CRC(bebeee5d) SHA1(9e57e62c6b9136667aa90d7d423fc33ac6df4352) )
+	ROM_LOAD16_BYTE( "fz2.b2",  0x040001, 0x20000, CRC(6681a7b6) SHA1(228df38601ba3895e9449921a64850941715b421) )
+	ROM_LOAD16_BYTE( "fz2.b6",  0x040000, 0x20000, CRC(42d3241f) SHA1(c3240e3e1d7d398e74e76ba65adca6b06f0f67a9) )
+	ROM_LOAD16_BYTE( "fz2.b3",  0x080001, 0x20000, CRC(5863926f) SHA1(0e591c4b85e5d572b3311bec2c1f6d2484204db6) )
+	ROM_LOAD16_BYTE( "fz2.b7",  0x080000, 0x20000, CRC(cd830510) SHA1(8a32a1aa43f8af5e86f552f05da40b6e4ba12495) )
+	ROM_LOAD16_BYTE( "fz2.b4",  0x0c0001, 0x20000, CRC(b98fa5b6) SHA1(c3f8891f81e80321e2ee5cc1f4d93b1867ed1868) )
+	ROM_LOAD16_BYTE( "fz2.b8",  0x0c0000, 0x20000, CRC(e8248f68) SHA1(7876945d2baf1d7bdb9cc3a23be9f1a1681cede9) )
+	ROM_LOAD16_BYTE( "fz2.a1",  0x100001, 0x20000, CRC(9d2f41f3) SHA1(54f5dc47d854cd26b108695f55263d8b8c29ce0e) )
+	ROM_LOAD16_BYTE( "fz2.b10", 0x100000, 0x20000, CRC(7686ea33) SHA1(812a638f42500b30f80f9a3956c5eb4553cc35d0) )
+	ROM_LOAD16_BYTE( "fz2.a2",  0x140001, 0x20000, CRC(3b4050b7) SHA1(8c7c8051c577a4b2ca54d7e60c100fbd5391551f) )
+	ROM_LOAD16_BYTE( "fz2.b11", 0x140000, 0x20000, CRC(da8a95dc) SHA1(d44e1515008d4ee302f940ce7799fa9a790799e9) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "fz2.a10", 0x00000, 0x08000, CRC(92c92924) SHA1(3c98cea8f42c316405b28ae03469c6876de5e806) )
+	ROM_LOAD( "fz2.a11", 0x10000, 0x20000, CRC(8c641bb9) SHA1(920da63961d2f3457c80d4c5f6d4f405374bb23a) )
+ROM_END
+
 
 
 /*************************************
@@ -6423,6 +6526,12 @@ static DRIVER_INIT( generic_5521 )
 static DRIVER_INIT( generic_5704 )
 {
 	system16b_generic_init(machine, ROM_BOARD_171_5704);
+}
+
+
+static DRIVER_INIT( generic_5704_extra_ram )
+{
+	system16b_generic_init(machine, ROM_BOARD_171_5704_EXTRA_RAM);
 }
 
 
@@ -6760,6 +6869,9 @@ GAME( 1988, wb32,       wb3,      system16b,           wb3,      generic_5358,  
 GAME( 1989, wrestwar,   0,        system16b_8751,      wrestwar, generic_5704,       ROT270, "Sega", "Wrestle War (set 3, World, 8751 317-0103)", 0 )
 GAME( 1989, wrestwar2,  wrestwar, system16b,           wrestwar, generic_5704,       ROT270, "Sega", "Wrestle War (set 2, World, FD1094 317-0102)", 0 )
 GAME( 1989, wrestwar1,  wrestwar, system16b,           wrestwar, generic_5704,       ROT270, "Sega", "Wrestle War (set 1, Japan, FD1094 317-0090)", 0 )
+
+/* Extra RAM, dubbed by M2 as 'System 16C' */
+GAME( 2008, fantzn2x,   0,        system16b,           fz2,  generic_5704_extra_ram, ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
 
 /* Custom Korean Board - these probably belong with the bootlegs... */
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  atomicp,            ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
