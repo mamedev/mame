@@ -20,14 +20,14 @@ Supported games :
 System specs :
 ===============
  CPU   : MC68000 (12 MHz) x 1, Z80 (4 MHz?, sound CPU) x 1
- Sound : YM2610, YM3016?
+ Sound : YM2610, YM3016
  OSC   : 20.000 MHz, 8.000 MHz, 24.000 MHz
- Chips : TC0070RGB (Palette?)
+ Chips : TC0070RGB (RGB/Video Mixer)
          TC0220IOC (Input)
          TC0140SYT (Sound communication)
          TC0130LNB (???)
          TC0160ROM (???)
-         TC0080VCO (Video?)
+         TC0080VCO (Tilemap & Motion Object Gen)
 
  name             irq    resolution   tx-layer   tc0220ioc
  --------------------------------------------------------------
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( dleague )
 	PORT_DIPSETTING(    0x01, "Constant" )
 	PORT_DIPSETTING(    0x00, "Based on Inning" )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
-	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
+	TAITO_COINAGE_US_LOC(SW1)
 
 	/* 0x200002 -> 0x100527.b ($527,A5) */
 	PORT_START("DSWB")
@@ -462,6 +462,13 @@ static INPUT_PORTS_START( dleague )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dleaguej )
+	PORT_INCLUDE(dleague)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
 INPUT_PORTS_END
 
 
@@ -602,11 +609,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( recordbr, taitoh_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)		/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(recordbr_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000 / 2)		/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START(taitoh)
@@ -632,7 +639,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -645,11 +652,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dleague, taitoh_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)		/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(dleague_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000 / 2)		/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START(taitoh)
@@ -675,7 +682,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -791,6 +798,38 @@ ROM_END
 
 ROM_START( dleague )
 	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "c02-xx.33", 0x00000, 0x20000, CRC(eda870a7) SHA1(1749a6eb80c137b042d4935fcb9cff1ca50d4397) ) /* Need to verify proper Taito chip number */
+	ROM_LOAD16_BYTE( "c02-xx.36", 0x00001, 0x20000, CRC(f52114af) SHA1(d500933852332a9463a5738cf5890625c9b35d65) ) /* Need to verify proper Taito chip number */
+	ROM_LOAD16_BYTE( "c02-20.34", 0x40000, 0x10000, CRC(cdf593f3) SHA1(6afbd9d8d74e6801dc991eb9fd3205057747b986) )
+	ROM_LOAD16_BYTE( "c02-xx.37", 0x40001, 0x10000, CRC(820a8241) SHA1(a1b75e76f6806d5cbdb97f59d29aa846a6f3bb8b) ) /* Need to verify proper Taito chip number */
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )
+	ROM_LOAD( "c02-23.40", 0x00000, 0x04000, CRC(5632ee49) SHA1(90dedaf40ab526529cd7d569b78a9d5451ec3e25) )
+	ROM_CONTINUE(          0x10000, 0x0c000 )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD       ( "c02-02.15", 0x000000, 0x80000, CRC(b273f854) SHA1(5961b9fe2c49fb05f5bc3e27e05925dbef8577e9) )
+	ROM_LOAD16_BYTE( "c02-06.6",  0x080000, 0x20000, CRC(b8473c7b) SHA1(8fe8d838bdba7aaaf4527ac1c5c16604922bb245) )
+	ROM_LOAD16_BYTE( "c02-10.14", 0x080001, 0x20000, CRC(50c02f0f) SHA1(7d13b798c0a98387719ab738b9178ee6079327b2) )
+	ROM_LOAD       ( "c02-03.17", 0x100000, 0x80000, CRC(c3fd0dcd) SHA1(43f32cefbca203bd0453e1c3d4523f0834900418) )
+	ROM_LOAD16_BYTE( "c02-07.7",  0x180000, 0x20000, CRC(8c1e3296) SHA1(088b028189131186c82c61c38d5a936a0cc9830f) )
+	ROM_LOAD16_BYTE( "c02-11.16", 0x180001, 0x20000, CRC(fbe548b8) SHA1(c2b453fc213c21d118810b8502836e7a2ba5626b) )
+	ROM_LOAD       ( "c02-24.19", 0x200000, 0x80000, CRC(18ef740a) SHA1(27f0445c053e28267e5688627d4f91d158d4fb07) )
+	ROM_LOAD16_BYTE( "c02-08.8",  0x280000, 0x20000, CRC(1a3c2f93) SHA1(0e45f8211dae8e17e67d26173262ca9831ccd283) )
+	ROM_LOAD16_BYTE( "c02-12.18", 0x280001, 0x20000, CRC(b1c151c5) SHA1(3fc3d4270cad52c4a82c217b452e534d24bd8548) )
+	ROM_LOAD       ( "c02-05.21", 0x300000, 0x80000, CRC(fe3a5179) SHA1(34a98969c553ee8c52aeb4fb09670a4ad572446e) )
+	ROM_LOAD16_BYTE( "c02-09.9",  0x380000, 0x20000, CRC(a614d234) SHA1(dc68a6a8cf89ab82edc571853249643aa304d37f) )
+	ROM_LOAD16_BYTE( "c02-13.20", 0x380001, 0x20000, CRC(8eb3194d) SHA1(98290f77a03826cdf7c8238dd35da1f9349d5cf5) )
+
+	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
+	ROM_LOAD( "c02-18.22", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
+	ROM_LOAD( "c02-01.31", 0x00000, 0x80000, CRC(d5a3d1aa) SHA1(544f807015b5d854a4d8cb73e4dbae4b953fd440) )
+ROM_END
+
+ROM_START( dleaguej )
+	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c02-19a.33", 0x00000, 0x20000, CRC(7e904e45) SHA1(04ac470c973753e71fba3998099a88ab0e6fcbab) )
 	ROM_LOAD16_BYTE( "c02-21a.36", 0x00001, 0x20000, CRC(18c8a32b) SHA1(507cd7a83dcb6eaefa52f2661b9f3a6fabbfbd46) )
 	ROM_LOAD16_BYTE( "c02-20.34",  0x40000, 0x10000, CRC(cdf593f3) SHA1(6afbd9d8d74e6801dc991eb9fd3205057747b986) )
@@ -822,8 +861,9 @@ ROM_START( dleague )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY  FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation",       "Syvalion (Japan)",        GAME_SUPPORTS_SAVE )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)",   GAME_SUPPORTS_SAVE )
-GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation",       "Go For The Gold (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation",       "Dynamite League (Japan)", GAME_SUPPORTS_SAVE )
+/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY                      FULLNAME */
+GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation",         "Syvalion (Japan)",        GAME_SUPPORTS_SAVE )
+GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",   GAME_SUPPORTS_SAVE )
+GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation",         "Go For The Gold (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito America Corporation", "Dynamite League (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, 0,       ROT0,    "Taito Corporation",         "Dynamite League (Japan)", GAME_SUPPORTS_SAVE )
