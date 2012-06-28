@@ -1142,6 +1142,31 @@ ROM_END
 
 /*
 
+Missile Command Multigame, produced by Braze Technologies
+from 2005(1st version) to 2007(version 1d). This kit combines
+Missile Command and Super Missile Attack on a daughterboard
+plugged into the main pcb cpu slot.
+
+- M6502 CPU (from main pcb)
+- 27C512 64KB EPROM
+- 93C46P E2PROM for saving highscore/settings
+- two 74LS chips (labels sandpapered off)
+
+*/
+
+ROM_START( missilem )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) // banked, decrypted rom goes here
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD("mcm001d.512", 0x00000, 0x10000, CRC(0a5845b5) SHA1(4828866018a984e7cd7f55a33613f43ece5d8d63) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
+ROM_END
+
+
+/*
+
 Missile Combat bootlegs by 'Videotron'
 
 1x 6502A (main)
@@ -1275,6 +1300,26 @@ static DRIVER_INIT( suprmatk )
 	}
 }
 
+static DRIVER_INIT( missilem )
+{
+	UINT8 *src = machine.root_device().memregion("user1")->base();
+	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
+
+	// decrypt rom and put in maincpu region (result looks correct, but is untested)
+	for (int i = 0; i < 0x10000; i++)
+	{
+		int a = BITSWAP16(i, 15,2,3,0,8,9,7,5,1,4,6,14,13,12,10,11);
+		int d = BITSWAP8(src[a], 3,2,4,5,6,1,7,0);
+		
+		a = i;
+		a ^= (~a >> 1 & 0x400);
+		a ^= (~a >> 4 & 0x100);
+		a ^= ( a >> 7 & 0x100);
+
+		dest[a] = d;
+	}
+}
+
 
 /*************************************
  *
@@ -1292,3 +1337,4 @@ GAME( 1981, suprmatkd,missile, missile, suprmatk,        0, ROT0, "Atari / Gener
 GAME( 1980, mcombat,  missile, missile, missile,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
 GAME( 1980, mcombata, missile, missile, missile,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )
 GAME( 1980, mcombats, missile, missile, missile,         0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", GAME_NOT_WORKING )
+GAME( 2005, missilem, missile, missile, missile,  missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", GAME_NOT_WORKING )

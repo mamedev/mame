@@ -6291,9 +6291,10 @@ missile2		// 035820-035825    (c) 1980
 missile1		// 035820-035825    (c) 1980
 suprmatk		//                  (c) 1980 + (c) 1981 Gencomp
 suprmatkd		//                  (c) 1980 + (c) 1981 Gencomp
-mcombat
-mcombata
-mcombats
+mcombat			// bootleg
+mcombata		// bootleg
+mcombats		// bootleg
+missilem		// hack
 
 // Atari vector games
 llander			// 0345xx           no copyright notice
