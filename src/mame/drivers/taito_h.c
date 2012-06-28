@@ -5,8 +5,8 @@ Taito H system
 driver by Yochizo
 
 This driver is heavily dependent on the Raine source.
-Very thanks to Richard Bush and the Raine team. Also,
-I have been given a lot of helpful informations by
+Special thanks to Richard Bush and the Raine team. Also,
+I have been given a lot of helpful information by
 Yasuhiro Ogawa. Thank you, Yasu.
 
 
@@ -566,11 +566,11 @@ static const tc0140syt_interface taitoh_tc0140syt_intf =
 static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)		/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(syvalion_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000 / 2)		/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START(taitoh)
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
