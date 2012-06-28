@@ -192,6 +192,8 @@ void tms99xx_device::device_start()
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 
 	build_command_lookup_table();
+
+	m_program = NULL;
 }
 
 void tms99xx_device::device_stop()
@@ -1079,6 +1081,8 @@ void tms99xx_device::execute_run()
 			if (m_load_state)
 			{
 				if (VERBOSE>4) LOG("tms99xx: LOAD interrupt\n");
+				m_irq_level = LOAD_INT;
+				m_irq_state = false;
 				service_interrupt();
 			}
 			else
@@ -2515,7 +2519,6 @@ void tms99xx_device::alu_int()
 		break;
 	case 5:
 		PC = m_current_value & m_prgaddr_mask;
-		m_irq_level = get_intlevel(ASSERT_LINE);
 		if (m_irq_level > 0 )
 		{
 			ST = (ST & 0xfff0) | (m_irq_level - 1);
