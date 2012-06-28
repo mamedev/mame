@@ -508,24 +508,59 @@ ROM_START( vballb ) /* bootleg */
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* region#2: music CPU, 64kb */
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
-	/* These are from the bootleg; the original has the image data stored in a special dip rom */
+	/* The bootlegs used standard roms on a daughter card that plugs into the socket for the TOSHIBA TRJ-101 dip rom */
 	ROM_REGION(0x80000, "gfx1", 0 )	 /* fg tiles */
-	ROM_LOAD( "vball13.bin",  0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball14.bin",  0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball15.bin",  0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball16.bin",  0x30000, 0x10000, CRC(936457ba) SHA1(1662bbd777fcd33a298d192a3f06681809b9d049) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball09.bin",  0x40000, 0x10000, CRC(42874924) SHA1(a75eed7934e089f035000b7f35f6ba8dd96f1e98) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball10.bin",  0x50000, 0x10000, CRC(6cc676ee) SHA1(6e8c590946211baa9266b19b871f252829057696) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball11.bin",  0x60000, 0x10000, CRC(4754b303) SHA1(8630f077b542590ef1340a2f0a6b94086ff91c40) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball12.bin",  0x70000, 0x10000, CRC(21294a84) SHA1(b36ea9ddf6879443d3104241997fa0f916856528) ) /* 0,1,2,3 */
+	ROM_LOAD( "13", 0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
+	ROM_LOAD( "14", 0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
+	ROM_LOAD( "15", 0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
+	ROM_LOAD( "16", 0x30000, 0x10000, CRC(936457ba) SHA1(1662bbd777fcd33a298d192a3f06681809b9d049) ) /* 0,1,2,3 */
+	ROM_LOAD( "9",  0x40000, 0x10000, CRC(42874924) SHA1(a75eed7934e089f035000b7f35f6ba8dd96f1e98) ) /* 0,1,2,3 */
+	ROM_LOAD( "10", 0x50000, 0x10000, CRC(6cc676ee) SHA1(6e8c590946211baa9266b19b871f252829057696) ) /* 0,1,2,3 */
+	ROM_LOAD( "11", 0x60000, 0x10000, CRC(4754b303) SHA1(8630f077b542590ef1340a2f0a6b94086ff91c40) ) /* 0,1,2,3 */
+	ROM_LOAD( "12", 0x70000, 0x10000, CRC(21294a84) SHA1(b36ea9ddf6879443d3104241997fa0f916856528) ) /* 0,1,2,3 */
 
 	ROM_REGION(0x40000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD( "vball.35",     0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
-	ROM_LOAD( "vball.5",      0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
+	ROM_LOAD( "vball.35",     0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 == 25j4-0.35 */
+	ROM_LOAD( "vball.5",      0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 == 25j3-0.5  */
 
 	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
-	ROM_LOAD( "vball.78a",    0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) )
-	ROM_LOAD( "vball.78b",    0x10000, 0x10000, CRC(7ad9d338) SHA1(3e3c270fa69bda93b03f07a54145eb5e211ec8ba) )
+	ROM_LOAD( "vball.78a",    0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) ) /* == 1st half of 25j0-0.78 */
+	ROM_LOAD( "vball.78b",    0x10000, 0x10000, CRC(7ad9d338) SHA1(3e3c270fa69bda93b03f07a54145eb5e211ec8ba) ) /* == 2nd half of 25j0-0.78 */
+
+	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
+	ROM_LOAD_NIB_LOW ( "25j5-0.144",   0x0000,  0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
+	ROM_LOAD_NIB_HIGH( "25j6-0.143",   0x0000,  0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
+	ROM_LOAD(          "25j7-0.160",   0x0800,  0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )
+ROM_END
+
+ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom */
+	ROM_REGION( 0x18000, "maincpu", 0 ) /* Main CPU: 64k for code */
+	ROM_LOAD( "1.124", 0x10000, 0x08000, CRC(432509c4) SHA1(6de50e21d279f4ac9674bc91990ba9535e80908c) )/* Bankswitched, == 25j2-2-5.124 from vball2pj */
+	ROM_CONTINUE(      0x08000, 0x08000 ) /* Static code  */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU, 64kb */
+	ROM_LOAD( "4.ic47", 0x00000, 0x8000,  CRC(534dfbd9) SHA1(d0cb37caf94fa85da4ebdfe15e7a78109084bf91) )
+
+	/* The bootlegs used standard roms on a daughter card that plugs into the socket for the TOSHIBA TRJ-101 dip rom */
+	ROM_REGION(0x80000, "gfx1", 0 )	 /* fg tiles */
+	ROM_LOAD( "13", 0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
+	ROM_LOAD( "14", 0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
+	ROM_LOAD( "15", 0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
+	ROM_LOAD( "16", 0x30000, 0x10000, CRC(936457ba) SHA1(1662bbd777fcd33a298d192a3f06681809b9d049) ) /* 0,1,2,3 */
+	ROM_LOAD( "9",  0x40000, 0x10000, CRC(42874924) SHA1(a75eed7934e089f035000b7f35f6ba8dd96f1e98) ) /* 0,1,2,3 */
+	ROM_LOAD( "10", 0x50000, 0x10000, CRC(6cc676ee) SHA1(6e8c590946211baa9266b19b871f252829057696) ) /* 0,1,2,3 */
+	ROM_LOAD( "11", 0x60000, 0x10000, CRC(4754b303) SHA1(8630f077b542590ef1340a2f0a6b94086ff91c40) ) /* 0,1,2,3 */
+	ROM_LOAD( "12", 0x70000, 0x10000, CRC(21294a84) SHA1(b36ea9ddf6879443d3104241997fa0f916856528) ) /* 0,1,2,3 */
+
+	ROM_REGION(0x40000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD( "8", 0x00000, 0x10000, CRC(b18d083c) SHA1(8c7a39b8a9c79a13682a4f283470801c3cbb748c) ) /* == 1st half of 25j4-0.35 */
+	ROM_LOAD( "7", 0x10000, 0x10000, CRC(79a35321) SHA1(0953730b1baa9bda4b2eb703258476423e5448f5) ) /* == 2nd half of 25j4-0.35 */
+	ROM_LOAD( "6", 0x20000, 0x10000, CRC(49c6aad7) SHA1(6c026ddd97a5dfd138fb65781504f192c11ee6aa) ) /* == 1st half of 25j3-0.5  */
+	ROM_LOAD( "5", 0x30000, 0x10000, CRC(9bb95651) SHA1(ec8a481cc7f0d6e469489db7c51103446910ae80) ) /* == 2nd half of 25j3-0.5  */
+
+	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
+	ROM_LOAD( "vball.78a", 0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) ) /* == 1st half of 25j0-0.78    (ROM type 27512) */
+	ROM_LOAD( "3.ic79",    0x10000, 0x08000, CRC(d77349ba) SHA1(5ef25636056607fae7a5463957487b53da0dd310) ) /* == 3rd quarter of 25j0-0.78 (ROM type 27256) */
 
 	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
 	ROM_LOAD_NIB_LOW ( "25j5-0.144",   0x0000,  0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
@@ -536,4 +571,5 @@ ROM_END
 
 GAME( 1988, vball,    0,     vball,    vball,    0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", 0 )
 GAME( 1988, vball2pj, vball, vball,    vball2pj, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", 0 )
-GAME( 1988, vballb,   vball, vball,    vball,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg)", 0 )
+GAME( 1988, vballb,   vball, vball,    vball,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", 0 )
+GAME( 1988, vball2pjb,vball, vball,    vball,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", 0 )
