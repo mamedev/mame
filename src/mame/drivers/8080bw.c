@@ -3344,6 +3344,13 @@ ROM_START( invmultis1a )
 	ROM_LOAD("s081a.bin", 0x00000, 0x20000, CRC(daa77345) SHA1(0fdc9c2a6d9c0aa3233c5d31433adb1ea4e5b250) )
 ROM_END
 
+ROM_START( invmultip )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("s10.bin",  0x00000, 0x20000, CRC(1b43e4d3) SHA1(c50decd9caaec7f2d8b3ba74f718372d31bc1c3b) )
+ROM_END
+
 
 ROM_START( rollingc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3781,3 +3788,4 @@ GAME( 2002, invmultit3d, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (
 GAME( 2002, invmultis3a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.83A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2002, invmultis2a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.82A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2002, invmultis1a, invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.81A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, invmultip,   invmulti, invmulti, invmulti, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
