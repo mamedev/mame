@@ -1283,6 +1283,23 @@ ROM_START( tm4ka )
 	ROM_LOAD( "tm4k_sound.u8", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) ) /* Mask rom labeled 5341-15746-07 U8 SOUND IMAGE */
 ROM_END
 
+ROM_START( tm4kca )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm4k_v602ca.u51", 0x000000, 0x100000, CRC(b355e15e) SHA1(e6a6cd74d3439f589ac0a914ec66962ce2885c00) ) /* TOUCHMASTER 4000 U51 CALIFORNIA  6.02 (CA. 4-14-98) */
+	ROM_LOAD16_BYTE( "tm4k_v602ca.u52", 0x000001, 0x100000, CRC(0adbbfc0) SHA1(4660bd95649bfc65d3e52975d168de4963bd27cb) ) /* TOUCHMASTER 4000 U52 CALIFORNIA  6.02 (CA. 4-14-98) */
+
+	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u37", 0x200001, 0x100000, CRC(bf49fafa) SHA1(b400667bf654dc9cd01a85c8b99670459400fd60) ) /* Mask rom labeled 5341-15746-02 U37 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u41", 0x400000, 0x100000, CRC(e97edb1e) SHA1(75510676cf1692ad03efd4ccd57d25af1cc8ef2a) ) /* Mask rom labeled 5341-15746-06 U41 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u40", 0x400001, 0x100000, CRC(f6771a09) SHA1(74f71d5e910006c83a38170f24aa811c38a3e020) ) /* Mask rom labeled 5341-15746-05 U40 VIDEO IMAGE */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm4k_sound.u8", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) ) /* Mask rom labeled 5341-15746-07 U8 SOUND IMAGE */
+ROM_END
+
 ROM_START( tm4kb )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm4k_v601.u51", 0x000000, 0x100000, CRC(cdcfd064) SHA1(51f022d25411d119a5f16ff7f09f4bed59b937e1) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.01 (Standard 3-23-98) */
@@ -1663,6 +1680,28 @@ Protection starts:
 }
 
 
+static DRIVER_INIT( tm4kca )
+{
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+
+	// protection
+	ROM[0x83470/2] = 0x4e75;
+
+	ROM[0x83426/2] = 0x601a;
+	ROM[0x83466/2] = 0x6002;
+/*
+Protection starts:
+
+ 83416: addi.w  #$384, D0       0640 0384
+ 8341a: move.w  D0, $207a86.l   33C0 0020 7A86
+ 83420: btst    #$7, ($1,A5)    082D 0007 0001
+ 83426: beq     $83448          671A           <-- First patch goes here
+
+*/
+
+}
+
+
 static DRIVER_INIT( tm4kb )
 {
 	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
@@ -1897,6 +1936,7 @@ GAME( 1997, tm3k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Game
 GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",      0 )
 GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",      0 )
 GAME( 1998, tm4ka,    tm4k,     tm3k,     tmaster,  tm4ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",      0 )
+GAME( 1998, tm4kca,   tm4k,     tm3k,     tmaster,  tm4kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 California)",    0 )
 GAME( 1998, tm4kb,    tm4k,     tm3k,     tmaster,  tm4kb,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Standard)",      0 )
 GAME( 1998, tm5k,     0,        tm3k,     tmaster,  tm5k,     ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",      0 )
 GAME( 1998, tm5kca,   tm5k,     tm3k,     tmaster,  tm5kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)",    0 )
