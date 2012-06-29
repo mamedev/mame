@@ -2138,6 +2138,7 @@ src/mame/drivers/atarisy2.c svneol=native#text/plain
 src/mame/drivers/atarisy4.c svneol=native#text/plain
 src/mame/drivers/ataxx.c svneol=native#text/plain
 src/mame/drivers/atetris.c svneol=native#text/plain
+src/mame/drivers/atlantis.c svneol=native#text/plain
 src/mame/drivers/atronic.c svneol=native#text/plain
 src/mame/drivers/attckufo.c svneol=native#text/plain
 src/mame/drivers/atvtrack.c svneol=native#text/plain
