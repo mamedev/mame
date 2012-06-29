@@ -6806,7 +6806,7 @@ static void ACI_V_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = V + imm + (PSW & CY);
-	ZHC_SUB( tmp, V, (PSW & CY) );
+	ZHC_ADD( tmp, V, (PSW & CY) );
 	V = tmp;
 }
 
@@ -6817,7 +6817,7 @@ static void ACI_A_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = A + imm + (PSW & CY);
-	ZHC_SUB( tmp, A, (PSW & CY) );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -6828,7 +6828,7 @@ static void ACI_B_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = B + imm + (PSW & CY);
-	ZHC_SUB( tmp, B, (PSW & CY) );
+	ZHC_ADD( tmp, B, (PSW & CY) );
 	B = tmp;
 }
 
@@ -6839,7 +6839,7 @@ static void ACI_C_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = C + imm + (PSW & CY);
-	ZHC_SUB( tmp, C, (PSW & CY) );
+	ZHC_ADD( tmp, C, (PSW & CY) );
 	C = tmp;
 }
 
@@ -6850,7 +6850,7 @@ static void ACI_D_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = D + imm + (PSW & CY);
-	ZHC_SUB( tmp, D, (PSW & CY) );
+	ZHC_ADD( tmp, D, (PSW & CY) );
 	D = tmp;
 }
 
@@ -6861,7 +6861,7 @@ static void ACI_E_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = E + imm + (PSW & CY);
-	ZHC_SUB( tmp, E, (PSW & CY) );
+	ZHC_ADD( tmp, E, (PSW & CY) );
 	E = tmp;
 }
 
@@ -6872,7 +6872,7 @@ static void ACI_H_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = H + imm + (PSW & CY);
-	ZHC_SUB( tmp, H, (PSW & CY) );
+	ZHC_ADD( tmp, H, (PSW & CY) );
 	H = tmp;
 }
 
@@ -6883,7 +6883,7 @@ static void ACI_L_xx(upd7810_state *cpustate)
 
 	RDOPARG( imm );
 	tmp = L + imm + (PSW & CY);
-	ZHC_SUB( tmp, L, (PSW & CY) );
+	ZHC_ADD( tmp, L, (PSW & CY) );
 	L = tmp;
 }
 
@@ -8822,7 +8822,8 @@ static void PRE_60(upd7810_state *cpustate)
 /* 61: 0110 0001 */
 static void DAA(upd7810_state *cpustate)
 {
-	UINT8 l = A & 0x0f, h = A >> 4, tmp, adj = 0x00;
+	UINT8 l = A & 0x0f, h = A >> 4, tmp, adj = 0x00, old_cy = PSW & CY;
+
 	if (0 == (PSW & HC))
 	{
 		if (l < 10)
@@ -8848,6 +8849,7 @@ static void DAA(upd7810_state *cpustate)
 	}
 	tmp = A + adj;
 	ZHC_ADD( tmp, A, PSW & CY );
+	PSW |= old_cy;
 	A = tmp;
 }
 
