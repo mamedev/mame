@@ -2234,7 +2234,7 @@ GAME( 1984, gghost,   0,        balsente, gghost,   gghost,   ROT0, "Bally/Sente
 
 /* Board: 006-8003-01-0D Rev D */
 GAME( 1984, hattrick, 0,        balsente, hattrick, hattrick, ROT0, "Bally/Sente",  "Hat Trick", GAME_SUPPORTS_SAVE )
-GAME( 1984, trivia12, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (12/14/84)", GAME_SUPPORTS_SAVE )
+GAME( 1984, trivia12, triviag1, balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
 GAME( 1984, otwalls,  0,        balsente, otwalls,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", GAME_SUPPORTS_SAVE )
@@ -2249,13 +2249,13 @@ GAME( 1985, minigolf2,minigolf, balsente, minigolf2,minigolf2,ROT0, "Bally/Sente
 GAME( 1984, triviabb, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
-GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, triviag2, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II)", GAME_SUPPORTS_SAVE )
+GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, triviag2, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviasp, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviayp, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", GAME_SUPPORTS_SAVE )
-GAME( 1987, triviaes, 0,        balsente, triviaes, triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish Edition)", GAME_SUPPORTS_SAVE )
+GAME( 1987, triviaes, 0,        balsente, triviaes, triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish)", GAME_SUPPORTS_SAVE )
 GAME( 1985, toggle,   0,        balsente, toggle,   toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune", GAME_SUPPORTS_SAVE )
+GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8030-01-0A Rev A */
 GAME( 1986, nametune2,nametune, balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", GAME_SUPPORTS_SAVE )
