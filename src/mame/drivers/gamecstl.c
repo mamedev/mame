@@ -540,7 +540,7 @@ static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32, gamecstl_state )
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -694,9 +694,9 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_MACHINE_START(gamecstl)
 	MCFG_MACHINE_RESET(gamecstl)
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_PIT8254_ADD( "pit8254", gamecstl_pit8254_config )
 

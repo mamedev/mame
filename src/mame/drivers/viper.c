@@ -384,25 +384,25 @@ static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, i
 
 READ64_MEMBER(viper_state::pci_config_addr_r)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	return device->read_64be(space, 0, U64(0xffffffff00000000));
 }
 
 WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	device->write_64be(space, 0, data, U64(0xffffffff00000000));
 }
 
 READ64_MEMBER(viper_state::pci_config_data_r)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	return device->read_64be(space, 1, U64(0x00000000ffffffff)) << 32;
 }
 
 WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	device->write_64be(space, 1, data >> 32, U64(0x00000000ffffffff));
 }
 
@@ -1976,9 +1976,9 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_MACHINE_START(viper)
 	MCFG_MACHINE_RESET(viper)
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
-	MCFG_PCI_BUS_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 8, "screen")

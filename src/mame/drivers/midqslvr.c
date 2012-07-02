@@ -558,7 +558,7 @@ static ADDRESS_MAP_START(midqslvr_io, AS_IO, 32, midqslvr_state)
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
 
 static const struct pit8253_config midqslvr_pit8254_config =
@@ -702,9 +702,9 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE( 0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE( 0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 

@@ -488,14 +488,14 @@ static void mpc106_pci_w(device_t *busdevice, device_t *device, int function, in
 
 READ64_MEMBER(cobra_state::main_mpc106_r)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	//return pci_64be_r(offset, mem_mask);
 	return device->read_64be(space, offset, mem_mask);
 }
 
 WRITE64_MEMBER(cobra_state::main_mpc106_w)
 {
-	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
+	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	//pci_64be_w(offset, data, mem_mask);
 	device->write_64be(space, offset, data, mem_mask);
 }
@@ -2027,8 +2027,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_MACHINE_RESET( cobra )
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 

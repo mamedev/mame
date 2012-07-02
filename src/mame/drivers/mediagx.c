@@ -960,7 +960,7 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1160,8 +1160,8 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_MACHINE_START(mediagx)
 	MCFG_MACHINE_RESET(mediagx)
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_PIT8254_ADD( "pit8254", mediagx_pit8254_config )
 

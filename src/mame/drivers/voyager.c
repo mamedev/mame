@@ -449,7 +449,7 @@ static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE_LEGACY(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
 	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x46e8, 0x46ef) AM_NOP //To debug
@@ -778,9 +778,9 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

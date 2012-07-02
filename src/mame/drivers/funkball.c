@@ -602,7 +602,7 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 //  AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 
 	AM_RANGE(0x0360, 0x0363) AM_WRITE8(flash_w,0xffffffff)
 
@@ -1156,9 +1156,9 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
-	MCFG_PCI_BUS_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 
