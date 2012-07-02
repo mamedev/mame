@@ -6632,7 +6632,7 @@ GAME( 1982, losttombh, losttomb, scobra,   losttomb,  losttomb, ROT90,  "Stern E
 
 GAME( 1984, spdcoin,   0,        scobra,   spdcoin,   scobra,   ROT90,  "Stern Electronics", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
 
-GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatron USA", "Agent Super Bond (Scobra Hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
 
 
