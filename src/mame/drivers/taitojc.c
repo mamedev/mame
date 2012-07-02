@@ -1825,7 +1825,16 @@ ROM_START( dendego23k )
 	ROM_LOAD16_BYTE( "e52-24.035",  0xc00000, 0x200000, CRC(a9a678da) SHA1(b980ae644ef0312acd63b017028af9bf2b084c29) )
 ROM_END
 
-ROM_START( landgear )
+/* Landing Gear known program rom sets not dumped:
+
+E17-17* through E17-20*  unknown version
+E17-33 through E17-36    unknown version
+
+E17-28 through E17-32 (5 numbers) are what?
+
+*/
+
+ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e17-37.36", 0x000000, 0x80000, CRC(e6dda113) SHA1(786cbfae420b6ee820a93731e59da3442245b6b8) )
 	ROM_LOAD32_BYTE( "e17-38.37", 0x000001, 0x80000, CRC(86fa29bd) SHA1(f711528143c042cdc4a26d9e6965a882a73f397c) )
@@ -1880,6 +1889,46 @@ ROM_START( landgear )
     */
 ROM_END
 
+ROM_START( landgearb ) /* Landing Gear Ver 3.1 O, is there an alternate set without the "*" on the labels? */
+	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
+	ROM_LOAD32_BYTE( "e17-24+.36", 0x000000, 0x80000, CRC(6907e451) SHA1(330eecb5898942514b40e67cf3c9dcb82d4cafab) ) /* Actually labeled E17-24* */
+	ROM_LOAD32_BYTE( "e17-25+.37", 0x000001, 0x80000, CRC(ecbc8875) SHA1(5f5e4850cbdbdfff4a7f0b781edb2e983c166962) ) /* Actually labeled E17-25* */
+	ROM_LOAD32_BYTE( "e17-26+.38", 0x000002, 0x80000, CRC(3032bbe7) SHA1(201c61f236c81928f50815d8ad12e312a3c7427b) ) /* Actually labeled E17-26* */
+	ROM_LOAD32_BYTE( "e17-27+.39", 0x000003, 0x80000, CRC(e936224c) SHA1(8699cbb756844d12b7585e66198b7faed2af8e24) ) /* Actually labeled E17-27* */
+
+	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "e17-21.30",  0x100001, 0x040000, CRC(8b54f46c) SHA1(c6d16197ab7768945becf9b49b6d286113b4d1cc) )
+	ROM_LOAD16_BYTE( "e17-22.31",  0x100000, 0x040000, CRC(b96f6cd7) SHA1(0bf086e5dc6d524cd00e33df3e3d2a8b9231eb72) )
+
+	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
+
+	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
+	ROM_FILL( 0x0000, 0x0080, 0 )
+
+	ROM_REGION( 0x1800000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "e17-03.9",   0x0800002, 0x200000, CRC(64820c4f) SHA1(ee18e4e2b01ec21c33ec1f0eb43f6d0cd48d7225) )
+	ROM_LOAD32_WORD( "e17-09.22",  0x0800000, 0x200000, CRC(19e9a1d1) SHA1(26f1a91e3757da510d685a11add08e3e00317796) )
+	ROM_LOAD32_WORD( "e17-04.10",  0x0c00002, 0x200000, CRC(7dc2cae3) SHA1(90638a1efc353428ce4155ca29f67accaf0499cd) )
+	ROM_LOAD32_WORD( "e17-10.23",  0x0c00000, 0x200000, CRC(a6bdf6b8) SHA1(e8d76d38f2c7e428a3c2f555571e314351d74a69) )
+	ROM_LOAD32_WORD( "e17-05.11",  0x1000002, 0x200000, CRC(3f70acd4) SHA1(e8c1c6214631e3e39d1fc9df13d1862442a47e5d) )
+	ROM_LOAD32_WORD( "e17-11.24",  0x1000000, 0x200000, CRC(4e986d93) SHA1(b218a0360c1d0eca5a907f2b402f352e0329fe41) )
+	ROM_LOAD32_WORD( "e17-06.12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
+	ROM_LOAD32_WORD( "e17-12.25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
+
+	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_LOAD( "e17-01.5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
+	ROM_LOAD( "e17-02.8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
+	ROM_LOAD( "e17-07.18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
+	ROM_LOAD( "e17-08.19",  0x0a00000, 0x200000, CRC(3107e154) SHA1(59a99770c2aa535cac6569f41b03be1554e0e800) )
+
+	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_LOAD16_BYTE( "e17-13.32",  0x000000, 0x200000, CRC(6cf238e7) SHA1(0745d2dcfea26178adde3ad08650156e8e30651f) )
+	ROM_LOAD16_BYTE( "e17-14.33",  0x400000, 0x200000, CRC(5efec311) SHA1(f253bc40f2567f59ddfb617fddb8b9a389bfac89) )
+	ROM_LOAD16_BYTE( "e17-15.34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
+	ROM_LOAD16_BYTE( "e17-16.35",  0xc00000, 0x200000, CRC(6cf9f277) SHA1(03ca51fadc6b0b6502804346f18eeb55ab87b0e7) )
+ROM_END
+
 ROM_START( dangcurv )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE("e09-23.036", 0x000000, 0x80000, CRC(b4cdadd6) SHA1(84bd1d055ff15afb5438cd5151abf78b0000cebc) )
@@ -1928,12 +1977,13 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1996, dendego,   0,       dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO!", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, dendegox,  dendego, dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! EX", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendego2,  0,       dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendego23k,dendego2,dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, sidebs,    0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sidebs2,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sidebs2j,  sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, landgear,  0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, dangcurv,  0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
+GAME( 1996, dendego,   0,        dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO!", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, dendegox,  dendego,  dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! EX", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendego2,  0,        dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendego23k,dendego2, dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, landgear,  0,        taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, landgearb, landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, dangcurv,  0,        taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
