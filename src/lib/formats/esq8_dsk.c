@@ -3,7 +3,7 @@
     formats/esq8_dsk.c
 
     Formats for 8-bit Ensoniq synthesizers and samplers
- 
+
     Disk is PC MFM, 40 tracks, single (Mirage) or double (SQ-80) sided,
     with 6 sectors per track.
     Sectors 0-4 are 1024 bytes, sector 5 is 512 bytes
@@ -119,9 +119,9 @@ bool esq8img_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 
 	int track_size = (5*1024) + 512;
 
-	for(int track=0; track < track_count; track++) 
+	for(int track=0; track < track_count; track++)
     {
-		for(int head=0; head < head_count; head++) 
+		for(int head=0; head < head_count; head++)
         {
 			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
 			generate_track(esq_6_desc, track, head, sectors, sector_count, 109376, image);
@@ -149,7 +149,7 @@ bool esq8img_format::save(io_generic *io, floppy_image *image)
 		sector_count = 6;
 
 	UINT8 sectdata[10*512];
-	int track_size = (5*1024) + 512; 
+	int track_size = (5*1024) + 512;
 
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {

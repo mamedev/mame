@@ -3,7 +3,7 @@
     formats/esq8_dsk.h
 
     Formats for 8-bit Ensoniq synthesizers and samplers
- 
+
     Disk is PC MFM, 40 tracks, single (Mirage) or double (SQ-80) sided,
     with 6 sectors per track.
     Sectors 0-4 are 1024 bytes, sector 5 is 512 bytes

@@ -6,119 +6,119 @@
 
 ****************************************************************************
 
-	The QS1000 is a 32-voice wavetable synthesizer, believed to be based on
-	the OPTi 82C941. It contains an 8051 core, 256b of RAM and an (undumped)
-	internal program ROM. The internal ROM can be bypassed in favour of an
-	external ROM. Commands are issued to the chip via the 8051 serial port.
+    The QS1000 is a 32-voice wavetable synthesizer, believed to be based on
+    the OPTi 82C941. It contains an 8051 core, 256b of RAM and an (undumped)
+    internal program ROM. The internal ROM can be bypassed in favour of an
+    external ROM. Commands are issued to the chip via the 8051 serial port.
 
-	The QS1000 can access 24Mb of sample ROM. To reduce demand on the CPU,
-	instrument parameters such as playback rate, envelope and filter values
-	are encoded in ROM and directly accessed by the wavetable engine.
-	There are table entries for every note of every instrument.
+    The QS1000 can access 24Mb of sample ROM. To reduce demand on the CPU,
+    instrument parameters such as playback rate, envelope and filter values
+    are encoded in ROM and directly accessed by the wavetable engine.
+    There are table entries for every note of every instrument.
 
-	Registers
-	=========
+    Registers
+    =========
 
-	[200] = Key on/off
-			0 = Key on
-			1 = ?
-			2 = key off
-	[201] = Address byte 0 (LSB)
-	[202] = Address byte 1
-	[203] = Address byte 2
-	[204] = Pitch
-	[205] = Pitch high byte? (Usually 0)
-	[206] = Left volume
-	[207] = Right volume
-	[208] = Volume
-	[209] = ?
-	[20a] = ?
-	[20b] = ?
-	[20c] = ?
-	[20d] = Velocity
-	[20e] = Channel select
-	[20f] = Modulation
-	[210] = Modulation
-	[211] = 0 - Select global registers?
-			3 - Select channel registers?
+    [200] = Key on/off
+            0 = Key on
+            1 = ?
+            2 = key off
+    [201] = Address byte 0 (LSB)
+    [202] = Address byte 1
+    [203] = Address byte 2
+    [204] = Pitch
+    [205] = Pitch high byte? (Usually 0)
+    [206] = Left volume
+    [207] = Right volume
+    [208] = Volume
+    [209] = ?
+    [20a] = ?
+    [20b] = ?
+    [20c] = ?
+    [20d] = Velocity
+    [20e] = Channel select
+    [20f] = Modulation
+    [210] = Modulation
+    [211] = 0 - Select global registers?
+            3 - Select channel registers?
 
-	Velocity register values for MIDI range 0-127:
+    Velocity register values for MIDI range 0-127:
 
-	01 01 01 01 01 01 01 02 02 03 03 04 04 05 05 06
-	06 07 07 08 08 09 09 0A 0A 0B 0B 0C 0C 0D 0D 0E
-	0E 0F 10 11 11 12 13 14 14 15 16 17 17 18 19 1A
-	1A 1B 1C 1D 1D 1E 1F 20 20 21 22 23 23 24 25 26
-	26 27 28 29 29 2A 2B 2C 2C 2D 2E 2F 2F 30 31 32
-	35 38 3B 3E 41 44 47 4A 4D 50 4F 51 52 53 54 56
-	57 58 59 5B 5C 5D 5E 60 61 62 63 65 66 67 6A 6B
-	6C 6E 6F 70 71 73 74 75 76 78 79 7A 7B 7D 7E 7F
+    01 01 01 01 01 01 01 02 02 03 03 04 04 05 05 06
+    06 07 07 08 08 09 09 0A 0A 0B 0B 0C 0C 0D 0D 0E
+    0E 0F 10 11 11 12 13 14 14 15 16 17 17 18 19 1A
+    1A 1B 1C 1D 1D 1E 1F 20 20 21 22 23 23 24 25 26
+    26 27 28 29 29 2A 2B 2C 2C 2D 2E 2F 2F 30 31 32
+    35 38 3B 3E 41 44 47 4A 4D 50 4F 51 52 53 54 56
+    57 58 59 5B 5C 5D 5E 60 61 62 63 65 66 67 6A 6B
+    6C 6E 6F 70 71 73 74 75 76 78 79 7A 7B 7D 7E 7F
 
-	(TODO: Other register values)
+    (TODO: Other register values)
 
-	This is the sequence of register writes used to play the Iron Fortress credit sound:
+    This is the sequence of register writes used to play the Iron Fortress credit sound:
 
-	[211] 0		Select global registers?
-	[200] 1		?
-	[203] d6	Address byte 2
-	[202] a9	Address byte 1
-	[201] 1		Address byte 0
-	[204] 80	Pitch
-	[205] 0		?
-	[206] 80	Left volume
-	[207] 80	Right volume
-	[208] b3	Volume
-	[209] 0		?
-	[20a] ff	?
-	[20b] 0		?
-	[20c] 0		?
-	[20d] 78	Velocity
-	[211] 3		Select channel registers
-	[20e] 0		Select channel
-	[200] 0		Key on
-
- 
-	Sound Headers
-	=============
-
-	The address registers point to a 6 byte entry in the sound ROM:
-
-	[019be0]
-	097b 397f 1510
-	^    ^    ^
-	|    |    |
-	|    |    +----- Sound descriptor pointer
-	|    +---------- ?
-	+--------------- Playback frequency (fixed point value representing 24MHz clock periods)
-
-	This in turn points to a 24 byte descriptor:
-
-	[1510]:
-	0 4502D 4508E 45F91 D0 7F 0F 2A 1F 90 00 FF
-	^ ^     ^     ^     ^  ^  ^  ^  ^  ^  ^  ^     
-	| |     |     |     |  |  |  |  |  |  |  |
-	| |     |     |     |  |  |  |  |  |  |  +-- ?
-	| |     |     |     |  |  |  |  |  |  +----- ?
-	| |     |     |     |  |  |  |  |  +-------- ?
-	| |     |     |     |  |  |  |  +----------- ?  
-	| |     |     |     |  |  |  +-------------- ?
-	| |     |     |     |  |  +----------------- Bit 7: Format (0:PCM 1:ADPCM)
-	| |     |     |     |  +-------------------- ?
-	| |     |     |     +----------------------- ?
-	| |     |     +----------------------------- Loop end address
-	| |     +----------------------------------- Loop start address
-	| +----------------------------------------- Start address
-	+------------------------------------------- Address most-significant nibble (shared with loop addresses)
-
-	* The unknown parameters are most likely envelope and filter parameters.
-	* Is there a loop flag or do sounds loop indefinitely until stopped?
+    [211] 0     Select global registers?
+    [200] 1     ?
+    [203] d6    Address byte 2
+    [202] a9    Address byte 1
+    [201] 1     Address byte 0
+    [204] 80    Pitch
+    [205] 0     ?
+    [206] 80    Left volume
+    [207] 80    Right volume
+    [208] b3    Volume
+    [209] 0     ?
+    [20a] ff    ?
+    [20b] 0     ?
+    [20c] 0     ?
+    [20d] 78    Velocity
+    [211] 3     Select channel registers
+    [20e] 0     Select channel
+    [200] 0     Key on
 
 
-	TODO:
-	* Looping is currently disabled 
-	* Figure out unknown sound header parameters
-	* Figure out and implement envelopes and filters
-	* Pitch bending
-	* Dump the internal ROM
+    Sound Headers
+    =============
+
+    The address registers point to a 6 byte entry in the sound ROM:
+
+    [019be0]
+    097b 397f 1510
+    ^    ^    ^
+    |    |    |
+    |    |    +----- Sound descriptor pointer
+    |    +---------- ?
+    +--------------- Playback frequency (fixed point value representing 24MHz clock periods)
+
+    This in turn points to a 24 byte descriptor:
+
+    [1510]:
+    0 4502D 4508E 45F91 D0 7F 0F 2A 1F 90 00 FF
+    ^ ^     ^     ^     ^  ^  ^  ^  ^  ^  ^  ^
+    | |     |     |     |  |  |  |  |  |  |  |
+    | |     |     |     |  |  |  |  |  |  |  +-- ?
+    | |     |     |     |  |  |  |  |  |  +----- ?
+    | |     |     |     |  |  |  |  |  +-------- ?
+    | |     |     |     |  |  |  |  +----------- ?
+    | |     |     |     |  |  |  +-------------- ?
+    | |     |     |     |  |  +----------------- Bit 7: Format (0:PCM 1:ADPCM)
+    | |     |     |     |  +-------------------- ?
+    | |     |     |     +----------------------- ?
+    | |     |     +----------------------------- Loop end address
+    | |     +----------------------------------- Loop start address
+    | +----------------------------------------- Start address
+    +------------------------------------------- Address most-significant nibble (shared with loop addresses)
+
+    * The unknown parameters are most likely envelope and filter parameters.
+    * Is there a loop flag or do sounds loop indefinitely until stopped?
+
+
+    TODO:
+    * Looping is currently disabled
+    * Figure out unknown sound header parameters
+    * Figure out and implement envelopes and filters
+    * Pitch bending
+    * Dump the internal ROM
 
 ***************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 //  qs1000_device - constructor
 //-------------------------------------------------
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, QS1000, "QS1000", "qs1000", tag, owner, clock),	
+	: device_t(mconfig, QS1000, "QS1000", "qs1000", tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
 	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
@@ -245,7 +245,7 @@ void qs1000_device::device_start()
 
 
 //-------------------------------------------------
-//	serial_in - send data to the chip
+//  serial_in - send data to the chip
 //-------------------------------------------------
 void qs1000_device::serial_in(UINT8 data)
 {
@@ -258,7 +258,7 @@ void qs1000_device::serial_in(UINT8 data)
 
 
 //-------------------------------------------------
-//	set_irq - interrupt the internal CPU
+//  set_irq - interrupt the internal CPU
 //-------------------------------------------------
 void qs1000_device::set_irq(int state)
 {
@@ -420,7 +420,7 @@ WRITE8_MEMBER( qs1000_device::wave_w )
 				// TODO
 				for (int i = 0; i < 16; ++i)
 					m_channels[ch].m_regs[i] = m_wave_regs[i];
-				
+
 				// Key on
 				start_voice(ch);
 			}
@@ -448,7 +448,7 @@ WRITE8_MEMBER( qs1000_device::wave_w )
 		case 0x0a:
 		case 0x0b:
 		case 0x0c:
-		case 0x0d:																							
+		case 0x0d:
 		{
 			if (m_wave_regs[0x11] == 3)
 			{
@@ -462,7 +462,7 @@ WRITE8_MEMBER( qs1000_device::wave_w )
 			}
 			break;
 		}
-	
+
 		default:
 			m_wave_regs[offset] = data;
 	}
@@ -470,14 +470,14 @@ WRITE8_MEMBER( qs1000_device::wave_w )
 
 
 //-------------------------------------------------
-//  sound_stream_update - 
+//  sound_stream_update -
 //-------------------------------------------------
 void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// Rset the output stream
 	memset(outputs[0], 0x0, samples * sizeof(*outputs[0]));
 	memset(outputs[1], 0x0, samples * sizeof(*outputs[1]));
-	
+
 	// Iterate over voices and accumulate sample data
 	for (int ch = 0; ch < QS1000_CHANNELS; ch++)
 	{
@@ -485,7 +485,7 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		UINT8 lvol = chan.m_regs[6];
 		UINT8 rvol = chan.m_regs[7];
-		UINT8 vol  = chan.m_regs[8];	
+		UINT8 vol  = chan.m_regs[8];
 
 		if (chan.m_flags & QS1000_PLAYING)
 		{
@@ -503,8 +503,8 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						else
 #endif
 						{
-							chan.m_flags &= ~QS1000_PLAYING;					
-							break;								
+							chan.m_flags &= ~QS1000_PLAYING;
+							break;
 						}
 					}
 
@@ -512,10 +512,10 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					while (chan.m_start + chan.m_adpcm_addr != chan.m_addr)
 					{
 						chan.m_adpcm_addr++;
-						
+
 						if (chan.m_start + chan.m_adpcm_addr >=  chan.m_loop_end)
 							chan.m_adpcm_addr = chan.m_loop_start - chan.m_start;
-						
+
 						UINT8 data = m_direct->read_raw_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
 						UINT8 nibble = (chan.m_adpcm_addr & 1 ? data : data >> 4) & 0xf;
 						chan.m_adpcm_signal = chan.m_adpcm.clock(nibble);
@@ -536,7 +536,7 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				{
 					if (chan.m_addr >= chan.m_loop_end)
 					{
-#if 0 // Looping disabled until envelopes work			
+#if 0 // Looping disabled until envelopes work
 						if (chan.m_flags & QS1000_KEYON)
 						{
 							chan.m_addr = chan.m_loop_start;
@@ -544,8 +544,8 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						else
 #endif
 						{
-							chan.m_flags &= ~QS1000_PLAYING;					
-							break;								
+							chan.m_flags &= ~QS1000_PLAYING;
+							break;
 						}
 					}
 
@@ -616,8 +616,8 @@ void qs1000_device::start_voice(int ch)
 		UINT8 byte12 = m_direct->read_raw_byte(base + 12);
 		UINT8 byte13 = m_direct->read_raw_byte(base + 13);
 		UINT8 byte14 = m_direct->read_raw_byte(base + 14);
-		UINT8 byte15 = m_direct->read_raw_byte(base + 15);							
-		
+		UINT8 byte15 = m_direct->read_raw_byte(base + 15);
+
 		printf("[%.6x] Sample Start:%.6x  Loop Start:%.6x  Loop End:%.6x  Params: %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", base, start_addr, loop_start, loop_end, byte8, byte9, byte10, byte11, byte12, byte13, byte14, byte15);
 	}
 
@@ -633,7 +633,7 @@ void qs1000_device::start_voice(int ch)
 	{
 		m_channels[ch].m_adpcm.reset();
 		m_channels[ch].m_adpcm_addr = -1;
-//		m_channels[ch].m_adpcm_signal = -2;
+//      m_channels[ch].m_adpcm_signal = -2;
 		m_channels[ch].m_flags |= QS1000_ADPCM;
 	}
 }

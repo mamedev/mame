@@ -88,21 +88,21 @@ public:
 
 	DECLARE_READ8_MEMBER( p0_r );
 	DECLARE_WRITE8_MEMBER( p0_w );
-	
+
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p1_w );
-	
+
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	
+
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 
 	enum
 	{
 		QS1000_KEYON   = 1,
-		QS1000_PLAYING = 2,        
-		QS1000_ADPCM   = 4,        
+		QS1000_PLAYING = 2,
+		QS1000_ADPCM   = 4,
 	};
 
 	void start_voice(int ch);
@@ -118,10 +118,10 @@ public:
 
 	// Internal state
 	const address_space_config		m_space_config;
-	sound_stream *					m_stream;	
+	sound_stream *					m_stream;
 	direct_read_data *				m_direct;
 	required_device<i8052_device>	m_cpu;
-	
+
 	// Wavetable engine
 	UINT8							m_serial_data_in;
 	UINT8							m_wave_regs[18];
@@ -132,7 +132,7 @@ public:
 		INT32			m_adpcm_signal;
 		UINT32			m_start;
 		UINT32			m_addr;
-		UINT32			m_adpcm_addr;		
+		UINT32			m_adpcm_addr;
 		UINT32			m_loop_start;
 		UINT32			m_loop_end;
 		UINT16			m_freq;

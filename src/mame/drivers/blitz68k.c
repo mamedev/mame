@@ -2807,7 +2807,7 @@ static DRIVER_INIT( cj3play )
 
 	// loop
 	ROM[0x2773c/2] = 0x4e71;
-//	ROM[0x3491a/2] = 0x4e71;
+//  ROM[0x3491a/2] = 0x4e71;
 
 	// ERROR CHECKSUM ROM PROGRAM
 	ROM[0x20ab0/2] = 0x6050;

@@ -635,8 +635,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-//	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)
-//	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
+//  AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)
+//  AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x246000, 0x247fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 //  AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 //  AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)

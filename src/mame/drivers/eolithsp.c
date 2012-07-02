@@ -25,7 +25,7 @@ void eolith_speedup_read(address_space *space)
   //    printf("%s:eolith speedup_read data %02x\n",space->machine().describe_context(), eolith_vblank);
 
 	if (eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
- 	{
+	{
 		int pc = cpu_get_pc(&space->device());
 
 		if ((pc==eolith_speedup_address) || (pc==eolith_speedup_address2))
@@ -60,9 +60,9 @@ static const struct
 	{ "fort2ba",  0x000081e0, -1, 240 },
 	{ "penfan",   0x4001FA66, -1, 240 },
 	{ "candy",    0x4001990C, -1, 240 },
- 	/* eolith16.c */
+	/* eolith16.c */
 	{ "klondkp",  0x0001a046, -1, 240 },
- 	/* vegaeo.c */
+	/* vegaeo.c */
 	{ "crazywar", 0x00008cf8, -1, 240 },
 	{ NULL, 0, 0 }
 };

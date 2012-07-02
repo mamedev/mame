@@ -2516,7 +2516,7 @@ WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 
 	// d6: reset
 	eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	// d4: write latch or select next bit to read
 	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -2532,7 +2532,7 @@ WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 static MACHINE_RESET( invmulti )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
-	
+
 	state->invmulti_bank_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, 0);
 
 	MACHINE_RESET_CALL(mw8080bw);
@@ -2543,9 +2543,9 @@ MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(invmulti_map)
-	
+
 	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
-	
+
 	MCFG_MACHINE_RESET(invmulti)
 
 MACHINE_CONFIG_END

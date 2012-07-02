@@ -73,11 +73,11 @@ public:
 	DECLARE_READ32_MEMBER(sb2003_speedup_r);
 	DECLARE_READ32_MEMBER(spotty_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
-    
+
     DECLARE_READ8_MEMBER(qs1000_p1_r);
     DECLARE_WRITE8_MEMBER(qs1000_p1_w);
     DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-    DECLARE_WRITE8_MEMBER(qs1000_p3_w);    
+    DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 };
 
 
@@ -164,12 +164,12 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 
 WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 {
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");    
-	
+	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
+
 	soundlatch_byte_w(space, 0, data >> 16);
 	qs1000->set_irq(ASSERT_LINE);
-	
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));	    
+
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
@@ -178,7 +178,7 @@ WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
 }
 
 READ8_MEMBER(limenko_state::qs1000_p1_r)
-{    
+{
 	return soundlatch_byte_r(space, 0);
 }
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
 	// ..x. .... - /IRQ clear
 
 	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-	
+
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
@@ -727,12 +727,12 @@ static QS1000_INTERFACE( qs1000_intf )
 {
 	/* External ROM */
 	true,
-	
+
 	/* P1-P3 read handlers */
 	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-    
+
 	/* P1-P3 write handlers */
 	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_w),
 	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p2_w),
@@ -1118,8 +1118,8 @@ static DRIVER_INIT( common )
 
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine.device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
-	state->membank("qs1000:bank")->configure_entries(0, 8, state->memregion("qs1000:cpu")->base()+0x100, 0x10000);	
-	
+	state->membank("qs1000:bank")->configure_entries(0, 8, state->memregion("qs1000:cpu")->base()+0x100, 0x10000);
+
 	state->m_spriteram_bit = 1;
 }
 

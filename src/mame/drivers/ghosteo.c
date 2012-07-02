@@ -375,7 +375,7 @@ READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 		case 0xB : data = machine().root_device().ioport( "10000000-0B")->read(); break;
 		case 0xC : data = machine().root_device().ioport( "10000000-0C")->read(); break;
 	}
-//	logerror( "touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
+//  logerror( "touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
 	return data;
 }
 

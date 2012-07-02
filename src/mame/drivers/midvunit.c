@@ -719,7 +719,7 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, "Sitdown" )
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:2" )	 	/* Manual shows Not Used */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:2" )		/* Manual shows Not Used */
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW2:1" )
 
 	/* DSW3 at U19 */
@@ -834,7 +834,7 @@ static INPUT_PORTS_START( offroadc )
 
 	PORT_START("DSW")
 	/* DSW2 at U97 */
-	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:8" )	 	/* Manual shows Not Used & "No Effect" for both On & Off */
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:8" )		/* Manual shows Not Used & "No Effect" for both On & Off */
 	PORT_DIPNAME( 0x0002, 0x0000, "Gear Shifter Switch" )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0002, "Normally Closed" )
 	PORT_DIPSETTING(      0x0000, "Normally Open" )
@@ -844,7 +844,7 @@ static INPUT_PORTS_START( offroadc )
 	PORT_DIPNAME( 0x0008, 0x0008, "Graphic Effects" )		PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0008, "Roadkill Present" )
 	PORT_DIPSETTING(      0x0000, "Roadkill Missing" )
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:4" )	 	/* Manual shows Not Used & "No Effect" for both On & Off */
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:4" )		/* Manual shows Not Used & "No Effect" for both On & Off */
 	PORT_DIPNAME( 0x0020, 0x0020, "Link" )				PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, "Disabled" )
 	PORT_DIPSETTING(      0x0000, "Enabled" )

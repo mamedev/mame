@@ -798,7 +798,7 @@ READ8_MEMBER(pacman_state::rocktrv2_question_r)
 
 /*
   This is a kit that upgrades an original Midway Pacman PCB to allow it to run many Pacman games.
-  It includes two small PCBs and two PROMs. The large PCB plugs into the CPU socket at 6B and the 
+  It includes two small PCBs and two PROMs. The large PCB plugs into the CPU socket at 6B and the
   Sync Bus Controller socket at 6D. The CPU that was in the socket at 6B plugs into the Super ABC PCB.
 
   The large PCB contains the following parts.....
@@ -821,7 +821,7 @@ WRITE8_MEMBER(pacman_state::superabc_bank_w)
 	membank("bank1")->set_base(memregion("maincpu")->base() + bank * 0x10000 + 0x0000);
 	membank("bank2")->set_base(memregion("maincpu")->base() + bank * 0x10000 + 0x4000);
 	membank("bank3")->set_base(memregion("maincpu")->base() + bank * 0x10000 + 0xa000); // looks like a15 is not connected and a16-onwards is shifted 1 bit
-	
+
 	if (bank != m_charbank)
 	{
 		m_spritebank = bank;

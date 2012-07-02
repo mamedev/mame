@@ -2650,13 +2650,13 @@ time_t ioport_manager::initialize()
 	int player_offset = 0;
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 	{
-		int players = 0;		
+		int players = 0;
 		for (ioport_port *port = first_port(); port != NULL; port = port->next())
 		{
 			if (&port->device()==device)
 			{
 				for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
-					if (field->type_class()==INPUT_CLASS_CONTROLLER) 
+					if (field->type_class()==INPUT_CLASS_CONTROLLER)
 					{
 						if (players < field->player() + 1) players = field->player() + 1;
 						field->set_player(field->player() + player_offset);
@@ -3064,7 +3064,7 @@ g_profiler.start(PROFILER_INPUT);
 		ioport_value newvalue = port->read();
 		for (dynamic_field *dynfield = port->live().writelist.first(); dynfield != NULL; dynfield = dynfield->next())
 			if (dynfield->field().type() != IPT_OUTPUT)
-				dynfield->write(newvalue);		
+				dynfield->write(newvalue);
 	}
 
 g_profiler.stop();

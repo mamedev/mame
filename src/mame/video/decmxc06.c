@@ -167,7 +167,7 @@ void deco_mxc06_device::draw_sprites_bootleg( running_machine &machine, bitmap_i
 	while (offs < 0x800 / 2)
 	{
 		int sx, sy, code, color, flipx, flipy;
-		
+
 		code =  spriteram[offs];
 		sy = 240-spriteram[offs + 1]; // 241- will align robocop with the ground but causes other issues too
 		sx = spriteram[offs + 2];

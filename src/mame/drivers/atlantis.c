@@ -8,7 +8,7 @@
         * Midway Skins Game
         * Midway Skins Game Tournament Edition (not dumped)
         * Midway Swingers Tour (not dumped)
- 
+
     Hardware overview:
         * VR4310 CPU (similar to the N64's VR4300)
         * VR4373 "Nile 3" system controller / PCI bridge
@@ -18,12 +18,12 @@
         * Midway Zeus-series custom video
         * TL16c552 dual UART
         * ADSP-2181 based DCS2 audio (unclear which variant)
- 
+
     TODO:
         * Proper VR4373 implementation
         * Proper PCI bus implementation
         * PCI peripherals
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -50,7 +50,7 @@ public:
 
 static MACHINE_START( mwskins )
 {
-//	atlantis_state *state = machine.driver_data<atlantis_state>();
+//  atlantis_state *state = machine.driver_data<atlantis_state>();
 	/* set the fastest DRC options */
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 }
@@ -173,7 +173,7 @@ MACHINE_CONFIG_END
 
 ROM_START( mwskins )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4310 code */
-    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) ) 
+    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "mwskins", 0, SHA1(5cb293a6fdb2478293f48ddfc93cdd018acb2bb5) )
@@ -181,7 +181,7 @@ ROM_END
 
 ROM_START( mwskinsa )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4310 code */
-    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) ) 
+    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "mwskinsa", 0, SHA1(72497917b31156eb11a46bbcc6f22a254dcec044) )

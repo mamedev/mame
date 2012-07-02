@@ -95,7 +95,7 @@ public:
 	UINT8 *m_finalgdr_backupram;
 	int m_has_extra_gfx;
 	UINT8 m_qs1000_data;
-	
+
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE32_MEMBER(flipscreen32_w);
 	DECLARE_WRITE16_MEMBER(jmpbreak_flipscreen_w);
@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE32_MEMBER(finalgdr_prize_w);
 	DECLARE_WRITE16_MEMBER(boonggab_prize_w);
 	DECLARE_WRITE16_MEMBER(boonggab_lamps_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);    
+	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
 
 	DECLARE_READ16_MEMBER(vamphalf_speedup_r);
 	DECLARE_READ16_MEMBER(vamphafk_speedup_r);
@@ -136,16 +136,16 @@ public:
 	DECLARE_WRITE32_MEMBER(finalgdr_eeprom_w);
 	DECLARE_WRITE32_MEMBER(finalgdr_backupram_bank_w);
 	DECLARE_READ32_MEMBER(finalgdr_backupram_r);
-	DECLARE_WRITE32_MEMBER(finalgdr_backupram_w);    
+	DECLARE_WRITE32_MEMBER(finalgdr_backupram_w);
 
 	DECLARE_WRITE32_MEMBER(finalgdr_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(aoh_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
 	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
-	
+
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);	
+	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -363,7 +363,7 @@ WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
 
 	m_qs1000_data = data & 0xff;
 	qs1000->set_irq(ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));	
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 WRITE16_MEMBER( vamphalf_state::misncrft_snd_w )
@@ -372,7 +372,7 @@ WRITE16_MEMBER( vamphalf_state::misncrft_snd_w )
 
 	m_qs1000_data = data & 0xff;
 	qs1000->set_irq(ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));	
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 READ8_MEMBER( vamphalf_state::qs1000_p1_r )
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( misncrft_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x200, 0x203) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
-	AM_RANGE(0x400, 0x403) AM_WRITE(misncrft_snd_w)	
+	AM_RANGE(0x400, 0x403) AM_WRITE(misncrft_snd_w)
 	AM_RANGE(0x580, 0x583) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
@@ -731,7 +731,7 @@ static SCREEN_UPDATE_IND16( common )
 
 static SCREEN_UPDATE_IND16( aoh )
 {
-//	vamphalf_handle_flipped_visible_area(screen); // not on this?
+//  vamphalf_handle_flipped_visible_area(screen); // not on this?
 	bitmap.fill(0, cliprect);
 	draw_sprites_aoh(screen, bitmap);
 	return 0;
@@ -933,7 +933,7 @@ static QS1000_INTERFACE( qs1000_intf )
 {
 	/* External ROM */
 	true,
-	
+
 	/* P1-P3 read handlers */
 	DEVCB_DRIVER_MEMBER(vamphalf_state, qs1000_p1_r),
 	DEVCB_NULL,
@@ -1869,7 +1869,7 @@ ROM_START( misncrft )
 	ROM_RELOAD(      0x20000, 0x20000 )
 	ROM_RELOAD(      0x40000, 0x20000 )
 	ROM_RELOAD(      0x60000, 0x20000 )
-	
+
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(748c5ae5) SHA1(28005f655920e18c82eccf05c0c449dac16ee36e) )
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(f34ae697) SHA1(2282e3ef2d100f3eea0167b25b66b35a64ddb0f8) )
@@ -2461,10 +2461,10 @@ static DRIVER_INIT( misncrft )
 
 	state->m_palshift = 0;
 	state->m_flip_bit = 1;
-	
+
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine.device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "data");
-	state->membank("qs1000:data")->configure_entries(0, 16, state->memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);	
+	state->membank("qs1000:data")->configure_entries(0, 16, state->memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
 static DRIVER_INIT( coolmini )

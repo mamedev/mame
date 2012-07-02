@@ -161,7 +161,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen2_r)
 
 WRITE32_MEMBER( eolith_state::sound_w )
 {
-//	printf("CPU Command: %x\n", m_sound_data);
+//  printf("CPU Command: %x\n", m_sound_data);
 	m_sound_data = data;
 	m_soundcpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 
@@ -196,16 +196,16 @@ WRITE8_MEMBER( eolith_state::sound_p1_w )
  *************************************/
 
 /*
-	Possible port mapping:
+    Possible port mapping:
 
-	P30 (O) A16      (RxD)
-	P31 (O) A17      (TxD)
-	P32 (O) A18      (/INT0)
-	P33 (I) INT_68   (/INT1)
-	P34 (O) PCM1     (T0)
-	P35 (O) SET_INT  (T1)
-	P36 (O) PCM0
-	P37 (O) RDB      (/RD)
+    P30 (O) A16      (RxD)
+    P31 (O) A17      (TxD)
+    P32 (O) A18      (/INT0)
+    P33 (I) INT_68   (/INT1)
+    P34 (O) PCM1     (T0)
+    P35 (O) SET_INT  (T1)
+    P36 (O) PCM0
+    P37 (O) RDB      (/RD)
 */
 
 READ8_MEMBER( eolith_state::qs1000_p1_r )
@@ -225,12 +225,12 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
  *  Sound CPU <-> QS1000 CPU
  *
  *************************************/
- 
+
 static void soundcpu_to_qs1000(device_t *device, int data)
 {
 	qs1000_device *qs1000 = device->machine().device<qs1000_device>("qs1000");
 	qs1000->serial_in(data);
-	
+
 	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
@@ -240,7 +240,7 @@ static void soundcpu_to_qs1000(device_t *device, int data)
  *  Main CPU memory map
  *
  *************************************/
- 
+
 static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32, eolith_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, eolith_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sound_bank")
 	AM_RANGE(0x8000, 0x8000) AM_READ(sound_cmd_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(sound_p1_w)			
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(sound_p1_w)
 ADDRESS_MAP_END
 
 
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
  *  Inputs
  *
  *************************************/
- 
+
 static INPUT_PORTS_START( common )
 	PORT_START("IN0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
@@ -549,7 +549,7 @@ static QS1000_INTERFACE( qs1000_intf )
 {
 	/* External ROM */
 	true,
-	
+
 	/* P1-P3 read handlers */
 	DEVCB_DRIVER_MEMBER(eolith_state, qs1000_p1_r),
 	DEVCB_NULL,
@@ -582,9 +582,9 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 
-//	for testing sound sync
-//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-//	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+//  for testing sound sync
+//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
+//  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -694,9 +694,9 @@ ROM_START( ironfort )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "u108", 0x00000, 0x80000, CRC(89233144) SHA1(74e87679a7559450934b80fcfcb667d9845977a7) ) /* 27C040 eprom with no label */
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u107", 0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) ) /* 27C256 eprom with no label */	
+	ROM_LOAD( "u107", 0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) ) /* 27C256 eprom with no label */
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
 	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(47b9d43a) SHA1(e0bc42892480cb563dc694fcefa8ca0b984749dd) ) /* 27C040 eprom with no label */
@@ -744,12 +744,12 @@ ROM_START( linkypip )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "u108.bin", 0x00000, 0x80000, CRC(ca65856f) SHA1(f45868552389ccd637b5ccb1067b94e1226001ce) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u107.bin", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "u107.bin", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "u97.bin",     0x00000, 0x80000, CRC(4465fe8d) SHA1(4d77169fff2fee5424e8da833088a544318b2981) )	
+	ROM_LOAD( "u97.bin",     0x00000, 0x80000, CRC(4465fe8d) SHA1(4d77169fff2fee5424e8da833088a544318b2981) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -844,9 +844,9 @@ ROM_START( nhidctch )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(2bae46cb) SHA1(7c43f1002dfc20b9c1bb1647f7261dfa7ed2b4f9) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
 	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(ebf9f77b) SHA1(5d472aeb84fc011e19b9e61d34aeddfe7d6ac216) )
@@ -923,15 +923,15 @@ ROM_START( hidctch2 )
 	ROM_REGION( 0x008000, "soundcpu", 0 ) /* AT89c52 */
 	/* This is the first 2K of hc2j.u111 from hidctch2a, verify against the internal dump when decapped */
 	ROM_LOAD( "hc2.103", 0x0000, 0x0800, BAD_DUMP CRC(92797034) SHA1(b600f19972986b2e09c56be0ea0c09f92a9fe422) ) /* MCU internal 2K flash */
-	
+
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(75fc7a65) SHA1(308715ab62d28787ee894ddcf7304464e2543b2e) )
 
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )	
+	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(a7a1627e) SHA1(a93ced858d839daac1fa9a85f4f8c89cb179bad5) )	
+	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(a7a1627e) SHA1(a93ced858d839daac1fa9a85f4f8c89cb179bad5) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -962,12 +962,12 @@ ROM_START( hidctch2a )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(75fc7a65) SHA1(308715ab62d28787ee894ddcf7304464e2543b2e) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
 	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(a7a1627e) SHA1(a93ced858d839daac1fa9a85f4f8c89cb179bad5) )	
+	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(a7a1627e) SHA1(a93ced858d839daac1fa9a85f4f8c89cb179bad5) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1053,12 +1053,12 @@ ROM_START( raccoon )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "racoon-u.108", 0x00000, 0x80000, CRC(fc4f30ee) SHA1(74b9e60cceb03ad572e0e080fbe1de5cffa1b2c3) )
-	
+
 	ROM_REGION( 0x08000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "racoon-u.107", 0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )	
+	ROM_LOAD( "racoon-u.107", 0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "racoon-u.97", 0x00000, 0x80000, CRC(fef828b1) SHA1(38352b67d18300db40113df9426c2aceec12a29b) )	
+	ROM_LOAD( "racoon-u.97", 0x00000, 0x80000, CRC(fef828b1) SHA1(38352b67d18300db40113df9426c2aceec12a29b) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1091,12 +1091,12 @@ ROM_START( landbrk )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "rom2.u108", 0x00000, 0x80000, CRC(f3b327ef) SHA1(4b359171afd6ca10275961f795f3fe64f9df9897) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "lb_3.u97",    0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )	
+	ROM_LOAD( "lb_3.u97",    0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1121,12 +1121,12 @@ ROM_START( landbrka )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "lb_2.108", 0x00000, 0x80000, CRC(a99182d7) SHA1(628c8d09efb3917a4e97d9e02b6b0ca1f339825d) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "lb_3.u97",    0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )	
+	ROM_LOAD( "lb_3.u97",    0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1158,9 +1158,9 @@ ROM_START( penfan )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "pfg.u108", 0x00000, 0x80000, CRC(ac97c23b) SHA1(85319cbff811c84af2a802c2f609bd58cf9e7bc3) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "pfg.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "pfg.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
 	ROM_LOAD( "pfg.u97",     0x00000, 0x80000, CRC(0c713eef) SHA1(4c4ea19fec5af4f0cb983c8b9f71152d05c15047) )
@@ -1196,12 +1196,12 @@ ROM_START( stealsee )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "ss.u108", 0x00000, 0x80000, CRC(95bd136d) SHA1(a6e2d75fc5e8d600d4dceab13c596f6a7edb6e72) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
 	ROM_LOAD( "ss.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "ss.u97",      0x00000, 0x80000, CRC(56c9f4a4) SHA1(dfc7cb8b68ec9e77854287b8998131e3ef4ca18d) )	
+	ROM_LOAD( "ss.u97",      0x00000, 0x80000, CRC(56c9f4a4) SHA1(dfc7cb8b68ec9e77854287b8998131e3ef4ca18d) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1270,9 +1270,9 @@ ROM_START( fort2b )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "3.u108",       0x00000, 0x80000, CRC(9b996b60) SHA1(c4e34601f754ae2908dd6d59ea9da0c5c6f56f2d) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "5.u107",       0x00000, 0x08000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "5.u107",       0x00000, 0x08000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sapmle ROMs */
 	ROM_LOAD( "2.u97",        0x00000, 0x80000, CRC(8a431b14) SHA1(5a9824280f30ef2e7b7f16652b2f9f9559cb764f) )
@@ -1299,12 +1299,12 @@ ROM_START( fort2ba )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "ftii009.u108", 0x00000, 0x80000, CRC(9b996b60) SHA1(c4e34601f754ae2908dd6d59ea9da0c5c6f56f2d) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "ftii010.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )	
+	ROM_LOAD( "ftii010.u107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "ftii011.u97",  0x00000, 0x80000, CRC(8a431b14) SHA1(5a9824280f30ef2e7b7f16652b2f9f9559cb764f) )	
+	ROM_LOAD( "ftii011.u97",  0x00000, 0x80000, CRC(8a431b14) SHA1(5a9824280f30ef2e7b7f16652b2f9f9559cb764f) )
 	ROM_LOAD( "qs1001a.u96",  0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1337,12 +1337,12 @@ ROM_START( puzzlekg )
 
 	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
 	ROM_LOAD( "u108.bin",    0x00000, 0x80000, CRC(e4555c6b) SHA1(128196a5b47d13ee7163981043b96f7b4b27204b) )
-	
+
 	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u107.bin",    0x0000, 0x8000, CRC(f3add818) SHA1(96e77950154ced9f3234200de2aa29060c00d47f) )	
+	ROM_LOAD( "u107.bin",    0x0000, 0x8000, CRC(f3add818) SHA1(96e77950154ced9f3234200de2aa29060c00d47f) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "u97.bin",     0x00000, 0x80000, CRC(f4604ce8) SHA1(e061b203ef5df386120dbf089ece094d16a1b59b) )	
+	ROM_LOAD( "u97.bin",     0x00000, 0x80000, CRC(f4604ce8) SHA1(e061b203ef5df386120dbf089ece094d16a1b59b) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1428,7 +1428,7 @@ ROM_START( hidctch3 )
 	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
-	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(6d37aa1a) SHA1(6827e500d9bf66e2e9236be563456ff88c78db91) )	
+	ROM_LOAD( "u97",         0x00000, 0x80000, CRC(6d37aa1a) SHA1(6827e500d9bf66e2e9236be563456ff88c78db91) )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -1446,7 +1446,7 @@ static DRIVER_INIT( eolith )
 
 	// Sound CPU -> QS1000 CPU serial link
 	i8051_set_serial_tx_callback(machine.device("soundcpu"), soundcpu_to_qs1000);
-	
+
 	// Configure the sound ROM banking
 	machine.root_device().membank("sound_bank")->configure_entries(0, 16, state->memregion("sounddata")->base(), 0x8000);
 }
@@ -1478,7 +1478,7 @@ static DRIVER_INIT( hidctch2 )
 	//it fails compares in memory like in landbrka
 	UINT32 *rombase = (UINT32*)machine.root_device().memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
-    
+
     DRIVER_INIT_CALL(eolith);
 }
 

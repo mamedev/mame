@@ -207,8 +207,8 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 
 
 
-READ64_MEMBER(pci_bus_legacy_device::read_64be) 
-{ 
+READ64_MEMBER(pci_bus_legacy_device::read_64be)
+{
 	UINT64 result = 0;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
 	if (ACCESSING_BITS_0_31)
@@ -219,7 +219,7 @@ READ64_MEMBER(pci_bus_legacy_device::read_64be)
 }
 
 WRITE64_MEMBER(pci_bus_legacy_device::write_64be)
-{ 
+{
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
 	if (ACCESSING_BITS_0_31)
@@ -420,8 +420,8 @@ WRITE32_MEMBER( pci_bus_device::write )
 
 
 
-READ64_MEMBER(pci_bus_device::read_64be) 
-{ 
+READ64_MEMBER(pci_bus_device::read_64be)
+{
 	UINT64 result = 0;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
 	if (ACCESSING_BITS_0_31)
@@ -432,7 +432,7 @@ READ64_MEMBER(pci_bus_device::read_64be)
 }
 
 WRITE64_MEMBER(pci_bus_device::write_64be)
-{ 
+{
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
 	if (ACCESSING_BITS_0_31)
@@ -480,7 +480,7 @@ void pci_bus_device::device_start()
 		pci_connector *conn = downcast<pci_connector *>(subdevice(id));
 		if (conn!=NULL)
 			m_device[i] = conn->get_device();
-		else 
+		else
 			m_device[i] = NULL;
 	}
 

@@ -22,7 +22,7 @@
   CPU:
   - 1x MC68000P12        ; 68000 CPU @ 12 MHz, from Motorola.
   - 1x D8751H            ; 8751 MCU (3.6864 MHz?)
-  
+
   Sound device:
   - 1x AY8930            ; Sound IC, from Yamaha.
 
@@ -32,12 +32,12 @@
   - 2x HD63486CP32       ; Hitachi - Graphic Video Attribute Controller (GVAC).
 
   Other:
-  - 1x MC68681           ; Motorola - Dual Asynchronous Receiver/Transmitter. 
+  - 1x MC68681           ; Motorola - Dual Asynchronous Receiver/Transmitter.
   - 4x XTALs....         ; 3.6864 / 12.000 / 26.000 / 24.000 MHz.
-  
+
                                                                                           .--------.
   PCB Layout:                                                                           --+--------+--
-  .---------------------------------------------------------------------------------------+        +-----------------------------------------------------. 
+  .---------------------------------------------------------------------------------------+        +-----------------------------------------------------.
   |                                                                                       |  DB9   |                                                     |
   |                        .--------.                    .--------.                       |        |                             .--------.              |
   |                        |::::::::|                    |::::::::|                       '--------'                             |74HCT32P|              |
@@ -101,12 +101,12 @@
   XTAL 1: 3.6864 MHz.
   XTAL 2: 12.000 MHz.
   XTAL 3: 26.000 MHz.
-  XTAL 4: 24.000 MHz. 
+  XTAL 4: 24.000 MHz.
 
   TL: TL7705ACP
 
 
-      DSW1:          DSW2:          DSW3:          DSW4:          
+      DSW1:          DSW2:          DSW3:          DSW4:
    .--------.     .--------.     .--------.     .--------.
   1| oo oooo|8   1|oooooooo|8   1|oooooooo|8   1|  o     |8    ON
    |--------|     |--------|     |--------|     |--------|
@@ -128,7 +128,7 @@
   ---------------------------------
 
   00000 - 7FFFF  ; ROM space.
-  
+
 
 *******************************************************************************
 
@@ -184,7 +184,7 @@ static VIDEO_START( wildpkr )
 
 static SCREEN_UPDATE_IND16( wildpkr )
 {
-//	wildpkr_state *state = screen.machine().driver_data<wildpkr_state>();
+//  wildpkr_state *state = screen.machine().driver_data<wildpkr_state>();
 	return 0;
 }
 
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_STATIC(wildpkr)
 
-//	MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
+//  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
 
 	MCFG_PALETTE_INIT(wildpkr)
 	MCFG_PALETTE_LENGTH(256)

@@ -748,8 +748,8 @@ static void nkishusp_decrypt(running_machine &machine)
 
 		// ryukobou xor:
 
-//		if ( (j & 0x00100) && (j & 0x00400) )
-//			x ^= 0x0200;
+//      if ( (j & 0x00100) && (j & 0x00400) )
+//          x ^= 0x0200;
 
 		if ( !(j & 0x00004) || !(j & 0x02000) || (!(j & 0x00080) && !(j & 0x00010) ) )
 			x ^= 0x0020;

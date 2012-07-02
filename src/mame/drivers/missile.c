@@ -1310,7 +1310,7 @@ static DRIVER_INIT( missilem )
 	{
 		int a = BITSWAP16(i, 15,2,3,0,8,9,7,5,1,4,6,14,13,12,10,11);
 		int d = BITSWAP8(src[a], 3,2,4,5,6,1,7,0);
-		
+
 		a = i;
 		a ^= (~a >> 1 & 0x400);
 		a ^= (~a >> 4 & 0x100);

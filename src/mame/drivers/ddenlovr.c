@@ -3724,7 +3724,7 @@ READ8_MEMBER(dynax_state::daimyojn_keyb1_r)
 	else if (!BIT(m_keyb, 3))  val = ioport("KEY3")->read() | hopper_bit;
 	else if (!BIT(m_keyb, 4))  val = ioport("KEY4")->read() | hopper_bit;
 
-//	val |= ioport("BET")->read();
+//  val |= ioport("BET")->read();
 	return val;
 }
 
@@ -8563,7 +8563,7 @@ static const ay8910_interface quiz365_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	// A							B
+	// A                            B
 	DEVCB_HANDLER(quiz365_input_r),	DEVCB_NULL,							// R
 	DEVCB_NULL,						DEVCB_HANDLER(ddenlovr_select_w)	// W
 };
@@ -8963,7 +8963,7 @@ static const ay8910_interface mjmyster_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	// A			B
+	// A            B
 	DEVCB_NULL,		DEVCB_NULL,							// R
 	DEVCB_NULL,		DEVCB_HANDLER(ddenlovr_select_w)	// W
 };
@@ -9035,7 +9035,7 @@ static const ay8910_interface hginga_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	// A							B
+	// A                            B
 	DEVCB_HANDLER(hginga_dsw_r),	DEVCB_NULL,								// R
 	DEVCB_NULL,						DEVCB_HANDLER(ddenlovr_select_w)		// W
 };
@@ -9355,7 +9355,7 @@ static const ay8910_interface seljan2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	// A							B
+	// A                            B
 	DEVCB_HANDLER(seljan2_dsw_r),	DEVCB_NULL,								// R
 	DEVCB_NULL,						DEVCB_HANDLER(ddenlovr_select_w)		// W
 };

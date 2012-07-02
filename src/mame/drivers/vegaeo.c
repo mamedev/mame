@@ -64,7 +64,7 @@ WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
 
 	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
 
-	membank("qs1000:bank")->set_entry(data & 0x07);	
+	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		qs1000->set_irq(CLEAR_LINE);

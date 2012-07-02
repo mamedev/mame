@@ -386,7 +386,7 @@ VIDEO_START( dec0 )
 
 VIDEO_START( automat )
 {
-//	dec0_state *state = machine.driver_data<dec0_state>();
+//  dec0_state *state = machine.driver_data<dec0_state>();
 }
 
 /******************************************************************************/

@@ -12,10 +12,10 @@
 
 PGM2 Motherboard Components:
 
- IS61LV25616AL(SRAM) 
- IGS037(GFX PROCESSOR) 
- YMZ774-S(SOUND) 
- R5F21256SN(extra MCU for protection and ICcard communication) 
+ IS61LV25616AL(SRAM)
+ IGS037(GFX PROCESSOR)
+ YMZ774-S(SOUND)
+ R5F21256SN(extra MCU for protection and ICcard communication)
 
 */
 

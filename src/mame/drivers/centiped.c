@@ -617,7 +617,7 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 		case 0x0033:
 		case 0x6b19:
 			return 0x01;
-		
+
 		default:
 			break;
 	}
@@ -873,7 +873,7 @@ WRITE8_MEMBER(centiped_state::multiped_prgbank_w)
 	{
 		m_prg_bank = bank;
 		multiped_gfxbank_w(space, 0, m_gfx_bank << 6);
-		
+
 		// TODO: prg bankswitch and alt memory map layout for centiped
 	}
 }
