@@ -6356,14 +6356,14 @@ ROM_START( superbon )
 	ROM_LOAD( "5f.cpu",       0x0000, 0x0800, CRC(5b9d4686) SHA1(c7814aefaccab9c8a3a0b015447d366cd2e43c3a) )
 	ROM_LOAD( "5h.cpu",       0x0800, 0x0800, CRC(58c29927) SHA1(b88515d9c3108d2ad59f30fed5d74877b1636280) )
 
-	/* conversion instructions do not mention color proms                        */
+	/* The conversion instructions do not mention color proms:                   */
 	/* http://www.arcadeflyers.com/?page=flyer&db=videodb&id=5353&image=2        */
-	/* however, pages may be missing. In addition, it is mentioned that the      */
-	/* conversion kit may be used for scramble, amidar and frogger as well.      */
-	/* They all have different color proms.                                      */
+	/* However, pages may be missing. In addition, it is mentioned that the      */
+	/* conversion kit may be used for Scramble, Amidar and Frogger as well.      */
+	/* They all have different color proms. We use the prom from Super Cobra     */
+	/* for now and mark it as bad dump until we have more information.           */
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "superbon.clr", 0x0000, 0x0020, NO_DUMP )
-
+	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, BAD_DUMP CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
 
