@@ -328,11 +328,23 @@ ROM_START( tankbatt )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "tb1-5.2k",  0x0000, 0x0800, CRC(aabd4fb1) SHA1(5cff659b531d0f1b6faa503f7c06045c3a209a84) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) ) /* prom is a Fujitsu MB7052 or equivalent */
-	ROM_LOAD( "prom.2d", 0x0100, 0x0100, NO_DUMP )
+	ROM_REGION( 0x0200, "proms", 0 ) /* prom is a Fujitsu MB7052 or equivalent */
+	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) )
 ROM_END
 
+ROM_START( tankbattb ) /* board with "NAMCO" removed from gfx1 rom, otherwise identical to original */
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "tb1-1.1a",  0x0000, 0x0800, CRC(278a0b8c) SHA1(11ea8fe8401b3cd986616a30a759c0ac1a5ce73b) ) // a.1a
+	ROM_LOAD( "tb1-2.1b",  0x0800, 0x0800, CRC(e0923370) SHA1(8d3dbea877bed9f9c267d8002dc180f6eb1e5a8f) ) // b.1b
+	ROM_LOAD( "tb1-3.1c",  0x1000, 0x0800, CRC(85005ea4) SHA1(91583081803a5ef600fb90bee34be9edd87f157e) ) // c.1c
+	ROM_LOAD( "tb1-4.1d",  0x1800, 0x0800, CRC(3dfb5bcf) SHA1(aa24bf74f4d5dc81baf3843196c837e0b731077b) ) // d.1d
 
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "e.2k",  0x0000, 0x0800, CRC(249f4e1b) SHA1(8654e8f9aa042ba49f20a58ff21879a593da57a3) )
 
-GAME( 1980, tankbatt, 0, tankbatt, tankbatt, 0, ROT90, "Namco", "Tank Battalion", GAME_IMPERFECT_SOUND )
+	ROM_REGION( 0x0200, "proms", 0 ) /* prom is a Fujitsu MB7052 or equivalent */
+	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) ) // dm74s287n.3l
+ROM_END
+
+GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, 0, ROT90, "Namco",   "Tank Battalion", GAME_IMPERFECT_SOUND )
+GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, 0, ROT90, "bootleg", "Tank Battalion (bootleg)", GAME_IMPERFECT_SOUND )
