@@ -96,6 +96,7 @@ public:
 	UINT32 *m_poly_rom;
 	UINT32 *m_poly_ram;
 	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(fifoin_status_r);
 	DECLARE_WRITE16_MEMBER(bank_w);
 	DECLARE_READ16_MEMBER(network_ctl_r);

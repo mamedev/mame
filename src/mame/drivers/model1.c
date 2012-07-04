@@ -654,6 +654,20 @@ READ16_MEMBER(model1_state::io_r)
 	return 0xffff;
 }
 
+WRITE16_MEMBER(model1_state::io_w)
+{
+	if(offset == 0x0f){
+		// tested in vf, swa, wingwar
+		set_led_status(machine(), 0, data & 0x4);	// START (1)
+		set_led_status(machine(), 1, data & 0x8);	// VIEW1 (START2 - VF)
+		set_led_status(machine(), 2, data & 0x10);	// VIEW2 (VIEW - SWA)
+		set_led_status(machine(), 3, data & 0x20);	// VIEW3
+		set_led_status(machine(), 4, data & 0x40);	// VIEW4
+		return;
+	}
+	logerror("IOW: %02x %02x\n", offset, data);
+}
+
 READ16_MEMBER(model1_state::fifoin_status_r)
 {
 	return 0xffff;
@@ -886,7 +900,7 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("paletteram")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0003f) AM_READWRITE(io_r, io_w)
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
