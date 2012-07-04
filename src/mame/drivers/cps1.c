@@ -11002,7 +11002,7 @@ GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj,   cps1,     ROT0,   "Ca
 GAME( 1995, pang3,       0,        pang3,      pang3,      pang3,    ROT0,  "Mitchell", "Pang! 3 (Euro 950601)", GAME_SUPPORTS_SAVE )
 GAME( 1995, pang3r1,     pang3,    pang3,      pang3,      pang3,    ROT0,  "Mitchell", "Pang! 3 (Euro 950511)", GAME_SUPPORTS_SAVE )
 GAME( 1995, pang3j,      pang3,    pang3,      pang3,      pang3,    ROT0,  "Mitchell", "Pang! 3: Kaitou Tachi no Karei na Gogo (Japan 950511)", GAME_SUPPORTS_SAVE )
-GAME( 1995, pang3b,      pang3,    pang3,      pang3b,     pang3b,   ROT0,  "Mitchell", "Pang! 3 (bootleg)", GAME_SUPPORTS_SAVE )	// 950511 - based on Euro version
+GAME( 1995, pang3b,      pang3,    pang3,      pang3b,     pang3b,   ROT0,  "bootleg", "Pang! 3 (bootleg)", GAME_SUPPORTS_SAVE )	// 950511 - based on Euro version
 
 /* Home 'CPS Changer' Unit - For MESS */
 
