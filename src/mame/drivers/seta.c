@@ -9964,8 +9964,8 @@ ROM_END
 
 ROM_START( daioh )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "fg1-001",  0x000000, 0x080000, CRC(104ae74a) SHA1(928c467e3ff98285a4828a927d851fcdf296849b) )
-	ROM_LOAD16_BYTE( "fg1-002",  0x000001, 0x080000, CRC(e39a4e67) SHA1(c3f47e9d407f32dbfaf209d29b4446e4de8829a2) )
+	ROM_LOAD16_BYTE( "fg001001",  0x000000, 0x080000, CRC(e1ef3007) SHA1(864349efac3e3dc3ccdeb892fed285c73aea3997) )
+	ROM_LOAD16_BYTE( "fg001002",  0x000001, 0x080000, CRC(5e3481f9) SHA1(7585a7e56392fc2b13d466cf262383dd68d6d995) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fg1-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
@@ -9983,8 +9983,8 @@ ROM_END
 
 ROM_START( daioha )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "fg1-001",  0x000000, 0x080000, CRC(e1ef3007) SHA1(864349efac3e3dc3ccdeb892fed285c73aea3997) )
-	ROM_LOAD16_BYTE( "fg1-002",  0x000001, 0x080000, CRC(5e3481f9) SHA1(7585a7e56392fc2b13d466cf262383dd68d6d995) )
+	ROM_LOAD16_BYTE( "fg1-001",  0x000000, 0x080000, CRC(104ae74a) SHA1(928c467e3ff98285a4828a927d851fcdf296849b) )
+	ROM_LOAD16_BYTE( "fg1-002",  0x000001, 0x080000, CRC(e39a4e67) SHA1(c3f47e9d407f32dbfaf209d29b4446e4de8829a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fg1-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
@@ -10993,8 +10993,8 @@ GAME( 1992, umanclub, 0,        umanclub, umanclub, 0,        ROT0,   "Banpresto
 GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer / Tecmo",        "Zing Zing Zip", 0 )
 GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip,  0,        ROT270, "bootleg",                "Zing Zing Zip (bootleg)", GAME_NOT_WORKING )
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
-GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
-GAME( 1993, daioha,   daioh,    daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh (alternate)", 0 )
+GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
+GAME( 1993, daioha,   daioh,    daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh (Set 2)", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, 0,        ROT0,   "bootleg",		"J. J. Squawkers (bootleg, Blandia Conversion)", GAME_IMPERFECT_SOUND )
