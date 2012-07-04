@@ -10994,7 +10994,7 @@ GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer /
 GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip,  0,        ROT270, "bootleg",                "Zing Zing Zip (bootleg)", GAME_NOT_WORKING )
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
-GAME( 1993, daioha,   daioh,    daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh (Set 2)", 0 )
+GAME( 1993, daioha,   daioh,    daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh (set 2)", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, 0,        ROT0,   "bootleg",		"J. J. Squawkers (bootleg, Blandia Conversion)", GAME_IMPERFECT_SOUND )
