@@ -1300,8 +1300,8 @@ $(MAMEOBJ)/seibu.a: \
 
 $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/aleck64.o $(MACHINE)/n64.o $(VIDEO)/n64.o $(VIDEO)/rdpblend.o $(VIDEO)/rdpspn16.o $(VIDEO)/rdptpipe.o \
-	$(DRIVERS)/darkhors.o \
 	$(DRIVERS)/hanaawas.o $(VIDEO)/hanaawas.o \
+	$(DRIVERS)/jclub2.o \
 	$(DRIVERS)/macs.o \
 	$(DRIVERS)/seta.o $(VIDEO)/seta.o \
 	$(DRIVERS)/seta2.o $(VIDEO)/seta2.o \
