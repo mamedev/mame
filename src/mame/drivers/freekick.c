@@ -777,7 +777,6 @@ through a dipswitch. Hopefully this version can be found and dumped before they 
 
 ROM_START( freekick )
 	ROM_REGION( 0x0d000, "maincpu", 0 ) /* Z80 Code, internal program RAM is 52K in custom cpu module */
-	// Custom CPU (pack) No. NS6201-A 1987.10 FREE KICK (also found NS6201-A 1987.9 FREE KICK)
 	ROM_LOAD( "ns6201-a_1987.10_free_kick.cpu", 0x00000, 0x0d000, CRC(6d172850) SHA1(ac461bff9da263681085920ad6acd778241dedd3) )
 
 	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
@@ -802,7 +801,33 @@ ROM_START( freekick )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
 ROM_END
 
-ROM_START( freekickb )
+ROM_START( freekicka ) /* The bootlegs are derived from this set, "freekbl8.q7" is identical but includes more addresss space then needed */
+	ROM_REGION( 0x0d000, "maincpu", 0 ) /* Z80 Code, internal program RAM is 52K in custom cpu module */
+	ROM_LOAD( "ns6201-a_1987.9_free_kick.cpu", 0x00000, 0x0d000, CRC(acc0a278) SHA1(27675870ece29ccd5135ca20fb2fa91125945ec5) )
+
+	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
+	ROM_LOAD( "11.1e", 0x00000, 0x08000, CRC(a6030ba9) SHA1(f363100f54a7a80701a6395c7539b8daa60db054) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
+	ROM_LOAD( "12.1h", 0x000000, 0x04000, CRC(fb82e486) SHA1(bc672272dc32b2aa64e991992172c44bea1ca65c) )
+	ROM_LOAD( "13.1j", 0x004000, 0x04000, CRC(3ad78ee2) SHA1(033285d4ab7d6f46abf4c1bd4671c874738f0ac1) )
+	ROM_LOAD( "14.1l", 0x008000, 0x04000, CRC(0185695f) SHA1(126994c69de157fc7c452ccc7f1a767f5085da27) )
+
+	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
+	ROM_LOAD( "15.1m", 0x000000, 0x04000, CRC(0fa7c13c) SHA1(24b0ca73b0e35474e2392d8e729bcd44b80f9135) )
+	ROM_LOAD( "16.1p", 0x004000, 0x04000, CRC(2b996e89) SHA1(c6900449d27e89c3b444fb028694fdcda8e79322) )
+	ROM_LOAD( "17.1r", 0x008000, 0x04000, CRC(e7894def) SHA1(5c97b7cce43d1e51c709603a0d2394b8119764bd) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) /* verified correct */
+	ROM_LOAD( "24s10n.8j", 0x0000, 0x0100, CRC(53a6bc21) SHA1(d4beedc226004c1aa9b6aae29bee9c8a9b0fff7c) ) /* Or compaitble type prom like the 82S129 */
+	ROM_LOAD( "24s10n.7j", 0x0100, 0x0100, CRC(38dd97d8) SHA1(468a0f87a704982dc1bce1ca21f9bb252ac241a0) )
+	ROM_LOAD( "24s10n.8k", 0x0200, 0x0100, CRC(18e66087) SHA1(54857526179b738862d11ce87e9d0edcb7878488) )
+	ROM_LOAD( "24s10n.7k", 0x0300, 0x0100, CRC(bc21797a) SHA1(4d6cf05e51b7ef9147eeff051c3728764021cfdb) )
+	ROM_LOAD( "24s10n.8h", 0x0400, 0x0100, CRC(8aac5fd0) SHA1(07a179603c0167c1f998b2337d66be95db9911cc) )
+	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
+ROM_END
+
+ROM_START( freekickb1 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "freekbl8.q7", 0x00000, 0x10000, CRC(4208cfe5) SHA1(21628cbe8a217fbae30a6c24c9cc4c790fe45d65) )
 
@@ -874,7 +899,33 @@ the same method as used for Freekick) before they all die, batteries don't last 
 ROM_START( countrun )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
 	//  Custom CPU (pack) No. NS6201-A 1988.3 COUNTER RUN
-	ROM_LOAD( "countrun.cpu", 0x00000, 0x10000, NO_DUMP ) // missing
+	ROM_LOAD( "ns6201-a_1988.3_counter_run.cpu", 0x00000, 0x10000, NO_DUMP ) // Need to find a working PCB module to dump!!
+
+	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
+	ROM_LOAD( "c-run.e1", 0x00000, 0x08000, CRC(2c3b6f8f) SHA1(ee7d71e6d8bb7138d5d029a10a95471d387b5f29) ) // rom 1
+
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
+	ROM_LOAD( "c-run.h1", 0x000000, 0x04000, CRC(3385b7b5) SHA1(3f8f96f2a5406369dd56a9fe9f509ebee4a0179a) ) // rom 2
+	ROM_LOAD( "c-run.j1", 0x004000, 0x04000, CRC(58dc148d) SHA1(3b2e5c6ced885d945f6c02fbab7c6d40db78c66a) ) // rom 3
+	ROM_LOAD( "c-run.l1", 0x008000, 0x04000, CRC(3201f1e9) SHA1(72bd35600bf6e38741730f39bfd2a19f359bfb93) ) // rom 4
+
+	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
+	ROM_LOAD( "c-run.m1", 0x000000, 0x04000, CRC(1efab3b4) SHA1(7ce39cecf2809d3a7cbca5c6dffee738ba6f7b11) ) // rom 5
+	ROM_LOAD( "c-run.p1", 0x004000, 0x04000, CRC(d0bf8d42) SHA1(b8d1bd155dba065475c84db768f14a3562fe21e0) ) // rom 6
+	ROM_LOAD( "c-run.r1", 0x008000, 0x04000, CRC(4bb4a3e3) SHA1(179696464fce548ec333eec233025840fdb1eac2) ) // rom 7
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "24s10n.8j", 0x0000, 0x0100, CRC(63c114ad) SHA1(db881c4ff92cb04a94988587503346a44eb89b69) ) /* Or compaitble type prom like the 82S129 */
+	ROM_LOAD( "24s10n.7j", 0x0100, 0x0100, CRC(d16f95cc) SHA1(041bb84576bd8492c1ad3e492d8cb3e04d316527) )
+	ROM_LOAD( "24s10n.8k", 0x0200, 0x0100, CRC(217db2c1) SHA1(f2af1a74b0ce56290b1c119e1a9707287132194a) )
+	ROM_LOAD( "24s10n.7k", 0x0300, 0x0100, CRC(8d983949) SHA1(d7331900d18a53ceb133f8a8848d3c108e03323a) )
+	ROM_LOAD( "24s10n.8h", 0x0400, 0x0100, CRC(33e87550) SHA1(951ce0dc975b799c1056ce8eb005256cbb43a112) )
+	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
+ROM_END
+
+ROM_START( countrunb )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "rom_cpu.bin", 0x00000, 0x10000, CRC(f65639ae) SHA1(faa81607858d49559098c887ac847722df955a76) )
 
 	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
 	ROM_LOAD( "c-run.e1", 0x00000, 0x08000, CRC(2c3b6f8f) SHA1(ee7d71e6d8bb7138d5d029a10a95471d387b5f29) ) // rom 1
@@ -904,32 +955,6 @@ ROM_START( countrunb2 )
 
 	ROM_REGION( 0x01000, "cpu1", 0 )
 	ROM_LOAD( "68705.uc",  0x00000, 0x01000, NO_DUMP )
-
-	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
-	ROM_LOAD( "c-run.e1", 0x00000, 0x08000, CRC(2c3b6f8f) SHA1(ee7d71e6d8bb7138d5d029a10a95471d387b5f29) ) // rom 1
-
-	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
-	ROM_LOAD( "c-run.h1", 0x000000, 0x04000, CRC(3385b7b5) SHA1(3f8f96f2a5406369dd56a9fe9f509ebee4a0179a) ) // rom 2
-	ROM_LOAD( "c-run.j1", 0x004000, 0x04000, CRC(58dc148d) SHA1(3b2e5c6ced885d945f6c02fbab7c6d40db78c66a) ) // rom 3
-	ROM_LOAD( "c-run.l1", 0x008000, 0x04000, CRC(3201f1e9) SHA1(72bd35600bf6e38741730f39bfd2a19f359bfb93) ) // rom 4
-
-	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
-	ROM_LOAD( "c-run.m1", 0x000000, 0x04000, CRC(1efab3b4) SHA1(7ce39cecf2809d3a7cbca5c6dffee738ba6f7b11) ) // rom 5
-	ROM_LOAD( "c-run.p1", 0x004000, 0x04000, CRC(d0bf8d42) SHA1(b8d1bd155dba065475c84db768f14a3562fe21e0) ) // rom 6
-	ROM_LOAD( "c-run.r1", 0x008000, 0x04000, CRC(4bb4a3e3) SHA1(179696464fce548ec333eec233025840fdb1eac2) ) // rom 7
-
-	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "24s10n.8j", 0x0000, 0x0100, CRC(63c114ad) SHA1(db881c4ff92cb04a94988587503346a44eb89b69) ) /* Or compaitble type prom like the 82S129 */
-	ROM_LOAD( "24s10n.7j", 0x0100, 0x0100, CRC(d16f95cc) SHA1(041bb84576bd8492c1ad3e492d8cb3e04d316527) )
-	ROM_LOAD( "24s10n.8k", 0x0200, 0x0100, CRC(217db2c1) SHA1(f2af1a74b0ce56290b1c119e1a9707287132194a) )
-	ROM_LOAD( "24s10n.7k", 0x0300, 0x0100, CRC(8d983949) SHA1(d7331900d18a53ceb133f8a8848d3c108e03323a) )
-	ROM_LOAD( "24s10n.8h", 0x0400, 0x0100, CRC(33e87550) SHA1(951ce0dc975b799c1056ce8eb005256cbb43a112) )
-	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(c77d0077) SHA1(4cbbf625ad5e45d00ca6aebe9566538ff0a3348d) )
-ROM_END
-
-ROM_START( countrunb )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "rom_cpu.bin", 0x00000, 0x10000, CRC(f65639ae) SHA1(faa81607858d49559098c887ac847722df955a76) )
 
 	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
 	ROM_LOAD( "c-run.e1", 0x00000, 0x08000, CRC(2c3b6f8f) SHA1(ee7d71e6d8bb7138d5d029a10a95471d387b5f29) ) // rom 1
@@ -1118,17 +1143,18 @@ static DRIVER_INIT( gigas )
  *  Game driver(s)
  *
  *************************************/
-/*    YEAR  NAME       PARENT    MACHINE    INPUT     INIT      ROT     COMPANY   FULLNAME        FLAGS  */
-GAME( 1986, gigas,     0,        gigas,     gigas,    gigas,    ROT270, "Sega", "Gigas (MC-8123, 317-5002)", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1986, gigasb,    gigas,    gigas,     gigas,    gigasb,   ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, oigas,     gigas ,   oigas,     gigas,    gigasb,   ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  gigasb,   ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, pbillrds,  pbillrd,  pbillrd,   pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, freekick,  0,        freekickb, freekck,  0,        ROT270, "Nihon System (Merit license)", "Free Kick", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, freekickb, freekick, freekickb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, freekickb2,freekick, freekickb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, countrun,  0,        freekickb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1988, countrunb, countrun, freekickb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, countrunb2,countrun, freekickb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT    MACHINE    INPUT     INIT      ROT     COMPANY                         FULLNAME        FLAGS  */
+GAME( 1986, gigas,     0,        gigas,     gigas,    gigas,    ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Missing a dump of one of the program roms
+GAME( 1986, gigasb,    gigas,    gigas,     gigas,    gigasb,   ROT270, "bootleg",                      "Gigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, oigas,     gigas ,   oigas,     gigas,    gigasb,   ROT270, "bootleg",                      "Oigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  0,        ROT0,   "Nihon System",                 "Perfect Billiard", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrds,  pbillrd,  pbillrd,   pbillrd,  pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, freekick,  0,        freekickb, freekck,  0,        ROT270, "Nihon System (Merit license)", "Free Kick (NS6201-A 1987.10)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, freekicka, freekick, freekickb, freekck,  0,        ROT270, "Nihon System",                 "Free Kick (NS6201-A 1987.9)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, freekickb1,freekick, freekickb, freekck,  0,        ROT270, "bootleg",                      "Free Kick (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, freekickb2,freekick, freekickb, freekck,  0,        ROT270, "bootleg",                      "Free Kick (bootleg set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, countrun,  0,        freekickb, countrun, 0,        ROT0,   "Nihon System (Sega license)",  "Counter Run (NS6201-A 1988.3)", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // CPU module not dumped
+GAME( 1988, countrunb, countrun, freekickb, countrun, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, countrunb2,countrun, freekickb, countrun, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 2)", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
