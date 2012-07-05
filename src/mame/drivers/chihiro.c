@@ -901,18 +901,19 @@ UINT32 nv2a_renderer::geforce_object_offset(UINT32 handle)
 
 void nv2a_renderer::geforce_read_dma_object(UINT32 handle,UINT32 &offset,UINT32 &size)
 {
-	UINT32 objclass,pt_present,pt_linear,access,target,dma_adjust,dma_frame,rorw;
+	//UINT32 objclass,pt_present,pt_linear,access,target,rorw;
+	UINT32 dma_adjust,dma_frame;
 	UINT32 o=geforce_object_offset(handle);
 
 	o=o/4;
-	objclass=ramin[o] & 0xfff;
-	pt_present=(ramin[o] >> 12) & 1;
-	pt_linear=(ramin[o] >> 13) & 1;
-	access=(ramin[o] >> 14) & 3;
-	target=(ramin[o] >> 16) & 3;
+	//objclass=ramin[o] & 0xfff;
+	//pt_present=(ramin[o] >> 12) & 1;
+	//pt_linear=(ramin[o] >> 13) & 1;
+	//access=(ramin[o] >> 14) & 3;
+	//target=(ramin[o] >> 16) & 3;
 	dma_adjust=(ramin[o] >> 20) & 0xfff;
 	size=ramin[o+1];
-	rorw=ramin[o+2] & 1;
+	//rorw=ramin[o+2] & 1;
 	dma_frame=ramin[o+2] & 0xfffff000;
 	offset=dma_frame+dma_adjust;
 }
@@ -990,7 +991,8 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 	}
 	if (method*4 == 0x1b0c) {
 		// enable texture
-		int enable,dma0,dma1,cubic,noborder,dims,format,mipmap;
+		int enable;
+		//int dma0,dma1,cubic,noborder,dims,format,mipmap;
 		int basesizeu,basesizev,basesizew;
 		UINT32 offset;//,base;
 		//UINT32 dmahand,dmaoff,dmasiz;
@@ -999,13 +1001,13 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 		enable=(data >> 30) & 1;
 		offset=channel[chanel][subchannel].object.method[0x1b00/4];
 		tmp=channel[chanel][subchannel].object.method[0x1b04/4];
-		dma0=(tmp >> 0) & 1;
-		dma1=(tmp >> 1) & 1;
-		cubic=(tmp >> 2) & 1;
-		noborder=(tmp >> 3) & 1;
-		dims=(tmp >> 4) & 15;
-		format=(tmp >> 8) & 255;
-		mipmap=(tmp >> 19) & 1;
+		//dma0=(tmp >> 0) & 1;
+		//dma1=(tmp >> 1) & 1;
+		//cubic=(tmp >> 2) & 1;
+		//noborder=(tmp >> 3) & 1;
+		//dims=(tmp >> 4) & 15;
+		//format=(tmp >> 8) & 255;
+		//mipmap=(tmp >> 19) & 1;
 		basesizeu=(tmp >> 20) & 15;
 		basesizev=(tmp >> 24) & 15;
 		basesizew=(tmp >> 28) & 15;
@@ -1026,7 +1028,8 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 	if (method*4 == 0x1810) {
 		// draw vertices
 		int offset,count,type;
-		int vtxbuf_kind[16],vtxbuf_size[16],vtxbuf_stride[16];
+		//int vtxbuf_kind[16],vtxbuf_size[16];
+		int vtxbuf_stride[16];
 		UINT32 vtxbuf_address[16];
 		UINT32 dmahand[2],dmaoff[2],smasiz[2];
 		UINT32 tmp,n,m;
@@ -1043,8 +1046,8 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 		for (n=0;n<16;n++) {
 			//printf(" %08X %08X\n\r",channel[chanel][subchannel].object.method[0x1720/4+n],channel[chanel][subchannel].object.method[0x1760/4+n]);
 			tmp=channel[chanel][subchannel].object.method[0x1760/4+n];
-			vtxbuf_kind[n]=tmp & 15;
-			vtxbuf_size[n]=(tmp >> 4) & 15;
+			//vtxbuf_kind[n]=tmp & 15;
+			//vtxbuf_size[n]=(tmp >> 4) & 15;
 			vtxbuf_stride[n]=(tmp >> 8) & 255;
 			tmp=channel[chanel][subchannel].object.method[0x1720/4+n];
 			if (tmp & 0x80000000)
