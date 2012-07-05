@@ -845,6 +845,8 @@ Jockey Club II Original sets
  -- the older hardware uses an st-0016 for sound (see st0016.c)
  -- the program can be upgraded by placing a ROM in the socket next to the main program ROM.
 
+There is known to be an undumped v4.00 with copyright 1994-97 Seta Corporation on the E84-0001 Rev.B hardware.
+
  */
 
 
