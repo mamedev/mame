@@ -916,7 +916,6 @@ static INTERRUPT_GEN( nmi_interrupt )
 *************************/
 
 static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
-	// 0xb000 - 0xb003 communication with the terminals
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")	/* VRAM1-1 */
