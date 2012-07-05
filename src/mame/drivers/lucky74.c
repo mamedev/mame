@@ -916,29 +916,30 @@ static INTERRUPT_GEN( nmi_interrupt )
 *************************/
 
 static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
+	// 0xb000 - 0xb003 communication with the terminals
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")				/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_SHARE("fg_colorram")				/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_SHARE("bg_videoram")				/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_SHARE("bg_colorram")				/* VRAM2-2 */
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports 0 & 1 */
-	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* DSW 1, 2 & 3 */
-	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)	/* DSW 4 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")	/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_SHARE("fg_colorram")	/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_SHARE("bg_videoram")	/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_SHARE("bg_colorram")	/* VRAM2-2 */
+	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)		/* Input Ports 0 & 1 */
+	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)		/* DSW 1, 2 & 3 */
+	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)		/* DSW 4 */
 	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE_LEGACY("sn1", sn76496_w)							/* SN76489 #1 */
-	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports 2 & 4 */
+	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)		/* Input Ports 2 & 4 */
 	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE_LEGACY("sn2", sn76496_w)							/* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)						/* YM2149 control */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)					/* YM2149 control */
 	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE_LEGACY("sn3", sn76496_w)							/* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
+	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)		/* YM2149 (Input Port 1) */
 	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lucky74_portmap, AS_IO, 8, lucky74_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)	/* custom 09R81P (samples system) */
-//  AM_RANGE(0xff, 0xff) AM_READWRITE_LEGACY(???)
+	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)			/* custom 09R81P (samples system) */
+	AM_RANGE(0xff, 0xff) AM_RAM // presumably HS satellite control port (check patched in Lucky 74)
 ADDRESS_MAP_END
 
 /* unknown I/O byte R/W
@@ -1503,10 +1504,18 @@ ROM_END
     ebj_s8.1k           1ST AND 2ND HALF IDENTICAL
     ebj_s9.1l           1ST AND 2ND HALF IDENTICAL
 
+
+	bp 364 do pc=367
+	irq0 comes from terminals, to communicate via the USART
+	0xb000 - 0xb003 are r/w during POST, unknown purpose
+
 */
 ROM_START( excitbj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ebj_prg.box",	0x0000, 0x10000, NO_DUMP )	/* someone will try to do some magic to extract this one */
+    ROM_LOAD( "8703_1992.1_ebj._stlite.cpu", 0x000000, 0x00c000, CRC(2ccf1abd) SHA1(a0bae5e3b0debe7c6f7f3efafdcb95237b5c63d2) )
+
+	ROM_REGION( 0x10000, "subcpu", 0 )
+    ROM_LOAD( "terminal.cpu", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "fgtiles", 0 )
 	ROM_LOAD( "ebj_s2.2j",	0x00000, 0x10000, CRC(a9d432f1) SHA1(25ff00a1fecc9bc767c4c417ab7dac0a32378884) )
@@ -1541,4 +1550,4 @@ ROM_END
        YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
 GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
 GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
-GAME(  198?, excitbj,  0,       lucky74, excitbj,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
+GAME(  1989, excitbj,  0,       lucky74, excitbj,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
