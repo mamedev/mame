@@ -16,6 +16,9 @@ typedef struct {
 #define OP_SSE3			0x100
 #define OP_CYRIX		0x8000
 #define OP_2BYTE		0x80000000
+#define OP_3BYTE66		0x40000000
+#define OP_3BYTEF2		0x20000000
+#define OP_3BYTEF3		0x10000000
 
 static const X86_OPCODE x86_opcode_table[] =
 {
@@ -284,6 +287,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xFD,		OP_I386,					I386OP(std),					I386OP(std),				},
 	{ 0xFE,		OP_I386,					I386OP(groupFE_8),				I386OP(groupFE_8),			},
 	{ 0xFF,		OP_I386,					I386OP(groupFF_16),				I386OP(groupFF_32),			},
+	/* 0F ?? */
 	{ 0x00,		OP_2BYTE|OP_I386,			I386OP(group0F00_16),			I386OP(group0F00_32),		},
 	{ 0x01,		OP_2BYTE|OP_I386,			I386OP(group0F01_16),			I386OP(group0F01_32),		},
 	{ 0x01,		OP_2BYTE|OP_I486,			I486OP(group0F01_16),			I486OP(group0F01_32),		},
@@ -300,10 +304,15 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0x23,		OP_2BYTE|OP_I386,			I386OP(mov_dr_r32),				I386OP(mov_dr_r32),			},
 	{ 0x24,		OP_2BYTE|OP_I386,			I386OP(mov_r32_tr),				I386OP(mov_r32_tr),			},
 	{ 0x26,		OP_2BYTE|OP_I386,			I386OP(mov_tr_r32),				I386OP(mov_tr_r32),			},
+	{ 0x28,		OP_2BYTE|OP_SSE,			SSEOP(movaps_r128_rm128),		SSEOP(movaps_r128_rm128),	},
+	{ 0x29,		OP_2BYTE|OP_SSE,			SSEOP(movaps_rm128_r128),		SSEOP(movaps_rm128_r128),	},
 	{ 0x30,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(wrmsr),				PENTIUMOP(wrmsr),			},
 	{ 0x31,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(rdtsc),				PENTIUMOP(rdtsc),			},
 	{ 0x32,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(rdmsr),				PENTIUMOP(rdmsr),			},
+	{ 0x58,		OP_2BYTE|OP_SSE,			SSEOP(addps),					SSEOP(addps),				},
+	{ 0x59,		OP_2BYTE|OP_SSE,			SSEOP(mulps),					SSEOP(mulps),				},
 	{ 0x74,		OP_2BYTE|OP_CYRIX,			I386OP(cyrix_unknown),			I386OP(cyrix_unknown),		},
+	{ 0x77,		OP_2BYTE|OP_MMX,			MMXOP(emms),					MMXOP(emms),				},
 	{ 0x80,		OP_2BYTE|OP_I386,			I386OP(jo_rel16),				I386OP(jo_rel32),			},
 	{ 0x81,		OP_2BYTE|OP_I386,			I386OP(jno_rel16),				I386OP(jno_rel32),			},
 	{ 0x82,		OP_2BYTE|OP_I386,			I386OP(jc_rel16),				I386OP(jc_rel32),			},
@@ -348,7 +357,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xAB,		OP_2BYTE|OP_I386,			I386OP(bts_rm16_r16),			I386OP(bts_rm32_r32),		},
 	{ 0xAC,		OP_2BYTE|OP_I386,			I386OP(shrd16_i8),				I386OP(shrd32_i8),			},
 	{ 0xAD,		OP_2BYTE|OP_I386,			I386OP(shrd16_cl),				I386OP(shrd32_cl),			},
-	{ 0xAE,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(sse_group0fae),		PENTIUMOP(sse_group0fae),	},
+	{ 0xAE,		OP_2BYTE|OP_SSE,			SSEOP(sse_group0fae),			SSEOP(sse_group0fae),		},
 	{ 0xAF,		OP_2BYTE|OP_I386,			I386OP(imul_r16_rm16),			I386OP(imul_r32_rm32),		},
 	{ 0xB0,		OP_2BYTE|OP_I486,			I486OP(cmpxchg_rm8_r8),			I486OP(cmpxchg_rm8_r8),		},
 	{ 0xB1,		OP_2BYTE|OP_I486,			I486OP(cmpxchg_rm16_r16),		I486OP(cmpxchg_rm32_r32),	},
@@ -366,6 +375,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xBF,		OP_2BYTE|OP_I386,			I386OP(invalid),				I386OP(movsx_r32_rm16),		},
 	{ 0xC0,		OP_2BYTE|OP_I486,			I486OP(xadd_rm8_r8),			I486OP(xadd_rm8_r8),		},
 	{ 0xC1,		OP_2BYTE|OP_I486,			I486OP(xadd_rm16_r16),			I486OP(xadd_rm32_r32),		},
+	{ 0xc6,		OP_2BYTE|OP_SSE,			SSEOP(shufps),					SSEOP(shufps),				},
 	{ 0xC7,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(cmpxchg8b_m64),		PENTIUMOP(cmpxchg8b_m64),	},
 	{ 0xC8,		OP_2BYTE|OP_I486,			I486OP(bswap_eax),				I486OP(bswap_eax),			},
 	{ 0xC9,		OP_2BYTE|OP_I486,			I486OP(bswap_ecx),				I486OP(bswap_ecx),			},
@@ -374,5 +384,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xCC,		OP_2BYTE|OP_I486,			I486OP(bswap_esp),				I486OP(bswap_esp),			},
 	{ 0xCD,		OP_2BYTE|OP_I486,			I486OP(bswap_ebp),				I486OP(bswap_ebp),			},
 	{ 0xCE,		OP_2BYTE|OP_I486,			I486OP(bswap_esi),				I486OP(bswap_esi),			},
-	{ 0xCF,		OP_2BYTE|OP_I486,			I486OP(bswap_edi),				I486OP(bswap_edi),			}
+	{ 0xCF,		OP_2BYTE|OP_I486,			I486OP(bswap_edi),				I486OP(bswap_edi),			},
+	/* F3 0F ?? */
+	{ 0x2C,		OP_3BYTEF3|OP_SSE,			SSEOP(cvttss2si),				SSEOP(cvttss2si),			}
 };

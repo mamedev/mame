@@ -2699,9 +2699,37 @@ static void build_cycle_table(running_machine &machine)
 	}
 }
 
+static void report_invalid_opcode(i386_state *cpustate)
+{
+#ifndef DEBUG_MISSING_OPCODE
+	logerror("i386: Invalid opcode %02X at %08X\n", cpustate->opcode, cpustate->pc - 1);
+#else
+	logerror("i386: Invalid opcode");
+	for (int a = 0; a < cpustate->opcode_bytes_length; a++)
+		logerror(" %02X", cpustate->opcode_bytes[a]);
+	logerror(" at %08X\n", cpustate->opcode_pc);
+#endif
+}
+
+static void report_unimplemented_opcode(i386_state *cpustate)
+{
+#ifndef DEBUG_MISSING_OPCODE
+	fatalerror("i386: Unimplemented opcode %02X at %08X", cpustate->opcode, cpustate->pc - 1 );
+#else
+	astring errmsg;
+	errmsg.cat("i386: Unimplemented opcode ");
+	for (int a = 0; a < cpustate->opcode_bytes_length; a++)
+		errmsg.catprintf(" %02X", cpustate->opcode_bytes[a]);
+	errmsg.catprintf(" at %08X", cpustate->opcode_pc );
+#endif
+}
+
 /* Forward declarations */
 static void I386OP(decode_opcode)(i386_state *cpustate);
 static void I386OP(decode_two_byte)(i386_state *cpustate);
+static void I386OP(decode_three_byte66)(i386_state *cpustate);
+static void I386OP(decode_three_bytef2)(i386_state *cpustate);
+static void I386OP(decode_three_bytef3)(i386_state *cpustate);
 
 
 
@@ -2730,6 +2758,36 @@ static void I386OP(decode_two_byte)(i386_state *cpustate)
 		cpustate->opcode_table2_32[cpustate->opcode](cpustate);
 	else
 		cpustate->opcode_table2_16[cpustate->opcode](cpustate);
+}
+
+/* Three-byte opcode prefix 66 0f */
+static void I386OP(decode_three_byte66)(i386_state *cpustate)
+{
+	cpustate->opcode = FETCH(cpustate);
+	if( cpustate->operand_size )
+		cpustate->opcode_table366_32[cpustate->opcode](cpustate);
+	else
+		cpustate->opcode_table366_16[cpustate->opcode](cpustate);
+}
+
+/* Three-byte opcode prefix f2 0f */
+static void I386OP(decode_three_bytef2)(i386_state *cpustate)
+{
+	cpustate->opcode = FETCH(cpustate);
+	if( cpustate->operand_size )
+		cpustate->opcode_table3f2_32[cpustate->opcode](cpustate);
+	else
+		cpustate->opcode_table3f2_16[cpustate->opcode](cpustate);
+}
+
+/* Three-byte opcode prefix f3 0f */
+static void I386OP(decode_three_bytef3)(i386_state *cpustate)
+{
+	cpustate->opcode = FETCH(cpustate);
+	if( cpustate->operand_size )
+		cpustate->opcode_table3f3_32[cpustate->opcode](cpustate);
+	else
+		cpustate->opcode_table3f3_16[cpustate->opcode](cpustate);
 }
 
 /*************************************************************************/
@@ -2876,6 +2934,7 @@ static CPU_INIT( i386 )
 	device->save_item(NAME(cpustate->ldtr.flags));
 	device->save_item(NAME(cpustate->irq_state));
 	device->save_item(NAME(cpustate->performed_intersegment_jump));
+	device->save_item(NAME(cpustate->mxcsr));
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(i386_postload), cpustate));
 }
 
@@ -2888,6 +2947,12 @@ static void build_opcode_table(i386_state *cpustate, UINT32 features)
 		cpustate->opcode_table1_32[i] = I386OP(invalid);
 		cpustate->opcode_table2_16[i] = I386OP(invalid);
 		cpustate->opcode_table2_32[i] = I386OP(invalid);
+		cpustate->opcode_table366_16[i] = I386OP(invalid);
+		cpustate->opcode_table366_32[i] = I386OP(invalid);
+		cpustate->opcode_table3f2_16[i] = I386OP(invalid);
+		cpustate->opcode_table3f2_32[i] = I386OP(invalid);
+		cpustate->opcode_table3f3_16[i] = I386OP(invalid);
+		cpustate->opcode_table3f3_32[i] = I386OP(invalid);
 	}
 
 	for (i=0; i < sizeof(x86_opcode_table)/sizeof(X86_OPCODE); i++)
@@ -2900,6 +2965,23 @@ static void build_opcode_table(i386_state *cpustate, UINT32 features)
 			{
 				cpustate->opcode_table2_32[op->opcode] = op->handler32;
 				cpustate->opcode_table2_16[op->opcode] = op->handler16;
+				cpustate->opcode_table366_32[op->opcode] = op->handler32;
+				cpustate->opcode_table366_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_3BYTE66)
+			{
+				cpustate->opcode_table366_32[op->opcode] = op->handler32;
+				cpustate->opcode_table366_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_3BYTEF2)
+			{
+				cpustate->opcode_table3f2_32[op->opcode] = op->handler32;
+				cpustate->opcode_table3f2_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_3BYTEF3)
+			{
+				cpustate->opcode_table3f3_32[op->opcode] = op->handler32;
+				cpustate->opcode_table3f3_16[op->opcode] = op->handler16;
 			}
 			else
 			{
@@ -3026,6 +3108,10 @@ static CPU_EXECUTE( i386 )
 			cpustate->IF = 1;
 			cpustate->delayed_interrupt_enable = 0;
 		}
+#ifdef DEBUG_MISSING_OPCODE
+		cpustate->opcode_bytes_length = 0;
+		cpustate->opcode_pc = cpustate->pc;
+#endif
 		try
 		{
 			I386OP(decode_opcode)(cpustate);
@@ -3531,10 +3617,11 @@ static CPU_RESET( pentium )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0x00000010;
+	cpustate->cr[0] = 0x60000010;
 	cpustate->eflags = 0x00200000;
 	cpustate->eflags_mask = 0x003f7fd7;
 	cpustate->eip = 0xfff0;
+	cpustate->mxcsr = 0x1f80;
 
 	x87_reset(cpustate);
 
@@ -3545,7 +3632,7 @@ static CPU_RESET( pentium )
 	REG32(EAX) = 0;
 	REG32(EDX) = (5 << 8) | (2 << 4) | (5);
 
-	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_MMX | OP_SSE);
 	build_x87_opcode_table(get_safe_token(device));
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];
 	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];

@@ -380,7 +380,7 @@ static floatx80 x87_sub(i386_state *cpustate, floatx80 a, floatx80 b)
 		{
 			float64 a64 = floatx80_to_float64(a);
 			float64 b64 = floatx80_to_float64(b);
-			result = float64_to_floatx80(float32_sub(a64, b64));
+			result = float64_to_floatx80(float64_sub(a64, b64));
 			break;
 		}
 		case X87_CW_PC_EXTEND:

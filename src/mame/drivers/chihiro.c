@@ -368,6 +368,8 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "machine/naomigd.h"
+#include "video/polynew.h"
+#include "bitmap.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
@@ -375,12 +377,230 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #define LOG_PCI
 #define LOG_OHCI
 
-static struct {
-	device_t	*pic8259_1;
-	device_t	*pic8259_2;
-	device_t	*ide;
-} chihiro_devices;
+class nv2a_renderer; // forw. dec.
+struct nvidia_object_data
+{
+	nv2a_renderer *data;
+};
 
+class chihiro_state : public driver_device
+{
+public:
+	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)	{ }
+
+	DECLARE_READ32_MEMBER( geforce_r );
+	DECLARE_WRITE32_MEMBER( geforce_w );
+	DECLARE_READ32_MEMBER( usbctrl_r );
+	DECLARE_WRITE32_MEMBER( usbctrl_w );
+	DECLARE_READ32_MEMBER( ide_r );
+	DECLARE_WRITE32_MEMBER( ide_w );
+	DECLARE_READ32_MEMBER( smbus_r );
+	DECLARE_WRITE32_MEMBER( smbus_w );
+	DECLARE_READ32_MEMBER( dummy_r );
+	DECLARE_WRITE32_MEMBER( dummy_w );
+
+	void smbus_register_device(int address,int (*handler)(chihiro_state &chs,int command,int rw,int data));
+	int smbus_pic16lc(int command,int rw,int data);
+	int smbus_cx25871(int command,int rw,int data);
+	int smbus_eeprom(int command,int rw,int data);
+	
+	void vblank_callback(screen_device &screen, bool state);
+	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	struct chihiro_devices {
+		device_t	*pic8259_1;
+		device_t	*pic8259_2;
+		device_t	*ide;
+	} chihiro_devs;
+
+	nv2a_renderer *nvidia_nv2a;
+};
+
+/*
+ * geforce 3d (NV2A) accelkerator
+ */
+/* very simplified view
+there is a set a set of context objects
+
+context objects are stored in RAMIN
+each context object is identified by an handle stored in RAMHT
+
+each context object can be assigned to a channel
+to assign you give to the channel an handle for the object
+
+offset in ramht=(((((handle >> 11) xor handle) >> 11) xor handle) & 0x7ff)*8
+offset in ramht contains the handle itself
+offset in ramht+4 contains in the lower 16 bits the offset in RAMIN divided by 16
+
+objects have methods used to do drawing
+most methods set parameters, others actually draw
+*/
+class nv2a_renderer : public poly_manager<float, nvidia_object_data, 5, 6000>
+{
+public:
+	nv2a_renderer(running_machine &machine)	: poly_manager<float, nvidia_object_data, 5, 6000>(machine) 
+	{ 
+		memset(channel,0,sizeof(channel));
+		memset(pfifo,0,sizeof(pfifo));
+		memset(pcrtc,0,sizeof(pcrtc));
+		memset(pmc,0,sizeof(pmc));
+		memset(ramin,0,sizeof(ramin));
+		computedilated();
+		video_memory=(UINT32 *)machine.firstcpu->space()->get_read_ptr(0xf0000000);
+		fb.allocate(640,480);
+		objectdata=&(object_data_alloc());
+		objectdata->data=this;
+	}
+	DECLARE_READ32_MEMBER( geforce_r );
+	DECLARE_WRITE32_MEMBER( geforce_w );
+	void vblank_callback(screen_device &screen, bool state);
+	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void render_tex(INT32 scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
+
+	int geforce_commandkind(UINT32 word);
+	UINT32 geforce_object_offset(UINT32 handle);
+	void geforce_read_dma_object(UINT32 handle,UINT32 &offset,UINT32 &size);
+	void geforce_exec_method(address_space &space,UINT32 channel,UINT32 subchannel,UINT32 method,UINT32 data);
+	UINT32 dilate0(UINT32 value,int bits);
+	UINT32 dilate1(UINT32 value,int bits);
+	void computedilated(void);
+	void putpixtex(int xp,int yp,int up,int vp);
+
+	UINT32 *video_memory;
+	struct {
+		UINT32 regs[0x80/4];
+		struct {
+			UINT32 objhandle;
+			UINT32 objclass;
+			UINT32 method[0x2000/4];
+		} object;
+	} channel[32][8];
+	UINT32 pfifo[0x2000/4];
+	UINT32 pcrtc[0x1000/4];
+	UINT32 pmc[0x1000/4];
+	UINT32 ramin[0x100000/4];
+	struct {
+		int enabled;
+		int sizeu;
+		int sizev;
+		int sizew;
+		int dilate;
+		void *buffer;
+	} texture;
+	bitmap_rgb32 fb;
+	UINT32 dilated0[16][2048];
+	UINT32 dilated1[16][2048];
+	int dilatechose[256];
+	nvidia_object_data *objectdata;
+
+	enum NV2A_BEGIN_END {
+		STOP=0,
+		POINTS=1,
+		LINES=2,
+		LINE_LOOP=3,
+		LINE_STRIP=4,
+		TRIANGLES=5,
+		TRIANGLE_STRIP=6,
+		TRIANGLE_FAN=7,
+		QUADS=8,
+		QUAD_STRIP=9,
+		POLYGON=10
+	};
+	enum NV2A_VERTEX_ATTR {
+		POS=0,
+		WEIGHT=1,
+		NORMAL=2,
+		COLOR0=3,
+		COLOR1=4,
+		FOG=5,
+		TEX0=9,
+		TEX1=10,
+		TEX2=11,
+		TEX3=12
+	};
+	enum NV2A_TEX_FORMAT {
+		L8=0x0,
+		I8=0x1,
+		A1R5G5B5=0x2,
+		A4R4G4B4=0x4,
+		R5G6B5=0x5,
+		A8R8G8B8=0x6,
+		X8R8G8B8=0x7,
+		INDEX8=0xb,
+		DXT1=0xc,
+		DXT3=0xe,
+		DXT5=0xf,
+		A1R5G5B5_RECT=0x10,
+		R5G6B5_RECT=0x11,
+		A8R8G8B8_RECT=0x12,
+		L8_RECT=0x13,
+		DSDT8_RECT=0x17,
+		A8L8=0x1a,
+		I8_RECT=0x1b,
+		A4R4G4B4_RECT=0x1d,
+		R8G8B8_RECT=0x1e,
+		A8L8_RECT=0x20,
+		Z24=0x2a,
+		Z24_RECT=0x2b,
+		Z16=0x2c,
+		Z16_RECT=0x2d,
+		DSDT8=0x28,
+		HILO16=0x33,
+		HILO16_RECT=0x36,
+		HILO8=0x44,
+		SIGNED_HILO8=0x45,
+		HILO8_RECT=0x46,
+		SIGNED_HILO8_RECT=0x47
+	};
+};
+
+UINT32 nv2a_renderer::dilate0(UINT32 value,int bits) // dilate first "bits" bits in "value"
+{
+	UINT32 x,m1,m2,m3;
+	int a;
+
+	x = value;
+	for (a=0;a < bits;a++)
+	{
+		m2 = 1 << (a << 1);
+		m1 = m2 - 1;
+		m3 = (~m1) << 1;
+		x = (x & m1) + (x & m2) + ((x & m3) << 1);
+	}
+	return x;
+}
+
+UINT32 nv2a_renderer::dilate1(UINT32 value,int bits) // dilate first "bits" bits in "value"
+{
+	UINT32 x,m1,m2,m3;
+	int a;
+
+	x = value;
+	for (a=0;a < bits;a++)
+	{
+		m2 = 1 << (a << 1);
+		m1 = m2 - 1;
+		m3 = (~m1) << 1;
+		x = (x & m1) + ((x & m2) << 1) + ((x & m3) << 1);
+	}
+	return x;
+}
+
+void nv2a_renderer::computedilated(void)
+{
+	int a,b;
+
+	for (b=0;b < 16;b++)
+		for (a=0;a < 2048;a++) {
+			dilated0[b][a]=dilate0(a,b);
+			dilated1[b][a]=dilate1(a,b);
+		}
+	for (b=0;b < 16;b++)
+		for (a=0;a < 16;a++)
+			dilatechose[(b << 4) + a]=(a < b ? a : b);
+}
 
 /* jamtable instructions for Chihiro (different from console)
 St.     Instr.       Comment
@@ -646,11 +866,273 @@ static void chihiro_debug_commands(running_machine &machine, int ref, int params
 		help_command(machine,ref,params-1,param+1);
 }
 
-/*
- * geforce 3d placeholder
- */
+int nv2a_renderer::geforce_commandkind(UINT32 word)
+{
+	if ((word & 0x00000003) == 0x00000002)
+		return 7; // call
+	if ((word & 0x00000003) == 0x00000001)
+		return 6; // jump
+	if ((word & 0xE0030003) == 0x40000000)
+		return 5; // non increasing
+	if ((word & 0xE0000003) == 0x20000000)
+		return 4; // old jump
+	if ((word & 0xFFFF0003) == 0x00030000)
+		return 3; // long non icreasing
+	if ((word & 0xFFFFFFFF) == 0x00020000)
+		return 2; // return
+	if ((word & 0xFFFF0003) == 0x00010000)
+		return 1; // sli conditional
+	if ((word & 0xE0030003) == 0x00000000)
+		return 0; // increasing
+	return -1;
+}
 
-static READ32_HANDLER( geforce_r )
+UINT32 nv2a_renderer::geforce_object_offset(UINT32 handle)
+{
+	UINT32 h=((((handle >> 11) ^ handle) >> 11) ^ handle) & 0x7ff;
+	UINT32 o=(pfifo[0x210/4] & 0x1f) << 8; // or 12 ?
+	UINT32 e=o+h*8; // at 0xfd000000+0x00700000
+	UINT32 w;
+	if (ramin[e/4] != handle)
+		e=0;
+	w=ramin[e/4+1];
+	return (w & 0xffff)*0x10;
+}
+
+void nv2a_renderer::geforce_read_dma_object(UINT32 handle,UINT32 &offset,UINT32 &size)
+{
+	UINT32 objclass,pt_present,pt_linear,access,target,dma_adjust,dma_frame,rorw;
+	UINT32 o=geforce_object_offset(handle);
+
+	o=o/4;
+	objclass=ramin[o] & 0xfff;
+	pt_present=(ramin[o] >> 12) & 1;
+	pt_linear=(ramin[o] >> 13) & 1;
+	access=(ramin[o] >> 14) & 3;
+	target=(ramin[o] >> 16) & 3;
+	dma_adjust=(ramin[o] >> 20) & 0xfff;
+	size=ramin[o+1];
+	rorw=ramin[o+2] & 1;
+	dma_frame=ramin[o+2] & 0xfffff000;
+	offset=dma_frame+dma_adjust;
+}
+
+/*void myline(bitmap_rgb32 &bmp,float x1,float y1,float x2,float y2)
+{
+	int xx1,yy1,xx2,yy2;
+
+	xx1=x1;
+	xx2=x2;
+	yy1=y1;
+	yy2=y2;
+	if (xx1 == xx2) {
+		if (yy1 > yy2) {
+			int t=yy1;
+			yy1=yy2;
+			yy2=t;
+		}
+		for (int y=yy1;y <= yy2;y++)
+			*((UINT32 *)bmp.raw_pixptr(y,xx1))= -1;
+	} else if (yy1 == yy2) {
+		if (xx1 > xx2) {
+			int t=xx1;
+			xx1=xx2;
+			xx2=t;
+		}
+		for (int x=xx1;x <= xx2;x++)
+			*((UINT32 *)bmp.raw_pixptr(yy1,x))= -1;
+	}
+}*/
+
+void nv2a_renderer::render_tex(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
+{
+	int x;
+
+	x=extent.stopx-extent.startx;
+	while (x >= 0) {
+		int to;
+		UINT32 a8r8g8b8,a4r4g4b4;
+		int up,vp;
+		int xp=extent.startx+x;
+		if (objectdata.data->texture.enabled) {
+			up=(extent.param[3].start+(float)x*extent.param[3].dpdx)*(float)(objectdata.data->texture.sizeu-1);
+			vp=extent.param[4].start*(float)(objectdata.data->texture.sizev-1);
+			to=(objectdata.data->dilated0[objectdata.data->texture.dilate][up]+objectdata.data->dilated1[objectdata.data->texture.dilate][vp]);
+			a4r4g4b4=*(((UINT16 *)objectdata.data->texture.buffer)+to);
+			a8r8g8b8=((a4r4g4b4 & 0xf) << 4)+((a4r4g4b4 & 0xf0) << 8)+((a4r4g4b4 & 0xf00) << 12);
+			*((UINT32 *)objectdata.data->fb.raw_pixptr(scanline,xp))=a8r8g8b8;
+		} else {
+		}
+		x--;
+	}
+}
+
+void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT32 subchannel,UINT32 method,UINT32 data)
+{
+	channel[chanel][subchannel].object.method[method]=data;
+	if ((method*4 == 0x1d6c) || (method*4 == 0x1d70) || (method*4 == 0x1a4))
+		method=method+0;
+	if (method*4 == 0x1d70) {
+		// with 1d70 write the value at offest [1d6c] inside dma object [1a4]
+		UINT32 offset,base;
+		UINT32 dmahand,dmaoff,smasiz;
+
+		offset=channel[chanel][subchannel].object.method[0x1d6c/4];
+		dmahand=channel[chanel][subchannel].object.method[0x1a4/4];
+		geforce_read_dma_object(dmahand,dmaoff,smasiz);
+		base=dmaoff;
+		space.write_dword(base+offset,data);
+	}
+	if (method*4 == 0x1d94) {
+		// clear framebuffer
+		UINT32 color=channel[chanel][subchannel].object.method[0x1d90/4];
+		fb.fill(color & 0xffffff);
+	}
+	if (method*4 == 0x1b0c) {
+		// enable texture
+		int enable,dma0,dma1,cubic,noborder,dims,format,mipmap;
+		int basesizeu,basesizev,basesizew;
+		UINT32 offset;//,base;
+		//UINT32 dmahand,dmaoff,dmasiz;
+		UINT32 tmp;
+
+		enable=(data >> 30) & 1;
+		offset=channel[chanel][subchannel].object.method[0x1b00/4];
+		tmp=channel[chanel][subchannel].object.method[0x1b04/4];
+		dma0=(tmp >> 0) & 1;
+		dma1=(tmp >> 1) & 1;
+		cubic=(tmp >> 2) & 1;
+		noborder=(tmp >> 3) & 1;
+		dims=(tmp >> 4) & 15;
+		format=(tmp >> 8) & 255;
+		mipmap=(tmp >> 19) & 1;
+		basesizeu=(tmp >> 20) & 15;
+		basesizev=(tmp >> 24) & 15;
+		basesizew=(tmp >> 28) & 15;
+		texture.enabled=enable;
+		texture.sizeu=1 << basesizeu;
+		texture.sizev=1 << basesizev;
+		texture.sizew=1 << basesizew;
+		texture.dilate=dilatechose[(basesizeu << 4)+basesizev];
+		texture.buffer=space.get_read_ptr(offset);
+		/*if (dma0 != 0) {
+			dmahand=channel[channel][subchannel].object.method[0x184/4];
+			geforce_read_dma_object(dmahand,dmaoff,smasiz);
+		} else if (dma1 != 0) {
+			dmahand=channel[channel][subchannel].object.method[0x188/4];
+			geforce_read_dma_object(dmahand,dmaoff,smasiz);
+		}*/
+	}
+	if (method*4 == 0x1810) {
+		// draw vertices
+		int offset,count,type;
+		int vtxbuf_kind[16],vtxbuf_size[16],vtxbuf_stride[16];
+		UINT32 vtxbuf_address[16];
+		UINT32 dmahand[2],dmaoff[2],smasiz[2];
+		UINT32 tmp,n,m;
+
+		offset=data & 0xffffff;
+		count=(data >> 24) & 0xff;
+		type=channel[chanel][subchannel].object.method[0x17fc/4];
+		tmp=channel[chanel][subchannel].object.method[0x1720/4];
+		dmahand[0]=channel[chanel][subchannel].object.method[0x019c/4];
+		dmahand[1]=channel[chanel][subchannel].object.method[0x01a0/4];
+		geforce_read_dma_object(dmahand[0],dmaoff[0],smasiz[0]);
+		geforce_read_dma_object(dmahand[1],dmaoff[1],smasiz[1]);
+		//printf("vertex %d %d %d\n\r",type,offset,count);
+		for (n=0;n<16;n++) {
+			//printf(" %08X %08X\n\r",channel[chanel][subchannel].object.method[0x1720/4+n],channel[chanel][subchannel].object.method[0x1760/4+n]);
+			tmp=channel[chanel][subchannel].object.method[0x1760/4+n];
+			vtxbuf_kind[n]=tmp & 15;
+			vtxbuf_size[n]=(tmp >> 4) & 15;
+			vtxbuf_stride[n]=(tmp >> 8) & 255;
+			tmp=channel[chanel][subchannel].object.method[0x1720/4+n];
+			if (tmp & 0x80000000)
+				vtxbuf_address[n]=(tmp & 0x0fffffff)+dmaoff[1];
+			else
+				vtxbuf_address[n]=(tmp & 0x0fffffff)+dmaoff[0];
+		}
+		if (type == nv2a_renderer::QUADS) {
+			for (n=0;n <= count;n+=4) {
+				vertex_t xy[4];
+				float z[4],w[4];
+				UINT32 c[4];
+				/*float u[4],v[4];
+				int   xi,yi,xf,yf,dx,dy,xp,yp,up,vp;
+				float ui,vi,uf,vf,du,dv;
+				rectangle clip(0,0,639,479);*/
+				render_delegate rend;
+
+				for (m=0;m < 4;m++) {
+					*((UINT32 *)(&xy[m].x))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+0);
+					*((UINT32 *)(&xy[m].y))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+4);
+					*((UINT32 *)(&z[m]))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+8);
+					*((UINT32 *)(&w[m]))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+12);
+					c[m]=space.read_dword(vtxbuf_address[3]+(n+m+offset)*vtxbuf_stride[0]+0); // color
+					xy[m].p[0]=c[m] & 0xff;
+					xy[m].p[1]=(c[m] & 0xff00) >> 8;
+					xy[m].p[2]=(c[m] & 0xff000) >> 16;
+					if (texture.enabled) {
+						*((UINT32 *)(&xy[m].p[3]))=space.read_dword(vtxbuf_address[9]+(n+m+offset)*vtxbuf_stride[9]+0);
+						*((UINT32 *)(&xy[m].p[4]))=space.read_dword(vtxbuf_address[9]+(n+m+offset)*vtxbuf_stride[9]+4);
+					}
+				}
+				
+				rend=render_delegate(FUNC(nv2a_renderer::render_tex),this);
+				render_polygon<4>(fb.cliprect(),rend,3+texture.enabled*2,xy);
+				wait();
+				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
+				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
+				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
+				myline(fb,xy[3].x,xy[3].y,xy[0].x,xy[0].y);*/
+				//printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r",x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2],x[3],y[3],z[3]);
+			}
+		} else {
+			type=type+0;
+		}
+	}
+}
+
+void nv2a_renderer::vblank_callback(screen_device &screen, bool state) 
+{
+	chihiro_state *chst=screen.machine().driver_data<chihiro_state>();
+
+	printf("vblank_callback\n\r");
+	if (state == true)
+		pcrtc[0x100/4] |= 1;
+	else
+		pcrtc[0x100/4] &= ~1;
+	if (pcrtc[0x100/4] & pcrtc[0x140/4])
+		pmc[0x100/4] |= 0x1000000;
+	else
+		pmc[0x100/4] &= ~0x1000000;
+	if ((pmc[0x100/4] != 0) && (pmc[0x140/4] != 0)) {
+		// send interrupt
+		pic8259_ir3_w(chst->chihiro_devs.pic8259_1, 1); // IRQ 3
+	} else
+		pic8259_ir3_w(chst->chihiro_devs.pic8259_1, 0); // IRQ 3
+}
+
+UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT32 *dst=(UINT32 *)bitmap.raw_pixptr(0,0);
+	UINT32 *src=(UINT32 *)fb.raw_pixptr(0,0);
+
+	memcpy(dst,src,bitmap.rowbytes()*bitmap.height());
+	return 0;
+}
+
+void chihiro_state::vblank_callback(screen_device &screen, bool state) 
+{
+	nvidia_nv2a->vblank_callback(screen,state);
+}
+
+UINT32 chihiro_state::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return nvidia_nv2a->screen_update_callback(screen, bitmap, cliprect);
+}
+
+READ32_MEMBER( nv2a_renderer::geforce_r )
 {
 static int x,ret;
 
@@ -659,13 +1141,177 @@ static int x,ret;
 		x = x ^ 0x08080808;
 		ret=x;
 	}
-	logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
+	if ((offset >= 0x00101000/4) && (offset < 0x00102000/4)) {
+		logerror("NV_2A: read STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
+	} else if ((offset >= 0x00002000/4) && (offset < 0x00004000/4)) {
+		ret=pfifo[offset-0x00002000/4];
+		// PFIFO.CACHE1.STATUS or PFIFO.RUNOUT_STATUS
+		if ((offset == 0x3214/4) || (offset == 0x2400/4))
+			ret=0x10;
+		logerror("NV_2A: read PFIFO[%06X] value %08X\n",offset*4-0x00002000,ret);
+	} else if ((offset >= 0x00700000/4) && (offset < 0x00800000/4)) {
+		ret=ramin[offset-0x00700000/4];
+		logerror("NV_2A: read PRAMIN[%06X] value %08X\n",offset*4-0x00700000,ret);
+	} else if ((offset >= 0x00400000/4) && (offset < 0x00402000/4)) {
+		logerror("NV_2A: read PGRAPH[%06X] value %08X\n",offset*4-0x00400000,ret);
+	} else if ((offset >= 0x00600000/4) && (offset < 0x00601000/4)) {
+		ret=pcrtc[offset-0x00600000/4];
+		logerror("NV_2A: read PCRTC[%06X] value %08X\n",offset*4-0x00600000,ret);
+	} else if ((offset >= 0x00000000/4) && (offset < 0x00001000/4)) {
+		ret=pmc[offset-0x00000000/4];
+		logerror("NV_2A: read PMC[%06X] value %08X\n",offset*4-0x00000000,ret);
+	} else if ((offset >= 0x00800000/4) && (offset < 0x00900000/4)) {
+		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
+		int chanel,subchannel,suboffset;
+
+		suboffset=offset-0x00800000/4;
+		chanel=(suboffset >> (16-2)) & 31;
+		subchannel=(suboffset >> (13-2)) & 7;
+		suboffset=suboffset & 0x7ff;
+		if (suboffset < 0x80/4)
+			ret=channel[chanel][subchannel].regs[suboffset];
+		logerror("NV_2A: read channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,ret);
+		return ret;
+	} else
+		logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
 	return ret;
 }
 
-static WRITE32_HANDLER( geforce_w )
+WRITE32_MEMBER( nv2a_renderer::geforce_w )
 {
-	logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
+	if ((offset >= 0x00101000/4) && (offset < 0x00102000/4)) {
+		logerror("NV_2A: write STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,data);
+	} else if ((offset >= 0x00002000/4) && (offset < 0x00004000/4)) {
+		COMBINE_DATA(pfifo+offset-0x00002000/4);
+		logerror("NV_2A: read PFIFO[%06X]=%08X\n",offset*4-0x00002000,data & mem_mask); // 2210 pfifo ramht & 1f0 << 12
+	} else if ((offset >= 0x00700000/4) && (offset < 0x00800000/4)) {
+		COMBINE_DATA(ramin+offset-0x00700000/4);
+		logerror("NV_2A: write PRAMIN[%06X]=%08X\n",offset*4-0x00700000,data & mem_mask);
+	} else if ((offset >= 0x00400000/4) && (offset < 0x00402000/4)) {
+		logerror("NV_2A: write PGRAPH[%06X]=%08X\n",offset*4-0x00400000,data & mem_mask);
+	} else if ((offset >= 0x00600000/4) && (offset < 0x00601000/4)) {
+		COMBINE_DATA(pcrtc+offset-0x00600000/4);
+		logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
+	} else if ((offset >= 0x00000000/4) && (offset < 0x00001000/4)) {
+		COMBINE_DATA(pmc+offset-0x00000000/4);
+		logerror("NV_2A: write PMC[%06X]=%08X\n",offset*4-0x00000000,data & mem_mask);
+	} else if ((offset >= 0x00800000/4) && (offset < 0x00900000/4)) {
+		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
+		int chanel,subchannel,suboffset;
+		int method,subch,count,handle,objclass;
+
+		suboffset=offset-0x00800000/4;
+		chanel=(suboffset >> (16-2)) & 31;
+		subchannel=(suboffset >> (13-2)) & 7;
+		suboffset=suboffset & 0x7ff;
+		logerror("NV_2A: write channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,data & mem_mask);
+		if (suboffset >= 0x80/4)
+			return;
+		COMBINE_DATA(&channel[chanel][subchannel].regs[suboffset]);
+		if ((suboffset == 0x40/4) || (suboffset == 0x44/4)) { // DMA_PUT or DMA_GET
+			UINT32 *dmaput,*dmaget;
+			UINT32 cmd,cmdtype;
+
+			dmaput=&channel[chanel][subchannel].regs[0x40/4];
+			dmaget=&channel[chanel][subchannel].regs[0x44/4];
+			printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput); // 7fcbe08 7f4d018
+			while (*dmaget != *dmaput) {
+				cmd=space.read_dword(*dmaget);
+				*dmaget += 4;
+				cmdtype=geforce_commandkind(cmd);
+				switch (cmdtype) 
+				{
+					case 6: // jump
+						printf("jump dmaget %08X",*dmaget);
+						*dmaget=cmd & 0xfffffffc;
+						printf(" -> %08X\n\r",*dmaget);
+						break;
+					case 0: // increasing method
+						method=(cmd >> 2) & 2047; // method*4 is address // if method >= 0x40 send it to assigned object
+						subch=(cmd >> 13) & 7;
+						count=(cmd >> 18) & 2047;
+						if ((method == 0) && (count == 1)) {
+							handle=space.read_dword(*dmaget);
+							handle=geforce_object_offset(handle);
+							logerror("  assign to subchannel %d object at %d\n",subch,handle);
+							channel[chanel][subchannel].object.objhandle=handle;
+							handle=ramin[handle/4];
+							objclass=handle & 0xff;
+							channel[chanel][subchannel].object.objclass=objclass;
+							*dmaget += 4;
+						} else {
+							logerror("  subch. %d method %04x offset %04x count %d\n",subch,method,method*4,count);
+							while (count > 0) {
+								geforce_exec_method(space,chanel,subchannel,method,space.read_dword(*dmaget));
+								count--;
+								method++;
+								*dmaget += 4;
+							}
+						}
+						break;
+					case 5: // non-increasing method
+						method=(cmd >> 2) & 2047;
+						subch=(cmd >> 13) & 7;
+						count=(cmd >> 18) & 2047;
+						if ((method == 0) && (count == 1)) {
+							logerror("  assign channel %d\n",subch);
+							handle=space.read_dword(*dmaget);
+							handle=geforce_object_offset(handle);
+							logerror("  assign to subchannel %d object at %d\n",subch,handle);
+							channel[chanel][subchannel].object.objhandle=handle;
+							handle=ramin[handle/4];
+							objclass=handle & 0xff;
+							channel[chanel][subchannel].object.objclass=objclass;
+							*dmaget += 4;
+						} else {
+							logerror("  subch. %d method %04x offset %04x count %d\n",subch,method,method*4,count);
+							while (count > 0) {
+								geforce_exec_method(space,chanel,subchannel,method,space.read_dword(*dmaget));
+								count--;
+								*dmaget += 4;
+							}
+						}
+						break;
+					case 3: // long non-increasing method
+						method=(cmd >> 2) & 2047;
+						subch=(cmd >> 13) & 7;
+						count=space.read_dword(*dmaget);
+						*dmaget += 4;
+						if ((method == 0) && (count == 1)) {
+							handle=space.read_dword(*dmaget);
+							handle=geforce_object_offset(handle);
+							logerror("  assign to subchannel %d object at %d\n",subch,handle);
+							channel[chanel][subchannel].object.objhandle=handle;
+							handle=ramin[handle/4];
+							objclass=handle & 0xff;
+							channel[chanel][subchannel].object.objclass=objclass;
+							*dmaget += 4;
+						} else {
+							logerror("  subch. %d method %04x offset %04x count %d\n",subch,method,method*4,count);
+							while (count > 0) {
+								geforce_exec_method(space,chanel,subchannel,method,space.read_dword(*dmaget));
+								count--;
+								*dmaget += 4;
+							}
+						}
+						break;
+					default:
+						logerror("  unimplemented command %08X\n",cmd);
+				}
+			}
+		}
+	} else
+		logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
+}
+
+READ32_MEMBER( chihiro_state::geforce_r )
+{
+	return nvidia_nv2a->geforce_r(space,offset,mem_mask);
+}
+
+WRITE32_MEMBER( chihiro_state::geforce_w )
+{
+	nvidia_nv2a->geforce_w(space,offset,data,mem_mask);
 }
 
 static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -712,11 +1358,11 @@ static const char *const usbregnames[]={
 	"HcRhPortStatus[1]"
 };
 
-static READ32_HANDLER( usbctrl_r )
+READ32_MEMBER( chihiro_state::usbctrl_r )
 {
 	if (offset == 0) { /* hack needed until usb (and jvs) is implemented */
-		chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a79f,0x01);
-		chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a7a0,0x00);
+		chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a79f,0x01);
+		chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a7a0,0x00);
 	}
 #ifdef LOG_OHCI
 	if (offset >= 0x54/4)
@@ -727,7 +1373,7 @@ static READ32_HANDLER( usbctrl_r )
 	return 0;
 }
 
-static WRITE32_HANDLER( usbctrl_w )
+WRITE32_MEMBER( chihiro_state::usbctrl_w )
 {
 #ifdef LOG_OHCI
 	if (offset >= 0x54/4)
@@ -756,12 +1402,12 @@ static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int
 #endif
 }
 
-static READ32_HANDLER( dummy_r )
+READ32_MEMBER( chihiro_state::dummy_r )
 {
 	return 0;
 }
 
-static WRITE32_HANDLER( dummy_w )
+WRITE32_MEMBER( chihiro_state::dummy_w )
 {
 }
 
@@ -798,17 +1444,17 @@ INLINE int convert_to_offset_and_size32(offs_t *offset, UINT32 mem_mask)
 	return size;
 }
 
-static READ32_HANDLER( ide_r )
+READ32_MEMBER( chihiro_state::ide_r )
 {
 	int size;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	return ide_controller_r(chihiro_devices.ide, offset+0x01f0, size) << ((offset & 3) * 8);
+	return ide_controller_r(chihiro_devs.ide, offset+0x01f0, size) << ((offset & 3) * 8);
 }
 
-static WRITE32_HANDLER( ide_w )
+WRITE32_MEMBER( chihiro_state::ide_w )
 {
 	int size;
 
@@ -816,12 +1462,13 @@ static WRITE32_HANDLER( ide_w )
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 	data = data >> ((offset & 3) * 8);
 
-	ide_controller_w(chihiro_devices.ide, offset+0x01f0, size, data);
+	ide_controller_w(chihiro_devs.ide, offset+0x01f0, size, data);
 }
 
 static void ide_interrupt(device_t *device, int state)
 {
-	pic8259_ir6_w(chihiro_devices.pic8259_2, state); // IRQ 14
+	chihiro_state *chst=device->machine().driver_data<chihiro_state>();
+	pic8259_ir6_w(chst->chihiro_devs.pic8259_2, state); // IRQ 14
 }
 
 // ======================> ide_baseboard_device
@@ -890,6 +1537,7 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	memcpy(buffer,data+off,512);
 	return 1;
 }
+
 int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
 {
 	logerror("baseboard: write sector lba %08x\n",lba);
@@ -907,8 +1555,9 @@ static WRITE_LINE_DEVICE_HANDLER( chihiro_pic8259_1_set_int_line )
 
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
+	chihiro_state *chst=device->machine().driver_data<chihiro_state>();
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(chihiro_devices.pic8259_2);
+		return pic8259_acknowledge(chst->chihiro_devs.pic8259_2);
 	}
 	return 0x00;
 }
@@ -929,11 +1578,12 @@ static const struct pic8259_interface chihiro_pic8259_2_config =
 
 static IRQ_CALLBACK(irq_callback)
 {
+	chihiro_state *chst=device->machine().driver_data<chihiro_state>();
 	int r = 0;
-	r = pic8259_acknowledge(chihiro_devices.pic8259_2);
+	r = pic8259_acknowledge(chst->chihiro_devs.pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge( chihiro_devices.pic8259_1);
+		r = pic8259_acknowledge(chst->chihiro_devs.pic8259_1);
 	}
 	return r;
 }
@@ -976,7 +1626,12 @@ static const struct pit8253_config chihiro_pit8254_config =
 
 static UINT8 pic16lc_buffer[0xff];
 
-int smbus_pic16lc(int command,int rw,int data)
+int smbus_callback_pic16lc(chihiro_state &chs,int command,int rw,int data)
+{
+	return chs.smbus_pic16lc(command, rw, data);
+}
+
+int chihiro_state::smbus_pic16lc(int command,int rw,int data)
 {
 	if (rw == 1) { // read
 		if (command == 0) {
@@ -998,7 +1653,12 @@ int smbus_pic16lc(int command,int rw,int data)
 	return 0;
 }
 
-int smbus_cx25871(int command,int rw,int data)
+int smbus_callback_cx25871(chihiro_state &chs,int command,int rw,int data)
+{
+	return chs.smbus_cx25871(command, rw, data);
+}
+
+int chihiro_state::smbus_cx25871(int command,int rw,int data)
 {
 	logerror("cx25871: %d %d %d\n",command,rw,data);
 	return 0;
@@ -1011,7 +1671,12 @@ static int dummyeeprom[256]={0x94,0x18,0x10,0x59,0x83,0x58,0x15,0xDA,0xDF,0xCC,0
 	0x4F,0x6E,0x6C,0x69,0x6E,0x65,0x6B,0x65,0x79,0x69,0x6E,0x76,0x61,0x6C,0x69,0x64,0x00,0x03,0x80,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,
 	0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-int smbus_eeprom(int command,int rw,int data)
+int smbus_callback_eeprom(chihiro_state &chs,int command,int rw,int data)
+{
+	return chs.smbus_eeprom(command, rw, data);
+}
+
+int chihiro_state::smbus_eeprom(int command,int rw,int data)
 {
 	if (command >= 112)
 		return 0;
@@ -1020,10 +1685,10 @@ int smbus_eeprom(int command,int rw,int data)
 		// hack to avoid hanging if eeprom contents are not correct
 		// this would need dumping the serial eeprom on the xbox board
 		if (command == 0) {
-			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b744,0x90);
-			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b745,0x90);
-			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b766,0xc9);
-			chihiro_devices.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b767,0xc3);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b744,0x90);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b745,0x90);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b766,0xc9);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b767,0xc3);
 		}
 		data = dummyeeprom[command]+dummyeeprom[command+1]*256;
 		logerror("eeprom: %d %d %d\n",command,rw,data);
@@ -1038,25 +1703,24 @@ int smbus_eeprom(int command,int rw,int data)
  * SMbus controller
  */
 
-typedef struct _smbus_state {
+struct smbus_state {
 	int status;
 	int control;
 	int address;
 	int data;
 	int command;
 	int rw;
-	int (*devices[128])(int command,int rw,int data);
+	int (*devices[128])(chihiro_state &chs,int command,int rw,int data);
 	UINT32 words[256/4];
-} smbus_state;
-smbus_state smbusst;
+} smbusst;
 
-void smbus_register_device(int address,int (*handler)(int command,int rw,int data))
+void chihiro_state::smbus_register_device(int address,int (*handler)(chihiro_state &chs,int command,int rw,int data))
 {
 	if (address < 128)
 		smbusst.devices[address]=handler;
 }
 
-static READ32_HANDLER( smbus_r )
+READ32_MEMBER( chihiro_state::smbus_r )
 {
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
 		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | ((smbusst.status << 0) & mem_mask);
@@ -1065,13 +1729,13 @@ static READ32_HANDLER( smbus_r )
 	return smbusst.words[offset];
 }
 
-static WRITE32_HANDLER( smbus_w )
+WRITE32_MEMBER( chihiro_state::smbus_w )
 {
 	COMBINE_DATA(smbusst.words);
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
 	{
 		if (!((smbusst.status ^ data) & 0x10)) // clearing interrupt
-			pic8259_ir3_w(chihiro_devices.pic8259_2, 0); // IRQ 11
+			pic8259_ir3_w(chihiro_devs.pic8259_2, 0); // IRQ 11
 		smbusst.status &= ~data;
 	}
 	if ((offset == 0) && (mem_mask == 0xff0000)) // 2 smbus control
@@ -1084,15 +1748,15 @@ static WRITE32_HANDLER( smbus_w )
 			{
 				if (smbusst.devices[smbusst.address])
 					if (smbusst.rw == 0)
-						smbusst.devices[smbusst.address](smbusst.command,smbusst.rw,smbusst.data);
+						smbusst.devices[smbusst.address](*this,smbusst.command,smbusst.rw,smbusst.data);
 					else
-						smbusst.data=smbusst.devices[smbusst.address](smbusst.command,smbusst.rw,smbusst.data);
+						smbusst.data=smbusst.devices[smbusst.address](*this,smbusst.command,smbusst.rw,smbusst.data);
 				else
 					logerror("SMBUS: access to missing device at address %d\n",smbusst.address);
 				smbusst.status |= 0x10;
 				if (smbusst.control & 0x10)
 				{
-					pic8259_ir3_w(chihiro_devices.pic8259_2, 1); // IRQ 11
+					pic8259_ir3_w(chihiro_devs.pic8259_2, 1); // IRQ 11
 				}
 			}
 		}
@@ -1111,45 +1775,42 @@ static WRITE32_HANDLER( smbus_w )
 		smbusst.command = data;
 }
 
-
-static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32, smbus_state )
-	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
-	AM_RANGE(0xfd000000, 0xfdffffff) AM_READWRITE_LEGACY(geforce_r, geforce_w)
-	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE_LEGACY(usbctrl_r, usbctrl_w)
+static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32, chihiro_state )
+	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM // 128 megabytes
+	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM
+	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
+	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(usbctrl_r, usbctrl_w)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, smbus_state )
+static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, chihiro_state )
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE_LEGACY(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x8000, 0x80ff) AM_READWRITE_LEGACY(dummy_r, dummy_w)
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(smbus_r, smbus_w)
+	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
 	AM_RANGE(0xff60, 0xff67) AM_DEVREADWRITE_LEGACY("ide", ide_bus_master32_r, ide_bus_master32_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chihiro )
 INPUT_PORTS_END
 
-static SCREEN_UPDATE_RGB32( chihiro )
-{
-    return 0;
-}
-
 static MACHINE_START( chihiro )
 {
+	chihiro_state *chst=machine.driver_data<chihiro_state>();
+	chst->nvidia_nv2a=auto_alloc(machine, nv2a_renderer(machine));
 	memset(pic16lc_buffer,0,sizeof(pic16lc_buffer));
 	pic16lc_buffer[0]='B';
 	pic16lc_buffer[4]=2; // A/V connector, 2=vga
-	smbus_register_device(0x10,smbus_pic16lc);
-	smbus_register_device(0x45,smbus_cx25871);
-	smbus_register_device(0x54,smbus_eeprom);
+	chst->smbus_register_device(0x10,smbus_callback_pic16lc);
+	chst->smbus_register_device(0x45,smbus_callback_cx25871);
+	chst->smbus_register_device(0x54,smbus_callback_eeprom);
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
-	chihiro_devices.pic8259_1 = machine.device( "pic8259_1" );
-	chihiro_devices.pic8259_2 = machine.device( "pic8259_2" );
-	chihiro_devices.ide = machine.device( "ide" );
+	chst->chihiro_devs.pic8259_1 = machine.device( "pic8259_1" );
+	chst->chihiro_devs.pic8259_2 = machine.device( "pic8259_2" );
+	chst->chihiro_devs.ide = machine.device( "ide" );
 	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine,"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);
 }
@@ -1158,10 +1819,10 @@ static SLOT_INTERFACE_START(ide_baseboard)
 	SLOT_INTERFACE("bb", IDE_BASEBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( chihiro_base, driver_device )
+static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */
+	MCFG_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! family 6 model 8 stepping 10 */
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
 
@@ -1179,15 +1840,17 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, "bb", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, NULL, "bb", true)
 	MCFG_IDE_BUS_MASTER_SPACE( "ide", "maincpu", PROGRAM )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_STATIC(chihiro)
+	MCFG_SCREEN_UPDATE_DRIVER(chihiro_state,screen_update_callback)
+	MCFG_SCREEN_VBLANK_DRIVER(chihiro_state,vblank_callback)
 
 	MCFG_MACHINE_START(chihiro)
 

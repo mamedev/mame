@@ -1088,6 +1088,13 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 	repeated_pc = cpustate->pc;
 	opcode = FETCH(cpustate);
 	switch(opcode) {
+		case 0x0f:
+		if (invert_flag == 0)
+			I386OP(decode_three_bytef3)(cpustate); // sse f3 0f
+		else
+			I386OP(decode_three_bytef2)(cpustate); // sse f2 0f
+		return;
+		break;
 		case 0x26:
 	    cpustate->segment_override=ES;
 		cpustate->segment_prefix=1;
@@ -2252,14 +2259,23 @@ static void I386OP(segment_SS)(i386_state *cpustate)		// Opcode 0x36
 	I386OP(decode_opcode)(cpustate);
 }
 
-static void I386OP(operand_size)(i386_state *cpustate)		// Opcode 0x66
+static void I386OP(operand_size)(i386_state *cpustate)		// Opcode prefix 0x66
 {
 	if(cpustate->operand_prefix == 0)
 	{
 		cpustate->operand_size ^= 1;
 		cpustate->operand_prefix = 1;
 	}
-	I386OP(decode_opcode)(cpustate);
+	cpustate->opcode = FETCH(cpustate);
+	if (cpustate->opcode == 0x0f)
+		I386OP(decode_three_byte66)(cpustate);
+	else
+	{
+		if( cpustate->operand_size )
+			cpustate->opcode_table1_32[cpustate->opcode](cpustate);
+		else
+			cpustate->opcode_table1_16[cpustate->opcode](cpustate);
+	}
 }
 
 static void I386OP(address_size)(i386_state *cpustate)		// Opcode 0x67
@@ -2465,11 +2481,11 @@ static void I386OP(loadall)(i386_state *cpustate)		// Opcode 0x0f 0x07 (0x0f 0x0
 
 static void I386OP(unimplemented)(i386_state *cpustate)
 {
-	fatalerror("i386: Unimplemented opcode %02X at %08X", cpustate->opcode, cpustate->pc - 1 );
+	report_unimplemented_opcode(cpustate);
 }
 
 static void I386OP(invalid)(i386_state *cpustate)
 {
-	logerror("i386: Invalid opcode %02X at %08X\n", cpustate->opcode, cpustate->pc - 1);
+	report_invalid_opcode(cpustate);
 	i386_trap(cpustate, 6, 0, 0);
 }

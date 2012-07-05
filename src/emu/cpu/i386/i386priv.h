@@ -7,10 +7,13 @@
 #include "../../../lib/softfloat/milieu.h"
 #include "../../../lib/softfloat/softfloat.h"
 
+//#define DEBUG_MISSING_OPCODE
+
 #define I386OP(XX)		i386_##XX
 #define I486OP(XX)		i486_##XX
 #define PENTIUMOP(XX)	pentium_##XX
 #define MMXOP(XX)		mmx_##XX
+#define SSEOP(XX)		sse_##XX
 
 extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 
@@ -150,7 +153,20 @@ enum
 	X87_ST4,
 	X87_ST5,
 	X87_ST6,
-	X87_ST7,
+	X87_ST7
+};
+
+enum
+{
+	/* mmx registers aliased to x87 ones */
+	MMX_MM0=X87_ST0,
+	MMX_MM1=X87_ST1,
+	MMX_MM2=X87_ST2,
+	MMX_MM3=X87_ST3,
+	MMX_MM4=X87_ST4,
+	MMX_MM5=X87_ST5,
+	MMX_MM6=X87_ST6,
+	MMX_MM7=X87_ST7
 };
 
 /* Protected mode exceptions */
@@ -163,6 +179,23 @@ enum
 #define FAULT_GP 13  // General Protection Fault
 #define FAULT_PF 14  // Page Fault
 #define FAULT_MF 16  // Match (Coprocessor) Fault
+
+/* MXCSR Control and Status Register */
+#define MXCSR_IE  (1<<0)  // Invalid Operation Flag
+#define MXCSR_DE  (1<<1)  // Denormal Flag
+#define MXCSR_ZE  (1<<2)  // Divide-by-Zero Flag
+#define MXCSR_OE  (1<<3)  // Overflow Flag
+#define MXCSR_UE  (1<<4)  // Underflow Flag
+#define MXCSR_PE  (1<<5)  // Precision Flag
+#define MXCSR_DAZ (1<<6)  // Denormals Are Zeros
+#define MXCSR_IM  (1<<7)  // Invalid Operation Mask
+#define MXCSR_DM  (1<<8)  // Denormal Operation Mask
+#define MXCSR_ZM  (1<<9)  // Divide-by-Zero Mask
+#define MXCSR_OM  (1<<10) // Overflow Mask
+#define MXCSR_UM  (1<<11) // Underflow Mask
+#define MXCSR_PM  (1<<12) // Precision Mask
+#define MXCSR_RC  (3<<13) // Rounding Control
+#define MXCSR_FZ  (1<<15) // Flush to Zero
 
 typedef struct {
 	UINT16 selector;
@@ -206,6 +239,16 @@ typedef union {
 	UINT64 i;
 	double f;
 } X87_REG;
+
+typedef UINT64 MMX_REG;
+
+typedef union {
+	UINT32 d[4];
+	UINT16 w[8];
+	UINT8 b[16];
+	UINT64 q[2];
+	float f[4];
+} XMM_REG;
 
 typedef struct _i386_state i386_state;
 struct _i386_state
@@ -300,14 +343,30 @@ struct _i386_state
 	void (*opcode_table_x87_de[256])(i386_state *cpustate, UINT8 modrm);
 	void (*opcode_table_x87_df[256])(i386_state *cpustate, UINT8 modrm);
 
+	// SSE
+	XMM_REG sse_reg[8];
+	UINT32 mxcsr;
 
 	void (*opcode_table1_16[256])(i386_state *cpustate);
 	void (*opcode_table1_32[256])(i386_state *cpustate);
 	void (*opcode_table2_16[256])(i386_state *cpustate);
 	void (*opcode_table2_32[256])(i386_state *cpustate);
+	void (*opcode_table366_16[256])(i386_state *cpustate);
+	void (*opcode_table366_32[256])(i386_state *cpustate);
+	void (*opcode_table3f2_16[256])(i386_state *cpustate);
+	void (*opcode_table3f2_32[256])(i386_state *cpustate);
+	void (*opcode_table3f3_16[256])(i386_state *cpustate);
+	void (*opcode_table3f3_32[256])(i386_state *cpustate);
 
 	UINT8 *cycle_table_pm;
 	UINT8 *cycle_table_rm;
+
+	// bytes in current opcode, debug only
+#ifdef DEBUG_MISSING_OPCODE
+	UINT8 opcode_bytes[16];
+	UINT32 opcode_pc;
+	int opcode_bytes_length;
+#endif
 };
 
 INLINE i386_state *get_safe_token(device_t *device)
@@ -351,6 +410,9 @@ static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset);
 #define SetSZPF8(x)			{cpustate->ZF = ((UINT8)(x)==0);  cpustate->SF = ((x)&0x80) ? 1 : 0; cpustate->PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF16(x)		{cpustate->ZF = ((UINT16)(x)==0);  cpustate->SF = ((x)&0x8000) ? 1 : 0; cpustate->PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF32(x)		{cpustate->ZF = ((UINT32)(x)==0);  cpustate->SF = ((x)&0x80000000) ? 1 : 0; cpustate->PF = i386_parity_table[x & 0xFF]; }
+
+#define MMX(n)				cpustate->fpu_reg[(n)].i
+#define XMM(n)				cpustate->sse_reg[(n)]
 
 /***********************************************************************************/
 
@@ -542,6 +604,10 @@ INLINE UINT8 FETCH(i386_state *cpustate)
 	}
 
 	value = cpustate->direct->read_decrypted_byte(address & cpustate->a20_mask);
+#ifdef DEBUG_MISSING_OPCODE
+	cpustate->opcode_bytes[cpustate->opcode_bytes_length] = value;
+	cpustate->opcode_bytes_length = (cpustate->opcode_bytes_length + 1) & 15;
+#endif	
 	cpustate->eip++;
 	cpustate->pc++;
 	return value;
