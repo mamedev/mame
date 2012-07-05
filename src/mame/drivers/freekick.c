@@ -770,9 +770,6 @@ ROM_END
 The original Freekick boards have the main CPU code inside a custom CPU "block". This code is stored in battery
 backed RAM. There is 64K of RAM, but only 52K is program code while the remaining RAM is actually used as RAM.
 
-There is known to exist a Nihon System version without the Merit license, but has the Sega license enabled
-through a dipswitch. Hopefully this version can be found and dumped before they all die.
-
 */
 
 ROM_START( freekick )
@@ -1033,8 +1030,7 @@ ROM_START( gigas ) /* From an actual Sega board 834-6167 with mc-8123: 317-5002 
 	ROM_LOAD( "2.3n", 0x08000, 0x04000, CRC(3a46e354) SHA1(ebd6a5db4c9cdfc6fabe6b412a704aaf03c32d7c) )
 
 	ROM_REGION( 0x0600, "proms", 0 ) /* not dumped yet; assumed to be the same */
-	/* fill in which locations for each prom when redumping; the chips have
-     * no labels, but are clearly located at 3a 3b 3c 3d 4a and 4d */
+	/* fill in which locations for each prom when redumping; the chips have no labels, but are clearly located at 3a 3b 3c 3d 4a and 4d */
 	ROM_LOAD( "1.pr", 0x0000, 0x0100, CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
 	ROM_LOAD( "6.pr", 0x0100, 0x0100, CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
 	ROM_LOAD( "5.pr", 0x0200, 0x0100, CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
