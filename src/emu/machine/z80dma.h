@@ -107,6 +107,8 @@ private:
 	void trigger_interrupt(int level);
 	void do_read();
 	int do_write();
+	void do_transfer_write();
+	void do_search();
 
 	static TIMER_CALLBACK( static_timerproc ) { reinterpret_cast<z80dma_device *>(ptr)->timerproc(); }
 	void timerproc();

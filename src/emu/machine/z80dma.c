@@ -390,6 +390,7 @@ void z80dma_device::do_read()
 	switch(mode) {
 		case TM_TRANSFER:
 		case TM_SEARCH:
+		case TM_SEARCH_TRANSFER:
 			if (PORTA_IS_SOURCE)
 			{
 				if (PORTA_MEMORY)
@@ -409,9 +410,6 @@ void z80dma_device::do_read()
 				if (DMA_LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
 			}
 			break;
-		case TM_SEARCH_TRANSFER:
-			fatalerror("z80dma_do_operation: unhandled search & transfer mode !\n");
-			break;
 		default:
 			logerror("z80dma_do_operation: invalid mode %d!\n", mode);
 			break;
@@ -422,6 +420,43 @@ void z80dma_device::do_read()
 //-------------------------------------------------
 //  do_write - perform DMA write
 //-------------------------------------------------
+
+void z80dma_device::do_transfer_write()
+{
+	if (PORTA_IS_SOURCE)
+	{
+		if (PORTB_MEMORY)
+			m_out_mreq_func(m_addressB, m_latch);
+		else
+			m_out_iorq_func(m_addressB, m_latch);
+
+		if (DMA_LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
+	}
+	else
+	{
+		if (PORTA_MEMORY)
+			m_out_mreq_func(m_addressA, m_latch);
+		else
+			m_out_iorq_func(m_addressA, m_latch);
+
+		if (DMA_LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
+	}
+}
+
+void z80dma_device::do_search()
+{
+	UINT8 load_byte,match_byte;
+	load_byte = m_latch | MASK_BYTE;
+	match_byte = MATCH_BYTE | MASK_BYTE;
+	//if (LOG) logerror("%02x %02x\n",load_byte,match_byte));
+	if (load_byte == match_byte)
+	{
+		if (INT_ON_MATCH)
+		{
+			trigger_interrupt(INT_MATCH);
+		}
+	}
+}
 
 int z80dma_device::do_write()
 {
@@ -435,46 +470,16 @@ int z80dma_device::do_write()
 	}
 	switch(mode) {
 		case TM_TRANSFER:
-			if (PORTA_IS_SOURCE)
-			{
-				if (PORTB_MEMORY)
-					m_out_mreq_func(m_addressB, m_latch);
-				else
-					m_out_iorq_func(m_addressB, m_latch);
-
-				if (DMA_LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
-			}
-			else
-			{
-				if (PORTA_MEMORY)
-					m_out_mreq_func(m_addressA, m_latch);
-				else
-					m_out_iorq_func(m_addressA, m_latch);
-
-				if (DMA_LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
-			}
-
+			do_transfer_write();
 			break;
 
 		case TM_SEARCH:
-			{
-				UINT8 load_byte,match_byte;
-				load_byte = m_latch | MASK_BYTE;
-				match_byte = MATCH_BYTE | MASK_BYTE;
-				//if (LOG) logerror("%02x %02x\n",load_byte,match_byte));
-				if (load_byte == match_byte)
-				{
-					if (INT_ON_MATCH)
-					{
-						trigger_interrupt(INT_MATCH);
-					}
-				}
-
-			}
+			do_search();
 			break;
 
 		case TM_SEARCH_TRANSFER:
-			fatalerror("z80dma_do_operation: unhandled search & transfer mode !\n");
+			do_transfer_write();
+			do_search();
 			break;
 
 		default:
@@ -779,10 +784,11 @@ void z80dma_device::write(UINT8 data)
 					m_ip = 0;
 					break;
 				case 0xFB:
+				case 0xFF: // TODO: p8k triggers this, it probably crashed.
 					if (LOG) logerror("Z80DMA '%s' undocumented command triggered 0x%02X!\n", tag(), data);
 					break;
 				default:
-					fatalerror("Z80DMA '%s' Unknown WR6 command %02x", tag(), data);
+					printf("Z80DMA '%s' Unknown WR6 command %02x\n", tag(), data);
 			}
 		}
 		else if(data == 0x8e) //newtype on Sharp X1, unknown purpose
