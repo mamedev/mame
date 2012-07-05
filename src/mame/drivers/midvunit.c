@@ -20,6 +20,9 @@
            Listen for Tone  ERROR E1 (during boot diag)
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
 
+Known to exist but not dumped:
+    Off Road Challenge v1.00 (MON 07-28-97)
+
 **************************************************************************/
 
 #include "emu.h"

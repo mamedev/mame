@@ -31,6 +31,7 @@
   CRT 250:
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
+  * Dodge City (c) 1989
   Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
   *Pit Boss Superstar III 30 (c)1993?
@@ -52,6 +53,7 @@
   *Megatouch 7 Encore (c)2000
 
   * indicates that game needs to be dumped or redumped
+    Dodge City: 9131-02 (U9 through U11)
 
 Custom Program Versions (from different Megatouch manuals):
 
