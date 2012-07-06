@@ -82,6 +82,7 @@ struct _tms9928a_interface
 	const char			*m_screen_tag;
 	int					m_vram_size;	/* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
 	devcb_write_line	m_out_int_line;	/* Callback is called whenever the state of the INT output changes */
+	const char			*m_regionname;		// Alternatively, get the name of the region (if vram size is 0)
 };
 
 
@@ -89,6 +90,7 @@ PALETTE_INIT( tms9928a );
 
 
 class tms9928a_device :	public device_t,
+						public device_memory_interface,
 						public tms9928a_interface
 {
 public:
@@ -113,7 +115,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const { return (spacenum == AS_DATA) ? &m_space_config : NULL; }
 
 private:
 	void change_register(UINT8 reg, UINT8 val);
@@ -145,8 +147,8 @@ private:
 
 	/* memory */
 	const address_space_config		m_space_config;
+	address_space*					m_vram_space;
 
-	UINT8		*m_vMem;
 	bitmap_ind16 m_tmpbmp;
 	emu_timer	*m_line_timer;
 	UINT8		m_mode;
@@ -161,7 +163,7 @@ class tms9918_device : public tms9928a_device
 {
 public:
 	tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9918, "tms9918", tag, owner, clock, false, false ) { }
+		: tms9928a_device( mconfig, TMS9918, "TMS9918", tag, owner, clock, false, false ) { }
 };
 
 
@@ -169,7 +171,7 @@ class tms9918a_device :	public tms9928a_device
 {
 public:
 	tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9918A, "tms9918a", tag, owner, clock, false, true ) { }
+		: tms9928a_device( mconfig, TMS9918A, "TMS9918a", tag, owner, clock, false, true ) { }
 };
 
 
@@ -177,7 +179,7 @@ class tms9118_device : public tms9928a_device
 {
 public:
 	tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9118, "tms9118", tag, owner, clock, false, true ) { }
+		: tms9928a_device( mconfig, TMS9118, "TMS9118", tag, owner, clock, false, true ) { }
 };
 
 
@@ -185,7 +187,7 @@ class tms9128_device : public tms9928a_device
 {
 public:
 	tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9128, "tms9128", tag, owner, clock, false, true ) { }
+		: tms9928a_device( mconfig, TMS9128, "TMS9128", tag, owner, clock, false, true ) { }
 };
 
 
@@ -193,7 +195,7 @@ class tms9929_device : public tms9928a_device
 {
 public:
 	tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9929, "tms9929", tag, owner, clock, true, false ) { }
+		: tms9928a_device( mconfig, TMS9929, "TMS9929", tag, owner, clock, true, false ) { }
 };
 
 
@@ -201,7 +203,7 @@ class tms9929a_device : public tms9928a_device
 {
 public:
 	tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9929A, "tms9929a", tag, owner, clock, true, true ) { }
+		: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true ) { }
 };
 
 
@@ -209,7 +211,7 @@ class tms9129_device : public tms9928a_device
 {
 public:
 	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: tms9928a_device( mconfig, TMS9129, "tms9129", tag, owner, clock, true, true ) { }
+		: tms9928a_device( mconfig, TMS9129, "TMS9129", tag, owner, clock, true, true ) { }
 };
 
 

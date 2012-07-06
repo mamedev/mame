@@ -64,7 +64,7 @@ typedef delegate<void (v99x8_device &, int)> v99x8_interrupt_delegate;
 
 // ======================> v99x8_device
 
-class v99x8_device : public device_t
+class v99x8_device : public device_t, public device_memory_interface
 {
 	friend PALETTE_INIT( v9958 );
 
@@ -97,19 +97,25 @@ public:
 	static void static_set_interrupt_callback(device_t &device, v99x8_interrupt_delegate callback, const char *device_name);
 
 protected:
+	const address_space_config		m_space_config;
+	address_space*					m_vram_space;
+
 	int m_model;
 
 	// device overrides
 	virtual void device_start();
 	virtual void device_reset();
 
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const { return (spacenum == AS_DATA) ? &m_space_config : NULL; }
+
 private:
 	// internal helpers
-	void reset_palette ();
-	void vram_write (int offset, int data);
-	int vram_read (int offset);
-	void check_int ();
-	void register_write (int reg, int data);
+	void reset_palette();
+	void vram_write(int offset, int data);
+	int vram_read(int offset);
+	void check_int();
+	void register_write(int reg, int data);
 
 	template<typename _PixelType, int _Width> void default_border(const pen_t *pens, _PixelType *ln);
 	template<typename _PixelType, int _Width> void graphic7_border(const pen_t *pens, _PixelType *ln);
@@ -128,15 +134,15 @@ private:
 	template<typename _PixelType, int _Width> void graphic5_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
 	template<typename _PixelType, int _Width> void graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
 
-	void sprite_mode1 (int line, UINT8 *col);
-	void sprite_mode2 (int line, UINT8 *col);
-	void set_mode ();
-	void refresh_16 (int line);
-	void refresh_line (int line);
+	void sprite_mode1(int line, UINT8 *col);
+	void sprite_mode2(int line, UINT8 *col);
+	void set_mode();
+	void refresh_16(int line);
+	void refresh_line(int line);
 
-	void interrupt_start_vblank ();
+	void interrupt_start_vblank();
 
-	UINT8 *VDPVRMP(UINT8 M, int MX, int X, int Y);
+	int VDPVRMP(UINT8 M, int MX, int X, int Y);
 
 	UINT8 VDPpoint5(int MXS, int SX, int SY);
 	UINT8 VDPpoint6(int MXS, int SX, int SY);
@@ -145,7 +151,7 @@ private:
 
 	UINT8 VDPpoint(UINT8 SM, int MXS, int SX, int SY);
 
-	void VDPpsetlowlevel(UINT8 *P, UINT8 CL, UINT8 M, UINT8 OP);
+	void VDPpsetlowlevel(int addr, UINT8 CL, UINT8 M, UINT8 OP);
 
 	void VDPpset5(int MXD, int DX, int DY, UINT8 CL, UINT8 OP);
 	void VDPpset6(int MXD, int DX, int DY, UINT8 CL, UINT8 OP);
@@ -154,24 +160,26 @@ private:
 
 	void VDPpset(UINT8 SM, int MXD, int DX, int DY, UINT8 CL, UINT8 OP);
 
-	int GetVdpTimingValue(const int *);
+	int get_vdp_timing_value(const int *);
 
-	void SrchEngine();
-	void LineEngine();
-	void LmmvEngine();
-	void LmmmEngine();
-	void LmcmEngine();
-	void LmmcEngine();
-	void HmmvEngine();
-	void HmmmEngine();
-	void YmmmEngine();
-	void HmmcEngine();
+	void srch_engine();
+	void line_engine();
+	void lmmv_engine();
+	void lmmm_engine();
+	void lmcm_engine();
+	void lmmc_engine();
+	void hmmv_engine();
+	void hmmm_engine();
+	void ymmm_engine();
+	void hmmc_engine();
 
-	void cpu_to_vdp (UINT8 V);
-	UINT8 vdp_to_cpu ();
-	void ReportVdpCommand(UINT8 Op);
-	UINT8 command_unit_w (UINT8 Op);
-	void update_command ();
+	inline bool v9938_second_field();
+
+	void cpu_to_vdp(UINT8 V);
+	UINT8 vdp_to_cpu();
+	void report_vdp_command(UINT8 Op);
+	UINT8 command_unit_w(UINT8 Op);
+	void update_command();
 
 	// general
 	int m_offset_x, m_offset_y, m_visible_y, m_mode;
@@ -179,10 +187,11 @@ private:
 	int	m_pal_write_first, m_cmd_write_first;
 	UINT8 m_pal_write, m_cmd_write;
 	UINT8 m_pal_reg[32], m_stat_reg[10], m_cont_reg[48], m_read_ahead;
+
 	// memory
 	UINT16 m_address_latch;
-	UINT8 *m_vram_exp;
 	int m_vram_size;
+
     // interrupt
     UINT8 m_int_state;
     v99x8_interrupt_delegate m_int_callback;
@@ -221,8 +230,6 @@ private:
 	} m_mmc;
 	int  m_vdp_ops_count;
 	void (v99x8_device::*m_vdp_engine)();
-
-	UINT8 m_vram[0x20000];
 
 	struct v99x8_mode
 	{

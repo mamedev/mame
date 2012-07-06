@@ -34,6 +34,13 @@ const device_type TMS9929  = &device_creator<tms9929_device>;
 const device_type TMS9929A = &device_creator<tms9929a_device>;
 const device_type TMS9129  = &device_creator<tms9129_device>;
 
+/*
+    The TMS9928 has an own address space.
+*/
+static ADDRESS_MAP_START(memmap, AS_DATA, 8, tms9928a_device)
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+ADDRESS_MAP_END
 
 /*
     New palette (R. Nabet).
@@ -94,18 +101,24 @@ PALETTE_INIT( tms9928a )
 
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva )
-	: device_t( mconfig, type, name, tag, owner, clock )
+	: device_t( mconfig, type, name, tag, owner, clock ),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("vram", ENDIANNESS_BIG, 8, 14)
 {
 	m_50hz = is_50hz;
 	m_reva = is_reva;
+	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t( mconfig, TMS9928A, "tms9928a", tag, owner, clock )
+	: device_t( mconfig, TMS9928A, "TMS9928A", tag, owner, clock ),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("vram", ENDIANNESS_BIG, 8, 14)
 {
 	m_50hz = false;
 	m_reva = true;
+	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 
@@ -113,7 +126,7 @@ READ8_MEMBER( tms9928a_device::vram_read )
 {
 	UINT8 data = m_ReadAhead;
 
-	m_ReadAhead = m_vMem[ m_Addr ];
+	m_ReadAhead = m_vram_space->read_byte(m_Addr);
 	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
 	m_latch = 0;
 
@@ -123,7 +136,7 @@ READ8_MEMBER( tms9928a_device::vram_read )
 
 WRITE8_MEMBER( tms9928a_device::vram_write )
 {
-	m_vMem[ m_Addr ] = data;
+	m_vram_space->write_byte(m_Addr, data);
 	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
 	m_ReadAhead = data;
 	m_latch = 0;
@@ -313,9 +326,9 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
-					UINT8 charcode = m_vMem[ addr ];
-					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
-					UINT8 colour = m_vMem[ m_colour + ( charcode >> 3 ) ];
+					UINT8 charcode = m_vram_space->read_byte( addr );
+					UINT8 pattern =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
+					UINT8 colour =  m_vram_space->read_byte( m_colour + ( charcode >> 3 ) );
 					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
 					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
@@ -338,8 +351,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
-					UINT16 charcode = m_vMem[ addr ];
-					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
+					UINT16 charcode =  m_vram_space->read_byte( addr );
+					UINT8 pattern =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
 
 					for ( int i = 0; i < 6; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -358,9 +371,9 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
-					UINT16 charcode = m_vMem[ addr ] + ( ( y >> 6 ) << 8 );
-					UINT8 pattern = m_vMem[ m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) ];
-					UINT8 colour = m_vMem[ m_colour + ( ( charcode & m_colourmask ) << 3 ) + ( y & 7 ) ];
+					UINT16 charcode =  m_vram_space->read_byte( addr ) + ( ( y >> 6 ) << 8 );
+					UINT8 pattern =  m_vram_space->read_byte( m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) );
+					UINT8 colour =  m_vram_space->read_byte( m_colour + ( ( charcode & m_colourmask ) << 3 ) + ( y & 7 ) );
 					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
 					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
@@ -383,8 +396,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
-					UINT16 charcode = ( m_vMem[ addr ] + ( ( y >> 6 ) << 8 ) ) & m_patternmask;
-					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
+					UINT16 charcode = (  m_vram_space->read_byte( addr ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask;
+					UINT8 pattern = m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
 
 					for ( int i = 0; i < 6; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -403,8 +416,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
-					UINT8 charcode = m_vMem[ addr ];
-					UINT8 colour = m_vMem[ m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) ];
+					UINT8 charcode =  m_vram_space->read_byte( addr );
+					UINT8 colour =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) );
 					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
 					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
@@ -443,8 +456,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
-					UINT8 charcode = m_vMem[ addr ];
-					UINT8 colour = m_vMem[ m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) ];
+					UINT8 charcode =  m_vram_space->read_byte( addr );
+					UINT8 colour =  m_vram_space->read_byte( m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) );
 					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
 					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
 
@@ -472,7 +485,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 			for ( UINT16 sprattr = 0; sprattr < 128; sprattr += 4 )
 			{
-				int spr_y = m_vMem[ m_spriteattribute + sprattr + 0 ];
+				int spr_y =  m_vram_space->read_byte( m_spriteattribute + sprattr + 0 );
 
 				m_FifthSprite = sprattr / 4;
 
@@ -489,9 +502,9 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				/* is sprite enabled on this line? */
 				if ( spr_y <= y && y < spr_y + sprite_height )
 				{
-					int spr_x = m_vMem[ m_spriteattribute + sprattr + 1 ];
-					UINT8 sprcode = m_vMem[ m_spriteattribute + sprattr + 2 ];
-					UINT8 sprcol = m_vMem[ m_spriteattribute + sprattr + 3 ];
+					int spr_x =  m_vram_space->read_byte( m_spriteattribute + sprattr + 1 );
+					UINT8 sprcode =  m_vram_space->read_byte( m_spriteattribute + sprattr + 2 );
+					UINT8 sprcol =  m_vram_space->read_byte( m_spriteattribute + sprattr + 3 );
 					UINT16 pataddr = m_spritepattern + ( ( sprite_size == 16 ) ? sprcode & ~0x03 : sprcode ) * 8;
 
 					num_sprites++;
@@ -508,7 +521,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					else
 						pataddr += ( ( y - spr_y ) & 0x0F );
 
-					UINT8 pattern = m_vMem[ pataddr ];
+					UINT8 pattern =  m_vram_space->read_byte( pataddr );
 
 					if ( sprcol & 0x80 )
 						spr_x -= 32;
@@ -547,7 +560,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 							}
 						}
 
-						pattern = m_vMem[ pataddr + 16 ];
+						pattern =  m_vram_space->read_byte( pataddr + 16 );
 						spr_x += sprite_mag ? 16 : 8;
 					}
 				}
@@ -597,8 +610,6 @@ void tms9928a_device::device_config_complete()
 
 void tms9928a_device::device_start()
 {
-	assert_always(((m_vram_size == 0x1000) || (m_vram_size == 0x2000) || (m_vram_size == 0x4000)), "4, 8 or 16 kB vram please");
-
 	m_screen = machine().device<screen_device>( m_screen_tag );
 	assert( m_screen != NULL );
 
@@ -607,8 +618,8 @@ void tms9928a_device::device_start()
 
 	m_irq_changed.resolve( m_out_int_line, *this );
 
-	/* Video RAM */
-	m_vMem = auto_alloc_array_clear(machine(), UINT8, m_vram_size);
+	// Video RAM is allocated as an own address space
+	m_vram_space = space(AS_DATA);
 
 	/* back bitmap */
 	m_tmpbmp.allocate(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL);
@@ -629,7 +640,7 @@ void tms9928a_device::device_start()
 	save_item(NAME(m_latch));
 	save_item(NAME(m_Addr));
 	save_item(NAME(m_INT));
-	save_pointer(NAME(m_vMem), m_vram_size);
+//  save_pointer(NAME(m_vMem), m_vram_size);
 	save_item(NAME(m_colour));
 	save_item(NAME(m_colourmask));
 	save_item(NAME(m_pattern));

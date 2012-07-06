@@ -1,17 +1,17 @@
 
 /***************************************************************************
 
-    v9938 / v9958 emulation
+v9938 / v9958 emulation
 
 ***************************************************************************/
 
 /*
- todo:
+todo:
 
- - sprite collision
- - vdp engine -- make run at correct speed
- - vr/hr/fh flags: double-check all of that
- - make vdp engine work in exp. ram
+- sprite collision
+- vdp engine -- make run at correct speed
+- vr/hr/fh flags: double-check all of that
+- make vdp engine work in exp. ram
 */
 
 #include "emu.h"
@@ -20,18 +20,22 @@
 #define VERBOSE 0
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#define V9938_MODE_TEXT1	(0)
-#define V9938_MODE_MULTI	(1)
-#define V9938_MODE_GRAPHIC1	(2)
-#define V9938_MODE_GRAPHIC2	(3)
-#define V9938_MODE_GRAPHIC3	(4)
-#define V9938_MODE_GRAPHIC4	(5)
-#define V9938_MODE_GRAPHIC5	(6)
-#define V9938_MODE_GRAPHIC6	(7)
-#define V9938_MODE_GRAPHIC7	(8)
-#define V9938_MODE_TEXT2	(9)
-#define V9938_MODE_UNKNOWN	(10)
+enum
+{
+	V9938_MODE_TEXT1 = 0,
+	V9938_MODE_MULTI,
+	V9938_MODE_GRAPHIC1,
+	V9938_MODE_GRAPHIC2,
+	V9938_MODE_GRAPHIC3,
+	V9938_MODE_GRAPHIC4,
+	V9938_MODE_GRAPHIC5,
+	V9938_MODE_GRAPHIC6,
+	V9938_MODE_GRAPHIC7,
+	V9938_MODE_TEXT2,
+	V9938_MODE_UNKNOWN
+};
 
+#define EXPMEM_OFFSET 0x20000
 
 static const char *const v9938_modes[] = {
 	"TEXT 1", "MULTICOLOR", "GRAPHIC 1", "GRAPHIC 2", "GRAPHIC 3",
@@ -43,53 +47,65 @@ static const char *const v9938_modes[] = {
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+/*
+Similar to the TMS9928, the V9938 has an own address space. It can handle
+at most 192 KiB RAM (128 KiB base, 64 KiB expansion).
+*/
+static ADDRESS_MAP_START(memmap, AS_DATA, 8, v99x8_device)
+ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
+AM_RANGE(0x00000, 0x2ffff) AM_RAM
+ADDRESS_MAP_END
+
+
 // devices
 const device_type V9938 = &device_creator<v9938_device>;
 const device_type V9958 = &device_creator<v9958_device>;
 
 v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, shortname, tag, owner, clock),
-	  m_model(0),
-	  m_offset_x(0),
-	  m_offset_y(0),
-	  m_visible_y(0),
-	  m_mode(0),
-	  m_pal_write_first(0),
-	  m_cmd_write_first(0),
-	  m_pal_write(0),
-	  m_cmd_write(0),
-	  m_read_ahead(0),
-	  m_address_latch(0),
-	  m_vram_exp(NULL),
-	  m_vram_size(0),
-	  m_int_state(0),
-	  m_int_callback_device_name(NULL),
-	  m_scanline(0),
-	  m_blink(0),
-	  m_blink_count(0),
-	  m_sprite_limit(0),
-	  m_size(0),
-	  m_size_old(0),
-	  m_size_auto(0),
-	  m_size_now(0),
-	  m_mx_delta(0),
-	  m_my_delta(0),
-	  m_button_state(0),
-	  m_screen(NULL),
-	  m_screen_name(NULL),
-	  m_vdp_ops_count(0),
-	  m_vdp_engine(NULL)
+:	device_t(mconfig, type, name, shortname, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
+	m_model(0),
+	m_offset_x(0),
+	m_offset_y(0),
+	m_visible_y(0),
+	m_mode(0),
+	m_pal_write_first(0),
+	m_cmd_write_first(0),
+	m_pal_write(0),
+	m_cmd_write(0),
+	m_read_ahead(0),
+	m_address_latch(0),
+	m_vram_size(0),
+	m_int_state(0),
+	m_int_callback_device_name(NULL),
+	m_scanline(0),
+	m_blink(0),
+	m_blink_count(0),
+	m_sprite_limit(0),
+	m_size(0),
+	m_size_old(0),
+	m_size_auto(0),
+	m_size_now(0),
+	m_mx_delta(0),
+	m_my_delta(0),
+	m_button_state(0),
+	m_screen(NULL),
+	m_screen_name(NULL),
+	m_vdp_ops_count(0),
+	m_vdp_engine(NULL)
 {
+	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: v99x8_device(mconfig, V9938, "V9938", "v9938", tag, owner, clock)
+: v99x8_device(mconfig, V9938, "V9938", "v9938", tag, owner, clock)
 {
 	m_model = MODEL_V9938;
 }
 
 v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: v99x8_device(mconfig, V9938, "V9938", "v9938", tag, owner, clock)
+: v99x8_device(mconfig, V9938, "V9938", "v9938", tag, owner, clock)
 {
 	m_model = MODEL_V9958;
 }
@@ -118,7 +134,7 @@ int v99x8_device::interrupt ()
 	max = (pal) ? 255 : (m_cont_reg[9] & 0x80) ? 234 : 244;
 	scanline = (m_scanline - scanline_start - m_offset_y);
 	if ( (scanline >= 0) && (scanline <= max) &&
-	   ( ( (scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
+		( ( (scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
 	{
 		m_stat_reg[1] |= 1;
 		LOG(("V9938: scanline interrupt (%d)\n", scanline));
@@ -131,7 +147,7 @@ int v99x8_device::interrupt ()
 	// check for start of vblank
 	if ((pal && (m_scanline == 310)) ||
 		(!pal && (m_scanline == 259)))
-		interrupt_start_vblank ();
+	interrupt_start_vblank ();
 
 	// render the current line
 	if ((m_scanline >= scanline_start) && (m_scanline < (212 + 28 + scanline_start)))
@@ -196,7 +212,7 @@ void v99x8_device::update_mouse_state(int mx_delta, int my_delta, int button_sta
 
 /***************************************************************************
 
-    Palette functions
+Palette functions
 
 ***************************************************************************/
 
@@ -217,9 +233,9 @@ a dip-switch to turn them off. I really don't know how they work though. :(
 */
 
 /*
- In screen 8, the colors are encoded as:
+In screen 8, the colors are encoded as:
 
- 7  6  5  4  3  2  1  0
+7  6  5  4  3  2  1  0
 +--+--+--+--+--+--+--+--+
 |g2|g1|g0|r2|r1|r0|b2|b1|
 +--+--+--+--+--+--+--+--+
@@ -314,34 +330,32 @@ UINT32 v99x8_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 /*
+    so lookups for screen 12 will look like:
 
- so lookups for screen 12 will look like:
+    int ind;
 
- int ind;
+    ind = (*data & 7) << 11 | (*(data + 1) & 7) << 14 |
+    (*(data + 2) & 7) << 5 | (*(data + 3) & 7) << 8;
 
- ind = (*data & 7) << 11 | (*(data + 1) & 7) << 14 |
-       (*(data + 2) & 7) << 5 | (*(data + 3) & 7) << 8;
+    pixel0 = s_pal_indYJK[ind | (*data >> 3) & 31];
+    pixel1 = s_pal_indYJK[ind | (*(data + 1) >> 3) & 31];
+    pixel2 = s_pal_indYJK[ind | (*(data + 2) >> 3) & 31];
+    pixel3 = s_pal_indYJK[ind | (*(data + 3) >> 3) & 31];
 
- pixel0 = s_pal_indYJK[ind | (*data >> 3) & 31];
- pixel1 = s_pal_indYJK[ind | (*(data + 1) >> 3) & 31];
- pixel2 = s_pal_indYJK[ind | (*(data + 2) >> 3) & 31];
- pixel3 = s_pal_indYJK[ind | (*(data + 3) >> 3) & 31];
+    and for screen 11:
 
-and for screen 11:
-
-pixel0 = (*data) & 8 ? pal_ind16[(*data) >> 4] : s_pal_indYJK[ind | (*data >> 3) & 30];
-pixel1 = *(data+1) & 8 ? pal_ind16[*(data+1) >> 4] : s_pal_indYJK[ind | *(data+1) >> 3) & 30];
-pixel2 = *(data+2) & 8 ? pal_ind16[*(data+2) >> 4] : s_pal_indYJK[ind | *(data+2) >> 3) & 30];
-pixel3 = *(data+3) & 8 ? pal_ind16[*(data+3) >> 4] : s_pal_indYJK[ind | *(data+3) >> 3) & 30];
-
+    pixel0 = (*data) & 8 ? pal_ind16[(*data) >> 4] : s_pal_indYJK[ind | (*data >> 3) & 30];
+    pixel1 = *(data+1) & 8 ? pal_ind16[*(data+1) >> 4] : s_pal_indYJK[ind | *(data+1) >> 3) & 30];
+    pixel2 = *(data+2) & 8 ? pal_ind16[*(data+2) >> 4] : s_pal_indYJK[ind | *(data+2) >> 3) & 30];
+    pixel3 = *(data+3) & 8 ? pal_ind16[*(data+3) >> 4] : s_pal_indYJK[ind | *(data+3) >> 3) & 30];
 */
 
 READ8_MEMBER( v99x8_device::read )
 {
 	switch (offset & 3)
 	{
-		case 0:	return vram_r();
-		case 1:	return status_r();
+	case 0:	return vram_r();
+	case 1:	return status_r();
 	}
 	return 0xff;
 }
@@ -350,10 +364,10 @@ WRITE8_MEMBER( v99x8_device::write )
 {
 	switch (offset & 3)
 	{
-		case 0:	vram_w(data);		break;
-		case 1:	command_w(data);	break;
-		case 2:	palette_w(data);	break;
-		case 3:	register_w(data);	break;
+	case 0:	vram_w(data);		break;
+	case 1:	command_w(data);	break;
+	case 2:	palette_w(data);	break;
+	case 3:	register_w(data);	break;
 	}
 }
 
@@ -368,19 +382,19 @@ UINT8 v99x8_device::vram_r()
 
 	ret = m_read_ahead;
 
-	if (m_cont_reg[45] & 0x40)
+	if (m_cont_reg[45] & 0x40)  // Expansion memory
 	{
 		if ( (m_mode == V9938_MODE_GRAPHIC6) || (m_mode == V9938_MODE_GRAPHIC7) )
 			address >>= 1;	// correct?
-		// correct?
-		if (m_vram_exp && address < 0x10000)
-			m_read_ahead = m_vram_exp[address];
+		// Expansion memory only offers 64 K
+		if (m_vram_size > 0x20000 && ((address & 0x10000)==0))
+			m_read_ahead = m_vram_space->read_byte(address + EXPMEM_OFFSET);
 		else
 			m_read_ahead = 0xff;
 	}
 	else
 	{
-		m_read_ahead = vram_read (address);
+		m_read_ahead = vram_read(address);
 	}
 
 	m_address_latch = (m_address_latch + 1) & 0x3fff;
@@ -405,56 +419,56 @@ UINT8 v99x8_device::status_r()
 
 	switch (reg)
 	{
-		case 0:
-			ret = m_stat_reg[0];
-			m_stat_reg[0] &= 0x1f;
-			break;
-		case 1:
-			ret = m_stat_reg[1];
-			m_stat_reg[1] &= 0xfe;
-			if ((m_cont_reg[8] & 0xc0) == 0x80)
-				// mouse mode: add button state
-				ret |= m_button_state & 0xc0;
-			break;
-		case 2:
-			/*update_command ();*/
-/*
-    WTF is this? Whatever this was intended to do, it is nonsensical.
-    Might as well pick a random number....
-    This was an attempt to emulate H-Blank flag ;)
-            n = cycles_currently_ran ();
-            if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
-            else vdp.statReg[2] &= ~0x20;
-*/
-			if (machine().rand() & 1) m_stat_reg[2] |= 0x20;
-			else m_stat_reg[2] &= ~0x20;
-			ret = m_stat_reg[2];
-			break;
-		case 3:
-			if ((m_cont_reg[8] & 0xc0) == 0x80)
-			{	// mouse mode: return x mouse delta
-				ret = m_mx_delta;
-				m_mx_delta = 0;
-			}
-			else
-				ret = m_stat_reg[3];
-			break;
-		case 5:
-			if ((m_cont_reg[8] & 0xc0) == 0x80)
-			{	// mouse mode: return y mouse delta
-				ret = m_my_delta;
-				m_my_delta = 0;
-			}
-			else
-				ret = m_stat_reg[5];
-			break;
-		case 7:
-			ret = m_stat_reg[7];
-			m_stat_reg[7] = m_cont_reg[44] = vdp_to_cpu () ;
-			break;
-		default:
-			ret = m_stat_reg[reg];
-			break;
+	case 0:
+		ret = m_stat_reg[0];
+		m_stat_reg[0] &= 0x1f;
+		break;
+	case 1:
+		ret = m_stat_reg[1];
+		m_stat_reg[1] &= 0xfe;
+		if ((m_cont_reg[8] & 0xc0) == 0x80)
+			// mouse mode: add button state
+		ret |= m_button_state & 0xc0;
+		break;
+	case 2:
+		/*update_command ();*/
+		/*
+        WTF is this? Whatever this was intended to do, it is nonsensical.
+        Might as well pick a random number....
+        This was an attempt to emulate H-Blank flag ;)
+        n = cycles_currently_ran ();
+        if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
+        else vdp.statReg[2] &= ~0x20;
+        */
+		if (machine().rand() & 1) m_stat_reg[2] |= 0x20;
+		else m_stat_reg[2] &= ~0x20;
+		ret = m_stat_reg[2];
+		break;
+	case 3:
+		if ((m_cont_reg[8] & 0xc0) == 0x80)
+		{	// mouse mode: return x mouse delta
+			ret = m_mx_delta;
+			m_mx_delta = 0;
+		}
+		else
+			ret = m_stat_reg[3];
+		break;
+	case 5:
+		if ((m_cont_reg[8] & 0xc0) == 0x80)
+		{	// mouse mode: return y mouse delta
+			ret = m_my_delta;
+			m_my_delta = 0;
+		}
+		else
+			ret = m_stat_reg[5];
+		break;
+	case 7:
+		ret = m_stat_reg[7];
+		m_stat_reg[7] = m_cont_reg[44] = vdp_to_cpu () ;
+		break;
+	default:
+		ret = m_stat_reg[reg];
+		break;
 	}
 
 	LOG(("V9938: Read %02x from S#%d\n", ret, reg));
@@ -475,8 +489,8 @@ void v99x8_device::palette_w(UINT8 data)
 		m_pal_reg[indexp*2+1] = data & 0x07;
 		// update palette
 		m_pal_ind16[indexp] = (((int)m_pal_write << 2) & 0x01c0)  |
-							   (((int)data << 3) & 0x0038)  |
-								((int)m_pal_write & 0x0007);
+		(((int)data << 3) & 0x0038)  |
+		((int)m_pal_write & 0x0007);
 
 		m_cont_reg[0x10] = (m_cont_reg[0x10] + 1) & 15;
 		m_pal_write_first = 0;
@@ -496,19 +510,19 @@ void v99x8_device::vram_w(UINT8 data)
 
 	m_cmd_write_first = 0;
 
-    address = ((int)m_cont_reg[14] << 14) | m_address_latch;
+	address = ((int)m_cont_reg[14] << 14) | m_address_latch;
 
-    if (m_cont_reg[45] & 0x40)
-        {
+	if (m_cont_reg[45] & 0x40)
+	{
 		if ( (m_mode == V9938_MODE_GRAPHIC6) || (m_mode == V9938_MODE_GRAPHIC7) )
 			address >>= 1;	// correct?
-        if (m_vram_exp && address < 0x10000)
-            m_vram_exp[address] = data;
-        }
-    else
-        {
-		vram_write (address, data);
-        }
+		if (m_vram_size > 0x20000 && ((address & 0x10000)==0))
+			m_vram_space->write_byte(EXPMEM_OFFSET + address, data);
+	}
+	else
+	{
+		vram_write(address, data);
+	}
 
 	m_address_latch = (m_address_latch + 1) & 0x3fff;
 	if ((!m_address_latch) && (m_cont_reg[0] & 0x0c) ) // correct ???
@@ -524,12 +538,12 @@ void v99x8_device::command_w(UINT8 data)
 		if (data & 0x80)
 		{
 			if (!(data & 0x40))
-			register_write (data & 0x3f, m_cmd_write);
+				register_write (data & 0x3f, m_cmd_write);
 		}
 		else
 		{
 			m_address_latch =
-				(((UINT16)data << 8) | m_cmd_write) & 0x3fff;
+			(((UINT16)data << 8) | m_cmd_write) & 0x3fff;
 			if ( !(data & 0x40) ) vram_r (); // read ahead!
 		}
 
@@ -548,7 +562,7 @@ void v99x8_device::register_w(UINT8 data)
 
 	reg = m_cont_reg[17] & 0x3f;
 	if (reg != 17)
-		register_write (reg, data); // true ?
+		register_write(reg, data); // true ?
 
 	if (!(m_cont_reg[17] & 0x80))
 		m_cont_reg[17] = (m_cont_reg[17] + 1) & 0x3f;
@@ -599,20 +613,17 @@ void v99x8_device::device_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 	m_size_old = -1;
 
+	// Video RAM is allocated as an own address space
+	m_vram_space = space(AS_DATA);
+
 	// allocate VRAM
 	assert(m_vram_size > 0);
-	memset(m_vram, 0, sizeof(m_vram));
+
 	if (m_vram_size < 0x20000)
 	{
 		// set unavailable RAM to 0xff
-		memset (m_vram + m_vram_size, 0xff, (sizeof(m_vram) - m_vram_size) );
+		for (int addr = m_vram_size; addr < 0x30000; addr++) m_vram_space->write_byte(addr, 0xff);
 	}
-
-	// do we have expanded memory?
-	if (m_vram_size > 0x20000)
-		m_vram_exp = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	else
-		m_vram_exp = NULL;
 
 	save_item(NAME(m_offset_x));
 	save_item(NAME(m_offset_y));
@@ -626,9 +637,9 @@ void v99x8_device::device_start()
 	save_item(NAME(m_stat_reg));
 	save_item(NAME(m_cont_reg));
 	save_item(NAME(m_read_ahead));
-	save_item(NAME(m_vram));
-	if ( m_vram_exp != NULL )
-		save_pointer(NAME(m_vram_exp), 0x10000);
+	//  save_item(NAME(m_vram));
+	//  if ( m_vram_exp != NULL )
+	//      save_pointer(NAME(m_vram_exp), 0x10000);
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_blink));
@@ -695,10 +706,8 @@ void v99x8_device::device_reset()
 }
 
 
-
-
 void v99x8_device::reset_palette ()
-	{
+{
 	// taken from V9938 Technical Data book, page 148. it's in G-R-B format
 	static const UINT8 pal16[16*3] = {
 		0, 0, 0, // 0: black/transparent
@@ -743,48 +752,48 @@ void v99x8_device::reset_palette ()
 
 /***************************************************************************
 
-    Memory functions
+Memory functions
 
 ***************************************************************************/
 
-void v99x8_device::vram_write (int offset, int data)
+void v99x8_device::vram_write(int offset, int data)
 {
 	int newoffset;
 
 	if ( (m_mode == V9938_MODE_GRAPHIC6) || (m_mode == V9938_MODE_GRAPHIC7) )
 	{
-        newoffset = ((offset & 1) << 16) | (offset >> 1);
+		newoffset = ((offset & 1) << 16) | (offset >> 1);
 		if (newoffset < m_vram_size)
-        	m_vram[newoffset] = data;
+			m_vram_space->write_byte(newoffset, data);
 	}
 	else
 	{
 		if (offset < m_vram_size)
-			m_vram[offset] = data;
-        }
+			m_vram_space->write_byte(offset, data);
+	}
 }
 
-int v99x8_device::vram_read (int offset)
+int v99x8_device::vram_read(int offset)
 {
 	if ( (m_mode == V9938_MODE_GRAPHIC6) || (m_mode == V9938_MODE_GRAPHIC7) )
-		return m_vram[((offset & 1) << 16) | (offset >> 1)];
+		return m_vram_space->read_byte(((offset & 1) << 16) | (offset >> 1));
 	else
-		return m_vram[offset];
+		return m_vram_space->read_byte(offset);
 }
 
-void v99x8_device::check_int ()
+void v99x8_device::check_int()
 {
 	UINT8 n;
 
 	n = ( (m_cont_reg[1] & 0x20) && (m_stat_reg[0] & 0x80) /*&& m_vblank_int*/) ||
-		( (m_stat_reg[1] & 0x01) && (m_cont_reg[0] & 0x10) );
+	( (m_stat_reg[1] & 0x01) && (m_cont_reg[0] & 0x10) );
 
-#if 0
+	#if 0
 	if(n && m_vblank_int)
 	{
 		m_vblank_int = 0;
 	}
-#endif
+	#endif
 
 	if (n != m_int_state)
 	{
@@ -796,7 +805,7 @@ void v99x8_device::check_int ()
     ** Somehow the IRQ request is going down without cpu_irq_line () being
     ** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
     ** run. As a patch it's called every scanline
-   */
+    */
 	m_int_callback (*this, n);
 }
 
@@ -832,13 +841,13 @@ void v99x8_device::register_write (int reg, int data)
 	/*update_command ();*/
 
 	switch (reg) {
-	// registers that affect interrupt and display mode
+		// registers that affect interrupt and display mode
 	case 0:
 	case 1:
 		m_cont_reg[reg] = data;
-		set_mode ();
-		check_int ();
-		LOG(("V9938: mode = %s\n", v9938_modes[m_mode]));
+		set_mode();
+		check_int();
+		LOG(("v9938: mode = %s\n", v9938_modes[m_mode]));
 		break;
 
 	case 18:
@@ -862,19 +871,18 @@ void v99x8_device::register_write (int reg, int data)
 		m_pal_write_first = 0;
 		break;
 
-	// color burst registers aren't emulated
+		// color burst registers aren't emulated
 	case 20:
 	case 21:
 	case 22:
-		LOG(("V9938: Write %02xh to R#%d; color burst not emulated\n",
-			data, reg));
+		LOG(("v9938: Write %02xh to R#%d; color burst not emulated\n", data, reg));
 		break;
 	case 25:
 	case 26:
 	case 27:
 		if (m_model != MODEL_V9958)
 		{
-			LOG(("V9938: Attempting to write %02xh to V9958 R#%d\n", data, reg));
+			LOG(("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg));
 			data = 0;
 		}
 		break;
@@ -889,24 +897,27 @@ void v99x8_device::register_write (int reg, int data)
 	}
 
 	if (reg != 15)
-		LOG(("V9938: Write %02x to R#%d\n", data, reg));
+		LOG(("v9938: Write %02x to R#%d\n", data, reg));
 
 	m_cont_reg[reg] = data;
 }
 
 /***************************************************************************
 
-    Refresh / render function
+Refresh / render function
 
 ***************************************************************************/
 
-#define V9938_SECOND_FIELD ( !(((m_cont_reg[9] & 0x04) && !(m_stat_reg[2] & 2)) || m_blink))
+inline bool v99x8_device::v9938_second_field()
+{
+	return !(((m_cont_reg[9] & 0x04) && !(m_stat_reg[2] & 2)) || m_blink);
+}
 
 /*
- * This file is included for a number of different situations:
- * _Width : can be 512 + 32 or 256 + 16
- * V9938_BPP : can be 8 or 16
- */
+* This file is included for a number of different situations:
+* _Width : can be 512 + 32 or 256 + 16
+* V9938_BPP : can be 8 or 16
+*/
 
 
 template<typename _PixelType, int _Width>
@@ -963,13 +974,13 @@ void v99x8_device::mode_text1(const pen_t *pens, _PixelType *ln, int line)
 {
 	int pattern, x, xx, name, xxx;
 	_PixelType fg, bg, pen;
-	UINT8 *nametbl, *patterntbl;
+	int nametbl_addr, patterntbl_addr;
 
-	patterntbl = m_vram + (m_cont_reg[4] << 11);
-	nametbl = m_vram + (m_cont_reg[2] << 10);
+	patterntbl_addr = m_cont_reg[4] << 11;
+	nametbl_addr = m_cont_reg[2] << 10;
 
-    fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
-    bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
+	fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
+	bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
 
 	name = (line/8)*40;
 
@@ -982,8 +993,8 @@ void v99x8_device::mode_text1(const pen_t *pens, _PixelType *ln, int line)
 
 	for (x=0;x<40;x++)
 	{
-		pattern = patterntbl[(nametbl[name] * 8) +
-			((line + m_cont_reg[23]) & 7)];
+		pattern = m_vram_space->read_byte(patterntbl_addr + (m_vram_space->read_byte(nametbl_addr + name) * 8) +
+			((line + m_cont_reg[23]) & 7));
 		for (xx=0;xx<6;xx++)
 		{
 			*ln++ = (pattern & 0x80) ? fg : bg;
@@ -1007,22 +1018,22 @@ void v99x8_device::mode_text2(const pen_t *pens, _PixelType *ln, int line)
 {
 	int pattern, x, charcode, name, xxx, patternmask, colourmask;
 	_PixelType fg, bg, fg0, bg0, pen;
-	UINT8 *nametbl, *patterntbl, *colourtbl;
+	int nametbl_addr, patterntbl_addr, colourtbl_addr;
 
-	patterntbl = m_vram + (m_cont_reg[4] << 11);
-	colourtbl = m_vram + ((m_cont_reg[3] & 0xf8) << 6) + (m_cont_reg[10] << 14);
-#if 0
+	patterntbl_addr = m_cont_reg[4] << 11;
+	colourtbl_addr =  ((m_cont_reg[3] & 0xf8) << 6) + (m_cont_reg[10] << 14);
+	#if 0
 	colourmask = ((m_cont_reg[3] & 7) << 5) | 0x1f; /* cause a bug in Forth+ v1.0 on Geneve */
-#else
+	#else
 	colourmask = ((m_cont_reg[3] & 7) << 6) | 0x3f; /* verify! */
-#endif
-	nametbl = m_vram + ((m_cont_reg[2] & 0xfc) << 10);
+	#endif
+	nametbl_addr = ((m_cont_reg[2] & 0xfc) << 10);
 	patternmask = ((m_cont_reg[2] & 3) << 10) | 0x3ff; /* seems correct */
 
-    fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
-    bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
-    fg0 = pens[m_pal_ind16[m_cont_reg[12] >> 4]];
-    bg0 = pens[m_pal_ind16[m_cont_reg[12] & 15]];
+	fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
+	bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
+	fg0 = pens[m_pal_ind16[m_cont_reg[12] >> 4]];
+	bg0 = pens[m_pal_ind16[m_cont_reg[12] & 15]];
 
 	name = (line/8)*80;
 
@@ -1034,14 +1045,14 @@ void v99x8_device::mode_text2(const pen_t *pens, _PixelType *ln, int line)
 
 	for (x=0;x<80;x++)
 	{
-		charcode = nametbl[name&patternmask];
+		charcode = m_vram_space->read_byte(nametbl_addr + (name&patternmask));
 		if (m_blink)
 		{
-			pattern = colourtbl[(name/8)&colourmask];
+			pattern = m_vram_space->read_byte(colourtbl_addr + ((name/8)&colourmask));
 			if (pattern & (0x80 >> (name & 7) ) )
 			{
-				pattern = patterntbl[(charcode * 8) +
-					((line + m_cont_reg[23]) & 7)];
+				pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode * 8) +
+					((line + m_cont_reg[23]) & 7)));
 
 				if (_Width > 512)
 				{
@@ -1064,8 +1075,8 @@ void v99x8_device::mode_text2(const pen_t *pens, _PixelType *ln, int line)
 			}
 		}
 
-		pattern = patterntbl[(charcode * 8) +
-			((line + m_cont_reg[23]) & 7)];
+		pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode * 8) +
+			((line + m_cont_reg[23]) & 7)));
 
 		if (_Width > 512)
 		{
@@ -1096,12 +1107,12 @@ void v99x8_device::mode_text2(const pen_t *pens, _PixelType *ln, int line)
 template<typename _PixelType, int _Width>
 void v99x8_device::mode_multi(const pen_t *pens, _PixelType *ln, int line)
 {
-	UINT8 *nametbl, *patterntbl, colour;
+	int nametbl_addr, patterntbl_addr, colour;
 	int name, line2, x, xx;
 	_PixelType pen, pen_bg;
 
-	nametbl = m_vram + (m_cont_reg[2] << 10);
-	patterntbl = m_vram + (m_cont_reg[4] << 11);
+	nametbl_addr = (m_cont_reg[2] << 10);
+	patterntbl_addr = (m_cont_reg[4] << 11);
 
 	line2 = (line - m_cont_reg[23]) & 255;
 	name = (line2/8)*32;
@@ -1115,7 +1126,7 @@ void v99x8_device::mode_multi(const pen_t *pens, _PixelType *ln, int line)
 
 	for (x=0;x<32;x++)
 	{
-		colour = patterntbl[(nametbl[name] * 8) + ((line2/4)&7)];
+		colour = m_vram_space->read_byte(patterntbl_addr + (m_vram_space->read_byte(nametbl_addr + name) * 8) + ((line2/4)&7));
 		pen = pens[m_pal_ind16[colour>>4]];
 		/* eight pixels */
 		*ln++ = pen;
@@ -1156,12 +1167,12 @@ template<typename _PixelType, int _Width>
 void v99x8_device::mode_graphic1(const pen_t *pens, _PixelType *ln, int line)
 {
 	_PixelType fg, bg, pen;
-	UINT8 *nametbl, *patterntbl, *colourtbl;
+	int nametbl_addr, patterntbl_addr, colourtbl_addr;
 	int pattern, x, xx, line2, name, charcode, colour, xxx;
 
-	nametbl = m_vram + (m_cont_reg[2] << 10);
-	colourtbl = m_vram + (m_cont_reg[3] << 6) + (m_cont_reg[10] << 14);
-	patterntbl = m_vram + (m_cont_reg[4] << 11);
+	nametbl_addr = (m_cont_reg[2] << 10);
+	colourtbl_addr = (m_cont_reg[3] << 6) + (m_cont_reg[10] << 14);
+	patterntbl_addr = (m_cont_reg[4] << 11);
 
 	line2 = (line - m_cont_reg[23]) & 255;
 
@@ -1176,11 +1187,11 @@ void v99x8_device::mode_graphic1(const pen_t *pens, _PixelType *ln, int line)
 
 	for (x=0;x<32;x++)
 	{
-		charcode = nametbl[name];
-		colour = colourtbl[charcode/8];
+		charcode = m_vram_space->read_byte(nametbl_addr + name);
+		colour = m_vram_space->read_byte(colourtbl_addr + charcode/8);
 		fg = pens[m_pal_ind16[colour>>4]];
 		bg = pens[m_pal_ind16[colour&15]];
-		pattern = patterntbl[charcode * 8 + (line2 & 7)];
+		pattern = m_vram_space->read_byte(patterntbl_addr + (charcode * 8 + (line2 & 7)));
 
 		for (xx=0;xx<8;xx++)
 		{
@@ -1203,16 +1214,16 @@ template<typename _PixelType, int _Width>
 void v99x8_device::mode_graphic23(const pen_t *pens, _PixelType *ln, int line)
 {
 	_PixelType fg, bg, pen;
-	UINT8 *nametbl, *patterntbl, *colourtbl;
+	int nametbl_addr, patterntbl_addr, colourtbl_addr;
 	int pattern, x, xx, line2, name, charcode,
-		colour, colourmask, patternmask, xxx;
+	colour, colourmask, patternmask, xxx;
 
 	colourmask = (m_cont_reg[3] & 0x7f) * 8 | 7;
 	patternmask = (m_cont_reg[4] & 0x03) * 256 | (colourmask & 255);
 
-	nametbl = m_vram + (m_cont_reg[2] << 10);
-	colourtbl = m_vram + ((m_cont_reg[3] & 0x80) << 6) + (m_cont_reg[10] << 14);
-	patterntbl = m_vram + ((m_cont_reg[4] & 0x3c) << 11);
+	nametbl_addr =  (m_cont_reg[2] << 10);
+	colourtbl_addr =  ((m_cont_reg[3] & 0x80) << 6) + (m_cont_reg[10] << 14);
+	patterntbl_addr = ((m_cont_reg[4] & 0x3c) << 11);
 
 	line2 = (line + m_cont_reg[23]) & 255;
 	name = (line2/8)*32;
@@ -1226,17 +1237,17 @@ void v99x8_device::mode_graphic23(const pen_t *pens, _PixelType *ln, int line)
 
 	for (x=0;x<32;x++)
 	{
-		charcode = nametbl[name] + (line2&0xc0)*4;
-		colour = colourtbl[(charcode&colourmask)*8+(line2&7)];
-		pattern = patterntbl[(charcode&patternmask)*8+(line2&7)];
-        fg = pens[m_pal_ind16[colour>>4]];
-        bg = pens[m_pal_ind16[colour&15]];
+		charcode = m_vram_space->read_byte(nametbl_addr + name) + (line2&0xc0)*4;
+		colour = m_vram_space->read_byte(colourtbl_addr + ((charcode&colourmask)*8+(line2&7)));
+		pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode&patternmask)*8+(line2&7)));
+		fg = pens[m_pal_ind16[colour>>4]];
+		bg = pens[m_pal_ind16[colour&15]];
 		for (xx=0;xx<8;xx++)
 		{
 			*ln++ = (pattern & 0x80) ? fg : bg;
 			if (_Width > 512)
 				*ln++ = (pattern & 0x80) ? fg : bg;
-            pattern <<= 1;
+			pattern <<= 1;
 		}
 		name++;
 	}
@@ -1251,7 +1262,7 @@ void v99x8_device::mode_graphic23(const pen_t *pens, _PixelType *ln, int line)
 template<typename _PixelType, int _Width>
 void v99x8_device::mode_graphic4(const pen_t *pens, _PixelType *ln, int line)
 {
-	UINT8 *nametbl, colour;
+	int nametbl_addr, colour;
 	int line2, linemask, x, xx;
 	_PixelType pen, pen_bg;
 
@@ -1259,9 +1270,9 @@ void v99x8_device::mode_graphic4(const pen_t *pens, _PixelType *ln, int line)
 
 	line2 = ((line + m_cont_reg[23]) & linemask) & 255;
 
-	nametbl = m_vram + ((m_cont_reg[2] & 0x40) << 10) + line2 * 128;
-	if ( (m_cont_reg[2] & 0x20) && (V9938_SECOND_FIELD) )
-		nametbl += 0x8000;
+	nametbl_addr = ((m_cont_reg[2] & 0x40) << 10) + line2 * 128;
+	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
+		nametbl_addr += 0x8000;
 
 	pen_bg = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
 	if (_Width < 512)
@@ -1272,12 +1283,12 @@ void v99x8_device::mode_graphic4(const pen_t *pens, _PixelType *ln, int line)
 
 	for (x=0;x<128;x++)
 	{
-		colour = *nametbl++;
-        pen = pens[m_pal_ind16[colour>>4]];
+		colour = m_vram_space->read_byte(nametbl_addr++);
+		pen = pens[m_pal_ind16[colour>>4]];
 		*ln++ = pen;
 		if (_Width > 512)
 			*ln++ = pen;
-        pen = pens[m_pal_ind16[colour&15]];
+		pen = pens[m_pal_ind16[colour&15]];
 		*ln++ = pen;
 		if (_Width > 512)
 			*ln++ = pen;
@@ -1293,7 +1304,7 @@ void v99x8_device::mode_graphic4(const pen_t *pens, _PixelType *ln, int line)
 template<typename _PixelType, int _Width>
 void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 {
-	UINT8 *nametbl, colour;
+	int nametbl_addr, colour;
 	int line2, linemask, x, xx;
 	_PixelType pen_bg0[4];
 	_PixelType pen_bg1[4];
@@ -1302,9 +1313,9 @@ void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 
 	line2 = ((line + m_cont_reg[23]) & linemask) & 255;
 
-	nametbl = m_vram + ((m_cont_reg[2] & 0x40) << 10) + line2 * 128;
-	if ( (m_cont_reg[2] & 0x20) && (V9938_SECOND_FIELD) )
-		nametbl += 0x8000;
+	nametbl_addr = ((m_cont_reg[2] & 0x40) << 10) + line2 * 128;
+	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
+		nametbl_addr += 0x8000;
 
 	if (_Width > 512)
 	{
@@ -1316,7 +1327,7 @@ void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 
 		x = (m_cont_reg[8] & 0x20) ? 0 : 1;
 
-	    for (;x<4;x++)
+		for (;x<4;x++)
 		{
 			pen_bg0[x] = pens[m_pal_ind16[x]];
 			pen_bg1[x] = pens[m_pal_ind16[x]];
@@ -1324,12 +1335,12 @@ void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 
 		for (x=0;x<128;x++)
 		{
-			colour = *nametbl++;
+			colour = m_vram_space->read_byte(nametbl_addr++);
 
-	        *ln++ = pen_bg0[colour>>6];
+			*ln++ = pen_bg0[colour>>6];
 			*ln++ = pen_bg1[(colour>>4)&3];
-	        *ln++ = pen_bg0[(colour>>2)&3];
-	    	*ln++ = pen_bg1[(colour&3)];
+			*ln++ = pen_bg0[(colour>>2)&3];
+			*ln++ = pen_bg1[(colour&3)];
 		}
 
 		pen_bg1[0] = pens[m_pal_ind16[(m_cont_reg[7]&0x03)]];
@@ -1343,7 +1354,7 @@ void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 
 		x = (m_cont_reg[8] & 0x20) ? 0 : 1;
 
-	    for (;x<4;x++)
+		for (;x<4;x++)
 			pen_bg0[x] = pens[m_pal_ind16[x]];
 
 		xx = m_offset_x;
@@ -1351,9 +1362,9 @@ void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 
 		for (x=0;x<128;x++)
 		{
-			colour = *nametbl++;
-	        *ln++ = pen_bg0[colour>>6];
-	        *ln++ = pen_bg0[(colour>>2)&3];
+			colour = m_vram_space->read_byte(nametbl_addr++);
+			*ln++ = pen_bg0[colour>>6];
+			*ln++ = pen_bg0[(colour>>2)&3];
 		}
 
 		pen_bg0[0] = pens[m_pal_ind16[((m_cont_reg[7]>>2)&0x03)]];
@@ -1366,18 +1377,18 @@ void v99x8_device::mode_graphic5(const pen_t *pens, _PixelType *ln, int line)
 template<typename _PixelType, int _Width>
 void v99x8_device::mode_graphic6(const pen_t *pens, _PixelType *ln, int line)
 {
-    UINT8 colour;
-    int line2, linemask, x, xx, nametbl;
-    _PixelType pen_bg, fg0;
+	UINT8 colour;
+	int line2, linemask, x, xx, nametbl_addr;
+	_PixelType pen_bg, fg0;
 	_PixelType fg1;
 
-    linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
+	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
 
 	line2 = ((line + m_cont_reg[23]) & linemask) & 255;
 
-    nametbl = line2 << 8 ;
-	if ( (m_cont_reg[2] & 0x20) && (V9938_SECOND_FIELD) )
-        nametbl += 0x10000;
+	nametbl_addr = line2 << 8 ;
+	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
+		nametbl_addr += 0x10000;
 
 	pen_bg = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
 	if (_Width < 512)
@@ -1390,9 +1401,9 @@ void v99x8_device::mode_graphic6(const pen_t *pens, _PixelType *ln, int line)
 	{
 		for (x=0;x<32;x++)
 		{
-			nametbl++;
-			colour = m_vram[((nametbl&1) << 16) | (nametbl>>1)];
-        	fg0 = pens[m_pal_ind16[colour>>4]];
+			nametbl_addr++;
+			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			fg0 = pens[m_pal_ind16[colour>>4]];
 			if (_Width < 512)
 			{
 				*ln++ = fg0; *ln++ = fg0;
@@ -1402,25 +1413,25 @@ void v99x8_device::mode_graphic6(const pen_t *pens, _PixelType *ln, int line)
 			}
 			else
 			{
-	        	fg1 = pens[m_pal_ind16[colour&15]];
+				fg1 = pens[m_pal_ind16[colour&15]];
 				*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 				*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 				*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 				*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			}
-			nametbl += 7;
+			nametbl_addr += 7;
 		}
 	}
 	else
 	{
 		for (x=0;x<256;x++)
 		{
-			colour = m_vram[((nametbl&1) << 16) | (nametbl>>1)];
-        	*ln++ = pens[m_pal_ind16[colour>>4]];
+			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			*ln++ = pens[m_pal_ind16[colour>>4]];
 			if (_Width > 512)
-	        	*ln++ = pens[m_pal_ind16[colour&15]];
-			nametbl++;
-        }
+				*ln++ = pens[m_pal_ind16[colour&15]];
+			nametbl_addr++;
+		}
 	}
 
 	xx = 16 - m_offset_x;
@@ -1433,17 +1444,17 @@ void v99x8_device::mode_graphic6(const pen_t *pens, _PixelType *ln, int line)
 template<typename _PixelType, int _Width>
 void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 {
-    UINT8 colour;
-    int line2, linemask, x, xx, nametbl;
-    _PixelType pen, pen_bg;
+	UINT8 colour;
+	int line2, linemask, x, xx, nametbl_addr;
+	_PixelType pen, pen_bg;
 
 	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
 
 	line2 = ((line + m_cont_reg[23]) & linemask) & 255;
 
-	nametbl = line2 << 8;
-	if ( (m_cont_reg[2] & 0x20) && (V9938_SECOND_FIELD) )
-		nametbl += 0x10000;
+	nametbl_addr = line2 << 8;
+	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
+		nametbl_addr += 0x10000;
 
 	pen_bg = pens[m_pal_ind256[m_cont_reg[7]]];
 	if (_Width < 512)
@@ -1456,8 +1467,8 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 	{
 		for (x=0;x<32;x++)
 		{
-			nametbl++;
-			colour = m_vram[((nametbl&1) << 16) | (nametbl>>1)];
+			nametbl_addr++;
+			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 			pen = pens[m_pal_ind256[colour]];
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
@@ -1470,20 +1481,20 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 				*ln++ = pen; *ln++ = pen;
 				*ln++ = pen; *ln++ = pen;
 			}
-			nametbl++;
+			nametbl_addr++;
 		}
 	}
 	else
 	{
 		for (x=0;x<256;x++)
-        {
-			colour = m_vram[((nametbl&1) << 16) | (nametbl>>1)];
+		{
+			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 			pen = pens[m_pal_ind256[colour]];
 			*ln++ = pen;
 			if (_Width > 512)
 				*ln++ = pen;
-			nametbl++;
-    	}
+			nametbl_addr++;
+		}
 	}
 
 	xx = 16 - m_offset_x;
@@ -1499,8 +1510,8 @@ void v99x8_device::mode_unknown(const pen_t *pens, _PixelType *ln, int line)
 	_PixelType fg, bg;
 	int x;
 
-    fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
-    bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
+	fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
+	bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
 
 	if (_Width < 512)
 	{
@@ -1586,7 +1597,7 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8
 {
 	static const UINT16 g7_ind16[16] = {
 		0, 2, 192, 194, 48, 50, 240, 242,
-		482, 7, 448, 455, 56, 63, 504, 511  };
+	482, 7, 448, 455, 56, 63, 504, 511  };
 	int i;
 
 	if (_Width > 512)
@@ -1615,16 +1626,16 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8
 
 void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 {
-	UINT8	*attrtbl, *patterntbl, *patternptr;
+	int	attrtbl_addr, patterntbl_addr, pattern_addr;
 	int x, y, p, height, c, p2, i, n, pattern;
 
-	memset (col, 0, 256);
+	memset(col, 0, 256);
 
 	// are sprites disabled?
 	if (m_cont_reg[8] & 0x02) return;
 
-	attrtbl = m_vram + (m_cont_reg[5] << 7) + (m_cont_reg[11] << 15);
-	patterntbl = m_vram + (m_cont_reg[6] << 11);
+	attrtbl_addr = (m_cont_reg[5] << 7) + (m_cont_reg[11] << 15);
+	patterntbl_addr = (m_cont_reg[6] << 11);
 
 	// 16x16 or 8x8 sprites
 	height = (m_cont_reg[1] & 2) ? 16 : 8;
@@ -1634,7 +1645,7 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 	p2 = p = 0;
 	while (1)
 	{
-		y = attrtbl[0];
+		y = m_vram_space->read_byte(attrtbl_addr);
 		if (y == 208) break;
 		y = (y - m_cont_reg[23]) & 255;
 		if (y > 208)
@@ -1654,27 +1665,26 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 				if (m_sprite_limit) break;
 			}
 			// get x
-			x = attrtbl[1];
-			if (attrtbl[3] & 0x80) x -= 32;
+			x = m_vram_space->read_byte(attrtbl_addr + 1);
+			if (m_vram_space->read_byte(attrtbl_addr + 3) & 0x80) x -= 32;
 
 			// get pattern
-			pattern = attrtbl[2];
+			pattern = m_vram_space->read_byte(attrtbl_addr + 2);
 			if (m_cont_reg[1] & 2)
 				pattern &= 0xfc;
 			n = line - y;
-			patternptr = patterntbl + pattern * 8 +
-				((m_cont_reg[1] & 1) ? n/2  : n);
-			pattern = patternptr[0] << 8 | patternptr[16];
+			pattern_addr = patterntbl_addr + pattern * 8 + ((m_cont_reg[1] & 1) ? n/2  : n);
+			pattern = (m_vram_space->read_byte(pattern_addr) << 8) | m_vram_space->read_byte(pattern_addr+16);
 
 			// get colour
-			c = attrtbl[3] & 0x0f;
+			c = m_vram_space->read_byte(attrtbl_addr + 3) & 0x0f;
 
 			// draw left part
 			n = 0;
 			while (1)
 			{
-				if (n == 0) pattern = patternptr[0];
-				else if ( (n == 1) && (m_cont_reg[1] & 2) ) pattern = patternptr[16];
+				if (n == 0) pattern = m_vram_space->read_byte(pattern_addr);
+				else if ( (n == 1) && (m_cont_reg[1] & 2) ) pattern = m_vram_space->read_byte(pattern_addr + 16);
 				else break;
 
 				n++;
@@ -1703,18 +1713,18 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 							if (m_cont_reg[1] & 1)
 							{
 								if (col[x+1] & 0x40)
-    	                        {
-    		                    	// we have a collision!
+								{
+									// we have a collision!
 									if (p2 < 4)
 										m_stat_reg[0] |= 0x20;
-                            	}
-                        		if ( !(col[x+1] & 0x80) )
-	                            {
-		                        	if (c || (m_cont_reg[8] & 0x20) )
+								}
+								if ( !(col[x+1] & 0x80) )
+								{
+									if (c || (m_cont_reg[8] & 0x20) )
 										col[x+1] |= 0xc0 | c;
 									else
 										col[x+1] |= 0x80;
-                            	}
+								}
 							}
 						}
 					}
@@ -1728,7 +1738,7 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 
 		if (p >= 31) break;
 		p++;
-		attrtbl += 4;
+		attrtbl_addr += 4;
 	}
 
 	if ( !(m_stat_reg[0] & 0x40) )
@@ -1737,17 +1747,17 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 
 void v99x8_device::sprite_mode2 (int line, UINT8 *col)
 {
-	int attrtbl, patterntbl, patternptr, colourtbl;
+	int attrtbl_addr, patterntbl_addr, pattern_addr, colourtbl_addr;
 	int x, i, y, p, height, c, p2, n, pattern, colourmask, first_cc_seen;
 
-	memset (col, 0, 256);
+	memset(col, 0, 256);
 
 	// are sprites disabled?
 	if (m_cont_reg[8] & 0x02) return;
 
-	attrtbl = ( (m_cont_reg[5] & 0xfc) << 7) + (m_cont_reg[11] << 15);
-	colourtbl =  ( (m_cont_reg[5] & 0xf8) << 7) + (m_cont_reg[11] << 15);
-	patterntbl = (m_cont_reg[6] << 11);
+	attrtbl_addr = ( (m_cont_reg[5] & 0xfc) << 7) + (m_cont_reg[11] << 15);
+	colourtbl_addr =  ( (m_cont_reg[5] & 0xf8) << 7) + (m_cont_reg[11] << 15);
+	patterntbl_addr = (m_cont_reg[6] << 11);
 	colourmask = ( (m_cont_reg[5] & 3) << 3) | 0x7; // check this!
 
 	// 16x16 or 8x8 sprites
@@ -1758,7 +1768,7 @@ void v99x8_device::sprite_mode2 (int line, UINT8 *col)
 	p2 = p = first_cc_seen = 0;
 	while (1)
 	{
-		y = vram_read (attrtbl);
+		y = vram_read(attrtbl_addr);
 		if (y == 216) break;
 		y = (y - m_cont_reg[23]) & 255;
 		if (y > 216)
@@ -1780,10 +1790,10 @@ void v99x8_device::sprite_mode2 (int line, UINT8 *col)
 
 			n = line - y; if (m_cont_reg[1] & 1) n /= 2;
 			// get colour
-			c = vram_read (colourtbl + (((p&colourmask)*16) + n));
+			c = vram_read(colourtbl_addr + (((p&colourmask)*16) + n));
 
 			// don't draw all sprite with CC set before any sprites
-            // with CC = 0 are seen on this line
+			// with CC = 0 are seen on this line
 			if (c & 0x40)
 			{
 				if (!first_cc_seen)
@@ -1793,15 +1803,14 @@ void v99x8_device::sprite_mode2 (int line, UINT8 *col)
 				first_cc_seen = 1;
 
 			// get pattern
-			pattern = vram_read (attrtbl + 2);
+			pattern = vram_read(attrtbl_addr + 2);
 			if (m_cont_reg[1] & 2)
 				pattern &= 0xfc;
-			patternptr = patterntbl + pattern * 8 + n;
-			pattern = (vram_read (patternptr) << 8) |
-				vram_read (patternptr + 16);
+			pattern_addr = patterntbl_addr + pattern * 8 + n;
+			pattern = (vram_read(pattern_addr) << 8) | vram_read(pattern_addr + 16);
 
 			// get x
-			x = vram_read (attrtbl + 1);
+			x = vram_read(attrtbl_addr + 1);
 			if (c & 0x80) x -= 32;
 
 			n = (m_cont_reg[1] & 2) ? 16 : 8;
@@ -1852,13 +1861,13 @@ void v99x8_device::sprite_mode2 (int line, UINT8 *col)
 				pattern <<= 1;
 			}
 
-skip_first_cc_set:
+		skip_first_cc_set:
 			p2++;
 		}
 
 		if (p >= 31) break;
 		p++;
-		attrtbl += 4;
+		attrtbl_addr += 4;
 	}
 
 	if ( !(m_stat_reg[0] & 0x40) )
@@ -1876,7 +1885,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		NULL,
 		NULL,
-		NULL },
+	NULL },
 	{ 0x01,
 		&v99x8_device::mode_multi<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_multi<UINT16, SHORT_WIDTH>,
@@ -1884,7 +1893,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode1,
 		&v99x8_device::default_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x00,
 		&v99x8_device::mode_graphic1<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic1<UINT16, SHORT_WIDTH>,
@@ -1892,7 +1901,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode1,
 		&v99x8_device::default_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x04,
 		&v99x8_device::mode_graphic23<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic23<UINT16, SHORT_WIDTH>,
@@ -1900,7 +1909,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode1,
 		&v99x8_device::default_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x08,
 		&v99x8_device::mode_graphic23<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic23<UINT16, SHORT_WIDTH>,
@@ -1908,7 +1917,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode2,
 		&v99x8_device::default_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x0c,
 		&v99x8_device::mode_graphic4<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic4<UINT16, SHORT_WIDTH>,
@@ -1916,7 +1925,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode2,
 		&v99x8_device::default_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x10,
 		&v99x8_device::mode_graphic5<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic5<UINT16, SHORT_WIDTH>,
@@ -1924,7 +1933,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::graphic5_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode2,
 		&v99x8_device::graphic5_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::graphic5_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::graphic5_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x14,
 		&v99x8_device::mode_graphic6<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic6<UINT16, SHORT_WIDTH>,
@@ -1932,7 +1941,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode2,
 		&v99x8_device::default_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::default_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x1c,
 		&v99x8_device::mode_graphic7<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_graphic7<UINT16, SHORT_WIDTH>,
@@ -1940,7 +1949,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::graphic7_border<UINT16, SHORT_WIDTH>,
 		&v99x8_device::sprite_mode2,
 		&v99x8_device::graphic7_draw_sprite<UINT16, LONG_WIDTH>,
-		&v99x8_device::graphic7_draw_sprite<UINT16, SHORT_WIDTH> },
+	&v99x8_device::graphic7_draw_sprite<UINT16, SHORT_WIDTH> },
 	{ 0x0a,
 		&v99x8_device::mode_text2<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_text2<UINT16, SHORT_WIDTH>,
@@ -1948,7 +1957,7 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		NULL,
 		NULL,
-		NULL },
+	NULL },
 	{ 0xff,
 		&v99x8_device::mode_unknown<UINT16, LONG_WIDTH>,
 		&v99x8_device::mode_unknown<UINT16, SHORT_WIDTH>,
@@ -1956,10 +1965,10 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 		&v99x8_device::default_border<UINT16, SHORT_WIDTH>,
 		NULL,
 		NULL,
-		NULL },
+	NULL },
 };
 
-void v99x8_device::set_mode ()
+void v99x8_device::set_mode()
 {
 	int n,i;
 
@@ -1971,7 +1980,7 @@ void v99x8_device::set_mode ()
 	m_mode = i;
 }
 
-void v99x8_device::refresh_16 (int line)
+void v99x8_device::refresh_16(int line)
 {
 	const pen_t *pens = machine().pens;
 	int i, double_lines;
@@ -2031,7 +2040,7 @@ void v99x8_device::refresh_16 (int line)
 		memcpy (ln2, ln, (512 + 32) * 2);
 }
 
-void v99x8_device::refresh_line (int line)
+void v99x8_device::refresh_line(int line)
 {
 	int ind16, ind256;
 
@@ -2158,25 +2167,14 @@ I do not know the behaviour of FV when IE0=0. That is the part that I still
 have to test.
 */
 
-void v99x8_device::interrupt_start_vblank ()
+void v99x8_device::interrupt_start_vblank()
 {
-#if 0
+	#if 0
 	if (machine.input().code_pressed (KEYCODE_D) )
 	{
-		FILE *fp;
-		int i;
-
-		fp = fopen ("vram.dmp", "wb");
-		if (fp)
-		{
-			fwrite (m_vram, 0x10000, 1, fp);
-			fclose (fp);
-			popmessage("saved");
-		}
-
 		for (i=0;i<24;i++) mame_printf_debug ("R#%d = %02x\n", i, m_cont_reg[i]);
 	}
-#endif
+	#endif
 
 	// at every frame, vdp switches fields
 	m_stat_reg[2] = (m_stat_reg[2] & 0xfd) | (~m_stat_reg[2] & 2);
@@ -2220,15 +2218,9 @@ void v99x8_device::interrupt_start_vblank ()
 
 /***************************************************************************
 
-    Command unit
+Command unit
 
 ***************************************************************************/
-
-#define VDP m_cont_reg
-#define VDPStatus m_stat_reg
-#define VRAM m_vram
-#define VRAM_EXP m_vram_exp
-#define ScrMode m_mode
 
 /*************************************************************/
 /** Completely rewritten by Alex Wulms:                     **/
@@ -2248,12 +2240,12 @@ void v99x8_device::interrupt_start_vblank ()
 /** Public release 1.0: 20-04-2000                          **/
 /*************************************************************/
 
-#define VDP_VRMP5(MX, X, Y) ((!MX) ? (VRAM + ((Y&1023)<<7) + ((X&255)>>1)) : (VRAM_EXP + ((Y&511)<<7) + ((X&255)>>1)))
-#define VDP_VRMP6(MX, X, Y) ((!MX) ? (VRAM + ((Y&1023)<<7) + ((X&511)>>2)) : (VRAM_EXP + ((Y&511)<<7) + ((X&511)>>2)))
-//#define VDP_VRMP7(MX, X, Y) ((!MX) ? (VRAM + ((Y&511)<<8) + ((X&511)>>1)) : (VRAM_EXP + ((Y&255)<<8) + ((X&511)>>1)))
-#define VDP_VRMP7(MX, X, Y) ((!MX) ? (VRAM + ((X&2)<<15) + ((Y&511)<<7) + ((X&511)>>2)) : (VRAM_EXP + ((Y&511)<<7) + ((X&511)>>2))/*(VRAM_EXP + ((Y&255)<<8) + ((X&511)>>1))*/)
-//#define VDP_VRMP8(MX, X, Y) ((!MX) ? (VRAM + ((Y&511)<<8) + (X&255)) : (VRAM_EXP + ((Y&255)<<8) + (X&255)))
-#define VDP_VRMP8(MX, X, Y) ((!MX) ? (VRAM + ((X&1)<<16) + ((Y&511)<<7) + ((X>>1)&127)) : (VRAM_EXP + ((Y&511)<<7) + ((X>>1)&127))/*(VRAM_EXP + ((Y&255)<<8) + (X&255))*/)
+#define VDP_VRMP5(MX, X, Y) ((!MX) ? (((Y&1023)<<7) + ((X&255)>>1)) : (EXPMEM_OFFSET + ((Y&511)<<7) + ((X&255)>>1)))
+#define VDP_VRMP6(MX, X, Y) ((!MX) ? (((Y&1023)<<7) + ((X&511)>>2)) : (EXPMEM_OFFSET + ((Y&511)<<7) + ((X&511)>>2)))
+//#define VDP_VRMP7(MX, X, Y) ((!MX) ? (((Y&511)<<8) + ((X&511)>>1)) : (EXPMEM_OFFSET + ((Y&255)<<8) + ((X&511)>>1)))
+#define VDP_VRMP7(MX, X, Y) ((!MX) ? (((X&2)<<15) + ((Y&511)<<7) + ((X&511)>>2)) : (EXPMEM_OFFSET + ((Y&511)<<7) + ((X&511)>>2))/*(EXPMEM_OFFSET + ((Y&255)<<8) + ((X&511)>>1))*/)
+//#define VDP_VRMP8(MX, X, Y) ((!MX) ? (((Y&511)<<8) + (X&255)) : (EXPMEM_OFFSET + ((Y&255)<<8) + (X&255)))
+#define VDP_VRMP8(MX, X, Y) ((!MX) ? (((X&1)<<16) + ((Y&511)<<7) + ((X>>1)&127)) : (EXPMEM_OFFSET + ((Y&511)<<7) + ((X>>1)&127))/*(EXPMEM_OFFSET + ((Y&255)<<8) + (X&255))*/)
 
 #define VDP_VRMP(M, MX, X, Y) VDPVRMP(M, MX, X, Y)
 #define VDP_POINT(M, MX, X, Y) VDPpoint(M, MX, X, Y)
@@ -2273,52 +2265,52 @@ void v99x8_device::interrupt_start_vblank ()
 #define CM_YMMM  0xE
 #define CM_HMMC  0xF
 
-/*************************************************************/
-// Many VDP commands are executed in some kind of loop but
-// essentially, there are only a few basic loop structures
-// that are re-used. We define the loop structures that are
-// re-used here so that they have to be entered only once
-/*************************************************************/
+/*************************************************************
+Many VDP commands are executed in some kind of loop but
+essentially, there are only a few basic loop structures
+that are re-used. We define the loop structures that are
+re-used here so that they have to be entered only once
+*************************************************************/
 #define pre_loop \
-    while ((cnt-=delta) > 0) {
+while ((cnt-=delta) > 0) {
 
-#define post_loop \
-    }
+	#define post_loop \
+}
 
 // Loop over DX, DY
 #define post__x_y(MX) \
-    if (!--ANX || ((ADX+=TX)&MX)) { \
-      if (!(--NY&1023) || (DY+=TY)==-1) \
+if (!--ANX || ((ADX+=TX)&MX)) { \
+	if (!(--NY&1023) || (DY+=TY)==-1) \
         break; \
-      else { \
+    else { \
         ADX=DX; \
         ANX=NX; \
-      } \
     } \
-  post_loop
+} \
+post_loop
 
 // Loop over DX, SY, DY
 #define post__xyy(MX) \
-    if ((ADX+=TX)&MX) { \
-      if (!(--NY&1023) || (SY+=TY)==-1 || (DY+=TY)==-1) \
+if ((ADX+=TX)&MX) { \
+	if (!(--NY&1023) || (SY+=TY)==-1 || (DY+=TY)==-1) \
         break; \
-      else \
+    else \
         ADX=DX; \
-    } \
-  post_loop
+} \
+post_loop
 
 // Loop over SX, DX, SY, DY
 #define post_xxyy(MX) \
-    if (!--ANX || ((ASX+=TX)&MX) || ((ADX+=TX)&MX)) { \
-      if (!(--NY&1023) || (SY+=TY)==-1 || (DY+=TY)==-1) \
+if (!--ANX || ((ASX+=TX)&MX) || ((ADX+=TX)&MX)) { \
+	if (!(--NY&1023) || (SY+=TY)==-1 || (DY+=TY)==-1) \
         break; \
-      else { \
+    else { \
         ASX=SX; \
         ADX=DX; \
         ANX=NX; \
-      } \
     } \
-  post_loop
+} \
+post_loop
 
 /*************************************************************/
 /** Variables visible only in this module                   **/
@@ -2330,48 +2322,48 @@ static const int  PPL[4]  = { 256,512,512,256 };
 //  SprOn SprOn SprOf SprOf
 //  ScrOf ScrOn ScrOf ScrOn
 static const int srch_timing[8]={
-  818, 1025,  818,  830, // ntsc
-  696,  854,  696,  684  // pal
+	818, 1025,  818,  830, // ntsc
+	696,  854,  696,  684  // pal
 };
 static const int line_timing[8]={
-  1063, 1259, 1063, 1161,
-  904,  1026, 904,  953
+	1063, 1259, 1063, 1161,
+	904,  1026, 904,  953
 };
 static const int hmmv_timing[8]={
-  439,  549,  439,  531,
-  366,  439,  366,  427
+	439,  549,  439,  531,
+	366,  439,  366,  427
 };
 static const int lmmv_timing[8]={
-  873,  1135, 873, 1056,
-  732,  909,  732,  854
+	873,  1135, 873, 1056,
+	732,  909,  732,  854
 };
 static const int ymmm_timing[8]={
-  586,  952,  586,  610,
-  488,  720,  488,  500
+	586,  952,  586,  610,
+	488,  720,  488,  500
 };
 static const int hmmm_timing[8]={
-  818,  1111, 818,  854,
-  684,  879,  684,  708
+	818,  1111, 818,  854,
+	684,  879,  684,  708
 };
 static const int lmmm_timing[8]={
-  1160, 1599, 1160, 1172,
-  964,  1257, 964,  977
+	1160, 1599, 1160, 1172,
+	964,  1257, 964,  977
 };
 
 /** VDPVRMP() **********************************************/
 /** Calculate addr of a pixel in vram                       **/
 /*************************************************************/
-inline UINT8 *v99x8_device::VDPVRMP(UINT8 M,int MX,int X,int Y)
+inline int v99x8_device::VDPVRMP(UINT8 M,int MX,int X,int Y)
 {
-  switch(M)
-  {
-    case 0: return VDP_VRMP5(MX,X,Y);
-    case 1: return VDP_VRMP6(MX,X,Y);
-    case 2: return VDP_VRMP7(MX,X,Y);
-    case 3: return VDP_VRMP8(MX,X,Y);
-  }
+	switch(M)
+	{
+	case 0: return VDP_VRMP5(MX,X,Y);
+	case 1: return VDP_VRMP6(MX,X,Y);
+	case 2: return VDP_VRMP7(MX,X,Y);
+	case 3: return VDP_VRMP8(MX,X,Y);
+	}
 
-  return(VRAM);
+	return 0;
 }
 
 /** VDPpoint5() ***********************************************/
@@ -2379,9 +2371,9 @@ inline UINT8 *v99x8_device::VDPVRMP(UINT8 M,int MX,int X,int Y)
 /*************************************************************/
 inline UINT8 v99x8_device::VDPpoint5(int MXS, int SX, int SY)
 {
-  return (*VDP_VRMP5(MXS, SX, SY) >>
-          (((~SX)&1)<<2)
-         )&15;
+	return (m_vram_space->read_byte(VDP_VRMP5(MXS, SX, SY)) >>
+		(((~SX)&1)<<2)
+		)&15;
 }
 
 /** VDPpoint6() ***********************************************/
@@ -2389,9 +2381,9 @@ inline UINT8 v99x8_device::VDPpoint5(int MXS, int SX, int SY)
 /*************************************************************/
 inline UINT8 v99x8_device::VDPpoint6(int MXS, int SX, int SY)
 {
-  return (*VDP_VRMP6(MXS, SX, SY) >>
-          (((~SX)&3)<<1)
-         )&3;
+	return (m_vram_space->read_byte(VDP_VRMP6(MXS, SX, SY)) >>
+		(((~SX)&3)<<1)
+		)&3;
 }
 
 /** VDPpoint7() ***********************************************/
@@ -2399,9 +2391,9 @@ inline UINT8 v99x8_device::VDPpoint6(int MXS, int SX, int SY)
 /*************************************************************/
 inline UINT8 v99x8_device::VDPpoint7(int MXS, int SX, int SY)
 {
-  return (*VDP_VRMP7(MXS, SX, SY) >>
-          (((~SX)&1)<<2)
-         )&15;
+	return (m_vram_space->read_byte(VDP_VRMP7(MXS, SX, SY)) >>
+		(((~SX)&1)<<2)
+		)&15;
 }
 
 /** VDPpoint8() ***********************************************/
@@ -2409,7 +2401,7 @@ inline UINT8 v99x8_device::VDPpoint7(int MXS, int SX, int SY)
 /*************************************************************/
 inline UINT8 v99x8_device::VDPpoint8(int MXS, int SX, int SY)
 {
-  return *VDP_VRMP8(MXS, SX, SY);
+	return m_vram_space->read_byte(VDP_VRMP8(MXS, SX, SY));
 }
 
 /** VDPpoint() ************************************************/
@@ -2417,36 +2409,43 @@ inline UINT8 v99x8_device::VDPpoint8(int MXS, int SX, int SY)
 /*************************************************************/
 inline UINT8 v99x8_device::VDPpoint(UINT8 SM, int MXS, int SX, int SY)
 {
-  switch(SM)
-  {
-    case 0: return VDPpoint5(MXS,SX,SY);
-    case 1: return VDPpoint6(MXS,SX,SY);
-    case 2: return VDPpoint7(MXS,SX,SY);
-    case 3: return VDPpoint8(MXS,SX,SY);
-  }
+	switch(SM)
+	{
+	case 0: return VDPpoint5(MXS,SX,SY);
+	case 1: return VDPpoint6(MXS,SX,SY);
+	case 2: return VDPpoint7(MXS,SX,SY);
+	case 3: return VDPpoint8(MXS,SX,SY);
+	}
 
-  return(0);
+	return(0);
 }
 
 /** VDPpsetlowlevel() ****************************************/
 /** Low level function to set a pixel on a screen           **/
 /** Make it inline to make it fast                          **/
 /*************************************************************/
-inline void v99x8_device::VDPpsetlowlevel(UINT8 *P, UINT8 CL, UINT8 M, UINT8 OP)
+inline void v99x8_device::VDPpsetlowlevel(int addr, UINT8 CL, UINT8 M, UINT8 OP)
 {
-  switch (OP)
-  {
-    case 0: *P = (*P & M) | CL; break;
-    case 1: *P = *P & (CL | M); break;
-    case 2: *P |= CL; break;
-    case 3: *P ^= CL; break;
-    case 4: *P = (*P & M) | ~(CL | M); break;
-    case 8: if (CL) *P = (*P & M) | CL; break;
-    case 9: if (CL) *P = *P & (CL | M); break;
-    case 10: if (CL) *P |= CL; break;
-    case 11:  if (CL) *P ^= CL; break;
-    case 12:  if (CL) *P = (*P & M) | ~(CL|M); break;
-  }
+	// If this turns out to be too slow, get a pointer to the address space
+	// and work directly on it.
+	UINT8 val = m_vram_space->read_byte(addr);
+	switch (OP)
+	{
+	case 0: val = (val & M) | CL; break;
+	case 1: val = val & (CL | M); break;
+	case 2: val |= CL; break;
+	case 3: val ^= CL; break;
+	case 4: val = (val & M) | ~(CL | M); break;
+	case 8: if (CL) val = (val & M) | CL; break;
+	case 9: if (CL) val = val & (CL | M); break;
+	case 10: if (CL) val |= CL; break;
+	case 11:  if (CL) val ^= CL; break;
+	case 12:  if (CL) val = (val & M) | ~(CL|M); break;
+	default:
+		LOG(("v9938: invalid operation %d in pset\n", OP));
+	}
+
+	m_vram_space->write_byte(addr, val);
 }
 
 /** VDPpset5() ***********************************************/
@@ -2454,10 +2453,8 @@ inline void v99x8_device::VDPpsetlowlevel(UINT8 *P, UINT8 CL, UINT8 M, UINT8 OP)
 /*************************************************************/
 inline void v99x8_device::VDPpset5(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 {
-  UINT8 SH = ((~DX)&1)<<2;
-
-  VDPpsetlowlevel(VDP_VRMP5(MXD, DX, DY),
-                  CL << SH, ~(15<<SH), OP);
+	UINT8 SH = ((~DX)&1)<<2;
+	VDPpsetlowlevel(VDP_VRMP5(MXD, DX, DY), CL << SH, ~(15<<SH), OP);
 }
 
 /** VDPpset6() ***********************************************/
@@ -2465,10 +2462,9 @@ inline void v99x8_device::VDPpset5(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /*************************************************************/
 inline void v99x8_device::VDPpset6(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 {
-  UINT8 SH = ((~DX)&3)<<1;
+	UINT8 SH = ((~DX)&3)<<1;
 
-  VDPpsetlowlevel(VDP_VRMP6(MXD, DX, DY),
-                  CL << SH, ~(3<<SH), OP);
+	VDPpsetlowlevel(VDP_VRMP6(MXD, DX, DY), CL << SH, ~(3<<SH), OP);
 }
 
 /** VDPpset7() ***********************************************/
@@ -2476,10 +2472,9 @@ inline void v99x8_device::VDPpset6(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /*************************************************************/
 inline void v99x8_device::VDPpset7(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 {
-  UINT8 SH = ((~DX)&1)<<2;
+	UINT8 SH = ((~DX)&1)<<2;
 
-  VDPpsetlowlevel(VDP_VRMP7(MXD, DX, DY),
-                  CL << SH, ~(15<<SH), OP);
+	VDPpsetlowlevel(VDP_VRMP7(MXD, DX, DY), CL << SH, ~(15<<SH), OP);
 }
 
 /** VDPpset8() ***********************************************/
@@ -2487,8 +2482,7 @@ inline void v99x8_device::VDPpset7(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /*************************************************************/
 inline void v99x8_device::VDPpset8(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 {
-  VDPpsetlowlevel(VDP_VRMP8(MXD, DX, DY),
-                  CL, 0, OP);
+	VDPpsetlowlevel(VDP_VRMP8(MXD, DX, DY), CL, 0, OP);
 }
 
 /** VDPpset() ************************************************/
@@ -2496,571 +2490,562 @@ inline void v99x8_device::VDPpset8(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /*************************************************************/
 inline void v99x8_device::VDPpset(UINT8 SM, int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 {
-  switch (SM) {
+	switch (SM) {
     case 0: VDPpset5(MXD, DX, DY, CL, OP); break;
     case 1: VDPpset6(MXD, DX, DY, CL, OP); break;
     case 2: VDPpset7(MXD, DX, DY, CL, OP); break;
     case 3: VDPpset8(MXD, DX, DY, CL, OP); break;
-  }
+    }
 }
 
-/** GetVdpTimingValue() **************************************/
+/** get_vdp_timing_value() **************************************/
 /** Get timing value for a certain VDP command              **/
 /*************************************************************/
-int v99x8_device::GetVdpTimingValue(const int *timing_values)
+int v99x8_device::get_vdp_timing_value(const int *timing_values)
 {
-  return(timing_values[((VDP[1]>>6)&1)|(VDP[8]&2)|((VDP[9]<<1)&4)]);
+	return(timing_values[((m_cont_reg[1]>>6)&1)|(m_cont_reg[8]&2)|((m_cont_reg[9]<<1)&4)]);
 }
 
 /** SrchEgine()** ********************************************/
 /** Search a dot                                            **/
 /*************************************************************/
-void v99x8_device::SrchEngine()
+void v99x8_device::srch_engine()
 {
-  int SX=m_mmc.SX;
-  int SY=m_mmc.SY;
-  int TX=m_mmc.TX;
-  int ANX=m_mmc.ANX;
-  UINT8 CL=m_mmc.CL;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int SX=m_mmc.SX;
+	int SY=m_mmc.SY;
+	int TX=m_mmc.TX;
+	int ANX=m_mmc.ANX;
+	UINT8 CL=m_mmc.CL;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(srch_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(srch_timing);
+	cnt = m_vdp_ops_count;
 
-#define pre_srch \
-    pre_loop \
-      if ((
-#define post_srch(MX) \
-           ==CL) ^ANX) { \
-      VDPStatus[2]|=0x10; /* Border detected */\
-      break; \
-    } \
-    if ((SX+=TX) & MX) { \
-      VDPStatus[2]&=0xEF; /* Border not detected */\
-      break; \
-    } \
-  post_loop
+	#define post_srch(MX) \
+	{ m_stat_reg[2]|=0x10; /* Border detected */ break; } \
+	if ((SX+=TX) & MX) { m_stat_reg[2] &= 0xEF; /* Border not detected */ break; } \
 
-  switch (ScrMode) {
-    default:
-    case 5: pre_srch VDPpoint5(MXD, SX, SY) post_srch(256)
-            break;
-    case 6: pre_srch VDPpoint6(MXD, SX, SY) post_srch(512)
-            break;
-    case 7: pre_srch VDPpoint7(MXD, SX, SY) post_srch(512)
-            break;
-    case 8: pre_srch VDPpoint8(MXD, SX, SY) post_srch(256)
-            break;
-  }
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop if ((VDPpoint5(MXD, SX, SY)==CL) ^ANX)  post_srch(256) post_loop
+			break;
+	case V9938_MODE_GRAPHIC5: pre_loop if ((VDPpoint6(MXD, SX, SY)==CL) ^ANX)  post_srch(512) post_loop
+			break;
+	case V9938_MODE_GRAPHIC6: pre_loop if ((VDPpoint7(MXD, SX, SY)==CL) ^ANX)  post_srch(512) post_loop
+			break;
+	case V9938_MODE_GRAPHIC7: pre_loop if ((VDPpoint8(MXD, SX, SY)==CL) ^ANX)  post_srch(256) post_loop
+			break;
+	}
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    // Update SX in VDP registers
-    VDPStatus[8]=SX&0xFF;
-    VDPStatus[9]=(SX>>8)|0xFE;
-  }
-  else {
-    m_mmc.SX=SX;
-  }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2] &= 0xFE;
+		m_vdp_engine = 0;
+		// Update SX in VDP registers
+		m_stat_reg[8] = SX & 0xFF;
+		m_stat_reg[9] = (SX>>8) | 0xFE;
+	}
+	else {
+		m_mmc.SX=SX;
+	}
 }
 
 /** LineEgine()** ********************************************/
 /** Draw a line                                             **/
 /*************************************************************/
-void v99x8_device::LineEngine()
+void v99x8_device::line_engine()
 {
-  int DX=m_mmc.DX;
-  int DY=m_mmc.DY;
-  int TX=m_mmc.TX;
-  int TY=m_mmc.TY;
-  int NX=m_mmc.NX;
-  int NY=m_mmc.NY;
-  int ASX=m_mmc.ASX;
-  int ADX=m_mmc.ADX;
-  UINT8 CL=m_mmc.CL;
-  UINT8 LO=m_mmc.LO;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int DX=m_mmc.DX;
+	int DY=m_mmc.DY;
+	int TX=m_mmc.TX;
+	int TY=m_mmc.TY;
+	int NX=m_mmc.NX;
+	int NY=m_mmc.NY;
+	int ASX=m_mmc.ASX;
+	int ADX=m_mmc.ADX;
+	UINT8 CL=m_mmc.CL;
+	UINT8 LO=m_mmc.LO;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(line_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(line_timing);
+	cnt = m_vdp_ops_count;
 
-#define post_linexmaj(MX) \
-      DX+=TX; \
-      if ((ASX-=NY)<0) { \
-        ASX+=NX; \
-        DY+=TY; \
-      } \
-      ASX&=1023; /* Mask to 10 bits range */\
-      if (ADX++==NX || (DX&MX)) \
-        break; \
-    post_loop
+	#define post_linexmaj(MX) \
+	DX+=TX; \
+	if ((ASX-=NY)<0) { \
+		ASX+=NX; \
+		DY+=TY; \
+	} \
+	ASX&=1023; /* Mask to 10 bits range */\
+	if (ADX++==NX || (DX&MX)) \
+		break; \
+	post_loop
 
-#define post_lineymaj(MX) \
-      DY+=TY; \
-      if ((ASX-=NY)<0) { \
-        ASX+=NX; \
-        DX+=TX; \
-      } \
-      ASX&=1023; /* Mask to 10 bits range */\
-      if (ADX++==NX || (DX&MX)) \
-        break; \
-    post_loop
+	#define post_lineymaj(MX) \
+	DY+=TY; \
+	if ((ASX-=NY)<0) { \
+		ASX+=NX; \
+		DX+=TX; \
+	} \
+	ASX&=1023; /* Mask to 10 bits range */\
+	if (ADX++==NX || (DX&MX)) \
+		break; \
+	post_loop
 
-  if ((VDP[45]&0x01)==0)
-    // X-Axis is major direction
-    switch (ScrMode) {
-      default:
-      case 5: pre_loop VDPpset5(MXD, DX, DY, CL, LO); post_linexmaj(256)
-              break;
-      case 6: pre_loop VDPpset6(MXD, DX, DY, CL, LO); post_linexmaj(512)
-              break;
-      case 7: pre_loop VDPpset7(MXD, DX, DY, CL, LO); post_linexmaj(512)
-              break;
-      case 8: pre_loop VDPpset8(MXD, DX, DY, CL, LO); post_linexmaj(256)
-              break;
-    }
-  else
-    // Y-Axis is major direction
-    switch (ScrMode) {
-      default:
-      case 5: pre_loop VDPpset5(MXD, DX, DY, CL, LO); post_lineymaj(256)
-              break;
-      case 6: pre_loop VDPpset6(MXD, DX, DY, CL, LO); post_lineymaj(512)
-              break;
-      case 7: pre_loop VDPpset7(MXD, DX, DY, CL, LO); post_lineymaj(512)
-              break;
-      case 8: pre_loop VDPpset8(MXD, DX, DY, CL, LO); post_lineymaj(256)
-              break;
-    }
+	if ((m_cont_reg[45]&0x01)==0)
+		// X-Axis is major direction
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop VDPpset5(MXD, DX, DY, CL, LO); post_linexmaj(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop VDPpset6(MXD, DX, DY, CL, LO); post_linexmaj(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop VDPpset7(MXD, DX, DY, CL, LO); post_linexmaj(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop VDPpset8(MXD, DX, DY, CL, LO); post_linexmaj(256)
+		break;
+	}
+	else
+		// Y-Axis is major direction
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop VDPpset5(MXD, DX, DY, CL, LO); post_lineymaj(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop VDPpset6(MXD, DX, DY, CL, LO); post_lineymaj(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop VDPpset7(MXD, DX, DY, CL, LO); post_lineymaj(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop VDPpset8(MXD, DX, DY, CL, LO); post_lineymaj(256)
+		break;
+	}
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    VDP[38]=DY & 0xFF;
-    VDP[39]=(DY>>8) & 0x03;
-  }
-  else {
-    m_mmc.DX=DX;
-    m_mmc.DY=DY;
-    m_mmc.ASX=ASX;
-    m_mmc.ADX=ADX;
-  }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		m_cont_reg[38]=DY & 0xFF;
+		m_cont_reg[39]=(DY>>8) & 0x03;
+	}
+	else {
+		m_mmc.DX=DX;
+		m_mmc.DY=DY;
+		m_mmc.ASX=ASX;
+		m_mmc.ADX=ADX;
+	}
 }
 
-/** LmmvEngine() *********************************************/
+/** lmmv_engine() *********************************************/
 /** VDP -> Vram                                             **/
 /*************************************************************/
-void v99x8_device::LmmvEngine()
+void v99x8_device::lmmv_engine()
 {
-  int DX=m_mmc.DX;
-  int DY=m_mmc.DY;
-  int TX=m_mmc.TX;
-  int TY=m_mmc.TY;
-  int NX=m_mmc.NX;
-  int NY=m_mmc.NY;
-  int ADX=m_mmc.ADX;
-  int ANX=m_mmc.ANX;
-  UINT8 CL=m_mmc.CL;
-  UINT8 LO=m_mmc.LO;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int DX=m_mmc.DX;
+	int DY=m_mmc.DY;
+	int TX=m_mmc.TX;
+	int TY=m_mmc.TY;
+	int NX=m_mmc.NX;
+	int NY=m_mmc.NY;
+	int ADX=m_mmc.ADX;
+	int ANX=m_mmc.ANX;
+	UINT8 CL=m_mmc.CL;
+	UINT8 LO=m_mmc.LO;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(lmmv_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(lmmv_timing);
+	cnt = m_vdp_ops_count;
 
-  switch (ScrMode) {
-    default:
-    case 5: pre_loop VDPpset5(MXD, ADX, DY, CL, LO); post__x_y(256)
-            break;
-    case 6: pre_loop VDPpset6(MXD, ADX, DY, CL, LO); post__x_y(512)
-            break;
-    case 7: pre_loop VDPpset7(MXD, ADX, DY, CL, LO); post__x_y(512)
-            break;
-    case 8: pre_loop VDPpset8(MXD, ADX, DY, CL, LO); post__x_y(256)
-            break;
-  }
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop VDPpset5(MXD, ADX, DY, CL, LO); post__x_y(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop VDPpset6(MXD, ADX, DY, CL, LO); post__x_y(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop VDPpset7(MXD, ADX, DY, CL, LO); post__x_y(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop VDPpset8(MXD, ADX, DY, CL, LO); post__x_y(256)
+		break;
+	}
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    if (!NY)
-      DY+=TY;
-    VDP[38]=DY & 0xFF;
-    VDP[39]=(DY>>8) & 0x03;
-    VDP[42]=NY & 0xFF;
-    VDP[43]=(NY>>8) & 0x03;
-  }
-  else {
-    m_mmc.DY=DY;
-    m_mmc.NY=NY;
-    m_mmc.ANX=ANX;
-    m_mmc.ADX=ADX;
-  }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		if (!NY)
+			DY+=TY;
+		m_cont_reg[38]=DY & 0xFF;
+		m_cont_reg[39]=(DY>>8) & 0x03;
+		m_cont_reg[42]=NY & 0xFF;
+		m_cont_reg[43]=(NY>>8) & 0x03;
+	}
+	else {
+		m_mmc.DY=DY;
+		m_mmc.NY=NY;
+		m_mmc.ANX=ANX;
+		m_mmc.ADX=ADX;
+	}
 }
 
-/** LmmmEngine() *********************************************/
+/** lmmm_engine() *********************************************/
 /** Vram -> Vram                                            **/
 /*************************************************************/
-void v99x8_device::LmmmEngine()
+void v99x8_device::lmmm_engine()
 {
-  int SX=m_mmc.SX;
-  int SY=m_mmc.SY;
-  int DX=m_mmc.DX;
-  int DY=m_mmc.DY;
-  int TX=m_mmc.TX;
-  int TY=m_mmc.TY;
-  int NX=m_mmc.NX;
-  int NY=m_mmc.NY;
-  int ASX=m_mmc.ASX;
-  int ADX=m_mmc.ADX;
-  int ANX=m_mmc.ANX;
-  UINT8 LO=m_mmc.LO;
-  int MXS = m_mmc.MXS;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int SX=m_mmc.SX;
+	int SY=m_mmc.SY;
+	int DX=m_mmc.DX;
+	int DY=m_mmc.DY;
+	int TX=m_mmc.TX;
+	int TY=m_mmc.TY;
+	int NX=m_mmc.NX;
+	int NY=m_mmc.NY;
+	int ASX=m_mmc.ASX;
+	int ADX=m_mmc.ADX;
+	int ANX=m_mmc.ANX;
+	UINT8 LO=m_mmc.LO;
+	int MXS = m_mmc.MXS;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(lmmm_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(lmmm_timing);
+	cnt = m_vdp_ops_count;
 
-  switch (ScrMode) {
-    default:
-    case 5: pre_loop VDPpset5(MXD, ADX, DY, VDPpoint5(MXS, ASX, SY), LO); post_xxyy(256)
-            break;
-    case 6: pre_loop VDPpset6(MXD, ADX, DY, VDPpoint6(MXS, ASX, SY), LO); post_xxyy(512)
-            break;
-    case 7: pre_loop VDPpset7(MXD, ADX, DY, VDPpoint7(MXS, ASX, SY), LO); post_xxyy(512)
-            break;
-    case 8: pre_loop VDPpset8(MXD, ADX, DY, VDPpoint8(MXS, ASX, SY), LO); post_xxyy(256)
-            break;
-  }
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop VDPpset5(MXD, ADX, DY, VDPpoint5(MXS, ASX, SY), LO); post_xxyy(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop VDPpset6(MXD, ADX, DY, VDPpoint6(MXS, ASX, SY), LO); post_xxyy(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop VDPpset7(MXD, ADX, DY, VDPpoint7(MXS, ASX, SY), LO); post_xxyy(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop VDPpset8(MXD, ADX, DY, VDPpoint8(MXS, ASX, SY), LO); post_xxyy(256)
+		break;
+	}
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    if (!NY) {
-      SY+=TY;
-      DY+=TY;
-    }
-    else
-      if (SY==-1)
-        DY+=TY;
-    VDP[42]=NY & 0xFF;
-    VDP[43]=(NY>>8) & 0x03;
-    VDP[34]=SY & 0xFF;
-    VDP[35]=(SY>>8) & 0x03;
-    VDP[38]=DY & 0xFF;
-    VDP[39]=(DY>>8) & 0x03;
-  }
-  else {
-    m_mmc.SY=SY;
-    m_mmc.DY=DY;
-    m_mmc.NY=NY;
-    m_mmc.ANX=ANX;
-    m_mmc.ASX=ASX;
-    m_mmc.ADX=ADX;
-  }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		if (!NY) {
+			SY+=TY;
+			DY+=TY;
+		}
+		else
+			if (SY==-1)
+			DY+=TY;
+		m_cont_reg[42]=NY & 0xFF;
+		m_cont_reg[43]=(NY>>8) & 0x03;
+		m_cont_reg[34]=SY & 0xFF;
+		m_cont_reg[35]=(SY>>8) & 0x03;
+		m_cont_reg[38]=DY & 0xFF;
+		m_cont_reg[39]=(DY>>8) & 0x03;
+	}
+	else {
+		m_mmc.SY=SY;
+		m_mmc.DY=DY;
+		m_mmc.NY=NY;
+		m_mmc.ANX=ANX;
+		m_mmc.ASX=ASX;
+		m_mmc.ADX=ADX;
+	}
 }
 
-/** LmcmEngine() *********************************************/
+/** lmcm_engine() *********************************************/
 /** Vram -> CPU                                             **/
 /*************************************************************/
-void v99x8_device::LmcmEngine()
+void v99x8_device::lmcm_engine()
 {
-  if ((VDPStatus[2]&0x80)!=0x80) {
+	if ((m_stat_reg[2]&0x80)!=0x80) {
 
-    VDPStatus[7]=VDP[44]=VDP_POINT(((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0, m_mmc.MXS, m_mmc.ASX, m_mmc.SY);
-    m_vdp_ops_count-=GetVdpTimingValue(lmmv_timing);
-    VDPStatus[2]|=0x80;
+		m_stat_reg[7]=m_cont_reg[44]=VDP_POINT(((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0, m_mmc.MXS, m_mmc.ASX, m_mmc.SY);
+		m_vdp_ops_count-=get_vdp_timing_value(lmmv_timing);
+		m_stat_reg[2]|=0x80;
 
-    if (!--m_mmc.ANX || ((m_mmc.ASX+=m_mmc.TX)&m_mmc.MX)) {
-      if (!(--m_mmc.NY & 1023) || (m_mmc.SY+=m_mmc.TY)==-1) {
-        VDPStatus[2]&=0xFE;
-        m_vdp_engine=0;
-        if (!m_mmc.NY)
-          m_mmc.DY+=m_mmc.TY;
-        VDP[42]=m_mmc.NY & 0xFF;
-        VDP[43]=(m_mmc.NY>>8) & 0x03;
-        VDP[34]=m_mmc.SY & 0xFF;
-        VDP[35]=(m_mmc.SY>>8) & 0x03;
-      }
-      else {
-        m_mmc.ASX=m_mmc.SX;
-        m_mmc.ANX=m_mmc.NX;
-      }
-    }
-  }
+		if (!--m_mmc.ANX || ((m_mmc.ASX+=m_mmc.TX)&m_mmc.MX)) {
+			if (!(--m_mmc.NY & 1023) || (m_mmc.SY+=m_mmc.TY)==-1) {
+				m_stat_reg[2]&=0xFE;
+				m_vdp_engine=0;
+				if (!m_mmc.NY)
+					m_mmc.DY+=m_mmc.TY;
+				m_cont_reg[42]=m_mmc.NY & 0xFF;
+				m_cont_reg[43]=(m_mmc.NY>>8) & 0x03;
+				m_cont_reg[34]=m_mmc.SY & 0xFF;
+				m_cont_reg[35]=(m_mmc.SY>>8) & 0x03;
+			}
+			else {
+				m_mmc.ASX=m_mmc.SX;
+				m_mmc.ANX=m_mmc.NX;
+			}
+		}
+	}
 }
 
-/** LmmcEngine() *********************************************/
+/** lmmc_engine() *********************************************/
 /** CPU -> Vram                                             **/
 /*************************************************************/
-void v99x8_device::LmmcEngine()
+void v99x8_device::lmmc_engine()
 {
-  if ((VDPStatus[2]&0x80)!=0x80) {
-    UINT8 SM=((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0;
+	if ((m_stat_reg[2]&0x80)!=0x80) {
+		UINT8 SM=((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0;
 
-    VDPStatus[7]=VDP[44]&=Mask[SM];
-    VDP_PSET(SM, m_mmc.MXD, m_mmc.ADX, m_mmc.DY, VDP[44], m_mmc.LO);
-    m_vdp_ops_count-=GetVdpTimingValue(lmmv_timing);
-    VDPStatus[2]|=0x80;
+		m_stat_reg[7]=m_cont_reg[44]&=Mask[SM];
+		VDP_PSET(SM, m_mmc.MXD, m_mmc.ADX, m_mmc.DY, m_cont_reg[44], m_mmc.LO);
+		m_vdp_ops_count-=get_vdp_timing_value(lmmv_timing);
+		m_stat_reg[2]|=0x80;
 
-    if (!--m_mmc.ANX || ((m_mmc.ADX+=m_mmc.TX)&m_mmc.MX)) {
-      if (!(--m_mmc.NY&1023) || (m_mmc.DY+=m_mmc.TY)==-1) {
-        VDPStatus[2]&=0xFE;
-        m_vdp_engine=0;
-        if (!m_mmc.NY)
-          m_mmc.DY+=m_mmc.TY;
-        VDP[42]=m_mmc.NY & 0xFF;
-        VDP[43]=(m_mmc.NY>>8) & 0x03;
-        VDP[38]=m_mmc.DY & 0xFF;
-        VDP[39]=(m_mmc.DY>>8) & 0x03;
-      }
-      else {
-        m_mmc.ADX=m_mmc.DX;
-        m_mmc.ANX=m_mmc.NX;
-      }
-    }
-  }
+		if (!--m_mmc.ANX || ((m_mmc.ADX+=m_mmc.TX)&m_mmc.MX)) {
+			if (!(--m_mmc.NY&1023) || (m_mmc.DY+=m_mmc.TY)==-1) {
+				m_stat_reg[2]&=0xFE;
+				m_vdp_engine=0;
+				if (!m_mmc.NY)
+					m_mmc.DY+=m_mmc.TY;
+				m_cont_reg[42]=m_mmc.NY & 0xFF;
+				m_cont_reg[43]=(m_mmc.NY>>8) & 0x03;
+				m_cont_reg[38]=m_mmc.DY & 0xFF;
+				m_cont_reg[39]=(m_mmc.DY>>8) & 0x03;
+			}
+			else {
+				m_mmc.ADX=m_mmc.DX;
+				m_mmc.ANX=m_mmc.NX;
+			}
+		}
+	}
 }
 
-/** HmmvEngine() *********************************************/
+/** hmmv_engine() *********************************************/
 /** VDP --> Vram                                            **/
 /*************************************************************/
-void v99x8_device::HmmvEngine()
+void v99x8_device::hmmv_engine()
 {
-  int DX=m_mmc.DX;
-  int DY=m_mmc.DY;
-  int TX=m_mmc.TX;
-  int TY=m_mmc.TY;
-  int NX=m_mmc.NX;
-  int NY=m_mmc.NY;
-  int ADX=m_mmc.ADX;
-  int ANX=m_mmc.ANX;
-  UINT8 CL=m_mmc.CL;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int DX=m_mmc.DX;
+	int DY=m_mmc.DY;
+	int TX=m_mmc.TX;
+	int TY=m_mmc.TY;
+	int NX=m_mmc.NX;
+	int NY=m_mmc.NY;
+	int ADX=m_mmc.ADX;
+	int ANX=m_mmc.ANX;
+	UINT8 CL=m_mmc.CL;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(hmmv_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(hmmv_timing);
+	cnt = m_vdp_ops_count;
 
-  switch (ScrMode) {
+	switch (m_mode) {
     default:
-    case 5: pre_loop *VDP_VRMP5(MXD, ADX, DY) = CL; post__x_y(256)
-            break;
-    case 6: pre_loop *VDP_VRMP6(MXD, ADX, DY) = CL; post__x_y(512)
-            break;
-    case 7: pre_loop *VDP_VRMP7(MXD, ADX, DY) = CL; post__x_y(512)
-            break;
-    case 8: pre_loop *VDP_VRMP8(MXD, ADX, DY) = CL; post__x_y(256)
-            break;
-  }
+    case V9938_MODE_GRAPHIC4: pre_loop m_vram_space->write_byte(VDP_VRMP5(MXD, ADX, DY), CL); post__x_y(256)
+    	break;
+    case V9938_MODE_GRAPHIC5: pre_loop m_vram_space->write_byte(VDP_VRMP6(MXD, ADX, DY), CL); post__x_y(512)
+    	break;
+    case V9938_MODE_GRAPHIC6: pre_loop m_vram_space->write_byte(VDP_VRMP7(MXD, ADX, DY), CL); post__x_y(512)
+    	break;
+    case V9938_MODE_GRAPHIC7: pre_loop m_vram_space->write_byte(VDP_VRMP8(MXD, ADX, DY), CL); post__x_y(256)
+    	break;
+    }
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    if (!NY)
-      DY+=TY;
-    VDP[42]=NY & 0xFF;
-    VDP[43]=(NY>>8) & 0x03;
-    VDP[38]=DY & 0xFF;
-    VDP[39]=(DY>>8) & 0x03;
-  }
-  else {
-    m_mmc.DY=DY;
-    m_mmc.NY=NY;
-    m_mmc.ANX=ANX;
-    m_mmc.ADX=ADX;
-  }
+    if ((m_vdp_ops_count=cnt)>0) {
+    	// Command execution done
+    	m_stat_reg[2]&=0xFE;
+    	m_vdp_engine=0;
+    	if (!NY)
+    		DY+=TY;
+    	m_cont_reg[42]=NY & 0xFF;
+    	m_cont_reg[43]=(NY>>8) & 0x03;
+    	m_cont_reg[38]=DY & 0xFF;
+    	m_cont_reg[39]=(DY>>8) & 0x03;
+    }
+    else {
+    	m_mmc.DY=DY;
+    	m_mmc.NY=NY;
+    	m_mmc.ANX=ANX;
+    	m_mmc.ADX=ADX;
+    }
 }
 
-/** HmmmEngine() *********************************************/
+/** hmmm_engine() *********************************************/
 /** Vram -> Vram                                            **/
 /*************************************************************/
-void v99x8_device::HmmmEngine()
+void v99x8_device::hmmm_engine()
 {
-  int SX=m_mmc.SX;
-  int SY=m_mmc.SY;
-  int DX=m_mmc.DX;
-  int DY=m_mmc.DY;
-  int TX=m_mmc.TX;
-  int TY=m_mmc.TY;
-  int NX=m_mmc.NX;
-  int NY=m_mmc.NY;
-  int ASX=m_mmc.ASX;
-  int ADX=m_mmc.ADX;
-  int ANX=m_mmc.ANX;
-  int MXS = m_mmc.MXS;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int SX=m_mmc.SX;
+	int SY=m_mmc.SY;
+	int DX=m_mmc.DX;
+	int DY=m_mmc.DY;
+	int TX=m_mmc.TX;
+	int TY=m_mmc.TY;
+	int NX=m_mmc.NX;
+	int NY=m_mmc.NY;
+	int ASX=m_mmc.ASX;
+	int ADX=m_mmc.ADX;
+	int ANX=m_mmc.ANX;
+	int MXS = m_mmc.MXS;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(hmmm_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(hmmm_timing);
+	cnt = m_vdp_ops_count;
 
-  switch (ScrMode) {
-    default:
-    case 5: pre_loop *VDP_VRMP5(MXD, ADX, DY) = *VDP_VRMP5(MXS, ASX, SY); post_xxyy(256)
-            break;
-    case 6: pre_loop *VDP_VRMP6(MXD, ADX, DY) = *VDP_VRMP6(MXS, ASX, SY); post_xxyy(512)
-            break;
-    case 7: pre_loop *VDP_VRMP7(MXD, ADX, DY) = *VDP_VRMP7(MXS, ASX, SY); post_xxyy(512)
-            break;
-    case 8: pre_loop *VDP_VRMP8(MXD, ADX, DY) = *VDP_VRMP8(MXS, ASX, SY); post_xxyy(256)
-            break;
-  }
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop m_vram_space->write_byte(VDP_VRMP5(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP5(MXS, ASX, SY))); post_xxyy(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop m_vram_space->write_byte(VDP_VRMP6(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP6(MXS, ASX, SY))); post_xxyy(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop m_vram_space->write_byte(VDP_VRMP7(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP7(MXS, ASX, SY))); post_xxyy(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop m_vram_space->write_byte(VDP_VRMP8(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP8(MXS, ASX, SY))); post_xxyy(256)
+		break;
+	}
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    if (!NY) {
-      SY+=TY;
-      DY+=TY;
-    }
-    else
-      if (SY==-1)
-        DY+=TY;
-    VDP[42]=NY & 0xFF;
-    VDP[43]=(NY>>8) & 0x03;
-    VDP[34]=SY & 0xFF;
-    VDP[35]=(SY>>8) & 0x03;
-    VDP[38]=DY & 0xFF;
-    VDP[39]=(DY>>8) & 0x03;
-  }
-  else {
-    m_mmc.SY=SY;
-    m_mmc.DY=DY;
-    m_mmc.NY=NY;
-    m_mmc.ANX=ANX;
-    m_mmc.ASX=ASX;
-    m_mmc.ADX=ADX;
-  }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		if (!NY) {
+			SY+=TY;
+			DY+=TY;
+		}
+		else
+			if (SY==-1)
+			DY+=TY;
+		m_cont_reg[42]=NY & 0xFF;
+		m_cont_reg[43]=(NY>>8) & 0x03;
+		m_cont_reg[34]=SY & 0xFF;
+		m_cont_reg[35]=(SY>>8) & 0x03;
+		m_cont_reg[38]=DY & 0xFF;
+		m_cont_reg[39]=(DY>>8) & 0x03;
+	}
+	else {
+		m_mmc.SY=SY;
+		m_mmc.DY=DY;
+		m_mmc.NY=NY;
+		m_mmc.ANX=ANX;
+		m_mmc.ASX=ASX;
+		m_mmc.ADX=ADX;
+	}
 }
 
-/** YmmmEngine() *********************************************/
+/** ymmm_engine() *********************************************/
 /** Vram -> Vram                                            **/
 /*************************************************************/
-void v99x8_device::YmmmEngine()
+
+void v99x8_device::ymmm_engine()
 {
-  int SY=m_mmc.SY;
-  int DX=m_mmc.DX;
-  int DY=m_mmc.DY;
-  int TX=m_mmc.TX;
-  int TY=m_mmc.TY;
-  int NY=m_mmc.NY;
-  int ADX=m_mmc.ADX;
-  int MXD = m_mmc.MXD;
-  int cnt;
-  int delta;
+	int SY=m_mmc.SY;
+	int DX=m_mmc.DX;
+	int DY=m_mmc.DY;
+	int TX=m_mmc.TX;
+	int TY=m_mmc.TY;
+	int NY=m_mmc.NY;
+	int ADX=m_mmc.ADX;
+	int MXD = m_mmc.MXD;
+	int cnt;
+	int delta;
 
-  delta = GetVdpTimingValue(ymmm_timing);
-  cnt = m_vdp_ops_count;
+	delta = get_vdp_timing_value(ymmm_timing);
+	cnt = m_vdp_ops_count;
 
-  switch (ScrMode) {
-    default:
-    case 5: pre_loop *VDP_VRMP5(MXD, ADX, DY) = *VDP_VRMP5(MXD, ADX, SY); post__xyy(256)
-            break;
-    case 6: pre_loop *VDP_VRMP6(MXD, ADX, DY) = *VDP_VRMP6(MXD, ADX, SY); post__xyy(512)
-            break;
-    case 7: pre_loop *VDP_VRMP7(MXD, ADX, DY) = *VDP_VRMP7(MXD, ADX, SY); post__xyy(512)
-            break;
-    case 8: pre_loop *VDP_VRMP8(MXD, ADX, DY) = *VDP_VRMP8(MXD, ADX, SY); post__xyy(256)
-            break;
-  }
+	switch (m_mode) {
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop m_vram_space->write_byte(VDP_VRMP5(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP5(MXD, ADX, SY))); post__xyy(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop m_vram_space->write_byte(VDP_VRMP6(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP6(MXD, ADX, SY))); post__xyy(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop m_vram_space->write_byte(VDP_VRMP7(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP7(MXD, ADX, SY))); post__xyy(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop m_vram_space->write_byte(VDP_VRMP8(MXD, ADX, DY), m_vram_space->read_byte(VDP_VRMP8(MXD, ADX, SY))); post__xyy(256)
+		break;
+	}
 
-  if ((m_vdp_ops_count=cnt)>0) {
-    // Command execution done
-    VDPStatus[2]&=0xFE;
-    m_vdp_engine=0;
-    if (!NY) {
-      SY+=TY;
-      DY+=TY;
-    }
-    else
-      if (SY==-1)
-        DY+=TY;
-    VDP[42]=NY & 0xFF;
-    VDP[43]=(NY>>8) & 0x03;
-    VDP[34]=SY & 0xFF;
-    VDP[35]=(SY>>8) & 0x03;
-    VDP[38]=DY & 0xFF;
-    VDP[39]=(DY>>8) & 0x03;
-  }
-  else {
-    m_mmc.SY=SY;
-    m_mmc.DY=DY;
-    m_mmc.NY=NY;
-    m_mmc.ADX=ADX;
-  }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		if (!NY) {
+			SY+=TY;
+			DY+=TY;
+		}
+		else
+			if (SY==-1)
+			DY+=TY;
+		m_cont_reg[42]=NY & 0xFF;
+		m_cont_reg[43]=(NY>>8) & 0x03;
+		m_cont_reg[34]=SY & 0xFF;
+		m_cont_reg[35]=(SY>>8) & 0x03;
+		m_cont_reg[38]=DY & 0xFF;
+		m_cont_reg[39]=(DY>>8) & 0x03;
+	}
+	else {
+		m_mmc.SY=SY;
+		m_mmc.DY=DY;
+		m_mmc.NY=NY;
+		m_mmc.ADX=ADX;
+	}
 }
 
-/** HmmcEngine() *********************************************/
+/** hmmc_engine() *********************************************/
 /** CPU -> Vram                                             **/
 /*************************************************************/
-void v99x8_device::HmmcEngine()
+void v99x8_device::hmmc_engine()
 {
-  if ((VDPStatus[2]&0x80)!=0x80) {
+	if ((m_stat_reg[2]&0x80)!=0x80) {
 
-    *VDP_VRMP(((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0, m_mmc.MXD, m_mmc.ADX, m_mmc.DY)=VDP[44];
-    m_vdp_ops_count-=GetVdpTimingValue(hmmv_timing);
-    VDPStatus[2]|=0x80;
+		m_vram_space->write_byte(VDP_VRMP(((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0, m_mmc.MXD, m_mmc.ADX, m_mmc.DY), m_cont_reg[44]);
+		m_vdp_ops_count -= get_vdp_timing_value(hmmv_timing);
+		m_stat_reg[2]|=0x80;
 
-    if (!--m_mmc.ANX || ((m_mmc.ADX+=m_mmc.TX)&m_mmc.MX)) {
-      if (!(--m_mmc.NY&1023) || (m_mmc.DY+=m_mmc.TY)==-1) {
-        VDPStatus[2]&=0xFE;
-        m_vdp_engine=0;
-        if (!m_mmc.NY)
-          m_mmc.DY+=m_mmc.TY;
-        VDP[42]=m_mmc.NY & 0xFF;
-        VDP[43]=(m_mmc.NY>>8) & 0x03;
-        VDP[38]=m_mmc.DY & 0xFF;
-        VDP[39]=(m_mmc.DY>>8) & 0x03;
-      }
-      else {
-        m_mmc.ADX=m_mmc.DX;
-        m_mmc.ANX=m_mmc.NX;
-      }
-    }
-  }
+		if (!--m_mmc.ANX || ((m_mmc.ADX+=m_mmc.TX)&m_mmc.MX)) {
+			if (!(--m_mmc.NY&1023) || (m_mmc.DY+=m_mmc.TY)==-1) {
+				m_stat_reg[2]&=0xFE;
+				m_vdp_engine=0;
+				if (!m_mmc.NY)
+					m_mmc.DY+=m_mmc.TY;
+				m_cont_reg[42]=m_mmc.NY & 0xFF;
+				m_cont_reg[43]=(m_mmc.NY>>8) & 0x03;
+				m_cont_reg[38]=m_mmc.DY & 0xFF;
+				m_cont_reg[39]=(m_mmc.DY>>8) & 0x03;
+			}
+			else {
+				m_mmc.ADX=m_mmc.DX;
+				m_mmc.ANX=m_mmc.NX;
+			}
+		}
+	}
 }
 
 /** VDPWrite() ***********************************************/
 /** Use this function to transfer pixel(s) from CPU to m_ **/
 /*************************************************************/
-void v99x8_device::cpu_to_vdp (UINT8 V)
+void v99x8_device::cpu_to_vdp(UINT8 V)
 {
-  VDPStatus[2]&=0x7F;
-  VDPStatus[7]=VDP[44]=V;
-  if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
+	m_stat_reg[2]&=0x7F;
+	m_stat_reg[7]=m_cont_reg[44]=V;
+	if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
 }
 
 /** VDPRead() ************************************************/
 /** Use this function to transfer pixel(s) from VDP to CPU. **/
 /*************************************************************/
-UINT8 v99x8_device::vdp_to_cpu ()
+UINT8 v99x8_device::vdp_to_cpu()
 {
-  VDPStatus[2]&=0x7F;
-  if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
-  return(VDP[44]);
+	m_stat_reg[2]&=0x7F;
+	if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
+	return(m_cont_reg[44]);
 }
 
-/** ReportVdpCommand() ***************************************/
+/** report_vdp_command() ***************************************/
 /** Report VDP Command to be executed                       **/
 /*************************************************************/
-void v99x8_device::ReportVdpCommand(UINT8 Op)
+void v99x8_device::report_vdp_command(UINT8 Op)
 {
 	static const char *const Ops[16] =
 	{
@@ -3077,165 +3062,165 @@ void v99x8_device::ReportVdpCommand(UINT8 Op)
 	int SX,SY, DX,DY, NX,NY;
 
 	// Fetch arguments
-	CL = VDP[44];
-	SX = (VDP[32]+((int)VDP[33]<<8)) & 511;
-	SY = (VDP[34]+((int)VDP[35]<<8)) & 1023;
-	DX = (VDP[36]+((int)VDP[37]<<8)) & 511;
-	DY = (VDP[38]+((int)VDP[39]<<8)) & 1023;
-	NX = (VDP[40]+((int)VDP[41]<<8)) & 1023;
-	NY = (VDP[42]+((int)VDP[43]<<8)) & 1023;
+	CL = m_cont_reg[44];
+	SX = (m_cont_reg[32]+((int)m_cont_reg[33]<<8)) & 511;
+	SY = (m_cont_reg[34]+((int)m_cont_reg[35]<<8)) & 1023;
+	DX = (m_cont_reg[36]+((int)m_cont_reg[37]<<8)) & 511;
+	DY = (m_cont_reg[38]+((int)m_cont_reg[39]<<8)) & 1023;
+	NX = (m_cont_reg[40]+((int)m_cont_reg[41]<<8)) & 1023;
+	NY = (m_cont_reg[42]+((int)m_cont_reg[43]<<8)) & 1023;
 	CM = Op>>4;
 	LO = Op&0x0F;
 
 	LOG(("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
-			Op, Commands[CM], Ops[LO],
-			SX,SY, DX,DY, CL, VDP[45]&0x04? -NX:NX,
-			VDP[45]&0x08? -NY:NY,
-			VDP[45]&0x70? " on ExtVRAM":""
+		Op, Commands[CM], Ops[LO],
+		SX,SY, DX,DY, CL, m_cont_reg[45]&0x04? -NX:NX,
+		m_cont_reg[45]&0x08? -NY:NY,
+		m_cont_reg[45]&0x70? " on ExtVRAM":""
 		));
 }
 
 /** VDPDraw() ************************************************/
 /** Perform a given V9938 operation Op.                     **/
 /*************************************************************/
-UINT8 v99x8_device::command_unit_w (UINT8 Op)
+UINT8 v99x8_device::command_unit_w(UINT8 Op)
 {
-  int SM;
+	int SM;
 
-  // V9938 ops only work in SCREENs 5-8
-  if (ScrMode<5)
-    return(0);
+	// V9938 ops only work in SCREENs 5-8
+	if (m_mode<5)
+		return(0);
 
-  SM = ScrMode-5;         // Screen mode index 0..3
+	SM = m_mode-5;		   // Screen mode index 0..3
 
-  m_mmc.CM = Op>>4;
-  if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)
-    // Dot operation: use only relevant bits of color
-    VDPStatus[7]=(VDP[44]&=Mask[SM]);
+	m_mmc.CM = Op>>4;
+	if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)
+		// Dot operation: use only relevant bits of color
+	m_stat_reg[7]=(m_cont_reg[44]&=Mask[SM]);
 
-//  if(Verbose&0x02)
-    ReportVdpCommand(Op);
+	//  if(Verbose&0x02)
+	report_vdp_command(Op);
 
-  switch(Op>>4) {
-    case CM_ABRT:
-      VDPStatus[2]&=0xFE;
-      m_vdp_engine=0;
-      return 1;
-    case CM_POINT:
-      VDPStatus[2]&=0xFE;
-      m_vdp_engine=0;
-      VDPStatus[7]=VDP[44]=
-                   VDP_POINT(SM, (VDP[45] & 0x10) != 0,
-                                 VDP[32]+((int)VDP[33]<<8),
-                                 VDP[34]+((int)VDP[35]<<8));
-      return 1;
-    case CM_PSET:
-      VDPStatus[2]&=0xFE;
-      m_vdp_engine=0;
-      VDP_PSET(SM, (VDP[45] & 0x20) != 0,
-               VDP[36]+((int)VDP[37]<<8),
-               VDP[38]+((int)VDP[39]<<8),
-               VDP[44],
-               Op&0x0F);
-      return 1;
-    case CM_SRCH:
-      m_vdp_engine=&v99x8_device::SrchEngine;
-      break;
-    case CM_LINE:
-      m_vdp_engine=&v99x8_device::LineEngine;
-      break;
-    case CM_LMMV:
-      m_vdp_engine=&v99x8_device::LmmvEngine;
-      break;
-    case CM_LMMM:
-      m_vdp_engine=&v99x8_device::LmmmEngine;
-      break;
-    case CM_LMCM:
-      m_vdp_engine=&v99x8_device::LmcmEngine;
-      break;
-    case CM_LMMC:
-      m_vdp_engine=&v99x8_device::LmmcEngine;
-      break;
-    case CM_HMMV:
-      m_vdp_engine=&v99x8_device::HmmvEngine;
-      break;
-    case CM_HMMM:
-      m_vdp_engine=&v99x8_device::HmmmEngine;
-      break;
-    case CM_YMMM:
-      m_vdp_engine=&v99x8_device::YmmmEngine;
-      break;
-    case CM_HMMC:
-      m_vdp_engine=&v99x8_device::HmmcEngine;
-      break;
-    default:
-      LOG(("V9938: Unrecognized opcode %02Xh\n",Op));
-        return(0);
-  }
+	switch(Op>>4) {
+	case CM_ABRT:
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		return 1;
+	case CM_POINT:
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		m_stat_reg[7]=m_cont_reg[44]=
+		VDP_POINT(SM, (m_cont_reg[45] & 0x10) != 0,
+			m_cont_reg[32]+((int)m_cont_reg[33]<<8),
+			m_cont_reg[34]+((int)m_cont_reg[35]<<8));
+		return 1;
+	case CM_PSET:
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		VDP_PSET(SM, (m_cont_reg[45] & 0x20) != 0,
+			m_cont_reg[36]+((int)m_cont_reg[37]<<8),
+			m_cont_reg[38]+((int)m_cont_reg[39]<<8),
+			m_cont_reg[44],
+			Op&0x0F);
+		return 1;
+	case CM_SRCH:
+		m_vdp_engine=&v99x8_device::srch_engine;
+		break;
+	case CM_LINE:
+		m_vdp_engine=&v99x8_device::line_engine;
+		break;
+	case CM_LMMV:
+		m_vdp_engine=&v99x8_device::lmmv_engine;
+		break;
+	case CM_LMMM:
+		m_vdp_engine=&v99x8_device::lmmm_engine;
+		break;
+	case CM_LMCM:
+		m_vdp_engine=&v99x8_device::lmcm_engine;
+		break;
+	case CM_LMMC:
+		m_vdp_engine=&v99x8_device::lmmc_engine;
+		break;
+	case CM_HMMV:
+		m_vdp_engine=&v99x8_device::hmmv_engine;
+		break;
+	case CM_HMMM:
+		m_vdp_engine=&v99x8_device::hmmm_engine;
+		break;
+	case CM_YMMM:
+		m_vdp_engine=&v99x8_device::ymmm_engine;
+		break;
+	case CM_HMMC:
+		m_vdp_engine=&v99x8_device::hmmc_engine;
+		break;
+	default:
+		LOG(("V9938: Unrecognized opcode %02Xh\n",Op));
+		return(0);
+	}
 
-  // Fetch unconditional arguments
-  m_mmc.SX = (VDP[32]+((int)VDP[33]<<8)) & 511;
-  m_mmc.SY = (VDP[34]+((int)VDP[35]<<8)) & 1023;
-  m_mmc.DX = (VDP[36]+((int)VDP[37]<<8)) & 511;
-  m_mmc.DY = (VDP[38]+((int)VDP[39]<<8)) & 1023;
-  m_mmc.NY = (VDP[42]+((int)VDP[43]<<8)) & 1023;
-  m_mmc.TY = VDP[45]&0x08? -1:1;
-  m_mmc.MX = PPL[SM];
-  m_mmc.CL = VDP[44];
-  m_mmc.LO = Op&0x0F;
-  m_mmc.MXS = (VDP[45] & 0x10) != 0;
-  m_mmc.MXD = (VDP[45] & 0x20) != 0;
+	// Fetch unconditional arguments
+	m_mmc.SX = (m_cont_reg[32]+((int)m_cont_reg[33]<<8)) & 511;
+	m_mmc.SY = (m_cont_reg[34]+((int)m_cont_reg[35]<<8)) & 1023;
+	m_mmc.DX = (m_cont_reg[36]+((int)m_cont_reg[37]<<8)) & 511;
+	m_mmc.DY = (m_cont_reg[38]+((int)m_cont_reg[39]<<8)) & 1023;
+	m_mmc.NY = (m_cont_reg[42]+((int)m_cont_reg[43]<<8)) & 1023;
+	m_mmc.TY = m_cont_reg[45]&0x08? -1:1;
+	m_mmc.MX = PPL[SM];
+	m_mmc.CL = m_cont_reg[44];
+	m_mmc.LO = Op&0x0F;
+	m_mmc.MXS = (m_cont_reg[45] & 0x10) != 0;
+	m_mmc.MXD = (m_cont_reg[45] & 0x20) != 0;
 
-  // Argument depends on UINT8 or dot operation
-  if ((m_mmc.CM & 0x0C) == 0x0C) {
-    m_mmc.TX = VDP[45]&0x04? -PPB[SM]:PPB[SM];
-    m_mmc.NX = ((VDP[40]+((int)VDP[41]<<8)) & 1023)/PPB[SM];
-  }
-  else {
-    m_mmc.TX = VDP[45]&0x04? -1:1;
-    m_mmc.NX = (VDP[40]+((int)VDP[41]<<8)) & 1023;
-  }
+	// Argument depends on UINT8 or dot operation
+	if ((m_mmc.CM & 0x0C) == 0x0C) {
+		m_mmc.TX = m_cont_reg[45]&0x04? -PPB[SM]:PPB[SM];
+		m_mmc.NX = ((m_cont_reg[40]+((int)m_cont_reg[41]<<8)) & 1023)/PPB[SM];
+	}
+	else {
+		m_mmc.TX = m_cont_reg[45]&0x04? -1:1;
+		m_mmc.NX = (m_cont_reg[40]+((int)m_cont_reg[41]<<8)) & 1023;
+	}
 
-  // X loop variables are treated specially for LINE command
-  if (m_mmc.CM == CM_LINE) {
-    m_mmc.ASX=((m_mmc.NX-1)>>1);
-    m_mmc.ADX=0;
-  }
-  else {
-    m_mmc.ASX = m_mmc.SX;
-    m_mmc.ADX = m_mmc.DX;
-  }
+	// X loop variables are treated specially for LINE command
+	if (m_mmc.CM == CM_LINE) {
+		m_mmc.ASX=((m_mmc.NX-1)>>1);
+		m_mmc.ADX=0;
+	}
+	else {
+		m_mmc.ASX = m_mmc.SX;
+		m_mmc.ADX = m_mmc.DX;
+	}
 
-  // NX loop variable is treated specially for SRCH command
-  if (m_mmc.CM == CM_SRCH)
-    m_mmc.ANX=(VDP[45]&0x02)!=0; // Do we look for "==" or "!="?
-  else
-    m_mmc.ANX = m_mmc.NX;
+	// NX loop variable is treated specially for SRCH command
+	if (m_mmc.CM == CM_SRCH)
+		m_mmc.ANX=(m_cont_reg[45]&0x02)!=0; // Do we look for "==" or "!="?
+	else
+		m_mmc.ANX = m_mmc.NX;
 
-  // Command execution started
-  VDPStatus[2]|=0x01;
+	// Command execution started
+	m_stat_reg[2]|=0x01;
 
-  // Start execution if we still have time slices
-  if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
+	// Start execution if we still have time slices
+	if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
 
-  // Operation successfull initiated
-  return(1);
+	// Operation successfull initiated
+	return(1);
 }
 
-/** LoopVDP() ************************************************/
-/** Run X steps of active VDP command                       **/
-/*************************************************************/
-void v99x8_device::update_command ()
+/** LoopVDP() ************************************************
+Run X steps of active VDP command
+*************************************************************/
+void v99x8_device::update_command()
 {
-  if(m_vdp_ops_count<=0)
-  {
-    m_vdp_ops_count+=13662;
-    if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
-  }
-  else
-  {
-    m_vdp_ops_count=13662;
-    if(m_vdp_engine) (this->*m_vdp_engine)();
-  }
+	if(m_vdp_ops_count<=0)
+	{
+		m_vdp_ops_count+=13662;
+		if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
+	}
+	else
+	{
+		m_vdp_ops_count=13662;
+		if(m_vdp_engine) (this->*m_vdp_engine)();
+	}
 }
 
