@@ -994,8 +994,8 @@ static DRIVER_INIT( wpksoc )
 
 /***************************************************************************/
 
-GAME( 1993, firebarr,      0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", 0 )
+GAME( 1993, firebarr,      0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL )
 // Air Assault : World version of Fire Barrel, seen on location at the London Trocadero
-GAME( 1994, dsoccr94,      0, dsoccr94, dsoccr94, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", 0 )
-GAME( 1995, wpksoc,        0, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_MECHANICAL )
-GAME( 1994, kftgoal,  wpksoc, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_MECHANICAL )
+GAME( 1994, dsoccr94,      0, dsoccr94, dsoccr94, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", GAME_NO_COCKTAIL )
+GAME( 1995, wpksoc,        0, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
+GAME( 1994, kftgoal,  wpksoc, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )

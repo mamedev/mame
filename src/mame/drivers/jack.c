@@ -1430,7 +1430,7 @@ GAME( 1982, treahunt, jack,     jack,    treahunt, treahunt, ROT90,  "bootleg? (
 GAME( 1982, zzyzzyxx, 0,        jack,    zzyzzyxx, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zzyzzyxx2,zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, brix,     zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", GAME_SUPPORTS_SAVE )
-GAME( 1984, freeze,   0,        jack,    freeze,   jack,     ROT90,  "Cinematronics",               "Freeze", GAME_SUPPORTS_SAVE )
+GAME( 1984, freeze,   0,        jack,    freeze,   jack,     ROT90,  "Cinematronics",               "Freeze", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1984, sucasino, 0,        jack,    sucasino, jack,     ROT90,  "Data Amusement",              "Super Casino", GAME_SUPPORTS_SAVE )
 GAME( 1981, tripool,  0,        tripool, tripool,  jack,     ROT90,  "Noma (Casino Tech license)",  "Tri-Pool (Casino Tech)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tripoola, tripool,  tripool, tripool,  jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_SUPPORTS_SAVE )

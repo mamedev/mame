@@ -1084,5 +1084,5 @@ static DRIVER_INIT( galpani3 )
 	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16) );
 }
 
-GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

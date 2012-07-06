@@ -4001,7 +4001,7 @@ GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    gtmr2, ROT0,  "Kaneko", "Gre
 GAME( 1992, brapboys, 0,        brapboys, brapboys, brapboys,   ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
 GAME( 1992, brapboysj,brapboys, brapboys, brapboys, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
 GAME( 1992, brapboysu,brapboys, brapboys, brapboys, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (US)", 0 )
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", 0 )
-GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)",    0 )
-GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", 0 )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL )
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL )
+GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL )
 

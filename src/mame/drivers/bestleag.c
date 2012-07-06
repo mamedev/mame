@@ -460,6 +460,6 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1993, bestleag, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", 0 )
-GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", 0 )
+GAME( 1993, bestleag, bigstrik, bestleag, bestleag, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", GAME_NO_COCKTAIL )
+GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", GAME_NO_COCKTAIL )
 
