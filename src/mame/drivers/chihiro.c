@@ -1825,7 +1825,7 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! family 6 model 8 stepping 10 */
+	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
 
