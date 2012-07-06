@@ -9484,11 +9484,10 @@ ROM_START( arbalest )
 	ROM_LOAD16_BYTE( "uk-001-004",  0x000001, 0x040000, CRC(902bb4e3) SHA1(e37a361a7c03aee2d6ac8c96c2dd6c1e411b46fb) ) /* Mask ROM on P1-037A sub PCB */
 
 	ROM_REGION( 0x010000, "sub", 0 )		/* 65c02 Code */
-	ROM_LOAD( "uk001.05", 0x006000, 0x002000, CRC(0339fc53) SHA1(9078f70a319132ef12c59b85e6306d5549a858f1) ) /* EPROM on P1-037A sub PCB */
-	ROM_RELOAD(           0x008000, 0x002000  )
-	ROM_RELOAD(           0x00a000, 0x002000  )
-	ROM_RELOAD(           0x00c000, 0x002000  )
-	ROM_RELOAD(           0x00e000, 0x002000  )
+	/* Label is correct, 1st & 2nd halves identical is correct. Chip is a 27128 - Verified on 2 different PCBs */
+	ROM_LOAD( "uk6005", 0x006000, 0x004000, CRC(48c73a4a) SHA1(1284ae7236a82a5898a57ec0451b7dcc4d409099) ) /* EPROM on P1-037A sub PCB */
+	ROM_RELOAD(         0x00a000, 0x004000  )
+	ROM_RELOAD(         0x00e000, 0x002000  )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD16_BYTE( "uk001.06", 0x000000, 0x040000, CRC(11c75746) SHA1(7faf9a26534397d21211d5ef25ca53c4eb286474) )
