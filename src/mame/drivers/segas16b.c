@@ -6465,7 +6465,7 @@ ROM_END
     attempting to use those ROMs on a real PCB / emulator will result
     in the game failing after a few stages.
 */
-ROM_START( fantzn2x )
+ROM_START( fantzn2x ) // based on PS2 version
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "fz2.a7", 0x00000, 0x20000, CRC(94c05f0b) SHA1(53da68a919776a46ae96dbc094ff941308d13613) )
 	ROM_LOAD16_BYTE( "fz2.a5", 0x00001, 0x20000, CRC(f3526895) SHA1(3197956608138601192f111d3bcc26662a7d6ec1) )
@@ -6495,6 +6495,36 @@ ROM_START( fantzn2x )
 	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "fz2.a10", 0x00000, 0x08000, CRC(92c92924) SHA1(3c98cea8f42c316405b28ae03469c6876de5e806) )
 	ROM_LOAD( "fz2.a11", 0x10000, 0x20000, CRC(8c641bb9) SHA1(920da63961d2f3457c80d4c5f6d4f405374bb23a) )
+ROM_END
+
+ROM_START( fantzn2xp ) // based on trial version
+	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "cpu1b.bin", 0x000000, 0x20000, CRC(d23ef944) SHA1(e147a436a661442dda0e7643e1adc169cc12a9e8) )
+	ROM_LOAD16_BYTE( "cpu1a.bin", 0x000001, 0x20000, CRC(407490e4) SHA1(19e0db715f8ca647454f9da03a3a944ecc0b956c) )
+	/* empty 0x40000 - 0x80000 */
+	ROM_LOAD16_BYTE( "cpu1d.bin", 0x080000, 0x20000, CRC(c8c7716b) SHA1(9f8f83307dc47fc7456f292f17d51595fa60a77f) )
+	ROM_LOAD16_BYTE( "cpu1c.bin", 0x080001, 0x20000, CRC(242e7b6e) SHA1(25d311d463ba95089be9b0b44c482a634ecb70a0) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "tilea.bin", 0x00000, 0x20000, CRC(47e0e5ce) SHA1(604ed062d7e7d640c49732d2c3202c991410381a) )
+	ROM_LOAD( "tileb.bin", 0x20000, 0x20000, CRC(59e181b7) SHA1(0d57d7b49b85baafa3038dc5b7551fea85f4f5c8) )
+	ROM_LOAD( "tilec.bin", 0x40000, 0x20000, CRC(375d354c) SHA1(2af5374777b13cb5aefb7fe90adea0b4d79e9202) )
+
+	ROM_REGION16_BE( 0x140000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "obja.bin", 0x000001, 0x20000, CRC(9af87a4d) SHA1(b4f0f40f96c4081803742bc6576c37edff6eab16) )
+	ROM_LOAD16_BYTE( "objb.bin", 0x000000, 0x20000, CRC(2fdbca68) SHA1(bc0c96bba9e89f2711267b737ecd4bf2a177edda) )
+	ROM_LOAD16_BYTE( "objc.bin", 0x040001, 0x20000, CRC(2587487a) SHA1(eb04c03e918f1d98c36360f2b089018fe25f8dad) )
+	ROM_LOAD16_BYTE( "objd.bin", 0x040000, 0x20000, CRC(8de4e7aa) SHA1(0b1b7b54306d680fb6c9142947a292847789b887) )
+	ROM_LOAD16_BYTE( "obje.bin", 0x080001, 0x20000, CRC(dfada4ff) SHA1(1a8f2b706d629042f64b8158f906e351d77898f2) )
+	ROM_LOAD16_BYTE( "objf.bin", 0x080000, 0x20000, CRC(65e5d23d) SHA1(97479e84c74ec65176365f5abd5f43927ec13056) )
+	ROM_LOAD16_BYTE( "objg.bin", 0x0c0001, 0x20000, CRC(dc9fbb75) SHA1(b774d7b1debe65241358d3ef327773c3dce6ad1e) )
+	ROM_LOAD16_BYTE( "objh.bin", 0x0c0000, 0x20000, CRC(97bb7c19) SHA1(07e2cc9a76ca5e01a4b66e55d2824caead2f033d) )
+	ROM_LOAD16_BYTE( "obji.bin", 0x100001, 0x20000, CRC(c7790fee) SHA1(bd4ce6ad439042f3d2da9f756f7ba82630102386) )
+	ROM_LOAD16_BYTE( "objj.bin", 0x100000, 0x20000, CRC(4535eb0e) SHA1(aaa067c509bc669a80a42df2f827c2bc0179b721) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "cpu2a.bin", 0x00000, 0x08000, CRC(92c92924) SHA1(3c98cea8f42c316405b28ae03469c6876de5e806) )
+	ROM_LOAD( "cpu2b.bin", 0x10000, 0x20000, CRC(2c8ad475) SHA1(9ef1ed5aab81a82844ccb0949cb393a8d1abac92) )
 ROM_END
 
 
@@ -6872,6 +6902,7 @@ GAME( 1989, wrestwar1,  wrestwar, system16b,           wrestwar, generic_5704,  
 
 /* Extra RAM, dubbed by M2 as 'System 16C' */
 GAME( 2008, fantzn2x,   0,        system16b,           fz2,  generic_5704_extra_ram, ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
+GAME( 2008, fantzn2xp,  fantzn2x, system16b,           fz2,  generic_5704_extra_ram, ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
 
 /* Custom Korean Board - these probably belong with the bootlegs... */
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  atomicp,            ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
