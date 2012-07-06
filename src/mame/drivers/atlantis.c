@@ -18,12 +18,18 @@
         * Midway Zeus-series custom video
         * TL16c552 dual UART
         * ADSP-2181 based DCS2 audio (unclear which variant)
+        * PIC16C57 (protection? serial #?)
+        * Quantum Fireball CX 6.4GB IDE HDD (C/H/S 13328/15/63)
 
     TODO:
         * Proper VR4373 implementation
         * Proper PCI bus implementation
         * PCI peripherals
-
+ 
+    NOTES:
+        * Skins Game is Linux based; the kernel is a customized 2.2.10 build of Linux-MIPS with Midway PCBs
+          added as recognized system types
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -187,6 +193,13 @@ ROM_START( mwskinsa )
 	DISK_IMAGE( "mwskinsa", 0, SHA1(72497917b31156eb11a46bbcc6f22a254dcec044) )
 ROM_END
 
+ROM_START( mwskinso )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4310 code */
+    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
+
+	DISK_REGION( "drive_0" )
+	DISK_IMAGE( "mwskins104", 0, SHA1(6917f66718999c144c854795c5856bf5659b85fa) )
+ROM_END
 
 /*************************************
  *
@@ -206,5 +219,6 @@ static DRIVER_INIT( mwskins )
  *************************************/
 
 GAME( 2000, mwskins,    0,      mwskins, mwskins,  mwskins,   ROT0, "Midway", "Skins Game (1.06)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2000, mwskinsa, mwskins,  mwskins, mwskins,  mwskins,   ROT0, "Midway", "Skins Game (unknown alt. version)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, mwskinsa, mwskins,  mwskins, mwskins,  mwskins,   ROT0, "Midway", "Skins Game (1.06, alt)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, mwskinso, mwskins,  mwskins, mwskins,  mwskins,   ROT0, "Midway", "Skins Game (1.04)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
