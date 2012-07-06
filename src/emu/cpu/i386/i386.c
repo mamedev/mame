@@ -8,6 +8,11 @@
         Intel 486
         Intel Pentium
         Cyrix MediaGX
+		Intel Pentium MMX
+		Intel Pentium Pro
+		Intel Pentium II
+		Intel Pentium III
+		Intel Pentium 4
 */
 
 #include "emu.h"
@@ -3617,7 +3622,7 @@ static CPU_RESET( pentium )
 
 	cpustate->a20_mask = ~0;
 
-	cpustate->cr[0] = 0x60000010;
+	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0x00200000;
 	cpustate->eflags_mask = 0x003f7fd7;
 	cpustate->eip = 0xfff0;
@@ -3632,7 +3637,7 @@ static CPU_RESET( pentium )
 	REG32(EAX) = 0;
 	REG32(EDX) = (5 << 8) | (2 << 4) | (5);
 
-	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_MMX | OP_SSE);
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
 	build_x87_opcode_table(get_safe_token(device));
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];
 	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];
@@ -3820,8 +3825,497 @@ CPU_GET_INFO( mediagx )
 	}
 }
 
+/*****************************************************************************/
+/* Intel Pentium Pro */
+
+static CPU_INIT( pentium_pro )
+{
+	CPU_INIT_CALL(pentium);
+}
+
+static CPU_RESET( pentium_pro )
+{
+	i386_state *cpustate = get_safe_token(device);
+	device_irq_acknowledge_callback save_irqcallback;
+
+	save_irqcallback = cpustate->irq_callback;
+	memset( cpustate, 0, sizeof(*cpustate) );
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
+	cpustate->io = device->space(AS_IO);
+
+	cpustate->sreg[CS].selector = 0xf000;
+	cpustate->sreg[CS].base		= 0xffff0000;
+	cpustate->sreg[CS].limit	= 0xffff;
+	cpustate->sreg[CS].flags    = 0x009b;
+
+	cpustate->sreg[DS].base = cpustate->sreg[ES].base = cpustate->sreg[FS].base = cpustate->sreg[GS].base = cpustate->sreg[SS].base = 0x00000000;
+	cpustate->sreg[DS].limit = cpustate->sreg[ES].limit = cpustate->sreg[FS].limit = cpustate->sreg[GS].limit = cpustate->sreg[SS].limit = 0xffff;
+	cpustate->sreg[DS].flags = cpustate->sreg[ES].flags = cpustate->sreg[FS].flags = cpustate->sreg[GS].flags = cpustate->sreg[SS].flags = 0x0092;
+
+	cpustate->idtr.base = 0;
+	cpustate->idtr.limit = 0x3ff;
+
+	cpustate->a20_mask = ~0;
+
+	cpustate->cr[0] = 0x60000010;
+	cpustate->eflags = 0x00200000;
+	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	cpustate->eip = 0xfff0;
+	cpustate->mxcsr = 0x1f80;
+
+	x87_reset(cpustate);
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 6, Model 1 (Pentium Pro)
+	REG32(EAX) = 0;
+	REG32(EDX) = (6 << 8) | (1 << 4) | (1);	/* TODO: is this correct? */
+
+	build_x87_opcode_table(get_safe_token(device));
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO);
+	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+
+	cpustate->cpuid_id0 = 0x756e6547;	// Genu
+	cpustate->cpuid_id1 = 0x49656e69;	// ineI
+	cpustate->cpuid_id2 = 0x6c65746e;	// ntel
+
+	cpustate->cpuid_max_input_value_eax = 0x02;
+	cpustate->cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	cpustate->feature_flags = 0x00000001;		// TODO: enable relevant flags here
+
+	CHANGE_PC(cpustate,cpustate->eip);
+}
+
+static CPU_EXIT( pentium_pro )
+{
+}
+
+static CPU_SET_INFO( pentium_pro )
+{
+	switch (state)
+	{
+		default:										CPU_SET_INFO_CALL(pentium);			break;
+	}
+}
+
+CPU_GET_INFO( pentium_pro )
+{
+	switch (state)
+	{
+		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium_pro);	break;
+		case CPUINFO_FCT_INIT:		    				info->init = CPU_INIT_NAME(pentium_pro);	break;
+		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(pentium_pro);	break;
+		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(pentium_pro);	break;
+
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pentium Pro");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium Pro");	break;
+
+		default:										CPU_GET_INFO_CALL(pentium);				break;
+	}
+}
+
+/*****************************************************************************/
+/* Intel Pentium MMX */
+
+static CPU_INIT( pentium_mmx )
+{
+	CPU_INIT_CALL(pentium);
+}
+
+static CPU_RESET( pentium_mmx )
+{
+	i386_state *cpustate = get_safe_token(device);
+	device_irq_acknowledge_callback save_irqcallback;
+
+	save_irqcallback = cpustate->irq_callback;
+	memset( cpustate, 0, sizeof(*cpustate) );
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
+	cpustate->io = device->space(AS_IO);
+
+	cpustate->sreg[CS].selector = 0xf000;
+	cpustate->sreg[CS].base		= 0xffff0000;
+	cpustate->sreg[CS].limit	= 0xffff;
+	cpustate->sreg[CS].flags    = 0x009b;
+
+	cpustate->sreg[DS].base = cpustate->sreg[ES].base = cpustate->sreg[FS].base = cpustate->sreg[GS].base = cpustate->sreg[SS].base = 0x00000000;
+	cpustate->sreg[DS].limit = cpustate->sreg[ES].limit = cpustate->sreg[FS].limit = cpustate->sreg[GS].limit = cpustate->sreg[SS].limit = 0xffff;
+	cpustate->sreg[DS].flags = cpustate->sreg[ES].flags = cpustate->sreg[FS].flags = cpustate->sreg[GS].flags = cpustate->sreg[SS].flags = 0x0092;
+
+	cpustate->idtr.base = 0;
+	cpustate->idtr.limit = 0x3ff;
+
+	cpustate->a20_mask = ~0;
+
+	cpustate->cr[0] = 0x60000010;
+	cpustate->eflags = 0x00200000;
+	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	cpustate->eip = 0xfff0;
+	cpustate->mxcsr = 0x1f80;
+
+	x87_reset(cpustate);
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 5, Model 4 (P55C)
+	REG32(EAX) = 0;
+	REG32(EDX) = (5 << 8) | (4 << 4) | (1);
+
+	build_x87_opcode_table(get_safe_token(device));
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_MMX);
+	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+
+	cpustate->cpuid_id0 = 0x756e6547;	// Genu
+	cpustate->cpuid_id1 = 0x49656e69;	// ineI
+	cpustate->cpuid_id2 = 0x6c65746e;	// ntel
+
+	cpustate->cpuid_max_input_value_eax = 0x01;
+	cpustate->cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	cpustate->feature_flags = 0x00000001;		// TODO: enable relevant flags here
+
+	CHANGE_PC(cpustate,cpustate->eip);
+}
+
+static CPU_EXIT( pentium_mmx )
+{
+}
+
+static CPU_SET_INFO( pentium_mmx )
+{
+	switch (state)
+	{
+		default:										CPU_SET_INFO_CALL(pentium);			break;
+	}
+}
+
+CPU_GET_INFO( pentium_mmx )
+{
+	switch (state)
+	{
+		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium_mmx);	break;
+		case CPUINFO_FCT_INIT:		    				info->init = CPU_INIT_NAME(pentium_mmx);	break;
+		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(pentium_mmx);	break;
+		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(pentium_mmx);	break;
+
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pentium MMX");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium");		break;
+
+		default:										CPU_GET_INFO_CALL(pentium);				break;
+	}
+}
+
+/*****************************************************************************/
+/* Intel Pentium II */
+
+static CPU_INIT( pentium2 )
+{
+	CPU_INIT_CALL(pentium);
+}
+
+static CPU_RESET( pentium2 )
+{
+	i386_state *cpustate = get_safe_token(device);
+	device_irq_acknowledge_callback save_irqcallback;
+
+	save_irqcallback = cpustate->irq_callback;
+	memset( cpustate, 0, sizeof(*cpustate) );
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
+	cpustate->io = device->space(AS_IO);
+
+	cpustate->sreg[CS].selector = 0xf000;
+	cpustate->sreg[CS].base		= 0xffff0000;
+	cpustate->sreg[CS].limit	= 0xffff;
+	cpustate->sreg[CS].flags    = 0x009b;
+
+	cpustate->sreg[DS].base = cpustate->sreg[ES].base = cpustate->sreg[FS].base = cpustate->sreg[GS].base = cpustate->sreg[SS].base = 0x00000000;
+	cpustate->sreg[DS].limit = cpustate->sreg[ES].limit = cpustate->sreg[FS].limit = cpustate->sreg[GS].limit = cpustate->sreg[SS].limit = 0xffff;
+	cpustate->sreg[DS].flags = cpustate->sreg[ES].flags = cpustate->sreg[FS].flags = cpustate->sreg[GS].flags = cpustate->sreg[SS].flags = 0x0092;
+
+	cpustate->idtr.base = 0;
+	cpustate->idtr.limit = 0x3ff;
+
+	cpustate->a20_mask = ~0;
+
+	cpustate->cr[0] = 0x60000010;
+	cpustate->eflags = 0x00200000;
+	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	cpustate->eip = 0xfff0;
+	cpustate->mxcsr = 0x1f80;
+
+	x87_reset(cpustate);
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 6, Model 3 (Pentium II / Klamath)
+	REG32(EAX) = 0;
+	REG32(EDX) = (6 << 8) | (3 << 4) | (1);	/* TODO: is this correct? */
+
+	build_x87_opcode_table(get_safe_token(device));
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX);
+	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+
+	cpustate->cpuid_id0 = 0x756e6547;	// Genu
+	cpustate->cpuid_id1 = 0x49656e69;	// ineI
+	cpustate->cpuid_id2 = 0x6c65746e;	// ntel
+
+	cpustate->cpuid_max_input_value_eax = 0x02;
+	cpustate->cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	cpustate->feature_flags = 0x00000001;		// TODO: enable relevant flags here
+
+	CHANGE_PC(cpustate,cpustate->eip);
+}
+
+static CPU_EXIT( pentium2 )
+{
+}
+
+static CPU_SET_INFO( pentium2 )
+{
+	switch (state)
+	{
+		default:										CPU_SET_INFO_CALL(pentium);			break;
+	}
+}
+
+CPU_GET_INFO( pentium2 )
+{
+	switch (state)
+	{
+		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium2);	break;
+		case CPUINFO_FCT_INIT:		    				info->init = CPU_INIT_NAME(pentium2);		break;
+		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(pentium2);		break;
+		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(pentium2);		break;
+
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pentium II");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium II");	break;
+
+		default:										CPU_GET_INFO_CALL(pentium2);				break;
+	}
+}
+
+/*****************************************************************************/
+/* Intel Pentium III */
+
+static CPU_INIT( pentium3 )
+{
+	CPU_INIT_CALL(pentium);
+}
+
+static CPU_RESET( pentium3 )
+{
+	i386_state *cpustate = get_safe_token(device);
+	device_irq_acknowledge_callback save_irqcallback;
+
+	save_irqcallback = cpustate->irq_callback;
+	memset( cpustate, 0, sizeof(*cpustate) );
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
+	cpustate->io = device->space(AS_IO);
+
+	cpustate->sreg[CS].selector = 0xf000;
+	cpustate->sreg[CS].base		= 0xffff0000;
+	cpustate->sreg[CS].limit	= 0xffff;
+	cpustate->sreg[CS].flags    = 0x009b;
+
+	cpustate->sreg[DS].base = cpustate->sreg[ES].base = cpustate->sreg[FS].base = cpustate->sreg[GS].base = cpustate->sreg[SS].base = 0x00000000;
+	cpustate->sreg[DS].limit = cpustate->sreg[ES].limit = cpustate->sreg[FS].limit = cpustate->sreg[GS].limit = cpustate->sreg[SS].limit = 0xffff;
+	cpustate->sreg[DS].flags = cpustate->sreg[ES].flags = cpustate->sreg[FS].flags = cpustate->sreg[GS].flags = cpustate->sreg[SS].flags = 0x0092;
+
+	cpustate->idtr.base = 0;
+	cpustate->idtr.limit = 0x3ff;
+
+	cpustate->a20_mask = ~0;
+
+	cpustate->cr[0] = 0x60000010;
+	cpustate->eflags = 0x00200000;
+	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	cpustate->eip = 0xfff0;
+	cpustate->mxcsr = 0x1f80;
+
+	x87_reset(cpustate);
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 6, Model 8 (Pentium III / Coppermine)
+	REG32(EAX) = 0;
+	REG32(EDX) = (6 << 8) | (8 << 4) | (10);
+
+	build_x87_opcode_table(get_safe_token(device));
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
+	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+
+	cpustate->cpuid_id0 = 0x756e6547;	// Genu
+	cpustate->cpuid_id1 = 0x49656e69;	// ineI
+	cpustate->cpuid_id2 = 0x6c65746e;	// ntel
+
+	cpustate->cpuid_max_input_value_eax = 0x03;
+	cpustate->cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	cpustate->feature_flags = 0x00000001;		// TODO: enable relevant flags here
+
+	CHANGE_PC(cpustate,cpustate->eip);
+}
+
+static CPU_EXIT( pentium3 )
+{
+}
+
+static CPU_SET_INFO( pentium3 )
+{
+	switch (state)
+	{
+		default:										CPU_SET_INFO_CALL(pentium);			break;
+	}
+}
+
+CPU_GET_INFO( pentium3 )
+{
+	switch (state)
+	{
+		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium3);	break;
+		case CPUINFO_FCT_INIT:		    				info->init = CPU_INIT_NAME(pentium3);		break;
+		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(pentium3);		break;
+		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(pentium3);		break;
+
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pentium III");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium III");	break;
+
+		default:										CPU_GET_INFO_CALL(pentium);				break;
+	}
+}
+
+/*****************************************************************************/
+/* Intel Pentium 4 */
+
+static CPU_INIT( pentium4 )
+{
+	CPU_INIT_CALL(pentium);
+}
+
+static CPU_RESET( pentium4 )
+{
+	i386_state *cpustate = get_safe_token(device);
+	device_irq_acknowledge_callback save_irqcallback;
+
+	save_irqcallback = cpustate->irq_callback;
+	memset( cpustate, 0, sizeof(*cpustate) );
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
+	cpustate->io = device->space(AS_IO);
+
+	cpustate->sreg[CS].selector = 0xf000;
+	cpustate->sreg[CS].base		= 0xffff0000;
+	cpustate->sreg[CS].limit	= 0xffff;
+	cpustate->sreg[CS].flags    = 0x009b;
+
+	cpustate->sreg[DS].base = cpustate->sreg[ES].base = cpustate->sreg[FS].base = cpustate->sreg[GS].base = cpustate->sreg[SS].base = 0x00000000;
+	cpustate->sreg[DS].limit = cpustate->sreg[ES].limit = cpustate->sreg[FS].limit = cpustate->sreg[GS].limit = cpustate->sreg[SS].limit = 0xffff;
+	cpustate->sreg[DS].flags = cpustate->sreg[ES].flags = cpustate->sreg[FS].flags = cpustate->sreg[GS].flags = cpustate->sreg[SS].flags = 0x0092;
+
+	cpustate->idtr.base = 0;
+	cpustate->idtr.limit = 0x3ff;
+
+	cpustate->a20_mask = ~0;
+
+	cpustate->cr[0] = 0x60000010;
+	cpustate->eflags = 0x00200000;
+	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	cpustate->eip = 0xfff0;
+	cpustate->mxcsr = 0x1f80;
+
+	x87_reset(cpustate);
+
+	// [27:20] Extended family
+	// [19:16] Extended model
+	// [13:12] Type
+	// [11: 8] Family
+	// [ 7: 4] Model
+	// [ 3: 0] Stepping ID
+	// Family 15, Model 0 (Pentium 4 / Willamette)
+	REG32(EAX) = 0;
+	REG32(EDX) = (0 << 20) | (0xf << 8) | (0 << 4) | (1);
+
+	build_x87_opcode_table(get_safe_token(device));
+	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE | OP_SSE2);
+	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];	// TODO: generate own cycle tables
+
+	cpustate->cpuid_id0 = 0x756e6547;	// Genu
+	cpustate->cpuid_id1 = 0x49656e69;	// ineI
+	cpustate->cpuid_id2 = 0x6c65746e;	// ntel
+
+	cpustate->cpuid_max_input_value_eax = 0x02;
+	cpustate->cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	cpustate->feature_flags = 0x00000001;		// TODO: enable relevant flags here
+
+	CHANGE_PC(cpustate,cpustate->eip);
+}
+
+static CPU_EXIT( pentium4 )
+{
+}
+
+static CPU_SET_INFO( pentium4 )
+{
+	switch (state)
+	{
+		default:										CPU_SET_INFO_CALL(pentium);			break;
+	}
+}
+
+CPU_GET_INFO( pentium4 )
+{
+	switch (state)
+	{
+		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium4);	break;
+		case CPUINFO_FCT_INIT:		    				info->init = CPU_INIT_NAME(pentium4);		break;
+		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(pentium4);		break;
+		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(pentium4);		break;
+
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pentium 4");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium 4");		break;
+
+		default:										CPU_GET_INFO_CALL(pentium);				break;
+	}
+}
+
+
 DEFINE_LEGACY_CPU_DEVICE(I386, i386);
 DEFINE_LEGACY_CPU_DEVICE(I486, i486);
 DEFINE_LEGACY_CPU_DEVICE(PENTIUM, pentium);
 DEFINE_LEGACY_CPU_DEVICE(MEDIAGX, mediagx);
+DEFINE_LEGACY_CPU_DEVICE(PENTIUM_PRO, pentium_pro);
+DEFINE_LEGACY_CPU_DEVICE(PENTIUM_MMX, pentium_mmx);
+DEFINE_LEGACY_CPU_DEVICE(PENTIUM2, pentium2);
+DEFINE_LEGACY_CPU_DEVICE(PENTIUM3, pentium3);
+DEFINE_LEGACY_CPU_DEVICE(PENTIUM4, pentium4);
 
