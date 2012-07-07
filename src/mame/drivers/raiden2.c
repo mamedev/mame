@@ -1,6 +1,5 @@
 /* Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
     TODO: figure out the rest of the protection
-    TODO: Zero Team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
     TODO: Zero Team presumably needs additive blending on the character screen
 */
 
@@ -1349,7 +1348,7 @@ ADDRESS_MAP_END
 /* INPUT PORTS */
 
 static INPUT_PORTS_START( raiden2 )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS_INVERT	/* coin inputs read through sound cpu */
 
 	PORT_START("P1_P2")	/* IN0/1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1438,6 +1437,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( zeroteam )
 	PORT_INCLUDE( raiden2 )
 
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(4)
+
 	PORT_MODIFY("P1_P2")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -1513,10 +1516,10 @@ static INPUT_PORTS_START( zeroteam )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0700, 0x0700, "Cabinet Setting" ) PORT_DIPLOCATION("SW3:!1,!2,!3")
 	PORT_DIPSETTING(    0x0700, "2P" )
-	PORT_DIPSETTING(    0x0600, "3P 3Slot" ) // TODO: coin3 is not hooked up here
-	PORT_DIPSETTING(    0x0500, "4P 4Slot" ) // TODO: coin3 and 4 are not hooked up here
+	PORT_DIPSETTING(    0x0600, "3P 3Slot" )
+	PORT_DIPSETTING(    0x0500, "4P 4Slot" )
 	PORT_DIPSETTING(    0x0400, "3P 2Slot" )
-	PORT_DIPSETTING(    0x0300, "2P x2" ) // TODO: coin3 and 4 are not hooked up here
+	PORT_DIPSETTING(    0x0300, "2P x2" )
 	PORT_DIPSETTING(    0x0200, "4P 2Slot" )
 	PORT_DIPSETTING(    0x0100, "2P Freeplay" )
 	PORT_DIPSETTING(    0x0000, "4P Freeplay" )
