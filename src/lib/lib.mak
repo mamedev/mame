@@ -144,6 +144,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/pmd_cas.o		\
 	$(LIBOBJ)/formats/primoptp.o	\
 	$(LIBOBJ)/formats/rk_cas.o		\
+	$(LIBOBJ)/formats/sc3000_bit.o	\
 	$(LIBOBJ)/formats/smx_dsk.o		\
 	$(LIBOBJ)/formats/sorc_dsk.o	\
 	$(LIBOBJ)/formats/sord_cas.o	\
