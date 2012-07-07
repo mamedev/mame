@@ -6,9 +6,9 @@
 
     Games supported:
         * Cruis'n USA (1994)        [3 sets]
-        * Cruis'n World (1996)      [6 sets]
+        * Cruis'n World (1996)      [7 sets]
         * War Gods (1996)           [3 sets]
-        * Off Road Challenge (1997) [4 sets]
+        * Off Road Challenge (1997) [5 sets]
 
     Known bugs:
         * textures for automatic/manual selection get overwritten in Cruis'n World
@@ -19,6 +19,9 @@
            Sound D/RAM      ERROR EE (during boot diag)
            Listen for Tone  ERROR E1 (during boot diag)
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
+
+Known to exist but not dumped:
+    Off Road Challenge v1.00 (Mon 07-28-97)
 
 **************************************************************************/
 
