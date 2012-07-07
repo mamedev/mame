@@ -248,11 +248,11 @@ SOUND_RESET( taito_en_soundsystem_reset )
 
 static void mb87078_gain_changed( running_machine &machine, int channel, int percent )
 {
-	if (channel < 2)
+	if (channel > 1)
 	{
 		es5505_device *es5505 = machine.device<es5505_device>("ensoniq");
 
-		es5505->set_output_gain(channel, percent / 100.0);
+		es5505->set_output_gain(channel & 1, percent / 100.0);
 	}
 }
 
