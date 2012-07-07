@@ -3040,7 +3040,7 @@ PCB Number: P-FG-02
 CN1   - 7 Pin connector
 CN2-1 - 3 Pin connector
 CN2-2 - 3 Pin connector
-CN3   - 10 Pin connector
+CN3   - 10 Pin connector (used for extra buttons)
 
 * Denotes not populated. U56 is unpopulated 93C45 EEPROM
 
@@ -3054,12 +3054,16 @@ Note:
   The graphics roms dumped that way have the first half as a bad mirror
   of the second half (even <- odd, odd <- FF). They seem OK dumped as 27C160.
 
+Program ROMs:
+  Labeled roms (undumped) have been seen as KF003002 & KF003004, which
+  revision do have?
+
 ***************************************************************************/
 
 ROM_START( reelquak )
 	ROM_REGION( 0x100000, "maincpu", 0 )	// TMP68301 Code
-	ROM_LOAD16_BYTE( "rq_ver1.05.u2", 0x00000, 0x80000, CRC(7740d7a4) SHA1(21c28db5d4d7eea5a2506cb51b58533eba28c2cb) )
-	ROM_LOAD16_BYTE( "rq_ver1.05.u3", 0x00001, 0x80000, CRC(8c78889e) SHA1(584ba123e9caafdbddc96a4d9b2b6f6994fa84b0) )
+	ROM_LOAD16_BYTE( "rq_ver1.05.u2", 0x00000, 0x80000, CRC(7740d7a4) SHA1(21c28db5d4d7eea5a2506cb51b58533eba28c2cb) ) /* Should be KF00x002, x = revision */
+	ROM_LOAD16_BYTE( "rq_ver1.05.u3", 0x00001, 0x80000, CRC(8c78889e) SHA1(584ba123e9caafdbddc96a4d9b2b6f6994fa84b0) ) /* Should be KF00x004, x = revision */
 
 	ROM_REGION( 0x800000, "sprites", 0 )	// Sprites
 	ROM_LOAD( "kf-001-005_t42.u16", 0x000000, 0x200000, CRC(25e07d5c) SHA1(dd0818611f39be25dc6f0c737da4e79c6c0f9659) )
