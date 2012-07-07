@@ -139,7 +139,7 @@ PALETTE_INIT( flipjack )
 		palette_set_color_rgb(machine, 2*i+0, pal1bit(color_prom[i] >> 1), pal1bit(color_prom[i] >> 2), pal1bit(color_prom[i] >> 0));
 	}
 
-	// standard 1bpp for blitter
+	// standard 3bpp for blitter
 	for (int i = 0; i < 8; i++)
 		palette_set_color_rgb(machine, i+0x80, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }

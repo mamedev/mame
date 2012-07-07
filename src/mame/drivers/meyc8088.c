@@ -37,7 +37,7 @@ class meyc8088_state : public driver_device
 {
 public:
 	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat")
@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_lights1_w);
 	DECLARE_WRITE8_MEMBER(meyc8088_lights2_w);
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
+
 	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
 };
 
@@ -237,7 +238,6 @@ READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 
 READ8_MEMBER(meyc8088_state::meyc8088_status_r)
 {
-
 	// d0: /CR2
 	// d1: screen on
 	// d2: video5
@@ -264,7 +264,6 @@ WRITE8_MEMBER(meyc8088_state::meyc8088_lights2_w)
 
 WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
 {
-
 	// d0: /CR2
 	m_status = (m_status & ~1) | (data & 1);
 

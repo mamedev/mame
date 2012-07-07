@@ -6,6 +6,7 @@ driver by Angelo Salese
 
 A fortune-teller machine with 24 characters LED-array and a printer.
 M6809 CPU, 2KB RAM
+It is not Y2K compliant.
 
 Rough cpanel sketch:
 
@@ -48,8 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(sound_on_w);
-	DECLARE_WRITE8_MEMBER(sound_off_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -153,14 +153,10 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		coin_counter_w(machine(), 0, newval);
 }
 
-WRITE8_MEMBER(destiny_state::sound_on_w)
+WRITE8_MEMBER(destiny_state::sound_w)
 {
-	beep_set_state(machine().device(BEEPER_TAG),1);
-}
-
-WRITE8_MEMBER(destiny_state::sound_off_w)
-{
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	// a0: sound on/off
+	beep_set_state(machine().device(BEEPER_TAG), ~offset & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
@@ -174,8 +170,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
 	AM_RANGE(0x9005, 0x9005) AM_READ_PORT("DIPSW") AM_WRITE(out_w)
 //  AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
 //  AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
-	AM_RANGE(0x900a, 0x900a) AM_WRITE(sound_on_w)
-	AM_RANGE(0x900b, 0x900b) AM_WRITE(sound_off_w)
+	AM_RANGE(0x900a, 0x900b) AM_WRITE(sound_w)
 	AM_RANGE(0x900c, 0x900c) AM_WRITE(bank_select_w)
 //  AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
 //  AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
