@@ -897,7 +897,7 @@ static MACHINE_RESET( hornet )
 	UINT8 *usr5 = machine.root_device().memregion("user5")->base();
 	if (usr3 != NULL)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
 
@@ -1019,7 +1019,7 @@ static MACHINE_RESET( hornet_2board )
 
 	if (usr3 != NULL)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
