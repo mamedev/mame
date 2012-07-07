@@ -7,6 +7,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_dsp(*this,"dsp"),
+		m_gfx2(*this, "gfx2"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
 		m_snd_shared_ram(*this, "snd_shared"),
@@ -48,6 +49,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
+	required_memory_region m_gfx2;
+
 	required_shared_ptr<UINT32> m_vram;
 	required_shared_ptr<UINT32> m_objlist;
 	optional_shared_ptr<UINT32> m_snd_shared_ram;

@@ -601,7 +601,6 @@ READ8_MEMBER(taitojc_state::jc_pcbid_r)
 
 READ32_MEMBER(taitojc_state::dsp_shared_r)
 {
-
 	return m_dsp_shared_ram[offset] << 16;
 }
 
@@ -911,8 +910,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
-	UINT16 *rom = (UINT16*)machine().root_device().memregion("gfx2")->base();
-	UINT16 data = rom[m_dsp_rom_pos++];
+	UINT16 data = ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
 
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
 	return data;
