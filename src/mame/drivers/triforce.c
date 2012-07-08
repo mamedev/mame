@@ -677,8 +677,24 @@ ROM_START( vs42006 )
 ROM_END
 
 
+// This dump is tested good on h/w: was flashed to a dead cart and it then ran fine
+ROM_START( mkartagp )
+	TRIFORCE_BIOS
+
+    ROM_REGION(0x19000000, "rom_board", 0)
+    ROM_LOAD( "ic9_29lv400t",    0x00000000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) ) 
+    ROM_LOAD( "ic1_k9f1208u0b",  0x01000000, 0x4200000, CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) ) 
+    ROM_LOAD( "ic2_k9f1208u0b",  0x04200000, 0x4200000, CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) ) 
+    ROM_LOAD( "ic5_k9f1208u0b",  0x08400000, 0x4200000, CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) ) 
+    ROM_LOAD( "ic6_k9f1208u0b",  0x0c600000, 0x4200000, CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) ) 
+    ROM_LOAD( "ic35_k9f1208u0b", 0x10800000, 0x4200000, CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) ) 
+    ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) ) 
+ROM_END
+
 
 GAME( 2002, triforce, 0,        triforcegd,    triforce,    0, ROT0, "Sega",           "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
+
+// GD-ROM games
 GAME( 2002, vs2002j,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
 GAME( 2002, vs2002ex, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
 GAME( 2003, avalons,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "The Key Of Avalon - The Wizard Master - Server (GDT-0005C) (V4.001)", GAME_IS_SKELETON )
@@ -689,3 +705,7 @@ GAME( 2004, vs4j,     triforce, triforcegd,    triforce,    0, ROT0, "Sega",    
 GAME( 2004, vs4,      triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_IS_SKELETON )
 GAME( 2004, avalon20, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_IS_SKELETON )
 GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
+
+// ROM games
+GAME( 2005, mkartagp, triforce, triforce_base, triforce,    0, ROT0, "Namco",          "Mario Kart Arcade GP", GAME_IS_SKELETON )
+
