@@ -445,6 +445,18 @@ ROM_START( scptour )
 	DISK_IMAGE_READONLY( "scp1cd0", 0, SHA1(19fa70ba22787704c40f0a8f27bc841218bbc99b) )
 ROM_END
 
+ROM_START( superdbz )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "db1vera.ic002", 0x000000, 0x800000, NO_DUMP )
+    ROM_LOAD( "db1vera_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "db1vera", 0, SHA1(5f4031e2beda9c1cd4a5a9a07740fa50946b73f2) )
+ROM_END
+
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, dragchrn,   sys246, system246, system246, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_IS_SKELETON)
@@ -468,6 +480,7 @@ GAME(2005, soulclb3a,soulclb3, system246, system246, 0, ROT0, "Namco", "Soul Cal
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_IS_SKELETON)
+GAME(2005, superdbz,   sys256, system256, system246, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
