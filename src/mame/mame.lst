@@ -5666,6 +5666,8 @@ timepltc		// GX393 (c) 1982 + Centuri license
 timeplta		// GX393 (c) 1982 + Atari license
 spaceplt		// bootleg
 psurge			// (c) 1988 unknown (NOT Konami)
+chkun			// Peni Soft (NOT Konami)
+bikkuric		// Peni Soft (NOT Konami)
 megazone		// GX319 (c) 1983
 megazonea		// GX319 (c) 1983
 megazoneb		// GX319 (c) 1983 + Kosuka
@@ -19808,16 +19810,17 @@ suprstar		// (c) 1996 Amatic
 am_mg24			// (c) 2000 Amatic
 am_mg3			// (c) 2000 Amatic
 am_mg3a			// (c) 2000 Amatic
+am_mg35i  		// (c) Amatic
+am_mg34i  		// (c) Amatic
+am_mg33i  		// (c) Amatic
+am_mg31i  		// (c) Amatic
+
 
 neptunp2
 rgum
 
 // Extrema Systems International Ltd.
 poker72
-
-// Peni Soft, actually an hack on modified Time Pilot HW
-chkun
-bikkuric
 
 // Blitz System Inc.
 megadpkr		// (c) 1990 Blitz System Inc
