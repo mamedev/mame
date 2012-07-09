@@ -165,7 +165,8 @@ public:
 
 	// force symbols to be cached
 	void cache_symbols() { scan_file_for_address(0, true); }
-
+	
+	void reset_cache() { m_cache.reset(); }
 private:
 	// internal helpers
 	bool query_system_for_address(FPTR address);
@@ -1806,6 +1807,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 		printf("\n");
 		num_printed++;
 	}
+	symbols.reset_cache();
 }
 
 
