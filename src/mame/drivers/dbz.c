@@ -255,6 +255,13 @@ static INPUT_PORTS_START( dbz )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dbza )
+	PORT_INCLUDE( dbz )
+
+	PORT_MODIFY("SYSTEM_DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )						// tests are always performed at start
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dbz2 )
 	PORT_INCLUDE( dbz )
 
@@ -531,24 +538,37 @@ ROM_START( dbz2 )
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
 ROM_END
 
-static DRIVER_INIT( dbz ) // FIX ME!! These DO NOT work correctly!!!!
+static DRIVER_INIT( dbz )
 {
-//	UINT16 *ROM;
+	UINT16 *ROM;
 
-//	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
+	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
+	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
 	// nop out dbz1's mask rom test
 	// tile ROM test
-//	ROM[0x7c4/2] = 0x4e71;
-//	ROM[0x7c6/2] = 0x4e71;
-	// PSAC2 ROM test
-//	ROM[0x9e4/2] = 0x4e71;
-//	ROM[0x9e6/2] = 0x4e71;
-//	ROM[0x9e8/2] = 0x4e71;
-//	ROM[0x9ea/2] = 0x4e71;
-//	ROM[0x9ec/2] = 0x4e71;
-//	ROM[0x9ee/2] = 0x4e71;
-//	ROM[0x9f0/2] = 0x4e71;
+	ROM[0x7b0/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #-$1e0d, D3 */
+	ROM[0x7b2/2] = 0x4e71;    /* 0xe1f3 */
+	ROM[0x7b4/2] = 0x4e71;    /* 0x6600 - bne     $7d6 */
+	ROM[0x7b6/2] = 0x4e71;    /* 0x0020 */
+	ROM[0x7c0/2] = 0x4e71;    /* 0x0c45 - cmpi.w  #-$7aad, D5 */
+	ROM[0x7c2/2] = 0x4e71;    /* 0x8553 */
+	ROM[0x7c4/2] = 0x4e71;    /* 0x6600 - bne     $7d6 */
+	ROM[0x7c6/2] = 0x4e71;    /* 0x0010 */
+	// PSAC2 ROM test (A and B)
+	ROM[0x9a8/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #$43c0, D3 */
+	ROM[0x9aa/2] = 0x4e71;    /* 0x43c0 */
+	ROM[0x9ac/2] = 0x4e71;    /* 0x6600 - bne     $a00 */
+	ROM[0x9ae/2] = 0x4e71;    /* 0x0052 */
+	ROM[0x9ea/2] = 0x4e71;    /* 0x0c44 - cmpi.w  #-$13de, D4 */
+	ROM[0x9ec/2] = 0x4e71;    /* 0xec22 */
+	ROM[0x9ee/2] = 0x4e71;    /* 0x6600 - bne     $a00 */
+	ROM[0x9f0/2] = 0x4e71;    /* 0x0010 */
+	// prog ROM test
+	ROM[0x80c/2] = 0x4e71;    /* 0xb650 - cmp.w   (A0), D3 */
+	ROM[0x80e/2] = 0x4e71;    /* 0x6600 - bne     $820 */
+	ROM[0x810/2] = 0x4e71;    /* 0x005e */
 }
 
 static DRIVER_INIT( dbza )
@@ -559,19 +579,58 @@ static DRIVER_INIT( dbza )
 
 	// nop out dbz1's mask rom test
 	// tile ROM test
-	ROM[0x790/2] = 0x4e71;
-	ROM[0x792/2] = 0x4e71;
+	ROM[0x78c/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #-$1236, D3 */
+	ROM[0x78e/2] = 0x4e71;    /* 0x0010 */
+	ROM[0x790/2] = 0x4e71;    /* 0x6600 - bne     $7a2 */
+	ROM[0x792/2] = 0x4e71;    /* 0x0010 */
 	// PSAC2 ROM test
-	ROM[0x982/2] = 0x4e71;
-	ROM[0x984/2] = 0x4e71;
-	ROM[0x986/2] = 0x4e71;
-	ROM[0x988/2] = 0x4e71;
-	ROM[0x98a/2] = 0x4e71;
-	ROM[0x98c/2] = 0x4e71;
-	ROM[0x98e/2] = 0x4e71;
-	ROM[0x990/2] = 0x4e71;
+	ROM[0x982/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #$437e, D3 */
+	ROM[0x984/2] = 0x4e71;    /* 0x437e */
+	ROM[0x986/2] = 0x4e71;    /* 0x6600 - bne     $9a0 */
+	ROM[0x988/2] = 0x4e71;    /* 0x0018 */
+	ROM[0x98a/2] = 0x4e71;    /* 0x0c44 - cmpi.w  #$65e8, D4 */
+	ROM[0x98c/2] = 0x4e71;    /* 0x65e8 */
+	ROM[0x98e/2] = 0x4e71;    /* 0x6600 - bne     $9a0 */
+	ROM[0x990/2] = 0x4e71;    /* 0x0010 */
+}
+
+static DRIVER_INIT( dbz2 )
+{
+	UINT16 *ROM;
+
+	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+
+	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
+	ROM[0xa48/2] = 0x007f;    /* 0x00ff */
+	// nop out dbz1's mask rom test
+	// tile ROM test
+	ROM[0xa88/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #$e58, D3 */
+	ROM[0xa8a/2] = 0x4e71;    /* 0x0e58 */
+	ROM[0xa8c/2] = 0x4e71;    /* 0x6600 - bne     $aae */
+	ROM[0xa8e/2] = 0x4e71;    /* 0x0020 */
+	ROM[0xa98/2] = 0x4e71;    /* 0x0c45 - cmpi.w  #-$3d20, D5 */
+	ROM[0xa9a/2] = 0x4e71;    /* 0xc2e0 */
+	ROM[0xa9c/2] = 0x4e71;    /* 0x6600 - bne     $aae */
+	ROM[0xa9e/2] = 0x4e71;    /* 0x0010 */
+	// PSAC2 ROM test (0 to 3)
+	ROM[0xc66/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xc68/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xc6a/2] = 0x4e71;    /* 0x005e */
+	ROM[0xc7c/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xc7e/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xc80/2] = 0x4e71;    /* 0x0048 */
+	ROM[0xc9e/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xca0/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xca2/2] = 0x4e71;    /* 0x0026 */
+	ROM[0xcb4/2] = 0x4e71;    /* 0xb549 - cmpm.w  (A1)+, (A2)+ */
+	ROM[0xcb6/2] = 0x4e71;    /* 0x6600 - bne     $cc8 */
+	ROM[0xcb8/2] = 0x4e71;    /* 0x0010 */
+	// prog ROM test
+	ROM[0xae4/2] = 0x4e71;    /* 0xb650 - cmp.w   (A0), D3 */
+	ROM[0xae6/2] = 0x4e71;    /* 0x6600 - bne     $af8 */
+	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
 
 GAME( 1993, dbz,  0,   dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
-GAME( 1993, dbza, dbz, dbz, dbz,  dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, dbz2, 0,   dbz, dbz2, 0,    ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, dbza, dbz, dbz, dbza, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, dbz2, 0,   dbz, dbz2, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
