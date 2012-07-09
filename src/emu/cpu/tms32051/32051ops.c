@@ -230,59 +230,40 @@ static UINT16 GET_ADDRESS(tms32051_state *cpustate)
 	}
 }
 
-static int GET_ZLVC_CONDITION(tms32051_state *cpustate, int zlvc, int zlvc_mask)
+INLINE int GET_ZLVC_CONDITION(tms32051_state *cpustate, int zlvc, int zlvc_mask)
 {
-	int condition = 0;
-
 	if (zlvc_mask & 0x8)		// Z-bit
 	{
 		if ((zlvc & 0x8) && (INT32)(cpustate->acc) == 0)				// EQ
-		{
-			condition = 1;
-		}
+			return 1;
 		else if ((zlvc & 0x8) == 0 && (INT32)(cpustate->acc) != 0)	// NEQ
-		{
-			condition = 1;
-		}
+			return 1;
 	}
 	if (zlvc_mask & 0x4)		// L-bit
 	{
 		if ((zlvc & 0x4) && (INT32)(cpustate->acc) < 0)				// LT
-		{
-			condition = 1;
-		}
+			return 1;
 		else if ((zlvc & 0x4) == 0 && (INT32)(cpustate->acc) > 0)		// GT
-		{
-			condition = 1;
-		}
+			return 1;
 	}
 	if (zlvc_mask & 0x2)		// OV-bit
 	{
 		if ((zlvc & 0x2) && cpustate->st0.ov)							// OV
-		{
-			condition = 1;
-		}
+			return 1;
 		else if ((zlvc & 0x2) == 0 && cpustate->st0.ov == 0)			// NOV
-		{
-			condition = 1;
-		}
+			return 1;
 	}
 	if (zlvc_mask & 0x1)		// C-bit
 	{
 		if ((zlvc & 0x1) && cpustate->st1.c)							// C
-		{
-			condition = 1;
-		}
+			return 1;
 		else if ((zlvc & 0x1) == 0 && cpustate->st1.c == 0)			// NC
-		{
-			condition = 1;
-		}
+			return 1;
 	}
-
-	return condition;
+	return 0;
 }
 
-static int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
+INLINE int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
 {
 	switch (tp)
 	{
@@ -293,11 +274,11 @@ static int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
 		}
 		case 1:		// TC = 1
 		{
-			return (cpustate->st1.tc == 1) ? 1 : 0;
+			return cpustate->st1.tc;
 		}
 		case 2:		// TC = 0
 		{
-			return (cpustate->st1.tc == 0) ? 1 : 0;
+			return !cpustate->st1.tc;
 		}
 		case 3:		// always false
 		{
@@ -1099,10 +1080,7 @@ static void op_bcnd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
 
-	int zlvc_condition = GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf);
-	int tp_condition = GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3);
-
-	if (zlvc_condition || tp_condition)
+	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
 	{
 		CHANGE_PC(cpustate, pma);
 		CYCLES(4);
@@ -1117,10 +1095,7 @@ static void op_bcndd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
 
-	int zlvc_condition = GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf);
-	int tp_condition = GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3);
-
-	if (zlvc_condition || tp_condition)
+	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
 	{
 		delay_slot(cpustate, cpustate->pc);
 		CHANGE_PC(cpustate, pma);
@@ -1193,10 +1168,8 @@ static void op_cc(tms32051_state *cpustate)
 static void op_ccd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
-	int zlvc_condition = GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf);
-	int tp_condition = GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3);
 
-	if (zlvc_condition || tp_condition)
+	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
 	{
 		PUSH_STACK(cpustate, cpustate->pc+2);
 
@@ -1219,20 +1192,7 @@ static void op_nmi(tms32051_state *cpustate)
 
 static void op_retc(tms32051_state *cpustate)
 {
-	int condition = 0;
-
-	if ((cpustate->op & 0x3ff) == 0x300)		// RET
-	{
-		condition = 1;
-	}
-	else
-	{
-		int zlvc_condition = GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf);
-		int tp_condition = GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3);
-		condition = zlvc_condition || tp_condition;
-	}
-
-	if (condition)
+	if ((cpustate->op & 0x3ff) == 0x300 || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
 	{
 		UINT16 pc = POP_STACK(cpustate);
 		CHANGE_PC(cpustate, pc);
@@ -1246,20 +1206,7 @@ static void op_retc(tms32051_state *cpustate)
 
 static void op_retcd(tms32051_state *cpustate)
 {
-	int condition = 0;
-
-	if ((cpustate->op & 0x3ff) == 0x300)		// RETD
-	{
-		condition = 1;
-	}
-	else
-	{
-		int zlvc_condition = GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf);
-		int tp_condition = GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3);
-		condition = zlvc_condition || tp_condition;
-	}
-
-	if (condition)
+	if ((cpustate->op & 0x3ff) == 0x300 || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
 	{
 		UINT16 pc = POP_STACK(cpustate);
 		delay_slot(cpustate, cpustate->pc);
@@ -1296,16 +1243,13 @@ static void op_trap(tms32051_state *cpustate)
 
 static void op_xc(tms32051_state *cpustate)
 {
-	int n = ((cpustate->op >> 12) & 0x1) + 1;
-	int zlvc_condition = GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf);
-	int tp_condition = GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3);
-
-	if (zlvc_condition || tp_condition)
+	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
 	{
 		CYCLES(1);
 	}
 	else
 	{
+		int n = ((cpustate->op >> 12) & 0x1) + 1;
 		CHANGE_PC(cpustate, cpustate->pc + n);
 		CYCLES(1 + n);
 	}
