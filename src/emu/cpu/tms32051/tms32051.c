@@ -227,27 +227,15 @@ static CPU_INIT( tms )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
+	
+	cpustate->pcstack_ptr = 0;
 }
 
 static CPU_RESET( tms )
 {
 	tms32051_state *cpustate = get_safe_token(device);
-	int i;
-	UINT16 src, dst, length;
 
-	src = 0x7800;
-	dst = DM_READ16(cpustate, src++);
-	length = DM_READ16(cpustate, src++);
-
-	CHANGE_PC(cpustate, dst);
-
-	/* TODO: if you soft reset on Taito JC it tries to do a 0x7802->0x9007 (0xff00) transfer. */
-	for (i=0; i < (length & 0x7ff); i++)
-	{
-		UINT16 data = DM_READ16(cpustate, src++);
-		PM_WRITE16(cpustate, dst++, data);
-	}
-
+	// reset registers
 	cpustate->st0.intm	= 1;
 	cpustate->st0.ov	= 0;
 	cpustate->st1.c		= 1;
@@ -267,6 +255,28 @@ static CPU_RESET( tms )
 	cpustate->ifr		= 0;
 	cpustate->cbcr		= 0;
 	cpustate->rptc		= -1;
+
+	// simulate internal rom boot loader (can be removed when the dsp rom(s) is dumped)
+	cpustate->st0.intm	= 1;
+	cpustate->st1.cnf	= 1;
+	cpustate->pmst.ram	= 1;
+	cpustate->pmst.ovly	= 0;
+
+	int i;
+	UINT16 src, dst, length;
+
+	src = 0x7800;
+	dst = DM_READ16(cpustate, src++);
+	length = DM_READ16(cpustate, src++);
+
+	CHANGE_PC(cpustate, dst);
+
+	/* TODO: if you soft reset on Taito JC it tries to do a 0x7802->0x9007 (0xff00) transfer. */
+	for (i=0; i < (length & 0x7ff); i++)
+	{
+		UINT16 data = DM_READ16(cpustate, src++);
+		PM_WRITE16(cpustate, dst++, data);
+	}
 }
 
 static void check_interrupts(tms32051_state *cpustate)

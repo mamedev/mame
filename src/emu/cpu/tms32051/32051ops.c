@@ -1,24 +1,15 @@
+// stack is LIFO and is 8 levels deep, there is no stackpointer on the real chip
 INLINE void PUSH_STACK(tms32051_state *cpustate, UINT16 pc)
 {
-	if (cpustate->pcstack_ptr >= 8)
-	{
-		fatalerror("32051: stack overflow at %04X!\n", cpustate->pc);
-	}
-
+	cpustate->pcstack_ptr = (cpustate->pcstack_ptr - 1) & 7;
 	cpustate->pcstack[cpustate->pcstack_ptr] = pc;
-	cpustate->pcstack_ptr++;
 }
 
 INLINE UINT16 POP_STACK(tms32051_state *cpustate)
 {
-	UINT16 pc;
-	cpustate->pcstack_ptr--;
-	if (cpustate->pcstack_ptr < 0)
-	{
-		fatalerror("32051: stack underflow at %04X!\n", cpustate->pc);
-	}
-
-	pc = cpustate->pcstack[cpustate->pcstack_ptr];
+	UINT16 pc = cpustate->pcstack[cpustate->pcstack_ptr];
+	cpustate->pcstack_ptr = (cpustate->pcstack_ptr + 1) & 7;
+	cpustate->pcstack[(cpustate->pcstack_ptr + 7) & 7] = cpustate->pcstack[(cpustate->pcstack_ptr + 6) & 7];
 	return pc;
 }
 
