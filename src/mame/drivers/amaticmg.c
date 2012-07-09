@@ -1094,7 +1094,7 @@ static DRIVER_INIT( ama8000_2_v )
 
 static DRIVER_INIT( ama8000_3_o )
 {
-	decrypt(machine, 0x000, 0x00);	// need to find the decryption keys.
+	decrypt(machine, 0x56e, 0xa7);
 }
 
 
