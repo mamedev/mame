@@ -2560,16 +2560,27 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 				v->reg[regnum].u = data;
 				if (v->reg[hSync].u != 0 && v->reg[vSync].u != 0 && v->reg[videoDimensions].u != 0)
 				{
+					int hvis;
+					int vvis;
 					int htotal = ((v->reg[hSync].u >> 16) & 0x3ff) + 1 + (v->reg[hSync].u & 0xff) + 1;
 					int vtotal = ((v->reg[vSync].u >> 16) & 0xfff) + (v->reg[vSync].u & 0xfff);
-					int hvis = v->reg[videoDimensions].u & 0x3ff;
-					int vvis = (v->reg[videoDimensions].u >> 16) & 0x3ff;
 					int hbp = (v->reg[backPorch].u & 0xff) + 2;
 					int vbp = (v->reg[backPorch].u >> 16) & 0xff;
 					attoseconds_t refresh = v->screen->frame_period().attoseconds;
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
+
+					if (v->type == VOODOO_2)
+					{
+						hvis = v->reg[videoDimensions].u & 0x7ff;
+						vvis = (v->reg[videoDimensions].u >> 16) & 0x7ff;
+					}
+					else
+					{
+						hvis = v->reg[videoDimensions].u & 0x3ff;
+						vvis = (v->reg[videoDimensions].u >> 16) & 0x3ff;
+					}
 
 					/* create a new visarea */
 					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
