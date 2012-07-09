@@ -533,22 +533,22 @@ ROM_END
 
 static DRIVER_INIT( dbz ) // FIX ME!! These DO NOT work correctly!!!!
 {
-	UINT16 *ROM;
+//	UINT16 *ROM;
 
-	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+//	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// nop out dbz1's mask rom test
 	// tile ROM test
-	ROM[0x7c4/2] = 0x4e71;
-	ROM[0x7c6/2] = 0x4e71;
+//	ROM[0x7c4/2] = 0x4e71;
+//	ROM[0x7c6/2] = 0x4e71;
 	// PSAC2 ROM test
-	ROM[0x9e4/2] = 0x4e71;
-	ROM[0x9e6/2] = 0x4e71;
-	ROM[0x9e8/2] = 0x4e71;
-	ROM[0x9ea/2] = 0x4e71;
-	ROM[0x9ec/2] = 0x4e71;
-	ROM[0x9ee/2] = 0x4e71;
-	ROM[0x9f0/2] = 0x4e71;
+//	ROM[0x9e4/2] = 0x4e71;
+//	ROM[0x9e6/2] = 0x4e71;
+//	ROM[0x9e8/2] = 0x4e71;
+//	ROM[0x9ea/2] = 0x4e71;
+//	ROM[0x9ec/2] = 0x4e71;
+//	ROM[0x9ee/2] = 0x4e71;
+//	ROM[0x9f0/2] = 0x4e71;
 }
 
 static DRIVER_INIT( dbza )
@@ -572,6 +572,6 @@ static DRIVER_INIT( dbza )
 	ROM[0x990/2] = 0x4e71;
 }
 
-GAME( 1993, dbz,  0,   dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbz,  0,   dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
 GAME( 1993, dbza, dbz, dbz, dbz,  dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1994, dbz2, 0,   dbz, dbz2, 0,    ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
