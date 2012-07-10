@@ -13,7 +13,11 @@
 
   4e226
   2bfb8 <- 0x109a7c / 0x109a84 VRAM DATA ROM
+  	0x4e5f6
+  0x4ef08
+
   0x10a1d4
+
 */
 
 #include "emu.h"
@@ -54,7 +58,7 @@ static SCREEN_UPDATE_IND16(kongambl)
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 //  k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
-//  k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
+//	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 	return 0;
@@ -327,7 +331,16 @@ ROM_START( vikingt )
 ROM_END
 
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+static DRIVER_INIT( kingtut )
+{
+	kongambl_state *state = machine.driver_data<kongambl_state>();
+	UINT32 *rom = (UINT32*)state->memregion("maincpu")->base();
+
+	rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
+	rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
+}
+
+GAME( 199?, kingtut,    0,        kongambl,    kongambl,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 199?, dragsphr,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 199?, ivorytsk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
