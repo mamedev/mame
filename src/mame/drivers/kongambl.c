@@ -10,6 +10,8 @@
   68000 @ 16 MHz + YMZ280B for audio
 
   Thanks to palindrome for PCB scans.
+
+  4e226
 */
 
 #include "emu.h"
@@ -75,22 +77,38 @@ WRITE32_MEMBER(kongambl_state::eeprom_w)
 	}
 }
 
+static READ32_HANDLER( test_r )
+{
+	return space->machine().rand();
+}
+
 static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
 
+	//0x400000 0x400001 "13M" even addresses
+	//0x400002,0x400003 "13J" odd addresses
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)
 
 	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE_LEGACY("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
 
-	AM_RANGE(0x440000, 0x443fff) AM_RAM
+	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
 	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 
-	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r )
-	AM_RANGE(0x780000, 0x780003) AM_WRITE(eeprom_w )
+	AM_RANGE(0x4c0004, 0x4c0007) AM_WRITENOP // bank num for "2G"
+
+	AM_RANGE(0x4cc000, 0x4cc003) AM_READ_LEGACY(test_r) // ???
+	AM_RANGE(0x4cc004, 0x4cc007) AM_READ_LEGACY(test_r) // ???
+	AM_RANGE(0x4cc008, 0x4cc00b) AM_READ_LEGACY(test_r) // "2G"
+	AM_RANGE(0x4cc00c, 0x4cc00f) AM_READ_LEGACY(test_r) // obj ROM
+
+	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITENOP // unknown
+
+	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r)
+	AM_RANGE(0x780000, 0x780003) AM_WRITE(eeprom_w)
 ADDRESS_MAP_END
 
 
@@ -153,7 +171,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(kongambl)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_VIDEO_START(kongambl)
 
