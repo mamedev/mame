@@ -651,7 +651,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				for (i=0; i < 3; i++)
 				{
-					vert[i].p[3] = polygon_fifo[ptr++];	// palette
+					vert[i].p[3] = polygon_fifo[ptr++] + 0.5;	// palette
 					vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
 					vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
 					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
@@ -777,7 +777,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				for (i=0; i < 4; i++)
 				{
-					vert[i].p[3] = polygon_fifo[ptr++];	// palette
+					vert[i].p[3] = polygon_fifo[ptr++] + 0.5;	// palette
 					vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
 					vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
 					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
