@@ -450,15 +450,28 @@ ROM_START( superdbz )
 	SYSTEM256_BIOS
 
     ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-    ROM_LOAD( "db1vera.ic002", 0x000000, 0x800000, NO_DUMP )
-    ROM_LOAD( "db1vera_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+    ROM_LOAD( "db1verb.ic002", 0x000000, 0x800000, CRC(ae9aa06d) SHA1(dabb6d797f706bb3523ce4ca77e9ffb1652e845a) ) 
+    ROM_LOAD( "db1verb_spr.ic002", 0x800000, 0x040000, CRC(baae64a1) SHA1(f82c5b1e98255976518f7b78f764e7a7bb3c9017) ) 
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "db1vera", 0, SHA1(5f4031e2beda9c1cd4a5a9a07740fa50946b73f2) )
+	DISK_IMAGE_READONLY( "db1", 0, SHA1(5f4031e2beda9c1cd4a5a9a07740fa50946b73f2) )
+ROM_END
+
+ROM_START( wanganmd )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "wmn1vera.ic002", 0x000000, 0x800000, CRC(436b08a7) SHA1(b574c25ba2d4a8b497654a7cf6491103130f1317) ) 
+    ROM_LOAD( "wmn1vera_spr.ic002", 0x000000, 0x040000, CRC(97253f9e) SHA1(652807972c62a96ba329b400e17dabd313134392) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "wmn1", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
 ROM_END
 
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
+GAME(2001, wanganmd,   sys246, system246, system246, 0, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, dragchrn,   sys246, system246, system246, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, netchu02,   sys246, system246, system246, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, scptour,    sys246, system246, system246, 0, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", GAME_IS_SKELETON)
@@ -480,7 +493,7 @@ GAME(2005, soulclb3a,soulclb3, system246, system246, 0, ROT0, "Namco", "Soul Cal
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_IS_SKELETON)
-GAME(2005, superdbz,   sys256, system256, system246, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. A)", GAME_IS_SKELETON)
+GAME(2005, superdbz,   sys256, system256, system246, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", GAME_IS_SKELETON)
 GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
