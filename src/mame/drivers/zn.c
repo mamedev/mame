@@ -283,7 +283,6 @@ static const struct
 
 READ32_MEMBER(zn_state::znsecsel_r)
 {
-
 	verboselog( machine(), 2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
 	return m_n_znsecsel;
 }
@@ -365,7 +364,6 @@ static void sio_dip_handler( running_machine &machine, int n_data )
 
 WRITE32_MEMBER(zn_state::znsecsel_w)
 {
-
 	COMBINE_DATA( &m_n_znsecsel );
 
 	if( ( m_n_znsecsel & 0x80 ) == 0 )
@@ -1786,7 +1784,6 @@ WRITE32_MEMBER(zn_state::bam2_sec_w)
 
 WRITE32_MEMBER(zn_state::bam2_mcu_w)
 {
-
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_0_15)
@@ -1803,7 +1800,6 @@ WRITE32_MEMBER(zn_state::bam2_mcu_w)
 
 READ32_MEMBER(zn_state::bam2_mcu_r)
 {
-
 	switch (offset)
 	{
 		case 0:
@@ -2089,7 +2085,6 @@ WRITE32_MEMBER(zn_state::jdredd_ide_w)
 
 CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
 {
-
 	return m_jdredd_gun_mux;
 }
 
@@ -2594,21 +2589,18 @@ static MACHINE_RESET( coh1002m )
 
 READ8_MEMBER(zn_state::cbaj_z80_latch_r)
 {
-
 	m_cbaj_to_z80 &= ~2;
 	return m_latch_to_z80;
 }
 
 WRITE8_MEMBER(zn_state::cbaj_z80_latch_w)
 {
-
 	m_cbaj_to_r3k |= 2;
 	soundlatch2_byte_w(space, 0, data);
 }
 
 READ8_MEMBER(zn_state::cbaj_z80_ready_r)
 {
-
 	int ret = m_cbaj_to_z80;
 
 	m_cbaj_to_z80 &= ~2;
@@ -4797,7 +4789,7 @@ GAME( 1999, shiryu2,   strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Stri
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000w.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atpsx,    0,        coh1000w, zn,       coh1000w, ROT0, "Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atpsx,    0,        coh1000w, zn,       coh1000w, ROT0, "Sony / Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, coh1000w, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
@@ -4806,7 +4798,7 @@ GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, coh1000w, ROT0, "Atari", "Pr
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000a.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, acpsx,    0,        coh1000a, zn, coh1000a, ROT0, "Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
+GAME( 1995, acpsx,    0,        coh1000a, zn, coh1000a, ROT0, "Sony / Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, nbajamex, acpsx,    coh1000a,     zn,     coh1000a, ROT0, "Acclaim", "NBA Jam Extreme", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1996, jdredd,   acpsx,    coh1000a_ide, jdredd, coh1000a, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4840,7 +4832,7 @@ GAME( 2001, mfjump,    tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002v.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Sony / Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, aerofgts, vspsx,    coh1002v, zn, coh1002v, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
