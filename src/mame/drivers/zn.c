@@ -246,14 +246,18 @@ static const struct
 	{ "tecmowcm", mg01, mg13 }, /* OK */
 	{ "mfjump",   mg01, mg14 }, /* OK */
 	{ "sfchamp",  tt01, tt02 }, /* OK */
-	{"sfchamp24o",tt01, tt02 }, /* OK */
+	{ "sfchampo", tt01, tt02 }, /* OK */
+	{ "sfchampu", tt01, tt02 }, /* OK */
 	{ "sfchampj", tt01, tt02 }, /* OK */
 	{ "psyforce", tt01, tt03 }, /* OK */
 	{ "psyforcej",tt01, tt03 }, /* OK */
 	{ "psyforcex",tt01, tt03 }, /* OK */
 	{ "raystorm", tt01, tt04 }, /* OK */
+	{ "raystormo",tt01, tt04 }, /* OK */
+	{ "raystormu",tt01, tt04 }, /* OK */
 	{ "raystormj",tt01, tt04 }, /* OK */
 	{ "ftimpact", tt01, tt05 }, /* OK */
+	{ "ftimpactu",tt01, tt05 }, /* OK */
 	{ "ftimpactj",tt01, tt05 }, /* OK */
 	{ "ftimpcta", tt01, tt05 }, /* OK */
 	{ "mgcldate", tt01, tt06 }, /* OK */
@@ -3996,11 +4000,47 @@ ROM_START( taitofx1 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( ftimpcta )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e25-13.4",     0x0000001, 0x100000, CRC(7f078d7b) SHA1(df9800dd6885dbc33736c5143d877b0847221061) )
+	ROM_LOAD16_BYTE( "e25-14.3",     0x0000000, 0x100000, CRC(0c5f474f) SHA1(ce7031ba860297b99cddd6d0177f07e03520faeb) )
+	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
+	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
+	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
+
+	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
+
+	ROM_REGION( 0x600000, "zsg1", 0 )
+	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
+	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+ROM_END
+
 ROM_START( ftimpact )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "user2", 0 )
 	ROM_LOAD16_BYTE( "e25-09.4",     0x0000001, 0x080000, CRC(d457bfc7) SHA1(e974a9c3e7b0748ef89d78e76a7dbb763c42b6f7) )
+	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
+	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
+	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
+	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
+
+	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
+
+	ROM_REGION( 0x600000, "zsg1", 0 )
+	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
+	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+ROM_END
+
+ROM_START( ftimpactu )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e25-08.4",     0x0000001, 0x080000, CRC(a3508f51) SHA1(fd4c3cc186e280497dc905ebda92472d5b72b1b4) )
 	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
 	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
 	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
@@ -4020,24 +4060,6 @@ ROM_START( ftimpactj )
 	ROM_REGION32_LE( 0x01000000, "user2", 0 )
 	ROM_LOAD16_BYTE( "e25-06.4",     0x0000001, 0x080000, CRC(3a59deeb) SHA1(4377c5829fb5b6f5d0120caf992b1ee714897641) )
 	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
-	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
-	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
-	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
-
-	ROM_REGION( 0x080000, "mn10200", 0 )
-	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
-
-	ROM_REGION( 0x600000, "zsg1", 0 )
-	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
-	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
-ROM_END
-
-ROM_START( ftimpcta )
-	TAITOFX1_BIOS
-
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
-	ROM_LOAD16_BYTE( "e25-13.4",     0x0000001, 0x100000, CRC(7f078d7b) SHA1(df9800dd6885dbc33736c5143d877b0847221061) )
-	ROM_LOAD16_BYTE( "e25-14.3",     0x0000000, 0x100000, CRC(0c5f474f) SHA1(ce7031ba860297b99cddd6d0177f07e03520faeb) )
 	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
 	ROM_LOAD( "e25-02.2",            0x0800000, 0x400000, CRC(8e8b4c82) SHA1(55c9d4d3a08fc3226a75ab3a674be433af83e289) )
 	ROM_LOAD( "e25-03.12",           0x0c00000, 0x400000, CRC(43b1c085) SHA1(6e53550e9be0d2f415fc6b4f3b8a71185c5370b2) )
@@ -4197,12 +4219,44 @@ ROM_START( raystorm )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "user2", 0 )
-	ROM_LOAD16_BYTE( "raystorm.ic4", 0x0000001, 0x080000, CRC(33f63638) SHA1(fdda33ffc9902b3605a3272fae5a614e93856a86) )
-	ROM_LOAD16_BYTE( "raystorm.ic3", 0x0000000, 0x080000, CRC(5eeed3b2) SHA1(d8bb1613d7285eabdc6f0a2d231d2eeeb52f307b) )
+	ROM_LOAD16_BYTE( "e24-xx.ic4", 0x0000001, 0x080000, CRC(33f63638) SHA1(fdda33ffc9902b3605a3272fae5a614e93856a86) ) /* Need to verify actual label */
+	ROM_LOAD16_BYTE( "e24-xx.ic3", 0x0000000, 0x080000, CRC(5eeed3b2) SHA1(d8bb1613d7285eabdc6f0a2d231d2eeeb52f307b) ) /* Need to verify actual label */
+	ROM_LOAD( "e24-02.1",          0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
+	ROM_LOAD( "e24-03.2",          0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
+
+	ROM_REGION16_LE( 0x080000, "mn10200", 0 )
+	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
+
+	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
+ROM_END
+
+ROM_START( raystormo )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e24-08.4",     0x0000001, 0x080000, CRC(ae071b95) SHA1(0e1597220808d6e3998ef1e9d88779e0187ba0af) )
+	ROM_LOAD16_BYTE( "e24-06.3",     0x0000000, 0x080000, CRC(d70cdf46) SHA1(da6163d69d3ea9c1e3f4b7961a548f1f9d8d9909) )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
 	ROM_LOAD( "e24-03.2",            0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
 
-	ROM_REGION16_LE( 0x080000, "mn10200", 0 )
+	ROM_REGION( 0x080000, "mn10200", 0 )
+	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
+
+	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
+ROM_END
+
+ROM_START( raystormu )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e24-07.4",     0x0000001, 0x080000, CRC(d9002b03) SHA1(bdb0aa88536c4c98c150ece87387930b3dbdd258) )
+	ROM_LOAD16_BYTE( "e24-06.3",     0x0000000, 0x080000, CRC(d70cdf46) SHA1(da6163d69d3ea9c1e3f4b7961a548f1f9d8d9909) )
+	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
+	ROM_LOAD( "e24-03.2",            0x0800000, 0x400000, CRC(6c1f0a5d) SHA1(1aac37a7ff23e54021a4cec18c9bb93242337180) )
+
+	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
 	ROM_REGION( 0x400000, "zsg1", 0 )
@@ -4229,8 +4283,8 @@ ROM_START( sfchamp )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "user2", 0 )
-	ROM_LOAD16_BYTE( "e18-12.2",     0x0000001, 0x080000, CRC(72304685) SHA1(2e6f645871e19a49fcdfbdca49c6be415471eadf) )
-	ROM_LOAD16_BYTE( "e18-13.7",     0x0000000, 0x080000, CRC(fa4d01ee) SHA1(27efd8e2107d71213d35f2a58762ed8812f809d3) )
+	ROM_LOAD16_BYTE( "e18-12.2",     0x0000001, 0x080000, CRC(72304685) SHA1(2e6f645871e19a49fcdfbdca49c6be415471eadf) ) /* Ver 2.5O */
+	ROM_LOAD16_BYTE( "e18-13.7",     0x0000000, 0x080000, CRC(fa4d01ee) SHA1(27efd8e2107d71213d35f2a58762ed8812f809d3) ) /* Ver 2.5O */
 	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
 	ROM_LOAD( "e18-03.16",           0x0800000, 0x200000, CRC(76392346) SHA1(2c5b70c4708208f866feea0472fcc72333061124) )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
@@ -4244,11 +4298,30 @@ ROM_START( sfchamp )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 ROM_END
 
-ROM_START( sfchamp24o )
+ROM_START( sfchampo )
 	TAITOFX1_BIOS
 
 	ROM_REGION32_LE( 0x01000000, "user2", 0 )
-	ROM_LOAD16_BYTE( "e18-11.2",     0x0000001, 0x080000, CRC(f5462f30) SHA1(44eb03a9b51e2d8dd14fe2ed36dbcf17035a22c7) )
+	ROM_LOAD16_BYTE( "e18-11.2",     0x0000001, 0x080000, CRC(f5462f30) SHA1(44eb03a9b51e2d8dd14fe2ed36dbcf17035a22c7) ) /* Ver 2.4O */
+	ROM_LOAD16_BYTE( "e18-08.7",     0x0000000, 0x080000, CRC(6a5558cd) SHA1(75b26bcaaa213283e7e0dace69ee58f305b4572d) ) /* Ver 2.4O */
+	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
+	ROM_LOAD( "e18-03.16",           0x0800000, 0x200000, CRC(76392346) SHA1(2c5b70c4708208f866feea0472fcc72333061124) )
+	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
+	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
+
+	ROM_REGION( 0x2c000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "e18-09.22",           0x0000000, 0x004000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) )
+	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
+ROM_END
+
+ROM_START( sfchampu )
+	TAITOFX1_BIOS
+
+	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e18-10.2",     0x0000001, 0x080000, CRC(82411fa6) SHA1(0aa1764b7ff68258ef76a41355c50d5067262d75) )
 	ROM_LOAD16_BYTE( "e18-08.7",     0x0000000, 0x080000, CRC(6a5558cd) SHA1(75b26bcaaa213283e7e0dace69ee58f305b4572d) )
 	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
 	ROM_LOAD( "e18-03.16",           0x0800000, 0x200000, CRC(76392346) SHA1(2c5b70c4708208f866feea0472fcc72333061124) )
@@ -4780,15 +4853,19 @@ GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System Co
 GAME( 1995, taitofx1, 0,        coh1000ta,zn, coh1000ta, ROT0, "Sony / Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, sfchamp,   taitofx1, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, sfchamp24o,sfchamp,  coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, sfchampo,  sfchamp,  coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, sfchampu,  sfchamp,  coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, sfchampj,  sfchamp,  coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, psyforce,  taitofx1, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Psychic Force (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, psyforcej, psyforce, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Psychic Force (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, psyforcex, psyforce, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, mgcldate,  mgcldtex, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, raystorm,  taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormo, raystorm, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormu, raystorm, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, raystormj, raystorm, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, ftimpact,  ftimpcta, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpactu, ftimpcta, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, ftimpactj, ftimpcta, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, ftimpcta,  taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, mgcldtex,  taitofx1, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

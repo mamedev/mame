@@ -3368,7 +3368,8 @@ sncwgltd		// Sonic Wings Limited (JAPAN)
 // Taito FX1a
 taitofx1
 sfchamp			// Super Football Champ (Ver 2.5O)
-sfchamp24o		// Super Football Champ (Ver 2.4O)
+sfchampo		// Super Football Champ (Ver 2.4O)
+sfchampu		// Super Football Champ (Ver 2.4A)
 sfchampj		// Super Football Champ (Ver 2.4J)
 psyforce		// Psychic Force (Ver 2.4O)
 psyforcej		// Psychic Force (Ver 2.4J)
@@ -3378,8 +3379,11 @@ mgcldtex		// Magical Date EX (JAPAN Ver 2.01J)
 
 // Taito FX1b
 raystorm		// Ray Storm (Ver 2.06A)
+raystormo		// Ray Storm (Ver 2.05O)
+raystormu		// Ray Storm (Ver 2.05A)
 raystormj		// Ray Storm (Ver 2.05J)
 ftimpact		// Fighters' Impact (Ver 2.02O)
+ftimpactu		// Fighters' Impact (Ver 2.02A)
 ftimpactj		// Fighters' Impact (Ver 2.02J)
 ftimpcta		// Fighters' Impact A (Ver 2.00J)
 gdarius			// G-Darius (Ver 2.01J)
