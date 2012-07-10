@@ -827,7 +827,7 @@ static INPUT_PORTS_START( sscope )
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Screen Flip (H)" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPNAME( 0x40, 0x00, "Screen Flip (H)" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Screen Flip (V)" ) PORT_DIPLOCATION("SW:3")
@@ -853,6 +853,12 @@ static INPUT_PORTS_START( sscope )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+
+	PORT_START("ANALOG1")		// Gun Yaw
+	PORT_BIT( 0x7ff, 0x400, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG2")		// Gun Pitch
+	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_INVERT
 INPUT_PORTS_END
 
 static const sharc_config sharc_cfg =
@@ -909,7 +915,14 @@ static MACHINE_RESET( hornet )
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
 {
-	return (double)0.0;
+	int value = 0;
+	switch (input)
+	{
+		case 0:		value = device->machine().root_device().ioport("ANALOG1")->read(); break;
+		case 1:		value = device->machine().root_device().ioport("ANALOG2")->read(); break;
+	}
+
+	return (double)(value) / 2047.0;
 }
 
 static const adc12138_interface hornet_adc_interface = {
@@ -1026,7 +1039,10 @@ static MACHINE_RESET( hornet_2board )
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
+	{
 		machine.root_device().membank("bank5")->set_base(usr5);
+		machine.root_device().membank("bank6")->set_base(usr5);
+	}
 }
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
