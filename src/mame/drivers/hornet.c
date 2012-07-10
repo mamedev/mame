@@ -316,6 +316,7 @@
 #include "machine/k033906.h"
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
+#include "machine/ds2401.h"
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
@@ -407,12 +408,11 @@ WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, param);
 }
 
 static void voodoo_vblank_1(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static SCREEN_UPDATE_RGB32( hornet )
@@ -978,6 +978,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(hornet_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_assert, 1000)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
@@ -1108,6 +1109,12 @@ static MACHINE_CONFIG_DERIVED( hornet_2board_v2, hornet_2board )
 	MCFG_3DFX_VOODOO_CPU("dsp2")
 	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sscope2, hornet_2board_v2)
+
+	MCFG_DS2401_ADD("lan_serial_id")
+	MCFG_EEPROM_93C46_ADD("lan_eeprom")
 MACHINE_CONFIG_END
 
 
@@ -1394,6 +1401,12 @@ ROM_START(sscope2)
 
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
+
+	ROM_REGION(0x8, "lan_serial_id", 0)		/* LAN Board DS2401 */
+	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, NO_DUMP )
+
+	ROM_REGION(0x80, "lan_eeprom", 0)		/* LAN Board AT93C46 */
+	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, NO_DUMP )
 ROM_END
 
 ROM_START(gradius4)
@@ -1519,4 +1532,4 @@ GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0,
 GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,          sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
