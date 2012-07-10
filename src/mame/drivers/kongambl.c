@@ -12,6 +12,8 @@
   Thanks to palindrome for PCB scans.
 
   4e226
+  2bfb8 <- 0x109a7c / 0x109a84 VRAM DATA ROM
+  0x10a1d4
 */
 
 #include "emu.h"
@@ -29,6 +31,7 @@ public:
 
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 };
 
 
@@ -82,13 +85,22 @@ static READ32_HANDLER( test_r )
 	return space->machine().rand();
 }
 
+WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
+{
+	/* enables thru 0->1 */
+	/* ---- x--- (related to OBJ ROM) */
+	/* ---- -x-- k056832 upper ROM bank */
+	/* ---- --x- k056832 related (enabled when testing ROM area) */
+//	printf("%02x\n",data);
+}
+
 static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_long_r)
 
 	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE_LEGACY("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
 
@@ -98,14 +110,14 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 
-	AM_RANGE(0x4c0004, 0x4c0007) AM_WRITENOP // bank num for "2G"
+//	AM_RANGE(0x4c0004, 0x4c0007) AM_WRITENOP // bank num for "2G"
 
 	AM_RANGE(0x4cc000, 0x4cc003) AM_READ_LEGACY(test_r) // ???
 	AM_RANGE(0x4cc004, 0x4cc007) AM_READ_LEGACY(test_r) // ???
 	AM_RANGE(0x4cc008, 0x4cc00b) AM_READ_LEGACY(test_r) // "2G"
 	AM_RANGE(0x4cc00c, 0x4cc00f) AM_READ_LEGACY(test_r) // obj ROM
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITENOP // unknown
+	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
 
 	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r)
 	AM_RANGE(0x780000, 0x780003) AM_WRITE(eeprom_w)
@@ -125,6 +137,11 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16, kongambl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// main program (mirrored?)
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// work RAM
+	AM_RANGE(0x180000, 0x180001) AM_WRITENOP
+	AM_RANGE(0x190000, 0x190001) AM_WRITENOP
+	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITENOP
+	AM_RANGE(0x1b0000, 0x1b0001) AM_READNOP
+	AM_RANGE(0x1c0000, 0x1c0001) AM_READNOP
 	AM_RANGE(0x200000, 0x2000ff) AM_RAM	// unknown (YMZ280b?  Shared with 68020?)
 ADDRESS_MAP_END
 
@@ -158,6 +175,7 @@ static const k053247_interface k053247_intf =
 static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(kongambl_map)
+	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
 
 	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
