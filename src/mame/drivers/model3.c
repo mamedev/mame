@@ -2524,6 +2524,87 @@ ROM_START( scudp )	/* step 1.5 */
 	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
 ROM_END
 
+ROM_START( scudpo )	/* step 1.5 */
+	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
+	// CROM
+	ROM_LOAD64_WORD_SWAP( "epr-20092.17",  0x0600006,  0x80000, CRC(6f9161c1) SHA1(b1c66eeb1bb67664aafa78ad62515204f231f09b) )
+	ROM_LOAD64_WORD_SWAP( "epr-20093.18",  0x0600004,  0x80000, CRC(9a85c611) SHA1(fb21c29584b205ec14f82318110ecf5821a95c23) )
+	ROM_LOAD64_WORD_SWAP( "epr-20094.19",  0x0600002,  0x80000, CRC(299b6257) SHA1(70438507a76ed96190ac11dac3d4c531610ff1fe) )
+	ROM_LOAD64_WORD_SWAP( "epr-20095.20",  0x0600000,  0x80000, CRC(44467bc1) SHA1(a69b1fc4ab3c4012ffc9f3f055b6221a8fc5eac8) )
+
+	// CROM0
+	ROM_LOAD64_WORD_SWAP( "mpr-19658.01",  0x0800006,  0x400000, CRC(d523235c) SHA1(0dbfe746b2bdc185768d82c50a329c4c58ad4a29) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19659.02",  0x0800004,  0x400000, CRC(c47e7002) SHA1(9644694e6d117564f92650f32f94ce4d7b5523fa) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19660.03",  0x0800002,  0x400000, CRC(d999c935) SHA1(ef5429e90314d7a789d8ccbad4d0efaeaff9741a) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19661.04",  0x0800000,  0x400000, CRC(8e3fd241) SHA1(df2596f483c759f068c75337320d369d80189ea1) )
+
+	// mirror CROM0 to CROM
+	ROM_COPY("user1", 0x800000, 0x000000, 0x600000)
+
+	// CROM1
+	ROM_LOAD64_WORD_SWAP( "mpr-19662.05",  0x1800006,  0x400000, CRC(3c700eff) SHA1(2ebb149a3d8a9de95afe091b3a1776f4dc3fc579) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19663.06",  0x1800004,  0x400000, CRC(f6af1ca4) SHA1(c78237b8f568792202d927ba0af86df6df80f87a) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19664.07",  0x1800002,  0x400000, CRC(b9d11294) SHA1(69b6f5708f423fb11337184a3646597356554058) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19665.08",  0x1800000,  0x400000, CRC(f97c78f9) SHA1(39aa69e365bf597e5e9185aaf4a044b485ebad8d) )
+
+	// CROM2
+	ROM_LOAD64_WORD_SWAP( "mpr-19666.09",  0x2800006,  0x400000, CRC(b53dc97f) SHA1(a4fbc7aade153e6f5fc1dd40ba97d462f643c2c4) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19667.10",  0x2800004,  0x400000, CRC(a8676799) SHA1(78734b194e2797ac7efc40f3d0a2ff09dc93409e) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19668.11",  0x2800002,  0x400000, CRC(0b4dd8d5) SHA1(b5668ce7ac5a4ac844a0a5a07df9649df9ad9615) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19669.12",  0x2800000,  0x400000, CRC(cdc43c61) SHA1(b096d0eb302a9285a8ee396fdbd7b8c546049fd4) )
+
+	// CROM3
+	ROM_LOAD64_WORD_SWAP( "mpr-20097.13",  0x3800006,  0x400000, CRC(269a9dbe) SHA1(df804ec1df87c1ab6387cd1bbd5dd224adc8d528) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20098.14",  0x3800004,  0x400000, CRC(8355fa41) SHA1(e6ac03fd7f1ab882a2861f65f6fea977c106dc15) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20099.15",  0x3800002,  0x400000, CRC(fc9bd7d9) SHA1(2dbcbb4b7f8fbeeeeacab51179003d8a4a9e771b) )
+	ROM_LOAD64_WORD_SWAP( "mpr-20100.16",  0x3800000,  0x400000, CRC(c99e2c01) SHA1(074d4b5e85f00f5b7550e9944664fdfba8666569) )
+
+	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
+	ROM_LOAD_VROM( "mpr-19672.26", 0x0000002,  0x200000, CRC(588c29fd) SHA1(5f58c885b506592106aa15208fc1db9d55ab4481) )
+	ROM_LOAD_VROM( "mpr-19673.27", 0x0000000,  0x200000, CRC(156abaa9) SHA1(6ef9c042e9ee34090192c1c99c98d19f18efcfba) )
+	ROM_LOAD_VROM( "mpr-19674.28", 0x0000006,  0x200000, CRC(c7b0f98c) SHA1(632dbc4cb225d91c82f6a1874517ed0b03b7a0c5) )
+	ROM_LOAD_VROM( "mpr-19675.29", 0x0000004,  0x200000, CRC(ff113396) SHA1(af90bb696a3c1585318150cb83ea2ed85cdb67a1) )
+	ROM_LOAD_VROM( "mpr-19676.30", 0x000000a,  0x200000, CRC(fd852ead) SHA1(854204c33aec8fb9c014db06e4106be37ecdaf0d) )
+	ROM_LOAD_VROM( "mpr-19677.31", 0x0000008,  0x200000, CRC(c6ac0347) SHA1(c792da72af8bf9d011305c9ab7a6230b9e2c5316) )
+	ROM_LOAD_VROM( "mpr-19678.32", 0x000000e,  0x200000, CRC(b8819cfe) SHA1(b99f8d0626bc38c75058e94d2461dbec6029589d) )
+	ROM_LOAD_VROM( "mpr-19679.33", 0x000000c,  0x200000, CRC(e126c3e3) SHA1(5440540c2432a9ff5bd8e36467af46c456d16844) )
+
+	ROM_REGION( 0x1000000, "user4", 0 )  /* Video ROMs Part 2 */
+	ROM_LOAD_VROM( "mpr-19680.34", 0x0000002,  0x200000, CRC(00ea5cef) SHA1(3aed46182c0e99c0b72b26c718e2fa20fa7d2e44) )
+	ROM_LOAD_VROM( "mpr-19681.35", 0x0000000,  0x200000, CRC(c949325f) SHA1(146de7abf764adc1840b84294cbd473f191cbcb8) )
+	ROM_LOAD_VROM( "mpr-19682.36", 0x0000006,  0x200000, CRC(ce5ca065) SHA1(2f518186b29e7cf5fa1c6b036427b8015cfb681e) )
+	ROM_LOAD_VROM( "mpr-19683.37", 0x0000004,  0x200000, CRC(e5856419) SHA1(3f8f5b8b36d417090955d34553dcf6d8d9f34558) )
+	ROM_LOAD_VROM( "mpr-19684.38", 0x000000a,  0x200000, CRC(56f6ec97) SHA1(dfd251dba77b39342457036fcbe4683d24029600) )
+	ROM_LOAD_VROM( "mpr-19685.39", 0x0000008,  0x200000, CRC(42b49304) SHA1(4e185d0f97de44a25b5f982a46f0c3d1dab406c2) )
+	ROM_LOAD_VROM( "mpr-19686.40", 0x000000e,  0x200000, CRC(84eed592) SHA1(cc03094770945096d81bc981bff77b540452b045) )
+	ROM_LOAD_VROM( "mpr-19687.41", 0x000000c,  0x200000, CRC(776ce694) SHA1(d1e56ebd0011aa3a54a5829c6bd0f5343b283fa0) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )	/* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "epr-20096a.21", 0x080000,  0x080000, CRC(0fef288b) SHA1(d6842108d1baea5fffba679d81179c8ffaa87b93) )
+
+	ROM_REGION( 0xc00000, "samples", 0 )	/* SCSP samples */
+	ROM_LOAD( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
+	ROM_LOAD( "mpr-20101.24", 0x400000, 0x400000, CRC(66d1e31f) SHA1(cbc06e9aebcdf82f14bef1c35cbb3203530ef6ae) )
+
+	ROM_REGION( 0x20000, "cpu2", 0 )	/* Z80 code */
+	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
+
+	ROM_REGION( 0x800000, "dsb", 0 )	/* DSB samples */
+	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
+	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
+	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
+	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
+
+	ROM_REGION( 0x80000, "scsp1", 0 )	/* first SCSP's RAM */
+	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	ROM_REGION( 0x80000, "scsp2", 0 )	/* second SCSP's RAM */
+	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
+	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
+ROM_END
+
 ROM_START( vf3 )	/* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-12821 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
@@ -5492,6 +5573,24 @@ static DRIVER_INIT( scudp )
 	rom[(0x741efc^4)/4] = 0x60000000;
 }
 
+static DRIVER_INIT( scudpo )
+{
+	model3_state *state = machine.driver_data<model3_state>();
+	//UINT32 *rom = (UINT32*)state->memregion("user1")->base();
+
+	DRIVER_INIT_CALL(model3_15);
+	/* TODO: network device at 0xC0000000 - FF */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
+
+	//rom[(0x713724^4)/4] = 0x60000000; // Fix ME!!!! Needs to corrected for the non REV A version!!!!
+	//rom[(0x713744^4)/4] = 0x60000000;
+
+	//rom[(0x741f48^4)/4] = 0x60000000;
+
+	//rom[(0x741f68^4)/4] = 0x60000000;
+	//rom[(0x741efc^4)/4] = 0x60000000;
+}
+
 static DRIVER_INIT( lemans24 )
 {
 	model3_state *state = machine.driver_data<model3_state>();
@@ -5658,6 +5757,22 @@ static DRIVER_INIT( vs299 )
 static DRIVER_INIT( harley )
 {
 	model3_state *state = machine.driver_data<model3_state>();
+	//UINT32 *rom = (UINT32*)state->memregion("user1")->base();
+	DRIVER_INIT_CALL(model3_20);
+
+	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
+
+	//rom[(0x50e8d4^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
+	//rom[(0x50e8f4^4)/4] = 0x60000000;
+	//rom[(0x50fb84^4)/4] = 0x60000000;
+	//rom[(0x4f736c^4)/4] = 0x60000000;
+	//rom[(0x4f738c^4)/4] = 0x60000000;
+}
+
+static DRIVER_INIT( harleya )
+{
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5669,22 +5784,6 @@ static DRIVER_INIT( harley )
 	rom[(0x50fb84^4)/4] = 0x60000000;
 	rom[(0x4f736c^4)/4] = 0x60000000;
 	rom[(0x4f738c^4)/4] = 0x60000000;
-}
-
-static DRIVER_INIT( harleyb )
-{
-	model3_state *state = machine.driver_data<model3_state>();
-	//UINT32 *rom = (UINT32*)state->memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
-
-	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
-
-	//rom[(0x50e8d4^4)/4] = 0x60000000;
-	//rom[(0x50e8f4^4)/4] = 0x60000000;
-	//rom[(0x50fb84^4)/4] = 0x60000000;
-	//rom[(0x4f736c^4)/4] = 0x60000000;
-	//rom[(0x4f738c^4)/4] = 0x60000000;
 }
 
 
@@ -5833,6 +5932,7 @@ GAME( 1996, scud,           0, model3_15, scud,         scud, ROT0, "Sega", "Scu
 GAME( 1996, scudj,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Deluxe (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, scuda,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Twin (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, scudp,       scud, model3_15, scud,        scudp, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, scudpo,      scud, model3_15, scud,       scudpo, ROT0, "Sega", "Scud Race Plus", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, lostwsga,       0, model3_15, lostwsga, lostwsga, ROT0, "Sega", "The Lost World", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, older)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -5842,7 +5942,7 @@ GAME( 1998, vs29815,    vs298, model3_15, model3,    vs29815, ROT0, "Sega", "Vir
 /* Model 3 Step 2.0 */
 GAME( 1997, vs2,            0, model3_20, model3,        vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, harley,         0, model3_20, harley,     harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, harleya,   harley, model3_20, harley,    harleyb, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, harleya,   harley, model3_20, harley,     harleya, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, lamachin,       0, model3_20, model3,  model3_20, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, oceanhun,       0, model3_20, model3,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, skichamp,       0, model3_20, skichamp, skichamp, ROT0, "Sega", "Ski Champ", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
