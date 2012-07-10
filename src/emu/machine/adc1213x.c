@@ -235,6 +235,11 @@ WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
 							break;
 						}
 
+						case 0x0f:		// L L L L H H H H - User mode
+						{
+							break;
+						}
+
 						default:
 						{
 							fatalerror("ADC1213X: unknown config mode %02X\n", mode);
