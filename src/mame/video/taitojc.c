@@ -524,7 +524,89 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 		switch (cmd & 0x7)
 		{
-			case 0x03:		// Textured Triangle
+			// screen global clipping for 3d(?)
+			case 0x00:
+			{
+				UINT16 min_x,min_y,min_z,max_x,max_y,max_z;
+
+				min_x = polygon_fifo[ptr+1];
+				min_y = polygon_fifo[ptr+0];
+				min_z = polygon_fifo[ptr+2];
+				max_x = polygon_fifo[ptr+4];
+				max_y = polygon_fifo[ptr+3];
+				max_z = polygon_fifo[ptr+5];
+
+				/* let's check if we need to implement this ... */
+				if(min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
+				{
+					printf("CMD %04x\n",cmd);
+					printf("MIN Y %04x\n",polygon_fifo[ptr+0]);
+					printf("MIN X %04x\n",polygon_fifo[ptr+1]);
+					printf("MIN Z %04x\n",polygon_fifo[ptr+2]);
+					printf("MAX Y %04x\n",polygon_fifo[ptr+3]);
+					printf("MAX X %04x\n",polygon_fifo[ptr+4]);
+					printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
+				}
+				ptr += 6;
+				break;
+			}
+
+			// Gouraud Shaded Triangle (Landing Gear)
+			case 0x01:
+			{
+				// 0x00: Command ID (0x0001)
+				// 0x01: Vertex 1 color
+				// 0x02: Vertex 1 Y
+				// 0x03: Vertex 1 X
+				// 0x04: Vertex 1 Z
+				// 0x05: Vertex 2 color
+				// 0x06: Vertex 2 Y
+				// 0x07: Vertex 2 X
+				// 0x08: Vertex 2 Z
+				// 0x09: Vertex 3 color
+				// 0x0a: Vertex 3 Y
+				// 0x0b: Vertex 3 X
+				// 0x0c: Vertex 3 Z
+
+#if 0
+                printf("CMD1: ");
+                for (i=0; i < 0x0c; i++)
+                {
+                    printf("%04X ", polygon_fifo[ptr+i]);
+                }
+                printf("\n");
+#endif
+
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+
+				extra->zbuffer = &state->m_zbuffer;
+
+				for (i=0; i < 3; i++)
+				{
+					vert[i].p[1] = polygon_fifo[ptr++];
+					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
+					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
+					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+				}
+
+				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
+				{
+					if (vert[0].p[1] == vert[1].p[1] &&
+						vert[1].p[1] == vert[2].p[1])
+					{
+						// optimization: all colours the same -> render solid
+						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2]);
+					}
+					else
+					{
+						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2]);
+					}
+				}
+				break;
+			}
+
+			// Textured Triangle
+			case 0x03:
 			{
 				// 0x00: Command ID (0x0003)
 				// 0x01: Texture base
@@ -547,19 +629,17 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				// 0x12: Vertex 3 X
 				// 0x13: Vertex 3 Z
 
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-				UINT16 texbase;
-
-				/*
+#if 0
                 printf("CMD3: ");
                 for (i=0; i < 0x13; i++)
                 {
                     printf("%04X ", polygon_fifo[ptr+i]);
                 }
                 printf("\n");
-                */
+#endif
 
-				texbase = polygon_fifo[ptr++];
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+				UINT16 texbase = polygon_fifo[ptr++];
 
 				extra->zbuffer = &state->m_zbuffer;
 				extra->texture = state->m_texture;
@@ -585,34 +665,37 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				}
 				break;
 			}
-			case 0x04:		// Gouraud shaded Quad
+
+			// Gouraud shaded Quad
+			case 0x04:
 			{
 				// 0x00: Command ID (0x0004)
-				// 0x01: Vertex 0 color
-				// 0x02: Vertex 0 Y
-				// 0x03: Vertex 0 X
-				// 0x04: Vertex 0 Z
-				// 0x05: Vertex 1 color
-				// 0x06: Vertex 1 Y
-				// 0x07: Vertex 1 X
-				// 0x08: Vertex 1 Z
-				// 0x09: Vertex 2 color
-				// 0x0a: Vertex 2 Y
-				// 0x0b: Vertex 2 X
-				// 0x0c: Vertex 2 Z
-				// 0x0d: Vertex 3 color
-				// 0x0e: Vertex 3 Y
-				// 0x0f: Vertex 3 X
-				// 0x10: Vertex 3 Z
+				// 0x01: Vertex 1 color
+				// 0x02: Vertex 1 Y
+				// 0x03: Vertex 1 X
+				// 0x04: Vertex 1 Z
+				// 0x05: Vertex 2 color
+				// 0x06: Vertex 2 Y
+				// 0x07: Vertex 2 X
+				// 0x08: Vertex 2 Z
+				// 0x09: Vertex 3 color
+				// 0x0a: Vertex 3 Y
+				// 0x0b: Vertex 3 X
+				// 0x0c: Vertex 3 Z
+				// 0x0d: Vertex 4 color
+				// 0x0e: Vertex 4 Y
+				// 0x0f: Vertex 4 X
+				// 0x10: Vertex 4 Z
 
-				/*
+#if 0
                 printf("CMD4: ");
                 for (i=0; i < 0x10; i++)
                 {
                     printf("%04X ", polygon_fifo[ptr+i]);
                 }
                 printf("\n");
-                */
+#endif
+
 				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 
 				extra->zbuffer = &state->m_zbuffer;
@@ -641,7 +724,9 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				}
 				break;
 			}
-			case 0x06:		// Textured Quad
+
+			// Textured Quad
+			case 0x06:
 			{
 				// 0x00: Command ID (0x0006)
 				// 0x01: Texture base
@@ -670,19 +755,17 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				// 0x18: Vertex 4 X
 				// 0x19: Vertex 4 Z
 
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-				UINT16 texbase;
-
-				/*
+#if 0
                 printf("CMD6: ");
                 for (i=0; i < 0x19; i++)
                 {
                     printf("%04X ", polygon_fifo[ptr+i]);
                 }
                 printf("\n");
-                */
+#endif
 
-				texbase = polygon_fifo[ptr++];
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+				UINT16 texbase = polygon_fifo[ptr++];
 
 				extra->zbuffer = &state->m_zbuffer;
 				extra->texture = state->m_texture;
@@ -708,63 +791,11 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 				}
 				break;
 			}
-			case 0x00: // almost certainly screen global clipping for 3d
-			{
-				static UINT16 min_x,min_y,min_z,max_x,max_y,max_z;
 
-				min_x = polygon_fifo[ptr+1];
-				min_y = polygon_fifo[ptr+0];
-				min_z = polygon_fifo[ptr+2];
-				max_x = polygon_fifo[ptr+4];
-				max_y = polygon_fifo[ptr+3];
-				max_z = polygon_fifo[ptr+5];
-
-				/* let's check if we need to implement this ... */
-				if(min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
-				{
-					printf("CMD %04x\n",cmd);
-					printf("MIN Y %04x\n",polygon_fifo[ptr+0]);
-					printf("MIN X %04x\n",polygon_fifo[ptr+1]);
-					printf("MIN Z %04x\n",polygon_fifo[ptr+2]);
-					printf("MAX Y %04x\n",polygon_fifo[ptr+3]);
-					printf("MAX X %04x\n",polygon_fifo[ptr+4]);
-					printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
-				}
-				ptr += 6;
-				break;
-			}
-			case 0x01: // Landing Gear, Gouraud Shaded Triangle
-			{
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-
-				extra->zbuffer = &state->m_zbuffer;
-
-				for (i=0; i < 3; i++)
-				{
-					vert[i].p[1] = polygon_fifo[ptr++];
-					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
-				}
-
-				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
-				{
-					if (vert[0].p[1] == vert[1].p[1] &&
-						vert[1].p[1] == vert[2].p[1])
-					{
-						// optimization: all colours the same -> render solid
-						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2]);
-					}
-					else
-					{
-						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2]);
-					}
-				}
-				break;
-			}
 			default:
 			{
 				printf("render_polygons: unknown command %04X %d\n", cmd,ptr);
+				break;
 			}
 		}
 	}
