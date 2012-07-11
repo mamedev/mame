@@ -486,14 +486,10 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 31;
 		if (newcomp.m_type == component::CTYPE_DOTMATRIXDOT)
 			m_maxstate = 1;
-			if (newcomp.m_type == component::CTYPE_SIMPLECOUNTER)
-		{
+		if (newcomp.m_type == component::CTYPE_SIMPLECOUNTER)
 			m_maxstate = xml_get_attribute_int_with_subst(machine, *compnode, "maxstate", 999);
-		}
 		if (newcomp.m_type == component::CTYPE_REEL)
-		{
 			m_maxstate = 65536;
-		}
 	}
 
 	// determine the scale/offset for normalization
@@ -621,8 +617,6 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_file[i] = NULL;
 	}
 
-
-
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
 	parse_bounds(machine, xml_get_sibling(compnode.child, "bounds"), m_bounds);
@@ -660,12 +654,15 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_DOTMATRIXDOT;
 	}
+
 	// simplecounter nodes
 	else if (strcmp(compnode.name, "simplecounter") == 0)
 	{
 		m_type = CTYPE_SIMPLECOUNTER;
 		m_digits = xml_get_attribute_int_with_subst(machine, compnode, "digits", 2);
+		m_textalign = xml_get_attribute_int_with_subst(machine, compnode, "align", 0);
 	}
+
 	// fruit machine reels
 	else if (strcmp(compnode.name, "reel") == 0)
 	{
@@ -715,6 +712,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_numsymbolsvisible = xml_get_attribute_int_with_subst(machine, compnode, "numsymbolsvisible", 3);
 		m_reelreversed = xml_get_attribute_int_with_subst(machine, compnode, "reelreversed", 0);
 	}
+
 	// led7seg nodes
 	else if (strcmp(compnode.name, "led7seg") == 0)
 		m_type = CTYPE_LED7SEG;
@@ -1031,8 +1029,6 @@ void layout_element::component::draw_simplecounter(running_machine &machine, bit
 /* state is a normalized value between 0 and 65536 so that we don't need to worry about how many motor steps here or in the .lay, only the number of symbols */
 void layout_element::component::draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
-
-
 	const int max_state_used = 0x10000;
 
 	// shift the reels a bit based on this param, allows fine tuning
@@ -1055,8 +1051,6 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 
 	for (int fruit = 0;fruit<m_numstops;fruit++)
 	{
-
-
 		int basey;
 
 		if (m_reelreversed==1)

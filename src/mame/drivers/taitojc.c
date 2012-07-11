@@ -347,7 +347,6 @@ Notes:
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
-        - dendego and clones needs output lamps and an artwork for the inputs (helps with the playability);
         - POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
@@ -360,6 +359,9 @@ Notes:
 #include "machine/eeprom.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
+
+#include "dendego.lh"
+
 
 #define POLYGON_FIFO_SIZE		100000
 
@@ -814,21 +816,31 @@ WRITE32_MEMBER(taitojc_state::jc_meters_w)
 	{
 		switch (offset & 3)
 		{
-			case 0: m_speed_meter = dendego_odometer_table[(data >> 16) & 0xff]; break;
-			case 1: m_brake_meter = dendego_brake_table[(data >> 16) & 0xff]; break;
+			case 0:
+			{
+				int val = dendego_odometer_table[(data >> 16) & 0xff];
+				if (val != m_speed_meter)
+				{
+					m_speed_meter = val;
+					output_set_value("counter2", val / 10);
+					output_set_value("counter3", val % 10);
+				}
+				break;
+			}
+
+			case 1:
+			{
+				int val = dendego_pressure_table[(data >> 16) & 0xff];
+				if (val != m_brake_meter)
+				{
+					m_brake_meter = val;
+					output_set_value("counter4", val);
+				}
+				break;
+			}
 			case 2: break; // unused?
 			case 3: break; // motor (used in dendego2 to shake seat)
 		}
-	}
-
-	if(ioport("METER")->read_safe(0))
-	{
-		UINT8 btn = (ioport("BUTTONS")->read() & 0x77);
-		int mascon_lv;
-		for (mascon_lv = 5; mascon_lv > 0; mascon_lv--)
-			if (btn == dendego_mascon_table[mascon_lv]) break;
-
-		popmessage("%d %.02f km/h %.02f MPa",mascon_lv,m_speed_meter,m_brake_meter/10);
 	}
 }
 
@@ -879,12 +891,12 @@ WRITE8_MEMBER(taitojc_state::hc11_lamps_w)
 	dendego/dendego2:
 	d0: START
 	d1: DOOR
-	d2: JYOUYO
-	d3: HIJYOU
-	d4: DENSEI
+	d2: JYOUYO (normal)
+	d3: HIJYOU (emergency)
+	d4: DENSEI (three-stage power)
 	d5: POP L
 	d6: POP R
-	d7: -------
+	d7: ------- (?)
 
 	landgear:
 	unused?
@@ -1180,12 +1192,7 @@ static INPUT_PORTS_START( dendego )
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ANALOG1")	// Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
-
-	PORT_START("METER")
-	PORT_CONFNAME( 0x01, 0x01, "Show Meters" )
-	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( No )  )
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xef) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landgear )
@@ -1297,7 +1304,7 @@ static const hc11_config taitojc_config =
 
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
-
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
@@ -1316,6 +1323,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_MACHINE_RESET(taitojc)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1332,6 +1340,11 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dendego, taitojc )
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_STATIC(dendego)
+
+	/* sound hardware */
 	MCFG_OKIM6295_ADD("oki", 32000000/32, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
@@ -2025,15 +2038,15 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1995, dangcurv,  0,        taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         GAME_NOT_WORKING )        // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
-GAME( 1995, landgear,  0,        taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             GAME_IMPERFECT_GRAPHICS ) // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
-GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             GAME_IMPERFECT_GRAPHICS ) // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
-GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             GAME_IMPERFECT_GRAPHICS ) // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
-GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             GAME_IMPERFECT_GRAPHICS ) // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
-GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             GAME_IMPERFECT_GRAPHICS ) // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
-GAME( 1996, dendego,   0,        dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            GAME_IMPERFECT_GRAPHICS ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
-GAME( 1996, dendegox,  dendego,  dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         GAME_IMPERFECT_GRAPHICS ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
-GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           GAME_IMPERFECT_GRAPHICS ) // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
-GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.4 J)",                           GAME_IMPERFECT_GRAPHICS ) // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
-GAME( 1998, dendego2,  0,        dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              GAME_IMPERFECT_GRAPHICS ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
-GAME( 1998, dendego23k,dendego2, dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", GAME_IMPERFECT_GRAPHICS ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
+GAME( 1995, dangcurv,  0,        taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         GAME_NOT_WORKING )                        // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
+GAME( 1995, landgear,  0,        taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
+GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
+GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
+GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             GAME_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
+GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
+GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
+GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
+GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
+GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.4 J)",                           GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
+GAMEL(1998, dendego2,  0,        dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
+GAMEL(1998, dendego23k,dendego2, dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38

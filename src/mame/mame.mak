@@ -2163,6 +2163,8 @@ $(DRIVERS)/sfbonus.o:	$(LAYOUT)/pirpok2.lh
 $(DRIVERS)/taito_z.o:	$(LAYOUT)/contcirc.lh \
 			$(LAYOUT)/dblaxle.lh
 
+$(DRIVERS)/taitojc.o:	$(LAYOUT)/dendego.lh
+
 $(DRIVERS)/tatsumi.o:	$(LAYOUT)/roundup5.lh
 
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh

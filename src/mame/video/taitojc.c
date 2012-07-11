@@ -378,6 +378,28 @@ SCREEN_UPDATE_IND16( taitojc )
 	return 0;
 }
 
+SCREEN_UPDATE_IND16( dendego )
+{
+	taitojc_state *state = screen.machine().driver_data<taitojc_state>();
+	
+	// update controller state in artwork
+	UINT8 btn = (state->ioport("BUTTONS")->read() & 0x77);
+	int level;
+	for (level = 5; level > 0; level--)
+		if (btn == dendego_mascon_table[level]) break;
+
+	if (level != output_get_value("counter0"))
+		output_set_value("counter0", level);
+
+	btn = (state->ioport("ANALOG1")->read() & 0xff);
+	for (level = 10; level > 0; level--)
+		if (btn >= dendego_brake_table[level]) break;
+
+	if (level != output_get_value("counter1"))
+		output_set_value("counter1", level);
+
+	return SCREEN_UPDATE16_CALL(taitojc);
+}
 
 
 
