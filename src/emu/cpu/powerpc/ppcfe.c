@@ -1040,7 +1040,7 @@ bool ppc_frontend::describe_1f(UINT32 op, opcode_desc &desc, const opcode_desc *
 			return true;
 
 		case 0x356:	// EIEIO
-			if (!(m_context.cap & PPCCAP_VEA))
+			if (!(m_context.cap & (PPCCAP_VEA | PPCCAP_4XX)))
 				return false;
 			return true;
 
