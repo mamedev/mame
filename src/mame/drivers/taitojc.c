@@ -804,24 +804,31 @@ READ32_MEMBER(taitojc_state::snd_share_r)
 
 WRITE32_MEMBER(taitojc_state::snd_share_w)
 {
-	UINT32 d = (data >> 24) & 0xff;
-
-	switch (offset & 3)
+	if (ACCESSING_BITS_24_31)
 	{
-		case 0: m_snd_shared_ram[(offset/4)] &= ~0xff000000; m_snd_shared_ram[(offset/4)] |= d << 24; break;
-		case 1: m_snd_shared_ram[(offset/4)] &= ~0x00ff0000; m_snd_shared_ram[(offset/4)] |= d << 16; break;
-		case 2: m_snd_shared_ram[(offset/4)] &= ~0x0000ff00; m_snd_shared_ram[(offset/4)] |= d <<  8; break;
-		case 3: m_snd_shared_ram[(offset/4)] &= ~0x000000ff; m_snd_shared_ram[(offset/4)] |= d <<  0; break;
+		switch (offset & 3)
+		{
+			case 0: m_snd_shared_ram[(offset/4)] &= ~0xff000000; m_snd_shared_ram[(offset/4)] |= (data >>  0 & 0xff000000); break;
+			case 1: m_snd_shared_ram[(offset/4)] &= ~0x00ff0000; m_snd_shared_ram[(offset/4)] |= (data >>  8 & 0x00ff0000); break;
+			case 2: m_snd_shared_ram[(offset/4)] &= ~0x0000ff00; m_snd_shared_ram[(offset/4)] |= (data >> 16 & 0x0000ff00); break;
+			case 3: m_snd_shared_ram[(offset/4)] &= ~0x000000ff; m_snd_shared_ram[(offset/4)] |= (data >> 24 & 0x000000ff); break;
+		}
 	}
 }
 
 WRITE32_MEMBER(taitojc_state::jc_meters_w)
 {
 	// printf("jc_output_w: %08x, %08x %08x\n", offset, data,mem_mask);
-	if(offset == 0 && ACCESSING_BITS_16_31)
-		m_speed_meter = taitojc_odometer_table[(data >> 16) & 0xff];
-	else if(offset == 1 && ACCESSING_BITS_16_31)
-		m_brake_meter = taitojc_brake_table[(data >> 16) & 0xff];
+	if (ACCESSING_BITS_16_31)
+	{
+		switch (offset & 3)
+		{
+			case 0: m_speed_meter = taitojc_odometer_table[(data >> 16) & 0xff]; break;
+			case 1: m_brake_meter = taitojc_brake_table[(data >> 16) & 0xff]; break;
+			case 2: break; // unused?
+			case 3: break; // ?
+		}
+	}
 
 	if(ioport("METER")->read_safe(0))
 	{
@@ -849,13 +856,13 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	//AM_RANGE(0x05fc0000, 0x05fc3fff)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
 	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
-	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
+	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog?
 	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
-	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP       // unknown
+	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
-	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
+	AM_RANGE(0x06e00000, 0x06e0000f) AM_WRITE(jc_meters_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
@@ -1168,7 +1175,7 @@ static INPUT_PORTS_START( dendego )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Horn Button")
 
 	PORT_MODIFY("BUTTONS")
 	/* TODO: fix this */
@@ -1185,7 +1192,7 @@ static INPUT_PORTS_START( dendego )
 	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 
 	PORT_START("ANALOG1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Brake")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Brake Lever")
 
 	PORT_START("METER")
 	PORT_CONFNAME( 0x01, 0x01, "Show Meters" )
