@@ -48,7 +48,7 @@
 		</text>
 	</element>
 	<element name="text_emergency">
-		<text string="EM!">
+		<text string="EME">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
@@ -151,6 +151,14 @@
 			<color red="0.2" green="0.2" blue="0.2" />
 		</disk>
 	</element>
+	<element name="lamp_disk_yellow" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="0.3" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.0" />
+		</disk>
+	</element>
 	<element name="lamp_disk_red" defstate="0">
 		<disk>
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -236,6 +244,13 @@
 		</bezel>
 		<bezel element="text_door">
 			<bounds x="84" y="304" width="25" height="9" />
+		</bezel>
+
+		<bezel name="lamp7" element="lamp_rect_white">
+			<bounds x="230.5" y="311" width="9" height="4" />
+		</bezel>
+		<bezel name="lamp0" element="lamp_disk_yellow">
+			<bounds x="230.5" y="317" width="9" height="9" />
 		</bezel>
 
 		<bezel name="lamp5" element="lamp_disk_red">
