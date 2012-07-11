@@ -115,7 +115,6 @@ public:
 	DECLARE_READ32_MEMBER(taitojc_char_r);
 	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
 	DECLARE_WRITE32_MEMBER(taitojc_char_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mascon_state_r);
 };
 
 
@@ -127,7 +126,8 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 VIDEO_START(taitojc);
 SCREEN_UPDATE_IND16(taitojc);
 
-const double taitojc_odometer_table[0x100] =
+// lookup tables for densha de go analog controls/meters
+const double dendego_odometer_table[0x100] =
 {
 	0.0,   0.3,   0.7,   1.0,   1.4,   1.7,   2.1,   2.4,   2.8,   3.1,   3.4,   3.8,   4.1,   4.5,   4.8,   5.2,
 	5.5,   5.9,   6.2,   6.6,   6.9,   7.2,   7.6,   7.9,   8.3,   8.6,   9.0,   9.3,   9.7,  10.0,  10.5,  11.1,
@@ -147,7 +147,7 @@ const double taitojc_odometer_table[0x100] =
 	125.3, 125.6, 125.9, 126.2, 126.6, 126.9, 127.2, 127.5, 127.8, 128.1, 128.4, 128.8, 129.1, 129.4, 129.7, 130.0,
 };
 
-const double taitojc_brake_table[0x100] =
+const double dendego_brake_table[0x100] =
 {
 	 0.00,  0.00,  0.00,  0.00,  0.05,  0.10,  0.14,  0.19,  0.24,  0.29,  0.33,  0.38,  0.43,  0.48,  0.52,  0.57,
 	 0.62,  0.67,  0.71,  0.76,  0.81,  0.86,  0.90,  0.95,  1.00,  1.06,  1.12,  1.19,  1.25,  1.31,  1.38,  1.44,
@@ -166,3 +166,6 @@ const double taitojc_brake_table[0x100] =
 	14.71, 14.79, 14.86, 14.93, 15.00, 15.04, 15.07, 15.11, 15.15, 15.19, 15.22, 15.26, 15.30, 15.33, 15.37, 15.41,
 	15.44, 15.48, 15.52, 15.56, 15.59, 15.63, 15.67, 15.70, 15.74, 15.78, 15.81, 15.85, 15.89, 15.93, 15.96, 16.00,
 };
+
+// Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
+const ioport_value dendego_mascon_table[] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };

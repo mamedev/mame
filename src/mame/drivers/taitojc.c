@@ -823,8 +823,8 @@ WRITE32_MEMBER(taitojc_state::jc_meters_w)
 	{
 		switch (offset & 3)
 		{
-			case 0: m_speed_meter = taitojc_odometer_table[(data >> 16) & 0xff]; break;
-			case 1: m_brake_meter = taitojc_brake_table[(data >> 16) & 0xff]; break;
+			case 0: m_speed_meter = dendego_odometer_table[(data >> 16) & 0xff]; break;
+			case 1: m_brake_meter = dendego_brake_table[(data >> 16) & 0xff]; break;
 			case 2: break; // unused?
 			case 3: break; // ?
 		}
@@ -832,7 +832,10 @@ WRITE32_MEMBER(taitojc_state::jc_meters_w)
 
 	if(ioport("METER")->read_safe(0))
 	{
-		UINT8 mascon_lv = (ioport("MASCON")->read() & 0x70) >> 4;
+		UINT8 btn = (ioport("BUTTONS")->read() & 0x77);
+		int mascon_lv;
+		for (mascon_lv = 0; mascon_lv < 6; mascon_lv++)
+			if (btn == dendego_mascon_table[mascon_lv]) break;
 
 		popmessage("%d %.02f km/h %.02f MPa",mascon_lv,m_speed_meter,m_brake_meter/10);
 	}
@@ -1152,47 +1155,18 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
-/* Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
-   We convert the 6 lever "shifter" into a fake analog port for now. */
-CUSTOM_INPUT_MEMBER(taitojc_state::mascon_state_r)
-{
-	static const UINT8 mascon_table[6] = { 0x01, 0x10, 0x02, 0x20, 0x04, 0x40 };
-	UINT8 res = ioport("MASCON")->read();
-	int i;
-
-	//popmessage("%02x",res);
-
-	for(i=0;i<6;i++)
-	{
-		if((res & 0x70) == (0x10*i))
-			return mascon_table[i];
-	}
-
-	return mascon_table[5];
-}
-
 static INPUT_PORTS_START( dendego )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Horn Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn Button")
 
-	PORT_MODIFY("BUTTONS")
-	/* TODO: fix this */
+	PORT_MODIFY("BUTTONS")	// Throttle Lever at left, move down to speed up, 6 positions
+	PORT_BIT( 0x77, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(6) PORT_REMAP_TABLE(dendego_mascon_table) PORT_SENSITIVITY(8) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Throttle Lever")
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitojc_state,mascon_state_r,NULL)
-//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")      // Mascon 5
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")      // Mascon 3
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")      // Mascon 1
-//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")      // Mascon 4
-//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")      // Mascon 2
-//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")      // Mascon 0
 
-	PORT_START("MASCON")
-	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
-
-	PORT_START("ANALOG1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Brake Lever")
+	PORT_START("ANALOG1")	// Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
 
 	PORT_START("METER")
 	PORT_CONFNAME( 0x01, 0x01, "Show Meters" )
