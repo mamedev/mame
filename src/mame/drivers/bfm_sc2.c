@@ -5393,8 +5393,6 @@ ROM_START( sc2cops )
 	// are these different HW? (SC1?) Will add in next pass
 	ROM_LOAD( "cop56cp1", 0x0000, 0x008000, CRC(214edd7d) SHA1(007c17cc522c8f0d30bc1fd08bb18850344f62ad) )
 	ROM_LOAD( "cop56cp2", 0x0000, 0x008000, CRC(c862ee34) SHA1(e807d1072953e67581ce0181bfd82a7efcee7bf0) )
-	ROM_LOAD( "cops&robbers5pv1-3a(27256)", 0x0000, 0x008000, CRC(29513083) SHA1(f2ce0b573d6756e7d835488b8d8eed3266787255) )
-	ROM_LOAD( "cops&robbers5pv1-3b(27256)", 0x0000, 0x008000, CRC(6f5425d6) SHA1(7673841ccfe16eaa0a5cfca1596383f7711f2dbe) )
 	ROM_LOAD( "cops & robbers 5p v1-3 a (27256)", 0x0000, 0x008000, CRC(29513083) SHA1(f2ce0b573d6756e7d835488b8d8eed3266787255) )
 	ROM_LOAD( "cops & robbers 5p v1-3 b (27256)", 0x0000, 0x008000, CRC(6f5425d6) SHA1(7673841ccfe16eaa0a5cfca1596383f7711f2dbe) )
 
