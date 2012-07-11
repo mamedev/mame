@@ -482,8 +482,19 @@ ROM_START( bldyr3b )
 	DISK_IMAGE_READONLY( "bldyr3b", 0, SHA1(1de9b14107a7a37ed31bccba17c1d062f0af5065) )
 ROM_END
 
+ROM_START( fateulc )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "fates-dongle.bin", 0x000000, 0x840000, CRC(b0f15996) SHA1(8161c61f18700ddaeecd89bf3a7fb685431355e7) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "fateulc", 0, SHA1(073e67a5219ad53292716093b8c35deb20761c04) )
+ROM_END
+
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
-GAME(2001, bldyr3b,    sys246, system246, system246, 0, ROT0, "unknown", "Bloody Roar 3 (bootleg)", GAME_IS_SKELETON)
+GAME(2001, bldyr3b,    sys246, system246, system246, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", GAME_IS_SKELETON)
 GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
 GAME(2001, wanganmd,   sys246, system246, system246, 0, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, dragchrn,   sys246, system246, system246, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_IS_SKELETON)
@@ -504,6 +515,7 @@ GAME(2004, zgundmdx,   sys246, system246, system246, 0, ROT0, "Capcom / Banprest
 GAME(2005, gundzaft,   sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", GAME_IS_SKELETON)
 GAME(2005, soulclb3,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_IS_SKELETON)
 GAME(2005, soulclb3a,soulclb3, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", GAME_IS_SKELETON)
+GAME(2008, fateulc,    sys246, system246, system246, 0, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", GAME_IS_SKELETON)
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_IS_SKELETON)
