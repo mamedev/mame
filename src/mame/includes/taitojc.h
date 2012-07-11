@@ -78,7 +78,6 @@ public:
 	DECLARE_READ32_MEMBER(jc_control_r);
 	DECLARE_WRITE32_MEMBER(jc_coin_counters_w);
 	DECLARE_WRITE32_MEMBER(jc_control_w);
-	DECLARE_WRITE32_MEMBER(jc_control1_w);
 	DECLARE_READ32_MEMBER(mcu_comm_r);
 	DECLARE_WRITE32_MEMBER(mcu_comm_w);
 	DECLARE_READ8_MEMBER(jc_pcbid_r);
@@ -90,6 +89,7 @@ public:
 	DECLARE_READ32_MEMBER(jc_lan_r);
 	DECLARE_READ8_MEMBER(hc11_comm_r);
 	DECLARE_WRITE8_MEMBER(hc11_comm_w);
+	DECLARE_WRITE8_MEMBER(hc11_lamps_w);
 	DECLARE_READ8_MEMBER(hc11_data_r);
 	DECLARE_WRITE8_MEMBER(hc11_data_w);
 	DECLARE_READ8_MEMBER(hc11_analog_r);

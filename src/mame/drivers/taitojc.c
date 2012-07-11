@@ -94,7 +94,7 @@ Notes:
       ROMs .32-.35 are 16M MASK, ES5505 samples.
       ROMs .8 and .21 are 4M MASK, graphics.
       ROMs .30-.31 are 27C2001, 68000 sound program.
-      ROM .65 is 27C512, use unknown.
+      ROM .65 is 27C512, MC68HC11 program.
 
 ----
 
@@ -226,7 +226,7 @@ Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
       MC68HC11: Surface-mounted QFP80 microcontroller with 64k internal ROM (not read but very likely protected)
       ROMs .36-.39 are 27C4001, main program.
-      ROM .65 is 27C512, use unknown, possibly used with 68HC11 MCU.
+      ROM .65 is 27C512, 68HC11 MCU program.
       ROMs .30-.31 are 27C2001, sound program.
       ROMs .32-.35 are 16M MASK, sound.
       ROMs .5-.25 are 16M MASK, graphics.
@@ -341,7 +341,6 @@ Notes:
     TODO:
         - dendego intro object RAM usage has various gfx bugs (check video file)
         - dendego title screen builds up and it shouldn't
-        - dendego/dendego2 doesn't show the odometer (btanb, thanks ANY);
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
         - dendego2 shows a debug string during gameplay?
@@ -479,14 +478,6 @@ WRITE32_MEMBER(taitojc_state::jc_control_w)
 		default:
 			popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 			break;
-	}
-}
-
-WRITE32_MEMBER(taitojc_state::jc_control1_w)
-{
-	if (data != 0)
-	{
-		logerror("jc_control1_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 	}
 }
 
@@ -826,7 +817,7 @@ WRITE32_MEMBER(taitojc_state::jc_meters_w)
 			case 0: m_speed_meter = dendego_odometer_table[(data >> 16) & 0xff]; break;
 			case 1: m_brake_meter = dendego_brake_table[(data >> 16) & 0xff]; break;
 			case 2: break; // unused?
-			case 3: break; // ?
+			case 3: break; // motor (used in dendego2 to shake seat)
 		}
 	}
 
@@ -834,7 +825,7 @@ WRITE32_MEMBER(taitojc_state::jc_meters_w)
 	{
 		UINT8 btn = (ioport("BUTTONS")->read() & 0x77);
 		int mascon_lv;
-		for (mascon_lv = 0; mascon_lv < 6; mascon_lv++)
+		for (mascon_lv = 5; mascon_lv > 0; mascon_lv--)
 			if (btn == dendego_mascon_table[mascon_lv]) break;
 
 		popmessage("%d %.02f km/h %.02f MPa",mascon_lv,m_speed_meter,m_brake_meter/10);
@@ -853,18 +844,16 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x040f8000, 0x040fbfff) AM_READWRITE(taitojc_tile_r, taitojc_tile_w)
 	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE(taitojc_char_r, taitojc_char_w)
 	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_SHARE("objlist")
-	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r,0xffffffff)
+	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r, 0xffffffff)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
-	//AM_RANGE(0x05a00000, 0x05a01fff)
-	//AM_RANGE(0x05fc0000, 0x05fc3fff)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
 	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
-	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog?
+	AM_RANGE(0x06600000, 0x06600003) AM_WRITENOP // watchdog?
 	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
-	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask? a watchdog?
+	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
-	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
+	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r)
 	AM_RANGE(0x06e00000, 0x06e0000f) AM_WRITE(jc_meters_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
@@ -880,6 +869,31 @@ READ8_MEMBER(taitojc_state::hc11_comm_r)
 
 WRITE8_MEMBER(taitojc_state::hc11_comm_w)
 {
+}
+
+WRITE8_MEMBER(taitojc_state::hc11_lamps_w)
+{
+/*
+	cabinet lamps, active high
+
+	dendego/dendego2:
+	d0: START
+	d1: DOOR
+	d2: JYOUYO
+	d3: HIJYOU
+	d4: DENSEI
+	d5: POP L
+	d6: POP R
+	d7: -------
+
+	landgear:
+	unused?
+
+	sidebs/sidebs2:
+	?
+*/
+	for (int i = 0; i < 8; i++)
+		output_set_lamp_value(i, data >> i & 1);
 }
 
 READ8_MEMBER(taitojc_state::hc11_data_r)
@@ -905,13 +919,13 @@ READ8_MEMBER(taitojc_state::hc11_analog_r)
 
 static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, taitojc_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
-	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_NOP
+	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_READNOP
 	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
-	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_NOP
+	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_WRITE(hc11_lamps_w)
 	AM_RANGE(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA) AM_READWRITE(hc11_data_r, hc11_data_w)
 	AM_RANGE(MC68HC11_IO_AD0,       MC68HC11_IO_AD7      ) AM_READ(hc11_analog_r)
 ADDRESS_MAP_END
@@ -1287,7 +1301,6 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
-//  MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
 	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
@@ -1386,14 +1399,11 @@ ROM_START( sidebs )
 	ROM_LOAD16_BYTE( "e23-23.030",  0x100001, 0x040000, CRC(cffbffe5) SHA1(c01ac44390dacab4b49bb066a46d81a184b07a1e) )
 	ROM_LOAD16_BYTE( "e23-24.031",  0x100000, 0x040000, CRC(64bae246) SHA1(f929f664881487615b1259db43a0721135830274) )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e23-05.009",  0x0800002, 0x200000, CRC(6e5d11ec) SHA1(e5c39d80577bf8ae9fc6162dc54571c6c8421160) )
@@ -1434,11 +1444,8 @@ ROM_START( sidebs2 )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_LOAD( "93c46.87",  0x000000, 0x000080, CRC(14e5526c) SHA1(ae02bd8f1eff41738043931642c652732fbe3801) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e38-05.9",  0x0800002, 0x200000, CRC(bda366bf) SHA1(a7558e6d5e4583a2d8e3d2bfa8cabcc459d3ee83) )
@@ -1503,11 +1510,8 @@ ROM_START( sidebs2j )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_LOAD( "japan-93c46.87",  0x000000, 0x000080, CRC(50fdcce0) SHA1(6e901856755ccdcf478a457c510c0de58683216a) ) /* No specific label but different defaults */
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e38-05.9",  0x0800002, 0x200000, CRC(bda366bf) SHA1(a7558e6d5e4583a2d8e3d2bfa8cabcc459d3ee83) )
@@ -1572,11 +1576,8 @@ ROM_START( dendego )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )	/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )	/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e35-05.009",  0x0800002, 0x200000, CRC(a94486c5) SHA1(c3f869aa0557411f747038a1e0ed6eedcf91fda5) )
@@ -1622,11 +1623,8 @@ ROM_START( dendegox )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e35-05.009",  0x0800002, 0x200000, CRC(a94486c5) SHA1(c3f869aa0557411f747038a1e0ed6eedcf91fda5) )
@@ -1672,11 +1670,8 @@ ROM_START( dendego2 )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e52-17.052",  0x0000002, 0x200000, CRC(4ac11921) SHA1(c4816e1d68bb52ee59e7a2e6de617c1093020944) )
@@ -1726,11 +1721,8 @@ ROM_START( dendego23k )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e52-17.052",  0x0000002, 0x200000, CRC(4ac11921) SHA1(c4816e1d68bb52ee59e7a2e6de617c1093020944) )
@@ -1786,11 +1778,8 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e17-03.9",   0x0800002, 0x200000, CRC(64820c4f) SHA1(ee18e4e2b01ec21c33ec1f0eb43f6d0cd48d7225) )
@@ -1843,11 +1832,8 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e17-03.9",   0x0800002, 0x200000, CRC(64820c4f) SHA1(ee18e4e2b01ec21c33ec1f0eb43f6d0cd48d7225) )
@@ -1900,11 +1886,8 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e17-03.9",   0x0800002, 0x200000, CRC(64820c4f) SHA1(ee18e4e2b01ec21c33ec1f0eb43f6d0cd48d7225) )
@@ -1957,11 +1940,8 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e17-03.9",   0x0800002, 0x200000, CRC(64820c4f) SHA1(ee18e4e2b01ec21c33ec1f0eb43f6d0cd48d7225) )
@@ -2014,11 +1994,8 @@ ROM_START( dangcurv )
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "user1", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
 	ROM_LOAD( "e09-29.065",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
-
-	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e09-05.009",  0x0800002, 0x200000, CRC(a948782f) SHA1(2a2b0d2955e036ddf424c54131435a20dbba3dd4) )
