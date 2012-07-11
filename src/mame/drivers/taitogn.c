@@ -1336,7 +1336,7 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002t.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, taitogn,  0,        coh3002t, coh3002t, coh3002t, ROT0,   "Sony / Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
+GAME( 1997, taitogn,  0,        coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
 
 GAME( 1998, chaoshea, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Chaos Heat (V2.09O)", GAME_IMPERFECT_SOUND )
 GAME( 1998, chaosheaj,chaoshea, coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Chaos Heat (V2.08J)", GAME_IMPERFECT_SOUND )

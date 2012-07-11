@@ -1859,7 +1859,7 @@ Judge Dread
 
 light-gun type shooting game
 
-Uses the Capcom/Sony  ZN-1 hardware with Rom board and
+Uses the Sony ZN-1 hardware with Rom board and
 Hard disk Drive
 
 U35 and U36 eproms are 27c1001 are believed to be the bios
@@ -4738,7 +4738,7 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, cpzn1,    0,        coh1000c, zn,   coh1000c, ROT0, "Sony / Capcom", "ZN1", GAME_IS_BIOS_ROOT )
+GAME( 1995, cpzn1,    0,        coh1000c, zn,   coh1000c, ROT0, "Capcom", "ZN1", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, ts2a,      ts2,      coh1000c, zn6b, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124) Older", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4759,7 +4759,7 @@ GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, cpzn2,    0,        coh3002c, zn,   coh3002c, ROT0, "Sony / Capcom", "ZN2", GAME_IS_BIOS_ROOT )
+GAME( 1997, cpzn2,    0,        coh3002c, zn,   coh3002c, ROT0, "Capcom", "ZN2", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, rvschool,  cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Rival Schools: United By Fate (Euro 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, rvschoolu, rvschool, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Rival Schools: United By Fate (USA 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4789,7 +4789,7 @@ GAME( 1999, shiryu2,   strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Stri
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000w.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atpsx,    0,        coh1000w, zn,       coh1000w, ROT0, "Sony / Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atpsx,    0,        coh1000w, zn,       coh1000w, ROT0, "Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, coh1000w, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
@@ -4798,7 +4798,7 @@ GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, coh1000w, ROT0, "Atari", "Pr
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000a.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, acpsx,    0,        coh1000a, zn, coh1000a, ROT0, "Sony / Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
+GAME( 1995, acpsx,    0,        coh1000a, zn, coh1000a, ROT0, "Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, nbajamex, acpsx,    coh1000a,     zn,     coh1000a, ROT0, "Acclaim", "NBA Jam Extreme", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1996, jdredd,   acpsx,    coh1000a_ide, jdredd, coh1000a, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4809,7 +4809,7 @@ GAME( 1996, jdreddb,  jdredd,   coh1000a_ide, jdredd, coh1000a, ROT0, "Acclaim",
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002m.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, tps,      0,        coh1002m, zn, coh1002m, ROT0, "Sony / Tecmo", "TPS", GAME_IS_BIOS_ROOT )
+GAME( 1997, tps,      0,        coh1002m, zn, coh1002m, ROT0, "Tecmo", "TPS", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, glpracr2,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1997, glpracr2j, glpracr2, coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
@@ -4832,7 +4832,7 @@ GAME( 2001, mfjump,    tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002v.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Sony / Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, aerofgts, vspsx,    coh1002v, zn, coh1002v, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4842,7 +4842,7 @@ GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System Co
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000t.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, taitofx1, 0,        coh1000ta,zn, coh1000ta, ROT0, "Sony / Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
+GAME( 1995, taitofx1, 0,        coh1000ta,zn, coh1000ta, ROT0, "Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, sfchamp,   taitofx1, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, sfchampo,  sfchamp,  coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4870,7 +4870,7 @@ GAME( 1997, gdarius2,  taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Dari
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002e.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Sony / Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
+GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4896,6 +4896,6 @@ GAME( 1999, bam2,     psarc95,  bam2,     zn, bam2,     ROT0, "Metro / Enix / Na
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002l.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atluspsx,  0,       coh1001l, zn, coh1001l, ROT0, "Sony / Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atluspsx,  0,       coh1001l, zn, coh1001l, ROT0, "Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, coh1001l, ROT0, "Atlus / Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
