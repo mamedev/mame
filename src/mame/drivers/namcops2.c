@@ -493,6 +493,18 @@ ROM_START( fateulc )
 	DISK_IMAGE_READONLY( "fateulc", 0, SHA1(073e67a5219ad53292716093b8c35deb20761c04) )
 ROM_END
 
+ROM_START( gdvsgd )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "gdvsgd.ic002", 0x000000, 0x800000, NO_DUMP ) 
+    ROM_LOAD( "gdvsgd_spr.ic002", 0x800000, 0x040000, NO_DUMP ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "gdvsgd", 0, SHA1(3cf9ade5495982fcb8e106e7be4067429530f864) )
+ROM_END
+
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2001, bldyr3b,    sys246, system246, system246, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", GAME_IS_SKELETON)
 GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
@@ -523,3 +535,5 @@ GAME(2005, superdbz,   sys256, system256, system246, 0, ROT0, "Banpresto / Spike
 GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
+GAME(2008, gdvsgd,     sys256, system256, system246, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam", GAME_IS_SKELETON)
+
