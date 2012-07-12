@@ -2443,7 +2443,7 @@ ROM_START( scuda )	/* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
-ROM_START( scudp )	/* step 1.5 */
+ROM_START( scudplus )	/* step 1.5 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20092a.17",  0x0600006,  0x80000, CRC(a94ec57e) SHA1(bda1d9cb38e10a25f7cdde38f30ae13541fdbc5e) )
@@ -2524,7 +2524,7 @@ ROM_START( scudp )	/* step 1.5 */
 	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
 ROM_END
 
-ROM_START( scudpo )	/* step 1.5 */
+ROM_START( scudplusa )	/* step 1.5 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20092.17",  0x0600006,  0x80000, CRC(6f9161c1) SHA1(b1c66eeb1bb67664aafa78ad62515204f231f09b) )
@@ -5763,11 +5763,11 @@ static DRIVER_INIT( harley )
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
 
-	//rom[(0x50e8d4^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
-	//rom[(0x50e8f4^4)/4] = 0x60000000;
-	//rom[(0x50fb84^4)/4] = 0x60000000;
-	//rom[(0x4f736c^4)/4] = 0x60000000;
-	//rom[(0x4f738c^4)/4] = 0x60000000;
+	rom[(0x50ecb4^4)/4] = 0x60000000;
+	rom[(0x50ecd4^4)/4] = 0x60000000;
+	rom[(0x50ff64^4)/4] = 0x60000000;
+	//rom[(0x4f736c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
+	//rom[(0x4f738c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
 }
 
 static DRIVER_INIT( harleya )
@@ -5931,8 +5931,8 @@ GAME( 1997, getbass,     bass, model3_10, bass,      getbass, ROT0, "Sega", "Get
 GAME( 1996, scud,           0, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Twin (Australia)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, scudj,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Deluxe (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, scuda,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Twin (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, scudp,       scud, model3_15, scud,        scudp, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, scudpo,      scud, model3_15, scud,       scudpo, ROT0, "Sega", "Scud Race Plus", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, scudplus,    scud, model3_15, scud,        scudp, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, scudplusa,   scud, model3_15, scud,       scudpo, ROT0, "Sega", "Scud Race Plus", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, lostwsga,       0, model3_15, lostwsga, lostwsga, ROT0, "Sega", "The Lost World", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, older)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
