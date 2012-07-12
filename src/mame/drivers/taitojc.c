@@ -341,11 +341,12 @@ Notes:
     TODO:
         - dendego intro object RAM usage has various gfx bugs (check video file)
         - dendego title screen builds up and it shouldn't
+        - dendego attract mode train doesn't ride, the doors light doesn't turn on.
+        - dendego/dendego2 train board (external sound board with OKI6295) is not emulated. where is it accessed???
+        - dendego2 shows a debug string during gameplay? it also shows up in the 2nd demo run.
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-        - dendego2 shows a debug string during gameplay?
-        - Train board (external sound board with OKI6295) is not emulated.
-        - dangcurv DSP program crashes very soon, so no 3d is currently shown.
+        - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
         - add idle skips if possible
         - POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
@@ -1141,7 +1142,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1162,7 +1163,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // debug related in dendego/sidebs
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
