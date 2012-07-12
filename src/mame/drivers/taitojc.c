@@ -1774,7 +1774,7 @@ ROM_END
 
 /* Landing Gear known program rom sets not dumped:
 
-E17-28 through E17-32 (5 numbers) are what? Different version and or regions?
+E17-28 through E17-31 (E17-32 is a PAL)
 
 */
 
