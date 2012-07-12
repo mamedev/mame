@@ -1272,19 +1272,19 @@ MACHINE_CONFIG_END
 
 ROM_START( legionna )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD32_BYTE( "1",           0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
-	ROM_LOAD32_BYTE( "2",           0x00001, 0x20000, CRC(35c8a28f) SHA1(31a1f2f9e04dfcab4b3357d6d27c24b434a8c14b) )
-	ROM_LOAD32_BYTE( "3",           0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
-	ROM_LOAD32_BYTE( "legion4.bin", 0x00003, 0x20000, CRC(2cc36c98) SHA1(484fc6eeeed89386ec69df0f92919b742cfdd89f) )
+	ROM_LOAD32_BYTE( "1.u025",  0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
+	ROM_LOAD32_BYTE( "2.u024",  0x00001, 0x20000, CRC(35c8a28f) SHA1(31a1f2f9e04dfcab4b3357d6d27c24b434a8c14b) )
+	ROM_LOAD32_BYTE( "3.u026",  0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
+	ROM_LOAD32_BYTE( "4a.u023", 0x00003, 0x20000, CRC(2cc36c98) SHA1(484fc6eeeed89386ec69df0f92919b742cfdd89f) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "6",   0x00000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_LOAD( "6.u1110",     0x000000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
+	ROM_CONTINUE(            0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
-	ROM_LOAD16_BYTE( "8",   0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
+	ROM_LOAD16_BYTE( "7.u077", 0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
+	ROM_LOAD16_BYTE( "8.u072", 0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
@@ -1293,11 +1293,11 @@ ROM_START( legionna )
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
+	ROM_LOAD( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
+	ROM_LOAD( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
 	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD( "back",     0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
+	ROM_LOAD( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
 	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
@@ -1309,24 +1309,30 @@ ROM_START( legionna )
 	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
+	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
+
+	ROM_REGION( 0x080000, "copx", 0 ) /* SEI300 data rom */
+	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
+	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( legionnau )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD32_BYTE( "1",   0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
-	ROM_LOAD32_BYTE( "2",   0x00001, 0x20000, CRC(35c8a28f) SHA1(31a1f2f9e04dfcab4b3357d6d27c24b434a8c14b) )
-	ROM_LOAD32_BYTE( "3",   0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
-	ROM_LOAD32_BYTE( "4",   0x00003, 0x20000, CRC(91fd4648) SHA1(8ad6d0512996b88d3c0c7a96912eebaae2333424) )
+	ROM_LOAD32_BYTE( "1.u025", 0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
+	ROM_LOAD32_BYTE( "2.u024", 0x00001, 0x20000, CRC(35c8a28f) SHA1(31a1f2f9e04dfcab4b3357d6d27c24b434a8c14b) )
+	ROM_LOAD32_BYTE( "3.u026", 0x00002, 0x20000, CRC(553fc7c0) SHA1(b12a2eea6b2c9bd76c0c74ddf2765d58510f586a) )
+	ROM_LOAD32_BYTE( "4.u023", 0x00003, 0x20000, CRC(91fd4648) SHA1(8ad6d0512996b88d3c0c7a96912eebaae2333424) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "6",   0x00000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_LOAD( "6.u1110",     0x000000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
+	ROM_CONTINUE(            0x010000, 0x08000 )	/* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "user1", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )	/* chars, some BK3 tiles too */
-	ROM_LOAD16_BYTE( "8",   0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
+	ROM_LOAD16_BYTE( "7.u077", 0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
+	ROM_LOAD16_BYTE( "8.u072", 0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
@@ -1335,11 +1341,11 @@ ROM_START( legionnau )
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
+	ROM_LOAD( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
+	ROM_LOAD( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
 	ROM_REGION( 0x100000, "user2", 0 ) /* load the tiles here so we can split them up into the required regions by hand */
-	ROM_LOAD( "back",     0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
+	ROM_LOAD( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )  /* MBK */
 	ROM_COPY( "user2", 0x000000, 0x000000, 0x80000 )
@@ -1351,7 +1357,13 @@ ROM_START( legionnau )
 	ROM_COPY( "user2", 0x080000, 0x000000, 0x78000 )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
+	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
+
+	ROM_REGION( 0x080000, "copx", 0 ) /* SEI300 data rom */
+	ROM_LOAD( "copx-d1.u0330",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) ) /* not dumped from this PCB assumed to be the same */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* Priority? */
+	ROM_LOAD( "leg007.u091",   0x000000, 0x000200, NO_DUMP ) /* N82S147N type BPROM */
 ROM_END
 
 ROM_START( heatbrl )
@@ -1726,7 +1738,7 @@ ROM_START( denjinmk )
 	ROM_LOAD16_BYTE( "rom8.615",       0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
 
 	ROM_REGION( 0x500000, "gfx2", 0 )
-    ROM_LOAD( "obj-0-3.748",     0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
+	ROM_LOAD( "obj-0-3.748",     0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
 	ROM_LOAD( "obj-4-5.756",     0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
 	ROM_LOAD( "obj-6-7.743",     0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
 	ROM_LOAD( "obj-8-9.757",     0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
