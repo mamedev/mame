@@ -107,6 +107,9 @@ public:
 	UINT32 screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	bitmap_ind16 &get_bitmap() { return m_tmpbmp; }
 
+	/* RESET pin */
+	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

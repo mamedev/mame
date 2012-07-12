@@ -96,6 +96,9 @@ public:
 	static void static_set_vram_size(device_t &device, UINT32 vram_size);
 	static void static_set_interrupt_callback(device_t &device, v99x8_interrupt_delegate callback, const char *device_name);
 
+	/* RESET pin */
+	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
+
 protected:
 	const address_space_config		m_space_config;
 	address_space*					m_vram_space;

@@ -11,6 +11,22 @@
 #include "emu.h"
 #include "debugger.h"
 
+/*
+    Define symbols for interrupt lines.
+
+    We use a separate RESET signal which is not captured by the core.
+
+    Caution: Check irqline in set_input_line of each driver using this CPU.
+    Values have changed. Use these symbols instead.
+*/
+enum
+{
+	INPUT_LINE_99XX_RESET = 0,
+	INPUT_LINE_99XX_INTREQ = 1,
+	INPUT_LINE_99XX_INT1 = 2,
+	INPUT_LINE_99XX_INT4 = 3
+};
+
 enum
 {
 	TI990_10_ID = 1,

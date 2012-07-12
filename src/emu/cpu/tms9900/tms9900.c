@@ -1154,7 +1154,7 @@ void tms99xx_device::execute_run()
 				}
 			}
 		}
-	} while (m_icount>0);
+	} while (m_icount>0 && !m_reset);
 	if (VERBOSE>6) LOG("tms99xx: cycles expired; will return soon.\n");
 }
 
@@ -1165,22 +1165,29 @@ void tms99xx_device::execute_run()
 */
 void tms99xx_device::execute_set_input(int irqline, int state)
 {
-	if (irqline == INPUT_LINE_NMI)
+	if (irqline==INPUT_LINE_99XX_RESET && state==ASSERT_LINE)
 	{
-		m_load_state = (state==ASSERT_LINE);
-		m_irq_level = -1;
+		m_reset = true;
 	}
 	else
 	{
-		m_irq_state = (state==ASSERT_LINE);
-		if (state==ASSERT_LINE)
+		if (irqline == INPUT_LINE_NMI)
 		{
-			m_irq_level = get_intlevel(state);
-			if (VERBOSE>6) LOG("tms99xx: interrupt line %d = %d, level=%d, ST=%04x\n", irqline, state, m_irq_level, ST);
+			m_load_state = (state==ASSERT_LINE);
+			m_irq_level = -1;
 		}
 		else
 		{
-			if (VERBOSE>6) LOG("tms99xx: cleared interrupt line %d\n", irqline);
+			m_irq_state = (state==ASSERT_LINE);
+			if (state==ASSERT_LINE)
+			{
+				m_irq_level = get_intlevel(state);
+				if (VERBOSE>6) LOG("tms99xx: interrupt line %d = %d, level=%d, ST=%04x\n", irqline, state, m_irq_level, ST);
+			}
+			else
+			{
+				if (VERBOSE>6) LOG("tms99xx: cleared interrupt line %d\n", irqline);
+			}
 		}
 	}
 }
@@ -2543,7 +2550,7 @@ UINT32 tms99xx_device::execute_max_cycles() const
 
 UINT32 tms99xx_device::execute_input_lines() const
 {
-	return 1;
+	return 2;
 }
 
 // clocks to cycles, cycles to clocks = id

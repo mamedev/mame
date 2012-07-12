@@ -1118,7 +1118,7 @@ void tms9995_device::execute_run()
 				}
 			}
 		}
-	} while (m_icount>0);
+	} while (m_icount>0 && !m_reset);
 	if (VERBOSE>5) LOG("tms9995: cycles expired; will return soon.\n");
 }
 
@@ -1133,37 +1133,44 @@ void tms9995_device::execute_run()
 */
 void tms9995_device::execute_set_input(int irqline, int state)
 {
-	if (irqline == INPUT_LINE_NMI)
+	if (irqline==INPUT_LINE_99XX_RESET && state==ASSERT_LINE)
 	{
-		m_nmi_active = (state==ASSERT_LINE);
-		if (VERBOSE>3) LOG("tms9995: NMI interrupt line state=%d\n", state);
+		m_reset = true;
 	}
 	else
 	{
-		if (irqline == 1)
+		if (irqline == INPUT_LINE_NMI)
 		{
-			m_int1_active = m_flag[2] = (state==ASSERT_LINE);
-			if (VERBOSE>3) LOG("tms9995: Line INT1 state=%d\n", state);
+			m_nmi_active = (state==ASSERT_LINE);
+			if (VERBOSE>3) LOG("tms9995: NMI interrupt line state=%d\n", state);
 		}
 		else
 		{
-			if (irqline == 4)
+			if (irqline == INPUT_LINE_99XX_INT1)
 			{
-				if (VERBOSE>3) LOG("tms9995: Line INT4/EC state=%d\n", state);
-				if (m_flag[0]==false)
-				{
-					if (VERBOSE>7) LOG("tms9995: set as interrupt\n");
-					m_int4_active = m_flag[4] = (state==ASSERT_LINE);
-				}
-				else
-				{
-					if (VERBOSE>7) LOG("tms9995: set as event count\n");
-					trigger_decrementer();
-				}
+				m_int1_active = m_flag[2] = (state==ASSERT_LINE);
+				if (VERBOSE>3) LOG("tms9995: Line INT1 state=%d\n", state);
 			}
 			else
 			{
-				if (VERBOSE>0) LOG("tms9995: Accessed invalid interrupt line %d\n", irqline);
+				if (irqline == INPUT_LINE_99XX_INT4)
+				{
+					if (VERBOSE>3) LOG("tms9995: Line INT4/EC state=%d\n", state);
+					if (m_flag[0]==false)
+					{
+						if (VERBOSE>7) LOG("tms9995: set as interrupt\n");
+						m_int4_active = m_flag[4] = (state==ASSERT_LINE);
+					}
+					else
+					{
+						if (VERBOSE>7) LOG("tms9995: set as event count\n");
+						trigger_decrementer();
+					}
+				}
+				else
+				{
+					if (VERBOSE>0) LOG("tms9995: Accessed invalid interrupt line %d\n", irqline);
+				}
 			}
 		}
 	}
