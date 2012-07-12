@@ -349,6 +349,61 @@ public:
 	int m_diff2;
 };
 
+class fantzn2_state : public systeme_state
+{
+public:
+	fantzn2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: systeme_state(mconfig, type, tag)
+		{ }
+
+protected:
+	virtual void driver_start();
+};
+
+class ridleofp_state : public systeme_state
+{
+public:
+	ridleofp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: systeme_state(mconfig, type, tag)
+		{ }
+
+protected:
+	virtual void driver_start();
+};
+
+class hangonjr_state : public systeme_state
+{
+public:
+	hangonjr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: systeme_state(mconfig, type, tag)
+		{ }
+
+protected:
+	virtual void driver_start();
+};
+
+class opaopa_state : public systeme_state
+{
+public:
+	opaopa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: systeme_state(mconfig, type, tag)
+		{ }
+
+protected:
+	virtual void driver_start();
+};
+
+class astrofl_state : public systeme_state
+{
+public:
+	astrofl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: systeme_state(mconfig, type, tag)
+			{ }
+
+protected:
+	virtual void driver_start();
+};
+
 
 /****************************************************************************************
  Memory Maps
@@ -441,29 +496,48 @@ void systeme_state::driver_start()
 	m_vdp2_vram = machine().memory().region_alloc("vdp2_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
 
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+}
 
-	if ( !strcmp( system().name, "ridleofp" ) )
-	{
-		m_maincpu->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::ridleofp_port_f8_read), this));
-		m_maincpu->memory().space(AS_IO)->install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::ridleofp_port_fa_write), this));
-	}
-	else if ( !strcmp( system().name, "hangonjr" ) )
-	{
-		m_maincpu->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::hangonjr_port_f8_read), this));
-		m_maincpu->memory().space(AS_IO)->install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::hangonjr_port_fa_write), this));
-	}
-	else if ( !strcmp( system().name, "opaopa" ) )
-	{
-		mc8123_decrypt_rom(machine(), "maincpu", "user1", "bank1", 8);
-	}
-	else if ( !strcmp( system().name, "fantzn2" ) )
-	{
-		mc8123_decrypt_rom(machine(), "maincpu", "user1", NULL, 0);
-	}
-	else if ( !strcmp( system().name, "astrofl" ) )
-	{
-		sega_315_5177_decode(machine(), "maincpu");
-	}
+
+void fantzn2_state::driver_start()
+{
+	systeme_state::driver_start();
+
+	mc8123_decrypt_rom(machine(), "maincpu", "user1", NULL, 0);
+}
+
+
+void ridleofp_state::driver_start()
+{
+	systeme_state::driver_start();
+
+	m_maincpu->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::ridleofp_port_f8_read), this));
+	m_maincpu->memory().space(AS_IO)->install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::ridleofp_port_fa_write), this));
+}
+
+
+void hangonjr_state::driver_start()
+{
+	systeme_state::driver_start();
+
+	m_maincpu->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::hangonjr_port_f8_read), this));
+	m_maincpu->memory().space(AS_IO)->install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::hangonjr_port_fa_write), this));
+}
+
+
+void opaopa_state::driver_start()
+{
+	systeme_state::driver_start();
+
+	mc8123_decrypt_rom(machine(), "maincpu", "user1", "bank1", 8);
+}
+
+
+void astrofl_state::driver_start()
+{
+	systeme_state::driver_start();
+
+	sega_315_5177_decode(machine(), "maincpu");
 }
 
 
@@ -1056,12 +1130,32 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 MACHINE_CONFIG_END
 
 
-//    YEAR, NAME,     PARENT,   MACHINE, INPUT,    INIT, MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        systeme, hangonjr, 0,    ROT0,   "Sega", "Hang-On Jr.", 0 )
-GAME( 1986, transfrm, 0,        systeme, transfrm, 0,    ROT0,   "Sega", "Transformer", 0 )
-GAME( 1986, astrofl,  transfrm, systeme, transfrm, 0,    ROT0,   "Sega", "Astro Flash (Japan)", 0 )
-GAME( 1986, ridleofp, 0,        systeme, ridleofp, 0,    ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", 0 )
-GAME( 1987, opaopa,   0,        systeme, opaopa,   0,    ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", 0 )
-GAME( 1988, fantzn2,  0,        systeme, fantzn2,  0,    ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", 0 )
-GAME( 1988, tetrisse, 0,        systeme, tetrisse, 0,    ROT0,   "Sega", "Tetris (Japan, System E)", 0 )
+static MACHINE_CONFIG_DERIVED_CLASS( fantzn2, systeme, fantzn2_state )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED_CLASS( ridleofp, systeme, ridleofp_state )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED_CLASS( hangonjr, systeme, hangonjr_state )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED_CLASS( opaopa, systeme, opaopa_state )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED_CLASS( astrofl, systeme, astrofl_state )
+MACHINE_CONFIG_END
+
+
+//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT, MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1985, hangonjr, 0,        hangonjr, hangonjr, 0,    ROT0,   "Sega", "Hang-On Jr.", 0 )
+GAME( 1986, transfrm, 0,        systeme,  transfrm, 0,    ROT0,   "Sega", "Transformer", 0 )
+GAME( 1986, astrofl,  transfrm, astrofl,  transfrm, 0,    ROT0,   "Sega", "Astro Flash (Japan)", 0 )
+GAME( 1986, ridleofp, 0,        ridleofp, ridleofp, 0,    ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", 0 )
+GAME( 1987, opaopa,   0,        opaopa,   opaopa,   0,    ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", 0 )
+GAME( 1988, fantzn2,  0,        fantzn2,  fantzn2,  0,    ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", 0 )
+GAME( 1988, tetrisse, 0,        systeme,  tetrisse, 0,    ROT0,   "Sega", "Tetris (Japan, System E)", 0 )
 
