@@ -75,7 +75,6 @@ public:
 
 	DECLARE_READ32_MEMBER(taitojc_palette_r);
 	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
-	DECLARE_WRITE32_MEMBER(jc_control_w);
 	DECLARE_READ32_MEMBER(mcu_comm_r);
 	DECLARE_WRITE32_MEMBER(mcu_comm_w);
 	DECLARE_READ8_MEMBER(jc_pcbid_r);

@@ -1,8 +1,31 @@
-/*
+/*************************************************************************
 
-Taito JC System
+  Taito JC System
 
-Driver by Ville Linde, based on the preliminary driver by David Haywood
+  Driver by Ville Linde, based on the preliminary driver by David Haywood
+
+Taito custom chips on this hardware:
+- TC0640FIO      : I/O
+- TC0770CMU      : Math co-processor?
+- TC0780FPA x 2  : Polygon renderer?
+- TC0840GLU      : 2D graphics?
+- TC0870HVP      : Vector processor?
+
+TODO:
+- dendego intro object RAM usage has various gfx bugs (check video file)
+- dendego title screen builds up and it shouldn't
+- dendego attract mode train doesn't ride, the doors light doesn't turn on.
+- dendego2 shows a debug string during gameplay? it also shows up in the 2nd demo run.
+- landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
+- landgear has huge 3d problems on gameplay (CPU comms?)
+- dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
+- add idle skips if possible
+- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
+
+--------------------------------------------------------------------------
+
+PCB notes:
+
 
 Side By Side 2
 Taito, 1997
@@ -336,18 +359,6 @@ Notes:
       ROM  .65 is 27C512, linked to 68HC11 MCU
       *    Unpopulated socket.
 
-
-
-    TODO:
-        - dendego intro object RAM usage has various gfx bugs (check video file)
-        - dendego title screen builds up and it shouldn't
-        - dendego attract mode train doesn't ride, the doors light doesn't turn on.
-        - dendego2 shows a debug string during gameplay? it also shows up in the 2nd demo run.
-        - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
-        - landgear has huge 3d problems on gameplay (CPU comms?)
-        - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
-        - add idle skips if possible
-        - POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
 #include "emu.h"
@@ -384,29 +395,6 @@ WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
 	b = (color >>  0) & 0xff;
 
 	palette_set_color(machine(),offset, MAKE_RGB(r, g, b));
-}
-
-WRITE32_MEMBER(taitojc_state::jc_control_w)
-{
-	//mame_printf_debug("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-
-	switch(offset)
-	{
-		case 0x3:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				ioport("EEPROMOUT")->write(data >> 24, 0xff);
-			}
-			else
-				popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-			return;
-		}
-
-		default:
-			popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-			break;
-	}
 }
 
 
@@ -751,7 +739,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
 	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8_LEGACY("tc0640fio", tc0640fio_r, tc0640fio_w, 0xff000000)
-	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
+	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r)
@@ -1110,9 +1098,9 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dendego )
