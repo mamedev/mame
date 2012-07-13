@@ -342,7 +342,6 @@ Notes:
         - dendego intro object RAM usage has various gfx bugs (check video file)
         - dendego title screen builds up and it shouldn't
         - dendego attract mode train doesn't ride, the doors light doesn't turn on.
-        - dendego/dendego2 train board (external sound board with OKI6295) is not emulated. where is it accessed???
         - dendego2 shows a debug string during gameplay? it also shows up in the 2nd demo run.
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
@@ -810,41 +809,6 @@ WRITE32_MEMBER(taitojc_state::snd_share_w)
 	}
 }
 
-WRITE32_MEMBER(taitojc_state::jc_meters_w)
-{
-	// printf("jc_output_w: %08x, %08x %08x\n", offset, data,mem_mask);
-	if (ACCESSING_BITS_16_31)
-	{
-		switch (offset & 3)
-		{
-			case 0:
-			{
-				int val = dendego_odometer_table[(data >> 16) & 0xff];
-				if (val != m_speed_meter)
-				{
-					m_speed_meter = val;
-					output_set_value("counter2", val / 10);
-					output_set_value("counter3", val % 10);
-				}
-				break;
-			}
-
-			case 1:
-			{
-				int val = dendego_pressure_table[(data >> 16) & 0xff];
-				if (val != m_brake_meter)
-				{
-					m_brake_meter = val;
-					output_set_value("counter4", val);
-				}
-				break;
-			}
-			case 2: break; // unused?
-			case 3: break; // motor (used in dendego2 to shake seat)
-		}
-	}
-}
-
 READ32_MEMBER(taitojc_state::jc_lan_r)
 {
 	return 0xffffffff;
@@ -867,9 +831,46 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r)
-	AM_RANGE(0x06e00000, 0x06e0000f) AM_WRITE(jc_meters_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
+ADDRESS_MAP_END
+
+
+/*
+
+Densha de Go games have odometers for speed and brakepressure.
+There's a voltmeter too, but seems to be a dummy (always stuck on 1.5kV)
+
+The OKI is used for seat vibration effects.
+
+*/
+
+WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
+{
+	int val = dendego_odometer_table[(data >> 16) & 0xff];
+	if (val != m_speed_meter)
+	{
+		m_speed_meter = val;
+		output_set_value("counter2", val / 10);
+		output_set_value("counter3", val % 10);
+	}
+}
+
+WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
+{
+	int val = dendego_pressure_table[(data >> 16) & 0xff];
+	if (val != m_brake_meter)
+	{
+		m_brake_meter = val;
+		output_set_value("counter4", val);
+	}
+}
+
+static ADDRESS_MAP_START( dendego_map, AS_PROGRAM, 32, taitojc_state )
+	AM_RANGE(0x06e00000, 0x06e00003) AM_WRITE8(dendego_speedmeter_w, 0x00ff0000)
+	AM_RANGE(0x06e00004, 0x06e00007) AM_WRITE8(dendego_brakemeter_w, 0x00ff0000)
+	AM_RANGE(0x06e0000c, 0x06e0000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
+	AM_IMPORT_FROM( taitojc_map )
 ADDRESS_MAP_END
 
 
@@ -1186,7 +1187,7 @@ static INPUT_PORTS_START( dendego )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn Pedal")
 
 	PORT_MODIFY("BUTTONS")	// Throttle Lever at left, move down to speed up, 6 positions
 	PORT_BIT( 0x77, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(6) PORT_REMAP_TABLE(dendego_mascon_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Throttle Lever")
@@ -1341,14 +1342,18 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dendego, taitojc )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dendego_map)
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(dendego)
 
 	/* sound hardware */
+	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 	MCFG_OKIM6295_ADD("oki", 32000000/32, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
