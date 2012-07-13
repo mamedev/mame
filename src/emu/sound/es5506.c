@@ -810,7 +810,7 @@ static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int 
 		/* generate from the appropriate source */
 		if (!base)
 		{
-			logerror("NULL region base %d\n",voice->control >> 14);
+			logerror("es5506: NULL region base %d\n",voice->control >> 14);
 			generate_dummy(chip, voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)
@@ -821,7 +821,8 @@ static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int 
 		/* does this voice have it's IRQ bit raised? */
 		if (voice->control&CONTROL_IRQ)
 		{
-logerror("IRQ raised on voice %d!!\n",v);
+			logerror("es5506: IRQ raised on voice %d!!\n",v);
+
 			/* only update voice vector if existing IRQ is acked by host */
 			if (chip->irqv&0x80)
 			{
@@ -2048,11 +2049,12 @@ INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 			/* want to waste time filtering stopped channels, we just look for a read from */
 			/* this register on a stopped voice, and return the raw sample data at the */
 			/* accumulator */
-			if ((voice->control & CONTROL_STOPMASK) && chip->region_base[voice->control >> 14]) {
+			if ((voice->control & CONTROL_STOPMASK) && chip->region_base[voice->control >> 14])
+			{
 				voice->o1n1 = chip->region_base[voice->control >> 14][voice->exbank + (voice->accum >> 11)];
-				logerror("%02x %08x ==> %08x\n",voice->o1n1,voice->control >> 14,voice->exbank + (voice->accum >> 11));
+				// logerror("%02x %08x ==> %08x\n",voice->o1n1,voice->control >> 14,voice->exbank + (voice->accum >> 11));
 			}
-				result = voice->o1n1;
+			result = voice->o1n1;
 			break;
 
 		case 0x07:
