@@ -728,6 +728,10 @@ READ32_MEMBER(taitojc_state::jc_lan_r)
 	return 0xffffffff;
 }
 
+WRITE32_MEMBER(taitojc_state::jc_lan_w)
+{
+}
+
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
@@ -742,7 +746,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
-	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r)
+	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE(jc_lan_r, jc_lan_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
@@ -795,7 +799,12 @@ WRITE8_MEMBER(taitojc_state::hc11_comm_w)
 {
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_lamps_w)
+READ8_MEMBER(taitojc_state::hc11_output_r)
+{
+	return m_mcu_output;
+}
+
+WRITE8_MEMBER(taitojc_state::hc11_output_w)
 {
 /*
 	cabinet lamps, active high
@@ -818,6 +827,8 @@ WRITE8_MEMBER(taitojc_state::hc11_lamps_w)
 */
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i, data >> i & 1);
+
+	m_mcu_output = data;
 }
 
 READ8_MEMBER(taitojc_state::hc11_data_r)
@@ -847,9 +858,9 @@ static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, taitojc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
-	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_READNOP
+	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_READNOP // ?
 	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
-	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_WRITE(hc11_lamps_w)
+	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_READWRITE(hc11_output_r, hc11_output_w)
 	AM_RANGE(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA) AM_READWRITE(hc11_data_r, hc11_data_w)
 	AM_RANGE(MC68HC11_IO_AD0,       MC68HC11_IO_AD7      ) AM_READ(hc11_analog_r)
 ADDRESS_MAP_END
@@ -871,7 +882,7 @@ WRITE16_MEMBER(taitojc_state::dsp_rom_w)
 		m_dsp_rom_pos &= 0xffff;
 		m_dsp_rom_pos |= data << 16;
 	}
-	else if (offset == 1)
+	else
 	{
 		m_dsp_rom_pos &= 0xffff0000;
 		m_dsp_rom_pos |= data;
@@ -931,40 +942,22 @@ READ16_MEMBER(taitojc_state::dsp_unk_r)
 
 WRITE16_MEMBER(taitojc_state::dsp_viewport_w)
 {
-	m_viewport_data[offset] = (INT16)(data);
+	m_viewport_data[offset] = data;
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_projection_w)
 {
-	m_projection_data[offset] = (INT16)(data);
-
-	if (offset == 2)
-	{
-		if (m_projection_data[2] != 0)
-		{
-			m_projected_point_y = (m_projection_data[0] * m_viewport_data[0]) / (m_projection_data[2]);
-			m_projected_point_x = (m_projection_data[1] * m_viewport_data[1]) / (m_projection_data[2]);
-		}
-		else
-		{
-			m_projected_point_y = 0;
-			m_projected_point_x = 0;
-		}
-	}
+	m_projection_data[offset] = data;
 }
 
-READ16_MEMBER(taitojc_state::dsp_projection_r)
+READ16_MEMBER(taitojc_state::dsp_projection_y_r)
 {
-	if (offset == 0)
-	{
-		return m_projected_point_y;
-	}
-	else if (offset == 2)
-	{
-		return m_projected_point_x;
-	}
+	return (m_projection_data[2] != 0) ? (m_projection_data[0] * m_viewport_data[0]) / m_projection_data[2] : 0;
+}
 
-	return 0;
+READ16_MEMBER(taitojc_state::dsp_projection_x_r)
+{
+	return (m_projection_data[2] != 0) ? (m_projection_data[1] * m_viewport_data[1]) / m_projection_data[2] : 0;
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
@@ -980,12 +973,12 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 
 WRITE16_MEMBER(taitojc_state::dsp_intersection_w)
 {
-	m_intersection_data[offset] = (INT32)(INT16)(data);
+	m_intersection_data[offset] = data;
 }
 
 READ16_MEMBER(taitojc_state::dsp_intersection_r)
 {
-	return (INT16)((m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2]);
+	return (m_intersection_data[2] != 0) ? (m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2] : 0;
 }
 
 /*
@@ -1007,6 +1000,7 @@ READ16_MEMBER(taitojc_state::dsp_intersection_r)
     0x701f: Projected point X read
     0x7022: Unknown read
     0x7030: Unknown write
+    0x703b: Unknown read/write
 */
 
 READ16_MEMBER(taitojc_state::dsp_to_main_r)
@@ -1036,7 +1030,8 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_intersection_w)
 	AM_RANGE(0x7013, 0x7015) AM_WRITE(dsp_viewport_w)
 	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_intersection_r)
-	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
+	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_projection_y_r)
+	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_projection_x_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
@@ -1200,9 +1195,6 @@ static MACHINE_RESET( taitojc )
 	state->m_dsp_rom_pos = 0;
 	state->m_dsp_tex_address = 0;
 	state->m_dsp_tex_offset = 0;
-
-	state->m_projected_point_x = 0;
-	state->m_projected_point_y = 0;
 
 	memset(state->m_viewport_data, 0, sizeof(state->m_viewport_data));
 	memset(state->m_projection_data, 0, sizeof(state->m_projection_data));

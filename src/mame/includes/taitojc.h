@@ -14,7 +14,11 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_dsp_shared_ram(*this, "dsp_shared"),
 		m_palette_ram(*this, "palette_ram")
-	{ }
+	{
+		m_mcu_output = 0;
+		m_speed_meter = 0;
+		m_brake_meter = 0;
+	}
 
 	// device/memory pointers
 	required_device<cpu_device> m_maincpu;
@@ -36,13 +40,9 @@ public:
 	UINT16 m_dsp_tex_offset;
 
 	int m_first_dsp_reset;
-	int m_viewport_data[3];
-
-	INT32 m_projected_point_x;
-	INT32 m_projected_point_y;
-	INT32 m_projection_data[3];
-
-	INT32 m_intersection_data[3];
+	INT16 m_viewport_data[3];
+	INT16 m_projection_data[3];
+	INT16 m_intersection_data[3];
 
 	UINT8 *m_texture;
 	bitmap_ind16 m_framebuffer;
@@ -65,6 +65,7 @@ public:
 	UINT8 m_mcu_comm_hc11;
 	UINT8 m_mcu_data_main;
 	UINT8 m_mcu_data_hc11;
+	UINT8 m_mcu_output;
 
 	UINT16 m_debug_dsp_ram[0x8000];
 
@@ -85,10 +86,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
 	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
 	DECLARE_READ32_MEMBER(jc_lan_r);
+	DECLARE_WRITE32_MEMBER(jc_lan_w);
 	DECLARE_READ8_MEMBER(hc11_comm_r);
 	DECLARE_WRITE8_MEMBER(hc11_comm_w);
-	DECLARE_WRITE8_MEMBER(hc11_lamps_w);
+	DECLARE_WRITE8_MEMBER(hc11_output_w);
 	DECLARE_READ8_MEMBER(hc11_data_r);
+	DECLARE_READ8_MEMBER(hc11_output_r);
 	DECLARE_WRITE8_MEMBER(hc11_data_w);
 	DECLARE_READ8_MEMBER(hc11_analog_r);
 	DECLARE_READ16_MEMBER(dsp_rom_r);
@@ -100,7 +103,8 @@ public:
 	DECLARE_READ16_MEMBER(dsp_unk_r);
 	DECLARE_WRITE16_MEMBER(dsp_viewport_w);
 	DECLARE_WRITE16_MEMBER(dsp_projection_w);
-	DECLARE_READ16_MEMBER(dsp_projection_r);
+	DECLARE_READ16_MEMBER(dsp_projection_y_r);
+	DECLARE_READ16_MEMBER(dsp_projection_x_r);
 	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
 	DECLARE_WRITE16_MEMBER(dsp_intersection_w);
 	DECLARE_READ16_MEMBER(dsp_intersection_r);
