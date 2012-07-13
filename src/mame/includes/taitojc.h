@@ -1,5 +1,8 @@
 #include "video/poly.h"
 
+#define TAITOJC_POLYGON_FIFO_SIZE		100000
+
+
 class taitojc_state : public driver_device
 {
 public:
@@ -74,19 +77,18 @@ public:
 	int m_speed_meter;
 	int m_brake_meter;
 
-	DECLARE_READ32_MEMBER(taitojc_palette_r);
-	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
 	DECLARE_READ32_MEMBER(mcu_comm_r);
 	DECLARE_WRITE32_MEMBER(mcu_comm_w);
-	DECLARE_READ8_MEMBER(jc_pcbid_r);
 	DECLARE_READ32_MEMBER(dsp_shared_r);
 	DECLARE_WRITE32_MEMBER(dsp_shared_w);
 	DECLARE_READ32_MEMBER(snd_share_r);
 	DECLARE_WRITE32_MEMBER(snd_share_w);
-	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
-	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
+	DECLARE_READ8_MEMBER(jc_pcbid_r);
 	DECLARE_READ32_MEMBER(jc_lan_r);
 	DECLARE_WRITE32_MEMBER(jc_lan_w);
+	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
+	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
+
 	DECLARE_READ8_MEMBER(hc11_comm_r);
 	DECLARE_WRITE8_MEMBER(hc11_comm_w);
 	DECLARE_WRITE8_MEMBER(hc11_output_w);
@@ -94,25 +96,31 @@ public:
 	DECLARE_READ8_MEMBER(hc11_output_r);
 	DECLARE_WRITE8_MEMBER(hc11_data_w);
 	DECLARE_READ8_MEMBER(hc11_analog_r);
+
 	DECLARE_READ16_MEMBER(dsp_rom_r);
 	DECLARE_WRITE16_MEMBER(dsp_rom_w);
 	DECLARE_WRITE16_MEMBER(dsp_texture_w);
 	DECLARE_READ16_MEMBER(dsp_texaddr_r);
 	DECLARE_WRITE16_MEMBER(dsp_texaddr_w);
 	DECLARE_WRITE16_MEMBER(dsp_polygon_fifo_w);
-	DECLARE_READ16_MEMBER(dsp_unk_r);
-	DECLARE_WRITE16_MEMBER(dsp_viewport_w);
-	DECLARE_WRITE16_MEMBER(dsp_projection_w);
-	DECLARE_READ16_MEMBER(dsp_projection_y_r);
-	DECLARE_READ16_MEMBER(dsp_projection_x_r);
 	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
-	DECLARE_WRITE16_MEMBER(dsp_intersection_w);
-	DECLARE_READ16_MEMBER(dsp_intersection_r);
 	DECLARE_READ16_MEMBER(dsp_to_main_r);
 	DECLARE_WRITE16_MEMBER(dsp_to_main_w);
+
+	DECLARE_WRITE16_MEMBER(dsp_math_viewport_w);
+	DECLARE_WRITE16_MEMBER(dsp_math_projection_w);
+	DECLARE_READ16_MEMBER(dsp_math_projection_y_r);
+	DECLARE_READ16_MEMBER(dsp_math_projection_x_r);
+	DECLARE_WRITE16_MEMBER(dsp_math_intersection_w);
+	DECLARE_READ16_MEMBER(dsp_math_intersection_r);
+	DECLARE_READ16_MEMBER(dsp_math_unk_r);
+
 	DECLARE_READ16_MEMBER(taitojc_dsp_idle_skip_r);
 	DECLARE_READ16_MEMBER(dendego2_dsp_idle_skip_r);
 	DECLARE_WRITE16_MEMBER(dsp_idle_skip_w);
+
+	DECLARE_READ32_MEMBER(taitojc_palette_r);
+	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
 	DECLARE_READ32_MEMBER(taitojc_tile_r);
 	DECLARE_READ32_MEMBER(taitojc_char_r);
 	DECLARE_WRITE32_MEMBER(taitojc_tile_w);

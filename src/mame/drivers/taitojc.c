@@ -375,144 +375,19 @@ Notes:
 #include "dendego.lh"
 
 
-#define POLYGON_FIFO_SIZE		100000
+/***************************************************************************
 
-READ32_MEMBER(taitojc_state::taitojc_palette_r)
-{
-	return m_palette_ram[offset];
-}
+  maincpu I/O
 
-WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
-{
-	int r, g, b;
-	UINT32 color;
+***************************************************************************/
 
-	COMBINE_DATA( m_palette_ram + offset );
-
-	color = m_palette_ram[offset];
-	r = (color >>  8) & 0xff;
-	g = (color >> 16) & 0xff;
-	b = (color >>  0) & 0xff;
-
-	palette_set_color(machine(),offset, MAKE_RGB(r, g, b));
-}
-
-
-
-static UINT8 mcu_comm_reg_r(address_space *space, int reg)
-{
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
-	UINT8 r = 0;
-
-	switch (reg)
-	{
-		case 0x03:
-		{
-			r = state->m_mcu_data_main;
-			break;
-		}
-		case 0x04:
-		{
-			r = state->m_mcu_comm_main | 0x14;
-			break;
-		}
-		default:
-		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(&space->device()));
-			break;
-		}
-	}
-
-	return r;
-}
-
-static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
-{
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
-
-	switch (reg)
-	{
-		case 0x00:
-		{
-			state->m_mcu_data_hc11 = data;
-			state->m_mcu_comm_hc11 &= ~0x04;
-			state->m_mcu_comm_main &= ~0x20;
-			break;
-		}
-		case 0x04:
-		{
-			break;
-		}
-		default:
-		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(&space->device()));
-			break;
-		}
-	}
-}
-
-READ32_MEMBER(taitojc_state::mcu_comm_r)
-{
-	UINT32 r = 0;
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 0) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 1) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 2) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mcu_comm_reg_r(&space, reg + 3) << 0;
-	}
-
-	return r;
-}
-
-WRITE32_MEMBER(taitojc_state::mcu_comm_w)
-{
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		mcu_comm_reg_w(&space, reg + 0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mcu_comm_reg_w(&space, reg + 1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mcu_comm_reg_w(&space, reg + 2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mcu_comm_reg_w(&space, reg + 3, (data >> 0) & 0xff);
-	}
-}
-
-READ8_MEMBER(taitojc_state::jc_pcbid_r)
-{
-	static const char pcb_id[0x40] =
-	{ "Needs proper PCB ID here!"};
-
-	return pcb_id[offset];
-}
+#define DEBUG_DSP				0
+#define DEBUG_BLOCK_MOVES		0
 
 READ32_MEMBER(taitojc_state::dsp_shared_r)
 {
 	return m_dsp_shared_ram[offset] << 16;
 }
-
-#define DEBUG_DSP				0
-#define DEBUG_BLOCK_MOVES		0
 
 #if DEBUG_DSP
 
@@ -643,7 +518,7 @@ static void debug_dsp_command(running_machine &machine)
 
 	printf("\n");
 }
-#endif
+#endif // DEBUG_DSP
 
 WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 {
@@ -696,6 +571,109 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 	}
 }
 
+
+
+static UINT8 mcu_comm_reg_r(address_space *space, int reg)
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+	UINT8 r = 0;
+
+	switch (reg)
+	{
+		case 0x03:
+		{
+			r = state->m_mcu_data_main;
+			break;
+		}
+		case 0x04:
+		{
+			r = state->m_mcu_comm_main | 0x14;
+			break;
+		}
+		default:
+		{
+			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(&space->device()));
+			break;
+		}
+	}
+
+	return r;
+}
+
+static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
+{
+	taitojc_state *state = space->machine().driver_data<taitojc_state>();
+
+	switch (reg)
+	{
+		case 0x00:
+		{
+			state->m_mcu_data_hc11 = data;
+			state->m_mcu_comm_hc11 &= ~0x04;
+			state->m_mcu_comm_main &= ~0x20;
+			break;
+		}
+		case 0x04:
+		{
+			break;
+		}
+		default:
+		{
+			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(&space->device()));
+			break;
+		}
+	}
+}
+
+READ32_MEMBER(taitojc_state::mcu_comm_r)
+{
+	UINT32 r = 0;
+	int reg = offset * 4;
+
+	if (ACCESSING_BITS_24_31)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 0) << 24;
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 1) << 16;
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 2) << 8;
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		r |= mcu_comm_reg_r(&space, reg + 3) << 0;
+	}
+
+	return r;
+}
+
+WRITE32_MEMBER(taitojc_state::mcu_comm_w)
+{
+	int reg = offset * 4;
+
+	if (ACCESSING_BITS_24_31)
+	{
+		mcu_comm_reg_w(&space, reg + 0, (data >> 24) & 0xff);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		mcu_comm_reg_w(&space, reg + 1, (data >> 16) & 0xff);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		mcu_comm_reg_w(&space, reg + 2, (data >> 8) & 0xff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		mcu_comm_reg_w(&space, reg + 3, (data >> 0) & 0xff);
+	}
+}
+
+
+
 READ32_MEMBER(taitojc_state::snd_share_r)
 {
 	switch (offset & 3)
@@ -722,6 +700,25 @@ WRITE32_MEMBER(taitojc_state::snd_share_w)
 		}
 	}
 }
+
+
+READ8_MEMBER(taitojc_state::jc_pcbid_r)
+{
+	static const char pcb_id[0x40] =
+	{ "Needs proper PCB ID here!"};
+
+	return pcb_id[offset];
+}
+
+
+/*
+
+Some games (Dangerous Curves, Side by Side, Side by Side 2) were released as Twin cabinets,
+allowing 2 players to compete eachother.
+
+Not emulated yet...
+
+*/
 
 READ32_MEMBER(taitojc_state::jc_lan_r)
 {
@@ -788,7 +785,13 @@ static ADDRESS_MAP_START( dendego_map, AS_PROGRAM, 32, taitojc_state )
 ADDRESS_MAP_END
 
 
-/*****************************************************************************/
+
+
+/***************************************************************************
+
+  MCU I/O
+
+***************************************************************************/
 
 READ8_MEMBER(taitojc_state::hc11_comm_r)
 {
@@ -797,6 +800,18 @@ READ8_MEMBER(taitojc_state::hc11_comm_r)
 
 WRITE8_MEMBER(taitojc_state::hc11_comm_w)
 {
+}
+
+READ8_MEMBER(taitojc_state::hc11_data_r)
+{
+	m_mcu_comm_hc11 |= 0x04;
+	m_mcu_comm_main |= 0x20;
+	return m_mcu_data_hc11;
+}
+
+WRITE8_MEMBER(taitojc_state::hc11_data_w)
+{
+	m_mcu_data_main = data;
 }
 
 READ8_MEMBER(taitojc_state::hc11_output_r)
@@ -831,18 +846,6 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 	m_mcu_output = data;
 }
 
-READ8_MEMBER(taitojc_state::hc11_data_r)
-{
-	m_mcu_comm_hc11 |= 0x04;
-	m_mcu_comm_main |= 0x20;
-	return m_mcu_data_hc11;
-}
-
-WRITE8_MEMBER(taitojc_state::hc11_data_w)
-{
-	m_mcu_data_main = data;
-}
-
 READ8_MEMBER(taitojc_state::hc11_analog_r)
 {
 	static const char *const portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
@@ -865,7 +868,74 @@ static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
 	AM_RANGE(MC68HC11_IO_AD0,       MC68HC11_IO_AD7      ) AM_READ(hc11_analog_r)
 ADDRESS_MAP_END
 
-/*****************************************************************************/
+
+
+
+/***************************************************************************
+
+  DSP I/O
+
+***************************************************************************/
+
+/*
+    Math co-processor memory map
+
+    0x7000: Projection point Y
+    0x7001: Projection point X
+    0x7002: Projection point Z
+    0x7003: Frustum Min Z(?)
+    0x7004: Frustum Max Z(?)
+    0x7010: Line intersection, parameter length
+    0x7011: Line intersection, intersection point
+    0x7012: Line intersection, line length
+    0x7013: Viewport Width / 2
+    0x7014: Viewport Height / 2
+    0x7015: Viewport Z / 2 (?)
+    0x701b: Line intersection, parameter interpolation read
+    0x701d: Projected point Y read
+    0x701f: Projected point X read
+    0x7022: Unknown read
+    0x7030: Unknown write
+    0x703b: Unknown read/write
+*/
+
+WRITE16_MEMBER(taitojc_state::dsp_math_projection_w)
+{
+	m_projection_data[offset] = data;
+}
+
+WRITE16_MEMBER(taitojc_state::dsp_math_viewport_w)
+{
+	m_viewport_data[offset] = data;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_projection_y_r)
+{
+	return (m_projection_data[2] != 0) ? (m_projection_data[0] * m_viewport_data[0]) / m_projection_data[2] : 0;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_projection_x_r)
+{
+	return (m_projection_data[2] != 0) ? (m_projection_data[1] * m_viewport_data[1]) / m_projection_data[2] : 0;
+}
+
+WRITE16_MEMBER(taitojc_state::dsp_math_intersection_w)
+{
+	m_intersection_data[offset] = data;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_intersection_r)
+{
+	return (m_intersection_data[2] != 0) ? (m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2] : 0;
+}
+
+READ16_MEMBER(taitojc_state::dsp_math_unk_r)
+{
+	return 0x7fff;
+}
+
+
+/**************************************************************************/
 
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
@@ -888,6 +958,7 @@ WRITE16_MEMBER(taitojc_state::dsp_rom_w)
 		m_dsp_rom_pos |= data;
 	}
 }
+
 
 WRITE16_MEMBER(taitojc_state::dsp_texture_w)
 {
@@ -923,41 +994,15 @@ WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 	m_dsp_tex_offset = 0;
 }
 
+
 WRITE16_MEMBER(taitojc_state::dsp_polygon_fifo_w)
 {
 	m_polygon_fifo[m_polygon_fifo_ptr++] = data;
 
-	if (m_polygon_fifo_ptr >= POLYGON_FIFO_SIZE)
+	if (m_polygon_fifo_ptr >= TAITOJC_POLYGON_FIFO_SIZE)
 	{
 		fatalerror("dsp_polygon_fifo_w: fifo overflow!\n");
 	}
-}
-
-
-
-READ16_MEMBER(taitojc_state::dsp_unk_r)
-{
-	return 0x7fff;
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_viewport_w)
-{
-	m_viewport_data[offset] = data;
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_projection_w)
-{
-	m_projection_data[offset] = data;
-}
-
-READ16_MEMBER(taitojc_state::dsp_projection_y_r)
-{
-	return (m_projection_data[2] != 0) ? (m_projection_data[0] * m_viewport_data[0]) / m_projection_data[2] : 0;
-}
-
-READ16_MEMBER(taitojc_state::dsp_projection_x_r)
-{
-	return (m_projection_data[2] != 0) ? (m_projection_data[1] * m_viewport_data[1]) / m_projection_data[2] : 0;
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
@@ -971,37 +1016,6 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	}
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_intersection_w)
-{
-	m_intersection_data[offset] = data;
-}
-
-READ16_MEMBER(taitojc_state::dsp_intersection_r)
-{
-	return (m_intersection_data[2] != 0) ? (m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2] : 0;
-}
-
-/*
-    Math co-processor memory map
-
-    0x7000: Projection point Y
-    0x7001: Projection point X
-    0x7002: Projection point Z
-    0x7003: Frustum Min Z(?)
-    0x7004: Frustum Max Z(?)
-    0x7010: Line intersection, parameter length
-    0x7011: Line intersection, intersection point
-    0x7012: Line intersection, line length
-    0x7013: Viewport Width / 2
-    0x7014: Viewport Height / 2
-    0x7015: Viewport Z / 2 (?)
-    0x701b: Line intersection, parameter interpolation read
-    0x701d: Projected point Y read
-    0x701f: Projected point X read
-    0x7022: Unknown read
-    0x7030: Unknown write
-    0x703b: Unknown read/write
-*/
 
 READ16_MEMBER(taitojc_state::dsp_to_main_r)
 {
@@ -1026,20 +1040,26 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x6b22, 0x6b22) AM_WRITE(dsp_texture_w)
 	AM_RANGE(0x6b23, 0x6b23) AM_READWRITE(dsp_texaddr_r, dsp_texaddr_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_READWRITE(dsp_rom_r, dsp_rom_w)
-	AM_RANGE(0x7000, 0x7002) AM_WRITE(dsp_projection_w)
-	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_intersection_w)
-	AM_RANGE(0x7013, 0x7015) AM_WRITE(dsp_viewport_w)
-	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_intersection_r)
-	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_projection_y_r)
-	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_projection_x_r)
-	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
+	AM_RANGE(0x7000, 0x7002) AM_WRITE(dsp_math_projection_w)
+	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_math_intersection_w)
+	AM_RANGE(0x7013, 0x7015) AM_WRITE(dsp_math_viewport_w)
+	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_math_intersection_r)
+	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_math_projection_y_r)
+	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_math_projection_x_r)
+	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_math_unk_r)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-/*****************************************************************************/
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( common )
 	PORT_START("SERVICE")
@@ -1178,6 +1198,12 @@ INPUT_PORTS_END
 
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
 static MACHINE_RESET( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -1221,7 +1247,6 @@ static const hc11_config taitojc_hc11_config =
 	1280,	// internal RAM size
 	0x00	// INIT defaults to 0x00
 };
-
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	/* basic machine hardware */
@@ -1277,6 +1302,15 @@ static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 
+
+
+
+/***************************************************************************
+
+  Game Drivers
+
+***************************************************************************/
+
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 {
 	if(cpu_get_pc(&space.device())==0x404c)
@@ -1298,11 +1332,12 @@ WRITE16_MEMBER(taitojc_state::dsp_idle_skip_w)
 	COMBINE_DATA(&m_dsp_shared_ram[0x7f0]);
 }
 
+
 static DRIVER_INIT( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 
-	state->m_polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
+	state->m_polygon_fifo = auto_alloc_array(machine, UINT16, TAITOJC_POLYGON_FIFO_SIZE);
 
 	state->m_has_dsp_hack = 1;
 
@@ -1318,7 +1353,6 @@ static DRIVER_INIT( dendego2 )
 	machine.device("dsp")->memory().space(AS_DATA)->install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),state), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),state));
 }
 
-
 static DRIVER_INIT( dangcurv )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -1327,6 +1361,9 @@ static DRIVER_INIT( dangcurv )
 
 	state->m_has_dsp_hack = 0;
 }
+
+
+/**************************************************************************/
 
 ROM_START( sidebs )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */

@@ -15,13 +15,10 @@ struct _poly_extra_data
 };
 
 
-
-#define TAITOJC_NUM_TILES		0x80
-
 static const gfx_layout taitojc_char_layout =
 {
 	16,16,
-	TAITOJC_NUM_TILES,
+	0x80,
 	4,
 	{ 0,1,2,3 },
 	{ 24,28,16,20,8,12,0,4, 56,60,48,52,40,44,32,36 },
@@ -37,6 +34,26 @@ static TILE_GET_INFO( taitojc_tile_info )
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
 	SET_TILE_INFO(state->m_gfx_index, tile, color, 0);
+}
+
+READ32_MEMBER(taitojc_state::taitojc_palette_r)
+{
+	return m_palette_ram[offset];
+}
+
+WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
+{
+	int r, g, b;
+	UINT32 color;
+
+	COMBINE_DATA( m_palette_ram + offset );
+
+	color = m_palette_ram[offset];
+	r = (color >>  8) & 0xff;
+	g = (color >> 16) & 0xff;
+	b = (color >>  0) & 0xff;
+
+	palette_set_color(machine(),offset, MAKE_RGB(r, g, b));
 }
 
 READ32_MEMBER(taitojc_state::taitojc_tile_r)
@@ -244,6 +261,34 @@ static void draw_object(running_machine &machine, bitmap_ind16 &bitmap, const re
 	}
 }
 
+static void draw_object_bank(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
+{
+	taitojc_state *state = machine.driver_data<taitojc_state>();
+	UINT16 start_offs;
+//  UINT8 double_xy;
+	int i;
+
+	start_offs = ((bank_type+1)*0x400)/4;
+//  double_xy = (state->m_objlist[(0xd1c+bank_type*0x10)/4] & 0x20000000) >> 29;
+
+	/* probably a core bug in there (otherwise objects sticks on screen in Densha de Go) */
+	if(bank_type == 1 && (!(state->m_objlist[0xfc4/4] & 0x2000)))
+		return;
+
+	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
+	{
+		UINT32 w1 = state->m_objlist[i + 0];
+		UINT32 w2 = state->m_objlist[i + 1];
+
+		if (((w2 & 0x200000) >> 21) == pri)
+		{
+			draw_object(machine, bitmap, cliprect, w1, w2, bank_type);
+		}
+	}
+}
+
+
+
 static void taitojc_exit(running_machine &machine)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
@@ -278,32 +323,6 @@ VIDEO_START( taitojc )
 
 	machine.primary_screen->register_screen_bitmap(state->m_framebuffer);
 	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
-}
-
-static void draw_object_bank(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
-{
-	taitojc_state *state = machine.driver_data<taitojc_state>();
-	UINT16 start_offs;
-//  UINT8 double_xy;
-	int i;
-
-	start_offs = ((bank_type+1)*0x400)/4;
-//  double_xy = (state->m_objlist[(0xd1c+bank_type*0x10)/4] & 0x20000000) >> 29;
-
-	/* probably a core bug in there (otherwise objects sticks on screen in Densha de Go) */
-	if(bank_type == 1 && (!(state->m_objlist[0xfc4/4] & 0x2000)))
-		return;
-
-	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
-	{
-		UINT32 w1 = state->m_objlist[i + 0];
-		UINT32 w2 = state->m_objlist[i + 1];
-
-		if (((w2 & 0x200000) >> 21) == pri)
-		{
-			draw_object(machine, bitmap, cliprect, w1, w2, bank_type);
-		}
-	}
 }
 
 //static int tick = 0;
