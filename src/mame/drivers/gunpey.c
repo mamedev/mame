@@ -43,6 +43,34 @@ Notes:
            GP_ROM4.525 / SOP44 32M MASK, Graphics
 
            GP_ROM5.622   SOP44 32M MASK, OKI samples
+
+
+AX51101 gfx chip:
+
+Axell Corporation is a Japanese company that specialises in Sound and Graphics (Amusement Graphics) LSI.
+The AG-1 is a sprite system controller meant for the amusement industry, such as pachi-slot machines,
+it has reached end-of-life in about 2005.
+These are the specifications of the Axell AG-1 AX51102A, it should be very similar to the AX51101.
+(excuse the strange grammar, it is a JP->EN translation)
+
+Drawing technique:               Sprite system
+Buffer drawing method:           Double frame buffer
+Configuration of the character:  Configured from 2 or more cells, a cell can be set in units of each dot a horizontal, vertical from 1 to 256 dots
+Maximum character size:          4096 × 4096 dot
+Display the number of sprite:    Up to 127 sheets (register 2KB)
+Maximum drawing speed:           Dot sec / 2500-35000000 highest
+Color depth:                     32,768 colors (5 bits for each RGB)
+Color scheme:                    Cell character unit can be specified in 256 colors of palettes, and 16 colors
+Scaling:                         256 times the resolution of 1/64 to 4 cell character unit
+Semi-transparent processing:     Gradation in the unit cell or 32 character
+Intensity modulation:            Gradation in the unit cell or 32 character
+Other Features:                  Rotation, DMA, BitBLT, Built-in flip
+Display resolution:              100 to 600 dots horizontal, 120 to 800 dots vertical
+Virtual screen size:             Up to 4096 × 4096 dot
+CGRAM space:                     4M-bit minimum, 32M-bit maximum
+Operating frequency:             Up to 76MHz
+Release:                         November 1999
+
 */
 
 #include "emu.h"
