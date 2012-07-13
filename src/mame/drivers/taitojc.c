@@ -847,22 +847,20 @@ The OKI is used for seat vibration effects.
 
 WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
 {
-	int val = dendego_odometer_table[(data >> 16) & 0xff];
-	if (val != m_speed_meter)
+	if (m_speed_meter != dendego_odometer_table[data])
 	{
-		m_speed_meter = val;
-		output_set_value("counter2", val / 10);
-		output_set_value("counter3", val % 10);
+		m_speed_meter = dendego_odometer_table[data];
+		output_set_value("counter2", m_speed_meter / 10);
+		output_set_value("counter3", m_speed_meter % 10);
 	}
 }
 
 WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 {
-	int val = dendego_pressure_table[(data >> 16) & 0xff];
-	if (val != m_brake_meter)
+	if (m_brake_meter != dendego_pressure_table[data])
 	{
-		m_brake_meter = val;
-		output_set_value("counter4", val);
+		m_brake_meter = dendego_pressure_table[data];
+		output_set_value("counter4", m_brake_meter);
 	}
 }
 
