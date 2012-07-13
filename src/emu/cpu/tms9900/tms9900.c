@@ -1308,6 +1308,7 @@ void tms99xx_device::decode(UINT16 inst)
 	m_state = 0;
 	IR = inst;
 	m_get_destination = false;
+	m_byteop = false;
 
 	while (!complete)
 	{
@@ -1336,6 +1337,10 @@ void tms99xx_device::decode(UINT16 inst)
 		MPC = -1;
 		m_command = decoded->id;
 		if (VERBOSE>7) LOG("tms99xx: Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded->opcode);
+		// Byte operations are either format 1 with the byte flag set
+		// or format 4 (CRU multi bit operations) with 1-8 bits to transfer.
+		m_byteop = ((decoded->format==1 && ((IR & 0x1000)!=0))
+				|| (decoded->format==4 && (((IR >> 6)&0x000f) > 0) && (((IR >> 6)&0x000f) > 9)));
 	}
 	m_pass = 1;
 }
@@ -1537,7 +1542,7 @@ void tms99xx_device::data_derivation_subprogram()
 	MPC = ircopy & 0x0030;
 
 	if (((MPC == 0x0020) && (m_regnumber != 0))			// indexed
-		|| ((MPC == 0x0030) && ((IR & 0x1000)!=0)))		// byte flag
+		|| ((MPC == 0x0030) && m_byteop))		// byte operation
 	{
 		MPC += 8;	// the second option
 	}
