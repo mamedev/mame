@@ -5555,7 +5555,7 @@ static DRIVER_INIT( scud )
 	rom[(0x71277c^4)/4] = 0x60000000;
 }
 
-static DRIVER_INIT( scudp )
+static DRIVER_INIT( scudplus )
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
@@ -5573,7 +5573,7 @@ static DRIVER_INIT( scudp )
 	rom[(0x741efc^4)/4] = 0x60000000;
 }
 
-static DRIVER_INIT( scudpo )
+static DRIVER_INIT( scudplusa )
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	//UINT32 *rom = (UINT32*)state->memregion("user1")->base();
@@ -5757,15 +5757,15 @@ static DRIVER_INIT( vs299 )
 static DRIVER_INIT( harley )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	//UINT32 *rom = (UINT32*)state->memregion("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
 
-	//rom[(0x50ecb4^4)/4] = 0x60000000;
-	//rom[(0x50ecd4^4)/4] = 0x60000000;
-	//rom[(0x50ff64^4)/4] = 0x60000000;
+	rom[(0x50ecb4^4)/4] = 0x60000000;
+	rom[(0x50ecd4^4)/4] = 0x60000000;
+	rom[(0x50ff64^4)/4] = 0x60000000;
 	//rom[(0x4f736c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
 	//rom[(0x4f738c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
 }
@@ -5931,8 +5931,8 @@ GAME( 1997, getbass,     bass, model3_10, bass,      getbass, ROT0, "Sega", "Get
 GAME( 1996, scud,           0, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Twin (Australia)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, scudj,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Deluxe (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, scuda,       scud, model3_15, scud,         scud, ROT0, "Sega", "Scud Race Twin (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, scudplus,    scud, model3_15, scud,        scudp, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, scudplusa,   scud, model3_15, scud,       scudpo, ROT0, "Sega", "Scud Race Plus", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, scudplus,    scud, model3_15, scud,     scudplus, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, scudplusa,   scud, model3_15, scud,    scudplusa, ROT0, "Sega", "Scud Race Plus", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, lostwsga,       0, model3_15, lostwsga, lostwsga, ROT0, "Sega", "The Lost World", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, older)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
