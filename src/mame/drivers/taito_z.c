@@ -321,7 +321,7 @@ c09-32   c09-33
 c09-21  c09-22
 
 Lower PCB:
-TCO270MOD
+TC0270MOD
 TC0300FLA
 TC0260DAR
 TC0370MSO
@@ -329,7 +329,7 @@ TC0100SCN
 TC0380BSH
 
 c09-16.rom is located next to
-c09-05, which is located next to Taito TCO370MSO.
+c09-05, which is located next to Taito TC0370MSO.
 
 SCI (Guru)
 Taito, 1989
@@ -347,20 +347,20 @@ PCB Layout
 
 CPU PCB  K1100490A  J1100209A
 |----------------------------------------------------|
-| 24MHz  C09-14.42  TCO140SYT   C09-22.3   C09-21.2  |
+| 24MHz  C09-14.42  TC0140SYT   C09-22.3   C09-21.2  |
 |        C09-13.43                    68000          |
 |        C09-12.44              C09-33.6   C09-32.5  |
 |        YM2610     C09-15.29   6264       6264      |
 | YM3016 TL074 TL074  Z80                            |
-|                   C09-34.31   6264       TCO150ROD |
+|                   C09-34.31   6264       TC0150ROD |
 |D             VOL    6264      6264                 |
 |                                                    |
 |        MB3735                 C09-07.15  C09-23.14 |
 |          D633        16MHz                         |
-|   62064             6264      6264       TCO170ABT |
+|   62064             6264      6264       TC0170ABT |
 |                    C09-28.37  6264                 |
 |G  62003            C09-36.38           C09-24.22   |
-|        TCO220IOC    6264     C09-26.26 C09-25.25   |
+|        TC0220IOC    6264     C09-26.26 C09-25.25   |
 |                    C09-30.40        68000          |
 |        DSWB DSWA   C09-31.41                       |
 |----------------------------------------------------|
@@ -445,17 +445,17 @@ PCB Layout
 
 VIDEO PCB  K1100491A  J1100210A
 |-----------------------------------------------------|
-|          TCO370MSO  C09-17.24  43256                |
+|          TC0370MSO  C09-17.24  43256                |
 |H                    C09-18.25  43256                |
 |          C09-05.16                                  |
-|          C09-16.17  26.686MHz  TCO100SCN  6264      |
+|          C09-16.17  26.686MHz  TC0100SCN  6264      |
 |   C1815                                             |
 |V  C1815                                   6264      |
-|   C1815  TCO260DAR             C09-06.37            |
+|   C1815  TC0260DAR             C09-06.37            |
 |6264                                                 |
 |                                                     |
-|                                TCO380BSH   C09-19.67|
-|TCO270MOD TCO300FLA                                  |
+|                                TC0380BSH   C09-19.67|
+|TC0270MOD TC0300FLA                                  |
 |                                                     |
 |43256    43256   43256   43256   C09-04.52  C09-20.71|
 |43256    43256   43256   43256   C09-03.53           |
@@ -518,13 +518,13 @@ PCB No: K1100406A J1100175A (CPU PCB)
         K1100407A J1100176A (VIDEO PCB)
 
 CPU: MC68000P12 (x2)
-SND: Z80, YM2610, TCO040IOC, YM3016F
+SND: Z80, YM2610, TC0040IOC, YM3016F
 OSC: 26.686MHz, 24.000MHz, 16.000MHz
 DIPs: 8 Position (x2)
 
 Taito Chips:
-CPU board - TCO100SCN, TCO140SYT, TCO170ABT, TCO110PCR
-Video Board - TCO150ROD, TCO050VDZ (x3), TCO020VAR
+CPU board - TC0100SCN, TC0140SYT, TC0170ABT, TC0110PCR
+Video Board - TC0150ROD, TC0050VDZ (x3), TC0020VAR
 
 Ram: CPU BOARD - 6264 (x9), 43256 (x2),
      VIDEO BOARD - 2018 (x10), 6264 (x2)
@@ -540,12 +540,12 @@ b58-12 (PAL16L8)
 
 VIDEO BOARD -
 b58-22 (PAL16L8) \
-b58-23 (63s141)   |  near TCO150ROD
+b58-23 (63s141)   |  near TC0150ROD
 b58-24 (63s141)  /
 
 b58-20 (PAL16L8) \
 b58-21 (PAL16R4)  |
-b58-17 (PAL16L8)  |  near TCO020VAR
+b58-17 (PAL16L8)  |  near TC0020VAR
 b58-18 (PAL16R4) /
 
 b58-25 (63S141)      near b58-27
@@ -559,19 +559,19 @@ CPU BOARD - b58-18 , 27C010  \
 
         b58-07 , 27C4096 \
         b58-08 , 27C4096  |
-        b58-09 , 27C4100  |  near TCO100SCN & TCO140SYT
+        b58-09 , 27C4100  |  near TC0100SCN & TC0140SYT
         b58-10 , 27C4096 /
 
         b58-32 , 27C512      z80 program
 
-VIDEO PCB - b58-06 , 27C4100     near TCO150ROD
+VIDEO PCB - b58-06 , 27C4100     near TC0150ROD
 
         b58-26a, 27C512      ?
         b58-27 , LH5763      ?
 
         b58-01 , 27C4100 \
         b58-02 , 27C4100  |
-        b58-03 , 27C4100  |  near TCO050VDZ's
+        b58-03 , 27C4100  |  near TC0050VDZ's
         b58-04 , 27C4100 /
 
 

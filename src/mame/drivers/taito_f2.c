@@ -237,16 +237,16 @@ NINJA KIDS
 |                                              |
 |           84256      84256     C85-03.65     |
 |      MB3771                                  |
-| TCO190FMC                 TCO100SCN TC51832  |
+| TC0190FMC                 TC0100SCN TC51832  |
 |C85-02.19  84256      84256          TC51832 J|
 |C85-01.17                        HM3-65764KS A|
 |                                             M|
-|TC51832 TC51832              TCO360PRI       M|
-|TC51832 TC51832   TCO540OBN       TCO260DAR  A|
+|TC51832 TC51832              TC0360PRI       M|
+|TC51832 TC51832   TC0540OBN       TC0260DAR  A|
 |TC51832 TC51832                               |
-|TC51832 TC51832   TCO520TBC                   |
+|TC51832 TC51832   TC0520TBC                   |
 |TC51832 TC51832                OSC2  Z80A     |
-|TC51832 TC51832       TCO530SYC               |
+|TC51832 TC51832       TC0530SYC               |
 |TC51832 TC51832 C85-05.33    C85-14.54        |
 |                C85-04.31 YM2610 YM3016       |
 |----------------------------------------------|
@@ -4343,24 +4343,24 @@ J1100251A  (sticker K1100629A)
 |-----------------------------------------------------|
 |          TL074  YM3016F  C71-01.29  TC51832  TC51832|
 |  MB3737  TL074                      TC51832  TC51832|
-|                 YM2610   TCO530SYC                  |
+|                 YM2610   TC0530SYC                  |
 |                                     TC51832  TC51832|
 |   C71-12.49   Z80B  24MHz           TC51832  TC51832|
 |   5563                                              |
 |                                     TC51832  TC51832|
-|     TCO260DAR           TCO520TBC   TC51832  TC51832|
-|J              TCO360PRI                             |
+|     TC0260DAR           TC0520TBC   TC51832  TC51832|
+|J              TC0360PRI                             |
 |A                                    TC51832  TC51832|
 |M  2088                              TC51832  TC51832|
-|M                         TCO540OBN                  |
+|M                         TC0540OBN                  |
 |A  TC51832                                C71-03.19  |
 |                                                     |
 |   TC51832                                           |
-|              TCO100SCN                              |
+|              TC0100SCN                              |
 |                    66256      66256    66256  66256 |
 |   C71-02.59                                         |
 |          MB3771    C71-16.38  C71-15.37             |
-|   TCO510NIO        C71-10.40  C71-14.39             |
+|   TC0510NIO        C71-10.40  C71-14.39             |
 |         26.686MHz  C71-09.42  C71-08.41    68000    |
 |   DSWB  DSWA                           PAL1    PAL2 |
 |-----------------------------------------------------|
@@ -4372,13 +4372,13 @@ Notes:
              VSync       : 60Hz
 
       Taito Custom Chips:
-                         TCO530SYC - Sound Communication  (QFP160)
-                         TCO260DAR - Palette Controller   (QFP100)
-                         TCO360PRI - Priority Controller  (QFP100)
-                         TCO520TBC - \ Sprite Controllers (QFP100)
-                         TCO540OBN - /                    (QFP160)
-                         TCO100SCN - Tilemap Controller   (QFP160)
-                         TCO510NIO - I/O                  (QFP100)
+                         TC0530SYC - Sound Communication  (QFP160)
+                         TC0260DAR - Palette Controller   (QFP100)
+                         TC0360PRI - Priority Controller  (QFP100)
+                         TC0520TBC - \ Sprite Controllers (QFP100)
+                         TC0540OBN - /                    (QFP160)
+                         TC0100SCN - Tilemap Controller   (QFP160)
+                         TC0510NIO - I/O                  (QFP100)
 
       RAM:
           62256  : 32K x8 SRAM

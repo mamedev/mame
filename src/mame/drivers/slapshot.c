@@ -87,15 +87,15 @@ Main Board K11E0801A - Not to Scale:-)
        D74 17                       Sub Board Connector
   D74 20      MC68000P12F                                    D74-05     SW2
        D74 18                                                D74-06
-  D74 16         MK48T08B-10        TCO480SCP                84256A-70L
+  D74 16         MK48T08B-10        TC0480SCP                84256A-70L
                                                              84256A-70L
-MB8421-90LP  D74-02  84256A-70L             26.6860MHz  TCO640FIO
+MB8421-90LP  D74-02  84256A-70L             26.6860MHz  TC0640FIO
              D74-03  84256A-70L
              D74-04
-                     TCO540OBN    TCO360PRI              TCO650FDA
-                 TCO520TBC
+                     TC0540OBN    TC0360PRI              TC0650FDA
+                 TC0520TBC
                                     32.0000MHz    Y3016-F
-               D74-01     TCO530SYC     D74 19    YM2610B
+               D74-01     TC0530SYC     D74 19    YM2610B
                                                   Z0840004PSC
 
 
@@ -109,13 +109,13 @@ Sound: Z084004PSC, YM2610B, Y3016-F
   OSC: 32.000MHz, 26.6860MHz
 
 Taito Custom:
-  TCO480SCP
-  TCO640FIO
-  TCO650FDA
-  TCO530SYC
-  TCO520TBC
-  TCO540OBN
-  TCO360PRI
+  TC0480SCP
+  TC0640FIO
+  TC0650FDA
+  TC0530SYC
+  TC0520TBC
+  TC0540OBN
+  TC0360PRI
 
 ST TimeKeeper Ram MK48T08B-10 - Lithuim Batery backed RAM chip
 MB8421-90LP - Dual Port SRAM
