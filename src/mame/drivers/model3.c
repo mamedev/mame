@@ -5763,9 +5763,9 @@ static DRIVER_INIT( harley )
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
 
-	rom[(0x50ecb4^4)/4] = 0x60000000;
-	rom[(0x50ecd4^4)/4] = 0x60000000;
-	rom[(0x50ff64^4)/4] = 0x60000000;
+	//rom[(0x50ecb4^4)/4] = 0x60000000;
+	//rom[(0x50ecd4^4)/4] = 0x60000000;
+	//rom[(0x50ff64^4)/4] = 0x60000000;
 	//rom[(0x4f736c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
 	//rom[(0x4f738c^4)/4] = 0x60000000; // Fix ME!! Needs to be updated for the REV B version!!
 }
