@@ -12,8 +12,9 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	DView *dv = DVIEW(wdv);
 	DViewClass *dvc = DVIEW_GET_CLASS(dv);
 	debug_view_xy vsize;
-	UINT32 i, j, xx, yy;
+	UINT32 i, j, k, l, xx, yy;
 	GdkColor bg, fg;
+	char s[256];
 
 	vsize = dv->view->visible_size();
 
@@ -32,58 +33,65 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 
 	yy = wdv->style->ythickness;
 	for(j=0; j<vsize.y; j++) {
+		k = l = 0;
 		xx = wdv->style->xthickness;
 		for(i=0; i<vsize.x; i++) {
 			unsigned char attr = viewdata->attrib;
-			char s[3];
 			unsigned char v = viewdata->byte;
+
 			if(v < 128) {
-				s[0] = v;
-				s[1] = 0;
+				s[k++] = v;
 			} else {
-				s[0] = 0xc0 | (v>>6);
-				s[1] = 0x80 | (v & 0x3f);
-				s[2] = 0;
+				s[k++] = 0xc0 | (v>>6);
+				s[k++] = 0x80 | (v & 0x3f);
+			}
+			l++;
+
+			if ( i == 0 || attr != viewdata[-1].attrib ) {
+
+				bg.red = bg.green = bg.blue = 0xffff;
+				fg.red = fg.green = fg.blue = 0;
+
+				if(attr & DCA_ANCILLARY)
+					bg.red = bg.green = bg.blue = 0xe0e0;
+				if(attr & DCA_SELECTED) {
+					bg.red = 0xffff;
+					bg.green = bg.blue = 0x8080;
+				}
+				if(attr & DCA_CURRENT) {
+					bg.red = bg.green = 0xffff;
+					bg.blue = 0;
+				}
+				if(attr & DCA_CHANGED) {
+					fg.red = 0xffff;
+					fg.green = fg.blue = 0;
+				}
+				if(attr & DCA_INVALID) {
+					fg.red = fg.green = 0;
+					fg.blue = 0xffff;
+				}
+				if(attr & DCA_DISABLED) {
+					fg.red   = (fg.red   + bg.red)   >> 1;
+					fg.green = (fg.green + bg.green) >> 1;
+					fg.blue  = (fg.blue  + bg.blue)   >> 1;
+				}
+				if(attr & DCA_COMMENT) {
+					fg.red = fg.blue = 0;
+					fg.green = 0x8080;
+				}
 			}
 
-			bg.red = bg.green = bg.blue = 0xffff;
-			fg.red = fg.green = fg.blue = 0;
+			if ( i == vsize.x - 1 || attr != viewdata[1].attrib || k >= 254 ) {
+				s[k++] = 0;
+				pango_layout_set_text(dv->playout, s, -1);
+				gdk_gc_set_rgb_fg_color(dv->gc, &bg);
+				gdk_draw_rectangle(GDK_DRAWABLE(wdv->window), dv->gc, TRUE, xx, yy, l * dvc->fixedfont_width, dvc->fixedfont_height);
+				gdk_gc_set_rgb_fg_color(dv->gc, &fg);
+				gdk_draw_layout(GDK_DRAWABLE(wdv->window), dv->gc, xx, yy, dv->playout);
 
-			if(attr & DCA_ANCILLARY)
-				bg.red = bg.green = bg.blue = 0xe0e0;
-			if(attr & DCA_SELECTED) {
-				bg.red = 0xffff;
-				bg.green = bg.blue = 0x8080;
+				xx += l * dvc->fixedfont_width;
+				l = k = 0;
 			}
-			if(attr & DCA_CURRENT) {
-				bg.red = bg.green = 0xffff;
-				bg.blue = 0;
-			}
-			if(attr & DCA_CHANGED) {
-				fg.red = 0xffff;
-				fg.green = fg.blue = 0;
-			}
-			if(attr & DCA_INVALID) {
-				fg.red = fg.green = 0;
-				fg.blue = 0xffff;
-			}
-			if(attr & DCA_DISABLED) {
-				fg.red   = (fg.red   + bg.red)   >> 1;
-				fg.green = (fg.green + bg.green) >> 1;
-				fg.blue  = (fg.blue  + bg.blue)   >> 1;
-			}
-			if(attr & DCA_COMMENT) {
-				fg.red = fg.blue = 0;
-				fg.green = 0x8080;
-			}
-
-			pango_layout_set_text(dv->playout, s, -1);
-			gdk_gc_set_rgb_fg_color(dv->gc, &bg);
-			gdk_draw_rectangle(GDK_DRAWABLE(wdv->window), dv->gc, TRUE, xx, yy, dvc->fixedfont_width, dvc->fixedfont_height);
-			gdk_gc_set_rgb_fg_color(dv->gc, &fg);
-			gdk_draw_layout(GDK_DRAWABLE(wdv->window), dv->gc, xx, yy, dv->playout);
-
-			xx += dvc->fixedfont_width;
 			viewdata++;
 		}
 		yy += dvc->fixedfont_height;
