@@ -541,11 +541,11 @@ MACHINE_CONFIG_END
 
 ROM_START( exprraid )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cz01.15a", 0x4000, 0x4000, CRC(dc8f9fba) SHA1(cae6af54fc0081d606b6884e8873aed356a37ba9) )
-	ROM_LOAD( "cz00.16b", 0x8000, 0x8000, CRC(a81290bc) SHA1(ddb0acda6124427bee691f9926c41fda27ed816e) )
+	ROM_LOAD( "cz01-5a.16b", 0x4000, 0x4000, CRC(dc8f9fba) SHA1(cae6af54fc0081d606b6884e8873aed356a37ba9) )
+	ROM_LOAD( "cz00-5.15a",  0x8000, 0x8000, CRC(a81290bc) SHA1(ddb0acda6124427bee691f9926c41fda27ed816e) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
-	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
+	ROM_LOAD( "cz02-1.a3", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
@@ -567,11 +567,11 @@ ROM_START( exprraid )
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cz03.12d", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "cz17.prm", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
-	ROM_LOAD( "cz16.prm", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
-	ROM_LOAD( "cz15.prm", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
-	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
+	ROM_REGION( 0x0400, "proms", 0 ) /* All 4 proms are Fujitsu MB7114 or compatible */
+	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
+	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
+	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
+	ROM_LOAD( "cy-14.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16r4a.5c", 0x0000, 0x0104, CRC(d66aaa87) SHA1(dc29b473238ed6a9de2076c79644b613a9ba6924) )
@@ -580,8 +580,8 @@ ROM_END
 
 ROM_START( exprraida )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cz01-2e.15a", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
-	ROM_LOAD( "cz00-4e.16b", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
+	ROM_LOAD( "cz01-2e.16b", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
+	ROM_LOAD( "cz00-4e.15a", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
@@ -606,11 +606,11 @@ ROM_START( exprraida )
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cz03.12d", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "cz17.prm", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
-	ROM_LOAD( "cz16.prm", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
-	ROM_LOAD( "cz15.prm", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
-	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
+	ROM_REGION( 0x0400, "proms", 0 ) /* All 4 proms are Fujitsu MB7114 or compatible */
+	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
+	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
+	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
+	ROM_LOAD( "cy-14.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16r4a.5c", 0x0000, 0x0104, CRC(d66aaa87) SHA1(dc29b473238ed6a9de2076c79644b613a9ba6924) )
@@ -619,8 +619,8 @@ ROM_END
 
 ROM_START( exprraidi ) /* PCB manufactured in Italy by Gecas under Data East license (custom ICs are all DECO original) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cz01-2e.15a",  0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
-	ROM_LOAD( "exraidi6.16b", 0x8000, 0x8000, CRC(a3d98118) SHA1(d35f0fcabef045afcec5119f95ae6da2cae547db) )
+	ROM_LOAD( "cz01-2e.16b",  0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
+	ROM_LOAD( "exraidi6.15a", 0x8000, 0x8000, CRC(a3d98118) SHA1(d35f0fcabef045afcec5119f95ae6da2cae547db) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
@@ -645,11 +645,11 @@ ROM_START( exprraidi ) /* PCB manufactured in Italy by Gecas under Data East lic
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cz03.12d", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "cz17.prm", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
-	ROM_LOAD( "cz16.prm", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
-	ROM_LOAD( "cz15.prm", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
-	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
+	ROM_REGION( 0x0400, "proms", 0 ) /* All 4 proms are Fujitsu MB7114 or compatible */
+	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
+	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
+	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
+	ROM_LOAD( "cy-14.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16r4a.5c", 0x0000, 0x0104, CRC(d66aaa87) SHA1(dc29b473238ed6a9de2076c79644b613a9ba6924) )
@@ -658,8 +658,8 @@ ROM_END
 
 ROM_START( wexpressb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2.15a", 0x4000, 0x4000, CRC(ea5e5a8f) SHA1(fa92bcb6b97c2966cd330b309eba73f9c059f14e) )
-	ROM_LOAD( "1.16b", 0x8000, 0x8000, CRC(a7daae12) SHA1(a97f4bc05a3ec096d8c717bdf096f4b0e59dc2c2) )
+	ROM_LOAD( "2.16b", 0x4000, 0x4000, CRC(ea5e5a8f) SHA1(fa92bcb6b97c2966cd330b309eba73f9c059f14e) )
+	ROM_LOAD( "1.15a", 0x8000, 0x8000, CRC(a7daae12) SHA1(a97f4bc05a3ec096d8c717bdf096f4b0e59dc2c2) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
@@ -684,12 +684,11 @@ ROM_START( wexpressb )
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "3.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "cz17.prm", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
-	ROM_LOAD( "cz16.prm", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
-	ROM_LOAD( "cz15.prm", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
-	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
-
+	ROM_REGION( 0x0400, "proms", 0 ) /* All 4 proms are Fujitsu MB7114 or compatible */
+	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
+	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
+	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
+	ROM_LOAD( "cy-14.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "pal16r4a.5c",   0x0000, 0x0104, CRC(d66aaa87) SHA1(dc29b473238ed6a9de2076c79644b613a9ba6924) )
@@ -724,17 +723,17 @@ ROM_START( wexpressb2 )
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "3.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "cz17.prm", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
-	ROM_LOAD( "cz16.prm", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
-	ROM_LOAD( "cz15.prm", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
-	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
+	ROM_REGION( 0x0400, "proms", 0 ) /* All 4 proms are Fujitsu MB7114 or compatible */
+	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
+	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
+	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
+	ROM_LOAD( "cy-14.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 ROM_END
 
 ROM_START( wexpressb3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "s2.15a", 0x4000, 0x4000, CRC(40d70fcb) SHA1(1327d39f872a39e020972952e5756ca59c55f9d0) )
-	ROM_LOAD( "s1.16b", 0x8000, 0x8000, CRC(7c573824) SHA1(f5e4d4f0866c08c88d012a77e8aa2e74a779f986) )
+	ROM_LOAD( "s2.16b", 0x4000, 0x4000, CRC(40d70fcb) SHA1(1327d39f872a39e020972952e5756ca59c55f9d0) )
+	ROM_LOAD( "s1.15a", 0x8000, 0x8000, CRC(7c573824) SHA1(f5e4d4f0866c08c88d012a77e8aa2e74a779f986) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
@@ -760,10 +759,10 @@ ROM_START( wexpressb3 )
 	ROM_LOAD( "3.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) /* Proms Weren't Present In This Set, Using the One from the Other */
-	ROM_LOAD( "cz17.prm", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
-	ROM_LOAD( "cz16.prm", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
-	ROM_LOAD( "cz15.prm", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
-	ROM_LOAD( "cz14.prm", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
+	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) /* red */
+	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) /* green */
+	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) /* blue */
+	ROM_LOAD( "cy-14.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) /* ??? */
 ROM_END
 
 
