@@ -2261,6 +2261,10 @@ void tms9995_device::alu_c()
 	// value in m_current_value
 	// The destination address is still in m_address
 	// Prefetch will not change m_current_value and m_address
+	if (m_instruction->byteop)
+	{
+		set_status_parity((UINT8)(m_source_value>>8));
+	}
 	compare_and_set_lae(m_source_value, m_current_value);
 	if (VERBOSE>7) LOG("tms9995: ST = %04x (val1=%04x, val2=%04x)\n", ST, m_source_value, m_current_value);
 }
@@ -2759,6 +2763,10 @@ void tms9995_device::alu_lst_lwp()
 void tms9995_device::alu_mov()
 {
 	m_current_value = m_source_value;
+	if (m_instruction->byteop)
+	{
+		set_status_parity((UINT8)(m_current_value>>8));
+	}
 	compare_and_set_lae(m_current_value, 0);
 	if (VERBOSE>7) LOG("tms9995: ST = %04x (val=%04x)\n", ST, m_current_value);
 	// No clock pulse, as next instruction is prefetch
@@ -2971,6 +2979,7 @@ void tms9995_device::alu_single_arithm()
 		// O if >8000
 		// C is always reset
 		set_status_bit(ST_OV, m_current_value == 0x8000);
+		set_status_bit(ST_C, false);
 		compare_and_set_lae(m_current_value, 0);
 
 		if ((m_current_value & 0x8000)!=0)

@@ -1928,7 +1928,7 @@ void tms99xx_device::alu_xop()
 		m_address = 0x0040 + ((IR >> 4) & 0x003c);
 		break;
 	case 1:
-		m_value = WP;							// save the old WP
+		m_value_copy = WP;						// save the old WP
 		WP = m_current_value & m_prgaddr_mask;	// the new WP has been read in the previous microoperation
 		m_current_value = m_address_saved;		// we saved the address of the source operand; retrieve it
 		m_address = WP + 0x0016;				// Next register is R11
@@ -1943,7 +1943,7 @@ void tms99xx_device::alu_xop()
 		break;
 	case 4:
 		m_address = WP + 0x001a;
-		m_current_value = m_value;						// old WP into new R13
+		m_current_value = m_value_copy;			// old WP into new R13
 		break;
 	case 5:
 		m_address =  0x0042 + ((IR >> 4) & 0x003c);		// location of new PC
@@ -1984,7 +1984,7 @@ void tms99xx_device::alu_clr_swpb()
 		check_ov = false;
 		break;
 	case NEG:
-		// LAEO
+		// LAECO
 		// Overflow occurs for value=0x8000
 		dest_new = ((~src_val) & 0x0000ffff) + 1;
 		check_ov = false;
@@ -2044,7 +2044,7 @@ void tms99xx_device::alu_abs()
 
 	if ((m_current_value & 0x8000)!=0)
 	{
-		m_current_value = (-m_current_value) & 0xffff;
+		m_current_value = (((~m_current_value) & 0x0000ffff) + 1) & 0xffff;
 		pulse_clock(2);		// If ABS is performed it takes one machine cycle more
 	}
 	else
