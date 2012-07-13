@@ -18,10 +18,10 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |54MHz                                   E23-32-1.51              43256           |
 |         424210 424210                                           43256           |
 |                      E23-29.39                                                  |
-|E23-25-1.3 TCO870HVP             E23-31.46                                       |
+|E23-25-1.3 TC0870HVP             E23-31.46                                       |
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
-|                              MC68040RC25            CXD1178Q    TCO640FIO       |
+|                              MC68040RC25            CXD1178Q    TC0640FIO       |
 |424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
@@ -30,18 +30,18 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                                             CY7B991       MB8421-90             |
 |4218160    43256                    CY7B991                                      |
 |                                                                                 |
-|           43256        TCO770CMU                          E23-35.110            |
+|           43256        TC0770CMU                          E23-35.110            |
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
-|E23-27.13  TCO780FPA                                                             |
+|E23-27.13  TC0780FPA                                                             |
 |           (QFP240)                                        ENSONIC               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
 |4218160               D482445                                                    |
-|                                 TCO840GLU                 MC33274   TDA1543     |
+|                                 TC0840GLU                 MC33274   TDA1543     |
 |                      D482445    (QFP144)                                        |
 |4218160                                      16MHz         MB87078               |
-|           TCO780FPA  D482445           30.4761MHz                               |
+|           TC0780FPA  D482445           30.4761MHz                               |
 |           (QFP240)              ENSONIC                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
@@ -154,13 +154,13 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |54MHz                                                            43256           |
 |                                                                                 |
 |TC514260                                                                         |
-|         TCO870HVP  uPD424210                                    TCO640FIO       |
+|         TC0870HVP  uPD424210                                    TC0640FIO       |
 |TC514260 (QFP208)   uPD424210             E07-08.65              (QFP120)        |
 |E07-02.4                                                                         |
 |                                                                                 |
 |TMS320C51  43256                                                                 |
 |(QFP132)   43256              MC68040RC25          E07-10.116  93C46.91          |
-|labelled          TCO770CMU   (PGA TYPE)                    E07-04.115  TEST_SW  |
+|labelled          TC0770CMU   (PGA TYPE)                    E07-04.115  TEST_SW  |
 |"Taito E07-11"    (QFP208)                         E07-09.82      MB3771         |
 |                                                                                 |
 |                                                            MB8421-90            |
@@ -169,15 +169,15 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |TC528257   TC514260                                                              |
 |                              E07-07.49    CY7B991                               |
 |TC528257   TC514260           E07-03.50                     TC511664             |
-|                     TCO780FPA                                                   |
+|                     TC0780FPA                                                   |
 |TC528257   TC514260  (QFP240)           10MHz   MC68EC000   ENSONIC              |
 |                                 CY7B991                    ESPR6 ES5510         |
 |TC528257   TC514260                                                              |
 |                                                                                 |
-|TC528257   TC514260              TCO840GLU   TC51832       MC33274   TDA1543     |
+|TC528257   TC514260              TC0840GLU   TC51832       MC33274   TDA1543     |
 |                                 (QFP144)    TC51832                             |
 |TC528257   TC514260                             16MHz      MB87078               |
-|                     TCO780FPA          30.4761MHz                               |
+|                     TC0780FPA          30.4761MHz                               |
 |TC528257   TC514260  (QFP240)                                                    |
 |                                           ENSONIC                               |
 |TC528257             E07-05.22             OTISR2                                |
@@ -248,10 +248,10 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |54MHz                                   E23-32-1.51              43256           |
 |         424210 424210                                           43256           |
 |                      E23-29.39                                                  |
-|E23-25-1.3 TCO870HVP             E23-31.46                                       |
+|E23-25-1.3 TC0870HVP             E23-31.46                                       |
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
-|                              MC68040RC25            CXD1178Q    TCO640FIO       |
+|                              MC68040RC25            CXD1178Q    TC0640FIO       |
 |424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
@@ -260,18 +260,18 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                                             CY7B991       MB8421-90             |
 |4218160    43256                    CY7B991                                      |
 |                                                                                 |
-|           43256        TCO770CMU                          E23-35.110            |
+|           43256        TC0770CMU                          E23-35.110            |
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
-|E23-27.13  TCO780FPA                                                             |
+|E23-27.13  TC0780FPA                                                             |
 |           (QFP240)                                        ENSONIC               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
 |4218160               D482445                                                    |
-|                                 TCO840GLU                 MC33274   TDA1543     |
+|                                 TC0840GLU                 MC33274   TDA1543     |
 |                      D482445    (QFP144)                                        |
 |4218160                                      16MHz         MB87078               |
-|           TCO780FPA  D482445           30.4761MHz                               |
+|           TC0780FPA  D482445           30.4761MHz                               |
 |           (QFP240)              ENSONIC                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
@@ -357,6 +357,7 @@ Notes:
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
+#include "machine/taitoio.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
 
@@ -383,81 +384,6 @@ WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
 	b = (color >>  0) & 0xff;
 
 	palette_set_color(machine(),offset, MAKE_RGB(r, g, b));
-}
-
-READ32_MEMBER(taitojc_state::jc_control_r)
-{
-	UINT32 r = 0;
-
-	if(ACCESSING_BITS_0_15)
-		printf("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
-	switch(offset)
-	{
-		case 0x0:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ((ioport("COINS")->read() & 0x2) << 2) << 24;
-			}
-			return r;
-		}
-		case 0x1:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("COINS")->read() << 24;
-			}
-			return r;
-		}
-		case 0x2:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("START")->read() << 24;
-			}
-			return r;
-		}
-		case 0x3:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("UNUSED")->read() << 24;
-			}
-			return r;
-		}
-		case 0x4:
-		{
-			if (ACCESSING_BITS_16_31)
-			{
-				r |= m_outputs << 16;
-			}
-			return r;
-		}
-		case 0x7:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				r |= ioport("BUTTONS")->read() << 24;
-			}
-			return r;
-		}
-
-		default:
-			break;
-	}
-
-	logerror("jc_control_r: %08X, %08X\n", offset, mem_mask);
-	return 0;
-}
-
-WRITE32_MEMBER(taitojc_state::jc_coin_counters_w)
-{
-	COMBINE_DATA(&m_outputs);
-
-	coin_lockout_w(machine(), 0, !(data & 0x01000000));
-	coin_lockout_w(machine(), 1, !(data & 0x02000000));
-	coin_counter_w(machine(), 0, data & 0x04000000);
-	coin_counter_w(machine(), 1, data & 0x08000000);
 }
 
 WRITE32_MEMBER(taitojc_state::jc_control_w)
@@ -824,9 +750,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r, 0xffffffff)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
-	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
-	AM_RANGE(0x06600000, 0x06600003) AM_WRITENOP // watchdog?
-	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
+	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8_LEGACY("tc0640fio", tc0640fio_r, tc0640fio_w, 0xff000000)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
@@ -1135,9 +1059,19 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( common )
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1295,11 +1229,17 @@ static INTERRUPT_GEN( taitojc_vblank )
 	device_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
 }
 
-static const hc11_config taitojc_config =
+static const tc0640fio_interface taitojc_io_intf =
 {
-	1,		//has extended I/O
-	1280,	//internal RAM size
-	0x00	//INIT defaults to 0x00
+	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COINS"),
+	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("UNUSED"), DEVCB_INPUT_PORT("BUTTONS")
+};
+
+static const hc11_config taitojc_hc11_config =
+{
+	1,		// has extended I/O
+	1280,	// internal RAM size
+	0x00	// INIT defaults to 0x00
 };
 
 
@@ -1309,10 +1249,10 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
 
-	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
+	MCFG_CPU_ADD("sub", MC68HC11, 4000000) // MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MCFG_CPU_IO_MAP(hc11_io_map)
-	MCFG_CPU_CONFIG(taitojc_config)
+	MCFG_CPU_CONFIG(taitojc_hc11_config)
 
 	MCFG_CPU_ADD("dsp", TMS32051, 50000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
@@ -1321,7 +1261,10 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(taitojc)
+
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TC0640FIO_ADD("tc0640fio", taitojc_io_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

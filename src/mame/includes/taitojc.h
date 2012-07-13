@@ -16,13 +16,24 @@ public:
 		m_palette_ram(*this, "palette_ram")
 	{ }
 
+	// device/memory pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp;
+	required_memory_region m_gfx2;
+
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_objlist;
+	optional_shared_ptr<UINT32> m_snd_shared_ram;
+	required_shared_ptr<UINT32> m_main_ram;
+	required_shared_ptr<UINT16> m_dsp_shared_ram;
+	required_shared_ptr<UINT32> m_palette_ram;
+
 	int m_texture_x;
 	int m_texture_y;
 
 	UINT32 m_dsp_rom_pos;
 	UINT16 m_dsp_tex_address;
 	UINT16 m_dsp_tex_offset;
-
 
 	int m_first_dsp_reset;
 	int m_viewport_data[3];
@@ -47,17 +58,6 @@ public:
 
 	poly_manager *m_poly;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
-	required_memory_region m_gfx2;
-
-	required_shared_ptr<UINT32> m_vram;
-	required_shared_ptr<UINT32> m_objlist;
-	optional_shared_ptr<UINT32> m_snd_shared_ram;
-	required_shared_ptr<UINT32> m_main_ram;
-	required_shared_ptr<UINT16> m_dsp_shared_ram;
-	required_shared_ptr<UINT32> m_palette_ram;
-
 	UINT16 *m_polygon_fifo;
 	int m_polygon_fifo_ptr;
 
@@ -72,11 +72,9 @@ public:
 
 	int m_speed_meter;
 	int m_brake_meter;
-	UINT32 m_outputs;
+
 	DECLARE_READ32_MEMBER(taitojc_palette_r);
 	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
-	DECLARE_READ32_MEMBER(jc_control_r);
-	DECLARE_WRITE32_MEMBER(jc_coin_counters_w);
 	DECLARE_WRITE32_MEMBER(jc_control_w);
 	DECLARE_READ32_MEMBER(mcu_comm_r);
 	DECLARE_WRITE32_MEMBER(mcu_comm_w);
