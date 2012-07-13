@@ -1,6 +1,6 @@
 #include "video/poly.h"
 
-#define TAITOJC_POLYGON_FIFO_SIZE		100000
+#define TAITOJC_POLYGON_FIFO_SIZE		0x20000
 
 
 class taitojc_state : public driver_device

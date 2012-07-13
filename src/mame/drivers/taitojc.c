@@ -672,8 +672,6 @@ WRITE32_MEMBER(taitojc_state::mcu_comm_w)
 	}
 }
 
-
-
 READ32_MEMBER(taitojc_state::snd_share_r)
 {
 	switch (offset & 3)
@@ -728,6 +726,7 @@ READ32_MEMBER(taitojc_state::jc_lan_r)
 WRITE32_MEMBER(taitojc_state::jc_lan_w)
 {
 }
+
 
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
@@ -939,10 +938,8 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
-	UINT16 data = ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
-
-	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
-	return data;
+	//assert (m_dsp_rom_pos < 0x800000); // never happens
+	return ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_rom_w)
@@ -958,7 +955,6 @@ WRITE16_MEMBER(taitojc_state::dsp_rom_w)
 		m_dsp_rom_pos |= data;
 	}
 }
-
 
 WRITE16_MEMBER(taitojc_state::dsp_texture_w)
 {
@@ -994,15 +990,10 @@ WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 	m_dsp_tex_offset = 0;
 }
 
-
 WRITE16_MEMBER(taitojc_state::dsp_polygon_fifo_w)
 {
+	//assert (m_polygon_fifo_ptr < TAITOJC_POLYGON_FIFO_SIZE); // never happens
 	m_polygon_fifo[m_polygon_fifo_ptr++] = data;
-
-	if (m_polygon_fifo_ptr >= TAITOJC_POLYGON_FIFO_SIZE)
-	{
-		fatalerror("dsp_polygon_fifo_w: fifo overflow!\n");
-	}
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
@@ -1016,7 +1007,6 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	}
 }
 
-
 READ16_MEMBER(taitojc_state::dsp_to_main_r)
 {
 	return m_dsp_shared_ram[0x7fe];
@@ -1028,6 +1018,7 @@ WRITE16_MEMBER(taitojc_state::dsp_to_main_w)
 
 	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
 }
+
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
@@ -1047,7 +1038,7 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_math_projection_y_r)
 	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_math_projection_x_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_math_unk_r)
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r, dsp_to_main_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -1221,6 +1212,7 @@ static MACHINE_RESET( taitojc )
 	state->m_dsp_rom_pos = 0;
 	state->m_dsp_tex_address = 0;
 	state->m_dsp_tex_offset = 0;
+	state->m_polygon_fifo_ptr = 0;
 
 	memset(state->m_viewport_data, 0, sizeof(state->m_viewport_data));
 	memset(state->m_projection_data, 0, sizeof(state->m_projection_data));
@@ -1768,7 +1760,7 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1822,7 +1814,7 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1876,7 +1868,7 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1930,7 +1922,7 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
