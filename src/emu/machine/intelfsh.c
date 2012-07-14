@@ -79,6 +79,7 @@ enum
 const device_type INTEL_28F016S5 = &device_creator<intel_28f016s5_device>;
 const device_type SHARP_LH28F016S = &device_creator<sharp_lh28f016s_device>;
 const device_type ATMEL_29C010 = &device_creator<atmel_29c010_device>;
+const device_type AMD_29F010 = &device_creator<amd_29f010_device>;
 const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
 const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
@@ -176,6 +177,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_page_size = 0x80;
 		m_maker_id = MFG_ATMEL;
 		m_device_id = 0xd5;
+		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
+		break;
+	case FLASH_AMD_29F010:
+		m_bits = 8;
+		m_size = 0x20000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0x20;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_AMD_29F040:
@@ -297,6 +305,9 @@ sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, co
 
 atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, ATMEL_29C010, "Atmel 29C010 Flash", tag, owner, clock, FLASH_ATMEL_29C010) { }
+
+amd_29f010_device::amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, AMD_29F010, "AMD 29F010 Flash", tag, owner, clock, FLASH_AMD_29F010) { }
 
 amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F040, "AMD 29F040 Flash", tag, owner, clock, FLASH_AMD_29F040) { }

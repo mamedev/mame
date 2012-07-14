@@ -375,7 +375,12 @@ INLINE i386_state *get_safe_token(device_t *device)
 	assert(device->type() == I386 ||
 		   device->type() == I486 ||
 		   device->type() == PENTIUM ||
-		   device->type() == MEDIAGX);
+		   device->type() == MEDIAGX ||
+		   device->type() == PENTIUM_PRO ||
+		   device->type() == PENTIUM_MMX ||
+		   device->type() == PENTIUM2 ||
+		   device->type() == PENTIUM3 ||
+		   device->type() == PENTIUM4);
 	return (i386_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 

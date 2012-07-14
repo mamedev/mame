@@ -19,6 +19,9 @@
 #define MCFG_ATMEL_29C010_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, ATMEL_29C010, 0)
 
+#define MCFG_AMD_29F010_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F010, 0)
+
 #define MCFG_AMD_29F040_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AMD_29F040, 0)
 
@@ -79,6 +82,7 @@ public:
 		FLASH_FUJITSU_29F016A,
 		FLASH_FUJITSU_29DL16X,
 		FLASH_ATMEL_29C010,
+		FLASH_AMD_29F010,
 		FLASH_AMD_29F040,
 		FLASH_AMD_29F080,
 		FLASH_SHARP_LH28F016S,
@@ -200,6 +204,12 @@ public:
 	atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class amd_29f010_device : public intelfsh8_device
+{
+public:
+	amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class amd_29f040_device : public intelfsh8_device
 {
 public:
@@ -279,6 +289,7 @@ public:
 extern const device_type INTEL_28F016S5;
 extern const device_type SHARP_LH28F016S;
 extern const device_type ATMEL_29C010;
+extern const device_type AMD_29F010;
 extern const device_type AMD_29F040;
 extern const device_type AMD_29F080;
 extern const device_type FUJITSU_29F016A;
