@@ -385,6 +385,11 @@ void cdp1869_device::device_start()
 	// create sound stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 
+	// initialize other
+	m_tonediv = 0;
+	m_tonefreq = 0;
+	m_toneamp = 0;
+
 	// register for state saving
 	save_item(NAME(m_prd));
 	save_item(NAME(m_dispoff));
