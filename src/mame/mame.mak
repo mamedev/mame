@@ -1901,6 +1901,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/manohman.o \
 	$(DRIVERS)/jankenmn.o \
 	$(DRIVERS)/wildpkr.o \
+	$(DRIVERS)/globalvr.o \
 
 
 #-------------------------------------------------
@@ -2241,5 +2242,4 @@ $(VIDEO)/model3.o:	$(MAMESRC)/video/m3raster.c
 $(VIDEO)/n64.o:		$(MAMESRC)/video/rdpfiltr.c
 $(DRIVERS)/bfm_sc4.o: $(MAMESRC)/includes/bfm_sc45.h
 $(DRIVERS)/bfm_sc5.o: $(MAMESRC)/includes/bfm_sc45.h
-
 

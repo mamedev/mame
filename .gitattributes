@@ -2469,6 +2469,7 @@ src/mame/drivers/ginganin.c svneol=native#text/plain
 src/mame/drivers/gladiatr.c svneol=native#text/plain
 src/mame/drivers/glass.c svneol=native#text/plain
 src/mame/drivers/globalfr.c svneol=native#text/plain
+src/mame/drivers/globalvr.c svneol=native#text/plain
 src/mame/drivers/gng.c svneol=native#text/plain
 src/mame/drivers/go2000.c svneol=native#text/plain
 src/mame/drivers/goal92.c svneol=native#text/plain
