@@ -7,15 +7,14 @@
 Taito custom chips on this hardware:
 - TC0640FIO      : I/O
 - TC0770CMU      : Math co-processor?
-- TC0780FPA x 2  : Polygon renderer?
+- TC0780FPA x 2  : Polygon/Texture renderer?
 - TC0840GLU      : 2D graphics?
-- TC0870HVP      : Vector processor?
+- TC0870HVP      : Vertex processor?
 
 TODO:
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
 - dendego attract mode train doesn't ride, the doors light doesn't turn on.
-- dendego2 shows a debug string during gameplay? it also shows up in the 2nd demo run.
 - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
 - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.

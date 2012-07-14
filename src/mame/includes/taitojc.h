@@ -51,8 +51,6 @@ public:
 	bitmap_ind16 m_framebuffer;
 	bitmap_ind16 m_zbuffer;
 
-	//int debug_tex_pal;
-
 	int m_gfx_index;
 
 	UINT32 *m_char_ram;

@@ -101,8 +101,27 @@ WRITE32_MEMBER(taitojc_state::taitojc_char_w)
     1 and 2 for each bank). Then dwords 2 and 3 should presumably configure bank 1 to a bigger
     (doubled?) height and width and a different x/y start point.
 
-    0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between bank 0 and bank 1.
+
+    0xfc0-0xfff is global vregs. 0xfc4 bit 13 is used to swap between bank 0 and bank 1?
     It's unknown at current time how bank 2 should show up.
+
+        fc0 00000000   always
+        fc4 c01f0000   boot-up, testmode, sidebs always, sidebs2 always
+            c0100000   landgear in-game, dendego2 in-game
+            c0310000   dendego in-game
+            c0312000   dendego intro 3d parts
+            c031f000   dendego disclaimer screen (only for a few frames)
+
+        fc4 11000000 00------ ----0000 00000000   always 0/1
+            -------- --xx---- -------- --------   ?
+            -------- ----xxxx -------- --------   one of these probably disables textlayer, unknown function otherwise
+            -------- -------- xxxx---- --------   object bank related
+
+        fc8 40000000   always
+        fcc 00000000   always
+        fd0 c0000000   always
+        ...
+        ffc c0000000   always
 
 */
 
@@ -325,74 +344,28 @@ VIDEO_START( taitojc )
 	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
 }
 
-//static int tick = 0;
 SCREEN_UPDATE_IND16( taitojc )
 {
 	taitojc_state *state = screen.machine().driver_data<taitojc_state>();
 
-#if 0
-    tick++;
-    if( tick >= 5 ) {
-        tick = 0;
-
-        if( screen.machine().input().code_pressed(KEYCODE_O) )
-            debug_tex_pal++;
-
-        if( screen.machine().input().code_pressed(KEYCODE_I) )
-            debug_tex_pal--;
-
-        debug_tex_pal &= 0x7f;
-    }
-#endif
-
 	bitmap.fill(0, cliprect);
 
-	/* 0xf000 used on Densha de Go disclaimer screen(s) (disable object RAM?) */
-	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
-		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
-
-	//popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
-
+	// low priority objects
 	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 0);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 0);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 0);
 
+	// 3D layer
 	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
+	// high priority objects
 	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 1);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 1);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 1);
 
-	state->m_tilemap->draw(bitmap, cliprect, 0,0);
-
-#if 0
-    if (debug_tex_pal > 0)
-    {
-        int j;
-        for (j=cliprect.min_y; j <= cliprect.max_y; j++)
-        {
-            UINT16 *d = &bitmap.pix16(j);
-            int index = 2048 * j;
-
-            for (i=cliprect.min_x; i <= cliprect.max_x; i++)
-            {
-                UINT8 t = state->m_texture[index+i];
-                UINT32 color;
-
-                //color = 0xff000000 | (t << 16) | (t << 8) | (t);
-                color = (state->m_debug_tex_pal << 8) | t;
-
-                d[i] = color;
-            }
-        }
-
-        {
-            char string[200];
-            sprintf(string, "Texture palette %d", debug_tex_pal);
-            popmessage("%s", string);
-        }
-    }
-#endif
+	// text layer
+	if (state->m_objlist[0xfc4/4] & 0x10000)
+		state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -430,18 +403,9 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
 	UINT16 *fb = &destmap->pix16(scanline);
-	UINT16 *zb;// = &extra->zbuffer->pix16(scanline);
-	int x;
+	UINT16 *zb = &extra->zbuffer->pix16(scanline);
 
-	// avoid crash in dendego2
-	//if (!extra->zbuffer)
-	//{
-	//  return;
-	//}
-
-	zb = &extra->zbuffer->pix16(scanline);
-
-	for (x = extent->startx; x < extent->stopx; x++)
+	for (int x = extent->startx; x < extent->stopx; x++)
 	{
 		int iz = (int)z & 0xffff;
 
@@ -464,18 +428,9 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	float dz = extent->param[0].dpdx;
 	float dcolor = extent->param[1].dpdx;
 	UINT16 *fb = &destmap->pix16(scanline);
-	UINT16 *zb;
-	int x;
+	UINT16 *zb = &extra->zbuffer->pix16(scanline);
 
-	// avoid crash in landgear/dangcurv
-	//if (!extra->zbuffer)
-	//{
-	//  return;
-	//}
-
-	zb = &extra->zbuffer->pix16(scanline);
-
-	for (x = extent->startx; x < extent->stopx; x++)
+	for (int x = extent->startx; x < extent->stopx; x++)
 	{
 		int ic = (int)color & 0xffff;
 		int iz = (int)z & 0xffff;
@@ -509,9 +464,8 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	int tex_wrap_y = extra->tex_wrap_y;
 	int tex_base_x = extra->tex_base_x;
 	int tex_base_y = extra->tex_base_y;
-	int x;
 
-	for (x = extent->startx; x < extent->stopx; x++)
+	for (int x = extent->startx; x < extent->stopx; x++)
 	{
 		int iu, iv;
 		UINT8 texel;
@@ -847,13 +801,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 void taitojc_clear_frame(running_machine &machine)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
-	rectangle cliprect;
 
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = machine.primary_screen->width() - 1;
-	cliprect.max_y = machine.primary_screen->height() - 1;
-
-	state->m_framebuffer.fill(0, cliprect);
-	state->m_zbuffer.fill(0xffff, cliprect);
+	state->m_framebuffer.fill(0, machine.primary_screen->visible_area());
+	state->m_zbuffer.fill(0xffff, machine.primary_screen->visible_area());
 }
