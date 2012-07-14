@@ -517,6 +517,17 @@ ROM_START( gdvsgd )
 	DISK_IMAGE_READONLY( "gdvsgd", 0, SHA1(3cf9ade5495982fcb8e106e7be4067429530f864) )
 ROM_END
 
+ROM_START( yuyuhaku )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "dongle.bin",   0x000000, 0x840000, CRC(36492878) SHA1(afd14aee033cf360c07d281112566d0463d17a1f) ) 
+
+    DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "yuyuhaku", 0, SHA1(ffdf1333d2c235e5fcec3780480f110afd20a7df) )
+ROM_END
+
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2001, bldyr3b,    sys246, system246, system246, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", GAME_IS_SKELETON)
 GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
@@ -547,6 +558,7 @@ GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5
 GAME(2005, superdbz,   sys256, system256, system246, 0, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", GAME_IS_SKELETON)
 GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
+GAME(2006, yuyuhaku,   sys256, system256, system246, 0, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", GAME_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam", GAME_IS_SKELETON)
 
