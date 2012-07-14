@@ -257,6 +257,18 @@ ROM_START( soulcl2b )
 	DISK_IMAGE_READONLY( "sc21-dvd0d", 0, SHA1(9a7b1ea836adc9d78481928a3067530e0f8d74a6) )
 ROM_END
 
+ROM_START( soulcl2w )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "scxx.ic002", 0x000000, 0x800000, NO_DUMP )   // no idea which dongle(s) this goes with, the SC2 sets are a huge mess now
+    ROM_LOAD( "scxx_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sc21-dvd0b", 0, SHA1(883170f759b4d53c4031e00ff29bcd1a4d3fea97) )
+ROM_END
+
 ROM_START( soulclb3 )
     ROM_REGION(0x200000, "bios", 0)
     SYSTEM246_BIOS
@@ -515,6 +527,7 @@ GAME(2002, scptour,    sys246, system246, system246, 0, ROT0, "Namco", "Smash Co
 GAME(2002, soulclb2,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, soulcl2a, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, soulcl2b, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", GAME_IS_SKELETON)
+GAME(2002, soulcl2w, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC2? world version)", GAME_IS_SKELETON)
 GAME(2002, tekken4,    sys246, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", GAME_IS_SKELETON)
 GAME(2002, tekken4a,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, tekken4b,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", GAME_IS_SKELETON)
