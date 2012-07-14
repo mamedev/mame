@@ -1748,7 +1748,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_MACHINE_RESET( sammymdl )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")	// battery
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit_delay)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
