@@ -13,46 +13,32 @@ INLINE UINT16 POP_STACK(tms32051_state *cpustate)
 	return pc;
 }
 
-INLINE INT32 SUB(tms32051_state *cpustate, INT32 a, INT32 b, int shift16)
+INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b, int shift16)
 {
-	INT64 res = a - b;
-	if (cpustate->st0.ovm)	// overflow saturation mode
+	UINT32 res = a - b;
+
+	// check overflow
+	if ((a ^ b) & (a ^ res) & 0x80000000)
 	{
-		if ((res & 0x80000000) && ((UINT32)(res >> 32) & 0xffffffff) != 0xffffffff)
+		if (cpustate->st0.ovm)	// overflow saturation mode
 		{
-			res = 0x80000000;
+			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
-		else if (((res & 0x80000000) == 0) && ((UINT32)(res >> 32) & 0xffffffff) != 0)
-		{
-			res = 0x7fffffff;
-		}
-	}
-	else				// normal mode, result is not modified
-	{
-		// set OV flag if overflow occurred, this is a sticky flag
-		if (((a) ^ (b)) & ((a) ^ ((INT32)res)) & 0x80000000)
-		{
-			cpustate->st0.ov = 1;
-		}
+
+		// set OV, this is a sticky flag
+		cpustate->st0.ov = 1;
 	}
 
 	// set carry
 	if (!shift16)
 	{
 		// C is cleared if borrow was generated
-		if (((UINT64)(a) + (UINT64)(~b)) & U64(0x100000000))
-		{
-			cpustate->st1.c = 0;
-		}
-		else
-		{
-			cpustate->st1.c = 1;
-		}
+		cpustate->st1.c = (b > a) ? 0 : 1;
 	}
 	else
 	{
 		// if 16-bit shift, C is cleared if borrow was generated, otherwise C is unaffected
-		if (((UINT64)(a) + (UINT64)(~b)) & U64(0x100000000))
+		if (b > a)
 		{
 			cpustate->st1.c = 0;
 		}
@@ -61,46 +47,32 @@ INLINE INT32 SUB(tms32051_state *cpustate, INT32 a, INT32 b, int shift16)
 	return (INT32)(res);
 }
 
-INLINE INT32 ADD(tms32051_state *cpustate, INT32 a, INT32 b, int shift16)
+INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b, int shift16)
 {
-	INT64 res = a + b;
-	if (cpustate->st0.ovm)	// overflow saturation mode
+	UINT32 res = a + b;
+	
+	// check overflow
+	if ((a ^ res) & (b ^ res) & 0x80000000)
 	{
-		if ((res & 0x80000000) && ((UINT32)(res >> 32) & 0xffffffff) != 0xffffffff)
+		if (cpustate->st0.ovm)	// overflow saturation mode
 		{
-			res = 0x80000000;
+			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
-		else if (((res & 0x80000000) == 0) && ((UINT32)(res >> 32) & 0xffffffff) != 0)
-		{
-			res = 0x7fffffff;
-		}
-	}
-	else				// normal mode, result is not modified
-	{
-		// set OV flag if overflow occurred, this is a sticky flag
-		if (((res) ^ (b)) & ((res) ^ (a)) & 0x80000000)
-		{
-			cpustate->st0.ov = 1;
-		}
+
+		// set OV, this is a sticky flag
+		cpustate->st0.ov = 1;
 	}
 
-	// set carry
+	// check carry
 	if (!shift16)
 	{
 		// C is set if carry was generated
-		if (res & U64(0x100000000))
-		{
-			cpustate->st1.c = 1;
-		}
-		else
-		{
-			cpustate->st1.c = 0;
-		}
+		cpustate->st1.c = (((UINT64)(a) + (UINT64)(b)) & U64(0x100000000)) ? 1 : 0;
 	}
 	else
 	{
 		// if 16-bit shift, C is set carry was generated, otherwise C is unaffected
-		if (res & U64(0x100000000))
+		if (((UINT64)(a) + (UINT64)(b)) & U64(0x100000000))
 		{
 			cpustate->st1.c = 1;
 		}
@@ -600,27 +572,13 @@ static void op_neg(tms32051_state *cpustate)
 	if ((UINT32)(cpustate->acc) == 0x80000000)
 	{
 		cpustate->st0.ov = 1;
-		if (cpustate->st0.ovm)
-		{
-			cpustate->acc = 0x7fffffff;
-		}
-		else
-		{
-			cpustate->acc = 0x80000000;
-		}
+		cpustate->st1.c = 0;
+		cpustate->acc = (cpustate->st0.ovm) ? 0x7fffffff : 0x80000000;
 	}
 	else
 	{
 		cpustate->acc = 0 - (UINT32)(cpustate->acc);
-
-		if (cpustate->acc == 0)
-		{
-			cpustate->st1.c = 1;
-		}
-		else
-		{
-			cpustate->st1.c = 0;
-		}
+		cpustate->st1.c = (cpustate->acc == 0) ? 1 : 0;
 	}
 
 	CYCLES(1);
