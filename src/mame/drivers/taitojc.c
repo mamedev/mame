@@ -110,7 +110,6 @@ Bottom board: JCG DAUGHTERL PCB-C K91E0677A
 
 Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
-      MC68HC11: Microcontroller with 64k internal ROM (not read but probably protected anyway ;-)
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.7, .9-.12, .18-.20, .22-.25 are 16M MASK, graphics.
       ROMs .32-.35 are 16M MASK, ES5505 samples.
@@ -246,7 +245,6 @@ Bottom board: JCG DAUGHTER PCB-L K91E0603A
 
 Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
-      MC68HC11: Surface-mounted QFP80 microcontroller with 64k internal ROM (not read but very likely protected)
       ROMs .36-.39 are 27C4001, main program.
       ROM .65 is 27C512, 68HC11 MCU program.
       ROMs .30-.31 are 27C2001, sound program.
@@ -350,7 +348,6 @@ Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
       6264: 8K x8 SRAM
       SMC_COM20020I: Network communmication IC
-      MC68HC11: Microcontroller with 64k internal ROM capability (not read but probably protected anyway ;-)
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.12, .18-.25 are 16M MASK, graphics.
       ROMs .32-.35 are 16M MASK, sound data.
