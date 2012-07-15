@@ -1179,7 +1179,7 @@ WRITE8_MEMBER(bfm_sc2_state::vfd1_data_w)
 	}
 	else
 	{
-		m_vfd0->write_char(data);
+	    m_vfd0->write_char(data);
 	}
 }
 

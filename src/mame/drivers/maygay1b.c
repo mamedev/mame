@@ -112,7 +112,9 @@ class maygay1b_state : public driver_device
 {
 public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd")
+		{ }
 
 	UINT8 m_lamppos;
 	int m_alpha_clock;
@@ -123,6 +125,7 @@ public:
 	int m_SRSEL;
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
+	optional_device<roc10937_t> m_vfd;
 	device_t *m_duart68681;
 	i8279_state m_i8279[2];
 	DECLARE_READ8_MEMBER(m1_8279_r);
@@ -537,7 +540,7 @@ static void m1_stepper_reset(running_machine &machine)
 static MACHINE_RESET( m1 )
 {
 	maygay1b_state *state = machine.driver_data<maygay1b_state>();
-	ROC10937_reset(0);	// reset display1
+	state->m_vfd->reset();	// reset display1
 	state->m_duart68681 = machine.device( "duart68681" );
 	m1_stepper_reset(machine);
 }
@@ -570,16 +573,21 @@ static void cpu0_nmi(running_machine &machine, int state)
 
 WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
-	if ( data & 0x40 ) ROC10937_reset(0);
-
-	if ( !m_alpha_clock && (data & 0x20) )
+	if(!(data & 0x40))
 	{
-		ROC10937_shift_data(0, ( data & 0x10 )?0:1);
+		if (m_alpha_clock != (data & 0x20))
+		{
+			if (!m_alpha_clock)//falling edge
+			{
+				m_vfd->shift_data((data & 0x10)?1:0);
+			}
+		}
+		m_alpha_clock = (data & 0x20);
 	}
-
-	m_alpha_clock = data & 0x20;
-
-	ROC10937_draw_16seg(0);
+	else
+	{
+		m_vfd->reset();
+	}
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
@@ -735,8 +743,6 @@ static MACHINE_START( m1 )
 		stepper_config(machine, i, &starpoint_interface_48step);
 	}
 
-// setup the standard oki MSC1937 display ///////////////////////////////
-	ROC10937_init(0, MSC1937,0);
 }
 WRITE8_MEMBER(maygay1b_state::reel12_w)
 {
@@ -911,7 +917,7 @@ static MACHINE_CONFIG_START( m1, maygay1b_state )
 
 	MCFG_DUART68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
 	MCFG_PIA6821_ADD("pia", m1_pia_intf)
-
+	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",AY8913, M1_MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(ay8910_config)

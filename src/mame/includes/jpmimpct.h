@@ -3,6 +3,7 @@
     JPM IMPACT with Video hardware
 
 ****************************************************************************/
+#include "machine/roc10937.h"
 
 struct duart_t
 {
@@ -54,6 +55,7 @@ class jpmimpct_state : public driver_device
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd"),
 		  m_vram(*this, "vram") { }
 
 	UINT8 m_tms_irq;
@@ -65,12 +67,12 @@ public:
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
 	int m_payen;
-	int m_alpha_data_line;
 	int m_alpha_clock;
 	int m_hopinhibit;
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
+	optional_device<roc10937_t> m_vfd;
 	optional_shared_ptr<UINT16> m_vram;
 	struct bt477_t m_bt477;
 	DECLARE_WRITE16_MEMBER(m68k_tms_w);

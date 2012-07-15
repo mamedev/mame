@@ -97,6 +97,7 @@ class mpu4_state : public driver_device
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd"),
 		  m_6840ptm(*this, "ptm_ic2"),
 		  m_pia3(*this, "pia_ic3"),
 		  m_pia4(*this, "pia_ic4"),
@@ -113,7 +114,7 @@ public:
 	{
 		return 0;
 	}
-
+	optional_device<roc10937_t> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
 	optional_device<pia6821_device> m_pia3;
 	optional_device<pia6821_device> m_pia4;

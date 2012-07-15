@@ -2,9 +2,8 @@
 #ifndef BFM_BD1_H
 #define BFM_BD1_H
 
-//Based on the datasheet, the makimum oscillation rate for one character is 31.25 KHz, so we set our character clock to that.
 #define MCFG_BFMBD1_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, BFM_BD1,312500)\
+		MCFG_DEVICE_ADD(_tag, BFM_BD1,60)\
 		MCFG_BD1_PORT(_val) \
 
 #define MCFG_BD1_PORT(_val) \
@@ -27,16 +26,15 @@ public:
     virtual void update_display();
 	UINT8	m_port_val;
 	void blank(int data);
+
 	void shift_data(int data);
 	void setdata(int segdata, int data);
-    UINT32 set_display(UINT16 segin);
+    UINT16 set_display(UINT16 segin);
 
 protected:
     static const UINT8 AT_NORMAL  = 0x00;
     static const UINT8 AT_FLASH   = 0x01;
     static const UINT8 AT_FLASHED = 0x80;   // set when character should be blinked off
-
-	emu_timer *m_timer;
 
 	int m_cursor_pos;
 	int	m_window_start;		// display window start pos 0-15
@@ -61,7 +59,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 };
 

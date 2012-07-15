@@ -944,25 +944,23 @@ WRITE8_MEMBER(jpmimpct_state::payen_a_w)
 
 WRITE8_MEMBER(jpmimpct_state::display_c_w)
 {
-
+	//Reset 0x04, data 0x02, clock 0x01
 	if(data & 0x04)
 	{
-		m_alpha_data_line = ((data >> 1) & 1);
-		if (m_alpha_clock != (data & 1))
+		int alpha_data = (data & 0x02)?0:1;
+		if (m_alpha_clock != (data & 0x01))
 		{
 			if (!m_alpha_clock)//falling edge
 			{
-				ROC10937_shift_data(0, m_alpha_data_line?0:1);
+				m_vfd->shift_data(alpha_data);
 			}
 		}
-		m_alpha_clock = (data & 1);
+		m_alpha_clock = (data & 0x01);
 	}
 	else
 	{
-		ROC10937_reset(0);
+		m_vfd->reset();
 	}
-		ROC10937_draw_16seg(0);
-	//?
 }
 
 static I8255_INTERFACE (ppi8255_intf)
@@ -1003,9 +1001,7 @@ static MACHINE_RESET( impctawp )
 
 	/* Reset states */
 	state->m_duart_1_irq = 0;
-
-	ROC10937_init(0, MSC1937,1);//Reversed
-	ROC10937_reset(0);	/* reset display1 */
+	state->m_vfd->reset();
 }
 /*************************************
  *
@@ -1379,6 +1375,7 @@ static MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	MCFG_MACHINE_START(impctawp)
 	MCFG_MACHINE_RESET(impctawp)

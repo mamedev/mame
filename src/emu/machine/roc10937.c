@@ -8,40 +8,6 @@
 #include "emu.h"
 #include "roc10937.h"
 
-static struct
-{
-	UINT8	type,				// type of alpha display
-
-			reversed,			// Allows for the data being written from right to left, not left to right.
-
-			changed,			// flag <>0, if contents are changed
-			window_start,		// display window start pos 0-15
-			window_end,			// display window end   pos 0-15
-			window_size;		// window  size
-
-	INT8	pcursor_pos,		// previous cursor pos
-			cursor_pos;			// current cursor pos
-
-	UINT16  brightness;			// display brightness level 0-31 (31=MAX)
-
-	UINT8	string[18];			// text buffer
-	UINT32  segments[16],		// segments
-			outputs[16];		// standardised outputs
-
-	UINT8	count,				// bit counter
-			data;				// receive register
-
-} roc10937[MAX_ROCK_ALPHAS];
-
-//
-// Rockwell 10937 charset to ASCII conversion table
-//
-static const char roc10937ASCII[]=
-//0123456789ABCDEF0123456789ABC DEF01 23456789ABCDEF0123456789ABCDEF
- "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ ?\"#$%%'()*+;-./0123456789&%<=>?"
- "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ ?\"#$%%'()*+;-./0123456789&%<=>?"
- "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ ?\"#$%%'()*+;-./0123456789&%<=>?";
-
 /*
    Rockwell 10937 16 segment charset lookup table
      0     1
@@ -60,81 +26,82 @@ In 14 segment mode, 0 represents the whole top line,
 and 5 the bottom line, allowing both modes to share
 a charset.
 
-Note that, although we call this a 16 segment display,
+Note that, although we call this a '16 segment' display,
 we actually have 18 segments, including the semicolon portions.
-This means our segment maths needs to be more than 16-bit to work!
+16-bit tables are used to hold the main characters, the rest are OR'd in
 */
 
-static const UINT32 roc10937charset[]=
-{            // 11 10 FEDC BA98 7654 3210
-	0x0507F, //  0  0 0101 0000 0111 1111 @.
-	0x044CF, //  0  0 0100 0100 1100 1111 A.
-	0x0153F, //  0  0 0001 0101 0011 1111 B.
-	0x000F3, //  0  0 0000 0000 1111 0011 C.
-	0x0113F, //  0  0 0001 0001 0011 1111 D.
-	0x040F3, //  0  0 0100 0000 1111 0011 E.
-	0x040C3, //  0  0 0100 0000 1100 0011 F.
-	0x004FB, //  0  0 0000 0100 1111 1011 G.
-	0x044CC, //  0  0 0100 0100 1100 1100 H.
-	0x01133, //  0  0 0001 0001 0011 0011 I.
-	0x0007C, //  0  0 0000 0000 0111 1100 J.
-	0x04AC0, //  0  0 0100 1010 1100 0000 K.
-	0x000F0, //  0  0 0000 0000 1111 0000 L.
-	0x082CC, //  0  0 1000 0010 1100 1100 M.
-	0x088CC, //  0  0 1000 1000 1100 1100 N.
-	0x000FF, //  0  0 0000 0000 1111 1111 O.
-	0x044C7, //  0  0 0100 0100 1100 0111 P.
-	0x008FF, //  0  0 0000 1000 1111 1111 Q.
-	0x04CC7, //  0  0 0100 1100 1100 0111 R.
-	0x044BB, //  0  0 0100 0100 1011 1011 S.
-	0x01103, //  0  0 0001 0001 0000 0011 T.
-	0x000FC, //  0  0 0000 0000 1111 1100 U.
-	0x022C0, //  0  0 0010 0010 1100 0000 V.
-	0x028CC, //  0  0 0010 1000 1100 1100 W.
-	0x0AA00, //  0  0 1010 1010 0000 0000 X.
-	0x09200, //  0  0 1001 0010 0000 0000 Y.
-	0x02233, //  0  0 0010 0010 0011 0011 Z.
-	0x000E1, //  0  0 0000 0000 1110 0001 [.
-	0x08800, //  0  0 1000 1000 0000 0000 \.
-	0x0001E, //  0  0 0000 0000 0001 1110 ].
-	0x02800, //  0  0 0010 1000 0000 0000 ^.
-	0x00030, //  0  0 0000 0000 0011 0000 _.
-	0x00000, //  0  0 0000 0000 0000 0000 dummy.
-	0x08121, //  0  0 1000 0001 0010 0001 Unknown symbol.
-	0x00180, //  0  0 0000 0001 1000 0000 ".
-	0x0553C, //  0  0 0101 0101 0011 1100 #.
-	0x055BB, //  0  0 0101 0101 1011 1011 $.
-	0x07799, //  0  0 0111 0111 1001 1001 %.
-	0x0C979, //  0  0 1100 1001 0111 1001 &.
-	0x00200, //  0  0 0000 0010 0000 0000 '.
-	0x00A00, //  0  0 0000 1010 0000 0000 (.
-	0x0A050, //  0  0 1010 0000 0000 0000 ).
-	0x0FF00, //  0  0 1111 1111 0000 0000 *.
-	0x05500, //  0  0 0101 0101 0000 0000 +.
-	0x30000, //  1  1 0000 0000 0000 0000 ;.
-	0x04400, //  0  0 0100 0100 0000 0000 --.
-	0x20000, //  1  0 0000 0000 0000 0000 . .
-	0x02200, //  0  0 0010 0010 0000 0000 /.
-	0x022FF, //  0  0 0010 0010 1111 1111 0.
-	0x01100, //  0  0 0001 0001 0000 0000 1.
-	0x04477, //  0  0 0100 0100 0111 0111 2.
-	0x0443F, //  0  0 0100 0100 0011 1111 3.
-	0x0448C, //  0  0 0100 0100 1000 1100 4.
-	0x044BB, //  0  0 0100 0100 1011 1011 5.
-	0x044FB, //  0  0 0100 0100 1111 1011 6.
-	0x0000E, //  0  0 0000 0000 0000 1110 7.
-	0x044FF, //  0  0 0100 0100 1111 1111 8.
-	0x044BF, //  0  0 0100 0100 1011 1111 9.
-	0x00021, //  0  0 0000 0000 0010 0001 -
-	         //                           -.
-	0x02001, //  0  0 0010 0000 0000 0001 -
-			 //                           /.
-	0x02430, //  0  0 0010 0100 0011 0000 <.
-	0x04430, //  0  0 0100 0100 0011 0000 =.
-	0x08830, //  0  0 1000 1000 0011 0000 >.
-	0x01407, //  0  0 0001 0100 0000 0111 ?.
+static const UINT16 roc10937charset[]=
+{            // FEDC BA98 7654 3210
+	0x507F, // 0101 0000 0111 1111 @.
+	0x44CF, // 0100 0100 1100 1111 A.
+	0x153F, // 0001 0101 0011 1111 B.
+	0x00F3, // 0000 0000 1111 0011 C.
+	0x113F, // 0001 0001 0011 1111 D.
+	0x40F3, // 0100 0000 1111 0011 E.
+	0x40C3, // 0100 0000 1100 0011 F.
+	0x04FB, // 0000 0100 1111 1011 G.
+	0x44CC, // 0100 0100 1100 1100 H.
+	0x1133, // 0001 0001 0011 0011 I.
+	0x007C, // 0000 0000 0111 1100 J.
+	0x4AC0, // 0100 1010 1100 0000 K.
+	0x00F0, // 0000 0000 1111 0000 L.
+	0x82CC, // 1000 0010 1100 1100 M.
+	0x88CC, // 1000 1000 1100 1100 N.
+	0x00FF, // 0000 0000 1111 1111 O.
+	0x44C7, // 0100 0100 1100 0111 P.
+	0x08FF, // 0000 1000 1111 1111 Q.
+	0x4CC7, // 0100 1100 1100 0111 R.
+	0x44BB, // 0100 0100 1011 1011 S.
+	0x1103, // 0001 0001 0000 0011 T.
+	0x00FC, // 0000 0000 1111 1100 U.
+	0x22C0, // 0010 0010 1100 0000 V.
+	0x28CC, // 0010 1000 1100 1100 W.
+	0xAA00, // 1010 1010 0000 0000 X.
+	0x9200, // 1001 0010 0000 0000 Y.
+	0x2233, // 0010 0010 0011 0011 Z.
+	0x00E1, // 0000 0000 1110 0001 [.
+	0x8800, // 1000 1000 0000 0000 \.
+	0x001E, // 0000 0000 0001 1110 ].
+	0x2800, // 0010 1000 0000 0000 ^.
+	0x0030, // 0000 0000 0011 0000 _.
+	0x0000, // 0000 0000 0000 0000 dummy.
+	0x8121, // 1000 0001 0010 0001 !.
+	0x0180, // 0000 0001 1000 0000 ".
+	0x553C, // 0101 0101 0011 1100 #.
+	0x55BB, // 0101 0101 1011 1011 $.
+	0x7799, // 0111 0111 1001 1001 %.
+	0xC979, // 1100 1001 0111 1001 &.
+	0x0200, // 0000 0010 0000 0000 '.
+	0x0A00, // 0000 1010 0000 0000 (.
+	0xA050, // 1010 0000 0000 0000 ).
+	0xFF00, // 1111 1111 0000 0000 *.
+	0x5500, // 0101 0101 0000 0000 +.
+	0x0000, // 0000 0000 0000 0000 ;. (Set separately)
+	0x4400, // 0100 0100 0000 0000 --.
+	0x0000, // 0000 0000 0000 0000 . .(Set separately)
+	0x2200, // 0010 0010 0000 0000 /.
+	0x22FF, // 0010 0010 1111 1111 0.
+	0x1100, // 0001 0001 0000 0000 1.
+	0x4477, // 0100 0100 0111 0111 2.
+	0x443F, // 0100 0100 0011 1111 3.
+	0x448C, // 0100 0100 1000 1100 4.
+	0x44BB, // 0100 0100 1011 1011 5.
+	0x44FB, // 0100 0100 1111 1011 6.
+	0x000E, // 0000 0000 0000 1110 7.
+	0x44FF, // 0100 0100 1111 1111 8.
+	0x44BF, // 0100 0100 1011 1111 9.
+	0x0021, // 0000 0000 0010 0001 -
+	        //                     -.
+	0x2001, // 0010 0000 0000 0001 -
+		    //                     /.
+	0x2430, // 0010 0100 0011 0000 <.
+	0x4430, // 0100 0100 0011 0000 =.
+	0x8830, // 1000 1000 0011 0000 >.
+	0x1407, // 0001 0100 0000 0111 ?.
 };
 
+///////////////////////////////////////////////////////////////////////////
 static const int roc10937poslut[]=
 {
 	1,//0
@@ -155,244 +122,282 @@ static const int roc10937poslut[]=
 	0//15
 };
 
-///////////////////////////////////////////////////////////////////////////
+const device_type ROC10937 = &device_creator<roc10937_t>;
 
-void ROC10937_init(int id, int type,int reversed)
+rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, type, name, tag, owner, clock)
 {
-	assert_always((id >= 0) && (id < MAX_ROCK_ALPHAS), "roc10937_init called on an invalid display ID!");
+	m_port_val=0;
+	m_reversed=0;
+}
 
-	memset( &roc10937[id], 0, sizeof(roc10937[0]));
 
-	roc10937[id].type = type;
-	roc10937[id].reversed = reversed;
-	ROC10937_reset(id);
+void rocvfd_t::static_set_value(device_t &device, int val)
+{
+	rocvfd_t &roc = downcast<rocvfd_t &>(device);
+	roc.m_port_val = val;
+}
+
+void rocvfd_t::static_set_zero(device_t &device, bool reversed)
+{
+	rocvfd_t &roc = downcast<rocvfd_t &>(device);
+	roc.m_reversed = reversed;
+}
+
+void rocvfd_t::device_start()
+{
+    save_item(NAME(m_port_val));
+    save_item(NAME(m_reversed));
+    save_item(NAME(m_cursor_pos));
+	save_item(NAME(m_window_size));
+	save_item(NAME(m_shift_count));
+	save_item(NAME(m_shift_data));
+	save_item(NAME(m_pcursor_pos));
+    save_item(NAME(m_chars));
+    save_item(NAME(m_outputs));
+    save_item(NAME(m_brightness));
+    save_item(NAME(m_count));
+    save_item(NAME(m_duty));
+	save_item(NAME(m_disp));
+	
+
+	device_reset();
+}
+
+void rocvfd_t::device_reset()
+{
+    m_cursor_pos = 0;
+	m_window_size = 16;
+	m_shift_count = 0;
+	m_shift_data = 0;
+	m_pcursor_pos = 0;
+	m_brightness =31;
+	m_count=0;
+	m_duty=31;
+    m_disp = 0;
+
+    memset(m_chars, 0, sizeof(m_chars));
+    memset(m_outputs, 0, sizeof(m_outputs));
 }
 
 ///////////////////////////////////////////////////////////////////////////
-
-void ROC10937_reset(int id)
+UINT32 rocvfd_t::set_display(UINT32 segin)
 {
-	roc10937[id].window_end  = 15;
-	roc10937[id].window_size = (roc10937[id].window_end - roc10937[id].window_start)+1;
-	memset(roc10937[id].string, ' ', 16);
+	UINT32 segout=0;
+	if ( segin & 0x0001 )	segout |=  0x0001;
+	else    	            segout &= ~0x0001;
+	if ( segin & 0x0002 )	segout |=  0x0002;
+	else        	        segout &= ~0x0002;
+	if ( segin & 0x0004 )	segout |=  0x0004;
+	else            	    segout &= ~0x0004;
+	if ( segin & 0x0008 )	segout |=  0x0008;
+	else                	segout &= ~0x0008;
+	if ( segin & 0x0010 )	segout |=  0x0010;
+	else                    segout &= ~0x0010;
+	if ( segin & 0x0020 )	segout |=  0x0020;
+	else                    segout &= ~0x0020;
+	if ( segin & 0x0040 )	segout |=  0x0040;
+	else                    segout &= ~0x0040;
+	if ( segin & 0x0080 )	segout |=  0x0080;
+	else                	segout &= ~0x0080;
+	if ( segin & 0x4000 )	segout |=  0x0100;
+	else        		    segout &= ~0x0100;
+	if ( segin & 0x0400 )	segout |=  0x0200;
+	else                    segout &= ~0x0200;
+	if ( segin & 0x0100 )	segout |=  0x0400;
+	else                    segout &= ~0x0400;
+	if ( segin & 0x1000 )	segout |=  0x0800;
+	else                    segout &= ~0x0800;
+	if ( segin & 0x2000 )	segout |=  0x1000;
+	else                    segout &= ~0x1000;
+	if ( segin & 0x8000 )	segout |=  0x2000;
+	else                    segout &= ~0x2000;
+	if ( segin & 0x0200 )	segout |=  0x4000;
+	else                    segout &= ~0x4000;
+	if ( segin & 0x0800 )	segout |=  0x8000;
+	else                    segout &= ~0x8000;
+	if ( segin & 0x10000 )	segout |=  0x10000;
+	else                    segout &= ~0x10000;
+	if ( segin & 0x20000 )	segout |=  0x20000;
+	else                    segout &= ~0x20000;
 
-	roc10937[id].brightness = 31;
-	roc10937[id].count      = 0;
-
-	roc10937[id].changed |= 1;
+	return segout;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-
-UINT32 *ROC10937_get_segments(int id)
+void rocvfd_t::device_post_load()
 {
-	return roc10937[id].segments;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-UINT32 *ROC10937_get_outputs(int id)
-{
-	return roc10937[id].outputs;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-UINT32 *ROC10937_set_outputs(int id)
-{
-	int cursor,val;
-	for (cursor = 0; cursor < 16; cursor++)
+	for (int i =0; i<16; i++)
 	{
-		if (!roc10937[id].reversed)//Output to the screen is naturally backwards, so we need to invert it
+		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+	}
+}
+
+void rocvfd_t::update_display()
+{
+	for (int i =0; i<16; i++)
+	{
+		if (m_reversed)
 		{
-			val = 15-cursor;
+			m_outputs[i] = set_display(m_chars[15-i]);
 		}
 		else
 		{
-			//If the controller is reversed, things look normal.
-			val = cursor;
+			m_outputs[i] = set_display(m_chars[i]);		
 		}
-
-		if ( ROC10937_get_segments(id)[val] & 0x0001 )	roc10937[id].outputs[cursor] |=  0x0001;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0001;
-		if ( ROC10937_get_segments(id)[val] & 0x0002 )	roc10937[id].outputs[cursor] |=  0x0002;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0002;
-		if ( ROC10937_get_segments(id)[val] & 0x0004 )	roc10937[id].outputs[cursor] |=  0x0004;
-		else	    	                				roc10937[id].outputs[cursor] &= ~0x0004;
-		if ( ROC10937_get_segments(id)[val] & 0x0008 )	roc10937[id].outputs[cursor] |=  0x0008;
-		else    	                    				roc10937[id].outputs[cursor] &= ~0x0008;
-		if ( ROC10937_get_segments(id)[val] & 0x0010 )	roc10937[id].outputs[cursor] |=  0x0010;
-		else            	            				roc10937[id].outputs[cursor] &= ~0x0010;
-		if ( ROC10937_get_segments(id)[val] & 0x0020 )	roc10937[id].outputs[cursor] |=  0x0020;
-		else                	        				roc10937[id].outputs[cursor] &= ~0x0020;
-		if ( ROC10937_get_segments(id)[val] & 0x0040 )	roc10937[id].outputs[cursor] |=  0x0040;
-		else                    	    				roc10937[id].outputs[cursor] &= ~0x0040;
-		if ( ROC10937_get_segments(id)[val] & 0x0080 )	roc10937[id].outputs[cursor] |=  0x0080;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0080;
-		if ( ROC10937_get_segments(id)[val] & 0x4000 )	roc10937[id].outputs[cursor] |=  0x0100;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0100;
-		if ( ROC10937_get_segments(id)[val] & 0x0400 )	roc10937[id].outputs[cursor] |=  0x0200;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0200;
-		if ( ROC10937_get_segments(id)[val] & 0x0100 )	roc10937[id].outputs[cursor] |=  0x0400;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0400;
-		if ( ROC10937_get_segments(id)[val] & 0x1000 )	roc10937[id].outputs[cursor] |=  0x0800;
-		else                        					roc10937[id].outputs[cursor] &= ~0x0800;
-		if ( ROC10937_get_segments(id)[val] & 0x2000 )	roc10937[id].outputs[cursor] |=  0x1000;
-		else                		    				roc10937[id].outputs[cursor] &= ~0x1000;
-		if ( ROC10937_get_segments(id)[val] & 0x8000 )	roc10937[id].outputs[cursor] |=  0x2000;
-		else                        					roc10937[id].outputs[cursor] &= ~0x2000;
-		if ( ROC10937_get_segments(id)[val] & 0x0200 )	roc10937[id].outputs[cursor] |=  0x4000;
-		else                        					roc10937[id].outputs[cursor] &= ~0x4000;
-		if ( ROC10937_get_segments(id)[val] & 0x0800 )	roc10937[id].outputs[cursor] |=  0x8000;
-		else                        					roc10937[id].outputs[cursor] &= ~0x8000;
-
-		if ( ROC10937_get_segments(id)[val] & 0x10000 )	roc10937[id].outputs[cursor] |=  0x10000;
-		else                        					roc10937[id].outputs[cursor] &= ~0x10000;
-		if ( ROC10937_get_segments(id)[val] & 0x20000 )	roc10937[id].outputs[cursor] |=  0x20000;
-		else                        					roc10937[id].outputs[cursor] &= ~0x20000;
+		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
-	return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////
-
-char  *ROC10937_get_string( int id)
+void rocvfd_t::shift_data(int data)
 {
-	return (char *)roc10937[id].string;
-}
+	m_shift_data <<= 1;
 
-///////////////////////////////////////////////////////////////////////////
+	if ( !data ) m_shift_data |= 1;
 
-void ROC10937_shift_data(int id, int data)
-{
-	roc10937[id].data <<= 1;
-
-	if ( !data ) roc10937[id].data |= 1;
-
-	if ( ++roc10937[id].count >= 8 )
+	if ( ++m_shift_count >= 8 )
 	{
-		if ( ROC10937_newdata(id, roc10937[id].data) )
-		{
-			roc10937[id].changed |= 1;
-		}
-
-		roc10937[id].count = 0;
-		roc10937[id].data  = 0;
+		write_char(m_shift_data);
+		m_shift_count = 0;
+		m_shift_data  = 0;
 	}
+	update_display();
 }
 
 ///////////////////////////////////////////////////////////////////////////
-
-int ROC10937_newdata(int id, int data)
+roc10937_t::roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rocvfd_t(mconfig, ROC10937, "Rockwell 10937 VFD controller and compatible", tag, owner, clock)
 {
-	int change = 0;
+	m_port_val=0;
+	m_reversed=0;
+}
 
+const device_type MSC1937 = &device_creator<msc1937_t>;
+
+msc1937_t::msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rocvfd_t(mconfig, MSC1937, "OKI MSC1937 VFD controller", tag, owner, clock)
+{
+	m_port_val=0;
+	m_reversed=0;
+}
+
+void rocvfd_t::write_char(int data)
+{
 	if ( data & 0x80 )
 	{ // Control data received
 		if ( (data & 0xF0) == 0xA0 ) // 1010 xxxx
 		{ // 1 010 xxxx Buffer Pointer control
-			roc10937[id].cursor_pos = roc10937poslut[data & 0x0F];
+			m_cursor_pos = roc10937poslut[data & 0x0F];
 		}
 		else if ( (data & 0xF0) == 0xC0 ) // 1100 xxxx
 		{ // 1100 xxxx Set number of digits
 			data &= 0x0F;
 
-			if ( data == 0 ) roc10937[id].window_size = 16;
-			else             roc10937[id].window_size = data;
-			roc10937[id].window_start = 0;
-			roc10937[id].window_end   = roc10937[id].window_size-1;
+			if ( data == 0 ) m_window_size = 16;
+			else             m_window_size = data;
 		}
 		else if ( (data & 0xE0) == 0xE0 ) // 111x xxxx
 		{ // 111x xxxx Set duty cycle ( brightness )
-			roc10937[id].brightness = (data & 0x1F);
-			change = 1;
+			m_brightness = (data & 0x1F);
 		}
 		else if ( (data & 0xE0) == 0x80 ) // 100x ---
 		{ // 100x xxxx Test mode
+			m_duty =4;
+		}
+	}
+	else
+	{ // Display data
+//		data &= 0x3F;
+
+		switch ( data )
+		{
+			case 0x2C: // ;
+			m_chars[m_pcursor_pos] |= (1<<16);//.
+			m_chars[m_pcursor_pos] |= (1<<17);//,
+			break;
+			case 0x2E: //
+			m_chars[m_pcursor_pos] |= (1<<16);//.
+			break;
+			default :
+			m_pcursor_pos = m_cursor_pos;
+			m_chars[m_cursor_pos] = roc10937charset[data & 0x3F];
+
+			m_cursor_pos++;
+			if (  m_cursor_pos > (m_window_size -1) )
+			{
+				m_cursor_pos = 0;
+			}
+			break;
+		}
+	}
+}
+
+const device_type ROC10957 = &device_creator<roc10957_t>;
+
+roc10957_t::roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rocvfd_t(mconfig, ROC10957, "Rockwell 10957 VFD controller and compatible", tag, owner, clock)
+{
+	m_port_val=0;
+	m_reversed=0;
+}
+
+void roc10957_t::write_char(int data)
+{
+	if ( data & 0x80 )
+	{ // Control data received
+		if ( (data & 0xF0) == 0xA0 ) // 1010 xxxx
+		{ // 1 010 xxxx Buffer Pointer control
+			m_cursor_pos = roc10937poslut[data & 0x0F];
+		}
+		else if ( (data & 0xF0) == 0xC0 ) // 1100 xxxx
+		{ // 1100 xxxx Set number of digits
+			data &= 0x0F;
+
+			if ( data == 0 ) m_window_size = 16;
+			else             m_window_size = data;
+		}
+		else if ( (data & 0xE0) == 0xE0 ) // 111x xxxx
+		{ // 111x xxxx Set duty cycle ( brightness )
+			m_brightness = (data & 0x1F);
+		}
+		else if ( (data & 0xE0) == 0x80 ) // 100x ---
+		{ // 100x xxxx Test mode
+			popmessage("TEST MODE ENABLED!");
+			m_duty = 4;
 		}
 	}
 	else
 	{ // Display data
 		data &= 0x3F;
-		change = 1;
 
 		switch ( data )
 		{
 			case 0x2C: // ;
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//,
+			m_chars[m_pcursor_pos] |= (1<<16);//.
+			m_chars[m_pcursor_pos] |= (1<<17);//,
 			break;
 			case 0x2E: //
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
+			m_chars[m_pcursor_pos] |= (1<<16);//.
 			break;
 			case 0x6C: // ;
-			roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
-			if ( roc10937[id].type == ROCKWELL10937)
-			{
-				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//,
-			}
+			m_chars[m_pcursor_pos] |= (1<<16);//.
 			break;
 			case 0x6E: //
-			if ( roc10937[id].type == ROCKWELL10937)
 			{
-				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<16);//.
-			}
-			else
-			{
-				roc10937[id].segments[roc10937[id].pcursor_pos] |= (1<<17);//,
+				m_chars[m_pcursor_pos] = 0;
 			}
 			break;
 			default :
-			roc10937[id].pcursor_pos = roc10937[id].cursor_pos;
-			roc10937[id].string[ roc10937[id].cursor_pos ] = roc10937ASCII[data];
-			roc10937[id].segments[roc10937[id].cursor_pos] = roc10937charset[data & 0x3F];
+			m_pcursor_pos = m_cursor_pos;
+			m_chars[m_cursor_pos] = roc10937charset[data & 0x3F];
 
-			roc10937[id].cursor_pos++;
-			if (  roc10937[id].cursor_pos > roc10937[id].window_end )
+			m_cursor_pos++;
+			if (  m_cursor_pos > (m_window_size -1) )
 			{
-					roc10937[id].cursor_pos = 0;
+				m_cursor_pos = 0;
 			}
 		break;
 		}
-
-	}
-	return change;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-static void ROC10937_plot(int id, int power)
-{
-	int cursor;
-	ROC10937_set_outputs(id);
-
-	for (cursor = 0; cursor < 16; cursor++)
-	{
-		output_set_indexed_value("vfd", (id*16)+cursor, power?ROC10937_get_outputs(id)[cursor]:0x00000);
-	}
-}
-static void ROC10937_draw(int id, int segs)
-{
-	int cycle;
-	for (cycle = 0; cycle < 32; cycle++)
-	{
-		if ((roc10937[id].brightness < cycle)||(roc10937[id].brightness == cycle))
-		{
-			ROC10937_plot(id,1);
-		}
-		else
-		{
-			ROC10937_plot(id,0);
-		}
 	}
 }
 
-//Helper functions
-void ROC10937_draw_16seg(int id)
-{
-	ROC10937_draw(id,16);
-}
-void ROC10937_draw_14seg(int id)
-{
-	ROC10937_draw(id,14);
-}

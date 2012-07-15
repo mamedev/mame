@@ -21,6 +21,7 @@ class proconn_state : public driver_device
 public:
 	proconn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd"),
 		  m_maincpu(*this, "maincpu"),
 		  m_z80pio_1(*this, "z80pio_1"),
 		  m_z80pio_2(*this, "z80pio_2"),
@@ -32,6 +33,7 @@ public:
 		  m_ay(*this, "aysnd")
 	{ }
 
+	optional_device<roc10937_t> m_vfd;
 
 	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, 0, data); }
 	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, 1, data); }
@@ -258,10 +260,15 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
-//  if (offset == 0)
+	proconn_state *state = device->machine().driver_data<proconn_state>();
+
+//Don't like the look of this, should be a clock somewhere
+//  if (offset == 0)	
+//		state->m_vfd->write_char( data );
+
+	for (int i=0; i<8;i++)
 	{
-		ROC10937_newdata(0, data);
-		ROC10937_draw_16seg(0);
+		state->m_vfd->shift_data( (data & (1<<i))?0:1  );
 	}
 }
 
@@ -300,13 +307,8 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 static MACHINE_RESET( proconn )
 {
-	ROC10937_reset(0);
-	ROC10937_draw_16seg(0);
-}
-
-static MACHINE_START( proconn )
-{
-	ROC10937_init(0, ROCKWELL10937,1);
+	proconn_state *state = machine.driver_data<proconn_state>();
+	state->m_vfd->reset();	// reset display1
 }
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
@@ -314,7 +316,8 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_CONFIG(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
-
+	MCFG_ROC10937_ADD("vfd",0,LEFT_TO_RIGHT)
+	
 	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, pio_interface_1 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_2", 4000000, pio_interface_2 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_3", 4000000, pio_interface_3 ) /* ?? Mhz */
@@ -325,7 +328,6 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_MACHINE_START( proconn )
 	MCFG_MACHINE_RESET( proconn )
 
 	MCFG_DEFAULT_LAYOUT(layout_awpvid16)

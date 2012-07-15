@@ -1944,9 +1944,6 @@ static MACHINE_START( mpu4_vid )
 	/* setup 8 mechanical meters */
 	MechMtr_config(machine,8);
 
-	/* setup the standard oki MSC1937 display */
-	ROC10937_init(0, MSC1937, 0);
-
 	/* Hook the reset line */
 	m68k_set_reset_callback(machine.device("video"), video_reset);
 }
@@ -1954,7 +1951,7 @@ static MACHINE_START( mpu4_vid )
 static MACHINE_RESET( mpu4_vid )
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
-	ROC10937_reset(0);
+	state->m_vfd->reset(); //for debug ports only
 
 	mpu4_stepper_reset(state);
 
@@ -2930,12 +2927,6 @@ ROM_START( v4dealem )
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "zenndlem.u10",	0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
-
-/*
-   Barcrest released two different games called "The Crystal Maze".
-   One is a non-video AWP, and uses only the MPU4 card, and the other SWP is the one we're interested in running
-   Some of the dumps available seem to confuse the two, due to an early database not distinguishing
-   between MPU4 and MPU4Video, as the latter had not been emulated at all at that stage. */
 
 #define VID_BIOS \
 	ROM_LOAD("vid.p1",  0x00000, 0x10000,  CRC(e996bc18) SHA1(49798165640627eb31024319353da04380787b10))
@@ -4748,7 +4739,7 @@ ROM_END
 /* Complete sets */
 /* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger (not emulated) to record more information about the game operation, for security etc.
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
-The AMLD versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
+The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
 GAME(  199?,v4bios,		0,			mod2,	mpu4,		0,			ROT0, "Barcrest","MPU4 Video Firmware",GAME_IS_BIOS_ROOT )
 

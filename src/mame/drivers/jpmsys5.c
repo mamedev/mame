@@ -47,7 +47,9 @@ class jpmsys5_state : public driver_device
 {
 public:
 	jpmsys5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd")
+		{ }
 
 	UINT8 m_palette[16][3];
 	int m_pal_addr;
@@ -60,6 +62,8 @@ public:
 	int m_lamp_strobe;
 	int m_mpxclk;
 	int m_muxram[255];
+	int m_alpha_clock;
+	optional_device<roc10937_t> m_vfd;
 	UINT8 m_a0_acia_dcd;
 	UINT8 m_a0_data_out;
 	UINT8 m_a0_data_in;
@@ -303,20 +307,47 @@ READ16_MEMBER(jpmsys5_state::mux_r)
 WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 {
 	device_t *device = machine().device("upd7759");
-	if (offset == 0)
+	switch (offset)
 	{
-		upd7759_port_w(device, 0, data & 0xff);
-		upd7759_start_w(device, 0);
-		upd7759_start_w(device, 1);
-	}
-	else if (offset == 2)
-	{
-		upd7759_reset_w(device, ~data & 0x4);
-		upd7759_set_bank_base(device, (data & 2) ? 0x20000 : 0);
-	}
-	else
-	{
-		logerror("%s: upd7759: Unknown write to %x with %x\n", machine().describe_context(),  offset, data);
+		case 0:
+		{
+			upd7759_port_w(device, 0, data & 0xff);
+			upd7759_start_w(device, 0);
+			upd7759_start_w(device, 1);
+			break;
+		}
+		case 1:
+		{
+			//Reset 0x04, data 0x02, clock 0x01
+			if(data & 0x04)
+			{
+				int alpha_data = (data & 0x02)?0:1;
+				if (m_alpha_clock != (data & 0x01))
+				{
+					if (!m_alpha_clock)//falling edge
+					{
+						m_vfd->shift_data(alpha_data);
+					}
+				}
+				m_alpha_clock = (data & 0x01);
+			}
+			else
+			{
+				m_vfd->reset();
+			}
+			break;
+		}
+		case 2:
+		{
+			upd7759_reset_w(device, ~data & 0x04);
+			upd7759_set_bank_base(device, (data & 2) ? 0x20000 : 0);
+			break;
+		}
+		default:
+		{
+			logerror("%s: upd7759: Unknown write to %x with %x\n", machine().describe_context(),  offset, data);
+			break;
+		}
 	}
 }
 
@@ -661,6 +692,8 @@ static MACHINE_RESET( jpmsys5v )
 	state->m_touch_state = IDLE;
 	state->m_a2_data_in = 1;
 	state->m_a2_acia_dcd = 0;
+	state->m_vfd->reset();
+
 }
 
 
@@ -679,6 +712,8 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_ACIA6850_ADD("acia6850_2", acia2_if)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)//for debug ports
 
 	MCFG_MACHINE_START(jpmsys5v)
 	MCFG_MACHINE_RESET(jpmsys5v)
@@ -809,6 +844,7 @@ static MACHINE_RESET( jpmsys5 )
 	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
 	state->m_a2_data_in = 1;
 	state->m_a2_acia_dcd = 0;
+	state->m_vfd->reset();
 }
 
 /*************************************
@@ -826,6 +862,7 @@ static MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_ACIA6850_ADD("acia6850_2", acia2_if)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	MCFG_MACHINE_START(jpmsys5)
 	MCFG_MACHINE_RESET(jpmsys5)

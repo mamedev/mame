@@ -117,7 +117,10 @@ class mpu3_state : public driver_device
 {
 public:
 	mpu3_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) { }
+	: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd")
+	{ }
+	optional_device<roc10937_t> m_vfd;
 
 
 int m_alpha_data_line;
@@ -213,7 +216,7 @@ static void mpu3_stepper_reset(running_machine &machine)
 static MACHINE_RESET( mpu3 )
 {
 	mpu3_state *state = machine.driver_data<mpu3_state>();
-	ROC10937_reset(0);	/* reset display1 */
+	state->m_vfd->reset();
 
 	mpu3_stepper_reset(machine);
 
@@ -622,16 +625,18 @@ READ8_MEMBER(mpu3_state::pia_ic6_portb_r)
 WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
 {
 	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data));
-	if ( data & 0x08 ) ROC10937_reset(0);
+	if ( data & 0x08 ) m_vfd->reset();
 
 	m_alpha_data_line = ((data & 0x20) >> 5);
-	if ( !m_alpha_clock && (data & 0x10) )
+	
+	if (m_alpha_clock != ((data & 0x10) >>4))
 	{
-		ROC10937_shift_data(0, m_alpha_data_line&0x01?0:1);
+		if (!m_alpha_clock)//falling edge
+		{
+			m_vfd->shift_data(m_alpha_data_line?1:0);
+		}
 	}
-	m_alpha_clock = (data & 0x10);
-
-	ROC10937_draw_16seg(0);
+	m_alpha_clock = (data & 0x10) >>4;
 }
 
 WRITE8_MEMBER(mpu3_state::pia_ic6_portb_w)
@@ -792,8 +797,6 @@ static MACHINE_START( mpu3 )
 	stepper_config(machine, 2, &mpu3_reel_interface);
 	stepper_config(machine, 3, &mpu3_reel_interface);
 
-	/* setup the standard oki MSC1937 display */
-	ROC10937_init(0, MSC1937,0);
 }
 /*
 Characteriser (CHR)
@@ -897,6 +900,8 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_MACHINE_RESET(mpu3)
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
+
+	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
 
 	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
 	MCFG_TIMER_ADD_PERIODIC("555_ic10",ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))

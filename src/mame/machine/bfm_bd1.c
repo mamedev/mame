@@ -113,9 +113,7 @@ void bfm_bd1_t::static_set_value(device_t &device, int val)
 
 void bfm_bd1_t::device_start()
 {
-	m_timer=timer_alloc(0);
-
-    save_item(NAME(m_cursor));
+	save_item(NAME(m_cursor));
     save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));		// display window start pos 0-15
 	save_item(NAME(m_window_end));		// display window end   pos 0-15
@@ -131,6 +129,7 @@ void bfm_bd1_t::device_start()
 	save_item(NAME(m_flash_control));
     save_item(NAME(m_chars));
     save_item(NAME(m_attrs));
+    save_item(NAME(m_outputs));
 	save_item(NAME(m_user_data));			// user defined character data (16 bit)
 	save_item(NAME(m_user_def));			// user defined character state
 
@@ -157,19 +156,13 @@ void bfm_bd1_t::device_reset()
 	m_user_def = 0;
 
     memset(m_chars, 0, sizeof(m_chars));
+    memset(m_outputs, 0, sizeof(m_outputs));
     memset(m_attrs, 0, sizeof(m_attrs));
-	m_timer->adjust(attotime::from_hz(clock()), 0);
 }
 
-void bfm_bd1_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+UINT16 bfm_bd1_t::set_display(UINT16 segin)
 {
-	update_display();
-	m_timer->adjust(attotime::from_hz(clock()), 0);
-}
-
-UINT32 bfm_bd1_t::set_display(UINT16 segin)
-{
-	UINT32 segout=0;
+	UINT16 segout=0;
 	if ( segin & 0x0004 )	segout |=  0x0001;
 	else    	            segout &= ~0x0001;
 	if ( segin & 0x0002 )	segout |=  0x0002;
@@ -214,13 +207,10 @@ void bfm_bd1_t::device_post_load()
 
 void bfm_bd1_t::update_display()
 {
-	m_outputs[m_cursor] = set_display(m_chars[m_cursor]);;
-	output_set_indexed_value("vfd", (m_port_val*16) + m_cursor, m_outputs[m_cursor]);
-
-	m_cursor++;
-	if (m_cursor >15)
+	for (int i =0; i<16; i++)
 	{
-		m_cursor=0;
+		m_outputs[i] = set_display(m_chars[i]);
+		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 ///////////////////////////////////////////////////////////////////////////
@@ -272,8 +262,10 @@ void bfm_bd1_t::blank(int data)
 		break;
 	}
 }
+
 int bfm_bd1_t::write_char(int data)
 {
+	update_display();
 	int change = 0;
 	if ( m_user_def )
 	{
@@ -289,6 +281,7 @@ int bfm_bd1_t::write_char(int data)
 
 		setdata( m_user_data, data);
 		change ++;
+
 	}
 	else
 	{

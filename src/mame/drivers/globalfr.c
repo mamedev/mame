@@ -7,6 +7,7 @@
   Motherboard contains very few major components
 
   Missing sound roms? (or is sound data in the program roms?)
+  NOTE: VFD is guessed as 16 segment, need to know more
 *******************************************************************************/
 
 
@@ -22,62 +23,62 @@ class globalfr_state : public driver_device
 public:
 	globalfr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-    { }
+		m_maincpu(*this, "maincpu"),
+		m_vfd(*this, "vfd")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<roc10937_t> m_vfd;
 
 // serial vfd
-	bool vfd_old_clock;
+	int m_alpha_clock;
+
+	DECLARE_WRITE16_MEMBER(vfd_w);
 
 };
 
 /******************************************************************************/
 
-static WRITE16_HANDLER(vfd_w)
+WRITE16_MEMBER(globalfr_state::vfd_w)
 {
-	globalfr_state *state = space->machine().driver_data<globalfr_state>();
 
-	bool clock = (data & 0x40) != 0;
-	int datline = (data & 0x80);
-
-	//Unlike MPU4, this uses positive transitions on both lines, so this may be a similar, but not identical component
-	// if the clock line changes
-	if ( clock != state->vfd_old_clock )
+//	if(!(data & 0x20)) need to find reset
 	{
-		if ( clock )//clock on rising edge
+		bool clock = (data & 0x40) != 0;
+		int datline = (data & 0x80);
+		if (m_alpha_clock != clock)
 		{
-			ROC10937_shift_data(0, datline?1:0);
+			if (!m_alpha_clock)
+			{
+				m_vfd->shift_data(datline?1:0);
+			}
 		}
+		m_alpha_clock = clock;
 	}
-	ROC10937_draw_16seg(0);
-	state->vfd_old_clock = clock;
+//	else
+//	{
+//		m_vfd->reset();
+//	}
 }
 
 static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 16, globalfr_state )
     AM_RANGE(0x002000, 0x002fff) AM_RAM
 	AM_RANGE(0x008000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x8000)
     AM_RANGE(0x0a0000, 0x0a01ff) AM_RAM
-	AM_RANGE(0x7e0040, 0x7e0041) AM_WRITE_LEGACY(vfd_w)
+	AM_RANGE(0x7e0040, 0x7e0041) AM_WRITE(vfd_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( globalfr )
 INPUT_PORTS_END
 
 
-static MACHINE_START( globalfr )
-{
-	//We assume this is a 16 seg display, but could be 14.
-	ROC10937_init(0, MSC1937,1);
-}
-
 /******************************************************************************/
 
 static MACHINE_CONFIG_START( globalfr, globalfr_state )
 	/* basic machine hardware */
-	MCFG_MACHINE_START(globalfr	)
 	MCFG_CPU_ADD("maincpu", M37710, 4000000)
 	MCFG_CPU_PROGRAM_MAP(globalfr_map)
+	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_DEFAULT_LAYOUT(layout_globalfr)
 MACHINE_CONFIG_END
 

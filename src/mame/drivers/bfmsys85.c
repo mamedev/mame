@@ -72,11 +72,14 @@ class bfmsys85_state : public driver_device
 {
 public:
 	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd")
+		{ }
+		
+	optional_device<roc10937_t> m_vfd;
 	int m_mmtr_latch;
 	int m_triac_latch;
-	int m_vfd_latch;
+	int m_alpha_clock;
 	int m_irq_status;
 	int m_optic_pattern;
 	int m_locked;
@@ -146,7 +149,7 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 static MACHINE_RESET( bfm_sys85 )
 {
 	bfmsys85_state *state = machine.driver_data<bfmsys85_state>();
-	state->m_vfd_latch         = 0;
+	state->m_alpha_clock       = 0;
 	state->m_mmtr_latch        = 0;
 	state->m_triac_latch       = 0;
 	state->m_irq_status        = 0;
@@ -156,7 +159,7 @@ static MACHINE_RESET( bfm_sys85 )
 	state->m_mux_input_strobe  = 0;
 	state->m_mux_input         = 0;
 
-	ROC10937_reset(0);	// reset display1
+	state->m_vfd->reset();	// reset display1
 
 // reset stepper motors ///////////////////////////////////////////////////
 	{
@@ -257,31 +260,23 @@ READ8_MEMBER(bfmsys85_state::mmtr_r)
 
 WRITE8_MEMBER(bfmsys85_state::vfd_w)
 {
-	int changed = m_vfd_latch ^ data;
-
-	m_vfd_latch = data;
-
-	if ( changed )
+	
+	if (data & VFD_RESET)//inverted?
 	{
-		if ( changed & VFD_RESET )
-		{ // vfd reset line changed
-			if ( !(data & VFD_RESET) )
-			{ // reset the vfd
-				ROC10937_reset(0);
-				ROC10937_reset(1);
-				ROC10937_reset(2);
+		if (m_alpha_clock != (data & VFD_CLOCK1))
+		{
+			if (m_alpha_clock)//rising edge
+			{
+				m_vfd->shift_data(data & VFD_DATA?1:0);
 			}
 		}
-
-		if ( changed & VFD_CLOCK1 )
-		{ // clock line changed
-			if ( !(data & VFD_CLOCK1) && (data & VFD_RESET) )
-			{ // new data clocked into vfd //////////////////////////////////////
-				ROC10937_shift_data(0, data & VFD_DATA );
-			}
-		}
-		ROC10937_draw_16seg(0);
+	m_alpha_clock = (data & VFD_CLOCK1);
 	}
+	else
+	{
+		m_vfd->reset();
+	}
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -380,8 +375,6 @@ static MACHINE_START( bfm_sys85 )
 		stepper_config(machine, i, &starpoint_interface_48step);
 	}
 
-	ROC10937_init(0,MSC1937,1);//?
-
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////
@@ -426,6 +419,7 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
+	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
 
