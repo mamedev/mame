@@ -91,7 +91,7 @@ INLINE void UPDATE_AR(tms32051_state *cpustate, int ar, int step)
 
 	if (cenb1 && ar == car1)
 	{
-		// update circular buffer 1
+		// update circular buffer 1, note that it only checks ==
 		if (cpustate->ar[ar] == cpustate->cber1)
 		{
 			cpustate->ar[ar] = cpustate->cbsr1;
@@ -103,7 +103,7 @@ INLINE void UPDATE_AR(tms32051_state *cpustate, int ar, int step)
 	}
 	else if (cenb2 && ar == car2)
 	{
-		// update circular buffer 2
+		// update circular buffer 2, note that it only checks ==
 		if (cpustate->ar[ar] == cpustate->cber2)
 		{
 			cpustate->ar[ar] = cpustate->cbsr2;
@@ -255,7 +255,7 @@ INLINE int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
 		}
 		case 2:		// TC = 0
 		{
-			return !cpustate->st1.tc;
+			return cpustate->st1.tc ^ 1;
 		}
 		case 3:		// always false
 		{
@@ -431,26 +431,22 @@ static void op_bsar(tms32051_state *cpustate)
 
 static void op_cmpl(tms32051_state *cpustate)
 {
-	cpustate->acc = ~cpustate->acc;
+	cpustate->acc = ~(UINT32)(cpustate->acc);
 
 	CYCLES(1);
 }
 
 static void op_crgt(tms32051_state *cpustate)
 {
-	if (cpustate->acc > cpustate->accb)
+	if (cpustate->acc >= cpustate->accb)
 	{
 		cpustate->accb = cpustate->acc;
 		cpustate->st1.c = 1;
 	}
-	else if (cpustate->acc < cpustate->accb)
+	else
 	{
 		cpustate->acc = cpustate->accb;
 		cpustate->st1.c = 0;
-	}
-	else
-	{
-		cpustate->st1.c = 1;
 	}
 
 	CYCLES(1);
@@ -458,19 +454,15 @@ static void op_crgt(tms32051_state *cpustate)
 
 static void op_crlt(tms32051_state *cpustate)
 {
-	if (cpustate->acc < cpustate->accb)
-	{
-		cpustate->accb = cpustate->acc;
-		cpustate->st1.c = 1;
-	}
-	else if (cpustate->acc > cpustate->accb)
+	if (cpustate->acc >= cpustate->accb)
 	{
 		cpustate->acc = cpustate->accb;
 		cpustate->st1.c = 0;
 	}
 	else
 	{
-		cpustate->st1.c = 0;
+		cpustate->accb = cpustate->acc;
+		cpustate->st1.c = 1;
 	}
 
 	CYCLES(1);
@@ -530,15 +522,7 @@ static void op_lacc_limm(tms32051_state *cpustate)
 static void op_lacc_s16_mem(tms32051_state *cpustate)
 {
 	UINT16 ea = GET_ADDRESS(cpustate);
-
-	if (cpustate->st1.sxm)
-	{
-		cpustate->acc = (INT32)(INT16)(DM_READ16(cpustate, ea)) << 16;
-	}
-	else
-	{
-		cpustate->acc = (UINT32)(DM_READ16(cpustate, ea)) << 16;
-	}
+	cpustate->acc = DM_READ16(cpustate, ea) << 16;
 
 	CYCLES(1);
 }
@@ -565,10 +549,9 @@ static void op_lact(tms32051_state *cpustate)
 
 static void op_lamm(tms32051_state *cpustate)
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	ea &= 0x7f;
-
+	UINT16 ea = GET_ADDRESS(cpustate) & 0x7f;
 	cpustate->acc = DM_READ16(cpustate, ea) & 0xffff;
+
 	CYCLES(1);
 }
 
@@ -1423,14 +1406,7 @@ static void op_cpl_imm(tms32051_state *cpustate)
 	UINT16 ea = GET_ADDRESS(cpustate);
 	UINT16 data = DM_READ16(cpustate, ea);
 
-	if (data == imm)
-	{
-		cpustate->st1.tc = 1;
-	}
-	else
-	{
-		cpustate->st1.tc = 0;
-	}
+	cpustate->st1.tc = (data == imm) ? 1 : 0;
 
 	CYCLES(1);
 }
@@ -1640,16 +1616,8 @@ static void op_bit(tms32051_state *cpustate)
 {
 	UINT16 ea = GET_ADDRESS(cpustate);
 	UINT16 data = DM_READ16(cpustate, ea);
-	int bit = 15 - ((cpustate->op >> 8) & 0xf);
 
-	if (data & (1 << bit))
-	{
-		cpustate->st1.tc = 1;
-	}
-	else
-	{
-		cpustate->st1.tc = 0;
-	}
+	cpustate->st1.tc = (data >> (~cpustate->op >> 8 & 0xf)) & 1;
 
 	CYCLES(1);
 }
@@ -1658,16 +1626,8 @@ static void op_bitt(tms32051_state *cpustate)
 {
 	UINT16 ea = GET_ADDRESS(cpustate);
 	UINT16 data = DM_READ16(cpustate, ea);
-	int bit = 15 - (cpustate->treg2 & 0xf);
 
-	if (data & (1 << bit))
-	{
-		cpustate->st1.tc = 1;
-	}
-	else
-	{
-		cpustate->st1.tc = 0;
-	}
+	cpustate->st1.tc = (data >> (~cpustate->treg2 & 0xf)) & 1;
 
 	CYCLES(1);
 }

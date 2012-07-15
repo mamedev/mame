@@ -27,9 +27,10 @@ class horse_state : public driver_device
 {
 public:
 	horse_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"){ }
+		m_color_ram(*this, "color_ram")
+	{ }
 
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_color_ram;
@@ -94,7 +95,6 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(horse_state::horse_input_r)
 {
-
 	switch (m_output >> 6 & 3)
 	{
 		case 0: return ioport("IN0")->read();
