@@ -204,6 +204,25 @@ static UINT16 GET_ADDRESS(tms32051_state *cpustate)
 
 INLINE int GET_ZLVC_CONDITION(tms32051_state *cpustate, int zlvc, int zlvc_mask)
 {
+	if (zlvc_mask & 0x2)		// OV-bit
+	{
+		if ((zlvc & 0x2) && cpustate->st0.ov)							// OV
+		{
+			// clear OV
+			cpustate->st0.ov = 0;
+
+			return 1;
+		}
+		else if ((zlvc & 0x2) == 0 && cpustate->st0.ov == 0)			// NOV
+			return 1;
+	}
+	if (zlvc_mask & 0x1)		// C-bit
+	{
+		if ((zlvc & 0x1) && cpustate->st1.c)							// C
+			return 1;
+		else if ((zlvc & 0x1) == 0 && cpustate->st1.c == 0)			// NC
+			return 1;
+	}
 	if (zlvc_mask & 0x8)		// Z-bit
 	{
 		if ((zlvc & 0x8) && (INT32)(cpustate->acc) == 0)				// EQ
@@ -216,20 +235,6 @@ INLINE int GET_ZLVC_CONDITION(tms32051_state *cpustate, int zlvc, int zlvc_mask)
 		if ((zlvc & 0x4) && (INT32)(cpustate->acc) < 0)				// LT
 			return 1;
 		else if ((zlvc & 0x4) == 0 && (INT32)(cpustate->acc) > 0)		// GT
-			return 1;
-	}
-	if (zlvc_mask & 0x2)		// OV-bit
-	{
-		if ((zlvc & 0x2) && cpustate->st0.ov)							// OV
-			return 1;
-		else if ((zlvc & 0x2) == 0 && cpustate->st0.ov == 0)			// NOV
-			return 1;
-	}
-	if (zlvc_mask & 0x1)		// C-bit
-	{
-		if ((zlvc & 0x1) && cpustate->st1.c)							// C
-			return 1;
-		else if ((zlvc & 0x1) == 0 && cpustate->st1.c == 0)			// NC
 			return 1;
 	}
 	return 0;
@@ -1038,7 +1043,7 @@ static void op_bcnd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
 
-	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
+	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
 	{
 		CHANGE_PC(cpustate, pma);
 		CYCLES(4);
@@ -1053,7 +1058,7 @@ static void op_bcndd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
 
-	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
+	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
 	{
 		delay_slot(cpustate, cpustate->pc);
 		CHANGE_PC(cpustate, pma);
@@ -1127,7 +1132,7 @@ static void op_ccd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
 
-	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
+	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
 	{
 		PUSH_STACK(cpustate, cpustate->pc+2);
 
@@ -1150,7 +1155,7 @@ static void op_nmi(tms32051_state *cpustate)
 
 static void op_retc(tms32051_state *cpustate)
 {
-	if ((cpustate->op & 0x3ff) == 0x300 || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
+	if ((cpustate->op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
 	{
 		UINT16 pc = POP_STACK(cpustate);
 		CHANGE_PC(cpustate, pc);
@@ -1164,7 +1169,7 @@ static void op_retc(tms32051_state *cpustate)
 
 static void op_retcd(tms32051_state *cpustate)
 {
-	if ((cpustate->op & 0x3ff) == 0x300 || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
+	if ((cpustate->op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
 	{
 		UINT16 pc = POP_STACK(cpustate);
 		delay_slot(cpustate, cpustate->pc);
@@ -1201,7 +1206,7 @@ static void op_trap(tms32051_state *cpustate)
 
 static void op_xc(tms32051_state *cpustate)
 {
-	if (GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3) || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf))
+	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
 	{
 		CYCLES(1);
 	}
