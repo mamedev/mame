@@ -1493,6 +1493,11 @@ static void op_lt(tms32051_state *cpustate)
 	UINT16 data = DM_READ16(cpustate, ea);
 
 	cpustate->treg0 = data;
+	if (cpustate->pmst.trm == 0)
+	{
+		cpustate->treg1 = data;
+		cpustate->treg2 = data;
+	}
 
 	CYCLES(1);
 }
@@ -1506,6 +1511,11 @@ static void op_lta(tms32051_state *cpustate)
 	cpustate->treg0 = data;
 	spreg = PREG_PSCALER(cpustate, cpustate->preg);
 	cpustate->acc = ADD(cpustate, cpustate->acc, spreg, 0);
+	if (cpustate->pmst.trm == 0)
+	{
+		cpustate->treg1 = data;
+		cpustate->treg2 = data;
+	}
 
 	CYCLES(1);
 }
