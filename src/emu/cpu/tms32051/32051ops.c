@@ -13,9 +13,12 @@ INLINE UINT16 POP_STACK(tms32051_state *cpustate)
 	return pc;
 }
 
-INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b, int shift16)
+INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b)
 {
 	UINT32 res = a - b;
+
+	// C is cleared if borrow was generated
+	cpustate->st1.c = (b > a) ? 0 : 1;
 
 	// check overflow
 	if ((a ^ b) & (a ^ res) & 0x80000000)
@@ -29,28 +32,16 @@ INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b, int shift16)
 		cpustate->st0.ov = 1;
 	}
 
-	// set carry
-	if (!shift16)
-	{
-		// C is cleared if borrow was generated
-		cpustate->st1.c = (b > a) ? 0 : 1;
-	}
-	else
-	{
-		// if 16-bit shift, C is cleared if borrow was generated, otherwise C is unaffected
-		if (b > a)
-		{
-			cpustate->st1.c = 0;
-		}
-	}
-
 	return (INT32)(res);
 }
 
-INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b, int shift16)
+INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b)
 {
 	UINT32 res = a + b;
 	
+	// C is set if carry was generated
+	cpustate->st1.c = (a > res) ? 1 : 0;
+
 	// check overflow
 	if ((a ^ res) & (b ^ res) & 0x80000000)
 	{
@@ -61,21 +52,6 @@ INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b, int shift16)
 
 		// set OV, this is a sticky flag
 		cpustate->st0.ov = 1;
-	}
-
-	// check carry
-	if (!shift16)
-	{
-		// C is set if carry was generated
-		cpustate->st1.c = (((UINT64)(a) + (UINT64)(b)) & U64(0x100000000)) ? 1 : 0;
-	}
-	else
-	{
-		// if 16-bit shift, C is set carry was generated, otherwise C is unaffected
-		if (((UINT64)(a) + (UINT64)(b)) & U64(0x100000000))
-		{
-			cpustate->st1.c = 1;
-		}
 	}
 
 	return (INT32)(res);
@@ -327,7 +303,7 @@ static void op_add_mem(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	cpustate->acc = ADD(cpustate, cpustate->acc, d, 0);
+	cpustate->acc = ADD(cpustate, cpustate->acc, d);
 
 	CYCLES(1);
 }
@@ -336,7 +312,7 @@ static void op_add_simm(tms32051_state *cpustate)
 {
 	UINT16 imm = cpustate->op & 0xff;
 
-	cpustate->acc = ADD(cpustate, cpustate->acc, imm, 0);
+	cpustate->acc = ADD(cpustate, cpustate->acc, imm);
 
 	CYCLES(1);
 }
@@ -356,7 +332,7 @@ static void op_add_limm(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	cpustate->acc = ADD(cpustate, cpustate->acc, d, 0);
+	cpustate->acc = ADD(cpustate, cpustate->acc, d);
 
 	CYCLES(2);
 }
@@ -368,7 +344,7 @@ static void op_add_s16_mem(tms32051_state *cpustate)
 
 static void op_addb(tms32051_state *cpustate)
 {
-	cpustate->acc = ADD(cpustate, cpustate->acc, cpustate->accb, 0);
+	cpustate->acc = ADD(cpustate, cpustate->acc, cpustate->accb);
 
 	CYCLES(1);
 }
@@ -683,7 +659,7 @@ static void op_satl(tms32051_state *cpustate)
 
 static void op_sbb(tms32051_state *cpustate)
 {
-	cpustate->acc = SUB(cpustate, cpustate->acc, cpustate->accb, 0);
+	cpustate->acc = SUB(cpustate, cpustate->acc, cpustate->accb);
 
 	CYCLES(1);
 }
@@ -750,7 +726,7 @@ static void op_sub_mem(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	cpustate->acc = SUB(cpustate, cpustate->acc, d, 0);
+	cpustate->acc = SUB(cpustate, cpustate->acc, d);
 
 	CYCLES(1);
 }
@@ -764,7 +740,7 @@ static void op_sub_simm(tms32051_state *cpustate)
 {
 	UINT16 imm = cpustate->op & 0xff;
 
-	cpustate->acc = SUB(cpustate, cpustate->acc, imm, 0);
+	cpustate->acc = SUB(cpustate, cpustate->acc, imm);
 
 	CYCLES(1);
 }
@@ -784,7 +760,7 @@ static void op_sub_limm(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	cpustate->acc = SUB(cpustate, cpustate->acc, d, 0);
+	cpustate->acc = SUB(cpustate, cpustate->acc, d);
 
 	CYCLES(2);
 }
@@ -1453,7 +1429,7 @@ static void op_xpl_imm(tms32051_state *cpustate)
 static void op_apac(tms32051_state *cpustate)
 {
 	INT32 spreg = PREG_PSCALER(cpustate, cpustate->preg);
-	cpustate->acc = ADD(cpustate, cpustate->acc, spreg, 0);
+	cpustate->acc = ADD(cpustate, cpustate->acc, spreg);
 
 	CYCLES(1);
 }
@@ -1486,7 +1462,7 @@ static void op_lta(tms32051_state *cpustate)
 
 	cpustate->treg0 = data;
 	spreg = PREG_PSCALER(cpustate, cpustate->preg);
-	cpustate->acc = ADD(cpustate, cpustate->acc, spreg, 0);
+	cpustate->acc = ADD(cpustate, cpustate->acc, spreg);
 	if (cpustate->pmst.trm == 0)
 	{
 		cpustate->treg1 = data;
