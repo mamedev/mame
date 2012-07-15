@@ -56,7 +56,7 @@ These are the specifications of the Axell AG-1 AX51102A, it should be very simil
 Drawing technique:               Sprite system
 Buffer drawing method:           Double frame buffer
 Configuration of the character:  Configured from 2 or more cells, a cell can be set in units of each dot a horizontal, vertical from 1 to 256 dots
-Maximum character size:          4096 ? 4096 dot
+Maximum character size:          4096 x 4096 dot
 Display the number of sprite:    Up to 127 sheets (register 2KB)
 Maximum drawing speed:           Dot sec / 2500-35000000 highest
 Color depth:                     32,768 colors (5 bits for each RGB)
@@ -66,7 +66,7 @@ Semi-transparent processing:     Gradation in the unit cell or 32 character
 Intensity modulation:            Gradation in the unit cell or 32 character
 Other Features:                  Rotation, DMA, BitBLT, Built-in flip
 Display resolution:              100 to 600 dots horizontal, 120 to 800 dots vertical
-Virtual screen size:             Up to 4096 ? 4096 dot
+Virtual screen size:             Up to 4096 x 4096 dot
 CGRAM space:                     4M-bit minimum, 32M-bit maximum
 Operating frequency:             Up to 76MHz
 Release:                         November 1999
