@@ -2529,10 +2529,9 @@ static void HC11OP(puly)(hc11_state *cpustate)
 /* ROLA             0x49 */
 static void HC11OP(rola)(hc11_state *cpustate)
 {
-	UINT8 c = (REG_A & 0x80);
 	UINT16 r = ((REG_A & 0x7f) << 1) | (cpustate->ccr & CC_C ? 1 : 0);
 	CLEAR_NZVC(cpustate);
-	cpustate->ccr |= (c & 0x80) ? CC_C : 0;
+	cpustate->ccr |= (REG_A & 0x80) ? CC_C : 0;
 	REG_A = (UINT8)(r);
 	SET_N8(REG_A);
 	SET_Z8(REG_A);
@@ -2549,10 +2548,9 @@ static void HC11OP(rola)(hc11_state *cpustate)
 /* ROLB             0x59 */
 static void HC11OP(rolb)(hc11_state *cpustate)
 {
-	UINT8 c = (REG_B & 0x80);
 	UINT16 r = ((REG_B & 0x7f) << 1) | (cpustate->ccr & CC_C ? 1 : 0);
 	CLEAR_NZVC(cpustate);
-	cpustate->ccr |= (c & 0x80) ? CC_C : 0;
+	cpustate->ccr |= (REG_B & 0x80) ? CC_C : 0;
 	REG_B = (UINT8)(r);
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
@@ -2636,10 +2634,9 @@ static void HC11OP(rol_indy)(hc11_state *cpustate)
 /* RORA             0x46 */
 static void HC11OP(rora)(hc11_state *cpustate)
 {
-	UINT8 c = (REG_A & 1);
 	UINT16 r = ((REG_A & 0x7f) >> 1) | (cpustate->ccr & CC_C ? 0x80 : 0);
 	CLEAR_NZVC(cpustate);
-	cpustate->ccr |= (c & 1) ? CC_C : 0;
+	cpustate->ccr |= (REG_A & 1) ? CC_C : 0;
 	REG_A = (UINT8)(r);
 	SET_N8(REG_A);
 	SET_Z8(REG_A);
@@ -2656,10 +2653,9 @@ static void HC11OP(rora)(hc11_state *cpustate)
 /* RORB             0x56 */
 static void HC11OP(rorb)(hc11_state *cpustate)
 {
-	UINT8 c = (REG_B & 1);
 	UINT16 r = ((REG_B & 0x7f) >> 1) | (cpustate->ccr & CC_C ? 0x80 : 0);
 	CLEAR_NZVC(cpustate);
-	cpustate->ccr |= (c & 1) ? CC_C : 0;
+	cpustate->ccr |= (REG_B & 1) ? CC_C : 0;
 	REG_B = (UINT8)(r);
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
