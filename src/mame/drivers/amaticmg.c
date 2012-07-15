@@ -618,8 +618,8 @@ static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8, amaticmg_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("attr")
-//	AM_RANGE(0xa010, 0xafff) AM_RAM AM_SHARE("vram")
-//	AM_RANGE(0xb010, 0xbfff) AM_RAM AM_SHARE("attr")
+//  AM_RANGE(0xa010, 0xafff) AM_RAM AM_SHARE("vram")
+//  AM_RANGE(0xb010, 0xbfff) AM_RAM AM_SHARE("attr")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 

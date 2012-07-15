@@ -612,7 +612,7 @@ INLINE UINT8 FETCH(i386_state *cpustate)
 #ifdef DEBUG_MISSING_OPCODE
 	cpustate->opcode_bytes[cpustate->opcode_bytes_length] = value;
 	cpustate->opcode_bytes_length = (cpustate->opcode_bytes_length + 1) & 15;
-#endif	
+#endif
 	cpustate->eip++;
 	cpustate->pc++;
 	return value;

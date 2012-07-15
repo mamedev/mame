@@ -1504,9 +1504,9 @@ ROM_END
     ebj_s9.1l           1ST AND 2ND HALF IDENTICAL
 
 
-	bp 364 do pc=367
-	irq0 comes from terminals, to communicate via the USART
-	0xb000 - 0xb003 are r/w during POST, unknown purpose
+    bp 364 do pc=367
+    irq0 comes from terminals, to communicate via the USART
+    0xb000 - 0xb003 are r/w during POST, unknown purpose
 
 */
 ROM_START( excitbj )

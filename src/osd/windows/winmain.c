@@ -165,7 +165,7 @@ public:
 
 	// force symbols to be cached
 	void cache_symbols() { scan_file_for_address(0, true); }
-	
+
 	void reset_cache() { m_cache.reset(); }
 private:
 	// internal helpers

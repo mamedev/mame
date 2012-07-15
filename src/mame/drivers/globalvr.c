@@ -153,6 +153,6 @@ GAME( 2000, bhead2ka,  0, globalvr, globalvr, 0, ROT0, "Gloval VR", "Beach Head 
 GAME( 2002, bhead2k2,  0, globalvr, globalvr, 0, ROT0, "Gloval VR", "Beach Head 2002 Install - 05/27/03", GAME_IS_SKELETON )
 GAME( 2003, bhead2k3,  0, globalvr, globalvr, 0, ROT0, "Gloval VR", "Beach Head 2003 Desert War Install - 05/27/03", GAME_IS_SKELETON )
 GAME( 2005, nfsug,     0, globalvr, globalvr, 0, ROT0, "Gloval VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", GAME_IS_SKELETON )
- 
+
 
  

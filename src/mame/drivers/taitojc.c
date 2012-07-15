@@ -820,23 +820,23 @@ READ8_MEMBER(taitojc_state::hc11_output_r)
 WRITE8_MEMBER(taitojc_state::hc11_output_w)
 {
 /*
-	cabinet lamps, active high
+    cabinet lamps, active high
 
-	dendego/dendego2:
-	d0: START
-	d1: DOOR
-	d2: JYOUYO (normal)
-	d3: HIJYOU (emergency)
-	d4: DENSEI (three-stage power)
-	d5: POP L
-	d6: POP R
-	d7: ------- (?)
+    dendego/dendego2:
+    d0: START
+    d1: DOOR
+    d2: JYOUYO (normal)
+    d3: HIJYOU (emergency)
+    d4: DENSEI (three-stage power)
+    d5: POP L
+    d6: POP R
+    d7: ------- (?)
 
-	landgear:
-	unused?
+    landgear:
+    unused?
 
-	sidebs/sidebs2:
-	?
+    sidebs/sidebs2:
+    ?
 */
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i, data >> i & 1);

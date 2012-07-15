@@ -13,13 +13,13 @@
 
   4e226
   2bfb8 <- 0x109a7c / 0x109a84 VRAM DATA ROM
-  	0x4e5f6
+    0x4e5f6
   0x4ef08
 
   0x10a1d4
 
-	...
-	0x55e42
+    ...
+    0x55e42
 
 */
 
@@ -107,7 +107,7 @@ WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
 	/* ---- x--- (related to OBJ ROM) */
 	/* ---- -x-- k056832 upper ROM bank */
 	/* ---- --x- k056832 related (enabled when testing ROM area) */
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 }
 
 static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
@@ -679,9 +679,9 @@ static DRIVER_INIT( kingtut )
 	kongambl_state *state = machine.driver_data<kongambl_state>();
 	UINT32 *rom = (UINT32*)state->memregion("maincpu")->base();
 
-//	rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
-//	rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
-//	rom[0x2acd0/4] = (rom[0x2acd0/4] & 0xffff) | 0x6612<<16; // patch OBJ ROM checks
+//  rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
+//  rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
+//  rom[0x2acd0/4] = (rom[0x2acd0/4] & 0xffff) | 0x6612<<16; // patch OBJ ROM checks
 	rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 

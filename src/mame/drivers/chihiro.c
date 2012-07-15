@@ -404,7 +404,7 @@ public:
 	int smbus_pic16lc(int command,int rw,int data);
 	int smbus_cx25871(int command,int rw,int data);
 	int smbus_eeprom(int command,int rw,int data);
-	
+
 	void vblank_callback(screen_device &screen, bool state);
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -439,8 +439,8 @@ most methods set parameters, others actually draw
 class nv2a_renderer : public poly_manager<float, nvidia_object_data, 5, 6000>
 {
 public:
-	nv2a_renderer(running_machine &machine)	: poly_manager<float, nvidia_object_data, 5, 6000>(machine) 
-	{ 
+	nv2a_renderer(running_machine &machine)	: poly_manager<float, nvidia_object_data, 5, 6000>(machine)
+	{
 		memset(channel,0,sizeof(channel));
 		memset(pfifo,0,sizeof(pfifo));
 		memset(pcrtc,0,sizeof(pcrtc));
@@ -920,29 +920,29 @@ void nv2a_renderer::geforce_read_dma_object(UINT32 handle,UINT32 &offset,UINT32 
 
 /*void myline(bitmap_rgb32 &bmp,float x1,float y1,float x2,float y2)
 {
-	int xx1,yy1,xx2,yy2;
+    int xx1,yy1,xx2,yy2;
 
-	xx1=x1;
-	xx2=x2;
-	yy1=y1;
-	yy2=y2;
-	if (xx1 == xx2) {
-		if (yy1 > yy2) {
-			int t=yy1;
-			yy1=yy2;
-			yy2=t;
-		}
-		for (int y=yy1;y <= yy2;y++)
-			*((UINT32 *)bmp.raw_pixptr(y,xx1))= -1;
-	} else if (yy1 == yy2) {
-		if (xx1 > xx2) {
-			int t=xx1;
-			xx1=xx2;
-			xx2=t;
-		}
-		for (int x=xx1;x <= xx2;x++)
-			*((UINT32 *)bmp.raw_pixptr(yy1,x))= -1;
-	}
+    xx1=x1;
+    xx2=x2;
+    yy1=y1;
+    yy2=y2;
+    if (xx1 == xx2) {
+        if (yy1 > yy2) {
+            int t=yy1;
+            yy1=yy2;
+            yy2=t;
+        }
+        for (int y=yy1;y <= yy2;y++)
+            *((UINT32 *)bmp.raw_pixptr(y,xx1))= -1;
+    } else if (yy1 == yy2) {
+        if (xx1 > xx2) {
+            int t=xx1;
+            xx1=xx2;
+            xx2=t;
+        }
+        for (int x=xx1;x <= xx2;x++)
+            *((UINT32 *)bmp.raw_pixptr(yy1,x))= -1;
+    }
 }*/
 
 void nv2a_renderer::render_tex(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
@@ -1018,12 +1018,12 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 		texture.dilate=dilatechose[(basesizeu << 4)+basesizev];
 		texture.buffer=space.get_read_ptr(offset);
 		/*if (dma0 != 0) {
-			dmahand=channel[channel][subchannel].object.method[0x184/4];
-			geforce_read_dma_object(dmahand,dmaoff,smasiz);
-		} else if (dma1 != 0) {
-			dmahand=channel[channel][subchannel].object.method[0x188/4];
-			geforce_read_dma_object(dmahand,dmaoff,smasiz);
-		}*/
+            dmahand=channel[channel][subchannel].object.method[0x184/4];
+            geforce_read_dma_object(dmahand,dmaoff,smasiz);
+        } else if (dma1 != 0) {
+            dmahand=channel[channel][subchannel].object.method[0x188/4];
+            geforce_read_dma_object(dmahand,dmaoff,smasiz);
+        }*/
 	}
 	if (method*4 == 0x1810) {
 		// draw vertices
@@ -1061,9 +1061,9 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				float z[4],w[4];
 				UINT32 c[4];
 				/*float u[4],v[4];
-				int   xi,yi,xf,yf,dx,dy,xp,yp,up,vp;
-				float ui,vi,uf,vf,du,dv;
-				rectangle clip(0,0,639,479);*/
+                int   xi,yi,xf,yf,dx,dy,xp,yp,up,vp;
+                float ui,vi,uf,vf,du,dv;
+                rectangle clip(0,0,639,479);*/
 				render_delegate rend;
 
 				for (m=0;m < 4;m++) {
@@ -1080,14 +1080,14 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 						*((UINT32 *)(&xy[m].p[4]))=space.read_dword(vtxbuf_address[9]+(n+m+offset)*vtxbuf_stride[9]+4);
 					}
 				}
-				
+
 				rend=render_delegate(FUNC(nv2a_renderer::render_tex),this);
 				render_polygon<4>(fb.cliprect(),rend,3+texture.enabled*2,xy);
 				wait();
 				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
-				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
-				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
-				myline(fb,xy[3].x,xy[3].y,xy[0].x,xy[0].y);*/
+                myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
+                myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
+                myline(fb,xy[3].x,xy[3].y,xy[0].x,xy[0].y);*/
 				//printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r",x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2],x[3],y[3],z[3]);
 			}
 		} else {
@@ -1096,7 +1096,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 	}
 }
 
-void nv2a_renderer::vblank_callback(screen_device &screen, bool state) 
+void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 {
 	chihiro_state *chst=screen.machine().driver_data<chihiro_state>();
 
@@ -1125,7 +1125,7 @@ UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-void chihiro_state::vblank_callback(screen_device &screen, bool state) 
+void chihiro_state::vblank_callback(screen_device &screen, bool state)
 {
 	nvidia_nv2a->vblank_callback(screen,state);
 }
@@ -1222,7 +1222,7 @@ WRITE32_MEMBER( nv2a_renderer::geforce_w )
 				cmd=space.read_dword(*dmaget);
 				*dmaget += 4;
 				cmdtype=geforce_commandkind(cmd);
-				switch (cmdtype) 
+				switch (cmdtype)
 				{
 					case 6: // jump
 						printf("jump dmaget %08X",*dmaget);

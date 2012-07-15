@@ -67,11 +67,11 @@ static casserr_t sc3000_bit_load(cassette_image *cassette)
 		case '1':
 			MODULATE(1);
 			break;
-	
+
 		case '0':
 			MODULATE(0);
 			break;
-	
+
 		case ' ':
 			err = cassette_put_sample( cassette, 0, time_index, 1/1200.0, 0);
 			if (err) return err;

@@ -25,11 +25,11 @@
         * Proper VR4373 implementation
         * Proper PCI bus implementation
         * PCI peripherals
- 
+
     NOTES:
         * Skins Game is Linux based; the kernel is a customized 2.2.10 build of Linux-MIPS with Midway PCBs
           added as recognized system types
- 
+
 ***************************************************************************/
 
 #include "emu.h"

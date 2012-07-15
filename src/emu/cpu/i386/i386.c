@@ -8,11 +8,11 @@
         Intel 486
         Intel Pentium
         Cyrix MediaGX
-		Intel Pentium MMX
-		Intel Pentium Pro
-		Intel Pentium II
-		Intel Pentium III
-		Intel Pentium 4
+        Intel Pentium MMX
+        Intel Pentium Pro
+        Intel Pentium II
+        Intel Pentium III
+        Intel Pentium 4
 */
 
 #include "emu.h"

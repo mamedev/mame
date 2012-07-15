@@ -373,7 +373,7 @@ SCREEN_UPDATE_IND16( taitojc )
 SCREEN_UPDATE_IND16( dendego )
 {
 	taitojc_state *state = screen.machine().driver_data<taitojc_state>();
-	
+
 	// update controller state in artwork
 	UINT8 btn = (state->ioport("BUTTONS")->read() & 0x77);
 	int level;

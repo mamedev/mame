@@ -82,7 +82,7 @@
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
-	
+
 	<element name="counter_throttle" defstate="0">
     	<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
