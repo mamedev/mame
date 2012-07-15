@@ -470,7 +470,7 @@ static INPUT_PORTS_START( topgun )
 	PORT_DIPNAME( 0x08, 0x00, "Lives per Coin" )		PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(	0x00, "3 - 12 Max" )
 	PORT_DIPSETTING(	0x08, "2 - 9 Max" )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus" )			PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(	0x00, "30k and Every 50k" )
 	PORT_DIPSETTING(	0x20, "50k and Every 100k" )
 	PORT_DIPSETTING(	0x10, "100k and Every 150k" )
@@ -529,21 +529,21 @@ static INPUT_PORTS_START( golf )
 	PORT_DIPSETTING(	0x00, "Large" )
 	PORT_DIPSETTING(	0x08, "Small" )
 	PORT_DIPNAME( 0x10, 0x00, "Points per Stroke" )		PORT_DIPLOCATION("SW1:!5")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easier ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Harder ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Easier ) ) /* See table below for "OFF" setting */
+	PORT_DIPSETTING(	0x10, DEF_STR( Harder ) ) /* See table below for "ON" setting */
 /*
-Stroke Play OFF/ON
-Hole in 1   +5  +4
-Double Eagle    +4  +3
-Eagle       +3  +2
-Birdie      +2  +1
-Par     +1   0
-Bogey        0  -1
-Other        0  -2
+Stroke Play   OFF/ON
+Hole in 1     +5  +4
+Double Eagle  +4  +3
+Eagle         +3  +2
+Birdie        +2  +1
+Par           +1   0
+Bogey          0  -1
+Other          0  -2 (IE: Double Bogey and Over)
 
 Match Play  OFF/ON
 Win Hole    +1  +2
-Tie      0   0
+Tie          0   0
 Lose Hole   -1  -2
 */
 	PORT_DIPNAME( 0x60, 0x00, "Starting Points" )		PORT_DIPLOCATION("SW1:!6,7")
@@ -625,12 +625,24 @@ static INPUT_PORTS_START( wrecking )
 	PORT_DIPSETTING(	0x02, "4" )
 	PORT_DIPSETTING(	0x01, "5" )
 	PORT_DIPSETTING(	0x03, "6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
+	PORT_DIPNAME( 0x1c, 0x18, "1st Bonus Life" )		PORT_DIPLOCATION("SW1:!3,!4,!5,")
+	PORT_DIPSETTING(	0x00, "20,000 Pts" )
+	PORT_DIPSETTING(	0x10, "30,000 Pts" )
+	PORT_DIPSETTING(	0x08, "40,000 Pts" )
+	PORT_DIPSETTING(	0x18, "50,000 Pts" )
+	PORT_DIPSETTING(	0x04, "70,000 Pts" )
+	PORT_DIPSETTING(	0x14, "80,000 Pts" )
+	PORT_DIPSETTING(	0x0c, "100,000 Pts" )
+	PORT_DIPSETTING(	0x1c, DEF_STR( None ) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Additional Bonus Lives" )	PORT_DIPLOCATION("SW1:!6,!7,!8") /* Manual shows NONE as Factory Shipment Setting */
+	PORT_DIPSETTING(	0x00, "20,000 Pts" )
+	PORT_DIPSETTING(	0x80, "30,000 Pts" )
+	PORT_DIPSETTING(	0x40, "40,000 Pts" )
+	PORT_DIPSETTING(	0xc0, "50,000 Pts" )
+	PORT_DIPSETTING(	0x20, "70,000 Pts" )
+	PORT_DIPSETTING(	0x60, "80,000 Pts" )
+	PORT_DIPSETTING(	0xa0, "100,000 Pts" )
+	PORT_DIPSETTING(	0xe0, DEF_STR( None ) )
 
 	PORT_START("DSW1")	/* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:!1,!2,!3")
@@ -642,11 +654,16 @@ static INPUT_PORTS_START( wrecking )
 	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:!4,!5")
+	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(	0x18, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x20, 0x00, "Copyright" )			PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPSETTING(	0x00, DEF_STR( Japan ) )	/* (c) Nintendo Co., Ltd. */
+	PORT_DIPSETTING(	0x20, DEF_STR( USA ) )		/* (c) Nintendo of America Inc. */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )		/* Manual states this is Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )		/* Manual states this is Unused */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( balonfgt )
@@ -662,10 +679,10 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(	0x07, DEF_STR( Free_Play ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW1:!4" )		/* Manual states this is Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )		/* Manual states this is Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:!6" )		/* Manual states this is Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:!7" )		/* Manual states this is Unused */
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )			PORT_DIPLOCATION("SW1:!8")
 
 	PORT_START("DSW1")	/* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
@@ -674,12 +691,20 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPSETTING(	0x02, "4" )
 	PORT_DIPSETTING(	0x01, "5" )
 	PORT_DIPSETTING(	0x03, "6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:!3,!4")
+	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Medium ) )
+	PORT_DIPSETTING(	0x0c, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x10, 0x00, "Enemy Regeneration" )	PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPSETTING(	0x00, DEF_STR( Low ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( High ) )
+	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!6,!7")
+	PORT_DIPSETTING(	0x60, "10,000 Pts" )
+	PORT_DIPSETTING(	0x20, "20,000 Pts" )
+	PORT_DIPSETTING(	0x40, "40,000 Pts" )
+	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )		/* Manual states this is Unused */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmahjng )
@@ -1052,10 +1077,10 @@ static INPUT_PORTS_START( excitebk )
 	PORT_DIPSETTING(	0x10, "Every 100k" )
 	PORT_DIPSETTING(	0x08, "100k Only" )
 	PORT_DIPSETTING(	0x18, DEF_STR( None ) )
-	PORT_DIPNAME( 0x20, 0x00, "1st Half Qualifying Time" )	PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, "1st Half Qualifying Time" )	PORT_DIPLOCATION("SW1:!6") /* Manual calls this "Time/Challenge" */
 	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, "2nd Half Qualifying Time" )	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, "2nd Half Qualifying Time" )	PORT_DIPLOCATION("SW1:!7") /* Manual calls this "Time/Excitebike" */
 	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Hard ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
