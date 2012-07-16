@@ -183,45 +183,10 @@ void rocvfd_t::device_reset()
 ///////////////////////////////////////////////////////////////////////////
 UINT32 rocvfd_t::set_display(UINT32 segin)
 {
-	UINT32 segout=0;
-	if ( segin & 0x0001 )	segout |=  0x0001;
-	else    	            segout &= ~0x0001;
-	if ( segin & 0x0002 )	segout |=  0x0002;
-	else        	        segout &= ~0x0002;
-	if ( segin & 0x0004 )	segout |=  0x0004;
-	else            	    segout &= ~0x0004;
-	if ( segin & 0x0008 )	segout |=  0x0008;
-	else                	segout &= ~0x0008;
-	if ( segin & 0x0010 )	segout |=  0x0010;
-	else                    segout &= ~0x0010;
-	if ( segin & 0x0020 )	segout |=  0x0020;
-	else                    segout &= ~0x0020;
-	if ( segin & 0x0040 )	segout |=  0x0040;
-	else                    segout &= ~0x0040;
-	if ( segin & 0x0080 )	segout |=  0x0080;
-	else                	segout &= ~0x0080;
-	if ( segin & 0x4000 )	segout |=  0x0100;
-	else        		    segout &= ~0x0100;
-	if ( segin & 0x0400 )	segout |=  0x0200;
-	else                    segout &= ~0x0200;
-	if ( segin & 0x0100 )	segout |=  0x0400;
-	else                    segout &= ~0x0400;
-	if ( segin & 0x1000 )	segout |=  0x0800;
-	else                    segout &= ~0x0800;
-	if ( segin & 0x2000 )	segout |=  0x1000;
-	else                    segout &= ~0x1000;
-	if ( segin & 0x8000 )	segout |=  0x2000;
-	else                    segout &= ~0x2000;
-	if ( segin & 0x0200 )	segout |=  0x4000;
-	else                    segout &= ~0x4000;
-	if ( segin & 0x0800 )	segout |=  0x8000;
-	else                    segout &= ~0x8000;
-	if ( segin & 0x10000 )	segout |=  0x10000;
-	else                    segout &= ~0x10000;
-	if ( segin & 0x20000 )	segout |=  0x20000;
-	else                    segout &= ~0x20000;
+	                          
+	
+	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 
-	return segout;
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -162,39 +162,7 @@ void bfm_bd1_t::device_reset()
 
 UINT16 bfm_bd1_t::set_display(UINT16 segin)
 {
-	UINT16 segout=0;
-	if ( segin & 0x0004 )	segout |=  0x0001;
-	else    	            segout &= ~0x0001;
-	if ( segin & 0x0002 )	segout |=  0x0002;
-	else        	        segout &= ~0x0002;
-	if ( segin & 0x0020 )	segout |=  0x0004;
-	else            	    segout &= ~0x0004;
-	if ( segin & 0x0200 )	segout |=  0x0008;
-	else                	segout &= ~0x0008;
-	if ( segin & 0x2000 )	segout |=  0x0010;
-	else                    segout &= ~0x0010;
-	if ( segin & 0x0001 )	segout |=  0x0020;
-	else                    segout &= ~0x0020;
-	if ( segin & 0x8000 )	segout |=  0x0040;
-	else                    segout &= ~0x0040;
-	if ( segin & 0x4000 )	segout |=  0x0080;
-	else                	segout &= ~0x0080;
-	if ( segin & 0x0008 )	segout |=  0x0100;
-	else        		    segout &= ~0x0100;
-	if ( segin & 0x0400 )	segout |=  0x0200;
-	else                    segout &= ~0x0200;
-	if ( segin & 0x0010 )	segout |=  0x0400;
-	else                    segout &= ~0x0400;
-	if ( segin & 0x0040 )	segout |=  0x0800;
-	else                    segout &= ~0x0800;
-	if ( segin & 0x0080 )	segout |=  0x1000;
-	else                    segout &= ~0x1000;
-	if ( segin & 0x0800 )	segout |=  0x2000;
-	else                    segout &= ~0x2000;
-	if ( segin & 0x1000 )	segout |=  0x4000;
-	else                    segout &= ~0x4000;
-
-	return segout;
+	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
 void bfm_bd1_t::device_post_load()
@@ -265,7 +233,6 @@ void bfm_bd1_t::blank(int data)
 
 int bfm_bd1_t::write_char(int data)
 {
-	update_display();
 	int change = 0;
 	if ( m_user_def )
 	{
@@ -414,6 +381,9 @@ int bfm_bd1_t::write_char(int data)
 			}
 		}
 	}
+	update_display();
+
+
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////////////
