@@ -780,8 +780,7 @@ static void HC11OP(bclr_indx)(hc11_state *cpustate)
 {
 	UINT8 offset = FETCH(cpustate);
 	UINT8 mask = FETCH(cpustate);
-	UINT8 r = READ8(cpustate, cpustate->ix + offset);
-	r = r & ~mask;
+	UINT8 r = READ8(cpustate, cpustate->ix + offset) & ~mask;
 	WRITE8(cpustate, cpustate->ix + offset, r);
 	CLEAR_NZV(cpustate);
 	SET_N8(r);
@@ -901,7 +900,7 @@ static void HC11OP(brclr_dir)(hc11_state *cpustate)
 	INT8 rel = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, d);
 
-	if(!(i & mask))
+	if ((i & mask) == 0)
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 4);
 	}
@@ -918,7 +917,7 @@ static void HC11OP(brclr_indx)(hc11_state *cpustate)
 	INT8 rel = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->ix + offset);
 
-	if(!(i & mask))
+	if ((i & mask) == 0)
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 4);
 	}
@@ -951,7 +950,7 @@ static void HC11OP(brset_indx)(hc11_state *cpustate)
 	INT8 rel = FETCH(cpustate);
 	UINT8 i = READ8(cpustate, cpustate->ix + offset);
 
-	if(i & mask)
+	if ((~i & mask) == 0)
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 4);
 	}
@@ -973,8 +972,7 @@ static void HC11OP(bset_indx)(hc11_state *cpustate)
 {
 	UINT8 offset = FETCH(cpustate);
 	UINT8 mask = FETCH(cpustate);
-	UINT8 r = READ8(cpustate, cpustate->ix + offset);
-	r = (r & ~mask) | mask;
+	UINT8 r = READ8(cpustate, cpustate->ix + offset) | mask;
 	WRITE8(cpustate, cpustate->ix + offset, r);
 	CLEAR_NZV(cpustate);
 	SET_N8(r);
