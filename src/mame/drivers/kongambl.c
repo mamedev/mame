@@ -29,13 +29,17 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 
+#define CUSTOM_DRAW 1
 
 class kongambl_state : public konamigx_state
 {
 public:
 	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: konamigx_state(mconfig, type, tag) { }
+		: konamigx_state(mconfig, type, tag),
+		m_vram(*this, "vram")
+		{ }
 
+	optional_shared_ptr<UINT8> m_vram;
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
@@ -44,6 +48,9 @@ public:
 
 static VIDEO_START(kongambl)
 {
+	#if CUSTOM_DRAW
+
+	#else
 	device_t *k056832 = machine.device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
@@ -51,10 +58,13 @@ static VIDEO_START(kongambl)
 	k056832_set_layer_offs(k056832, 1,  2, 0);
 	k056832_set_layer_offs(k056832, 2,  4, 0);
 	k056832_set_layer_offs(k056832, 3,  6, 0);
+	#endif
 }
 
 static SCREEN_UPDATE_IND16(kongambl)
 {
+	#if CUSTOM_DRAW
+	#else
 	device_t *k056832 = screen.machine().device("k056832");
 
 	bitmap.fill(0, cliprect);
@@ -64,6 +74,7 @@ static SCREEN_UPDATE_IND16(kongambl)
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
+	#endif
 	return 0;
 }
 
@@ -120,15 +131,19 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
+	#if CUSTOM_DRAW
+	AM_RANGE(0x400000, 0x401fff) AM_ROM AM_REGION("gfx1",0)
+	AM_RANGE(0x420000, 0x43ffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x480000, 0x48003f) AM_RAM // vregs
+	#else
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_long_r)
-
 	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE_LEGACY("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
+	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
+	#endif
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
 	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
-
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 
 	AM_RANGE(0x4b001c, 0x4b001f) AM_WRITENOP
 
@@ -483,10 +498,29 @@ static void kongambl_sprite_callback( running_machine &machine, int *code, int *
 {
 }
 
+#if !CUSTOM_DRAW
 static void kongambl_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
 }
+#endif
 
+#if CUSTOM_DRAW
+static const gfx_layout charlayout8_tasman =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,8,16,24,32,40,48,56 },
+	{ 0,1,2,3,4,5,6,7 },	// bit order probably not exact - note ramp in first 16 tiles
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
+	8*64
+};
+
+static GFXDECODE_START( tasman )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/256 )
+GFXDECODE_END
+
+#else
 static const k056832_interface k056832_intf =
 {
 	"gfx1", 0,
@@ -495,6 +529,7 @@ static const k056832_interface k056832_intf =
 	KONAMI_ROM_DEINTERLEAVE_NONE,
 	kongambl_tile_callback, "none"
 };
+#endif
 
 static const k053247_interface k053247_intf =
 {
@@ -541,7 +576,11 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_VIDEO_START(kongambl)
 
 	MCFG_K053247_ADD("k053246", k053247_intf)
+	#if CUSTOM_DRAW
+	MCFG_GFXDECODE(tasman)
+	#else
 	MCFG_K056832_ADD("k056832", k056832_intf)
+	#endif
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
