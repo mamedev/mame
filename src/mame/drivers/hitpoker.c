@@ -199,7 +199,7 @@ READ8_MEMBER(hitpoker_state::eeprom_r)
 {
 	m_tmp = m_eeprom_data[m_eeprom_index];
 	if((m_eeprom_index & 0x1f) == 0x1f)
-		m_tmp = 0xaa;
+		m_tmp = 1;
 	//printf("%02x\n",m_eeprom_index);
 	m_eeprom_index++;
 	//m_eeprom_index&=0x1f;
