@@ -646,6 +646,24 @@ static INPUT_PORTS_START( cbdash )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cfishing )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )						PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )					PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
+	PORT_DIPSETTING(    0x06, "10000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x02, "30000" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )					PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
+	/* Switches 5, 6, 7 & 8 are listed as "Not Used" and "Don't Change" */
+INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -1707,7 +1725,7 @@ static DRIVER_INIT( cdsteljn )
 /* 23 */ // 1982.?? 18 Hole Pro Golf
 /* 24 */ // 1982.07 Tsumego Kaisyou
 /* 25 */ // 1982.10 Angler Dangler? (fishing)
-/* 25 */ GAME( 1982, cfishing,  decocass, cfishing, decocass, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette)", 0 )
+/* 25 */ GAME( 1982, cfishing,  decocass, cfishing, cfishing, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette)", 0 )
 /* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette)", 0 )
          GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette, Japan)", 0 )
 /* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )
