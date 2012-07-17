@@ -102,7 +102,6 @@ enum
 
 WRITE16_MEMBER(micro3d_state::micro3d_ti_uart_w)
 {
-
 	switch (offset)
 	{
 		case 0x0:
@@ -159,7 +158,6 @@ WRITE16_MEMBER(micro3d_state::micro3d_ti_uart_w)
 
 READ16_MEMBER(micro3d_state::micro3d_ti_uart_r)
 {
-
 	switch (offset)
 	{
 		case 0x0:
@@ -271,20 +269,17 @@ static TIMER_CALLBACK( mac_done_callback )
 
 WRITE32_MEMBER(micro3d_state::micro3d_mac1_w)
 {
-
 	m_vtx_addr = (data & 0x3ffff);
 	m_sram_w_addr = (data >> 18) & 0xfff;
 }
 
 READ32_MEMBER(micro3d_state::micro3d_mac2_r)
 {
-
 	return (m_mac_inst << 1) | m_mac_stat;
 }
 
 WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 {
-
 	UINT32 cnt = data & 0xff;
 	UINT32 inst = (data >> 8) & 0x1f;
 	UINT32 mac_cycles = 1;
@@ -521,7 +516,6 @@ static TIMER_CALLBACK( adc_done_callback )
 
 READ16_MEMBER(micro3d_state::micro3d_adc_r)
 {
-
 	return m_adc_val;
 }
 
@@ -537,23 +531,20 @@ WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
 	machine().scheduler().timer_set(attotime::from_usec(40), FUNC(adc_done_callback), data & ~4);
 }
 
-CUSTOM_INPUT_MEMBER(micro3d_state::botssa_hwchk_r)
+CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
 {
-
-	return m_botssa_latch;
+	return m_botss_latch;
 }
 
-READ16_MEMBER(micro3d_state::botssa_140000_r)
+READ16_MEMBER(micro3d_state::botss_140000_r)
 {
-
-	m_botssa_latch = 0;
+	m_botss_latch = 0;
 	return 0xffff;
 }
 
-READ16_MEMBER(micro3d_state::botssa_180000_r)
+READ16_MEMBER(micro3d_state::botss_180000_r)
 {
-
-	m_botssa_latch = 1;
+	m_botss_latch = 1;
 	return 0xffff;
 }
 
@@ -586,14 +577,12 @@ WRITE16_MEMBER(micro3d_state::host_drmath_int_w)
 
 WRITE32_MEMBER(micro3d_state::micro3d_shared_w)
 {
-
 	m_shared_ram[offset * 2 + 1] = data & 0xffff;
 	m_shared_ram[offset * 2 + 0] = data >> 16;
 }
 
 READ32_MEMBER(micro3d_state::micro3d_shared_r)
 {
-
 	return (m_shared_ram[offset * 2] << 16) | m_shared_ram[offset * 2 + 1];
 }
 
@@ -634,14 +623,14 @@ DRIVER_INIT( micro3d )
 	machine.device("maincpu")->set_clock_scale(0.945f);
 }
 
-DRIVER_INIT( botssa )
+DRIVER_INIT( botss )
 {
 	micro3d_state *state = machine.driver_data<micro3d_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
-	space->install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botssa_140000_r),state));
-	space->install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botssa_180000_r),state));
+	space->install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),state));
+	space->install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),state));
 
 	DRIVER_INIT_CALL(micro3d);
 }

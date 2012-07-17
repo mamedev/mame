@@ -382,7 +382,6 @@ WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
 
 WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 {
-
 	m_sound_port_latch[offset] = data;
 
 	switch (offset)
@@ -404,7 +403,6 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 
 READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 {
-
 	switch (offset)
 	{
 		case 0x01:	return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();

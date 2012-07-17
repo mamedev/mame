@@ -118,7 +118,6 @@ WRITE16_MEMBER(micro3d_state::micro3d_clut_w)
 
 WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
 {
-
 	if (~data & 0x80)
 		cputag_set_input_line(machine(), "vgb", 0, CLEAR_LINE);
 
@@ -127,7 +126,6 @@ WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
 
 WRITE16_MEMBER(micro3d_state::micro3d_xfer3dk_w)
 {
-
 	m_xfer3dk = data;
 }
 
@@ -747,13 +745,11 @@ WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 
 WRITE32_MEMBER(micro3d_state::micro3d_alt_fifo_w)
 {
-
 	m_vtx_fifo[m_fifo_idx++] = VTX_SEX(data);
 }
 
 READ32_MEMBER(micro3d_state::micro3d_pipe_r)
 {
-
 	cputag_set_input_line(machine(), "drmath", AM29000_INTR1, CLEAR_LINE);
 	return m_pipe_data;
 }

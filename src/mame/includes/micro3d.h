@@ -16,10 +16,11 @@ class micro3d_state : public driver_device
 {
 public:
 	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
-		m_micro3d_sprite_vram(*this, "sprite_vram"){ }
+		m_micro3d_sprite_vram(*this, "sprite_vram")
+	{ }
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	device_t			*m_duart68681;
@@ -38,7 +39,7 @@ public:
 	UINT8				m_adc_val;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	UINT8				m_botssa_latch;
+	UINT8				m_botss_latch;
 
 	/* MAC */
 	required_shared_ptr<UINT32> m_mac_sram;
@@ -75,6 +76,7 @@ public:
 	UINT16				*m_tmp_buffer;
 	int					m_drawing_buffer;
 	int					m_display_buffer;
+
 	DECLARE_WRITE16_MEMBER(micro3d_ti_uart_w);
 	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
 	DECLARE_WRITE32_MEMBER(micro3d_scc_w);
@@ -88,8 +90,8 @@ public:
 	DECLARE_READ16_MEMBER(micro3d_encoder_l_r);
 	DECLARE_READ16_MEMBER(micro3d_adc_r);
 	DECLARE_WRITE16_MEMBER(micro3d_adc_w);
-	DECLARE_READ16_MEMBER(botssa_140000_r);
-	DECLARE_READ16_MEMBER(botssa_180000_r);
+	DECLARE_READ16_MEMBER(botss_140000_r);
+	DECLARE_READ16_MEMBER(botss_180000_r);
 	DECLARE_WRITE16_MEMBER(micro3d_reset_w);
 	DECLARE_WRITE16_MEMBER(host_drmath_int_w);
 	DECLARE_WRITE32_MEMBER(micro3d_shared_w);
@@ -102,7 +104,7 @@ public:
 	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
 	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
 	DECLARE_READ32_MEMBER(micro3d_pipe_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(botssa_hwchk_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
@@ -117,12 +119,6 @@ typedef struct _micro3d_vtx_
 
 /*----------- defined in machine/micro3d.c -----------*/
 
-
-
-
-
-
-
 void micro3d_duart_irq_handler(device_t *device, int state, UINT8 vector);
 UINT8 micro3d_duart_input_r(device_t *device);
 void micro3d_duart_output_w(device_t *device, UINT8 data);
@@ -130,7 +126,7 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
 MACHINE_RESET( micro3d );
 DRIVER_INIT( micro3d );
-DRIVER_INIT( botssa );
+DRIVER_INIT( botss );
 
 
 /*----------- defined in audio/micro3d.c -----------*/
