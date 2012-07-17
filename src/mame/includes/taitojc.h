@@ -82,8 +82,8 @@ public:
 	DECLARE_READ32_MEMBER(snd_share_r);
 	DECLARE_WRITE32_MEMBER(snd_share_w);
 	DECLARE_READ8_MEMBER(jc_pcbid_r);
-	DECLARE_READ32_MEMBER(jc_lan_r);
-	DECLARE_WRITE32_MEMBER(jc_lan_w);
+	DECLARE_READ8_MEMBER(jc_lan_r);
+	DECLARE_WRITE8_MEMBER(jc_lan_w);
 	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
 	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
 
