@@ -1623,6 +1623,57 @@ static INPUT_PORTS_START( superabc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( birdiy )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(1) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1) PORT_4WAY
+	PORT_DIPNAME(0x10, 0x10, "Rack Test (Cheat)" )	PORT_CODE(KEYCODE_F1)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x20, 0x20, "Skip Screen" )		PORT_DIPLOCATION("SW:7") /* Used to skip "Act" (AKA level)?? - How do you activate it? */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Stop Screen" )		PORT_DIPLOCATION("SW:8") /* Seems to have no function? */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( maketrax )
 	PORT_START("IN0")
@@ -4807,7 +4858,7 @@ ROM_END
 
 
 /*
-Birdyi by Mama Top
+Birdiy by Mama Top
 
 Pcb marked Mama.Top MDK-13V-0  FCC  Made in japan
 
@@ -6135,7 +6186,7 @@ GAME( 1982, eyes2,    eyes,     pacman,   eyes,     eyes,     ROT90,  "Techstar 
 GAME( 1982, eyesb,    eyes,     pacman,   eyes,     eyes,     ROT90,  "bootleg", "Eyes (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, eyeszac,  eyes,     pacman,   eyes,     eyes,     ROT90,  "Techstar (Zaccaria license)", "Eyes (Italy)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // bad dump
 GAME( 1982, eyeszacb, eyes,     pacman,   eyes,     0,        ROT90,  "bootleg", "Eyes (bootleg set 2, decrypted)", GAME_SUPPORTS_SAVE ) // based on Zaccaria version
-GAME( 1983, birdiy,   0,        birdiy,   pacman,   0,        ROT270, "Mama Top", "Birdiy", GAME_SUPPORTS_SAVE )
+GAME( 1983, birdiy,   0,        birdiy,   birdiy,   0,        ROT270, "Mama Top", "Birdiy", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Techstar (Telko license)", "Mr. TNT", GAME_SUPPORTS_SAVE )
 GAME( 1983, gorkans,  mrtnt,    pacman,   mrtnt,    0,        ROT90,  "Techstar", "Gorkans", GAME_SUPPORTS_SAVE )
 GAME( 1983, eggor,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Telko", "Eggor", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
