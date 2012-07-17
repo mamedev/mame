@@ -316,6 +316,24 @@ Notes:
       68010 clock input - 8.000MHz [32/4]
       34010 clock input - 48.000MHz
 
+****************************************************************************
+
+Emulation notes
+---------------
+
+harddriv1:
+
+    In the debugger, right after the game is loaded, type the following :
+
+    maincpu.mb@2c99e=1
+
+    The game boots and seems playable.
+
+    Put a bp at 0x0164f8 and compare execution with 'harddriv2' (bp at same address) which skips some parts of the code.
+
+    1st problem at 0x0164fc : jumps to 0x016526 instead of 0x016508.
+    2nd problem at 0x016542 : jumps to 0x01654c instead of 0x016552. Game resets if you attemp to step over code at 0x01654c.
+
 ****************************************************************************/
 
 
