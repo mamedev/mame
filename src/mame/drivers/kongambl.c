@@ -138,10 +138,12 @@ static READ32_HANDLER( test_r )
 	return -1;//space->machine().rand();
 }
 
-static READ32_HANDLER( rng_r )
+/*
+ static READ32_HANDLER( rng_r )
 {
 	return space->machine().rand();
 }
+*/
 
 WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
 {
