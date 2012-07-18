@@ -607,15 +607,13 @@ static void addh(tms32025_state *cpustate)
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.h += cpustate->ALU.w.l;
+	if ( (UINT16)(cpustate->oldacc.w.h) > (UINT16)(cpustate->ACC.w.h) ) {
+		SET1(cpustate, C_FLAG);	/* Carry flag is not cleared, if no carry occurred */
+	}
 	if ((INT16)((cpustate->ACC.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
 		SET0(cpustate, OV_FLAG);
-		if (OVM)
-			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
-	if ( ((INT16)(cpustate->oldacc.w.h) < 0) && ((INT16)(cpustate->ACC.w.h) >= 0) ) {
-		SET1(cpustate, C_FLAG);
-	}
-	/* Carry flag is not cleared, if no carry occurred */
 }
 static void addk(tms32025_state *cpustate)
 {
@@ -668,7 +666,6 @@ static void andk(tms32025_state *cpustate)
 	cpustate->PC++;
 	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
 	cpustate->ACC.d &= cpustate->ALU.d;
-	cpustate->ACC.d &= 0x7fffffff;
 }
 static void apac(tms32025_state *cpustate)
 {
@@ -843,7 +840,6 @@ static void cmpr(tms32025_state *cpustate)
 		case 03:	if ( (UINT16)(cpustate->AR[ARP]) != (UINT16)(cpustate->AR[0]) ) SET1(cpustate, TC_FLAG);
 					else CLR1(cpustate, TC_FLAG);
 					break;
-		default:	break;
 	}
 }
 static void cnfd(tms32025_state *cpustate)	/** next two fetches need to use previous CNF value ! **/
@@ -973,8 +969,6 @@ static void conf(tms32025_state *cpustate)	/** Need to reconfigure the memory bl
 					cpustate->pgmmap[510] = &cpustate->intRAM[0x700];	/* B3 */
 					cpustate->pgmmap[511] = &cpustate->intRAM[0x780];	/* B3 */
 					break;
-
-		default:	break;
 	}
 }
 static void dint(tms32025_state *cpustate)
@@ -1021,15 +1015,9 @@ static void lact(tms32025_state *cpustate)
 }
 static void lalk(tms32025_state *cpustate)
 {
-	if (SXM) {
-		cpustate->ALU.d = (INT16)M_RDOP_ARG(cpustate->PC);
-		cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
-	}
-	else {
-		cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
-		cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
-		cpustate->ACC.d &= 0x7fffffff;
-	}
+	if (SXM) cpustate->ALU.d =  (INT16)M_RDOP_ARG(cpustate->PC);
+	else     cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+	cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
 	cpustate->PC++;
 }
 static void lar_ar0(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[0] = cpustate->ALU.w.l; }
@@ -1225,16 +1213,13 @@ static void nop(tms32025_state *cpustate) { }   // NOP is a subset of the MAR in
 */
 static void norm(tms32025_state *cpustate)
 {
-	UINT32 acc = cpustate->ACC.d;
-
-	if( acc == 0 || ((acc^(acc<<1))&(1<<31))!=0 ) {
-		SET1(cpustate, TC_FLAG); /* 1 -> TC */
-	}
-	else {
-		CLR1(cpustate, TC_FLAG); /* 0 -> TC */
-		cpustate->ACC.d <<= 1; /* (ACC)*2 -> ACC */
+	if (cpustate->ACC.d !=0 && (INT32)(cpustate->ACC.d ^ (cpustate->ACC.d << 1)) >= 0)
+	{
+		CLR1(cpustate, TC_FLAG);
+		cpustate->ACC.d <<= 1;
 		MODIFY_AR_ARP(cpustate);
 	}
+	else SET1(cpustate, TC_FLAG);
 }
 static void or_(tms32025_state *cpustate)
 {
@@ -1513,15 +1498,13 @@ static void subh(tms32025_state *cpustate)
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.h -= cpustate->ALU.w.l;
+	if ( (UINT16)(cpustate->oldacc.w.h) < (UINT16)(cpustate->ACC.w.h) ) {
+		CLR1(cpustate, C_FLAG);	/* Carry flag is not affected, if no borrow occurred */
+	}
 	if ((INT16)((cpustate->oldacc.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
 		SET0(cpustate, OV_FLAG);
-		if (OVM)
-			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
-	if ( ((INT16)(cpustate->oldacc.w.h) >= 0) && ((INT16)(cpustate->ACC.w.h) < 0) ) {
-		CLR1(cpustate, C_FLAG);
-	}
-	/* Carry flag is not affected, if no borrow occurred */
 }
 static void subk(tms32025_state *cpustate)
 {
