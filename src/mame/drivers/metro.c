@@ -2449,13 +2449,10 @@ INPUT_PORTS_END
                                 Dharma Doujou
 ***************************************************************************/
 
-/* I don't really know HOW to describe the effect of IN2 bits 8 and 9.
-   All I can tell is that in "table 2" the values are smaller for the 2
-   first levels (so the game is harder), but they vary less between the
-   levels (so there is almost no increasing difficulty).
+/* Difficulty refers to how difficult the stack is solve in the given time.
+   The manual calls it "Placement Difficulty" or block placement in the
+   stack when you start the level. */
 
-   Even if there are 4 "tables" the 2 first ones and the 2 last ones
-   contains the same values for the timer. */
 static INPUT_PORTS_START( dharma )
 	PORT_START("IN0") //$c00000
 	COINS_SOUND
@@ -2467,16 +2464,16 @@ static INPUT_PORTS_START( dharma )
 	PORT_START("DSW0") //$c00004
 	COINAGE_SERVICE_LOC(SW1)
 
-	PORT_DIPNAME( 0x0300, 0x0300, "Time" )			PORT_DIPLOCATION("SW2:1,2")	// Check code at 0x00da0a and see notes
-	PORT_DIPSETTING(      0x0000, "Table 1" )	//   Table offset : 0x00e668
-//  PORT_DIPSETTING(      0x0100, "Table 1" )       //   Table offset : 0x00e6c0
-//  PORT_DIPSETTING(      0x0200, "Table 2" )       //   Table offset : 0x00e718
-	PORT_DIPSETTING(      0x0300, "Table 2" )	//   Table offset : 0x00e770
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")	// Timer (crab) speed
-	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )		//   Slow
-	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )	//   Normal
-	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )		//   Fast
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )	//   Fastest
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")	// Check code at 0x00da0a and see notes
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )		//   Table offset : 0x00e718
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )	//   Table offset : 0x00e770
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )		//   Table offset : 0x00e6c0
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )	//   Table offset : 0x00e668
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Timer" )			PORT_DIPLOCATION("SW2:3,4")	// Timer (crab) speed
+	PORT_DIPSETTING(      0x0800, "Slow" )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, "Fast" )
+	PORT_DIPSETTING(      0x0000, "Fastest" )
 	PORT_DIPNAME( 0x1000, 0x1000, "2 Players Game" )	PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, "2 Credits" )
 	PORT_DIPSETTING(      0x0000, "1 Credit" )
