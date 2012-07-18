@@ -1746,6 +1746,9 @@ ROM_START( aircomb )
 	ROM_LOAD( "gal16v8a-3pdsp5.17d", 0x0000, 0x0117, CRC(799c1f26) SHA1(d28ed1b9fa78180c5a0b01a7198a2870137c7349) )
 	ROM_LOAD( "plhs18p8-3pobj3.17n", 0x0200, 0x0149, CRC(9625f469) SHA1(29158a3d37485fb0714d0a60bcd07abd26a3f56e) )
 	ROM_LOAD( "plhs18p8-3pobj4.17n", 0x0400, 0x0149, CRC(1b7c90c1) SHA1(ae65aab7a191cdf1af488e144af22b9d8669c903) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "aircomb.nv", 0x0000, 0x2000, CRC(a97ea3e0) SHA1(95684bb7369c1cb1e2fa53c743d4f94b0080c6f5) )
 ROM_END
 
 ROM_START( aircombj )
@@ -1802,6 +1805,9 @@ ROM_START( aircombj )
 	ROM_LOAD( "gal16v8a-3pdsp5.17d", 0x0000, 0x0117, CRC(799c1f26) SHA1(d28ed1b9fa78180c5a0b01a7198a2870137c7349) )
 	ROM_LOAD( "plhs18p8-3pobj3.17n", 0x0200, 0x0149, CRC(9625f469) SHA1(29158a3d37485fb0714d0a60bcd07abd26a3f56e) )
 	ROM_LOAD( "plhs18p8-3pobj4.17n", 0x0400, 0x0149, CRC(1b7c90c1) SHA1(ae65aab7a191cdf1af488e144af22b9d8669c903) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "aircombj.nv", 0x0000, 0x2000, CRC(56c71c83) SHA1(83dfcf4e3232f78e3807e9d3e862aa5446444165) )
 ROM_END
 
 ROM_START( cybsled )
@@ -1858,7 +1864,7 @@ ROM_START( cybsled )
 	ROM_LOAD("cy1-voi3.12e", 0x180000, 0x80000,CRC(c902b4a4) SHA1(816357ec1a02a7ebf817ac1182e9c50ce5ca71f6) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "cybsled.nv", 0x000000, 0x2000, CRC(aa18bf9e) SHA1(3712d4d20e5f5f1c920e3f1f6a00101e874662d0) )
+	ROM_LOAD( "cybsled.nv", 0x0000, 0x2000, CRC(aa18bf9e) SHA1(3712d4d20e5f5f1c920e3f1f6a00101e874662d0) )
 ROM_END
 
 ROM_START( cybsledj )
@@ -1915,7 +1921,7 @@ ROM_START( cybsledj )
 	ROM_LOAD("cy1-voi3.12e", 0x180000, 0x80000,CRC(c902b4a4) SHA1(816357ec1a02a7ebf817ac1182e9c50ce5ca71f6) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "cybsledj.nv", 0x000000, 0x2000, CRC(a73bb03e) SHA1(e074bfeae14178c867070e06f6690ed13115f5fa) )
+	ROM_LOAD( "cybsledj.nv", 0x0000, 0x2000, CRC(a73bb03e) SHA1(e074bfeae14178c867070e06f6690ed13115f5fa) )
 ROM_END
 
 ROM_START( driveyes )
@@ -2271,7 +2277,7 @@ static DRIVER_INIT( winrun )
 	state->m_mbNeedsKickstart = 0;
 }
 
-static DRIVER_INIT( aircombt )
+static DRIVER_INIT( aircomb )
 {
 	namcos21_init( machine, NAMCOS21_AIRCOMBAT );
 }
@@ -2409,7 +2415,7 @@ static INPUT_PORTS_START( winrun )
 	PORT_MODIFY("AN2")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) /* steering */
 	PORT_MODIFY("AN3")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) /* break */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) /* brake */
 	PORT_MODIFY("AN4")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_MODIFY("AN5")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
@@ -2463,7 +2469,7 @@ static INPUT_PORTS_START( cybsled )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( aircombt )
+static INPUT_PORTS_START( aircomb )
 	PORT_INCLUDE(s21default)
 
 	PORT_MODIFY("AN0")		/* IN#2: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
@@ -2473,7 +2479,7 @@ static INPUT_PORTS_START( aircombt )
 	PORT_MODIFY("AN2")		/* IN#4: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 	PORT_MODIFY("AN3")		/* IN#5: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 	PORT_MODIFY("AN4")		/* IN#6: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_MODIFY("AN5")		/* IN#7: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
@@ -2506,7 +2512,7 @@ GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0, 
 GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
 /* 1992, SimDrive */
-GAME( 1992, aircomb,  0,       poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (US)",	                     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, aircombj, aircomb, poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,  0,       poly_c140_typeB,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (US)",	                     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircombj, aircomb, poly_c140_typeB,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (US)",                       GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, cybsledj, cybsled, poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )
