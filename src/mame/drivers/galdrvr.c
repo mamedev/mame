@@ -4570,7 +4570,7 @@ ROM_START( fantastc )
 	ROM_LOAD( "38",           0x1000, 0x1000, CRC(88b71264) SHA1(60c2eb49f16b94b27625045c78c864e299b60d6b) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom-74g138", 0x0000, 0x0020, BAD_DUMP CRC(b7cbbc1f) SHA1(ba7c496091a3e5701a6d01423446ee89a42edcd3) ) // or different wiring?
+	ROM_LOAD( "prom-74g138", 0x0000, 0x0020, CRC(800f5718) SHA1(5387b24934c8130726180159e207943211215ae2) )
 ROM_END
 
 ROM_START( kong )
@@ -6500,7 +6500,7 @@ GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Ele
 GAME( 198?, kong,     0,        mooncrst, kong,     kong,     ROT90,  "Taito do Brasil", "Kong (Brazil)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
-GAME( 198?, fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Galaga (!) not a clone
+GAME( 198?, fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
 GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
