@@ -413,9 +413,6 @@ INLINE void MODIFY_AR_ARP(tms32025_state *cpustate)
 		case 0x70: /* 111   *BR0+    */
 			cpustate->AR[ARP] += reverse_carry_add(cpustate->AR[ARP],cpustate->AR[0]);
 			break;
-
-		default:
-			break;
 	}
 
 	if( !cpustate->mHackIgnoreARP )
@@ -449,7 +446,7 @@ INLINE void CALCULATE_SUB_CARRY(tms32025_state *cpustate)
 
 INLINE void CALCULATE_ADD_OVERFLOW(tms32025_state *cpustate, INT32 addval)
 {
-	if ((INT32)(~(cpustate->oldacc.d ^ addval) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0)
+	if ((INT32)((cpustate->ACC.d ^ addval) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0)
 	{
 		SET0(cpustate, OV_FLAG);
 		if (OVM)
@@ -587,12 +584,11 @@ static void abst(tms32025_state *cpustate)
 	}
 	CLR1(cpustate, C_FLAG);
 }
-static void add(tms32025_state *cpustate)		/* #### add carry support - see page 3-31 (70) #### */
-{						/* page 10-13 (348) spru031d */
+static void add(tms32025_state *cpustate)
+{
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, (cpustate->opcode.b.h & 0xf), SXM);
 	cpustate->ACC.d += cpustate->ALU.d;
-
 	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
 	CALCULATE_ADD_CARRY(cpustate);
 }
@@ -600,17 +596,18 @@ static void addc(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
-	if (CARRY) cpustate->ALU.d++;
+	if (CARRY) cpustate->ACC.d++;
 	cpustate->ACC.d += cpustate->ALU.d;
 	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
-	CALCULATE_ADD_CARRY(cpustate);
+	if (cpustate->ACC.d == cpustate->oldacc.d) {}	/* edge case, carry remains same */
+	else CALCULATE_ADD_CARRY(cpustate);
 }
 static void addh(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.h += cpustate->ALU.w.l;
-	if ((INT16)(~(cpustate->oldacc.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
+	if ((INT16)((cpustate->ACC.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
 		SET0(cpustate, OV_FLAG);
 		if (OVM)
 			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
@@ -1486,10 +1483,11 @@ static void subb(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
-	if (CARRY == 0) cpustate->ALU.d--;
+	if (CARRY == 0) cpustate->ACC.d--;
 	cpustate->ACC.d -= cpustate->ALU.d;
 	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
-	CALCULATE_SUB_CARRY(cpustate);
+	if (cpustate->ACC.d == cpustate->oldacc.d) {}	/* edge case, carry remains same */
+	else CALCULATE_SUB_CARRY(cpustate);
 }
 static void subc(tms32025_state *cpustate)
 {
