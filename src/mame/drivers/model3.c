@@ -2899,7 +2899,7 @@ ROM_START( bass )	/* step 1.0, Sega game ID# is 833-13317, ROM board ID# 834-133
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( getbass )	/* step 1.0 */
+ROM_START( getbass )	/* step 1.0, Sega game ID# is 833-13416 GET BASS STD */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20309.17",  0x600006, 0x080000, CRC(a42e1033) SHA1(a834eb973e9529338413220a2d8e66ce98d6cb31) )
