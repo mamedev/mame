@@ -1006,8 +1006,9 @@ static void lalk(tms32025_state *cpustate)
 {
 	if (SXM) cpustate->ALU.d =  (INT16)M_RDOP_ARG(cpustate->PC);
 	else     cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
-	cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
 	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d = cpustate->ALU.d;
 }
 static void lar_ar0(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[0] = cpustate->ALU.w.l; }
 static void lar_ar1(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[1] = cpustate->ALU.w.l; }
