@@ -24,20 +24,23 @@ class igs_m027_state : public driver_device
 {
 public:
 	igs_m027_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_igs_mainram(*this, "igs_mainram"),
 		m_igs_cg_videoram(*this, "igs_cg_videoram"),
 		m_igs_palette32(*this, "igs_palette32"),
 		m_igs_tx_videoram(*this, "igs_tx_videoram"),
-		m_igs_bg_videoram(*this, "igs_bg_videoram"){ }
+		m_igs_bg_videoram(*this, "igs_bg_videoram")
+	{ }
 
 	required_shared_ptr<UINT32> m_igs_mainram;
 	required_shared_ptr<UINT32> m_igs_cg_videoram;
 	required_shared_ptr<UINT32> m_igs_palette32;
 	required_shared_ptr<UINT32> m_igs_tx_videoram;
 	required_shared_ptr<UINT32> m_igs_bg_videoram;
+
 	tilemap_t *m_igs_tx_tilemap;
 	tilemap_t *m_igs_bg_tilemap;
+
 	DECLARE_WRITE32_MEMBER(igs_cg_videoram_w);
 	DECLARE_WRITE32_MEMBER(igs_tx_videoram_w);
 	DECLARE_WRITE32_MEMBER(igs_bg_videoram_w);
@@ -737,10 +740,13 @@ ROM_END
 ROM_START( haunthig )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
-	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'H2'
 
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-101us.u34", 0x000000, 0x80000, CRC(4bf045d4) SHA1(78c848fd69961df8d9b75f92ad57c3534fbf08db) )
+
+	ROM_REGION( 0x10000, "plcc", 0 )
+	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked J9, not read protected?
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
