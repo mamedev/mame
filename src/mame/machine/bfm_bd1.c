@@ -177,7 +177,14 @@ void bfm_bd1_t::update_display()
 {
 	for (int i =0; i<16; i++)
 	{
-		m_outputs[i] = set_display(m_chars[i]);
+		if (m_attrs[i] != AT_BLANK)
+		{
+			m_outputs[i] = set_display(m_chars[i]);
+		}
+		else
+		{
+			m_outputs[i] = 0;
+		}
 		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
@@ -186,17 +193,21 @@ void bfm_bd1_t::blank(int data)
 {
 	switch ( data & 0x04 )
 	{
-		case 0x00:	// blank all
+		case 0x00:	// clear blanking
 		{
-			memset(m_chars, 0, sizeof(m_chars));
-			memset(m_attrs, 0, sizeof(m_attrs));
+			for (int i = 0; i < 15; i++)
+			{
+				m_attrs[i] = 0;
+			}
 		}
 		break;
 		case 0x01:	// blank inside window
 		if ( m_window_size > 0 )
 		{
-			memset(m_chars+m_window_start,0,m_window_size);
-			memset(m_attrs+m_window_start,0,m_window_size);
+			for (int i = m_window_start; i < m_window_end ; i++)
+			{
+				m_attrs[i] = AT_BLANK;
+			}
 		}
 		break;
 		case 0x02:	// blank outside window
@@ -206,8 +217,7 @@ void bfm_bd1_t::blank(int data)
 			{
 				for (int i = 0; i < m_window_start; i++)
 				{
-					memset(m_chars+i,0,i);
-					memset(m_attrs+i,0,i);
+					m_attrs[i] = AT_BLANK;
 				}
 			}
 
@@ -215,17 +225,18 @@ void bfm_bd1_t::blank(int data)
 			{
 				for (int i = m_window_end; i < 15- m_window_end ; i++)
 				{
-					memset(m_chars+i,0,i);
-					memset(m_attrs+i,0,i);
+					m_attrs[i] = AT_BLANK;
 				}
 			}
 		}
 		break;
 
-		case 0x03:	// blank entire display
+		case 0x03:	//blank all
 		{
-			memset(m_chars, 0, sizeof(m_chars));
-			memset(m_attrs, 0, sizeof(m_attrs));
+			for (int i = 0; i < 15; i++)
+			{
+					m_attrs[i] = AT_BLANK;
+			}
 		}
 		break;
 	}
@@ -309,6 +320,7 @@ int bfm_bd1_t::write_char(int data)
 				break;
 
 				case 0xB0:	// 0xB0 - 0xBF Clear display area
+				popmessage("Clearing display area %x",data&0x03);
 				switch ( data & 0x03 )
 				{
 					case 0x00:	// clr nothing
@@ -382,7 +394,6 @@ int bfm_bd1_t::write_char(int data)
 		}
 	}
 	update_display();
-
 
 	return 0;
 }
