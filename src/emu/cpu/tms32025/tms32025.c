@@ -308,17 +308,6 @@ INLINE void MODIFY_ARP(tms32025_state *cpustate, int data)
 	cpustate->STR0 |= 0x0400;
 }
 
-
-#ifdef UNUSED_FUNCTION
-INLINE void MODIFY_ARB(tms32025_state *cpustate, int data)
-{
-	cpustate->STR1 &= ~ARB_REG;
-	cpustate->STR1 |= ((data << 13) & ARB_REG);
-	cpustate->STR1 |= 0x0180;
-}
-#endif
-
-
 INLINE UINT16 M_RDROM(tms32025_state *cpustate, offs_t addr)
 {
 	UINT16 *ram;
@@ -1231,7 +1220,7 @@ static void ork(tms32025_state *cpustate)
 	cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
 	cpustate->PC++;
 	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
-	cpustate->ACC.d |=  (cpustate->ALU.d & 0x7fffffff);
+	cpustate->ACC.d |=  (cpustate->ALU.d);
 }
 static void out(tms32025_state *cpustate)
 {
@@ -1445,7 +1434,7 @@ static void sst1(tms32025_state *cpustate)
 	PUTDATA_SST(cpustate, cpustate->STR1);
 }
 static void ssxm(tms32025_state *cpustate)
-{	/** Check instruction description, and make sure right instructions use SXM */
+{
 	SET1(cpustate, SXM_FLAG);
 }
 static void stc(tms32025_state *cpustate)
@@ -1476,22 +1465,21 @@ static void subb(tms32025_state *cpustate)
 }
 static void subc(tms32025_state *cpustate)
 {
-	PAIR temp_alu;
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 15, SXM);
 	cpustate->ACC.d -= cpustate->ALU.d;		/* Temporary switch to ACC. Actual calculation is done as (ACC)-[mem] -> ALU, will be preserved later on. */
-	temp_alu.d = cpustate->ACC.d;
 	if ((INT32)((cpustate->oldacc.d ^ cpustate->ALU.d) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0) {
 		SET0(cpustate, OV_FLAG);			/* Not affected by OVM */
 	}
 	CALCULATE_SUB_CARRY(cpustate);
 	if( cpustate->oldacc.d >= cpustate->ALU.d ) {
-		cpustate->ACC.d = (cpustate->oldacc.d - cpustate->ALU.d)*2+1;
+		cpustate->ALU.d = cpustate->ACC.d;
+		cpustate->ACC.d = cpustate->ACC.d << 1 | 1;
 	}
 	else {
-		cpustate->ACC.d = cpustate->oldacc.d*2;
+		cpustate->ALU.d = cpustate->ACC.d;
+		cpustate->ACC.d = cpustate->oldacc.d << 1;
 	}
-	cpustate->ALU.d = temp_alu.d;
 }
 static void subh(tms32025_state *cpustate)
 {
@@ -1569,12 +1557,10 @@ static void xor_(tms32025_state *cpustate)
 }
 static void xork(tms32025_state *cpustate)
 {
-	cpustate->oldacc.d = cpustate->ACC.d;
 	cpustate->ALU.d = M_RDOP_ARG(cpustate->PC);
 	cpustate->PC++;
 	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
 	cpustate->ACC.d ^= cpustate->ALU.d;
-	cpustate->ACC.d |= (cpustate->oldacc.d & 0x80000000);
 }
 static void zalh(tms32025_state *cpustate)
 {
