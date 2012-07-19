@@ -48,6 +48,9 @@ public:
 	int      m_bank1;
 	int      m_bank2;
 
+	UINT8*	 m_bankedram;
+	UINT8*	 m_ROM;
+
 	/* devices */
 	device_t *m_audiocpu;
 	device_t *m_subcpu;
@@ -61,7 +64,7 @@ public:
 	DECLARE_READ8_MEMBER(arknoid2_sh_f000_r);
 	DECLARE_READ8_MEMBER(tnzs_mcu_r);
 	DECLARE_WRITE8_MEMBER(tnzs_mcu_w);
-	DECLARE_WRITE8_MEMBER(tnzs_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tnzs_ramrom_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tnzs_bankswitch1_w);
 	DECLARE_READ8_MEMBER(mcu_tnzs_r);
 	DECLARE_WRITE8_MEMBER(mcu_tnzs_w);
@@ -74,6 +77,10 @@ public:
 	DECLARE_WRITE8_MEMBER(kageki_csport_w);
 	DECLARE_WRITE8_MEMBER(kabukiz_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(kabukiz_sample_w);
+
+	DECLARE_READ8_MEMBER(tnzs_ramrom_bank_r);
+	DECLARE_WRITE8_MEMBER(tnzs_ramrom_bank_w);
+
 };
 
 

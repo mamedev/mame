@@ -16,6 +16,32 @@
 #include "cpu/mcs48/mcs48.h"
 #include "includes/tnzs.h"
 
+READ8_MEMBER(tnzs_state::tnzs_ramrom_bank_r)
+{
+	// the first 2 banks would correspond to the fixed section of ROM, since this is
+	// a waste of time the hardware maps 2 banks of RAM there instead.
+	if (m_bank1<2)
+	{
+		return m_bankedram[m_bank1 * 0x4000 + offset];
+	}
+	else
+	{
+		return m_ROM[m_bank1 * 0x4000 + offset];
+	}
+}
+
+WRITE8_MEMBER(tnzs_state::tnzs_ramrom_bank_w)
+{
+	if (m_bank1<2)
+	{
+		m_bankedram[m_bank1 * 0x4000 + offset] = data;
+	}
+	else
+	{
+		// illegal write to ROM
+	}
+}
+
 
 READ8_MEMBER(tnzs_state::mcu_tnzs_r)
 {
@@ -538,7 +564,7 @@ DRIVER_INIT( kabukiz )
 	UINT8 *SOUND = state->memregion("audiocpu")->base();
 	state->m_mcu_type = MCU_NONE_KABUKIZ;
 
-	state->membank("bank3")->configure_entries(0, 8, &SOUND[0x10000], 0x4000);
+	state->membank("audiobank")->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
 }
 
 DRIVER_INIT( insectx )
@@ -657,37 +683,43 @@ MACHINE_RESET( jpopnics )
 static void tnzs_postload(running_machine &machine)
 {
 	tnzs_state *state = machine.driver_data<tnzs_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	state->membank("subbank")->set_entry(state->m_bank2);
+}
 
-	state->membank("bank1")->set_entry(state->m_bank1);
-	state->membank("bank2")->set_entry(state->m_bank2);
 
-	if (state->m_bank1 <= 1)
-		space->install_write_bank(0x8000, 0xbfff, "bank1");
-	else
-		space->unmap_write(0x8000, 0xbfff);
+MACHINE_START( jpopnics )
+{
+	tnzs_state *state = machine.driver_data<tnzs_state>();
+	UINT8 *SUB = state->memregion("sub")->base();
+	state->m_ROM = machine.root_device().memregion("maincpu")->base();
+	state->m_bankedram = auto_alloc_array(machine, UINT8, 0x8000); // 2 banks of 0x4000
+
+	state->membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
+	state->membank("subbank")->set_entry(state->m_bank2);
+
+	state->m_subcpu = machine.device("sub");
+	state->m_mcu = NULL;
+
+	state->m_bank1 = 2;
+	state->m_bank2 = 0;
+
+	state->save_item(NAME(*state->m_bankedram));
+	state->save_item(NAME(state->m_screenflip));
+	state->save_item(NAME(state->m_bank1));
+	state->save_item(NAME(state->m_bank2));
+
+	machine.save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine));
 }
 
 MACHINE_START( tnzs )
 {
 	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	UINT8 *SUB = state->memregion("sub")->base();
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->membank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
-
-	state->membank("bank1")->set_entry(2);
-	state->membank("bank2")->set_entry(0);
-
-	state->m_bank1 = 2;
-	state->m_bank2 = 0;
+	MACHINE_START_CALL( jpopnics );
 
 	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
 	state->m_mcu = machine.device("mcu");
 
-	state->save_item(NAME(state->m_screenflip));
 	state->save_item(NAME(state->m_kageki_csport_sel));
 	state->save_item(NAME(state->m_input_select));
 	state->save_item(NAME(state->m_mcu_readcredits));
@@ -700,36 +732,11 @@ MACHINE_START( tnzs )
 	state->save_item(NAME(state->m_mcu_credits));
 	state->save_item(NAME(state->m_mcu_reportcoin));
 	state->save_item(NAME(state->m_mcu_command));
-	state->save_item(NAME(state->m_bank1));
-	state->save_item(NAME(state->m_bank2));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine));
-}
-
-MACHINE_START( jpopnics )
-{
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	UINT8 *SUB = state->memregion("sub")->base();
-
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->membank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
-
-	state->m_subcpu = machine.device("sub");
-	state->m_mcu = NULL;
-
-	state->m_bank1 = 2;
-	state->m_bank2 = 0;
-
-	state->save_item(NAME(state->m_screenflip));
-	state->save_item(NAME(state->m_bank1));
-	state->save_item(NAME(state->m_bank2));
-
-	machine.save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine));
 }
 
 
-WRITE8_MEMBER(tnzs_state::tnzs_bankswitch_w)
+WRITE8_MEMBER(tnzs_state::tnzs_ramrom_bankswitch_w)
 {
 
 //  logerror("PC %04x: writing %02x to bankswitch\n", cpu_get_pc(&space.device()),data);
@@ -742,12 +749,6 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch_w)
 
 	/* bits 0-2 select RAM/ROM bank */
 	m_bank1 = data & 0x07;
-	membank("bank1")->set_entry(m_bank1);
-
-	if (m_bank1 <= 1)
-		space.install_write_bank(0x8000, 0xbfff, "bank1");
-	else
-		space.unmap_write(0x8000, 0xbfff);
 }
 
 WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
@@ -798,5 +799,5 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 
 	/* bits 0-1 select ROM bank */
 	m_bank2 = data & 0x03;
-	membank("bank2")->set_entry(m_bank2);
+	membank("subbank")->set_entry(m_bank2);
 }
