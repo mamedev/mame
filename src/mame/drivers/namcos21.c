@@ -1556,21 +1556,6 @@ static MACHINE_CONFIG_DERIVED( poly_c140_typeA, s21base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("c140", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeB)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(driveyes_68k_master)
@@ -2505,14 +2490,14 @@ static INPUT_PORTS_START( aircomb )
 INPUT_PORTS_END
 
 /*    YEAR, NAME,     PARENT,  MACHINE,           INPUT,        INIT,     MONITOR,  COMPANY,   FULLNAME,                             FLAGS */
-GAME( 1988, winrun,   0,       winrun_c140_typeA, winrun,       winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, winrun,   0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, winrungp, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run 91 (Japan)",                GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
 /* 1992, SimDrive */
-GAME( 1992, aircomb,  0,       poly_c140_typeB,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (US)",	                     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, aircombj, aircomb, poly_c140_typeB,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,  0,       poly_c140_typeA,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (US)",                       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircombj, aircomb, poly_c140_typeA,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (US)",                       GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, cybsledj, cybsled, poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )
