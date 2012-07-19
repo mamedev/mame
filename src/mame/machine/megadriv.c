@@ -45,6 +45,7 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "includes/megadriv.h"
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
+#include "megacd.lh"
 
 
 
@@ -1258,6 +1259,8 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
 
+	MCFG_DEFAULT_LAYOUT( layout_megacd )
+
 	MCFG_NVRAM_ADD_0FILL("backupram")
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
@@ -1269,7 +1272,6 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
-
 
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
@@ -1304,6 +1306,8 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
+
+	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )

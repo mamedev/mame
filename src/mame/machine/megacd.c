@@ -2415,9 +2415,11 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
 
+		output_set_value("red_led",segacd_redled ^ 1);
+		output_set_value("green_led",segacd_greenled ^ 1);
+
 		//popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
-
 }
 
 

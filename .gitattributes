@@ -4093,6 +4093,7 @@ src/mame/layout/luckyrlt.lay svneol=native#text/plain
 src/mame/layout/majorpkr.lay svneol=native#text/plain
 src/mame/layout/maxaflex.lay svneol=native#text/plain
 src/mame/layout/mdrawpkr.lay svneol=native#text/plain
+src/mame/layout/megacd.lay svneol=native#text/plain
 src/mame/layout/meybjack.lay svneol=native#text/plain
 src/mame/layout/mil4000.lay svneol=native#text/plain
 src/mame/layout/mpoker.lay svneol=native#text/plain
