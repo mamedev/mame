@@ -2720,6 +2720,40 @@ ROM_START( gprideru )
 	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
+/* Royal Ascot 2 - should be X-Board, or closely related, although it's a main display / terminal setup, and we only have the ROMs for one of those parts.. */
+
+ROM_START( rascot2 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-13694a", 0x00001, 0x20000, CRC(15b86498) SHA1(ccb57063ca53347b5f771b0d7ceaeb9cd50d246a) ) // 13964a?
+	ROM_LOAD16_BYTE( "epr-13965a", 0x00000, 0x20000, CRC(7eacdfb3) SHA1(fad23352d9c5e266ad9f7fe3ccbd29b5b912b90b) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
+	ROM_LOAD16_BYTE( "epr-13966", 0x00001, 0x20000, CRC(eaa644e1) SHA1(b9cc171523995f5120ea7b9748af2f8de697b933) )
+	ROM_LOAD16_BYTE( "epr-13967", 0x00000, 0x20000, CRC(3b92e2b8) SHA1(5d456d7d6fa540709facda1fd8813707ebfd99d8) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-13961", 0x00000, 0x10000, CRC(68038629) SHA1(fbe8605840331096c5156d695772e5f36b2e131a) )
+	ROM_LOAD( "epr-13962", 0x10000, 0x10000, CRC(7d7605bc) SHA1(20d3a7116807db7c831e285233d8c67317980e4a) )
+	ROM_LOAD( "epr-13963", 0x20000, 0x10000, CRC(f3376b65) SHA1(36b9292518a112409d03b97ea048b7ab22734841) )
+
+	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "epr-13960",  0x000000, 0x20000, CRC(b974128d) SHA1(14450615b3a10b1de6d098a282f80f80c98c34b8) )
+	ROM_LOAD32_BYTE( "epr-13959",  0x000001, 0x20000, CRC(db245b22) SHA1(301b7caea7a3b42ab1ab21894ad61b8b14ef1e7c) )
+	ROM_LOAD32_BYTE( "epr-13958",  0x000002, 0x20000, CRC(7803a027) SHA1(ff659da334e4440a6de9be43dde9dfa21dae5f14) )
+	ROM_LOAD32_BYTE( "epr-13957",  0x000003, 0x20000, CRC(6d50fb54) SHA1(d21462c30a5555980b964930ddef4dc1963e1d8e) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
+	/* none?? */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	// is this really a sound rom, or a terminal / link rom? accesses unexpected addresses
+	ROM_LOAD( "epr-14221a",    0x00000, 0x10000, CRC(0d429ac4) SHA1(9cd4c7e858874f372eb3e409ba37964f1ebf07d5) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	/* none?? */
+ROM_END
+
+
 
 
 /*************************************
@@ -2818,3 +2852,4 @@ GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega
 GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
 GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gprideru, gprider,  xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
+GAME( 1991, rascot2,  0,        xboard,  thndrbld, generic_xboard, ROT0,   "Sega", "Royal Ascot 2", NOT_WORKING )
