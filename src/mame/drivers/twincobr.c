@@ -610,8 +610,6 @@ static MACHINE_CONFIG_DERIVED( fsharkbt, twincobr )
 	/* Program Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(fsharkbt_i8741_io_map)
 	MCFG_DEVICE_DISABLE()		/* Internal program code is not dumped */
-
-	MCFG_MACHINE_RESET(fsharkbt)	/* Reset fshark bootleg 8741 MCU data */
 MACHINE_CONFIG_END
 
 

@@ -105,13 +105,10 @@ public:
 INTERRUPT_GEN( twincobr_interrupt );
 INTERRUPT_GEN( wardner_interrupt );
 
-
 MACHINE_RESET( twincobr );
-MACHINE_RESET( fsharkbt );
 MACHINE_RESET( wardner );
 
 extern void twincobr_driver_savestate(running_machine &machine);
-extern void wardner_driver_savestate(running_machine &machine);
 
 
 /*----------- defined in video/twincobr.c -----------*/

@@ -11,10 +11,6 @@
 
 #define LOG_DSP_CALLS 0
 #define LOG(x) do { if (LOG_DSP_CALLS) logerror x; } while (0)
-#define CLEAR  0
-#define ASSERT 1
-
-
 static const int toaplan_port_type[2] = { 0x7800c, 0x5c };
 
 
@@ -316,6 +312,7 @@ WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
 MACHINE_RESET( twincobr )
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
+
 	state->m_toaplan_main_cpu = 0;		/* 68000 */
 	twincobr_display(machine, 0);
 	state->m_intenable = 0;
@@ -323,17 +320,23 @@ MACHINE_RESET( twincobr )
 	state->m_main_ram_seg = 0;
 	state->m_dsp_execute = 0;
 	state->m_dsp_BIO = CLEAR_LINE;
+	state->m_wardner_membank = 0;
+	state->m_fsharkbt_8741 = -1;
 }
-MACHINE_RESET( fsharkbt )
+
+MACHINE_RESET( wardner )
 {
-	twincobr_state *state = machine.driver_data<twincobr_state>();
 	MACHINE_RESET_CALL(twincobr);
-	state->m_fsharkbt_8741 = -1;			/* Reset the Flying Shark Bootleg MCU */
+
+	twincobr_state *state = machine.driver_data<twincobr_state>();
+	state->m_toaplan_main_cpu = 1;		/* Z80 */
+	twincobr_display(machine, 1);
 }
 
 void twincobr_driver_savestate(running_machine &machine)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
+
 	state_save_register_global(machine, state->m_toaplan_main_cpu);
 	state_save_register_global(machine, state->m_intenable);
 	state_save_register_global(machine, state->m_dsp_on);
@@ -342,31 +345,7 @@ void twincobr_driver_savestate(running_machine &machine)
 	state_save_register_global(machine, state->m_dsp_BIO);
 	state_save_register_global(machine, state->m_dsp_execute);
 	state_save_register_global(machine, state->m_fsharkbt_8741);
-	machine.save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_dsp), &machine));
-}
-
-MACHINE_RESET( wardner )
-{
-	twincobr_state *state = machine.driver_data<twincobr_state>();
-	state->m_toaplan_main_cpu = 1;		/* Z80 */
-	twincobr_display(machine, 1);
-	state->m_intenable = 0;
-	state->m_dsp_addr_w = 0;
-	state->m_main_ram_seg = 0;
-	state->m_dsp_execute = 0;
-	state->m_dsp_BIO = CLEAR_LINE;
-	state->m_wardner_membank = 0;
-}
-void wardner_driver_savestate(running_machine &machine)
-{
-	twincobr_state *state = machine.driver_data<twincobr_state>();
-	state_save_register_global(machine, state->m_toaplan_main_cpu);
-	state_save_register_global(machine, state->m_intenable);
-	state_save_register_global(machine, state->m_dsp_on);
-	state_save_register_global(machine, state->m_dsp_addr_w);
-	state_save_register_global(machine, state->m_main_ram_seg);
-	state_save_register_global(machine, state->m_dsp_BIO);
-	state_save_register_global(machine, state->m_dsp_execute);
 	state_save_register_global(machine, state->m_wardner_membank);
+
 	machine.save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_dsp), &machine));
 }

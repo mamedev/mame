@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))						/* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))		/* 100 CPU slices per frame */
 
 	MCFG_MACHINE_RESET(wardner)
 
@@ -597,7 +597,7 @@ static DRIVER_INIT( wardner )
 {
 	wardner_state *state = machine.driver_data<wardner_state>();
 	state->m_ROM = machine.root_device().memregion("maincpu")->base();
-	wardner_driver_savestate(machine);	/* Save-State stuff in src/machine/twincobr.c */
+	twincobr_driver_savestate(machine);	/* Save-State stuff in src/machine/twincobr.c */
 }
 
 
