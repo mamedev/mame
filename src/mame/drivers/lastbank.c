@@ -26,23 +26,42 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
+	UINT8 m_ram_bank[4];
 	UINT8 m_rom_bank;
 	UINT8 m_irq_vector[3];
 	UINT8 m_irq_enable;
+	UINT8 *m_palette_ram;
 
 	DECLARE_READ8_MEMBER(lastbank_rom_r);
+
+	DECLARE_READ8_MEMBER(lastbank_ram_0_r);
+	DECLARE_READ8_MEMBER(lastbank_ram_1_r);
+	DECLARE_READ8_MEMBER(lastbank_ram_2_r);
+	DECLARE_READ8_MEMBER(lastbank_ram_3_r);
+	DECLARE_WRITE8_MEMBER(lastbank_ram_0_w);
+	DECLARE_WRITE8_MEMBER(lastbank_ram_1_w);
+	DECLARE_WRITE8_MEMBER(lastbank_ram_2_w);
+	DECLARE_WRITE8_MEMBER(lastbank_ram_3_w);
+
 	DECLARE_READ8_MEMBER(lastbank_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(lastbank_rom_bank_w);
+	DECLARE_READ8_MEMBER(lastbank_ram_bank_r);
+	DECLARE_WRITE8_MEMBER(lastbank_ram_bank_w);
 	DECLARE_READ8_MEMBER(lastbank_irq_vector_r);
 	DECLARE_WRITE8_MEMBER(lastbank_irq_vector_w);
 	DECLARE_READ8_MEMBER(lastbank_irq_enable_r);
 	DECLARE_WRITE8_MEMBER(lastbank_irq_enable_w);
+
+	UINT8 ram_bank_r(UINT16 offset, UINT8 bank_num);
+	void ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num);
 };
 
 
 static VIDEO_START( lastbank )
 {
+	lastbank_state *state = machine.driver_data<lastbank_state>();
 
+	state->m_palette_ram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 static SCREEN_UPDATE_IND16( lastbank )
@@ -93,12 +112,81 @@ static READ8_HANDLER( test_r )
 	return -1;
 }
 
+
+READ8_MEMBER(lastbank_state::lastbank_ram_bank_r)
+{
+	return m_ram_bank[offset];
+}
+
+WRITE8_MEMBER(lastbank_state::lastbank_ram_bank_w)
+{
+	m_ram_bank[offset] = data;
+}
+
+UINT8 lastbank_state::ram_bank_r(UINT16 offset, UINT8 bank_num)
+{
+	UINT8 *ram = memregion("wram")->base();
+	UINT8 res;
+
+	if(m_ram_bank[bank_num] & 0x80)
+		res = m_palette_ram[offset & 0x1ff];
+	else
+		res = ram[offset + (m_ram_bank[bank_num] & 0x1f) * 0x1000];
+
+	return res;
+}
+
+void lastbank_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
+{
+	UINT8 *ram = memregion("wram")->base();
+
+	if(m_ram_bank[bank_num] & 0x80)
+	{
+		m_palette_ram[offset & 0x1ff] = data;
+		{
+			UINT8 r,g,b,i;
+			UINT16 pal;
+
+			pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
+
+			i = (pal & 0x7000) >> 12;
+			b = (pal & 0x0f00) >> 8;
+			g = (pal & 0x00f0) >> 4;
+			r = (pal & 0x000f) >> 0;
+
+			r <<= 1;
+			g <<= 1;
+			b <<= 1;
+
+			/* TODO: correct? */
+			b |= ((i & 4) >> 2);
+			g |= ((i & 2) >> 1);
+			r |= (i & 1);
+
+			palette_set_color_rgb(machine(), offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+		}
+	}
+	else
+		ram[offset + (m_ram_bank[bank_num] & 0x1f) * 0x1000] = data;
+}
+
+READ8_MEMBER(lastbank_state::lastbank_ram_0_r) { return ram_bank_r(offset, 0); }
+READ8_MEMBER(lastbank_state::lastbank_ram_1_r) { return ram_bank_r(offset, 1); }
+READ8_MEMBER(lastbank_state::lastbank_ram_2_r) { return ram_bank_r(offset, 2); }
+READ8_MEMBER(lastbank_state::lastbank_ram_3_r) { return ram_bank_r(offset, 3); }
+WRITE8_MEMBER(lastbank_state::lastbank_ram_0_w) { ram_bank_w(offset, data, 0); }
+WRITE8_MEMBER(lastbank_state::lastbank_ram_1_w) { ram_bank_w(offset, data, 1); }
+WRITE8_MEMBER(lastbank_state::lastbank_ram_2_w) { ram_bank_w(offset, data, 2); }
+WRITE8_MEMBER(lastbank_state::lastbank_ram_3_w) { ram_bank_w(offset, data, 3); }
+
+
 static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(lastbank_rom_r)
 
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
@@ -108,10 +196,10 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0xa80c, 0xa80c) AM_READNOP
 	AM_RANGE(0xa800, 0xa81f) AM_READ_LEGACY(test_r)
 	/* TODO: RAM banks! */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xfdff) AM_RAM
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(lastbank_ram_0_r,lastbank_ram_0_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastbank_ram_1_r,lastbank_ram_1_w)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastbank_ram_2_r,lastbank_ram_2_w)
+	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(lastbank_ram_3_r,lastbank_ram_3_w)
 
 	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)
 	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)
@@ -119,16 +207,22 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(lastbank_irq_vector_r, lastbank_irq_vector_w)
 	AM_RANGE(0xff03, 0xff03) AM_READWRITE(lastbank_irq_enable_r, lastbank_irq_enable_w)
-	//AM_RANGE(0xff04, 0xff07) AM_READWRITE_LEGACY(rambankswitch_r, rambankswitch_w)
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(lastbank_ram_bank_r, lastbank_ram_bank_w)
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(lastbank_rom_bank_r, lastbank_rom_bank_w)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastbank_io, AS_IO, 8, lastbank_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
+static ADDRESS_MAP_START( lastbank_audio_map, AS_PROGRAM, 8, lastbank_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( lastbank_audio_io, AS_IO, 8, lastbank_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0xff) AM_NOP // I get on this later on ...
+
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lastbank )
 	PORT_START("IN0")
@@ -137,7 +231,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_START("IN3")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) //?
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN ) //?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 INPUT_PORTS_END
@@ -206,10 +300,15 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
 	MCFG_CPU_PROGRAM_MAP(lastbank_map)
-	MCFG_CPU_IO_MAP(lastbank_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", lastbank_irq_scanline, "screen", 0, 1)
 
-//  MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(lastbank_audio_map)
+	MCFG_CPU_IO_MAP(lastbank_audio_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	//MCFG_MACHINE_START(lastbank)
 	//MCFG_MACHINE_RESET(lastbank)
@@ -224,7 +323,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 
 
 	MCFG_GFXDECODE( lastbank )
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(lastbank)
 
@@ -244,6 +343,8 @@ ROM_START( lastbank )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
 	ROM_RELOAD(              0x10000, 0x40000 )
 
+	ROM_REGION( 0x20*0x1000, "wram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
@@ -255,4 +356,4 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x40000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank,  0, ROT0, "Excellent Systems", "Last Bank", GAME_IS_SKELETON )
+GAME( 1994, lastbank,  0,   lastbank, lastbank,  0, ROT0, "Excellent Systems", "Last Bank", GAME_NOT_WORKING | GAME_NO_SOUND )
