@@ -2212,7 +2212,7 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
 $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
 
-$(MACHINE)/megadriv.o   $(LAYOUT)/megacd.lh
+$(MACHINE)/megadriv.o:  $(LAYOUT)/megacd.lh
 
 
 #-------------------------------------------------
