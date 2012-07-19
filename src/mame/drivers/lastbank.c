@@ -144,7 +144,7 @@ static SCREEN_UPDATE_IND16( lastbank )
 				fx = vram[count+3] & 0x1;
 				fy = vram[count+3] & 0x2;
 
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,0,fy,x,y,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,0);
 			}
 		}
 
