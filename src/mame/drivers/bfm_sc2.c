@@ -4463,9 +4463,6 @@ ROM_START( sc2cshcl1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club_cashino_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(0e9fad24) SHA1(d14569f106ba29f9cb7769234f5531382e28bd69) )
 
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	ROM_LOAD( "club_cashino_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(b529604e) SHA1(87f8dca7e570472697de2cbe7565a038503a6251) )
-
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "cashsnd", 0x0000, 0x080000, CRC(807d37a6) SHA1(bd5f7c39a64a562e96a850a2cc82bfe3f74f1e54) )
 ROM_END
@@ -5388,13 +5385,6 @@ ROM_END
 ROM_START( sc2cops )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cops & robbers 10 p1 (27512)", 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	// are these different HW? (SC1?) Will add in next pass
-	ROM_LOAD( "cop56cp1", 0x0000, 0x008000, CRC(214edd7d) SHA1(007c17cc522c8f0d30bc1fd08bb18850344f62ad) )
-	ROM_LOAD( "cop56cp2", 0x0000, 0x008000, CRC(c862ee34) SHA1(e807d1072953e67581ce0181bfd82a7efcee7bf0) )
-	ROM_LOAD( "cops & robbers 5p v1-3 a (27256)", 0x0000, 0x008000, CRC(29513083) SHA1(f2ce0b573d6756e7d835488b8d8eed3266787255) )
-	ROM_LOAD( "cops & robbers 5p v1-3 b (27256)", 0x0000, 0x008000, CRC(6f5425d6) SHA1(7673841ccfe16eaa0a5cfca1596383f7711f2dbe) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
 	ROM_LOAD( "95000578.p1", 0x0000, 0x010000, CRC(bdd56a09) SHA1(92d0416578c55075a127f1c2af8d6de5216dd189) )//official part number for cops-and-robbers-mtx-ass.bin, cops & robbers 10 p2 (27512
