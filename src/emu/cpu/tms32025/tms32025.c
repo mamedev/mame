@@ -552,6 +552,11 @@ INLINE void PUTDATA_SST(tms32025_state *cpustate, UINT16 data)
 }
 
 
+
+/****************************************************************************
+ *	Emulate the Instructions
+ ****************************************************************************/
+
 /* The following functions are here to fill the void for the */
 /* opcode call functions. These functions are never actually called. */
 static void opcodes_CE(tms32025_state *cpustate) { }
@@ -1345,7 +1350,7 @@ static void sblk(tms32025_state *cpustate)
 	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
 	CALCULATE_SUB_CARRY(cpustate);
 }
-static void sbrk_tms(tms32025_state *cpustate)
+static void sbrk_ar(tms32025_state *cpustate)
 {
 	cpustate->AR[ARP] -= cpustate->opcode.b.l;
 }
@@ -1604,7 +1609,7 @@ static const tms32025_opcode opcode_main[256]=
 /*60*/ {1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},
 /*68*/ {1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},
 /*70*/ {1*CLK, sar_ar0	},{1*CLK, sar_ar1	},{1*CLK, sar_ar2	},{1*CLK, sar_ar3	},{1*CLK, sar_ar4	},{1*CLK, sar_ar5	},{1*CLK, sar_ar6	},{1*CLK, sar_ar7	},
-/*78*/ {1*CLK, sst		},{1*CLK, sst1		},{1*CLK, popd		},{1*CLK, zalr		},{1*CLK, spl		},{1*CLK, sph		},{1*CLK, adrk		},{1*CLK, sbrk_tms	},
+/*78*/ {1*CLK, sst		},{1*CLK, sst1		},{1*CLK, popd		},{1*CLK, zalr		},{1*CLK, spl		},{1*CLK, sph		},{1*CLK, adrk		},{1*CLK, sbrk_ar	},
 /*80*/ {2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},
 /*88*/ {2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},
 /*90*/ {1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},
@@ -1667,7 +1672,7 @@ static const tms32025_opcode_Dx opcode_Dx_subset[8]=	/* Instructions living unde
 
 
 /****************************************************************************
- *  Inits CPU emulation
+ *  Initialise the CPU emulation
  ****************************************************************************/
 static CPU_INIT( tms32025 )
 {
@@ -1729,7 +1734,7 @@ static CPU_RESET( tms32025 )
 {
 	tms32025_state *cpustate = get_safe_token(device);
 
-	SET_PC(0);			/* Starting address on a reset */
+	SET_PC(0);					/* Starting address on a reset */
 	cpustate->STR0 |= 0x0600;	/* INTM and unused bit set to 1 */
 	cpustate->STR0 &= 0xefff;	/* OV cleared to 0. Remaining bits undefined */
 	cpustate->STR1 |= 0x07f0;	/* SXM, C, HM, FSM, XF and unused bits set to 1 */
@@ -1747,6 +1752,7 @@ static CPU_RESET( tms32025 )
 
 	cpustate->idle = 0;
 	cpustate->hold = 0;
+	cpustate->tms32025_dec_cycles = 0;
 	cpustate->init_load_addr = 1;
 
 	/* Reset the Data/Program address banks */
@@ -1797,7 +1803,7 @@ static CPU_EXIT( tms32025 )
 /****************************************************************************
  *  Issue an interrupt if necessary
  ****************************************************************************/
-static int process_IRQs(tms32025_state *cpustate)
+INLINE int process_IRQs(tms32025_state *cpustate)
 {
 	/********** Interrupt Flag Register (IFR) **********
         |  5  |  4  |  3  |  2  |  1  |  0  |
@@ -1990,6 +1996,15 @@ static CPU_EXECUTE( tms32025 )
 
 
 		if (cpustate->init_load_addr == 2) {		/* Repeat next instruction */
+			/****************************************************\
+			******* These instructions are not repeatable ********
+			** ADLK, ANDK, LALK, LRLK, ORK,  SBLK, XORK 		**
+			** ADDK, ADRK, LACK, LARK, LDPK, MPYK, RPTK 		**
+			** SBRK, SPM,  SUBK, ZAC,  IDLE, RPT,  TRAP 		**
+			** BACC, CALA, RET									**
+			** B,    BANZ, BBNZ, BBZ,  BC,   BGEZ, BGZ,  BIOZ	**
+			** BNC,  BNV,  BNZ,  BV,   BZ,   CALL, BLEZ, BLZ	**
+			\****************************************************/
 			cpustate->PREVPC = cpustate->PC;
 
 			debugger_instruction_hook(device, cpustate->PC);
@@ -2008,16 +2023,6 @@ static CPU_EXECUTE( tms32025 )
 						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
 					(*opcode_CE_subset[cpustate->opcode.b.l].function)(cpustate);
-				}
-				if ((cpustate->opcode.w.l & 0xf0f8) == 0xd000)
-				{							/* Do all valid 0xDxxx Opcodes */
-					if (cpustate->init_load_addr) {
-						cpustate->tms32025_dec_cycles += (1*CLK);
-					}
-					else {
-						cpustate->tms32025_dec_cycles += (1*CLK);
-					}
-					(*opcode_Dx_subset[cpustate->opcode.b.l].function)(cpustate);
 				}
 				else
 				{							/* Do all other opcodes */
@@ -2067,7 +2072,6 @@ static void set_irq_line(tms32025_state *cpustate, int irqline, int state)
 	if (state != CLEAR_LINE)
 	{
 		cpustate->IFR |= (1 << irqline);
-//      cpustate->IFR &= 0x07;
 	}
 }
 
