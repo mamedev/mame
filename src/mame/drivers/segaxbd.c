@@ -2852,4 +2852,4 @@ GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega
 GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
 GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gprideru, gprider,  xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
-GAME( 1991, rascot2,  0,        xboard,  thndrbld, generic_xboard, ROT0,   "Sega", "Royal Ascot 2", NOT_WORKING )
+GAME( 1991, rascot2,  0,        xboard,  thndrbld, generic_xboard, ROT0,   "Sega", "Royal Ascot 2", GAME_IS_SKELETON )
