@@ -1,12 +1,14 @@
 /***************************************************************************
 
-    Last Bank skeleton driver
+    Last Bank driver
+
+	preliminary driver by Angelo Salese
 
     Uses a TC0091LVC, a variant of the one used on Taito L HW
 
     TODO:
     - somebody should port CPU core contents in a shared file;
-    - Currently resets half-way through bootstrap routine, check why;
+	- various gfxs are completely missing;
 
 ***************************************************************************/
 
@@ -21,15 +23,18 @@ class lastbank_state : public driver_device
 public:
 	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_vregs(*this, "vregs")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_vregs;
 
 	UINT8 m_ram_bank[4];
 	UINT8 m_rom_bank;
 	UINT8 m_irq_vector[3];
 	UINT8 m_irq_enable;
+	UINT8 m_mux_data;
 	UINT8 *m_palette_ram;
 
 	DECLARE_READ8_MEMBER(lastbank_rom_r);
@@ -42,6 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lastbank_ram_1_w);
 	DECLARE_WRITE8_MEMBER(lastbank_ram_2_w);
 	DECLARE_WRITE8_MEMBER(lastbank_ram_3_w);
+
+	DECLARE_READ8_MEMBER(mux_0_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
 
 	DECLARE_READ8_MEMBER(lastbank_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(lastbank_rom_bank_w);
@@ -66,6 +74,100 @@ static VIDEO_START( lastbank )
 
 static SCREEN_UPDATE_IND16( lastbank )
 {
+	lastbank_state *state = screen.machine().driver_data<lastbank_state>();
+	int y,x;
+	UINT8 *vram = state->memregion("wram")->base();
+	int count;
+
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+
+	if((state->m_vregs[4] & 0x8) == 0) // title screen
+	{
+		count = 0x40000;
+
+		for (y=0;y<32*8;y++)
+		{
+			for (x=0;x<512;x++)
+			{
+				bitmap.pix16(y, x) = screen.machine().pens[vram[count]];
+
+				count++;
+			}
+		}
+	}
+	else
+	{
+		if(0)
+		{
+			count = 0x18000;
+
+			for (y=0;y<32;y++)
+			{
+				for (x=0;x<64;x++)
+				{
+					const gfx_element *gfx = screen.machine().gfx[0];
+					UINT16 attr = vram[count]|(vram[count+1]<<8);
+					UINT16 tile = attr & 0x1ff;
+					UINT8 color = (attr & 0xf000) >> 12;
+
+					drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8);
+
+					count+=2;
+				}
+			}
+		}
+
+		/*
+		    Sprite format:
+		    00: xxxxxxxx tile number (low)
+		    01: xxxxxxxx tile number (high)
+		    02: ----xxxx color
+		        ----x--- priority
+		    03: -------x flip x
+		        ------x- flip y
+		    04: xxxxxxxx x position (low)
+		    05: -------x x position (high)
+		    06: xxxxxxxx y position
+		    07: xxxxxxxx unknown / ignored? Seems just garbage in many cases, e.g
+		                 plgirs2 bullets and raimais big bosses.
+		*/
+		{
+			for(count=0x1b000;count<0x1b3e7;count+=8)
+			{
+				int x,y,spr_offs,col,fx,fy;
+				const gfx_element *gfx = screen.machine().gfx[1];
+
+				spr_offs = vram[count+0]|(vram[count+1]<<8);
+				x = vram[count+4]|(vram[count+5]<<8);
+				y = vram[count+6];
+				col = (vram[count+2])&0x0f;
+				fx = vram[count+3] & 0x1;
+				fy = vram[count+3] & 0x2;
+
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,0,fy,x,y,0);
+			}
+		}
+
+		{
+			count = 0x1a000;
+
+			for (y=0;y<32;y++)
+			{
+				for (x=0;x<64;x++)
+				{
+					UINT16 attr = vram[count]|(vram[count+1]<<8);
+					UINT16 tile = attr & 0x1ff;
+					UINT8 color = (attr & 0xf000) >> 12;
+					const gfx_element *gfx = screen.machine().gfx[((attr & 0x1000) >> 12) + 2];
+
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8, 0);
+
+					count+=2;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -107,12 +209,6 @@ WRITE8_MEMBER(lastbank_state::lastbank_irq_enable_w)
 	m_irq_enable = data;
 }
 
-static READ8_HANDLER( test_r )
-{
-	return -1;
-}
-
-
 READ8_MEMBER(lastbank_state::lastbank_ram_bank_r)
 {
 	return m_ram_bank[offset];
@@ -131,7 +227,7 @@ UINT8 lastbank_state::ram_bank_r(UINT16 offset, UINT8 bank_num)
 	if(m_ram_bank[bank_num] & 0x80)
 		res = m_palette_ram[offset & 0x1ff];
 	else
-		res = ram[offset + (m_ram_bank[bank_num] & 0x1f) * 0x1000];
+		res = ram[offset + (m_ram_bank[bank_num] & 0x7f) * 0x1000];
 
 	return res;
 }
@@ -142,6 +238,9 @@ void lastbank_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
 
 	if(m_ram_bank[bank_num] & 0x80)
 	{
+		if(m_ram_bank[bank_num] & 0x7f)
+			printf("%02x\n",m_ram_bank[bank_num]);
+
 		m_palette_ram[offset & 0x1ff] = data;
 		{
 			UINT8 r,g,b,i;
@@ -167,7 +266,27 @@ void lastbank_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
 		}
 	}
 	else
-		ram[offset + (m_ram_bank[bank_num] & 0x1f) * 0x1000] = data;
+		ram[offset + (m_ram_bank[bank_num] & 0x7f) * 0x1000] = data;
+
+	/* RAM-chars 1 */
+	if((m_ram_bank[bank_num] & 0x1c) == 0x14)
+	{
+		UINT8 *gfx_ram = memregion("ram_gfx1")->base();
+		UINT32 addr = offset + (m_ram_bank[bank_num] & 0x3) * 0x1000;
+
+		gfx_ram[addr] = data;
+		gfx_element_mark_dirty(machine().gfx[2], addr / 32);
+	}
+
+	/* RAM-chars 2 */
+	if((m_ram_bank[bank_num] & 0x1c) == 0x1c)
+	{
+		UINT8 *gfx_ram = memregion("ram_gfx2")->base();
+		UINT32 addr = offset + (m_ram_bank[bank_num] & 0x3) * 0x1000;
+
+		gfx_ram[addr] = data;
+		gfx_element_mark_dirty(machine().gfx[3], addr / 32);
+	}
 }
 
 READ8_MEMBER(lastbank_state::lastbank_ram_0_r) { return ram_bank_r(offset, 0); }
@@ -180,6 +299,31 @@ WRITE8_MEMBER(lastbank_state::lastbank_ram_2_w) { ram_bank_w(offset, data, 2); }
 WRITE8_MEMBER(lastbank_state::lastbank_ram_3_w) { ram_bank_w(offset, data, 3); }
 
 
+
+READ8_MEMBER(lastbank_state::mux_0_r)
+{
+	const char *const keynames[2][5] = {
+		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
+		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
+	UINT8 res;
+	int i;
+
+	res = 0xff;
+
+	for(i=0;i<5;i++)
+	{
+		if(m_mux_data & 1 << i)
+			res = ioport(keynames[0][i])->read();
+	}
+
+	return res;
+}
+
+WRITE8_MEMBER(lastbank_state::mux_w)
+{
+	m_mux_data = data;
+}
+
 static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(lastbank_rom_r)
@@ -187,14 +331,21 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN3") AM_WRITENOP // mux for $a808 / $a80c
-	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("IN4")
-	AM_RANGE(0xa808, 0xa808) AM_READNOP
-	AM_RANGE(0xa80c, 0xa80c) AM_READNOP
-	AM_RANGE(0xa800, 0xa81f) AM_READ_LEGACY(test_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS") AM_WRITENOP
+	AM_RANGE(0xa801, 0xa801) AM_WRITENOP
+	AM_RANGE(0xa802, 0xa802) AM_WRITENOP
+	AM_RANGE(0xa803, 0xa803) AM_WRITE(mux_w) // mux for $a808 / $a80c
+	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("VBLANK")
+	AM_RANGE(0xa805, 0xa805) AM_WRITENOP
+	AM_RANGE(0xa806, 0xa806) AM_WRITENOP
+	AM_RANGE(0xa807, 0xa807) AM_WRITENOP
+	AM_RANGE(0xa808, 0xa808) AM_READ(mux_0_r)
+	AM_RANGE(0xa80c, 0xa80c) AM_READ(mux_0_r)
+	AM_RANGE(0xa81c, 0xa81c) AM_READ_PORT("DSW0")
+	AM_RANGE(0xa81d, 0xa81d) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa81e, 0xa81e) AM_READ_PORT("DSW2")
+	AM_RANGE(0xa81f, 0xa81f) AM_READ_PORT("DSW3")
+
 	/* TODO: RAM banks! */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(lastbank_ram_0_r,lastbank_ram_0_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastbank_ram_1_r,lastbank_ram_1_w)
@@ -203,13 +354,11 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 
 	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)
 	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM
-
+	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_SHARE("vregs")
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(lastbank_irq_vector_r, lastbank_irq_vector_w)
 	AM_RANGE(0xff03, 0xff03) AM_READWRITE(lastbank_irq_enable_r, lastbank_irq_enable_w)
 	AM_RANGE(0xff04, 0xff07) AM_READWRITE(lastbank_ram_bank_r, lastbank_ram_bank_w)
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(lastbank_rom_bank_r, lastbank_rom_bank_w)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastbank_audio_map, AS_PROGRAM, 8, lastbank_state )
@@ -220,20 +369,178 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastbank_audio_io, AS_IO, 8, lastbank_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_NOP // I get on this later on ...
-
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lastbank )
-	PORT_START("IN0")
-	PORT_START("IN1")
-	PORT_START("IN2")
-	PORT_START("IN3")
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN4")
-	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN ) //?
+	PORT_START("VBLANK")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service")
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Count" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Hopper Empty" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN ) // bit 6 is a status of some sort
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
+	PORT_START("P1_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("1P 3-4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("1P 4-6") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("1P 4-5") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("1P Small") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P FF") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("1P 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("1P Big") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("1P Cancel") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("1P 3-5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("1P 2-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1P 1-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1P 1-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Payout") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("1P 2-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("1P Autobet") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("1P 3-6") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("1P 2-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout bg2_layout =
@@ -273,10 +580,22 @@ static const gfx_layout char_layout =
 	8*8*4
 };
 
+static const gfx_layout char_layout8 =
+{
+	8, 8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
+};
+
 static GFXDECODE_START( lastbank )
-	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu",           0, char_layout,  0, 16 )  // Ram-based
+	GFXDECODE_ENTRY( "gfx1", 		0, bg2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 		0, sp2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "ram_gfx1",    0, char_layout,  0, 16 )  // Ram-based
+	GFXDECODE_ENTRY( "ram_gfx2",    0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
 static TIMER_DEVICE_CALLBACK( lastbank_irq_scanline )
@@ -305,8 +624,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(lastbank_audio_map)
 	MCFG_CPU_IO_MAP(lastbank_audio_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60)
+//	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -317,8 +635,8 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(lastbank)
 
 
@@ -343,17 +661,20 @@ ROM_START( lastbank )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
 	ROM_RELOAD(              0x10000, 0x40000 )
 
-	ROM_REGION( 0x20*0x1000, "wram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80*0x1000, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "5.u10", 0x00000, 0x20000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "5.u10", 0x00000, 0x20000, BAD_DUMP CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) ) // bad size?
+
+	ROM_REGION( 0x4000, "ram_gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "ram_gfx2", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
 	ROM_LOAD( "6.u55", 0x00000, 0x40000, CRC(9e78e234) SHA1(031f93e4bc338d0257fa673da7ce656bb1cda5fb) )
 	ROM_LOAD( "7.u60", 0x40000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank,  0, ROT0, "Excellent Systems", "Last Bank", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1994, lastbank,  0,   lastbank, lastbank,  0, ROT0, "Excellent Systems", "Last Bank (v1.16)", GAME_NOT_WORKING | GAME_NO_SOUND )
