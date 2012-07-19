@@ -3,7 +3,6 @@
         -----------------------------------------------------------
 ****************************************************************************/
 
-
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 
@@ -12,14 +11,18 @@ class twincobr_state : public driver_device
 {
 public:
 	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram8(*this, "spriteram8"),
-		m_spriteram16(*this, "spriteram16"){ }
+		m_spriteram16(*this, "spriteram16")
+	{ }
+
+	optional_shared_ptr<UINT8> m_sharedram;
+	optional_device<buffered_spriteram8_device> m_spriteram8;
+	optional_device<buffered_spriteram16_device> m_spriteram16;
 
 	int m_toaplan_main_cpu;
 	int m_wardner_membank;
-	optional_shared_ptr<UINT8> m_sharedram;
 	INT32 m_fg_rom_bank;
 	INT32 m_bg_ram_bank;
 	INT32 m_wardner_sprite_hack;
@@ -52,8 +55,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	optional_device<buffered_spriteram8_device> m_spriteram8;
-	optional_device<buffered_spriteram16_device> m_spriteram16;
+
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_addrsel_w);
 	DECLARE_READ16_MEMBER(twincobr_dsp_r);
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_w);
@@ -98,10 +100,6 @@ public:
 };
 
 
-/*----------- defined in drivers/wardner.c -----------*/
-
-void wardner_restore_bank(running_machine &machine);
-
 /*----------- defined in machine/twincobr.c -----------*/
 
 INTERRUPT_GEN( twincobr_interrupt );
@@ -116,15 +114,12 @@ extern void twincobr_driver_savestate(running_machine &machine);
 extern void wardner_driver_savestate(running_machine &machine);
 
 
-
-
 /*----------- defined in video/twincobr.c -----------*/
+
 extern const mc6845_interface twincobr_mc6845_intf;
 
 extern void twincobr_flipscreen(running_machine &machine, int flip);
 extern void twincobr_display(running_machine &machine, int enable);
-
-
 
 VIDEO_START( toaplan0 );
 SCREEN_UPDATE_IND16( toaplan0 );

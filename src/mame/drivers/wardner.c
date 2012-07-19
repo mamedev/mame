@@ -131,123 +131,51 @@ out:
 #include "includes/toaplipt.h"
 #include "includes/twincobr.h"
 
-// installing handlers at runtime with the current memory system is SLOW, can use 80-90% of CPU time on some levels(!) just leave it in attract mode to see
-// if the memory system becomes faster than using the modern banking might be an option again
-// #define WARDNER_MODERN_BANKING
 
 class wardner_state : public twincobr_state
 {
 public:
 	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
 		: twincobr_state(mconfig, type,tag),
-		  m_rambase_ae00(*this, "rambase_ae00"),
 		  m_rambase_c000(*this, "rambase_c000")
 	{ 
 	}
 
-	required_shared_ptr<UINT8> m_rambase_ae00;
 	required_shared_ptr<UINT8> m_rambase_c000;
-	DECLARE_WRITE8_MEMBER(wardner_ramrom_bank_sw);
 	UINT8 *m_ROM;
-#ifdef WARDNER_MODERN_BANKING
-#else
+
+	DECLARE_WRITE8_MEMBER(wardner_ramrom_bank_sw);
 	DECLARE_READ8_MEMBER(wardner_bank_r);
-#endif
 };
 
-#ifdef WARDNER_MODERN_BANKING
-#else
+
 READ8_MEMBER( wardner_state::wardner_bank_r )
 {
-	switch (m_wardner_membank)
+	if (m_wardner_membank == 0)
 	{
 		// RAM mapped (plus fallthroughs to bits of ROM bank 0)
-		case 0:
-			{
-				int addr = offset + 0x8000;
+		int addr = offset + 0x8000;
 
-				if ((addr>=0x8000) && (addr < 0x9000)) /* 0x8000 - 0x8fff (sprites) */
-				{
-					return wardner_sprite_r(space, addr-0x8000);
-				}
-				else if ((addr>=0xa000) && (addr < 0xae00)) /* 0xa000 - 0xadff ('bank4' m_generic_paletteram_8) (paletteram) */
-				{
-					return m_generic_paletteram_8[addr - 0xa000];
-				}
-				else if ((addr>=0xae00) && (addr < 0xb000)) /* 0xae00 - 0xafff ('bank2' m_rambase_ae00) (unused paletteram) */
-				{
-					return m_rambase_ae00[addr - 0xae00];
-				}
-				else if ((addr>=0xc000) && (addr < 0xc800)) /* 0xc000 - 0xc7ff ('bank3' m_rambase_c000)  (z80 shared ram) */
-				{
-					return m_rambase_c000[addr - 0xc000];
-				}
-				else /* anything else falls through to ROM bank 0 */
-				{
-					return m_ROM[m_wardner_membank * 0x8000 + offset];
-				}
-			}
+		// 0x8000 - 0x8fff (sprites)
+		if ((addr >= 0x8000) && (addr < 0x9000))
+			return wardner_sprite_r(space, addr - 0x8000);
 
-		// ROM mapped
-		default: // 1-7
-			return m_ROM[m_wardner_membank * 0x8000 + offset];
+		// 0xa000 - 0xafff (paletteram)
+		else if ((addr >= 0xa000) && (addr < 0xb000))
+			return m_generic_paletteram_8[addr - 0xa000];
+
+		// 0xc000 - 0xc7ff (z80 shared ram)
+		else if ((addr >= 0xc000) && (addr < 0xc800))
+			return m_rambase_c000[addr - 0xc000];
 	}
+	
+	// ROM bank mapped
+	return m_ROM[m_wardner_membank * 0x8000 + offset];
 }
-#endif
 
 WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 {
-#ifdef WARDNER_MODERN_BANKING
-
-	if (m_wardner_membank != data)
-	{
-		int bankaddress = 0;
-
-		address_space *mainspace;
-
-		mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-		m_wardner_membank = data;
-
-		if (data)
-		{
-			mainspace->install_read_bank(0x8000, 0xffff, "bank1");
-			switch (data)
-			{
-				default: bankaddress = 0x00000; break; /* not used */
-				case 1:  bankaddress = 0x08000; break; /* not used */
-				case 2:  bankaddress = 0x10000; break;
-				case 3:  bankaddress = 0x18000; break;
-				case 4:  bankaddress = 0x20000; break;
-				case 5:  bankaddress = 0x28000; break;
-				case 6:  bankaddress = 0x30000; break; /* not used */
-				case 7:  bankaddress = 0x38000; break;
-			}
-			membank("bank1")->set_base(&m_ROM[bankaddress]);
-		}
-		else
-		{
-			mainspace->install_read_handler(0x8000, 0x8fff, read8_delegate(FUNC(wardner_state::wardner_sprite_r),this));
-			mainspace->install_read_bank(0xa000, 0xadff, "bank4");
-			mainspace->install_read_bank(0xae00, 0xafff, "bank2");
-			mainspace->install_read_bank(0xc000, 0xc7ff, "bank3");
-			membank("bank1")->set_base(&m_ROM[0x0000]);
-			membank("bank2")->set_base(m_rambase_ae00);
-			membank("bank3")->set_base(m_rambase_c000);
-			membank("bank4")->set_base(m_generic_paletteram_8);
-		}
-	}
-#else
-	m_wardner_membank = data;
-#endif
-}
-
-void wardner_restore_bank(running_machine &machine)
-{
-	wardner_state *state = machine.driver_data<wardner_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-	state->wardner_ramrom_bank_sw(*space,0,1);	/* Dummy value to ensure restoration */
-	state->wardner_ramrom_bank_sw(*space,0,state->m_wardner_membank);
+	m_wardner_membank = data & 7;
 }
 
 
@@ -256,17 +184,10 @@ void wardner_restore_bank(running_machine &machine)
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-
-#ifdef WARDNER_MODERN_BANKING
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") /* Overlapped RAM/Banked ROM - See below */
-#else
 	AM_RANGE(0x8000, 0xffff) AM_READ(wardner_bank_r) /* Overlapped RAM/Banked ROM */
-#endif
-
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram8")
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xae00, 0xafff) AM_RAM AM_SHARE("rambase_ae00")
+	AM_RANGE(0xa000, 0xafff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("rambase_c000") /* Shared RAM with Sound Z80 */
 	AM_RANGE(0xc800, 0xffff) AM_ROM
