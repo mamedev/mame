@@ -8,7 +8,9 @@
 
     TODO:
     - somebody should port CPU core contents in a shared file;
-	- various gfxs are completely missing;
+    - sound;
+    - complete video part;
+    - device-ify video and irq routines;
 
 ***************************************************************************/
 
@@ -97,7 +99,7 @@ static SCREEN_UPDATE_IND16( lastbank )
 	}
 	else
 	{
-		if(0)
+		if(1)
 		{
 			count = 0x18000;
 
@@ -107,10 +109,34 @@ static SCREEN_UPDATE_IND16( lastbank )
 				{
 					const gfx_element *gfx = screen.machine().gfx[0];
 					UINT16 attr = vram[count]|(vram[count+1]<<8);
-					UINT16 tile = attr & 0x1ff;
+					UINT16 tile = attr & 0x3ff;
+					UINT8 tile_bank = state->m_vregs[(attr & 0xc00) >> 10];
 					UINT8 color = (attr & 0xf000) >> 12;
+					tile |= (tile_bank << 10);
 
-					drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8);
+					drawgfx_transpen(bitmap,cliprect,gfx,tile+0x1000,color,0,0,x*8,y*8,0);
+
+					count+=2;
+				}
+			}
+		}
+
+		if(1)
+		{
+			count = 0x19000;
+
+			for (y=0;y<32;y++)
+			{
+				for (x=0;x<64;x++)
+				{
+					const gfx_element *gfx = screen.machine().gfx[0];
+					UINT16 attr = vram[count]|(vram[count+1]<<8);
+					UINT16 tile = attr & 0x3ff;
+					UINT8 tile_bank = state->m_vregs[(attr & 0xc00) >> 10];
+					UINT8 color = (attr & 0xf000) >> 12;
+					tile |= (tile_bank << 10);
+
+					drawgfx_transpen(bitmap,cliprect,gfx,tile+0x1000,color,0,0,x*8,y*8,0);
 
 					count+=2;
 				}
@@ -144,7 +170,7 @@ static SCREEN_UPDATE_IND16( lastbank )
 				fx = vram[count+3] & 0x1;
 				fy = vram[count+3] & 0x2;
 
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+0x400,col,fx,fy,x,y,0);
 			}
 		}
 
@@ -375,7 +401,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Bookkeeping")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -666,8 +692,11 @@ ROM_START( lastbank )
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "5.u10", 0x00000, 0x20000, BAD_DUMP CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) ) // bad size?
+	ROM_REGION( 0x120000, "gfx1", 0 )
+	ROM_LOAD( "5.u10", 0x00000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
+	ROM_LOAD( "u11",   0x20000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
+
+//	ROM_REGION( 0x100000, "gfx2", 0 )
 
 	ROM_REGION( 0x4000, "ram_gfx1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "ram_gfx2", ROMREGION_ERASE00 )
