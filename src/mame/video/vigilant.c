@@ -6,10 +6,6 @@
 
   TODO:
 
-  - Get a dump of the PAL16L8 (IC38 - 4M).  This controls transparency.
-    It takes as input 4 bits of sprite color, and 6 bits of background tile
-    color.  It outputs a sprite enable line, a background enable line, and
-    a background select (which layer of background to draw).
   - Add cocktail flipping.
 
 ***************************************************************************/
