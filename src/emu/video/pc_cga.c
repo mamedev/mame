@@ -1227,6 +1227,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 					break;
 			}
 			space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
+			space_prg->install_legacy_readwrite_handler(0xb9000, 0xb97ff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
 		} else {
 			if (cga.videoram_size== 0x4000) {
 				space_prg->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );

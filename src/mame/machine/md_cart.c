@@ -159,7 +159,7 @@ static const md_pcb pcb_list[] =
 	{"MC_12IN1", MC_12IN1},
 	{"TOPFIGHTER", TOPFIGHTER},
 	{"POKEMON", POKEMON},
-	{"POKEMON2", POKEMON},
+	{"POKEMON2", POKEMON2},
 	{"MULAN", MULAN}
 };
 
