@@ -10,13 +10,370 @@
     - somebody should port CPU core contents in a shared file;
     - sound;
     - complete video part;
-    - device-ify video and irq routines;
+    - device-ify irq routines;
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+
+/*
+Start of TC0091LVC device code (TODO: move into a proper file)
+*/
+
+
+class tc0091lvc_device : public device_t,
+						  public device_memory_interface
+{
+public:
+	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    DECLARE_READ8_MEMBER( vregs_r );
+    DECLARE_WRITE8_MEMBER( vregs_w );
+
+	DECLARE_READ8_MEMBER( tc0091lvc_paletteram_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_paletteram_w );
+	DECLARE_READ8_MEMBER( tc0091lvc_bitmap_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_bitmap_w );
+	DECLARE_READ8_MEMBER( tc0091lvc_pcg1_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_pcg1_w );
+	DECLARE_READ8_MEMBER( tc0091lvc_pcg2_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_pcg2_w );
+	DECLARE_READ8_MEMBER( tc0091lvc_vram0_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_vram0_w );
+	DECLARE_READ8_MEMBER( tc0091lvc_vram1_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_vram1_w );
+	DECLARE_READ8_MEMBER( tc0091lvc_spr_r );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_spr_w );
+
+	DECLARE_WRITE8_MEMBER( tc0091lvc_bg0_scroll_w );
+	DECLARE_WRITE8_MEMBER( tc0091lvc_bg1_scroll_w );
+
+	UINT8 *m_palette_ram;
+	UINT8 *m_vregs;
+	UINT8 *m_bitmap_ram;
+	UINT8 *m_pcg1_ram;
+	UINT8 *m_pcg2_ram;
+	UINT8 *m_vram0;
+	UINT8 *m_vram1;
+	UINT8 *m_sprram;
+	UINT8 m_bg0_scroll[4];
+	UINT8 m_bg1_scroll[4];
+
+	tilemap_t *bg0_tilemap;
+	tilemap_t *bg1_tilemap;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void device_config_complete();
+	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start();
+	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	address_space_config		m_space_config;
+};
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)
+{
+	return m_palette_ram[offset & 0x1ff];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
+{
+	m_palette_ram[offset & 0x1ff] = data;
+
+	{
+		UINT8 r,g,b,i;
+		UINT16 pal;
+
+		pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
+
+		i = (pal & 0x7000) >> 12;
+		b = (pal & 0x0f00) >> 8;
+		g = (pal & 0x00f0) >> 4;
+		r = (pal & 0x000f) >> 0;
+
+		r <<= 1;
+		g <<= 1;
+		b <<= 1;
+
+		/* TODO: correct? */
+		b |= ((i & 4) >> 2);
+		g |= ((i & 2) >> 1);
+		r |= (i & 1);
+
+		palette_set_color_rgb(machine(), offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+}
+
+READ8_MEMBER(tc0091lvc_device::vregs_r)
+{
+	return m_vregs[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::vregs_w)
+{
+	m_vregs[offset] = data;
+}
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_r)
+{
+	return m_bitmap_ram[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_w)
+{
+	m_bitmap_ram[offset] = data;
+}
+
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_r)
+{
+	return m_pcg1_ram[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_w)
+{
+//	UINT8 *gfx_ram = memregion("ram_gfx1")->base();
+
+	m_pcg1_ram[offset] = data;
+	//gfx_element_mark_dirty(machine().gfx[2], offset / 32);
+}
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
+{
+	return m_pcg2_ram[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_w)
+{
+//	UINT8 *gfx_ram = memregion("ram_gfx2")->base();
+
+	m_pcg2_ram[offset] = data;
+	//gfx_element_mark_dirty(machine().gfx[3], offset / 32);
+}
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_r)
+{
+	return m_vram0[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_w)
+{
+	m_vram0[offset] = data;
+	bg0_tilemap->mark_tile_dirty(offset/2);
+}
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_r)
+{
+	return m_vram1[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_w)
+{
+	m_vram1[offset] = data;
+	bg1_tilemap->mark_tile_dirty(offset/2);
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bg0_scroll_w)
+{
+	m_bg0_scroll[offset] = data;
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bg1_scroll_w)
+{
+	m_bg1_scroll[offset] = data;
+}
+
+READ8_MEMBER(tc0091lvc_device::tc0091lvc_spr_r)
+{
+	return m_sprram[offset];
+}
+
+WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
+{
+	m_sprram[offset] = data;
+}
+
+static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
+	AM_RANGE(0x014000, 0x017fff) AM_READWRITE(tc0091lvc_pcg1_r, tc0091lvc_pcg1_w)
+	AM_RANGE(0x018000, 0x018fff) AM_READWRITE(tc0091lvc_vram0_r, tc0091lvc_vram0_w)
+	AM_RANGE(0x019000, 0x019fff) AM_READWRITE(tc0091lvc_vram1_r, tc0091lvc_vram1_w)
+
+	AM_RANGE(0x01b000, 0x01b3e7) AM_READWRITE(tc0091lvc_spr_r, tc0091lvc_spr_w)
+
+	AM_RANGE(0x01b3f4, 0x01b3f7) AM_WRITE(tc0091lvc_bg0_scroll_w)
+
+	AM_RANGE(0x01b3fc, 0x01b3ff) AM_WRITE(tc0091lvc_bg1_scroll_w)
+
+	AM_RANGE(0x01c000, 0x01ffff) AM_READWRITE(tc0091lvc_pcg2_r, tc0091lvc_pcg2_w)
+	AM_RANGE(0x040000, 0x05ffff) AM_READWRITE(tc0091lvc_bitmap_r, tc0091lvc_bitmap_w)
+	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(tc0091lvc_paletteram_r,tc0091lvc_paletteram_w)
+ADDRESS_MAP_END
+
+const device_type TC0091LVC = &device_creator<tc0091lvc_device>;
+
+tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0091LVC, "TC0091LVC", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, NULL, *ADDRESS_MAP_NAME(tc0091lvc_map8))
+{
+}
+
+
+void tc0091lvc_device::device_config_complete()
+{
+//  int address_bits = 20;
+
+//  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,  address_bits, 0, *ADDRESS_MAP_NAME(tc0091lvc_map8));
+}
+
+void tc0091lvc_device::device_validity_check(validity_checker &valid) const
+{
+}
+
+static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
+{
+	tc0091lvc_device *vdp = (tc0091lvc_device*)device;
+	int attr = vdp->m_vram0[2 * tile_index + 1];
+	int code = vdp->m_vram0[2 * tile_index]
+			| ((attr & 0x03) << 8)
+			| ((vdp->m_vregs[(attr & 0xc) >> 2]) << 10);
+//			| (state->m_horshoes_gfxbank << 12);
+
+	SET_TILE_INFO_DEVICE(
+			0,
+			code+0x1000,
+			(attr & 0xf0) >> 4,
+			0);
+}
+
+static TILE_GET_INFO_DEVICE( get_bg1_tile_info )
+{
+	tc0091lvc_device *vdp = (tc0091lvc_device*)device;
+	int attr = vdp->m_vram1[2 * tile_index + 1];
+	int code = vdp->m_vram1[2 * tile_index]
+			| ((attr & 0x03) << 8)
+			| ((vdp->m_vregs[(attr & 0xc) >> 2]) << 10);
+//			| (state->m_horshoes_gfxbank << 12);
+
+	SET_TILE_INFO_DEVICE(
+			0,
+			code+0x1000,
+			(attr & 0xf0) >> 4,
+			0);
+}
+
+void tc0091lvc_device::device_start()
+{
+	m_palette_ram = auto_alloc_array(machine(), UINT8, 0x200);
+	m_vregs = auto_alloc_array(machine(), UINT8, 0x100);
+	m_bitmap_ram = auto_alloc_array(machine(), UINT8, 0x20000);
+	m_pcg1_ram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_pcg2_ram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_vram0 = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_vram1 = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_sprram = auto_alloc_array(machine(), UINT8, 0x400);
+
+	//top.tmap = tilemap_create_device(this, get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg0_tilemap = tilemap_create_device(this, get_bg0_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg1_tilemap = tilemap_create_device(this, get_bg1_tile_info,tilemap_scan_rows,8,8,64,32);
+
+	//top.tmap->set_transparent_pen(0);
+	//fg.tmap->set_transparent_pen(0);
+	bg0_tilemap->set_transparent_pen(0);
+	bg1_tilemap->set_transparent_pen(0);
+
+	//m_ch1a_tilemap->set_scrolldx(-8, -8);
+	bg0_tilemap->set_scrolldx(28, -11);
+	bg1_tilemap->set_scrolldx(38, -21);
+}
+
+void tc0091lvc_device::device_reset()
+{
+}
+
+const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+
+void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	const gfx_element *gfx = machine.gfx[1];
+	int count;
+
+	for(count=0;count<0x3e7;count+=8)
+	{
+		int x,y,spr_offs,col,fx,fy;
+
+		spr_offs = m_sprram[count+0]|(m_sprram[count+1]<<8);
+		x = m_sprram[count+4]|(m_sprram[count+5]<<8);
+		y = m_sprram[count+6];
+		col = (m_sprram[count+2])&0x0f;
+		fx = m_sprram[count+3] & 0x1;
+		fy = m_sprram[count+3] & 0x2;
+
+		pdrawgfx_transpen(bitmap,cliprect,gfx,spr_offs+0x400,col,fx,fy,x,y,machine.priority_bitmap,(col & 0x08) ? 0xaa : 0x00,0);
+	}
+}
+
+UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT32 count;
+	int x,y;
+
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+
+	if((m_vregs[4] & 0x20) == 0)
+		return 0;
+
+	if((m_vregs[4] & 0x8) == 0) // 8bpp bitmap enabled
+	{
+		count = 0;
+
+		for (y=0;y<32*8;y++)
+		{
+			for (x=0;x<512;x++)
+			{
+				bitmap.pix16(y, x) = screen.machine().pens[m_bitmap_ram[count]];
+				count++;
+			}
+		}
+	}
+	else
+	{
+		int dx, dy;
+
+		dx = m_bg0_scroll[0] | (m_bg0_scroll[1] << 8);
+		//if (state->m_flipscreen)
+		//	dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
+		dy = m_bg0_scroll[2];
+
+		bg0_tilemap->set_scrollx(0, -dx);
+		bg0_tilemap->set_scrolly(0, -dy);
+
+		dx = m_bg1_scroll[0] | (m_bg1_scroll[1] << 8);
+		//if (state->m_flipscreen)
+		//	dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
+		dy = m_bg1_scroll[2];
+
+		bg1_tilemap->set_scrollx(0, -dx);
+		bg1_tilemap->set_scrolly(0, -dy);
+
+		machine().priority_bitmap.fill(0, cliprect);
+		bg1_tilemap->draw(bitmap, cliprect, 0,0);
+		bg0_tilemap->draw(bitmap, cliprect, 0,0);
+		draw_sprites(machine(), bitmap, cliprect);
+	}
+	return 0;
+}
+
+/* End of TC0091LVC */
 
 #define MASTER_CLOCK XTAL_14_31818MHz
 
@@ -26,18 +383,20 @@ public:
 	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vregs(*this, "vregs")
+		m_vdp(*this, "tc0091lvc")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_vregs;
+	required_device<tc0091lvc_device> m_vdp;
+
+	virtual void video_start();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 m_ram_bank[4];
 	UINT8 m_rom_bank;
 	UINT8 m_irq_vector[3];
 	UINT8 m_irq_enable;
 	UINT8 m_mux_data;
-	UINT8 *m_palette_ram;
 
 	DECLARE_READ8_MEMBER(lastbank_rom_r);
 
@@ -66,133 +425,15 @@ public:
 	void ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num);
 };
 
-
-static VIDEO_START( lastbank )
+void lastbank_state::video_start()
 {
-	lastbank_state *state = machine.driver_data<lastbank_state>();
-
-	state->m_palette_ram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
-static SCREEN_UPDATE_IND16( lastbank )
+UINT32 lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lastbank_state *state = screen.machine().driver_data<lastbank_state>();
-	int y,x;
-	UINT8 *vram = state->memregion("wram")->base();
-	int count;
+	bitmap.fill(0, cliprect);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-	if((state->m_vregs[4] & 0x8) == 0) // title screen
-	{
-		count = 0x40000;
-
-		for (y=0;y<32*8;y++)
-		{
-			for (x=0;x<512;x++)
-			{
-				bitmap.pix16(y, x) = screen.machine().pens[vram[count]];
-
-				count++;
-			}
-		}
-	}
-	else
-	{
-		if(1)
-		{
-			count = 0x18000;
-
-			for (y=0;y<32;y++)
-			{
-				for (x=0;x<64;x++)
-				{
-					const gfx_element *gfx = screen.machine().gfx[0];
-					UINT16 attr = vram[count]|(vram[count+1]<<8);
-					UINT16 tile = attr & 0x3ff;
-					UINT8 tile_bank = state->m_vregs[(attr & 0xc00) >> 10];
-					UINT8 color = (attr & 0xf000) >> 12;
-					tile |= (tile_bank << 10);
-
-					drawgfx_transpen(bitmap,cliprect,gfx,tile+0x1000,color,0,0,x*8,y*8,0);
-
-					count+=2;
-				}
-			}
-		}
-
-		if(1)
-		{
-			count = 0x19000;
-
-			for (y=0;y<32;y++)
-			{
-				for (x=0;x<64;x++)
-				{
-					const gfx_element *gfx = screen.machine().gfx[0];
-					UINT16 attr = vram[count]|(vram[count+1]<<8);
-					UINT16 tile = attr & 0x3ff;
-					UINT8 tile_bank = state->m_vregs[(attr & 0xc00) >> 10];
-					UINT8 color = (attr & 0xf000) >> 12;
-					tile |= (tile_bank << 10);
-
-					drawgfx_transpen(bitmap,cliprect,gfx,tile+0x1000,color,0,0,x*8,y*8,0);
-
-					count+=2;
-				}
-			}
-		}
-
-		/*
-		    Sprite format:
-		    00: xxxxxxxx tile number (low)
-		    01: xxxxxxxx tile number (high)
-		    02: ----xxxx color
-		        ----x--- priority
-		    03: -------x flip x
-		        ------x- flip y
-		    04: xxxxxxxx x position (low)
-		    05: -------x x position (high)
-		    06: xxxxxxxx y position
-		    07: xxxxxxxx unknown / ignored? Seems just garbage in many cases, e.g
-		                 plgirs2 bullets and raimais big bosses.
-		*/
-		{
-			for(count=0x1b000;count<0x1b3e7;count+=8)
-			{
-				int x,y,spr_offs,col,fx,fy;
-				const gfx_element *gfx = screen.machine().gfx[1];
-
-				spr_offs = vram[count+0]|(vram[count+1]<<8);
-				x = vram[count+4]|(vram[count+5]<<8);
-				y = vram[count+6];
-				col = (vram[count+2])&0x0f;
-				fx = vram[count+3] & 0x1;
-				fy = vram[count+3] & 0x2;
-
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+0x400,col,fx,fy,x,y,0);
-			}
-		}
-
-		{
-			count = 0x1a000;
-
-			for (y=0;y<32;y++)
-			{
-				for (x=0;x<64;x++)
-				{
-					UINT16 attr = vram[count]|(vram[count+1]<<8);
-					UINT16 tile = attr & 0x1ff;
-					UINT8 color = (attr & 0xf000) >> 12;
-					const gfx_element *gfx = screen.machine().gfx[((attr & 0x1000) >> 12) + 2];
-
-					drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8, 0);
-
-					count+=2;
-				}
-			}
-		}
-	}
+	m_vdp->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -247,72 +488,14 @@ WRITE8_MEMBER(lastbank_state::lastbank_ram_bank_w)
 
 UINT8 lastbank_state::ram_bank_r(UINT16 offset, UINT8 bank_num)
 {
-	UINT8 *ram = memregion("wram")->base();
-	UINT8 res;
-
-	if(m_ram_bank[bank_num] & 0x80)
-		res = m_palette_ram[offset & 0x1ff];
-	else
-		res = ram[offset + (m_ram_bank[bank_num] & 0x7f) * 0x1000];
-
-	return res;
+	address_space *vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
+	return vdp_space->read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
 }
 
 void lastbank_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
 {
-	UINT8 *ram = memregion("wram")->base();
-
-	if(m_ram_bank[bank_num] & 0x80)
-	{
-		if(m_ram_bank[bank_num] & 0x7f)
-			printf("%02x\n",m_ram_bank[bank_num]);
-
-		m_palette_ram[offset & 0x1ff] = data;
-		{
-			UINT8 r,g,b,i;
-			UINT16 pal;
-
-			pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
-
-			i = (pal & 0x7000) >> 12;
-			b = (pal & 0x0f00) >> 8;
-			g = (pal & 0x00f0) >> 4;
-			r = (pal & 0x000f) >> 0;
-
-			r <<= 1;
-			g <<= 1;
-			b <<= 1;
-
-			/* TODO: correct? */
-			b |= ((i & 4) >> 2);
-			g |= ((i & 2) >> 1);
-			r |= (i & 1);
-
-			palette_set_color_rgb(machine(), offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
-		}
-	}
-	else
-		ram[offset + (m_ram_bank[bank_num] & 0x7f) * 0x1000] = data;
-
-	/* RAM-chars 1 */
-	if((m_ram_bank[bank_num] & 0x1c) == 0x14)
-	{
-		UINT8 *gfx_ram = memregion("ram_gfx1")->base();
-		UINT32 addr = offset + (m_ram_bank[bank_num] & 0x3) * 0x1000;
-
-		gfx_ram[addr] = data;
-		gfx_element_mark_dirty(machine().gfx[2], addr / 32);
-	}
-
-	/* RAM-chars 2 */
-	if((m_ram_bank[bank_num] & 0x1c) == 0x1c)
-	{
-		UINT8 *gfx_ram = memregion("ram_gfx2")->base();
-		UINT32 addr = offset + (m_ram_bank[bank_num] & 0x3) * 0x1000;
-
-		gfx_ram[addr] = data;
-		gfx_element_mark_dirty(machine().gfx[3], addr / 32);
-	}
+	address_space *vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
+	vdp_space->write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
 }
 
 READ8_MEMBER(lastbank_state::lastbank_ram_0_r) { return ram_bank_r(offset, 0); }
@@ -372,7 +555,6 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0xa81e, 0xa81e) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa81f, 0xa81f) AM_READ_PORT("DSW3")
 
-	/* TODO: RAM banks! */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(lastbank_ram_0_r,lastbank_ram_0_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastbank_ram_1_r,lastbank_ram_1_w)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastbank_ram_2_r,lastbank_ram_2_w)
@@ -380,7 +562,7 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 
 	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)
 	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_SHARE("vregs")
+	AM_RANGE(0xfe00, 0xfeff)  AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(lastbank_irq_vector_r, lastbank_irq_vector_w)
 	AM_RANGE(0xff03, 0xff03) AM_READWRITE(lastbank_irq_enable_r, lastbank_irq_enable_w)
 	AM_RANGE(0xff04, 0xff07) AM_READWRITE(lastbank_ram_bank_r, lastbank_ram_bank_w)
@@ -606,16 +788,6 @@ static const gfx_layout char_layout =
 	8*8*4
 };
 
-static const gfx_layout char_layout8 =
-{
-	8, 8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
 
 static GFXDECODE_START( lastbank )
 	GFXDECODE_ENTRY( "gfx1", 		0, bg2_layout, 0, 16 )
@@ -662,14 +834,15 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(lastbank)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
 
+	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 
 	MCFG_GFXDECODE( lastbank )
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_VIDEO_START(lastbank)
+//	MCFG_VIDEO_START(lastbank)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -686,8 +859,6 @@ ROM_START( lastbank )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
 	ROM_RELOAD(              0x10000, 0x40000 )
-
-	ROM_REGION( 0x80*0x1000, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
