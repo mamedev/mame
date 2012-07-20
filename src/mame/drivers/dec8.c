@@ -2717,7 +2717,7 @@ ROM_START( gondo )
 	ROM_LOAD( "dt-11.256", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) )    /* Priority (Not yet used) */
+	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) )	/* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
 ROM_START( makyosen )
@@ -2761,7 +2761,7 @@ ROM_START( makyosen )
 	ROM_LOAD( "dt-11.256",0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) ) // ds11.h15
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) )    /* Priority (Not yet used) */
+	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) )	/* BPROM type MB7122E for Priority (Not yet used) */
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16r4nc.u10", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
