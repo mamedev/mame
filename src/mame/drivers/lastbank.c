@@ -291,7 +291,7 @@ static TILE_GET_INFO_DEVICE( get_tx_tile_info )
 	int attr = vdp->m_tvram[2 * tile_index + 1];
 	int code = vdp->m_tvram[2 * tile_index]
 			| ((attr & 0x01) << 8);
-	int region = ((attr & 0x10) >> 4) + vdp->m_gfx_index;
+	int region = ((attr & 0x04) >> 2) + vdp->m_gfx_index;
 
 	SET_TILE_INFO_DEVICE(
 			region,
