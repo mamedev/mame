@@ -3624,7 +3624,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
@@ -3662,7 +3662,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -3788,7 +3788,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4105,7 +4105,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, OKIM6295_PIN7_HIGH)// was /128.. so pin 7 not verified - not confirmed
+	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
@@ -4143,7 +4143,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -4185,7 +4185,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
@@ -5163,28 +5163,51 @@ Board number VG420
 CPU: MC68000P12
 SND: OKI M6295+ YM2413 + NEC D78C10ACW + NEC D4016 (ram?)
 DSW: see manual (scanned in sub-directory Manual)
-OSC: 24.000 MHz
+OSC: 24.000 MHz, 3.579545MHz
 
 ***************************************************************************/
 
 ROM_START( lastforte )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "tre_jc09", 0x000000, 0x020000, CRC(32f43390) SHA1(b5bad9d80f2155f277265fe487a59f0f4ec6575d) )
-	ROM_LOAD16_BYTE( "tre_jc10", 0x000001, 0x020000, CRC(9536369c) SHA1(39291e92c107be35d130ff29533b42581efc308b) )
+	ROM_LOAD16_BYTE( "tr_hc09", 0x000000, 0x020000, CRC(32f43390) SHA1(b5bad9d80f2155f277265fe487a59f0f4ec6575d) )
+	ROM_LOAD16_BYTE( "tr_hc10", 0x000001, 0x020000, CRC(9536369c) SHA1(39291e92c107be35d130ff29533b42581efc308b) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(        0x010000, 0x01c000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "tre_jc02", 0x000000, 0x020000, CRC(11cfbc84) SHA1(fb7005be7678564713b5480569f2cdab6c36f029) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc04", 0x000001, 0x020000, CRC(32bf9c26) SHA1(9d16eca8810d1823726dc9c047504bd24f2a55f7) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc06", 0x000002, 0x020000, CRC(16937977) SHA1(768bb6b1c9b90b2eedc9dbb19c8e9fa8f4265f17) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc08", 0x000003, 0x020000, CRC(6dd96a9b) SHA1(fe8214d57dc83157eff53f2d83bd3a4e2da91555) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc01", 0x000004, 0x020000, CRC(aceb44b3) SHA1(9a236eddbc916c206bfa694b576d971d788e8eb1) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc03", 0x000005, 0x020000, CRC(f18f1248) SHA1(30e39d904368c61a46719a0f21a6acb7fa55593f) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc05", 0x000006, 0x020000, CRC(79f769dd) SHA1(7a9ff8e961ae09fdf36a0a751befc141f47c9fd8) , ROM_SKIP(7))
-	ROMX_LOAD( "tre_jc07", 0x000007, 0x020000, CRC(b6feacb2) SHA1(85df28d5ff6601753a435e31bcaf45702c7489ea) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha02", 0x000000, 0x020000, CRC(11cfbc84) SHA1(fb7005be7678564713b5480569f2cdab6c36f029) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha04", 0x000001, 0x020000, CRC(32bf9c26) SHA1(9d16eca8810d1823726dc9c047504bd24f2a55f7) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha06", 0x000002, 0x020000, CRC(16937977) SHA1(768bb6b1c9b90b2eedc9dbb19c8e9fa8f4265f17) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha08", 0x000003, 0x020000, CRC(6dd96a9b) SHA1(fe8214d57dc83157eff53f2d83bd3a4e2da91555) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha01", 0x000004, 0x020000, CRC(aceb44b3) SHA1(9a236eddbc916c206bfa694b576d971d788e8eb1) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha03", 0x000005, 0x020000, CRC(f18f1248) SHA1(30e39d904368c61a46719a0f21a6acb7fa55593f) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha05", 0x000006, 0x020000, CRC(79f769dd) SHA1(7a9ff8e961ae09fdf36a0a751befc141f47c9fd8) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha07", 0x000007, 0x020000, CRC(b6feacb2) SHA1(85df28d5ff6601753a435e31bcaf45702c7489ea) , ROM_SKIP(7))
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
+ROM_END
+
+ROM_START( lastfortea )
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "tr_ha09", 0x000000, 0x020000, CRC(61fe8fb2) SHA1(d3f33bbc5326f89407fe1f4e389af7510ce134a0) )
+	ROM_LOAD16_BYTE( "tr_ha10", 0x000001, 0x020000, CRC(14a9fba2) SHA1(984247397f204b9e1bdf69e68299b2e061fba5b1) )
+
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
+	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
+	ROM_CONTINUE(        0x010000, 0x01c000 )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "tr_ha02", 0x000000, 0x020000, CRC(11cfbc84) SHA1(fb7005be7678564713b5480569f2cdab6c36f029) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha04", 0x000001, 0x020000, CRC(32bf9c26) SHA1(9d16eca8810d1823726dc9c047504bd24f2a55f7) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha06", 0x000002, 0x020000, CRC(16937977) SHA1(768bb6b1c9b90b2eedc9dbb19c8e9fa8f4265f17) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha08", 0x000003, 0x020000, CRC(6dd96a9b) SHA1(fe8214d57dc83157eff53f2d83bd3a4e2da91555) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha01", 0x000004, 0x020000, CRC(aceb44b3) SHA1(9a236eddbc916c206bfa694b576d971d788e8eb1) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha03", 0x000005, 0x020000, CRC(f18f1248) SHA1(30e39d904368c61a46719a0f21a6acb7fa55593f) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha05", 0x000006, 0x020000, CRC(79f769dd) SHA1(7a9ff8e961ae09fdf36a0a751befc141f47c9fd8) , ROM_SKIP(7))
+	ROMX_LOAD( "tr_ha07", 0x000007, 0x020000, CRC(b6feacb2) SHA1(85df28d5ff6601753a435e31bcaf45702c7489ea) , ROM_SKIP(7))
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
@@ -6062,7 +6085,8 @@ GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, blzntrnd, ROT0,   "Human Am
 GAME( 1994, dharma,    0,        dharma,   dharma,   metro,    ROT0,   "Metro",                                  "Dharma Doujou",                     GAME_SUPPORTS_SAVE )
 GAME( 1994, dharmak,   dharma,   dharma,   dharma,   dharmak,  ROT0,   "Metro",                                  "Dharma Doujou (Korea)",             GAME_SUPPORTS_SAVE )
 GAME( 1994, lastfort,  0,        lastfort, lastfort, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride",            GAME_SUPPORTS_SAVE )
-GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic)",   GAME_SUPPORTS_SAVE )
+GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic, Rev C)", GAME_SUPPORTS_SAVE )
+GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic, Rev A)", GAME_SUPPORTS_SAVE )
 GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Korea)",    GAME_SUPPORTS_SAVE )
 GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   GAME_SUPPORTS_SAVE )
 GAME( 1994, toride2g,  0,        toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
