@@ -316,30 +316,13 @@ Notes:
       68010 clock input - 8.000MHz [32/4]
       34010 clock input - 48.000MHz
 
-****************************************************************************
-
-Emulation notes
----------------
-
-harddriv1:
-
-    In the debugger, right after the game is loaded, type the following :
-
-    maincpu.mb@2c99e=1
-
-    The game boots and seems playable.
-
-    Put a bp at 0x0164f8 and compare execution with 'harddriv2' (bp at same address) which skips some parts of the code.
-
-    1st problem at 0x0164fc : jumps to 0x016526 instead of 0x016508.
-    2nd problem at 0x016542 : jumps to 0x01654c instead of 0x016552. Game resets if you attemp to step over code at 0x01654c.
-
 ****************************************************************************/
 
 
 #include "emu.h"
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
+#include "machine/68681.h"
 #include "audio/atarijsa.h"
 #include "sound/dac.h"
 #include "includes/slapstic.h"
@@ -415,6 +398,21 @@ static const dsp32_config dsp32c_config =
 };
 
 
+/*************************************
+ *
+ *  68681 DUART config
+ *
+ *************************************/
+
+static const duart68681_config duart_config =
+{
+	harddriv_duart_irq_handler,		/* irq callback */
+	NULL,							/* serial transmit */
+	NULL,							/* output port */
+	NULL							/* input port */
+};
+
+
 
 /*************************************
  *
@@ -435,7 +433,7 @@ static ADDRESS_MAP_START( driver_68k_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE_LEGACY(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE_LEGACY(hd68k_msp_io_r, hd68k_msp_io_w)
-	AM_RANGE(0xff0000, 0xff001f) AM_READWRITE_LEGACY(hd68k_duart_r, hd68k_duart_w)
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
 	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE_LEGACY(hd68k_zram_r, hd68k_zram_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -483,7 +481,7 @@ static ADDRESS_MAP_START( multisync_68k_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE_LEGACY(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE_LEGACY(hd68k_msp_io_r, hd68k_msp_io_w)
-	AM_RANGE(0xff0000, 0xff001f) AM_READWRITE_LEGACY(hd68k_duart_r, hd68k_duart_w)
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
 	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE_LEGACY(hd68k_zram_r, hd68k_zram_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -521,7 +519,7 @@ static ADDRESS_MAP_START( multisync2_68k_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE_LEGACY(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE_LEGACY(hd68k_msp_io_r, hd68k_msp_io_w)
-	AM_RANGE(0xfc0000, 0xfc001f) AM_READWRITE_LEGACY(hd68k_duart_r, hd68k_duart_w)
+	AM_RANGE(0xfc0000, 0xfc001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
 	AM_RANGE(0xfd0000, 0xfd0fff) AM_MIRROR(0x004000) AM_READWRITE_LEGACY(hd68k_zram_r, hd68k_zram_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -702,15 +700,42 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( harddriv )
 	PORT_START("IN0")		/* 600000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )	/* diagnostic switch */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* option switches */
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("SW1")		/* 600002 */
+	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Abort")	/* abort */
@@ -758,15 +783,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( racedriv )
 	PORT_START("IN0")		/* 600000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )	/* diagnostic switch */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* option switches */
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("SW1")		/* 600002 */
+	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Abort")	/* abort */
@@ -814,15 +866,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( racedrivc )
 	PORT_START("IN0")		/* 60c000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )	/* diagnostic switch */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* option switches */
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("SW1")		/* 60c002 */
+	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Abort")
@@ -876,15 +955,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( stunrun )
 	PORT_START("IN0")		/* 60c000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* Option switches */
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("SW1")		/* 60c002 */
+	PORT_DIPNAME( 0x01, 0x00, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -938,15 +1044,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( steeltal )
 	PORT_START("IN0")		/* 60c000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("SW1")		/* 60c002 */
+	PORT_DIPNAME( 0x01, 0x00, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
@@ -1001,15 +1134,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( strtdriv )
 	PORT_START("IN0")		/* 60c000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("SW1")		/* 60c002 */
+	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )	/* abort */
@@ -1064,15 +1224,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hdrivair )
 	PORT_START("IN0")		/* 60c000 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
-	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 8-bit EOC */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("SW1")		/* 60c002 */
+	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW1:7" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1:6" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1:5" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW1:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW1:3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW1:2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW1:1" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("a80000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )	/* abort */
@@ -1136,12 +1323,12 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, 32000000/4)
+	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
-	MCFG_CPU_PERIODIC_INT(hd68k_irq_gen, (double)32000000/16/16/16/16/2)
+	MCFG_CPU_PERIODIC_INT(hd68k_irq_gen, (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_CPU_ADD("gsp", TMS34010, 48000000)
+	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
 	MCFG_CPU_CONFIG(gsp_config_driver)
 
@@ -1151,14 +1338,14 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_MACHINE_RESET(harddriv)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
-	MCFG_TIMER_ADD("duart_timer", hd68k_duart_callback)
+	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, duart_config)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(4000000*4, 160*4, 0, 127*4, 417, 0, 384)
+	MCFG_SCREEN_RAW_PARAMS(HARDDRIV_GSP_CLOCK/12*4, 160*4, 0, 127*4, 417, 0, 384)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
 	MCFG_VIDEO_START(harddriv)
@@ -1169,7 +1356,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( driver_msp, driver_nomsp )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("msp", TMS34010, 50000000)
+	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
 	MCFG_CPU_CONFIG(msp_config)
 MACHINE_CONFIG_END
@@ -1188,7 +1375,7 @@ static MACHINE_CONFIG_DERIVED( multisync_nomsp, driver_nomsp )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(6000000*2, 323*2, 0, 256*2, 308, 0, 288)
+	MCFG_SCREEN_RAW_PARAMS(HARDDRIV_GSP_CLOCK/8*2, 323*2, 0, 256*2, 308, 0, 288)
 MACHINE_CONFIG_END
 
 
@@ -1196,7 +1383,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( multisync_msp, multisync_nomsp )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("msp", TMS34010, 50000000)
+	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
 	MCFG_CPU_CONFIG(msp_config)
 MACHINE_CONFIG_END
@@ -1225,7 +1412,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( adsp )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2100, 8000000)
+	MCFG_CPU_ADD("adsp", ADSP2100, XTAL_32MHz/4)
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 MACHINE_CONFIG_END
@@ -1235,7 +1422,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( ds3 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2101, 12000000)
+	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
 	MCFG_CPU_DATA_MAP(ds3_data_map)
 
@@ -1247,7 +1434,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( ds4 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2101, 12000000)
+	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
 	MCFG_CPU_DATA_MAP(ds3_data_map)
 
@@ -1278,7 +1465,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( dsk )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dsp32", DSP32C, 40000000)
+	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
 	MCFG_DSP32C_CONFIG(dsp32c_config)
 	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
@@ -1291,7 +1478,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( dsk2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dsp32", DSP32C, 40000000)
+	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
 	MCFG_DSP32C_CONFIG(dsp32c_config)
 	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
@@ -1310,10 +1497,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( driversnd )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M68000, 16000000/2)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
 
-	MCFG_CPU_ADD("sounddsp", TMS32010, 20000000)
+	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)
@@ -4168,7 +4355,23 @@ static void racedrivc_init_common(running_machine &machine, offs_t gsp_protectio
 static DRIVER_INIT( racedrivc ) { racedrivc_init_common(machine, 0xfff95cd0); }
 static DRIVER_INIT( racedrivc1 ) { racedrivc_init_common(machine, 0xfff7ecd0); }
 
+static DRIVER_INIT( racedrivb1 )
+{
+	harddriv_state *state = machine.driver_data<harddriv_state>();
 
+	/* this unpleasantness prevents racedrivb1 and racedrivg1 from crashing MAME during boot */
+	/* both clear the DSP32C's RAM and then release it from reset, causing it to run through */
+	/* its address space recursively executing instructions */
+	state->m_dsp32->memory().space(AS_PROGRAM)->install_read_handler(0x002000, 0x5fffff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),state));
+	state->m_dsp32->memory().space(AS_PROGRAM)->install_read_handler(0x640000, 0xfff7ff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),state));
+
+	DRIVER_INIT_CALL( racedriv );
+}
+
+READ32_MEMBER(harddriv_state::rddsp_unmap_r)
+{
+	return 0;
+}
 
 READ16_MEMBER(harddriv_state::steeltal_dummy_r)
 {
@@ -4317,7 +4520,7 @@ GAME( 1988, harddrivb5, harddriv, harddriv, harddriv, harddriv, ROT0, "Atari Gam
 GAME( 1988, harddrivg4, harddriv, harddriv, harddriv, harddriv, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
 GAME( 1988, harddriv3,  harddriv, harddriv, harddriv, harddriv, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
 GAME( 1988, harddriv2,  harddriv, harddriv, harddriv, harddriv, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
-GAME( 1988, harddriv1,  harddriv, harddriv, harddriv, harddriv, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", GAME_NOT_WORKING )
+GAME( 1988, harddriv1,  harddriv, harddriv, harddriv, harddriv, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
 
 GAME( 1990, harddrivc,  harddriv, harddrivc, racedrivc, harddrivc, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
 GAME( 1990, harddrivcg, harddriv, harddrivc, racedrivc, harddrivc, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
@@ -4336,17 +4539,17 @@ GAME( 1989, stunrun2e, stunrun,  stunrun,  stunrun,  stunrun,  ROT0, "Atari Game
 GAME( 1989, stunrun0,  stunrun,  stunrun,  stunrun,  stunrun,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
 GAME( 1989, stunrunp,  stunrun,  stunrun,  stunrun,  stunrun,  ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
 
-GAME( 1990, racedriv,   0,        racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
-GAME( 1990, racedrivb,  racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1990, racedrivg,  racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
-GAME( 1990, racedriv4,  racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
-GAME( 1990, racedrivb4, racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
-GAME( 1990, racedrivg4, racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1990, racedriv3,  racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", GAME_NOT_WORKING )
-GAME( 1990, racedriv2,  racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", GAME_NOT_WORKING )
-GAME( 1990, racedriv1,  racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", GAME_NOT_WORKING )
-GAME( 1990, racedrivb1, racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", GAME_NOT_WORKING )
-GAME( 1990, racedrivg1, racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", GAME_NOT_WORKING )
+GAME( 1990, racedriv,   0,        racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
+GAME( 1990, racedrivb,  racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
+GAME( 1990, racedrivg,  racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
+GAME( 1990, racedriv4,  racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
+GAME( 1990, racedrivb4, racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
+GAME( 1990, racedrivg4, racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
+GAME( 1990, racedriv3,  racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
+GAME( 1990, racedriv2,  racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
+GAME( 1990, racedriv1,  racedriv, racedriv, racedriv, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
+GAME( 1990, racedrivb1, racedriv, racedriv, racedriv, racedrivb1, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
+GAME( 1990, racedrivg1, racedriv, racedriv, racedriv, racedrivb1, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
 
 GAME( 1990, racedrivc,   racedriv, racedrivc, racedrivc, racedrivc, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
 GAME( 1990, racedrivcb,  racedriv, racedrivc, racedrivc, racedrivc, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
@@ -4354,8 +4557,8 @@ GAME( 1990, racedrivcg,  racedriv, racedrivc, racedrivc, racedrivc, ROT0, "Atari
 GAME( 1990, racedrivc4,  racedriv, racedrivc, racedrivc, racedrivc, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
 GAME( 1990, racedrivcb4, racedriv, racedrivc, racedrivc, racedrivc, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
 GAME( 1990, racedrivcg4, racedriv, racedrivc, racedrivc, racedrivc, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
-GAME( 1990, racedrivc2,  racedriv, racedrivc, racedrivc, racedrivc1,ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", GAME_NOT_WORKING )
-GAME( 1990, racedrivc1,  racedriv, racedrivc, racedrivc, racedrivc1,ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", GAME_NOT_WORKING )
+GAME( 1990, racedrivc2,  racedriv, racedrivc, racedrivc, racedrivc1,ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
+GAME( 1990, racedrivc1,  racedriv, racedrivc, racedrivc, racedrivc1,ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
 GAME( 1990, racedrivpan, racedriv, racedriv, racedriv, racedriv, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", GAME_NOT_WORKING )
 

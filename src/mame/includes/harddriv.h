@@ -11,6 +11,9 @@
 #include "cpu/dsp32/dsp32.h"
 #include "machine/atarigen.h"
 
+#define HARDDRIV_MASTER_CLOCK	XTAL_32MHz
+#define HARDDRIV_GSP_CLOCK		XTAL_48MHz
+
 class harddriv_state : public atarigen_state
 {
 public:
@@ -34,8 +37,7 @@ public:
 		  m_gsp_control_lo(*this, "gsp_control_lo"),
 		  m_gsp_control_hi(*this, "gsp_control_hi"),
 		  m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
-		  m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
-		  m_duart_timer(*this, "duart_timer") { }
+		  m_gsp_paletteram_hi(*this, "gsp_palram_hi") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -94,11 +96,6 @@ public:
 	UINT8					m_msp_irq_state;
 	UINT8					m_adsp_irq_state;
 	UINT8					m_duart_irq_state;
-
-	UINT8					m_duart_read_data[16];
-	UINT8					m_duart_write_data[16];
-	UINT8					m_duart_output_port;
-	optional_device<timer_device> m_duart_timer;
 
 	UINT8					m_last_gsp_shiftreg;
 
@@ -177,6 +174,7 @@ public:
 	INT8					m_gfx_finescroll;
 	UINT8					m_gfx_palettebank;
 	DECLARE_READ16_MEMBER(steeltal_dummy_r);
+	DECLARE_READ32_MEMBER(rddsp_unmap_r);
 	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
 	DECLARE_READ16_MEMBER(hd68k_snd_status_r);
 	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
@@ -241,9 +239,7 @@ WRITE16_HANDLER( hdc68k_wheel_edge_reset_w );
 READ16_HANDLER( hd68k_zram_r );
 WRITE16_HANDLER( hd68k_zram_w );
 
-TIMER_DEVICE_CALLBACK( hd68k_duart_callback );
-READ16_HANDLER( hd68k_duart_r );
-WRITE16_HANDLER( hd68k_duart_w );
+void harddriv_duart_irq_handler(device_t *device, int state, UINT8 vector);
 
 WRITE16_HANDLER( hdgsp_io_w );
 

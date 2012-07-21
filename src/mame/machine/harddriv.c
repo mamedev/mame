@@ -22,7 +22,6 @@
  *
  *************************************/
 
-#define DUART_CLOCK			(36864000)
 #define DS3_TRIGGER			7777
 
 /* debugging tools */
@@ -89,11 +88,6 @@ MACHINE_RESET( harddriv )
 
 	/* reset IRQ states */
 	state->m_irq_state = state->m_gsp_irq_state = state->m_msp_irq_state = state->m_adsp_irq_state = state->m_duart_irq_state = 0;
-
-	/* reset the DUART */
-	memset(state->m_duart_read_data, 0, sizeof(state->m_duart_read_data));
-	memset(state->m_duart_write_data, 0, sizeof(state->m_duart_write_data));
-	state->m_duart_output_port = 0;
 
 	/* reset the ADSP/DSIII/DSIV boards */
 	state->m_adsp_halt = 1;
@@ -238,7 +232,7 @@ READ16_HANDLER( hd68k_port0_r )
             .....
         0x8000 = SW1 #1
     */
-	int temp = space->machine().root_device().ioport("IN0")->read();
+	int temp = (space->machine().root_device().ioport("SW1")->read() << 8) | space->machine().root_device().ioport("IN0")->read();
 	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0002;
 	temp ^= 0x0018;		/* both EOCs always high for now */
 	return temp;
@@ -478,149 +472,16 @@ WRITE16_HANDLER( hd68k_zram_w )
 
 /*************************************
  *
- *  68000 DUART interface
+ *  68681 DUART
  *
  *************************************/
 
-/*
-                                    DUART registers
-
-            Read                                Write
-            ----------------------------------  -------------------------------------------
-    0x00 =  Mode Register A (MR1A, MR2A)        Mode Register A (MR1A, MR2A)
-    0x02 =  Status Register A (SRA)             Clock-Select Register A (CSRA)
-    0x04 =  Clock-Select Register A 1 (CSRA)    Command Register A (CRA)
-    0x06 =  Receiver Buffer A (RBA)             Transmitter Buffer A (TBA)
-    0x08 =  Input Port Change Register (IPCR)   Auxiliary Control Register (ACR)
-    0x0a =  Interrupt Status Register (ISR)     Interrupt Mask Register (IMR)
-    0x0c =  Counter Mode: Current MSB of        Counter/Timer Upper Register (CTUR)
-                    Counter (CUR)
-    0x0e =  Counter Mode: Current LSB of        Counter/Timer Lower Register (CTLR)
-                    Counter (CLR)
-    0x10 = Mode Register B (MR1B, MR2B)         Mode Register B (MR1B, MR2B)
-    0x12 = Status Register B (SRB)              Clock-Select Register B (CSRB)
-    0x14 = Clock-Select Register B 2 (CSRB)     Command Register B (CRB)
-    0x16 = Receiver Buffer B (RBB)              Transmitter Buffer B (TBB)
-    0x18 = Interrupt-Vector Register (IVR)      Interrupt-Vector Register (IVR)
-    0x1a = Input Port (IP)                      Output Port Configuration Register (OPCR)
-    0x1c = Start-Counter Command 3              Output Port Register (OPR): Bit Set Command 3
-    0x1e = Stop-Counter Command 3               Output Port Register (OPR): Bit Reset Command 3
-*/
-
-
-INLINE int duart_clock(harddriv_state *state)
+void harddriv_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	int mode = (state->m_duart_write_data[0x04] >> 4) & 7;
-	if (mode != 3)
-		logerror("DUART: unsupported clock mode %d\n", mode);
-	return DUART_CLOCK / 16;
+	harddriv_state *hd_state = device->machine().driver_data<harddriv_state>();
+	hd_state->m_duart_irq_state = state;
+	atarigen_update_interrupts(device->machine());
 }
-
-
-INLINE attotime duart_clock_period(harddriv_state *state)
-{
-	return attotime::from_hz(duart_clock(state));
-}
-
-
-TIMER_DEVICE_CALLBACK( hd68k_duart_callback )
-{
-	harddriv_state *state = timer.machine().driver_data<harddriv_state>();
-	logerror("DUART timer fired\n");
-	if (state->m_duart_write_data[0x05] & 0x08)
-	{
-		logerror("DUART interrupt generated\n");
-		state->m_duart_read_data[0x05] |= 0x08;
-		state->m_duart_irq_state = (state->m_duart_read_data[0x05] & state->m_duart_write_data[0x05]) != 0;
-		atarigen_update_interrupts(timer.machine());
-	}
-	timer.adjust(duart_clock_period(state) * 65536);
-}
-
-
-READ16_HANDLER( hd68k_duart_r )
-{
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
-	switch (offset)
-	{
-		case 0x00:		/* Mode Register A (MR1A, MR2A) */
-		case 0x08:		/* Mode Register B (MR1B, MR2B) */
-			return (state->m_duart_write_data[0x00] << 8) | 0x00ff;
-		case 0x01:		/* Status Register A (SRA) */
-		case 0x02:		/* Clock-Select Register A 1 (CSRA) */
-		case 0x03:		/* Receiver Buffer A (RBA) */
-		case 0x04:		/* Input Port Change Register (IPCR) */
-		case 0x05:		/* Interrupt Status Register (ISR) */
-		case 0x06:		/* Counter Mode: Current MSB of Counter (CUR) */
-		case 0x07:		/* Counter Mode: Current LSB of Counter (CLR) */
-		case 0x09:		/* Status Register B (SRB) */
-		case 0x0a:		/* Clock-Select Register B 2 (CSRB) */
-		case 0x0b:		/* Receiver Buffer B (RBB) */
-		case 0x0c:		/* Interrupt-Vector Register (IVR) */
-		case 0x0d:		/* Input Port (IP) */
-			return (state->m_duart_read_data[offset] << 8) | 0x00ff;
-		case 0x0e:		/* Start-Counter Command 3 */
-		{
-			int reps = (state->m_duart_write_data[0x06] << 8) | state->m_duart_write_data[0x07];
-			state->m_duart_timer->adjust(duart_clock_period(state) * reps);
-			logerror("DUART timer started (period=%f)\n", (duart_clock_period(state) * reps).as_double());
-			return 0x00ff;
-		}
-		case 0x0f:		/* Stop-Counter Command 3 */
-			{
-				int reps = (state->m_duart_timer->time_left() * duart_clock(state)).as_double();
-				state->m_duart_timer->reset();
-				state->m_duart_read_data[0x06] = reps >> 8;
-				state->m_duart_read_data[0x07] = reps & 0xff;
-				logerror("DUART timer stopped (final count=%04X)\n", reps);
-			}
-			state->m_duart_read_data[0x05] &= ~0x08;
-			state->m_duart_irq_state = (state->m_duart_read_data[0x05] & state->m_duart_write_data[0x05]) != 0;
-			atarigen_update_interrupts(space->machine());
-			return 0x00ff;
-	}
-	return 0x00ff;
-}
-
-
-WRITE16_HANDLER( hd68k_duart_w )
-{
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
-	if (ACCESSING_BITS_8_15)
-	{
-		int newdata = (data >> 8) & 0xff;
-		state->m_duart_write_data[offset] = newdata;
-
-		switch (offset)
-		{
-			case 0x00:		/* Mode Register A (MR1A, MR2A) */
-			case 0x01:		/* Clock-Select Register A (CSRA) */
-			case 0x02:		/* Command Register A (CRA) */
-			case 0x03:		/* Transmitter Buffer A (TBA) */
-			case 0x04:		/* Auxiliary Control Register (ACR) */
-			case 0x05:		/* Interrupt Mask Register (IMR) */
-			case 0x06:		/* Counter/Timer Upper Register (CTUR) */
-			case 0x07:		/* Counter/Timer Lower Register (CTLR) */
-			case 0x08:		/* Mode Register B (MR1B, MR2B) */
-			case 0x09:		/* Clock-Select Register B (CSRB) */
-			case 0x0a:		/* Command Register B (CRB) */
-			case 0x0b:		/* Transmitter Buffer B (TBB) */
-			case 0x0c:		/* Interrupt-Vector Register (IVR) */
-			case 0x0d:		/* Output Port Configuration Register (OPCR) */
-				break;
-			case 0x0e:		/* Output Port Register (OPR): Bit Set Command 3 */
-				state->m_duart_output_port |= newdata;
-				break;
-			case 0x0f:		/* Output Port Register (OPR): Bit Reset Command 3 */
-				state->m_duart_output_port &= ~newdata;
-				break;
-		}
-		logerror("DUART write %02X @ %02X\n", (data >> 8) & 0xff, offset);
-	}
-	else
-		logerror("Unexpected DUART write %02X @ %02X\n", data, offset);
-}
-
 
 
 /*************************************
