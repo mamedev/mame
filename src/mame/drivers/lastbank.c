@@ -264,7 +264,7 @@ static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
 
 	SET_TILE_INFO_DEVICE(
 			0,
-			code+0x1000,
+			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
@@ -280,7 +280,7 @@ static TILE_GET_INFO_DEVICE( get_bg1_tile_info )
 
 	SET_TILE_INFO_DEVICE(
 			0,
-			code+0x1000,
+			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
@@ -341,7 +341,7 @@ void tc0091lvc_device::device_start()
 		if (machine().gfx[m_gfx_index] == 0)
 			break;
 
-	printf("m_gfx_index %d\n", m_gfx_index);
+	//printf("m_gfx_index %d\n", m_gfx_index);
 
 	machine().gfx[m_gfx_index+0] = gfx_element_alloc(machine(), &char_layout, (UINT8 *)m_pcg1_ram, machine().total_colors() / 16, 0);
 	machine().gfx[m_gfx_index+1] = gfx_element_alloc(machine(), &char_layout, (UINT8 *)m_pcg2_ram, machine().total_colors() / 16, 0);
@@ -374,7 +374,7 @@ void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 		fx = m_sprram[count+3] & 0x1;
 		fy = m_sprram[count+3] & 0x2;
 
-		pdrawgfx_transpen(bitmap,cliprect,gfx,spr_offs+0x400,col,fx,fy,x,y,machine.priority_bitmap,(col & 0x08) ? 0xaa : 0x00,0);
+		pdrawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,machine.priority_bitmap,(col & 0x08) ? 0xaa : 0x00,0);
 	}
 }
 
@@ -908,8 +908,8 @@ ROM_START( lastbank )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
 	ROM_REGION( 0x120000, "gfx1", 0 )
-	ROM_LOAD( "5.u10", 0x00000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
-	ROM_LOAD( "u11",   0x20000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
+	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
+	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
 
 	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
 	ROM_LOAD( "6.u55", 0x00000, 0x40000, CRC(9e78e234) SHA1(031f93e4bc338d0257fa673da7ce656bb1cda5fb) )
