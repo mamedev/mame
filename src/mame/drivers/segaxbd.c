@@ -714,13 +714,6 @@ static WRITE16_HANDLER( smgp_excs_w )
 
 static READ16_HANDLER( rascot_excs_r )
 {
-	/* patch out bootup link test */
-	UINT16 *rom = (UINT16 *)space->machine().root_device().memregion("sub")->base();
-	rom[0x57e/2] = 0x4e71;
-	rom[0x5d0/2] = 0x6000;
-	rom[0x5d2/2] = 0x0008;
-	rom[0x606/2] = 0x4e71;
-
 	logerror("%06X:rascot_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
 
 	// probably receives commands from the server here
@@ -2875,6 +2868,13 @@ static DRIVER_INIT( smgp )
 
 static DRIVER_INIT( rascot )
 {
+	// patch out bootup link test
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("sub")->base();
+	rom[0xb78/2] = 0x601e; // subrom checksum test
+	rom[0x57e/2] = 0x4e71;
+	rom[0x5d0/2] = 0x6008;
+	rom[0x606/2] = 0x4e71;
+
 	xboard_generic_init(machine);
 	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0f0000, 0x0f3fff, FUNC(rascot_excs_r), FUNC(rascot_excs_w));
 }
