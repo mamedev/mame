@@ -174,10 +174,10 @@ UINT32 dsp32c_device::cau_read_pi_special(UINT8 i)
 	{
 		case 4:		return m_ibuf;
 		case 5:		return m_obuf;
-		case 6:		update_pcr(m_pcr & ~PCR_PDFs); return m_pdr;
+		case 6:		update_pcr(m_pcr & ~PCR_PDFs); update_pins(); return m_pdr;
 		case 14:	return m_piop;
 		case 20:	return m_pdr2;
-		case 22:	update_pcr(m_pcr & ~PCR_PIFs); return m_pir;
+		case 22:	update_pcr(m_pcr & ~PCR_PIFs); update_pins(); return m_pir;
 		case 30:	return m_pcw;
 		default:	fprintf(stderr, "Unimplemented CAU PI read = %X\n", i);
 	}
@@ -191,10 +191,10 @@ void dsp32c_device::cau_write_pi_special(UINT8 i, UINT32 val)
 	{
 		case 4:		m_ibuf = val;	break;
 		case 5:		m_obuf = val;	break;
-		case 6:		m_pdr = val; update_pcr(m_pcr | PCR_PDFs); break;
+		case 6:		m_pdr = val; update_pcr(m_pcr | PCR_PDFs); update_pins(); break;
 		case 14:	m_piop = val;	break;
 		case 20:	m_pdr2 = val;	break;
-		case 22:	m_pir = val; update_pcr(m_pcr | PCR_PIFs); break;
+		case 22:	m_pir = val; update_pcr(m_pcr | PCR_PIFs); update_pins(); break;
 		case 30:	m_pcw = val;	break;
 		default:	fprintf(stderr, "Unimplemented CAU PI write = %X\n", i);
 	}
@@ -989,25 +989,41 @@ void dsp32c_device::goto_obe(UINT32 op)
 
 void dsp32c_device::goto_pde(UINT32 op)
 {
-	unimplemented(op);
+	if (!(m_pcr & PCR_PDFs))
+	{
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	}
 }
 
 
 void dsp32c_device::goto_pdf(UINT32 op)
 {
-	unimplemented(op);
+	if (m_pcr & PCR_PDFs)
+	{
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	}
 }
 
 
 void dsp32c_device::goto_pie(UINT32 op)
 {
-	unimplemented(op);
+	if (!(m_pcr & PCR_PIFs))
+	{
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	}
 }
 
 
 void dsp32c_device::goto_pif(UINT32 op)
 {
-	unimplemented(op);
+	if (m_pcr & PCR_PIFs)
+	{
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	}
 }
 
 

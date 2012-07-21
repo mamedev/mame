@@ -321,9 +321,13 @@ void dsp32c_device::device_reset()
 
 	// clear some registers
 	m_pcw &= 0x03ff;
-	update_pcr(m_pcr & PCR_RESET);
+	m_pcr = PCR_RESET;
 	m_esr = 0;
 	m_emr = 0xffff;
+
+	// clear the output pins
+	if (m_output_pins_changed != NULL)
+		(*m_output_pins_changed)(*this, 0);
 
 	// initialize fixed registers
 	R0 = R0_ALT = 0;
@@ -553,15 +557,33 @@ void dsp32c_device::update_pcr(UINT16 newval)
 	// reset the chip if we get a reset
 	if ((oldval & PCR_RESET) == 0 && (newval & PCR_RESET) != 0)
 		reset();
+}
 
-	// track the state of the output pins
-	if (m_output_pins_changed != NULL)
+
+
+//**************************************************************************
+//  OUTPUT HANDLING
+//**************************************************************************
+
+void dsp32c_device::update_pins(void)
+{
+	if (m_pcr & PCR_ENI)
 	{
-		UINT16 newoutput = ((newval & (PCR_PIFs | PCR_ENI)) == (PCR_PIFs | PCR_ENI)) ? DSP32_OUTPUT_PIF : 0;
-		if (newoutput != m_lastpins)
+		if (m_output_pins_changed != NULL)
 		{
-			m_lastpins = newoutput;
-			(*m_output_pins_changed)(*this, newoutput);
+			UINT16 newoutput = 0;
+
+			if (m_pcr & PCR_PIFs)
+				newoutput |= DSP32_OUTPUT_PIF;
+
+			if (m_pcr & PCR_PDFs)
+				newoutput |= DSP32_OUTPUT_PDF;
+
+			if (newoutput != m_lastpins)
+			{
+				m_lastpins = newoutput;
+				(*m_output_pins_changed)(*this, newoutput);
+			}
 		}
 	}
 }
@@ -780,6 +802,7 @@ void dsp32c_device::pio_w(int reg, int data)
 			{
 				dma_store();
 				dma_increment();
+				update_pins();
 			}
 			break;
 
@@ -806,7 +829,10 @@ void dsp32c_device::pio_w(int reg, int data)
 
 			// set PIF on upper half
 			if (!(mask & 0xff00))
+			{
 				update_pcr(m_pcr | PCR_PIFs);
+				update_pins();
+			}
 			break;
 
 		// error case
@@ -854,7 +880,10 @@ int dsp32c_device::pio_r(int reg)
 
 			// trigger a fetch on the upper half
 			if (!(mask & 0xff00))
+			{
 				dma_load();
+				update_pins();
+			}
 			break;
 
 		case PIO_PDR2:
@@ -875,7 +904,10 @@ int dsp32c_device::pio_r(int reg)
 
 		case PIO_PIR:
 			if (!(mask & 0xff00))
+			{
 				update_pcr(m_pcr & ~PCR_PIFs);	// clear PIFs
+				update_pins();
+			}
 			result = m_pir;
 			break;
 

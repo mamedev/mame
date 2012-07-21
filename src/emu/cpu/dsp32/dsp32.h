@@ -60,7 +60,8 @@ const int DSP32_IRQ0		= 0;		// IRQ0
 const int DSP32_IRQ1		= 1;		// IRQ1
 
 // pin signal bits
-const int DSP32_OUTPUT_PIF = 0x01;
+const int DSP32_OUTPUT_PIF	= 0x01;
+const int DSP32_OUTPUT_PDF	= 0x02;
 
 // register enumeration
 enum
@@ -191,6 +192,7 @@ protected:
 	void set_irq_line(int irqline, int state);
 
 	void update_pcr(UINT16 newval);
+	void update_pins(void);
 	void illegal(UINT32 op);
 	void unimplemented(UINT32 op);
 	void execute_one();
