@@ -15,8 +15,7 @@ void c140_set_base(device_t *device, void *base);
 enum
 {
 	C140_TYPE_SYSTEM2,
-	C140_TYPE_SYSTEM21_A,
-	C140_TYPE_SYSTEM21_B,
+	C140_TYPE_SYSTEM21,
 	C140_TYPE_ASIC219
 };
 

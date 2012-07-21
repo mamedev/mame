@@ -1475,14 +1475,9 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
-static const c140_interface C140_interface_typeA =
+static const c140_interface C140_interface =
 {
-	C140_TYPE_SYSTEM21_A
-};
-
-static const c140_interface C140_interface_typeB =
-{
-	C140_TYPE_SYSTEM21_B
+	C140_TYPE_SYSTEM21
 };
 
 static MACHINE_START( namcos21 )
@@ -1492,7 +1487,7 @@ static MACHINE_START( namcos21 )
 }
 
 
-static MACHINE_CONFIG_START( s21base, namcos21_state )
+static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(namcos21_68k_master)
 	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1538,15 +1533,11 @@ static MACHINE_CONFIG_START( s21base, namcos21_state )
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
 	MCFG_VIDEO_START(namcos21)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( poly_c140_typeA, s21base )
-
+	
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("c140", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_SOUND_CONFIG(C140_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1601,7 +1592,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("c140", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_SOUND_CONFIG(C140_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1659,7 +1650,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("c140", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeB)
+	MCFG_SOUND_CONFIG(C140_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -2355,13 +2346,13 @@ static INPUT_PORTS_START( s21default )
 	PORT_DIPNAME( 0x10, 0x10, "DSW5")
 	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW6")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPSETTING(	0x20, "2M" )
+	PORT_DIPSETTING(	0x00, "4M" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW8")
+	PORT_DIPNAME( 0x80, 0x80, "Screen Stop")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -2378,6 +2369,11 @@ INPUT_PORTS_END
 /* "SCI - ? */
 static INPUT_PORTS_START( winrun )
 	PORT_INCLUDE(s21default)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
+	PORT_DIPSETTING(	0x20, "2M" )
+	PORT_DIPSETTING(	0x00, "4M" )
 
 	PORT_MODIFY("PORTB")		/* 63B05Z0 - PORT B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) /* ? */
@@ -2410,6 +2406,15 @@ static INPUT_PORTS_START( winrun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* shift up */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( winrungp )
+	PORT_INCLUDE(winrun)
+	
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPSETTING(	0x20, "2M" )
+	PORT_DIPSETTING(	0x00, "4M" )
 INPUT_PORTS_END
 
 // the default inc/dec analog keys have been chosen to map 'tank' style inputs found on Assault.
@@ -2467,7 +2472,7 @@ static INPUT_PORTS_START( aircomb )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")		/* 63B05Z0 - $2000 DIP SW */
-	PORT_DIPNAME( 0x01, 0x01, "DSW1") // not test mode on this gamef
+	PORT_DIPNAME( 0x01, 0x01, "DSW1") // not test mode on this game
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -2481,15 +2486,14 @@ static INPUT_PORTS_START( aircomb )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/*    YEAR, NAME,     PARENT,  MACHINE,           INPUT,        INIT,     MONITOR,  COMPANY,   FULLNAME,                             FLAGS */
-GAME( 1988, winrun,   0,       winrun,            winrun,       winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, winrungp, 0,       winrun,            winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91, 0,       winrun,            winrun,       winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
-/* 1992, SimDrive */
-GAME( 1992, aircomb,  0,       poly_c140_typeA,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (US)",                       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, aircombj, aircomb, poly_c140_typeA,   aircomb,      aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (US)",                       GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsledj, cybsled, poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )
+/*    YEAR, NAME,     PARENT,  MACHINE,  INPUT,      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
+GAME( 1988, winrun,   0,       winrun,   winrun,     winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, winrungp, 0,       winrun,   winrungp,   winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, winrun91, 0,       winrun,   winrungp,   winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes, 0,       driveyes, winrungp,   driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, solvalou, 0,       namcos21, s21default, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, starblad, 0,       namcos21, s21default, starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,  0,       namcos21, aircomb,    aircomb,  ROT0,    "Namco", "Air Combat (US)",                       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircombj, aircomb, namcos21, aircomb,    aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsled,  0,       namcos21, cybsled,    cybsled,  ROT0,    "Namco", "Cyber Sled (US)",                       GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsledj, cybsled, namcos21, cybsled,    cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )

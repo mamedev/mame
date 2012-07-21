@@ -619,14 +619,9 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
-static const c140_interface C140_interface_typeA =
+static const c140_interface C140_interface =
 {
-	C140_TYPE_SYSTEM21_A
-};
-
-static const c140_interface C140_interface_typeB =
-{
-	C140_TYPE_SYSTEM21_B
+	C140_TYPE_SYSTEM21
 };
 
 static MACHINE_CONFIG_START( gal3, gal3_state )
@@ -680,12 +675,12 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("c140_16g", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeA)	//to be verified
+	MCFG_SOUND_CONFIG(C140_interface)	//to be verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("c140_16a", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_SOUND_CONFIG(C140_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

@@ -156,31 +156,10 @@ static long find_sample(c140_state *info, long adrs, long bank, int voice)
 			newadr = ((adrs&0x200000)>>2)|(adrs&0x7ffff);
 			break;
 
-		case C140_TYPE_SYSTEM21_A:
-			// System 21 type A (simple) banking.
+		case C140_TYPE_SYSTEM21:
+			// System 21 banking.
 			// similar to System 2's.
 			newadr = ((adrs&0x300000)>>1)+(adrs&0x7ffff);
-			break;
-
-		case C140_TYPE_SYSTEM21_B:
-			// System 21 type B (chip select) banking
-
-			// get base address of sample inside the bank
-			newadr = ((adrs&0x100000)>>2) + (adrs&0x3ffff);
-
-			// now add the starting bank offsets based on the 2
-			// chip select bits.
-			// 0x40000 picks individual 512k ROMs
-			if (adrs & 0x40000)
-			{
-				newadr += 0x80000;
-			}
-
-			// and 0x200000 which group of chips...
-			if (adrs & 0x200000)
-			{
-				newadr += 0x100000;
-			}
 			break;
 
 		case C140_TYPE_ASIC219:
