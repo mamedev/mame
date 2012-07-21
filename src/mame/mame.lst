@@ -19435,20 +19435,36 @@ sp_emmrdl		//
 sp_emmrdm		//
 sp_emmrdn		//
 sp_emmrdo		//
-sp_emmrdp		//
-sp_emmrdq		//
-sp_emmrdr		//
-sp_emmrds		//
-sp_emmrdt		//
-sp_emmrdu		//
-sp_emmrdv		//
-sp_emmrdw		//
-sp_emmrdx		//
-sp_emmrdy		//
-sp_emmrdz		//
-sp_emmrd0		//
-sp_emmrd1		//
-sp_emmrd2		//
+sp_woolp		// Woolpack (Ace)
+sp_woolpa		//
+sp_woolpb		//
+sp_woolpc		//
+sp_woolpd		//
+sp_woolpe		//
+sp_woolpf		//
+sp_woolpg		//
+sp_woolph		//
+sp_woolpi		//
+sp_woolpj		//
+sp_woolpk		//
+sp_woolpl		//
+sp_woolpm		//
+sp_woolpn		//
+sp_woolpo		//
+sp_zigzg		// Zig Zag (Ace)
+sp_zigzga		//
+sp_zigzgb		//
+sp_zigzgc		//
+sp_zigzgd		//
+sp_zigzge		//
+sp_zigzgf		//
+sp_zigzgg		//
+sp_zigzgh		//
+sp_zigzgi		//
+sp_zigzgj		//
+sp_zigzgk		//
+sp_zigzgl		//
+sp_zigzgm		//
 sp_goldm		// Golden Mile (Ace)
 sp_gnat			// Grand National (Ace)
 sp_gprix		// Grand Prix (Ace)
@@ -19499,8 +19515,6 @@ sp_przna		//Prize National (Ace)
 sp_road			//Road To Hell (Ace)
 sp_skylm		//Sky's The Limit Club, The (Ace)
 sp_tkpik		//Take Your Pick (Ace)
-sp_woolp		//Woolpack (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
-sp_zigzg		//Zig Zag (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
 sp_atw
 sp_five
 sp_crun
