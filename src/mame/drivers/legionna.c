@@ -1374,32 +1374,38 @@ ROM_START( heatbrl )
 	ROM_LOAD32_BYTE( "4e_ver3.9h",   0x00003, 0x20000, CRC(ebd34559) SHA1(9d565eb144b9239769a272990c1d1e22e72e3f0c) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
+	ROM_CONTINUE(               0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_REGION( 0x020000, "gfx1", 0 )	/* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* sprites */
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
 	ROM_REGION( 0x020000, "gfx4", 0 )	/* not used? */
 	ROM_COPY( "gfx1", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
 
 	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )		/* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )	/* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
 ROM_START( heatbrl2 )
@@ -1410,32 +1416,38 @@ ROM_START( heatbrl2 )
 	ROM_LOAD32_BYTE( "4e_ver2.9h",   0x00003, 0x20000, CRC(a50f4f08) SHA1(f468e4a016a53803b8404bacdef5712311c6f0ac) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
+	ROM_CONTINUE(               0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_REGION( 0x020000, "gfx1", 0 )	/* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* sprites */
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
 	ROM_REGION( 0x020000, "gfx4", 0 )	/* not used? */
 	ROM_COPY( "gfx1", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
 
 	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )		/* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )	/* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
 ROM_START( heatbrlo )
@@ -1446,13 +1458,13 @@ ROM_START( heatbrlo )
 	ROM_LOAD32_BYTE( "barrel.4h",   0x00003, 0x20000, CRC(19a8606b) SHA1(6e950212c532e46bb6645c3c1f8205c2a4ea2c87) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
+	ROM_CONTINUE(               0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_REGION( 0x020000, "gfx1", 0 )	/* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 /* Sprite + tilemap gfx roms not dumped, for now we use ones from heatbrlu
 Readme mentions as undumped:
@@ -1460,22 +1472,28 @@ barrel1,2,3,4.OBJ
 barrel1,2,3,4.BG */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
 	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
 	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )		/* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )	/* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
 ROM_START( heatbrlu )
@@ -1486,71 +1504,83 @@ ROM_START( heatbrlu )
 	ROM_LOAD32_BYTE( "4e_ver2.9h",   0x00003, 0x20000, CRC(a50f4f08) SHA1(f468e4a016a53803b8404bacdef5712311c6f0ac) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
+	ROM_CONTINUE(               0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_REGION( 0x020000, "gfx1", 0 )	/* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
 	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )	/* not used */
 
 	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )		/* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )	/* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
 ROM_START( heatbrle )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD32_BYTE( "2.u025",   0x00000, 0x20000, CRC(b34dc60c) SHA1(f9d1438469bf0d36d53d3f148bdf7f04dee5eae0) )
+	ROM_LOAD32_BYTE( "2.u025",   0x00000, 0x20000, CRC(b34dc60c) SHA1(f9d1438469bf0d36d53d3f148bdf7f04dee5eae0) ) /* ROM type is AM27C020 */
 	ROM_IGNORE( 0x20000 )	// 1xxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "1.u024",   0x00001, 0x20000, CRC(16a3754f) SHA1(3e070f2d004fc17d8ae9171955dc48ec5d14cf8a) )
+	ROM_LOAD32_BYTE( "1.u024",   0x00001, 0x20000, CRC(16a3754f) SHA1(3e070f2d004fc17d8ae9171955dc48ec5d14cf8a) ) /* ROM type is AM27C020 */
 	ROM_IGNORE( 0x20000 )	// 1xxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "4.u026",   0x00002, 0x20000, CRC(fae85c88) SHA1(1b0316e66d4e0c5b3aa4045d6bfcc8a5464dc74e) )
+	ROM_LOAD32_BYTE( "4.u026",   0x00002, 0x20000, CRC(fae85c88) SHA1(1b0316e66d4e0c5b3aa4045d6bfcc8a5464dc74e) ) /* ROM type is AM27C020 */
 	ROM_IGNORE( 0x20000 )	// 1xxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD32_BYTE( "3.u023",   0x00003, 0x20000, CRC(3b035081) SHA1(b7ecbacd85102eda21dd162427a0e57cc6d24661) )
+	ROM_LOAD32_BYTE( "3.u023",   0x00003, 0x20000, CRC(3b035081) SHA1(b7ecbacd85102eda21dd162427a0e57cc6d24661) ) /* ROM type is AM27C020 */
 	ROM_IGNORE( 0x20000 )	// 1xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_LOAD( "barrel_7.u1110", 0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
+	ROM_CONTINUE(               0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audiocpu", 0,    0x18000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_REGION( 0x020000, "gfx1", 0 )	/* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
 	ROM_REGION( 0x020000, "gfx4", 0 )	/* not used? */
 	ROM_COPY( "gfx1", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
 
 	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
 	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )		/* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )	/* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
 /*
