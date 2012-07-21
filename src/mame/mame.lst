@@ -19345,24 +19345,53 @@ acefruit	// (c) 1982? ACE
 
 ac1cshtw	// Cash Towers (Ace)
 ac1clbmn	// Club Money (Ace)
+ac1clbmna	//
 ac1gogld	// Go For Gold (Ace)
+ac1goglda	//
 ac1hotpf	// Hot Profit (Ace)
 ac1pster	// Pound Sterling (Ace)
 ac1pstrt	// Pound Stretcher (Pcp)
 ac1primt	// Primetime (Ace)
+ac1primta	//
 ac1taklv	// Take It Or Leave It (Ace)
-
+ac1taklva	//
 ac1bbclb	// Big Break Club (Ace)
+ac1bbclba	//
 ac1clbsv	// Club Sovereign (Ace)
 ac1clbxt	// Club Xtra (Ace)
+ac1clbxta	//
 ac1piaca	// Play It Again Casino (Ace)
 ac1piacl	// Play It Again Club (Ace)
+ac1piacla	//
+ac1piaclb	//
+ac1piaclc	//
 ac1prmcl	// Premier Club (Ace)
+ac1prmcla	//
+ac1prmclb	//
+ac1prmclc	//
 ac1rundx	// Runner Deluxe Club (Ace)
+ac1rundxa	//
 ac1totb		// Top Of The Bill (Ace)
-ac1sptb		// Simply The Best (Pcp)
 ac1shid		// Super Hi De Hi (Ace)
-
+ac1shida	//
+ac1bluec	// Blue Chip (Pcp)
+ac1blueca	//
+ac1bluecb	//
+ac1bluecc	//
+ac1bluecd	//
+ac1dbldx	// Double Deluxe (Pcp)
+ac1nudbk	// Nudge Break (Pcp)
+ac1nudbka	//
+ac1nudbkb	//
+ac1nudbkc	//
+ac1nudbkd	//
+ac1sstrk	// Starstruck (Pcp)
+ac1sstrka	//
+ac1sstrkb	//
+ac1xpres	// Xpress (Pcp)
+ac1roll		// Roll Up (Pcp)
+ac1rolla	//
+ac1rollb	//
 
 // Ace 'sp.ACE system'
 
@@ -19428,15 +19457,6 @@ sp_crun
 sp_carry
 sp_front
 
-// Unknown PCP
-
-up_bluec		// Blue Chip (Pcp)
-up_dbldx		// Double Deluxe (Pcp)
-up_nudbk		// Nudge Break (Pcp)
-up_sstrk		// Starstruck (Pcp)
-up_xpres		// Xpress (Pcp)
-up_roll			// Roll Up (Pcp)
-
 // Project - PROCONN
 
 pr_lday			// 'L' Of A Day (Project)
@@ -19500,6 +19520,7 @@ pr_fspot		// Fun Spot (Coinworld)
 pr_gnuc			// Golden Nugget (Coinworld)
 pr_magln		// Magic Lines (Coinworld)
 pr_swop			// Swop It (Ace)
+pr_sptb			// Simply The Best (Pcp)
 
 /* Astra */
 

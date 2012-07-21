@@ -952,6 +952,13 @@ ROM_START( pr_qksht )
 ROM_END
 
 
+ROM_START( pr_sptb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "simplythebest091a20pn.bin", 0x0000, 0x010000, CRC(8402d11f) SHA1(bc10f29c546fda03e18238811956c56546fa8bef) ) // wrong hardware
+ROM_END
+
+
+
 DRIVER_INIT( proconn )
 {
 }
@@ -1011,6 +1018,7 @@ GAME( 199?, pr_whlft		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wheel O
 GAME( 199?, pr_wldkn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wild Kings (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_nifty		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Nifty Fifty (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_upnun		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Up & Under (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_sptb			,0			,proconn	,proconn	,proconn	,ROT0	,"Pcp", "Simply the Best (Pcp) (PROCONN?)",GAME_IS_SKELETON_MECHANICAL ) // not 100% sure this belongs here
 
 // Some of these are PC98 hardware.. I don't know how / if that differs
 GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
