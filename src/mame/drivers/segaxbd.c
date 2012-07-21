@@ -13,6 +13,7 @@
           due to testing an out-of-bounds value
         * abcop doesn't like IC41/IC108 (divide chips) in self-test
           due to testing an out-of-bounds value
+        * rascot is not working at all
 
 
 Sega X-Board System Overview
@@ -28,6 +29,7 @@ GP Rider           (C) Sega 1990
 *Last Survivor     (C) Sega 1989
 Line of Fire       (C) Sega 1989
 Racing Hero        (C) Sega 1990
+Royal Ascot        (C) Sega 1991    dumped, but very likely incomplete
 Super Monaco GP    (C) Sega 1989
 Thunder Blade      (C) Sega 1987
 
@@ -706,6 +708,37 @@ static WRITE16_HANDLER( smgp_excs_w )
 
 /*************************************
  *
+ *  Royal Ascot external access
+ *
+ *************************************/
+
+static READ16_HANDLER( rascot_excs_r )
+{
+	/* patch out bootup link test */
+	UINT16 *rom = (UINT16 *)space->machine().root_device().memregion("sub")->base();
+	rom[0x57e/2] = 0x4e71;
+	rom[0x5d0/2] = 0x6000;
+	rom[0x5d2/2] = 0x0008;
+	rom[0x606/2] = 0x4e71;
+
+	logerror("%06X:rascot_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
+
+	// probably receives commands from the server here
+	//return space->machine().rand() & 0xff;
+
+	return 0xff;
+}
+
+
+static WRITE16_HANDLER( rascot_excs_w )
+{
+	logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -800,6 +833,17 @@ static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8, segas1x_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8, segas1x_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( rascot_z80_map, AS_PROGRAM, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xafff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rascot_z80_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1227,6 +1271,12 @@ static INPUT_PORTS_START( gprider )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( rascot )
+	PORT_INCLUDE( xboard_generic )
+
+INPUT_PORTS_END
+
+
 
 /*************************************
  *
@@ -1346,6 +1396,14 @@ static MACHINE_CONFIG_DERIVED( smgp, xboard )
 	MCFG_CPU_ADD("comm", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
 	MCFG_CPU_IO_MAP(smgp_comm_portmap)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( rascot, xboard )
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(rascot_z80_map)
+	MCFG_CPU_IO_MAP(rascot_z80_portmap)
 MACHINE_CONFIG_END
 
 
@@ -2618,8 +2676,8 @@ ROM_END
 */
 ROM_START( gprider )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-13408.ic63", 0x00001, 0x20000, CRC(8e410e97) SHA1(2021d738064e57d175b59ba053d9ee35ed4516c8) )
 	ROM_LOAD16_BYTE( "epr-13409.ic58", 0x00000, 0x20000, CRC(9abb81b6) SHA1(f6308f3ec99ee66677e86f6a915e4dff8557d25f) )
+	ROM_LOAD16_BYTE( "epr-13408.ic63", 0x00001, 0x20000, CRC(8e410e97) SHA1(2021d738064e57d175b59ba053d9ee35ed4516c8) )
 
 	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
 	ROM_LOAD( "317-0163.key", 0x0000, 0x2000, CRC(c1d4d207) SHA1(c35b0a49fb6a1e0e9a1c087f0ccd190ad5c2bb2c) )
@@ -2673,8 +2731,8 @@ ROM_END
 */
 ROM_START( gprideru )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-13406.ic63", 0x00001, 0x20000, CRC(122c711f) SHA1(2bcc51347e771a7e7f770e68b24d82497d24aa2e) )
 	ROM_LOAD16_BYTE( "epr-13407.ic58", 0x00000, 0x20000, CRC(03553ebd) SHA1(041a71a2dce2ad56360f500cb11e29a629020160) )
+	ROM_LOAD16_BYTE( "epr-13406.ic63", 0x00001, 0x20000, CRC(122c711f) SHA1(2bcc51347e771a7e7f770e68b24d82497d24aa2e) )
 
 	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
 	ROM_LOAD( "317-0162.key", 0x0000, 0x2000, CRC(8067de53) SHA1(e8cd1dfbad94856c6bd51569557667e72f0a5dd4) )
@@ -2720,16 +2778,15 @@ ROM_START( gprideru )
 	ROM_LOAD( "epr-13389.ic13",    0x40000, 0x20000, CRC(4e4c758e) SHA1(181750dfcdd6d5b28b063c980c251991163d9474) )
 ROM_END
 
-/* Royal Ascot 2 - should be X-Board, or closely related, although it's a main display / terminal setup, and we only have the ROMs for one of those parts.. */
-
-ROM_START( rascot2 )
+/* Royal Ascot - should be X-Board, or closely related, although it's a main display / terminal setup, and we only have the ROMs for one of those parts.. */
+ROM_START( rascot )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-13694a", 0x00001, 0x20000, CRC(15b86498) SHA1(ccb57063ca53347b5f771b0d7ceaeb9cd50d246a) ) // 13964a?
-	ROM_LOAD16_BYTE( "epr-13965a", 0x00000, 0x20000, CRC(7eacdfb3) SHA1(fad23352d9c5e266ad9f7fe3ccbd29b5b912b90b) )
+	ROM_LOAD16_BYTE( "epr-13965a.ic58", 0x00000, 0x20000, CRC(7eacdfb3) SHA1(fad23352d9c5e266ad9f7fe3ccbd29b5b912b90b) )
+	ROM_LOAD16_BYTE( "epr-13694a.ic63", 0x00001, 0x20000, CRC(15b86498) SHA1(ccb57063ca53347b5f771b0d7ceaeb9cd50d246a) ) // 13964a?
 
 	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
-	ROM_LOAD16_BYTE( "epr-13966", 0x00001, 0x20000, CRC(eaa644e1) SHA1(b9cc171523995f5120ea7b9748af2f8de697b933) )
-	ROM_LOAD16_BYTE( "epr-13967", 0x00000, 0x20000, CRC(3b92e2b8) SHA1(5d456d7d6fa540709facda1fd8813707ebfd99d8) )
+	ROM_LOAD16_BYTE( "epr-13967.ic20", 0x00000, 0x20000, CRC(3b92e2b8) SHA1(5d456d7d6fa540709facda1fd8813707ebfd99d8) )
+	ROM_LOAD16_BYTE( "epr-13966.ic29", 0x00001, 0x20000, CRC(eaa644e1) SHA1(b9cc171523995f5120ea7b9748af2f8de697b933) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "epr-13961", 0x00000, 0x10000, CRC(68038629) SHA1(fbe8605840331096c5156d695772e5f36b2e131a) )
@@ -2816,6 +2873,13 @@ static DRIVER_INIT( smgp )
 }
 
 
+static DRIVER_INIT( rascot )
+{
+	xboard_generic_init(machine);
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0f0000, 0x0f3fff, FUNC(rascot_excs_r), FUNC(rascot_excs_w));
+}
+
+
 static DRIVER_INIT( gprider )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
@@ -2852,4 +2916,4 @@ GAME( 1989, smgpja,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega
 GAME( 1990, abcop,    0,        xboard,  abcop,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
 GAME( 1990, gprider,  0,        xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gprideru, gprider,  xboard,  gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
-GAME( 1991, rascot2,  0,        xboard,  thndrbld, generic_xboard, ROT0,   "Sega", "Royal Ascot 2", GAME_IS_SKELETON )
+GAME( 1991, rascot,   0,        rascot,  rascot,   rascot,         ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", GAME_NOT_WORKING | GAME_NO_SOUND )
