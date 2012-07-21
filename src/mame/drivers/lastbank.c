@@ -68,6 +68,8 @@ public:
 	tilemap_t *bg1_tilemap;
 	tilemap_t *tx_tilemap;
 
+	int m_gfx_index; // for RAM tiles
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -120,6 +122,12 @@ READ8_MEMBER(tc0091lvc_device::vregs_r)
 
 WRITE8_MEMBER(tc0091lvc_device::vregs_w)
 {
+	if((offset & 0xfc) == 0)
+	{
+		bg0_tilemap->mark_all_dirty();
+		bg1_tilemap->mark_all_dirty();
+	}
+
 	m_vregs[offset] = data;
 }
 
@@ -141,10 +149,9 @@ READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_r)
 
 WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_w)
 {
-//	UINT8 *gfx_ram = memregion("ram_gfx1")->base();
-
 	m_pcg1_ram[offset] = data;
 	gfx_element_mark_dirty(machine().gfx[2], offset / 32);
+	tx_tilemap->mark_all_dirty();
 }
 
 READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
@@ -154,10 +161,9 @@ READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
 
 WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_w)
 {
-//	UINT8 *gfx_ram = memregion("ram_gfx2")->base();
-
 	m_pcg2_ram[offset] = data;
 	gfx_element_mark_dirty(machine().gfx[3], offset / 32);
+	tx_tilemap->mark_all_dirty();
 }
 
 READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_r)
@@ -285,7 +291,7 @@ static TILE_GET_INFO_DEVICE( get_tx_tile_info )
 	int attr = vdp->m_tvram[2 * tile_index + 1];
 	int code = vdp->m_tvram[2 * tile_index]
 			| ((attr & 0x01) << 8);
-	int region = ((attr & 0x1000) >> 12) + 2;
+	int region = ((attr & 0x10) >> 4) + vdp->m_gfx_index;
 
 	SET_TILE_INFO_DEVICE(
 			region,
@@ -293,6 +299,18 @@ static TILE_GET_INFO_DEVICE( get_tx_tile_info )
 			(attr & 0xf0) >> 4,
 			0);
 }
+
+
+static const gfx_layout char_layout =
+{
+	8, 8,
+	0x4000 / (8 * 4), // need to specify exact number because we create dynamically
+	4,
+	{ 8, 12, 0, 4 },
+	{ 3, 2, 1, 0, 19, 18, 17, 16},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*8*4
+};
 
 
 void tc0091lvc_device::device_start()
@@ -319,9 +337,14 @@ void tc0091lvc_device::device_start()
 	bg0_tilemap->set_scrolldx(28, -11);
 	bg1_tilemap->set_scrolldx(38, -21);
 
-//	gfx_element_set_source(machine().gfx[2], reinterpret_cast<UINT8 *>(m_pcg1_ram.target()));
-//	gfx_element_set_source(machine().gfx[3], reinterpret_cast<UINT8 *>(m_pcg2_ram.target()));
+	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
+		if (machine().gfx[m_gfx_index] == 0)
+			break;
 
+	printf("m_gfx_index %d\n", m_gfx_index);
+
+	machine().gfx[m_gfx_index+0] = gfx_element_alloc(machine(), &char_layout, (UINT8 *)m_pcg1_ram, machine().total_colors() / 16, 0);
+	machine().gfx[m_gfx_index+1] = gfx_element_alloc(machine(), &char_layout, (UINT8 *)m_pcg2_ram, machine().total_colors() / 16, 0);
 }
 
 void tc0091lvc_device::device_reset()
@@ -402,7 +425,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		bg1_tilemap->draw(bitmap, cliprect, 0,0);
 		bg0_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(machine(), bitmap, cliprect);
-		//tx_tilemap->draw(bitmap, cliprect, 0,0);
+		tx_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	return 0;
 }
@@ -811,23 +834,10 @@ static const gfx_layout sp2_layout =
 #undef O
 #undef O2
 
-static const gfx_layout char_layout =
-{
-	8, 8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8, 12, 0, 4 },
-	{ 3, 2, 1, 0, 19, 18, 17, 16},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
 
 static GFXDECODE_START( lastbank )
 	GFXDECODE_ENTRY( "gfx1", 		0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 		0, sp2_layout, 0, 16 )
-	GFXDECODE_ENTRY( NULL,    		0, char_layout,  0, 16 )  // Ram-based
-	GFXDECODE_ENTRY( NULL,    		0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
 static TIMER_DEVICE_CALLBACK( lastbank_irq_scanline )
