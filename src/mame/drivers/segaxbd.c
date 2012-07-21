@@ -205,7 +205,14 @@ OTHER:
       HSync: 15.5645kHz /
 
 
-Network Board (used on Super Monaco GP)
+Add-on boards for Super Monaco GP
+---------------------------------
+
+Super Monaco GP was released as upright, twin, cockpit, and deluxe 'Air Drive'.
+DIP switches determine the cabinet type. It is presumed that these extra boards can be interchanged.
+
+
+Network Board (twin cabinet)
 -------------
 
 Top    : 834-6780
@@ -226,6 +233,28 @@ Notes:
       MB8421   : Fujitsu 2k x8 Dual-Port SRAM (SDIP52)
       MB89372  : ?, Manufactured by Fujitsu, SDIP64
       epr-12587: 27C256 EPROM
+
+
+Sound Board (for 4-channel sound, cockpit and deluxe cabinets)
+-------------
+
+label: 837-7000
+Z80 (assume 4MHz)
+Sega 315-5218 sound IC
+ROMs:
+- epr-12535.8
+- mpr-12437.20
+- mpr-12438.21
+- mpr-12439.22
+
+
+Motor 'Air Drive' Board (deluxe cabinet)
+-------------
+
+label: ?
+Z80 (unknown speed)
+ROMs:
+- epr-12505.8
 
 
 ***************************************************************************/
@@ -1886,11 +1915,430 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
+    Super Monaco GP, Sega X-board
+    CPU: FD1094 (317-0126a)
+    This set is coming from a twin.
 
-Super Monaco GP
-Sega, 1989
+    This set has an extra link board (834-7112) or 171-5729-01 under the main board with a Z80
 
-This game runs on Sega X-Board hardware.
+    Xtal is 16.000 Mhz.
+
+    It has also one eprom (Epr 12587.14) two pal 16L8 (315-5336 and 315-5337) and two
+    fujitsu IC MB89372P and MB8421-12LP
+
+    Main Board : (834-8180-02)
+
+    epr-12576A.20 (68000)
+    epr-12577A.29 (68000)
+    epr-12563B.58 FD1094 317-0126A
+    epr-12564B.63 FD1094 317-0126A
+    epr-12609.93
+    epr-12610.97
+    epr-12611.101
+    epr-12612.105
+    mpr-12417.92
+    mpr-12418.96
+    mpr-12419.100
+    mpr-12420.104
+    mpr-12421.91
+    mpr-12422.95
+    mpr-12423.99
+    mpr-12424.103
+    mpr-12425.90
+    mpr-12426.94
+    mpr-12427.98
+    mpr-12428.102
+    epr-12429.154
+    epr-12430.153
+    epr-12431.152
+    epr-12436.17
+    mpr-12437.11
+    mpr-12438.12
+    mpr-12439.13
+
+    Link Board :
+
+    Ep12587.14
+*/
+
+ROM_START( smgp )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-12563b.58", 0x00000, 0x20000, CRC(baf1f333) SHA1(f91a7a311237b9940a44b815716d4226a7ae1e8b) )
+	ROM_LOAD16_BYTE( "epr-12564b.63", 0x00001, 0x20000, CRC(b5191af0) SHA1(d6fb19552e4816eefe751907ec55a2e07ad24879) )
+
+	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
+	ROM_LOAD( "317-0126a.key", 0x0000, 0x2000, CRC(2abc1982) SHA1(cc4c36e6ba52431df17c6e36ba08d3a89be7b7e7) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
+	ROM_LOAD16_BYTE( "epr-12576a.20", 0x00000, 0x20000, CRC(2c9599c1) SHA1(79206f38c2976bd9299ed37bf62ac26dd3fba801) )
+	ROM_LOAD16_BYTE( "epr-12577a.29", 0x00001, 0x20000, CRC(abf9a50b) SHA1(e367b305cd45900aae4849af4904543f05456dc6) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
+	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
+	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
+
+	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
+	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
+	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
+	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
+	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
+	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
+	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
+	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
+	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
+	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
+	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
+	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
+	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
+	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
+	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
+	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
+	/* none?? */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+
+	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
+ROM_END
+
+/**************************************************************************************************************************
+    Super Monaco GP, Sega X-board
+    CPU: FD1094 (317-0126a)
+*/
+/* this set contained only prg roms */
+ROM_START( smgp6 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-12563a.58", 0x00000, 0x20000, CRC(2e64b10e) SHA1(2be1ffb3120e4af6a61880e2a2602db07a73f373) )
+	ROM_LOAD16_BYTE( "epr-12564a.63", 0x00001, 0x20000, CRC(5baba3e7) SHA1(37194d5a4d3ee48a276f6aeb35b2f20a7661caa2) )
+
+	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
+	ROM_LOAD( "317-0126a.key", 0x0000, 0x2000, CRC(2abc1982) SHA1(cc4c36e6ba52431df17c6e36ba08d3a89be7b7e7) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
+	ROM_LOAD16_BYTE( "epr-12576a.20", 0x00000, 0x20000, CRC(2c9599c1) SHA1(79206f38c2976bd9299ed37bf62ac26dd3fba801) )
+	ROM_LOAD16_BYTE( "epr-12577a.29", 0x00001, 0x20000, CRC(abf9a50b) SHA1(e367b305cd45900aae4849af4904543f05456dc6) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
+	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
+	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
+
+	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
+	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
+	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
+	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
+	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
+	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
+	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
+	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
+	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
+	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
+	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
+	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
+	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
+	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
+	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
+	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
+	/* none?? */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+
+	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
+ROM_END
+
+/**************************************************************************************************************************
+    Super Monaco GP, Sega X-board
+    CPU: FD1094 (317-0126)
+    This set is coming from a deluxe.
+
+    SEGA Monaco G.P. by SEGA 1989
+
+    This set is coming from a sitdown "air drive" version.
+
+    This set has an extra sound board (837-7000) under the main board with a Z80
+    and a few eproms, some of those eproms are already on the main board !
+
+    It has also an "air drive" board with a Z80 and one eprom.
+
+    Main Board : (834-7016-05)
+
+    epr-12576.20 (68000)
+    epr-12577.29 (68000)
+    epr-12563.58 FD1094 317-0126
+    epr-12564.63 FD1094 317-0126
+    epr-12413.93
+    epr-12414.97
+    epr-12415.101
+    epr-12416.105
+    mpr-12417.92
+    mpr-12418.96
+    mpr-12419.100
+    mpr-12420.104
+    mpr-12421.91
+    mpr-12422.95
+    mpr-12423.99
+    mpr-12424.103
+    mpr-12425.90
+    mpr-12426.94
+    mpr-12427.98
+    mpr-12428.102
+    epr-12429.154
+    epr-12430.153
+    epr-12431.152
+    epr-12436.17
+    mpr-12437.11
+    mpr-12438.12
+    IC 13 is not used !
+
+    Sound Board :
+
+    epr-12535.8
+    mpr-12437.20
+    mpr-12438.21
+    mpr-12439.22
+
+    Air Drive Board :
+
+    Ep12505.8
+*/
+ROM_START( smgp5 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-12563.58", 0x00000, 0x20000, CRC(6d7325ae) SHA1(bf88ceddc49dab5b439080d5bf0e7e084a79546c) )
+	ROM_LOAD16_BYTE( "epr-12564.63", 0x00001, 0x20000, CRC(adfbf921) SHA1(f3321e03dc37b14db065b85d63e321810e4ea797) )
+
+	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
+	ROM_LOAD( "317-0126.key", 0x0000, 0x2000, CRC(4d917996) SHA1(17232c0e35d439a12db3d966064cf00104088903) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
+	ROM_LOAD16_BYTE( "epr-12576.20", 0x00000, 0x20000, CRC(23266b26) SHA1(240b9bf198fd2975851e769766566ec4e8379f87) )
+	ROM_LOAD16_BYTE( "epr-12577.29", 0x00001, 0x20000, CRC(d5b53211) SHA1(b11f5c5094eb7ea9578f15489b00d8bbac1edee6) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
+	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
+	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
+
+	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
+	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
+	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
+	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
+	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
+	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
+	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
+	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
+	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
+	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
+	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
+	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
+	ROM_LOAD32_BYTE( "epr-12413.93",  0x180000, 0x20000, CRC(2f1693df) SHA1(ba1e654a1b5fae661b0dae4a8ed04ff50fb546a2) )
+	ROM_LOAD32_BYTE( "epr-12414.97",  0x180001, 0x20000, CRC(c78f3d45) SHA1(665750907ed11c89c2ea5c410eac2808445131ae) )
+	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
+	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
+	/* none?? */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) )
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
+
+	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) )
+ROM_END
+
+/**************************************************************************************************************************
+    Super Monaco GP, Sega X-board
+    CPU: FD1094 (317-0125a)
+*/
+ROM_START( smgpu )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-12561c.58", 0x00000, 0x20000, CRC(a5b0f3fe) SHA1(17103e56f822fdb52e72f597c01415ed375aa102) )
+	ROM_LOAD16_BYTE( "epr-12562c.63", 0x00001, 0x20000, CRC(799e55f4) SHA1(2e02cdc63bda47b087c81021018287cfa961c083) )
+
+	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
+	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
+	ROM_LOAD16_BYTE( "epr-12574a.20", 0x00000, 0x20000, CRC(f8b5c38b) SHA1(0184d5a1b71fb42d33dbaaad99d2c0fbc5750e7e) )
+	ROM_LOAD16_BYTE( "epr-12575a.29", 0x00001, 0x20000, CRC(248b1d17) SHA1(22f1e0d0d698abdf0cb1954f1f6382432a12c186) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
+	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
+	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
+
+	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
+	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
+	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
+	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
+	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
+	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
+	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
+	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
+	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
+	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
+	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
+	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
+	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
+	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
+	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
+	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
+	/* none?? */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+
+	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
+ROM_END
+
+/**************************************************************************************************************************
+    Super Monaco GP, Sega X-board
+    CPU: FD1094 (317-0125a)
+*/
+/* very first US version with demo sound on by default */
+ROM_START( smgpu1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-12561b.58", 0x00000, 0x20000, CRC(80a32655) SHA1(fe1ffa8af9f1ca175ba90b24a0853329b08d19af) )
+	ROM_LOAD16_BYTE( "epr-12562b.63", 0x00001, 0x20000, CRC(d525f2a8) SHA1(f3241e11485c7428cd9f081ec6768fda39ae3250) )
+
+	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
+	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
+	ROM_LOAD16_BYTE( "epr-12574a.20", 0x00000, 0x20000, CRC(f8b5c38b) SHA1(0184d5a1b71fb42d33dbaaad99d2c0fbc5750e7e) )
+	ROM_LOAD16_BYTE( "epr-12575a.29", 0x00001, 0x20000, CRC(248b1d17) SHA1(22f1e0d0d698abdf0cb1954f1f6382432a12c186) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
+	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
+	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
+
+	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
+	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
+	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
+	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
+	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
+	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
+	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
+	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
+	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
+	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
+	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
+	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
+	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
+	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
+	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
+	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
+	/* none?? */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
+	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
+
+	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
+ROM_END
+
+/**************************************************************************************************************************
+    Super Monaco GP, Sega X-board
+    CPU: FD1094 (317-0125a)
+    This set is coming from a twin.
 
 PCB Layouts
 -----------
@@ -2051,7 +2499,7 @@ Sticker: 834-7112
 |             315-5337                  |
 |                                       |
 |            16MHz      6264            |
-|                     epr-12587.14       |
+|                     epr-12587.14      |
 | MB89372P-SH     Z80E        MB8421    |
 |---------------------------------------|
 Notes:
@@ -2062,387 +2510,6 @@ Notes:
       MB89372  : Manufactured by Fujitsu, SDIP64
       epr-12587 : 27C256 EEPROM
 
-***********************************************************************
-
-    Super Monaco GP, Sega X-board
-    CPU: FD1094 (317-0126a)
-
-    This set is coming from a twin.
-
-    This set has an extra link board (834-7112) or 171-5729-01 under the main board with a Z80
-
-    Xtal is 16.000 Mhz.
-
-    It has also one eprom (Epr 12587.14) two pal 16L8 (315-5336 and 315-5337) and two
-    fujitsu IC MB89372P and MB8421-12LP
-
-    Main Board : (834-8180-02)
-
-    epr-12576A.20 (68000)
-    epr-12577A.29 (68000)
-    epr-12563B.58 FD1094 317-0126A
-    epr-12564B.63 FD1094 317-0126A
-    epr-12609.93
-    epr-12610.97
-    epr-12611.101
-    epr-12612.105
-    mpr-12417.92
-    mpr-12418.96
-    mpr-12419.100
-    mpr-12420.104
-    mpr-12421.91
-    mpr-12422.95
-    mpr-12423.99
-    mpr-12424.103
-    mpr-12425.90
-    mpr-12426.94
-    mpr-12427.98
-    mpr-12428.102
-    epr-12429.154
-    epr-12430.153
-    epr-12431.152
-    epr-12436.17
-    mpr-12437.11
-    mpr-12438.12
-    mpr-12439.13
-
-    Link Board :
-
-    Ep12587.14
-*/
-
-ROM_START( smgp )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-12563b.58", 0x00000, 0x20000, CRC(baf1f333) SHA1(f91a7a311237b9940a44b815716d4226a7ae1e8b) )
-	ROM_LOAD16_BYTE( "epr-12564b.63", 0x00001, 0x20000, CRC(b5191af0) SHA1(d6fb19552e4816eefe751907ec55a2e07ad24879) )
-
-	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-0126a.key", 0x0000, 0x2000, CRC(2abc1982) SHA1(cc4c36e6ba52431df17c6e36ba08d3a89be7b7e7) )
-
-	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
-	ROM_LOAD16_BYTE( "epr-12576a.20", 0x00000, 0x20000, CRC(2c9599c1) SHA1(79206f38c2976bd9299ed37bf62ac26dd3fba801) )
-	ROM_LOAD16_BYTE( "epr-12577a.29", 0x00001, 0x20000, CRC(abf9a50b) SHA1(e367b305cd45900aae4849af4904543f05456dc6) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
-	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
-	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
-
-	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
-	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
-	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
-	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
-	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
-	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
-	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
-	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
-	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
-	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
-	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
-	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
-	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
-	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
-	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
-	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
-	/* none?? */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
-
-	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
-
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
-ROM_END
-
-/**************************************************************************************************************************
-    Super Monaco GP, Sega X-board
-    CPU: FD1094 (317-0126a)
-*/
-/* this set contained only prg roms */
-ROM_START( smgp6 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-12563a.58", 0x00000, 0x20000, CRC(2e64b10e) SHA1(2be1ffb3120e4af6a61880e2a2602db07a73f373) )
-	ROM_LOAD16_BYTE( "epr-12564a.63", 0x00001, 0x20000, CRC(5baba3e7) SHA1(37194d5a4d3ee48a276f6aeb35b2f20a7661caa2) )
-
-	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-0126a.key", 0x0000, 0x2000, CRC(2abc1982) SHA1(cc4c36e6ba52431df17c6e36ba08d3a89be7b7e7) )
-
-	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
-	ROM_LOAD16_BYTE( "epr-12576a.20", 0x00000, 0x20000, CRC(2c9599c1) SHA1(79206f38c2976bd9299ed37bf62ac26dd3fba801) )
-	ROM_LOAD16_BYTE( "epr-12577a.29", 0x00001, 0x20000, CRC(abf9a50b) SHA1(e367b305cd45900aae4849af4904543f05456dc6) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
-	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
-	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
-
-	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
-	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
-	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
-	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
-	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
-	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
-	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
-	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
-	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
-	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
-	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
-	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
-	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
-	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
-	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
-	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
-	/* none?? */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
-
-	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
-
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
-ROM_END
-
-/**************************************************************************************************************************
-    Super Monaco GP, Sega X-board
-    CPU: FD1094 (317-0126)
-
-    SEGA Monaco G.P. by SEGA 1989
-
-    This set is coming from a sitdown "air drive" version.
-
-    This set has an extra sound board (837-7000) under the main board with a Z80
-    and a few eproms, some of those eproms are already on the main board !
-
-    It has also an "air drive" board with a Z80 and one eprom.
-
-    Main Board : (834-7016-05)
-
-    epr-12576.20 (68000)
-    epr-12577.29 (68000)
-    epr-12563.58 FD1094 317-0126
-    epr-12564.63 FD1094 317-0126
-    epr-12413.93
-    epr-12414.97
-    epr-12415.101
-    epr-12416.105
-    mpr-12417.92
-    mpr-12418.96
-    mpr-12419.100
-    mpr-12420.104
-    mpr-12421.91
-    mpr-12422.95
-    mpr-12423.99
-    mpr-12424.103
-    mpr-12425.90
-    mpr-12426.94
-    mpr-12427.98
-    mpr-12428.102
-    epr-12429.154
-    epr-12430.153
-    epr-12431.152
-    epr-12436.17
-    mpr-12437.11
-    mpr-12438.12
-    IC 13 is not used !
-
-    Sound Board :
-
-    epr-12535.8
-    mpr-12437.20
-    mpr-12438.21
-    mpr-12439.22
-
-    Air Drive Board :
-
-    Ep12505.8
-*/
-ROM_START( smgp5 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-12563.58", 0x00000, 0x20000, CRC(6d7325ae) SHA1(bf88ceddc49dab5b439080d5bf0e7e084a79546c) )
-	ROM_LOAD16_BYTE( "epr-12564.63", 0x00001, 0x20000, CRC(adfbf921) SHA1(f3321e03dc37b14db065b85d63e321810e4ea797) )
-
-	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-0126.key", 0x0000, 0x2000, CRC(4d917996) SHA1(17232c0e35d439a12db3d966064cf00104088903) )
-
-	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
-	ROM_LOAD16_BYTE( "epr-12576.20", 0x00000, 0x20000, CRC(23266b26) SHA1(240b9bf198fd2975851e769766566ec4e8379f87) )
-	ROM_LOAD16_BYTE( "epr-12577.29", 0x00001, 0x20000, CRC(d5b53211) SHA1(b11f5c5094eb7ea9578f15489b00d8bbac1edee6) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
-	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
-	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
-
-	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
-	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
-	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
-	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
-	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
-	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
-	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
-	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
-	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
-	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
-	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
-	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
-	ROM_LOAD32_BYTE( "epr-12413.93",  0x180000, 0x20000, CRC(2f1693df) SHA1(ba1e654a1b5fae661b0dae4a8ed04ff50fb546a2) )
-	ROM_LOAD32_BYTE( "epr-12414.97",  0x180001, 0x20000, CRC(c78f3d45) SHA1(665750907ed11c89c2ea5c410eac2808445131ae) )
-	ROM_LOAD32_BYTE( "epr-12415.101", 0x180002, 0x20000, CRC(6080e9ed) SHA1(eb1b871453f76e6a65d20fa9d4bddc1c9f940b4d) )
-	ROM_LOAD32_BYTE( "epr-12416.105", 0x180003, 0x20000, CRC(6f1f2769) SHA1(d00d26cd1052d4b46c432b6b69cb2d83179d52a6) )
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
-	/* none?? */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
-
-	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-//  ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not here on this set
-
-	ROM_REGION( 0x10000, "comm", ROMREGION_ERASE00 ) /* comms */
-	/* no comms? */
-
-	ROM_REGION( 0x10000, "cpu4", 0 ) /* z80 on extra sound board */
-	ROM_LOAD( "epr-12535.8",    0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) )
-
-	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
-	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
-
-	ROM_REGION( 0x10000, "cpu5", 0 ) /* z80 on air board */
-	ROM_LOAD( "epr-12505.8",    0x00000, 0x8000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) )
-ROM_END
-
-/**************************************************************************************************************************
-    Super Monaco GP, Sega X-board
-    CPU: FD1094 (317-0125a)
-*/
-ROM_START( smgpu )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-12561c.58", 0x00000, 0x20000, CRC(a5b0f3fe) SHA1(17103e56f822fdb52e72f597c01415ed375aa102) )
-	ROM_LOAD16_BYTE( "epr-12562c.63", 0x00001, 0x20000, CRC(799e55f4) SHA1(2e02cdc63bda47b087c81021018287cfa961c083) )
-
-	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
-
-	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
-	ROM_LOAD16_BYTE( "epr-12574a.20", 0x00000, 0x20000, CRC(f8b5c38b) SHA1(0184d5a1b71fb42d33dbaaad99d2c0fbc5750e7e) )
-	ROM_LOAD16_BYTE( "epr-12575a.29", 0x00001, 0x20000, CRC(248b1d17) SHA1(22f1e0d0d698abdf0cb1954f1f6382432a12c186) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
-	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
-	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
-
-	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
-	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
-	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
-	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
-	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
-	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
-	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
-	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
-	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
-	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
-	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
-	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
-	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
-	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
-	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
-	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
-	/* none?? */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
-
-	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
-
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
-ROM_END
-
-/**************************************************************************************************************************
-    Super Monaco GP, Sega X-board
-    CPU: FD1094 (317-0125a)
-*/
-/* very first US version with demo sound on by default */
-ROM_START( smgpu1 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-12561b.58", 0x00000, 0x20000, CRC(80a32655) SHA1(fe1ffa8af9f1ca175ba90b24a0853329b08d19af) )
-	ROM_LOAD16_BYTE( "epr-12562b.63", 0x00001, 0x20000, CRC(d525f2a8) SHA1(f3241e11485c7428cd9f081ec6768fda39ae3250) )
-
-	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
-
-	ROM_REGION( 0x80000, "sub", 0 ) /* 2nd 68000 code */
-	ROM_LOAD16_BYTE( "epr-12574a.20", 0x00000, 0x20000, CRC(f8b5c38b) SHA1(0184d5a1b71fb42d33dbaaad99d2c0fbc5750e7e) )
-	ROM_LOAD16_BYTE( "epr-12575a.29", 0x00001, 0x20000, CRC(248b1d17) SHA1(22f1e0d0d698abdf0cb1954f1f6382432a12c186) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "epr-12429.154", 0x00000, 0x10000, CRC(5851e614) SHA1(3dc97237ede2c6125e92ea6efc68a748d0ec69be) )
-	ROM_LOAD( "epr-12430.153", 0x10000, 0x10000, CRC(05e00134) SHA1(8baaa80815d5dabd38dc8600e357975b96d23b95) )
-	ROM_LOAD( "epr-12431.152", 0x20000, 0x10000, CRC(35572f4a) SHA1(d66456ecf7b59f81736fb873c553926b56bb3977))
-
-	ROM_REGION32_LE( 0x200000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD32_BYTE( "mpr-12425.90",  0x000000, 0x20000, CRC(14bf2a15) SHA1(84db3ac09e4a8fe470ac051d8d5de1814b48bc72) )
-	ROM_LOAD32_BYTE( "mpr-12426.94",  0x000001, 0x20000, CRC(28b60dc0) SHA1(ad69d449434853445a076319a55a29014217a100) )
-	ROM_LOAD32_BYTE( "mpr-12427.98",  0x000002, 0x20000, CRC(0a367928) SHA1(bcb558b7c23906397e66a7f046b09eb5036c0888) )
-	ROM_LOAD32_BYTE( "mpr-12428.102", 0x000003, 0x20000, CRC(efa80ad5) SHA1(9bc7c3fb60cc076f29a0af487d58e5b48f1c4b06) )
-	ROM_LOAD32_BYTE( "mpr-12421.91",  0x080000, 0x20000, CRC(25f46140) SHA1(ea75e364cf52636d100158f79be627e36da8c327) )
-	ROM_LOAD32_BYTE( "mpr-12422.95",  0x080001, 0x20000, CRC(cb51c8f6) SHA1(5af56ae1916c3212b8d5b9e4bccbbe1916694f89) )
-	ROM_LOAD32_BYTE( "mpr-12423.99",  0x080002, 0x20000, CRC(0be9818e) SHA1(637a8201416e73d53f7e2502ea0a5277e43c167d) )
-	ROM_LOAD32_BYTE( "mpr-12424.103", 0x080003, 0x20000, CRC(0ce00dfc) SHA1(3b1990977ec7ad4c3bea66527707cff2cd8d5a98) )
-	ROM_LOAD32_BYTE( "mpr-12417.92",  0x100000, 0x20000, CRC(a806eabf) SHA1(1a61a2135d92b42ee131fd3240bc8a17a96696ab) )
-	ROM_LOAD32_BYTE( "mpr-12418.96",  0x100001, 0x20000, CRC(ed1a0f2b) SHA1(1aa87292ca0465fa129d6be81d95dbb77332ecab) )
-	ROM_LOAD32_BYTE( "mpr-12419.100", 0x100002, 0x20000, CRC(ce4568cb) SHA1(1ed66e74ce94d41593b498827d9cc243f775d4ba) )
-	ROM_LOAD32_BYTE( "mpr-12420.104", 0x100003, 0x20000, CRC(679442eb) SHA1(f88ef0219497f955d8db6783f3636dad52928f46) )
-	ROM_LOAD32_BYTE( "epr-12609.93",  0x180000, 0x20000, CRC(a867812f) SHA1(f8950bf794b6c2ec767ffff837d28917b636dbe7) ) //
-	ROM_LOAD32_BYTE( "epr-12610.97",  0x180001, 0x20000, CRC(53b99417) SHA1(ab72d35c88695c777d24c5557e5d3ea2d446e51b) ) //
-	ROM_LOAD32_BYTE( "epr-12611.101", 0x180002, 0x20000, CRC(bd5c6ab0) SHA1(7632dc4daa8eabe74769369856a8ba451e5bd420) ) // these differ from japan set
-	ROM_LOAD32_BYTE( "epr-12612.105", 0x180003, 0x20000, CRC(ac86e890) SHA1(7720c1c8df6de5de50254e97772c15161b796031) ) //
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
-	/* none?? */
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr-12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
-
-	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
-	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
-	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
-
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
-ROM_END
-
-/**************************************************************************************************************************
-    Super Monaco GP, Sega X-board
-    CPU: FD1094 (317-0125a)
 */
 ROM_START( smgpu2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
@@ -2488,10 +2555,21 @@ ROM_START( smgpu2 )
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
 	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
 /**************************************************************************************************************************
@@ -2542,10 +2620,21 @@ ROM_START( smgpj )
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
 	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
 /**************************************************************************************************************************
@@ -2596,10 +2685,21 @@ ROM_START( smgpja )
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-12437.11",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) )
 	ROM_LOAD( "mpr-12438.12",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
-	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
+	ROM_LOAD( "mpr-12439.13",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // not used in deluxe
+
+	ROM_REGION( 0x10000, "soundcpu2", 0 ) /* z80 on extra sound board */
+	ROM_LOAD( "epr-12535.8",     0x00000, 0x10000, CRC(80453597) SHA1(d3fee7bb4a8964f5cf1cdae80fc3dde06c947839) ) // taken from deluxe cabinet dump
+
+	ROM_REGION( 0x80000, "pcm2", ROMREGION_ERASEFF ) /* Sega PCM sound data on extra sound board (same as on main board..) */
+	ROM_LOAD( "mpr-12437.20",    0x00000, 0x20000, CRC(a1c7e712) SHA1(fa7fa8c39690ae5dab8b28af5aeed5ffae2cd6de) ) // taken from deluxe cabinet dump
+	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
+	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
 	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
-	ROM_LOAD( "epr-12587.14",    0x00000, 0x8000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
+	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
+
+	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
 
@@ -2905,9 +3005,9 @@ GAME( 1989, loffire,  0,        xboard,  loffire,  loffire,        ROT0,   "Sega
 GAME( 1989, loffireu, loffire,  xboard,  loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
 GAME( 1989, loffirej, loffire,  xboard,  loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
 GAME( 1989, rachero,  0,        xboard,  rachero,  generic_xboard, ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
-GAME( 1989, smgp,     0,        smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev B, 'Twin', FD1094 317-0126a)", 0 )
+GAME( 1989, smgp,     0,        smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev B, FD1094 317-0126a)", 0 )
 GAME( 1989, smgp6,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev A, FD1094 317-0126a)", 0 )
-GAME( 1989, smgp5,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, 'Air Drive Cabinet', FD1094 317-0126)", 0 )
+GAME( 1989, smgp5,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, FD1094 317-0126)", 0 )
 GAME( 1989, smgpu,    smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev C, FD1094 317-0125a)", 0 )
 GAME( 1989, smgpu1,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev B, FD1094 317-0125a)", 0 )
 GAME( 1989, smgpu2,   smgp,     smgp,    smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev A, FD1094 317-0125a)", 0 )
