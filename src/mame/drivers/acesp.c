@@ -5,11 +5,17 @@
  skeleton driver!
 
  should all games have OKI roms? are most missing?
+
+ has an undumped 'reel processor' (68705 like Mach2000?)
+
+ based on internal accesses it seems to use a 6303Y (like Mach2000)
+ which does NOT have the same internal map as a 6303R
 */
 
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/6821pia.h"
 
 class ace_sp_state : public driver_device
 {
@@ -27,13 +33,56 @@ protected:
 
 
 
+
+
 static ADDRESS_MAP_START( ace_sp_map, AS_PROGRAM, 8, ace_sp_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	/**** 6303Y internal area ****/
+	//----- 0x0000 - 0x0027 is internal registers -----
+	AM_RANGE(0x0000, 0x0027) AM_RAM
+	//----- 0x0028 - 0x003f is external access -----
+	// 0x30 - reels write
+	// 0x31 - lamp high
+	// 0x32 - lamp low
+	// 0x33 - lamp stb
+	// 0x34 - shift stb
+	// 0x35 - shift clk
+	// 0x36 - sio
+	// 0x37 - watchdog?
+	AM_RANGE(0x0038, 0x003b) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	/* 0x3c */
+	/* 0x3d */
+	/* 0x3e */
+	/* 0x3f */
+	//----- 0x0040 - 0x013f is internal RAM (256 bytes) -----
+	AM_RANGE(0x0040, 0x013f) AM_RAM
+	
+
+	/**** regular map ****/
+	AM_RANGE(0x0140, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
+const pia6821_interface ace_sp_pia0_intf =
+{
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
+
 static ADDRESS_MAP_START( ace_sp_portmap, AS_IO, 8, ace_sp_state )
+	//AM_RANGE(0x02, 0x02) // misc
+	//AM_RANGE(0x05, 0x06) // AYs
 ADDRESS_MAP_END
 
 
@@ -42,117 +91,405 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( ace_sp, ace_sp_state )
-	MCFG_CPU_ADD("maincpu", HD6301, 1000000) // 6303?
+	MCFG_CPU_ADD("maincpu", HD6301, 1000000) // 6303Y?
 	MCFG_CPU_PROGRAM_MAP(ace_sp_map)
 	MCFG_CPU_IO_MAP(ace_sp_portmap)
+
+	MCFG_PIA6821_ADD("pia0", ace_sp_pia0_intf)
+
 MACHINE_CONFIG_END
 
 
-
+#define SP_CBOWL_SOUND \
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "cashbowlsnd1.bin", 0x000000, 0x080000, CRC(44e67cef) SHA1(3cfe48122da527e82f9058e0c5b81b5096bf4181) ) \
+	ROM_LOAD( "cashbowlsnd2.bin", 0x080000, 0x080000, CRC(a28291a2) SHA1(c07b585cee89bc35c880d24eb6124796d6df423c) ) \
 
 ROM_START( sp_cbowl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cashbowlgam2.bin", 0x0000, 0x008000, CRC(b20fa6f3) SHA1(63ded9527650e7810d6432fce762fe4691b87c1b) )
 	ROM_LOAD( "cashbowlgam1.bin", 0x8000, 0x008000, CRC(3193cf8c) SHA1(f5a2fa260261adbdcc39a002b6fde11c3c350d84) )
+	SP_CBOWL_SOUND
+ROM_END
 
-	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "cashbowlsnd1.bin", 0x000000, 0x080000, CRC(44e67cef) SHA1(3cfe48122da527e82f9058e0c5b81b5096bf4181) )
-	ROM_LOAD( "cashbowlsnd2.bin", 0x080000, 0x080000, CRC(a28291a2) SHA1(c07b585cee89bc35c880d24eb6124796d6df423c) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "9391.bin", 0x0000, 0x008000, CRC(7f7e3253) SHA1(c42346651095db78ab85cc69da775307643fe4ce) )
+ROM_START( sp_cbowla )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9392.bin", 0x0000, 0x008000, CRC(9345973d) SHA1(2a4349ea3c115fbf8ce465eae2dcfacb13ada310) )
+	ROM_LOAD( "9391.bin", 0x8000, 0x008000, CRC(7f7e3253) SHA1(c42346651095db78ab85cc69da775307643fe4ce) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9393.bin", 0x0000, 0x008000, CRC(971596f0) SHA1(4a4e4a505df0b60a2be19e87ec9dd04e65d14082) )
+	ROM_LOAD( "9391.bin", 0x8000, 0x008000, CRC(7f7e3253) SHA1(c42346651095db78ab85cc69da775307643fe4ce) )
+	SP_CBOWL_SOUND
+ROM_END
 
-	ROM_LOAD( "cb.bin", 0x0000, 0x010000, CRC(dc454e67) SHA1(57f470fbb44fe50c9c8068bbcdc9b41c617b0d82) )
-
-	ROM_LOAD( "022p4-5a.bin", 0x0000, 0x008000, CRC(ca31a175) SHA1(e25b5cc23276cf2be20e0724cfc8517ade5bb1f8) )
-	ROM_LOAD( "022p4-5b.bin", 0x0000, 0x008000, CRC(07eae791) SHA1(9edd66f50a137063565e4152e3d0ea223a467e52) )
-	ROM_LOAD( "022p4-5f.bin", 0x0000, 0x008000, CRC(4bcd2648) SHA1(d55a777f3c948738b2ee29388e481e3918e8f418) )
-	ROM_LOAD( "022p4-5g.bin", 0x0000, 0x008000, CRC(c689e24e) SHA1(f79173f1628af0bf33de4c676f519dd901d7c867) )
-	ROM_LOAD( "022p4-5h.bin", 0x0000, 0x008000, CRC(4dd8fdc7) SHA1(203759247112ad3424282a7d4c75d0ed79da9738) )
-	ROM_LOAD( "022p4-5i.bin", 0x0000, 0x008000, CRC(c09c39c1) SHA1(ce6cd27bec22d806a9bbd654b09a853d49f2e0cd) )
-
-	ROM_LOAD( "022p5-2a.bin", 0x0000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
-	ROM_LOAD( "022p5-2b.bin", 0x0000, 0x008000, CRC(dd8ea703) SHA1(a213f2010a4b525dfb73c98558b704e55aad888c) )
-	ROM_LOAD( "022p5-2c.bin", 0x0000, 0x008000, CRC(50ca6305) SHA1(8b089eb234fe0ed5bd502ff878ef0de71e440d83) )
-	ROM_LOAD( "022p5-2f.bin", 0x0000, 0x008000, CRC(91a966da) SHA1(4ce0eaa2c4f0dbcd9dafaa19526d90b25c753227) )
-	ROM_LOAD( "022p5-2g.bin", 0x0000, 0x008000, CRC(1ceda2dc) SHA1(70da06cd910ab6ae9cada17133aa5c7278394988) )
-	ROM_LOAD( "022p5-2h.bin", 0x0000, 0x008000, CRC(97bcbd55) SHA1(3bfad6beef82dac501b8ce3439c2c81e565b8b55) )
-	ROM_LOAD( "022p5-2i.bin", 0x0000, 0x008000, CRC(1af87953) SHA1(62d21cd63c45cee69af6fc5b83f5cc5336db2e73) )
+ROM_START( sp_cbowlc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cb.bin", 0x0000, 0x010000, CRC(dc454e67) SHA1(57f470fbb44fe50c9c8068bbcdc9b41c617b0d82) ) // just a merged rom?
+	SP_CBOWL_SOUND
 ROM_END
 
 
+ROM_START( sp_cbowld )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p4-5b.bin", 0x0000, 0x008000, CRC(07eae791) SHA1(9edd66f50a137063565e4152e3d0ea223a467e52) )
+	ROM_LOAD( "022p4-5a.bin", 0x8000, 0x008000, CRC(ca31a175) SHA1(e25b5cc23276cf2be20e0724cfc8517ade5bb1f8) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowle )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p4-5f.bin", 0x0000, 0x008000, CRC(4bcd2648) SHA1(d55a777f3c948738b2ee29388e481e3918e8f418) )
+	ROM_LOAD( "022p4-5a.bin", 0x8000, 0x008000, CRC(ca31a175) SHA1(e25b5cc23276cf2be20e0724cfc8517ade5bb1f8) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlf )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p4-5g.bin", 0x0000, 0x008000, CRC(c689e24e) SHA1(f79173f1628af0bf33de4c676f519dd901d7c867) )
+	ROM_LOAD( "022p4-5a.bin", 0x8000, 0x008000, CRC(ca31a175) SHA1(e25b5cc23276cf2be20e0724cfc8517ade5bb1f8) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p4-5h.bin", 0x0000, 0x008000, CRC(4dd8fdc7) SHA1(203759247112ad3424282a7d4c75d0ed79da9738) )
+	ROM_LOAD( "022p4-5a.bin", 0x8000, 0x008000, CRC(ca31a175) SHA1(e25b5cc23276cf2be20e0724cfc8517ade5bb1f8) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p4-5i.bin", 0x0000, 0x008000, CRC(c09c39c1) SHA1(ce6cd27bec22d806a9bbd654b09a853d49f2e0cd) )
+	ROM_LOAD( "022p4-5a.bin", 0x8000, 0x008000, CRC(ca31a175) SHA1(e25b5cc23276cf2be20e0724cfc8517ade5bb1f8) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowli )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p5-2b.bin", 0x0000, 0x008000, CRC(dd8ea703) SHA1(a213f2010a4b525dfb73c98558b704e55aad888c) )
+	ROM_LOAD( "022p5-2a.bin", 0x8000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlj )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p5-2c.bin", 0x0000, 0x008000, CRC(50ca6305) SHA1(8b089eb234fe0ed5bd502ff878ef0de71e440d83) )
+	ROM_LOAD( "022p5-2a.bin", 0x8000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p5-2f.bin", 0x0000, 0x008000, CRC(91a966da) SHA1(4ce0eaa2c4f0dbcd9dafaa19526d90b25c753227) )
+	ROM_LOAD( "022p5-2a.bin", 0x8000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowll )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p5-2g.bin", 0x0000, 0x008000, CRC(1ceda2dc) SHA1(70da06cd910ab6ae9cada17133aa5c7278394988) )
+	ROM_LOAD( "022p5-2a.bin", 0x8000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowlm )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p5-2h.bin", 0x0000, 0x008000, CRC(97bcbd55) SHA1(3bfad6beef82dac501b8ce3439c2c81e565b8b55) )
+	ROM_LOAD( "022p5-2a.bin", 0x8000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
+	SP_CBOWL_SOUND
+ROM_END
+
+ROM_START( sp_cbowln )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "022p5-2i.bin", 0x0000, 0x008000, CRC(1af87953) SHA1(62d21cd63c45cee69af6fc5b83f5cc5336db2e73) )
+	ROM_LOAD( "022p5-2a.bin", 0x8000, 0x008000, CRC(7f5c9ba7) SHA1(9b06664d734f7902cd2146d0c97aaebdb5f08e5f) )
+	SP_CBOWL_SOUND
+ROM_END
 
 
+#define SP_CRIME_SOUND \
+	ROM_REGION(	0x100000, "oki", ROMREGION_ERASE00 ) \
+	/* not used, or missing? */ \
 
 ROM_START( sp_crime )
 	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "crimwatchnew2.bin", 0x0000, 0x008000, CRC(b799fa39) SHA1(7d701d9368c3db26d4f6dae9a68f2833e2d48a40) )
+	ROM_LOAD( "crimwatchnew1.bin", 0x8000, 0x008000, CRC(733312bd) SHA1(bb449babd3b3eb9d23efc532b2a3ad6e6fac7837) )
+	SP_CRIME_SOUND
+ROM_END
+
+
+ROM_START( sp_crimea )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cw591d5b", 0x0000, 0x008000, CRC(f0da19e0) SHA1(17605d6462a8feeec338a637fbc8d3d840e00431) )
 	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
-//  ROM_LOAD( "cw2.bin", 0x0000, 0x008000, CRC(f0da19e0) SHA1(17605d6462a8feeec338a637fbc8d3d840e00431) )
-//  ROM_LOAD( "cw1.bin", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "cw591d5c", 0x0000, 0x008000, CRC(7d9edde6) SHA1(af5ffc4c4b7a02ae8ce8683741c5586b21f0e971) )
-	ROM_LOAD( "cw591d5d", 0x0000, 0x008000, CRC(f6cfc26f) SHA1(a2f6118831b29ab264d772446e73fa1e4f2ee35a) )
-	ROM_LOAD( "cw591d5e", 0x0000, 0x008000, CRC(7b8b0669) SHA1(73aa51676a296c1e2e2184cb816e86be7204617a) )
-	ROM_LOAD( "cw591d5f", 0x0000, 0x008000, CRC(bcfdd839) SHA1(d8f055308045c423da90e82e6b6d0cf3011f9e5a) )
-	ROM_LOAD( "cw591d5g", 0x0000, 0x008000, CRC(31b91c3f) SHA1(c5aefaab25d127d6a4b48d3131f86fd64383c61b) )
-	ROM_LOAD( "cw591d5h", 0x0000, 0x008000, CRC(bae803b6) SHA1(b2cc751e6b66099757dc32a5c74378843429f179) )
-	ROM_LOAD( "cw591d5i", 0x0000, 0x008000, CRC(37acc7b0) SHA1(a4e765e67bd282c024bec6f523e553edc95d63c6) )
+	SP_CRIME_SOUND
 ROM_END
+
+ROM_START( sp_crimeb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5c", 0x0000, 0x008000, CRC(7d9edde6) SHA1(af5ffc4c4b7a02ae8ce8683741c5586b21f0e971) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+ROM_START( sp_crimec )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5d", 0x0000, 0x008000, CRC(f6cfc26f) SHA1(a2f6118831b29ab264d772446e73fa1e4f2ee35a) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+ROM_START( sp_crimed )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5e", 0x0000, 0x008000, CRC(7b8b0669) SHA1(73aa51676a296c1e2e2184cb816e86be7204617a) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+ROM_START( sp_crimee )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5f", 0x0000, 0x008000, CRC(bcfdd839) SHA1(d8f055308045c423da90e82e6b6d0cf3011f9e5a) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+ROM_START( sp_crimef )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5g", 0x0000, 0x008000, CRC(31b91c3f) SHA1(c5aefaab25d127d6a4b48d3131f86fd64383c61b) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+ROM_START( sp_crimeg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5h", 0x0000, 0x008000, CRC(bae803b6) SHA1(b2cc751e6b66099757dc32a5c74378843429f179) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+ROM_START( sp_crimeh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cw591d5i", 0x0000, 0x008000, CRC(37acc7b0) SHA1(a4e765e67bd282c024bec6f523e553edc95d63c6) )
+	ROM_LOAD( "cw591d5a", 0x8000, 0x008000, CRC(b97effd9) SHA1(203171d993f81cc11169cf8daaa26b1639511d40) )
+	SP_CRIME_SOUND
+ROM_END
+
+#define SP_EMMRD_SOUND \
+	ROM_REGION(	0x100000, "oki", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "edsnd1.bin", 0x000000, 0x080000, CRC(e91382d7) SHA1(499a0606e9bbabcf207c8778323899b7b81ae372) ) \
+	ROM_LOAD( "edsnd2.bin", 0x080000, 0x080000, CRC(0e103080) SHA1(2dcfcb35d04f34e4bc6da32f2d23bd8685654f8e) ) \
 
 
 ROM_START( sp_emmrd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "013p5-0b.bin", 0x0000, 0x008000, CRC(f6230a91) SHA1(748a1fa356b1748f38f62089e61863b96a2a62e7) )
 	ROM_LOAD( "013p5-0a.bin", 0x8000, 0x008000, CRC(2856abac) SHA1(a3ecd165189bb8ebbd0cb74c3594b19eb27183e7) )
-
-	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "edsnd1.bin", 0x000000, 0x080000, CRC(e91382d7) SHA1(499a0606e9bbabcf207c8778323899b7b81ae372) )
-	ROM_LOAD( "edsnd2.bin", 0x080000, 0x080000, CRC(0e103080) SHA1(2dcfcb35d04f34e4bc6da32f2d23bd8685654f8e) )
+	SP_EMMRD_SOUND
+ROM_END
 
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_START( sp_emmrda )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "013p5-0c.bin", 0x0000, 0x008000, CRC(7b67ce97) SHA1(0430d0331e696c1c812754341f55e5aad8e284a7) )
+	ROM_LOAD( "013p5-0a.bin", 0x8000, 0x008000, CRC(2856abac) SHA1(a3ecd165189bb8ebbd0cb74c3594b19eb27183e7) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "013p5-0f.bin", 0x0000, 0x008000, CRC(56c33d00) SHA1(ff1afbca404a9dca096b3660dc01ba0e213c26f0) )
+	ROM_LOAD( "013p5-0a.bin", 0x8000, 0x008000, CRC(2856abac) SHA1(a3ecd165189bb8ebbd0cb74c3594b19eb27183e7) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "013p5-0g.bin", 0x0000, 0x008000, CRC(db87f906) SHA1(9e3a32e29d7f622bfc38d0f8a48f86a551c23e78) )
+	ROM_LOAD( "013p5-0a.bin", 0x8000, 0x008000, CRC(2856abac) SHA1(a3ecd165189bb8ebbd0cb74c3594b19eb27183e7) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdd )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "013p5-0h.bin", 0x0000, 0x008000, CRC(2584e8a7) SHA1(027ca1d9861824dc9235f030e73e569278b61113) )
+	ROM_LOAD( "013p5-0a.bin", 0x8000, 0x008000, CRC(2856abac) SHA1(a3ecd165189bb8ebbd0cb74c3594b19eb27183e7) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrde )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "013p5-0i.bin", 0x0000, 0x008000, CRC(a8c02ca1) SHA1(ed776dc8aca3d820170ee5dd4ae5d0c440209ee9) )
+	ROM_LOAD( "013p5-0a.bin", 0x8000, 0x008000, CRC(2856abac) SHA1(a3ecd165189bb8ebbd0cb74c3594b19eb27183e7) )
+	SP_EMMRD_SOUND
+ROM_END
 
-	ROM_LOAD( "014p8-0a.bin", 0x0000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+
+ROM_START( sp_emmrdf )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "014p8-0b.bin", 0x0000, 0x008000, CRC(70a0aaf6) SHA1(d8fa564739784512ff982e3c809a92fcffdef645) )
+	ROM_LOAD( "014p8-0a.bin", 0x8000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+	SP_EMMRD_SOUND
+ROM_END
+
+
+ROM_START( sp_emmrdg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "014p8-0c.bin", 0x0000, 0x008000, CRC(fde46ef0) SHA1(544d71a228285162f4e6e5a0de9a380e927bfbfa) )
+	ROM_LOAD( "014p8-0a.bin", 0x8000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "014p8-0f.bin", 0x0000, 0x008000, CRC(3c876b2f) SHA1(a3af4ceb6f7c32b4dd27ab47cdfb10f44fa5aec1) )
+	ROM_LOAD( "014p8-0a.bin", 0x8000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdi )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "014p8-0g.bin", 0x0000, 0x008000, CRC(b1c3af29) SHA1(f584bd51f37c1e13bf6510b454352d3ccbf92202) )
+	ROM_LOAD( "014p8-0a.bin", 0x8000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdj )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "014p8-0h.bin", 0x0000, 0x008000, CRC(3a92b0a0) SHA1(d1665938afd5884ff77c717a18d89be6b0a86303) )
+	ROM_LOAD( "014p8-0a.bin", 0x8000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "014p8-0i.bin", 0x0000, 0x008000, CRC(b7d674a6) SHA1(6833fe55189282fdbeab478d5d258cf8832ceab7) )
+	ROM_LOAD( "014p8-0a.bin", 0x8000, 0x008000, CRC(7ecfcdbd) SHA1(e86083ac22eec4ce1f977b5c03d12b7b051bbf1e) )
+	SP_EMMRD_SOUND
+ROM_END
 
-	ROM_LOAD( "015p5-0a.bin", 0x0000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+ROM_START( sp_emmrdl )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "015p5-0b.bin", 0x0000, 0x008000, CRC(7673ecda) SHA1(d4cf2e0c5ee4d0d3a26033f8192a01dec7df3649) )
+	ROM_LOAD( "015p5-0a.bin", 0x8000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdm )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "015p5-0c.bin", 0x0000, 0x008000, CRC(fb3728dc) SHA1(f892f8716b28e70f188babca7bf91462a61128fb) )
+	ROM_LOAD( "015p5-0a.bin", 0x8000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdn )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "015p5-0f.bin", 0x0000, 0x008000, CRC(3a542d03) SHA1(22c167924a1f58a297b99f30d379187c033aec35) )
+	ROM_LOAD( "015p5-0a.bin", 0x8000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdo )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "015p5-0g.bin", 0x0000, 0x008000, CRC(b710e905) SHA1(c5b562665df7e3302b05875bdc393501cff2bb06) )
+	ROM_LOAD( "015p5-0a.bin", 0x8000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "015p5-0h.bin", 0x0000, 0x008000, CRC(3c41f68c) SHA1(7a93bfe90718a13e0ddcefe4f2622ebea5590700) )
+	ROM_LOAD( "015p5-0a.bin", 0x8000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdq )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "015p5-0i.bin", 0x0000, 0x008000, CRC(b105328a) SHA1(00de9eefd19c96e6a821bb9e0156bfd13d1d0ca3) )
+	ROM_LOAD( "015p5-0a.bin", 0x8000, 0x008000, CRC(b4986b03) SHA1(baba6da695b0b75360ebb091ead8aa2a25c1177a) )
+	SP_EMMRD_SOUND
+ROM_END
 
-	ROM_LOAD( "708p6-0a.bin", 0x0000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+ROM_START( sp_emmrdr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "708p6-0b.bin", 0x0000, 0x008000, CRC(b3dda1f9) SHA1(aadf8e9b85efbc8d4335cb47c399e0d936ba35cf) )
+	ROM_LOAD( "708p6-0a.bin", 0x8000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrds )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "708p6-0c.bin", 0x0000, 0x008000, CRC(3e9965ff) SHA1(ec30f5d4c231a2f0836f22519b234a19db990497) )
+	ROM_LOAD( "708p6-0a.bin", 0x8000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdt )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "708p6-0f.bin", 0x0000, 0x008000, CRC(fffa6020) SHA1(8d9ca0f55edae56a41514b03394139d4a736b850) )
+	ROM_LOAD( "708p6-0a.bin", 0x8000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdu )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "708p6-0g.bin", 0x0000, 0x008000, CRC(72bea426) SHA1(01f11cf43867f8238407acd1b6d28749a619feec) )
+	ROM_LOAD( "708p6-0a.bin", 0x8000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdv )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "708p6-0h.bin", 0x0000, 0x008000, CRC(f9efbbaf) SHA1(d2ec92424ddfb5021e5e0869222e30d8fcbd7d9d) )
+	ROM_LOAD( "708p6-0a.bin", 0x8000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdw )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "708p6-0i.bin", 0x0000, 0x008000, CRC(74ab7fa9) SHA1(398df07fb6c085ea96105148ecc3f562d8fea394) )
+	ROM_LOAD( "708p6-0a.bin", 0x8000, 0x008000, CRC(dda4f3ff) SHA1(a7049aaa07b401482c42639161b1c5b59d9076c6) )
+	SP_EMMRD_SOUND
+ROM_END
 
-	// these are just joined up roms, check they match above
-	ROM_LOAD( "0013rp50.bin", 0x0000, 0x010000, CRC(5e7ba11a) SHA1(30477ff930e9f23bf32a5bdf8573fc47ed26773d) )
-	ROM_LOAD( "0013rp60.bin", 0x0000, 0x010000, CRC(fb439994) SHA1(0820cf663ed5f9600d4e0313a7b3c6f8b28db471) )
+ROM_START( sp_emmrdx )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "0013rp50.bin", 0x0000, 0x010000, CRC(5e7ba11a) SHA1(30477ff930e9f23bf32a5bdf8573fc47ed26773d) ) // just a merged rom?
+	SP_EMMRD_SOUND
+ROM_END
 
-	ROM_LOAD( "0015dp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) )
-	ROM_LOAD( "0015dp60.bin", 0x0000, 0x010000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) )
-	ROM_LOAD( "0015rp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) )
-	ROM_LOAD( "0015rp60.bin", 0x0000, 0x010000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) )
+ROM_START( sp_emmrdy )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "0013rp60.bin", 0x0000, 0x010000, CRC(fb439994) SHA1(0820cf663ed5f9600d4e0313a7b3c6f8b28db471) ) // just a merged rom?
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrdz )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "0015dp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) ) // just a merged rom?
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrd0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "0015dp60.bin", 0x0000, 0x010000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) ) // just a merged rom?
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrd1 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "0015rp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) ) // just a merged rom?
+	SP_EMMRD_SOUND
+ROM_END
+
+ROM_START( sp_emmrd2 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "0015rp60.bin", 0x0000, 0x010000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) ) // just a merged rom?
+	SP_EMMRD_SOUND
 ROM_END
 
 
@@ -1180,11 +1517,6 @@ ROM_START( sp_zigzg )
 	ROM_LOAD( "707p6-0i.bin", 0x0000, 0x008000, CRC(569e62ef) SHA1(e08edd9f06c7140a6fcee41ebea6bb805a7b15aa) )
 ROM_END
 
-ROM_START( sp_cw )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "crimwatchnew2.bin", 0x0000, 0x008000, CRC(b799fa39) SHA1(7d701d9368c3db26d4f6dae9a68f2833e2d48a40) )
-	ROM_LOAD( "crimwatchnew1.bin", 0x8000, 0x008000, CRC(733312bd) SHA1(bb449babd3b3eb9d23efc532b2a3ad6e6fac7837) )
-ROM_END
 
 
 ROM_START( sp_atw )
@@ -1245,10 +1577,63 @@ DRIVER_INIT( ace_sp )
 
 }
 
-GAME( 199?, sp_cbowl		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, sp_crime		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE, set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, sp_cw			,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE, set 2)",GAME_IS_SKELETON_MECHANICAL ) // roms all contain Emmerdale strings??
-GAME( 199?, sp_emmrd		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowl		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowla		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlb		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 3)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlc		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 4)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowld		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 5)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowle		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 6)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlf		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 7)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlg		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 8)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlh		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 9)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowli		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 10)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlj		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 11)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlk		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 12)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowll		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 13)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowlm		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 14)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_cbowln		,sp_cbowl	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 15)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, sp_crime		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimea		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimeb		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 3)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimec		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 4)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimed		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 5)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimee		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 6)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimef		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 7)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimeg		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 8)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_crimeh		,sp_crime	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Crime Watch (Ace) (sp.ACE) (set 9)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 1995, sp_emmrd		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrda		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdb		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 3)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdc		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 4)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdd		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 5)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrde		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 6)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdf		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 7)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdg		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 8)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdh		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 9)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdi		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 10)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdj		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 11)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdk		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 12)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdl		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 13)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdm		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 14)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdn		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 15)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdo		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 16)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdp		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 17)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdq		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 18)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdr		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 19)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrds		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 20)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdt		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 21)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdu		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 22)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdv		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 23)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdw		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 24)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdx		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 25)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdy		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 26)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrdz		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 27)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrd0		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 28)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrd1		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 29)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1995, sp_emmrd2		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 30)",GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, sp_goldm		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Golden Mile (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_gnat			,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Grand National (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_gprix		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Grand Prix (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL )

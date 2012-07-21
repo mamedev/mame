@@ -19396,8 +19396,59 @@ ac1rollb	//
 // Ace 'sp.ACE system'
 
 sp_cbowl		// Cash Bowl (Ace)
+sp_cbowla		//
+sp_cbowlb		//
+sp_cbowlc		//
+sp_cbowld		//
+sp_cbowle		//
+sp_cbowlf		//
+sp_cbowlg		//
+sp_cbowlh		//
+sp_cbowli		//
+sp_cbowlj		//
+sp_cbowlk		//
+sp_cbowll		//
+sp_cbowlm		//
+sp_cbowln		//
 sp_crime		// Crime Watch (Ace)
+sp_crimea		//
+sp_crimeb		//
+sp_crimec		//
+sp_crimed		//
+sp_crimee		//
+sp_crimef		//
+sp_crimeg		//
+sp_crimeh		//
 sp_emmrd		// Emmerdale (Ace)
+sp_emmrda		//
+sp_emmrdb		//
+sp_emmrdc		//
+sp_emmrdd		//
+sp_emmrde		//
+sp_emmrdf		//
+sp_emmrdg		//
+sp_emmrdh		//
+sp_emmrdi		//
+sp_emmrdj		//
+sp_emmrdk		//
+sp_emmrdl		//
+sp_emmrdm		//
+sp_emmrdn		//
+sp_emmrdo		//
+sp_emmrdp		//
+sp_emmrdq		//
+sp_emmrdr		//
+sp_emmrds		//
+sp_emmrdt		//
+sp_emmrdu		//
+sp_emmrdv		//
+sp_emmrdw		//
+sp_emmrdx		//
+sp_emmrdy		//
+sp_emmrdz		//
+sp_emmrd0		//
+sp_emmrd1		//
+sp_emmrd2		//
 sp_goldm		// Golden Mile (Ace)
 sp_gnat			// Grand National (Ace)
 sp_gprix		// Grand Prix (Ace)
@@ -19450,7 +19501,6 @@ sp_skylm		//Sky's The Limit Club, The (Ace)
 sp_tkpik		//Take Your Pick (Ace)
 sp_woolp		//Woolpack (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
 sp_zigzg		//Zig Zag (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
-sp_cw			//Crime Watch (Ace)
 sp_atw
 sp_five
 sp_crun
