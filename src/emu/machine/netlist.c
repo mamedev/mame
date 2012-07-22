@@ -288,14 +288,14 @@ netlist_base_t::~netlist_base_t()
 void netlist_base_t::set_clock_freq(int clockfreq)
 {
 	m_clockfreq = clockfreq;
-	m_divisor = 1000000000L * 100L / (m_clockfreq) / m_gatedelay;
+	m_divisor = U64(1000000000) * 100 / m_clockfreq / m_gatedelay;
 	VERBOSE_OUT(("Divisor %d\n", m_divisor));
 }
 
 void netlist_base_t::set_gatedelay(int gatedelay)
 {
 	m_gatedelay = gatedelay;
-	m_divisor = 1000000000L * 100L / (m_clockfreq) / m_gatedelay;
+	m_divisor = U64(1000000000) * 100 / m_clockfreq / m_gatedelay;
 	VERBOSE_OUT(("Divisor %d\n", m_divisor));
 }
 
