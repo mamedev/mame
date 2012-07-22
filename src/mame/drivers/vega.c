@@ -1,6 +1,6 @@
 /***************************************************************************
 
- Vega by Olypmia?
+ Vega by Olypmia
 
  I don't know much about this, and I'm unsure of the dump quality.  There
  were several dumps, and all but one had ROM10 with identical halves, however
@@ -145,4 +145,4 @@ DRIVER_INIT(vegaa)
 }
 #endif
 
-GAME( 19??, vega,   0, vega, vega, 0, ROT270, "Olympia?", "Vega", GAME_IS_SKELETON )
+GAME( 1982, vega,   0, vega, vega, 0, ROT270, "Olympia", "Vega", GAME_IS_SKELETON )
