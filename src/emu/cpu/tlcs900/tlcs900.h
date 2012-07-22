@@ -9,8 +9,14 @@ enum tlcs900_inputs
 	TLCS900_INTWD,
 	TLCS900_INT0,
 	TLCS900_INTAD,
+	TLCS900_INT1,
+	TLCS900_INT2,
+	TLCS900_INT3,
 	TLCS900_INT4,
 	TLCS900_INT5,
+	TLCS900_INT6,
+	TLCS900_INT7,
+	TLCS900_INT8,
 	TLCS900_TIO,
 	TLCS900_NUM_INPUTS
 };
@@ -36,10 +42,13 @@ struct _tlcs900_interface
 {
 	devcb_write8	to1;
 	devcb_write8	to3;
+	devcb_read8		port_read;
+	devcb_write8	port_write;
 };
 
 
 DECLARE_LEGACY_CPU_DEVICE(TLCS900H, tlcs900h);
+DECLARE_LEGACY_CPU_DEVICE(TMP95C063, tmp95c063);
 
 extern CPU_DISASSEMBLE( tlcs900 );
 
