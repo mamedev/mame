@@ -2083,7 +2083,7 @@ GAME(198?, j2silvcl	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Silver Classic (Pc
 GAME(198?, j2silvsh	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Silver Shot (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2sstrea	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Supa Streak (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2tstplt	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Test Pilot (Set 1) (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2tstplt	,j2tstplta	,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Test Pilot (Set 2) (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2tstplta,j2tstplt	,jpmmps,jpmmps,jpmmps,ROT0,   "Pcp","Test Pilot (Set 2) (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 
 GAME(198?, j2bonanz	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Eurocoin","Bonanza (Eurocoin) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2supchy	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Eurocoin","Super Cherry (Eurocoin) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
