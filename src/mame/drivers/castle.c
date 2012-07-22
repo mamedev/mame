@@ -22,9 +22,9 @@
   One significant difference is that the V1 REV E board has *2* 6303 CPUs
   whereas the V2 REV A board only has a single 6303
 
-              CPUs     PIA?                  SOUND           CMOSRAM    RTC       REEL CONTROLLER
-    V1 rv E - 2x6303 + HD6321 +              2xAY-3-8912A +  2xTC5516 + ICM7170 + 68705
-    V2 rv A - 1x6303 + HD468821P/HD68821P +  2xAY-3-8912A +   TC5??4  + none?   + 68705
+              CPUs       PIA?                  SOUND           CMOSRAM    RTC       REEL CONTROLLER
+    V1 rv E - 2x6303YP + HD6321 +              2xAY-3-8912A +  2xTC5516 + ICM7170 + 68705
+    V2 rv A - 1x6303YP + HD468821P/HD68821P +  2xAY-3-8912A +   TC5??4  + none?   + 68705
 
   In both cases the 68705 is marked the same way
   'REEL CONTROLLER V1 (C) CASTLE (1987) MACH 2000 SYSTEM'
@@ -75,10 +75,10 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( castle_V1rvE, castle_state )
-	MCFG_CPU_ADD("maincpu", HD6301, 1000000)
+	MCFG_CPU_ADD("maincpu", HD6303Y, 1000000)
 	MCFG_CPU_PROGRAM_MAP(V1rvE_mastermap)
 
-	MCFG_CPU_ADD("slavecpu", HD6301, 1000000)
+	MCFG_CPU_ADD("slavecpu", HD6303Y, 1000000)
 	MCFG_CPU_PROGRAM_MAP(V1rvE_slavemap)
 MACHINE_CONFIG_END
 
@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( castle_V2rvA, castle_state )
-	MCFG_CPU_ADD("maincpu", HD6301, 1000000)
+	MCFG_CPU_ADD("maincpu", HD6303Y, 1000000)
 	MCFG_CPU_PROGRAM_MAP(V2rvA_map)
 MACHINE_CONFIG_END
 

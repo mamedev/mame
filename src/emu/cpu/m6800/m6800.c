@@ -1327,6 +1327,7 @@ static CPU_INIT( hd6301 )
 	state_register(cpustate, "hd6301");
 }
 
+
 /****************************************************************************
  * HD63701 similiar to the HD6301
  ****************************************************************************/
@@ -2077,6 +2078,57 @@ CPU_GET_INFO( hd6301 )
  * CPU-specific set_info
  **************************************************************************/
 
+// has integrated peripherals, not yet emulated
+CPU_GET_INFO( hd6303r )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6301);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HD6303R");				break;
+
+		default:										CPU_GET_INFO_CALL(m6800);				break;
+	}
+}
+
+
+/**************************************************************************
+ * CPU-specific set_info
+ **************************************************************************/
+
+// has integrated peripherals, not yet emulated
+CPU_GET_INFO( hd6303y )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6301);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HD6303Y");				break;
+
+		default:										CPU_GET_INFO_CALL(m6800);				break;
+	}
+}
+
+/**************************************************************************
+ * CPU-specific set_info
+ **************************************************************************/
+
 CPU_GET_INFO( hd63701 )
 {
 	switch (state)
@@ -2128,3 +2180,17 @@ DEFINE_LEGACY_CPU_DEVICE(M6808, m6808);
 DEFINE_LEGACY_CPU_DEVICE(HD6301, hd6301);
 DEFINE_LEGACY_CPU_DEVICE(HD63701, hd63701);
 DEFINE_LEGACY_CPU_DEVICE(NSC8105, nsc8105);
+
+// DP-40 package: HD6303RP,  HD63A03RP,  HD63B03RP, 
+// FP-54 package: HD6303RF,  HD63A03RF,  HD63B03RF, 
+// CG-40 package: HD6303RCG, HD63A03RCG, HD63B03RCG, 
+DEFINE_LEGACY_CPU_DEVICE(HD6303R, hd6303r);
+
+// DP-64S package: HD6303YP,  HD63A03YP,  HD63B03YP,  HD63C03YP
+// FP-64  package: HD6303YF,  HD63A03YF,  HD63B03YF,  HD63C03YF
+// FP-64A package: HD6303YH,  HD63A03YH,  HD63B03YH,  HD63C03YH
+// CP-68  package: HD6303YCP, HD63A03YCP, HD63B03YCP, HD63C03YCP
+DEFINE_LEGACY_CPU_DEVICE(HD6303Y, hd6303y);
+
+
+
