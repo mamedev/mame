@@ -220,6 +220,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/msm58321.o	\
 	$(EMUMACHINE)/msm6242.o		\
 	$(EMUMACHINE)/ncr539x.o 	\
+	$(EMUMACHINE)/netlist.o		\
+	$(EMUMACHINE)/net_lib.o		\
 	$(EMUMACHINE)/nmc9306.o		\
     $(EMUMACHINE)/nscsi_bus.o   \
     $(EMUMACHINE)/nscsi_cd.o    \
