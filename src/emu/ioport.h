@@ -1606,6 +1606,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 // analog adjuster definition
 #define PORT_ADJUSTER(_default, _name) \
 	configurer.field_alloc(IPT_ADJUSTER, (_default), 0xff, (_name)); \
+	configurer.field_set_min_max(0, 100); \
 
 // config definition
 #define PORT_CONFNAME(_mask, _default, _name) \

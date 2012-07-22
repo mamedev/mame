@@ -1670,7 +1670,7 @@ static slider_state *slider_init(running_machine &machine)
 			if (field->type() == IPT_ADJUSTER)
 			{
 				void *param = (void *)field;
-				*tailptr = slider_alloc(machine, field->name(), 0, field->defvalue(), 100, 1, slider_adjuster, param);
+				*tailptr = slider_alloc(machine, field->name(), field->minval(), field->defvalue(), field->maxval(), 1, slider_adjuster, param);
 				tailptr = &(*tailptr)->next;
 			}
 
