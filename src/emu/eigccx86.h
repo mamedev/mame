@@ -673,15 +673,19 @@ INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 #else
 INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 {
-	UINT64 result;
-    UINT32 r1, r2;
+	union
+	{
+		UINT64 r;
+		struct {
+		    UINT32 r1, r2;
+		} p;
+	} r;
     __asm__ __volatile__ (
             "rdtsc"
-            : "=a" (r1), "=d" (r2)
+            : "=a" (r.p.r1), "=d" (r.p.r2)
     );
 
-    result = ((UINT64)r2<<32) | (UINT64)r1;
-    return (INT64) (result & U64(0x7fffffffffffffff));
+    return (INT64) (r.r & U64(0x7fffffffffffffff));
 }
 #endif
 
