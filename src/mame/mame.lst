@@ -9366,6 +9366,7 @@ j2adnoteg
 j2adnoteh
 j2adnotei
 j2bankch	// Bank Chase (Jpm)
+j2bankrd	// Bank Raid (Jpm)
 j2bigbnk	// Big Banker (Jpm)
 j2bigbox	// Big Box (Jpm)
 j2bigbuk	// Big Buck$ (Jpm)
@@ -9391,6 +9392,7 @@ j2fqueen	// Find The Queen (Jpm)
 j2fiveal	// Five Alive (Jpm)
 j2fiveln	// Five Liner (Jpm) [Mps]
 j2fws		// Five Way Shuffle (Jpm)
+j2fwsa
 j2frmtch	// Fruit Match (Jpm)
 j2fullhs	// Full House Club (Jpm)
 j2ghostb	// Ghostbuster (Jpm)
@@ -9411,14 +9413,18 @@ j2kingcl	// King Of Clubs (Jpm)
 j2litean	// Lite A Nudge (Jpm)
 j2lovsht	// Loot Shoot (Jpm)
 j2lovshd	// Loot Shoot Deluxe (Jpm)
+j2luckar	// Lucky Arrows (Jpm)
 j2lucky2	// Lucky 2s (Jpm)
 j2monblt	// Money Belt (Jpm)
 j2mongam	// Money Game (Jpm)
 j2mongmd	// Money Game Deluxe (Jpm)
 j2multwn	// Multi Win (Jpm)
 j2notexc	// Note Exchange (Jpm)
+j2notexca
+j2notexcb
 j2notesh	// Note Shoot (Jpm)
 j2nudbnz	// Nudge Bonanza Deluxe (Jpm)
+j2nudbnza
 j2nuddup	// Nudge Double Up (Jpm)
 j2nuddud	// Nudge Double Up Deluxe (Jpm)
 j2nudup3	// Nudge Double Up MkIII (Jpm)
@@ -9438,6 +9444,7 @@ j2reelmo	// Reel Money (Jpm) [Mps]
 j2rotnot	// Rota Note (Jpm)
 j2roulcl	// Roulette Club (Jpm)
 j2rdclb		// Royal Deal Club (Jpm)
+j2sldgld	// Solid Gold (Jpm)
 j2slvrgh	// Silver Ghost (Jpm)
 j2spcrsv	// Special Reserve (Jpm)
 j2stahed	// Streets Ahead (Jpm)
