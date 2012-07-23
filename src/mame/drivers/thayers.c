@@ -16,7 +16,7 @@
 #include "machine/ldstub.h"
 #include "machine/ldv1000.h"
 #include "cpu/cop400/cop400.h"
-//#include "dlair.lh"
+#include "dlair.lh"
 
 
 struct ssi263_t
