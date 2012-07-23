@@ -1,11 +1,12 @@
 /***************************************************************************
 
-    Dream Fruit skeleton driver
+    Fruit Dream skeleton driver
 
     Uses a TC0091LVC, a variant of the one used on Taito L HW
 
     TODO:
-    - somebody should port CPU core contents in a shared file;
+	- title screen (PCG uploads at 0x1b400?)
+	- inputs
 
 ***************************************************************************/
 
@@ -13,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "machine/tc009xlvc.h"
+#include "machine/i8255.h"
 
 class dfruit_state : public driver_device
 {
@@ -169,19 +171,92 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dfruit_map, AS_PROGRAM, 8, dfruit_state )
 	AM_IMPORT_FROM(tc0091lvc_map)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa004, 0xa005) AM_DEVREADWRITE_LEGACY("opn",ym2203_r,ym2203_w)
 	AM_RANGE(0xa008, 0xa008) AM_READNOP //watchdog
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dfruit_io, AS_IO, 8, dfruit_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dfruit )
 	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN4")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -279,6 +354,16 @@ static GFXDECODE_START( dfruit )
 	//GFXDECODE_ENTRY( NULL,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
+static I8255A_INTERFACE( ppi8255_intf )
+{
+	DEVCB_INPUT_PORT("IN0"),						/* Port A read */
+	DEVCB_NULL,			/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
 static TIMER_DEVICE_CALLBACK( dfruit_irq_scanline )
 {
 	dfruit_state *state = timer.machine().driver_data<dfruit_state>();
@@ -305,7 +390,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
+		DEVCB_INPUT_PORT("IN4"), DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
 	},
 	0
 };
@@ -319,7 +404,6 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
 	MCFG_CPU_PROGRAM_MAP(dfruit_map)
-	MCFG_CPU_IO_MAP(dfruit_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", dfruit_irq_scanline, "screen", 0, 1)
 
 	//MCFG_MACHINE_START(4enraya)
@@ -329,12 +413,13 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(dfruit_state, screen_eof)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 
 	MCFG_GFXDECODE( dfruit )
 	MCFG_PALETTE_LENGTH(0x100)
@@ -353,11 +438,12 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( dfruit )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "n-3800ii_ver.1.20.ic2", 0x00000, 0x40000, CRC(4e7c3700) SHA1(17bc731a91460d8f67c2b2b6e038641d57cf93be) )
+	ROM_RELOAD(              0x10000, 0x40000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 199?, dfruit,  0,   dfruit, dfruit,  0, ROT0, "<unknown>", "Dream Fruit", GAME_IS_SKELETON )
+GAME( 1993, dfruit,  0,   dfruit, dfruit,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

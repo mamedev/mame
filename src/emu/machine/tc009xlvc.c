@@ -322,7 +322,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	global_flip = m_vregs[4] & 0x10;
 
-	if((m_vregs[4] & 0x8) == 0) // 8bpp bitmap enabled
+	if((m_vregs[4] & 0x7) == 7) // 8bpp bitmap enabled
 	{
 		count = 0;
 
@@ -366,7 +366,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		machine().priority_bitmap.fill(0, cliprect);
 		bg1_tilemap->draw(bitmap, cliprect, 0,0);
-		bg0_tilemap->draw(bitmap, cliprect, 0,0);
+		bg0_tilemap->draw(bitmap, cliprect, 0,(m_vregs[4] & 0x8) ? 0 : 1);
 		draw_sprites(machine(), bitmap, cliprect, global_flip);
 		tx_tilemap->draw(bitmap, cliprect, 0,0);
 	}
