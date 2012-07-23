@@ -60,6 +60,7 @@ public:
 	UINT8 *m_vram0;
 	UINT8 *m_vram1;
 	UINT8 *m_sprram;
+	UINT8 *m_sprram_buffer;
 	UINT8 *m_tvram;
 	UINT8 m_bg0_scroll[4];
 	UINT8 m_bg1_scroll[4];
@@ -72,6 +73,7 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip);
+	void screen_eof(void);
 
 protected:
 	virtual void device_config_complete();
@@ -315,15 +317,16 @@ static const gfx_layout char_layout =
 
 void tc0091lvc_device::device_start()
 {
-	m_palette_ram = auto_alloc_array(machine(), UINT8, 0x200);
-	m_vregs = auto_alloc_array(machine(), UINT8, 0x100);
-	m_bitmap_ram = auto_alloc_array(machine(), UINT8, 0x20000);
-	m_pcg1_ram = auto_alloc_array(machine(), UINT8, 0x4000);
-	m_pcg2_ram = auto_alloc_array(machine(), UINT8, 0x4000);
-	m_vram0 = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_vram1 = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_tvram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_sprram = auto_alloc_array(machine(), UINT8, 0x400);
+	m_palette_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
+	m_vregs = auto_alloc_array_clear(machine(), UINT8, 0x100);
+	m_bitmap_ram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
+	m_pcg1_ram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
+	m_pcg2_ram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
+	m_vram0 = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_vram1 = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_tvram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_sprram = auto_alloc_array_clear(machine(), UINT8, 0x400);
+	m_sprram_buffer = auto_alloc_array_clear(machine(), UINT8, 0x400);
 
 	tx_tilemap = tilemap_create_device(this, get_tx_tile_info,tilemap_scan_rows,8,8,64,32);
 	bg0_tilemap = tilemap_create_device(this, get_bg0_tile_info,tilemap_scan_rows,8,8,64,32);
@@ -367,14 +370,14 @@ void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 	{
 		int x,y,spr_offs,col,fx,fy;
 
-		spr_offs = m_sprram[count+0]|(m_sprram[count+1]<<8);
-		x = m_sprram[count+4]|(m_sprram[count+5]<<8);
+		spr_offs = m_sprram_buffer[count+0]|(m_sprram_buffer[count+1]<<8);
+		x = m_sprram_buffer[count+4]|(m_sprram_buffer[count+5]<<8);
 		if (x >= 320)
 			x -= 512;
-		y = m_sprram[count+6];
-		col = (m_sprram[count+2])&0x0f;
-		fx = m_sprram[count+3] & 0x1;
-		fy = m_sprram[count+3] & 0x2;
+		y = m_sprram_buffer[count+6];
+		col = (m_sprram_buffer[count+2])&0x0f;
+		fx = m_sprram_buffer[count+3] & 0x1;
+		fy = m_sprram_buffer[count+3] & 0x2;
 
 		if (global_flip)
 		{
@@ -452,6 +455,12 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+void tc0091lvc_device::screen_eof(void)
+{
+	memcpy(m_sprram_buffer,m_sprram,0x3e8);
+}
+
+
 /* End of TC0091LVC */
 
 #define MASTER_CLOCK XTAL_14_31818MHz
@@ -470,6 +479,7 @@ public:
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
 
 	UINT8 m_ram_bank[4];
 	UINT8 m_rom_bank;
@@ -517,6 +527,13 @@ UINT32 lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+void lastbank_state::screen_eof(screen_device &screen, bool state)
+{
+	if (state)
+	{
+		m_vdp->screen_eof();
+	}
+}
 
 READ8_MEMBER(lastbank_state::lastbank_rom_r)
 {
@@ -903,6 +920,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(lastbank_state, screen_eof)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 
