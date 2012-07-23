@@ -12,44 +12,166 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "machine/tc009xlvc.h"
 
 class dfruit_state : public driver_device
 {
 public:
 	dfruit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_vdp(*this, "tc0091lvc")
+		{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<tc0091lvc_device> m_vdp;
+
+	virtual void video_start();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
+
+	UINT8 m_ram_bank[4];
+	UINT8 m_rom_bank;
+	UINT8 m_irq_vector[3];
+	UINT8 m_irq_enable;
+
+	DECLARE_READ8_MEMBER(dfruit_rom_r);
+
+	DECLARE_READ8_MEMBER(dfruit_ram_0_r);
+	DECLARE_READ8_MEMBER(dfruit_ram_1_r);
+	DECLARE_READ8_MEMBER(dfruit_ram_2_r);
+	DECLARE_READ8_MEMBER(dfruit_ram_3_r);
+	DECLARE_WRITE8_MEMBER(dfruit_ram_0_w);
+	DECLARE_WRITE8_MEMBER(dfruit_ram_1_w);
+	DECLARE_WRITE8_MEMBER(dfruit_ram_2_w);
+	DECLARE_WRITE8_MEMBER(dfruit_ram_3_w);
+
+	DECLARE_READ8_MEMBER(dfruit_rom_bank_r);
+	DECLARE_WRITE8_MEMBER(dfruit_rom_bank_w);
+	DECLARE_READ8_MEMBER(dfruit_ram_bank_r);
+	DECLARE_WRITE8_MEMBER(dfruit_ram_bank_w);
+	DECLARE_READ8_MEMBER(dfruit_irq_vector_r);
+	DECLARE_WRITE8_MEMBER(dfruit_irq_vector_w);
+	DECLARE_READ8_MEMBER(dfruit_irq_enable_r);
+	DECLARE_WRITE8_MEMBER(dfruit_irq_enable_w);
+
+	UINT8 ram_bank_r(UINT16 offset, UINT8 bank_num);
+	void ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num);
 };
 
-static VIDEO_START( dfruit )
+void dfruit_state::video_start()
 {
-
 }
 
-static SCREEN_UPDATE_IND16( dfruit )
+UINT32 dfruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
+	m_vdp->screen_update(screen, bitmap, cliprect);
+
 	return 0;
 }
 
-static ADDRESS_MAP_START( dfruit_map, AS_PROGRAM, 8, dfruit_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* TODO: ROM banks! */
+void dfruit_state::screen_eof(screen_device &screen, bool state)
+{
+	if (state)
+	{
+		m_vdp->screen_eof();
+	}
+}
+
+READ8_MEMBER(dfruit_state::dfruit_rom_r)
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+
+	return ROM[offset + 0x10000 + m_rom_bank * 0x2000];
+}
+
+READ8_MEMBER(dfruit_state::dfruit_rom_bank_r)
+{
+	return m_rom_bank;
+}
+
+WRITE8_MEMBER(dfruit_state::dfruit_rom_bank_w)
+{
+	m_rom_bank = data;
+}
+
+READ8_MEMBER(dfruit_state::dfruit_irq_vector_r)
+{
+	return m_irq_vector[offset];
+}
+
+WRITE8_MEMBER(dfruit_state::dfruit_irq_vector_w)
+{
+	m_irq_vector[offset] = data;
+}
+
+READ8_MEMBER(dfruit_state::dfruit_irq_enable_r)
+{
+	return m_irq_enable;
+}
+
+WRITE8_MEMBER(dfruit_state::dfruit_irq_enable_w)
+{
+	m_irq_enable = data;
+}
+
+READ8_MEMBER(dfruit_state::dfruit_ram_bank_r)
+{
+	return m_ram_bank[offset];
+}
+
+WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
+{
+	m_ram_bank[offset] = data;
+}
+
+UINT8 dfruit_state::ram_bank_r(UINT16 offset, UINT8 bank_num)
+{
+	address_space *vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
+	return vdp_space->read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
+}
+
+void dfruit_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
+{
+	address_space *vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
+	vdp_space->write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+}
+
+READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }
+READ8_MEMBER(dfruit_state::dfruit_ram_1_r) { return ram_bank_r(offset, 1); }
+READ8_MEMBER(dfruit_state::dfruit_ram_2_r) { return ram_bank_r(offset, 2); }
+READ8_MEMBER(dfruit_state::dfruit_ram_3_r) { return ram_bank_r(offset, 3); }
+WRITE8_MEMBER(dfruit_state::dfruit_ram_0_w) { ram_bank_w(offset, data, 0); }
+WRITE8_MEMBER(dfruit_state::dfruit_ram_1_w) { ram_bank_w(offset, data, 1); }
+WRITE8_MEMBER(dfruit_state::dfruit_ram_2_w) { ram_bank_w(offset, data, 2); }
+WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
+
+static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, dfruit_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_READ(dfruit_rom_r)
 
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
+
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(dfruit_ram_0_r,dfruit_ram_0_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(dfruit_ram_1_r,dfruit_ram_1_w)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(dfruit_ram_2_r,dfruit_ram_2_w)
+	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(dfruit_ram_3_r,dfruit_ram_3_w)
+
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(dfruit_irq_vector_r, dfruit_irq_vector_w)
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(dfruit_irq_enable_r, dfruit_irq_enable_w)
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(dfruit_ram_bank_r, dfruit_ram_bank_w)
+	AM_RANGE(0xff08, 0xff08) AM_READWRITE(dfruit_rom_bank_r, dfruit_rom_bank_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( dfruit_map, AS_PROGRAM, 8, dfruit_state )
+	AM_IMPORT_FROM(tc0091lvc_map)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa004, 0xa005) AM_DEVREADWRITE_LEGACY("opn",ym2203_r,ym2203_w)
 	AM_RANGE(0xa008, 0xa008) AM_READNOP //watchdog
-	/* TODO: RAM banks! */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xfdff) AM_RAM
-
-	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)
-	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)
-
-	//AM_RANGE(0xff00, 0xff02) AM_READWRITE_LEGACY(irq_adr_r, irq_adr_w)
-	//AM_RANGE(0xff03, 0xff03) AM_READWRITE_LEGACY(irq_enable_r, irq_enable_w)
-	//AM_RANGE(0xff04, 0xff07) AM_READWRITE_LEGACY(rambankswitch_r, rambankswitch_w)
-	//AM_RANGE(0xff08, 0xff08) AM_READWRITE_LEGACY(rombankswitch_r, rombankswitch_w)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dfruit_io, AS_IO, 8, dfruit_state )
@@ -59,7 +181,57 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dfruit )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START("IN5")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout bg2_layout =
@@ -107,6 +279,39 @@ static GFXDECODE_START( dfruit )
 	//GFXDECODE_ENTRY( NULL,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
+static TIMER_DEVICE_CALLBACK( dfruit_irq_scanline )
+{
+	dfruit_state *state = timer.machine().driver_data<dfruit_state>();
+	int scanline = param;
+
+	if (scanline == 240 && (state->m_irq_enable & 4))
+	{
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, state->m_irq_vector[2]);
+	}
+
+	if (scanline == 0 && (state->m_irq_enable & 2))
+	{
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, state->m_irq_vector[1]);
+	}
+
+	if (scanline == 196 && (state->m_irq_enable & 1))
+	{
+		//device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, state->m_irq_vector[0]);
+	}
+}
+
+static const ym2203_interface ym2203_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
+	},
+	0
+};
+
+
+
 #define MASTER_CLOCK XTAL_14MHz
 
 static MACHINE_CONFIG_START( dfruit, dfruit_state )
@@ -115,6 +320,7 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
 	MCFG_CPU_PROGRAM_MAP(dfruit_map)
 	MCFG_CPU_IO_MAP(dfruit_io)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", dfruit_irq_scanline, "screen", 0, 1)
 
 	//MCFG_MACHINE_START(4enraya)
 	//MCFG_MACHINE_RESET(4enraya)
@@ -125,17 +331,18 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(dfruit)
+	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(dfruit_state, screen_eof)
 
+	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 
 	MCFG_GFXDECODE( dfruit )
-	MCFG_PALETTE_LENGTH(16)
-
-	MCFG_VIDEO_START(dfruit)
+	MCFG_PALETTE_LENGTH(0x100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

@@ -132,16 +132,6 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_w)
 	tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bg0_scroll_w)
-{
-	m_bg0_scroll[offset] = data;
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bg1_scroll_w)
-{
-	m_bg1_scroll[offset] = data;
-}
-
 READ8_MEMBER(tc0091lvc_device::tc0091lvc_spr_r)
 {
 	return m_sprram[offset];
@@ -157,9 +147,8 @@ static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
 	AM_RANGE(0x018000, 0x018fff) AM_READWRITE(tc0091lvc_vram0_r, tc0091lvc_vram0_w)
 	AM_RANGE(0x019000, 0x019fff) AM_READWRITE(tc0091lvc_vram1_r, tc0091lvc_vram1_w)
 	AM_RANGE(0x01a000, 0x01afff) AM_READWRITE(tc0091lvc_tvram_r, tc0091lvc_tvram_w)
-	AM_RANGE(0x01b000, 0x01b3e7) AM_READWRITE(tc0091lvc_spr_r, tc0091lvc_spr_w)
-	AM_RANGE(0x01b3f4, 0x01b3f7) AM_WRITE(tc0091lvc_bg0_scroll_w)
-	AM_RANGE(0x01b3fc, 0x01b3ff) AM_WRITE(tc0091lvc_bg1_scroll_w)
+	AM_RANGE(0x01b000, 0x01b3ff) AM_READWRITE(tc0091lvc_spr_r, tc0091lvc_spr_w)
+	AM_RANGE(0x01b400, 0x01bfff) AM_RAM
 	AM_RANGE(0x01c000, 0x01ffff) AM_READWRITE(tc0091lvc_pcg2_r, tc0091lvc_pcg2_w)
 	AM_RANGE(0x040000, 0x05ffff) AM_READWRITE(tc0091lvc_bitmap_r, tc0091lvc_bitmap_w)
 	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(tc0091lvc_paletteram_r,tc0091lvc_paletteram_w)
@@ -386,6 +375,13 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void tc0091lvc_device::screen_eof(void)
 {
-	memcpy(m_sprram_buffer,m_sprram,0x3e8);
+	memcpy(m_sprram_buffer,m_sprram,0x400);
+	m_bg0_scroll[0] = m_sprram_buffer[0x3f4];
+	m_bg0_scroll[1] = m_sprram_buffer[0x3f5];
+	m_bg0_scroll[2] = m_sprram_buffer[0x3f6];
+
+	m_bg1_scroll[0] = m_sprram_buffer[0x3fc];
+	m_bg1_scroll[1] = m_sprram_buffer[0x3fd];
+	m_bg1_scroll[2] = m_sprram_buffer[0x3fe];
 }
 
