@@ -19618,24 +19618,150 @@ sp_swope		//
 sp_swopf		//
 sp_swopg		//
 sp_timem		// Time Machine (Ace)
+sp_timema		//
+sp_timemb		//
+sp_timemc		//
+sp_timemd		//
+sp_timeme		//
+sp_timemf		//
+sp_timemg		//
+sp_timemh		//
+sp_timemi		//
+sp_timemj		//
+sp_timemk		//
 sp_tz			// Twilight Zone (Ace)
+sp_tza			//
+sp_tzb			//
+sp_tzc			//
+sp_tzd			//
+sp_tze			//
+sp_tzf			//
+sp_tzg			//
+sp_tzh			//
 sp_tzbwb		//
 sp_tzfe			// Twilight Zone - Further Encounters (Ace)
-sp_beau			//Beau Peep (Ace)
-sp_bigbd		//Big Break Deluxe Club (Ace)
-sp_brkbk		//Break The Bank (Ace)
-sp_camel		//Camelot (Ace)
-sp_clbna		//Club National (Ace)
-sp_coder		//Code Red (Ace)
-sp_criss		//Criss Cross Cash (Ace)
-sp_daytr		//Daytripper (Ace)
-sp_donky		//Donkey Derby (Ace)
-sp_dyour		//Double Your Money (Ace)
-sp_festi		//Festival (Ace)
-sp_beau2		//Further Adventures Of Beau Peep (Ace)
-sp_ghost		//Ghost Trapper (Ace)
-sp_globe		//Globe Trotter (Ace)
-sp_gol			//Gol (Ace)
+sp_tzfea		//
+sp_tzfeb		//
+sp_tzfec		//
+sp_tzfed		//
+sp_tzfee		//
+sp_tzfef		//
+sp_tzfeg		//
+sp_tzfeh		//
+sp_tzfei		//
+sp_tzfej		//
+sp_tzfek		//
+sp_tzfel		//
+sp_tzfem		//
+sp_tzfen		//
+sp_tzfeo		//
+sp_tzfep		//
+sp_tzfeq		//
+sp_tzfer		//
+sp_tzfes		//
+sp_tzfet		//
+sp_tzfeu		//
+sp_beau			// Beau Peep (Ace)
+sp_beaua		// 
+sp_beaub		// 
+sp_beauc		// 
+sp_beaud		// 
+sp_beaue		// 
+sp_beauf		// 
+sp_beaug		// 
+sp_beauh		// 
+sp_bigbd		// Big Break Deluxe Club (Ace)
+sp_bigbda		//
+sp_brkbk		// Break The Bank (Ace)
+sp_brkbka		//
+sp_brkbkb		//
+sp_brkbkc		//
+sp_brkbkd		//
+sp_camel		// Camelot (Ace)
+sp_camela		//
+sp_camelb		//
+sp_camelc		//
+sp_cameld		//
+sp_camele		//
+sp_camelf		//
+sp_camelg		//
+sp_camelh		//
+sp_cameli		//
+sp_camelj		//
+sp_camelk		//
+sp_camell		//
+sp_camelm		//
+sp_cameln		//
+sp_camelo		//
+sp_clbna		// Club National (Ace)
+sp_clbnaa		//
+sp_coder		// Code Red (Ace)
+sp_codera		//
+sp_coderb		//
+sp_coderc		//
+sp_coderd		//
+sp_codere		//
+sp_coderf		//
+sp_coderg		//
+sp_criss		// Criss Cross Cash (Ace)
+sp_crissa		//
+sp_crissb		//
+sp_crissc		//
+sp_crissd		//
+sp_crisse		//
+sp_crissf		//
+sp_crissg		//
+sp_daytr		// Daytripper (Ace)
+sp_daytra		//
+sp_daytrb		//
+sp_daytrc		//
+sp_donky		// Donkey Derby (Ace)
+sp_donkya		//
+sp_donkyb		//
+sp_donkyc		//
+sp_donkyd		//
+sp_donkye		//
+sp_donkyf		//
+sp_donkyg		//
+sp_dyour		// Double Your Money (Ace)
+sp_festi		// Festival (Ace)
+sp_beau2		// Further Adventures Of Beau Peep (Ace)
+sp_beau2a		//
+sp_beau2b		//
+sp_beau2c		//
+sp_beau2d		//
+sp_beau2e		//
+sp_beau2f		//
+sp_ghost		// Ghost Trapper (Ace)
+sp_ghosta		//
+sp_ghostb		//
+sp_ghostc		//
+sp_ghostd		//
+sp_ghoste		//
+sp_ghostf		//
+sp_ghostg		//
+sp_ghosth		//
+sp_ghosti		//
+sp_ghostj		//
+sp_ghostk		//
+sp_ghostl		//
+sp_ghostm		//
+sp_ghostn		//
+sp_ghosto		//
+sp_ghostp		//
+sp_ghostq		//
+sp_ghostr		//
+sp_ghosts		//
+sp_globe		// Globe Trotter (Ace)
+sp_globea		//
+sp_globeb		//
+sp_globec		//
+sp_globed		//
+sp_globee		//
+sp_globef		//
+sp_globeg		//
+sp_gol			// Gol (Ace)
+
 sp_golda		//Golden Arrow Club (Ace)
 sp_golds		//Golden Streak (Ace)
 sp_goldt		//Golden Touch (Golden Streak?) (Ace)
@@ -21706,3 +21832,4 @@ nfsug                   // Need For Speed: Underground Install (2 Discs) (v1.1)
 
 // TTL logic games
 pong			// (c) 1972 Atari
+pongf			// (c) 1972 Atari - no subcycles
