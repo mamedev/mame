@@ -71,7 +71,7 @@ public:
 	int m_gfx_index; // for RAM tiles
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip);
 
 protected:
 	virtual void device_config_complete();
@@ -358,7 +358,7 @@ const address_space_config *tc0091lvc_device::memory_space_config(address_spacen
 }
 
 
-void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip )
 {
 	const gfx_element *gfx = machine.gfx[1];
 	int count;
@@ -369,10 +369,20 @@ void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 
 		spr_offs = m_sprram[count+0]|(m_sprram[count+1]<<8);
 		x = m_sprram[count+4]|(m_sprram[count+5]<<8);
+		if (x >= 320)
+			x -= 512;
 		y = m_sprram[count+6];
 		col = (m_sprram[count+2])&0x0f;
 		fx = m_sprram[count+3] & 0x1;
 		fy = m_sprram[count+3] & 0x2;
+
+		if (global_flip)
+		{
+			x = 304 - x;
+			y = 240 - y;
+			fx = !fx;
+			fy = !fy;
+		}
 
 		pdrawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,machine.priority_bitmap,(col & 0x08) ? 0xaa : 0x00,0);
 	}
@@ -382,21 +392,31 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	UINT32 count;
 	int x,y;
+	UINT8 global_flip;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if((m_vregs[4] & 0x20) == 0)
 		return 0;
 
+	global_flip = m_vregs[4] & 0x10;
+
 	if((m_vregs[4] & 0x8) == 0) // 8bpp bitmap enabled
 	{
 		count = 0;
 
-		for (y=0;y<32*8;y++)
+		for (y=0;y<256;y++)
 		{
 			for (x=0;x<512;x++)
 			{
-				bitmap.pix16(y, x) = screen.machine().pens[m_bitmap_ram[count]];
+				int res_x, res_y;
+
+				res_x = (global_flip) ? 320-x : x;
+				res_y = (global_flip) ? 256-y : y;
+
+				if(machine().primary_screen->visible_area().contains(res_x, res_y))
+					bitmap.pix16(res_y, res_x) = screen.machine().pens[m_bitmap_ram[count]];
+
 				count++;
 			}
 		}
@@ -405,26 +425,28 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		int dx, dy;
 
+		machine().tilemap().set_flip_all(global_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
 		dx = m_bg0_scroll[0] | (m_bg0_scroll[1] << 8);
-		//if (state->m_flipscreen)
-		//	dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
+		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }
 		dy = m_bg0_scroll[2];
 
 		bg0_tilemap->set_scrollx(0, -dx);
 		bg0_tilemap->set_scrolly(0, -dy);
 
 		dx = m_bg1_scroll[0] | (m_bg1_scroll[1] << 8);
-		//if (state->m_flipscreen)
-		//	dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
+		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }
 		dy = m_bg1_scroll[2];
 
 		bg1_tilemap->set_scrollx(0, -dx);
 		bg1_tilemap->set_scrolly(0, -dy);
 
+		tx_tilemap->set_scrollx(0, (global_flip) ? -192 : 0);
+
 		machine().priority_bitmap.fill(0, cliprect);
 		bg1_tilemap->draw(bitmap, cliprect, 0,0);
 		bg0_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect, global_flip);
 		tx_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	return 0;
@@ -590,12 +612,26 @@ WRITE8_MEMBER(lastbank_state::mux_w)
 	m_mux_data = data;
 }
 
-static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
+static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(lastbank_rom_r)
 
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(lastbank_ram_0_r,lastbank_ram_0_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastbank_ram_1_r,lastbank_ram_1_w)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastbank_ram_2_r,lastbank_ram_2_w)
+	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(lastbank_ram_3_r,lastbank_ram_3_w)
+
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(lastbank_irq_vector_r, lastbank_irq_vector_w)
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(lastbank_irq_enable_r, lastbank_irq_enable_w)
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(lastbank_ram_bank_r, lastbank_ram_bank_w)
+	AM_RANGE(0xff08, 0xff08) AM_READWRITE(lastbank_rom_bank_r, lastbank_rom_bank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
+	AM_IMPORT_FROM( tc0091lvc_map )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS") AM_WRITENOP
 	AM_RANGE(0xa801, 0xa801) AM_WRITENOP
@@ -611,19 +647,6 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0xa81d, 0xa81d) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa81e, 0xa81e) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa81f, 0xa81f) AM_READ_PORT("DSW3")
-
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(lastbank_ram_0_r,lastbank_ram_0_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastbank_ram_1_r,lastbank_ram_1_w)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastbank_ram_2_r,lastbank_ram_2_w)
-	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(lastbank_ram_3_r,lastbank_ram_3_w)
-
-	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)
-	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)
-	AM_RANGE(0xfe00, 0xfeff)  AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(lastbank_irq_vector_r, lastbank_irq_vector_w)
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(lastbank_irq_enable_r, lastbank_irq_enable_w)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(lastbank_ram_bank_r, lastbank_ram_bank_w)
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE(lastbank_rom_bank_r, lastbank_rom_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastbank_audio_map, AS_PROGRAM, 8, lastbank_state )
@@ -672,7 +695,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("1P Small") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P FF") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P FF") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("1P 2-4") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -916,4 +939,4 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x40000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank,  0, ROT0, "Excellent Systems", "Last Bank (v1.16)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1994, lastbank,  0,   lastbank, lastbank,  0, ROT0, "Excellent Systems", "Last Bank (v1.16)", GAME_NO_SOUND )
