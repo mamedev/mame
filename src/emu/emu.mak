@@ -253,6 +253,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/timekpr.o		\
 	$(EMUMACHINE)/tmp68301.o	\
 	$(EMUMACHINE)/tms6100.o		\
+	$(EMUMACHINE)/tms9901.o		\
+	$(EMUMACHINE)/tms9902.o		\
 	$(EMUMACHINE)/upd1990a.o	\
 	$(EMUMACHINE)/upd4701.o		\
 	$(EMUMACHINE)/upd7201.o		\
