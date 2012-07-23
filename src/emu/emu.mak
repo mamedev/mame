@@ -223,17 +223,17 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/netlist.o		\
 	$(EMUMACHINE)/net_lib.o		\
 	$(EMUMACHINE)/nmc9306.o		\
-    $(EMUMACHINE)/nscsi_bus.o   \
-    $(EMUMACHINE)/nscsi_cd.o    \
-    $(EMUMACHINE)/nscsi_hd.o    \
+    	$(EMUMACHINE)/nscsi_bus.o   	\
+    	$(EMUMACHINE)/nscsi_cd.o    	\
+    	$(EMUMACHINE)/nscsi_hd.o    	\
 	$(EMUMACHINE)/nvram.o		\
 	$(EMUMACHINE)/pc16552d.o	\
-	$(EMUMACHINE)/pci.o			\
+	$(EMUMACHINE)/pci.o		\
 	$(EMUMACHINE)/pd4990a.o		\
 	$(EMUMACHINE)/pic8259.o		\
 	$(EMUMACHINE)/pit8253.o		\
 	$(EMUMACHINE)/pls100.o		\
-	$(EMUMACHINE)/ram.o			\
+	$(EMUMACHINE)/ram.o		\
 	$(EMUMACHINE)/roc10937.o	\
 	$(EMUMACHINE)/rp5c01.o		\
 	$(EMUMACHINE)/rp5c15.o		\
@@ -249,6 +249,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/scsihd.o		\
 	$(EMUMACHINE)/secflash.o	\
 	$(EMUMACHINE)/smc91c9x.o	\
+	$(EMUMACHINE)/tc009xlvc.o	\
 	$(EMUMACHINE)/timekpr.o		\
 	$(EMUMACHINE)/tmp68301.o	\
 	$(EMUMACHINE)/tms6100.o		\
