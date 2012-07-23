@@ -1271,6 +1271,59 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 						source = int32_to_floatx80((INT32)10*10);
 						break;
 
+                    case 0x35:	// 10^4
+                        source = int32_to_floatx80((INT32)1000*10);
+                        break;
+
+                    case 0x36:	// 1.0e8
+                        source = int32_to_floatx80((INT32)10000000*10);
+                        break;
+
+                    case 0x37:  // 1.0e16 - can't get the right precision from INT32 so go "direct" with constants from h/w
+                        source.high = 0x4034;
+                        source.low = U64(0x8e1bc9bf04000000);
+                        break;
+
+                    case 0x38:  // 1.0e32
+                        source.high = 0x4069;
+                        source.low = U64(0x9dc5ada82b70b59e);
+                        break;
+
+                    case 0x39:  // 1.0e64
+                        source.high = 0x40d3;
+                        source.low = U64(0xc2781f49ffcfa6d5);
+                        break;
+
+                    case 0x3a:  // 1.0e128
+                        source.high = 0x41a8;
+                        source.low = U64(0x93ba47c980e98ce0);
+                        break;
+
+                    case 0x3b:  // 1.0e256
+                        source.high = 0x4351;
+                        source.low = U64(0xaa7eebfb9df9de8e);
+                        break;
+
+                    case 0x3c:  // 1.0e512
+                        source.high = 0x46a3;
+                        source.low = U64(0xe319a0aea60e91c7);
+                        break;
+
+                    case 0x3d:  // 1.0e1024
+                        source.high = 0x4d48;
+                        source.low = U64(0xc976758681750c17);
+                        break;
+
+                    case 0x3e:  // 1.0e2048
+                        source.high = 0x5a92;
+                        source.low = U64(0x9e8b3b5dc53d5de5);
+                        break;
+
+                    case 0x3f:  // 1.0e4096
+                        source.high = 0x7525;
+                        source.low = U64(0xc46052028a20979b);
+                        break;
+
 					default:
 						fatalerror("fmove_rm_reg: unknown constant ROM offset %x at %08x\n", w2&0x7f, REG_PC(m68k)-4);
 						break;
