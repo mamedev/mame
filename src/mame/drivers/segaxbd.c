@@ -8,7 +8,7 @@
 
     Known bugs:
         * gprider has a hack to make it work
-        * extra sound boards etc. in some smgp sets not hooked up
+        * smgp network and motor boards not hooked up
         * rachero doesn't like IC17/IC108 (divide chips) in self-test
           due to testing an out-of-bounds value
         * abcop doesn't like IC41/IC108 (divide chips) in self-test
@@ -248,7 +248,7 @@ ROMs:
 - mpr-12439.22
 
 
-Motor 'Air Drive' Board (deluxe cabinet)
+Motor Board (deluxe cabinet)
 -------------
 
 label: ?
@@ -271,8 +271,8 @@ ROMs:
 #include "includes/segaipt.h"
 
 
-#define MASTER_CLOCK			50000000
-#define SOUND_CLOCK				16000000
+#define MASTER_CLOCK			XTAL_50MHz
+#define SOUND_CLOCK				XTAL_16MHz
 
 
 
@@ -301,6 +301,7 @@ static void xboard_generic_init(running_machine &machine)
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_soundcpu = machine.device("soundcpu");
+	state->m_soundcpu2 = NULL;
 	state->m_subcpu = machine.device("sub");
 	state->m_315_5250_1 = machine.device("5250_main");
 
@@ -412,6 +413,10 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 	state->soundlatch_byte_w(*space, 0, param);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
+
+	// if an extra sound board is attached, do an nmi there as well
+	if (state->m_soundcpu2 != NULL)
+		device_set_input_line(state->m_soundcpu2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -433,7 +438,7 @@ static READ8_HANDLER( sound_data_r )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
-	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(&space->device(), INPUT_LINE_NMI, CLEAR_LINE);
 	return state->soundlatch_byte_r(*space, offset);
 }
 
@@ -717,50 +722,6 @@ static WRITE16_HANDLER( loffire_sync0_w )
 
 /*************************************
  *
- *  SMGP external access
- *
- *************************************/
-
-static READ16_HANDLER( smgp_excs_r )
-{
-	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
-	return 0xffff;
-}
-
-
-static WRITE16_HANDLER( smgp_excs_w )
-{
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
-}
-
-
-
-/*************************************
- *
- *  Royal Ascot external access
- *
- *************************************/
-
-static READ16_HANDLER( rascot_excs_r )
-{
-	logerror("%06X:rascot_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
-
-	// probably receives commands from the server here
-	//return space->machine().rand() & 0xff;
-
-	return 0xff;
-}
-
-
-static WRITE16_HANDLER( rascot_excs_w )
-{
-	logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -844,21 +805,88 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Misc CPU memory handlers
+ *  SMGP extra hardware
  *
  *************************************/
 
+static READ16_HANDLER( smgp_excs_r )
+{
+	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
+	return 0xffff;
+}
+
+static WRITE16_HANDLER( smgp_excs_w )
+{
+	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
+}
+
+// Sound Board
+// The extra sound is used when the cabinet is Deluxe(Air Drive), or Cockpit. The soundlatch is
+// shared with the main board sound.
+static ADDRESS_MAP_START( smgp_sound2_map, AS_PROGRAM, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE_LEGACY("pcm2", sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( smgp_sound2_portmap, AS_IO, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ_LEGACY(sound_data_r)
+ADDRESS_MAP_END
+
+// Motor Board, not yet emulated
+static ADDRESS_MAP_START( smgp_airdrive_map, AS_PROGRAM, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xafff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( smgp_airdrive_portmap, AS_IO, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01, 0x01) AM_READNOP
+	AM_RANGE(0x02, 0x03) AM_NOP
+ADDRESS_MAP_END
+
+// Link Board, not yet emulated
 static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM // MB8421 Dual-Port SRAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
+
+/*************************************
+ *
+ *  Royal Ascot extra hardware
+ *
+ *************************************/
+
+static READ16_HANDLER( rascot_excs_r )
+{
+	logerror("%06X:rascot_excs_r(%04X)\n", cpu_get_pc(&space->device()), offset*2);
+
+	// probably receives commands from the server here
+	//return space->machine().rand() & 0xff;
+
+	return 0xff;
+}
+
+static WRITE16_HANDLER( rascot_excs_w )
+{
+	logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(&space->device()), offset*2, data, mem_mask);
+}
+
+// Z80, unknown function
 static ADDRESS_MAP_START( rascot_z80_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -866,6 +894,7 @@ static ADDRESS_MAP_START( rascot_z80_map, AS_PROGRAM, 8, segas1x_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rascot_z80_portmap, AS_IO, 8, segas1x_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -884,8 +913,8 @@ ADDRESS_MAP_END
             chip 0, port D: lamp (W)
             chip 1, port A: buttons
             chip 1, port B: ---
-            chip 2, port C: DIPs
-            chip 3, port D: DIPs
+            chip 1, port C: DIPs
+            chip 1, port D: DIPs
 */
 
 static INPUT_PORTS_START( xboard_generic )
@@ -1415,14 +1444,32 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( smgp, xboard )
 
-	MCFG_CPU_ADD("comm", Z80, 4000000)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
+	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
+
+	MCFG_CPU_ADD("commcpu", Z80, XTAL_16MHz/2) // Z80E
 	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
 	MCFG_CPU_IO_MAP(smgp_comm_portmap)
+
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
+	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
+	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+
+	MCFG_SOUND_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
+	MCFG_SOUND_CONFIG(segapcm_interface)
+	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
+	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( rascot, xboard )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(rascot_z80_map)
 	MCFG_CPU_IO_MAP(rascot_z80_portmap)
@@ -2015,10 +2062,10 @@ ROM_START( smgp )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2081,10 +2128,10 @@ ROM_START( smgp6 )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2197,10 +2244,10 @@ ROM_START( smgp5 )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) )
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) )
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) )
 ROM_END
 
@@ -2262,10 +2309,10 @@ ROM_START( smgpu )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2328,10 +2375,10 @@ ROM_START( smgpu1 )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2565,10 +2612,10 @@ ROM_START( smgpu2 )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) )
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2630,10 +2677,10 @@ ROM_START( smgpj )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2695,10 +2742,10 @@ ROM_START( smgpja )
 	ROM_LOAD( "mpr-12438.21",    0x20000, 0x20000, CRC(6573d46b) SHA1(c4a4a0ea35250eff28a5bfd5e9cd372f52fd1308) ) // "
 	ROM_LOAD( "mpr-12439.22",    0x40000, 0x20000, CRC(13bf6de5) SHA1(92228a05ec33d606491a1da98c4989f69cddbb49) ) // "
 
-	ROM_REGION( 0x10000, "comm", 0 ) /* comms */
+	ROM_REGION( 0x10000, "commcpu", 0 ) /* z80 on network board */
 	ROM_LOAD( "epr-12587.14",    0x00000, 0x08000, CRC(2afe648b) SHA1(b5bf86f3acbcc23c136185110acecf2c971294fa) ) // taken from twin cabinet dump
 
-	ROM_REGION( 0x10000, "airdrive", 0 ) /* z80 on air board */
+	ROM_REGION( 0x10000, "motorcpu", 0 ) /* z80 on air board */
 	ROM_LOAD( "epr-12505.8",     0x00000, 0x08000, CRC(5020788a) SHA1(ed6d1dfb8b6a62d17469e3d09a5b5b864c6b486c) ) // taken from deluxe cabinet dump
 ROM_END
 
@@ -2961,8 +3008,12 @@ static DRIVER_INIT( loffire )
 
 static DRIVER_INIT( smgp )
 {
+	segas1x_state *state = machine.driver_data<segas1x_state>();
+
 	xboard_generic_init(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
+	
+	state->m_soundcpu2 = machine.device("soundcpu2");
 }
 
 

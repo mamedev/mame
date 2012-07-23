@@ -4,7 +4,8 @@ class segas1x_state : public driver_device
 public:
 	segas1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_interrupt_timer(*this, "int_timer") { }
+		m_interrupt_timer(*this, "int_timer")
+	{ }
 
 	/* memory pointers */
 //  UINT16 *  m_workram;  // this is used in the nvram handler, hence it cannot be added here
@@ -85,6 +86,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	device_t *m_soundcpu2;
 	device_t *m_subcpu;
 	device_t *m_subx;
 	device_t *m_suby;
