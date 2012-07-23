@@ -471,14 +471,14 @@ void driver_device::soundlatch_sync_callback(void *ptr, INT32 param)
 //  writing to sound latches
 //-------------------------------------------------
 
-WRITE8_MEMBER( driver_device::soundlatch_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
-WRITE16_MEMBER( driver_device::soundlatch_word_w )  { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
-WRITE8_MEMBER( driver_device::soundlatch2_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
-WRITE16_MEMBER( driver_device::soundlatch2_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
-WRITE8_MEMBER( driver_device::soundlatch3_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
-WRITE16_MEMBER( driver_device::soundlatch3_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch_byte_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch_word_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch2_byte_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch2_word_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch3_byte_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch3_word_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
 WRITE8_MEMBER( driver_device::soundlatch4_byte_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
-WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch4_word_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
 
 
 //-------------------------------------------------
@@ -486,14 +486,14 @@ WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { machine().scheduler().sync
 //  reading from sound latches
 //-------------------------------------------------
 
-READ8_MEMBER( driver_device::soundlatch_byte_r )		{ return m_latched_value[0]; }
-READ16_MEMBER( driver_device::soundlatch_word_r )   { return m_latched_value[0]; }
-READ8_MEMBER( driver_device::soundlatch2_byte_r )		{ return m_latched_value[1]; }
-READ16_MEMBER( driver_device::soundlatch2_word_r )  { return m_latched_value[1]; }
-READ8_MEMBER( driver_device::soundlatch3_byte_r )		{ return m_latched_value[2]; }
-READ16_MEMBER( driver_device::soundlatch3_word_r )  { return m_latched_value[2]; }
-READ8_MEMBER( driver_device::soundlatch4_byte_r )		{ return m_latched_value[3]; }
-READ16_MEMBER( driver_device::soundlatch4_word_r )  { return m_latched_value[3]; }
+READ8_MEMBER( driver_device::soundlatch_byte_r )	{ m_latch_read[0] = 1; return m_latched_value[0]; }
+READ16_MEMBER( driver_device::soundlatch_word_r )	{ m_latch_read[0] = 1; return m_latched_value[0]; }
+READ8_MEMBER( driver_device::soundlatch2_byte_r )	{ m_latch_read[1] = 1; return m_latched_value[1]; }
+READ16_MEMBER( driver_device::soundlatch2_word_r )	{ m_latch_read[1] = 1; return m_latched_value[1]; }
+READ8_MEMBER( driver_device::soundlatch3_byte_r )	{ m_latch_read[2] = 1; return m_latched_value[2]; }
+READ16_MEMBER( driver_device::soundlatch3_word_r )	{ m_latch_read[2] = 1; return m_latched_value[2]; }
+READ8_MEMBER( driver_device::soundlatch4_byte_r )	{ m_latch_read[3] = 1; return m_latched_value[3]; }
+READ16_MEMBER( driver_device::soundlatch4_word_r )	{ m_latch_read[3] = 1; return m_latched_value[3]; }
 
 
 //-------------------------------------------------
