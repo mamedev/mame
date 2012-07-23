@@ -122,7 +122,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 	{																				\
 	public:																			\
 		_name (netlist_setup_t *parent, const char *name)							\
-		: net_signal_t(parent, name) { }											\
+		: net_signal_t<_num_input>(parent, name) { }								\
 		ATTR_HOT void update();														\
 	};																				\
 
