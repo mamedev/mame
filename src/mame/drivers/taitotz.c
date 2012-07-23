@@ -1048,7 +1048,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 	float zvalue = 0;//ZBUFFER_MAX;
 	m_zbuffer->fill(*(int*)&zvalue, cliprect);
 
-//	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle visarea = machine.primary_screen->visible_area();
 	vertex_t v[8];
 
 	UINT32 *src = (UINT32*)&state->m_work_ram[0];
@@ -1173,7 +1173,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 
 			for (j=2; j < num_verts; j++)
 			{
-			//	render_triangle(visarea, render_delegate(FUNC(taitotz_renderer::draw_scanline_noz), this), 3, v[0], v[j-1], v[j]);
+				render_triangle(visarea, render_delegate(FUNC(taitotz_renderer::draw_scanline_noz), this), 3, v[0], v[j-1], v[j]);
 			}
 
 #if LOG_DISPLAY_LIST
