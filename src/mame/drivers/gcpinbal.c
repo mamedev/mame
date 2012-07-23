@@ -21,7 +21,22 @@ Understand role of bit 5 of IN1
 
 Eprom?
 
-BGMs (controlled by MSM-6585 sound chip)
+BGMs (controlled by OKI MSM6585 sound chip)
+  MSM6585: is an upgraded MSM5205 voice synth IC.
+   Improvements:
+    More precise internal DA converter
+    Built in low-pass filter
+    Expanded sampling frequency
+
+Differences between MSM6585 & MSM5205:
+
+                          MSM6586          MSM5205
+Master clock frequency    640kHz           384kHz
+Sampling frequency        4k/8k/16k/32kHz  4k/6k/8kHz
+ADPCM bit length          4-bit            3-bit/4-bit
+DA converter              12-bit           10-bit
+Low-pass filter           -40dB/oct        N/A
+Overflow prevent circuit  Included         N/A
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
@@ -460,7 +475,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000) /* Actually an OKI MSM6585 @ 640kHz */
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
