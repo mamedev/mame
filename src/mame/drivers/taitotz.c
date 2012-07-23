@@ -507,6 +507,8 @@ public:
 	DECLARE_READ8_MEMBER(tlcs900_port_read);
 	DECLARE_WRITE8_MEMBER(tlcs900_port_write);
 
+	UINT8 m_rtcdata[8];
+
 	
 
 	UINT32 m_reg105;
@@ -1945,14 +1947,14 @@ READ8_MEMBER(taitotz_state::tlcs_rtc_r)
 	switch (offset)
 	{
 		// NOTE: bcd numbers
-		case 0x00:		return 0x11;		// milliseconds?
-		case 0x01:		return 0x00;		// seconds
-		case 0x02:		return 0x07;		// minutes
-		case 0x03:		return 0x19;		// hours
-		case 0x04:		return 0x00;		// day of the week
-		case 0x05:		return 0x19;		// day
-		case 0x06:		return 0x02;		// month
-		case 0x07:		return 0x12;		// year
+		case 0x00:		return m_rtcdata[0];		// milliseconds?
+		case 0x01:		return m_rtcdata[1];		// seconds
+		case 0x02:		return m_rtcdata[2];		// minutes
+		case 0x03:		return m_rtcdata[3];		// hours
+		case 0x04:		return m_rtcdata[4];		// day of the week
+		case 0x05:		return m_rtcdata[5];		// day
+		case 0x06:		return m_rtcdata[6];		// month
+		case 0x07:		return m_rtcdata[7];		// year
 
 		case 0x0e:		return 0;
 
@@ -1968,11 +1970,19 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 {
 	switch (offset)
 	{
+		case 0x00:		m_rtcdata[0] = data; break;
+		case 0x01:		m_rtcdata[1] = data; break;
+		case 0x02:		m_rtcdata[2] = data; break;
+		case 0x03:		m_rtcdata[3] = data; break;
+		case 0x04:		m_rtcdata[4] = data; break;
+		case 0x05:		m_rtcdata[5] = data; break;
+		case 0x06:		m_rtcdata[6] = data; break;
+		case 0x07:		m_rtcdata[7] = data; break;
 		case 0x0e:
 			break;
 
 		default:
-			printf("tlcs_rtc_w: %02X, %02X\n", offset, data);
+			//printf("tlcs_rtc_w: %02X, %02X\n", offset, data);
 			break;
 	}
 }
