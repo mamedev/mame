@@ -510,7 +510,7 @@ INLINE UINT16 iochip_r(running_machine &machine, int which, int port, int inputv
 
 	/* if there's custom I/O, do that to get the input value */
 	if (state->m_iochip_custom_io_r[which])
-		inputval = (*state->m_iochip_custom_io_r[which])(port, inputval);
+		inputval = (*state->m_iochip_custom_io_r[which])(machine, port, inputval);
 
 	/* for ports 0-3, the direction is controlled 4 bits at a time by register 6 */
 	if (port <= 3)
@@ -599,10 +599,15 @@ static WRITE16_HANDLER( iochip_0_w )
                 D1: (CONT) - affects sprite hardware
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			if (((oldval ^ data) & 0x40) && !(data & 0x40)) state->watchdog_reset_w(*space,0,0);
+			if (((oldval ^ data) & 0x40) && !(data & 0x40))
+				state->watchdog_reset_w(*space, 0, 0);
+
 			segaic16_set_display_enable(space->machine(), data & 0x20);
+
 			device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			return;
+			if (state->m_soundcpu2 != NULL)
+				device_set_input_line(state->m_soundcpu2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			break;
 
 		case 3:
 			/* Output port:
@@ -610,10 +615,15 @@ static WRITE16_HANDLER( iochip_0_w )
                 D6-D0: CN D pin A17-A23 (output level 1= high, 0= low)
             */
 			space->machine().sound().system_enable(data & 0x80);
-			return;
+			break;
+		
+		default: break;
 	}
 
-	if (offset <= 4)
+	/* if there's custom I/O, handle that as well */
+	if (state->m_iochip_custom_io_w[0])
+		(*state->m_iochip_custom_io_w[0])(space->machine(), offset, data);
+	else if (offset <= 4)
 		logerror("I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
 }
 
@@ -657,11 +667,12 @@ static WRITE16_HANDLER( iochip_1_w )
 		return;
 
 	data &= 0xff;
-
-	/* swap in the new value and remember the previous value */
 	state->m_iochip_regs[1][offset] = data;
 
-	if (offset <= 4)
+	/* if there's custom I/O, handle that as well */
+	if (state->m_iochip_custom_io_w[1])
+		(*state->m_iochip_custom_io_w[1])(space->machine(), offset, data);
+	else if (offset <= 4)
 		logerror("I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
 }
 
@@ -684,40 +695,99 @@ static WRITE16_HANDLER( iocontrol_w )
  *
  *************************************/
 
-static WRITE16_HANDLER( aburner2_iochip_0_D_w )
+static UINT8 aburner2_iochip_0_r(running_machine &machine, int port, UINT8 data)
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	switch (port)
+	{
+		// motor status
+		case 0:
+			data &= 0xc0;
 
-	/* access is via the low 8 bits */
-	if (!ACCESSING_BITS_0_7)
-		return;
+			// TODO
+			data |= 0x3f;
+			break;
+		
+		default: break;
+	}
+	
+	return data;
+}
 
-	state->m_iochip_regs[0][3] = data;
+static void aburner2_iochip_0_w(running_machine &machine, int port, UINT8 data)
+{
+	switch (port)
+	{
+		// motor control
+		case 1:
+			// TODO
+			break;
+		
+		// unknown
+		case 2:
+			break;
+		
+		// lamps/coincounter
+		case 3:
+			// in clone aburner, lamps work only in testmode?
+			output_set_lamp_value(2, (data >> 1) & 0x01);	/* altitude warning lamp */
+			output_set_led_value(0, (data >> 2) & 0x01);	/* start lamp */
+			output_set_lamp_value(0, (data >> 5) & 0x01);	/* lock on lamp */
+			output_set_lamp_value(1, (data >> 6) & 0x01);	/* danger lamp */
+			coin_counter_w(machine, 0, (data >> 4) & 0x01);
+			break;
 
-	output_set_lamp_value(2, (data >> 1) & 0x01);	/* altitude warning lamp */
-	output_set_led_value(0, (data >> 2) & 0x01);	/* start lamp */
-	coin_counter_w(space->machine(), 0, (data >> 4) & 0x01);
-	output_set_lamp_value(0, (data >> 5) & 0x01);	/* lock on lamp */
-	output_set_lamp_value(1, (data >> 6) & 0x01);	/* danger lamp */
-	space->machine().sound().system_enable((data >> 7) & 0x01);
+		default: break;
+	}
 }
 
 
 
 /*************************************
  *
- *  Line of Fire Custom I/O
+ *  SMGP Custom I/O
  *
  *************************************/
 
-static WRITE16_HANDLER( loffire_sync0_w )
+static UINT8 smgp_iochip_0_r(running_machine &machine, int port, UINT8 data)
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	switch (port)
+	{
+		// motor/air drive status
+		case 0:
+			data &= 0xc0;
 
-	COMBINE_DATA(&state->m_loffire_sync[offset]);
-	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+			// TODO
+			data |= 0;
+			break;
+		
+		default: break;
+	}
+	
+	return data;
 }
 
+static void smgp_iochip_0_w(running_machine &machine, int port, UINT8 data)
+{
+	switch (port)
+	{
+		// motor/air drive control
+		case 1:
+			// TODO
+			break;
+		
+		// unknown
+		case 2:
+			break;
+		
+		// lamps/coincounter
+		case 3:
+			// lamps: TODO
+			coin_counter_w(machine, 0, (data >> 4) & 0x01);
+			break;
+
+		default: break;
+	}
+}
 
 
 /*************************************
@@ -905,17 +975,6 @@ ADDRESS_MAP_END
  *  Generic port definitions
  *
  *************************************/
-
-/*
-    aburner chip 0, port A: motor status (R)
-            chip 0, port B: motor power (W)
-            chip 0, port C: unknown (W)
-            chip 0, port D: lamp (W)
-            chip 1, port A: buttons
-            chip 1, port B: ---
-            chip 1, port C: DIPs
-            chip 1, port D: DIPs
-*/
 
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("IO0PORTA")
@@ -2977,22 +3036,19 @@ static DRIVER_INIT( aburner2 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	xboard_generic_init(machine);
-
 	state->m_road_priority = 0;
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x140006, 0x140007, 0, 0x00fff0, FUNC(aburner2_iochip_0_D_w));
+	state->m_iochip_custom_io_r[0] = aburner2_iochip_0_r;
+	state->m_iochip_custom_io_w[0] = aburner2_iochip_0_w;
 }
 
 
-static DRIVER_INIT( aburner )
+static WRITE16_HANDLER( loffire_sync0_w )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
-	xboard_generic_init(machine);
-
-	state->m_road_priority = 0;
+	COMBINE_DATA(&state->m_loffire_sync[offset]);
+	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
-
 
 static DRIVER_INIT( loffire )
 {
@@ -3001,7 +3057,7 @@ static DRIVER_INIT( loffire )
 	xboard_generic_init(machine);
 	state->m_adc_reverse[1] = state->m_adc_reverse[3] = 1;
 
-	/* install extra synchronization on core shared memory */
+	/* install sync hack on core shared memory */
 	state->m_loffire_sync = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x29c000, 0x29c011, FUNC(loffire_sync0_w));
 }
 
@@ -3011,9 +3067,11 @@ static DRIVER_INIT( smgp )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	xboard_generic_init(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
-	
 	state->m_soundcpu2 = machine.device("soundcpu2");
+	state->m_iochip_custom_io_r[0] = smgp_iochip_0_r;
+	state->m_iochip_custom_io_w[0] = smgp_iochip_0_w;
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
 }
 
 
@@ -3027,6 +3085,7 @@ static DRIVER_INIT( rascot )
 	rom[0x606/2] = 0x4e71;
 
 	xboard_generic_init(machine);
+
 	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0f0000, 0x0f3fff, FUNC(rascot_excs_r), FUNC(rascot_excs_w));
 }
 
@@ -3049,7 +3108,7 @@ static DRIVER_INIT( gprider )
 
 //    YEAR, NAME,     PARENT,   MACHINE, INPUT,    INIT,           MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, aburner2, 0,        xboard,  aburner2, aburner2,       ROT0,   "Sega", "After Burner II", 0 )
-GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner,        ROT0,   "Sega", "After Burner (Japan)", 0 )
+GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner2,       ROT0,   "Sega", "After Burner (Japan)", 0 )
 GAME( 1987, thndrbld, 0,        xboard,  thndrbld, generic_xboard, ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1,thndrbld, xboard,  thndrbd1, generic_xboard, ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
 GAME( 1989, loffire,  0,        xboard,  loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )

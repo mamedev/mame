@@ -74,8 +74,8 @@ public:
 	UINT8 m_iochip_regs[2][8];
 	UINT8 m_iochip_force_input;
 
-	UINT8 (*m_iochip_custom_io_r[2])(offs_t offset, UINT8 portdata);	// currently unused
-	void (*m_iochip_custom_io_w[2])(offs_t offset, UINT8 data);	// currently unused
+	UINT8 (*m_iochip_custom_io_r[2])(running_machine &machine, int port, UINT8 data);
+	void (*m_iochip_custom_io_w[2])(running_machine &machine, int port, UINT8 data);
 
 	UINT8 m_adc_reverse[8];
 
