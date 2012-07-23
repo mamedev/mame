@@ -278,47 +278,7 @@ ROMs:
 
 /*************************************
  *
- *  Configuration
- *
- *************************************/
-
-static void xboard_generic_init(running_machine &machine)
-{
-	segas1x_state *state = machine.driver_data<segas1x_state>();
-
-	/* init the FD1094 */
-	fd1094_driver_init(machine, "maincpu", NULL);
-
-	/* set the default road priority */
-	state->m_road_priority = 1;
-
-	/* reset the custom handlers and other pointers */
-	memset(state->m_iochip_custom_io_r, 0, sizeof(state->m_iochip_custom_io_r));
-	memset(state->m_iochip_custom_io_w, 0, sizeof(state->m_iochip_custom_io_w));
-	memset(state->m_adc_reverse, 0, sizeof(state->m_adc_reverse));
-
-	state->m_gprider_hack = 0;
-
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
-	state->m_soundcpu2 = NULL;
-	state->m_subcpu = machine.device("sub");
-	state->m_315_5250_1 = machine.device("5250_main");
-
-	state->save_item(NAME(state->m_iochip_force_input));
-	state->save_item(NAME(state->m_vblank_irq_state));
-	state->save_item(NAME(state->m_timer_irq_state));
-	state->save_item(NAME(state->m_gprider_hack));
-	state->save_item(NAME(state->m_iochip_regs[0]));
-	state->save_item(NAME(state->m_iochip_regs[1]));
-	state->save_item(NAME(state->m_adc_reverse));
-}
-
-
-
-/*************************************
- *
- *  Initialization & interrupts
+ *  Interrupts
  *
  *************************************/
 
@@ -446,36 +406,6 @@ static READ8_HANDLER( sound_data_r )
 
 /*************************************
  *
- *  Basic machine setup
- *
- *************************************/
-
-static void xboard_reset(device_t *device)
-{
-	segas1x_state *state = device->machine().driver_data<segas1x_state>();
-
-	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, PULSE_LINE);
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
-
-static MACHINE_RESET( xboard )
-{
-	segas1x_state *state = machine.driver_data<segas1x_state>();
-	fd1094_machine_init(machine.device("maincpu"));
-	segaic16_tilemap_reset(machine, 0);
-
-	/* hook the RESET line, which resets CPU #1 */
-	m68k_set_reset_callback(machine.device("maincpu"), xboard_reset);
-
-	/* start timers to track interrupts */
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(1), 1);
-}
-
-
-
-/*************************************
- *
  *  Input handlers
  *
  *************************************/
@@ -509,8 +439,8 @@ INLINE UINT16 iochip_r(running_machine &machine, int which, int port, int inputv
 	UINT16 result = state->m_iochip_regs[which][port];
 
 	/* if there's custom I/O, do that to get the input value */
-	if (state->m_iochip_custom_io_r[which])
-		inputval = (*state->m_iochip_custom_io_r[which])(machine, port, inputval);
+	if (state->m_iochip_custom_io_r[which][port])
+		inputval = (*state->m_iochip_custom_io_r[which][port])(machine, inputval);
 
 	/* for ports 0-3, the direction is controlled 4 bits at a time by register 6 */
 	if (port <= 3)
@@ -612,7 +542,7 @@ static WRITE16_HANDLER( iochip_0_w )
 		case 3:
 			/* Output port:
                 D7: Amplifier mute control (1= sounding, 0= muted)
-                D6-D0: CN D pin A17-A23 (output level 1= high, 0= low)
+                D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
             */
 			space->machine().sound().system_enable(data & 0x80);
 			break;
@@ -621,8 +551,8 @@ static WRITE16_HANDLER( iochip_0_w )
 	}
 
 	/* if there's custom I/O, handle that as well */
-	if (state->m_iochip_custom_io_w[0])
-		(*state->m_iochip_custom_io_w[0])(space->machine(), offset, data);
+	if (state->m_iochip_custom_io_w[0][offset])
+		(*state->m_iochip_custom_io_w[0][offset])(space->machine(), data);
 	else if (offset <= 4)
 		logerror("I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
 }
@@ -670,8 +600,8 @@ static WRITE16_HANDLER( iochip_1_w )
 	state->m_iochip_regs[1][offset] = data;
 
 	/* if there's custom I/O, handle that as well */
-	if (state->m_iochip_custom_io_w[1])
-		(*state->m_iochip_custom_io_w[1])(space->machine(), offset, data);
+	if (state->m_iochip_custom_io_w[1][offset])
+		(*state->m_iochip_custom_io_w[1][offset])(space->machine(), data);
 	else if (offset <= 4)
 		logerror("I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
 }
@@ -691,103 +621,64 @@ static WRITE16_HANDLER( iocontrol_w )
 
 /*************************************
  *
- *  After Burner II Custom I/O
+ *  Custom I/O Handlers
  *
  *************************************/
 
-static UINT8 aburner2_iochip_0_r(running_machine &machine, int port, UINT8 data)
+static void generic_iochip0_lamps_w(running_machine &machine, UINT8 data)
 {
-	switch (port)
-	{
-		// motor status
-		case 0:
-			data &= 0xc0;
+	// d0: ?
+	// d3: always 0?
+	// d4: coin counter
+	// d7: mute audio (always handled above)
+	// other bits: lamps
+	coin_counter_w(machine, 0, (data >> 4) & 0x01);
 
-			// TODO
-			data |= 0x3f;
-			break;
-		
-		default: break;
-	}
+	/*
+		aburner2:
+	d1: altitude warning lamp
+	d2: start lamp
+	d5: lock on lamp
+	d6: danger lamp
+	in clone aburner, lamps work only in testmode?
 	
-	return data;
+	*/
+	output_set_lamp_value(0, (data >> 5) & 0x01);
+	output_set_lamp_value(1, (data >> 6) & 0x01);
+	output_set_lamp_value(2, (data >> 1) & 0x01);
+	output_set_lamp_value(3, (data >> 2) & 0x01);
 }
 
-static void aburner2_iochip_0_w(running_machine &machine, int port, UINT8 data)
+
+// After Burner II
+static UINT8 aburner2_iochip0_motor_r(running_machine &machine, UINT8 data)
 {
-	switch (port)
-	{
-		// motor control
-		case 1:
-			// TODO
-			break;
-		
-		// unknown
-		case 2:
-			break;
-		
-		// lamps/coincounter
-		case 3:
-			// in clone aburner, lamps work only in testmode?
-			output_set_lamp_value(2, (data >> 1) & 0x01);	/* altitude warning lamp */
-			output_set_led_value(0, (data >> 2) & 0x01);	/* start lamp */
-			output_set_lamp_value(0, (data >> 5) & 0x01);	/* lock on lamp */
-			output_set_lamp_value(1, (data >> 6) & 0x01);	/* danger lamp */
-			coin_counter_w(machine, 0, (data >> 4) & 0x01);
-			break;
+	data &= 0xc0;
 
-		default: break;
-	}
+	// TODO
+	return data | 0x3f;
 }
 
-
-
-/*************************************
- *
- *  SMGP Custom I/O
- *
- *************************************/
-
-static UINT8 smgp_iochip_0_r(running_machine &machine, int port, UINT8 data)
+static void aburner2_iochip0_motor_w(running_machine &machine, UINT8 data)
 {
-	switch (port)
-	{
-		// motor/air drive status
-		case 0:
-			data &= 0xc0;
-
-			// TODO
-			data |= 0;
-			break;
-		
-		default: break;
-	}
-	
-	return data;
+	// TODO
 }
 
-static void smgp_iochip_0_w(running_machine &machine, int port, UINT8 data)
+
+// SMGP
+static UINT8 smgp_iochip0_motor_r(running_machine &machine, UINT8 data)
 {
-	switch (port)
-	{
-		// motor/air drive control
-		case 1:
-			// TODO
-			break;
-		
-		// unknown
-		case 2:
-			break;
-		
-		// lamps/coincounter
-		case 3:
-			// lamps: TODO
-			coin_counter_w(machine, 0, (data >> 4) & 0x01);
-			break;
+	data &= 0xc0;
 
-		default: break;
-	}
+	// TODO
+	return data | 0x0;
 }
+
+static void smgp_iochip0_motor_w(running_machine &machine, UINT8 data)
+{
+	// TODO
+}
+
 
 
 /*************************************
@@ -1436,6 +1327,28 @@ GFXDECODE_END
  *  Generic machine drivers
  *
  *************************************/
+
+static void xboard_reset(device_t *device)
+{
+	segas1x_state *state = device->machine().driver_data<segas1x_state>();
+
+	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, PULSE_LINE);
+	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+}
+
+static MACHINE_RESET( xboard )
+{
+	segas1x_state *state = machine.driver_data<segas1x_state>();
+	fd1094_machine_init(machine.device("maincpu"));
+	segaic16_tilemap_reset(machine, 0);
+
+	/* hook the RESET line, which resets CPU #1 */
+	m68k_set_reset_callback(machine.device("maincpu"), xboard_reset);
+
+	/* start timers to track interrupts */
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(1), 1);
+}
+
 
 static const ic_315_5250_interface segaxb_5250_1_intf =
 {
@@ -3014,31 +2927,52 @@ ROM_END
 
 /*************************************
  *
- *  Generic driver initialization
+ *  Driver initialization
  *
  *************************************/
 
 static DRIVER_INIT( generic_xboard )
 {
-	xboard_generic_init(machine);
+	segas1x_state *state = machine.driver_data<segas1x_state>();
+
+	/* init the FD1094 */
+	fd1094_driver_init(machine, "maincpu", NULL);
+
+	/* set the default road priority */
+	state->m_road_priority = 1;
+
+	/* reset the custom handlers and other pointers */
+	memset(state->m_adc_reverse, 0, sizeof(state->m_adc_reverse));
+	memset(state->m_iochip_custom_io_r, 0, sizeof(state->m_iochip_custom_io_r));
+	memset(state->m_iochip_custom_io_w, 0, sizeof(state->m_iochip_custom_io_w));
+	state->m_iochip_custom_io_w[0][3] = generic_iochip0_lamps_w;
+
+	state->m_gprider_hack = 0;
+
+	state->m_maincpu = machine.device("maincpu");
+	state->m_soundcpu = machine.device("soundcpu");
+	state->m_soundcpu2 = NULL;
+	state->m_subcpu = machine.device("sub");
+	state->m_315_5250_1 = machine.device("5250_main");
+
+	state->save_item(NAME(state->m_iochip_force_input));
+	state->save_item(NAME(state->m_vblank_irq_state));
+	state->save_item(NAME(state->m_timer_irq_state));
+	state->save_item(NAME(state->m_gprider_hack));
+	state->save_item(NAME(state->m_iochip_regs[0]));
+	state->save_item(NAME(state->m_iochip_regs[1]));
+	state->save_item(NAME(state->m_adc_reverse));
 }
 
-
-
-/*************************************
- *
- *  Game-specific driver inits
- *
- *************************************/
 
 static DRIVER_INIT( aburner2 )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	xboard_generic_init(machine);
+	DRIVER_INIT_CALL( generic_xboard );
 	state->m_road_priority = 0;
-	state->m_iochip_custom_io_r[0] = aburner2_iochip_0_r;
-	state->m_iochip_custom_io_w[0] = aburner2_iochip_0_w;
+	state->m_iochip_custom_io_r[0][0] = aburner2_iochip0_motor_r;
+	state->m_iochip_custom_io_w[0][1] = aburner2_iochip0_motor_w;
 }
 
 
@@ -3054,7 +2988,7 @@ static DRIVER_INIT( loffire )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	xboard_generic_init(machine);
+	DRIVER_INIT_CALL( generic_xboard );
 	state->m_adc_reverse[1] = state->m_adc_reverse[3] = 1;
 
 	/* install sync hack on core shared memory */
@@ -3066,10 +3000,10 @@ static DRIVER_INIT( smgp )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	xboard_generic_init(machine);
+	DRIVER_INIT_CALL( generic_xboard );
 	state->m_soundcpu2 = machine.device("soundcpu2");
-	state->m_iochip_custom_io_r[0] = smgp_iochip_0_r;
-	state->m_iochip_custom_io_w[0] = smgp_iochip_0_w;
+	state->m_iochip_custom_io_r[0][0] = smgp_iochip0_motor_r;
+	state->m_iochip_custom_io_w[0][1] = smgp_iochip0_motor_w;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
 }
@@ -3084,7 +3018,7 @@ static DRIVER_INIT( rascot )
 	rom[0x5d0/2] = 0x6008;
 	rom[0x606/2] = 0x4e71;
 
-	xboard_generic_init(machine);
+	DRIVER_INIT_CALL( generic_xboard );
 
 	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0f0000, 0x0f3fff, FUNC(rascot_excs_r), FUNC(rascot_excs_w));
 }
@@ -3094,7 +3028,7 @@ static DRIVER_INIT( gprider )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	xboard_generic_init(machine);
+	DRIVER_INIT_CALL( generic_xboard );
 	state->m_gprider_hack = 1;
 }
 
