@@ -1486,6 +1486,10 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 			{
 				UML_TEST(block, I0, 3);											// test    i0,3
 				UML_JMPc(block, COND_NZ, alignex = label++);									// jmp     alignex,nz
+
+				/* word aligned accesses need to be broken up */
+				UML_TEST(block, I0, 4);											// test    i0,4
+				UML_JMPc(block, COND_NZ, unaligned = label++);					// jmp     unaligned, nz
 			}
 
 			/* unaligned 2 and 4 byte accesses need to be broken up */
@@ -1768,6 +1772,26 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 				UML_CALLH(block, *masked);													// callh   masked
 				UML_SHR(block, I0, I0, 8);									// shr     i0,i0,8
 				UML_OR(block, I0, I0, mem(&ppc->impstate->tempdata.w.l));			// or      i0,i0,[tempdata]
+			}
+		}
+		else if (size == 8)
+		{
+			if (iswrite)
+			{
+				UML_DMOV(block, I3, I1);									// dmov     i3,i1
+				UML_DSHR(block, I1, I1, 32);								// dshr     i1,i1,32
+				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);		// write    i0,i1,program_dword
+				UML_ADD(block, I0, I0, 4);									// add      i0,i0,4
+				UML_WRITE(block, I0, I3, SIZE_DWORD, SPACE_PROGRAM);		// write    i0,i3,program_dword
+			}
+			else
+			{
+				UML_XOR(block, I3, I3, I3);									// xor      i3,i3,i3
+				UML_READ(block, I1, I0, SIZE_DWORD, SPACE_PROGRAM);			// read     i1,i0,program_dword
+				UML_ADD(block, I0, I0, 4);									// add      i0,i0,4
+				UML_READ(block, I3, I0, SIZE_DWORD, SPACE_PROGRAM);			// read     i3,i0,program_dword
+				UML_DSHL(block, I1, I1, 32);								// dshl     i1,i1,32
+				UML_DOR(block, I0, I1, I3);									// dor      i0,i1,i3
 			}
 		}
 		UML_RET(block);																		// ret
