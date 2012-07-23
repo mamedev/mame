@@ -2423,7 +2423,10 @@ static MACHINE_RESET( taitotz )
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 	devtag_reset(machine, "ide");
 
-	set_ide_drive_serial_number(machine.device("ide"), 0, state->m_hdd_serial_number);
+	if (state->m_hdd_serial_number != NULL)
+	{
+		set_ide_drive_serial_number(machine.device("ide"), 0, state->m_hdd_serial_number);
+	}
 }
 
 static MACHINE_START( taitotz )
@@ -2517,13 +2520,22 @@ static void init_taitotz_111a(running_machine &machine)
 	rom[(0x2b748^4)/4] = 0x480000b8;	// skip sound load timeout
 }
 
+static const char LANDHIGH_HDD_SERIAL[] =			// "824915746386        "
+	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x36, 0x33, 0x38, 0x36, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
+static const char BATLGR2_HDD_SERIAL[] =			// "            05412842"
+	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x32, 0x38, 0x34, 0x32 };
+
+static const char BATLGR2A_HDD_SERIAL[] =			// "            05411645"
+	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x31, 0x36, 0x34, 0x35 };
+
 static DRIVER_INIT(landhigh)
 {
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 
 	init_taitotz_152(machine);
 
-	state->m_hdd_serial_number = "824915746386        ";
+	state->m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
 
 	state->m_scr_base = 0x1c0000;
 
@@ -2537,7 +2549,7 @@ static DRIVER_INIT(batlgear)
 	init_taitotz_111a(machine);
 
 	// unknown, not used by BIOS 1.11a
-	state->m_hdd_serial_number = "00000000000000000000";
+	state->m_hdd_serial_number = NULL;
 
 	state->m_scr_base = 0x1c0000;
 
@@ -2550,7 +2562,7 @@ static DRIVER_INIT(batlgr2)
 
 	init_taitotz_152(machine);
 	
-	state->m_hdd_serial_number = "            05412842";
+	state->m_hdd_serial_number = BATLGR2_HDD_SERIAL;
 	
 	state->m_scr_base = 0x1e0000;
 
@@ -2563,7 +2575,7 @@ static DRIVER_INIT(batlgr2a)
 
 	init_taitotz_152(machine);
 	
-	state->m_hdd_serial_number = "            05411645";
+	state->m_hdd_serial_number = BATLGR2A_HDD_SERIAL;
 	
 	state->m_scr_base = 0x1e0000;
 
@@ -2577,7 +2589,7 @@ static DRIVER_INIT(pwrshovl)
 	init_taitotz_111a(machine);
 	
 	// unknown, not used by BIOS 1.11a
-	state->m_hdd_serial_number = "00000000000000000000";
+	state->m_hdd_serial_number = NULL;
 	
 	state->m_scr_base = 0x1c0000;
 
