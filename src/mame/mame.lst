@@ -19530,6 +19530,14 @@ sp_gnatl		//
 sp_gnatm		//
 sp_gnatn		//
 sp_gnato		//
+sp_przna		// Prize National (Ace)
+sp_prznaa		//
+sp_prznab		//
+sp_prznac		//
+sp_prznad		//
+sp_prznae		//
+sp_prznaf		//
+sp_prznag		//
 sp_gprix		// Grand Prix (Ace)
 sp_gprixa		//
 sp_gprixb		//
@@ -19851,16 +19859,50 @@ sp_pistem		//
 sp_pisten		//
 sp_pisteo		//
 sp_pistep		//
-sp_pound		//Pound For Pound (Ace)
-sp_przna		//Prize National (Ace)
-sp_road			//Road To Hell (Ace)
-sp_skylm		//Sky's The Limit Club, The (Ace)
-sp_tkpik		//Take Your Pick (Ace)
-sp_atw
-sp_five
-sp_crun
-sp_carry
-sp_front
+sp_pound		// Pound For Pound (Ace)
+sp_pounda		//
+sp_poundb		//
+sp_poundc		//
+sp_poundd		//
+sp_pounde		//
+sp_poundf		//
+sp_poundg		//
+sp_poundh		//
+sp_poundi		//
+sp_poundj		//
+sp_poundk		//
+sp_poundl		//
+sp_poundm		//
+sp_poundn		//
+sp_poundo		//
+sp_poundp		//
+sp_poundbwb		//
+sp_poundbwba	//
+sp_poundbwbb	//
+sp_poundbwbc	//
+sp_poundbwbd	//
+sp_poundbwbe	//
+sp_poundbwbf	//
+sp_road			// Road To Hell (Ace)
+sp_skylm		// Sky's The Limit Club, The (Ace)
+sp_skylma		// 
+sp_tkpik		// Take Your Pick (Ace)
+sp_tkpika		//
+sp_tkpikb		//
+sp_tkpikc		//
+sp_tkpikd		//
+sp_tkpike		//
+sp_tkpikf		//
+sp_carry		// Carry On (PCP)
+sp_carrya		//
+sp_front		// Final Frontier (Bwb)
+sp_atw			// Around the World (Crystal)
+sp_five			// Fiver Fever (Crystal)
+sp_fivea		// 
+sp_crun			// Cash Run (Crystal)
+sp_cruna		//
+sp_crunb		//
+
 
 // Project - PROCONN
 
