@@ -422,10 +422,9 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 MACHINE_CONFIG_END
 
 ROM_START( speglsht )
-	ROM_REGION( 0x210000, "maincpu", 0 )
-	ROM_LOAD( "sx004-07.u70", 0x010000, 0x200000, CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) ) /* Noted as "ZPRO0" IE: Z80 (ST0016) Program 0 */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "sx004-07.u70", 0x000000, 0x200000, CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) ) /* Noted as "ZPRO0" IE: Z80 (ST0016) Program 0 */
 	/* U71 unpopulated, Noted as ZPRO1 */
-	ROM_COPY( "maincpu",  0x10000, 0x00000, 0x08000 )
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 )
 	ROM_LOAD32_BYTE( "sx004-04.u33", 0x00000, 0x80000, CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) ) /* Noted as "RPRO3" IE: R3000 Program 3 */

@@ -11,6 +11,11 @@ lots of reads from 0xe000 at the start
 
 JPM style Reel MCU?
 
+ Hardware overview
+  - Z80
+  - 2 timed interrupts (IRQ and NMI) (can be reset)
+  - AY8910 for sound
+
 
  - some of the roms appear to have been merged to larger files, or there are two versions of the board?
 
@@ -22,6 +27,7 @@ JPM style Reel MCU?
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 
+
 class aces1_state : public driver_device
 {
 public:
@@ -30,81 +36,249 @@ public:
 		  m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_READ8_MEMBER( aces1_unk_r )
+	{
+		return 0x00;
+	}
+	
+	DECLARE_READ8_MEMBER( aces1_unk_port00_r )
+	{
+		return 0x00;
+	}
+
 	DECLARE_READ8_MEMBER( aces1_nmi_counter_reset_r )
 	{
+		aces1_reset_nmi_timer();
 		return 0x00;
 	}
 
 	DECLARE_WRITE8_MEMBER( aces1_nmi_counter_reset_w )
 	{
-
+		aces1_reset_nmi_timer();
 	}
 
-protected:
+	void aces1_reset_nmi_timer(void)
+	{
+		m_aces1_nmi_timer->adjust(m_maincpu->cycles_to_attotime(3072));
+	}
+
+	void aces1_reset_irq_timer(void)
+	{
+		m_aces1_irq_timer->adjust(m_maincpu->cycles_to_attotime(160000));
+	}
+
+
+	emu_timer *m_aces1_irq_timer;
+	emu_timer *m_aces1_nmi_timer;
+
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic24_intf_write_a)
+	{
+	//	printf("7segs %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic24_intf_write_b)
+	{
+	//	printf("lamp %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic24_intf_write_c)
+	{
+	//	printf("strobe %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_a)
+	{
+	//	printf("extender lamps %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_b)
+	{
+	//	printf("meters, extender select %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_c)
+	{
+	//	printf("reels, extender strobe %02x\n", data);
+	}
+	
+	DECLARE_READ8_MEMBER( ppi8255_ic37_intf_read_a )
+	{
+		return 0xff;
+	}
+
+	DECLARE_READ8_MEMBER( ppi8255_ic37_intf_read_b )
+	{
+		return 0xff;
+	}
+
+	DECLARE_READ8_MEMBER( ppi8255_ic37_intf_read_c )
+	{
+		return 0xff;
+	}
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+
+
+protected:
+
 };
 
 
 
+
+
+static TIMER_CALLBACK( m_aces1_irq_timer_callback )
+{
+	aces1_state *state = machine.driver_data<aces1_state>();
+//	printf("irq\n");
+	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+	state->aces1_reset_irq_timer();
+}
+
+static TIMER_CALLBACK( m_aces1_nmi_timer_callback )
+{
+	aces1_state *state = machine.driver_data<aces1_state>();
+//	printf("nmi\n");
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->aces1_reset_nmi_timer();
+}
+
+static void aces1_create_timers(running_machine &machine)
+{
+	aces1_state *state = machine.driver_data<aces1_state>();
+
+	state->m_aces1_irq_timer = machine.scheduler().timer_alloc(FUNC(m_aces1_irq_timer_callback), 0);
+	state->m_aces1_nmi_timer = machine.scheduler().timer_alloc(FUNC(m_aces1_nmi_timer_callback), 0);
+}
+
+static MACHINE_START( aces1 )
+{
+	aces1_create_timers(machine);
+}
+
+static MACHINE_RESET( aces1 )
+{
+	aces1_state *state = machine.driver_data<aces1_state>();
+	state->aces1_reset_nmi_timer();
+	state->aces1_reset_irq_timer();
+}
+
 static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	// 0xadf0 AY - sound, dips
-	// 0xafb0 IC24 - lamps, 7segs
-	// 0xafd0 IC25 - lamps, meters, reel comms (writes)
-	// 0xafe0 IC37 - doors, coins, reel optics (reads)
-	// 0xc000 Illegal access?
+	AM_RANGE(0xadf0, 0xadf3) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w) //  Dips, Sound
+	AM_RANGE(0xafb0, 0xafb3) AM_DEVREADWRITE("ppi8255_ic24", i8255_device, read, write) // IC24 - lamps, 7segs
+	AM_RANGE(0xafd0, 0xafd3) AM_DEVREADWRITE("ppi8255_ic25", i8255_device, read, write) // IC25 - lamps, meters, reel comms (writes)
+	AM_RANGE(0xafe0, 0xafe3) AM_DEVREADWRITE("ppi8255_ic37", i8255_device, read, write)//  IC37 - doors, coins, reel optics (reads)
+	AM_RANGE(0xc000, 0xc000) AM_READ(aces1_unk_r) // illegal or reset irq?
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(aces1_nmi_counter_reset_r, aces1_nmi_counter_reset_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( aces1_portmap, AS_IO, 8, aces1_state )
+	AM_RANGE(0x00, 0x00) AM_READ(aces1_unk_port00_r) // read before enabling interrupts?
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( aces1 )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "DSWB" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 
+
+// 0xafb0 IC24 - lamps, 7segs
 static I8255A_INTERFACE( ppi8255_ic24_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic24_intf_write_a),							/* Port A write */ // 7segs
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic24_intf_write_b),							/* Port B write */ // lamps
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic24_intf_write_c)							/* Port C write */ // strobe
 };
 
+// 0xafd0 IC25 - lamps, meters, reel comms (writes)
 static I8255A_INTERFACE( ppi8255_ic25_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic25_intf_write_a),							/* Port A write */ // extra lamps
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic25_intf_write_b),							/* Port B write */ // meters, extra lamp select
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic25_intf_write_c)							/* Port C write */ // reel write, extra lamp strobe
 };
 
+// 0xafe0 IC37 - doors, coins, reel optics (reads)
 static I8255A_INTERFACE( ppi8255_ic37_intf )
 {
-	DEVCB_NULL,							/* Port A read */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic37_intf_read_a),							/* Port A read */ // doors + coins
 	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic37_intf_read_b),							/* Port B read */ // switches
 	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
+	DEVCB_DRIVER_MEMBER(aces1_state,ppi8255_ic37_intf_read_c),							/* Port C read */ // reel optics
 	DEVCB_NULL							/* Port C write */
 };
 
+// 0xadf0 - Dips, Sound
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSWA"),
+	DEVCB_INPUT_PORT("DSWB"),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -116,9 +290,12 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	MCFG_CPU_PROGRAM_MAP(aces1_map)
 	MCFG_CPU_IO_MAP(aces1_portmap)
 
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_ic24_intf )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_ic25_intf )
-	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_ic37_intf )
+	MCFG_I8255A_ADD( "ppi8255_ic24", ppi8255_ic24_intf )
+	MCFG_I8255A_ADD( "ppi8255_ic25", ppi8255_ic25_intf )
+	MCFG_I8255A_ADD( "ppi8255_ic37", ppi8255_ic37_intf )
+	
+	MCFG_MACHINE_START( aces1 )
+	MCFG_MACHINE_RESET( aces1 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

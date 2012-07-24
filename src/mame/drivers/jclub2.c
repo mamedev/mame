@@ -754,7 +754,7 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	//AM_RANGE(0xc1, 0xc1) AM_READ_LEGACY(cmd2_r)
 	//AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(cmd_stat8_r)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
+	//AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
 	//AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END
 
@@ -951,9 +951,8 @@ ROM_START( jclub2o )
 	ROM_LOAD16_WORD_SWAP( "jc2-110x.u27",0x00000, 0x080000, CRC(03aa6882) SHA1(e0343bc77a19994ddafa614891663b40e1476332) )
 	ROM_LOAD16_WORD_SWAP( "jc2-112x.u27",0x00000, 0x080000, CRC(e1ab93bd) SHA1(78b618b3f7819bd5351ebf949f328fec7795cec9) ) // alt revision?
 
-	ROM_REGION( 0x90000, "st0016", 0 ) // z80 core (used for sound?)
-	ROM_LOAD( "sx006-04.u87", 0x10000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
-	ROM_COPY( "st0016",  0x10000, 0x00000, 0x08000 )
+	ROM_REGION( 0x80000, "st0016", 0 ) // z80 core (used for sound?)
+	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 ROM_END
 
 /***************************************************************************

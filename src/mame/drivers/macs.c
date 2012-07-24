@@ -136,7 +136,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (data* 0x4000) + macs_cart_slot*0x400000 );
 
 	m_st0016_rom_bank=data;
 }
@@ -162,7 +162,7 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 
 			macs_cart_slot = (data & 0xc) >> 2;
 
-			membank("bank4")->set_base(&ROM[macs_cart_slot*0x400000+0x10000] );
+			membank("bank4")->set_base(&ROM[macs_cart_slot*0x400000] );
 		}
 
 		membank("bank2")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x800] );
@@ -519,8 +519,7 @@ ROM_START( macsbios )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
 ROM_END
 
 ROM_START( mac2bios )
@@ -529,8 +528,7 @@ ROM_START( mac2bios )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
 ROM_END
 
 ROM_START( kisekaem )
@@ -546,9 +544,8 @@ ROM_START( kisekaem )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x008000 )
-	ROM_COPY( "user2",   0x00000, 0x410000, 0x400000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x00000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( kisekaeh )
@@ -564,9 +561,8 @@ ROM_START( kisekaeh )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x008000 )
-	ROM_COPY( "user2",   0x00000, 0x410000, 0x400000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x00000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
@@ -587,10 +583,9 @@ ROM_START( cultname ) // uses printer - two different games ? (slot a - checks f
 
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x008000 )
-	ROM_COPY( "user2",   0x00000, 0x410000, 0x400000 )
-	ROM_COPY( "user3",   0x00000, 0x810000, 0x400000 )
+	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x00000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user3",   0x00000, 0x800000, 0x400000 ) // Slot B
 ROM_END
 
 /* these are listed as MACS2 sub-boards, is it the same?  - it's not ;) */
@@ -599,7 +594,6 @@ ROM_START( yuka )
 	MACS2_BIOS
 
 	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
-
 	ROM_LOAD16_BYTE( "yu-ka_2.u6", 0x000001, 0x100000, CRC(c3c5728b) SHA1(e53cdcae556f34bab45d9342fd78ec29b6543c46) )
 	ROM_LOAD16_BYTE( "yu-ka_4.u5", 0x000000, 0x100000, CRC(7e391ee6) SHA1(3a0c122c9d0e2a91df6d8039fb958b6d00997747) )
 	ROM_LOAD16_BYTE( "yu-ka_1.u8", 0x200001, 0x100000, CRC(bccd1b15) SHA1(02511f3be60c53b5f5d90f12f0648f6e184ca667) )
@@ -608,8 +602,7 @@ ROM_START( yuka )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASE00 ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user2",   0x00000, 0x000000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( yujan )
@@ -624,8 +617,7 @@ ROM_START( yujan )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
+	ROM_COPY( "user2",   0x00000, 0x000000, 0x400000 ) // Slot A
 ROM_END
 
 static const UINT8 ramdata[160]=
@@ -716,7 +708,7 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x10000 );
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() );
 		state->membank("bank2")->set_base(macs_ram1+0x800);
 		state->membank("bank3")->set_base(macs_ram1+0x10000);
 		state->membank("bank4")->set_base(machine.root_device().memregion("maincpu")->base() );
