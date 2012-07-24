@@ -47,9 +47,6 @@
 #include "lib7z/LzmaDec.h"
 #include <new>
 
-// function that should exist but doesn't in the official release
-extern "C" SRes LzmaDec_Allocate_MAME(CLzmaDec *p, const CLzmaProps *propNew, ISzAlloc *alloc);
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES

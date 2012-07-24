@@ -224,6 +224,11 @@ SRes LzmaDecode(Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen,
     const Byte *propData, unsigned propSize, ELzmaFinishMode finishMode,
     ELzmaStatus *status, ISzAlloc *alloc);
 
+/*
+ * Why isn't there an interface to pass in the properties directly????
+ */
+SRes LzmaDec_Allocate_MAME(CLzmaDec *p, const CLzmaProps *propNew, ISzAlloc *alloc);
+
 #ifdef __cplusplus
 }
 #endif
