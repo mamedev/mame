@@ -883,6 +883,7 @@ ROM_START( rygar2 )
 	ROM_LOAD( "cpu_1f.bin",   0x0000, 0x4000, CRC(3cc98c5a) SHA1(ea1035be939ed1a994f3273b33412c85dda0973e) )
 ROM_END
 
+/* There is a known bootleg board which uses U locations but without Tecmo etchings which is a match for rygar3 */
 ROM_START( rygar3 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "cpu_5p.bin",   0x00000, 0x08000, CRC(e79c054a) SHA1(1aaffa53d121d5c55899bf18e85c42333fe0df54) ) /* code */

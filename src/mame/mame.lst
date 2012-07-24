@@ -19404,6 +19404,8 @@ ac1xpres	// Xpress (Pcp)
 ac1roll		// Roll Up (Pcp)
 ac1rolla	//
 ac1rollb	//
+ac1hideh	// Hi De Hi Deluxe
+ac1hideha	//
 
 // Ace 'sp.ACE system'
 
@@ -19565,8 +19567,6 @@ sp_hidehm		//
 sp_hidehn		//
 sp_hideho		//
 sp_hidehp		//
-sp_hidehq		//
-sp_hidehr		//
 sp_hifly		// Hi Flyer (Ace) [Mps]
 sp_hiflya		//
 sp_hiflyb		//

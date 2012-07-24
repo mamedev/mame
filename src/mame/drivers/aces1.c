@@ -30,6 +30,16 @@ public:
 		  m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_READ8_MEMBER( aces1_nmi_counter_reset_r )
+	{
+		return 0x00;
+	}
+
+	DECLARE_WRITE8_MEMBER( aces1_nmi_counter_reset_w )
+	{
+
+	}
+
 protected:
 
 	// devices
@@ -40,13 +50,13 @@ protected:
 
 static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	// 0xadf0 AY - sound, dips
 	// 0xafb0 IC24 - lamps, 7segs
 	// 0xafd0 IC25 - lamps, meters, reel comms (writes)
 	// 0xafe0 IC37 - doors, coins, reel optics (reads)
 	// 0xc000 Illegal access?
-	// 0xe000 NMI Counter Reset
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(aces1_nmi_counter_reset_r, aces1_nmi_counter_reset_w)
 ADDRESS_MAP_END
 
 
@@ -494,6 +504,18 @@ ROM_START( ac1rollb )
 	ROM_LOAD( "roll up 5p 2.40 p4 19.1.90.bin", 0x6000, 0x2000, CRC(8d2ddb6c) SHA1(4c0e8975c9b65fbacb519455e06a6cca9c3993c1) )
 ROM_END
 
+ROM_START( ac1hideh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "hh541d8a", 0x0000, 0x010000, CRC(be4d9ca9) SHA1(948471938f58e50be6e75c1a226947fc14f7eebf) ) // 2nd half blank
+ROM_END
+
+ROM_START( ac1hideha )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "hh563p4r", 0x0000, 0x8000, CRC(c82aabb1) SHA1(6a94cbae10edc544117a6bc5849ac8c9ad80a333) )
+ROM_END
+
+
+
 DRIVER_INIT( aces1 )
 {
 }
@@ -547,4 +569,5 @@ GAME(199?,  ac1blueca		,ac1bluec	,aces1  ,aces1  ,aces1,  ROT0,  "Pcp",    "Blue
 GAME(199?,  ac1bluecb		,ac1bluec	,aces1  ,aces1  ,aces1,  ROT0,  "Pcp",    "Blue Chip (Pcp) (ACESYS1) (set 3)",       GAME_IS_SKELETON_MECHANICAL )
 GAME(199?,  ac1bluecc		,ac1bluec	,aces1  ,aces1  ,aces1,  ROT0,  "Pcp",    "Blue Chip (Pcp) (ACESYS1) (set 4)",       GAME_IS_SKELETON_MECHANICAL )
 GAME(199?,  ac1bluecd		,ac1bluec	,aces1  ,aces1  ,aces1,  ROT0,  "Pcp",    "Blue Chip (Pcp) (ACESYS1) (set 5)",       GAME_IS_SKELETON_MECHANICAL )
-
+GAME(199?,  ac1hideh		,0	        ,aces1	,aces1	,aces1,  ROT0,  "Ace",    "Hi De Hi Deluxe (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL ) // was in Hi De Hi (Ace) (sp.ACE) set
+GAME(199?,  ac1hideha		,sp_hideh	,aces1	,aces1	,aces1,  ROT0,  "Ace",    "Hi De Hi Deluxe (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) //  ^^

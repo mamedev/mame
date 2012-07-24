@@ -1206,17 +1206,7 @@ ROM_START( sp_hidehp )
 	SP_HIDEH_SOUND
 ROM_END
 
-ROM_START( sp_hidehq )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	// this is a z80 rom, doesn't belong here? (ace system 1?)
-	ROM_LOAD( "hh541d8a", 0x0000, 0x010000, CRC(be4d9ca9) SHA1(948471938f58e50be6e75c1a226947fc14f7eebf) ) // 2nd half blank
-ROM_END
 
-ROM_START( sp_hidehr )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	// this is a z80 rom, doesn't belong here? (ace system 1?)
-	ROM_LOAD( "hh563p4r", 0x0000, 0x8000, CRC(c82aabb1) SHA1(6a94cbae10edc544117a6bc5849ac8c9ad80a333) )
-ROM_END
 
 #define SP_HIFLY_SOUND \
 	ROM_REGION(	0x100000, "oki", ROMREGION_ERASE00 ) \
@@ -4099,8 +4089,6 @@ GAME( 199?, sp_hidehm		,sp_hideh	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi De Hi
 GAME( 199?, sp_hidehn		,sp_hideh	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi De Hi (Ace) (sp.ACE) (set 15)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_hideho		,sp_hideh	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi De Hi (Ace) (sp.ACE) (set 16)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_hidehp		,sp_hideh	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi De Hi (Ace) (sp.ACE) (set 17)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, sp_hidehq		,sp_hideh	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi De Hi (Ace) (sp.ACE) (set 18)",GAME_IS_SKELETON_MECHANICAL ) // misidentified?, wrong driver? z80? code..
-GAME( 199?, sp_hidehr		,sp_hideh	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi De Hi (Ace) (sp.ACE) (set 19)",GAME_IS_SKELETON_MECHANICAL ) // misidentified?, wrong driver? z80? code..
 
 GAME( 199?, sp_hifly		,0			,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi Flyer (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_hiflya		,sp_hifly	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Hi Flyer (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
