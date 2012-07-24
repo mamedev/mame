@@ -401,6 +401,12 @@ ROM_START( j2coprun )
 	ROM_LOAD( "copperrun2.3", 0x4000, 0x2000, CRC(d15e2276) SHA1(504b792f4ac508e3f9ef8add1adbb09d4c2d9afe) )
 ROM_END
 
+ROM_START( j2cprndx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "crundeluxe3.1", 0x0000, 0x2000, CRC(379e296a) SHA1(3f9b7adcb10bad611a0bfa144ee270166688c957) )
+	ROM_LOAD( "crundeluxe3.2", 0x2000, 0x2000, CRC(62eb4fa7) SHA1(0d8dc650acbf651f80124b3d847e4c11940e235b) )
+	ROM_LOAD( "crundeluxe3.3", 0x4000, 0x2000, CRC(1c7446f1) SHA1(0065e1fa5018d615d736e40d221ccd2d6e980147) )
+ROM_END
 
 ROM_START( j2crkbnk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2024,6 +2030,7 @@ GAME(198?, j2cashtk	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Cash Track (Jpm) (
 GAME(198?, j2cashtd	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Cash Track Deluxe (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2coppot	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Copper Pot (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2coprun	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Copper Run (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cprndx	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Copper Run Deluxe (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2crkbnk	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Crack The Bank (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2droplt	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Drop The Lot (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j2dropld	,0			,jpmmps,jpmmps,jpmmps,ROT0,   "Jpm","Drop The Lot Deluxe (Jpm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )

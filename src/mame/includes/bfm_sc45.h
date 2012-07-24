@@ -2264,6 +2264,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_casry_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) ) \
 
 #define sc_cbaz_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
