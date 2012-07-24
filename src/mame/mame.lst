@@ -19421,6 +19421,13 @@ sp_cbowlk		//
 sp_cbowll		//
 sp_cbowlm		//
 sp_cbowln		//
+sp_cbowlo		//
+sp_cbowlp		//
+sp_cbowlq		//
+sp_cbowlr		//
+sp_cbowls		//
+sp_cbowlt		//
+sp_cbowlu		//
 sp_crime		// Crime Watch (Ace)
 sp_crimea		//
 sp_crimeb		//
@@ -19761,20 +19768,89 @@ sp_globee		//
 sp_globef		//
 sp_globeg		//
 sp_gol			// Gol (Ace)
-
-sp_golda		//Golden Arrow Club (Ace)
-sp_golds		//Golden Streak (Ace)
-sp_goldt		//Golden Touch (Golden Streak?) (Ace)
-sp_here			//Here We Go (Ace)
-sp_holid		//Holiday Club (Ace)
-sp_lotto		//Lotto (Ace)
-sp_magmo		//Magic Money (Ace)
-sp_megmo		//Mega Money (Ace)
-sp_monma		//Money Magic (Ace)
-sp_monmo		//Money Mountain (Ace)
-sp_nudex		//Nudge Explosion (Ace)
-sp_onbox		//On The Box (Ace)
-sp_piste		//On The Piste (Ace)
+sp_golda		// Golden Arrow Club (Ace)
+sp_goldaa		//
+sp_golds		// Golden Streak (Ace)
+sp_goldsa		// 
+sp_goldsb		// 
+sp_goldsc		// 
+sp_goldsd		// 
+sp_goldse		// 
+sp_goldsf		// 
+sp_goldsg		// 
+sp_goldsh		// 
+sp_goldt		// Golden Touch (Golden Streak) (Ace)
+sp_here			// Here We Go (Ace)
+sp_herea		//
+sp_hereb		//
+sp_herec		//
+sp_hered		//
+sp_heree		//
+sp_heref		//
+sp_hereg		//
+sp_holid		// Holiday Club (Ace)
+sp_holida		//
+sp_lotto		// Lotto (Ace)
+sp_magmo		// Magic Money (Ace)
+sp_magmoa		//
+sp_magmob		//
+sp_magmoc		//
+sp_magmod		//
+sp_megmo		// Mega Money (Ace)
+sp_megmoa		//
+sp_megmob		//
+sp_megmoc		//
+sp_megmod		//
+sp_megmoe		//
+sp_megmof		//
+sp_megmog		//
+sp_monma		// Money Magic (Ace)
+sp_monmaa		//
+sp_monmab		//
+sp_monmac		//
+sp_monmad		//
+sp_monmo		// Money Mountain (Ace)
+sp_monmoa		//
+sp_monmob		//
+sp_monmoc		//
+sp_monmod		//
+sp_monmoe		//
+sp_monmof		//
+sp_monmog		//
+sp_nudex		// Nudge Explosion (Ace)
+sp_nudexa		//
+sp_onbox		// On The Box (Ace)
+sp_onboxa		//
+sp_onboxb		//
+sp_onboxc		//
+sp_onboxd		//
+sp_onboxe		//
+sp_onboxf		//
+sp_onboxg		//
+sp_onboxh		//
+sp_onboxi		//
+sp_onboxj		//
+sp_onboxk		//
+sp_onboxl		//
+sp_onboxm		//
+sp_onboxn		//
+sp_piste		// On The Piste (Ace)
+sp_pistea		//
+sp_pisteb		//
+sp_pistec		//
+sp_pisted		//
+sp_pistee		//
+sp_pistef		//
+sp_pisteg		//
+sp_pisteh		//
+sp_pistei		//
+sp_pistej		//
+sp_pistek		//
+sp_pistel		//
+sp_pistem		//
+sp_pisten		//
+sp_pisteo		//
+sp_pistep		//
 sp_pound		//Pound For Pound (Ace)
 sp_przna		//Prize National (Ace)
 sp_road			//Road To Hell (Ace)
