@@ -257,7 +257,6 @@ public:
 	DECLARE_WRITE8_MEMBER(payout_latch_w);
 	DECLARE_WRITE8_MEMBER(payout_triac_w);
 	DECLARE_WRITE8_MEMBER(payout_select_w);
-	DECLARE_WRITE8_MEMBER(vfd2_data_w);
 	DECLARE_WRITE8_MEMBER(vfd_reset_w);
 	DECLARE_READ8_MEMBER(uart1stat_r);
 	DECLARE_READ8_MEMBER(uart1data_r);
@@ -273,7 +272,10 @@ public:
 	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(vfd_status_r);
-	DECLARE_WRITE8_MEMBER(vfd1_data_w);
+	DECLARE_WRITE8_MEMBER(vfd1_bd1_w);
+	DECLARE_WRITE8_MEMBER(vfd1_dmd_w);
+	DECLARE_WRITE8_MEMBER(dmd_reset_w);
+	DECLARE_WRITE8_MEMBER(vfd2_data_w);
 	DECLARE_WRITE8_MEMBER(e2ram_w);
 	DECLARE_READ8_MEMBER(direct_input_r);
 	DECLARE_READ8_MEMBER(sc3_expansion_r);
@@ -940,18 +942,10 @@ WRITE8_MEMBER(bfm_sc2_state::payout_select_w)
 
 
 ///////////////////////////////////////////////////////////////////////////
-
+//TODO: Change this!
 WRITE8_MEMBER(bfm_sc2_state::vfd2_data_w)
 {
 	m_vfd1->write_char(data);
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
-{
-	m_vfd0->reset();
-	m_vfd1->reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1170,19 +1164,21 @@ READ8_MEMBER(bfm_sc2_state::vfd_status_r)
 	return result;
 }
 
-WRITE8_MEMBER(bfm_sc2_state::vfd1_data_w)
+WRITE8_MEMBER(bfm_sc2_state::vfd1_bd1_w)
 {
-
-	if (machine().device("matrix"))
-	{
-		BFM_dm01_writedata(machine(),data);
-	}
-	else
-	{
-	    m_vfd0->write_char(data);
-	}
+    m_vfd0->write_char(data);
 }
 
+WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
+{
+	m_vfd0->reset();
+	m_vfd1->reset();
+}
+
+WRITE8_MEMBER(bfm_sc2_state::vfd1_dmd_w)
+{
+	BFM_dm01_writedata(machine(),data);
+}
 
 //
 WRITE8_MEMBER(bfm_sc2_state::e2ram_w)
@@ -1458,14 +1454,14 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2500, 0x2500) AM_READWRITE(uart1data_r, uart1data_w)
 	AM_RANGE(0x2600, 0x2600) AM_READWRITE(uart2stat_r, uart2ctrl_w)	/* mc6850 compatible uart */
 	AM_RANGE(0x2700, 0x2700) AM_READWRITE(uart2data_r, uart2data_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_bd1_w)					/* vfd1 data */
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
 	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
 	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
 	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
-	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)					/* vfd2 data */
+	//AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)				/* vfd2 data (not usually connected!)*/
 
 	AM_RANGE(0x3FFE, 0x3FFE) AM_READ(direct_input_r )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ(coin_input_r)
@@ -3678,6 +3674,20 @@ static INPUT_PORTS_START( scorpion3 )
 
 INPUT_PORTS_END
 
+WRITE8_MEMBER(bfm_sc2_state::dmd_reset_w)
+{
+//TODO: Reset callback for DMD
+}
+
+static MACHINE_START( sc2dmd )
+{
+	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
+
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->install_write_handler(0x2800, 0x2800, 0, 0, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),state));
+	space->install_write_handler(0x2900, 0x2900, 0, 0, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),state));
+}
+
 /* machine driver for scorpion2 board */
 
 static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
@@ -3721,13 +3731,11 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
-	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_BFMBD1_ADD("vfd1",1)
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_MACHINE_START(sc2dmd)
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -3773,6 +3781,7 @@ static void sc2awpdmd_common_init(running_machine &machine,int reels, int decryp
 		stepper_config(machine, n, &starpoint_interface_48step);
 	}
 }
+
 
 
 static DRIVER_INIT (bbrkfst)

@@ -320,7 +320,7 @@ int bfm_bd1_t::write_char(int data)
 				break;
 
 				case 0xB0:	// 0xB0 - 0xBF Clear display area
-				popmessage("Clearing display area %x",data&0x03);
+				
 				switch ( data & 0x03 )
 				{
 					case 0x00:	// clr nothing
