@@ -1,19 +1,6 @@
 #include "emu.h"
-#include "video/poly.h"
+#include "video/polynew.h"
 #include "includes/taitojc.h"
-
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
-{
-	bitmap_ind16 *zbuffer;
-	UINT8 *texture;
-
-	int tex_base_x;
-	int tex_base_y;
-	int tex_wrap_x;
-	int tex_wrap_y;
-};
-
 
 static const gfx_layout taitojc_char_layout =
 {
@@ -310,15 +297,12 @@ static void draw_object_bank(running_machine &machine, bitmap_ind16 &bitmap, con
 
 static void taitojc_exit(running_machine &machine)
 {
-	taitojc_state *state = machine.driver_data<taitojc_state>();
-	poly_free(state->m_poly);
 }
 
 VIDEO_START( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 
-	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitojc_exit), &machine));
 
 	/* find first empty slot to decode gfx */
@@ -342,6 +326,9 @@ VIDEO_START( taitojc )
 
 	machine.primary_screen->register_screen_bitmap(state->m_framebuffer);
 	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
+
+	/* create renderer */
+	state->m_renderer = auto_alloc(machine, taitojc_renderer(machine, &state->m_framebuffer, &state->m_zbuffer, state->m_texture));
 }
 
 SCREEN_UPDATE_IND16( taitojc )
@@ -395,17 +382,15 @@ SCREEN_UPDATE_IND16( dendego )
 
 
 
-static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void taitojc_renderer::render_solid_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	float z = extent->param[0].start;
-	int color = extent->param[1].start;
-	float dz = extent->param[0].dpdx;
-	UINT16 *fb = &destmap->pix16(scanline);
-	UINT16 *zb = &extra->zbuffer->pix16(scanline);
+	float z = extent.param[0].start;
+	int color = extent.param[1].start;
+	float dz = extent.param[0].dpdx;
+	UINT16 *fb = &m_framebuffer->pix16(scanline);
+	UINT16 *zb = &m_zbuffer->pix16(scanline);
 
-	for (int x = extent->startx; x < extent->stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iz = (int)z & 0xffff;
 
@@ -419,18 +404,16 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	}
 }
 
-static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void taitojc_renderer::render_shade_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	float z = extent->param[0].start;
-	float color = extent->param[1].start;
-	float dz = extent->param[0].dpdx;
-	float dcolor = extent->param[1].dpdx;
-	UINT16 *fb = &destmap->pix16(scanline);
-	UINT16 *zb = &extra->zbuffer->pix16(scanline);
+	float z = extent.param[0].start;
+	float color = extent.param[1].start;
+	float dz = extent.param[0].dpdx;
+	float dcolor = extent.param[1].dpdx;
+	UINT16 *fb = &m_framebuffer->pix16(scanline);
+	UINT16 *zb = &m_zbuffer->pix16(scanline);
 
-	for (int x = extent->startx; x < extent->stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int ic = (int)color & 0xffff;
 		int iz = (int)z & 0xffff;
@@ -446,26 +429,24 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	}
 }
 
-static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void taitojc_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	float z = extent->param[0].start;
-	float u = extent->param[1].start;
-	float v = extent->param[2].start;
-	float color = extent->param[3].start;
-	float dz = extent->param[0].dpdx;
-	float du = extent->param[1].dpdx;
-	float dv = extent->param[2].dpdx;
-	float dcolor = extent->param[3].dpdx;
-	UINT16 *fb = &destmap->pix16(scanline);
-	UINT16 *zb = &extra->zbuffer->pix16(scanline);
-	int tex_wrap_x = extra->tex_wrap_x;
-	int tex_wrap_y = extra->tex_wrap_y;
-	int tex_base_x = extra->tex_base_x;
-	int tex_base_y = extra->tex_base_y;
+	float z = extent.param[0].start;
+	float u = extent.param[1].start;
+	float v = extent.param[2].start;
+	float color = extent.param[3].start;
+	float dz = extent.param[0].dpdx;
+	float du = extent.param[1].dpdx;
+	float dv = extent.param[2].dpdx;
+	float dcolor = extent.param[3].dpdx;
+	UINT16 *fb = &m_framebuffer->pix16(scanline);
+	UINT16 *zb = &m_zbuffer->pix16(scanline);
+	int tex_wrap_x = extradata.tex_wrap_x;
+	int tex_wrap_y = extradata.tex_wrap_y;
+	int tex_base_x = extradata.tex_base_x;
+	int tex_base_y = extradata.tex_base_y;
 
-	for (int x = extent->startx; x < extent->stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
 		UINT8 texel;
@@ -490,7 +471,7 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 			iv = (tex_base_y + (((int)v >> 4) & 0x3f)) & 0x7ff;
 		}
 
-		texel = extra->texture[(iv * 2048) + iu];
+		texel = m_texture[(iv * 2048) + iu];
 
 		if (iz <= zb[x] && texel != 0)
 		{
@@ -505,10 +486,11 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	}
 }
 
-void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length)
+void taitojc_renderer::render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length)
 {
-	taitojc_state *state = machine.driver_data<taitojc_state>();
-	poly_vertex vert[4];
+//	taitojc_state *state = machine.driver_data<taitojc_state>();
+	const rectangle visarea = machine.primary_screen->visible_area();
+	vertex_t vert[4];
 	int i;
 	int ptr;
 
@@ -572,10 +554,6 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
                 printf("\n");
 #endif
 
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-
-				extra->zbuffer = &state->m_zbuffer;
-
 				for (i=0; i < 3; i++)
 				{
 					vert[i].p[1] = polygon_fifo[ptr++];
@@ -590,11 +568,11 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 						vert[1].p[1] == vert[2].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2]);
+						render_triangle(visarea, render_delegate(FUNC(taitojc_renderer::render_solid_scan), this), 2, vert[0], vert[1], vert[2]);
 					}
 					else
 					{
-						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2]);
+						render_triangle(visarea, render_delegate(FUNC(taitojc_renderer::render_shade_scan), this), 2, vert[0], vert[1], vert[2]);
 					}
 				}
 				break;
@@ -633,16 +611,14 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
                 printf("\n");
 #endif
 
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+				taitojc_polydata &extra = object_data_alloc();
 				UINT16 texbase = polygon_fifo[ptr++];
 
-				extra->zbuffer = &state->m_zbuffer;
-				extra->texture = state->m_texture;
-				extra->tex_base_x = ((texbase >> 0) & 0xff) << 4;
-				extra->tex_base_y = ((texbase >> 8) & 0xff) << 4;
+				extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
+				extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-				extra->tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-				extra->tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+				extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
+				extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
 
 				for (i=0; i < 3; i++)
 				{
@@ -656,7 +632,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 				{
-					poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
+					render_triangle(visarea, render_delegate(FUNC(taitojc_renderer::render_texture_scan), this), 4, vert[0], vert[1], vert[2]);
 				}
 				break;
 			}
@@ -691,10 +667,6 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
                 printf("\n");
 #endif
 
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
-
-				extra->zbuffer = &state->m_zbuffer;
-
 				for (i=0; i < 4; i++)
 				{
 					vert[i].p[1] = polygon_fifo[ptr++];
@@ -710,11 +682,11 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 						vert[2].p[1] == vert[3].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						poly_render_quad(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						render_polygon<4>(visarea, render_delegate(FUNC(taitojc_renderer::render_solid_scan), this), 2, vert);
 					}
 					else
 					{
-						poly_render_quad(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						render_polygon<4>(visarea, render_delegate(FUNC(taitojc_renderer::render_shade_scan), this), 2, vert);
 					}
 				}
 				break;
@@ -759,16 +731,14 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
                 printf("\n");
 #endif
 
-				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+				taitojc_polydata &extra = object_data_alloc();
 				UINT16 texbase = polygon_fifo[ptr++];
 
-				extra->zbuffer = &state->m_zbuffer;
-				extra->texture = state->m_texture;
-				extra->tex_base_x = ((texbase >> 0) & 0xff) << 4;
-				extra->tex_base_y = ((texbase >> 8) & 0xff) << 4;
+				extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
+				extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-				extra->tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-				extra->tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+				extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
+				extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
 
 				for (i=0; i < 4; i++)
 				{
@@ -782,7 +752,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 				{
-					poly_render_quad(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
+					render_polygon<4>(visarea, render_delegate(FUNC(taitojc_renderer::render_texture_scan), this), 4, vert);
 				}
 				break;
 			}
@@ -795,7 +765,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 		}
 	}
 
-	poly_wait(state->m_poly, "Finished render");
+	wait("Finished render");
 }
 
 void taitojc_clear_frame(running_machine &machine)

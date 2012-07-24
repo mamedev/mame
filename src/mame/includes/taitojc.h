@@ -1,7 +1,37 @@
-#include "video/poly.h"
+#include "video/polynew.h"
 
 #define TAITOJC_POLYGON_FIFO_SIZE		0x20000
 
+struct taitojc_polydata
+{
+	int tex_base_x;
+	int tex_base_y;
+	int tex_wrap_x;
+	int tex_wrap_y;
+};
+
+class taitojc_renderer : public poly_manager<float, taitojc_polydata, 6, 10000>
+{
+public:
+	taitojc_renderer(running_machine &machine, bitmap_ind16 *fb, bitmap_ind16 *zb, const UINT8 *texture_ram)
+		: poly_manager<float, taitojc_polydata, 6, 10000>(machine)
+	{
+		m_framebuffer = fb;
+		m_zbuffer = zb;
+		m_texture = texture_ram;
+	}
+
+	void render_solid_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
+	void render_shade_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
+	void render_texture_scan(INT32 scanline, const extent_t &extent, const taitojc_polydata &extradata, int threadid);
+
+	void render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
+
+private:
+	bitmap_ind16 *m_framebuffer;
+	bitmap_ind16 *m_zbuffer;
+	const UINT8 *m_texture;
+};
 
 class taitojc_state : public driver_device
 {
@@ -35,6 +65,8 @@ public:
 	required_shared_ptr<UINT16> m_dsp_shared_ram;
 	required_shared_ptr<UINT32> m_palette_ram;
 
+	taitojc_renderer *m_renderer;
+
 	int m_texture_x;
 	int m_texture_y;
 
@@ -56,8 +88,6 @@ public:
 	UINT32 *m_char_ram;
 	UINT32 *m_tile_ram;
 	tilemap_t *m_tilemap;
-
-	poly_manager *m_poly;
 
 	UINT16 *m_polygon_fifo;
 	int m_polygon_fifo_ptr;
