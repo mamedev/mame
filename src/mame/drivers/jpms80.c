@@ -8,6 +8,8 @@
 
   AY8910?
 
+  TMS9902
+  (is there a 9901 as well?)
 
  ---
 
@@ -20,6 +22,7 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
+#include "machine/tms9902.h"
 
 class jpms80_state : public driver_device
 {
@@ -41,7 +44,15 @@ static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8, jpms80_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8, jpms80_state )
-
+	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
+//	AM_RANGE(0x0000, 0x000f) // I/O & Optic (in) / Reels (out)
+//	AM_RANGE(0x0050, 0x0050) // INT1 enable (lv3)
+//	AM_RANGE(0x0051, 0x0051) // INT2 enable (lv4)
+//	AM_RANGE(0x0052, 0x0052) // Watchdog
+//	AM_RANGE(0x0053, 0x0053) // I/O Enable
+//	AM_RANGE(0x0140, 0x015f) // AY
+	AM_RANGE(0x01e0, 0x01ff) AM_DEVREADWRITE("tms9902duart", tms9902_device, cruread, cruwrite)
+//  Lamps, Meters etc. can move around	
 ADDRESS_MAP_END
 
 
@@ -63,6 +74,16 @@ static const ay8910_interface ay8910_interface_jpm =
 // these are wrong
 #define MAIN_CLOCK 2000000
 #define SOUND_CLOCK 2000000
+#define DUART_CLOCK 2000000
+
+static const tms9902_interface tms9902_config =
+{
+	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
+	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
+	DEVCB_NULL,				/* called when a character is transmitted */
+	DEVCB_NULL				/* called for setting interface parameters and line states */
+};
+
 
 static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	/* basic machine hardware */
@@ -72,11 +93,16 @@ static MACHINE_CONFIG_START( jpms80, jpms80_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_TMS9902_ADD("tms9902duart", tms9902_config,	DUART_CLOCK)
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_CONFIG(ay8910_interface_jpm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+/********* not much is known about these older platforms, they're probably similar tho ***************/
+
+/* System with RAM at 0x0e00 */
 
 static ADDRESS_MAP_START( jpms_older_e00_map, AS_PROGRAM, 8, jpms80_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
@@ -86,12 +112,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jpms_older_e00_io, AS_IO, 8, jpms80_state )
 ADDRESS_MAP_END
 
-
 static MACHINE_CONFIG_START( jpms_older_e00, jpms80_state )
 	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(jpms_older_e00_map)
 	MCFG_CPU_IO_MAP(jpms_older_e00_io)
 MACHINE_CONFIG_END
+
+/* System with RAM at 0x0c00 */
 
 static ADDRESS_MAP_START( jpms_older_c00_map, AS_PROGRAM, 8, jpms80_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM

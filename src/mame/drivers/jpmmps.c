@@ -26,6 +26,7 @@
 #include "cpu/tms9900/tms9900l.h"
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
+#include "machine/tms9902.h"
 
 class jpmmps_state : public driver_device
 {
@@ -54,6 +55,26 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpmmps_io_map, AS_IO, 8, jpmmps_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("tms9902_ic5", tms9902_device, cruread, cruwrite)
+	
+//	AM_RANGE(0x0020, 0x0020) // power fail
+//	AM_RANGE(0x0021, 0x0021) // wd timeout
+//	AM_RANGE(0x0022, 0x0022) // invalid access
+//	AM_RANGE(0x0023, 0x0023) // clear down
+	
+//	AM_RANGE(0x0026, 0x0026) // uart4 int
+//	AM_RANGE(0x0027, 0x0027) // uart2 int
+
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE("tms9902_ic10", tms9902_device, cruread, cruwrite)
+
+//	AM_RANGE(0x0060, 0x0060) // watchdog
+//	AM_RANGE(0x0061, 0x0061) // ram en
+//	AM_RANGE(0x0062, 0x0062) // alarm
+//	AM_RANGE(0x0063, 0x0063) // nmi en
+//	AM_RANGE(0x0064, 0x0064) // reel en
+//	AM_RANGE(0x0065, 0x0065) // io en
+//	AM_RANGE(0x0066, 0x0066) // bb
+//	AM_RANGE(0x0067, 0x0067) // diagnostic led
 ADDRESS_MAP_END
 
 
@@ -100,10 +121,28 @@ static I8255_INTERFACE (ppi8255_intf_ic25)
 	DEVCB_NULL						/* Port C write */
 };
 
+// Communication with Reel MCU
+static const tms9902_interface tms9902_uart4_ic10_params =
+{
+	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
+	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
+	DEVCB_NULL,				/* called when a character is transmitted */
+	DEVCB_NULL				/* called for setting interface parameters and line states */
+};
+
+// Communication with Security / Printer
+static const tms9902_interface tms9902_uart2_ic5_params =
+{
+	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
+	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
+	DEVCB_NULL,				/* called when a character is transmitted */
+	DEVCB_NULL				/* called for setting interface parameters and line states */
+};
 
 // these are wrong
 #define MAIN_CLOCK 2000000
 #define SOUND_CLOCK 2000000
+#define DUART_CLOCK 2000000
 
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
@@ -116,6 +155,10 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 	MCFG_I8255_ADD( "ppi8255_ic21", ppi8255_intf_ic21 )
 	MCFG_I8255_ADD( "ppi8255_ic22", ppi8255_intf_ic22 )
 	MCFG_I8255_ADD( "ppi8255_ic25", ppi8255_intf_ic25 )
+
+	MCFG_TMS9902_ADD("tms9902_ic10", tms9902_uart4_ic10_params,	DUART_CLOCK)
+	MCFG_TMS9902_ADD("tms9902_ic5",  tms9902_uart2_ic5_params,	DUART_CLOCK)
+
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
