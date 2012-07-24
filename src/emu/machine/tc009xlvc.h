@@ -43,6 +43,8 @@ public:
 	UINT8 *m_palette_ram;
 	UINT8 *m_vregs;
 	UINT8 *m_bitmap_ram;
+	
+	UINT8 *m_pcg_ram;
 	UINT8 *m_pcg1_ram;
 	UINT8 *m_pcg2_ram;
 	UINT8 *m_vram0;
