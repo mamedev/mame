@@ -191,7 +191,7 @@ void bfm_bd1_t::update_display()
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bd1_t::blank(int data)
 {
-	switch ( data & 0x04 )
+	switch ( data & 0x04 ) // TODO: wrong case values???
 	{
 		case 0x00:	// clear blanking
 		{
@@ -235,7 +235,7 @@ void bfm_bd1_t::blank(int data)
 		{
 			for (int i = 0; i < 15; i++)
 			{
-					m_attrs[i] = AT_BLANK;
+				m_attrs[i] = AT_BLANK;
 			}
 		}
 		break;

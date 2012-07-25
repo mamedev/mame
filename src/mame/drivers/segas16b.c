@@ -1636,7 +1636,7 @@ static READ16_HANDLER( aceattac_custom_io_r )
 			}
 			break;
 		case 0x3000/2:
-			switch (offset & 3)
+			switch (offset & 7)
 			{
 				case 0:	return state->ioport("HANDX1")->read();
 				case 1:	return state->ioport("TRACKX1")->read();

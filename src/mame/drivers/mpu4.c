@@ -972,7 +972,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
         of making the game fair, short of simulating the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
-			switch ((machine().rand()>>5) & 0x2)
+			switch ((machine().rand()>>5) % 0x3)
 			{
 				case 0x00: //Top row
 				{

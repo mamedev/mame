@@ -1324,7 +1324,7 @@ static void tgp_render(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 				list += 6;
 				break;
 			case 0xf:
-			case -1:
+			//case -1:
 				goto end;
 			default:
 				LOG_TGP(("VIDEO:   unknown type %d\n", type));
