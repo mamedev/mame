@@ -91,7 +91,7 @@ READ8_MEMBER(dfruit_state::dfruit_rom_r)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	return ROM[offset + 0x10000 + m_rom_bank * 0x2000];
+	return ROM[offset + m_rom_bank * 0x2000];
 }
 
 READ8_MEMBER(dfruit_state::dfruit_rom_bank_r)
@@ -421,9 +421,8 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( dfruit )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "n-3800ii_ver.1.20.ic2", 0x00000, 0x40000, CRC(4e7c3700) SHA1(17bc731a91460d8f67c2b2b6e038641d57cf93be) )
-	ROM_RELOAD(              0x10000, 0x40000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )

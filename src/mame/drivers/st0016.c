@@ -694,5 +694,5 @@ GAME(  1994, mayjisn2,	0,	    mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",      "
 GAME(  1995, koikois,   0,	    st0016,   koikois,  renju,    ROT0, "Visco",     "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
 GAME( 1994, mayjinsn,	0,	    mayjinsn, st0016,   mayjinsn, ROT0, "Seta",      "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
-GAME( 199?, dcrown,	    0,      st0016,   renju,    renju,    ROT0, "<unknown>", "Dream Crown (Set 1)", GAME_NOT_WORKING)
-GAME( 199?, dcrowna,    dcrown, st0016,   renju,    renju,    ROT0, "<unknown>", "Dream Crown (Set 2)", GAME_NOT_WORKING)
+GAME( 1994, dcrown,	    0,      st0016,   renju,    renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", GAME_NOT_WORKING) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   renju,    renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", GAME_NOT_WORKING) // the Insert Coin text has been translated to English and no (c) is uploaded

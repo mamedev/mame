@@ -92,7 +92,7 @@ READ8_MEMBER(lastbank_state::lastbank_rom_r)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	return ROM[offset + 0x10000 + m_rom_bank * 0x2000];
+	return ROM[offset + m_rom_bank * 0x2000];
 }
 
 READ8_MEMBER(lastbank_state::lastbank_rom_bank_r)
@@ -494,9 +494,8 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( lastbank )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
-	ROM_RELOAD(              0x10000, 0x40000 )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
