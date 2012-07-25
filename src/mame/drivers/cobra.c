@@ -979,6 +979,9 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
+//	AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM							// PSAC (ROZ) in Racing Jam.
+//	AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM							// LANC
+//	AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM							// LANC
 	AM_RANGE(0x7e380000, 0x7e380003) AM_MIRROR(0x80000000) AM_READWRITE(sub_mainbd_r, sub_mainbd_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)		/* Boot ROM */
 ADDRESS_MAP_END
@@ -1859,9 +1862,11 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 		fifo_push(&space.device(), GFXFIFO_OUT, 0);
 	}
 }
-#if 0
-static void gfx_cpu_dc_store(const device_t *device, UINT32 address)
+
+static void gfx_cpu_dc_store(device_t *device, UINT32 address)
 {
+	cobra_state *cobra = device->machine().driver_data<cobra_state>();
+
 	if (address == 0x10000000 || address == 0x18000000 || address == 0x1e000000)
 	{
 		UINT64 i = (UINT64)(gfx_fifo_cache_addr) << 32;
@@ -1875,14 +1880,14 @@ static void gfx_cpu_dc_store(const device_t *device, UINT32 address)
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[3] >> 32) | i);
 		fifo_push(device, GFXFIFO_IN, (UINT32)(gfx_fifo_mem[3] >>  0) | i);
 
-		gfx_fifo_exec();
+		gfx_fifo_exec(cobra);
 	}
 	else
 	{
 		logerror("gfx: data cache store at %08X\n", address);
 	}
 }
-#endif
+
 WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 {
 	if (ACCESSING_BITS_40_47)
@@ -2057,7 +2062,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(cobra)
 {
-//  cobra_state *cobra = machine.driver_data<cobra_state>();
+	cobra_state *cobra = machine.driver_data<cobra_state>();
 
 	fifo_init(machine, GFXFIFO_IN, 8192, "GFXFIFO_IN", GFXFIFO_IN_VERBOSE);
 	fifo_init(machine, GFXFIFO_OUT, 8192, "GFXFIFO_OUT", GFXFIFO_OUT_VERBOSE);
@@ -2065,7 +2070,7 @@ static DRIVER_INIT(cobra)
 	fifo_init(machine, S2MFIFO, 2048, "S2MFIFO", S2MFIFO_VERBOSE);
 
 #if ENABLE_GFX_CPU
-//  ppc_set_dcstore_handler(cobra->m_gfxcpu, gfx_cpu_dc_store);
+	ppc_set_dcstore_callback(cobra->m_gfxcpu, gfx_cpu_dc_store);
 
 	cobra_gfx_init(&machine);
 #endif
