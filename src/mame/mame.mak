@@ -1878,8 +1878,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/umipoker.o \
 	$(DRIVERS)/unkfr.o \
 	$(DRIVERS)/unkhorse.o \
-	$(DRIVERS)/unkpcp.o \
-	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
+ 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
 	$(DRIVERS)/vectrex.o $(VIDEO)/vectrex.o $(MACHINE)/vectrex.o \
