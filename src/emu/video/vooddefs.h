@@ -1723,6 +1723,16 @@ struct _banshee_info
 	UINT8				gc[0x05];				/* VGA graphics controller registers */
 	UINT8				att[0x15];				/* VGA attribute registers */
 	UINT8				attff;					/* VGA attribute flip-flop */
+
+	UINT32				blt_regs[0x20];			/* 2D Blitter registers */
+	UINT32				blt_base;
+	UINT32				blt_x;
+	UINT32				blt_y;
+	UINT32				blt_width;
+	UINT32				blt_height;
+	UINT32				blt_stride;
+	UINT32				blt_bpp;
+	UINT32				blt_cmd;
 };
 
 

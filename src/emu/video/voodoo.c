@@ -4260,21 +4260,9 @@ READ32_DEVICE_HANDLER( banshee_rom_r )
 	return 0xffffffff;
 }
 
-
-int blt_base;
-int blt_x, blt_y;
-int blt_width, blt_height;
-int blt_format;
-int blt_stride;
-int blt_bpp;
-
-int blt_cur_x, blt_cur_y, blt_cur_bpp, blt_cur_base;
-int blt_cur_stride, blt_cur_width, blt_cur_height;
-int blt_cmd;
-
 static void blit_2d(voodoo_state *v, UINT32 data)
 {
-	switch (blt_cmd)
+	switch (v->banshee.blt_cmd)
 	{
 		case 0:			// NOP - wait for idle
 		{
@@ -4297,46 +4285,46 @@ static void blit_2d(voodoo_state *v, UINT32 data)
 
 		case 3:			// Host-to-screen blit
 		{
-			UINT32 addr = blt_cur_base;
+			UINT32 addr = v->banshee.blt_base;
 
-			addr += (blt_cur_y * blt_cur_stride) + (blt_cur_x * blt_cur_bpp);
+			addr += (v->banshee.blt_y * v->banshee.blt_stride) + (v->banshee.blt_x * v->banshee.blt_bpp);
 
 #if LOG_BANSHEE_2D
-			logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, blt_cur_x, blt_cur_y);
+			logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, v->banshee.blt_x, v->banshee.blt_y);
 #endif
 
-			switch (blt_cur_bpp)
+			switch (v->banshee.blt_bpp)
 			{
 				case 1:
 					v->fbi.ram[addr+0] = data & 0xff;
 					v->fbi.ram[addr+1] = (data >> 8) & 0xff;
 					v->fbi.ram[addr+2] = (data >> 16) & 0xff;
 					v->fbi.ram[addr+3] = (data >> 24) & 0xff;
-					blt_cur_x += 4;
+					v->banshee.blt_x += 4;
 					break;
 				case 2:
 					v->fbi.ram[addr+1] = data & 0xff;
 					v->fbi.ram[addr+0] = (data >> 8) & 0xff;
 					v->fbi.ram[addr+3] = (data >> 16) & 0xff;
 					v->fbi.ram[addr+2] = (data >> 24) & 0xff;
-					blt_cur_x += 2;
+					v->banshee.blt_x += 2;
 					break;
 				case 3:
-					blt_cur_x += 1;
+					v->banshee.blt_x += 1;
 					break;
 				case 4:
 					v->fbi.ram[addr+3] = data & 0xff;
 					v->fbi.ram[addr+2] = (data >> 8) & 0xff;
 					v->fbi.ram[addr+1] = (data >> 16) & 0xff;
 					v->fbi.ram[addr+0] = (data >> 24) & 0xff;
-					blt_cur_x += 1;
+					v->banshee.blt_x += 1;
 					break;
 			}
 
-			if (blt_cur_x >= blt_cur_width)
+			if (v->banshee.blt_x >= v->banshee.blt_width)
 			{
-				blt_cur_x = 0;
-				blt_cur_y++;
+				v->banshee.blt_x = 0;
+				v->banshee.blt_y++;
 			}
 			break;
 		}
@@ -4363,7 +4351,7 @@ static void blit_2d(voodoo_state *v, UINT32 data)
 
 		default:
 		{
-			fatalerror("blit_2d: unknown command %d\n", blt_cmd);
+			fatalerror("blit_2d: unknown command %d\n", v->banshee.blt_cmd);
 		}
 	}
 }
@@ -4376,137 +4364,133 @@ static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data)
 #if LOG_BANSHEE_2D
 			logerror("   2D:command: cmd %d, ROP0 %02X\n", data & 0x3, data >> 24);
 #endif
-			blt_cur_x = blt_x;
-			blt_cur_y = blt_y;
-			blt_cur_bpp = blt_bpp;
-			blt_cur_base = blt_base;
-			blt_cur_stride = blt_stride;
-			blt_cur_width = blt_width;
-			blt_cur_height = blt_height;
+			v->banshee.blt_x		= v->banshee.blt_regs[banshee2D_srcXY] & 0xfff;
+			v->banshee.blt_y		= (v->banshee.blt_regs[banshee2D_srcXY] >> 16) & 0xfff;
+			v->banshee.blt_base		= v->banshee.blt_regs[banshee2D_dstBaseAddr] & 0xffffff;
+			v->banshee.blt_stride	= v->banshee.blt_regs[banshee2D_dstFormat] & 0x3fff;
+			v->banshee.blt_width	= v->banshee.blt_regs[banshee2D_dstSize] & 0xfff;
+			v->banshee.blt_height	= (v->banshee.blt_regs[banshee2D_dstSize] >> 16) & 0xfff;
 
-			blt_cmd = data & 0x3;
+			switch ((v->banshee.blt_regs[banshee2D_dstFormat] >> 16) & 0x7)
+			{
+				case 1: v->banshee.blt_bpp = 1; break;
+				case 3: v->banshee.blt_bpp = 2; break;
+				case 4: v->banshee.blt_bpp = 3; break;
+				case 5: v->banshee.blt_bpp = 4; break;
+				default: v->banshee.blt_bpp = 1; break;
+			}
+
+			v->banshee.blt_cmd = data & 0x3;
 			break;
 
 		case banshee2D_colorBack:
 #if LOG_BANSHEE_2D
 			logerror("   2D:colorBack: %08X\n", data);
 #endif
+			v->banshee.blt_regs[banshee2D_colorBack] = data;
 			break;
 
 		case banshee2D_colorFore:
 #if LOG_BANSHEE_2D
 			logerror("   2D:colorFore: %08X\n", data);
 #endif
+			v->banshee.blt_regs[banshee2D_colorFore] = data;
 			break;
 
 		case banshee2D_srcBaseAddr:
 #if LOG_BANSHEE_2D
 			logerror("   2D:srcBaseAddr: %08X, %s\n", data & 0xffffff, data & 0x80000000 ? "tiled" : "non-tiled");
 #endif
+			v->banshee.blt_regs[banshee2D_srcBaseAddr] = data;
 			break;
 
 		case banshee2D_dstBaseAddr:
 #if LOG_BANSHEE_2D
 			logerror("   2D:dstBaseAddr: %08X, %s\n", data & 0xffffff, data & 0x80000000 ? "tiled" : "non-tiled");
 #endif
-			blt_base = data & 0xffffff;
+			v->banshee.blt_regs[banshee2D_dstBaseAddr] = data;
 			break;
 
 		case banshee2D_srcSize:
 #if LOG_BANSHEE_2D
 			logerror("   2D:srcSize: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
+			v->banshee.blt_regs[banshee2D_srcSize] = data;
 			break;
 
 		case banshee2D_dstSize:
 #if LOG_BANSHEE_2D
 			logerror("   2D:dstSize: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
-			blt_width = data & 0xfff;
-			blt_height = (data >> 16) & 0xfff;
+			v->banshee.blt_regs[banshee2D_dstSize] = data;
 			break;
 
 		case banshee2D_srcXY:
 #if LOG_BANSHEE_2D
 			logerror("   2D:srcXY: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
-			blt_x = data & 0xfff;
-			blt_y = (data >> 16) & 0xfff;
+			v->banshee.blt_regs[banshee2D_srcXY] = data;
 			break;
 
 		case banshee2D_dstXY:
 #if LOG_BANSHEE_2D
 			logerror("   2D:dstXY: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
+			v->banshee.blt_regs[banshee2D_dstXY] = data;
 			break;
 
 		case banshee2D_srcFormat:
 #if LOG_BANSHEE_2D
 			logerror("   2D:srcFormat: str %d, fmt %d, packing %d\n", data & 0x3fff, (data >> 16) & 0xf, (data >> 22) & 0x3);
 #endif
+			v->banshee.blt_regs[banshee2D_srcFormat] = data;
 			break;
 
 		case banshee2D_dstFormat:
 #if LOG_BANSHEE_2D
 			logerror("   2D:dstFormat: str %d, fmt %d\n", data & 0x3fff, (data >> 16) & 0xf);
 #endif
-			blt_format = (data >> 16) & 0x7;
-			blt_stride = data & 0x3fff;
-
-			blt_bpp = 1;
-			switch (blt_format)
-			{
-				case 1:	blt_bpp = 1; break;
-				case 3: blt_bpp = 2; break;
-				case 4: blt_bpp = 3; break;
-				case 5: blt_bpp = 4; break;
-			}
+			v->banshee.blt_regs[banshee2D_dstFormat] = data;
 			break;
 
 		case banshee2D_clip0Min:
 #if LOG_BANSHEE_2D
 			logerror("   2D:clip0Min: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
+			v->banshee.blt_regs[banshee2D_clip0Min] = data;
 			break;
 
 		case banshee2D_clip0Max:
 #if LOG_BANSHEE_2D
 			logerror("   2D:clip0Max: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
+			v->banshee.blt_regs[banshee2D_clip0Max] = data;
 			break;
 
 		case banshee2D_clip1Min:
 #if LOG_BANSHEE_2D
 			logerror("   2D:clip1Min: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
+			v->banshee.blt_regs[banshee2D_clip1Min] = data;
 			break;
 
 		case banshee2D_clip1Max:
 #if LOG_BANSHEE_2D
 			logerror("   2D:clip1Max: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
 #endif
+			v->banshee.blt_regs[banshee2D_clip1Max] = data;
 			break;
 
 		case banshee2D_rop:
 #if LOG_BANSHEE_2D
 			logerror("   2D:rop: %d, %d, %d\n",  data & 0xff, (data >> 8) & 0xff, (data >> 16) & 0xff);
 #endif
+			v->banshee.blt_regs[banshee2D_rop] = data;
 			break;
 
 		default:
 			if (offset >= 0x20 && offset < 0x40)
 			{
-				/*
-                logerror("   2D:launch: %08x -> %08x, %d remaining\n", data, blt_base, blt_count);
-                v->fbi.ram[blt_base+3] = (data >> 24) & 0xff;
-                v->fbi.ram[blt_base+2] = (data >> 16) & 0xff;
-                v->fbi.ram[blt_base+1] = (data >> 8) & 0xff;
-                v->fbi.ram[blt_base+0] = data & 0xff;
-
-                blt_count -= 4;
-                blt_base += 4;
-                */
-
 				blit_2d(v, data);
 			}
 			else if (offset >= 0x40 && offset < 0x80)
