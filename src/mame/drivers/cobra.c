@@ -1777,7 +1777,7 @@ READ64_MEMBER(cobra_state::gfx_unk1_r)
 
 		r |= (UINT64) 0x7f << 40;
 	}
-	if (ACCESSING_BITS_24_31)
+	if (ACCESSING_BITS_24_31)			// this register returns FIFO number during check_fifo (see below)
 	{
 		r |= (gfx_unknown_v1 & 3) << 24;
 	}
@@ -1807,7 +1807,7 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 		{
 			fifo_pop(&space.device(), GFXFIFO_IN, &in1);
 			fifo_pop(&space.device(), GFXFIFO_IN, &in2);
-			gfx_unknown_v1 = (UINT32)(in1 >> 32);
+			gfx_unknown_v1 = (UINT32)(in1 >> 32);			// FIFO number is read back from this same register
 
 			fifo_push(&space.device(), GFXFIFO_OUT, in1 & 0xffffffff);
 			fifo_push(&space.device(), GFXFIFO_OUT, in2 & 0xffffffff);
@@ -2124,6 +2124,7 @@ static DRIVER_INIT(bujutsu)
 		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
 
 		rom[(0x022d4^4) / 4] = 0x60000000;		// skip init_raster() for now ...
+		rom[(0x01ac8^4) / 4] = 0x60000000;		// this op changes SDR1 to 0x7f000000 which breaks page translation
 
 		// calculate the checksum of the patched rom...
 		for (i=0; i < 0x20000/4; i++)
