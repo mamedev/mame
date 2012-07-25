@@ -41,6 +41,7 @@
 #define PPCCAP_603_MMU				0x20		/* TRUE if we have 603-class MMU features */
 #define PPCCAP_MFIOC                0x40        /* TRUE if we have memory-forced I/O controller interface accesses */
 #define PPCCAP_601BAT               0x80        /* TRUE if we're doing 601-style BATs (unified I/D, different bit layout) */
+#define PPCCAP_604_MMU				0x100		/* TRUE if we have 604-class MMU features */
 
 /* PowerPC flavors */
 enum _powerpc_flavor
@@ -533,7 +534,7 @@ struct _powerpc_state
 
 	/* architectural distinctions */
 	powerpc_flavor	flavor;
-	UINT8			cap;
+	UINT32			cap;
 	UINT8			cache_line_size;
 	UINT32			tb_divisor;
 
@@ -578,7 +579,7 @@ struct _powerpc_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback);
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback);
 void ppccom_exit(powerpc_state *ppc);
 
 void ppccom_reset(powerpc_state *ppc);
