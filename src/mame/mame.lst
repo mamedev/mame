@@ -17754,6 +17754,7 @@ mv1guac		// Give Us A Clue
 mv1guaca	//
 mv1sfx		// Special Effects
 mv1sfxa		//
+mv1sfx2
 mv1wc		// World Cup
 
 // Maygay 68K based SWP hardware
@@ -18079,6 +18080,7 @@ m4clr		// MPU4 Meter Clear ROM
 m4tenten	// 10 X 10 (Barcrest)
 m421club	// 21 Club (Barcrest)
 m4actbnk	// Action Bank (Barcrest)
+m4actbnka
 m4actclb	// Action Club (Barcrest)
 m4actnot	// Action Note (Barcrest)
 m4actpak	// Action Pack (Barcrest)
@@ -19954,6 +19956,8 @@ pr_sevml		// Sevens & Melons (Project)
 pr_theme		// Theme Park (Project)
 pr_ttrai		// Treasure Trail (Project)
 pr_trpx			// Triple X (Project)
+pr_trktr		// Trick or Treat (Project)
+pr_trktp
 pr_walls		// Wall Street (Project)
 pr_whlft		// Wheel Of Fortune (Project)
 pr_wldkn		// Wild Kings (Project)

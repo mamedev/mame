@@ -957,7 +957,15 @@ ROM_START( pr_sptb )
 	ROM_LOAD( "simplythebest091a20pn.bin", 0x0000, 0x010000, CRC(8402d11f) SHA1(bc10f29c546fda03e18238811956c56546fa8bef) ) // wrong hardware
 ROM_END
 
+ROM_START( pr_trktr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "305a30pn.121", 0x00000, 0x010000, CRC(8ed1467c) SHA1(572a84bfaa5a2cef49404425058b96e1e0102cca) )
+ROM_END
 
+ROM_START( pr_trktp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "305a30pn.990", 0x00000, 0x010000, CRC(5448e7d5) SHA1(81414083341364c011ab814a3f57d0831edb3036) )
+ROM_END
 
 DRIVER_INIT( proconn )
 {
@@ -1013,6 +1021,8 @@ GAME( 199?, pr_sevml		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Sevens 
 GAME( 199?, pr_theme		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Theme Park (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_ttrai		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Treasure Trail (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_trpx			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Triple X (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1999, pr_trktr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Trick or Treat (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1999, pr_trktp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Trick or Treat (Protocol?) (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_walls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wall Street (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_whlft		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wheel Of Fortune (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_wldkn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wild Kings (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )

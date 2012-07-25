@@ -3161,6 +3161,16 @@ ROM_START( m4actbnk )
 	ROM_LOAD( "actsnd.p2", 0x080000, 0x080000, CRC(2e832d40) SHA1(622b2c9694714446dbf67beb67d03af97d14ece7) )
 ROM_END
 
+ROM_START( m4actbnka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ac30_prom2.bin", 0x0000, 0x04000, CRC(595615cd) SHA1(42d2028d11e2160c67f0dfde5a1ad805c0dc0fe1) )
+	ROM_LOAD( "ac30_prom1.bin", 0x4000, 0x08000, CRC(6765aef1) SHA1(4158bd2ff65434f040ef6505adc5026710031756) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "actsnd.p1", 0x000000, 0x080000, CRC(34777fea) SHA1(be784e73586719219ae5c1a3841f0e44edb6b497) )
+	ROM_LOAD( "actsnd.p2", 0x080000, 0x080000, CRC(2e832d40) SHA1(622b2c9694714446dbf67beb67d03af97d14ece7) )
+ROM_END
+
 ROM_START( m4actclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "abcs.p1", 0x0000, 0x010000, CRC(cf730606) SHA1(35b95b924a24b306428c6c81136c14d7732e2356) )
@@ -13728,9 +13738,12 @@ ROM_START( m4twstr )
 	ROM_LOAD( "fda103p.bin", 0x0000, 0x010000, CRC(61e9a21d) SHA1(940abedbbfaa40534c8be7136369cbf404e4c9a8) )
 	ROM_LOAD( "fds103.bin", 0x0000, 0x010000, CRC(4282cba9) SHA1(a664d342482e50604f9a585a1887f342b95caf00) )
 	ROM_LOAD( "fds103p.bin", 0x0000, 0x010000, CRC(764bd0a8) SHA1(cea826c94ce28ab3e47071846756a7e1effa5d1b) )
+	ROM_LOAD( "twisterprog.bin", 0x0000, 0x010000, CRC(96209a3e) SHA1(434aa824a517929d9ace959b06f2d38464a54541) )
 
+	
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD( "twistersound.bin", 0x000000, 0x100000, CRC(5aa2729b) SHA1(cf490ec6c75c038addcff24655cd6e498cad60c1) )
+	
 ROM_END
 
 
@@ -13744,7 +13757,7 @@ ROM_START( m4twstcl )
 	ROM_LOAD( "fl106p.bin", 0x0000, 0x010000, CRC(93dd36e7) SHA1(eded1b5748cb24af80ab392a5fd4d2cc312a66a2) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD( "twistersound.bin", 0x000000, 0x100000, CRC(5aa2729b) SHA1(cf490ec6c75c038addcff24655cd6e498cad60c1) )//From original, may be wrong
 ROM_END
 
 
@@ -15208,7 +15221,8 @@ GAME( 198?, m4clr,        0, mod2    ,   mpu4,       0,       ROT0, "Barcrest","
 /* I don't actually think all of these are Barcrest, some are mislabeled */
 GAME(199?, m4tenten	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","10 X 10 (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )  // gives WRONG SOUND, NEEDS V1 (can be skipped with 1)
 GAME(199?, m421club	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // not english
-GAME(199?, m4actbnk	,0			,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
+GAME(199?, m4actbnk	,0			,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (set 1) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
+GAME(199?, m4actbnka,m4actbnk	,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (set 2) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
 GAME(199?, m4actclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4)",						GAME_FLAGS )
 GAME(199?, m4actnot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) [AN 1.2] (MPU4)",						GAME_FLAGS )
 GAME(199?, m4actpak	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4)",						GAME_FLAGS )
