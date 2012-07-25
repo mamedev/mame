@@ -260,9 +260,9 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 			for (x=0;x<128;x++)
 			{
 				UINT16 tile = state->m_bg_vram[count] & 0x1fff;
-				UINT16 color = (state->m_fg_vram[count] & 0xe000) >> 13;
+				UINT16 color = (state->m_bg_vram[count] & 0xe000) >> 13;
 
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,(x*8)+screen_shift,(y*8),0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x190,0,0,(x*8)+screen_shift,(y*8),0);
 
 				count++;
 
