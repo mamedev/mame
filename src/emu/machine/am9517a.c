@@ -118,6 +118,7 @@ inline void am9517a_device::dma_request(int channel, int state)
 	{
 		m_status &= ~(1 << (channel + 4));
 	}
+	trigger(1);
 }
 
 
@@ -142,7 +143,7 @@ inline bool am9517a_device::is_software_request_active(int channel)
 
 
 //-------------------------------------------------
-//  set_hreq -
+//  set_hreq 
 //-------------------------------------------------
 
 inline void am9517a_device::set_hreq(int state)
@@ -498,6 +499,11 @@ void am9517a_device::execute_run()
 					}
 				}
 			}
+			if(m_state == STATE_SI)
+			{
+				suspend_until_trigger(1, true);
+				m_icount = 0;
+			}
 			break;
 
 		case STATE_S0:
@@ -507,13 +513,24 @@ void am9517a_device::execute_run()
 			{
 				m_state = (MODE_MASK == MODE_CASCADE) ? STATE_SC : get_state1(true);
 			}
+			else
+			{
+				suspend_until_trigger(1, true);
+				m_icount = 0;
+			}
 			break;
 
 		case STATE_SC:
 			if (!is_request_active(m_current_channel))
 			{
+				set_hreq(0);
 				m_current_channel = -1;
 				m_state = STATE_SI;
+			}
+			else
+			{
+				suspend_until_trigger(1, true);
+				m_icount = 0;
 			}
 
 			set_dack();
@@ -649,7 +666,7 @@ READ8_MEMBER( am9517a_device::read )
 			data = m_status;
 
 			// clear TC bits
-			m_status &= 0x0f;
+			m_status &= 0xf0;
 			break;
 
 		case REGISTER_TEMPORARY:
@@ -793,6 +810,7 @@ WRITE8_MEMBER( am9517a_device::write )
 			break;
 		}
 	}
+	trigger(1);
 }
 
 
@@ -805,6 +823,7 @@ WRITE_LINE_MEMBER( am9517a_device::hack_w )
 	if (LOG) logerror("AM9517A '%s' Hold Acknowledge: %u\n", tag(), state);
 
 	m_hack = state;
+	trigger(1);
 }
 
 
