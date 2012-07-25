@@ -37,6 +37,12 @@
 
 # NO_X11 = 1
 
+# uncomment next line to disable XInput support for e.g. multiple lightguns 
+# using Wiimote driver (see http://spritesmods.com/?art=wiimote-mamegun for more info)
+# enabling NO_X11 also implies no XInput support, of course.
+
+# NO_USE_XINPUT = 1
+
 # uncomment and adapt next line to link against specific GL-Library
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
@@ -549,6 +555,17 @@ INCPATH += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
 
 #-------------------------------------------------
+# XInput
+#-------------------------------------------------
+
+ifneq ($(NO_USE_XINPUT),1)
+DEFS += -DUSE_XINPUT=1 -DUSE_XINPUT_DEBUG=0
+LIBS += -lXext -lXi
+else
+DEFS += -DUSE_XINPUT=0
+endif # USE_XINPUT
+
+#-------------------------------------------------
 # Network (TAP/TUN)
 #-------------------------------------------------
 
@@ -649,3 +666,4 @@ zip:
 	zip -rq ../mame_$(BUILD_VERSION).zip $(DISTFILES) $(EXCLUDES)
 
 endif
+

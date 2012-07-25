@@ -599,6 +599,16 @@ void sdlwindow_modify_prescale(running_machine &machine, sdl_window_info *window
 
 static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window)
 {
+#if (USE_XINPUT)
+	// Hack for wii-lightguns:
+	// they stop working with a grabbed mouse;
+	// even a ShowCursor(SDL_DISABLE) already does this.
+	// To make the cursor disappear, we'll just set an empty cursor image.
+	unsigned char data[]={0,0,0,0,0,0,0,0};
+	SDL_Cursor *c;
+	c=SDL_CreateCursor(data, data, 8, 8, 0, 0);
+	SDL_SetCursor(c);
+#else
 #if (SDLMAME_SDL2)
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
@@ -644,6 +654,7 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 			}
 		}
 	}
+#endif
 #endif
 }
 

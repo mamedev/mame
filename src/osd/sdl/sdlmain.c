@@ -216,6 +216,19 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_JOYINDEX "8",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #8" },
 	{ SDLOPTION_SIXAXIS,			         "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
 
+#if (USE_XINPUT)
+	// lightgun mapping
+	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL LIGHTGUN MAPPING" },
+	{ SDLOPTION_LIGHTGUNINDEX "1",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #1" },
+	{ SDLOPTION_LIGHTGUNINDEX "2",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #2" },
+	{ SDLOPTION_LIGHTGUNINDEX "3",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #3" },
+	{ SDLOPTION_LIGHTGUNINDEX "4",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #4" },
+	{ SDLOPTION_LIGHTGUNINDEX "5",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #5" },
+	{ SDLOPTION_LIGHTGUNINDEX "6",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #6" },
+	{ SDLOPTION_LIGHTGUNINDEX "7",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #7" },
+	{ SDLOPTION_LIGHTGUNINDEX "8",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #8" },
+#endif
+
 #if (SDLMAME_SDL2)
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL MOUSE MAPPING" },
 	{ SDLOPTION_MOUSEINDEX "1",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #1" },

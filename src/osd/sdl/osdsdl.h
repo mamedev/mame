@@ -78,6 +78,9 @@
 #define SDLOPTION_JOYINDEX				"joy_idx"
 #define SDLOPTION_KEYBINDEX				"keyb_idx"
 #define SDLOPTION_MOUSEINDEX			"mouse_index"
+#if (USE_XINPUT)
+#define SDLOPTION_LIGHTGUNINDEX			"lightgun_index"
+#endif
 
 #define SDLOPTION_SHADER_MAME			"glsl_shader_mame"
 #define SDLOPTION_SHADER_SCREEN			"glsl_shader_screen"
