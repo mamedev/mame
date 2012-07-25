@@ -348,27 +348,6 @@ WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 	/* unknown. always write 0 */
 }
 
-READ8_MEMBER(combatsc_state::combatsc_ym2203_r)
-{
-	device_t *device = machine().device("ymsnd");
-	int status = ym2203_r(device,offset);
-
-	if (cpu_get_pc(m_audiocpu) == 0x334)
-	{
-		if (m_boost)
-		{
-			m_boost = 0;
-			m_interleave_timer->adjust(attotime::zero, 0, m_audiocpu->cycles_to_attotime(80));
-		}
-		else if (status & 2)
-		{
-			m_boost = 1;
-			m_interleave_timer->adjust(attotime::zero);
-		}
-	}
-
-	return status;
-}
 
 /*************************************
  *
@@ -423,7 +402,7 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(combatsc_voice_reset_w)			/* upd7759 reset? */
 
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)								/* soundlatch_byte_r? */
-	AM_RANGE(0xe000, 0xe001) AM_READ(combatsc_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	/* YM 2203 intercepted */
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(combatsc_state::combatscb_dac_w)

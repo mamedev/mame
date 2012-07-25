@@ -64,7 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_play_w);
 	DECLARE_WRITE8_MEMBER(combatsc_voice_reset_w);
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
-	DECLARE_READ8_MEMBER(combatsc_ym2203_r);
 	DECLARE_WRITE8_MEMBER(combatscb_dac_w);
 };
 
