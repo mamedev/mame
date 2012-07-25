@@ -117,7 +117,11 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 			texel >>= 16;
 		}
 
-		fb[x] = texel ? 0xffffffff : 0xff000000;
+		UINT32 r = (texel & 0x7c00) << 9;
+		UINT32 g = (texel & 0x03e0) << 6;
+		UINT32 b = (texel & 0x001f) << 3;
+
+		fb[x] = 0xff000000 | r | g | b;
 
 		u += du;
 		v += dv;
