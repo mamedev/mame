@@ -12,7 +12,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pokechmp_bank_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_paletteram_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_videoram_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
 };

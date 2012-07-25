@@ -61,9 +61,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				if (flipx) flipx=0; else flipx=1;
 				if (flipy) flipy=0; else flipy=1;
 			}
+			int tileno = spriteram[offs+3];
+			if (spriteram[offs+1] & 0x01) tileno += 0x100;
+			if (spriteram[offs+1] & 0x08) tileno += 0x200;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
+					tileno,
 					(spriteram[offs+1] & 0xf0) >> 4,
 					flipx,flipy,
 					sx,sy,0);
