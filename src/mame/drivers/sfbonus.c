@@ -6173,6 +6173,7 @@ GAME( 200?, fb3g,        0,        sfbonus,    newer1_reels3,    fb3g,          
 GAME( 200?, getrich,     0,        sfbonus,    newer1_reels3,    getrich,         ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", 0) /* After Around The World */
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
+/* Version 4 is a multi-game that has New Fruit Bonus ‘96 Special Edition Ver. 4, New Cherry ‘96 Special Edition Ver. 4 or Skill Cherry ‘97 Ver. 4 */
 GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  GAME_NOT_WORKING)
 GAME( 2006, version4v,   version4, sfbonus,    amcoe1_reels3,    version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", GAME_NOT_WORKING)
 GAME( 2006, version4d2,  version4, sfbonus,    amcoe1_reels3,    version4d2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E CGA)",  GAME_NOT_WORKING)
@@ -6181,7 +6182,7 @@ GAME( 2006, version4d3,  version4, sfbonus,    amcoe1_reels3,    version4,      
 GAME( 2006, version4v3,  version4, sfbonus,    amcoe1_reels3,    version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3LT Dual)",GAME_NOT_WORKING)
 GAME( 2006, version4o,   version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R CGA)", GAME_NOT_WORKING)
 
-GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (2nd edition) (Version 2.0.4)", GAME_NOT_WORKING) /* After Around The World */
+GAME( 200?, spooky,      0,        sfbonus,    newer1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (2nd edition) (Version 2.0.4)", GAME_NOT_WORKING) /* After Around The World */
 
 
 // Known sets but no roms dumped at all for these:
@@ -6191,4 +6192,4 @@ GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,        
 
 
 // ?? what is this
-GAME( 200?, amclink,     0,        sfbonus,    newer1_reels3,    sfbonus_common,  ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", GAME_NOT_WORKING)
+GAME( 200?, amclink,     0,        sfbonus,    amcoe1_reels3,    sfbonus_common,  ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", GAME_NOT_WORKING)
