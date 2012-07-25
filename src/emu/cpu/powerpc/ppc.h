@@ -155,6 +155,7 @@ struct _powerpc_config
 	write32_device_func	dcr_write_func;
 };
 
+typedef void (*ppc_dcstore_handler)(device_t *device, UINT32 address);
 
 
 /***************************************************************************
@@ -167,6 +168,8 @@ void ppcdrc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycle
 
 void ppc4xx_spu_set_tx_handler(device_t *device, ppc4xx_spu_tx_handler handler);
 void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval);
+
+void ppc_set_dcstore_callback(device_t *device, ppc_dcstore_handler handler);
 
 
 DECLARE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);

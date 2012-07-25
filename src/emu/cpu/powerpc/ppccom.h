@@ -568,6 +568,8 @@ struct _powerpc_state
 
 	read32_device_func	dcr_read_func;
 	write32_device_func	dcr_write_func;
+
+	ppc_dcstore_handler dcstore_handler;
 };
 
 
@@ -600,6 +602,8 @@ void ppccom_execute_mfdcr(powerpc_state *ppc);
 void ppccom_execute_mtdcr(powerpc_state *ppc);
 
 void ppccom_update_fprf(powerpc_state *ppc);
+
+void ppccom_dcstore_callback(powerpc_state *ppc);
 
 void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);

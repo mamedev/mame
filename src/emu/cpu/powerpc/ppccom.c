@@ -454,6 +454,19 @@ offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *opr
 }
 
 
+/*-------------------------------------------------
+	ppccom_dcstore_callback - call the dcstore
+	callback if installed
+-------------------------------------------------*/
+
+void ppccom_dcstore_callback(powerpc_state *ppc)
+{
+	if (ppc->dcstore_handler != NULL)
+	{
+		ppc->dcstore_handler(ppc->device, ppc->param0);
+	}
+}
+
 
 /***************************************************************************
     TLB HANDLING
@@ -1607,6 +1620,16 @@ static TIMER_CALLBACK( decrementer_int_callback )
 	ppc->decrementer_int_timer->adjust(ppc->device->cycles_to_attotime(cycles_until_next));
 }
 
+/*-------------------------------------------------
+	ppc_set_dcstore_callback - installs a callback
+	for detecting datacache stores with dcbst
+-------------------------------------------------*/
+
+void ppc_set_dcstore_callback(device_t *device, ppc_dcstore_handler handler)
+{
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
+	ppc->dcstore_handler = handler;
+}
 
 
 /***************************************************************************

@@ -3617,6 +3617,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			return FALSE;
 
 		case 0x036:	/* DCBST */
+			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
+			UML_MOV(block, mem(&ppc->param0), I0);										// mov     [param0],i0
+			UML_CALLC(block, (c_function)ppccom_dcstore_callback, ppc);
+			return TRUE;
+
 		case 0x056:	/* DCBF */
 		case 0x0f6:	/* DCBTST */
 		case 0x116:	/* DCBT */
