@@ -19355,7 +19355,6 @@ acefruit	// (c) 1982? ACE
 
 // Ace System 1
 
-ac1cshtw	// Cash Towers (Ace)
 ac1clbmn	// Club Money (Ace)
 ac1clbmna	//
 ac1gogld	// Go For Gold (Ace)
@@ -19366,7 +19365,6 @@ ac1pstrt	// Pound Stretcher (Pcp)
 ac1primt	// Primetime (Ace)
 ac1primta	//
 ac1taklv	// Take It Or Leave It (Ace)
-ac1taklva	//
 ac1bbclb	// Big Break Club (Ace)
 ac1bbclba	//
 ac1clbsv	// Club Sovereign (Ace)
@@ -19622,7 +19620,6 @@ sp_spelld		//
 sp_spelle		//
 sp_spellf		//
 sp_spellg		//
-sp_spellh		//
 sp_spelli		//
 sp_spellj		//
 sp_swop			// Swop Shop (Ace)

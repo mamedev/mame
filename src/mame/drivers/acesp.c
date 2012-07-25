@@ -1629,13 +1629,6 @@ ROM_START( sp_spellg )
 	SP_SPELL_SOUND
 ROM_END
 
-ROM_START( sp_spellh )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "spellbound2.bin", 0x0000, 0x8000, CRC(439bcf8b) SHA1(d84be299744eeb4c3040e5ed64fb64f614fe0a1c) )
-	ROM_LOAD( "spellbound1.bin", 0x8000, 0x8000, CRC(285b4774) SHA1(0d7816cf0a47dabdb45eb5d904e45b44a170f87f) )
-	SP_SPELL_SOUND
-ROM_END
-
 ROM_START( sp_spelli )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "0009p5.bin", 0x0000, 0x010000, CRC(5d94418e) SHA1(92a9b6deed307b99bb57193d9974a0b4d76ee569) ) // merged rom
@@ -4150,7 +4143,6 @@ GAME( 199?, sp_spelld		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbou
 GAME( 199?, sp_spelle		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE) (set 6)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_spellf		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE) (set 7)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_spellg		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE) (set 8)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, sp_spellh		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE) (set 9)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_spelli		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE) (set 10)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_spellj		,sp_spell	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Spellbound (Ace) (sp.ACE) (set 11)",GAME_IS_SKELETON_MECHANICAL )
 
