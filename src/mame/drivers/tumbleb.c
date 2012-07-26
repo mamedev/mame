@@ -279,6 +279,11 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
  Jumping Pop is a complete rip-off of Tumble Pop, not even the levels have
  been changed, it simply has different hardware and new 8bpp backgrounds!
+ Looks like "Emag" might have been the original programmers (bootleggers)
+ of Jumping Pop and ESD picked it up later. Check out the names on the high
+ score table, they spell out emag soft. hhmmmm... Also it doesn't look like
+ emag "cleaned" the tiles for the title screen, but started clean and ESD
+ added their text into the tiles later.
 
 
  Pang Pang
@@ -2331,11 +2336,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( jumppop, tumbleb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(jumppop_main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3500000) /* verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4) /* verified */
 	MCFG_CPU_PROGRAM_MAP(jumppop_sound_map)
 	MCFG_CPU_IO_MAP(jumppop_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
@@ -2362,11 +2367,11 @@ static MACHINE_CONFIG_START( jumppop, tumbleb_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 
-	MCFG_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_14MHz/16, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -2675,6 +2680,40 @@ Notes:
 
               Note there are no IC locations on the PCB, so the extension of the ROMs is just 'BIN'
 
+-------------------------------------------
+
+Jumping Pop (c) 2001 Emag Soft
+
+PCB Layout
+----------
+
+ESD 11-09-98
++-----------------------------------------+
+|       YM3812   6116    su10         fu27|
+|VOL    YM3014   su06    M6295        fu32|
+|           PAL  Z80                  fu26|
+|        6116                         fu30|
+|J       6116            Actel        fu28|
+|A DSWA DSWB    76C256   A40MX04      fu31|
+|M              76C256                fu29|
+|M    cu03 76C256   6116 Actel    PAL fu33|
+|A    cu02 76C256   6116 A40MX04  PAL ju07|
+|      68000              6116        ju03|
+|       PAL               6116 PAL    ju04|
+|       PAL               6116 PAL    ju05|
+|16MHz 14MHz              6116 PAL    ju06|
++-----------------------------------------+
+
+PCB No. ESD 11-09-98
+  CPU: MC68HC000FN16 (68000, 68 pin PLCC socketed)
+  SND: Z80 (Z0840006PSC), U6614/U6612 (YM3014/YM3812), AD-65 (OKI M6295)
+  OSC: 16.000MHz, 14.000MHz
+  RAM: 4 x 62256, 9 x 6116
+ DIPS: 2 x 8 position
+Other: 2 x Actel A40MX04-F FPGA (PLCC84)
+
+Should move these two into esd16.c at some point.
+
 */
 
 ROM_START( jumppop )
@@ -2689,12 +2728,39 @@ ROM_START( jumppop )
 	ROM_LOAD( "bg0.bin", 0x000000, 0x100000, CRC(35a1363d) SHA1(66c550b0bdea7c8b079f186f5e044f731d31bc58) )
 	ROM_LOAD( "bg1.bin", 0x100000, 0x100000, CRC(5b37f943) SHA1(fe73b839f29d4c32823418711b22f85a5f583ec2) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "gfx2", 0 ) // 2nd half of these is just unused garbage data from the gfx1 region
 	ROM_LOAD( "sp0.bin", 0x000000, 0x100000, CRC(7c5d0633) SHA1(1fba60073d1d5d4dbd217fde181fa73a9d92bdc6) )
 	ROM_LOAD( "sp1.bin", 0x100000, 0x100000, CRC(7eae782e) SHA1(a33c544ad9516ec409c209968e72f63e7cdb934b) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "samples.bin", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) )
+ROM_END
+
+/* This set displays an a '(c)2001 Emag Soft' copyright and doesn't have the ESD copyright embedded into the gfx1 tiles,
+   it was running on an original ESD 11-09-98 PCB with original ROMs */
+ROM_START( jumppope )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(302dd093) SHA1(fd52dc2342652fd6e6f24942d00a0c2bff83e4ed) ) // 68k_prg.bin  [odd]      99.980164%
+	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(883392ba) SHA1(7241fd35b0431bbb6e83e4f0eb9026bafbcf1d7f) ) // 68k_prg.bin  [even]     99.979782%
+
+	ROM_REGION( 0x80000, "audiocpu", 0 ) /* Z80 code */
+	ROM_LOAD( "at27c020.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // z80_prg.bin             IDENTICAL
+	ROM_RELOAD( 0x10000, 0x40000)
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "esd6.fu29", 0x000000, 0x080000, CRC(c01af40d) SHA1(fce0244027d4d4eb5cff1809cf8f404bfe016455) ) // [even 1/2] 99.778366%, [even 2/2] 99.267578%
+	ROM_LOAD16_BYTE( "esd3.fu27", 0x000001, 0x080000, CRC(3358a693) SHA1(2e368e5c26755bbe6d04838015fd4ca5e43ccfb5) ) // [odd 1/2]  99.784470%, [odd 2/2]  99.267578%
+	ROM_LOAD16_BYTE( "esd5.fu28", 0x100000, 0x080000, CRC(0d47f821) SHA1(fc1ef080eb05990909e25d5db59918f1f4e90a67) ) // [even 1/2] 99.769974%, [even 2/2] 99.267578%
+	ROM_LOAD16_BYTE( "esd4.fu26", 0x100001, 0x080000, CRC(97b409be) SHA1(3a4344ca8ffb0aee046e3c0bab2d7c3f7c0eb204) ) // [odd 1/2]  99.763107%, [odd 2/2]  99.267578%
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "esd7.ju03",  0x000000, 0x040000, CRC(9c2970e0) SHA1(000b0f43d4d5434ba6c4834107ade8ebcd509ff8) ) // sp0.bin      [even 1/2] IDENTICAL
+	ROM_LOAD16_BYTE( "esd8.ju04",  0x000001, 0x040000, CRC(33bf99b0) SHA1(023ce2948b8130bf8464b3fc6f5543c6f3b1865c) ) // sp0.bin      [odd 1/2]  IDENTICAL
+	ROM_LOAD16_BYTE( "esd9.ju05",  0x100000, 0x040000, CRC(671d21fd) SHA1(c9dfe163bd9e46855db7af8daf436b1248df1ed0) ) // sp1.bin      [even 1/2] IDENTICAL
+	ROM_LOAD16_BYTE( "esd10.ju06", 0x100001, 0x040000, CRC(85a3cc73) SHA1(ec90f4d2e4244dffbada306a732e50263173203e) ) // sp1.bin      [odd 1/2]  IDENTICAL
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_LOAD( "at27c020.su10", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) ) // samples.bin             IDENTICAL
 ROM_END
 
 /**************************************
@@ -3794,8 +3860,8 @@ GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, chokchok, ROT0, "First Amu
 GAME( 1994, pangpang, 0,       pangpang,    tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
 GAME( 1996, fncywld,  0,       fncywld,     fncywld,  fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
-GAME( 2001, jumppop,  0,       jumppop,     jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop", GAME_SUPPORTS_SAVE )
-
+GAME( 2001, jumppop,  0,       jumppop,     jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 2001, jumppope, jumppop, jumppop,     jumppop,  0,        ORIENTATION_FLIP_X, "Emag Soft", "Jumping Pop (set 2)", GAME_SUPPORTS_SAVE )
 // Should also be 'Magicball Fighting' (c)1994
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets

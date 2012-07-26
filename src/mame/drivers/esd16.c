@@ -30,7 +30,6 @@ Other ESD games:
 
 3 Cushion Billiards (c) 2000 - Undumped
 Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
-Jumping Pop         (c) 2001 - Undumped "Emag Soft" copyright on ESD 11-09-98 hardware
 Fire Hawk           (c) 2001 - see nmk16.c driver
 Jumping Pop         (c) 2001 - see tumbleb.c driver
 
