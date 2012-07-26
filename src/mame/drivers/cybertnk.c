@@ -175,7 +175,6 @@ public:
 		m_tx_vram(*this, "tx_vram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_fg_vram(*this, "fg_vram"),
-		m_io_ram(*this, "io_ram"),
 		m_roadram(*this, "roadram"){ }
 
 	tilemap_t *m_tx_tilemap;
@@ -183,16 +182,19 @@ public:
 	required_shared_ptr<UINT16> m_tx_vram;
 	required_shared_ptr<UINT16> m_bg_vram;
 	required_shared_ptr<UINT16> m_fg_vram;
-	required_shared_ptr<UINT16> m_io_ram;
 	required_shared_ptr<UINT16> m_roadram;
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
 	int m_color_pen;
+	UINT8 m_mux_data;
 	DECLARE_WRITE16_MEMBER(tx_vram_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(soundport_r);
+	DECLARE_WRITE8_MEMBER(cybertnk_sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(cybertnk_unk_w);
+	DECLARE_WRITE8_MEMBER(cybertnk_mux_w);
+	DECLARE_READ8_MEMBER(cybertnk_io_rdy_r);
+	DECLARE_READ8_MEMBER(cybertnk_mux_r);
+	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
 };
 
 
@@ -526,136 +528,39 @@ WRITE16_MEMBER(cybertnk_state::tx_vram_w)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-/* TODO: clean this mess! */
-READ16_MEMBER(cybertnk_state::io_r)
+WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
 {
-	switch( offset )
-	{
-		case 2/2:
-			return ioport("DSW1")->read();
-
-		// 0x00110007 is controller device select
-		// 0x001100D5 is controller data
-		// 0x00110004 low is controller data ready
-		case 4/2:
-			switch( (m_io_ram[6/2]) & 0xf0 )
-			{
-				case 0:
-					m_io_ram[0xd4/2] = ioport("TRAVERSE")->read();
-					break;
-
-				case 0x20:
-					m_io_ram[0xd4/2] = ioport("ELEVATE")->read();
-					break;
-
-				case 0x40:
-					m_io_ram[0xd4/2] = ioport("ACCEL")->read();
-					break;
-
-				case 0x60:
-					m_io_ram[0xd4/2] = ioport("HANDLE")->read();
-					break;
-
-				//default:
-					//popmessage("unknown controller device");
-			}
-			return 0;
-
-		case 6/2:
-			return ioport("IN0")->read(); // high half
-
-		case 8/2:
-			return ioport("IN0")->read(); // low half
-
-		case 0xa/2:
-			return ioport("DSW2")->read();
-
-		case 0xd4/2:
-			return m_io_ram[offset]; // controller data
-
-		default:
-		{
-			//popmessage("unknown io read 0x%08x", offset);
-			return m_io_ram[offset];
-		}
-	}
+	soundlatch_byte_w(space, offset, data & 0xff);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
-WRITE16_MEMBER(cybertnk_state::io_w)
+WRITE8_MEMBER( cybertnk_state::cybertnk_unk_w )
 {
-	COMBINE_DATA(&m_io_ram[offset]);
-
-	switch( offset )
-	{
-		case 0/2:
-			// sound data
-			if (ACCESSING_BITS_0_7)
-				cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
-			else
-				LOG_UNKNOWN_WRITE
-			break;
-
-		case 2/2:
-			if (ACCESSING_BITS_0_7)
-				;//watchdog ? written in similar context to CPU1 @ 0x140002
-			else
-				LOG_UNKNOWN_WRITE
-			break;
-
-		case 6/2:
-			if (ACCESSING_BITS_0_7)
-				;//select controller device
-			else
-				;//blank inputs
-			break;
-
-		case 8/2:
-			if (ACCESSING_BITS_8_15)
-				;//blank inputs
-			else
-				LOG_UNKNOWN_WRITE
-			break;
-
-		case 0xc/2:
-			//if (ACCESSING_BITS_0_7)
-				// This seems to only be written after each irq1 and irq2, irq ack?
-				//logerror("irq wrote %04x\n", data);
-			//else
-			//  LOG_UNKNOWN_WRITE
-			break;
-
-		case 0xd4/2:
-			if ( ACCESSING_BITS_0_7 )
-				;// controller device data
-			else
-				LOG_UNKNOWN_WRITE
-			break;
-
-		// Cabinet pictures show dials and gauges
-		// Maybe this is for lamps and stuff, or
-		// maybe just debug.
-		// They are all written in a block at 0x00000944
-		case 0x40/2:
-		case 0x42/2:
-		case 0x44/2:
-		case 0x48/2:
-		case 0x4a/2:
-		case 0x4c/2:
-		case 0x80/2:
-		case 0x82/2:
-		case 0x84/2:
-			popmessage("%02x %02x %02x %02x %02x %02x %02x",m_io_ram[0x40/2],m_io_ram[0x42/2],m_io_ram[0x44/2],m_io_ram[0x46/2],m_io_ram[0x48/2],m_io_ram[0x4a/2],m_io_ram[0x4c/2]);
-			break;
-
-		default:
-			LOG_UNKNOWN_WRITE
-			break;
-	}
+	// ...
 }
 
-READ8_MEMBER(cybertnk_state::soundport_r)
+WRITE8_MEMBER( cybertnk_state::cybertnk_mux_w )
 {
-	return m_io_ram[0] & 0xff;
+	m_mux_data = data & 0x60;
+	/* Other bits are unknown */
+}
+
+READ8_MEMBER( cybertnk_state::cybertnk_io_rdy_r )
+{
+	// bit 0: i/o controller busy?
+	return 0;
+}
+
+READ8_MEMBER( cybertnk_state::cybertnk_mux_r )
+{
+	const char *const innames[] = { "TRAVERSE", "ELEVATE", "ACCEL", "HANDLE" };
+	return ioport(innames[(m_mux_data & 0x60) >> 5])->read();;
+}
+
+/* Amusingly the data written here is pretty weird, it seems suited for an unused protection device (attract = coin count, in-game = return status of some inputs) */
+WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
+{
+	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
@@ -667,11 +572,28 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_SHARE("fg_vram")
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_SHARE("io_ram")
+
+	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0x00ff)
+	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1") AM_WRITENOP // watchdog?
+	AM_RANGE(0x110004, 0x110005) AM_READ8(cybertnk_io_rdy_r,0xff00)
+	AM_RANGE(0x110006, 0x110007) AM_READ_PORT("IN0")
+	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_unk_w,0xff00)
+	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_mux_w,0x00ff)
+	AM_RANGE(0x110008, 0x110009) AM_READ_PORT("IN1") AM_WRITENOP
+	AM_RANGE(0x11000a, 0x11000b) AM_READ_PORT("DSW2")
+	AM_RANGE(0x11000c, 0x11000d) AM_WRITE8(cybertnk_irq_ack_w,0x00ff)
+
+	AM_RANGE(0x110042, 0x11004d) AM_RAM // vregs
+	AM_RANGE(0x110080, 0x110085) AM_RAM // vregs
+
+	AM_RANGE(0x1100d4, 0x1100d5) AM_READ8(cybertnk_mux_r, 0x00ff) AM_WRITENOP
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x020000, 0x020001) AM_READNOP // POST debug?
+	AM_RANGE(0x07fff8, 0x07fffd) AM_READNOP // POST debug?
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_SHARE("roadram")
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
@@ -681,7 +603,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
-	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundport_r)
+	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xa005, 0xa006 ) AM_NOP
 	AM_RANGE(0xa000, 0xa001 ) AM_DEVREADWRITE_LEGACY("ym1", y8950_r, y8950_w)
 	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("ym2", y8950_r, y8950_w)
@@ -689,14 +611,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cybertnk )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Machine Gun")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Cannon")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -705,6 +620,12 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Machine Gun")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRAVERSE")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2) PORT_REVERSE PORT_NAME("P2 Machine Gun X")
@@ -866,7 +787,7 @@ static const y8950_interface y8950_config = {
 static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
-	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_assert)
 
 	MCFG_CPU_ADD("slave", M68000,20000000/2)
 	MCFG_CPU_PROGRAM_MAP(slave_mem)
