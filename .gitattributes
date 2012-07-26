@@ -2589,6 +2589,7 @@ src/mame/drivers/jp.c svneol=native#text/plain
 src/mame/drivers/jpmimpct.c svneol=native#text/plain
 src/mame/drivers/jpmmps.c svneol=native#text/plain
 src/mame/drivers/jpms80.c svneol=native#text/plain
+src/mame/drivers/jpmsru.c svneol=native#text/plain
 src/mame/drivers/jpmsys5.c svneol=native#text/plain
 src/mame/drivers/jpmsys7.c svneol=native#text/plain
 src/mame/drivers/jrpacman.c svneol=native#text/plain

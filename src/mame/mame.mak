@@ -826,6 +826,7 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/jpmsys5.o \
 	$(DRIVERS)/jpmmps.o \
 	$(DRIVERS)/jpms80.o \
+	$(DRIVERS)/jpmsru.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/pluto5.o \
 	$(DRIVERS)/jpmsys7.o \
