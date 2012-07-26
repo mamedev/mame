@@ -199,6 +199,7 @@ ifeq ($(TARGETOS),haiku)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 NO_X11 = 1
+NO_USE_XINPUT = 1
 LIBS += -lnetwork -lbsd
 endif
 
@@ -212,6 +213,7 @@ SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 SDL_NETWORK = pcap
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
+NO_USE_XINPUT = 1
 ifdef BIGENDIAN
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
@@ -240,6 +242,7 @@ ifeq ($(TARGETOS),win32)
 BASE_TARGETOS = win32
 SYNC_IMPLEMENTATION = win32
 NO_X11 = 1
+NO_USE_XINPUT = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI
 LIBGL = -lopengl32
 SDLMAIN = $(SDLOBJ)/main.o
@@ -274,6 +277,7 @@ DEFS += -DSDLMAME_OS2
 SYNC_IMPLEMENTATION = os2
 NO_DEBUGGER = 1
 NO_X11 = 1
+NO_USE_XINPUT = 1
 # OS/2 can't have OpenGL (aww)
 NO_OPENGL = 1
 endif
