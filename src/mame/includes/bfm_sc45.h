@@ -1336,6 +1336,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_jjok_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008470.bin", 0x000000, 0x100000, CRC(b5162561) SHA1(28feebc4de68264b92325e58bbf95458533bde7f) ) \
 
 #define sc_kingx_others \
 	ROM_REGION( 0x5000, "pics", 0 ) \

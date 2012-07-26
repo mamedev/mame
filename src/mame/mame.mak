@@ -1914,6 +1914,8 @@ $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
 			$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/cosmicm.lh
 
+$(DRIVERS)/aces1.o:	$(LAYOUT)/aces1.lh
+
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
 $(DRIVERS)/amaticmg.o:	$(LAYOUT)/suprstar.lh

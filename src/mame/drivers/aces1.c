@@ -26,6 +26,8 @@ JPM style Reel MCU?
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "video/awpvid.h"
+#include "aces1.lh"
 
 
 class aces1_state : public driver_device
@@ -35,6 +37,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
+	int m_input_strobe;
+	int m_lamp_strobe;
+	int m_led_strobe;
 
 	DECLARE_READ8_MEMBER( aces1_unk_r )
 	{
@@ -74,17 +79,34 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_intf_write_a)
 	{
-	//	printf("7segs %02x\n", data);
+		if (m_led_strobe != m_input_strobe)
+		{
+			output_set_digit_value(m_input_strobe,data);
+			m_led_strobe = m_input_strobe;
+		}
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_intf_write_b)
 	{
-	//	printf("lamp %02x\n", data);
+	//cheating a bit here, need persistence
+	int i;
+		if (m_lamp_strobe != m_input_strobe)
+		{
+			// Because of the nature of the lamping circuit, there is an element of persistance where the lamp retains residual charge
+			// As a consequence, the lamp column data can change before the input strobe (effectively writing 0 to the previous strobe)
+			// without causing the relevant lamps to black out.
+
+			for (i = 0; i < 8; i++)
+			{
+				output_set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+			}
+			m_lamp_strobe = m_input_strobe;
+		}
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_intf_write_c)
 	{
-	//	printf("strobe %02x\n", data);
+		m_input_strobe = (data & 0x0f);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_a)
@@ -296,6 +318,7 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	
 	MCFG_MACHINE_START( aces1 )
 	MCFG_MACHINE_RESET( aces1 )
+	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
