@@ -40,14 +40,11 @@ public:
 	UINT16 m_protbase;
 	DECLARE_WRITE16_MEMBER(tumblepb_oki_w);
 	DECLARE_READ16_MEMBER(tumblepb_prot_r);
-	DECLARE_WRITE16_MEMBER(jumppop_sound_w);
 	DECLARE_READ16_MEMBER(tumblepopb_controls_r);
 	DECLARE_READ16_MEMBER(semibase_unknown_r);
 	DECLARE_WRITE16_MEMBER(jumpkids_sound_w);
 	DECLARE_WRITE16_MEMBER(semicom_soundcmd_w);
 	DECLARE_WRITE8_MEMBER(oki_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(jumppop_z80_bank_w);
-	DECLARE_READ8_MEMBER(jumppop_z80latch_r);
 	DECLARE_WRITE8_MEMBER(jumpkids_oki_bank_w);
 	DECLARE_READ8_MEMBER(prot_io_r);
 	DECLARE_WRITE8_MEMBER(prot_io_w);
@@ -72,7 +69,6 @@ public:
 
 VIDEO_START( tumblepb );
 VIDEO_START( fncywld );
-VIDEO_START( jumppop );
 VIDEO_START( sdfight );
 VIDEO_START( suprtrio );
 VIDEO_START( pangpang );
@@ -80,7 +76,6 @@ VIDEO_START( pangpang );
 SCREEN_UPDATE_IND16( tumblepb );
 SCREEN_UPDATE_IND16( jumpkids );
 SCREEN_UPDATE_IND16( fncywld );
-SCREEN_UPDATE_IND16( jumppop );
 SCREEN_UPDATE_IND16( semicom );
 SCREEN_UPDATE_IND16( semicom_altoffsets );
 SCREEN_UPDATE_IND16( bcstory );

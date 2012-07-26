@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			state->m_tilemap1_color,
 			0);
 }
 
@@ -91,7 +91,7 @@ static TILE_GET_INFO( get_tile_info_1_16x16 )
 	SET_TILE_INFO(
 			2,
 			code,
-			0,
+			state->m_tilemap1_color,
 			0);
 }
 
@@ -111,8 +111,18 @@ WRITE16_MEMBER(esd16_state::esd16_vram_1_w)
 
 WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
 {
-	m_tilemap0_color = data & 3;
+	m_tilemap0_color = data & 0x03;
 	m_tilemap_0->mark_all_dirty();
+	m_tilemap_0_16x16->mark_all_dirty();
+
+	flip_screen_set(data & 0x80);
+}
+
+WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
+{
+	// todo
+	m_tilemap0_color = 2;
+	m_tilemap1_color = 1;
 
 	flip_screen_set(data & 0x80);
 }

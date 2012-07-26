@@ -183,56 +183,6 @@ static TILE_GET_INFO( get_fncywld_fg_tile_info )
 }
 
 
-/* jump pop */
-static TILE_GET_INFO( get_jumppop_bg1_tile_info )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	int data = state->m_pf1_data[tile_index];
-
-	SET_TILE_INFO(
-			2,
-			data & 0x3fff,
-			0,
-			0);
-}
-
-static TILE_GET_INFO( get_jumppop_bg2_tile_info )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	int data = state->m_pf2_data[tile_index];
-
-	SET_TILE_INFO(
-			1,
-			data & 0x1fff,
-			1,
-			0);
-}
-
-static TILE_GET_INFO( get_jumppop_bg2_alt_tile_info )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	int data = state->m_pf2_data[tile_index];
-
-	SET_TILE_INFO(
-			0,
-			data & 0x7fff,
-			1,
-			0);
-}
-
-
-static TILE_GET_INFO( get_jumppop_fg_tile_info )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	int data = state->m_pf1_data[tile_index];
-
-	SET_TILE_INFO(
-			0,
-			data & 0x7fff,
-			0,
-			0);
-}
-
 INLINE void pangpang_get_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
 {
 	int data = gfx_base[tile_index * 2 + 1];
@@ -339,26 +289,6 @@ VIDEO_START( fncywld )
 
 	state->m_pf1_tilemap->set_transparent_pen(15);
 	state->m_pf1_alt_tilemap->set_transparent_pen(15);
-
-	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
-}
-
-VIDEO_START( jumppop )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-
-	state->m_pf1_tilemap =     tilemap_create(machine, get_jumppop_fg_tile_info,      tilemap_scan_rows,     8,  8, 128, 64);
-	state->m_pf1_alt_tilemap = tilemap_create(machine, get_jumppop_bg1_tile_info,     tilemap_scan_rows,    16, 16,  64, 64);
-	state->m_pf2_tilemap =     tilemap_create(machine, get_jumppop_bg2_tile_info,     tilemap_scan_rows,    16, 16,  64, 64);
-	state->m_pf2_alt_tilemap = tilemap_create(machine, get_jumppop_bg2_alt_tile_info, tilemap_scan_rows,     8,  8, 128, 64);
-
-	state->m_pf1_tilemap->set_transparent_pen(0);
-	state->m_pf1_alt_tilemap->set_transparent_pen(0);
-
-	state->m_pf1_tilemap->set_flip(TILEMAP_FLIPX);
-	state->m_pf1_alt_tilemap->set_flip(TILEMAP_FLIPX);
-	state->m_pf2_tilemap->set_flip(TILEMAP_FLIPX);
-	state->m_pf2_alt_tilemap->set_flip(TILEMAP_FLIPX);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
@@ -583,35 +513,6 @@ SCREEN_UPDATE_IND16( pangpang )
 	return 0;
 }
 
-
-
-SCREEN_UPDATE_IND16( jumppop )
-{
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
-
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control[3]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control[3]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control[1]);
-	state->m_pf2_alt_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
-	state->m_pf2_alt_tilemap->set_scrolly(0, state->m_control[1]);
-
-	if (state->m_control[7] & 1)
-		state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf2_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control[7] & 2)
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
-
-	return 0;
-}
 
 
 SCREEN_UPDATE_IND16( suprtrio )

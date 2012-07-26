@@ -18,7 +18,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_head_layersize(*this, "head_layersize"),
 		m_headpanic_platform_x(*this, "platform_x"),
-		m_headpanic_platform_y(*this, "platform_y"){ }
+		m_headpanic_platform_y(*this, "platform_y")
+	{ 
+		m_tilemap0_color = 0;
+		m_tilemap1_color = 0;
+	}
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vram_0;
@@ -37,6 +41,7 @@ public:
 	tilemap_t       *m_tilemap_0;
 	tilemap_t       *m_tilemap_1;
 	int           m_tilemap0_color;
+	int           m_tilemap1_color;
 
 	/* devices */
 	device_t *m_audio_cpu;
@@ -51,6 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(esd16_vram_0_w);
 	DECLARE_WRITE16_MEMBER(esd16_vram_1_w);
 	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_w);
+	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_jumppop_w);	
 };
 
 
