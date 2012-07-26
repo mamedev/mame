@@ -44,7 +44,7 @@ WRITE16_MEMBER(globalfr_state::vfd_w)
 
 //	if(!(data & 0x20)) need to find reset
 	{
-		bool clock = (data & 0x40) != 0;
+		int clock = (data & 0x40) != 0;
 		int datline = (data & 0x80);
 		if (m_alpha_clock != clock)
 		{
