@@ -565,11 +565,11 @@ endif # NO_X11
 # XInput
 #-------------------------------------------------
 
-ifneq ($(NO_USE_XINPUT),1)
+ifeq ($(NO_USE_XINPUT),1)
+DEFS += -DUSE_XINPUT=0
+else
 DEFS += -DUSE_XINPUT=1 -DUSE_XINPUT_DEBUG=0
 LIBS += -lXext -lXi
-else
-DEFS += -DUSE_XINPUT=0
 endif # USE_XINPUT
 
 #-------------------------------------------------
