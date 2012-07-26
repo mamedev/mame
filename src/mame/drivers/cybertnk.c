@@ -8,9 +8,6 @@ Maybe it has some correlation with WEC Le Mans HW? (supposely that was originall
 
 TODO:
 - improve sprite emulation
-- how does colour banking work, there are no obvious writes.  is it based on the proms? some kind of
-  per-tile hardcoded value? or do the tile select bits and palette overlap? it's interesting to note
-  that many palettes are duplicated next to each other..
 
 ============================================================================================
 
@@ -204,13 +201,27 @@ public:
 	DECLARE_READ8_MEMBER(cybertnk_io_rdy_r);
 	DECLARE_READ8_MEMBER(cybertnk_mux_r);
 	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
 };
+
+/* tile format
+
+ 1 word
+
+ ---- ---- ---- ----
+    t tttt tttt tttt  (0x1fff) tilenumber
+ ppp                  (0xe000) LOWER 3 palette bits
+    p pp              (0x1c00) UPPER 3 palette bits (overlap tilenumber!)
+
+*/
 
 static TILE_GET_INFO( get_tilemap0_tile_info )
 {
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
 	int code = state->m_tilemap0_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
+	pal     |=(code & 0x1c00) >> 7;
+
 	SET_TILE_INFO(
 			0,
 			code & 0x1fff,
@@ -223,10 +234,8 @@ static TILE_GET_INFO( get_tilemap1_tile_info )
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
 	int code = state->m_tilemap1_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
+	pal     |=(code & 0x1c00) >> 7;
 
-	// where is the palette banking?
-	pal += 0x10; // title screen
-	
 	SET_TILE_INFO(
 			1,
 			code & 0x1fff,
@@ -239,6 +248,7 @@ static TILE_GET_INFO( get_tilemap2_tile_info )
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
 	int code = state->m_tilemap2_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
+	pal     |=(code & 0x1c00) >> 7;
 
 	SET_TILE_INFO(
 			2,
@@ -261,8 +271,8 @@ static VIDEO_START( cybertnk )
 }
 
 #define CYBERTNK_DRAWPIXEL \
-	if (cliprect.contains(xx, yy)) \
-		bitmap.pix16(yy, xx) = paldata[dot]; \
+	if ((xx>=minx) && (xx<=maxx)) \
+		dest[xx] = paldata[dot]; \
 
 
 static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri)
@@ -278,9 +288,9 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 		UINT16 param2 = state->m_roadram[i+1];
 		UINT16 param3 = state->m_roadram[i+0];
 	
-		int col = 0x100 + (param2 & 0xf);
+		int col = (param2 & 0x3f);
 
-		// hack, might be priority related, or pen related..
+		// seems to be priority related, cases seen are 0xc0 and 0x00 (once the palette bits are masked out)
 		if ((param2&0x80) == pri)
 		{
 			drawgfx_transpen(bitmap,cliprect,gfx,param1,col,0,0,-param3+screen_shift,i/4,0);
@@ -290,6 +300,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 	}
 }
 
+// check if these are similar / the same as weclemans
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
@@ -298,6 +309,13 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	UINT32 spr_offs,spr_offs_helper;
 	int xf,yf,xz,yz;
 	const pen_t *paldata = screen.machine().pens;
+
+	int miny = cliprect.min_y;
+	int	maxy = cliprect.max_y;
+	int minx = cliprect.min_x;
+	int	maxx = cliprect.max_x;
+	UINT16* dest;
+
 
 	for(offs=0;offs<0x1000/2;offs+=8)
 	{
@@ -327,90 +345,103 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 			spr_offs_helper = spr_offs;
 			int yy = y+yz;
 
-			for(xi=0;xi < xsize;xi+=8)
+			if ((yy>=miny) && (yy<=maxy))
 			{
-				UINT32 color;
-				UINT16 dot;
-				int shift_pen, x_dec; //helpers
+				dest = &bitmap.pix16(yy, 0);
 
-				color = ((blit_ram[spr_offs+0] & 0xff) << 24);
-				color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
-				color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
-				color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
+				for(xi=0;xi < xsize;xi+=8)
+				{ // start x loop
+					UINT32 color;
+					UINT16 dot;
+					int shift_pen, x_dec; //helpers
 
-				shift_pen = 28;
-				x_dec = 0;
+					// 4 bytes = 8 pixels..
+					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
+					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
+					color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
+					color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
 
-				while(x_dec < 4 && x_dec+xi <= xsize)
-				{
-					dot = (color >> shift_pen) & 0xf;
-					if(dot != 0) // transparent pen
+					shift_pen = 28;
+					x_dec = 0;
+
+					// draw 4 pixels
+					while(x_dec < 4 && x_dec+xi <= xsize)
 					{
-						dot|= col_bank<<4;
-
-						if(fx)
+						dot = (color >> shift_pen) & 0xf;
+						if(dot != 0) // transparent pen
 						{
-							int xx = x+xsize-(xz)+screen_shift;
-							CYBERTNK_DRAWPIXEL
+							dot|= col_bank<<4;
+
+							if(fx)
+							{
+								int xx = x+xsize-(xz)+screen_shift;
+								CYBERTNK_DRAWPIXEL
+							}
+							else
+							{
+								int xx = x+xz+screen_shift;
+								CYBERTNK_DRAWPIXEL
+							}
+						}
+						xf+=zoom;
+						if(xf >= 0x100)
+						{
+							xz++;
+							xf-=0x100;
 						}
 						else
 						{
-							int xx = x+xz+screen_shift;
-							CYBERTNK_DRAWPIXEL
+							shift_pen -= 8;
+							x_dec++;
+							if(xf >= 0x80) { xz++; xf-=0x80; }
 						}
 					}
-					xf+=zoom;
-					if(xf >= 0x100)
-					{
-						xz++;
-						xf-=0x100;
-					}
-					else
-					{
-						shift_pen -= 8;
-						x_dec++;
-						if(xf >= 0x80) { xz++; xf-=0x80; }
-					}
-				}
 
-				shift_pen = 24;
-				x_dec = 4;
+					shift_pen = 24;
+					x_dec = 4;
 
-				while(x_dec < 8 && x_dec+xi <= xsize)
-				{
-					dot = (color >> shift_pen) & 0xf;
-					if(dot != 0) // transparent pen
+					// draw 4 pixels
+					while(x_dec < 8 && x_dec+xi <= xsize)
 					{
-						dot|= col_bank<<4;
-
-						if(fx)
+						dot = (color >> shift_pen) & 0xf;
+						if(dot != 0) // transparent pen
 						{
-							int xx = x+xsize-(xz)+screen_shift;
-							CYBERTNK_DRAWPIXEL
+							dot|= col_bank<<4;
+
+							if(fx)
+							{
+								int xx = x+xsize-(xz)+screen_shift;
+								CYBERTNK_DRAWPIXEL
+							}
+							else
+							{
+								int xx = x+xz+screen_shift;
+								CYBERTNK_DRAWPIXEL
+
+							}
+						}
+						xf+=zoom;
+						if(xf >= 0x100)
+						{
+							xz++;
+							xf-=0x100;
 						}
 						else
 						{
-							int xx = x+xz+screen_shift;
-							CYBERTNK_DRAWPIXEL
-
+							shift_pen -= 8;
+							x_dec++;
+							if(xf >= 0x80) { xz++; xf-=0x80; }
 						}
 					}
-					xf+=zoom;
-					if(xf >= 0x100)
-					{
-						xz++;
-						xf-=0x100;
-					}
-					else
-					{
-						shift_pen -= 8;
-						x_dec++;
-						if(xf >= 0x80) { xz++; xf-=0x80; }
-					}
-				}
-
-				spr_offs+=4;
+					spr_offs+=4;
+				} // end x loop
 			}
+			else
+			{
+				spr_offs+=xsize/8;
+			}
+
+
 			yf+=zoom;
 			if(yf >= 0x100)
 			{
@@ -528,6 +559,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 {
 	if (offset == 0)
 	{
+		// unused?
 		logerror("cybertnk_irq_ack_w offset 0 %02x\n", data); 
 	}
 	else if (offset == 1)
@@ -535,6 +567,22 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 		cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 	}
 }
+
+WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
+{
+	if (offset == 0)
+	{
+		// count counters / lamps?
+		// writes 04 / 00 atlternating during attract mode
+		// writes 01 or 02 when coins are inserted depending on slot
+	}
+	else if (offset == 1)
+	{
+		// unused?
+		logerror("cybertnk_cnt_w offset 1 %02x\n", data); 
+	}
+}
+
 
 static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -551,7 +599,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x110004, 0x110005) AM_READ8(cybertnk_io_rdy_r,0xff00)
 	AM_RANGE(0x110006, 0x110007) AM_READ_PORT("IN0")
 	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_mux_w,0xffff)
-	AM_RANGE(0x110008, 0x110009) AM_READ_PORT("IN1") AM_WRITENOP // writes 0x0000, 0x0400
+	AM_RANGE(0x110008, 0x110009) AM_READ_PORT("IN1") AM_WRITE8(cybertnk_cnt_w, 0xffff)
 	AM_RANGE(0x11000a, 0x11000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x11000c, 0x11000d) AM_WRITE8(cybertnk_irq_ack_w,0xffff)
 
@@ -586,8 +634,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( cybertnk )
 	PORT_START("IN0")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun 1")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon 1")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun 1 (Bomb)")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon 1 (Bomb)")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
@@ -597,8 +645,8 @@ static INPUT_PORTS_START( cybertnk )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun 2")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon 2")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun 2 (Fire)")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon 2 (Fire)")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRAVERSE")
@@ -749,13 +797,13 @@ static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "tilemap0_gfx", 0, tile_8x8x4,     0x1400, 64 ) /*Pal offset???*/
 	GFXDECODE_ENTRY( "tilemap1_gfx", 0, tile_8x8x4,     0x1800, 64 )
 	GFXDECODE_ENTRY( "tilemap2_gfx", 0, tile_8x8x4,     0x1c00, 64 )
-	GFXDECODE_ENTRY( "road_data", 0, roadlayout,     0,      0x400 )
+	GFXDECODE_ENTRY( "road_data", 0, roadlayout,        0x1000, 64 )
 GFXDECODE_END
 
 /* palette breakdown
 
- 0x0000 - 0x0fff = sprites?
- 0x1000 - 0x13ff = road?
+ 0x0000 - 0x0fff = sprites
+ 0x1000 - 0x13ff = road
  0x1400 - 0x17ff = tilemap0
  0x1800 - 0x1bff = tilemap1
  0x1c00 - 0x1fff = tilemap2
@@ -780,7 +828,7 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3579500)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))//arbitrary value,needed to get the communication to work
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -868,14 +916,17 @@ ROM_START( cybertnk )
 	ROM_LOAD32_BYTE( "c02.92" , 0x180000, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
 	ROM_LOAD32_BYTE( "c03.91" , 0x180003, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
 	ROM_LOAD32_BYTE( "c04.90" , 0x180002, 0x20000, CRC(04d6fdc2) SHA1(56f8091c1a010014e951f5f47084e1400006123e) )
+
 	ROM_LOAD32_BYTE( "c05.102", 0x100001, 0x20000, CRC(3f537490) SHA1(12d6545d29dda9f88019040fa33c73a22a2a213b) )
 	ROM_LOAD32_BYTE( "c06.101", 0x100000, 0x20000, CRC(ff69c6a4) SHA1(badd20d26ba771780aebf733e1fbd1d37aa66f9b) )
 	ROM_LOAD32_BYTE( "c07.100", 0x100003, 0x20000, CRC(5e8eba75) SHA1(6d0c1916517802acf808c8edc8e0b6074bdc90be) )
 	ROM_LOAD32_BYTE( "c08.98" , 0x100002, 0x20000, CRC(f0820ddd) SHA1(7fb6c7d66ff96148f14921bc8d0cc0c65ffce4c4) )
-	ROM_LOAD32_BYTE( "c09.109", 0x080001, 0x20000, CRC(080f87c3) SHA1(aedebc22ff03d4cc710e71ca14e09c7808f59c72) ) //correct
+
+	ROM_LOAD32_BYTE( "c09.109", 0x080001, 0x20000, CRC(080f87c3) SHA1(aedebc22ff03d4cc710e71ca14e09c7808f59c72) )
 	ROM_LOAD32_BYTE( "c10.108", 0x080000, 0x20000, CRC(777c6a62) SHA1(4684d1c5d88b37ecb20002b7aa4814bf566e7d4b) )
 	ROM_LOAD32_BYTE( "c11.107", 0x080003, 0x20000, CRC(330ca5a1) SHA1(4409da231a5abcec8c7d2d66eefdfd2019a322db) )
 	ROM_LOAD32_BYTE( "c12.106", 0x080002, 0x20000, CRC(c1ec8e61) SHA1(09f2f4ddc100e5675c9bd82c200718fb0b69655e) )
+
 	ROM_LOAD32_BYTE( "c13.119", 0x000001, 0x20000, CRC(4e22a7e0) SHA1(69cc7dd528b8af0c28b448285768a3ed079099ba) )
 	ROM_LOAD32_BYTE( "c14.118", 0x000000, 0x20000, CRC(bdbd6232) SHA1(94b0741d5eced558723dda32a89aa2b747cdcbbd) )
 	ROM_LOAD32_BYTE( "c15.117", 0x000003, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
@@ -887,13 +938,15 @@ ROM_START( cybertnk )
 
 	/* I think these are zoom tables etc.? */
 	ROM_REGION( 0x30000, "user3", 0 )
-	ROM_LOAD( "t1",   0x00000, 0x08000, CRC(24890512) SHA1(2a6c9d39ca0c1c8316e85d9f565f6b3922d596b2) )
-	ROM_LOAD( "t2",   0x08000, 0x08000, CRC(5a10480d) SHA1(f17598442091dae14abe3505957d94793f3ed886))
-	ROM_LOAD( "t3",   0x10000, 0x08000, CRC(454af4dc) SHA1(e5b18a37715e50db2243432564f5a04fb39dea60) )
-	ROM_LOAD( "t4",   0x18000, 0x08000, CRC(0e1ef6a9) SHA1(d230841bbee6d07bab05aa8d37ec2409fc6278bc) )
+	ROM_LOAD( "t1",   0x00000, 0x08000, CRC(24890512) SHA1(2a6c9d39ca0c1c8316e85d9f565f6b3922d596b2) ) // data repeated 4 times
+	ROM_LOAD( "t2",   0x08000, 0x08000, CRC(5a10480d) SHA1(f17598442091dae14abe3505957d94793f3ed886) ) // data repeated 4 times
+	ROM_LOAD( "t3",   0x10000, 0x08000, CRC(454af4dc) SHA1(e5b18a37715e50db2243432564f5a04fb39dea60) ) // data repeated 4 times
+	ROM_LOAD( "t4",   0x18000, 0x08000, CRC(0e1ef6a9) SHA1(d230841bbee6d07bab05aa8d37ec2409fc6278bc) ) // data repeated 4 times
+
+	ROM_REGION( 0x10000, "user4", 0 )
 	/*The following two are identical*/
-	ROM_LOAD( "t5",   0x20000, 0x08000, CRC(12eb51bc) SHA1(35708eb456207ebee498c70dd82340b364797c56) )
-	ROM_LOAD( "t6",   0x28000, 0x08000, CRC(12eb51bc) SHA1(35708eb456207ebee498c70dd82340b364797c56) )
+	ROM_LOAD( "t5",   0x00000, 0x08000, CRC(12eb51bc) SHA1(35708eb456207ebee498c70dd82340b364797c56) )
+	ROM_LOAD( "t6",   0x08000, 0x08000, CRC(12eb51bc) SHA1(35708eb456207ebee498c70dd82340b364797c56) )
 
 	ROM_REGION( 0x280, "proms", 0 )
 	ROM_LOAD( "ic2",  0x0000, 0x0100, CRC(aad2a447) SHA1(a12923027e3093bd6d358af44d35d2e8e588dd1a) )//road proms related?
@@ -904,4 +957,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING )
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING ) // it boots as 1.4, not 1.04?
