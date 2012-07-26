@@ -262,7 +262,7 @@ private:
 // net_output_t
 // ----------------------------------------------------------------------------------------
 
-struct net_output_t
+class net_output_t
 {
 public:
 	net_output_t();
