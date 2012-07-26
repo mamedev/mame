@@ -8,9 +8,9 @@ Maybe it has some correlation with WEC Le Mans HW? (supposely that was originall
 
 TODO:
 - improve sprite emulation
-- road emulation;
-- tilemap scrolling /-color banking;
-- inputs doesn't work in-game?
+- how does colour banking work, there are no obvious writes.  is it based on the proms? some kind of
+  per-tile hardcoded value? or do the tile select bits and palette overlap? it's interesting to note
+  that many palettes are duplicated next to each other..
 
 ============================================================================================
 
@@ -172,347 +172,288 @@ public:
 	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_spr_ram(*this, "spr_ram"),
-		m_tx_vram(*this, "tx_vram"),
-		m_bg_vram(*this, "bg_vram"),
-		m_fg_vram(*this, "fg_vram"),
+		m_tilemap0_vram(*this, "tilemap0_vram"),
+		m_tilemap1_vram(*this, "tilemap1_vram"),
+		m_tilemap2_vram(*this, "tilemap2_vram"),
+		m_tilemap0scroll(*this, "tilemap1_scroll"),
+		m_tilemap1scroll(*this, "tilemap1_scroll"),
+		m_tilemap2scroll(*this, "tilemap2_scroll"),
 		m_roadram(*this, "roadram"){ }
 
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_tilemap0_tilemap;
+	tilemap_t *m_tilemap1_tilemap;
+	tilemap_t *m_tilemap2_tilemap;
+
+	DECLARE_WRITE16_MEMBER(tilemap0_vram_w);
+	DECLARE_WRITE16_MEMBER(tilemap1_vram_w);
+	DECLARE_WRITE16_MEMBER(tilemap2_vram_w);
+
+
 	required_shared_ptr<UINT16> m_spr_ram;
-	required_shared_ptr<UINT16> m_tx_vram;
-	required_shared_ptr<UINT16> m_bg_vram;
-	required_shared_ptr<UINT16> m_fg_vram;
+	required_shared_ptr<UINT16> m_tilemap0_vram;
+	required_shared_ptr<UINT16> m_tilemap1_vram;
+	required_shared_ptr<UINT16> m_tilemap2_vram;
+	required_shared_ptr<UINT16> m_tilemap0scroll;
+	required_shared_ptr<UINT16> m_tilemap1scroll;
+	required_shared_ptr<UINT16> m_tilemap2scroll;
 	required_shared_ptr<UINT16> m_roadram;
-	int m_test_x;
-	int m_test_y;
-	int m_start_offs;
-	int m_color_pen;
+
 	UINT8 m_mux_data;
-	DECLARE_WRITE16_MEMBER(tx_vram_w);
 	DECLARE_WRITE8_MEMBER(cybertnk_sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(cybertnk_unk_w);
 	DECLARE_WRITE8_MEMBER(cybertnk_mux_w);
 	DECLARE_READ8_MEMBER(cybertnk_io_rdy_r);
 	DECLARE_READ8_MEMBER(cybertnk_mux_r);
 	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
 };
 
-
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space.device().tag(), cpu_get_pc(&space.device()), offset*2, data, mem_mask);
-
-static TILE_GET_INFO( get_tx_tile_info )
+static TILE_GET_INFO( get_tilemap0_tile_info )
 {
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	int code = state->m_tx_vram[tile_index];
+	int code = state->m_tilemap0_vram[tile_index];
+	int pal = (code & 0xe000) >> 13;
 	SET_TILE_INFO(
 			0,
 			code & 0x1fff,
-			(code & 0xe000) >> 13,
+			pal,
+			0);
+}
+
+static TILE_GET_INFO( get_tilemap1_tile_info )
+{
+	cybertnk_state *state = machine.driver_data<cybertnk_state>();
+	int code = state->m_tilemap1_vram[tile_index];
+	int pal = (code & 0xe000) >> 13;
+
+	// where is the palette banking?
+	pal += 0x10; // title screen
+	
+	SET_TILE_INFO(
+			1,
+			code & 0x1fff,
+			pal,
+			0);
+}
+
+static TILE_GET_INFO( get_tilemap2_tile_info )
+{
+	cybertnk_state *state = machine.driver_data<cybertnk_state>();
+	int code = state->m_tilemap2_vram[tile_index];
+	int pal = (code & 0xe000) >> 13;
+
+	SET_TILE_INFO(
+			2,
+			code & 0x1fff,
+			pal,
 			0);
 }
 
 static VIDEO_START( cybertnk )
 {
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_tilemap0_tilemap = tilemap_create(machine, get_tilemap0_tile_info,tilemap_scan_rows,8,8,128,32);
+	state->m_tilemap0_tilemap->set_transparent_pen(0);
+
+	state->m_tilemap1_tilemap = tilemap_create(machine, get_tilemap1_tile_info,tilemap_scan_rows,8,8,128,32);
+	state->m_tilemap1_tilemap->set_transparent_pen(0);
+
+	state->m_tilemap2_tilemap = tilemap_create(machine, get_tilemap2_tile_info,tilemap_scan_rows,8,8,128,32);
+	state->m_tilemap2_tilemap->set_transparent_pen(0);
 }
 
-static void draw_pixel( bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, int pen)
+#define CYBERTNK_DRAWPIXEL \
+	if (cliprect.contains(xx, yy)) \
+		bitmap.pix16(yy, xx) = paldata[dot]; \
+
+
+static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri)
 {
-	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = pen;
+	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
+	int i;
+	const gfx_element *gfx = screen.machine().gfx[3];
+
+
+	for (i=0;i<0x1000/4;i+=4)
+	{
+		UINT16 param1 = state->m_roadram[i+2];
+		UINT16 param2 = state->m_roadram[i+1];
+		UINT16 param3 = state->m_roadram[i+0];
+	
+		int col = 0x100 + (param2 & 0xf);
+
+		// hack, might be priority related, or pen related..
+		if ((param2&0x80) == pri)
+		{
+			drawgfx_transpen(bitmap,cliprect,gfx,param1,col,0,0,-param3+screen_shift,i/4,0);
+		}
+
+
+	}
 }
+
+static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
+{
+	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
+	const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
+	int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
+	UINT32 spr_offs,spr_offs_helper;
+	int xf,yf,xz,yz;
+	const pen_t *paldata = screen.machine().pens;
+
+	for(offs=0;offs<0x1000/2;offs+=8)
+	{
+		z = (state->m_spr_ram[offs+(0x6/2)] & 0xffff);
+		if(z == 0xffff || state->m_spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
+			continue;
+		x = (state->m_spr_ram[offs+(0xa/2)] & 0x3ff);
+		y = (state->m_spr_ram[offs+(0x4/2)] & 0xff);
+		if(state->m_spr_ram[offs+(0x4/2)] & 0x100)
+			y = 0x100 - y;
+		spr_offs = (((state->m_spr_ram[offs+(0x0/2)] & 7) << 16) | (state->m_spr_ram[offs+(0x2/2)])) << 2;
+		xsize = ((state->m_spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
+		ysize = (state->m_spr_ram[offs+(0x8/2)] & 0x00ff)+1;
+		fx = (state->m_spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
+		zoom = (state->m_spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
+
+		col_bank = (state->m_spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
+
+		xf = 0;
+		yf = 0;
+		xz = 0;
+		yz = 0;
+
+		for(yi = 0;yi < ysize;yi++)
+		{
+			xf = xz = 0;
+			spr_offs_helper = spr_offs;
+			int yy = y+yz;
+
+			for(xi=0;xi < xsize;xi+=8)
+			{
+				UINT32 color;
+				UINT16 dot;
+				int shift_pen, x_dec; //helpers
+
+				color = ((blit_ram[spr_offs+0] & 0xff) << 24);
+				color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
+				color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
+				color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
+
+				shift_pen = 28;
+				x_dec = 0;
+
+				while(x_dec < 4 && x_dec+xi <= xsize)
+				{
+					dot = (color >> shift_pen) & 0xf;
+					if(dot != 0) // transparent pen
+					{
+						dot|= col_bank<<4;
+
+						if(fx)
+						{
+							int xx = x+xsize-(xz)+screen_shift;
+							CYBERTNK_DRAWPIXEL
+						}
+						else
+						{
+							int xx = x+xz+screen_shift;
+							CYBERTNK_DRAWPIXEL
+						}
+					}
+					xf+=zoom;
+					if(xf >= 0x100)
+					{
+						xz++;
+						xf-=0x100;
+					}
+					else
+					{
+						shift_pen -= 8;
+						x_dec++;
+						if(xf >= 0x80) { xz++; xf-=0x80; }
+					}
+				}
+
+				shift_pen = 24;
+				x_dec = 4;
+
+				while(x_dec < 8 && x_dec+xi <= xsize)
+				{
+					dot = (color >> shift_pen) & 0xf;
+					if(dot != 0) // transparent pen
+					{
+						dot|= col_bank<<4;
+
+						if(fx)
+						{
+							int xx = x+xsize-(xz)+screen_shift;
+							CYBERTNK_DRAWPIXEL
+						}
+						else
+						{
+							int xx = x+xz+screen_shift;
+							CYBERTNK_DRAWPIXEL
+
+						}
+					}
+					xf+=zoom;
+					if(xf >= 0x100)
+					{
+						xz++;
+						xf-=0x100;
+					}
+					else
+					{
+						shift_pen -= 8;
+						x_dec++;
+						if(xf >= 0x80) { xz++; xf-=0x80; }
+					}
+				}
+
+				spr_offs+=4;
+			}
+			yf+=zoom;
+			if(yf >= 0x100)
+			{
+				yi--;
+				yz++;
+				spr_offs = spr_offs_helper;
+				yf-=0x100;
+			}
+			if(yf >= 0x80) { yz++; yf-=0x80; }
+		}
+	}		
+}
+
 
 static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
 
-	state->m_tx_tilemap->set_scrolldx(screen_shift, screen_shift);
+	state->m_tilemap0_tilemap->set_scrolldx(screen_shift, screen_shift);
+	state->m_tilemap1_tilemap->set_scrolldx(screen_shift, screen_shift);
+	state->m_tilemap2_tilemap->set_scrolldx(screen_shift, screen_shift);
 
+	state->m_tilemap1_tilemap->set_scrolly(state->m_tilemap1scroll[2]);
+	state->m_tilemap2_tilemap->set_scrolly(state->m_tilemap2scroll[2]);
+
+	state->m_tilemap1_tilemap->set_scrollx(state->m_tilemap1scroll[0]);
+	state->m_tilemap2_tilemap->set_scrollx(state->m_tilemap2scroll[0]);
+
+	
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	{
-		int i;
-		const gfx_element *gfx = screen.machine().gfx[3];
 
+	draw_road(screen,bitmap,cliprect,screen_shift, 0x00);
 
-		for (i=0;i<0x1000/4;i+=4)
-		{
-			UINT16 param1 = state->m_roadram[i+2];
-			UINT16 param2 = state->m_roadram[i+0];
+	state->m_tilemap2_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap1_tilemap->draw(bitmap, cliprect, 0,0);
 
-			drawgfx_transpen(bitmap,cliprect,gfx,param1,0x23,0,0,-param2+screen_shift,i/4,0);
+	draw_road(screen,bitmap,cliprect,screen_shift, 0x80);
 
+	draw_sprites(screen,bitmap,cliprect,screen_shift);
 
-		}
-
-	}
-
-
-	{
-		int count,x,y;
-		const gfx_element *gfx = screen.machine().gfx[2];
-
-		count = 0;
-
-		for (y=0;y<32;y++)
-		{
-			for (x=0;x<128;x++)
-			{
-				UINT16 tile = state->m_bg_vram[count] & 0x1fff;
-				UINT16 color = (state->m_bg_vram[count] & 0xe000) >> 13;
-
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x190,0,0,(x*8)+screen_shift,(y*8),0);
-
-				count++;
-
-			}
-		}
-	}
-
-	{
-		int count,x,y;
-		const gfx_element *gfx = screen.machine().gfx[1];
-
-		count = 0;
-
-		for (y=0;y<32;y++)
-		{
-			for (x=0;x<128;x++)
-			{
-				UINT16 tile = state->m_fg_vram[count] & 0x1fff;
-				UINT16 color = (state->m_fg_vram[count] & 0xe000) >> 13;
-
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,(x*8)+screen_shift,(y*8),0);
-
-				count++;
-
-			}
-		}
-	}
-
-	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
-	if(1)
-	{
-		const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
-		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
-		UINT32 spr_offs,spr_offs_helper;
-		int xf,yf,xz,yz;
-
-		for(offs=0;offs<0x1000/2;offs+=8)
-		{
-			z = (state->m_spr_ram[offs+(0x6/2)] & 0xffff);
-			if(z == 0xffff || state->m_spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
-				continue;
-			x = (state->m_spr_ram[offs+(0xa/2)] & 0x3ff);
-			y = (state->m_spr_ram[offs+(0x4/2)] & 0xff);
-			if(state->m_spr_ram[offs+(0x4/2)] & 0x100)
-				y = 0x100 - y;
-			spr_offs = (((state->m_spr_ram[offs+(0x0/2)] & 7) << 16) | (state->m_spr_ram[offs+(0x2/2)])) << 2;
-			xsize = ((state->m_spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
-			ysize = (state->m_spr_ram[offs+(0x8/2)] & 0x00ff)+1;
-			fx = (state->m_spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
-			zoom = (state->m_spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
-
-			col_bank = (state->m_spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
-
-			xf = 0;
-			yf = 0;
-			xz = 0;
-			yz = 0;
-
-			for(yi = 0;yi < ysize;yi++)
-			{
-				xf = xz = 0;
-				spr_offs_helper = spr_offs;
-				for(xi=0;xi < xsize;xi+=8)
-				{
-					UINT32 color;
-					UINT16 dot;
-					int shift_pen, x_dec; //helpers
-
-					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
-					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
-					color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
-					color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
-
-					shift_pen = 28;
-					x_dec = 0;
-
-					while(x_dec < 4 && x_dec+xi <= xsize)
-					{
-						dot = (color >> shift_pen) & 0xf;
-						if(dot != 0) // transparent pen
-						{
-							dot|= col_bank<<4;
-							if(fx)
-							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen.machine().pens[dot]);
-							}
-							else
-							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen.machine().pens[dot]);
-							}
-						}
-						xf+=zoom;
-						if(xf >= 0x100)
-						{
-							xz++;
-							xf-=0x100;
-						}
-						else
-						{
-							shift_pen -= 8;
-							x_dec++;
-							if(xf >= 0x80) { xz++; xf-=0x80; }
-						}
-					}
-
-					shift_pen = 24;
-					x_dec = 4;
-
-					while(x_dec < 8 && x_dec+xi <= xsize)
-					{
-						dot = (color >> shift_pen) & 0xf;
-						if(dot != 0) // transparent pen
-						{
-							dot|= col_bank<<4;
-							if(fx)
-							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen.machine().pens[dot]);
-							}
-							else
-							{
-								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen.machine().pens[dot]);
-							}
-						}
-						xf+=zoom;
-						if(xf >= 0x100)
-						{
-							xz++;
-							xf-=0x100;
-						}
-						else
-						{
-							shift_pen -= 8;
-							x_dec++;
-							if(xf >= 0x80) { xz++; xf-=0x80; }
-						}
-					}
-
-					spr_offs+=4;
-				}
-				yf+=zoom;
-				if(yf >= 0x100)
-				{
-					yi--;
-					yz++;
-					spr_offs = spr_offs_helper;
-					yf-=0x100;
-				}
-				if(yf >= 0x80) { yz++; yf-=0x80; }
-			}
-		}
-	}
-
-	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
-
-
-//0x62 0x9a 1c2d0
-//0x62 0x9a 1e1e4
-//0x20 0x9c 2011c
-	if (screen_shift == 0)
-	{
-		if(0) //sprite gfx debug viewer
-		{
-			int x,y,count;
-			const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
-
-			if(screen.machine().input().code_pressed(KEYCODE_Z))
-			state->m_test_x++;
-
-			if(screen.machine().input().code_pressed(KEYCODE_X))
-			state->m_test_x--;
-
-			if(screen.machine().input().code_pressed(KEYCODE_A))
-			state->m_test_y++;
-
-			if(screen.machine().input().code_pressed(KEYCODE_S))
-			state->m_test_y--;
-
-			if(screen.machine().input().code_pressed(KEYCODE_Q))
-			state->m_start_offs+=0x200;
-
-			if(screen.machine().input().code_pressed(KEYCODE_W))
-			state->m_start_offs-=0x200;
-
-			if(screen.machine().input().code_pressed_once(KEYCODE_T))
-			state->m_start_offs+=0x20000;
-
-			if(screen.machine().input().code_pressed_once(KEYCODE_Y))
-			state->m_start_offs-=0x20000;
-
-			if(screen.machine().input().code_pressed(KEYCODE_E))
-			state->m_start_offs+=4;
-
-			if(screen.machine().input().code_pressed(KEYCODE_R))
-			state->m_start_offs-=4;
-
-			if(screen.machine().input().code_pressed(KEYCODE_D))
-			state->m_color_pen++;
-
-			if(screen.machine().input().code_pressed(KEYCODE_F))
-			state->m_color_pen--;
-
-			popmessage("%02x %02x %04x %02x",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_color_pen);
-
-			bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-			count = (state->m_start_offs);
-
-			for(y=0;y<state->m_test_y;y++)
-			{
-				for(x=0;x<state->m_test_x;x+=8)
-				{
-					UINT32 color;
-					UINT8 dot;
-
-					color = ((blit_ram[count+0] & 0xff) << 24);
-					color|= ((blit_ram[count+1] & 0xff) << 16);
-					color|= ((blit_ram[count+2] & 0xff) << 8);
-					color|= ((blit_ram[count+3] & 0xff) << 0);
-
-					dot = (color & 0xf0000000) >> 28;
-					bitmap.pix16(y, x+0) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x0f000000) >> 24;
-					bitmap.pix16(y, x+4) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x00f00000) >> 20;
-					bitmap.pix16(y, x+1) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x000f0000) >> 16;
-					bitmap.pix16(y, x+5) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x0000f000) >> 12;
-					bitmap.pix16(y, x+2) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x00000f00) >> 8;
-					bitmap.pix16(y, x+6) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x000000f0) >> 4;
-					bitmap.pix16(y, x+3) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					dot = (color & 0x0000000f) >> 0;
-					bitmap.pix16(y, x+7) = screen.machine().pens[dot+(state->m_color_pen<<4)];
-
-					count+=4;
-				}
-			}
-		}
-	}
+	state->m_tilemap0_tilemap->draw(bitmap, cliprect, 0,0);
 
 
 	return 0;
@@ -522,27 +463,52 @@ static SCREEN_UPDATE_IND16( cybertnk_left ) { return update_screen(screen, bitma
 static SCREEN_UPDATE_IND16( cybertnk_right ) { return update_screen(screen, bitmap, cliprect, -256); }
 
 
-WRITE16_MEMBER(cybertnk_state::tx_vram_w)
+WRITE16_MEMBER(cybertnk_state::tilemap0_vram_w)
 {
-	COMBINE_DATA(&m_tx_vram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap0_vram[offset]);
+	m_tilemap0_tilemap->mark_tile_dirty(offset);
 }
+
+WRITE16_MEMBER(cybertnk_state::tilemap1_vram_w)
+{
+	COMBINE_DATA(&m_tilemap1_vram[offset]);
+	m_tilemap1_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(cybertnk_state::tilemap2_vram_w)
+{
+	COMBINE_DATA(&m_tilemap2_vram[offset]);
+	m_tilemap2_tilemap->mark_tile_dirty(offset);
+}
+
+
 
 WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
 {
-	soundlatch_byte_w(space, offset, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	if (offset == 0)
+	{
+		printf("cybertnk_sound_cmd_w offset 0 %02x\n", data); 
+	}
+	else if (offset == 1)
+	{
+		soundlatch_byte_w(space, offset, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	}
 }
 
-WRITE8_MEMBER( cybertnk_state::cybertnk_unk_w )
-{
-	// ...
-}
 
 WRITE8_MEMBER( cybertnk_state::cybertnk_mux_w )
 {
-	m_mux_data = data & 0x60;
-	/* Other bits are unknown */
+	if (offset == 0)
+	{
+//		printf("cybertnk_mux_w offset 0 %02x\n", data); 
+	}
+	else if (offset == 1)
+	{
+//		printf("cybertnk_mux_w offset 1 %02x\n", data); 
+		m_mux_data = data & 0x60;
+		/* Other bits are unknown */
+	}
 }
 
 READ8_MEMBER( cybertnk_state::cybertnk_io_rdy_r )
@@ -560,34 +526,40 @@ READ8_MEMBER( cybertnk_state::cybertnk_mux_r )
 /* Amusingly the data written here is pretty weird, it seems suited for an unused protection device (attract = coin count, in-game = return status of some inputs) */
 WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 {
-	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	if (offset == 0)
+	{
+		logerror("cybertnk_irq_ack_w offset 0 %02x\n", data); 
+	}
+	else if (offset == 1)
+	{
+		cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	}
 }
 
 static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spr_ram") // non-tile based sprite ram
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tx_vram")
-	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_SHARE("bg_vram")
-	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_SHARE("fg_vram")
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tilemap0_vram_w) AM_SHARE("tilemap0_vram")
+	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM_WRITE(tilemap1_vram_w) AM_SHARE("tilemap1_vram")
+	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM_WRITE(tilemap2_vram_w) AM_SHARE("tilemap2_vram")
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") /* 2x palettes, one for each screen */
 
-	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0x00ff)
-	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1") AM_WRITENOP // watchdog?
+	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0xffff)
+	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1")  AM_WRITENOP// watchdog?
 	AM_RANGE(0x110004, 0x110005) AM_READ8(cybertnk_io_rdy_r,0xff00)
 	AM_RANGE(0x110006, 0x110007) AM_READ_PORT("IN0")
-	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_unk_w,0xff00)
-	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_mux_w,0x00ff)
-	AM_RANGE(0x110008, 0x110009) AM_READ_PORT("IN1") AM_WRITENOP
+	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_mux_w,0xffff)
+	AM_RANGE(0x110008, 0x110009) AM_READ_PORT("IN1") AM_WRITENOP // writes 0x0000, 0x0400
 	AM_RANGE(0x11000a, 0x11000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x11000c, 0x11000d) AM_WRITE8(cybertnk_irq_ack_w,0x00ff)
+	AM_RANGE(0x11000c, 0x11000d) AM_WRITE8(cybertnk_irq_ack_w,0xffff)
 
-	AM_RANGE(0x110042, 0x11004d) AM_RAM // vregs
-	AM_RANGE(0x110080, 0x110085) AM_RAM // vregs
+	AM_RANGE(0x110040, 0x110045) AM_RAM AM_SHARE("tilemap0_scroll")
+	AM_RANGE(0x110048, 0x11004d) AM_RAM AM_SHARE("tilemap1_scroll")
+	AM_RANGE(0x110080, 0x110085) AM_RAM AM_SHARE("tilemap2_scroll")
 
-	AM_RANGE(0x1100d4, 0x1100d5) AM_READ8(cybertnk_mux_r, 0x00ff) AM_WRITENOP
-
+	AM_RANGE(0x1100d4, 0x1100d5) AM_READ8(cybertnk_mux_r, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
@@ -609,11 +581,13 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
 	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("ym2", y8950_r, y8950_w)
 ADDRESS_MAP_END
 
+// Player 1 controls the Driving and the Cannons
+// Player 2 controls the Machine Guns
 static INPUT_PORTS_START( cybertnk )
 	PORT_START("IN0")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Cannon")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun 1")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon 1")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
@@ -623,8 +597,8 @@ static INPUT_PORTS_START( cybertnk )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Machine Gun")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Machine Gun 2")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon 2")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRAVERSE")
@@ -758,7 +732,6 @@ static const gfx_layout tile_8x8x4 =
     8*8
 };
 
-// could be wrong.. needs to be 512 wide, might not be 8bpp
 static const UINT32 xoffsets[] = { STEP1024(0,4) };
 static const gfx_layout roadlayout =
 {
@@ -773,11 +746,22 @@ static const gfx_layout roadlayout =
 };
 
 static GFXDECODE_START( cybertnk )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/
-	GFXDECODE_ENTRY( "gfx2", 0, tile_8x8x4,     0,      0x400 )
-	GFXDECODE_ENTRY( "gfx3", 0, tile_8x8x4,     0,      0x400 )
+	GFXDECODE_ENTRY( "tilemap0_gfx", 0, tile_8x8x4,     0x1400, 64 ) /*Pal offset???*/
+	GFXDECODE_ENTRY( "tilemap1_gfx", 0, tile_8x8x4,     0x1800, 64 )
+	GFXDECODE_ENTRY( "tilemap2_gfx", 0, tile_8x8x4,     0x1c00, 64 )
 	GFXDECODE_ENTRY( "road_data", 0, roadlayout,     0,      0x400 )
 GFXDECODE_END
+
+/* palette breakdown
+
+ 0x0000 - 0x0fff = sprites?
+ 0x1000 - 0x13ff = road?
+ 0x1400 - 0x17ff = tilemap0
+ 0x1800 - 0x1bff = tilemap1
+ 0x1c00 - 0x1fff = tilemap2
+
+ 0x2000 - 0x3fff = same but screen 2
+*/
 
 
 static const y8950_interface y8950_config = {
@@ -860,19 +844,19 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ss2.31",    0x00000, 0x20000, CRC(27d1cf94) SHA1(26246f217192bcfa39692df6d388640d385e9ed9) )
 	ROM_LOAD( "ss4.32",    0x20000, 0x20000, CRC(a327488e) SHA1(b55357101e392f50f0cf75cf496a3ff4b79b2633) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "tilemap0_gfx", 0 )
 	ROM_LOAD( "s09", 0x00000, 0x10000, CRC(69e6470c) SHA1(8e7db6988366cae714fff72449623a7977af1db1) )
 	ROM_LOAD( "s10", 0x10000, 0x10000, CRC(77230f44) SHA1(b79fc841fa784d23855e4085310cee435c11348f) )
 	ROM_LOAD( "s11", 0x20000, 0x10000, CRC(bfda980d) SHA1(1f975fdd2cfdc345eeb03fbc26fc1be1b2d7737e) )
 	ROM_LOAD( "s12", 0x30000, 0x10000, CRC(8a11fcfa) SHA1(a406ac9cf841dd9d829cb83bfe8feb5128a3e77e) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "tilemap2_gfx", 0 )
 	ROM_LOAD( "s01", 0x00000, 0x10000, CRC(6513452c) SHA1(95ed2da8f90e16c50716011577606a7dc93ba65e) )
 	ROM_LOAD( "s02", 0x10000, 0x10000, CRC(3a270e3b) SHA1(97c8282d4d782c9d2fcfb5e5dabbe1ca88978f5c) )
 	ROM_LOAD( "s03", 0x20000, 0x10000, CRC(584eff66) SHA1(308ec058693ce3ce34b058a8dbeedf342134311c) )
 	ROM_LOAD( "s04", 0x30000, 0x10000, CRC(51ba5402) SHA1(c4522c4562ce0514bef3257e323bcc255b635544) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "tilemap1_gfx", 0 )
 	ROM_LOAD( "s05", 0x00000, 0x10000, CRC(bddb6008) SHA1(bacb822bac4893eee0648a19ce449e5559d32b5e) )
 	ROM_LOAD( "s06", 0x10000, 0x10000, CRC(d65b0fa5) SHA1(ce398a52ad408778fd910c42a9618194b862becf) )
 	ROM_LOAD( "s07", 0x20000, 0x10000, CRC(70220567) SHA1(44b48ded8581a6d78b27a3af833f62413ff31c76) )
@@ -901,7 +885,7 @@ ROM_START( cybertnk )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000001, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
 	ROM_LOAD16_BYTE( "road_chh" , 0x000000, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
 
-	/*The following ROM regions aren't checked yet*/
+	/* I think these are zoom tables etc.? */
 	ROM_REGION( 0x30000, "user3", 0 )
 	ROM_LOAD( "t1",   0x00000, 0x08000, CRC(24890512) SHA1(2a6c9d39ca0c1c8316e85d9f565f6b3922d596b2) )
 	ROM_LOAD( "t2",   0x08000, 0x08000, CRC(5a10480d) SHA1(f17598442091dae14abe3505957d94793f3ed886))
@@ -920,19 +904,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-DRIVER_INIT( cybertnk )
-{
-	/* make the gfx decode easier by swapping bits around */
-/*
-    UINT8* road_data;
-    int i;
-
-    road_data = machine.root_device().memregion("road_data")->base();
-    for (i=0;i < 0x40000;i++)
-    {
-        road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);
-    }
-*/
-}
-
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING )
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING )

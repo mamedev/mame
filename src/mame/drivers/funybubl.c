@@ -210,7 +210,7 @@ static MACHINE_START( funybubl )
 	state->save_item(NAME(state->m_banked_vram));
 
 	state->membank("bank1")->configure_entries(0, 2, &state->m_banked_vram[0x0000], 0x1000);
-	state->membank("bank2")->configure_entries(0, 0x10, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 0x10, ROM, 0x4000);
 
 	state->membank("bank1")->set_entry(0);
 }
@@ -253,9 +253,8 @@ MACHINE_CONFIG_END
 
 
 ROM_START( funybubl )
-	ROM_REGION( 0x50000, "maincpu", 0 ) /* main z80, lots of banked data */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "a.ub16", 0x00000, 0x40000, CRC(4e799cdd) SHA1(c6474fd2f621c27224e847ecb88a1ae17a0dbaf9)  )
-	ROM_RELOAD ( 0x10000, 0x40000 )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_INVERT  ) // bg gfx 8x8x8
 	ROM_LOAD( "f.ug13", 0x000000, 0x40000, CRC(64d7163d) SHA1(2619ac96e05779ea23c7f0f71665d284c79ba72f) )
@@ -284,9 +283,8 @@ ROM_START( funybubl )
 ROM_END
 
 ROM_START( funybublc )
-	ROM_REGION( 0x50000, "maincpu", 0 ) /* main z80, lots of banked data */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "2.ub16", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
-	ROM_RELOAD ( 0x10000, 0x40000 )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_INVERT  ) // bg gfx 8x8x8
 	ROM_LOAD( "7.ug12",  0x000000, 0x40000, CRC(87603d7b) SHA1(21aec4cd011691f8608c3ddab83697bd89634fc8) )

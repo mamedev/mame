@@ -748,6 +748,16 @@ static DRIVER_INIT(nzerotea)
 	zeroteam_decrypt_sprites(machine);
 
 	machine.root_device().membank("bank1")->set_entry(1);
+}
+
+static DRIVER_INIT(zerotm2k)
+{
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
+
+	// sprites are NOT encrypted
+	//zeroteam_decrypt_sprites(machine);
+
+	machine.root_device().membank("bank1")->set_entry(1);
 
 }
 
@@ -915,5 +925,5 @@ GAME( 1996, r2dx_v33, 0,          rdx_v33,  rdx_v33,  rdx_v33,   ROT270, "Seibu 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
 GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
 
-// 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
-GAME( 2000, zerotm2k,  zeroteam,  nzerotea, nzerotea, nzerotea,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND)
+// 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites
+GAME( 2000, zerotm2k,  zeroteam,  nzerotea, nzerotea, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", GAME_NOT_WORKING|GAME_NO_SOUND)
