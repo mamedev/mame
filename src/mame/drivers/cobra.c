@@ -18,6 +18,11 @@ typedef struct
 	poly_vertex v[3];
 } POLYENTRY;
 
+typedef struct
+{
+	poly_vertex v[2];
+} LINEENTRY;
+
 static int texture_width = 128;
 static int texture_height = 8;
 
@@ -66,8 +71,10 @@ public:
 	poly_manager *poly;
 
 	int polybuffer_ptr;
+	int linebuffer_ptr;
 
 	POLYENTRY polybuffer[4096];
+	LINEENTRY linebuffer[4096];
 	DECLARE_READ64_MEMBER(main_mpc106_r);
 	DECLARE_WRITE64_MEMBER(main_mpc106_w);
 	DECLARE_READ32_MEMBER(sub_ata_r);
@@ -128,6 +135,44 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	}
 }
 
+static void draw_line(bitmap_rgb32 *dest, const rectangle &visarea, LINEENTRY &line)
+{
+	int dx = (line.v[1].x - line.v[0].x);
+	int dy = (line.v[1].y - line.v[0].y);
+
+	int x1 = line.v[0].x;
+	int y1 = line.v[0].y;
+
+	UINT32 color = 0xffffffff;		// TODO: where does there color come from?
+
+	if (dx > dy)
+	{
+		int x = x1;
+		for (int i=0; i < abs(dx); i++)
+		{		
+			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
+
+			UINT32 *fb = &dest->pix32(y);
+			fb[x] = color;
+
+			x++;
+		}
+	}
+	else
+	{
+		int y = y1;
+		for (int i=0; i < abs(dy); i++)
+		{
+			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
+
+			UINT32 *fb = &dest->pix32(y);
+			fb[x] = color;
+
+			y++;
+		}
+	}
+}
+
 
 static void cobra_video_exit(running_machine *machine)
 {
@@ -161,6 +206,12 @@ SCREEN_UPDATE_RGB32( cobra )
 			poly_wait(cobra->poly, "Finished render");
 		}
 		cobra->polybuffer_ptr = 0;
+
+		for (i=0; i < cobra->linebuffer_ptr; i++)
+		{
+			draw_line(cobra->framebuffer, screen.machine().primary_screen->visible_area(), cobra->linebuffer[i]);
+		}
+		cobra->linebuffer_ptr = 0;
 	}
 
 	copybitmap_trans(bitmap, *cobra->framebuffer, 0, 0, 0, 0, cliprect, 0);
@@ -435,8 +486,8 @@ static void fifo_flush(int id)
 #define M2SFIFO					2		// main to sub FIFO
 #define S2MFIFO					3		// sub to main FIFO
 
-#define GFXFIFO_IN_VERBOSE		1
-#define GFXFIFO_OUT_VERBOSE		1
+#define GFXFIFO_IN_VERBOSE		0
+#define GFXFIFO_OUT_VERBOSE		0
 #define M2SFIFO_VERBOSE			0
 #define S2MFIFO_VERBOSE			0
 
@@ -559,6 +610,14 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		}
 
 		r |= (UINT64)(value & 0xff) << 40;
+
+
+		/*
+		if (fifo_is_empty(S2MFIFO))
+		{
+			device_spin_until_time(machine().device("subcpu"), attotime::from_usec(80));
+		}
+		*/
 	}
 	if (ACCESSING_BITS_32_39)
 	{
@@ -759,7 +818,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 
 		if (fifo_is_empty(M2SFIFO))
 		{
-			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	//		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
@@ -768,6 +827,13 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		}
 
 		r |= (value & 0xff) << 24;
+
+		/*
+		if (fifo_is_empty(M2SFIFO))
+		{
+			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(80));
+		}
+		*/
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -832,7 +898,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 
 		if (!s2mfifo_unk_flag)
 		{
-			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+//			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
@@ -841,7 +907,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		}
 		else
 		{
-			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+//			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
@@ -1054,6 +1120,19 @@ static void push_poly(cobra_state *cobra, poly_vertex *v1, poly_vertex *v2, poly
 	if (cobra->polybuffer_ptr >= 4096)
 	{
 		logerror("push_poly() overflow\n");
+	}
+}
+
+static void push_line(cobra_state *cobra, poly_vertex *v1, poly_vertex *v2)
+{
+	memcpy(&cobra->linebuffer[cobra->linebuffer_ptr].v[0], v1, sizeof(poly_vertex));
+	memcpy(&cobra->linebuffer[cobra->linebuffer_ptr].v[1], v2, sizeof(poly_vertex));
+
+	cobra->linebuffer_ptr++;
+
+	if (cobra->linebuffer_ptr >= 4096)
+	{
+		logerror("push_line() overflow\n");
 	}
 }
 
@@ -1311,7 +1390,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					return;
 				}
 
-				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+				
 
 				// make sure the FIFO has fresh data at top...
 				fifo_flush(GFXFIFO_OUT);
@@ -1348,6 +1427,33 @@ static void gfx_fifo_exec(cobra_state *cobra)
 					push_poly(cobra, &vert[0], &vert[1], &vert[2]);
 					push_poly(cobra, &vert[2], &vert[1], &vert[3]);
 				}
+				else if (w1 == 0xe3400008 && w2 == 0x58c003c1)
+				{
+					// Draw a batch of lines
+					poly_vertex vert[2];
+
+					for (i=0; i < units/2; i++)
+					{
+						for (int j=0; j < 2; j++)
+						{
+							UINT64 in;
+
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? seen values 0x10 and 0x100 (start and end markers?)
+							fifo_pop_float(NULL, GFXFIFO_IN, &vert[j].x);		// X coord
+							fifo_pop_float(NULL, GFXFIFO_IN, &vert[j].y);		// Y coord
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 0 so far (Z coord?)
+
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 1.0f so far
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 1.0f so far
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 1.0f so far
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 1.0f so far
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 1.0f so far
+							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 0 so far
+						}
+
+						push_line(cobra, &vert[0], &vert[1]);
+					}
+				}
 				else if (w1 == 0xe0c00003 && w2 == 0x18c003c0)
 				{
 					// Triangle poly packet?
@@ -1381,6 +1487,8 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				}
 				else
 				{
+					printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+
 					for (i=0; i < num; i+=2)
 					{
 						UINT64 in3 = 0, in4 = 0;
@@ -1957,32 +2065,25 @@ INPUT_PORTS_END
 //  REGION_SOUND1
 //};
 
-/*
-#if ENABLE_MAIN_CPU
-static ppc_config main_ppc_cfg =
-{
-    PPC_MODEL_603EV,
-    0x40,
-    BUS_FREQUENCY_33MHZ
-};
-#endif
 
-#if ENABLE_SUB_CPU
-static ppc_config sub_ppc_cfg =
+#if ENABLE_MAIN_CPU
+static powerpc_config main_ppc_cfg =
 {
-    PPC_MODEL_403GA
+    XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+    NULL,
+    NULL
 };
 #endif
 
 #if ENABLE_GFX_CPU
-static ppc_config gfx_ppc_cfg =
+static powerpc_config gfx_ppc_cfg =
 {
-    PPC_MODEL_604,
-    0x40,
-    BUS_FREQUENCY_33MHZ,
+    XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	NULL,
+    NULL
 };
 #endif
-*/
+
 
 static void ide_interrupt(int state)
 {
@@ -2015,24 +2116,23 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	/* basic machine hardware */
 #if ENABLE_MAIN_CPU
 	MCFG_CPU_ADD("maincpu", PPC603, 100000000)		/* 603EV, 100? MHz */
-	//MCFG_CPU_CONFIG(main_ppc_cfg)
+	MCFG_CPU_CONFIG(main_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(cobra_main_map)
 	MCFG_CPU_VBLANK_INT("screen", cobra_vblank)
 #endif
 
 #if ENABLE_SUB_CPU
 	MCFG_CPU_ADD("subcpu", PPC403GA, 33000000)		/* 403GA, 33? MHz */
-	//MCFG_CPU_CONFIG(sub_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(cobra_sub_map)
 #endif
 
 #if ENABLE_GFX_CPU
 	MCFG_CPU_ADD("gfxcpu", PPC604, 100000000)		/* 604, 100? MHz */
-	//MCFG_CPU_CONFIG(gfx_ppc_cfg)
+	MCFG_CPU_CONFIG(gfx_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(cobra_gfx_map)
 #endif
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(10000))
 
 	MCFG_MACHINE_RESET( cobra )
 
@@ -2147,6 +2247,55 @@ static DRIVER_INIT(bujutsu)
 static DRIVER_INIT(racjamdx)
 {
 	DRIVER_INIT_CALL(cobra);
+
+
+	// rom hacks for sub board...
+	{
+		UINT32 *rom = (UINT32*)machine.root_device().memregion("user2")->base();
+
+		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
+		rom[0x62ddc / 4] = 0x60000000;			// skip lanc_hardcheck()
+
+		
+		// calculate the checksum of the patched rom...
+		UINT32 sum = 0;
+		for (int i=0; i < 0x20000/4; i++)
+		{
+			sum += (UINT8)((rom[(0x60000/4)+i] >> 24) & 0xff);
+			sum += (UINT8)((rom[(0x60000/4)+i] >> 16) & 0xff);
+			sum += (UINT8)((rom[(0x60000/4)+i] >>  8) & 0xff);
+			sum += (UINT8)((rom[(0x60000/4)+i] >>  0) & 0xff);
+		}
+
+		rom[(0x0007fff0^4) / 4] = ~sum;
+		rom[(0x0007fff4^4) / 4] = sum;
+	}
+
+
+	// rom hacks for gfx board...
+	{
+		int i;
+		UINT32 sum = 0;
+
+		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
+
+		rom[(0x02448^4) / 4] = 0x60000000;		// skip init_raster() for now ...
+		rom[(0x01ac8^4) / 4] = 0x60000000;		// this op changes SDR1 to 0x7f000000 which breaks page translation
+
+		rom[(0x02438^4) / 4] = 0x60000000;		// awfully long delay loop (5000000 * 166)
+
+		// calculate the checksum of the patched rom...
+		for (i=0; i < 0x20000/4; i++)
+		{
+			sum += (UINT8)((rom[i] >> 24) & 0xff);
+			sum += (UINT8)((rom[i] >> 16) & 0xff);
+			sum += (UINT8)((rom[i] >>  8) & 0xff);
+			sum += (UINT8)((rom[i] >>  0) & 0xff);
+		}
+
+		rom[(0x0001fff0^4) / 4] = sum;
+		rom[(0x0001fff4^4) / 4] = ~sum;
+	}
 }
 
 /*****************************************************************************/
