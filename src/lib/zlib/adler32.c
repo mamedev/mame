@@ -170,6 +170,8 @@ uLong ZEXPORT adler32_combine(adler1, adler2, len2)
     return adler32_combine_(adler1, adler2, len2);
 }
 
+#ifdef Z_LARGE64
+
 uLong ZEXPORT adler32_combine64(adler1, adler2, len2)
     uLong adler1;
     uLong adler2;
@@ -177,3 +179,5 @@ uLong ZEXPORT adler32_combine64(adler1, adler2, len2)
 {
     return adler32_combine_(adler1, adler2, len2);
 }
+
+#endif
