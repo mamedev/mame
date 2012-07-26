@@ -1778,20 +1778,27 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 		{
 			if (iswrite)
 			{
-				UML_DMOV(block, I3, I1);									// dmov     i3,i1
-				UML_DSHR(block, I1, I1, 32);								// dshr     i1,i1,32
-				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);		// write    i0,i1,program_dword
-				UML_ADD(block, I0, I0, 4);									// add      i0,i0,4
-				UML_WRITE(block, I0, I3, SIZE_DWORD, SPACE_PROGRAM);		// write    i0,i3,program_dword
+				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);						// mov     [tempaddr],i0
+				UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I1);					// dmov    [tempdata],i1
+				UML_DSHR(block, I1, I1, 32);											// dshr    i1,i1,32
+				UML_DMOV(block, I2, U64(0x00000000ffffffff));							// dmov    i2,0x00000000ffffffff
+				UML_CALLH(block, *masked);												// callh   masked
+				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 4);					// add     i0,[tempaddr],4
+				UML_DSHL(block, I1, mem(&ppc->impstate->tempdata.d), 32);				// dshl    i1,[tempdata],32
+				UML_DMOV(block, I2, U64(0xffffffff00000000));							// dmov    i2,0xffffffff00000000
+				UML_CALLH(block, *masked);												// callh   masked
 			}
 			else
 			{
-				UML_XOR(block, I3, I3, I3);									// xor      i3,i3,i3
-				UML_READ(block, I1, I0, SIZE_DWORD, SPACE_PROGRAM);			// read     i1,i0,program_dword
-				UML_ADD(block, I0, I0, 4);									// add      i0,i0,4
-				UML_READ(block, I3, I0, SIZE_DWORD, SPACE_PROGRAM);			// read     i3,i0,program_dword
-				UML_DSHL(block, I1, I1, 32);								// dshl     i1,i1,32
-				UML_DOR(block, I0, I1, I3);									// dor      i0,i1,i3
+				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);						// mov     [tempaddr],i0
+				UML_DMOV(block, I2, U64(0x00000000ffffffff));							// mov     i2,0x00000000ffffffff
+				UML_CALLH(block, *masked);												// callh   masked
+				UML_DSHL(block, mem(&ppc->impstate->tempdata.d), I0, 32);				// dshl    [tempdata],i0,32
+				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 4);					// add     i0,[tempaddr],4
+				UML_DMOV(block, I2, U64(0xffffffff00000000));							// dmov    i2,0xffffffff00000000
+				UML_CALLH(block, *masked);												// callh   masked
+				UML_DSHR(block, I0, I0, 32);											// dshr    i0,i0,32
+				UML_DOR(block, I0, I0, mem(&ppc->impstate->tempdata.d));				// dor     i0,i0,[tempdata]
 			}
 		}
 		UML_RET(block);																		// ret
