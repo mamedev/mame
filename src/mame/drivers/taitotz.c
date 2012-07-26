@@ -419,7 +419,7 @@ private:
 		POLY_NZ		= 5,
 	};
  
-	static const float ZBUFFER_MAX = 10000000000.0f;
+	//static const float ZBUFFER_MAX = 10000000000.0f;
 
 	bitmap_rgb32 *m_fb;
 	bitmap_ind32 *m_zbuffer;
