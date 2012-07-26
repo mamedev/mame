@@ -191,7 +191,7 @@ void bfm_bd1_t::update_display()
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bd1_t::blank(int data)
 {
-	switch ( data & 0x04 ) // TODO: wrong case values???
+	switch ( data & 0x03 ) // TODO: wrong case values???
 	{
 		case 0x00:	// clear blanking
 		{
@@ -272,7 +272,7 @@ int bfm_bd1_t::write_char(int data)
 				if (m_blank_flag)
 				{
 					//m_display_blanking = data & 0x0F;
-					blank( data & 0x04 );
+//					blank( data & 0x04 );
 					m_blank_flag = 0;
 				}
 				if (m_flash_flag)
@@ -296,13 +296,13 @@ int bfm_bd1_t::write_char(int data)
 			switch ( data & 0xF0 )
 			{
 				case 0x80:	// 0x80 - 0x8F Set display blanking
-				if (data ==0x84)// futaba setup
+				if (data==0x84)// futaba setup
 				{
 					m_blank_flag = 1;
 				}
 				else
 				{
-					blank(data&0x04);//use the blanking data
+					//blank(data&0x03);//use the blanking data
 				}
 				break;
 
