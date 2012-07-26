@@ -185,7 +185,6 @@ ZLIBOBJS = \
 	$(LIBOBJ)/zlib/compress.o \
 	$(LIBOBJ)/zlib/crc32.o \
 	$(LIBOBJ)/zlib/deflate.o \
-	$(LIBOBJ)/zlib/gzio.o \
 	$(LIBOBJ)/zlib/inffast.o \
 	$(LIBOBJ)/zlib/inflate.o \
 	$(LIBOBJ)/zlib/infback.o \
