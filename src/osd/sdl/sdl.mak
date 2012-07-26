@@ -101,6 +101,9 @@ ifdef NOASM
 DEFS += -DSDLMAME_NOASM
 endif
 
+# patch up problems with new zlib
+DEFS += -D_LFS64_LARGEFILE=0
+
 # bring in external flags for RPM build
 CCOMFLAGS += $(OPT_FLAGS)
 
