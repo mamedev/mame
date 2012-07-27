@@ -268,24 +268,27 @@ HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char*
 							   int x, int y, int width, int height, HWND parent, HMENU menu,
 							   HINSTANCE instance, void* param)
 {
-	TCHAR* t_classname;
-	TCHAR* t_windowname;
+	TCHAR* t_classname = NULL;
+	TCHAR* t_windowname = NULL;
 	HWND result = 0;
 
 	t_classname = tstring_from_utf8(classname);
 	if( !t_classname )
 		return result;
 
-	t_windowname = tstring_from_utf8(windowname);
-	if( !t_windowname ) {
-		osd_free(t_classname);
-		return result;
+	if( windowname ) {
+		t_windowname = tstring_from_utf8(windowname);
+		if( !t_windowname ) {
+			osd_free(t_classname);
+			return result;
+		}
 	}
 
 	result = CreateWindowEx(exstyle, t_classname, t_windowname, style, x, y, width, height, parent,
 							menu, instance, param);
 
-	osd_free(t_windowname);
+	if( t_windowname )
+		osd_free(t_windowname);
 	osd_free(t_classname);
 
 	return result;
