@@ -195,7 +195,7 @@ CPU_DISASSEMBLE( cop410 )
 		case 0x33:
 			bytes = 2;
 
-			if (next_opcode >= 0x60 || next_opcode <= 0x6F)
+			if (next_opcode >= 0x60 && next_opcode <= 0x6F)
 			{
 				sprintf(buffer, "LEI %x", next_opcode & 0xF);
 			}
