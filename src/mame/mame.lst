@@ -18979,6 +18979,7 @@ m5barkng	// Barking Mad (Barcrest)
 m5barmy		// Barmy Army (Barcrest)
 m5baxe		// Battle Axe (Barcrest)
 m5bbro		// Big Brother (Barcrest)
+m5bbro02	//
 m5bbrocl	// Big Brother Club (Barcrest)
 m5bigchs	// The Big Cheese (Barcrest)
 m5biggam	// The Big Game (Barcrest)
@@ -19056,8 +19057,6 @@ m5openbx	// Open The Box (Barcrest)
 m5overld	// Overload (Barcrest)
 m5ptyani	// Party Animal (Barcrest)
 m5peepsh	// Peep Show (Barcrest)
-m5psycho	// Psycho Cash Beast (Barcrest)
-m5psyccl	// Psycho Cash Beast Club (Barcrest)
 m5psy2		// Psycho Cash Beast 2 (Barcrest)
 m5qshot		// Quack Shot (Barcrest)
 m5roof		// Raise The Roof (Barcrest)
@@ -19067,7 +19066,6 @@ m5redrck	// Ready To Rock (Barcrest)
 m5rhkni		// Red Hot Knights (Barcrest)
 m5rhrg		// Red Hot Roll Gold (Barcrest)
 m5rhrgt		// Red Hot Roll Triple (Barcrest)
-m5rwb		// Red White & Blue (Barcrest)
 m5revo		// Revolution (Barcrest)
 m5rgclb		// Rio Grande Club (Barcrest)
 m5rcx		// Royal Exchange Club (Barcrest)
@@ -19222,8 +19220,6 @@ m5starcl	// Stars & Stripes Club (Vivid)
 m5startr	// Stars & Stripes Triple (Vivid)
 m5supro		// Super Roulette (Vivid)
 m5tempp		// Temple Of Pleasure (Vivid)
-m5tictac	// Tic Tac Tut (Vivid)
-m5tictaca	//
 m5whdres	// Who Dares Spins (Vivid)
 m5winway	// Winning Ways (Vivid)
 m5rawin		// Reel A Win (Vivid)
@@ -19300,38 +19296,73 @@ m5xfact		// X Factor (Empire)
 
 /* Bwb */
 m5carwsh	// Car Wash (Bwb)
+m5carwsh10	//
 m5cshstx	// Cash Stax (Bwb)
 m5circus	// Circus (Bwb)
+m5circus0a	//
+m5circus0b	//
+m5circus20	//
+m5circus21	//
+m5circus11	//
 m5circlb	// Circus Club (Bwb)
+m5circlb00  //
+m5circlb15  //
+m5circlb33  //
 m5clown		// Clown In Around (Bwb)
-m5clowna	//
+m5clown11	//
+m5clown13	//
 m5clubsn	// Club Sandwich (Bwb)
+m5clubsn11	//
+m5clubsn14  //
+m5clubsn16  //
 m5dick		// Dick Turnip (Bwb)
 m5donna		// Donna Kebab (Bwb)
 m5donnad	//
 m5donnaa	//
 m5dblqts	// Double Or Quits (Bwb)
 m5dblqtsa	//
+m5dblqtsb	//
+m5dblqts1b	//
 m5eggold	// Egyptian Gold (Bwb)
 m55050		// Fifty Fifty (Bwb)
 m5gpclub	// Get Plastered Club (Bwb)
 m5goape		// Going Ape (Bwb)
 m5hgl		// Happy Go Lucky (Bwb)
+m5hgl16		//
+m5hgl14		//
 m5jokpak	// Joker In The Pack (Bwb)
 m5lvwire	// Live Wire (Bwb)
+m5lvwirea	//
 m5carpet	// Magic Carpet (Bwb)
+m5carpet12	//
 m5minesw	// Minesweeper (Bwb)
+m5psycho	// Psycho Cash Beast (Barcrest)
+m5psycho06	//
 m5psychoa	// Psycho Cash Beast (Bwb)
+m5psychoa21 //
+m5psyccl	// Psycho Cash Beast Club (Barcrest)
+m5psyccl01	//
 m5psyccla	// Psycho Cash Beast Club (Bwb)
+m5psyccla24 //
+m5psyccla02 //
+m5rwb		// Red White & Blue (Barcrest)
 m5rwbbwb	// Red White & Blue (Bwb)
+m5rwbbwb24  //
+m5rwbbwb25  //
+m5rwbbwb15  //
 m5reelwn	// Reel A Win (Bwb)
+m5reelwn24	//
 m5reelth	// Reel Thunder (Bwb)
 m5rlup		// Roll Up (Bwb)
 m5round		// Round & Round (Bwb)
 m5sec7		// Secret 7s (Bwb)
+m5sec7a		//
 m5sil7		// Silver 7s (Bwb)
+m5sil7a		//
 m5smobik	// Smokey Bikin (Bwb)
+m5tictac	// Tic Tac Tut (Vivid)
 m5tictacbwb	// Tic Tac Tut (Bwb)
+m5tictacbwb16 //
 m5xena		// Xena Warrior Princess (Bwb)
 
 
