@@ -304,9 +304,9 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
-	const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
-	int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
-	UINT32 spr_offs,spr_offs_helper;
+	const UINT32 *sprrom = (UINT32*)screen.machine().root_device().memregion("spr_gfx")->base();
+	int offs,x,y,xsize,ysize,yi,xi,col_bank,fx,zoom;
+	UINT32 spr_offs,line_start_spr_offset;
 	int xf,yf,xz,yz;
 	const pen_t *paldata = screen.machine().pens;
 
@@ -316,72 +316,119 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	int	maxx = cliprect.max_x;
 	UINT16* dest;
 
+	/*
+
+	o = offset
+	y = ypos  Y = ysize
+	x = xpos  X = xsize f = flipx
+
+	Z = zoom
+	C = colour
+                            +word offset
+	 CCCC CCCC ---- -ooo   0x0
+	 oooo oooo oooo oooo   0x1
+	 ---- ---- ---y yyyy   0x2
+	 ---- ---- ---- ----   0x3
+	 ---- ---- ---- YYYY   0x4
+	 f--- --xx xxxx xxxx   0x5
+	 ZZZZ ZZZZ ---- XXXX   0x6
+	 ---- ---- ---- ----   0x7
+
+	*/
+
 
 	for(offs=0;offs<0x1000/2;offs+=8)
 	{
-		z = (state->m_spr_ram[offs+(0x6/2)] & 0xffff);
-		if(z == 0xffff || state->m_spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
-			continue;
-		x = (state->m_spr_ram[offs+(0xa/2)] & 0x3ff);
-		y = (state->m_spr_ram[offs+(0x4/2)] & 0xff);
-		if(state->m_spr_ram[offs+(0x4/2)] & 0x100)
-			y = 0x100 - y;
-		spr_offs = (((state->m_spr_ram[offs+(0x0/2)] & 7) << 16) | (state->m_spr_ram[offs+(0x2/2)])) << 2;
-		xsize = ((state->m_spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
-		ysize = (state->m_spr_ram[offs+(0x8/2)] & 0x00ff)+1;
-		fx = (state->m_spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
-		zoom = (state->m_spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
+		// todo, how are sprites really disabled? our gunshots etc. still leave trails with this logic
 
-		col_bank = (state->m_spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
+		if ((state->m_spr_ram[offs+0x3]) == 0xffff)
+			continue;
+
+		if ((state->m_spr_ram[offs+0x0]) == 0x0000)
+			continue;
+
+
+		x = (state->m_spr_ram[offs+0x5] & 0x3ff);
+		if (x&0x200) x-=0x400;
+
+		y = (state->m_spr_ram[offs+0x2] & 0x1ff);
+		if (y&0x100) y-=0x200;
+
+
+		spr_offs = (((state->m_spr_ram[offs+0x0] & 7) << 16) | (state->m_spr_ram[offs+0x1]));
+		xsize = ((state->m_spr_ram[offs+0x6] & 0x000f)+1) << 3;
+		ysize = (state->m_spr_ram[offs+0x4] & 0x00ff)+1;
+		fx = (state->m_spr_ram[offs+0x5] & 0x8000) >> 15;
+		zoom = (state->m_spr_ram[offs+0x6] & 0xff00) >> 8;
+
+
+		col_bank = (state->m_spr_ram[offs+0x0] & 0xff00) >> 8;
 
 		xf = 0;
 		yf = 0;
 		xz = 0;
 		yz = 0;
 
+		line_start_spr_offset = spr_offs;
+
+
 		for(yi = 0;yi < ysize;yi++)
 		{
 			xf = xz = 0;
-			spr_offs_helper = spr_offs;
+			
+
 			int yy = y+yz;
 
 			if ((yy>=miny) && (yy<=maxy))
 			{
-				dest = &bitmap.pix16(yy, 0);
+				dest = &bitmap.pix16(yy, 0);	
 
-				for(xi=0;xi < xsize;xi+=8)
+				int start,end,inc;
+
+				if (!fx)
+				{
+					start = 0;
+					end = xsize;
+					inc = 8;
+				}
+				else
+				{
+					start = xsize-8;
+					end = -8;
+					inc = -8;
+				}
+
+				for(xi=start;xi != end;xi+=inc)
 				{ // start x loop
 					UINT32 color;
+					
+					color = sprrom[line_start_spr_offset+xi/8];
+			
 					UINT16 dot;
-					int shift_pen, x_dec; //helpers
+					int x_dec; //helpers
 
-					// 4 bytes = 8 pixels..
-					color = ((blit_ram[spr_offs+0] & 0xff) << 24);
-					color|= ((blit_ram[spr_offs+1] & 0xff) << 16);
-					color|= ((blit_ram[spr_offs+2] & 0xff) << 8);
-					color|= ((blit_ram[spr_offs+3] & 0xff) << 0);
+					int shift_pen = 0;
 
-					shift_pen = 28;
 					x_dec = 0;
 
-					// draw 4 pixels
-					while(x_dec < 4 && x_dec+xi <= xsize)
+					// draw 8 pixels
+					while(x_dec < 8)
 					{
-						dot = (color >> shift_pen) & 0xf;
+						if (!fx)
+						{
+							dot = (color >> shift_pen) & 0xf;
+						}
+						else
+						{
+							dot = (color >> (28-shift_pen)) & 0xf;
+						}
+
 						if(dot != 0) // transparent pen
 						{
 							dot|= col_bank<<4;
 
-							if(fx)
-							{
-								int xx = x+xsize-(xz)+screen_shift;
-								CYBERTNK_DRAWPIXEL
-							}
-							else
-							{
-								int xx = x+xz+screen_shift;
-								CYBERTNK_DRAWPIXEL
-							}
+							int xx = (x+xz)+screen_shift;
+							CYBERTNK_DRAWPIXEL
 						}
 						xf+=zoom;
 						if(xf >= 0x100)
@@ -389,56 +436,14 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 							xz++;
 							xf-=0x100;
 						}
-						else
+						else // next source pixel
 						{
-							shift_pen -= 8;
+							shift_pen += 4;
 							x_dec++;
 							if(xf >= 0x80) { xz++; xf-=0x80; }
 						}
 					}
-
-					shift_pen = 24;
-					x_dec = 4;
-
-					// draw 4 pixels
-					while(x_dec < 8 && x_dec+xi <= xsize)
-					{
-						dot = (color >> shift_pen) & 0xf;
-						if(dot != 0) // transparent pen
-						{
-							dot|= col_bank<<4;
-
-							if(fx)
-							{
-								int xx = x+xsize-(xz)+screen_shift;
-								CYBERTNK_DRAWPIXEL
-							}
-							else
-							{
-								int xx = x+xz+screen_shift;
-								CYBERTNK_DRAWPIXEL
-
-							}
-						}
-						xf+=zoom;
-						if(xf >= 0x100)
-						{
-							xz++;
-							xf-=0x100;
-						}
-						else
-						{
-							shift_pen -= 8;
-							x_dec++;
-							if(xf >= 0x80) { xz++; xf-=0x80; }
-						}
-					}
-					spr_offs+=4;
 				} // end x loop
-			}
-			else
-			{
-				spr_offs+=xsize/8;
 			}
 
 
@@ -447,10 +452,13 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 			{
 				yi--;
 				yz++;
-				spr_offs = spr_offs_helper;
 				yf-=0x100;
 			}
-			if(yf >= 0x80) { yz++; yf-=0x80; }
+			else // next line
+			{
+				line_start_spr_offset += xsize/8;
+				if(yf >= 0x80) { yz++; yf-=0x80; }
+			}
 		}
 	}		
 }
@@ -957,4 +965,18 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING ) // it boots as 1.4, not 1.04?
+DRIVER_INIT( cybertnk )
+{
+	UINT32 *spr = (UINT32*)machine.root_device().memregion("spr_gfx")->base();
+
+	for (int x = 0; x< 0x200000/4;x++)
+	{
+		// reorder the data to simplify sprite drawing
+		// we draw 8 pixels at a time, each each nibble contains a pixel, however the original order of 32-bits (8 pixels)
+		// is along the lines of 04 15 26 37 which is awkward to use
+		spr[x] = BITSWAP32(spr[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
+	}
+
+}
+
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.4)", GAME_NOT_WORKING )
