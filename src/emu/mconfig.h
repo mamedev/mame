@@ -176,30 +176,21 @@ private:
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
 	device_t *device = NULL; \
-	const char *tag; \
-	astring tempstring; \
 	(void)device; \
-	(void)tag; \
 	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0); \
 
 #define MACHINE_CONFIG_FRAGMENT(_name) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
 	device_t *device = NULL; \
-	const char *tag; \
-	astring tempstring; \
 	(void)device; \
-	(void)tag; \
 	assert(owner != NULL); \
 
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
 	device_t *device = NULL; \
-	const char *tag; \
-	astring tempstring; \
 	(void)device; \
-	(void)tag; \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
 	assert(owner != NULL); \
 
@@ -207,10 +198,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
 	device_t *device = NULL; \
-	const char *tag; \
-	astring tempstring; \
 	(void)device; \
-	(void)tag; \
 	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0); \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
 
