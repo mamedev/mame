@@ -2717,6 +2717,7 @@ chd_file_compressor::hashmap::hashmap()
 chd_file_compressor::hashmap::~hashmap()
 {
 	reset();
+	delete m_block_list;
 }
 
 
