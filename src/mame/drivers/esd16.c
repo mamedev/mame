@@ -34,17 +34,11 @@ Other ESD games:
 3 Cushion Billiards (c) 2000 - Undumped
 Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
 Fire Hawk           (c) 2001 - see nmk16.c driver
-Jumping Pop         (c) 2001 - see tumbleb.c driver
 
 Head Panic
 - Nude / Bikini pics don't show in-game, even when set in test mode?
 
 ---------------------------------------------------------------------------
-
- Jumping Pop
-
-  - The game needs more investigation to get similar infos to "Tumble Pop" bootlegs/ripoffs.
-
 
  Jumping Pop
  -----------
@@ -57,7 +51,16 @@ Head Panic
  emag "cleaned" the tiles for the title screen, but started clean and ESD
  added their text into the tiles later.
 
+ToDo:
+ Verify if Multi Champ, on ESD 11-09-98, uses the same timing / clocks as
+ Jumping Pop also on ESD 11-09-98 or the later games:
 
+    Jumping Pop                   Later Games
+ -------------------------------------------------------
+  68000 = 16MHz                  68000 = 16MHz
+    Z80 = 3.5MHz (14MHz/4)         Z80 = 4MHz (16MHz/4)
+ YM3812 = 3.5MHz (14MHz/4)      YM3812 = 4MHz (16MHz/4)
+  M6295 = 875KHz (14MHz/16)      M6295 = 1Mhz (16MHz/16)
 
 ***************************************************************************/
 
@@ -332,11 +335,11 @@ static INPUT_PORTS_START( jumppop )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_SERVICE_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SWA:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SWA:2")
+	PORT_SERVICE_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWA:3,4,5")
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
@@ -345,7 +348,7 @@ static INPUT_PORTS_START( jumppop )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWA:6,7,8")
+	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:6,7,8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
@@ -354,24 +357,24 @@ static INPUT_PORTS_START( jumppop )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:1")
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Picture Viewer" )        PORT_DIPLOCATION("SWB:3")
+	PORT_DIPNAME( 0x0400, 0x0400, "Picture Viewer" )        PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "BG Modesty" )               PORT_DIPLOCATION("SWB:4")
+	PORT_DIPNAME( 0x0800, 0x0800, "BG Modesty" )               PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, "Less" )
 	PORT_DIPSETTING(      0x0000, "More" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:7,8")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0xc000, "3" )
@@ -666,11 +669,11 @@ static UINT16 hedpanic_pri_callback(UINT16 x)
 static MACHINE_CONFIG_START( esd16, esd16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)	/* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_sound_map)
 	MCFG_CPU_IO_MAP(multchmp_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,32*60)	/* IRQ By Main CPU */
@@ -700,10 +703,10 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)	/* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // 1.0Mhz?? clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)	/* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -716,13 +719,15 @@ static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
 	MCFG_CPU_PROGRAM_MAP(jumppop_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK( XTAL_14MHz/4) /* 3.5MHz - Verfied */
+	MCFG_CPU_CLOCK( XTAL_14MHz/4) /* 3.5MHz - Verified */
 
 	MCFG_GFXDECODE(jumppop)
 
-//	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verfied */
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-//	MCFG_SOUND_REPLACE("oki", XTAL_14MHz/16, OKIM6295_PIN7_HIGH) /* 875kHz - Verfied */
+	MCFG_OKIM6295_REPLACE("oki", XTAL_14MHz/16, OKIM6295_PIN7_HIGH) /* 875kHz - Verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 
@@ -817,9 +822,9 @@ ESD 11-09-98
 +-----------------------------------------+
 
 (C) ESD 1998, 1999
-PCB No. ESD 11-09-98    (Probably the manufacture date)
+PCB No. ESD 11-09-98
 CPU: MC68HC000FN16 (68000, 68 pin PLCC socketed)
-SND: Z80 (Z0840006PSC), U6614/U6612 (YM3014/YM3812), AD-65 (OKI M6295)
+SND: Z80 (Z0840006PSC), YM3812/YM3014 & OKI M6295 (rebaged as U6612/U6614 & AD-65)
 OSC: 16.000MHz, 14.000MHz
 RAM: 4 x 62256, 9 x 6116
 DIPS: 2 x 8 position
@@ -940,9 +945,9 @@ ESD 08-26-1999
 
 Notes:
       68000 clock 16.000MHz
-      Z80 clock 4.000MHz
+        Z80 clock 4.000MHz
       M6295 clock 1.000MHz. Sample rate 1000000/132
-      YM3812 clock 4.000MHz
+     YM3812 clock 4.000MHz
       HSync   - 15.625kHz
       VSync   - 60Hz
       MCM6206 - 32k x8 SRAM (SOJ28)
@@ -1059,7 +1064,9 @@ ESD 05-28-99
 Notes:
       68000 (MC68HC000FN16)
       Z80 (Z84C00006FEC)
-      YM3014/YM3812 & OKI M6295 (rebaged as U6614/U6612 & AD-65)
+      OKI6295 label AD65 (sound)
+      YM3812 label U6612 (sound)
+      YM3014 label U6614 (sound)
       A40MX04 - Actel A40MX04-F FPGA (PLCC84)
       CRTC99  - ESD CRTC99 Graphics Controller (QFP240)
 
@@ -1101,6 +1108,7 @@ Notes:
       VSync: 60Hz
       MCM6206 is 32kx8 SRAM
       6116 is 8kx8 SRAM
+
       * : Board has positions for 6x standard 32 pin EPROMs but only position ESD5 is populated
           with an EPROM. In between the unpopulated positions are 2x smt pads. These are populated
           with 2x 16M SOP44 smt Mask ROMs.
@@ -1228,8 +1236,8 @@ Notes:
       68000 (MC68HC000FN16)
       Z80 (Z84C00006FEC-Z80CPU)
       OKI6295 label AD65 (sound)
-      YM3014 label U6614 (sound)
       YM3812 label U6612 (sound)
+      YM3014 label U6614 (sound)
       MCM6206 - 32k x8 SRAM (SOJ28)
       6116    - 2k x8 SRAM (SOP28)
       A40MX04 - Actel A40MX04-F FPGA (PLCC84)
@@ -1303,8 +1311,8 @@ Notes:
       68000 (MC68HC000FN16-2E60R-QQJU9508)
       Z80 (Z84C00006FEC-Z80CPU-9618Z3)
       OKI6295 label AD65 (sound)
-      YM3014 label U6614 (sound)
       YM3812 label U6612 (sound)
+      YM3014 label U6614 (sound)
       MCM6206 - 32k x8 SRAM (SOJ28)
       6116    - 2k x8 SRAM (SOP28)
       A40MX04 - Actel A40MX04-F FPGA (PLCC84)
@@ -1377,8 +1385,8 @@ Notes:
       68000 (MC68HC000FN16)
       Z80 (Z84C00006FEC-Z80CPU)
       OKI6295 label AD65 (sound)
-      YM3014 label U6614 (sound)
       YM3812 label U6612 (sound)
+      YM3014 label U6614 (sound)
       MCM6206 - 32k x8 SRAM (SOJ28)
       6116    - 2k x8 SRAM (SOP28)
       A40MX04 - Actel A40MX04-F FPGA (PLCC84)
@@ -1451,7 +1459,7 @@ PCB Layout
 Notes:
       68000   - Motorola MC68EC000FU10, running at 16.000MHz (QFP64)
       YM3812  - Yamaha YM3812, running at 3.500MHz [14 / 4] (DIP24)
-      YM3012  - Yamaha YM3012 16bit Serial DAC (DIP8)
+      YM3014  - Yamaha YM3014 16bit Serial DAC (DIP8)
       Z80     - Zilog Z84C0006FEC, running at 3.500MHz [14 / 4] (QFP44)
       6295    - Oki M6295, running at 875kHz [14 / 16], samples rate 6.628787879kHz [875000 /132] (QFP44)
       A40MX04 - Actel A40MX04-F FPGA (x2, PLCC84)
@@ -1504,6 +1512,8 @@ PCB No. ESD 11-09-98
  DIPS: 2 x 8 position
 Other: 2 x Actel A40MX04-F FPGA (PLCC84)
 
+JU07 and FU30 through FU32 unpopulated
+
 */
 
 ROM_START( jumppop )
@@ -1525,9 +1535,8 @@ ROM_START( jumppop )
 	ROM_LOAD( "samples.bin", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) )
 ROM_END
 
-/* This set displays an a '(c)2001 Emag Soft' copyright and doesn't have the ESD copyright embedded into the 'bgs' tiles,
-   it was running on an original ESD 11-09-98 PCB with original ROMs */
-ROM_START( jumppope )
+/* This set displays an a '(c)2001 Emag Soft' copyright and doesn't have the ESD copyright embedded into the 'bgs' tiles */
+ROM_START( jumppope ) /* Running on an original ESD 11-09-98 PCB with original ESD labeled ROMs */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(302dd093) SHA1(fd52dc2342652fd6e6f24942d00a0c2bff83e4ed) ) // 68k_prg.bin  [odd]      99.980164%
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(883392ba) SHA1(7241fd35b0431bbb6e83e4f0eb9026bafbcf1d7f) ) // 68k_prg.bin  [even]     99.979782%
@@ -1563,7 +1572,7 @@ ROM_END
 /* ESD 11-09-98 */
 GAME( 1999, multchmp, 0,        esd16,    multchmp, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)", GAME_SUPPORTS_SAVE )
 GAME( 1998, multchmpk,multchmp, esd16,    multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 2001, jumppop,  0,        jumppop,  jumppop,  0, ROT0, "ESD",         "Jumping Pop (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 2001, jumppop,  0,        jumppop,  jumppop,  0, ROT0, "ESD",         "Jumping Pop (set 1)", GAME_SUPPORTS_SAVE ) /* Redesigned(?) ESD 11-09-98 with no ID# */
 GAME( 2001, jumppope, jumppop,  jumppop,  jumppop,  0, ROT0, "Emag Soft",   "Jumping Pop (set 2)", GAME_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
