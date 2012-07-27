@@ -1159,20 +1159,45 @@ static void f8_am(f8_Regs *cpustate)
  ***************************************************/
 static void f8_amd(f8_Regs *cpustate)
 {
-    UINT8 tmp = cpustate->a - 0x66, adj = 0x00;
-    int sum;
+
+/*SKR from F8 Guide To programming description of AMD 
+
+ binary add the addend to the binary sum of the augend and $66
+   *NOTE* the binary addition of the augend to $66 is done before AMD is called
+   record the status of the carry and intermediate carry
+   add a factor to the sum based on the carry and intermediate carry:
+     no carry, no intermediate carry, add $AA
+     no carry, intermediate carry, add $A0
+     carry, no intermediate carry, add $0A
+     carry, intermediate carry, add $00
+     any carry from the low-order digit is suppressed
+   *NOTE* status flags are updated prior to the factor being added
+*/
+
+    UINT8 augend=cpustate->a;
     ROMC_02(cpustate);
-    sum = (tmp & 0x0f) + (cpustate->dbus & 0x0f);
-    if (sum > 0x09)
-	adj += 0x06;
-    sum = tmp + cpustate->dbus + adj;
-    if (sum > 0x99)
-	adj += 0x60;
-    tmp += adj;
+    UINT8 addend=cpustate->dbus;
+    UINT8 tmp=addend+augend;
+
+    UINT8 c=0;              /* high order carry */
+    UINT8 ic=0;             /* low order carry */
+    if(((augend+addend)&0xff0)>0xf0)
+    c=1;
+    if((augend&0x0f)+(addend&0x0f)>0x0F)
+    ic=1;
+
     CLR_OZCS;
-    SET_OC(tmp,cpustate->dbus);
-    cpustate->a = tmp + cpustate->dbus;
-    SET_SZ(cpustate->a);
+    SET_OC(augend,addend);
+    SET_SZ(tmp);
+
+    if(c==0&&ic==0)
+    tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
+    if(c==0&&ic==1)
+    tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
+    if(c==1&&ic==0)
+    tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
+   
+    cpustate->a = tmp;
 }
 
 /***************************************************
@@ -1364,20 +1389,31 @@ static void f8_as_isar_d(f8_Regs *cpustate)
  ***************************************************/
 static void f8_asd(f8_Regs *cpustate, int r)
 {
-	UINT8 tmp = cpustate->a - 0x66, adj = 0x00;
-	int sum;
-	ROMC_1C(cpustate, cS);
-	sum = (tmp & 0x0f) + (cpustate->r[r] & 0x0f);
-	if (sum > 0x09)
-		adj += 0x06;
-	sum = tmp + cpustate->r[r] + adj;
-	if (sum > 0x99)
-		adj += 0x60;
-	tmp += adj;
-	CLR_OZCS;
-	SET_OC(tmp, cpustate->r[r]);
-	cpustate->a = tmp + cpustate->r[r];
-	SET_SZ(cpustate->a);
+/*SKR from F8 Guide To programming description of AMD */
+    UINT8 augend=cpustate->a;
+    ROMC_1C(cpustate, cS);
+    UINT8 addend=cpustate->r[r];
+    UINT8 tmp=augend+addend;
+
+    UINT8 c=0;
+    UINT8 ic=0;
+    if(((augend+addend)&0xff0)>0xf0)
+    c=1;
+    if((augend&0x0f)+(addend&0x0f)>0x0F)
+    ic=1;
+
+    CLR_OZCS;
+    SET_OC(augend,addend);
+    SET_SZ(tmp);
+
+    if(c==0&&ic==0)
+    tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
+    if(c==0&&ic==1)
+    tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
+    if(c==1&&ic==0)
+    tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
+   
+    cpustate->a = tmp;
 }
 
 /***************************************************
@@ -1386,20 +1422,31 @@ static void f8_asd(f8_Regs *cpustate, int r)
  ***************************************************/
 static void f8_asd_isar(f8_Regs *cpustate)
 {
-	UINT8 tmp = cpustate->a - 0x66, adj = 0x00;
-	int sum;
-	ROMC_1C(cpustate, cS);
-	sum = (tmp & 0x0f) + (cpustate->r[cpustate->is] & 0x0f);
-	if (sum > 0x09)
-		adj += 0x06;
-	sum = tmp + cpustate->r[cpustate->is] + adj;
-	if (sum > 0x99)
-		adj += 0x60;
-	tmp += adj;
-	CLR_OZCS;
-	SET_OC(tmp, cpustate->r[cpustate->is]);
-	cpustate->a = tmp + cpustate->r[cpustate->is];
-	SET_SZ(cpustate->a);
+/*SKR from F8 Guide To programming description of AMD */
+    UINT8 augend=cpustate->a;
+    ROMC_1C(cpustate, cS);
+    UINT8 addend=cpustate->r[cpustate->is];
+    UINT8 tmp=augend+addend;
+
+    UINT8 c=0;
+    UINT8 ic=0;
+    if(((augend+addend)&0xff0)>0xf0)
+    c=1;
+    if((augend&0x0f)+(addend&0x0f)>0x0F)
+    ic=1;
+
+    CLR_OZCS;
+    SET_OC(augend,addend);
+    SET_SZ(tmp);
+
+    if(c==0&&ic==0)
+    tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
+    if(c==0&&ic==1)
+    tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
+    if(c==1&&ic==0)
+    tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
+   
+    cpustate->a = tmp;
 }
 
 /***************************************************
@@ -1408,21 +1455,32 @@ static void f8_asd_isar(f8_Regs *cpustate)
  ***************************************************/
 static void f8_asd_isar_i(f8_Regs *cpustate)
 {
-	UINT8 tmp = cpustate->a - 0x66, adj = 0x00;
-	int sum;
-	ROMC_1C(cpustate, cS);
-	sum = (tmp & 0x0f) + (cpustate->r[cpustate->is] & 0x0f);
-	if (sum > 0x09)
-		adj += 0x06;
-	sum = tmp + cpustate->r[cpustate->is] + adj;
-	if (sum > 0x99)
-		adj += 0x60;
-	tmp += adj;
-	CLR_OZCS;
-	SET_OC(tmp, cpustate->r[cpustate->is]);
-	cpustate->a = tmp + cpustate->r[cpustate->is];
-	SET_SZ(cpustate->a);
-	cpustate->is = (cpustate->is & 0x38) | ((cpustate->is + 1) & 0x07);
+/*SKR from F8 Guide To programming description of AMD */
+    UINT8 augend=cpustate->a;
+    ROMC_1C(cpustate, cS);
+    UINT8 addend=cpustate->r[cpustate->is];
+    UINT8 tmp=augend+addend;
+
+    UINT8 c=0;
+    UINT8 ic=0;
+    if(((augend+addend)&0xff0)>0xf0)
+    c=1;
+    if((augend&0x0f)+(addend&0x0f)>0x0F)
+    ic=1;
+
+    CLR_OZCS;
+    SET_OC(augend,addend);
+    SET_SZ(tmp);
+
+    if(c==0&&ic==0)
+    tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
+    if(c==0&&ic==1)
+    tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
+    if(c==1&&ic==0)
+    tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
+   
+    cpustate->a = tmp;
+    cpustate->is = (cpustate->is & 0x38) | ((cpustate->is + 1) & 0x07);
 }
 
 /***************************************************
@@ -1431,21 +1489,32 @@ static void f8_asd_isar_i(f8_Regs *cpustate)
  ***************************************************/
 static void f8_asd_isar_d(f8_Regs *cpustate)
 {
-	UINT8 tmp = cpustate->a - 0x66, adj = 0x00;
-	int sum;
-	ROMC_1C(cpustate, cS);
-	sum = (tmp & 0x0f) + (cpustate->r[cpustate->is] & 0x0f);
-	if (sum > 0x09)
-		adj += 0x06;
-	sum = tmp + cpustate->r[cpustate->is] + adj;
-	if (sum > 0x99)
-		adj += 0x60;
-	tmp += adj;
-	CLR_OZCS;
-	SET_OC(tmp, cpustate->r[cpustate->is]);
-	cpustate->a = tmp + cpustate->r[cpustate->is];
-	SET_SZ(cpustate->a);
-	cpustate->is = (cpustate->is & 0x38) | ((cpustate->is - 1) & 0x07);
+/*SKR from F8 Guide To programming description of AMD */
+    UINT8 augend=cpustate->a;
+    ROMC_1C(cpustate, cS);
+    UINT8 addend=cpustate->r[cpustate->is];
+    UINT8 tmp=augend+addend;
+
+    UINT8 c=0;
+    UINT8 ic=0;
+    if(((augend+addend)&0xff0)>0xf0)
+    c=1;
+    if((augend&0x0f)+(addend&0x0f)>0x0F)
+    ic=1;
+
+    CLR_OZCS;
+    SET_OC(augend,addend);
+    SET_SZ(tmp);
+
+    if(c==0&&ic==0)
+    tmp=((tmp+0xa0)&0xf0)+((tmp+0x0a)&0x0f);
+    if(c==0&&ic==1)
+    tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
+    if(c==1&&ic==0)
+    tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
+   
+    cpustate->a = tmp;
+    cpustate->is = (cpustate->is & 0x38) | ((cpustate->is - 1) & 0x07);
 }
 
 /***************************************************
