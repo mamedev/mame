@@ -525,7 +525,7 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
 	$(MACHINE)/sec.o \
-	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
+	$(MACHINE)/bfm_bd1.o $(MACHINE)/bfm_bda.o $(VIDEO)/bfm_dm01.o \
 
 $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \

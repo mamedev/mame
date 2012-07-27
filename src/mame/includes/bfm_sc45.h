@@ -4,7 +4,7 @@
 #include "machine/sec.h"
 #include "machine/steppers.h" // stepper motor
 
-#include "machine/bfm_bd1.h"
+#include "machine/bfm_bda.h"
 
 class sc4_state : public driver_device
 {
@@ -25,7 +25,7 @@ public:
 	device_t* m_duart;
 	device_t* m_ymz;
 	required_device<cpu_device> m_maincpu;
-	optional_device<bfm_bd1_t> m_vfd0;
+	optional_device<bfm_bda_t> m_vfd0;
 
 	// serial vfd
 	int vfd_enabled;

@@ -779,7 +779,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 
 	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
 
-	MCFG_BFMBD1_ADD("vfd0",0)
+	MCFG_BFMBDA_ADD("vfd0",0)
 
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 

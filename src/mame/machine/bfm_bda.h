@@ -1,22 +1,22 @@
 #pragma once
-#ifndef BFM_BD1_H
-#define BFM_BD1_H
+#ifndef BFM_BDA_H
+#define BFM_BDA_H
 
-#define MCFG_BFMBD1_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, BFM_BD1,60)\
-		MCFG_BD1_PORT(_val) \
+#define MCFG_BFMBDA_ADD(_tag,_val) \
+		MCFG_DEVICE_ADD(_tag, BFM_BDA,60)\
+		MCFG_BDA_PORT(_val) \
 
-#define MCFG_BD1_PORT(_val) \
-	bfm_bd1_t::static_set_value(*device, _val); \
+#define MCFG_BDA_PORT(_val) \
+	bfm_bda_t::static_set_value(*device, _val); \
 
-#define MCFG_BFMBD1_REMOVE(_tag) \
+#define MCFG_BFMBDA_REMOVE(_tag) \
     MCFG_DEVICE_REMOVE(_tag)
 
-class bfm_bd1_t : public device_t
+class bfm_bda_t : public device_t
 {
 public:
 	typedef delegate<void (bool state)> line_cb;
-	bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
 	// inline configuration helpers
@@ -44,6 +44,8 @@ protected:
 	int	m_shift_count;
 	int	m_shift_data;
 	int m_pcursor_pos;
+	int m_blank_flag;
+	int m_flash_flag;
 	int m_scroll_active;
 	int m_display_mode;
 	int m_flash_rate;
@@ -61,6 +63,6 @@ protected:
 
 };
 
-extern const device_type BFM_BD1;
+extern const device_type BFM_BDA;
 #endif
 

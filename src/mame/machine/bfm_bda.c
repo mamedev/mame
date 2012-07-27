@@ -1,37 +1,19 @@
 /**********************************************************************
 
-    Bellfruit BD1 VFD module interface and emulation by J.Wallace
+    Bellfruit 7x5 Dot matrix VFD module interface and emulation by J.Wallace
 
-    TODO: Implement flashing (our only datasheet has that section
-    completely illegible)
+    TODO: Everything really!
 **********************************************************************/
 
 #include "emu.h"
-#include "bfm_bd1.h"
+#include "bfm_bda.h"
 
-const device_type BFM_BD1 = &device_creator<bfm_bd1_t>;
+const device_type BFM_BDA = &device_creator<bfm_bda_t>;
 
 
-/*
-   BD1 14 segment charset lookup table, according to datasheet (we rewire this later)
+//I currently use the BDA character set, until a suitable image can be programmed
 
-        2
-    ---------
-   |\   |3  /|
- 0 | \6 |  /7| 1
-   |  \ | /  |
-    -F-- --E-
-   |  / | \  |
- D | /4 |A \B| 5
-   |/   |   \|
-    ---------  C
-        9
-
-        8 is flashing
-
-  */
-
-static const UINT16 BD1charset[]=
+static const UINT16 BDAcharset[]=
 {           // FEDC BA98 7654 3210
 	0xA626, // 1010 0110 0010 0110 @.
 	0xE027, // 1110 0000 0010 0111 A.
@@ -99,19 +81,19 @@ static const UINT16 BD1charset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BFM_BD1, "BFM BD1 VFD controller", tag, owner, clock),
+bfm_bda_t::bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BFM_BDA, "BFM BDA VFD controller", tag, owner, clock),
 	m_port_val(0)
 {
 }
 
-void bfm_bd1_t::static_set_value(device_t &device, int val)
+void bfm_bda_t::static_set_value(device_t &device, int val)
 {
-	bfm_bd1_t &bd1 = downcast<bfm_bd1_t &>(device);
-	bd1.m_port_val = val;
+	bfm_bda_t &BDA = downcast<bfm_bda_t &>(device);
+	BDA.m_port_val = val;
 }
 
-void bfm_bd1_t::device_start()
+void bfm_bda_t::device_start()
 {
 	save_item(NAME(m_cursor));
     save_item(NAME(m_cursor_pos));
@@ -121,6 +103,8 @@ void bfm_bd1_t::device_start()
 	save_item(NAME(m_shift_count));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_pcursor_pos));
+	save_item(NAME(m_blank_flag));
+	save_item(NAME(m_flash_flag));
 	save_item(NAME(m_scroll_active));
 	save_item(NAME(m_display_mode));
 	save_item(NAME(m_flash_rate));
@@ -134,7 +118,7 @@ void bfm_bd1_t::device_start()
 	device_reset();
 }
 
-void bfm_bd1_t::device_reset()
+void bfm_bda_t::device_reset()
 {
 	m_cursor = 0;
     m_cursor_pos = 0;
@@ -144,6 +128,8 @@ void bfm_bd1_t::device_reset()
 	m_shift_count = 0;
 	m_shift_data = 0;
 	m_pcursor_pos = 0;
+	m_blank_flag = 0;
+	m_flash_flag = 0;
 	m_scroll_active = 0;
 	m_display_mode = 0;
 	m_flash_rate = 0;
@@ -156,12 +142,12 @@ void bfm_bd1_t::device_reset()
     memset(m_attrs, 0, sizeof(m_attrs));
 }
 
-UINT16 bfm_bd1_t::set_display(UINT16 segin)
+UINT16 bfm_bda_t::set_display(UINT16 segin)
 {
 	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
-void bfm_bd1_t::device_post_load()
+void bfm_bda_t::device_post_load()
 {
 	for (int i =0; i<16; i++)
 	{
@@ -169,7 +155,7 @@ void bfm_bd1_t::device_post_load()
 	}
 }
 
-void bfm_bd1_t::update_display()
+void bfm_bda_t::update_display()
 {
 	for (int i =0; i<16; i++)
 	{
@@ -185,18 +171,17 @@ void bfm_bd1_t::update_display()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////
-void bfm_bd1_t::blank(int data)
+void bfm_bda_t::blank(int data)
 {
-	switch ( data & 0x03 )
+	switch ( data & 0x03 ) // TODO: wrong case values???
 	{
-		case 0x00:	//blank all
+		case 0x00:	// clear blanking
 		{
 			for (int i = 0; i < 15; i++)
 			{
-				m_attrs[i] = AT_BLANK;
+				m_attrs[i] = 0;
 			}
 		}
-
 		break;
 		case 0x01:	// blank inside window
 		if ( m_window_size > 0 )
@@ -227,18 +212,19 @@ void bfm_bd1_t::blank(int data)
 			}
 		}
 		break;
-		case 0x03:	// clear blanking
+
+		case 0x03:	//blank all
 		{
 			for (int i = 0; i < 15; i++)
 			{
-				m_attrs[i] = 0;
+				m_attrs[i] = AT_BLANK;
 			}
 		}
 		break;
 	}
 }
 
-int bfm_bd1_t::write_char(int data)
+int bfm_bda_t::write_char(int data)
 {
 	int change = 0;
 	if ( m_user_def )
@@ -262,20 +248,43 @@ int bfm_bd1_t::write_char(int data)
 
 		if(data < 0x80)//characters
 		{
-			if (data > 0x3F)
-			{
-				//  logerror("Undefined character %x \n", data);
-			}
 
-			setdata(BD1charset[(data & 0x3F)], data);
+			if (m_blank_flag || m_flash_flag)
+			{
+				if (m_blank_flag)
+				{
+					logerror("Brightness data %x \n", data) ;
+					m_blank_flag = 0;
+				}
+				if (m_flash_flag)
+				{
+					//not setting yet
+					m_flash_flag = 0;
+				}
+			}
+			else
+			{
+				if (data > 0x3F)
+				{
+					logerror("Undefined character %x \n", data);
+				}
+
+				setdata(BDAcharset[(data & 0x3F)], data);
+			}
 		}
 		else
 		{
 			switch ( data & 0xF0 )
 			{
 				case 0x80:	// 0x80 - 0x8F Set display blanking
+				if (data==0x84)// futaba setup
 				{
-					blank(data&0x03);//use the blanking data
+					m_blank_flag = 1;
+				}
+				else
+				{
+					logerror("80s %x \n",data);
+					//blank(data&0x03);//use the blanking data
 				}
 				break;
 
@@ -372,7 +381,7 @@ int bfm_bd1_t::write_char(int data)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-void bfm_bd1_t::setdata(int segdata, int data)
+void bfm_bda_t::setdata(int segdata, int data)
 {
 	int move = 0;
 	int change =0;
@@ -537,7 +546,7 @@ void bfm_bd1_t::setdata(int segdata, int data)
 	}
 }
 
-void bfm_bd1_t::shift_data(int data)
+void bfm_bda_t::shift_data(int data)
 {
 	m_shift_data <<= 1;
 
