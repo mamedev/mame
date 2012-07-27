@@ -126,6 +126,7 @@ static PALETTE_INIT( cyclemb )
 	}
 }
 
+
 static VIDEO_START( cyclemb )
 {
 
@@ -276,6 +277,41 @@ static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(cyclemb_8741_0_r, cyclemb_8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
+
+static READ8_HANDLER( skydest_8741_0_r )
+{
+	if(offset == 1) //status port
+	{
+		printf("STATUS PC=%04x\n",cpu_get_pc(&space->device()));
+
+		return 1;
+	}
+	else
+	{
+		printf("READ PC=%04x\n",cpu_get_pc(&space->device()));
+		return 0;
+	}
+}
+
+static WRITE8_HANDLER( skydest_8741_0_w )
+{
+	if(offset == 1) //command port
+	{
+		printf("%02x CMD PC=%04x\n",data,cpu_get_pc(&space->device()));
+	}
+	else
+	{
+		printf("%02x DATA PC=%04x\n",data,cpu_get_pc(&space->device()));
+	}
+}
+
+static ADDRESS_MAP_START( skydest_io, AS_IO, 8, cyclemb_state )
+//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
+	AM_RANGE(0xc080, 0xc081) AM_READWRITE_LEGACY(skydest_8741_0_r, skydest_8741_0_w)
+	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -569,6 +605,13 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(skydest_io)
+
+//	MCFG_PALETTE_INIT(skydest)
+MACHINE_CONFIG_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -596,10 +639,10 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p0_7.1k",    0x0000, 0x2000, CRC(6507d23f) SHA1(1640b25a6efa0976f13ed7838f31ef53c37c8d2d) )
 
 	ROM_REGION( 0xc000, "sprite_data_2", ROMREGION_ERASEFF )
-	ROM_LOAD( "p0_10.1n",   0x4000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) )
 	ROM_LOAD( "p0_11.1r",   0x0000, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) )
-	ROM_LOAD( "p0_12.1s",   0x6000, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
 	ROM_LOAD( "p0_13.1t",   0x2000, 0x2000, CRC(086639c1) SHA1(3afbe76bb466d4c5916ef85d4cfc42e0c3f69883) )
+	ROM_LOAD( "p0_10.1n",   0x4000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) )
+	ROM_LOAD( "p0_12.1s",   0x6000, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
 	ROM_LOAD( "p0_14.1u",   0x8000, 0x2000, CRC(3f5fe2b6) SHA1(a7d1d0bc449f557ba827936b0fdbcccf7b1ee629) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -611,9 +654,44 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p2.4e",      0x020, 0x020, CRC(70a09cc5) SHA1(82c0f3122d2c1e8be74b857737380c2e978adeef) )
 ROM_END
 
+ROM_START( skydest )
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pd1-1.1a",     0x000000, 0x002000, CRC(78951c75) SHA1(f6d36a1b9b35a346a1e7389956e90332ada07454) )
+	ROM_LOAD( "pd0-2.1b",     0x002000, 0x002000, CRC(da2d48cd) SHA1(5f4871f66bca8515505e4ef887cadf41a4e88f4d) )
+    ROM_LOAD( "pd0-3.1c",     0x004000, 0x002000, CRC(28ef8eda) SHA1(c2ca346b1170e8ca7239bee4040225c50923e527) )
+    ROM_LOAD( "pd1-4.1e",     0x006000, 0x002000, CRC(b8ec9938) SHA1(79f9be7ba74af9542488247c83a4aa731ebb7917) )
+    ROM_LOAD( "pd1-8.1l",     0x010000, 0x002000, CRC(b810858b) SHA1(385e625fc989a1dfa18559a62c99363b62c66a67) )
+    ROM_LOAD( "pd0-9.1m",     0x012000, 0x002000, CRC(6f558bee) SHA1(0539feaa848d6cfb9f90a46a851f73fb74e82676) )
+
+	ROM_REGION( 0x4000, "audiocpu", 0 )
+    ROM_LOAD( "pd0-15.10c",   0x000000, 0x002000, CRC(f8b3d3f7) SHA1(447907f982362f5995d7eb646628cf0e07ba8f64) )
+    ROM_LOAD( "pd0-16.10d",   0x002000, 0x002000, CRC(19ce8106) SHA1(31186d3b1c0d124da82310930a002a481941ebb1) )
+
+	ROM_REGION( 0x4000, "tilemap_data", 0 )
+    ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) )
+
+	ROM_REGION( 0x2000, "sprite_data_1", ROMREGION_ERASEFF )
+    ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) )
+
+	ROM_REGION( 0xc000, "sprite_data_2", ROMREGION_ERASEFF )
+    ROM_LOAD( "pd0-11.1r",    0x000000, 0x002000, CRC(29e5fce4) SHA1(59748e3a192a45dce7920e8d5a7a11d5145915b0) )
+    ROM_LOAD( "pd1-13.1t",    0x002000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) )
+    ROM_LOAD( "pd1-10.1n",    0x004000, 0x002000, CRC(5840b5b5) SHA1(1b5b188023c4d3198402c946b8c5a51d7f512a07) )
+    ROM_LOAD( "pd0-12.1s",    0x006000, 0x002000, CRC(06234942) SHA1(1cc40a8c8e24ab6db1dc7dc88979be23b7a9cab6) )
+    ROM_LOAD( "pd0-14.1u",    0x008000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "green.11t",    0x000, 0x100, CRC(f803beb7) SHA1(9c979a296de04728d43c94e9e06f8d8600dc9cfb) )
+    ROM_LOAD( "red.11u",      0x100, 0x100, CRC(24b7b6f3) SHA1(c2f6477baa5be038c41f5f2ecd16522a6b8d84db) )
+
+	ROM_REGION( 0x100, "unk_prom", 0 ) //???
+	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) )
+ROM_END
+
 static DRIVER_INIT( cyclemb )
 {
 	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
 GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb,  cyclemb, ROT0, "Taito Corporation", "Cycle Mahbou (Japan)", GAME_NOT_WORKING )
+GAME( 1985, skydest,  0,   skydest,  cyclemb,  cyclemb, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", GAME_NOT_WORKING )
