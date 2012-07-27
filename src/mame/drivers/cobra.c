@@ -46,6 +46,9 @@ public:
 	DECLARE_WRITE64_MEMBER(main_comram_w);
 	DECLARE_READ64_MEMBER(main_fifo_r);
 	DECLARE_WRITE64_MEMBER(main_fifo_w);
+	DECLARE_READ64_MEMBER(main_mpc106_r);
+	DECLARE_WRITE64_MEMBER(main_mpc106_w);
+
 	DECLARE_READ32_MEMBER(sub_comram_r);
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
 	DECLARE_READ32_MEMBER(sub_sound_r);
@@ -57,6 +60,10 @@ public:
 	DECLARE_WRITE32_MEMBER(sub_config_w);
 	DECLARE_READ32_MEMBER(sub_mainbd_r);
 	DECLARE_WRITE32_MEMBER(sub_mainbd_w);
+	DECLARE_READ32_MEMBER(sub_ata_r);
+	DECLARE_WRITE32_MEMBER(sub_ata_w);
+	DECLARE_READ32_MEMBER(sub_psac2_r);
+
 	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
 	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
 	DECLARE_WRITE64_MEMBER(gfx_fifo2_w);
@@ -66,6 +73,8 @@ public:
 	DECLARE_READ64_MEMBER(gfx_fifo_r);
 	DECLARE_WRITE64_MEMBER(gfx_buf_w);
 
+	UINT32 *m_comram[2];
+	int m_comram_page;
 
 	bitmap_rgb32 *framebuffer;
 	poly_manager *poly;
@@ -75,10 +84,16 @@ public:
 
 	POLYENTRY polybuffer[4096];
 	LINEENTRY linebuffer[4096];
-	DECLARE_READ64_MEMBER(main_mpc106_r);
-	DECLARE_WRITE64_MEMBER(main_mpc106_w);
-	DECLARE_READ32_MEMBER(sub_ata_r);
-	DECLARE_WRITE32_MEMBER(sub_ata_w);
+	
+	int m_main_debug_state;
+	int m_main_debug_state_wc;
+	int m_sub_debug_state;
+	int m_sub_debug_state_wc;
+	int m_gfx_debug_state;
+	int m_gfx_debug_state_wc;
+
+	UINT32 m_sub_psac_reg;
+	int m_sub_psac_count;
 };
 
 #if 0
@@ -143,7 +158,7 @@ static void draw_line(bitmap_rgb32 *dest, const rectangle &visarea, LINEENTRY &l
 	int x1 = line.v[0].x;
 	int y1 = line.v[0].y;
 
-	UINT32 color = 0xffffffff;		// TODO: where does there color come from?
+	UINT32 color = 0xffffffff;		// TODO: where does the color come from?
 
 	if (dx > dy)
 	{
@@ -228,17 +243,7 @@ SCREEN_UPDATE_RGB32( cobra )
 
 /*****************************************************************************/
 
-static UINT32 *comram[2];
-static int comram_page = 0;
-
 static UINT8 gfx_unk_flag;
-
-static int main_debug_state = 0;
-static int main_debug_state_wc = 0;
-static int sub_debug_state = 0;
-static int sub_debug_state_wc = 0;
-static int gfx_debug_state = 0;
-static int gfx_debug_state_wc = 0;
 
 static int decode_debug_state_value(int v)
 {
@@ -583,7 +588,7 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		value |= fifo_is_empty(S2MFIFO) ? 0x00 : 0x20;
 		value |= fifo_is_half_full(S2MFIFO) ? 0x00 : 0x40;
 
-		value |= comram_page ? 0x80 : 0x00;
+		value |= m_comram_page ? 0x80 : 0x00;
 
 		r |= (UINT64)(value) << 56;
 	}
@@ -690,7 +695,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 			m2sfifo_unk_flag = 0x0;
 		}
 
-		comram_page = ((data >> 32) & 0x80) ? 1 : 0;
+		m_comram_page = ((data >> 32) & 0x80) ? 1 : 0;
 	}
 
 	// Register 0xffff0000,1
@@ -698,39 +703,39 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 	if (ACCESSING_BITS_56_63)
 	{
-		main_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
-		main_debug_state_wc++;
+		m_main_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
+		m_main_debug_state_wc++;
 	}
 	if (ACCESSING_BITS_48_55)
 	{
-		main_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
-		main_debug_state_wc++;
+		m_main_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
+		m_main_debug_state_wc++;
 	}
 
-	if (main_debug_state_wc >= 2)
+	if (m_main_debug_state_wc >= 2)
 	{
-		if (main_debug_state != 0)
+		if (m_main_debug_state != 0)
 		{
-			printf("MAIN: debug state %02X\n", main_debug_state);
+			printf("MAIN: debug state %02X\n", m_main_debug_state);
 		}
 
-		main_debug_state = 0;
-		main_debug_state_wc = 0;
+		m_main_debug_state = 0;
+		m_main_debug_state_wc = 0;
 	}
 }
 
 READ64_MEMBER(cobra_state::main_comram_r)
 {
 	UINT64 r = 0;
-	int page = comram_page;
+	int page = m_comram_page;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(comram[page][(offset << 1) + 0]) << 32;
+		r |= (UINT64)(m_comram[page][(offset << 1) + 0]) << 32;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		r |= (UINT64)(comram[page][(offset << 1) + 1]);
+		r |= (UINT64)(m_comram[page][(offset << 1) + 1]);
 	}
 
 	return r;
@@ -738,17 +743,17 @@ READ64_MEMBER(cobra_state::main_comram_r)
 
 WRITE64_MEMBER(cobra_state::main_comram_w)
 {
-	int page = comram_page;
+	int page = m_comram_page;
 
-	UINT32 w1 = comram[page][(offset << 1) + 0];
-	UINT32 w2 = comram[page][(offset << 1) + 1];
+	UINT32 w1 = m_comram[page][(offset << 1) + 0];
+	UINT32 w2 = m_comram[page][(offset << 1) + 1];
 	UINT32 d1 = (UINT32)(data >> 32);
 	UINT32 d2 = (UINT32)(data);
 	UINT32 m1 = (UINT32)(mem_mask >> 32);
 	UINT32 m2 = (UINT32)(mem_mask);
 
-	comram[page][(offset << 1) + 0] = (w1 & m1) | (d1 & ~m1);
-	comram[page][(offset << 1) + 1] = (w2 & m2) | (d2 & ~m2);
+	m_comram[page][(offset << 1) + 0] = (w1 & ~m1) | (d1 & m1);
+	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
 static ADDRESS_MAP_START( cobra_main_map, AS_PROGRAM, 64, cobra_state )
@@ -859,7 +864,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		value |= fifo_is_empty(M2SFIFO) ? 0x00 : 0x20;
 		value |= fifo_is_half_full(M2SFIFO) ? 0x00 : 0x40;
 
-		value |= comram_page ? 0x80 : 0x00;
+		value |= m_comram_page ? 0x80 : 0x00;
 
 		r |= (value) << 16;
 	}
@@ -921,24 +926,24 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		sub_debug_state |= decode_debug_state_value((data >> 24) & 0xff) << 4;
-		sub_debug_state_wc++;
+		m_sub_debug_state |= decode_debug_state_value((data >> 24) & 0xff) << 4;
+		m_sub_debug_state_wc++;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		sub_debug_state |= decode_debug_state_value((data >> 16) & 0xff);
-		sub_debug_state_wc++;
+		m_sub_debug_state |= decode_debug_state_value((data >> 16) & 0xff);
+		m_sub_debug_state_wc++;
 	}
 
-	if (sub_debug_state_wc >= 2)
+	if (m_sub_debug_state_wc >= 2)
 	{
-		if (sub_debug_state != 0)
+		if (m_sub_debug_state != 0)
 		{
-			printf("SUB: debug state %02X\n", sub_debug_state);
+			printf("SUB: debug state %02X\n", m_sub_debug_state);
 		}
 
-		sub_debug_state = 0;
-		sub_debug_state_wc = 0;
+		m_sub_debug_state = 0;
+		m_sub_debug_state_wc = 0;
 	}
 }
 
@@ -997,16 +1002,16 @@ WRITE32_MEMBER(cobra_state::sub_ata_w)
 
 READ32_MEMBER(cobra_state::sub_comram_r)
 {
-	int page = comram_page ^ 1;
+	int page = m_comram_page ^ 1;
 
-	return comram[page][offset];
+	return m_comram[page][offset];
 }
 
 WRITE32_MEMBER(cobra_state::sub_comram_w)
 {
-	int page = comram_page ^ 1;
+	int page = m_comram_page ^ 1;
 
-	COMBINE_DATA(comram[page] + offset);
+	COMBINE_DATA(m_comram[page] + offset);
 }
 
 READ32_MEMBER(cobra_state::sub_sound_r)
@@ -1041,11 +1046,23 @@ WRITE32_MEMBER(cobra_state::sub_sound_w)
     */
 }
 
+READ32_MEMBER(cobra_state::sub_psac2_r)
+{
+	m_sub_psac_count++;
+	if (m_sub_psac_count >= 0x8000)
+	{
+		m_sub_psac_reg ^= 0xffffffff;
+		m_sub_psac_count = 0;
+	}
+	return m_sub_psac_reg;
+}
+
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_sound_r, sub_sound_w)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata_r, sub_ata_w)
+	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READ(sub_psac2_r)				// PSAC
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
@@ -2009,24 +2026,24 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 
 	if (ACCESSING_BITS_56_63)
 	{
-		gfx_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
-		gfx_debug_state_wc++;
+		m_gfx_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
+		m_gfx_debug_state_wc++;
 	}
 	if (ACCESSING_BITS_48_55)
 	{
-		gfx_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
-		gfx_debug_state_wc++;
+		m_gfx_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
+		m_gfx_debug_state_wc++;
 	}
 
-	if (gfx_debug_state_wc >= 2)
+	if (m_gfx_debug_state_wc >= 2)
 	{
-		if (gfx_debug_state != 0)
+		if (m_gfx_debug_state != 0)
 		{
-			printf("GFX: debug state %02X\n", gfx_debug_state);
+			printf("GFX: debug state %02X\n", m_gfx_debug_state);
 		}
 
-		gfx_debug_state = 0;
-		gfx_debug_state_wc = 0;
+		m_gfx_debug_state = 0;
+		m_gfx_debug_state_wc = 0;
 	}
 }
 
@@ -2179,8 +2196,10 @@ static DRIVER_INIT(cobra)
 	cobra_gfx_init(&machine);
 #endif
 
-	comram[0] = auto_alloc_array(machine, UINT32, 0x40000/4);
-	comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
+	cobra->m_comram[0] = auto_alloc_array(machine, UINT32, 0x40000/4);
+	cobra->m_comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
+
+	cobra->m_comram_page = 0;
 }
 
 static DRIVER_INIT(bujutsu)
