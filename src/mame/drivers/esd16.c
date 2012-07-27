@@ -26,7 +26,7 @@ Year + Game            PCB             Notes
 00  Deluxe 5           ESD            (no date is marked on PCB)
 00  Tang Tang          ESD            (no date is marked on PCB)
 01  SWAT Police        ESD            (no date is marked on PCB)
-01  Jumping Pop        ESD 11-09-98   (also original version by Emag)
+01  Jumping Pop        ESD 11-09-98   (also original version by Emag Soft)
 ---------------------------------------------------------------------------
 
 Other ESD games:
@@ -900,14 +900,14 @@ ROM_START( multchmpk )
 	ROM_LOAD( "multchmp.u35", 0x100000, 0x040000, CRC(9d1590a6) SHA1(35f634dbf0df06ec62359c7bae43c7f5d14b0ab2) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
-	ROM_LOAD32_BYTE( "multchmp.u27", 0x000003, 0x080000, CRC(dc42704e) SHA1(58a04a47ffc6d6ae0e4d49e466b1c58b37ad741a) )
+	ROM_LOAD32_BYTE( "multchmp.u31", 0x000000, 0x080000, CRC(b1e4e9e3) SHA1(1a7393e9073b028b4170393b3788ad8cb86c0c78) )
 	ROM_LOAD32_BYTE( "multchmp.u33", 0x000001, 0x080000, CRC(e4c0ec96) SHA1(74152108e4d05f4aff9d38919f212fcb8c87cef3) )
 	ROM_LOAD32_BYTE( "multchmp.u29", 0x000002, 0x080000, CRC(01bd1399) SHA1(b717ccffe0af92a42a0879736d34d3ad71840233) )
-	ROM_LOAD32_BYTE( "multchmp.u31", 0x000000, 0x080000, CRC(b1e4e9e3) SHA1(1a7393e9073b028b4170393b3788ad8cb86c0c78) )
-	ROM_LOAD32_BYTE( "multchmp.u28", 0x200003, 0x080000, CRC(449991fa) SHA1(fd93e420a04cb8bea5421aa9cbe079bd3e7d4924) )
+	ROM_LOAD32_BYTE( "multchmp.u27", 0x000003, 0x080000, CRC(dc42704e) SHA1(58a04a47ffc6d6ae0e4d49e466b1c58b37ad741a) )
+	ROM_LOAD32_BYTE( "multchmp.u32", 0x200000, 0x080000, CRC(f05cb5b4) SHA1(1b33e60942238e39d61ae59e9317b99e83595ab1) )
 	ROM_LOAD32_BYTE( "multchmp.u34", 0x200001, 0x080000, CRC(bffaaccc) SHA1(d9ab248e2c7c639666e3717cfc5d8c8468a1bde2) )
 	ROM_LOAD32_BYTE( "multchmp.u30", 0x200002, 0x080000, CRC(c6b4cc18) SHA1(d9097b85584272cfe4989a40d622ef1feeee6775) )
-	ROM_LOAD32_BYTE( "multchmp.u32", 0x200000, 0x080000, CRC(f05cb5b4) SHA1(1b33e60942238e39d61ae59e9317b99e83595ab1) )
+	ROM_LOAD32_BYTE( "multchmp.u28", 0x200003, 0x080000, CRC(449991fa) SHA1(fd93e420a04cb8bea5421aa9cbe079bd3e7d4924) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
@@ -1528,8 +1528,8 @@ ROM_START( jumppop )
 	ROM_LOAD( "sp1.bin", 0x100000, 0x100000, CRC(7eae782e) SHA1(a33c544ad9516ec409c209968e72f63e7cdb934b) )
 
 	ROM_REGION( 0x200000, "bgs", 0 )
-	ROM_LOAD16_BYTE( "bg0.bin", 0x000001, 0x100000, CRC(35a1363d) SHA1(66c550b0bdea7c8b079f186f5e044f731d31bc58) )
 	ROM_LOAD16_BYTE( "bg1.bin", 0x000000, 0x100000, CRC(5b37f943) SHA1(fe73b839f29d4c32823418711b22f85a5f583ec2) )
+	ROM_LOAD16_BYTE( "bg0.bin", 0x000001, 0x100000, CRC(35a1363d) SHA1(66c550b0bdea7c8b079f186f5e044f731d31bc58) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "samples.bin", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) )
@@ -1551,10 +1551,10 @@ ROM_START( jumppope ) /* Running on an original ESD 11-09-98 PCB with original E
 	ROM_LOAD16_BYTE( "esd10.ju06", 0x100001, 0x040000, CRC(85a3cc73) SHA1(ec90f4d2e4244dffbada306a732e50263173203e) ) // sp1.bin      [odd 1/2]  IDENTICAL
 
 	ROM_REGION( 0x200000, "bgs", 0 )
-	ROM_LOAD32_BYTE( "esd6.fu29", 0x000001, 0x080000, CRC(c01af40d) SHA1(fce0244027d4d4eb5cff1809cf8f404bfe016455) ) // [even 1/2] 99.778366%, [even 2/2] 99.267578%
-	ROM_LOAD32_BYTE( "esd3.fu27", 0x000003, 0x080000, CRC(3358a693) SHA1(2e368e5c26755bbe6d04838015fd4ca5e43ccfb5) ) // [odd 1/2]  99.784470%, [odd 2/2]  99.267578%
 	ROM_LOAD32_BYTE( "esd5.fu28", 0x000000, 0x080000, CRC(0d47f821) SHA1(fc1ef080eb05990909e25d5db59918f1f4e90a67) ) // [even 1/2] 99.769974%, [even 2/2] 99.267578%
+	ROM_LOAD32_BYTE( "esd6.fu29", 0x000001, 0x080000, CRC(c01af40d) SHA1(fce0244027d4d4eb5cff1809cf8f404bfe016455) ) // [even 1/2] 99.778366%, [even 2/2] 99.267578%
 	ROM_LOAD32_BYTE( "esd4.fu26", 0x000002, 0x080000, CRC(97b409be) SHA1(3a4344ca8ffb0aee046e3c0bab2d7c3f7c0eb204) ) // [odd 1/2]  99.763107%, [odd 2/2]  99.267578%
+	ROM_LOAD32_BYTE( "esd3.fu27", 0x000003, 0x080000, CRC(3358a693) SHA1(2e368e5c26755bbe6d04838015fd4ca5e43ccfb5) ) // [odd 1/2]  99.784470%, [odd 2/2]  99.267578%
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "at27c020.su10", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) ) // samples.bin             IDENTICAL
