@@ -129,7 +129,7 @@ READ8_HANDLER( wow_speech_r )
 
 	/* Phoneme to word translation */
 
-	if (strlen(state->m_totalword) == 0) {
+	if (*(state->m_totalword) == 0) {
 		strcpy(state->m_totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
 		if (state->m_plural != 0) {
 			//logerror("found a possible plural at %d\n",state->m_plural-1);

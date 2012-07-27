@@ -980,7 +980,7 @@ bool device_image_interface::load(const char *path)
 bool device_image_interface::open_image_file(emu_options &options)
 {
 	const char* path = options.value(instance_name());
-	if (strlen(path)>0)
+	if (*path != 0)
 	{
 		set_init_phase();
 		if (load_internal(path, FALSE, 0, NULL, TRUE)==IMAGE_INIT_PASS)

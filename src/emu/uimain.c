@@ -2383,7 +2383,7 @@ void ui_menu_crosshair::populate()
 			int found = false;
 
 			/* if we are using the default, then we just need to find the first in the list */
-			if (strlen(settings.name) == 0)
+			if (*(settings.name) == 0)
 				using_default = true;
 
 			/* look for the current name, then remember the name before */

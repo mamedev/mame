@@ -462,15 +462,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("bcnd    %04X", FETCH());
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}
@@ -489,15 +489,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("xc      %d", n);
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}
@@ -514,15 +514,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("cc      %04X", FETCH());
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}
@@ -539,15 +539,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("retc    ");
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}
@@ -567,15 +567,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("bcndd   %04X", FETCH());
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}
@@ -592,15 +592,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("ccd     %04X", FETCH());
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}
@@ -617,15 +617,15 @@ CPU_DISASSEMBLE( tms32051 )
 
 			print("retcd   ");
 
-			if (strlen(zl_condition_codes[zl]) > 0)
+			if (*(zl_condition_codes[zl]) != 0)
 			{
 				print(", %s", zl_condition_codes[zl]);
 			}
-			if (strlen(cv_condition_codes[cv]) > 0)
+			if (*(cv_condition_codes[cv]) != 0)
 			{
 				print(", %s", cv_condition_codes[cv]);
 			}
-			if (strlen(tp_condition_codes[tp]) > 0)
+			if (*(tp_condition_codes[tp]) != 0)
 			{
 				print(", %s", tp_condition_codes[tp]);
 			}

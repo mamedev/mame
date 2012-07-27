@@ -82,7 +82,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 			if (!is_selected_driver || !options.exists(owner.tag()+1))
 				selval = slot->get_default_card();
 
-			if (selval != NULL && strlen(selval) != 0)
+			if (selval != NULL && *selval != 0)
 			{
 				bool found = false;
 				for (int i = 0; intf[i].name != NULL; i++)

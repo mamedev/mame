@@ -2002,7 +2002,7 @@ const char *input_manager::seq_name(astring &string, const input_seq &seq) const
 	{
 		// if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs
 		input_code code = seq[codenum];
-		if (!code.internal() && strlen(code_name(codestr, code)) == 0)
+		if (!code.internal() && *(code_name(codestr, code)) == 0)
 		{
 			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
 				clean_index--;

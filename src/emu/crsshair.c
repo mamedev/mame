@@ -507,7 +507,7 @@ static void crosshair_save(running_machine &machine, int config_type, xml_data_n
 				}
 
 				/* the default graphic name is "", so only save if not */
-				if (strlen(global.name[player]) > 0)
+				if (*(global.name[player]) != 0)
 				{
 					xml_set_attribute(crosshairnode, "pic", global.name[player]);
 					changed = TRUE;

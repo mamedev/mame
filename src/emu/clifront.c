@@ -154,10 +154,10 @@ int cli_frontend::execute(int argc, char **argv)
 		// first parse options to be able to get software from it
 		astring option_errors;
 		m_options.parse_command_line(argc, argv, option_errors);
-		if (strlen(m_options.software_name()) > 0)
+		if (*(m_options.software_name()) != 0)
 		{
 			const game_driver *system = m_options.system();
-			if (system == NULL && strlen(m_options.system_name()) > 0)
+			if (system == NULL && *(m_options.system_name()) != 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			machine_config config(*system, m_options);
@@ -193,7 +193,7 @@ int cli_frontend::execute(int argc, char **argv)
 											{
 												const char *option = m_options.value(image->brief_instance_name());
 												// mount only if not already mounted
-												if (strlen(option) == 0)
+												if (*option == 0)
 												{
 													astring val;
 													val.printf("%s:%s:%s",swlist->list_name(),m_options.software_name(),swpart->name);
@@ -224,7 +224,7 @@ int cli_frontend::execute(int argc, char **argv)
 		if (!m_options.parse_command_line(argc, argv, option_errors))
 		{
 			// if we failed, check for no command and a system name first; in that case error on the name
-			if (strlen(m_options.command()) == 0 && m_options.system() == NULL && strlen(m_options.system_name()) > 0)
+			if (*(m_options.command()) == 0 && m_options.system() == NULL && *(m_options.system_name()) != 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			// otherwise, error on the options
@@ -238,7 +238,7 @@ int cli_frontend::execute(int argc, char **argv)
 		core_filename_extract_base(exename, argv[0], true);
 
 		// if we have a command, execute that
-		if (strlen(m_options.command()) != 0)
+		if (*(m_options.command()) != 0)
 			execute_commands(exename);
 
 		// otherwise, check for a valid system
@@ -246,7 +246,7 @@ int cli_frontend::execute(int argc, char **argv)
 		{
 			// if we can't find it, give an appropriate error
 			const game_driver *system = m_options.system();
-			if (system == NULL && strlen(m_options.system_name()) > 0)
+			if (system == NULL && *(m_options.system_name()) != 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 			// otherwise just run the game
 			m_result = mame_execute(m_options, m_osd);
@@ -262,7 +262,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
 		// reason for failure, offer some suggestions
-		if (m_result == MAMERR_NO_SUCH_GAME && strlen(m_options.system_name()) > 0 && strchr(m_options.system_name(), '*') == NULL && m_options.system() == NULL)
+		if (m_result == MAMERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && strchr(m_options.system_name(), '*') == NULL && m_options.system() == NULL)
 		{
 			// get the top 10 approximate matches
 			driver_enumerator drivlist(m_options);
@@ -806,7 +806,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		device_iterator iter(config.root_device());
 		for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
 		{
-			if (dev->owner() != NULL && (strlen(dev->shortname())>0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
+			if (dev->owner() != NULL && (*(dev->shortname()) != 0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
 				if (mame_strwildcmp(gamename, dev->shortname()) == 0)
 				{
 					matched++;

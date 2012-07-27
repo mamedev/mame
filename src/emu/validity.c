@@ -132,7 +132,7 @@ void validity_checker::validate_tag(const char *tag)
 		begin += 1;
 
 	// 0-length = bad
-	if (strlen(begin) == 0)
+	if (*begin == 0)
 		mame_printf_error("Found 0-length tag\n");
 
 	// too short/too long = bad

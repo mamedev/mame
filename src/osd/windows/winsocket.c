@@ -60,7 +60,7 @@ void win_cleanup_sockets()
 
 bool win_check_socket_path(const char *path)
 {
-	if (strlen(winfile_socket_identifier) > 0 &&
+	if (*winfile_socket_identifier != 0 &&
 		strncmp(path, winfile_socket_identifier, strlen(winfile_socket_identifier)) == 0 &&
 		strchr(path, ':') != NULL) return true;
 	return false;
