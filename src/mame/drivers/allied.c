@@ -1,3 +1,5 @@
+/*  Allied Leisure Cocktail Pinball
+All tables use the same base roms and some playfields even interchange between games */
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

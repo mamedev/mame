@@ -107,6 +107,8 @@ ROM_START(party)
 	ROM_LOAD("party_b.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
 
+
+/* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
 GAME(1978,	bigtown,	0,		play_1,	play_1,	play_1,	ROT0,	"Playmatic",	"Big Town",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1978,	chance,		0,		play_1,	play_1,	play_1,	ROT0,	"Playmatic",	"Chance",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1978,	lastlap,	0,		play_1,	play_1,	play_1,	ROT0,	"Playmatic",	"Last Lap",				GAME_IS_SKELETON_MECHANICAL)

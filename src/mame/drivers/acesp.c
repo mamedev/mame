@@ -423,18 +423,6 @@ ROM_START( sp_emmrdk )
 	SP_EMMRD_SOUND
 ROM_END
 
-ROM_START( sp_emmrdl )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0015dp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) ) // just a merged rom?
-	SP_EMMRD_SOUND
-ROM_END
-
-ROM_START( sp_emmrdm )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "0015dp60.bin", 0x0000, 0x010000, CRC(b27378c8) SHA1(dd8dfc587d0c051d1144f4b0205bd8d4a28ceaaf) ) // just a merged rom?
-	SP_EMMRD_SOUND
-ROM_END
-
 ROM_START( sp_emmrdn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "0015rp50.bin", 0x0000, 0x010000, CRC(e37fa624) SHA1(3d7e09a259ed53a88cd4c9dc2e39b1aadb7049c7) ) // just a merged rom?
@@ -3960,8 +3948,6 @@ GAME( 1995, sp_emmrdh		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdal
 GAME( 1995, sp_emmrdi		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 10)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 1995, sp_emmrdj		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 11)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 1995, sp_emmrdk		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 12)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 1995, sp_emmrdl		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 13)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 1995, sp_emmrdm		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 14)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 1995, sp_emmrdn		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 15)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 1995, sp_emmrdo		,sp_emmrd	,ace_sp	,ace_sp	,ace_sp	,ROT0	,"Ace", "Emmerdale (Ace) (sp.ACE) (set 16)",GAME_IS_SKELETON_MECHANICAL )
 // seems to be very closely related to Emmerdale, looks like the same basic game with different strings, these have "GO T' WOOLPACK"
