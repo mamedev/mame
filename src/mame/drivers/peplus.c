@@ -621,7 +621,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 
 	if (curr_cycles - m_last_door > door_wait) {
 		if ((ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
-			m_door_open = (!m_door_open & 0x01);
+			m_door_open = (m_door_open ^ 0x01) & 0x01;
 		} else {
 			m_door_open = 1;
 		}

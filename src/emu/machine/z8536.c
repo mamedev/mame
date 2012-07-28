@@ -885,7 +885,7 @@ inline bool z8536_device::counter_gated(device_timer_id id)
 inline void z8536_device::count(device_timer_id id)
 {
 	if (!counter_gated(id)) return;
-	if (!m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP) return;
+	if (!(m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP)) return;
 
 	// count down
 	m_counter[id]--;

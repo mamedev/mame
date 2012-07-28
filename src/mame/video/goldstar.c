@@ -383,7 +383,7 @@ SCREEN_UPDATE_IND16( goldstar )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_cm_enable_reg &0x01)
+	if (!(state->m_cm_enable_reg &0x01))
 		return 0;
 
 	if (state->m_cm_enable_reg &0x08)
@@ -434,7 +434,7 @@ SCREEN_UPDATE_IND16( bingowng )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_cm_enable_reg &0x01)
+	if (!(state->m_cm_enable_reg &0x01))
 		return 0;
 
 	if (state->m_cm_enable_reg &0x08)
@@ -477,7 +477,7 @@ SCREEN_UPDATE_IND16( magical )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_cm_enable_reg &0x01)
+	if (!(state->m_cm_enable_reg &0x01))
 		return 0;
 
 	if (state->m_cm_enable_reg &0x08)
@@ -536,7 +536,7 @@ SCREEN_UPDATE_IND16( unkch )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_cm_enable_reg &0x01)
+	if (!(state->m_cm_enable_reg &0x01))
 		return 0;
 
 	if (state->m_cm_enable_reg &0x08)
@@ -590,7 +590,7 @@ SCREEN_UPDATE_IND16( cmast91 )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_cm_enable_reg &0x01)
+	if (!(state->m_cm_enable_reg &0x01))
 		return 0;
 
 	if (state->m_cm_enable_reg &0x08)
@@ -626,7 +626,7 @@ SCREEN_UPDATE_IND16( amcoe1a )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (!state->m_cm_enable_reg &0x01)
+	if (!(state->m_cm_enable_reg &0x01))
 		return 0;
 
 	if (state->m_cm_enable_reg &0x08)

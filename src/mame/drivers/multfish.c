@@ -435,10 +435,10 @@ WRITE8_MEMBER(multfish_state::rollfr_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-        coin_lockout_w(machine(), 0, !data & 0x01);
-        coin_lockout_w(machine(), 1, !data & 0x01);
-        coin_lockout_w(machine(), 2, !data & 0x01);
-        coin_lockout_w(machine(), 3, !data & 0x01);
+        coin_lockout_w(machine(), 0,~data & 0x01);
+        coin_lockout_w(machine(), 1,~data & 0x01);
+        coin_lockout_w(machine(), 2,~data & 0x01);
+        coin_lockout_w(machine(), 3,~data & 0x01);
         coin_lockout_w(machine(), 4, data & 0x04);
         coin_lockout_w(machine(), 5, data & 0x04);
         coin_lockout_w(machine(), 6, data & 0x04);

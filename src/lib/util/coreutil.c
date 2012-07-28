@@ -91,7 +91,7 @@ UINT32 bcd_2_dec(UINT32 a)
 
 int gregorian_is_leap_year(int year)
 {
-	return !(year % 100 ? year % 4 : year % 400);
+	return !((year % 100) ? (year % 4) : (year % 400));
 }
 
 
