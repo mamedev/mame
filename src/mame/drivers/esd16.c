@@ -81,10 +81,6 @@ ToDo:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(esd16_state::esd16_spriteram_w)
-{
-	COMBINE_DATA(&m_spriteram[offset]);
-}
 
 WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 {
@@ -106,7 +102,7 @@ static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM									// RAM
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-/**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")							// Sprites (Mirrored)
+/**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x000800)				// Sprites (Mirrored)
 /**/AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
 /**/AM_RANGE(0x420000, 0x423fff) AM_RAM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
 /**/AM_RANGE(0x500000, 0x500003) AM_RAM AM_SHARE("scroll_0")							// Scroll
@@ -129,8 +125,7 @@ static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-/**/AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")							// Sprites
-	AM_RANGE(0x160800, 0x160807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
+/**/AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x000800)							// Sprites
 	AM_RANGE(0x180000, 0x180001) AM_NOP									// IRQ ack?
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
@@ -181,8 +176,7 @@ static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM									// RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x900000, 0x9007ff) AM_WRITEONLY AM_SHARE("spriteram")						// Sprites
-	AM_RANGE(0x900800, 0x900807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
+	AM_RANGE(0x900000, 0x9007ff) AM_WRITEONLY AM_SHARE("spriteram")	AM_MIRROR(0x000800)					// Sprites
 	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
 	AM_RANGE(0xa20000, 0xa23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
 	AM_RANGE(0xa24000, 0xa27fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				// mirror?
@@ -220,8 +214,7 @@ static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP								// ? 2 not checked
 	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w)						// To Sound CPU // ok
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITE(esd_eeprom_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_WRITEONLY AM_SHARE("spriteram")						// Sprites
-	AM_RANGE(0x600800, 0x600807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
+	AM_RANGE(0x600000, 0x6007ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)						// Sprites
 	AM_RANGE(0x700000, 0x700003) AM_WRITEONLY AM_SHARE("scroll_0")						// Scroll
 	AM_RANGE(0x700004, 0x700007) AM_WRITEONLY AM_SHARE("scroll_1")						//
 	AM_RANGE(0x700008, 0x700009) AM_WRITEONLY AM_SHARE("platform_x")					// not used in mchampdx?
@@ -236,8 +229,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// RAM
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITEONLY AM_SHARE("spriteram")						// Sprites
-	AM_RANGE(0x200800, 0x200807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
+	AM_RANGE(0x200000, 0x2007ff) AM_WRITEONLY AM_SHARE("spriteram")	AM_MIRROR(0x000800)					// Sprites
 	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
 	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
 	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				// mirror?
@@ -542,18 +534,20 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-/* 16x16x5, made of four 8x8 tiles */
-static const gfx_layout layout_16x16x5 =
+
+
+static const gfx_layout jumppop_sprite_16x16x4 =
 {
 	16,16,
-	RGN_FRAC(1,5),
-	5,
-	{ RGN_FRAC(4,5),RGN_FRAC(3,5),RGN_FRAC(2,5),RGN_FRAC(1,5), RGN_FRAC(0,5) },
-	{ STEP8(8*16,1), STEP8(0,1) },
-	{ STEP16(0,8) },
-	16*16
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
+	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
+			0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	64*8
 };
-
 
 static const gfx_layout hedpanic_sprite_16x16x5 =
 {
@@ -591,21 +585,9 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 	256*8,
 };
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
-};
 
 static GFXDECODE_START( esd16 )
-	GFXDECODE_ENTRY( "spr", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 ) // [1] Layers
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8,   0x000, 2 ) // [1] Layers
 GFXDECODE_END
@@ -618,13 +600,13 @@ static GFXDECODE_START( hedpanic )
 GFXDECODE_END
 
 static GFXDECODE_START( tangtang )
-	GFXDECODE_ENTRY( "spr", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 ) // [1] Layers
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 ) // [2] Layers
 GFXDECODE_END
 
 static GFXDECODE_START( jumppop )
-	GFXDECODE_ENTRY( "spr", 0, layout_16x16x4,		0x000, 0x40 )	/* Sprites 16x16 */ // has 4bpp sprites, unlike the others
+	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,	0x000, 0x40 )	/* Sprites 16x16 */ // has 4bpp sprites, unlike the others
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,	0x000, 4 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8,	0x000, 4 )	/* Tiles 16x16 */
 GFXDECODE_END
@@ -863,12 +845,12 @@ ROM_START( multchmp )
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x20000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 
-	ROM_REGION( 0x140000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "esd14.ju03", 0x000000, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
-	ROM_LOAD( "esd15.ju04", 0x040000, 0x040000, CRC(88b7a97c) SHA1(0a57ec8f6a44c8e3aa3ef35499a415d6a2b7eb16) )
-	ROM_LOAD( "esd16.ju05", 0x080000, 0x040000, CRC(e670a6da) SHA1(47cbe45b6d5d0ca70d0c6787d589dde5d14fdba4) )
-	ROM_LOAD( "esd17.ju06", 0x0c0000, 0x040000, CRC(a69d4399) SHA1(06ae6c07cc6b7313e2e2aa3b994f7532d6994e1b) )
-	ROM_LOAD( "esd13.ju07", 0x100000, 0x040000, CRC(22071594) SHA1(c79102b250780d1da8c290d065d61fbbfa193366) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "esd17.ju06", 0x000000, 0x040000, CRC(a69d4399) SHA1(06ae6c07cc6b7313e2e2aa3b994f7532d6994e1b) )
+	ROM_LOAD16_BYTE( "esd16.ju05", 0x000001, 0x040000, CRC(e670a6da) SHA1(47cbe45b6d5d0ca70d0c6787d589dde5d14fdba4) )
+	ROM_LOAD16_BYTE( "esd15.ju04", 0x080000, 0x040000, CRC(88b7a97c) SHA1(0a57ec8f6a44c8e3aa3ef35499a415d6a2b7eb16) )
+	ROM_LOAD16_BYTE( "esd14.ju03", 0x080001, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
+	ROM_LOAD16_BYTE( "esd13.ju07", 0x100000, 0x040000, CRC(22071594) SHA1(c79102b250780d1da8c290d065d61fbbfa193366) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD32_BYTE( "esd9.fu28",  0x000000, 0x080000, CRC(6652c04a) SHA1(178e1d42847506d869ef79db2f7e10df05e9ef76) )
@@ -892,12 +874,12 @@ ROM_START( multchmpk )
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x20000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 
-	ROM_REGION( 0x140000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "multchmp.u36", 0x000000, 0x040000, CRC(d8f06fa8) SHA1(f76912f93f99578529612a7f01d82ac7229a8e41) )
-	ROM_LOAD( "multchmp.u37", 0x040000, 0x040000, CRC(b1ae7f08) SHA1(37dd9d4cef8b9e1d09d7b46a9794fb2b777c9a01) )
-	ROM_LOAD( "multchmp.u38", 0x080000, 0x040000, CRC(88e252e8) SHA1(07d898379798c6be42b636762b0af61b9111a480) )
-	ROM_LOAD( "multchmp.u39", 0x0c0000, 0x040000, CRC(51f01067) SHA1(d5ebbc7d358b63724d2f24da8b2ce4a202be37a5) )
-	ROM_LOAD( "multchmp.u35", 0x100000, 0x040000, CRC(9d1590a6) SHA1(35f634dbf0df06ec62359c7bae43c7f5d14b0ab2) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "multchmp.u39", 0x000000, 0x040000, CRC(51f01067) SHA1(d5ebbc7d358b63724d2f24da8b2ce4a202be37a5) )
+	ROM_LOAD16_BYTE( "multchmp.u38", 0x000001, 0x040000, CRC(88e252e8) SHA1(07d898379798c6be42b636762b0af61b9111a480) )
+	ROM_LOAD16_BYTE( "multchmp.u37", 0x080000, 0x040000, CRC(b1ae7f08) SHA1(37dd9d4cef8b9e1d09d7b46a9794fb2b777c9a01) )
+	ROM_LOAD16_BYTE( "multchmp.u36", 0x080001, 0x040000, CRC(d8f06fa8) SHA1(f76912f93f99578529612a7f01d82ac7229a8e41) )
+	ROM_LOAD16_BYTE( "multchmp.u35", 0x100000, 0x040000, CRC(9d1590a6) SHA1(35f634dbf0df06ec62359c7bae43c7f5d14b0ab2) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD32_BYTE( "multchmp.u31", 0x000000, 0x080000, CRC(b1e4e9e3) SHA1(1a7393e9073b028b4170393b3788ad8cb86c0c78) )
@@ -1262,12 +1244,12 @@ ROM_START( deluxe5 ) /* Deluxe 5 */
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
 
-	ROM_REGION( 0x280000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "am27c020.ju03", 0x000000, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) ) /* AM27C020 mask roms with no label */
-	ROM_LOAD( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
-	ROM_LOAD( "am27c020.ju05", 0x100000, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
-	ROM_LOAD( "am27c020.ju06", 0x180000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) )
-	ROM_LOAD( "am27c020.ju07", 0x200000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) /* AM27C020 mask roms with no label */
+	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
+	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) /* No labels on the flash roms */
@@ -1338,12 +1320,12 @@ ROM_START( tangtang )
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(d48ecc5c) SHA1(5015dd775980542eb29a08bffe1a09ea87d56272) )
 
-	ROM_REGION( 0x140000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "xju04.bin", 0x000000, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
-	ROM_LOAD( "xju05.bin", 0x040000, 0x040000, CRC(679302cf) SHA1(911c2f7e0e809ee28e4f2364788fd51d2bcef24e) )
-	ROM_LOAD( "xju06.bin", 0x080000, 0x040000, CRC(01f59ff7) SHA1(a62a2d5c2d107f67fecfc08fdb5d801ee39c3875) )
-	ROM_LOAD( "xju07.bin", 0x0c0000, 0x040000, CRC(556acac3) SHA1(10e919e63b434da80fb261db1d8967cb11e95e00) )
-	ROM_LOAD( "xju08.bin", 0x100000, 0x040000, CRC(ecc2d8c7) SHA1(1aabdf7204fcdff8d46cb50de8b097e3775dddf3) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "xju07.bin", 0x000000, 0x040000, CRC(556acac3) SHA1(10e919e63b434da80fb261db1d8967cb11e95e00) )
+	ROM_LOAD16_BYTE( "xju06.bin", 0x000001, 0x040000, CRC(01f59ff7) SHA1(a62a2d5c2d107f67fecfc08fdb5d801ee39c3875) )
+	ROM_LOAD16_BYTE( "xju05.bin", 0x080000, 0x040000, CRC(679302cf) SHA1(911c2f7e0e809ee28e4f2364788fd51d2bcef24e) )
+	ROM_LOAD16_BYTE( "xju04.bin", 0x080001, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
+	ROM_LOAD16_BYTE( "xju08.bin", 0x100000, 0x040000, CRC(ecc2d8c7) SHA1(1aabdf7204fcdff8d46cb50de8b097e3775dddf3) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35.bin", 0x000000, 0x200000, CRC(84f3f833) SHA1(f84e41d93dc47a58ada800b921a7e5902b7631cd) )
@@ -1411,12 +1393,12 @@ ROM_START( swatpolc ) /* SWAT Police */
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) /* 2 roms on PCB with an ESD3 label */
 
-	ROM_REGION( 0x280000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "esd1.ju03", 0x000000, 0x080000, CRC(17fcc5e7) SHA1(ad57d2b0c0062f6f8c7732df57e4d12ca47c1bb8) )
-	ROM_LOAD( "esd2.ju04", 0x080000, 0x080000, CRC(9c1752f2) SHA1(2e8c377137258498564749413b49e156180e806a) )
-	ROM_LOAD( "esd3.ju05", 0x100000, 0x080000, CRC(e8d9c092) SHA1(80e1f1d4dad48c7be3d4b72c4a82d5388fd493c7) )
-	ROM_LOAD( "esd4.ju06", 0x180000, 0x080000, CRC(bde1b130) SHA1(e45a2257f8c4d107dfb7401b5ae1b79951052bc6) )
-	ROM_LOAD( "esd5.ju07", 0x200000, 0x080000, CRC(d2c27f03) SHA1(7cbdf7f7ff17df16ca81823f69e82ae1cf96b714) )
+	ROM_REGION( 0x300000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "esd4.ju06", 0x000000, 0x080000, CRC(bde1b130) SHA1(e45a2257f8c4d107dfb7401b5ae1b79951052bc6) )
+	ROM_LOAD16_BYTE( "esd3.ju05", 0x000001, 0x080000, CRC(e8d9c092) SHA1(80e1f1d4dad48c7be3d4b72c4a82d5388fd493c7) )
+	ROM_LOAD16_BYTE( "esd2.ju04", 0x100000, 0x080000, CRC(9c1752f2) SHA1(2e8c377137258498564749413b49e156180e806a) )
+	ROM_LOAD16_BYTE( "esd1.ju03", 0x100001, 0x080000, CRC(17fcc5e7) SHA1(ad57d2b0c0062f6f8c7732df57e4d12ca47c1bb8) )
+	ROM_LOAD16_BYTE( "esd5.ju07", 0x200000, 0x080000, CRC(d2c27f03) SHA1(7cbdf7f7ff17df16ca81823f69e82ae1cf96b714) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(c55897c5) SHA1(f6e0ef1c2fcfe6a511fe787a3abeff4da16d1b54) ) /* No labels on the flash roms */
