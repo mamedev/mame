@@ -1137,6 +1137,7 @@ static void pc_cga_plantronics_w(running_machine &machine, int data)
 static WRITE8_HANDLER ( char_ram_w )
 {
 	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
+	offset ^= BIT(offset, 12);
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
 	gfx[offset + 0x0800] = data;
@@ -1147,6 +1148,7 @@ static WRITE8_HANDLER ( char_ram_w )
 static READ8_HANDLER ( char_ram_r )
 {
 	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
+	offset ^= BIT(offset, 12);
 	return gfx[offset];
 }
 
@@ -1226,8 +1228,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 					fatalerror("CGA: Bus width %d not supported", buswidth);
 					break;
 			}
-			space_prg->install_legacy_readwrite_handler(0xb8000, 0xb87ff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
-			space_prg->install_legacy_readwrite_handler(0xb9000, 0xb97ff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
+			space_prg->install_legacy_readwrite_handler(0xb8000, 0xb9fff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
 		} else {
 			if (cga.videoram_size== 0x4000) {
 				space_prg->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
