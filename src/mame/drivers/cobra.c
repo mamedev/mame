@@ -6,27 +6,44 @@
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "video/poly.h"
+#include "video/polynew.h"
 #include "sound/rf5c400.h"
 
 #define ENABLE_MAIN_CPU		1
 #define ENABLE_SUB_CPU		1
 #define ENABLE_GFX_CPU		1
 
-typedef struct
+struct cobra_polydata
 {
-	poly_vertex v[3];
-} POLYENTRY;
+};
 
-typedef struct
+class cobra_renderer : public poly_manager<float, cobra_polydata, 6, 10000>
 {
-	poly_vertex v[2];
-} LINEENTRY;
+public:
+	cobra_renderer(running_machine &machine, bitmap_rgb32 *fb)
+		: poly_manager<float, cobra_polydata, 6, 10000>(machine)
+	{
+		m_fb = fb;
 
-static int texture_width = 128;
-static int texture_height = 8;
+		m_gfx_texture = auto_alloc_array(machine, UINT32, 0x1000);
 
-static UINT32 gfx_texture[4096];
+		// TODO: these are probably set by some 3D registers
+		m_texture_width = 128;
+		m_texture_height = 8;
+	}
+
+	void render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
+	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
+
+	void gfx_fifo_exec(running_machine &machine);
+
+private:
+	bitmap_rgb32 *m_fb;
+
+	UINT32 *m_gfx_texture;
+	int m_texture_width;
+	int m_texture_height;
+};
 
 class cobra_state : public driver_device
 {
@@ -78,6 +95,8 @@ public:
 	DECLARE_READ64_MEMBER(gfx_fifo_r);
 	DECLARE_WRITE64_MEMBER(gfx_buf_w);
 
+	cobra_renderer *m_renderer;
+
 	int m2sfifo_unk_flag;
 	int s2mfifo_unk_flag;
 
@@ -85,14 +104,7 @@ public:
 	UINT32 *m_comram[2];
 	int m_comram_page;
 
-	bitmap_rgb32 *framebuffer;
-	poly_manager *poly;
-
-	int polybuffer_ptr;
-	int linebuffer_ptr;
-
-	POLYENTRY polybuffer[4096];
-	LINEENTRY linebuffer[4096];
+	bitmap_rgb32 *m_framebuffer;
 	
 	int m_main_debug_state;
 	int m_main_debug_state_wc;
@@ -121,39 +133,24 @@ public:
 	int m_gfx_status_byte;
 };
 
-#if 0
-static void render_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
-	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
-	UINT32 *fb = &destmap->pix32(scanline);
+	float u = extent.param[0].start;
+	float v = extent.param[1].start;
+	float du = extent.param[0].dpdx;
+	float dv = extent.param[1].dpdx;
+	UINT32 *fb = &m_fb->pix32(scanline);
 	int x;
 
-	for (x = extent->startx; x < extent->stopx; x++)
-	{
-		fb[x] = 0xffff0000;
-	}
-}
-#endif
-
-static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
-{
-	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
-	float u = extent->param[0].start;
-	float v = extent->param[1].start;
-	float du = extent->param[0].dpdx;
-	float dv = extent->param[1].dpdx;
-	UINT32 *fb = &destmap->pix32(scanline);
-	int x;
-
-	for (x = extent->startx; x < extent->stopx; x++)
+	for (x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
 		UINT32 texel;
 
-		iu = (int)(u * texture_width);
-		iv = (int)(v * texture_height);
+		iu = (int)(u * m_texture_width);
+		iv = (int)(v * m_texture_height);
 
-		texel = gfx_texture[((iv * texture_width) + iu) / 2];
+		texel = m_gfx_texture[((iv * m_texture_width) + iu) / 2];
 
 		if (iu & 1)
 		{
@@ -175,13 +172,13 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	}
 }
 
-static void draw_line(bitmap_rgb32 *dest, const rectangle &visarea, LINEENTRY &line)
+void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2)
 {
-	int dx = (line.v[1].x - line.v[0].x);
-	int dy = (line.v[1].y - line.v[0].y);
+	int dx = (v2.x - v1.x);
+	int dy = (v2.y - v1.y);
 
-	int x1 = line.v[0].x;
-	int y1 = line.v[0].y;
+	int x1 = v1.x;
+	int y1 = v1.y;
 
 	UINT32 color = 0xffffffff;		// TODO: where does the color come from?
 
@@ -192,7 +189,7 @@ static void draw_line(bitmap_rgb32 *dest, const rectangle &visarea, LINEENTRY &l
 		{		
 			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
 
-			UINT32 *fb = &dest->pix32(y);
+			UINT32 *fb = &m_fb->pix32(y);
 			fb[x] = color;
 
 			x++;
@@ -205,7 +202,7 @@ static void draw_line(bitmap_rgb32 *dest, const rectangle &visarea, LINEENTRY &l
 		{
 			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
 
-			UINT32 *fb = &dest->pix32(y);
+			UINT32 *fb = &m_fb->pix32(y);
 			fb[x] = color;
 
 			y++;
@@ -213,48 +210,26 @@ static void draw_line(bitmap_rgb32 *dest, const rectangle &visarea, LINEENTRY &l
 	}
 }
 
-
 static void cobra_video_exit(running_machine *machine)
 {
-	cobra_state *cobra = machine->driver_data<cobra_state>();
-
-	poly_free(cobra->poly);
 }
 
 VIDEO_START( cobra )
 {
 	cobra_state *cobra = machine.driver_data<cobra_state>();
 
-	cobra->poly = poly_alloc(machine, 4000, 10, POLYFLAG_ALLOW_QUADS);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine));
 
-	cobra->framebuffer = auto_bitmap_rgb32_alloc(machine, 64*8, 32*8);
+	cobra->m_framebuffer = auto_bitmap_rgb32_alloc(machine, 64*8, 32*8);
+
+	cobra->m_renderer = auto_alloc(machine, cobra_renderer(machine, cobra->m_framebuffer));
 }
 
 SCREEN_UPDATE_RGB32( cobra )
 {
 	cobra_state *cobra = screen.machine().driver_data<cobra_state>();
 
-	if (cobra->polybuffer_ptr > 0)
-	{
-		int i;
-
-		for (i=0; i < cobra->polybuffer_ptr; i++)
-		{
-			poly_render_triangle(cobra->poly, cobra->framebuffer, screen.machine().primary_screen->visible_area(), render_texture_scan, 2,
-								 &cobra->polybuffer[i].v[0], &cobra->polybuffer[i].v[1], &cobra->polybuffer[i].v[2]);
-			poly_wait(cobra->poly, "Finished render");
-		}
-		cobra->polybuffer_ptr = 0;
-
-		for (i=0; i < cobra->linebuffer_ptr; i++)
-		{
-			draw_line(cobra->framebuffer, screen.machine().primary_screen->visible_area(), cobra->linebuffer[i]);
-		}
-		cobra->linebuffer_ptr = 0;
-	}
-
-	copybitmap_trans(bitmap, *cobra->framebuffer, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *cobra->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 
@@ -1171,36 +1146,8 @@ ADDRESS_MAP_END
 #define RE_STATUS_IDLE			0
 #define RE_STATUS_COMMAND		1
 
-static void push_poly(cobra_state *cobra, poly_vertex *v1, poly_vertex *v2, poly_vertex *v3)
-{
-	memcpy(&cobra->polybuffer[cobra->polybuffer_ptr].v[0], v1, sizeof(poly_vertex));
-	memcpy(&cobra->polybuffer[cobra->polybuffer_ptr].v[1], v2, sizeof(poly_vertex));
-	memcpy(&cobra->polybuffer[cobra->polybuffer_ptr].v[2], v3, sizeof(poly_vertex));
-
-	cobra->polybuffer_ptr++;
-
-	if (cobra->polybuffer_ptr >= 4096)
-	{
-		logerror("push_poly() overflow\n");
-	}
-}
-
-static void push_line(cobra_state *cobra, poly_vertex *v1, poly_vertex *v2)
-{
-	memcpy(&cobra->linebuffer[cobra->linebuffer_ptr].v[0], v1, sizeof(poly_vertex));
-	memcpy(&cobra->linebuffer[cobra->linebuffer_ptr].v[1], v2, sizeof(poly_vertex));
-
-	cobra->linebuffer_ptr++;
-
-	if (cobra->linebuffer_ptr >= 4096)
-	{
-		logerror("push_line() overflow\n");
-	}
-}
-
 static void cobra_gfx_init(cobra_state *cobra)
 {
-	//gfx_gram = auto_malloc(0x100000);
 	cobra->m_gfx_gram = auto_alloc_array(cobra->machine(), UINT8, 0x100000);
 	cobra->m_gfx_register = auto_alloc_array(cobra->machine(), UINT64, 0x3000);
 }
@@ -1210,10 +1157,14 @@ static void cobra_gfx_reset(cobra_state *cobra)
 	cobra->m_gfx_re_status = RE_STATUS_IDLE;
 }
 
-static void gfx_fifo_exec(cobra_state *cobra)
+void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 {
+	cobra_state *cobra = machine.driver_data<cobra_state>();
+
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
+
+	const rectangle visarea = machine.primary_screen->visible_area();
 
 	while (fifo_current_num(GFXFIFO_IN) >= 2)
 	{
@@ -1347,6 +1298,40 @@ static void gfx_fifo_exec(cobra_state *cobra)
 			case 0xa8:
 			case 0xac:
 			{
+				// 0xA80114CC			prm_flashcolor()
+				// 0xA80118CC
+				// 0xA80108FF
+
+				// 0xA80108FF			prm_flashmisc()
+				// 0xA80110FF
+				// 0xA8011CE0
+
+				// 0xA401BCC0			texenvmode()
+
+				// 0xA4019CC0			mode_fog()
+
+				// 0xA40018C0			mode_stipple()
+				// 0xA400D080
+
+				// 0xA40138E0			mode_viewclip()
+
+				// 0xA4011410			mode_scissor()
+
+				// 0xA40198A0			mode_alphatest()
+
+				// 0xA8002010			mode_depthtest()
+
+				// 0xA800507C			mode_blend()
+
+				// 0xA8001CFE			mode_stenciltest()
+
+				// 0xA8002010			mode_stencilmod()
+				// 0xA80054E0
+				// 0xA8001CFE
+
+				// 0xA80118CC			mode_colormask()
+				// 0xA80114CC
+
 				// 0xAxxxxxxx is different form in mbuslib_regwrite()
 
 				// mbuslib_regwrite(): 0x800000FF 0x00000001
@@ -1383,20 +1368,20 @@ static void gfx_fifo_exec(cobra_state *cobra)
 			{
 				// E0C00004 18C003C0 - 32 params
 				// E0C00004 18F803C1 - 48 params
-				// E0C00003 18C003C0 - 24 params
-				// E0C00008 18C003C0 - 64 params
-				// E0C00001 58C003C1 - 10 params
-				// E0800004 18C003C0 - 32 params
-				// E3000002 58C003C1 - 20 params
-				// E3000008 58C003C1 - 80 params
-				// E3000005 58C003C1 - 50 params
-				// E2000001 18C003C0 - 8 params
-				// E2000008 18C003C0 - 64 params
+				// E0C00003 18C003C0 - 24 params		prm_triangle()
+				// E0C00008 18C003C0 - 64 params		prm_trianglestrip()
+				// E0C00001 58C003C1 - 10 params		prm_trianglefan() (start vertex?)
+				// E0800004 18C003C0 - 32 params		prm_trianglefan()
+				// E3000002 58C003C1 - 20 params		prm_line()
+				// E3000008 58C003C1 - 80 params		prm_lines()
+				// E3000005 58C003C1 - 50 params		prm_linestrip()
+				// E2000001 18C003C0 - 8 params			prm_point()
+				// E2000008 18C003C0 - 64 params		prm_points()
 				// E0C00003 38C003C1 - 30 params
 				// E0C00008 38C003C1 - 80 params
 				// E0C00001 78C003C0 - 10 params
 				// E0800004 38C003C1 - 40 params
-				// E3000002 78C003C0 - 20 params
+				// E3000002 78C003C0 - 20 params		prm_line()
 				// E3400002 58C003C1 - 20 params
 				// E0C00003 18F803C1 - 36 params
 				// E0C00001 58F803C0 - 12 params
@@ -1466,7 +1451,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 				if (w1 == 0xe0c00004 && w2 == 0x18f803c1)
 				{
 					// Quad poly packet
-					poly_vertex vert[4];
+					vertex_t vert[4];
 
 					for (i=0; i < 4; i++)
 					{
@@ -1488,17 +1473,14 @@ static void gfx_fifo_exec(cobra_state *cobra)
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 					}
 
-					//poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(machine->primary_screen), render_texture_scan, 2, &vert[0], &vert[1], &vert[2]);
-					//poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(machine->primary_screen), render_texture_scan, 2, &vert[2], &vert[1], &vert[3]);
-					//poly_wait(poly, "Finished render");
-
-					push_poly(cobra, &vert[0], &vert[1], &vert[2]);
-					push_poly(cobra, &vert[2], &vert[1], &vert[3]);
+					render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
+					render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
+					render_triangle(visarea, rd, 6, vert[2], vert[1], vert[3]);
 				}
 				else if (w1 == 0xe3400008 && w2 == 0x58c003c1)
 				{
 					// Draw a batch of lines
-					poly_vertex vert[2];
+					vertex_t vert[2];
 
 					for (i=0; i < units/2; i++)
 					{
@@ -1519,13 +1501,13 @@ static void gfx_fifo_exec(cobra_state *cobra)
 							fifo_pop(NULL, GFXFIFO_IN, &in);					// ? only 0 so far
 						}
 
-						push_line(cobra, &vert[0], &vert[1]);
+						draw_line(visarea, vert[0], vert[1]);
 					}
 				}
 				else if (w1 == 0xe0c00003 && w2 == 0x18c003c0)
 				{
 					// Triangle poly packet?
-					poly_vertex vert[3];
+					vertex_t vert[3];
 
 					for (i=0; i < 3; i++)
 					{
@@ -1548,10 +1530,8 @@ static void gfx_fifo_exec(cobra_state *cobra)
 						fifo_pop(NULL, GFXFIFO_IN, &in);
 					}
 
-					//poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(machine->primary_screen), render_scan, 0, &vert[0], &vert[1], &vert[2]);
-					//poly_wait(poly, "Finished render");
-
-					push_poly(cobra, &vert[0], &vert[1], &vert[2]);
+					render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
+					render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
 				}
 				else
 				{
@@ -1822,7 +1802,7 @@ static void gfx_fifo_exec(cobra_state *cobra)
 						fifo_pop(NULL, GFXFIFO_IN, &param);
 						cobra->m_gfx_re_word_count++;
 
-						gfx_texture[start+i] = (UINT32)(param);
+						m_gfx_texture[start+i] = (UINT32)(param);
 
 						if (c == 0)
 							printf("              ");
@@ -1880,13 +1860,15 @@ static void gfx_fifo_exec(cobra_state *cobra)
 
 //      printf("gfxfifo_exec: %08X %08X\n", w1, w2);
 	};
+
+	wait();
 }
 
 READ64_MEMBER(cobra_state::gfx_fifo_r)
 {
 	UINT64 r = 0;
 
-	gfx_fifo_exec(this);
+	m_renderer->gfx_fifo_exec(space.machine());
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -2012,7 +1994,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 //  printf("prc_read %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), activecpu_get_pc());
 
-	gfx_fifo_exec(this);
+	m_renderer->gfx_fifo_exec(space.machine());
 
 	if (data == U64(0x00a0000110500018))
 	{
@@ -2057,7 +2039,7 @@ static void gfx_cpu_dc_store(device_t *device, UINT32 address)
 		fifo_push(device, GFXFIFO_IN, (UINT32)(cobra->m_gfx_fifo_mem[3] >> 32) | i);
 		fifo_push(device, GFXFIFO_IN, (UINT32)(cobra->m_gfx_fifo_mem[3] >>  0) | i);
 
-		gfx_fifo_exec(cobra);
+		cobra->m_renderer->gfx_fifo_exec(device->machine());
 	}
 	else
 	{
@@ -2176,8 +2158,6 @@ static MACHINE_RESET( cobra )
 {
 	cobra_state *cobra = machine.driver_data<cobra_state>();
 
-	cobra->polybuffer_ptr = 0;
-
 	cobra->m_sub_interrupt = 0xff;
 
 	UINT8 *ide_features = ide_get_features(machine.device("ide"), 0);
@@ -2274,28 +2254,6 @@ static DRIVER_INIT(bujutsu)
 {
 	DRIVER_INIT_CALL(cobra);
 
-	// rom hacks for main board...
-	/*
-	{
-		int i;
-		UINT32 sum = 0;
-		UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
-
-		// calculate the checksum of the patched rom...
-		for (i=0; i < 0x20000/4; i++)
-		{
-			sum += (UINT8)((rom[i] >> 24) & 0xff);
-			sum += (UINT8)((rom[i] >> 16) & 0xff);
-			sum += (UINT8)((rom[i] >>  8) & 0xff);
-			sum += (UINT8)((rom[i] >>  0) & 0xff);
-		}
-
-		rom[(0x0001fff0^4) / 4] = sum;
-		rom[(0x0001fff4^4) / 4] = ~sum;
-	}
-	*/
-
-
 	// rom hacks for sub board...
 	{
 		UINT32 *rom = (UINT32*)machine.root_device().memregion("user2")->base();
@@ -2330,28 +2288,6 @@ static DRIVER_INIT(bujutsu)
 static DRIVER_INIT(racjamdx)
 {
 	DRIVER_INIT_CALL(cobra);
-
-	// rom hacks for main board...
-	/*
-	{
-		int i;
-		UINT32 sum = 0;
-		UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
-
-		// calculate the checksum of the patched rom...
-		for (i=0; i < 0x20000/4; i++)
-		{
-			sum += (UINT8)((rom[i] >> 24) & 0xff);
-			sum += (UINT8)((rom[i] >> 16) & 0xff);
-			sum += (UINT8)((rom[i] >>  8) & 0xff);
-			sum += (UINT8)((rom[i] >>  0) & 0xff);
-		}
-
-		rom[(0x0001fff0^4) / 4] = sum;
-		rom[(0x0001fff4^4) / 4] = ~sum;
-	}
-	*/
-
 
 	// rom hacks for sub board...
 	{
