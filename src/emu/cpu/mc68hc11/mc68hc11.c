@@ -281,7 +281,7 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 
 			if (reg_page == ram_page) {
 				cpustate->reg_position = reg_page << 12;
-				cpustate->ram_position = (ram_page << 12) + (cpustate->has_extended_io) ? 0x100 : 0x80;
+				cpustate->ram_position = (ram_page << 12) + ((cpustate->has_extended_io) ? 0x100 : 0x80);
 			} else {
 				cpustate->reg_position = reg_page << 12;
 				cpustate->ram_position = ram_page << 12;

@@ -2773,7 +2773,7 @@ static UINT8 h8_subx8(h83xx_state *h8, UINT8 src, UINT8 dst)
 {
 	UINT16 res;
 
-	res = (UINT16)dst - src - (h8->h8cflag) ? 1 : 0;
+	res = (UINT16)dst - src - ((h8->h8cflag) ? 1 : 0);
 	// H,N,Z,V,C modified
 	h8->h8nflag = (res>>7) & 1;
 	h8->h8vflag = (((src^dst) & (res^dst))>>7) & 1;
