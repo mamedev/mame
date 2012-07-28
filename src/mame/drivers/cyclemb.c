@@ -170,43 +170,6 @@ static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
-	int x,y,count;
-	UINT8 flip_screen = state->flip_screen();
-
-	count = 0;
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<64;x++)
-		{
-			/* TODO: first two bytes appears to be scrolling for that line */
-			int attr = state->m_cram[x+y*64];
-			int tile = (state->m_vram[x+y*64]) | ((attr & 3)<<8);
-			int color = ((attr & 0xf8) >> 3) + 0x20;
-			int scrollx = 0;
-
-			if(flip_screen)
-			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
-				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
-			}
-			else
-			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8));
-				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8));
-			}
-
-			count++;
-		}
-	}
-}
-
 
 	/*
     bank 1
@@ -218,7 +181,7 @@ static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
     bank 3
     ---- ---x [1] sprite enable flag?
     */
-static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	UINT8 flip_screen = state->flip_screen();
@@ -265,17 +228,101 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	}
 }
 
+
+static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
+	const gfx_element *gfx = screen.machine().gfx[0];
+	int x,y;
+	UINT8 flip_screen = state->flip_screen();
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			/* TODO: first two bytes appears to be scrolling for that line */
+			int attr = state->m_cram[x+y*64];
+			int tile = (state->m_vram[x+y*64]) | ((attr & 3)<<8);
+			int color = ((attr & 0x7c) >> 2) ^ 0x1f;
+			int scrollx = 0;
+
+			if(flip_screen)
+			{
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
+				/* wrap-around */
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
+			}
+			else
+			{
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8));
+				/* wrap-around */
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+			}
+		}
+	}
+}
+
+/*
+    bank 1
+    xxxx xxxx [0] sprite offset
+    ---x xxxx [1] color offset
+    bank 2
+    xxxx xxxx [0] y offs
+    xxxx xxxx [1] x offs
+    bank 3
+    ---- ---x [1] sprite enable flag?
+*/
+
+static void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
+	UINT8 flip_screen = state->flip_screen();
+	UINT8 col,fx,fy,region;
+	UINT16 spr_offs,i;
+	INT16 x,y;
+
+	for(i=0;i<0x40;i+=2)
+	{
+		y = state->m_obj2_ram[i];
+		x = 0x100 - state->m_obj2_ram[i+1];
+		spr_offs = (state->m_obj1_ram[i+0]);
+		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
+		col = (state->m_obj1_ram[i+1] & 0x3f);
+		region = 1;//((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
+		//if(region == 2)
+		//{
+		//	spr_offs >>= 2;
+		//	spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
+		//	x-=16;
+		//}
+
+		//if(state->m_obj3_ram[i+1] & 1)
+		//	x+=256;
+		//if(state->m_obj3_ram[i+1] & 2)
+//              x-=256;
+		fx = 0;//(state->m_obj3_ram[i+0] & 4) >> 2;
+		fy = 0;//(state->m_obj3_ram[i+0] & 8) >> 3;
+
+		if(flip_screen)
+		{
+			fx = !fx;
+			fy = !fy;
+		}
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[region],spr_offs,col,fx,fy,x,y,0);
+	}
+}
+
 static SCREEN_UPDATE_IND16( cyclemb )
 {
 	cyclemb_draw_tilemap(screen,bitmap,cliprect);
-	draw_sprites(screen,bitmap,cliprect);
+	cyclemb_draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 
 static SCREEN_UPDATE_IND16( skydest )
 {
 	skydest_draw_tilemap(screen,bitmap,cliprect);
-	draw_sprites(screen,bitmap,cliprect);
+	skydest_draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 
@@ -343,13 +390,12 @@ static READ8_HANDLER( skydest_8741_0_r )
 {
 	if(offset == 1) //status port
 	{
-		printf("STATUS PC=%04x\n",cpu_get_pc(&space->device()));
+		//printf("STATUS PC=%04x\n",cpu_get_pc(&space->device()));
 
 		return 1;
 	}
 	else
 	{
-		printf("READ PC=%04x\n",cpu_get_pc(&space->device()));
 		if(skydest_mcu.rst)
 		{
 			/* FIXME: mame rands are supposedly parity checks or signals that the i8741 sends to the main z80 for telling him what kind of input
@@ -359,6 +405,7 @@ static READ8_HANDLER( skydest_8741_0_r )
 			{
 				case 0x554: skydest_mcu.rxd = ((space->machine().root_device().ioport("DSW1")->read() & 0x1f) << 2); break;
 				case 0x583:
+				case 0x3b9:
 				{
 					static UINT8 mux_r;
 					mux_r^=0x20;
@@ -368,9 +415,11 @@ static READ8_HANDLER( skydest_8741_0_r )
 						skydest_mcu.rxd = ((space->machine().root_device().ioport("IN0")->read()) & 0x9f) | (mux_r) | (space->machine().rand() & 0x40);
 				}
 				break;
-				case 0x3b9:
-					skydest_mcu.rxd = space->machine().rand();
+				default:
+					printf("READ PC=%04x\n",cpu_get_pc(&space->device()));
 					break;
+				//	skydest_mcu.rxd = space->machine().rand();
+				//	break;
 			}
 		}
 
@@ -382,7 +431,7 @@ static WRITE8_HANDLER( skydest_8741_0_w )
 {
 	if(offset == 1) //command port
 	{
-		printf("%02x CMD PC=%04x\n",data,cpu_get_pc(&space->device()));
+		//printf("%02x CMD PC=%04x\n",data,cpu_get_pc(&space->device()));
 		switch(data)
 		{
 			case 0:
@@ -415,7 +464,7 @@ static WRITE8_HANDLER( skydest_8741_0_w )
 	}
 	else
 	{
-		printf("%02x DATA PC=%04x\n",data,cpu_get_pc(&space->device()));
+		//printf("%02x DATA PC=%04x\n",data,cpu_get_pc(&space->device()));
 		skydest_mcu.txd = data;
 
 	}
@@ -449,30 +498,30 @@ static MACHINE_RESET( cyclemb )
 
 static INPUT_PORTS_START( cyclemb )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "IN0" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
@@ -791,15 +840,24 @@ ROM_START( skydest )
 	ROM_REGION( 0x4000, "tilemap_data", 0 )
     ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) )
 
-	ROM_REGION( 0x2000, "sprite_data_1", ROMREGION_ERASEFF )
-    ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) )
+	ROM_REGION( 0x10000, "sprite_data_1", ROMREGION_ERASEFF ) // Note: sprite data for score points 80-99 are missing at very least
+    ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, BAD_DUMP CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) )
+	ROM_RELOAD(               0x002000, 0x002000 )
+    ROM_LOAD( "pd1-10.1n",    0x006000, 0x002000, CRC(5840b5b5) SHA1(1b5b188023c4d3198402c946b8c5a51d7f512a07) )
+   	ROM_LOAD( "pd0-12.1s",    0x00e000, 0x002000, CRC(06234942) SHA1(1cc40a8c8e24ab6db1dc7dc88979be23b7a9cab6) )
+    ROM_LOAD( "pd0-14.1u",    0x004000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
+    ROM_LOAD( "pd0-11.1r",    0x008000, 0x002000, CRC(29e5fce4) SHA1(59748e3a192a45dce7920e8d5a7a11d5145915b0) ) //ok
+    ROM_LOAD( "pd1-13.1t",    0x00c000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) ) //ok
 
-	ROM_REGION( 0xc000, "sprite_data_2", ROMREGION_ERASEFF )
-    ROM_LOAD( "pd0-11.1r",    0x000000, 0x002000, CRC(29e5fce4) SHA1(59748e3a192a45dce7920e8d5a7a11d5145915b0) )
-    ROM_LOAD( "pd1-13.1t",    0x002000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) )
-    ROM_LOAD( "pd1-10.1n",    0x004000, 0x002000, CRC(5840b5b5) SHA1(1b5b188023c4d3198402c946b8c5a51d7f512a07) )
-    ROM_LOAD( "pd0-12.1s",    0x006000, 0x002000, CRC(06234942) SHA1(1cc40a8c8e24ab6db1dc7dc88979be23b7a9cab6) )
-    ROM_LOAD( "pd0-14.1u",    0x008000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
+	ROM_REGION( 0x10000, "sprite_data_2", ROMREGION_ERASEFF )
+//	ROM_COPY( "sprite_data_1", 0x0000, 0x0000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0x2000, 0x2000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0x4000, 0x4000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0x6000, 0x6000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0x8000, 0x8000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0xa000, 0xa000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0xc000, 0xc000, 0x2000 )
+//	ROM_COPY( "sprite_data_1", 0xe000, 0xe000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "green.11t",    0x000, 0x100, CRC(f803beb7) SHA1(9c979a296de04728d43c94e9e06f8d8600dc9cfb) )
