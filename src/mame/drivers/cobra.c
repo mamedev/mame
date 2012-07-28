@@ -35,12 +35,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_gfxcpu(*this, "gfxcpu")
+		m_gfxcpu(*this, "gfxcpu"),
+		m_gfx_pagetable(*this, "pagetable")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_gfxcpu;
+	required_shared_ptr<UINT64> m_gfx_pagetable;
 
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);
@@ -65,6 +67,7 @@ public:
 	DECLARE_READ32_MEMBER(sub_ata1_r);
 	DECLARE_WRITE32_MEMBER(sub_ata1_w);
 	DECLARE_READ32_MEMBER(sub_psac2_r);
+	DECLARE_WRITE32_MEMBER(sub_psac2_w);
 
 	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
 	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
@@ -110,7 +113,7 @@ public:
 	int m_gfx_re_status;
 
 	int m_gfx_register_select;
-	UINT64 m_gfx_register[0x3000];
+	UINT64 *m_gfx_register;
 	UINT64 m_gfx_fifo_mem[4];
 	int m_gfx_fifo_cache_addr;
 	int m_gfx_fifo_loopback;
@@ -777,11 +780,9 @@ static ADDRESS_MAP_START( cobra_main_map, AS_PROGRAM, 64, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_READWRITE(main_mpc106_r, main_mpc106_w)
-	AM_RANGE(0xc0000000, 0xc03fffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc0400000, 0xc07fffff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xc7800000, 0xc7bfffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc7c00000, 0xc7ffffff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_REGION("user1", 0)		/* Boot ROM */
+	AM_RANGE(0xc0000000, 0xc03fffff) AM_RAM AM_SHARE("gfx_main_ram_0")				// GFX board main ram, bank 0
+	AM_RANGE(0xc7c00000, 0xc7ffffff) AM_RAM AM_SHARE("gfx_main_ram_1")				// GFX board main ram, bank 1
+	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_REGION("user1", 0)					/* Boot ROM */
 	AM_RANGE(0xfff80000, 0xfffbffff) AM_READWRITE(main_comram_r, main_comram_w)
 	AM_RANGE(0xffff0000, 0xffff0007) AM_READWRITE(main_fifo_r, main_fifo_w)
 ADDRESS_MAP_END
@@ -1110,21 +1111,28 @@ READ32_MEMBER(cobra_state::sub_psac2_r)
 	return m_sub_psac_reg;
 }
 
+WRITE32_MEMBER(cobra_state::sub_psac2_w)
+{
+
+}
+
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_sound_r, sub_sound_w)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
-	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READ(sub_psac2_r)				// PSAC
+	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_RAM											// PSAC RAM
+	AM_RANGE(0x78240000, 0x78241fff) AM_MIRROR(0x80000000) AM_RAM											// PSAC unknown
+	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_psac2_r, sub_psac2_w)			// PSAC
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
-//	AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM							// PSAC (ROZ) in Racing Jam.
-//	AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM							// LANC
-//	AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM							// LANC
+//	AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM											// PSAC (ROZ) in Racing Jam.
+//	AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM											// LANC
+//	AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM											// LANC
 	AM_RANGE(0x7e380000, 0x7e380003) AM_MIRROR(0x80000000) AM_READWRITE(sub_mainbd_r, sub_mainbd_w)
-	AM_RANGE(0x7ff80000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)		/* Boot ROM */
+	AM_RANGE(0x7ff80000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)						/* Boot ROM */
 ADDRESS_MAP_END
 
 #endif		// ENABLE_SUB_CPU
@@ -1194,6 +1202,7 @@ static void cobra_gfx_init(cobra_state *cobra)
 {
 	//gfx_gram = auto_malloc(0x100000);
 	cobra->m_gfx_gram = auto_alloc_array(cobra->machine(), UINT8, 0x100000);
+	cobra->m_gfx_register = auto_alloc_array(cobra->machine(), UINT64, 0x3000);
 }
 
 static void cobra_gfx_reset(cobra_state *cobra)
@@ -2087,13 +2096,14 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 }
 
 static ADDRESS_MAP_START( cobra_gfx_map, AS_PROGRAM, 64, cobra_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("gfx_main_ram_0")
+	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM AM_SHARE("gfx_main_ram_1")
 	AM_RANGE(0x10000000, 0x1000001f) AM_WRITE(gfx_fifo0_w)
 	AM_RANGE(0x18000000, 0x1800001f) AM_WRITE(gfx_fifo1_w)
 	AM_RANGE(0x1e000000, 0x1e00001f) AM_WRITE(gfx_fifo2_w)
-	AM_RANGE(0x20000000, 0x20000007) AM_WRITE(gfx_buf_w)
-	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_REGION("user3", 0)		/* Boot ROM */
+	AM_RANGE(0x20000000, 0x20000007) AM_WRITE(gfx_buf_w)							// this might really map to 0x1e000000, depending on the pagetable
+	AM_RANGE(0x7f000000, 0x7f00ffff) AM_RAM AM_SHARE("pagetable")
+	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_REGION("user3", 0)					/* Boot ROM */
 	AM_RANGE(0xfff80000, 0xfff80007) AM_WRITE(gfx_debug_state_w)
 	AM_RANGE(0xffff0000, 0xffff0007) AM_READWRITE(gfx_unk1_r, gfx_unk1_w)
 	AM_RANGE(0xffff0010, 0xffff001f) AM_READ(gfx_fifo_r)
@@ -2253,6 +2263,11 @@ static DRIVER_INIT(cobra)
 	cobra->m_comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
 
 	cobra->m_comram_page = 0;
+
+
+	// setup fake pagetable until we figure out what really maps there...
+	//cobra->m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);
+	cobra->m_gfx_pagetable[0x80 / 8] = U64(0x80000100200001a8);		// should this map to 0x1e000000?
 }
 
 static DRIVER_INIT(bujutsu)
@@ -2260,15 +2275,11 @@ static DRIVER_INIT(bujutsu)
 	DRIVER_INIT_CALL(cobra);
 
 	// rom hacks for main board...
+	/*
 	{
 		int i;
 		UINT32 sum = 0;
 		UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
-
-		//rom[(0x02218^4) / 4] = 0x60000000;        // skip connect_grphcpu()...
-
-		rom[(0x2b7c^4) / 4] = 0x60000000;		// this fails because the value in ram gets changed too soon...
-		rom[(0x3de8^4) / 4] = 0x48000020;		// same here...
 
 		// calculate the checksum of the patched rom...
 		for (i=0; i < 0x20000/4; i++)
@@ -2282,6 +2293,7 @@ static DRIVER_INIT(bujutsu)
 		rom[(0x0001fff0^4) / 4] = sum;
 		rom[(0x0001fff4^4) / 4] = ~sum;
 	}
+	*/
 
 
 	// rom hacks for sub board...
@@ -2300,7 +2312,6 @@ static DRIVER_INIT(bujutsu)
 		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
 
 		rom[(0x022d4^4) / 4] = 0x60000000;		// skip init_raster() for now ...
-		rom[(0x01ac8^4) / 4] = 0x60000000;		// this op changes SDR1 to 0x7f000000 which breaks page translation
 
 		// calculate the checksum of the patched rom...
 		for (i=0; i < 0x20000/4; i++)
@@ -2319,6 +2330,27 @@ static DRIVER_INIT(bujutsu)
 static DRIVER_INIT(racjamdx)
 {
 	DRIVER_INIT_CALL(cobra);
+
+	// rom hacks for main board...
+	/*
+	{
+		int i;
+		UINT32 sum = 0;
+		UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
+
+		// calculate the checksum of the patched rom...
+		for (i=0; i < 0x20000/4; i++)
+		{
+			sum += (UINT8)((rom[i] >> 24) & 0xff);
+			sum += (UINT8)((rom[i] >> 16) & 0xff);
+			sum += (UINT8)((rom[i] >>  8) & 0xff);
+			sum += (UINT8)((rom[i] >>  0) & 0xff);
+		}
+
+		rom[(0x0001fff0^4) / 4] = sum;
+		rom[(0x0001fff4^4) / 4] = ~sum;
+	}
+	*/
 
 
 	// rom hacks for sub board...
@@ -2352,7 +2384,6 @@ static DRIVER_INIT(racjamdx)
 		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
 
 		rom[(0x02448^4) / 4] = 0x60000000;		// skip init_raster() for now ...
-		rom[(0x01ac8^4) / 4] = 0x60000000;		// this op changes SDR1 to 0x7f000000 which breaks page translation
 
 		rom[(0x02438^4) / 4] = 0x60000000;		// awfully long delay loop (5000000 * 166)
 
