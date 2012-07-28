@@ -2,12 +2,32 @@
 
 Cyber Tank HW (c) 1987/1988 Coreland Technology
 
-preliminary driver by Angelo Salese
+preliminary driver by Angelo Salese & David Haywood
 
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
 - improve sprite emulation
+  How are unused sprites marked? None of the bits alone seem to be used for this purpose
+   and while in many cases the first value gets cleared to 0x0000 (palette 0, upper tile offset 0)
+   that doesn't really seem like a valid marker, and leaves us with some lingering sprites anyway.
+  
+  Attempting to clear the spriteram every frame doesn't help either, the list is copied, complete
+   with 'unwanted' sprites every frame, ruling out some kind of auto clear after drawing operation.
+
+  The last entry in spriteram has 0x0008 in the first word as the only value set, maybe these bits
+  are used as some kind of jump list like several other systems, but I can't see the logic right now
+
+- improve sprite zooming
+  Currently many sprites have an ugly 'bad' line at the top, the chances of this being caused by
+  bad roms is very low because a single 8 pixel block of a sprite covers 4 roms, and it's only
+  ever the top lines.  Do they have some special meaning, or does the zoom algorithm mean that
+  those 'bad' lines would actually never be drawn?  Are the t1-t4 Roms related to the zoom?
+
+- sprite shadows
+  looks like sprites should have a shadow colour rather than the shadows being solid black, how
+  is this marked?
+
 
 ============================================================================================
 
@@ -305,9 +325,6 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
 	const UINT32 *sprrom = (UINT32*)screen.machine().root_device().memregion("spr_gfx")->base();
-	int offs,x,y,xsize,ysize,yi,xi,col_bank,fx,zoom;
-	UINT32 spr_offs,line_start_spr_offset;
-	int xf,yf,xz,yz;
 	const pen_t *paldata = screen.machine().pens;
 
 	int miny = cliprect.min_y;
@@ -319,60 +336,54 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	/*
 
 	o = offset
-	y = ypos  Y = ysize
+	y = ypos  Y = ysize ^ = always 0xF?  ? = set for no obvious reason..
 	x = xpos  X = xsize f = flipx
 
-	Z = zoom
+	Z = zoom   * = alt zoom? (ok for roadside, but 00 for player tank etc?)
 	C = colour
                             +word offset
-	 CCCC CCCC ---- -ooo   0x0
+	 CCCC CCCC #### @ooo   0x0  # bits are often set too? @ is set at the very end of spriteram
 	 oooo oooo oooo oooo   0x1
 	 ---- ---- ---y yyyy   0x2
-	 ---- ---- ---- ----   0x3
-	 ---- ---- ---- YYYY   0x4
+	 ---- ---- ---- ----   0x3 (always has a value here, gets set to FFFF on some cleared sprites?)
+	 ???? ^^^^ YYYY YYYY   0x4
 	 f--- --xx xxxx xxxx   0x5
 	 ZZZZ ZZZZ ---- XXXX   0x6
-	 ---- ---- ---- ----   0x7
+	 ---- ---- **** ****   0x7
 
 	*/
 
 
-	for(offs=0;offs<0x1000/2;offs+=8)
+	for(int offs=0;offs<0x1000/2;offs+=8)
 	{
 		// todo, how are sprites really disabled? our gunshots etc. still leave trails with this logic
 
-		if ((state->m_spr_ram[offs+0x3]) == 0xffff)
-			continue;
 
 		if ((state->m_spr_ram[offs+0x0]) == 0x0000)
 			continue;
 
-
-		x = (state->m_spr_ram[offs+0x5] & 0x3ff);
+		int x = (state->m_spr_ram[offs+0x5] & 0x3ff);
 		if (x&0x200) x-=0x400;
 
-		y = (state->m_spr_ram[offs+0x2] & 0x1ff);
+		int y = (state->m_spr_ram[offs+0x2] & 0x1ff);
 		if (y&0x100) y-=0x200;
 
 
-		spr_offs = (((state->m_spr_ram[offs+0x0] & 7) << 16) | (state->m_spr_ram[offs+0x1]));
-		xsize = ((state->m_spr_ram[offs+0x6] & 0x000f)+1) << 3;
-		ysize = (state->m_spr_ram[offs+0x4] & 0x00ff)+1;
-		fx = (state->m_spr_ram[offs+0x5] & 0x8000) >> 15;
-		zoom = (state->m_spr_ram[offs+0x6] & 0xff00) >> 8;
+		UINT32 spr_offs = (((state->m_spr_ram[offs+0x0] & 7) << 16) | (state->m_spr_ram[offs+0x1]));
+		int xsize = ((state->m_spr_ram[offs+0x6] & 0x000f)+1) << 3;
+		int ysize = (state->m_spr_ram[offs+0x4] & 0x00ff)+1;
+		int fx = (state->m_spr_ram[offs+0x5] & 0x8000) >> 15;
+		int zoom = (state->m_spr_ram[offs+0x6] & 0xff00) >> 8;
 
 
-		col_bank = (state->m_spr_ram[offs+0x0] & 0xff00) >> 8;
+		int col_bank = (state->m_spr_ram[offs+0x0] & 0xff00) >> 8;
 
-		xf = 0;
-		yf = 0;
-		xz = 0;
-		yz = 0;
+		int xf = 0;
+		int yf = 0;
+		int xz = 0;
+		int yz = 0;
 
-		line_start_spr_offset = spr_offs;
-
-
-		for(yi = 0;yi < ysize;yi++)
+		for(int yi = 0;yi < ysize;yi++)
 		{
 			xf = xz = 0;
 			
@@ -398,11 +409,11 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					inc = -8;
 				}
 
-				for(xi=start;xi != end;xi+=inc)
+				for(int xi=start;xi != end;xi+=inc)
 				{ // start x loop
 					UINT32 color;
 					
-					color = sprrom[line_start_spr_offset+xi/8];
+					color = sprrom[spr_offs+xi/8];
 			
 					UINT16 dot;
 					int x_dec; //helpers
@@ -423,7 +434,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 							dot = (color >> (28-shift_pen)) & 0xf;
 						}
 
-						if(dot != 0) // transparent pen
+						if (dot != 0)
 						{
 							dot|= col_bank<<4;
 
@@ -456,11 +467,15 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 			}
 			else // next line
 			{
-				line_start_spr_offset += xsize/8;
+				spr_offs += xsize/8;
 				if(yf >= 0x80) { yz++; yf-=0x80; }
 			}
 		}
-	}		
+	}	
+
+//	if (state->m_spr_ram[0xff0/2] == 0x0008)
+//		memset(state->m_spr_ram, 0x00, 0xff0);
+
 }
 
 
