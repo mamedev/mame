@@ -179,7 +179,9 @@ INLINE m6800_state *get_safe_token(device_t *device)
 		   device->type() == M6808 ||
 		   device->type() == HD6301 ||
 		   device->type() == HD63701 ||
-		   device->type() == NSC8105);
+		   device->type() == NSC8105 ||
+		   device->type() == HD6303R ||
+		   device->type() == HD6303Y);
 	return (m6800_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
