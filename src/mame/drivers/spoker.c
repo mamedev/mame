@@ -694,7 +694,7 @@ static DRIVER_INIT( 3super8 )
 	{
 		UINT8 a6, a7, a8, a9, a11, d5 = 0;
 		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
-		d5 = (a6&a8)&((!a7&a11)|(a9&!a11));
+		d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
 		ROM[i] ^= d5*0x20;
 	}
 
