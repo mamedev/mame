@@ -5217,6 +5217,30 @@ ROM_END
 
 ROM_START( driftout )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
+	ROM_LOAD16_BYTE( "ic46.rom",  0x00000, 0x80000, CRC(71303738) SHA1(b473e1cfe2b64df41d57bdf421a62bebcc882304) )
+	ROM_LOAD16_BYTE( "ic45.rom",  0x00001, 0x80000, CRC(43f81eca) SHA1(1a67105bc56cb5366ee85dc54eafe7673bb10ef0) )
+
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_ERASEFF )
+	/* empty */
+
+	ROM_REGION( 0x080000, "gfx2", 0 )      /* OBJ */
+	ROM_LOAD( "do_obj.rom", 0x00000, 0x80000, CRC(5491f1c4) SHA1(a2e92a9a1e77d9f683f6720947e0622dde48287f) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )      /* pivot gfx */
+	ROM_LOAD( "do_piv.rom", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_LOAD( "do_50.rom",  0x00000, 0x04000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
+	ROM_CONTINUE(           0x10000, 0x0c000 )	/* banked stuff */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "do_snd.rom", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
+
+	/* no Delta-T samples */
+ROM_END
+
+ROM_START( driftoutj )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "do_46.rom",  0x00000, 0x80000, CRC(f960363e) SHA1(3f64fd606d4e19198de460cf2d99331a2d2e7434) )
 	ROM_LOAD16_BYTE( "do_45.rom",  0x00001, 0x80000, CRC(e3fe66b9) SHA1(6b197061be0c296af08a86dace08ba75c9574e19) )
 
@@ -5427,5 +5451,6 @@ GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,   0,        ROT0,   "Taito
 
 GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,  0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, driftout,   0,        driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driftout,   0,        driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driftoutj,  driftout, driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1991, driveout,   driftout, driveout,  driftout,  driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", GAME_SUPPORTS_SAVE )
