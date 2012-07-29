@@ -24,8 +24,9 @@ Supported games:
     truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
     pipibibs    TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 1)
     pipibibsa   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 2)
+    pipibibsp   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (Prototype)
+    pipibibsbl  bootleg??     Toaplan       Pipi & Bibis / Whoopee!! (Really a boot or an earlier Proto?)
     whoopee    *TP-025/TP-020 Toaplan       Pipi & Bibis / Whoopee!! (Teki Paki hardware)
-    pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (bootleg)
     fixeight    TP-026        Toaplan       FixEight
     fixeightbl  bootleg       Toaplan       FixEight
     grindstm    TP-027        Toaplan       Grind Stormer (1992)
@@ -2023,6 +2024,25 @@ static INPUT_PORTS_START( pipibibs )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( pipibibsp )
+	PORT_INCLUDE( pipibibs )
+
+	PORT_MODIFY("DSWA")
+	// Various features on bit mask 0x000d - see above
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x80000, 0x80000, SW1 )
+
+	PORT_MODIFY("JMPR")
+	PORT_DIPNAME( 0x80007,	0x00002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,FAKE:!1")
+	PORT_DIPSETTING(		0x00002, DEF_STR( World ) )
+	PORT_DIPSETTING(		0x80005, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x00004, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x00000, "Japan (Ryouta Kikaku)" )
+	PORT_DIPSETTING(		0x00001, "Hong Kong (Honest Trading Co.)" )
+	PORT_DIPSETTING(		0x80006, "Spain & Portugal (APM Electronics S.A.)" )
+	PORT_DIPSETTING(		0x00007, "World (Ryouta Kikaku)" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE( pipibibs )
 
@@ -2043,7 +2063,7 @@ static INPUT_PORTS_START( pipibibsbl )
 
 	PORT_MODIFY("JMPR")
 	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
-	PORT_DIPNAME( 0x80007,	0x00007, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,FAKE:!1")
+	PORT_DIPNAME( 0x80007,	0x00002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,FAKE:!1")
 	PORT_DIPSETTING(		0x00002, DEF_STR( World ) )
 //  PORT_DIPSETTING(        0x00003, DEF_STR( World ) )
 	PORT_DIPSETTING(		0x80005, DEF_STR( Europe ) )
@@ -4120,7 +4140,23 @@ ROM_START( whoopee )
 ROM_END
 
 
-ROM_START( pipibibsbl )
+ROM_START( pipibibsp )
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
+	ROM_LOAD16_BYTE( "pip_cpu_e", 0x000000, 0x020000, CRC(ae3205bd) SHA1(1613fec637dfed213433dca0d267e49f4848df81) )
+	ROM_LOAD16_BYTE( "pip_cpu_o", 0x000001, 0x020000, CRC(241669a9) SHA1(234e0bb819453e16625d15d2cf22496bbc547943) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
+	ROM_LOAD( "pip_snd", 0x0000, 0x8000, CRC(8ebf183b) SHA1(602b138c85b02d121d007f6788b322aa107c7d91) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "cg_01_l", 0x000000, 0x080000, CRC(21d1ef46) SHA1(d7ccbe56eb08be421c241065cbaa99cc9cca4d73) )
+	ROM_LOAD( "cg_01_h", 0x080000, 0x080000, CRC(d5726328) SHA1(26401ba8ce22fda161306b91d70afefa959cde8c) )
+	ROM_LOAD( "cg_23_l", 0x100000, 0x080000, CRC(114d41d0) SHA1(d1166d495d92c6082fffbed422deb7605c5a41a2) )
+	ROM_LOAD( "cg_23_h", 0x180000, 0x080000, CRC(e0468152) SHA1(f5a872d8658e959ec6cce51c7798291b5b973f15) )
+ROM_END
+
+
+ROM_START( pipibibsbl ) /* Either based off the proto OR an earlier version on slightly different hardware with no Flip Screen */
 	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "ppbb06.bin", 0x000000, 0x020000, CRC(14c92515) SHA1(2d7f7c89272bb2a8115f163ad651bef3bca5107e) )
 	ROM_LOAD16_BYTE( "ppbb05.bin", 0x000001, 0x020000, CRC(3d51133c) SHA1(d7bd94ad11e9aeb5a5165c5ac6f71950849bcd2f) )
@@ -5093,6 +5129,7 @@ GAME( 1992, truxton2,   0,        truxton2, truxton2, 0,        ROT270, "Toaplan
 
 GAME( 1991, pipibibs,   0,        pipibibs, pipibibs, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, pipibibsa,  pipibibs, pipibibs, pipibibs, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibsp,  pipibibs, pipibibs, pipibibsp,0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 
 GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
