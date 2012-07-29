@@ -25,7 +25,7 @@ Supported games:
     pipibibs    TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 1)
     pipibibsa   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 2)
     pipibibsp   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (Prototype)
-    pipibibsbl  bootleg??     Toaplan       Pipi & Bibis / Whoopee!! (Really a boot or an earlier Proto?)
+    pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (based of the prototype)
     whoopee    *TP-025/TP-020 Toaplan       Pipi & Bibis / Whoopee!! (Teki Paki hardware)
     fixeight    TP-026        Toaplan       FixEight
     fixeightbl  bootleg       Toaplan       FixEight
@@ -2032,6 +2032,7 @@ static INPUT_PORTS_START( pipibibsp )
 	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x80000, 0x80000, SW1 )
 
 	PORT_MODIFY("JMPR")
+	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
 	PORT_DIPNAME( 0x80007,	0x00002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,FAKE:!1")
 	PORT_DIPSETTING(		0x00002, DEF_STR( World ) )
 	PORT_DIPSETTING(		0x80005, DEF_STR( Europe ) )
@@ -2055,7 +2056,7 @@ static INPUT_PORTS_START( pipibibsbl )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:!2")	// This video HW doesn't support flip screen
+	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:!2")	// In Test Mode, it shows as Normal/Invert Screen - HW doesn't support it
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
 	// Various features on bit mask 0x000d - see above
@@ -2065,7 +2066,6 @@ static INPUT_PORTS_START( pipibibsbl )
 	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
 	PORT_DIPNAME( 0x80007,	0x00002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,FAKE:!1")
 	PORT_DIPSETTING(		0x00002, DEF_STR( World ) )
-//  PORT_DIPSETTING(        0x00003, DEF_STR( World ) )
 	PORT_DIPSETTING(		0x80005, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x00004, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x00000, "Japan (Ryouta Kikaku)" )
@@ -4156,7 +4156,7 @@ ROM_START( pipibibsp )
 ROM_END
 
 
-ROM_START( pipibibsbl ) /* Either based off the proto OR an earlier version on slightly different hardware with no Flip Screen */
+ROM_START( pipibibsbl ) /* Based off the proto code. */
 	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "ppbb06.bin", 0x000000, 0x020000, CRC(14c92515) SHA1(2d7f7c89272bb2a8115f163ad651bef3bca5107e) )
 	ROM_LOAD16_BYTE( "ppbb05.bin", 0x000001, 0x020000, CRC(3d51133c) SHA1(d7bd94ad11e9aeb5a5165c5ac6f71950849bcd2f) )
