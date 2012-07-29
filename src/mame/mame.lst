@@ -19021,7 +19021,10 @@ m5draclb	// Ooh Aah Dracula Club (Barcrest)
 m5draclb07	//
 m5draclb01	//
 m5ewn		// Each Way Nudge (Barcrest)
+m5ewn08		//
 m5elim		// Eliminator (Barcrest)
+m5elim03	//
+m5elim04	//
 m5egr		// Elvis Gold Rush (Barcrest)
 m5egra		//
 m5egss		// Elvis Gold Super Streak (Barcrest)
@@ -19032,30 +19035,57 @@ m5xchn		// Exchanges Unlimited (Barcrest)
 m5firebl	// Fireball (Barcrest)
 m5flipcr	// Flippin Crazy (Barcrest)
 m5fortby	// Fort Boyard (Barcrest)
+m5fortby01	//
 m5frnzy		// Frenzy (Barcrest)
+m5frnzya	//
 m5beans		// Full Of Beans (Barcrest)
+m5beansa	//
 m5funsun	// Fun In The Sun (Barcrest)
+m5funsun03	//
 m5gimmie	// Gimmie Gimmie Gimmie (Barcrest)
 m5grush		// Gold Rush (Barcrest)
+m5grush10	//
+m5grush04	//
+m5grush03	//
+m5grush02	//
+m5grush01	//
 m5grush5	// Gold Rush Five Liner (Barcrest)
+m5grush504	//
 m5gruss		// Gold Rush Sit Down (Barcrest)
 m5grusst	// Gold Rush Stampede (Barcrest)
+m5grusst04	//
+m5grusst03	//
 m5gstrik	// Gold Strike (Barcrest)
+m5gstrik11	//
+m5gstrik02	//
+m5gstrik01	//
+m5gstrik01a	//
+m5gstrika	//
 m5gsstrk	// Gold Super Streak (Barcrest)
+m5gsstrk07	//
 m5gdrag		// Golden Dragon (Barcrest)
 m5gdrgcl	// Golden Dragon Club (Barcrest)
+m5gdrgcl05	//
 m5gkeys		// Golden Keys (Barcrest)
 m5hellrz	// Hellraiser (Barcrest)
 m5hlsumo	// Hi Lo Sumo (Barcrest)
 m5hifly		// High Flyer (Barcrest)
+m5hifly03	//
+m5hifly04	//
 m5holy		// The Holy Grail (Barcrest)
+m5holy10	//
 m5hotslt	// Hot Slot (Barcrest)
 m5hotstf	// Hot Stuff (Barcrest)
 m5hypvip	// Hyper Viper (Barcrest)
 m5jackpt	// Jackpoteers (Barcrest)
+m5jackpt07	//
 m5jackp2	// Jackpoteers 2 (Barcrest)
+m5jackp2a	//
 m5jlyjwl	// Jolly Jewels (Barcrest)
+m5jlyjwl01	//
+m5jlyjwl02  //
 m5jlyrog	// Jolly Roger (Barcrest)
+m5jlyroga	//
 m5kkebab	// King Kebab (Barcrest)
 m5kingko	// King KO (Barcrest)
 m5lotta		// Lotta Luck (Barcrest)
@@ -20318,6 +20348,7 @@ hb_rhv		// Red Hot Voucher (Qps)
 hb_ringb	// Ring A Bell (Jpm)
 hb_rckrl	// Rock 'n' Roll (Qps)
 hb_ydd		// Yabba-Dabba-Dough (Qps)
+hb_hotst	// Hot Stuff??
 
 /* Summit Coin */
 

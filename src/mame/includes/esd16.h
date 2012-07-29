@@ -46,7 +46,6 @@ public:
 	/* devices */
 	device_t *m_audio_cpu;
 	eeprom_device *m_eeprom;
-	DECLARE_WRITE16_MEMBER(esd16_spriteram_w);
 	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
 	DECLARE_READ16_MEMBER(esd_eeprom_r);

@@ -549,6 +549,27 @@ ROM_START( hb_ydd )
 	ROM_LOAD16_BYTE( "80001040.p2", 0x00001, 0x080000, CRC(046b5e10) SHA1(364024d5b8750d457c368ab2afd99a8118aaa309) )
 ROM_END
 
+ROM_START( hb_hotst )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "hstv0-04.u1", 0x000000, 0x080000, CRC(23043c19) SHA1(03c7b2eda9b4d975aeba3eea091b11016df35047) )
+	ROM_LOAD16_BYTE( "hstv0-04.u2", 0x000001, 0x080000, CRC(941294dc) SHA1(359f3dac97c869f9cec5367d14aa95edced7c2de) )
+
+	ROM_REGION( 0x400000, "altrevs", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "hst0-04d.u1", 0x000000, 0x080000, CRC(2affa3aa) SHA1(ed3c5a0380f7d823e05164cbce85a85211fd2755) )
+	ROM_LOAD16_BYTE( "hst0-04g.u1", 0x000000, 0x080000, CRC(4bcbd10b) SHA1(c7a9c0b3cec6dafd699b67b51823b86f354c665c) )
+
+	ROM_LOAD16_BYTE( "hstv006d.u1", 0x000000, 0x080000, CRC(e9640d3f) SHA1(a51a6c3a8301fc19d15a07a4f1d1c86d13ef9141) )
+	ROM_LOAD16_BYTE( "hstv006g.u1", 0x000000, 0x080000, CRC(88507f9e) SHA1(acf1e26d7ddc6270c4025079516ad58c85630b50) )
+	ROM_LOAD16_BYTE( "hstv0-06.u1", 0x000000, 0x080000, CRC(e09f928c) SHA1(fafd8bb8c1f9e1904ef7a4dfe89eaf5a8ec6398e) )
+	ROM_LOAD16_BYTE( "hstv0-06.u2", 0x000001, 0x080000, CRC(2f9a53cc) SHA1(63e7ec37c6ee177e3d33ff2c649f743a8585bce4) )
+
+	ROM_LOAD16_BYTE( "hst0-07d.u1", 0x000000, 0x080000, CRC(baccf4e6) SHA1(bd3f6c5e1a43779f278b481dd08860be22c565a2) )
+	ROM_LOAD16_BYTE( "hst0-07g.u1", 0x000000, 0x080000, CRC(dbf88647) SHA1(c2bdabae0e4234b245541983bb8e7d43636816c9) )
+	ROM_LOAD16_BYTE( "hstv0-07.u1", 0x000000, 0x080000, CRC(b3376b55) SHA1(4c5b6f104318bea7efefb8535921a8527429392e) )
+	ROM_LOAD16_BYTE( "hstv0-07.u2", 0x000001, 0x080000, CRC(adde3b86) SHA1(95b65b9ae2c2034370c895803eb5dcac0a69a77a) )
+ROM_END
+
+
 
 
 extern void astra_addresslines( UINT16* src, size_t srcsize, int small );
@@ -575,7 +596,6 @@ static DRIVER_INIT( hb )
 	#endif
 }
 
-
 GAME( 200?, hb_cr		,0,			pluto5, pluto5, hb, ROT0, "Qps","Cash Raker (Qps)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, hb_bar7		,0,			pluto5, pluto5, hb, ROT0, "Fairgames","Bar Seven (Fairgames)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, hb_bigx		,0,			pluto5, pluto5, hb, ROT0, "Jpm","Big X (Jpm)", GAME_IS_SKELETON_MECHANICAL )
@@ -596,3 +616,5 @@ GAME( 200?, hb_rhv		,0,			pluto5, pluto5, hb, ROT0, "Qps","Red Hot Voucher (Qps)
 GAME( 200?, hb_ringb	,0,			pluto5, pluto5, hb, ROT0, "Jpm","Ring A Bell (Jpm)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, hb_rckrl	,0,			pluto5, pluto5, hb, ROT0, "Qps","Rock 'n' Roll (Qps)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, hb_ydd		,0,			pluto5, pluto5, hb, ROT0, "Qps","Yabba-Dabba-Dough (Qps)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 200?, hb_hotst	,0,			pluto5, pluto5, hb, ROT0, "Barcrest?","Hot Stuff (Barcrest?)", GAME_IS_SKELETON_MECHANICAL ) // was in a Barcrest MPU5 set, but I doubt it is
