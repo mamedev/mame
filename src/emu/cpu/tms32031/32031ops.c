@@ -83,7 +83,7 @@
 #define OR_V_SUB(a,b,r)		do { UINT32 temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
 #define OR_V_ADD(a,b,r)		do { UINT32 temp = ((~((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
 #define OR_C_SUB(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(b) > (UINT32)(a)); } while (0)
-#define OR_C_ADD(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(~(a)) < (UINT32)(b)); } while (0)
+#define OR_C_ADD(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(a) > (UINT32)(r)); } while (0)
 #define OR_NZCV_SUB(a,b,r)	do { OR_V_SUB(a,b,r); OR_C_SUB(a,b,r); OR_NZ(r); } while (0)
 #define OR_NZCV_ADD(a,b,r)	do { OR_V_ADD(a,b,r); OR_C_ADD(a,b,r); OR_NZ(r); } while (0)
 
