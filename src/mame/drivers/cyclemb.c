@@ -288,13 +288,13 @@ static void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		spr_offs = (state->m_obj1_ram[i+0]);
 		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
 		col = (state->m_obj1_ram[i+1] & 0x3f);
-		region = 1;//((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
-		//if(region == 2)
-		//{
-		//	spr_offs >>= 2;
+		region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
+		if(region == 2)
+		{
+			spr_offs >>= 2;
 		//	spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
-		//	x-=16;
-		//}
+			x-=16;
+		}
 
 		//if(state->m_obj3_ram[i+1] & 1)
 		//	x+=256;
@@ -843,12 +843,13 @@ ROM_START( skydest )
    	ROM_LOAD( "pd1-8.1l",     0x002000, 0x002000, CRC(b810858b) SHA1(385e625fc989a1dfa18559a62c99363b62c66a67) )
     ROM_LOAD( "pd1-10.1n",    0x006000, 0x002000, CRC(5840b5b5) SHA1(1b5b188023c4d3198402c946b8c5a51d7f512a07) )
    	ROM_LOAD( "pd0-12.1s",    0x00e000, 0x002000, CRC(06234942) SHA1(1cc40a8c8e24ab6db1dc7dc88979be23b7a9cab6) )
-    ROM_LOAD( "pd0-14.1u",    0x004000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
+    ROM_LOAD( "pd0-14.1u",    0x00a000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
+    ROM_LOAD( "pd0-9.1m",     0x004000, 0x002000, CRC(6f558bee) SHA1(0539feaa848d6cfb9f90a46a851f73fb74e82676) ) //ok
     ROM_LOAD( "pd0-11.1r",    0x008000, 0x002000, CRC(29e5fce4) SHA1(59748e3a192a45dce7920e8d5a7a11d5145915b0) ) //ok
     ROM_LOAD( "pd1-13.1t",    0x00c000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) ) //ok
 
 	ROM_REGION( 0x10000, "sprite_data_2", ROMREGION_ERASEFF )
-    ROM_LOAD( "pd0-9.1m",     0x000000, 0x002000, CRC(6f558bee) SHA1(0539feaa848d6cfb9f90a46a851f73fb74e82676) )
+	ROM_COPY( "sprite_data_1", 0x000000, 0x000000, 0x010000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "green.11t",    0x000, 0x100, CRC(f803beb7) SHA1(9c979a296de04728d43c94e9e06f8d8600dc9cfb) )
