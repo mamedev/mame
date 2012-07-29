@@ -1,6 +1,59 @@
 /*  Konami Cobra System
 */
 
+/*
+	check_color_buffer(): 0, 0
+		gfxfifo_exec: ram write 00100: 00000800
+		gfxfifo_exec: ram write 00104: 00000000
+		gfxfifo_exec: ram write 00108: 00000080
+		gfxfifo_exec: ram write 0010C: 00000080
+		gfxfifo_exec: ram write 00110: 20200000
+		gfxfifo_exec: ram write 00120: 08800800
+		gfxfifo_exec: ram write 00124: 00081018
+		gfxfifo_exec: ram write 00128: 08080808
+		gfxfifo_exec: ram write 80100: 00800000
+		gfxfifo_exec: ram write 80104: 00800000
+		gfxfifo_exec: ram write 80110: 00800000
+		gfxfifo_exec: ram write 800A8: 00000000
+		gfxfifo_exec: ram write 80108: 00000000
+
+	check_color_buffer(): 0, 1
+		gfxfifo_exec: ram write 00120: 08800800
+		gfxfifo_exec: ram write 00124: 00081018
+		gfxfifo_exec: ram write 00128: 08080808
+		gfxfifo_exec: ram write 80100: 00200000
+		gfxfifo_exec: ram write 80104: 00200000
+		gfxfifo_exec: ram write 80110: 00200000
+		gfxfifo_exec: ram write 800A8: 00000000
+
+	check_overlay_buffer():
+		gfxfifo_exec: ram write 00120: 08800800
+		gfxfifo_exec: ram write 00124: 00081018
+		gfxfifo_exec: ram write 00128: 08080808
+		gfxfifo_exec: ram write 80100: 000E0000
+		gfxfifo_exec: ram write 80104: 000E0000
+		gfxfifo_exec: ram write 80110: 000E0000
+		gfxfifo_exec: ram write 800A8: 00000000
+
+	check_z_buffer():
+		gfxfifo_exec: ram write 00120: 08000800
+		gfxfifo_exec: ram write 00124: 00000010
+		gfxfifo_exec: ram write 00128: 00001010
+		gfxfifo_exec: ram write 80100: 00000000
+		gfxfifo_exec: ram write 80104: 00000800
+		gfxfifo_exec: ram write 80110: 00000800
+		gfxfifo_exec: ram write 800A8: 80000000
+
+	check_stencil_buffer():
+		gfxfifo_exec: ram write 00120: 08000800
+		gfxfifo_exec: ram write 00124: 00000010
+		gfxfifo_exec: ram write 00128: 00001010
+		gfxfifo_exec: ram write 80100: 00000000
+		gfxfifo_exec: ram write 80104: 00000200
+		gfxfifo_exec: ram write 80110: 00000200
+		gfxfifo_exec: ram write 800A8: 80000000
+*/
+
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
@@ -139,6 +192,9 @@ public:
 	cobra_fifo *m_m2sfifo;
 	cobra_fifo *m_s2mfifo;
 
+	UINT8 m_m2s_int_enable;
+	UINT8 m_s2m_int_enable;
+
 	int m2sfifo_unk_flag;
 	int s2mfifo_unk_flag;
 
@@ -223,6 +279,12 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 	int y1 = v1.y;
 
 	UINT32 color = 0xffffffff;		// TODO: where does the color come from?
+
+	if (v1.x < visarea.min_x || v1.x > visarea.max_x ||
+		v1.y < visarea.min_y || v1.y > visarea.max_y ||
+		v2.x < visarea.min_x || v2.x > visarea.max_x ||
+		v2.y < visarea.min_y || v2.y > visarea.max_x)
+		return;
 
 	if (dx > dy)
 	{
@@ -553,6 +615,7 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		//       x              S2M FIFO full flag
 		//     x                S2M FIFO empty flag
 		//   x                  S2M FIFO half-full flag
+		// x                    Comram page
 
 		int value = 0x00;
 		value |= m_m2sfifo->is_full() ? 0x00 : 0x01;
@@ -653,6 +716,11 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 	{
 		// Register 0xffff0003:
 		// Main-to-Sub FIFO unknown
+		//
+		// 7 6 5 4 3 2 1 0
+		//----------------
+		//         x            M2S unknown flag
+		// x                    Comram page
 
 		if (!m_m2sfifo->is_empty())
 		{
@@ -671,6 +739,47 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		}
 
 		m_comram_page = ((data >> 32) & 0x80) ? 1 : 0;
+	}
+	if (ACCESSING_BITS_24_31)
+	{
+		// Register 0xffff0004:
+		// Interrupt enable for ???
+		//
+		// 7 6 5 4 3 2 1 0
+		//----------------
+		// x                    ?
+
+		printf("main_fifo_w: 0xffff0004: %02X\n", (UINT8)(data >> 24));
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		// Register 0xffff0005:
+		// Interrupt enable for S2MFIFO
+		//
+		// 7 6 5 4 3 2 1 0
+		//----------------
+		// x                    ?
+
+		m_s2m_int_enable = (UINT8)(data >> 16);
+
+		if ((m_s2m_int_enable & 0x80) == 0)
+		{
+			// clear the interrupt
+			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		}
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		// Register 0xffff0007:
+		// Interrupt enable for M2SFIFO
+		//
+		// 7 6 5 4 3 2 1 0
+		//----------------
+		// x                    ?
+
+		m_m2s_int_enable = (UINT8)(data);
+
+		printf("main_fifo_w: 0xffff0007: %02X\n", (UINT8)(data >> 0));
 	}
 
 	// Register 0xffff0000,1
@@ -848,6 +957,12 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		// Sub-to-Main FIFO data
 
 		m_s2mfifo->push(&space.device(), (UINT8)(data >> 24));
+
+		// fire off an interrupt if enabled
+		if (m_s2m_int_enable & 0x80)
+		{
+			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		}
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -1482,6 +1597,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 						draw_line(visarea, vert[0], vert[1]);
 					}
 				}
+				/*
 				else if (w1 == 0xe0c00003 && w2 == 0x18c003c0)
 				{
 					// Triangle poly packet?
@@ -1511,6 +1627,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
 					render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
 				}
+				*/
 				else
 				{
 					printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
@@ -1533,9 +1650,11 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 			case 0xe8:
 			{
+				// Write into a pixelbuffer?
+
 				int num = w2;
 				int i;
-			//  int c=0;
+				//int c=0;
 
 				if (fifo_in->current_num() < num)
 				{
@@ -1543,24 +1662,18 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					return;
 				}
 
-				/*
-                printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
-
-                for (i=0; i < num; i++)
-                {
-                    UINT64 in3;
-                    fifo_pop(GFXFIFO_IN, &in3);
-                    printf("                        %08X\n", (UINT32)(in3));
-                }*/
-
-				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+				if (num > 0)
+				{
+					printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+				}
 
 				for (i=0; i < num; i++)
 				{
 					UINT64 param;
 					fifo_in->pop(NULL, &param);
 
-					/*if (c == 0)
+					/*
+					if (c == 0)
                         printf("       ");
                     printf("%08X ", (UINT32)(param));
 
@@ -1580,6 +1693,8 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 			case 0xe9:
 			{
+				// Read a specified pixel position from a pixelbuffer?
+
 			//  printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
 
 				/*{
