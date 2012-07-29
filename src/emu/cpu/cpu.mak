@@ -1302,7 +1302,6 @@ $(CPUOBJ)/v30mz/v30mz.o:	$(CPUSRC)/v30mz/v30mz.c \
 							$(CPUSRC)/v30mz/necmodrm.h \
 							$(CPUSRC)/v30mz/necinstr.h \
 							$(CPUSRC)/v30mz/necea.h \
-							$(CPUSRC)/v30mz/nechost.h \
 							$(CPUSRC)/v30mz/nec.h
 
 

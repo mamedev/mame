@@ -583,7 +583,6 @@ src/emu/cpu/upd7810/upd7810.c svneol=native#text/plain
 src/emu/cpu/upd7810/upd7810.h svneol=native#text/plain
 src/emu/cpu/v30mz/nec.h svneol=native#text/plain
 src/emu/cpu/v30mz/necea.h svneol=native#text/plain
-src/emu/cpu/v30mz/nechost.h svneol=native#text/plain
 src/emu/cpu/v30mz/necinstr.h svneol=native#text/plain
 src/emu/cpu/v30mz/necmodrm.h svneol=native#text/plain
 src/emu/cpu/v30mz/v30mz.c svneol=native#text/plain
