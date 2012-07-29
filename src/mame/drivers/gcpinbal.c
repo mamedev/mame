@@ -28,16 +28,6 @@ BGMs (controlled by OKI MSM6585 sound chip)
     Built in low-pass filter
     Expanded sampling frequency
 
-Differences between MSM6585 & MSM5205:
-
-                          MSM6586          MSM5205
-Master clock frequency    640kHz           384kHz
-Sampling frequency        4k/8k/16k/32kHz  4k/6k/8kHz
-ADPCM bit length          4-bit            3-bit/4-bit
-DA converter              12-bit           10-bit
-Low-pass filter           -40dB/oct        N/A
-Overflow prevent circuit  Included         N/A
-
 Stephh's notes (based on the game M68000 code and some tests) :
 
   - Reset the game while pressing START1 to enter the "test mode"
@@ -395,10 +385,10 @@ GFXDECODE_END
                             (SOUND)
 **************************************************************/
 
-static const msm5205_interface msm5205_config =
+static const msm5205_interface msm6585_config =
 {
 	gcp_adpcm_int,		/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	MSM6585_S40			/* 16 kHz */
 };
 
 /***********************************************************
@@ -475,8 +465,8 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000) /* Actually an OKI MSM6585 @ 640kHz */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
+	MCFG_SOUND_CONFIG(msm6585_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

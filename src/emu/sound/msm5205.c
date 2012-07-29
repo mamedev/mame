@@ -25,6 +25,11 @@
  *
  *  A reset signal is set high or low to determine whether playback (and interrupts) are occuring
  *
+ *
+ * TODO:
+ * - convert to modern
+ * - lowpass filter for MSM6585
+ *
  */
 
 typedef struct _msm5205_state msm5205_state;
@@ -32,9 +37,9 @@ struct _msm5205_state
 {
 	const msm5205_interface *intf;
 	device_t *device;
-	sound_stream * stream;  /* number of stream system      */
-	INT32 clock;				/* clock rate */
-	emu_timer *timer;        /* VCLK callback timer          */
+	sound_stream * stream;    /* number of stream system      */
+	INT32 clock;              /* clock rate                   */
+	emu_timer *timer;         /* VCLK callback timer          */
 	INT32 data;               /* next adpcm data              */
 	INT32 vclk;               /* vclk signal (external mode)  */
 	INT32 reset;              /* reset pin signal             */
@@ -56,7 +61,7 @@ INLINE msm5205_state *get_safe_token(device_t *device)
 static void msm5205_playmode(msm5205_state *voice,int select);
 
 /*
- * ADPCM lockup tabe
+ * ADPCM lookup table
  */
 
 /* step size index shift table */
@@ -117,16 +122,17 @@ static STREAM_UPDATE( MSM5205_update )
 		memset (buffer,0,samples*sizeof(*buffer));
 }
 
-/* timer callback at VCLK low eddge */
+/* timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585) */
 static TIMER_CALLBACK( MSM5205_vclk_callback )
 {
 	msm5205_state *voice = (msm5205_state *)ptr;
 	int val;
 	int new_signal;
+
 	/* callback user handler and latch next data */
 	if(voice->intf->vclk_callback) (*voice->intf->vclk_callback)(voice->device);
 
-	/* reset check at last hieddge of VCLK */
+	/* reset check at last hiedge of VCLK */
 	if(voice->reset)
 	{
 		new_signal = 0;
@@ -144,6 +150,7 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 		if (voice->step > 48) voice->step = 48;
 		else if (voice->step < 0) voice->step = 0;
 	}
+
 	/* update when signal changed */
 	if( voice->signal != new_signal)
 	{
@@ -165,6 +172,7 @@ static DEVICE_RESET( msm5205 )
 	voice->reset   = 0;
 	voice->signal  = 0;
 	voice->step    = 0;
+
 	/* timer and bitwidth set */
 	msm5205_playmode(voice,voice->intf->select);
 }
@@ -250,19 +258,23 @@ void msm5205_data_w (device_t *device, int data)
 }
 
 /*
- *    Handle an change of the selector
+ *    Handle a change of the selector
  */
 
 void msm5205_playmode_w(device_t *device, int select)
 {
 	msm5205_state *voice = get_safe_token(device);
-	msm5205_playmode(voice,select);
+	msm5205_playmode(voice, select);
 }
 
-static void msm5205_playmode(msm5205_state *voice,int select)
+static void msm5205_playmode(msm5205_state *voice, int select)
 {
-	static const int prescaler_table[4] = {96,48,64,0};
-	int prescaler = prescaler_table[select & 3];
+	static const int prescaler_table[2][4] =
+	{
+		{ 96, 48, 64,  0},
+		{160, 40, 80, 20}
+	};
+	int prescaler = prescaler_table[select >> 3 & 1][select & 3];
 	int bitwidth = (select & 4) ? 4 : 3;
 
 
@@ -271,6 +283,7 @@ static void msm5205_playmode(msm5205_state *voice,int select)
 		voice->stream->update();
 
 		voice->prescaler = prescaler;
+
 		/* timer set */
 		if( prescaler )
 		{
@@ -318,21 +331,31 @@ DEVICE_GET_INFO( msm5205 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm5205_state);				break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(msm5205_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( msm5205 );		break;
-		case DEVINFO_FCT_STOP:							/* nothing */									break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( msm5205 );		break;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME( msm5205 );		break;
+		case DEVINFO_FCT_STOP:						/* nothing */									break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( msm5205 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "MSM5205");						break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "MSM5205");						break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "ADPCM");						break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+	}
+}
+
+DEVICE_GET_INFO( msm6585 )
+{
+	switch (state)
+	{
+		case DEVINFO_STR_NAME:						strcpy(info->s, "MSM6585");						break;
+		default:									DEVICE_GET_INFO_CALL(msm5205);					break;
 	}
 }
 
 
 DEFINE_LEGACY_SOUND_DEVICE(MSM5205, msm5205);
+DEFINE_LEGACY_SOUND_DEVICE(MSM6585, msm6585);

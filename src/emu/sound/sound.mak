@@ -383,7 +383,7 @@ ifneq ($(filter OKIM6258 OKIM6295 OKIM9810 I5000_SND,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/okiadpcm.o
 endif
 
-ifneq ($(filter MSM5205,$(SOUNDS)),)
+ifneq ($(filter MSM5205 MSM6585,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/msm5205.o
 endif
 

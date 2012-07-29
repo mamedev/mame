@@ -68,6 +68,8 @@ It has Sega and Taito logos in the roms ?!
 ES8712 sound may not be quite right. Samples are currently looped, but
 whether they should and how, is unknown.
 
+where does the M6585 hook up to?
+
 cleanup
 
 
@@ -84,11 +86,12 @@ class vmetal_state : public metro_state
 public:
 	vmetal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: metro_state(mconfig, type, tag),
-		  m_texttileram(*this, "texttileram"),
-		  m_mid1tileram(*this, "mid1tileram"),
-		  m_mid2tileram(*this, "mid2tileram"),
-		  m_tlookup(*this, "tlookup"),
-		  m_vmetal_videoregs(*this, "vmetal_regs") { }
+		m_texttileram(*this, "texttileram"),
+		m_mid1tileram(*this, "mid1tileram"),
+		m_mid2tileram(*this, "mid2tileram"),
+		m_tlookup(*this, "tlookup"),
+		m_vmetal_videoregs(*this, "vmetal_regs")
+	{ }
 
 	required_shared_ptr<UINT16> m_texttileram;
 	required_shared_ptr<UINT16> m_mid1tileram;

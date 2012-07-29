@@ -7,17 +7,18 @@ class gcpinbal_state : public driver_device
 public:
 	gcpinbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_oki(*this, "oki"),
-		  m_msm(*this, "msm") ,
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki"),
+		m_msm(*this, "msm"),
 		m_tilemapram(*this, "tilemapram"),
 		m_spriteram(*this, "spriteram"),
-		m_ioc_ram(*this, "ioc_ram"){ }
+		m_ioc_ram(*this, "ioc_ram")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
-	required_device<msm5205_device> m_msm;
+	required_device<msm6585_device> m_msm;
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_tilemapram;
