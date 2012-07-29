@@ -45,10 +45,6 @@
 
 #define PC(n)		(((n)->sregs[CS]<<4)+(n)->ip)
 
-typedef UINT8 BOOLEAN;
-typedef UINT8 BYTE;
-typedef UINT16 WORD;
-typedef UINT32 DWORD;
 
 #include "v30mz.h"
 #include "nec.h"
@@ -59,12 +55,6 @@ typedef union
     UINT16 w[8];    /* viewed as 16 bits registers */
     UINT8  b[16];   /* or as 8 bit registers */
 } necbasicregs;
-
-/* default configuration */
-static const nec_config default_config =
-{
-	NULL		 // no internal decryption table
-};
 
 typedef struct _v30mz_state v30mz_state;
 struct _v30mz_state
@@ -96,8 +86,6 @@ struct _v30mz_state
 	UINT32 ea;
 	UINT16 eo;
 	UINT16 e16;
-
-	const nec_config *config;
 };
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
@@ -173,13 +161,12 @@ static CPU_EXIT( nec )
 
 }
 
-static void nec_interrupt(v30mz_state *cpustate,unsigned int_num,BOOLEAN md_flag)
+static void nec_interrupt(v30mz_state *cpustate,unsigned int_num)
 {
     UINT32 dest_seg, dest_off;
 
     i_pushf(cpustate);
 	cpustate->TF = cpustate->IF = 0;
-	if (md_flag) SetMD(0);	/* clear Mode-flag = start 8080 emulation mode */
 
 	if (int_num == -1)
 	{
@@ -194,28 +181,28 @@ static void nec_interrupt(v30mz_state *cpustate,unsigned int_num,BOOLEAN md_flag
 
 	PUSH(cpustate->sregs[CS]);
 	PUSH(cpustate->ip);
-	cpustate->ip = (WORD)dest_off;
-	cpustate->sregs[CS] = (WORD)dest_seg;
+	cpustate->ip = (UINT16)dest_off;
+	cpustate->sregs[CS] = (UINT16)dest_seg;
 }
 
 static void nec_trap(v30mz_state *cpustate)
 {
 	nec_instruction[FETCHOP](cpustate);
-	nec_interrupt(cpustate,1,0);
+	nec_interrupt(cpustate,1);
 }
 
 static void external_int(v30mz_state *cpustate)
 {
 	if( cpustate->pending_irq & NMI_IRQ )
 	{
-		nec_interrupt(cpustate,NEC_NMI_INT_VECTOR,0);
+		nec_interrupt(cpustate,NEC_NMI_INT_VECTOR);
 		cpustate->pending_irq &= ~NMI_IRQ;
 	}
 	else if( cpustate->pending_irq )
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(cpustate,(UINT32)-1,0);
+		nec_interrupt(cpustate,(UINT32)-1);
 	}
 }
 
@@ -397,7 +384,7 @@ OP( 0x62, i_chkind  ) {
 	high= GetnextRMWord;
 	tmp= RegWord(ModRM);
 	if (tmp<low || tmp>high) {
-		nec_interrupt(cpustate,5,0);
+		nec_interrupt(cpustate,5);
 		CLK(20);
 	} else {
 		CLK(13);
@@ -461,9 +448,9 @@ OP( 0x65, i_repc  ) {	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
 }
 
 OP( 0x68, i_push_d16 ) { UINT32 tmp;	FETCHWORD(tmp); PUSH(tmp);	CLK(1);	}
-OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w;	FETCHWORD(tmp); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     if (ModRM >= 0xc0) CLK(3) else CLK(4) }
-OP( 0x6a, i_push_d8  ) { UINT32 tmp = (WORD)((INT16)((INT8)FETCH)); 	PUSH(tmp);	CLK(1);	}
-OP( 0x6b, i_imul_d8  ) { UINT32 src2; DEF_r16w; src2= (WORD)((INT16)((INT8)FETCH)); dst = (INT32)((INT16)src)*(INT32)((INT16)src2); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1); RegWord(ModRM)=(WORD)dst; if (ModRM >= 0xc0) CLK(3) else CLK(4) }
+OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w;	FETCHWORD(tmp); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(UINT16)dst;     if (ModRM >= 0xc0) CLK(3) else CLK(4) }
+OP( 0x6a, i_push_d8  ) { UINT32 tmp = (UINT16)((INT16)((INT8)FETCH)); 	PUSH(tmp);	CLK(1);	}
+OP( 0x6b, i_imul_d8  ) { UINT32 src2; DEF_r16w; src2= (UINT16)((INT16)((INT8)FETCH)); dst = (INT32)((INT16)src)*(INT32)((INT16)src2); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1); RegWord(ModRM)=(UINT16)dst; if (ModRM >= 0xc0) CLK(3) else CLK(4) }
 OP( 0x6c, i_insb     ) { PutMemB(ES,cpustate->regs.w[IY],read_port(cpustate->regs.w[DW])); cpustate->regs.w[IY]+= -2 * cpustate->DF + 1; CLK(6); }
 OP( 0x6d, i_insw     ) { PutMemB(ES,cpustate->regs.w[IY],read_port(cpustate->regs.w[DW])); PutMemB(ES,(cpustate->regs.w[IY]+1)&0xffff,read_port((cpustate->regs.w[DW]+1)&0xffff)); cpustate->regs.w[IY]+= -4 * cpustate->DF + 2; CLK(6); }
 OP( 0x6e, i_outsb    ) { write_port(cpustate->regs.w[DW],GetMemB(DS,cpustate->regs.w[IX])); cpustate->regs.w[IX]+= -2 * cpustate->DF + 1; CLK(7); }
@@ -514,7 +501,7 @@ OP( 0x81, i_81pre   ) { UINT32 dst, src; GetModRM; dst = GetRMWord(ModRM); src =
     }
 }
 
-OP( 0x82, i_82pre   ) { UINT32 dst, src; GetModRM; dst = GetRMByte(ModRM); src = (BYTE)((INT8)FETCH);
+OP( 0x82, i_82pre   ) { UINT32 dst, src; GetModRM; dst = GetRMByte(ModRM); src = (UINT8)((INT8)FETCH);
 	if (ModRM >=0xc0 ) CLK(1) else if ((ModRM & 0x38)==0x38) CLK(2) else CLK(3)
 	switch (ModRM & 0x38) {
 	    case 0x00: ADDB;			PutbackRMByte(ModRM,dst);	break;
@@ -528,7 +515,7 @@ OP( 0x82, i_82pre   ) { UINT32 dst, src; GetModRM; dst = GetRMByte(ModRM); src =
     }
 }
 
-OP( 0x83, i_83pre   ) { UINT32 dst, src; GetModRM; dst = GetRMWord(ModRM); src = (WORD)((INT16)((INT8)FETCH));
+OP( 0x83, i_83pre   ) { UINT32 dst, src; GetModRM; dst = GetRMWord(ModRM); src = (UINT16)((INT16)((INT8)FETCH));
 	if (ModRM >=0xc0 ) CLK(1) else if ((ModRM & 0x38)==0x38) CLK(2) else CLK(3)
     switch (ModRM & 0x38) {
 	    case 0x00: ADDW;			PutbackRMWord(ModRM,dst);	break;
@@ -579,7 +566,7 @@ OP( 0x97, i_xchg_axdi ) { XchgAWReg(IY); CLK(3); }
 
 OP( 0x98, i_cbw       ) { cpustate->regs.b[AH] = (cpustate->regs.b[AL] & 0x80) ? 0xff : 0;		CLK(1);	}
 OP( 0x99, i_cwd       ) { cpustate->regs.w[DW] = (cpustate->regs.b[AH] & 0x80) ? 0xffff : 0;	CLK(1);	}
-OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	FETCHWORD(tmp); FETCHWORD(tmp2); PUSH(cpustate->sregs[CS]); PUSH(cpustate->ip); cpustate->ip = (WORD)tmp; cpustate->sregs[CS] = (WORD)tmp2; CLK(10); }
+OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	FETCHWORD(tmp); FETCHWORD(tmp2); PUSH(cpustate->sregs[CS]); PUSH(cpustate->ip); cpustate->ip = (UINT16)tmp; cpustate->sregs[CS] = (UINT16)tmp2; CLK(10); }
 OP( 0x9b, i_wait      ) { logerror("%06x: Hardware POLL\n",PC(cpustate)); }
 OP( 0x9c, i_pushf     ) { PUSH( CompressFlags() ); CLK(2); }
 OP( 0x9d, i_popf      ) { UINT32 tmp; POP(tmp); ExpandFlags(tmp); CLK(3); if (cpustate->TF) nec_trap(cpustate); }
@@ -628,10 +615,10 @@ OP( 0xc0, i_rotshft_bd8 ) {
 	c=FETCH;
 	CLKM(3,5);
 	if (c) switch (ModRM & 0x38) {
-		case 0x00: do { ROL_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
-		case 0x08: do { ROR_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
-		case 0x10: do { ROLC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
-		case 0x18: do { RORC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
+		case 0x00: do { ROL_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
+		case 0x08: do { ROR_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
+		case 0x10: do { ROLC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
+		case 0x18: do { RORC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
 		case 0x20: SHL_BYTE(c); break;
 		case 0x28: SHR_BYTE(c); break;
 		case 0x30: logerror("%06x: Undefined opcode 0xc0 0x30 (SHLA)\n",PC(cpustate)); break;
@@ -645,10 +632,10 @@ OP( 0xc1, i_rotshft_wd8 ) {
 	c=FETCH;
 	CLKM(3,5);
     if (c) switch (ModRM & 0x38) {
-		case 0x00: do { ROL_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
-		case 0x08: do { ROR_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
-		case 0x10: do { ROLC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
-		case 0x18: do { RORC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
+		case 0x00: do { ROL_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
+		case 0x08: do { ROR_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
+		case 0x10: do { ROLC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
+		case 0x18: do { RORC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
 		case 0x20: SHL_WORD(c); break;
 		case 0x28: SHR_WORD(c); break;
 		case 0x30: logerror("%06x: Undefined opcode 0xc1 0x30 (SHLA)\n",PC(cpustate)); break;
@@ -658,8 +645,8 @@ OP( 0xc1, i_rotshft_wd8 ) {
 
 OP( 0xc2, i_ret_d16  ) { UINT32 count = FETCH; count += FETCH << 8; POP(cpustate->ip); cpustate->regs.w[SP]+=count; CLK(6); }
 OP( 0xc3, i_ret      ) { POP(cpustate->ip); CLK(6); }
-OP( 0xc4, i_les_dw   ) { GetModRM; WORD tmp = GetRMWord(ModRM); RegWord(ModRM)=tmp; cpustate->sregs[ES] = GetnextRMWord; CLK(6); }
-OP( 0xc5, i_lds_dw   ) { GetModRM; WORD tmp = GetRMWord(ModRM); RegWord(ModRM)=tmp; cpustate->sregs[DS] = GetnextRMWord; CLK(6); }
+OP( 0xc4, i_les_dw   ) { GetModRM; UINT16 tmp = GetRMWord(ModRM); RegWord(ModRM)=tmp; cpustate->sregs[ES] = GetnextRMWord; CLK(6); }
+OP( 0xc5, i_lds_dw   ) { GetModRM; UINT16 tmp = GetRMWord(ModRM); RegWord(ModRM)=tmp; cpustate->sregs[DS] = GetnextRMWord; CLK(6); }
 OP( 0xc6, i_mov_bd8  ) { GetModRM; PutImmRMByte(ModRM); CLK(1); }
 OP( 0xc7, i_mov_wd16 ) { GetModRM; PutImmRMWord(ModRM); CLK(1); }
 
@@ -686,19 +673,19 @@ OP( 0xc9, i_leave ) {
 }
 OP( 0xca, i_retf_d16  ) { UINT32 count = FETCH; count += FETCH << 8; POP(cpustate->ip); POP(cpustate->sregs[CS]); cpustate->regs.w[SP]+=count; CLK(9); }
 OP( 0xcb, i_retf      ) { POP(cpustate->ip); POP(cpustate->sregs[CS]); CLK(8); }
-OP( 0xcc, i_int3      ) { nec_interrupt(cpustate,3,0); CLK(9); }
-OP( 0xcd, i_int       ) { nec_interrupt(cpustate,FETCH,0); CLK(10); }
-OP( 0xce, i_into      ) { if (OF) { nec_interrupt(cpustate,4,0); CLK(13); } else CLK(6); }
+OP( 0xcc, i_int3      ) { nec_interrupt(cpustate,3); CLK(9); }
+OP( 0xcd, i_int       ) { nec_interrupt(cpustate,FETCH); CLK(10); }
+OP( 0xce, i_into      ) { if (OF) { nec_interrupt(cpustate,4); CLK(13); } else CLK(6); }
 OP( 0xcf, i_iret      ) { POP(cpustate->ip); POP(cpustate->sregs[CS]); i_popf(cpustate); CLK(10); }
 
 OP( 0xd0, i_rotshft_b ) {
 	UINT32 src, dst; GetModRM; src = (UINT32)GetRMByte(ModRM); dst=src;
 	CLKM(1,3);
     switch (ModRM & 0x38) {
-		case 0x00: ROL_BYTE;  PutbackRMByte(ModRM,(BYTE)dst); cpustate->OverVal = (src^dst)&0x80; break;
-		case 0x08: ROR_BYTE;  PutbackRMByte(ModRM,(BYTE)dst); cpustate->OverVal = (src^dst)&0x80; break;
-		case 0x10: ROLC_BYTE; PutbackRMByte(ModRM,(BYTE)dst); cpustate->OverVal = (src^dst)&0x80; break;
-		case 0x18: RORC_BYTE; PutbackRMByte(ModRM,(BYTE)dst); cpustate->OverVal = (src^dst)&0x80; break;
+		case 0x00: ROL_BYTE;  PutbackRMByte(ModRM,(UINT8)dst); cpustate->OverVal = (src^dst)&0x80; break;
+		case 0x08: ROR_BYTE;  PutbackRMByte(ModRM,(UINT8)dst); cpustate->OverVal = (src^dst)&0x80; break;
+		case 0x10: ROLC_BYTE; PutbackRMByte(ModRM,(UINT8)dst); cpustate->OverVal = (src^dst)&0x80; break;
+		case 0x18: RORC_BYTE; PutbackRMByte(ModRM,(UINT8)dst); cpustate->OverVal = (src^dst)&0x80; break;
 		case 0x20: SHL_BYTE(1); cpustate->OverVal = (src^dst)&0x80; break;
 		case 0x28: SHR_BYTE(1); cpustate->OverVal = (src^dst)&0x80; break;
 		case 0x30: logerror("%06x: Undefined opcode 0xd0 0x30 (SHLA)\n",PC(cpustate)); break;
@@ -710,10 +697,10 @@ OP( 0xd1, i_rotshft_w ) {
 	UINT32 src, dst; GetModRM; src = (UINT32)GetRMWord(ModRM); dst=src;
 	CLKM(1,3);
 	switch (ModRM & 0x38) {
-		case 0x00: ROL_WORD;  PutbackRMWord(ModRM,(WORD)dst); cpustate->OverVal = (src^dst)&0x8000; break;
-		case 0x08: ROR_WORD;  PutbackRMWord(ModRM,(WORD)dst); cpustate->OverVal = (src^dst)&0x8000; break;
-		case 0x10: ROLC_WORD; PutbackRMWord(ModRM,(WORD)dst); cpustate->OverVal = (src^dst)&0x8000; break;
-		case 0x18: RORC_WORD; PutbackRMWord(ModRM,(WORD)dst); cpustate->OverVal = (src^dst)&0x8000; break;
+		case 0x00: ROL_WORD;  PutbackRMWord(ModRM,(UINT16)dst); cpustate->OverVal = (src^dst)&0x8000; break;
+		case 0x08: ROR_WORD;  PutbackRMWord(ModRM,(UINT16)dst); cpustate->OverVal = (src^dst)&0x8000; break;
+		case 0x10: ROLC_WORD; PutbackRMWord(ModRM,(UINT16)dst); cpustate->OverVal = (src^dst)&0x8000; break;
+		case 0x18: RORC_WORD; PutbackRMWord(ModRM,(UINT16)dst); cpustate->OverVal = (src^dst)&0x8000; break;
 		case 0x20: SHL_WORD(1); cpustate->OverVal = (src^dst)&0x8000;  break;
 		case 0x28: SHR_WORD(1); cpustate->OverVal = (src^dst)&0x8000;  break;
 		case 0x30: logerror("%06x: Undefined opcode 0xd1 0x30 (SHLA)\n",PC(cpustate)); break;
@@ -726,10 +713,10 @@ OP( 0xd2, i_rotshft_bcl ) {
 	c=cpustate->regs.b[CL];
 	CLKM(3,5);
 	if (c) switch (ModRM & 0x38) {
-		case 0x00: do { ROL_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
-		case 0x08: do { ROR_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
-		case 0x10: do { ROLC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
-		case 0x18: do { RORC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
+		case 0x00: do { ROL_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
+		case 0x08: do { ROR_BYTE;  c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
+		case 0x10: do { ROLC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
+		case 0x18: do { RORC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(UINT8)dst); break;
 		case 0x20: SHL_BYTE(c); break;
 		case 0x28: SHR_BYTE(c); break;
 		case 0x30: logerror("%06x: Undefined opcode 0xd2 0x30 (SHLA)\n",PC(cpustate)); break;
@@ -742,10 +729,10 @@ OP( 0xd3, i_rotshft_wcl ) {
 	c=cpustate->regs.b[CL];
 	CLKM(3,5);
     if (c) switch (ModRM & 0x38) {
-		case 0x00: do { ROL_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
-		case 0x08: do { ROR_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
-		case 0x10: do { ROLC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
-		case 0x18: do { RORC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
+		case 0x00: do { ROL_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
+		case 0x08: do { ROR_WORD;  c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
+		case 0x10: do { ROLC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
+		case 0x18: do { RORC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(UINT16)dst); break;
 		case 0x20: SHL_WORD(c); break;
 		case 0x28: SHR_WORD(c); break;
 		case 0x30: logerror("%06x: Undefined opcode 0xd3 0x30 (SHLA)\n",PC(cpustate)); break;
@@ -759,21 +746,21 @@ OP( 0xd6, i_setalc ) { cpustate->regs.b[AL] = (CF)?0xff:0x00; CLK(3); logerror("
 OP( 0xd7, i_trans  ) { UINT32 dest = (cpustate->regs.w[BW]+cpustate->regs.b[AL])&0xffff; cpustate->regs.b[AL] = GetMemB(DS, dest); CLK(5); }
 OP( 0xd8, i_fpo    ) { GetModRM; CLK(1);	logerror("%06x: Unimplemented floating point control %04x\n",PC(cpustate),ModRM); }
 
-OP( 0xe0, i_loopne ) { INT8 disp = (INT8)FETCH; cpustate->regs.w[CW]--; if (!ZF && cpustate->regs.w[CW]) { cpustate->ip = (WORD)(cpustate->ip+disp); CLK(6); } else CLK(3); }
-OP( 0xe1, i_loope  ) { INT8 disp = (INT8)FETCH; cpustate->regs.w[CW]--; if ( ZF && cpustate->regs.w[CW]) { cpustate->ip = (WORD)(cpustate->ip+disp); CLK(6); } else CLK(3); }
-OP( 0xe2, i_loop   ) { INT8 disp = (INT8)FETCH; cpustate->regs.w[CW]--; if (cpustate->regs.w[CW]) { cpustate->ip = (WORD)(cpustate->ip+disp); CLK(5); } else CLK(2); }
-OP( 0xe3, i_jcxz   ) { INT8 disp = (INT8)FETCH; if (cpustate->regs.w[CW] == 0) { cpustate->ip = (WORD)(cpustate->ip+disp); CLK(4); } else CLK(1); }
+OP( 0xe0, i_loopne ) { INT8 disp = (INT8)FETCH; cpustate->regs.w[CW]--; if (!ZF && cpustate->regs.w[CW]) { cpustate->ip = (UINT16)(cpustate->ip+disp); CLK(6); } else CLK(3); }
+OP( 0xe1, i_loope  ) { INT8 disp = (INT8)FETCH; cpustate->regs.w[CW]--; if ( ZF && cpustate->regs.w[CW]) { cpustate->ip = (UINT16)(cpustate->ip+disp); CLK(6); } else CLK(3); }
+OP( 0xe2, i_loop   ) { INT8 disp = (INT8)FETCH; cpustate->regs.w[CW]--; if (cpustate->regs.w[CW]) { cpustate->ip = (UINT16)(cpustate->ip+disp); CLK(5); } else CLK(2); }
+OP( 0xe3, i_jcxz   ) { INT8 disp = (INT8)FETCH; if (cpustate->regs.w[CW] == 0) { cpustate->ip = (UINT16)(cpustate->ip+disp); CLK(4); } else CLK(1); }
 OP( 0xe4, i_inal   ) { UINT8 port = FETCH; cpustate->regs.b[AL] = read_port(port); CLK(6);	}
 OP( 0xe5, i_inax   ) { UINT8 port = FETCH; cpustate->regs.b[AL] = read_port(port); cpustate->regs.b[AH] = read_port(port+1); CLK(6); }
 OP( 0xe6, i_outal  ) { UINT8 port = FETCH; write_port(port, cpustate->regs.b[AL]); CLK(6);	}
 OP( 0xe7, i_outax  ) { UINT8 port = FETCH; write_port(port, cpustate->regs.b[AL]); write_port(port+1, cpustate->regs.b[AH]); CLK(6);	}
 
-OP( 0xe8, i_call_d16 ) { UINT32 tmp; FETCHWORD(tmp); PUSH(cpustate->ip); cpustate->ip = (WORD)(cpustate->ip+(INT16)tmp); CLK(5); }
-OP( 0xe9, i_jmp_d16  ) { UINT32 tmp; FETCHWORD(tmp); cpustate->ip = (WORD)(cpustate->ip+(INT16)tmp); CLK(4); }
-OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; FETCHWORD(tmp); FETCHWORD(tmp1); cpustate->sregs[CS] = (WORD)tmp1;	cpustate->ip = (WORD)tmp; CLK(7);  }
+OP( 0xe8, i_call_d16 ) { UINT32 tmp; FETCHWORD(tmp); PUSH(cpustate->ip); cpustate->ip = (UINT16)(cpustate->ip+(INT16)tmp); CLK(5); }
+OP( 0xe9, i_jmp_d16  ) { UINT32 tmp; FETCHWORD(tmp); cpustate->ip = (UINT16)(cpustate->ip+(INT16)tmp); CLK(4); }
+OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; FETCHWORD(tmp); FETCHWORD(tmp1); cpustate->sregs[CS] = (UINT16)tmp1;	cpustate->ip = (UINT16)tmp; CLK(7);  }
 OP( 0xeb, i_jmp_d8   ) { int tmp = (int)((INT8)FETCH); CLK(4);
 	if (tmp==-2 && cpustate->no_interrupt==0 && (cpustate->pending_irq==0) && cpustate->icount>0) cpustate->icount%=12; /* cycle skip */
-	cpustate->ip = (WORD)(cpustate->ip+tmp);
+	cpustate->ip = (UINT16)(cpustate->ip+tmp);
 }
 OP( 0xec, i_inaldx   ) { cpustate->regs.b[AL] = read_port(cpustate->regs.w[DW]); CLK(6);}
 OP( 0xed, i_inaxdx   ) { UINT32 port = cpustate->regs.w[DW];	cpustate->regs.b[AL] = read_port(port);	cpustate->regs.b[AH] = read_port(port+1); CLK(6); }
@@ -844,10 +831,10 @@ OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
 		case 0x08: logerror("%06x: Undefined opcode 0xf6 0x08\n",PC(cpustate)); break;
 		case 0x10: PutbackRMByte(ModRM,~tmp); CLKM(1,3); break; /* NOT */
 		case 0x18: cpustate->CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); CLKM(1,3); break; /* NEG */
-		case 0x20: uresult = cpustate->regs.b[AL]*tmp; cpustate->regs.w[AW]=(WORD)uresult; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MULU */
-		case 0x28: result = (INT16)((INT8)cpustate->regs.b[AL])*(INT16)((INT8)tmp); cpustate->regs.w[AW]=(WORD)result; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MUL */
-		case 0x30: if (tmp) { DIVUB; } else nec_interrupt(cpustate,0,0); CLKM(15,16); break;
-		case 0x38: if (tmp) { DIVB;  } else nec_interrupt(cpustate,0,0); CLKM(17,18); break;
+		case 0x20: uresult = cpustate->regs.b[AL]*tmp; cpustate->regs.w[AW]=(UINT16)uresult; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MULU */
+		case 0x28: result = (INT16)((INT8)cpustate->regs.b[AL])*(INT16)((INT8)tmp); cpustate->regs.w[AW]=(UINT16)result; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.b[AH]!=0); CLKM(3,4); break; /* MUL */
+		case 0x30: if (tmp) { DIVUB; } else nec_interrupt(cpustate,0); CLKM(15,16); break;
+		case 0x38: if (tmp) { DIVB;  } else nec_interrupt(cpustate,0); CLKM(17,18); break;
 	}
 }
 
@@ -860,8 +847,8 @@ OP( 0xf7, i_f7pre   ) { UINT32 tmp,tmp2; UINT32 uresult,uresult2; INT32 result,r
 		case 0x18: cpustate->CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); CLKM(1,3); break; /* NEG */
 		case 0x20: uresult = cpustate->regs.w[AW]*tmp; cpustate->regs.w[AW]=uresult&0xffff; cpustate->regs.w[DW]=((UINT32)uresult)>>16; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.w[DW]!=0); CLKM(3,4); break; /* MULU */
 		case 0x28: result = (INT32)((INT16)cpustate->regs.w[AW])*(INT32)((INT16)tmp); cpustate->regs.w[AW]=result&0xffff; cpustate->regs.w[DW]=result>>16; cpustate->CarryVal=cpustate->OverVal=(cpustate->regs.w[DW]!=0); CLKM(3,4); break; /* MUL */
-		case 0x30: if (tmp) { DIVUW; } else nec_interrupt(cpustate,0,0); CLKM(23,24); break;
-		case 0x38: if (tmp) { DIVW;  } else nec_interrupt(cpustate,0,0); CLKM(24,25); break;
+		case 0x30: if (tmp) { DIVUW; } else nec_interrupt(cpustate,0); CLKM(23,24); break;
+		case 0x38: if (tmp) { DIVW;  } else nec_interrupt(cpustate,0); CLKM(24,25); break;
 	}
 }
 
@@ -873,16 +860,16 @@ OP( 0xfc, i_cld   ) { SetDF(0);			CLK(4);	}
 OP( 0xfd, i_std   ) { SetDF(1);			CLK(4);	}
 OP( 0xfe, i_fepre ) { UINT32 tmp, tmp1; GetModRM; tmp=GetRMByte(ModRM);
     switch(ModRM & 0x38) {
-    	case 0x00: tmp1 = tmp+1; cpustate->OverVal = (tmp==0x7f); SetAF(tmp1,tmp,1); SetSZPF_Byte(tmp1); PutbackRMByte(ModRM,(BYTE)tmp1); CLKM(1,3); break; /* INC */
-		case 0x08: tmp1 = tmp-1; cpustate->OverVal = (tmp==0x80); SetAF(tmp1,tmp,1); SetSZPF_Byte(tmp1); PutbackRMByte(ModRM,(BYTE)tmp1); CLKM(1,3); break; /* DEC */
+    	case 0x00: tmp1 = tmp+1; cpustate->OverVal = (tmp==0x7f); SetAF(tmp1,tmp,1); SetSZPF_Byte(tmp1); PutbackRMByte(ModRM,(UINT8)tmp1); CLKM(1,3); break; /* INC */
+		case 0x08: tmp1 = tmp-1; cpustate->OverVal = (tmp==0x80); SetAF(tmp1,tmp,1); SetSZPF_Byte(tmp1); PutbackRMByte(ModRM,(UINT8)tmp1); CLKM(1,3); break; /* DEC */
 		default:   logerror("%06x: FE Pre with unimplemented mod\n",PC(cpustate));
 	}
 }
 OP( 0xff, i_ffpre ) { UINT32 tmp, tmp1; GetModRM; tmp=GetRMWord(ModRM);
     switch(ModRM & 0x38) {
-    	case 0x00: tmp1 = tmp+1; cpustate->OverVal = (tmp==0x7fff); SetAF(tmp1,tmp,1); SetSZPF_Word(tmp1); PutbackRMWord(ModRM,(WORD)tmp1); CLKM(1,3); break; /* INC */
-		case 0x08: tmp1 = tmp-1; cpustate->OverVal = (tmp==0x8000); SetAF(tmp1,tmp,1); SetSZPF_Word(tmp1); PutbackRMWord(ModRM,(WORD)tmp1); CLKM(1,3); break; /* DEC */
-		case 0x10: PUSH(cpustate->ip);	cpustate->ip = (WORD)tmp; CLKM(5,6); break; /* CALL */
+    	case 0x00: tmp1 = tmp+1; cpustate->OverVal = (tmp==0x7fff); SetAF(tmp1,tmp,1); SetSZPF_Word(tmp1); PutbackRMWord(ModRM,(UINT16)tmp1); CLKM(1,3); break; /* INC */
+		case 0x08: tmp1 = tmp-1; cpustate->OverVal = (tmp==0x8000); SetAF(tmp1,tmp,1); SetSZPF_Word(tmp1); PutbackRMWord(ModRM,(UINT16)tmp1); CLKM(1,3); break; /* DEC */
+		case 0x10: PUSH(cpustate->ip);	cpustate->ip = (UINT16)tmp; CLKM(5,6); break; /* CALL */
 		case 0x18: tmp1 = cpustate->sregs[CS]; cpustate->sregs[CS] = GetnextRMWord; PUSH(tmp1); PUSH(cpustate->ip); cpustate->ip = tmp; CLKM(5,12); break; /* CALL FAR */
 		case 0x20: cpustate->ip = tmp; CLKM(4,5); break; /* JMP */
 		case 0x28: cpustate->ip = tmp; cpustate->sregs[CS] = GetnextRMWord; CLK(10); break; /* JMP FAR */
@@ -928,16 +915,12 @@ static void set_irq_line(v30mz_state *cpustate, int irqline, int state)
 
 static CPU_DISASSEMBLE( nec )
 {
-	v30mz_state *cpustate = get_safe_token(device);
-
-	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
+	return necv_dasm_one(buffer, pc, oprom, NULL);
 }
 
 static void nec_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
-
-	const nec_config *config = &default_config;
 
 	device->save_item(NAME(cpustate->regs.w));
 	device->save_item(NAME(cpustate->sregs));
@@ -958,7 +941,6 @@ static void nec_init(legacy_cpu_device *device, device_irq_acknowledge_callback 
 	device->save_item(NAME(cpustate->CarryVal));
 	device->save_item(NAME(cpustate->ParityVal));
 
-	cpustate->config = config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

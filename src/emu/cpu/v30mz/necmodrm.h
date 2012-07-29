@@ -35,7 +35,7 @@ static struct {
 
 #define PutImmRMWord(ModRM) 				\
 {							\
-	WORD val;					\
+	UINT16 val;					\
 	if (ModRM >= 0xc0)				\
 		FETCHWORD(cpustate->regs.w[Mod_RM.RM.w[ModRM]]) \
 	else {						\
