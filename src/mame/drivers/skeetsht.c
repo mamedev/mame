@@ -2,6 +2,8 @@
 
     Dynamo Skeet Shot
 
+Notes: Pop Shot is a prototype sequal (or upgrade) to Skeet Shot
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -294,6 +296,16 @@ ROM_START( skeetsht )
 	ROM_LOAD16_BYTE( "odd_v1.2.u13",  0x000001, 0x40000, CRC(ea4402fb) SHA1(b0b6b191a8b48bead660a385c638363943a6ffe2) )
 ROM_END
 
+ROM_START( popshot )
+	ROM_REGION( 0x40000, "68hc11", 0 )
+	ROM_LOAD( "popshot_hc68.u34",  0x00000, 0x20000, CRC(90de8bd3) SHA1(1809f209ead8e304464c697f42e9f6ac2d0ca594) )
+	ROM_LOAD( "sound.u35",         0x20000, 0x20000, CRC(0d9be853) SHA1(51eda4e0a99d50e09476704eb75310b5ee2690f4) )
+
+	ROM_REGION16_LE( 0x200000, "tms", 0 )
+	ROM_LOAD16_BYTE( "popshot_tms34_even.u14", 0x000000, 0x80000, CRC(bf2f7309) SHA1(6ca252f857e5dc2e5267c176403c44e7a15f539e) )
+	ROM_LOAD16_BYTE( "popshot_tms34_odd.u13",  0x000001, 0x80000, CRC(82d616d8) SHA1(83ab33727ebab882b79c9ebd3557e2c319b3387a) )
+ROM_END
+
 
 /*************************************
  *
@@ -302,3 +314,4 @@ ROM_END
  *************************************/
 
 GAME( 1991, skeetsht, 0, skeetsht, skeetsht, 0, ROT0, "Dynamo", "Skeet Shot", GAME_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, 0, ROT0, "Dynamo", "Pop Shot (prototype)", GAME_NOT_WORKING )
