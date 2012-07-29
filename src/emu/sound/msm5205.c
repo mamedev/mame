@@ -11,25 +11,45 @@
  *   for the current sample rate
  *
  *   01/06/99
- *  separate MSM5205 emulator form adpcm.c and some fix
+ *    separate MSM5205 emulator form adpcm.c and some fix
+ *
+ *   07/29/12
+ *    added basic support for the MSM6585
  */
 
 #include "emu.h"
 #include "msm5205.h"
 
 /*
- *
- *  MSM 5205 ADPCM chip:
- *
- *  Data is streamed from a CPU by means of a clock generated on the chip.
- *
- *  A reset signal is set high or low to determine whether playback (and interrupts) are occuring
- *
- *
- * TODO:
- * - convert to modern
- * - lowpass filter for MSM6585
- *
+
+    MSM 5205 ADPCM chip:
+
+    Data is streamed from a CPU by means of a clock generated on the chip.
+
+    A reset signal is set high or low to determine whether playback (and interrupts) are occuring.
+
+  MSM6585: is an upgraded MSM5205 voice synth IC.
+   Improvements:
+    More precise internal DA converter
+    Built in low-pass filter
+    Expanded sampling frequency
+
+   Differences between MSM6585 & MSM5205:
+
+                              MSM6586          MSM5205
+    Master clock frequency    640kHz           384kHz
+    Sampling frequency        4k/8k/16k/32kHz  4k/6k/8kHz
+    ADPCM bit length          4-bit            3-bit/4-bit
+    DA converter              12-bit           10-bit
+    Low-pass filter           -40dB/oct        N/A
+    Overflow prevent circuit  Included         N/A
+
+    Timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585)
+
+   TODO:
+   - convert to modern
+   - lowpass filter for MSM6585
+
  */
 
 typedef struct _msm5205_state msm5205_state;
