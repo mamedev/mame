@@ -173,6 +173,8 @@ struct _powerpc_config
 };
 
 typedef void (*ppc_dcstore_handler)(device_t *device, UINT32 address);
+typedef UINT32 (*ppc4xx_dma_read_handler)(device_t *device, int width);
+typedef void (*ppc4xx_dma_write_handler)(device_t *device, int width, UINT32 data);
 
 
 /***************************************************************************
@@ -187,6 +189,8 @@ void ppc4xx_spu_set_tx_handler(device_t *device, ppc4xx_spu_tx_handler handler);
 void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval);
 
 void ppc_set_dcstore_callback(device_t *device, ppc_dcstore_handler handler);
+void ppc4xx_set_dma_read_handler(device_t *device, int channel, ppc4xx_dma_read_handler handler);
+void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_write_handler handler);
 
 
 DECLARE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);

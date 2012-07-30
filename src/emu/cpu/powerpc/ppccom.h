@@ -571,6 +571,9 @@ struct _powerpc_state
 	write32_device_func	dcr_write_func;
 
 	ppc_dcstore_handler dcstore_handler;
+
+	ppc4xx_dma_read_handler ext_dma_read_handler[4];
+	ppc4xx_dma_write_handler ext_dma_write_handler[4];
 };
 
 

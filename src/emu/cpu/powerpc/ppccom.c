@@ -1856,7 +1856,102 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 	{
 		/* buffered mode DMA */
 		case 0:
-			/* nothing to do; this happens asynchronously and is driven by the SPU */
+			if (((dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_PL) >> 28) == 0)
+			{
+				/* buffered DMA with external peripheral */
+
+				width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_PW_MASK) >> 26];
+				destinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_DAI) ? width : 0;
+
+				if (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TD)
+				{
+					/* peripheral to memory */
+
+					switch (width)
+					{
+						/* byte transfer */
+						case 1:
+							do
+							{
+								UINT8 data = 0;
+								if (ppc->ext_dma_read_handler[dmachan] != NULL)
+									data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 1);
+								ppc->program->write_byte(dmaregs[DCR4XX_DMADA0], data);
+								dmaregs[DCR4XX_DMADA0] += destinc;
+							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+							break;
+
+						/* word transfer */
+						case 2:
+							do
+							{
+								UINT16 data = 0;
+								if (ppc->ext_dma_read_handler[dmachan] != NULL)
+									data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 2);
+								ppc->program->write_word(dmaregs[DCR4XX_DMADA0], data);
+								dmaregs[DCR4XX_DMADA0] += destinc;
+							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+							break;
+
+						/* dword transfer */
+						case 4:
+							do
+							{
+								UINT32 data = 0;
+								if (ppc->ext_dma_read_handler[dmachan] != NULL)
+									data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 4);
+								ppc->program->write_dword(dmaregs[DCR4XX_DMADA0], data);
+								dmaregs[DCR4XX_DMADA0] += destinc;
+							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+							break;
+					}
+				}
+				else
+				{
+					/* memory to peripheral */
+
+					// data is read from destination address!
+					switch (width)
+					{
+						/* byte transfer */
+						case 1:
+							do
+							{
+								UINT8 data = ppc->program->read_byte(dmaregs[DCR4XX_DMADA0]);
+								if (ppc->ext_dma_write_handler[dmachan] != NULL)
+									(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 1, data);
+								dmaregs[DCR4XX_DMADA0] += destinc;
+							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+							break;
+
+						/* word transfer */
+						case 2:
+							do
+							{
+								UINT16 data = ppc->program->read_word(dmaregs[DCR4XX_DMADA0]);
+								if (ppc->ext_dma_write_handler[dmachan] != NULL)
+									(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 2, data);
+								dmaregs[DCR4XX_DMADA0] += destinc;
+							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+							break;
+
+						/* dword transfer */
+						case 4:
+							do
+							{
+								UINT32 data = ppc->program->read_dword(dmaregs[DCR4XX_DMADA0]);
+								if (ppc->ext_dma_write_handler[dmachan] != NULL)
+									(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 4, data);
+								dmaregs[DCR4XX_DMADA0] += destinc;
+							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+							break;
+					}
+				}
+			}
+			else		/* buffered DMA with internal peripheral (SPU) */
+			{
+				/* nothing to do; this happens asynchronously and is driven by the SPU */
+			}
 			break;
 
 		/* fly-by mode DMA */
@@ -2258,6 +2353,28 @@ void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc4xx_spu_rx_data(ppc, byteval);
+}
+
+/*-------------------------------------------------
+    ppc4xx_set_dma_read_handler - PowerPC 4XX-
+    specific external DMA read handler configuration
+-------------------------------------------------*/
+
+void ppc4xx_set_dma_read_handler(device_t *device, int channel, ppc4xx_dma_read_handler handler)
+{
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
+	ppc->ext_dma_read_handler[channel] = handler;
+}
+
+/*-------------------------------------------------
+    ppc4xx_set_dma_write_handler - PowerPC 4XX-
+    specific external DMA write handler configuration
+-------------------------------------------------*/
+
+void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_write_handler handler)
+{
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
+	ppc->ext_dma_write_handler[channel] = handler;
 }
 
 
