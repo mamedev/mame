@@ -165,6 +165,9 @@ static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 	//      int sx_offs = flip_screen ? 512 : 0
 			int scrollx = ((state->m_vram[(y/2)+odd_line]) + (state->m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
+			if(!(attr & 4))
+				color += 0x20;//screen.machine().rand();
+
 			if(flip_screen)
 			{
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
