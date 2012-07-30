@@ -237,14 +237,14 @@ static TIMER_DEVICE_CALLBACK( m92_scanline_interrupt )
 	if (scanline == state->m_raster_irq_position)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_2);
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == machine.primary_screen->visible_area().max_y + 1)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_0);
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, M92_IRQ_0);
 	}
 }
 
@@ -296,7 +296,9 @@ CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
 
 WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, ASSERT_LINE);
+	if (m_soundcpu)
+		device_set_input_line(m_soundcpu, NEC_INPUT_LINE_INTP1, ASSERT_LINE);
+
 	soundlatch_byte_w(space, 0, data & 0xff);
 }
 
@@ -308,24 +310,29 @@ READ16_MEMBER(m92_state::m92_sound_status_r)
 
 READ16_MEMBER(m92_state::m92_soundlatch_r)
 {
-	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	if (m_soundcpu)
+		device_set_input_line(m_soundcpu, NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+
 	return soundlatch_byte_r(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	if (m_soundcpu)
+		device_set_input_line(m_soundcpu, NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	cputag_set_input_line_and_vector(machine(), "maincpu", 0, HOLD_LINE, M92_IRQ_3);
+	device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, M92_IRQ_3);
+
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_soundcpu)
+		device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -868,16 +875,48 @@ static GFXDECODE_START( m92 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( psoldier )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 0, 128 )
 GFXDECODE_END
 
+static const gfx_layout bootleg_charlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 24,16,8,0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,32) },
+	8*32
+};
+
+static const gfx_layout bootleg_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 48,32,16,0 },
+	{ 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7 },
+	{ STEP16(0,64) },
+	1024
+};
+
+
+static GFXDECODE_START( bootleg )
+	GFXDECODE_ENTRY( "gfx1", 0, bootleg_charlayout,   0x400, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, bootleg_spritelayout, 0x400, 128 )
+GFXDECODE_END
+
+
+
 /***************************************************************************/
 
-static void sound_irq(device_t *device, int state)
+static void sound_irq(device_t *device, int pinstate)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
+	m92_state *state = device->machine().driver_data<m92_state>();
+
+	device_set_input_line(state->m_soundcpu, NEC_INPUT_LINE_INTP0, pinstate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -891,7 +930,7 @@ void m92_sprite_interrupt(running_machine &machine)
 {
 	m92_state *state = machine.driver_data<m92_state>();
 
-	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_1);
+	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_CONFIG_START( m92, m92_state )
@@ -1037,13 +1076,24 @@ static MACHINE_CONFIG_DERIVED( nbbatman, m92 )
 	MCFG_CPU_CONFIG(nbbatman_config)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( nbbatman2bl, m92 )
+	MCFG_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("irem")
+
+	MCFG_GFXDECODE(bootleg)
+
+	/* 8951 MCU as sound CPU */
+	/* OKI6295 (AD-65) as sound */
+
+MACHINE_CONFIG_END
 
 static const nec_config psoldier_config ={ psoldier_decryption_table, };
 static MACHINE_CONFIG_DERIVED( psoldier, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_CONFIG(psoldier_config)
 	/* video hardware */
-	MCFG_GFXDECODE(2)
+	MCFG_GFXDECODE(psoldier)
 MACHINE_CONFIG_END
 
 static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
@@ -1051,7 +1101,7 @@ static MACHINE_CONFIG_DERIVED( dsoccr94j, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_CONFIG(dsoccr94_config)
 	/* video hardware */
-	MCFG_GFXDECODE(2)
+	MCFG_GFXDECODE(psoldier)
 MACHINE_CONFIG_END
 
 static const nec_config gunforc2_config ={ lethalth_decryption_table, };
@@ -1936,6 +1986,24 @@ ROM_START( leaguemn )
 	ROM_LOAD( "lh534k0k.8", 0x000000, 0x080000, CRC(735e6380) SHA1(bf019815e579ef2393c00869f101a01f746e04d6) )
 ROM_END
 
+ROM_START( nbbatman2bl )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "1.sys_rom",  0x000000, 0x100000, CRC(88526580) SHA1(175ec535d1d4641b3057afd1979b18148060f397) )
+
+	ROM_REGION( 0x20000, "mcu", 0 )
+	ROM_LOAD( "at89c4051-24pc.mcu", 0x00000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
+	ROM_LOAD( "4.bg_rom1",  0x100000, 0x100000, BAD_DUMP CRC(c78cd3e9) SHA1(f484399000ac604370998d11ee9e9501b8a09f1e) ) // half size, 1st half missing
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
+	ROM_LOAD( "2.obj_rom1", 0x000000, 0x200000, BAD_DUMP CRC(2bd35975) SHA1(9e2e2be727a24943c056acb3e2f453b3b7328c76) ) // half size, 2nd half missing
+
+	ROM_REGION( 0x200000, "irem", 0 )
+	ROM_LOAD( "3.sou_rom", 0x000000, 0x100000,  CRC(776ed65d) SHA1(0e3321c024a62fc48aa5541215af8af14c95ccc6) ) // looped music samples for OKI, don't know if it's the right size, so marking as bad as a precaution
+ROM_END
+
+
 ROM_START( ssoldier )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "f3-h0-h.bin", 0x000001, 0x040000, CRC(b63fb9da) SHA1(429beb7ebc98815809fdd0ff69fcb4a14e1d8a14) )
@@ -2191,6 +2259,7 @@ GAME( 1993, kaiteids, inthunt,  inthunt,       inthunt,  m92,      ROT0,   "Irem
 GAME( 1993, nbbatman, 0,        nbbatman,      nbbatman, m92_bank, ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, nbbatmanu,nbbatman, nbbatman,      nbbatman, m92_bank, ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, m92_bank, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, nbbatman2bl,nbbatman,nbbatman2bl,  nbbatman, m92_bank, ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg/hack)", GAME_NO_SOUND | GAME_NOT_WORKING ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
 GAME( 1993, ssoldier, 0,        psoldier,      psoldier, m92_alt,  ROT0,   "Irem America", "Superior Soldiers (US)", GAME_SUPPORTS_SAVE )
 GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, m92_alt,  ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1994, dsoccr94j,dsoccr94, dsoccr94j,     dsoccr94j,m92_bank, ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", GAME_SUPPORTS_SAVE )
