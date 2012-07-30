@@ -11,7 +11,7 @@
 
    Todo:
 
-	Verify frequencies etc.
+    Verify frequencies etc.
 
 */
 
@@ -54,7 +54,7 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	int bank;
-	
+
 	bank  = (data & 0x1) ? 0x04000 : 0x00000;
 	bank |= (data & 0x2) ? 0x10000 : 0x00000;
 
@@ -175,7 +175,7 @@ static const gfx_layout pokechmp_charlayout =
 	RGN_FRAC(1,8),
 	8,
 	/* bizzare order, but it seems to be correct? */
-	{ RGN_FRAC(1,8), RGN_FRAC(3,8),RGN_FRAC(0,8),RGN_FRAC(5,8),RGN_FRAC(2,8),RGN_FRAC(7,8),RGN_FRAC(4,8),RGN_FRAC(6,8) }, 
+	{ RGN_FRAC(1,8), RGN_FRAC(3,8),RGN_FRAC(0,8),RGN_FRAC(5,8),RGN_FRAC(2,8),RGN_FRAC(7,8),RGN_FRAC(4,8),RGN_FRAC(6,8) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	 /* every char takes 8 consecutive bytes */
@@ -244,10 +244,10 @@ static DRIVER_INIT( pokechmp )
 {
 	// default sound rom bank
 	machine.root_device().membank("bank3")->configure_entries(0, 2, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
-	
+
 	// default fixed area for main CPU
 	machine.root_device().membank("fixed")->set_base( machine.root_device().memregion("maincpu")->base() + 0x18000 );
-	
+
 	// default OKI sample bank
 	machine.root_device().membank("okibank")->set_base( machine.root_device().memregion("oki")->base() + 0x40000 );
 }

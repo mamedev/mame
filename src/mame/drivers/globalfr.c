@@ -42,7 +42,7 @@ public:
 WRITE16_MEMBER(globalfr_state::vfd_w)
 {
 
-//	if(!(data & 0x20)) need to find reset
+//  if(!(data & 0x20)) need to find reset
 	{
 		int clock = (data & 0x40) != 0;
 		int datline = (data & 0x80);
@@ -55,10 +55,10 @@ WRITE16_MEMBER(globalfr_state::vfd_w)
 		}
 		m_alpha_clock = clock;
 	}
-//	else
-//	{
-//		m_vfd->reset();
-//	}
+//  else
+//  {
+//      m_vfd->reset();
+//  }
 }
 
 static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 16, globalfr_state )

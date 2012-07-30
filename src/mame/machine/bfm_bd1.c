@@ -293,7 +293,7 @@ int bfm_bd1_t::write_char(int data)
 				break;
 
 				case 0xB0:	// 0xB0 - 0xBF Clear display area
-				
+
 				switch ( data & 0x03 )
 				{
 					case 0x00:	// clr nothing

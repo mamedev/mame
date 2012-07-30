@@ -19,7 +19,7 @@ public:
 		m_head_layersize(*this, "head_layersize"),
 		m_headpanic_platform_x(*this, "platform_x"),
 		m_headpanic_platform_y(*this, "platform_y")
-	{ 
+	{
 		m_tilemap0_color = 0;
 		m_tilemap1_color = 0;
 	}
@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE16_MEMBER(esd16_vram_0_w);
 	DECLARE_WRITE16_MEMBER(esd16_vram_1_w);
 	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_w);
-	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_jumppop_w);	
+	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_jumppop_w);
 };
 
 

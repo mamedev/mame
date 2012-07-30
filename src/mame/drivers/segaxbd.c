@@ -546,7 +546,7 @@ static WRITE16_HANDLER( iochip_0_w )
             */
 			space->machine().sound().system_enable(data & 0x80);
 			break;
-		
+
 		default: break;
 	}
 
@@ -635,14 +635,14 @@ static void generic_iochip0_lamps_w(running_machine &machine, UINT8 data)
 	coin_counter_w(machine, 0, (data >> 4) & 0x01);
 
 	/*
-		aburner2:
-	d1: altitude warning lamp
-	d2: start lamp
-	d5: lock on lamp
-	d6: danger lamp
-	in clone aburner, lamps work only in testmode?
-	
-	*/
+        aburner2:
+    d1: altitude warning lamp
+    d2: start lamp
+    d5: lock on lamp
+    d6: danger lamp
+    in clone aburner, lamps work only in testmode?
+
+    */
 	output_set_lamp_value(0, (data >> 5) & 0x01);
 	output_set_lamp_value(1, (data >> 6) & 0x01);
 	output_set_lamp_value(2, (data >> 1) & 0x01);

@@ -554,7 +554,7 @@ INLINE void PUTDATA_SST(tms32025_state *cpustate, UINT16 data)
 
 
 /****************************************************************************
- *	Emulate the Instructions
+ *  Emulate the Instructions
  ****************************************************************************/
 
 /* The following functions are here to fill the void for the */
@@ -1997,14 +1997,14 @@ static CPU_EXECUTE( tms32025 )
 
 		if (cpustate->init_load_addr == 2) {		/* Repeat next instruction */
 			/****************************************************\
-			******* These instructions are not repeatable ********
-			** ADLK, ANDK, LALK, LRLK, ORK,  SBLK, XORK 		**
-			** ADDK, ADRK, LACK, LARK, LDPK, MPYK, RPTK 		**
-			** SBRK, SPM,  SUBK, ZAC,  IDLE, RPT,  TRAP 		**
-			** BACC, CALA, RET									**
-			** B,    BANZ, BBNZ, BBZ,  BC,   BGEZ, BGZ,  BIOZ	**
-			** BNC,  BNV,  BNZ,  BV,   BZ,   CALL, BLEZ, BLZ	**
-			\****************************************************/
+            ******* These instructions are not repeatable ********
+            ** ADLK, ANDK, LALK, LRLK, ORK,  SBLK, XORK         **
+            ** ADDK, ADRK, LACK, LARK, LDPK, MPYK, RPTK         **
+            ** SBRK, SPM,  SUBK, ZAC,  IDLE, RPT,  TRAP         **
+            ** BACC, CALA, RET                                  **
+            ** B,    BANZ, BBNZ, BBZ,  BC,   BGEZ, BGZ,  BIOZ   **
+            ** BNC,  BNV,  BNZ,  BV,   BZ,   CALL, BLEZ, BLZ    **
+            \****************************************************/
 			cpustate->PREVPC = cpustate->PC;
 
 			debugger_instruction_hook(device, cpustate->PC);

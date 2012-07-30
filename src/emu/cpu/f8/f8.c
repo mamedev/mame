@@ -1160,7 +1160,7 @@ static void f8_am(f8_Regs *cpustate)
 static void f8_amd(f8_Regs *cpustate)
 {
 
-/*SKR from F8 Guide To programming description of AMD 
+/*SKR from F8 Guide To programming description of AMD
 
  binary add the addend to the binary sum of the augend and $66
    *NOTE* the binary addition of the augend to $66 is done before AMD is called
@@ -1196,7 +1196,7 @@ static void f8_amd(f8_Regs *cpustate)
     tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
     if(c==1&&ic==0)
     tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-   
+
     cpustate->a = tmp;
 }
 
@@ -1412,7 +1412,7 @@ static void f8_asd(f8_Regs *cpustate, int r)
     tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
     if(c==1&&ic==0)
     tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-   
+
     cpustate->a = tmp;
 }
 
@@ -1445,7 +1445,7 @@ static void f8_asd_isar(f8_Regs *cpustate)
     tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
     if(c==1&&ic==0)
     tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-   
+
     cpustate->a = tmp;
 }
 
@@ -1478,7 +1478,7 @@ static void f8_asd_isar_i(f8_Regs *cpustate)
     tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
     if(c==1&&ic==0)
     tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-   
+
     cpustate->a = tmp;
     cpustate->is = (cpustate->is & 0x38) | ((cpustate->is + 1) & 0x07);
 }
@@ -1512,7 +1512,7 @@ static void f8_asd_isar_d(f8_Regs *cpustate)
     tmp=((tmp+0xa0)&0xf0)+(tmp&0x0f);
     if(c==1&&ic==0)
     tmp=(tmp&0xf0)+((tmp+0x0a)&0x0f);
-   
+
     cpustate->a = tmp;
     cpustate->is = (cpustate->is & 0x38) | ((cpustate->is - 1) & 0x07);
 }

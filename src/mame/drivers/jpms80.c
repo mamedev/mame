@@ -45,14 +45,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8, jpms80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-//	AM_RANGE(0x0000, 0x000f) // I/O & Optic (in) / Reels (out)
-//	AM_RANGE(0x0050, 0x0050) // INT1 enable (lv3)
-//	AM_RANGE(0x0051, 0x0051) // INT2 enable (lv4)
-//	AM_RANGE(0x0052, 0x0052) // Watchdog
-//	AM_RANGE(0x0053, 0x0053) // I/O Enable
-//	AM_RANGE(0x0140, 0x015f) // AY
+//  AM_RANGE(0x0000, 0x000f) // I/O & Optic (in) / Reels (out)
+//  AM_RANGE(0x0050, 0x0050) // INT1 enable (lv3)
+//  AM_RANGE(0x0051, 0x0051) // INT2 enable (lv4)
+//  AM_RANGE(0x0052, 0x0052) // Watchdog
+//  AM_RANGE(0x0053, 0x0053) // I/O Enable
+//  AM_RANGE(0x0140, 0x015f) // AY
 	AM_RANGE(0x01e0, 0x01ff) AM_DEVREADWRITE("tms9902duart", tms9902_device, cruread, cruwrite)
-//  Lamps, Meters etc. can move around	
+//  Lamps, Meters etc. can move around
 ADDRESS_MAP_END
 
 

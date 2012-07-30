@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	TC009xLVC device emulation
+    TC009xLVC device emulation
 
-	Written by Angelo Salese, based off Taito L implementation
+    Written by Angelo Salese, based off Taito L implementation
 
-	TODO:
-	- non-video stuff needs to be ported there as well
+    TODO:
+    - non-video stuff needs to be ported there as well
 
 ***************************************************************************/
 
@@ -188,7 +188,7 @@ static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
 	int code = vdp->m_vram0[2 * tile_index]
 			| ((attr & 0x03) << 8)
 			| ((vdp->m_vregs[(attr & 0xc) >> 2]) << 10);
-//			| (state->m_horshoes_gfxbank << 12);
+//          | (state->m_horshoes_gfxbank << 12);
 
 	SET_TILE_INFO_DEVICE(
 			0,
@@ -204,7 +204,7 @@ static TILE_GET_INFO_DEVICE( get_bg1_tile_info )
 	int code = vdp->m_vram1[2 * tile_index]
 			| ((attr & 0x03) << 8)
 			| ((vdp->m_vregs[(attr & 0xc) >> 2]) << 10);
-//			| (state->m_horshoes_gfxbank << 12);
+//          | (state->m_horshoes_gfxbank << 12);
 
 	SET_TILE_INFO_DEVICE(
 			0,

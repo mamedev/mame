@@ -11,7 +11,7 @@
 
   Thanks to palindrome for PCB scans.
 
-	0x38606
+    0x38606
 */
 
 #include "emu.h"
@@ -141,7 +141,7 @@ static READ32_HANDLER( test_r )
 /*
  static READ32_HANDLER( rng_r )
 {
-	return space->machine().rand();
+    return space->machine().rand();
 }
 */
 
@@ -196,9 +196,9 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x500380, 0x500383) AM_READ_LEGACY(test_r)
 	AM_RANGE(0x500000, 0x5007ff) AM_RAM
-//	AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
-//	AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
-//	AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
+//  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
+//  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
+//  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
 	AM_RANGE(0x580000, 0x580007) AM_READ_LEGACY(test_r)
 
 	AM_RANGE(0x600000, 0x60000f) AM_READ_LEGACY(test_r)

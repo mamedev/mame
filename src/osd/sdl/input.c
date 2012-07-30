@@ -1045,10 +1045,10 @@ static void sdlinput_register_lightguns(running_machine &machine)
 {
     int index;
     XExtensionVersion   *version;
-    
+
     lightgun_enabled = machine.options().lightgun();
-    devmap_init(machine, &lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");    
-    
+    devmap_init(machine, &lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
+
     XDisplay = XOpenDisplay(NULL);
 
     if (XDisplay == NULL) {

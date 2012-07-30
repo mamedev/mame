@@ -159,7 +159,7 @@ void rocvfd_t::device_start()
     save_item(NAME(m_count));
     save_item(NAME(m_duty));
 	save_item(NAME(m_disp));
-	
+
 
 	device_reset();
 }
@@ -183,8 +183,8 @@ void rocvfd_t::device_reset()
 ///////////////////////////////////////////////////////////////////////////
 UINT32 rocvfd_t::set_display(UINT32 segin)
 {
-	                          
-	
+
+
 	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 
 }
@@ -208,7 +208,7 @@ void rocvfd_t::update_display()
 		}
 		else
 		{
-			m_outputs[i] = set_display(m_chars[i]);		
+			m_outputs[i] = set_display(m_chars[i]);
 		}
 		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
@@ -272,7 +272,7 @@ void rocvfd_t::write_char(int data)
 	}
 	else
 	{ // Display data
-//		data &= 0x3F;
+//      data &= 0x3F;
 
 		switch ( data )
 		{

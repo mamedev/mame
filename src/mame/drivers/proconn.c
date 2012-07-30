@@ -263,8 +263,8 @@ static WRITE8_DEVICE_HANDLER( serial_transmit )
 	proconn_state *state = device->machine().driver_data<proconn_state>();
 
 //Don't like the look of this, should be a clock somewhere
-//  if (offset == 0)	
-//		state->m_vfd->write_char( data );
+//  if (offset == 0)
+//      state->m_vfd->write_char( data );
 
 	for (int i=0; i<8;i++)
 	{
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
 	MCFG_ROC10937_ADD("vfd",0,LEFT_TO_RIGHT)
-	
+
 	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, pio_interface_1 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_2", 4000000, pio_interface_2 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_3", 4000000, pio_interface_3 ) /* ?? Mhz */

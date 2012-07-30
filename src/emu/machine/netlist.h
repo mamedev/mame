@@ -6,41 +6,41 @@
 
 ****************************************************************************
 
-	Couriersud reserves the right to license the code under a less restrictive
-	license going forward.
+    Couriersud reserves the right to license the code under a less restrictive
+    license going forward.
 
-	Copyright Nicola Salmoria and the MAME team
-	All rights reserved.
+    Copyright Nicola Salmoria and the MAME team
+    All rights reserved.
 
-	Redistribution and use of this code or any derivative works are permitted
-	provided that the following conditions are met:
+    Redistribution and use of this code or any derivative works are permitted
+    provided that the following conditions are met:
 
-	* Redistributions may not be sold, nor may they be used in a commercial
-	product or activity.
+    * Redistributions may not be sold, nor may they be used in a commercial
+    product or activity.
 
-	* Redistributions that are modified from the original source must include the
-	complete source code, including the source code for all components used by a
-	binary built from the modified sources. However, as a special exception, the
-	source code distributed need not include anything that is normally distributed
-	(in either source or binary form) with the major components (compiler, kernel,
-	and so on) of the operating system on which the executable runs, unless that
-	component itself accompanies the executable.
+    * Redistributions that are modified from the original source must include the
+    complete source code, including the source code for all components used by a
+    binary built from the modified sources. However, as a special exception, the
+    source code distributed need not include anything that is normally distributed
+    (in either source or binary form) with the major components (compiler, kernel,
+    and so on) of the operating system on which the executable runs, unless that
+    component itself accompanies the executable.
 
-	* Redistributions must reproduce the above copyright notice, this list of
-	conditions and the following disclaimer in the documentation and/or other
-	materials provided with the distribution.
+    * Redistributions must reproduce the above copyright notice, this list of
+    conditions and the following disclaimer in the documentation and/or other
+    materials provided with the distribution.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 
 ****************************************************************************/
@@ -93,11 +93,11 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 #define NETLIST_END  }
 
-#define NETLIST_INCLUDE(_name) 														\
+#define NETLIST_INCLUDE(_name)														\
 		NETLIST_NAME(_name)(netlist);												\
 
 
-#define NETLIST_MEMREGION(_name) 													\
+#define NETLIST_MEMREGION(_name)													\
 		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());		\
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
@@ -154,19 +154,19 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 // MAME specific
 
 #define MCFG_NETLIST_ADD(_tag, _clock, _setup, _subcycles)  						\
-    MCFG_DEVICE_ADD(_tag, NETLIST, _clock) 											\
+    MCFG_DEVICE_ADD(_tag, NETLIST, _clock)											\
     MCFG_NETLIST_SUBCYCLES(_subcycles)												\
-    MCFG_NETLIST_SETUP(_setup) 														\
+    MCFG_NETLIST_SETUP(_setup)														\
 
 #define MCFG_NETLIST_REPLACE(_tag, _clock, _setup, _subcycles)  					\
-    MCFG_DEVICE_REPLACE(_tag, NETLIST, _clock) 										\
+    MCFG_DEVICE_REPLACE(_tag, NETLIST, _clock)										\
     MCFG_NETLIST_SUBCYCLES(_subcycles)												\
-    MCFG_NETLIST_SETUP(_setup) 														\
+    MCFG_NETLIST_SETUP(_setup)														\
 
-#define MCFG_NETLIST_SUBCYCLES(_subcycles) 											\
+#define MCFG_NETLIST_SUBCYCLES(_subcycles)											\
 	netlist_mame_device::static_set_subcycles(*device, _subcycles); 				\
 
-#define MCFG_NETLIST_SETUP(_setup) 													\
+#define MCFG_NETLIST_SETUP(_setup)													\
 	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));		\
 
 
@@ -267,8 +267,8 @@ class net_output_t
 public:
 	net_output_t();
 
-	ATTR_HOT inline void clear() 	{ set_Q(nst_LOW); }
-	ATTR_HOT inline void set()   	{ set_Q(nst_HIGH); }
+	ATTR_HOT inline void clear()	{ set_Q(nst_LOW); }
+	ATTR_HOT inline void set()  	{ set_Q(nst_HIGH); }
 	ATTR_HOT inline void setTo(const net_sig_t val) { set_Q(val); }
 	ATTR_HOT inline void setTo(const net_sig_t val, const UINT8 delay_ns) { set_Q(val,delay_ns); }
 	ATTR_HOT inline void setToNoCheck(const net_sig_t val)
@@ -285,10 +285,10 @@ public:
 
 	ATTR_COLD void initial(const net_sig_t val) { m_Q = val; m_new_Q = val; }
 
-	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q; 	}
+	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q;	}
 
 	inline net_sig_t *Q_ptr()		{ return &m_Q; }
-	inline net_sig_t *new_Q_ptr() 	{ return &m_new_Q; }
+	inline net_sig_t *new_Q_ptr()	{ return &m_new_Q; }
 
 	ATTR_COLD void register_con(net_dev_t *dev);
 
@@ -407,8 +407,8 @@ public:
 	inline void initial(const double val) { m_param = val; }
 	inline void initial(const int val) { m_param = val; }
 
-	inline double Value() 		{ return m_param; 	}
-	inline int    ValueInt()	{ return m_param; 	}
+	inline double Value()		{ return m_param;	}
+	inline int    ValueInt()	{ return m_param;	}
 
 	ATTR_HOT inline const net_dev_t *ttl_dev() { return m_ttldev; }
 	void set_ttl_dev(net_dev_t *dev) { m_ttldev = dev; }

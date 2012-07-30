@@ -397,7 +397,7 @@ static NETLIST_START(pong_schematics)
 
 	/* net */
 	TTL_74107(ic_f3b, clk, 256H, 256HQ, high)
- 	TTL_7400_NAND(ic_g3b, ic_f3b.QQ, 256H)
+	TTL_7400_NAND(ic_g3b, ic_f3b.QQ, 256H)
 	TTL_7427_NOR(ic_g2b, ic_g3b.Q, vblank, 4V)
 	NET_ALIAS(net, ic_g2b.Q)
 
@@ -423,8 +423,8 @@ static NETLIST_START(pong_fast)
 
 	NETLIST_INCLUDE(pong_schematics)
 	/* the signal above is delayed on pong due to counter at gate delays.
-	 * This is approximated by the following circuit ...
-	 */
+     * This is approximated by the following circuit ...
+     */
 	NET_REMOVE_DEV(ic_h5b)
 	NETDEV_DELAY_RISE(ic_g5b_D, clk, ic_g5b.Q)
 	TTL_7400_NAND(ic_h5b, ic_h5c.Q, ic_g5b_D.Q)
@@ -441,7 +441,7 @@ public:
 	pong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_dac(*this, "dac"), 				/* just to have a sound device */
+		  m_dac(*this, "dac"),				/* just to have a sound device */
 		  m_srst(*this, "maincpu", "SRST"),
 		  m_sw1a(*this, "maincpu", "sw1a.POS"),
 		  m_sw1b(*this, "maincpu", "sw1b.POS"),

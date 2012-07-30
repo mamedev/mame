@@ -34,7 +34,7 @@ public:
 protected:
     static const UINT8 AT_NORMAL  = 0x00;
     static const UINT8 AT_FLASH   = 0x01;
-    static const UINT8 AT_BLANK   = 0x02;	
+    static const UINT8 AT_BLANK   = 0x02;
     static const UINT8 AT_FLASHED = 0x80;   // set when character should be blinked off
 
 	int m_cursor_pos;

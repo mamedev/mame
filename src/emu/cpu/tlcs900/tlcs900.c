@@ -1946,11 +1946,11 @@ static CPU_EXECUTE( tmp95c063 )
 			cpustate->cycles += inst->cycles;
 		}
 
-	//	tmp95c063_handle_ad( cpustate );	// TODO
+	//  tmp95c063_handle_ad( cpustate );    // TODO
 
 		tmp95c063_handle_timers( cpustate );
 
-	//	tmp95c063_check_hdma( cpustate );	// TODO
+	//  tmp95c063_check_hdma( cpustate );   // TODO
 
 		cpustate->icount -= cpustate->cycles;
 	} while ( cpustate->icount > 0 );

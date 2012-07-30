@@ -22,7 +22,7 @@
 
 #define MCFG_ROC10937_REVERSE(_reversed) \
 	roc10937_t::static_set_zero(*device, _reversed); \
-	
+
 #define MCFG_ROC10937_REMOVE(_tag) \
     MCFG_DEVICE_REMOVE(_tag)
 
@@ -50,11 +50,11 @@
 
 #define MCFG_MSC1937_REVERSE(_reversed) \
 	roc10937_t::static_set_zero(*device, _reversed); \
-	
+
 #define MCFG_MSC1937_REMOVE(_tag) \
     MCFG_DEVICE_REMOVE(_tag)
-	
-	
+
+
 class rocvfd_t : public device_t {
 public:
 	typedef delegate<void (bool state)> line_cb;

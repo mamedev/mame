@@ -2,16 +2,16 @@
 
     Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
 
-	driver by Angelo Salese
+    driver by Angelo Salese
 
     Uses a TC0091LVC, a variant of the one used on Taito L HW
 
     TODO:
-	- title screen (PCG uploads at 0x1b400?)
-	- inputs are grossly mapped;
-	- lamps?
-	- service mode?
-	- nvram?
+    - title screen (PCG uploads at 0x1b400?)
+    - inputs are grossly mapped;
+    - lamps?
+    - service mode?
+    - nvram?
 
 ***************************************************************************/
 

@@ -56,25 +56,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jpmmps_io_map, AS_IO, 8, jpmmps_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("tms9902_ic5", tms9902_device, cruread, cruwrite)
-	
-//	AM_RANGE(0x0020, 0x0020) // power fail
-//	AM_RANGE(0x0021, 0x0021) // wd timeout
-//	AM_RANGE(0x0022, 0x0022) // invalid access
-//	AM_RANGE(0x0023, 0x0023) // clear down
-	
-//	AM_RANGE(0x0026, 0x0026) // uart4 int
-//	AM_RANGE(0x0027, 0x0027) // uart2 int
+
+//  AM_RANGE(0x0020, 0x0020) // power fail
+//  AM_RANGE(0x0021, 0x0021) // wd timeout
+//  AM_RANGE(0x0022, 0x0022) // invalid access
+//  AM_RANGE(0x0023, 0x0023) // clear down
+
+//  AM_RANGE(0x0026, 0x0026) // uart4 int
+//  AM_RANGE(0x0027, 0x0027) // uart2 int
 
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE("tms9902_ic10", tms9902_device, cruread, cruwrite)
 
-//	AM_RANGE(0x0060, 0x0060) // watchdog
-//	AM_RANGE(0x0061, 0x0061) // ram en
-//	AM_RANGE(0x0062, 0x0062) // alarm
-//	AM_RANGE(0x0063, 0x0063) // nmi en
-//	AM_RANGE(0x0064, 0x0064) // reel en
-//	AM_RANGE(0x0065, 0x0065) // io en
-//	AM_RANGE(0x0066, 0x0066) // bb
-//	AM_RANGE(0x0067, 0x0067) // diagnostic led
+//  AM_RANGE(0x0060, 0x0060) // watchdog
+//  AM_RANGE(0x0061, 0x0061) // ram en
+//  AM_RANGE(0x0062, 0x0062) // alarm
+//  AM_RANGE(0x0063, 0x0063) // nmi en
+//  AM_RANGE(0x0064, 0x0064) // reel en
+//  AM_RANGE(0x0065, 0x0065) // io en
+//  AM_RANGE(0x0066, 0x0066) // bb
+//  AM_RANGE(0x0067, 0x0067) // diagnostic led
 ADDRESS_MAP_END
 
 

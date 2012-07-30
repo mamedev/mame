@@ -138,7 +138,7 @@ public:
 	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
 		: twincobr_state(mconfig, type,tag),
 		  m_rambase_c000(*this, "rambase_c000")
-	{ 
+	{
 	}
 
 	required_shared_ptr<UINT8> m_rambase_c000;
@@ -168,7 +168,7 @@ READ8_MEMBER( wardner_state::wardner_bank_r )
 		else if ((addr >= 0xc000) && (addr < 0xc800))
 			return m_rambase_c000[addr - 0xc000];
 	}
-	
+
 	// ROM bank mapped
 	return m_ROM[m_wardner_membank * 0x8000 + offset];
 }

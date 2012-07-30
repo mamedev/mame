@@ -11,7 +11,7 @@ TODO:
   How are unused sprites marked? None of the bits alone seem to be used for this purpose
    and while in many cases the first value gets cleared to 0x0000 (palette 0, upper tile offset 0)
    that doesn't really seem like a valid marker, and leaves us with some lingering sprites anyway.
-  
+
   Attempting to clear the spriteram every frame doesn't help either, the list is copied, complete
    with 'unwanted' sprites every frame, ruling out some kind of auto clear after drawing operation.
 
@@ -307,7 +307,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 		UINT16 param1 = state->m_roadram[i+2];
 		UINT16 param2 = state->m_roadram[i+1];
 		UINT16 param3 = state->m_roadram[i+0];
-	
+
 		int col = (param2 & 0x3f);
 
 		// seems to be priority related, cases seen are 0xc0 and 0x00 (once the palette bits are masked out)
@@ -335,23 +335,23 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 	/*
 
-	o = offset
-	y = ypos  Y = ysize ^ = always 0xF?  ? = set for no obvious reason..
-	x = xpos  X = xsize f = flipx
+    o = offset
+    y = ypos  Y = ysize ^ = always 0xF?  ? = set for no obvious reason..
+    x = xpos  X = xsize f = flipx
 
-	Z = zoom   * = alt zoom? (ok for roadside, but 00 for player tank etc?)
-	C = colour
+    Z = zoom   * = alt zoom? (ok for roadside, but 00 for player tank etc?)
+    C = colour
                             +word offset
-	 CCCC CCCC #### @ooo   0x0  # bits are often set too? @ is set at the very end of spriteram
-	 oooo oooo oooo oooo   0x1
-	 ---- ---- ---y yyyy   0x2
-	 ---- ---- ---- ----   0x3 (always has a value here, gets set to FFFF on some cleared sprites?)
-	 ???? ^^^^ YYYY YYYY   0x4
-	 f--- --xx xxxx xxxx   0x5
-	 ZZZZ ZZZZ ---- XXXX   0x6
-	 ---- ---- **** ****   0x7
+     CCCC CCCC #### @ooo   0x0  # bits are often set too? @ is set at the very end of spriteram
+     oooo oooo oooo oooo   0x1
+     ---- ---- ---y yyyy   0x2
+     ---- ---- ---- ----   0x3 (always has a value here, gets set to FFFF on some cleared sprites?)
+     ???? ^^^^ YYYY YYYY   0x4
+     f--- --xx xxxx xxxx   0x5
+     ZZZZ ZZZZ ---- XXXX   0x6
+     ---- ---- **** ****   0x7
 
-	*/
+    */
 
 
 	for(int offs=0;offs<0x1000/2;offs+=8)
@@ -386,13 +386,13 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		for(int yi = 0;yi < ysize;yi++)
 		{
 			xf = xz = 0;
-			
+
 
 			int yy = y+yz;
 
 			if ((yy>=miny) && (yy<=maxy))
 			{
-				dest = &bitmap.pix16(yy, 0);	
+				dest = &bitmap.pix16(yy, 0);
 
 				int start,end,inc;
 
@@ -412,9 +412,9 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 				for(int xi=start;xi != end;xi+=inc)
 				{ // start x loop
 					UINT32 color;
-					
+
 					color = sprrom[spr_offs+xi/8];
-			
+
 					UINT16 dot;
 					int x_dec; //helpers
 
@@ -471,10 +471,10 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 				if(yf >= 0x80) { yz++; yf-=0x80; }
 			}
 		}
-	}	
+	}
 
-//	if (state->m_spr_ram[0xff0/2] == 0x0008)
-//		memset(state->m_spr_ram, 0x00, 0xff0);
+//  if (state->m_spr_ram[0xff0/2] == 0x0008)
+//      memset(state->m_spr_ram, 0x00, 0xff0);
 
 }
 
@@ -493,7 +493,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 	state->m_tilemap1_tilemap->set_scrollx(state->m_tilemap1scroll[0]);
 	state->m_tilemap2_tilemap->set_scrollx(state->m_tilemap2scroll[0]);
 
-	
+
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -541,7 +541,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
 {
 	if (offset == 0)
 	{
-		printf("cybertnk_sound_cmd_w offset 0 %02x\n", data); 
+		printf("cybertnk_sound_cmd_w offset 0 %02x\n", data);
 	}
 	else if (offset == 1)
 	{
@@ -555,11 +555,11 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_mux_w )
 {
 	if (offset == 0)
 	{
-//		printf("cybertnk_mux_w offset 0 %02x\n", data); 
+//      printf("cybertnk_mux_w offset 0 %02x\n", data);
 	}
 	else if (offset == 1)
 	{
-//		printf("cybertnk_mux_w offset 1 %02x\n", data); 
+//      printf("cybertnk_mux_w offset 1 %02x\n", data);
 		m_mux_data = data & 0x60;
 		/* Other bits are unknown */
 	}
@@ -583,7 +583,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 	if (offset == 0)
 	{
 		// unused?
-		logerror("cybertnk_irq_ack_w offset 0 %02x\n", data); 
+		logerror("cybertnk_irq_ack_w offset 0 %02x\n", data);
 	}
 	else if (offset == 1)
 	{
@@ -602,7 +602,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
 	else if (offset == 1)
 	{
 		// unused?
-		logerror("cybertnk_cnt_w offset 1 %02x\n", data); 
+		logerror("cybertnk_cnt_w offset 1 %02x\n", data);
 	}
 }
 

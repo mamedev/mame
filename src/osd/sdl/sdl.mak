@@ -37,7 +37,7 @@
 
 # NO_X11 = 1
 
-# uncomment next line to disable XInput support for e.g. multiple lightguns 
+# uncomment next line to disable XInput support for e.g. multiple lightguns
 # using Wiimote driver (see http://spritesmods.com/?art=wiimote-mamegun for more info)
 # enabling NO_X11 also implies no XInput support, of course.
 

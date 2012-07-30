@@ -628,7 +628,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
 	if ( data & 0x08 ) m_vfd->reset();
 
 	m_alpha_data_line = ((data & 0x20) >> 5);
-	
+
 	if (m_alpha_clock != ((data & 0x10) >>4))
 	{
 		if (!m_alpha_clock)//falling edge

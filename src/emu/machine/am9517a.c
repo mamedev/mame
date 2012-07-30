@@ -143,7 +143,7 @@ inline bool am9517a_device::is_software_request_active(int channel)
 
 
 //-------------------------------------------------
-//  set_hreq 
+//  set_hreq
 //-------------------------------------------------
 
 inline void am9517a_device::set_hreq(int state)

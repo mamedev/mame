@@ -38,7 +38,7 @@ INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b)
 INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b)
 {
 	UINT32 res = a + b;
-	
+
 	// C is set if carry was generated
 	cpustate->st1.c = (a > res) ? 1 : 0;
 

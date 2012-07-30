@@ -449,7 +449,7 @@ OP( 0x65, i_repc  ) {	UINT32 next = FETCHOP;	UINT16 c = cpustate->regs.w[CW];
 
 OP( 0x68, i_push_d16 ) { UINT32 tmp;	FETCHWORD(tmp); PUSH(tmp);	CLK(1);	}
 OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w;	FETCHWORD(tmp); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(UINT16)dst;     if (ModRM >= 0xc0) CLK(3) else CLK(4) }
-OP( 0x6a, i_push_d8  ) { UINT32 tmp = (UINT16)((INT16)((INT8)FETCH)); 	PUSH(tmp);	CLK(1);	}
+OP( 0x6a, i_push_d8  ) { UINT32 tmp = (UINT16)((INT16)((INT8)FETCH));	PUSH(tmp);	CLK(1);	}
 OP( 0x6b, i_imul_d8  ) { UINT32 src2; DEF_r16w; src2= (UINT16)((INT16)((INT8)FETCH)); dst = (INT32)((INT16)src)*(INT32)((INT16)src2); cpustate->CarryVal = cpustate->OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1); RegWord(ModRM)=(UINT16)dst; if (ModRM >= 0xc0) CLK(3) else CLK(4) }
 OP( 0x6c, i_insb     ) { PutMemB(ES,cpustate->regs.w[IY],read_port(cpustate->regs.w[DW])); cpustate->regs.w[IY]+= -2 * cpustate->DF + 1; CLK(6); }
 OP( 0x6d, i_insw     ) { PutMemB(ES,cpustate->regs.w[IY],read_port(cpustate->regs.w[DW])); PutMemB(ES,(cpustate->regs.w[IY]+1)&0xffff,read_port((cpustate->regs.w[DW]+1)&0xffff)); cpustate->regs.w[IY]+= -4 * cpustate->DF + 2; CLK(6); }

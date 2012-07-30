@@ -19369,6 +19369,7 @@ m5clubsn11	//
 m5clubsn14  //
 m5clubsn16  //
 m5dick		// Dick Turnip (Bwb)
+m5dick10
 m5donna		// Donna Kebab (Bwb)
 m5donnad	//
 m5donnaa	//
@@ -19413,6 +19414,7 @@ m5sec7a		//
 m5sil7		// Silver 7s (Bwb)
 m5sil7a		//
 m5smobik	// Smokey Bikin (Bwb)
+m5smobik12
 m5tictac	// Tic Tac Tut (Vivid)
 m5tictacbwb	// Tic Tac Tut (Bwb)
 m5tictacbwb16 //
@@ -19761,14 +19763,14 @@ sp_tzfes		//
 sp_tzfet		//
 sp_tzfeu		//
 sp_beau			// Beau Peep (Ace)
-sp_beaua		// 
-sp_beaub		// 
-sp_beauc		// 
-sp_beaud		// 
-sp_beaue		// 
-sp_beauf		// 
-sp_beaug		// 
-sp_beauh		// 
+sp_beaua		//
+sp_beaub		//
+sp_beauc		//
+sp_beaud		//
+sp_beaue		//
+sp_beauf		//
+sp_beaug		//
+sp_beauh		//
 sp_bigbd		// Big Break Deluxe Club (Ace)
 sp_bigbda		//
 sp_brkbk		// Break The Bank (Ace)
@@ -19863,14 +19865,14 @@ sp_gol			// Gol (Ace)
 sp_golda		// Golden Arrow Club (Ace)
 sp_goldaa		//
 sp_golds		// Golden Streak (Ace)
-sp_goldsa		// 
-sp_goldsb		// 
-sp_goldsc		// 
-sp_goldsd		// 
-sp_goldse		// 
-sp_goldsf		// 
-sp_goldsg		// 
-sp_goldsh		// 
+sp_goldsa		//
+sp_goldsb		//
+sp_goldsc		//
+sp_goldsd		//
+sp_goldse		//
+sp_goldsf		//
+sp_goldsg		//
+sp_goldsh		//
 sp_goldt		// Golden Touch (Golden Streak) (Ace)
 sp_here			// Here We Go (Ace)
 sp_herea		//
@@ -19969,7 +19971,7 @@ sp_poundbwbe	//
 sp_poundbwbf	//
 sp_road			// Road To Hell (Ace)
 sp_skylm		// Sky's The Limit Club, The (Ace)
-sp_skylma		// 
+sp_skylma		//
 sp_tkpik		// Take Your Pick (Ace)
 sp_tkpika		//
 sp_tkpikb		//
@@ -19982,7 +19984,7 @@ sp_carrya		//
 sp_front		// Final Frontier (Bwb)
 sp_atw			// Around the World (Crystal)
 sp_five			// Fiver Fever (Crystal)
-sp_fivea		// 
+sp_fivea		//
 sp_crun			// Cash Run (Crystal)
 sp_cruna		//
 sp_crunb		//

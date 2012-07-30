@@ -75,7 +75,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_vfd(*this, "vfd")
 		{ }
-		
+
 	optional_device<roc10937_t> m_vfd;
 	int m_mmtr_latch;
 	int m_triac_latch;
@@ -260,7 +260,7 @@ READ8_MEMBER(bfmsys85_state::mmtr_r)
 
 WRITE8_MEMBER(bfmsys85_state::vfd_w)
 {
-	
+
 	if (data & VFD_RESET)//inverted?
 	{
 		if (m_alpha_clock != (data & VFD_CLOCK1))

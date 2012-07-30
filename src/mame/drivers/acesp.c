@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( ace_sp_map, AS_PROGRAM, 8, ace_sp_state )
 	/* 0x3f */
 	//----- 0x0040 - 0x013f is internal RAM (256 bytes) -----
 	AM_RANGE(0x0040, 0x013f) AM_RAM
-	
+
 
 	/**** regular map ****/
 	AM_RANGE(0x0140, 0x1fff) AM_RAM
@@ -2310,7 +2310,7 @@ ROM_START( sp_codera )
 	SP_CODER_SOUND
 ROM_END
 
-	
+
 ROM_START( sp_coderb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cr655d3d", 0x0000, 0x8000, CRC(a20fc66b) SHA1(df67d0fe655e218afc92342609411e76be4dd47b) )
@@ -3342,13 +3342,13 @@ ROM_START( sp_onboxm )
 	ROM_LOAD( "0016rp40.bin", 0x0000, 0x010000, CRC(591e3e24) SHA1(b147bfc19aa46eb3237b270d771031caaf978850) ) // merged rom
 	SP_ONBOX_SOUND
 ROM_END
-	
+
 ROM_START( sp_onboxn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "0016rp50.bin", 0x0000, 0x010000, CRC(73c5c449) SHA1(453969ec5c4fe1ce8f118110106e31126a358cda) ) // merged rom
 	SP_ONBOX_SOUND
 ROM_END
-	
+
 
 
 #define SP_PISTE_SOUND \

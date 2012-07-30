@@ -2,16 +2,16 @@
 
     JPM S.R.U Hardware
 
-	The Stepper Reel Unit (SRU) was the first JPM hardware platform
-	to use CPU based technology as opposed to a purely mechanical 
-	setup.
-	
-	It really shows that this is the antecedent of System 80,
-	the sound hardware seems to be a basic discrete circuit (complete
-	with tone pot), and the hardware uses the older TMS9980A as a CPU.
-	
-	TODO: Everything!
-	
+    The Stepper Reel Unit (SRU) was the first JPM hardware platform
+    to use CPU based technology as opposed to a purely mechanical
+    setup.
+
+    It really shows that this is the antecedent of System 80,
+    the sound hardware seems to be a basic discrete circuit (complete
+    with tone pot), and the hardware uses the older TMS9980A as a CPU.
+
+    TODO: Everything!
+
 **********************************************************************/
 
 #include "emu.h"

@@ -45,7 +45,7 @@ public:
 	{
 		return 0x00;
 	}
-	
+
 	DECLARE_READ8_MEMBER( aces1_unk_port00_r )
 	{
 		return 0x00;
@@ -111,19 +111,19 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_a)
 	{
-	//	printf("extender lamps %02x\n", data);
+	//  printf("extender lamps %02x\n", data);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_b)
 	{
-	//	printf("meters, extender select %02x\n", data);
+	//  printf("meters, extender select %02x\n", data);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic25_intf_write_c)
 	{
-	//	printf("reels, extender strobe %02x\n", data);
+	//  printf("reels, extender strobe %02x\n", data);
 	}
-	
+
 	DECLARE_READ8_MEMBER( ppi8255_ic37_intf_read_a )
 	{
 		return 0xff;
@@ -154,7 +154,7 @@ protected:
 static TIMER_CALLBACK( m_aces1_irq_timer_callback )
 {
 	aces1_state *state = machine.driver_data<aces1_state>();
-//	printf("irq\n");
+//  printf("irq\n");
 	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 	state->aces1_reset_irq_timer();
 }
@@ -162,7 +162,7 @@ static TIMER_CALLBACK( m_aces1_irq_timer_callback )
 static TIMER_CALLBACK( m_aces1_nmi_timer_callback )
 {
 	aces1_state *state = machine.driver_data<aces1_state>();
-//	printf("nmi\n");
+//  printf("nmi\n");
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	state->aces1_reset_nmi_timer();
 }
@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	MCFG_I8255A_ADD( "ppi8255_ic24", ppi8255_ic24_intf )
 	MCFG_I8255A_ADD( "ppi8255_ic25", ppi8255_ic25_intf )
 	MCFG_I8255A_ADD( "ppi8255_ic37", ppi8255_ic37_intf )
-	
+
 	MCFG_MACHINE_START( aces1 )
 	MCFG_MACHINE_RESET( aces1 )
 	MCFG_DEFAULT_LAYOUT(layout_aces1)
@@ -403,13 +403,13 @@ ROM_END
 
 /*
 ROM_START( ac1taklva ) // set 2, just a merged rom of the above, probably for another emulator
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "430tl.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
+    ROM_REGION( 0x8000, "maincpu", 0 )
+    ROM_LOAD( "430tl.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
 ROM_END
 
 ROM_START( ac1cshtw ) // Cash Towers, same ROM as above, original machine apparently plays the same, reskinned machine?
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "ctp1.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
+    ROM_REGION( 0x8000, "maincpu", 0 )
+    ROM_LOAD( "ctp1.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
 ROM_END
 */
 
@@ -731,8 +731,8 @@ GAME( 199?, ac1pstrt		,0			,aces1	,aces1	,aces1	,ROT0	,"Pcp", "Pound Stretcher (
 GAME( 199?, ac1primt		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Primetime (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1primta		,ac1primt	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Primetime (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // same but different rom size?
 GAME( 199?, ac1taklv		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-//GAME( 199?, ac1taklva		,ac1taklv	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // just a merged rom of the above, probably for another emulator
-//GAME( 199?, ac1cshtw		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Cash Towers (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL ) // same ROM as above, original machine apparently plays the same, reskinned machine?
+//GAME( 199?, ac1taklva     ,ac1taklv   ,aces1  ,aces1  ,aces1  ,ROT0   ,"Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // just a merged rom of the above, probably for another emulator
+//GAME( 199?, ac1cshtw      ,0          ,aces1  ,aces1  ,aces1  ,ROT0   ,"Ace", "Cash Towers (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL ) // same ROM as above, original machine apparently plays the same, reskinned machine?
 GAME( 199?, ac1bbclb		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Big Break Club (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1bbclba		,ac1bbclb	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Big Break Club (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1clbsv		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Club Sovereign (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL )

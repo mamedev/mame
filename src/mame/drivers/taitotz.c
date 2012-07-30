@@ -79,281 +79,281 @@ IC7 Panasonic MN1020819DA E68-01
 #include "video/polynew.h"
 
 /*
-	Interesting mem areas
+    Interesting mem areas
 
-	0x40080400...0x400807fc: PPC Interrupt handler table for TLCS900 interrupts (called from 0x4002ea80)
+    0x40080400...0x400807fc: PPC Interrupt handler table for TLCS900 interrupts (called from 0x4002ea80)
         0x40080440 (0x10): 0x4003b274       (0xfc06f7 on TLCS sets 0x1000)
         0x400804c0 (0x30): 0x4003f1e4       (INT1 handler on TLCS sets 0x3010)  (comms, could be IEEE1394)
         0x40080500 (0x40): 0x4002ed94       (debug/trace)
         0x40080504 (0x41): 0x4002ede4       (debug/break)
-        0x40080540 (0x50): 0x4003c21c															0x5001: sets 0x00000001 in 0x40049c58
-        0x40080740 (0xd0): 0x4002ecc0       (INT3 handler on TLCS sets 0xd000)	(VBlank?)
+        0x40080540 (0x50): 0x4003c21c                                                           0x5001: sets 0x00000001 in 0x40049c58
+        0x40080740 (0xd0): 0x4002ecc0       (INT3 handler on TLCS sets 0xd000)  (VBlank?)
         0x400807c0 (0xf0): 0x4002eae4       (0xfc0a44 on TLCS sets 0xf001)
- 
+
     PPC -> TLCS Commands:
-	    0x1000:            0x4003a9e0()								HDD Reset
-		0x1001:            0x4003aa14()								HDD Init. Writes HDD status and error to io_shared[0x1a00].
-		0x1010:            0x4003aaf4(), 0x4003ab8c()				HDD Read Sector
-		0x1020:            0x4003ac1c()								HDD Write Sector
-		0x4000:            ?										Related to sound loading?
-        0x4001:            0x400429b0()								MBox related
-		0x4002:            ?										Loads a byte from MBox ram. Address in io_shared[0x1c04]
-		0x4003:            ?										Writes a byte into MBox ram. Address in io_shared[0x1c04], data in io_shared[0x1c06].
-		0x4004:            0x40042bc4(), 0x40042c50()				Play music/sound? Params in io_shared[0x1c08...0x1c12]
-		0x5000:            0x4003bc68()								Reset RTC?
-		0x5010:            0x4003bb68()								Read RTC
-		0x5020:            0x4003bbec()								Write RTC
-		0x6000:            ?										Backup RAM Read. Address in io_shared[0x1d00].
-		0x6010:            ?										Backup RAM Write. Address in io_shared[0x1d00].
-		0x7000:            0x4003d1c4()
-		0x7001:            0x4003d28c()
-		0x7002:            0x4003d4ac()
-		0x7003:            0x4003d508()
-		0x7004:            0x4003d554()
-		0x7005:            0x4003d168()
-		0x8000:            ?										Used by vibration (force feedback?) on pwrshovl
-		0xa000:            ?										Used by vibration (force feedback?) on pwrshovl
-		0xf000:            0x4002f328() TLCS_Init
-		0xf010:            0x4002f074()								Enables TLCS watchdog timer
-		0xf011:            0x4002f0a8()								Disables TLCS watchdog
-		0xf020:            ?
-		0xf055:            0x4002f0dc()								Enables TLCS watchdog and infloops the TLCS
-		0xf0ff:            ?										TLCS soft reset?
+        0x1000:            0x4003a9e0()                             HDD Reset
+        0x1001:            0x4003aa14()                             HDD Init. Writes HDD status and error to io_shared[0x1a00].
+        0x1010:            0x4003aaf4(), 0x4003ab8c()               HDD Read Sector
+        0x1020:            0x4003ac1c()                             HDD Write Sector
+        0x4000:            ?                                        Related to sound loading?
+        0x4001:            0x400429b0()                             MBox related
+        0x4002:            ?                                        Loads a byte from MBox ram. Address in io_shared[0x1c04]
+        0x4003:            ?                                        Writes a byte into MBox ram. Address in io_shared[0x1c04], data in io_shared[0x1c06].
+        0x4004:            0x40042bc4(), 0x40042c50()               Play music/sound? Params in io_shared[0x1c08...0x1c12]
+        0x5000:            0x4003bc68()                             Reset RTC?
+        0x5010:            0x4003bb68()                             Read RTC
+        0x5020:            0x4003bbec()                             Write RTC
+        0x6000:            ?                                        Backup RAM Read. Address in io_shared[0x1d00].
+        0x6010:            ?                                        Backup RAM Write. Address in io_shared[0x1d00].
+        0x7000:            0x4003d1c4()
+        0x7001:            0x4003d28c()
+        0x7002:            0x4003d4ac()
+        0x7003:            0x4003d508()
+        0x7004:            0x4003d554()
+        0x7005:            0x4003d168()
+        0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
+        0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
+        0xf000:            0x4002f328() TLCS_Init
+        0xf010:            0x4002f074()                             Enables TLCS watchdog timer
+        0xf011:            0x4002f0a8()                             Disables TLCS watchdog
+        0xf020:            ?
+        0xf055:            0x4002f0dc()                             Enables TLCS watchdog and infloops the TLCS
+        0xf0ff:            ?                                        TLCS soft reset?
 
-	TLCS -> PPC Commands:
-	    0x10xx:            0xfc06f7()								HDD Command ack?
-																	0x40094ec8:
-																		0x00:	IDLE
-																		0x10:	READ
-																		0x11:	READ SECTOR
-																		0x12:	READ ALL
-																		0x20:	WRITE
-																		0x21:	WRITE SECTOR
-																		0x22:	WRITE ALL
-																		0x30:	VENDER
-																		0xff:	ERROR
-																		0x??:	UNKNOWN
-		0x3010:            0xfc071c() int1 handler					Comm IRQ, IEEE1394
-		0x40xx:            ?										Debug
-		0x41xx:            ?										Debug
-	    0x5001:            ?										RTC?
-		0xd000:            0xfc06b4() int3 handler					VBlank? Runs a counter on the PPC side
-		0xf001:            0xfc0a44()								PPC sync?
-
-
-	BG2 intro packet writes:
-
-	construction?
-	0x4012f390()
-		-> 0x401304f0() scene graph parser?
-			-> 0x40130d60()
-				-> 0x401aff48()		R3 = dest, R4 = source, R5 = length
-
-	0x40174674()
-	0x401ba294()			
-							R3 = 0x000007d0, R4 = 0x40707bac, R5 = 0x00000398
-
-							f1 00 00 63 0c 00 00 7f 0c 00 00 00 08 00 00 00
-							00 40 01 3e 00 00 81 00 00 00 7f 00 00 7f 00 00
-							00 40 3e 3e 00 00 7f 00 00 00 7f 00 00 7f 00 00
-							00 40 3e 00 00 00 7f 00 00 00 81 00 00 7f 00 00
-							00 40 01 00 00 00 81 00 00 00 81 00 00 7f 00 00
-							f1 00 00 69 00 00 7f 00 0c 7f 00 00 0d 00 00 7f
-							00 40 00 3f 00 00 e0 40 00 00 00 00 00 7f 7f 00
-							00 40 00 00 00 00 e0 40 00 00 00 00 00 7f 81 00
-							00 40 1f 00 00 00 1f c0 00 00 00 00 00 7f 81 00
-							00 40 1f 3f 00 00 1f c0 00 00 00 00 00 7f 7f 00
-							...
-
-							R3 = 0x00000b68, R4 = 0x40707e58, R5 = 0x00001000
-
-							e1 00 00 73 00 81 00 00 04 00 00 00 0c 00 00 00
-							00 40 06 00 00 94 fd d1 00 d2 82 ce 00 2e 03 ef
-							00 40 06 00 00 99 fd d1 00 c0 82 ce 00 df 00 40
-							00 40 06 02 00 91 fd d1 00 ef 88 9e 00 c7 fc 40
-							00 40 06 1f 00 88 fd d1 00 00 b8 60 00 26 03 ef
-							e0 00 00 73 00 81 00 00 04 00 00 00 0c 00 00 00
-							00 40 06 1f 00 8b fd d1 00 00 b8 60 00 d0 fc 40
-							00 40 06 1f 00 88 fd d1 00 00 b8 60 00 26 03 ef
-							00 40 06 02 00 91 fd d1 00 ef 88 9e 00 c7 fc 40
-							...
-
-							R3 = 0x00001b68, R4 = 0x40707e58, R5 = 0x00000d19
-							R3 = 0x00075770, R4 = 0x40443e2c, R5 = 0x00000014
-							R3 = 0x00075784, R4 = 0x40443e7c, R5 = 0x00000014
-							R3 = 0x00075798, R4 = 0x40443ecc, R5 = 0x00000014
-							R3 = 0x000757ac, R4 = 0x40443f1c, R5 = 0x00000014
-							R3 = 0x000757c0, R4 = 0x40443e6c, R5 = 0x00000014
-
-							R3 = 0x00062ca0, R4 = 0x409cfa70, R5 = 0x000001e0
-							R3 = 0x00008ca0, R4 = 0x409f8f70, R5 = 0x000002c5
-							R3 = 0x00002ba4, R4 = 0x40fffaf0, R5 = 0x00000028
-							R3 = 0x0001f4a0, R4 = 0x40a06350, R5 = 0x00000340
-							R3 = 0x00002bcc, R4 = 0x40fffaf0, R5 = 0x00000028
-
-							R3 = 0x00000190, R4 = 0x40fff8f8, R5 = 0x00000014
-
-	0x40188514()
-							R3 = 0x0000d818, R4 = 0x40ffcce0, R5 = 0x00000bc0
-
-							00 00 00 dd 00 00 00 00 00 00 00 00 00 00 00 00
-							00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-							00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-							00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-							...
-
-							R3 = 0x0001494c, R4 = 0x40ffcce0, R5 = 0x00000bc0
-
-	0x40116c28():		Draws 2D images
-							R3 = 0x009e0c7a, R4 = 0x40a7c3bc, R5 = 0x0000007c
-
-	0x40116a80():		Clears 2D images?
-							R3 = 0x009f6308, R4 = 0x40a9a784, R5 = 0x000000f0
+    TLCS -> PPC Commands:
+        0x10xx:            0xfc06f7()                               HDD Command ack?
+                                                                    0x40094ec8:
+                                                                        0x00:   IDLE
+                                                                        0x10:   READ
+                                                                        0x11:   READ SECTOR
+                                                                        0x12:   READ ALL
+                                                                        0x20:   WRITE
+                                                                        0x21:   WRITE SECTOR
+                                                                        0x22:   WRITE ALL
+                                                                        0x30:   VENDER
+                                                                        0xff:   ERROR
+                                                                        0x??:   UNKNOWN
+        0x3010:            0xfc071c() int1 handler                  Comm IRQ, IEEE1394
+        0x40xx:            ?                                        Debug
+        0x41xx:            ?                                        Debug
+        0x5001:            ?                                        RTC?
+        0xd000:            0xfc06b4() int3 handler                  VBlank? Runs a counter on the PPC side
+        0xf001:            0xfc0a44()                               PPC sync?
 
 
+    BG2 intro packet writes:
 
-		-> 0x40116430():	R3 = dest (|= 0x30800000), R4 = source, R5 = num words
-			-> 0x401162ac() WriteVideoMem:		R3 = source, R4 = dest, R5 = num words
-				-> 0x401064b0() Write video data using FIFO:		R3 = source, R4 = dest, R5 = num words (must be divisible by 8)
-				-> 0x40106668() Write video data using write port:	R3 = source, R4 = dest, R5 = num words
+    construction?
+    0x4012f390()
+        -> 0x401304f0() scene graph parser?
+            -> 0x40130d60()
+                -> 0x401aff48()     R3 = dest, R4 = source, R5 = length
+
+    0x40174674()
+    0x401ba294()
+                            R3 = 0x000007d0, R4 = 0x40707bac, R5 = 0x00000398
+
+                            f1 00 00 63 0c 00 00 7f 0c 00 00 00 08 00 00 00
+                            00 40 01 3e 00 00 81 00 00 00 7f 00 00 7f 00 00
+                            00 40 3e 3e 00 00 7f 00 00 00 7f 00 00 7f 00 00
+                            00 40 3e 00 00 00 7f 00 00 00 81 00 00 7f 00 00
+                            00 40 01 00 00 00 81 00 00 00 81 00 00 7f 00 00
+                            f1 00 00 69 00 00 7f 00 0c 7f 00 00 0d 00 00 7f
+                            00 40 00 3f 00 00 e0 40 00 00 00 00 00 7f 7f 00
+                            00 40 00 00 00 00 e0 40 00 00 00 00 00 7f 81 00
+                            00 40 1f 00 00 00 1f c0 00 00 00 00 00 7f 81 00
+                            00 40 1f 3f 00 00 1f c0 00 00 00 00 00 7f 7f 00
+                            ...
+
+                            R3 = 0x00000b68, R4 = 0x40707e58, R5 = 0x00001000
+
+                            e1 00 00 73 00 81 00 00 04 00 00 00 0c 00 00 00
+                            00 40 06 00 00 94 fd d1 00 d2 82 ce 00 2e 03 ef
+                            00 40 06 00 00 99 fd d1 00 c0 82 ce 00 df 00 40
+                            00 40 06 02 00 91 fd d1 00 ef 88 9e 00 c7 fc 40
+                            00 40 06 1f 00 88 fd d1 00 00 b8 60 00 26 03 ef
+                            e0 00 00 73 00 81 00 00 04 00 00 00 0c 00 00 00
+                            00 40 06 1f 00 8b fd d1 00 00 b8 60 00 d0 fc 40
+                            00 40 06 1f 00 88 fd d1 00 00 b8 60 00 26 03 ef
+                            00 40 06 02 00 91 fd d1 00 ef 88 9e 00 c7 fc 40
+                            ...
+
+                            R3 = 0x00001b68, R4 = 0x40707e58, R5 = 0x00000d19
+                            R3 = 0x00075770, R4 = 0x40443e2c, R5 = 0x00000014
+                            R3 = 0x00075784, R4 = 0x40443e7c, R5 = 0x00000014
+                            R3 = 0x00075798, R4 = 0x40443ecc, R5 = 0x00000014
+                            R3 = 0x000757ac, R4 = 0x40443f1c, R5 = 0x00000014
+                            R3 = 0x000757c0, R4 = 0x40443e6c, R5 = 0x00000014
+
+                            R3 = 0x00062ca0, R4 = 0x409cfa70, R5 = 0x000001e0
+                            R3 = 0x00008ca0, R4 = 0x409f8f70, R5 = 0x000002c5
+                            R3 = 0x00002ba4, R4 = 0x40fffaf0, R5 = 0x00000028
+                            R3 = 0x0001f4a0, R4 = 0x40a06350, R5 = 0x00000340
+                            R3 = 0x00002bcc, R4 = 0x40fffaf0, R5 = 0x00000028
+
+                            R3 = 0x00000190, R4 = 0x40fff8f8, R5 = 0x00000014
+
+    0x40188514()
+                            R3 = 0x0000d818, R4 = 0x40ffcce0, R5 = 0x00000bc0
+
+                            00 00 00 dd 00 00 00 00 00 00 00 00 00 00 00 00
+                            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+                            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+                            00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+                            ...
+
+                            R3 = 0x0001494c, R4 = 0x40ffcce0, R5 = 0x00000bc0
+
+    0x40116c28():       Draws 2D images
+                            R3 = 0x009e0c7a, R4 = 0x40a7c3bc, R5 = 0x0000007c
+
+    0x40116a80():       Clears 2D images?
+                            R3 = 0x009f6308, R4 = 0x40a9a784, R5 = 0x000000f0
 
 
 
-	0x40106788(): FIFO Packet write:			R3 = source, R4 = select between cmd 0 and 1, R5 = num words (must be divisible by 8)
+        -> 0x40116430():    R3 = dest (|= 0x30800000), R4 = source, R5 = num words
+            -> 0x401162ac() WriteVideoMem:      R3 = source, R4 = dest, R5 = num words
+                -> 0x401064b0() Write video data using FIFO:        R3 = source, R4 = dest, R5 = num words (must be divisible by 8)
+                -> 0x40106668() Write video data using write port:  R3 = source, R4 = dest, R5 = num words
 
 
 
-	BG2: 4x4 Matrices at 0x40223218
-			word 0: ?? (0x62e6c, 0xf20a0, ...)		anded by 0x1fffff on read, or'd by 0xff800000, or'd by 0x400000 if no matrix, store -> [0x00]
-			word 1: ?? (usually zero)
-			word 2: float (often 1.0)				multiplied by 31.0f, converted to (int), anded by 0x1f, or by 0x80 if word 1 == 1, store -> [0x08]
-			word 3: float							if (exponent < 1, mult by 0.5), store -> [0x04]
-			word 4: usually 0x00000001				if 0, matrix not stored
-			16x float: 4x4 matrix
-				matrix[0][0] -> store [0x10]
-				matrix[1][0] -> store [0x14]
-				matrix[2][0] -> store [0x18]
-				matrix[3][0] -> store [0x1c]
-				...
-			word 0: Pointer to another matrix
-			word 1: Pointer to another matrix
-
-		0x401afffc(): Write
-
-	0x40118af0():
-		-> 0x401195e0(): Read	(Transposes matrix, only columns 0-2 stored + 4 extra command words)
-
-		-> 0x40118080: Read, store to [0x40362314+], never read
+    0x40106788(): FIFO Packet write:            R3 = source, R4 = select between cmd 0 and 1, R5 = num words (must be divisible by 8)
 
 
-	Display list top?:		0x403408c0 (pointer to at 0x4020b80c)
-			     bottom?:	0x403608e4 (pointer to at 0x4020b81c)
 
-	0x40123fcc():
-		-> 0x401186c8():	Display list parser?
+    BG2: 4x4 Matrices at 0x40223218
+            word 0: ?? (0x62e6c, 0xf20a0, ...)      anded by 0x1fffff on read, or'd by 0xff800000, or'd by 0x400000 if no matrix, store -> [0x00]
+            word 1: ?? (usually zero)
+            word 2: float (often 1.0)               multiplied by 31.0f, converted to (int), anded by 0x1f, or by 0x80 if word 1 == 1, store -> [0x08]
+            word 3: float                           if (exponent < 1, mult by 0.5), store -> [0x04]
+            word 4: usually 0x00000001              if 0, matrix not stored
+            16x float: 4x4 matrix
+                matrix[0][0] -> store [0x10]
+                matrix[1][0] -> store [0x14]
+                matrix[2][0] -> store [0x18]
+                matrix[3][0] -> store [0x1c]
+                ...
+            word 0: Pointer to another matrix
+            word 1: Pointer to another matrix
 
-	0x40117fb4():	Insert command to disp list. R3 = command word
+        0x401afffc(): Write
 
-	Display list format
-	-------------------
-					0xffff0010: ?
+    0x40118af0():
+        -> 0x401195e0(): Read   (Transposes matrix, only columns 0-2 stored + 4 extra command words)
 
-					0xffff0011: Draw Polygon Object
-								0 = Polygon data address (21 bits) in screen RAM (in dwords). If 0x400000 set, no matrix.
-								1 = Object scale (float), if <1.0f multiply scale by 2.0f
-								2 = 0x80 = object alpha enable, 0x1f = object alpha (0x1f = opaque)
-								3 = ?
-								4...15 = 4x3 matrix
+        -> 0x40118080: Read, store to [0x40362314+], never read
 
-					0xffff0020: ? (no parameters)
-					
-					0xffff0021: Draw Pretransformed Polygon (used for drawing the background images)
-								0 = address? (if 0x400 set, 24 words)
-								1 = Texture number (* 0x4000 to address the texture)
-								2 = ?
-								3 = ? (usually 0)
-								
-								Vertex data: 4x or 5x 4 words
-								0 = XY coordinates. X = high 16 bits, Y = low 16 bits
-								1 = Z value?
-								2 = UV coordinates. U = high 16 bits, V = low 16 bits (possibly shifted left by 4?)
-								3 = ? (usually 0)
-					
-					0xffff0022: ? (1 word)
-								0 = ? (Set to 0x00000001 before drawing the background. Z-buffer read disable?)
-					
-					0xffff0030: ? (2 + n words) FIFO write?
-								0 = ?
-								1 = num of words
-								n words = ?
-					
-					0xffff0080: Display List Call?
-					
-					0xffff00ff: End of List?
 
-	Polygon data format
-	-------------------
+    Display list top?:      0x403408c0 (pointer to at 0x4020b80c)
+                 bottom?:   0x403608e4 (pointer to at 0x4020b81c)
 
-	Word 0:
-					---x---- -------- -------- --------		1: this is the last polygon of the model
-					-------x -------- -------- --------		0: triangle, 1: quad
-					-------- -------- -----xxx xxxxxxxx		Texture number (* 0x4000 to address the texture)
+    0x40123fcc():
+        -> 0x401186c8():    Display list parser?
 
-	Word 1:
-					?
+    0x40117fb4():   Insert command to disp list. R3 = command word
 
-	Word 2:
-					?
+    Display list format
+    -------------------
+                    0xffff0010: ?
 
-	Word 3:
-					?
+                    0xffff0011: Draw Polygon Object
+                                0 = Polygon data address (21 bits) in screen RAM (in dwords). If 0x400000 set, no matrix.
+                                1 = Object scale (float), if <1.0f multiply scale by 2.0f
+                                2 = 0x80 = object alpha enable, 0x1f = object alpha (0x1f = opaque)
+                                3 = ?
+                                4...15 = 4x3 matrix
 
-	Vertex data: 3x (triangle) or 4x (quad) 4 words
-	Word 0:
-					-------- -------- -------- xxxxxxxx		Texture V coordinate (0..63 with max 4x repeat)
-					-------- -------- xxxxxxxx --------		Texture U coordinate (0..63 with max 4x repeat)
-					-------- xxxxxxxx -------- --------		Usually 0x40. HUD elements set 0xff. Self-illumination?
+                    0xffff0020: ? (no parameters)
 
-	Word 1:
-					-------- -------- xxxxxxxx xxxxxxxx		Vertex X coordinate (signed 8.8 fixed point)
-					-------- xxxxxxxx -------- --------		Normal X (signed 1.7 fixed point)
+                    0xffff0021: Draw Pretransformed Polygon (used for drawing the background images)
+                                0 = address? (if 0x400 set, 24 words)
+                                1 = Texture number (* 0x4000 to address the texture)
+                                2 = ?
+                                3 = ? (usually 0)
 
-	Word 2:
-					-------- -------- xxxxxxxx xxxxxxxx		Vertex Y coordinate (signed 8.8 fixed point)
-					-------- xxxxxxxx -------- --------		Normal Y (signed 1.7 fixed point)
+                                Vertex data: 4x or 5x 4 words
+                                0 = XY coordinates. X = high 16 bits, Y = low 16 bits
+                                1 = Z value?
+                                2 = UV coordinates. U = high 16 bits, V = low 16 bits (possibly shifted left by 4?)
+                                3 = ? (usually 0)
 
-	Word 3:
-					-------- -------- xxxxxxxx xxxxxxxx		Vertex Z coordinate (signed 8.8 fixed point)
-					-------- xxxxxxxx -------- --------		Normal Z (signed 1.7 fixed point)
+                    0xffff0022: ? (1 word)
+                                0 = ? (Set to 0x00000001 before drawing the background. Z-buffer read disable?)
 
-	3D registers
-	------------
+                    0xffff0030: ? (2 + n words) FIFO write?
+                                0 = ?
+                                1 = num of words
+                                n words = ?
 
-	0x00000100:		xxxxxxxx xxxxxxxx -------- --------		Viewport Y?
-					-------- -------- xxxxxxxx xxxxxxxx		Viewport X?
+                    0xffff0080: Display List Call?
 
-	0x00000101:		xxxxxxxx xxxxxxxx -------- --------		Viewport center X? (usually 255 or 240)
-					-------- -------- xxxxxxxx xxxxxxxx		Viewport center Y? (usually 200 or 191)
+                    0xffff00ff: End of List?
 
-	0x00000102:		xxxxxxxx xxxxxxxx -------- --------		? (usually 0x100)
-					-------- -------- xxxxxxxx xxxxxxxx		? (usually 0x100 or 0xc0)
+    Polygon data format
+    -------------------
 
-	0x00000103:
+    Word 0:
+                    ---x---- -------- -------- --------     1: this is the last polygon of the model
+                    -------x -------- -------- --------     0: triangle, 1: quad
+                    -------- -------- -----xxx xxxxxxxx     Texture number (* 0x4000 to address the texture)
 
-	0x00000104:
+    Word 1:
+                    ?
 
-	0x10000100:
+    Word 2:
+                    ?
 
-	0x10000101:
+    Word 3:
+                    ?
 
-	0x10000102:		xxxxxxxx xxxxxxxx -------- --------		Diffuse light color (ARGB1555)
-					-------- -------- xxxxxxxx xxxxxxxx		Ambient light color (ARGB1555)
-	
-	0x10000103:
+    Vertex data: 3x (triangle) or 4x (quad) 4 words
+    Word 0:
+                    -------- -------- -------- xxxxxxxx     Texture V coordinate (0..63 with max 4x repeat)
+                    -------- -------- xxxxxxxx --------     Texture U coordinate (0..63 with max 4x repeat)
+                    -------- xxxxxxxx -------- --------     Usually 0x40. HUD elements set 0xff. Self-illumination?
 
-	0x10000104:
-	
-	0x10000105:
+    Word 1:
+                    -------- -------- xxxxxxxx xxxxxxxx     Vertex X coordinate (signed 8.8 fixed point)
+                    -------- xxxxxxxx -------- --------     Normal X (signed 1.7 fixed point)
+
+    Word 2:
+                    -------- -------- xxxxxxxx xxxxxxxx     Vertex Y coordinate (signed 8.8 fixed point)
+                    -------- xxxxxxxx -------- --------     Normal Y (signed 1.7 fixed point)
+
+    Word 3:
+                    -------- -------- xxxxxxxx xxxxxxxx     Vertex Z coordinate (signed 8.8 fixed point)
+                    -------- xxxxxxxx -------- --------     Normal Z (signed 1.7 fixed point)
+
+    3D registers
+    ------------
+
+    0x00000100:     xxxxxxxx xxxxxxxx -------- --------     Viewport Y?
+                    -------- -------- xxxxxxxx xxxxxxxx     Viewport X?
+
+    0x00000101:     xxxxxxxx xxxxxxxx -------- --------     Viewport center X? (usually 255 or 240)
+                    -------- -------- xxxxxxxx xxxxxxxx     Viewport center Y? (usually 200 or 191)
+
+    0x00000102:     xxxxxxxx xxxxxxxx -------- --------     ? (usually 0x100)
+                    -------- -------- xxxxxxxx xxxxxxxx     ? (usually 0x100 or 0xc0)
+
+    0x00000103:
+
+    0x00000104:
+
+    0x10000100:
+
+    0x10000101:
+
+    0x10000102:     xxxxxxxx xxxxxxxx -------- --------     Diffuse light color (ARGB1555)
+                    -------- -------- xxxxxxxx xxxxxxxx     Ambient light color (ARGB1555)
+
+    0x10000103:
+
+    0x10000104:
+
+    0x10000105:
 */
 
 #define LOG_PPC_TO_TLCS_COMMANDS		1
@@ -418,7 +418,7 @@ private:
 		POLY_NY		= 4,
 		POLY_NZ		= 5,
 	};
- 
+
 	//static const float ZBUFFER_MAX = 10000000000.0f;
 
 	bitmap_rgb32 *m_fb;
@@ -443,7 +443,7 @@ private:
 	int m_specular_r;
 	int m_specular_g;
 	int m_specular_b;
-	
+
 	float m_vp_center_x;
 	float m_vp_center_y;
 	float m_vp_focus;
@@ -509,7 +509,7 @@ public:
 
 	UINT8 m_rtcdata[8];
 
-	
+
 
 	UINT32 m_reg105;
 	UINT32 m_displist_addr;
@@ -522,41 +522,41 @@ public:
 static void taitotz_exit(running_machine &machine)
 {
 	/*
-	taitotz_state *state = machine.driver_data<taitotz_state>();
+    taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	FILE *file;
-	int i;
+    FILE *file;
+    int i;
 
-	file = fopen("screen_ram.bin","wb");
-	for (i=0; i < 0x200000; i++)
-	{
-		fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
-		fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
-		fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
-		fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
-	}
-	fclose(file);
+    file = fopen("screen_ram.bin","wb");
+    for (i=0; i < 0x200000; i++)
+    {
+        fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
+        fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
+        fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
+        fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
+    }
+    fclose(file);
 
-	file = fopen("frame_ram.bin","wb");
-	for (i=0; i < 0x80000; i++)
-	{
-		fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
-		fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
-		fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
-		fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
-	}
-	fclose(file);
+    file = fopen("frame_ram.bin","wb");
+    for (i=0; i < 0x80000; i++)
+    {
+        fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
+        fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
+        fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
+        fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
+    }
+    fclose(file);
 
-	file = fopen("texture_ram.bin","wb");
-	for (i=0; i < 0x800000; i++)
-	{
-		fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
-		fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
-		fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
-		fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
-	}
-	fclose(file);
-	*/
+    file = fopen("texture_ram.bin","wb");
+    for (i=0; i < 0x800000; i++)
+    {
+        fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
+        fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
+        fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
+        fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
+    }
+    fclose(file);
+    */
 }
 
 static VIDEO_START( taitotz )
@@ -596,13 +596,13 @@ INLINE float finvsqrt(float number)
 	UINT32 i;
 	float x2, y;
 	const float threehalfs = 1.5f;
- 
+
 	x2 = number * 0.5f;
 	y  = number;
 	i  = *(UINT32*)&y;
     i  = 0x5f3759df - ( i >> 1 );
     y  = *(float*)&i;
-    y  = y * ( threehalfs - ( x2 * y * y ) ); 
+    y  = y * ( threehalfs - ( x2 * y * y ) );
 	return y;
 }
 
@@ -789,7 +789,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 					g = ((g * a) >> 5) + ((sg * (31 - a)) >> 5);
 					b = ((b * a) >> 5) + ((sb * (31 - a)) >> 5);
 				}
-				
+
 
 				// write to framebuffer
 				fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
@@ -920,7 +920,7 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 		{
 			// texture coordinates
 			UINT8 tu = (src[index] >> 8) & 0xff;
-			UINT8 tv = (src[index] >> 0) & 0xff;	
+			UINT8 tv = (src[index] >> 0) & 0xff;
 			v[i].p[POLY_U] = (float)(tu);
 			v[i].p[POLY_V] = (float)(tv);
 
@@ -931,7 +931,7 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 			float px = ((float)(x) / 256.0f) * scale;
 			float py = ((float)(y) / 256.0f) * scale;
 			float pz = ((float)(z) / 256.0f) * scale;
-			
+
 			// normals
 			INT8 inx = (src[index + 1] >> 16) & 0xff;
 			INT8 iny = (src[index + 2] >> 16) & 0xff;
@@ -1100,7 +1100,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 			m_matrix[1][1]= *(float*)&w[9];
 			m_matrix[2][1]= *(float*)&w[10];
 			m_matrix[3][1]= *(float*)&w[11];
-			
+
 			m_matrix[0][2]= *(float*)&w[12];
 			m_matrix[1][2]= *(float*)&w[13];
 			m_matrix[2][2]= *(float*)&w[14];
@@ -1161,7 +1161,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 				UINT16 y = (w[4] >>  0) & 0xffff;
 				UINT16 tu = (w[6] >> 20) & 0xfff;
 				UINT16 tv = (w[6] >>  4) & 0xfff;
-//				UINT16 z = (w[5] & 0xffff);
+//              UINT16 z = (w[5] & 0xffff);
 
 				v[j].x = x;
 				v[j].y = y;		// batlgear needs -50 modifier here (why?)
@@ -1279,7 +1279,7 @@ static SCREEN_UPDATE_RGB32( taitotz )
 	bitmap.fill(0x000000, cliprect);
 	state->m_renderer->set_fb(&bitmap);
 	state->m_renderer->render_displaylist(screen.machine(), cliprect);
-	
+
 
 	UINT16 *screen_src = (UINT16*)&state->m_screen_ram[state->m_scr_base];
 
@@ -1329,19 +1329,19 @@ static void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
 }
 
 /*
-	Video chip memory map
+    Video chip memory map
 
-	0x800000...0x9fffff			Screen RAM
-		0x980000...7fff			Char RAM
-		0x9c0000...fffff		Tile RAM?
+    0x800000...0x9fffff         Screen RAM
+        0x980000...7fff         Char RAM
+        0x9c0000...fffff        Tile RAM?
 
-	0x1000000...0x17fffff		Texture RAM
+    0x1000000...0x17fffff       Texture RAM
 
-	0x1800000...0x187ffff		Frame RAM
+    0x1800000...0x187ffff       Frame RAM
 
 
-	landhigh puts fullscreen images into 0x9c0000
-	batlgr2 into 0x9e0000
+    landhigh puts fullscreen images into 0x9c0000
+    batlgr2 into 0x9e0000
 */
 
 static UINT32 video_mem_r(taitotz_state *state, UINT32 address)
@@ -1407,7 +1407,7 @@ static UINT32 video_reg_r(taitotz_state *state, UINT32 reg)
 
 			if (reg != 0x20000008)
 				logerror("video_reg_r: reg: %08X\n", reg);
-			
+
 			if (subreg < 0x10)
 			{
 				return state->m_video_unk_reg[subreg];
@@ -1500,7 +1500,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 {
 	UINT64 r = 0;
 	UINT32 reg = offset * 8;
-	
+
 	if (ACCESSING_BITS_0_31)
 	{
 		reg += 4;
@@ -1600,7 +1600,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 					}
 					case 0x3:
 					{
-						// video_chip_w: port 0x08: 30000001		gets spammed a lot
+						// video_chip_w: port 0x08: 30000001        gets spammed a lot
 						break;
 					}
 					default:
@@ -1666,7 +1666,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 	else if (command == 0x1)
 	{
 		// FIFO command/packet write
-		
+
 		if (ACCESSING_BITS_32_63)
 		{
 			if (m_video_fifo_ptr >= 8)
@@ -1734,7 +1734,7 @@ WRITE64_MEMBER(taitotz_state::ieee1394_w)
 READ64_MEMBER(taitotz_state::ppc_common_r)
 {
 	UINT64 res = 0;
-	
+
 	if (ACCESSING_BITS_0_15)
 	{
 		res |= m_io_share_ram[(offset * 2) + 1];
@@ -1801,14 +1801,14 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 					m_io_share_ram[0x1c1a/2]
 					);
 		}
-		
+
 		/*
-		if (m_io_share_ram[0xfff] == 0x1010)
-		{
-			printf("   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
-		}
-		*/
-		
+        if (m_io_share_ram[0xfff] == 0x1010)
+        {
+            printf("   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+        }
+        */
+
 #endif
 
 
@@ -1935,7 +1935,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 		if (m_io_share_ram[0xfff] == 0 && m_io_share_ram[0xffe] == 0x1012)
 		{
 			//device_spin_until_trigger(machine().device("iocpu"), TLCS_PPC_COMM_TRIGGER);
-			device_yield(machine().device("iocpu"));	
+			device_yield(machine().device("iocpu"));
 			machine().scheduler().trigger(PPC_TLCS_COMM_TRIGGER);
 		}
 	}
@@ -2048,7 +2048,7 @@ static READ8_DEVICE_HANDLER(tlcs_ide1_r)
 {
 	//static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
-	
+
 	if (reg != 6)
 		fatalerror("tlcs_ide1_r: %02X\n", offset);
 
@@ -2116,7 +2116,7 @@ WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
 	{
 		case 0x7:
 			//if (data != 0xff && data != 0xfa && data != 0xfe)
-			//	printf("tlcs900_port_write %02X, %02X\n", offset, data);
+			//  printf("tlcs900_port_write %02X, %02X\n", offset, data);
 			break;
 
 		case 0x8:
@@ -2128,7 +2128,7 @@ WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
 
 		case 0x9:
 			//if (data != 0x00)
-			//	printf("tlcs900_port_write %02X, %02X\n", offset, data);
+			//  printf("tlcs900_port_write %02X, %02X\n", offset, data);
 			break;
 
 		case 0xb:
@@ -2142,28 +2142,28 @@ WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
 
 // TLCS900 interrupt vectors
 // 0xfc0150:    Reset
-// 0xfc0120:    SWI1-7			-
-// 0xfc0120:	NMI				-
-// 0xfc0120:	INTWD			-
-// 0xfc0122:    INT0			PPC communication
-// 0xfc0137:    INT1			IEEE1394?
-// 0xfc013c:    INT2			IDE
-// 0xfc0141:    INT3			VBlank? Drives a counter on PPC side
-// 0xfc0146:    INT4			-
-// 0xfc0147:    INT5			-
-// 0xfc0148:    INT6			-
-// 0xfc0149:    INT7			-
-// 0xfc014a:    INT8			Sound chip interrupt?
-// 0xfc0120:	INTAD			-
-// 0xfc0120:	INTTR8-A		-
-// 0xfc0120:	INTT0			-
-// 0xfc0467:    INTT1			A/D Conversion
-// 0xfc0120:	INTT2-7			-
-// 0xfc0120:	INTTC0-3		-
-// 0xfc0d1d:    INTRX0			Serial 0 receive
-// 0xfc0ca5:    INTTX0			Serial 0 transmit
-// 0xfc0d55:    INTRX1			Serial 1 receive
-// 0xfc0ce1:    INTTX1			Serial 1 transmit
+// 0xfc0120:    SWI1-7          -
+// 0xfc0120:    NMI             -
+// 0xfc0120:    INTWD           -
+// 0xfc0122:    INT0            PPC communication
+// 0xfc0137:    INT1            IEEE1394?
+// 0xfc013c:    INT2            IDE
+// 0xfc0141:    INT3            VBlank? Drives a counter on PPC side
+// 0xfc0146:    INT4            -
+// 0xfc0147:    INT5            -
+// 0xfc0148:    INT6            -
+// 0xfc0149:    INT7            -
+// 0xfc014a:    INT8            Sound chip interrupt?
+// 0xfc0120:    INTAD           -
+// 0xfc0120:    INTTR8-A        -
+// 0xfc0120:    INTT0           -
+// 0xfc0467:    INTT1           A/D Conversion
+// 0xfc0120:    INTT2-7         -
+// 0xfc0120:    INTTC0-3        -
+// 0xfc0d1d:    INTRX0          Serial 0 receive
+// 0xfc0ca5:    INTTX0          Serial 0 transmit
+// 0xfc0d55:    INTRX1          Serial 1 receive
+// 0xfc0ce1:    INTTX1          Serial 1 transmit
 
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitotz_state)
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM														// Work RAM
@@ -2233,7 +2233,7 @@ static INPUT_PORTS_START( taitotz )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON7 )									// View 5
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON8 )									// View 6
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 )									// View 1
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 ) 									// View 2
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 )									// View 2
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 )									// Select 1
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 )									// Select 2
 INPUT_PORTS_END
@@ -2510,7 +2510,7 @@ static void init_taitotz_152(running_machine &machine)
 {
 	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
     rom[(0x2c87c^4)/4] = 0x38600000;	// skip sound load timeout...
-//  rom[(0x2c620^4)/4] = 0x48000014;	// ID check skip (not needed with correct serial number)
+//  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 }
 
 // Init for BIOS 1.11a
@@ -2561,9 +2561,9 @@ static DRIVER_INIT(batlgr2)
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 
 	init_taitotz_152(machine);
-	
+
 	state->m_hdd_serial_number = BATLGR2_HDD_SERIAL;
-	
+
 	state->m_scr_base = 0x1e0000;
 
 	state->m_displist_addr = 0x3608e4;
@@ -2574,9 +2574,9 @@ static DRIVER_INIT(batlgr2a)
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 
 	init_taitotz_152(machine);
-	
+
 	state->m_hdd_serial_number = BATLGR2A_HDD_SERIAL;
-	
+
 	state->m_scr_base = 0x1e0000;
 
 	state->m_displist_addr = 0x3608e4;
@@ -2587,10 +2587,10 @@ static DRIVER_INIT(pwrshovl)
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 
 	init_taitotz_111a(machine);
-	
+
 	// unknown, not used by BIOS 1.11a
 	state->m_hdd_serial_number = NULL;
-	
+
 	state->m_scr_base = 0x1c0000;
 
 	state->m_displist_addr = 0x4a989c;

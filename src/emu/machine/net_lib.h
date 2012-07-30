@@ -6,41 +6,41 @@
 
 ****************************************************************************
 
-	Couriersud reserves the right to license the code under a less restrictive
-	license going forward.
+    Couriersud reserves the right to license the code under a less restrictive
+    license going forward.
 
-	Copyright Nicola Salmoria and the MAME team
-	All rights reserved.
+    Copyright Nicola Salmoria and the MAME team
+    All rights reserved.
 
-	Redistribution and use of this code or any derivative works are permitted
-	provided that the following conditions are met:
+    Redistribution and use of this code or any derivative works are permitted
+    provided that the following conditions are met:
 
-	* Redistributions may not be sold, nor may they be used in a commercial
-	product or activity.
+    * Redistributions may not be sold, nor may they be used in a commercial
+    product or activity.
 
-	* Redistributions that are modified from the original source must include the
-	complete source code, including the source code for all components used by a
-	binary built from the modified sources. However, as a special exception, the
-	source code distributed need not include anything that is normally distributed
-	(in either source or binary form) with the major components (compiler, kernel,
-	and so on) of the operating system on which the executable runs, unless that
-	component itself accompanies the executable.
+    * Redistributions that are modified from the original source must include the
+    complete source code, including the source code for all components used by a
+    binary built from the modified sources. However, as a special exception, the
+    source code distributed need not include anything that is normally distributed
+    (in either source or binary form) with the major components (compiler, kernel,
+    and so on) of the operating system on which the executable runs, unless that
+    component itself accompanies the executable.
 
-	* Redistributions must reproduce the above copyright notice, this list of
-	conditions and the following disclaimer in the documentation and/or other
-	materials provided with the distribution.
+    * Redistributions must reproduce the above copyright notice, this list of
+    conditions and the following disclaimer in the documentation and/or other
+    materials provided with the distribution.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 
 ****************************************************************************/
@@ -92,7 +92,7 @@
 
 #define TTL_7402_NOR(_name, _I1, _I2)												\
 		NET_REGISTER_DEV(nic7402, _name)											\
-		NET_CONNECT(_name, I1, _I1)		 											\
+		NET_CONNECT(_name, I1, _I1)													\
 		NET_CONNECT(_name, I2, _I2)													\
 
 #define TTL_7404_INVERT(_name, _I1)													\
@@ -145,7 +145,7 @@
 
 #define TTL_7486_XOR(_name, _I1, _I2)												\
 		NET_REGISTER_DEV(nic7486, _name)											\
-		NET_CONNECT(_name, I1, _I1)		 											\
+		NET_CONNECT(_name, I1, _I1)													\
 		NET_CONNECT(_name, I2, _I2)													\
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)						\
@@ -347,7 +347,7 @@ class nic74107 : public nic74107A
 {
 public:
 	nic74107(netlist_setup_t *parent, const char *name)
-	: 	nic74107A(parent, name) {}
+	:	nic74107A(parent, name) {}
 
 };
 

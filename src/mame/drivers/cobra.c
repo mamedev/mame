@@ -2,56 +2,56 @@
 */
 
 /*
-	check_color_buffer(): 0, 0
-		gfxfifo_exec: ram write 00100: 00000800
-		gfxfifo_exec: ram write 00104: 00000000
-		gfxfifo_exec: ram write 00108: 00000080
-		gfxfifo_exec: ram write 0010C: 00000080
-		gfxfifo_exec: ram write 00110: 20200000
-		gfxfifo_exec: ram write 00120: 08800800
-		gfxfifo_exec: ram write 00124: 00081018
-		gfxfifo_exec: ram write 00128: 08080808
-		gfxfifo_exec: ram write 80100: 00800000
-		gfxfifo_exec: ram write 80104: 00800000
-		gfxfifo_exec: ram write 80110: 00800000
-		gfxfifo_exec: ram write 800A8: 00000000
-		gfxfifo_exec: ram write 80108: 00000000
+    check_color_buffer(): 0, 0
+        gfxfifo_exec: ram write 00100: 00000800
+        gfxfifo_exec: ram write 00104: 00000000
+        gfxfifo_exec: ram write 00108: 00000080
+        gfxfifo_exec: ram write 0010C: 00000080
+        gfxfifo_exec: ram write 00110: 20200000
+        gfxfifo_exec: ram write 00120: 08800800
+        gfxfifo_exec: ram write 00124: 00081018
+        gfxfifo_exec: ram write 00128: 08080808
+        gfxfifo_exec: ram write 80100: 00800000
+        gfxfifo_exec: ram write 80104: 00800000
+        gfxfifo_exec: ram write 80110: 00800000
+        gfxfifo_exec: ram write 800A8: 00000000
+        gfxfifo_exec: ram write 80108: 00000000
 
-	check_color_buffer(): 0, 1
-		gfxfifo_exec: ram write 00120: 08800800
-		gfxfifo_exec: ram write 00124: 00081018
-		gfxfifo_exec: ram write 00128: 08080808
-		gfxfifo_exec: ram write 80100: 00200000
-		gfxfifo_exec: ram write 80104: 00200000
-		gfxfifo_exec: ram write 80110: 00200000
-		gfxfifo_exec: ram write 800A8: 00000000
+    check_color_buffer(): 0, 1
+        gfxfifo_exec: ram write 00120: 08800800
+        gfxfifo_exec: ram write 00124: 00081018
+        gfxfifo_exec: ram write 00128: 08080808
+        gfxfifo_exec: ram write 80100: 00200000
+        gfxfifo_exec: ram write 80104: 00200000
+        gfxfifo_exec: ram write 80110: 00200000
+        gfxfifo_exec: ram write 800A8: 00000000
 
-	check_overlay_buffer():
-		gfxfifo_exec: ram write 00120: 08800800
-		gfxfifo_exec: ram write 00124: 00081018
-		gfxfifo_exec: ram write 00128: 08080808
-		gfxfifo_exec: ram write 80100: 000E0000
-		gfxfifo_exec: ram write 80104: 000E0000
-		gfxfifo_exec: ram write 80110: 000E0000
-		gfxfifo_exec: ram write 800A8: 00000000
+    check_overlay_buffer():
+        gfxfifo_exec: ram write 00120: 08800800
+        gfxfifo_exec: ram write 00124: 00081018
+        gfxfifo_exec: ram write 00128: 08080808
+        gfxfifo_exec: ram write 80100: 000E0000
+        gfxfifo_exec: ram write 80104: 000E0000
+        gfxfifo_exec: ram write 80110: 000E0000
+        gfxfifo_exec: ram write 800A8: 00000000
 
-	check_z_buffer():
-		gfxfifo_exec: ram write 00120: 08000800
-		gfxfifo_exec: ram write 00124: 00000010
-		gfxfifo_exec: ram write 00128: 00001010
-		gfxfifo_exec: ram write 80100: 00000000
-		gfxfifo_exec: ram write 80104: 00000800
-		gfxfifo_exec: ram write 80110: 00000800
-		gfxfifo_exec: ram write 800A8: 80000000
+    check_z_buffer():
+        gfxfifo_exec: ram write 00120: 08000800
+        gfxfifo_exec: ram write 00124: 00000010
+        gfxfifo_exec: ram write 00128: 00001010
+        gfxfifo_exec: ram write 80100: 00000000
+        gfxfifo_exec: ram write 80104: 00000800
+        gfxfifo_exec: ram write 80110: 00000800
+        gfxfifo_exec: ram write 800A8: 80000000
 
-	check_stencil_buffer():
-		gfxfifo_exec: ram write 00120: 08000800
-		gfxfifo_exec: ram write 00124: 00000010
-		gfxfifo_exec: ram write 00128: 00001010
-		gfxfifo_exec: ram write 80100: 00000000
-		gfxfifo_exec: ram write 80104: 00000200
-		gfxfifo_exec: ram write 80110: 00000200
-		gfxfifo_exec: ram write 800A8: 80000000
+    check_stencil_buffer():
+        gfxfifo_exec: ram write 00120: 08000800
+        gfxfifo_exec: ram write 00124: 00000010
+        gfxfifo_exec: ram write 00128: 00001010
+        gfxfifo_exec: ram write 80100: 00000000
+        gfxfifo_exec: ram write 80104: 00000200
+        gfxfifo_exec: ram write 80110: 00000200
+        gfxfifo_exec: ram write 800A8: 80000000
 */
 
 
@@ -203,7 +203,7 @@ public:
 	int m_comram_page;
 
 	bitmap_rgb32 *m_framebuffer;
-	
+
 	int m_main_debug_state;
 	int m_main_debug_state_wc;
 	int m_sub_debug_state;
@@ -290,7 +290,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 	{
 		int x = x1;
 		for (int i=0; i < abs(dx); i++)
-		{		
+		{
 			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
 
 			UINT32 *fb = &m_fb->pix32(y);
@@ -656,11 +656,11 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 
 
 		/*
-		if (fifo_is_empty(S2MFIFO))
-		{
-			device_spin_until_time(machine().device("subcpu"), attotime::from_usec(80));
-		}
-		*/
+        if (fifo_is_empty(S2MFIFO))
+        {
+            device_spin_until_time(machine().device("subcpu"), attotime::from_usec(80));
+        }
+        */
 	}
 	if (ACCESSING_BITS_32_39)
 	{
@@ -900,7 +900,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 
 		if (m_m2sfifo->is_empty())
 		{
-	//		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	//      cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
@@ -911,11 +911,11 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		r |= (value & 0xff) << 24;
 
 		/*
-		if (fifo_is_empty(M2SFIFO))
-		{
-			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(80));
-		}
-		*/
+        if (fifo_is_empty(M2SFIFO))
+        {
+            device_spin_until_time(machine().device("maincpu"), attotime::from_usec(80));
+        }
+        */
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -986,7 +986,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 
 		if (!s2mfifo_unk_flag)
 		{
-//			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+//          cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
@@ -995,7 +995,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		}
 		else
 		{
-//			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+//          cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
@@ -1195,9 +1195,9 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
-//	AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM											// PSAC (ROZ) in Racing Jam.
-//	AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM											// LANC
-//	AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM											// LANC
+//  AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM                                           // PSAC (ROZ) in Racing Jam.
+//  AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
+//  AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
 	AM_RANGE(0x7e380000, 0x7e380003) AM_MIRROR(0x80000000) AM_READWRITE(sub_mainbd_r, sub_mainbd_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)						/* Boot ROM */
 ADDRESS_MAP_END
@@ -1391,38 +1391,38 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			case 0xa8:
 			case 0xac:
 			{
-				// 0xA80114CC			prm_flashcolor()
+				// 0xA80114CC           prm_flashcolor()
 				// 0xA80118CC
 				// 0xA80108FF
 
-				// 0xA80108FF			prm_flashmisc()
+				// 0xA80108FF           prm_flashmisc()
 				// 0xA80110FF
 				// 0xA8011CE0
 
-				// 0xA401BCC0			texenvmode()
+				// 0xA401BCC0           texenvmode()
 
-				// 0xA4019CC0			mode_fog()
+				// 0xA4019CC0           mode_fog()
 
-				// 0xA40018C0			mode_stipple()
+				// 0xA40018C0           mode_stipple()
 				// 0xA400D080
 
-				// 0xA40138E0			mode_viewclip()
+				// 0xA40138E0           mode_viewclip()
 
-				// 0xA4011410			mode_scissor()
+				// 0xA4011410           mode_scissor()
 
-				// 0xA40198A0			mode_alphatest()
+				// 0xA40198A0           mode_alphatest()
 
-				// 0xA8002010			mode_depthtest()
+				// 0xA8002010           mode_depthtest()
 
-				// 0xA800507C			mode_blend()
+				// 0xA800507C           mode_blend()
 
-				// 0xA8001CFE			mode_stenciltest()
+				// 0xA8001CFE           mode_stenciltest()
 
-				// 0xA8002010			mode_stencilmod()
+				// 0xA8002010           mode_stencilmod()
 				// 0xA80054E0
 				// 0xA8001CFE
 
-				// 0xA80118CC			mode_colormask()
+				// 0xA80118CC           mode_colormask()
 				// 0xA80114CC
 
 				// 0xAxxxxxxx is different form in mbuslib_regwrite()
@@ -1461,20 +1461,20 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			{
 				// E0C00004 18C003C0 - 32 params
 				// E0C00004 18F803C1 - 48 params
-				// E0C00003 18C003C0 - 24 params		prm_triangle()
-				// E0C00008 18C003C0 - 64 params		prm_trianglestrip()
-				// E0C00001 58C003C1 - 10 params		prm_trianglefan() (start vertex?)
-				// E0800004 18C003C0 - 32 params		prm_trianglefan()
-				// E3000002 58C003C1 - 20 params		prm_line()
-				// E3000008 58C003C1 - 80 params		prm_lines()
-				// E3000005 58C003C1 - 50 params		prm_linestrip()
-				// E2000001 18C003C0 - 8 params			prm_point()
-				// E2000008 18C003C0 - 64 params		prm_points()
+				// E0C00003 18C003C0 - 24 params        prm_triangle()
+				// E0C00008 18C003C0 - 64 params        prm_trianglestrip()
+				// E0C00001 58C003C1 - 10 params        prm_trianglefan() (start vertex?)
+				// E0800004 18C003C0 - 32 params        prm_trianglefan()
+				// E3000002 58C003C1 - 20 params        prm_line()
+				// E3000008 58C003C1 - 80 params        prm_lines()
+				// E3000005 58C003C1 - 50 params        prm_linestrip()
+				// E2000001 18C003C0 - 8 params         prm_point()
+				// E2000008 18C003C0 - 64 params        prm_points()
 				// E0C00003 38C003C1 - 30 params
 				// E0C00008 38C003C1 - 80 params
 				// E0C00001 78C003C0 - 10 params
 				// E0800004 38C003C1 - 40 params
-				// E3000002 78C003C0 - 20 params		prm_line()
+				// E3000002 78C003C0 - 20 params        prm_line()
 				// E3400002 58C003C1 - 20 params
 				// E0C00003 18F803C1 - 36 params
 				// E0C00001 58F803C0 - 12 params
@@ -1536,7 +1536,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					return;
 				}
 
-				
+
 
 				// make sure the FIFO has fresh data at top...
 				fifo_out->flush();
@@ -1598,36 +1598,36 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					}
 				}
 				/*
-				else if (w1 == 0xe0c00003 && w2 == 0x18c003c0)
-				{
-					// Triangle poly packet?
-					vertex_t vert[3];
+                else if (w1 == 0xe0c00003 && w2 == 0x18c003c0)
+                {
+                    // Triangle poly packet?
+                    vertex_t vert[3];
 
-					for (i=0; i < 3; i++)
-					{
-						UINT64 in = 0;
-						fifo_in->pop(NULL, &in);
+                    for (i=0; i < 3; i++)
+                    {
+                        UINT64 in = 0;
+                        fifo_in->pop(NULL, &in);
 
-						fifo_in->pop(NULL, &in);
+                        fifo_in->pop(NULL, &in);
 
-						vert[i].x = (u2f((UINT32)(in)) / 8.0f) + 256.0f;
+                        vert[i].x = (u2f((UINT32)(in)) / 8.0f) + 256.0f;
 
-						fifo_in->pop(NULL, &in);
+                        fifo_in->pop(NULL, &in);
 
-						vert[i].y = (u2f((UINT32)(in)) / 8.0f) + 192.0f;
+                        vert[i].y = (u2f((UINT32)(in)) / 8.0f) + 192.0f;
 
-						fifo_in->pop(NULL, &in);
+                        fifo_in->pop(NULL, &in);
 
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-					}
+                        fifo_in->pop(NULL, &in);
+                        fifo_in->pop(NULL, &in);
+                        fifo_in->pop(NULL, &in);
+                        fifo_in->pop(NULL, &in);
+                    }
 
-					render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
-					render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
-				}
-				*/
+                    render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
+                    render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
+                }
+                */
 				else
 				{
 					printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
@@ -1673,7 +1673,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					fifo_in->pop(NULL, &param);
 
 					/*
-					if (c == 0)
+                    if (c == 0)
                         printf("       ");
                     printf("%08X ", (UINT32)(param));
 
@@ -2058,7 +2058,7 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 		if (value == 0xc0)
 		{
 			m_gfxfifo_in->pop(&space.device(), &in1);
-			m_gfxfifo_in->pop(&space.device(), &in2);			
+			m_gfxfifo_in->pop(&space.device(), &in2);
 			m_gfx_unknown_v1 = (UINT32)(in1 >> 32);			// FIFO number is read back from this same register
 
 			m_gfxfifo_out->push(&space.device(), in1 & 0xffffffff);
@@ -2379,7 +2379,7 @@ static DRIVER_INIT(racjamdx)
 		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 		rom[0x62ddc / 4] = 0x60000000;			// skip lanc_hardcheck()
 
-		
+
 		// calculate the checksum of the patched rom...
 		UINT32 sum = 0;
 		for (int i=0; i < 0x20000/4; i++)

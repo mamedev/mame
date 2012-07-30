@@ -455,8 +455,8 @@ offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *opr
 
 
 /*-------------------------------------------------
-	ppccom_dcstore_callback - call the dcstore
-	callback if installed
+    ppccom_dcstore_callback - call the dcstore
+    callback if installed
 -------------------------------------------------*/
 
 void ppccom_dcstore_callback(powerpc_state *ppc)
@@ -1672,8 +1672,8 @@ static TIMER_CALLBACK( decrementer_int_callback )
 }
 
 /*-------------------------------------------------
-	ppc_set_dcstore_callback - installs a callback
-	for detecting datacache stores with dcbst
+    ppc_set_dcstore_callback - installs a callback
+    for detecting datacache stores with dcbst
 -------------------------------------------------*/
 
 void ppc_set_dcstore_callback(device_t *device, ppc_dcstore_handler handler)
