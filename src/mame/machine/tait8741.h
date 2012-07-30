@@ -49,16 +49,6 @@ READ8_HANDLER( josvolly_8741_0_r );
 READ8_HANDLER( josvolly_8741_1_r );
 WRITE8_HANDLER( josvolly_nmi_enable_w );
 
-/****************************************************************************
-  Cycle Mahbou set.
-****************************************************************************/
-
-void cyclemb_8741_reset(running_machine &machine);
-WRITE8_HANDLER( cyclemb_8741_0_w );
-//WRITE8_HANDLER( cyclemb_8741_1_w );
-READ8_HANDLER( cyclemb_8741_0_r );
-//READ8_HANDLER( cyclemb_8741_1_r );
-
 #endif
 
 
