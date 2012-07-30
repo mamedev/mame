@@ -69,7 +69,7 @@
 #define SIGN(val)			((val) & 0x80000000)
 
 #define OVERFLOW_SUB(a,b,r)	((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0)
-#define OVERFLOW_ADD(a,b,r)	((INT32)(~((a) ^ (b)) & ((a) ^ (r))) < 0)
+#define OVERFLOW_ADD(a,b,r)	((INT32)(((a) ^ (r)) & ((b) ^ (r))) < 0)
 
 #define CLR_FLAGS(f)		do { IREG(TMR_ST) &= ~(f); } while (0)
 #define CLR_NVUF()			CLR_FLAGS(NFLAG | VFLAG | UFFLAG)
@@ -81,11 +81,11 @@
 #define OR_NZF(reg)			do { IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | ((reg.exponent() == -128) << 2); } while (0)
 #define OR_NUF(reg)			do { int temp = (reg.exponent() == -128) << 4; IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | (temp) | (temp << 2); } while (0)
 #define OR_V_SUB(a,b,r)		do { UINT32 temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
-#define OR_V_ADD(a,b,r)		do { UINT32 temp = ((~((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
+#define OR_V_ADD(a,b,r)		do { UINT32 temp = ((((a) ^ (r)) & ((b) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
 #define OR_C_SUB(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(b) > (UINT32)(a)); } while (0)
 #define OR_C_ADD(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(a) > (UINT32)(r)); } while (0)
-#define OR_NZCV_SUB(a,b,r)	do { OR_V_SUB(a,b,r); OR_C_SUB(a,b,r); OR_NZ(r); } while (0)
-#define OR_NZCV_ADD(a,b,r)	do { OR_V_ADD(a,b,r); OR_C_ADD(a,b,r); OR_NZ(r); } while (0)
+#define OR_C_SBB(a,b,c)		do { INT64 temp = (UINT32)(a) - (UINT32)(b) - (UINT32)(c); IREG(TMR_ST) |= (temp < 0); } while (0)
+#define OR_C_ADC(a,b,c)		do { UINT64 temp = (UINT32)(a) + (UINT32)(b) + (UINT32)(c); IREG(TMR_ST) |= (temp > 0xffffffffUL); } while (0)
 
 #define OVM()				(IREG(TMR_ST) & OVMFLAG)
 
@@ -1529,15 +1529,17 @@ void tms3203x_device::absi_imm(UINT32 op)
 #define ADDC(dreg, src1, src2)										\
 {																	\
 	UINT32 _res = src1 + src2 + (IREG(TMR_ST) & CFLAG);				\
-	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))						\
+	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))					\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
 	if (dreg < 8)													\
 	{																\
-		UINT32 tempc = src2 + (IREG(TMR_ST) & CFLAG);				\
+		UINT32 tempc = IREG(TMR_ST) & CFLAG;						\
 		CLR_NZCVUF();												\
-		OR_NZCV_ADD(src1,tempc,_res);								\
+		OR_C_ADC(src1,src2,tempc);									\
+		OR_V_ADD(src1,src2,_res);									\
+		OR_NZ(_res);												\
 	}																\
 	else if (dreg >= TMR_BK)										\
 		update_special(dreg);										\
@@ -1611,14 +1613,16 @@ void tms3203x_device::addf_imm(UINT32 op)
 #define ADDI(dreg, src1, src2)										\
 {																	\
 	UINT32 _res = src1 + src2;										\
-	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))						\
+	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))					\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
 	if (dreg < 8)													\
 	{																\
 		CLR_NZCVUF();												\
-		OR_NZCV_ADD(src1,src2,_res);								\
+		OR_C_ADD(src1,src2,_res);									\
+		OR_V_ADD(src1,src2,_res);									\
+		OR_NZ(_res);												\
 	}																\
 	else if (dreg >= TMR_BK)										\
 		update_special(dreg);										\
@@ -1861,7 +1865,9 @@ void tms3203x_device::cmpf_imm(UINT32 op)
 {																	\
 	UINT32 _res = src1 - src2;										\
 	CLR_NZCVUF();													\
-	OR_NZCV_SUB(src1,src2,_res);									\
+	OR_C_SUB(src1,src2,_res);										\
+	OR_V_SUB(src1,src2,_res);										\
+	OR_NZ(_res);													\
 }
 
 void tms3203x_device::cmpi_reg(UINT32 op)
@@ -2290,16 +2296,18 @@ void tms3203x_device::mpyi_imm(UINT32 op)
 
 #define NEGB(dreg, src)												\
 {																	\
-	UINT32 temps = 0 - (IREG(TMR_ST) & CFLAG);						\
-	UINT32 _res = temps - src;										\
-	if (!OVM() || !OVERFLOW_SUB(temps,src,_res))						\
+	UINT32 _res = 0 - src - (IREG(TMR_ST) & CFLAG);					\
+	if (!OVM() || !OVERFLOW_SUB(0,src,_res))						\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;	\
 	if (dreg < 8)													\
 	{																\
+		UINT32 tempc = IREG(TMR_ST) & CFLAG;						\
 		CLR_NZCVUF();												\
-		OR_NZCV_SUB(temps,src,_res);								\
+		OR_C_SBB(0,src,tempc);										\
+		OR_V_SUB(0,src,_res);										\
+		OR_NZ(_res);												\
 	}																\
 	else if (dreg >= TMR_BK)										\
 		update_special(dreg);										\
@@ -2369,14 +2377,16 @@ void tms3203x_device::negf_imm(UINT32 op)
 #define NEGI(dreg, src)												\
 {																	\
 	UINT32 _res = 0 - src;											\
-	if (!OVM() || !OVERFLOW_SUB(0,src,_res))							\
+	if (!OVM() || !OVERFLOW_SUB(0,src,_res))						\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;	\
 	if (dreg < 8)													\
 	{																\
 		CLR_NZCVUF();												\
-		OR_NZCV_SUB(0,src,_res);									\
+		OR_C_SUB(0,src,_res);										\
+		OR_V_SUB(0,src,_res);										\
+		OR_NZ(_res);												\
 	}																\
 	else if (dreg >= TMR_BK)										\
 		update_special(dreg);										\
@@ -2791,16 +2801,18 @@ void tms3203x_device::sigi(UINT32 op) { unimplemented(op); }
 
 #define SUBB(dreg, src1, src2)										\
 {																	\
-	UINT32 temps = src1 - (IREG(TMR_ST) & CFLAG);					\
-	UINT32 _res = temps - src2;										\
-	if (!OVM() || !OVERFLOW_SUB(temps,src2,_res))						\
+	UINT32 _res = src1 - src2 - (IREG(TMR_ST) & CFLAG);				\
+	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))					\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
 	if (dreg < 8)													\
 	{																\
+		UINT32 tempc = IREG(TMR_ST) & CFLAG;						\
 		CLR_NZCVUF();												\
-		OR_NZCV_SUB(temps,src2,_res);								\
+		OR_C_SBB(src1,src2,tempc);									\
+		OR_V_SUB(src1,src2,_res);									\
+		OR_NZ(_res);												\
 	}																\
 	else if (dreg >= TMR_BK)										\
 		update_special(dreg);										\
@@ -2915,14 +2927,16 @@ void tms3203x_device::subf_imm(UINT32 op)
 #define SUBI(dreg, src1, src2)										\
 {																	\
 	UINT32 _res = src1 - src2;										\
-	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))						\
+	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))					\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
 	if (dreg < 8)													\
 	{																\
 		CLR_NZCVUF();												\
-		OR_NZCV_SUB(src1,src2,_res);								\
+		OR_C_SUB(src1,src2,_res);									\
+		OR_V_SUB(src1,src2,_res);									\
+		OR_NZ(_res);												\
 	}																\
 	else if (dreg >= TMR_BK)										\
 		update_special(dreg);										\
