@@ -1,17 +1,15 @@
 /***************************************************************************************************
 
-    Cycle Mahbou (c) 1984 Taito Corporation / Seta
+    Cycle Maabou (c) 1984 Taito Corporation / Seta
 	Sky Destroyer (c9 1985 Taito Corporation
 
     appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
-    preliminary driver by Angelo Salese
+    driver by Angelo Salese
 
     TODO:
-    - protection (two 8741);
-    - colors;
-    - fix remaining video issues;
-    - sound;
+	- inputs in Cycle Maabou;
+    - sound (controlled by three i8741);
     - add flipscreen;
 
     (wait until it completes the post test, then put 1 to be23)
@@ -218,12 +216,13 @@ static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		y = 0xf1 - state->m_obj2_ram[i];
 		x = state->m_obj2_ram[i+1] - 56;
 		spr_offs = (state->m_obj1_ram[i+0]);
+		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
 		col = (state->m_obj1_ram[i+1] & 0x3f);
 		region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
 		if(region == 2)
 		{
 			spr_offs >>= 2;
-			spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
+			//spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
 			y-=16;
 		}
 
@@ -733,9 +732,9 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW3")
@@ -751,9 +750,9 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -937,8 +936,8 @@ static const gfx_layout spritelayout_32x32 =
 
 static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "tilemap_data", 0, charlayout,     0, 0x40 )
-	GFXDECODE_ENTRY( "sprite_data_1", 0, spritelayout_16x16,    0x00, 0x40 )
-	GFXDECODE_ENTRY( "sprite_data_2", 0, spritelayout_32x32,    0x00, 0x40 )
+	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_16x16,    0x00, 0x40 )
+	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
@@ -1009,15 +1008,13 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p0_21.3e",   0x0000, 0x2000, CRC(a7dab6d8) SHA1(c5802e76abd394a2ce1526815bfbfc12e5e57587) )
 	ROM_LOAD( "p0_20.3d",   0x2000, 0x2000, CRC(53e3a36e) SHA1(d95c1dfe216bb8b1f3e14c72a480eb2befa9d1dd) )
 
-	ROM_REGION( 0x2000, "sprite_data_1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "sprite_data", ROMREGION_ERASEFF )
 	ROM_LOAD( "p0_7.1k",    0x0000, 0x2000, CRC(6507d23f) SHA1(1640b25a6efa0976f13ed7838f31ef53c37c8d2d) )
-
-	ROM_REGION( 0xc000, "sprite_data_2", ROMREGION_ERASEFF )
-	ROM_LOAD( "p0_11.1r",   0x0000, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) )
-	ROM_LOAD( "p0_13.1t",   0x2000, 0x2000, CRC(086639c1) SHA1(3afbe76bb466d4c5916ef85d4cfc42e0c3f69883) )
-	ROM_LOAD( "p0_10.1n",   0x4000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) )
-	ROM_LOAD( "p0_12.1s",   0x6000, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
-	ROM_LOAD( "p0_14.1u",   0x8000, 0x2000, CRC(3f5fe2b6) SHA1(a7d1d0bc449f557ba827936b0fdbcccf7b1ee629) )
+	ROM_LOAD( "p0_10.1n",   0x6000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) )
+	ROM_LOAD( "p0_11.1r",   0x8000, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) )
+	ROM_LOAD( "p0_12.1s",   0xa000, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
+	ROM_LOAD( "p0_13.1t",   0xc000, 0x2000, CRC(086639c1) SHA1(3afbe76bb466d4c5916ef85d4cfc42e0c3f69883) )
+	ROM_LOAD( "p0_14.1u",   0xe000, 0x2000, CRC(3f5fe2b6) SHA1(a7d1d0bc449f557ba827936b0fdbcccf7b1ee629) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "p0_3.11t",   0x0000, 0x100, CRC(be89c1f7) SHA1(7fb2d9fccf6c74130c3e0db4ea4269aeb45359e3) )
@@ -1042,7 +1039,7 @@ ROM_START( skydest )
 	ROM_REGION( 0x4000, "tilemap_data", ROMREGION_INVERT )
     ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) )
 
-	ROM_REGION( 0x10000, "sprite_data_1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "sprite_data", ROMREGION_ERASEFF )
     ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) ) //ok
    	ROM_LOAD( "pd1-8.1l",     0x002000, 0x002000, CRC(b810858b) SHA1(385e625fc989a1dfa18559a62c99363b62c66a67) ) //ok
     ROM_LOAD( "pd0-9.1m",     0x004000, 0x002000, CRC(6f558bee) SHA1(0539feaa848d6cfb9f90a46a851f73fb74e82676) ) //ok
@@ -1051,9 +1048,6 @@ ROM_START( skydest )
    	ROM_LOAD( "pd0-12.1s",    0x00a000, 0x002000, CRC(06234942) SHA1(1cc40a8c8e24ab6db1dc7dc88979be23b7a9cab6) )
     ROM_LOAD( "pd1-13.1t",    0x00c000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) ) //ok
     ROM_LOAD( "pd0-14.1u",    0x00e000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
-
-	ROM_REGION( 0x10000, "sprite_data_2", ROMREGION_ERASEFF )
-	ROM_COPY( "sprite_data_1", 0x000000, 0x000000, 0x010000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "green.11t",    0x000, 0x100, CRC(f803beb7) SHA1(9c979a296de04728d43c94e9e06f8d8600dc9cfb) )
