@@ -92,12 +92,24 @@ public:
 	required_shared_ptr<UINT8> m_obj1_ram;
 	required_shared_ptr<UINT8> m_obj2_ram;
 	required_shared_ptr<UINT8> m_obj3_ram;
-	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
-	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
+
+	struct
+	{
+		UINT8 rxd;
+		UINT8 txd;
+		UINT8 rst;
+		UINT8 state;
+		UINT8 packet_type;
+	}m_mcu[2];
 
 	UINT16 m_dsw_pc_hack;
+
+	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
+//	DECLARE_READ8_MEMBER(mcu_status_r);
+//	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
+	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
+	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
 };
 
 
@@ -375,15 +387,6 @@ WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 }
 #endif
 
-static struct
-{
-	UINT8 rxd;
-	UINT8 txd;
-	UINT8 rst;
-	UINT8 state;
-}skydest_mcu;
-
-
 WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 {
 	flip_screen_set(data & 1);
@@ -393,18 +396,17 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 
 static void skydest_i8741_reset(running_machine &machine)
 {
-	//cyclemb_state *state = machine.driver_data<cyclemb_state>();
+	cyclemb_state *state = machine.driver_data<cyclemb_state>();
 
-	skydest_mcu.rxd = 0;
-	skydest_mcu.txd = 0;
-	skydest_mcu.rst = 0;
-	skydest_mcu.state = 0;
+	state->m_mcu[0].rxd = 0;
+	state->m_mcu[0].txd = 0;
+	state->m_mcu[0].rst = 0;
+	state->m_mcu[0].state = 0;
+	state->m_mcu[0].packet_type = 0;
 }
 
-static READ8_HANDLER( skydest_8741_0_r )
+READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 {
-	cyclemb_state *state = space->machine().driver_data<cyclemb_state>();
-
 	if(offset == 1) //status port
 	{
 		//printf("STATUS PC=%04x\n",cpu_get_pc(&space->device()));
@@ -418,73 +420,72 @@ static READ8_HANDLER( skydest_8741_0_r )
 		//printf("%04x\n",cpu_get_pc(&space->device()));
 
 		/* TODO: internal state of this */
-		if(cpu_get_pc(&space->device()) == state->m_dsw_pc_hack)
-			skydest_mcu.rxd = (space->machine().root_device().ioport("DSW1")->read() & 0x1f) << 2;
-		else if(skydest_mcu.rst)
+		if(cpu_get_pc(&space.device()) == m_dsw_pc_hack)
+			m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
+		else if(m_mcu[0].rst)
 		{
 			//printf("READ PC=%04x\n",cpu_get_pc(&space->device()));
 			{
-				static UINT8 mux_r;
 
 				/* bit 6 controls inputs */
 				/* bit 7 routes to audio i8741 */
-				switch(skydest_mcu.state)
+				switch(m_mcu[0].state)
 				{
 					case 1:
 					{
-						mux_r^=0x20;
-						if(mux_r & 0x20)
-							skydest_mcu.rxd = ((space->machine().root_device().ioport("DSW3")->read()) & 0x9f) | (mux_r);
+						m_mcu[0].packet_type^=0x20;
+						if(m_mcu[0].packet_type & 0x20)
+							m_mcu[0].rxd = ((ioport("DSW3")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						else
-							skydest_mcu.rxd = ((space->machine().root_device().ioport("SYSTEM")->read()) & 0x9f) | (mux_r);
+							m_mcu[0].rxd = ((ioport("SYSTEM")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						break;
 					}
 					case 2:
 					{
-						mux_r^=0x20;
-						if(mux_r & 0x20)
-							skydest_mcu.rxd = ((space->machine().root_device().ioport("P1_1")->read()) & 0x1f) | (mux_r);
+						m_mcu[0].packet_type^=0x20;
+						if(m_mcu[0].packet_type & 0x20)
+							m_mcu[0].rxd = ((ioport("P1_1")->read()) & 0x1f) | (m_mcu[0].packet_type);
 						else
-							skydest_mcu.rxd = ((space->machine().root_device().ioport("P1_0")->read()) & 0x1f) | (mux_r);
+							m_mcu[0].rxd = ((ioport("P1_0")->read()) & 0x1f) | (m_mcu[0].packet_type);
 
-						skydest_mcu.rxd |= ((space->machine().root_device().ioport("SYSTEM")->read()) & 0x80);
+						m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 						break;
 					}
 					case 3:
 					{
-						mux_r^=0x20;
-						if(mux_r & 0x20)
-							skydest_mcu.rxd = ((space->machine().root_device().ioport("P2_1")->read()) & 0x1f) | (mux_r);
+						m_mcu[0].packet_type^=0x20;
+						if(m_mcu[0].packet_type & 0x20)
+							m_mcu[0].rxd = ((ioport("P2_1")->read()) & 0x1f) | (m_mcu[0].packet_type);
 						else
-							skydest_mcu.rxd = ((space->machine().root_device().ioport("P2_0")->read()) & 0x1f) | (mux_r);
+							m_mcu[0].rxd = ((ioport("P2_0")->read()) & 0x1f) | (m_mcu[0].packet_type);
 
-						skydest_mcu.rxd |= ((space->machine().root_device().ioport("SYSTEM")->read()) & 0x80);
+						m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 						break;
 					}
 					default:
-						//printf("%02x\n",skydest_mcu.txd);
-						skydest_mcu.rxd = 0x00;
+						//printf("%02x\n",m_mcu[0].txd);
+						m_mcu[0].rxd = 0x00;
 				}
-				//	skydest_mcu.rxd = space->machine().rand();
+				//	m_mcu[0].rxd = space->machine().rand();
 				//	break;
 			}
 
 
 			for(i=0,pt=0;i<8;i++)
 			{
-				if(skydest_mcu.rxd & (1 << i))
+				if(m_mcu[0].rxd & (1 << i))
 					pt++;
 			}
 
 			if((pt % 2) == 1)
-				skydest_mcu.rxd|=0x40;
+				m_mcu[0].rxd|=0x40;
 		}
 
-		return skydest_mcu.rxd;
+		return m_mcu[0].rxd;
 	}
 }
 
-static WRITE8_HANDLER( skydest_8741_0_w )
+WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 {
 	if(offset == 1) //command port
 	{
@@ -492,9 +493,9 @@ static WRITE8_HANDLER( skydest_8741_0_w )
 		switch(data)
 		{
 			case 0:
-				skydest_mcu.rxd = 0x40;
-				skydest_mcu.rst = 0;
-				skydest_mcu.state = 0;
+				m_mcu[0].rxd = 0x40;
+				m_mcu[0].rst = 0;
+				m_mcu[0].state = 0;
 				break;
 			case 1:
 				/*
@@ -507,31 +508,31 @@ static WRITE8_HANDLER( skydest_8741_0_w )
                 0x01 sub NG RAM
                 0x00 ok
                 */
-				skydest_mcu.rxd = 0x40;
-				skydest_mcu.rst = 0;
+				m_mcu[0].rxd = 0x40;
+				m_mcu[0].rst = 0;
 				break;
 			case 2:
-				skydest_mcu.rxd = (space->machine().root_device().ioport("DSW2")->read() & 0x1f) << 2;
-				skydest_mcu.rst = 0;
+				m_mcu[0].rxd = (ioport("DSW2")->read() & 0x1f) << 2;
+				m_mcu[0].rst = 0;
 				break;
 			case 3:
-				//skydest_mcu.rxd = (space->machine().root_device().ioport("DSW1")->read() & 0x1f) << 2;
-				skydest_mcu.rst = 1;
-				skydest_mcu.txd = 0;
+				//m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
+				m_mcu[0].rst = 1;
+				m_mcu[0].txd = 0;
 				break;
 		}
 	}
 	else
 	{
 		//printf("%02x DATA PC=%04x\n",data,cpu_get_pc(&space->device()));
-		skydest_mcu.txd = data;
+		m_mcu[0].txd = data;
 
-		if(skydest_mcu.txd == 0x41)
-			skydest_mcu.state = 1;
-		if(skydest_mcu.txd == 0x42)
-			skydest_mcu.state = 2;
-		if(skydest_mcu.txd == 0x44)
-			skydest_mcu.state = 3;
+		if(m_mcu[0].txd == 0x41)
+			m_mcu[0].state = 1;
+		if(m_mcu[0].txd == 0x42)
+			m_mcu[0].state = 2;
+		if(m_mcu[0].txd == 0x44)
+			m_mcu[0].state = 3;
 	}
 }
 
@@ -550,7 +551,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(skydest_8741_0_r, skydest_8741_0_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(skydest_i8741_0_r, skydest_i8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
@@ -558,7 +559,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( skydest_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
-	AM_RANGE(0xc080, 0xc081) AM_READWRITE_LEGACY(skydest_8741_0_r, skydest_8741_0_w)
+	AM_RANGE(0xc080, 0xc081) AM_READWRITE(skydest_i8741_0_r, skydest_i8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
@@ -1076,5 +1077,5 @@ static DRIVER_INIT( skydest )
 	state->m_dsw_pc_hack = 0x554;
 }
 
-GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)", GAME_NOT_WORKING )
-GAME( 1985, skydest,  0,   skydest,  skydest,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1985, skydest,  0,   skydest,  skydest,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
