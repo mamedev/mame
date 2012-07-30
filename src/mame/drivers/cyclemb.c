@@ -1,6 +1,7 @@
 /***************************************************************************************************
 
     Cycle Mahbou (c) 1984 Taito Corporation / Seta
+	Sky Destroyer (c9 1985 Taito Corporation
 
     appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
@@ -234,33 +235,48 @@ static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
 	int x,y;
-	UINT8 flip_screen = state->flip_screen();
+	//UINT8 flip_screen = state->flip_screen();
+/*
+	char tempstring[1024];
+
+	for (x=0;x<64;x++)
+	{
+		if (x<32)
+			sprintf(tempstring, "%s %02x", tempstring, state->m_vram[x*64+0]);
+		else
+			sprintf(tempstring, "%s %02x", tempstring, state->m_vram[(x-32)*64+1]);
+	}
+
+	printf("%s", tempstring);
+*/
 
 	for (y=0;y<32;y++)
 	{
+
 		for (x=2;x<62;x++)
 		{
-			/* TODO: first two bytes appears to be scrolling for that line */
+			/* upper bits of the first address of cram seems to be related to colour cycling */
+
 			int attr = state->m_cram[x+y*64];
 			int tile = (state->m_vram[x+y*64]) | ((attr & 3)<<8);
 			int color = ((attr & 0x7c) >> 2) ^ 0x1f;
-			int scrollx = 0;//state->m_vram[y*64+1];
-			int scrolly = 0;//state->m_vram[y*64+1];
+			int scrollx = state->m_vram[0*64+0];
+			scrollx |= (state->m_cram[0*64+0] & 0x01)<<8;
 
-			if(flip_screen)
-			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx,256-(y*8)-scrolly);
-				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8)-scrolly);
-			}
+			scrollx -= 0xc0;
+
+			int scrolly;
+			if (x<32)
+				scrolly = state->m_vram[(x)*64+0];
 			else
-			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8)-scrolly);
-				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8)-scrolly);
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8)-scrolly+256);
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8)-scrolly+256);
-			}
+				scrolly = state->m_vram[(x-32)*64+1];
+
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
+
+
 		}
 	}
 }
@@ -286,10 +302,10 @@ static void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 //	popmessage("%d %d",state->m_obj2_ram[0x0d], 0xf1 - state->m_obj2_ram[0x0c+1] + 68);
 
-	for(i=0;i<0x40;i+=2)
+	for(i=0;i<0x80;i+=2)
 	{
 		y = state->m_obj2_ram[i] - 1;
-		x = 0x100 - state->m_obj2_ram[i+1] + 56;
+		x = 0xf1 - state->m_obj2_ram[i+1] + 68;
 		if(x >= 256) { x-= 512; }
 		spr_offs = (state->m_obj1_ram[i+0]);
 		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
@@ -327,6 +343,8 @@ static SCREEN_UPDATE_IND16( cyclemb )
 
 static SCREEN_UPDATE_IND16( skydest )
 {
+	bitmap.fill(0, cliprect);
+
 	skydest_draw_tilemap(screen,bitmap,cliprect);
 	skydest_draw_sprites(screen,bitmap,cliprect);
 	return 0;
@@ -760,25 +778,23 @@ static INPUT_PORTS_START( skydest )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x02, 0x02, "IN2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x04, 0x00, "IN2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN3")
 	PORT_DIPNAME( 0x01, 0x01, "IN3" )
