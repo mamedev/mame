@@ -442,6 +442,11 @@ static READ8_HANDLER( skydest_8741_0_r )
 						break;
 					}
 					case 0x42:
+					case 0xc6:
+					case 0xc9:
+					case 0xca:
+					case 0xbe:
+					case 0xbd:
 					{
 						mux_r^=0x20;
 						if(mux_r & 0x20)
@@ -888,9 +893,9 @@ static INPUT_PORTS_START( skydest )
 	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -906,9 +911,9 @@ static INPUT_PORTS_START( skydest )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Invincibility (Cheat)" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
