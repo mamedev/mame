@@ -228,6 +228,7 @@ Notes:
 #include "cpu/arm/arm.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
 #include "machine/eeprom.h"
@@ -905,7 +906,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
+//	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
@@ -1032,6 +1033,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nslasher_io_sound, AS_IO, 8, deco32_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
+
+
+#if 0
+static ADDRESS_MAP_START( lockload_sound_map, AS_PROGRAM, 8, deco32_state )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+
+ADDRESS_MAP_END
+#endif
 
 /**********************************************************************************/
 
@@ -2009,8 +2018,11 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_CPU_PROGRAM_MAP(lockload_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", lockload_vbl_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 32220000/8)
+	MCFG_CPU_PROGRAM_MAP(nslasher_sound)
+	MCFG_CPU_IO_MAP(nslasher_io_sound)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* to improve main<->audio comms */
 
 	MCFG_MACHINE_RESET(deco32)
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2039,7 +2051,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_CONFIG(ym2151_interface_nslasher)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -2047,15 +2059,19 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/32, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-
-	MCFG_OKIM6295_ADD("oki3", 32220000/32, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( lockloadu, lockload )
+	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_SOUND_CONFIG(ym2151_config)
+
+MACHINE_CONFIG_END
 
 static int tattass_bank_callback( int bank )
 {
@@ -2826,9 +2842,7 @@ ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly d
 	ROM_REGION(0x100000, "oki1", 0 )
 	ROM_LOAD( "mbm-06.n17",  0x00000, 0x100000,  CRC(f34d5999) SHA1(265b5f4e8598bcf9183bf9bd95db69b01536acb2) )
 
-	ROM_REGION(0x80000, "oki2", ROMREGION_ERASE00 ) /* Sound data - unique PCB and this region is not used? */
-
-	ROM_REGION(0x80000, "oki3", 0 )
+	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mbm-07.n19",  0x00000, 0x80000,  CRC(414f3793) SHA1(ed5f63e57390d503193fd1e9f7294ae1da6d3539) ) /* Does this go here or "oki2" ?? */
 ROM_END
 
@@ -2899,9 +2913,7 @@ ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly di
 	ROM_REGION(0x100000, "oki1", 0 )
 	ROM_LOAD( "mbm-06.n17",  0x00000, 0x100000,  CRC(f34d5999) SHA1(265b5f4e8598bcf9183bf9bd95db69b01536acb2) )
 
-	ROM_REGION(0x80000, "oki2", ROMREGION_ERASE00 ) /* Sound data - unique PCB and this region is not used? */
-
-	ROM_REGION(0x80000, "oki3", 0 )
+	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mbm-07.n19",  0x00000, 0x80000,  CRC(414f3793) SHA1(ed5f63e57390d503193fd1e9f7294ae1da6d3539) ) /* Does this go here or "oki2" ?? */
 ROM_END
 
@@ -3376,9 +3388,9 @@ GAME( 1993, fghthist,   0,        fghthist, fghthist, fghthist, ROT0, "Data East
 GAME( 1993, fghthistu,  fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-03)", GAME_UNEMULATED_PROTECTION )
 GAME( 1993, fghthista,  fghthist, fghthsta, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, alternate hardware)", GAME_UNEMULATED_PROTECTION )
 GAME( 1993, fghthistj,  fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (Japan ver 42-03)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, lockload,   0,        lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1994, gunhard,    lockload, lockload, lockload, lockload, ROT0, "Data East Corporation", "Gun Hard (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1994, lockloadu,  lockload, lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (US)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1994, lockload,   0,        lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1994, gunhard,    lockload, lockload, lockload, lockload, ROT0, "Data East Corporation", "Gun Hard (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1994, lockloadu,  lockload, lockloadu,lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (US)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1994, tattass,    0,        tattass,  tattass,  tattass,  ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, tattassa,   tattass,  tattass,  tattass,  tattass,  ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, nslasher,   0,        nslasher, nslasher, nslasher, ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3)", GAME_IMPERFECT_GRAPHICS )
