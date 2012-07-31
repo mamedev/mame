@@ -59,6 +59,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "machine/idectrl.h"
+#include "machine/timekpr.h"
 #include "video/polynew.h"
 #include "sound/rf5c400.h"
 
@@ -1200,6 +1201,7 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x78240000, 0x78241fff) AM_MIRROR(0x80000000) AM_RAM											// PSAC unknown
 	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_psac2_r, sub_psac2_w)			// PSAC
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
+	AM_RANGE(0x7e040000, 0x7e041fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)				// TMS57002?
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
 //  AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM                                           // PSAC (ROZ) in Racing Jam.
@@ -2393,6 +2395,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
+	MCFG_M48T58_ADD( "m48t58" )
+
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -2462,6 +2466,31 @@ static DRIVER_INIT(bujutsu)
 		rom[(0x0001fff0^4) / 4] = sum;
 		rom[(0x0001fff4^4) / 4] = ~sum;
 	}
+
+
+
+	// fill in M48T58 data for now...
+	{
+		UINT8 *rom = (UINT8*)machine.root_device().memregion("m48t58")->base();
+		rom[0x00] = 0x47;		// G
+		rom[0x02] = 0x36;		// 6
+		rom[0x03] = 0x34;		// 4
+		rom[0x04] = 0x35;		// 5
+		rom[0x05] = 0x00;
+		rom[0x06] = 0x00;
+		rom[0x07] = 0x00;
+
+		// calculate checksum
+		UINT16 sum = 0;
+		for (int i=0; i < 14; i+=2)
+		{
+			sum += ((UINT16)(rom[i]) << 8) | (rom[i+1]);
+		}
+		sum ^= 0xffff;
+
+		rom[0x0e] = (UINT8)(sum >> 8);
+		rom[0x0f] = (UINT8)(sum);
+	}
 }
 
 static DRIVER_INIT(racjamdx)
@@ -2514,6 +2543,31 @@ static DRIVER_INIT(racjamdx)
 		rom[(0x0001fff0^4) / 4] = sum;
 		rom[(0x0001fff4^4) / 4] = ~sum;
 	}
+
+
+	// fill in M48T58 data for now...
+	{
+		UINT8 *rom = (UINT8*)machine.root_device().memregion("m48t58")->base();
+		rom[0x00] = 0x47;		// G
+		rom[0x01] = 0x59;		// Y
+		rom[0x02] = 0x36;		// 6
+		rom[0x03] = 0x37;		// 7
+		rom[0x04] = 0x36;		// 6
+		rom[0x05] = 0x00;
+		rom[0x06] = 0x00;
+		rom[0x07] = 0x00;
+
+		// calculate checksum
+		UINT16 sum = 0;
+		for (int i=0; i < 14; i+=2)
+		{
+			sum += ((UINT16)(rom[i]) << 8) | (rom[i+1]);
+		}
+		sum ^= 0xffff;
+
+		rom[0x0e] = (UINT8)(sum >> 8);
+		rom[0x0f] = (UINT8)(sum);
+	}
 }
 
 /*****************************************************************************/
@@ -2528,6 +2582,9 @@ ROM_START(bujutsu)
 	ROM_REGION64_BE(0x80000, "user3", 0)		/* Gfx CPU program (PPC604) */
 	ROM_LOAD("645a03.u17", 0x00000, 0x80000, CRC(086abd0b) SHA1(24df439eb9828ed3842f43f5f4014a3fc746e1e3) )
 
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
+	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
+
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
@@ -2541,6 +2598,9 @@ ROM_START(racjamdx)
 
 	ROM_REGION64_BE(0x80000, "user3", 0)		/* Gfx CPU program (PPC604) */
 	ROM_LOAD( "676a03.u17", 0x000000, 0x080000, CRC(66f77cbd) SHA1(f1c7e50dbbfcc27ac011cbbb8ad2fd376c2e9056) )
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
+	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
