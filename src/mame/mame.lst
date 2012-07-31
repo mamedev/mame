@@ -19166,26 +19166,50 @@ m5silver	// Silver Screen (Barcrest)
 m5silver06	//
 m5silver03	//
 m5sondr		// Son Of Dracula (Barcrest)
-m5sondra
+m5sondr05	//
+m5sondra	//
 m5spicer	// The Spice Is Right (Barcrest)
+m5spicer06	//
 m5spiker	// Spiker The Biker (Barcrest)
+m5spiker02	//
+m5spikera	//
 m5spins		// Spinsation (Barcrest)
 m5squids	// Squids In (Barcrest)
+m5squids04a	//
+m5squids05	//
+m5squids06	//
 m5stax		// Stax Of Cash (Barcrest)
 m5scharg	// Super Charged (Barcrest)
+m5scharg05	//
+m5scharg06	//
+m5scharga	//
 m5supstr	// Super Star (Barcrest)
+m5supstra	//
 m5sstrk		// Super Streak (Barcrest)
+m5sstrk02a	//
 m5supnov	// Supernova (Barcrest)
+m5supnova	//
 m5tempt		// Temple Of Treasure (Barcrest)
+m5tempt05	//
+m5tempta	//
+m5temptb	//
 m5tempt2	// Temple Of Treasure 2 (Barcrest)
+m5tempt203	//
+m5tempt2a	//
 m5tempcl	// Temple Of Treasure Club (Barcrest)
 m5tbird		// Thunderbird (Barcrest)
 m5topdog	// Top Dog (Barcrest)
+m5topdog04	//
+m5topdoga	//
 m5trail		// Trailblazer Club (Barcrest)
 m5ultimo	// Ultimo (Barcrest)
+m5ultimo03a	//
+m5ultimo04	//
 m5upover	// Up & Over (Barcrest)
+m5upover15	//
 m5vampup	// Vamp It Up (Barcrest)
 m5wking		// Wild King (Barcrest)
+m5wking05	//
 m5costa		// Costa Del Cash (Barcrest)
 m5ttwo		// Take Two (Barcrest)
 m5horn		// Horn Of Plenty (Barcrest)
@@ -19196,9 +19220,15 @@ m5hotrk		// Hot Rocks (Barcrest)
 m5ashock	// Aftershock (Barcrest - Red Gaming)
 m5ashocka	//
 m5bigsht	// Big Shot (Barcrest - Red Gaming)
+m5bigsht04	//
+m5bigsht11	//
+m5bigsht13	//
+m5bigshta	//
 m5bnkrs		// Bonkers (Barcrest - Red Gaming)
 m5bbank		// Break The Bank (Barcrest - Red Gaming)
+m5bbank13	//
 m5casfev	// Casino Fever (Red Gaming)
+m5casfev12	//
 m5dmnstr	// Demon Streak (Barcrest - Red Gaming)
 m5dmnstra	//
 m5dbubl		// Double Bubble (Barcrest - Red Gaming)
@@ -19207,25 +19237,32 @@ m5dragnda
 m5fnfair	// Funfair (Barcrest - Red Gaming)
 m5fnfaird	//
 m5fusir		// Fruits U Sir (Barcrest - Red Gaming)
-m5fusira	//
+m5fusir11	//
+m5fusir12	//
 m5hypalx	// Hypalinx (Barcrest - Red Gaming)
 m5invad		// Invaders (Barcrest - Red Gaming)
 m5jcptgn	// Jackpot Genie (Barcrest - Red Gaming)
 m5jlstrk	// Jewel Strike (Barcrest - Red Gaming)
 m5lock		// Lock 'n' Load (Barcrest - Red Gaming)
-m5locka		//
+m5lock13	//
+m5lock12	//
 m5lockcl	// Lock 'n' Load Club (Barcrest - Red Gaming)
-m5lockcla	//
+m5lockcl15	//
+m5lockcl14	//
 m5nitro		// Nitro (Barcrest - Red Gaming)
 m5paint		// Paint The Town Red (Barcrest - Red Gaming)
 m5quake		// Quake (Barcrest - Red Gaming)
 m5rainrn	// Rainbow Runner (Barcrest - Red Gaming)
 m5rainrna	//
 m5rampg		// Rampage (Barcrest - Red Gaming)
+m5rampg11	//
+m5rampg12	//
 m5rdwarf	// Red Dwarf (Barcrest - Red Gaming)
 m5redx		// Red X (Barcrest - Red Gaming)
+m5redx12	//
 m5thtsmg	// That's Magic (Barcrest - Red Gaming)
 m5topdol	// Top Dollar (Barcrest - Red Gaming)
+m5topdola	//
 m5zigzag	// Zig Zag
 m5cmass		// Critical Mass (Barcrest - Red Gaming)
 m5sblz		// Snail Blazer (Barcrest - Red Gaming)
@@ -19265,23 +19302,33 @@ m5all41m	//
 m5atlan		// Atlantic (Vivid)
 m5atlana	//
 m5bttf		// Back To The Features (Vivid)
+m5bttfa		//
 m5btlbnk	// Bottle Bank (Vivid)
 m5caesc		// Caesar's Cash (Vivid)
 m5card		// Card Shark (Vivid)
 m5cshkcb	// Card Shark Club (Vivid)
+m5cshkcb12	//
+m5cshkcb13	//
 m5clifhn	// Cliffhanger (Vivid)
 m5cnct4		// Connect 4 (Vivid)
-m5devil		// Devil Of A  Deal (Vivid)
+m5cnct415	//
+m5cnct420	//
+m5devil		// Devil Of A Deal (Vivid)
 m5elband	// El Bandido Club (Vivid)
 m5fair		// Fairground Attraction (Vivid)
 m5ggems		// Giant Gems (Vivid)
+m5ggems20	//
 m5groll		// Golden Roll (Vivid)
 m5hilok		// Hi Lo Karate (Vivid)
 m5hiclau	// High Claudius (Vivid)
 m5honmon	// Honey Money (Vivid)
+m5honmona	//
 m5hopidl	// Hop Idol (Vivid)
 m5hypno		// Hypnotic (Vivid)
 m5jmpjok	// Jumpin Jokers (Vivid)
+m5jmpjok11	//
+m5jmpjoka	//
+m5jmpjokb	//
 m5loony		// Loony Juice (Vivid)
 m5loot		// Loot 'n' Khamun (Vivid)
 m5loota		//
@@ -19294,19 +19341,40 @@ m5mag7se	//
 m5msf		// Manic Streak Features (Vivid)
 m5msfa		//
 m5piefac	// Pie Factory (Vivid)
+m5piefac23	//
+m5piefac12	//
+m5piefaca	//
 m5piefc2	// Pie Factory 2 (Vivid)
+m5piefc2a	//
+m5piefc2b	//
 m5piefcr	// Pie Factory Rio (Vivid)
 m5qdraw		// Quick On The Draw (Vivid)
+m5qdraw12	//
+m5qdraw14	//
+m5qdraw15	//
+m5qdrawa	//
+m5qdrawb	//
 m5redbal	// Random Red Ball (Vivid)
 m5ratpk		// Rat Pack (Vivid)
+m5ratpka	//
 m5rollup	// Roll Up Roll Up (Vivid)
 m5shark		// Shark Raving Mad (Vivid)
+m5sharka	//
 m5speccl	// Spectrum Club (Vivid)
 m5spddmn	// Speed Demon (Vivid)
 m5stars		// Stars & Stripes (Vivid)
+m5stars13a	//
+m5stars26	//
+m5stars25a	//
+m5stars25	//
+m5stars22	//
+m5stars20	//
+m5stars10	//
+m5stars10a	//
 m5starcl	// Stars & Stripes Club (Vivid)
 m5startr	// Stars & Stripes Triple (Vivid)
 m5supro		// Super Roulette (Vivid)
+m5suproa	//
 m5tempp		// Temple Of Pleasure (Vivid)
 m5whdres	// Who Dares Spins (Vivid)
 m5winway	// Winning Ways (Vivid)
@@ -19324,12 +19392,18 @@ m5aceclba	//
 m5aceclbb	//
 m5barxdx	// Bar X Deluxe (Empire)
 m5bnzclb	// Bonanza Club (Empire)
+m5bnzclb11	//
 m5bukroo	// Buckaroo (Empire)
 m5cbrun		// Cannonball Run (Empire)
 m5carou		// Carousel (Empire)
 m5casroc	// Casino Royale Club (Empire)
 m5centcl	// Centurion Club (Empire)
+m5centcl20	//
+m5centcl21	//
+m5centcl21a	//
+m5centcla	//
 m5cworan	// Clockwork Oranges (Empire)
+m5cworan12	//
 m5clbtro	// Club Tropicana (Empire)
 m5cockdd	// Cock A Doodle Dough! (Empire)
 m5coloss	// Colossus Club (Empire)
