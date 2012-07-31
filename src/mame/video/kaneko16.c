@@ -8,19 +8,6 @@
 
         In ROM  (Optional)
 
-    [ Scrolling Layers ]
-
-        Each VIEW2 chip generates 2 layers. Up to 2 chips are used
-        (4 layers)
-
-        Layer Size:             512 x 512
-        Tiles:                  16 x 16 x 4
-
-        Line scroll is supported by the chip: each layer has RAM
-        for 512 horizontal scroll offsets (one per tilemap line)
-        that are added to the global scroll values.
-        See e.g. blazeon (2nd demo level), mgcrystl, sandscrp.
-
     [ 1024 Sprites ]
 
         Sprites are 16 x 16 x 4 in the older games, 16 x 16 x 8 in
@@ -51,51 +38,6 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
 	COMBINE_DATA(&m_disp_enable);
 }
 
-/***************************************************************************
-
-                        Callbacks for the TileMap code
-
-                              [ Tiles Format ]
-
-Offset:
-
-0000.w          fedc b--- ---- ----     unused?
-                ---- -a9- ---- ----     High Priority (vs Sprites)
-                ---- ---8 ---- ----     High Priority (vs Tiles)
-                ---- ---- 7654 32--     Color
-                ---- ---- ---- --1-     Flip X
-                ---- ---- ---- ---0     Flip Y
-
-0002.w                                  Code
-
-***************************************************************************/
-
-INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	UINT16 code_hi = state->m_vram[_N_][ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_vram[_N_][ 2 * tile_index + 1];
-	SET_TILE_INFO(1 + _N_/2, code_lo, (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
-	tileinfo.category	=	(code_hi >> 8) & 7;
-}
-
-static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine, tileinfo, tile_index, 0); }
-static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine, tileinfo, tile_index, 1); }
-static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine, tileinfo, tile_index, 2); }
-static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info(machine, tileinfo, tile_index, 3); }
-
-INLINE void kaneko16_vram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
-{
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	COMBINE_DATA(&state->m_vram[_N_][offset]);
-	state->m_tmap[_N_]->mark_tile_dirty(offset/2);
-}
-
-WRITE16_MEMBER(kaneko16_state::kaneko16_vram_0_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(kaneko16_state::kaneko16_vram_1_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(kaneko16_state::kaneko16_vram_2_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(kaneko16_state::kaneko16_vram_3_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 3); }
-
 VIDEO_START( kaneko16_sprites )
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
@@ -111,110 +53,24 @@ VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	state->m_disp_enable = 1; // default enabled for games not using it
 	state->m_keep_sprites = 0;	// default disabled for games not using it
-
-	state->m_tmap[0] = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
-										 16,16, 0x20,0x20	);
-	state->m_tmap[1] = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
-										 16,16, 0x20,0x20	);
-
-	state->m_tmap[2] = 0;
-
-	state->m_tmap[3] = 0;
-
 	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
-
-	{
-		int dx, dy;
-
-		int xdim = machine.primary_screen->width();
-		int ydim = machine.primary_screen->height();
-
-		switch (xdim)
-		{
-			case 320:	dx = 0x33;	break;
-			case 256:	dx = 0x5b;	break;
-			default:	dx = 0;
-		}
-		switch (machine.primary_screen->visible_area().max_y - machine.primary_screen->visible_area().min_y + 1)
-		{
-			case 240- 8:	dy = +0x08;	break;	/* blazeon */
-			case 240-16:	dy = -0x08;	break;	/* berlwall, bakubrk */
-			default:		dy = 0;
-		}
-
-		state->m_tmap[0]->set_scrolldx(-dx,		xdim + dx -1        );
-		state->m_tmap[1]->set_scrolldx(-(dx+2),	xdim + (dx + 2) - 1 );
-
-		state->m_tmap[0]->set_scrolldy(-dy,		ydim + dy -1 );
-		state->m_tmap[1]->set_scrolldy(-dy,		ydim + dy -1 );
-
-		state->m_tmap[0]->set_transparent_pen(0);
-		state->m_tmap[1]->set_transparent_pen(0);
-
-		state->m_tmap[0]->set_scroll_rows(0x200);	// Line Scroll
-		state->m_tmap[1]->set_scroll_rows(0x200);
-	}
-
 }
 
 
 VIDEO_START( kaneko16_1xVIEW2 )
 {
 	VIDEO_START_CALL(kaneko16_sprites);
-
 	VIDEO_START_CALL(kaneko16_1xVIEW2_tilemaps);
 }
 
 VIDEO_START( kaneko16_2xVIEW2 )
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
-
-	state->m_tmap[2] = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
-										 16,16, 0x20,0x20	);
-	state->m_tmap[3] = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
-										 16,16, 0x20,0x20	);
-
-	{
-		int dx, dy;
-
-		int xdim = machine.primary_screen->width();
-		int ydim = machine.primary_screen->height();
-
-		switch (xdim)
-		{
-			case 320:	dx = 0x33;	break;
-			case 256:	dx = 0x5b;	break;
-			default:	dx = 0;
-		}
-		switch (machine.primary_screen->visible_area().max_y - machine.primary_screen->visible_area().min_y + 1)
-		{
-			case 240- 8:	dy = +0x08;	break;
-			case 240-16:	dy = -0x08;	break;
-			default:		dy = 0;
-		}
-
-		state->m_tmap[2]->set_scrolldx(-dx,		xdim + dx -1        );
-		state->m_tmap[3]->set_scrolldx(-(dx+2),	xdim + (dx + 2) - 1 );
-
-		state->m_tmap[2]->set_scrolldy(-dy,		ydim + dy -1 );
-		state->m_tmap[3]->set_scrolldy(-dy,		ydim + dy -1 );
-
-		state->m_tmap[2]->set_transparent_pen(0);
-		state->m_tmap[3]->set_transparent_pen(0);
-
-		state->m_tmap[2]->set_scroll_rows(0x200);	// Line Scroll
-		state->m_tmap[3]->set_scroll_rows(0x200);
-	}
 }
 
 VIDEO_START( sandscrp_1xVIEW2 )
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
-
-	state->m_tmap[0]->set_scrolldy(0, 256 - 1 );
-	state->m_tmap[1]->set_scrolldy(0, 256 - 1 );
 }
 
 
@@ -284,35 +140,8 @@ VIDEO_START( galsnew )
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	VIDEO_START_CALL(kaneko16_sprites);
 
-	state->m_tmap[0] = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
-										 16,16, 0x20,0x20	);
-	state->m_tmap[1] = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
-										 16,16, 0x20,0x20	);
-
-	state->m_tmap[2] = 0;
-
-	state->m_tmap[3] = 0;
-
 	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
 
-	{
-		int dx = 0x5b, dy = 8;
-
-		int xdim = machine.primary_screen->width();
-		int ydim = machine.primary_screen->height();
-
-		state->m_tmap[0]->set_scrolldx(-dx,		xdim + dx -1        );
-		state->m_tmap[1]->set_scrolldx(-(dx+2),	xdim + (dx + 2) - 1 );
-
-		state->m_tmap[0]->set_scrolldy(-dy,		ydim + dy -1 );
-		state->m_tmap[1]->set_scrolldy(-dy,		ydim + dy -1 );
-
-		state->m_tmap[0]->set_transparent_pen(0);
-		state->m_tmap[1]->set_transparent_pen(0);
-
-		state->m_tmap[0]->set_scroll_rows(0x200);	// Line Scroll
-		state->m_tmap[1]->set_scroll_rows(0x200);
-	}
 }
 
 /***************************************************************************
@@ -747,67 +576,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_sprites_regs_w)
 }
 
 
-/***************************************************************************
 
-                            Layers Registers
-
-
-    Offset:         Format:                     Value:
-
-    0000.w                                      FG Scroll X
-    0002.w                                      FG Scroll Y
-
-    0004.w                                      BG Scroll X
-    0006.w                                      BG Scroll Y
-
-    0008.w          Layers Control
-
-                    fed- ---- ---- ----
-                    ---c ---- ---- ----     BG Disable
-                    ---- b--- ---- ----     Line Scroll (Always 1 in berlwall & bakubrkr)
-                    ---- -a-- ---- ----     ? Always 1 in gtmr     & bakubrkr ?
-                    ---- --9- ---- ----     BG Flip X
-                    ---- ---8 ---- ----     BG Flip Y
-
-                    ---- ---- 765- ----
-                    ---- ---- ---4 ----     FG Disable
-                    ---- ---- ---- 3---     Line Scroll (Always 1 in berlwall & bakubrkr)
-                    ---- ---- ---- -2--     ? Always 1 in gtmr     & bakubrkr ?
-                    ---- ---- ---- --1-     FG Flip X
-                    ---- ---- ---- ---0     FG Flip Y
-
-    000a.w                                      ? always 0x0002 ?
-
-There are more!
-
-***************************************************************************/
-
-/*  [gtmr]
-
-    car select screen scroll values:
-    Flipscreen off:
-        $6x0000: $72c0 ; $fbc0 ; 7340 ; 0
-        $72c0/$40 = $1cb = $200-$35 /   $7340/$40 = $1cd = $1cb+2
-
-        $fbc0/$40 = -$11
-
-    Flipscreen on:
-        $6x0000: $5d00 ; $3780 ; $5c80 ; $3bc0
-        $5d00/$40 = $174 = $200-$8c /   $5c80/$40 = $172 = $174-2
-
-        $3780/$40 = $de /   $3bc0/$40 = $ef
-
-*/
-
-WRITE16_MEMBER(kaneko16_state::kaneko16_layers_0_regs_w)
-{
-	COMBINE_DATA(&m_layers_0_regs[offset]);
-}
-
-WRITE16_MEMBER(kaneko16_state::kaneko16_layers_1_regs_w)
-{
-	COMBINE_DATA(&m_layers_1_regs[offset]);
-}
 
 
 
@@ -833,113 +602,6 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_bg15_reg_w)
 }
 
 
-
-
-/***************************************************************************
-
-
-                                Screen Drawing
-
-
-***************************************************************************/
-
-static void kaneko16_prepare_first_tilemap_chip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	/* Set Up FIRST Tilemap chip */
-	int layers_flip_0;
-	UINT16 layer0_scrollx, layer0_scrolly;
-	UINT16 layer1_scrollx, layer1_scrolly;
-	int i;
-
-	layers_flip_0 = state->m_layers_0_regs[ 4 ];
-
-	/* Enable layers */
-	state->m_tmap[0]->enable(~layers_flip_0 & 0x1000);
-	state->m_tmap[1]->enable(~layers_flip_0 & 0x0010);
-
-	/* Flip layers */
-	state->m_tmap[0]->set_flip(	((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
-										((layers_flip_0 & 0x0200) ? TILEMAP_FLIPX : 0) );
-	state->m_tmap[1]->set_flip(	((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
-										((layers_flip_0 & 0x0200) ? TILEMAP_FLIPX : 0) );
-
-	/* Scroll layers */
-	layer0_scrollx		=	state->m_layers_0_regs[ 2 ];
-	layer0_scrolly		=	state->m_layers_0_regs[ 3 ] >> 6;
-	layer1_scrollx		=	state->m_layers_0_regs[ 0 ];
-	layer1_scrolly		=	state->m_layers_0_regs[ 1 ] >> 6;
-
-	state->m_tmap[0]->set_scrolly(0,layer0_scrolly);
-	state->m_tmap[1]->set_scrolly(0,layer1_scrolly);
-
-	for (i=0; i<0x200; i++)
-	{
-		UINT16 scroll;
-		scroll = (layers_flip_0 & 0x0800) ? state->m_vscroll[0][i] : 0;
-		state->m_tmap[0]->set_scrollx(i,(layer0_scrollx + scroll) >> 6 );
-		scroll = (layers_flip_0 & 0x0008) ? state->m_vscroll[1][i] : 0;
-		state->m_tmap[1]->set_scrollx(i,(layer1_scrollx + scroll) >> 6 );
-	}
-
-}
-
-static void kaneko16_prepare_second_tilemap_chip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	/* Set Up SECOND Tilemap chip */
-	int layers_flip_1 = 0;
-	UINT16 layer0_scrollx, layer0_scrolly;
-	UINT16 layer1_scrollx, layer1_scrolly;
-	int i;
-
-	if (state->m_tmap[2])
-	{
-		layers_flip_1 = state->m_layers_1_regs[ 4 ];
-
-		state->m_tmap[2]->enable(~layers_flip_1 & 0x1000);
-		state->m_tmap[3]->enable(~layers_flip_1 & 0x0010);
-
-		state->m_tmap[2]->set_flip(	((layers_flip_1 & 0x0100) ? TILEMAP_FLIPY : 0) |
-											((layers_flip_1 & 0x0200) ? TILEMAP_FLIPX : 0) );
-		state->m_tmap[3]->set_flip(	((layers_flip_1 & 0x0100) ? TILEMAP_FLIPY : 0) |
-											((layers_flip_1 & 0x0200) ? TILEMAP_FLIPX : 0) );
-
-		layer0_scrollx		=	state->m_layers_1_regs[ 2 ];
-		layer0_scrolly		=	state->m_layers_1_regs[ 3 ] >> 6;
-		layer1_scrollx		=	state->m_layers_1_regs[ 0 ];
-		layer1_scrolly		=	state->m_layers_1_regs[ 1 ] >> 6;
-
-		state->m_tmap[2]->set_scrolly(0,layer0_scrolly);
-		state->m_tmap[3]->set_scrolly(0,layer1_scrolly);
-
-		for (i=0; i<0x200; i++)
-		{
-			UINT16 scroll;
-			scroll = (layers_flip_1 & 0x0800) ? state->m_vscroll[2][i] : 0;
-			state->m_tmap[2]->set_scrollx(i,(layer0_scrollx + scroll) >> 6 );
-			scroll = (layers_flip_1 & 0x0008) ? state->m_vscroll[3][i] : 0;
-			state->m_tmap[3]->set_scrollx(i,(layer1_scrollx + scroll) >> 6 );
-		}
-	}
-}
-
-static void kaneko16_render_first_tilemap_chip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	state->m_tmap[0]->draw(bitmap, cliprect, pri, pri, 0);
-	state->m_tmap[1]->draw(bitmap, cliprect, pri, pri, 0);
-}
-
-static void kaneko16_render_second_tilemap_chip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	if (state->m_tmap[2])
-	{
-		state->m_tmap[2]->draw(bitmap, cliprect, pri, state->m_priority.VIEW2_2_pri ? pri : 0, 0);
-		state->m_tmap[3]->draw(bitmap, cliprect, pri, state->m_priority.VIEW2_2_pri ? pri : 0, 0);
-	}
-}
 
 static void kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -996,16 +658,17 @@ static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap,
 static SCREEN_UPDATE_IND16( common )
 {
 	int i;
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	kaneko16_prepare_first_tilemap_chip(screen.machine(), bitmap, cliprect);
-	kaneko16_prepare_second_tilemap_chip(screen.machine(), bitmap, cliprect);
+	if (state->m_view2_0) state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	if (state->m_view2_1) state->m_view2_1->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		kaneko16_render_first_tilemap_chip(screen.machine(),bitmap,cliprect,i);
-		kaneko16_render_second_tilemap_chip(screen.machine(),bitmap,cliprect,i);
+		if (state->m_view2_0) state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		if (state->m_view2_1) state->m_view2_1->render_tilemap_chip_alt(bitmap,cliprect,i, state->m_priority.VIEW2_2_pri);
 	}
 
 	return 0;
@@ -1028,20 +691,7 @@ SCREEN_UPDATE_IND16(berlwall)
 
 SCREEN_UPDATE_IND16( jchan_view2 )
 {
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
-	int dx,dy;
-
 	SCREEN_UPDATE16_CALL(common);
-
-	/* override the offsets set in common - tuned to char select in jchan2 */
-	dx = 25;dy = 11;
-
-	state->m_tmap[0]->set_scrolldx(-dx,		320 + dx -1        );
-	state->m_tmap[1]->set_scrolldx(-(dx+2),	320 + (dx + 2) - 1 );
-
-	state->m_tmap[0]->set_scrolldy(-dy,		240 + dy -1 );
-	state->m_tmap[1]->set_scrolldy(-dy,		240 + dy -1 );
-
 	return 0;
 }
 

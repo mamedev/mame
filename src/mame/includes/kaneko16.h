@@ -8,6 +8,7 @@
 #define __KANEKO16_H__
 
 #include "machine/nvram.h"
+#include "video/kaneko_tmap.h"
 
 typedef struct
 {
@@ -78,14 +79,13 @@ public:
 		m_bg15_reg(*this, "bg15_reg"),
 		m_bg15_select(*this, "bg15_select"),
 		m_sprites_regs(*this, "sprites_regs"),
-		m_vram(*this, "vram"),
-		m_vscroll(*this, "vscroll"),
-		m_layers_0_regs(*this, "layers_0_regs"),
-		m_layers_1_regs(*this, "layers_1_regs"),
 		m_mcu_ram(*this, "mcu_ram"),
 		m_mainram(*this, "mainram"),
 		m_galsnew_bg_pixram(*this, "galsnew_bgram"),
-		m_galsnew_fg_pixram(*this, "galsnew_fgram") { }
+		m_galsnew_fg_pixram(*this, "galsnew_fgram"),
+		m_view2_0(*this, "view2_0"),
+		m_view2_1(*this, "view2_1")
+	{ }
 
 
 	required_device<cpu_device> m_maincpu;
@@ -93,12 +93,12 @@ public:
 	optional_shared_ptr<UINT16> m_bg15_reg;
 	optional_shared_ptr<UINT16> m_bg15_select;
 	optional_shared_ptr<UINT16> m_sprites_regs;
-	optional_shared_ptr_array<UINT16,4> m_vram;
-	optional_shared_ptr_array<UINT16,4> m_vscroll;
-	optional_shared_ptr<UINT16> m_layers_0_regs;
-	optional_shared_ptr<UINT16> m_layers_1_regs;
 	optional_shared_ptr<UINT16> m_mcu_ram;
 	optional_shared_ptr<UINT16> m_mainram;
+	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
+	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
+	optional_device<kaneko_view2_tilemap_device> m_view2_0;
+	optional_device<kaneko_view2_tilemap_device> m_view2_1;
 
 	UINT8 m_nvram_save[128];
 	int m_sprite_type;
@@ -109,15 +109,12 @@ public:
 	UINT16 m_sprite_flipy;
 	struct tempsprite *m_first_sprite;
 	kaneko16_priority_t m_priority;
-	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
-	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
 	calc1_hit_t m_hit;
 	calc3_hit_t m_hit3;
 	calc3_t m_calc3;
 	void (*m_toybox_mcu_run)(running_machine &machine);
 	UINT16 m_toybox_mcu_com[4];
 	UINT16 m_disp_enable;
-	tilemap_t *m_tmap[4];
 	int m_keep_sprites;
 	bitmap_ind16 m_bg15_bitmap;
 	bitmap_ind16 m_sprites_bitmap;
@@ -151,14 +148,8 @@ public:
 	DECLARE_WRITE16_MEMBER(shogwarr_calc_w);
 	DECLARE_READ16_MEMBER(shogwarr_calc_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_0_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_1_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_2_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_3_w);
 	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_layers_0_regs_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_layers_1_regs_w);
 	DECLARE_READ16_MEMBER(kaneko16_bg15_select_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
 	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
