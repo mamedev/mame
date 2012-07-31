@@ -87,6 +87,8 @@ public:
 	}
 
 	void render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
+	void render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
+	void draw_point(const rectangle &visarea, vertex_t &v, UINT32 color);
 	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
 
 	void gfx_fifo_exec(running_machine &machine);
@@ -117,7 +119,7 @@ public:
 
 	void push(const device_t *cpu, UINT64 data);
 	bool pop(const device_t *cpu, UINT64 *result);
-	bool pop_float(const device_t *cpu, float *result);
+	bool pop(const device_t *cpu, float *result);
 	int current_num();
 	int space_left();
 	bool is_empty();
@@ -231,6 +233,20 @@ public:
 	int m_gfx_status_byte;
 };
 
+void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
+{
+	/*
+	UINT32 *fb = &m_fb->pix32(scanline);
+
+	UINT32 color = 0xffff0000; // TODO
+
+	for (int x = extent.startx; x < extent.stopx; x++)
+	{
+		fb[x] = color;
+	}
+	*/
+}
+
 void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
 	float u = extent.param[0].start;
@@ -238,9 +254,8 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 	float du = extent.param[0].dpdx;
 	float dv = extent.param[1].dpdx;
 	UINT32 *fb = &m_fb->pix32(scanline);
-	int x;
 
-	for (x = extent.startx; x < extent.stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
 		UINT32 texel;
@@ -267,6 +282,19 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 
 		u += du;
 		v += dv;
+	}
+}
+
+void cobra_renderer::draw_point(const rectangle &visarea, vertex_t &v, UINT32 color)
+{
+	int x = v.x;
+	int y = v.y;
+
+	if (x >= visarea.min_x && x <= visarea.max_x &&
+		y >= visarea.min_y && y <= visarea.max_y)
+	{
+		UINT32 *fb = &m_fb->pix32(y);
+		fb[x] = color;
 	}
 }
 
@@ -498,7 +526,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 	return true;
 }
 
-bool cobra_fifo::pop_float(const device_t *cpu, float *result)
+bool cobra_fifo::pop(const device_t *cpu, float *result)
 {
 	UINT64 value = 0;
 	bool status = pop(cpu, &value);
@@ -705,7 +733,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		m_m2sfifo->push(&space.device(), (UINT8)(data >> 40));
 
-		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+	//	cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
 		// this is a hack...
 		// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
@@ -1112,12 +1140,12 @@ WRITE32_MEMBER(cobra_state::sub_ata1_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		UINT16 d = ((data >> 24) & 0xff) | ((data >> 8) & 0xff00);
-		ide_bus_w(device, 0, (offset << 1) + 0, d);
+		ide_bus_w(device, 1, (offset << 1) + 0, d);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		UINT16 d = ((data >> 8) & 0xff) | ((data << 8) & 0xff00);
-		ide_bus_w(device, 0, (offset << 1) + 1, d);
+		ide_bus_w(device, 1, (offset << 1) + 1, d);
 	}
 }
 
@@ -1133,38 +1161,6 @@ WRITE32_MEMBER(cobra_state::sub_comram_w)
 	int page = m_comram_page ^ 1;
 
 	COMBINE_DATA(m_comram[page] + offset);
-}
-
-READ32_MEMBER(cobra_state::sub_sound_r)
-{
-	UINT32 r = 0;
-
-	/*
-    if (!(mem_mask & 0xffff0000))
-    {
-        r |= RF5C400_0_r((offset << 1) + 0, 0x0000);
-    }
-    if (!(mem_mask & 0x0000ffff))
-    {
-        r |= RF5C400_0_r((offset << 1) + 1, 0x0000);
-    }
-    */
-
-	return r;
-}
-
-WRITE32_MEMBER(cobra_state::sub_sound_w)
-{
-	/*
-    if (!(mem_mask & 0xffff0000))
-    {
-        RF5C400_0_w((offset << 1) + 0, (UINT16)(data >> 16), 0x0000);
-    }
-    if (!(mem_mask & 0x0000ffff))
-    {
-        RF5C400_0_w((offset << 1) + 1, (UINT16)(data), 0x0000);
-    }
-    */
 }
 
 READ32_MEMBER(cobra_state::sub_psac2_r)
@@ -1183,17 +1179,28 @@ WRITE32_MEMBER(cobra_state::sub_psac2_w)
 
 }
 
+static UINT32 sub_unknown_dma_r(device_t *device, int width)
+{
+	printf("DMA read from unknown: size %d\n", width);
+	return 0;
+}
+
+static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
+{
+	printf("DMA write to unknown: size %d, data %08X\n", width, data);
+}
+
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)
-	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_sound_r, sub_sound_w)
+	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16_LEGACY("rfsnd", rf5c400_r, rf5c400_w, 0xffffffff)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
 	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_RAM											// PSAC RAM
 	AM_RANGE(0x78240000, 0x78241fff) AM_MIRROR(0x80000000) AM_RAM											// PSAC unknown
 	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_psac2_r, sub_psac2_w)			// PSAC
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
-	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)
+	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)				// TMS57002?
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
 //  AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM                                           // PSAC (ROZ) in Racing Jam.
 //  AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
@@ -1255,6 +1262,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 		return;
 
 	const rectangle visarea = machine.primary_screen->visible_area();
+	vertex_t vert[8];
 
 	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
 	cobra_fifo *fifo_out = cobra->m_gfxfifo_out;
@@ -1485,26 +1493,28 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				int i;
 				int num = 0;
 				int units = w1 & 0xff;
+				int unit_size = 0;
 
+				// determine the expected packet size to see if we can process it yet
 				if (w2 == 0x18c003c0)
 				{
-					num = units * 8;
+					unit_size = 8;
+					num = units * unit_size;
 				}
-				//else if (w2 == 0x18c003c1)
-				//{
-				//  num = units * 12;
-				//}
 				else if (w2 == 0x38c003c1 || w2 == 0x58c003c1 || w2 == 0x78c003c0)
 				{
-					num = units * 10;
+					unit_size = 10;
+					num = units * unit_size;
 				}
 				else if (w2 == 0x18f803c1 || w2 == 0x38f803c0 || w2 == 0x58f803c0)
 				{
-					num = units * 12;
+					unit_size = 12;
+					num = units * unit_size;
 				}
 				else if (w2 == 0x78f803c1)
 				{
-					num = units * 14;
+					unit_size = 14;
+					num = units * unit_size;
 				}
 				else
 				{
@@ -1527,7 +1537,10 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 							c = 0;
 						}
 					};
-					logerror("\n");
+					printf("\n");
+
+					cobra->m_gfx_re_status = RE_STATUS_IDLE;
+					return;
 				}
 
 				if (fifo_in->current_num() < num)
@@ -1537,110 +1550,196 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				}
 
 
-
-				// make sure the FIFO has fresh data at top...
-				fifo_out->flush();
-
-				if (w1 == 0xe0c00004 && w2 == 0x18f803c1)
+				// extract vertex data
+				if (w2 == 0x18c003c0)							
 				{
-					// Quad poly packet
-					vertex_t vert[4];
-
-					for (i=0; i < 4; i++)
+					for (int i=0; i < units; i++)				// in screen coords!
 					{
 						UINT64 in;
-						fifo_in->pop_float(NULL, &vert[i].x);		// X coord
-						fifo_in->pop_float(NULL, &vert[i].y);		// Y coord
-
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-
-						fifo_in->pop_float(NULL, &vert[i].p[0]);	// texture U coord
-						fifo_in->pop_float(NULL, &vert[i].p[1]);	// texture V coord
-
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
+						fifo_in->pop(NULL, &vert[i].x);			// X coord
+						fifo_in->pop(NULL, &vert[i].y);			// Y coord
+						fifo_in->pop(NULL, &in);				// ? (usually 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (usually 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (usually 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (usually 0.0f)
+						fifo_in->pop(NULL, &in);				// ? (usually 0.0f)
+						fifo_in->pop(NULL, &in);				// ? (usually 0.0f)
 					}
-
-					render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
-					render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
-					render_triangle(visarea, rd, 6, vert[2], vert[1], vert[3]);
 				}
-				else if (w1 == 0xe3400008 && w2 == 0x58c003c1)
+				else if (w2 == 0x38c003c1)
 				{
-					// Draw a batch of lines
-					vertex_t vert[2];
-
-					for (i=0; i < units/2; i++)
+					for (int i=0; i < units; i++)				// 3d coords?
 					{
-						for (int j=0; j < 2; j++)
-						{
-							UINT64 in;
+						float x, y;
 
-							fifo_in->pop(NULL, &in);					// ? seen values 0x10 and 0x100 (start and end markers?)
-							fifo_in->pop_float(NULL, &vert[j].x);		// X coord
-							fifo_in->pop_float(NULL, &vert[j].y);		// Y coord
-							fifo_in->pop(NULL, &in);					// ? only 0 so far (Z coord?)
-
-							fifo_in->pop(NULL, &in);					// ? only 1.0f so far
-							fifo_in->pop(NULL, &in);					// ? only 1.0f so far
-							fifo_in->pop(NULL, &in);					// ? only 1.0f so far
-							fifo_in->pop(NULL, &in);					// ? only 1.0f so far
-							fifo_in->pop(NULL, &in);					// ? only 1.0f so far
-							fifo_in->pop(NULL, &in);					// ? only 0 so far
-						}
-
-						draw_line(visarea, vert[0], vert[1]);
+						UINT64 in;
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &x);					// X coord?
+						fifo_in->pop(NULL, &y);					// Y coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[0]);		// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[1]);		// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// always 0?
+						vert[i].x = 256  + (x / 16);
+						vert[i].y = 192  + (y / 16);
 					}
 				}
-				/*
-                else if (w1 == 0xe0c00003 && w2 == 0x18c003c0)
-                {
-                    // Triangle poly packet?
-                    vertex_t vert[3];
+				else if (w2 == 0x58c003c1)
+				{
+					for (int i=0; i < units; i++)				// screen coords (used by the boot screen box lines)
+					{
+						float x, y;
 
-                    for (i=0; i < 3; i++)
-                    {
-                        UINT64 in = 0;
+						UINT64 in;
+						fifo_in->pop(NULL, &in);				// flags?
+						fifo_in->pop(NULL, &x);					// X coord?
+						fifo_in->pop(NULL, &y);					// Y coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// always 0?
+						vert[i].x = x;
+						vert[i].y = y;
+					}
+				}
+				else if (w2 == 0x78c003c0)
+				{
+					for (int i=0; i < units; i++)
+					{
+						UINT64 in;
+						fifo_in->pop(NULL, &in);				// flags?
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].x);			// X coord?
+						fifo_in->pop(NULL, &vert[i].y);			// Y coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[0]);		// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[1]);		// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+					}
+				}
+				else if (w2 == 0x18f803c1 || w2 == 0x38f803c0 || w2 == 0x58f803c0)
+				{
+					for (int i=0; i < units; i++)				// in screen coords!
+					{
+						UINT64 in;
+						fifo_in->pop(NULL, &vert[i].x);			// X coord
+						fifo_in->pop(NULL, &vert[i].y);			// Y coord
+						fifo_in->pop(NULL, &in);
                         fifo_in->pop(NULL, &in);
-
-                        fifo_in->pop(NULL, &in);
-
-                        vert[i].x = (u2f((UINT32)(in)) / 8.0f) + 256.0f;
-
-                        fifo_in->pop(NULL, &in);
-
-                        vert[i].y = (u2f((UINT32)(in)) / 8.0f) + 192.0f;
-
-                        fifo_in->pop(NULL, &in);
-
+						fifo_in->pop(NULL, &in);
+						fifo_in->pop(NULL, &vert[i].p[0]);		// texture U coord
+						fifo_in->pop(NULL, &vert[i].p[1]);		// texture V coord
                         fifo_in->pop(NULL, &in);
                         fifo_in->pop(NULL, &in);
                         fifo_in->pop(NULL, &in);
+						fifo_in->pop(NULL, &in);
                         fifo_in->pop(NULL, &in);
                     }
-
-                    render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
-                    render_triangle(visarea, rd, 6, vert[0], vert[1], vert[2]);
-                }
-                */
+				}
+				else if (w2 == 0x78f803c1)
+				{
+					for (int i=0; i < units; i++)				// 3d coords?
+					{
+						UINT64 in;
+						fifo_in->pop(NULL, &in);				// flags?
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].x);			// X coord?
+						fifo_in->pop(NULL, &vert[i].y);			// Y coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// coord?
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[0]);		// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[1]);		// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+					}
+				}
 				else
 				{
-					printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+					fatalerror("gfxfifo_exec: E0 unhandled %08X %08X\n", w1, w2);
+				}
 
-					for (i=0; i < num; i+=2)
+
+				// render
+				switch ((w1 >> 24) & 0xff)
+				{
+					case 0xe0:			// triangles
 					{
-						UINT64 in3 = 0, in4 = 0;
-						fifo_in->pop(NULL, &in3);
-						fifo_in->pop(NULL, &in4);
-						printf("                        %08X %08X (%f, %f)\n", (UINT32)(in3), (UINT32)(in4), u2f((UINT32)(in3)), u2f((UINT32)(in4)));
+						if (unit_size == 12)
+						{
+							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
+							for (int i=2; i < units; i++)
+							{
+								render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
+							}
+						}
+						else if (unit_size == 8)
+						{
+							//render_delegate rd = render_delegate(FUNC(cobra_renderer::render_color_scan), this);
+							for (int i=2; i < units; i++)
+							{
+								//render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
+								draw_point(visarea, vert[i-2], 0xffff0000);
+								draw_point(visarea, vert[i-1], 0xffff0000);
+								draw_point(visarea, vert[i], 0xffff0000);
+							}
+						}
+						break;
+					}
 
-						fifo_out->push(NULL, (UINT32)(in3));
-						fifo_out->push(NULL, (UINT32)(in4));
+					case 0xe2:			// points
+					{
+						if (unit_size == 8)
+						{
+							for (int i=0; i < units; i++)
+							{
+								draw_point(visarea, vert[i], 0xffffffff);
+							}
+						}
+						else if (unit_size == 12)
+						{
+							for (int i=0; i < units; i++)
+							{
+								draw_point(visarea, vert[i], 0xffffffff);
+							}
+						}
+						break;
+					}
+
+					case 0xe3:			// lines
+					{
+						if (unit_size == 10)
+						{
+							if ((units & 1) == 0)		// batches of lines
+							{
+								for (i=0; i < units; i+=2)
+								{
+									draw_line(visarea, vert[i], vert[i+1]);
+								}
+							}
+							else						// line strip
+							{
+								printf("GFX: linestrip %08X, %08X\n", w1, w2);
+							}
+						}
+						break;
+					}
+
+					default:
+					{
+						printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+						break;
 					}
 				}
 
@@ -2201,12 +2300,6 @@ INPUT_PORTS_START( cobra )
 
 INPUT_PORTS_END
 
-//static struct RF5C400interface rf5c400_interface =
-//{
-//  REGION_SOUND1
-//};
-
-
 static powerpc_config main_ppc_cfg =
 {
     XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
@@ -2268,7 +2361,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_CPU_PROGRAM_MAP(cobra_main_map)
 	MCFG_CPU_VBLANK_INT("screen", cobra_vblank)
 
-	MCFG_CPU_ADD("subcpu", PPC403GA, 33000000)		/* 403GA, 33? MHz */
+	MCFG_CPU_ADD("subcpu", PPC403GA, 32000000)		/* 403GA, 33? MHz */
 	MCFG_CPU_PROGRAM_MAP(cobra_sub_map)
 
 	MCFG_CPU_ADD("gfxcpu", PPC604, 100000000)		/* 604, 100? MHz */
@@ -2296,10 +2389,9 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-//  MCFG_SOUND_ADD(RF5C400, 64000000/4)
-//  MCFG_SOUND_CONFIG(rf5c400_interface)
-//  MCFG_SOUND_ROUTE(0, "left", 1.0)
-//  MCFG_SOUND_ROUTE(1, "right", 1.0)
+	MCFG_SOUND_ADD("rfsnd", RF5C400, XTAL_16_9344MHz)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -2318,6 +2410,10 @@ static DRIVER_INIT(cobra)
 
 
 	ppc_set_dcstore_callback(cobra->m_gfxcpu, gfx_cpu_dc_store);
+
+
+	ppc4xx_set_dma_read_handler(cobra->m_subcpu, 0, sub_unknown_dma_r);
+	ppc4xx_set_dma_write_handler(cobra->m_subcpu, 0, sub_unknown_dma_w);
 
 
 	cobra_gfx_init(cobra);
