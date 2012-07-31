@@ -163,6 +163,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/hd63484.h"
+#include "video/ramdac.h"
 
 
 class wildpkr_state : public driver_device
@@ -208,8 +209,13 @@ static PALETTE_INIT( wildpkr )
 *************************/
 
 static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM
+//	AM_RANGE(0x800000, 0x800003) ACRTC?
+	AM_RANGE(0x800180, 0x800181) AM_READNOP // protection, puts m68k code snippets to RAM
+	AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
+	AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
+	AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
 ADDRESS_MAP_END
 
 /* Unknown R/W:
@@ -246,6 +252,17 @@ static MACHINE_START(wildpkr)
 // static const hd63484_interface wildpkr_hd63484_intf = { 1 };
 
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, wildpkr_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+
+
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -255,7 +272,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)	//guess
+//	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)	//guess
 
 	MCFG_MACHINE_START(wildpkr)
 
@@ -267,6 +284,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_SCREEN_UPDATE_STATIC(wildpkr)
 
 //  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_PALETTE_INIT(wildpkr)
 	MCFG_PALETTE_LENGTH(256)
@@ -284,6 +302,9 @@ ROM_START( wildpkr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vd_1.01_3.bin", 0x000000, 0x40000, CRC(d19d5609) SHA1(87eedb7daaa8ac33c0a73e4e849b9a0f76152261) )
 	ROM_LOAD16_BYTE( "vd_1.01_1.bin", 0x000001, 0x40000, CRC(f10644ab) SHA1(5872fe41b8c7fec5e83011abdf82a85f064b734f) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "d8751h",  0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal6v8s.bin",  0x0000, 0x0117, CRC(389c63a7) SHA1(4ebb26a001ed14a9e96dd268ed1c7f298f0c086b) )
@@ -305,5 +326,5 @@ static DRIVER_INIT(wildpkr)
 *************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                   FLAGS */
-GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
