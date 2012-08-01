@@ -492,92 +492,6 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 }
 
 
-READ16_MEMBER(ssv_state::gdfs_gfxram_r)
-{
-
-	return m_eaglshot_gfxram[offset + m_gdfs_gfxram_bank * 0x100000/2];
-}
-
-WRITE16_MEMBER(ssv_state::gdfs_gfxram_w)
-{
-	offset += m_gdfs_gfxram_bank * 0x100000/2;
-	COMBINE_DATA(&m_eaglshot_gfxram[offset]);
-	gfx_element_mark_dirty(machine().gfx[2], offset / (16*8/2));
-}
-
-READ16_MEMBER(ssv_state::gdfs_blitram_r)
-{
-	switch (offset)
-	{
-		case 0x00/2:
-			// blitter status? (bit C, bit A)
-			return 0;
-	}
-
-	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(&space.device()),offset*2);
-	return 0;
-}
-
-WRITE16_MEMBER(ssv_state::gdfs_blitram_w)
-{
-	UINT16 *gdfs_blitram = m_gdfs_blitram;
-
-	COMBINE_DATA(&gdfs_blitram[offset]);
-
-	switch (offset)
-	{
-		case 0x8a/2:
-		{
-			if (data & ~0x43)
-				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(&space.device()),data);
-
-			if (ACCESSING_BITS_0_7)
-				m_gdfs_gfxram_bank = data & 3;
-		}
-		break;
-
-		case 0xc0/2:
-		case 0xc2/2:
-		case 0xc4/2:
-		case 0xc6/2:
-		case 0xc8/2:
-		break;
-
-		case 0xca/2:
-		{
-			UINT32 src	=	(gdfs_blitram[0xc0/2] + (gdfs_blitram[0xc2/2] << 16)) << 1;
-			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
-			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
-
-			UINT8 *rom	=	memregion("gfx2")->base();
-			size_t size	=	memregion("gfx2")->bytes();
-
-			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
-			{
-				memcpy( &m_eaglshot_gfxram[dst/2], &rom[src], len );
-
-				if (len % (16*8))	len = len / (16*8) + 1;
-				else				len = len / (16*8);
-
-				dst /= 16*8;
-				while (len--)
-				{
-					gfx_element_mark_dirty(machine().gfx[2], dst);
-					dst++;
-				}
-			}
-			else
-			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(&space.device()),src,dst,len);
-			}
-		}
-		break;
-
-		default:
-			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(&space.device()),offset*2,data);
-	}
-}
-
 static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_SHARE("gdfs_tmapram")
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
@@ -585,9 +499,9 @@ static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
 	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE(gdfs_blitram_r, gdfs_blitram_w) AM_SHARE("gdfs_blitram")
-	AM_RANGE(0x900000, 0x9fffff) AM_READWRITE(gdfs_gfxram_r, gdfs_gfxram_w)
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w );
+	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w );
+	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w );
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -2586,7 +2500,6 @@ static const gfx_layout layout_16x16x8 =
 static GFXDECODE_START( gdfs )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8,   0, 0x8000/64  ) // [0] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6,   0, 0x8000/64  ) // [1] Sprites (64 colors)
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x8x8_2, 0, 0x8000/64  ) // [2] Zooming Sprites (256 colors, decoded from ram)
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,  0, 0x8000/256 ) // [3] Tilemap
 GFXDECODE_END
 
@@ -2749,6 +2662,8 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1)
 	MCFG_SCREEN_UPDATE_STATIC(gdfs)
+
+	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 
 	MCFG_GFXDECODE(gdfs)
 	MCFG_VIDEO_START(gdfs)
@@ -4629,7 +4544,7 @@ ROM_START( gdfs )
 	ROM_LOAD( "vg004-10.u45", 0x200000, 0x200000, CRC(b3c6b1cb) SHA1(c601213e35d8dfd1244921da5c093f82145706d2) )
 	ROM_LOAD( "vg004-11.u48", 0x400000, 0x200000, CRC(1491def1) SHA1(344043302c81b4118cac4f692375b8af7ea68570) )
 
-	ROM_REGION( 0x1000000, "gfx2", /*0*/0 )	// Zooming Sprites, read by a blitter
+	ROM_REGION( 0x1000000, "st0020", /*0*/0 )	// Zooming Sprites, read by a blitter
 	ROM_LOAD( "vg004-01.u33", 0x0000000, 0x200000, CRC(aa9a81c2) SHA1(a7d005f9be199e317aa4c6aed8a2ab322fe82119) )
 	ROM_LOAD( "vg004-02.u34", 0x0200000, 0x200000, CRC(fa40ecb4) SHA1(0513f3b6879dc7d207646d949d6ddb7251f77bcc) )
 	ROM_LOAD( "vg004-03.u35", 0x0400000, 0x200000, CRC(90004023) SHA1(041edb77b34e6677ac5b85ce542d87a9bb1baf31) )

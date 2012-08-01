@@ -213,7 +213,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 	ssv_state *state = machine.driver_data<ssv_state>();
 	UINT16 tile = state->m_gdfs_tmapram[tile_index];
 
-	SET_TILE_INFO(3, tile, 0, TILE_FLIPXY( tile >> 14 ));
+	SET_TILE_INFO(2, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
@@ -229,10 +229,6 @@ VIDEO_START( gdfs )
 
 	VIDEO_START_CALL(ssv);
 
-	state->m_eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 4 * 0x100000 / 2);
-
-	machine.gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
-	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_eaglshot_gfxram);
 
 	state->m_gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 											 16,16, 0x100,0x100	);
@@ -983,191 +979,14 @@ SCREEN_UPDATE_IND16( eaglshot )
 	return SCREEN_UPDATE16_CALL(ssv);
 }
 
-/*
-    Sprites RAM is 0x80000 bytes long. The first 0x2000? bytes hold a list
-    of sprites to display (the list can be made shorter using an end-of-list
-    marker).
-
-    Each entry in the list (16 bytes) is a multi-sprite (e.g it tells the
-    hardware to display several single-sprites).
-
-    The list looks like this:
-
-    Offset:     Bits:                   Value:
-
-        0.h     fedc ba-- ---- ----
-                ---- --98 7654 3210     X displacement
-
-        2.h     fedc ba-- ---- ----
-                ---- --98 7654 3210     Y displacement
-
-        4.h     f--- ---- ---- ----     List end
-                -edc ba98 7654 3210     Offset of the single-sprite(s) data
-
-        0.h                             Number of single-sprites (how many bits?)
-
-    A single-sprite is:
-
-    Offset:     Bits:                   Value:
-
-        0.h                             Code
-
-        2.h     f--- ---- ---- ----     Flip X
-                -e-- ---- ---- ----     Flip Y
-                ---- -a-- ---- ----     0 = 256 color steps, 1 = 64 color steps
-                ---- --98 7654 3210     Color code
-
-        4.h     fedc ba-- ---- ----
-                ---- --98 7654 3210     X displacement
-
-        6.h     fedc ba-- ---- ----
-                ---- --98 7654 3210     Y displacement
-
-        8.h     fedc ba98 ---- ----     Y Size
-                ---- ---- 7654 3210     X Size
-
-        A.h     fedc ba98 ---- ----
-                ---- ---- 7654 ----     Priority
-                ---- ---- ---- 32--     Y Tiles (1,2,4,8)
-                ---- ---- ---- --10     X Tiles (1,2,4,8)
-
-        C.h                             Unused
-
-        E.h                             Unused
-
-*/
-static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
-{
-	/* Sprites list */
-
-	ssv_state *state = machine.driver_data<ssv_state>();
-	UINT16 *spriteram16_2 = state->m_spriteram2;
-	UINT16 *s1	=	spriteram16_2;
-	UINT16 *end1	=	spriteram16_2 + 0x02000/2;
-	UINT16 *s2;
-
-	priority <<= 4;
-
-	for ( ; s1 < end1; s1+=8/2 )
-	{
-		int attr, code, color, num, sprite, zoom, size;
-		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, xdim, xscale;
-		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, ydim, yscale;
-
-		xoffs	=		s1[ 0 ];
-		yoffs	=		s1[ 1 ];
-		sprite	=		s1[ 2 ];
-		num		=		s1[ 3 ] % 0x101;
-
-		/* Last sprite */
-		if (sprite & 0x8000) break;
-
-		/* Single-sprite address */
-		s2		=		&spriteram16_2[ (sprite & 0x7fff) * 16/2 ];
-
-		for( ; num > 0; num--,s2+=16/2 )
-		{
-			code	=	s2[ 0 ];
-			attr	=	s2[ 1 ];
-			sx		=	s2[ 2 ];
-			sy		=	s2[ 3 ];
-			zoom	=	s2[ 4 ];
-			size	=	s2[ 5 ];
-
-			if (priority != (size & 0xf0))
-				break;
-
-			flipx	=	(attr & 0x8000);
-			flipy	=	(attr & 0x4000);
-
-/*
-            if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-            {
-                if (flipx == 0) flipx = 1; else flipx = 0;
-            }
-            if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-            {
-                if (flipy == 0) flipy = 1; else flipy = 0;
-            }
-*/
-
-			color	=	(attr & 0x0400) ? attr : attr * 4;
-
-			/* Single-sprite tile size */
-			xnum = 1 << ((size >> 0) & 3);
-			ynum = 1 << ((size >> 2) & 3);
-
-			xnum = (xnum + 1) / 2;
-
-			if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-			else		{ xstart = 0;       xend = xnum;  xinc = +1; }
-
-			if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-			else		{ ystart = 0;       yend = ynum;  yinc = +1; }
-
-			/* Apply global offsets */
-			sx	+=	xoffs;
-			sy	+=	yoffs;
-
-			/* Sign extend the position */
-			sx	=	(sx & 0x1ff) - (sx & 0x200);
-			sy	=	(sy & 0x1ff) - (sy & 0x200);
-
-			sy	=	-sy;
-
-			/* Use fixed point values (16.16), for accuracy */
-			sx <<= 16;
-			sy <<= 16;
-
-			xdim	=	( ( ((zoom >> 0) & 0xff) + 1) << 16 ) / xnum;
-			ydim	=	( ( ((zoom >> 8) & 0xff) + 1) << 16 ) / ynum;
-
-			xscale	=	xdim / 16;
-			yscale	=	ydim / 8;
-
-			/* Let's approximate to the nearest greater integer value
-               to avoid holes in between tiles */
-			if (xscale & 0xffff)	xscale += (1<<16) / 16;
-			if (yscale & 0xffff)	yscale += (1<<16) / 8;
-
-			/* Draw the tiles */
-
-			for (x = xstart; x != xend; x += xinc)
-			{
-				for (y = ystart; y != yend; y += yinc)
-				{
-					drawgfxzoom_transpen( bitmap, cliprect, machine.gfx[2],
-									code++,
-									color,
-									flipx, flipy,
-									(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-									xscale, yscale, 0
-					);
-				}
-			}
-
-			#ifdef MAME_DEBUG
-			if (machine.input().code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
-			{
-				char buf[10];
-				sprintf(buf, "%X",size);
-				ui_draw_text(&machine.render().ui_container(), buf, sx / 0x10000, sy / 0x10000);
-			}
-			#endif
-		}	/* single-sprites */
-
-	}	/* sprites list */
-}
-
 SCREEN_UPDATE_IND16( gdfs )
 {
 	ssv_state *state = screen.machine().driver_data<ssv_state>();
-	int pri;
 
 	SCREEN_UPDATE16_CALL(ssv);
 
-	for (pri = 0; pri <= 0xf; pri++)
-		gdfs_draw_zooming_sprites(screen.machine(), bitmap, cliprect, pri);
+	// draw zooming sprites
+	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 
 	state->m_gdfs_tmap->set_scrollx(0, state->m_gdfs_tmapscroll[0x0c/2]);
 	state->m_gdfs_tmap->set_scrolly(0, state->m_gdfs_tmapscroll[0x10/2]);

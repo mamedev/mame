@@ -1313,6 +1313,7 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/srmp5.o \
 	$(DRIVERS)/srmp6.o \
 	$(DRIVERS)/ssv.o $(VIDEO)/ssv.o \
+	$(VIDEO)/st0020.o \
 	$(DRIVERS)/st0016.o $(VIDEO)/st0016.o \
 	$(VIDEO)/seta001.o \
 

@@ -1,4 +1,5 @@
 #include "cpu/upd7725/upd7725.h"
+#include "video/st0020.h"
 
 class ssv_state : public driver_device
 {
@@ -13,8 +14,7 @@ public:
 		m_irq_vectors(*this, "irq_vectors"),
 		m_gdfs_tmapram(*this, "gdfs_tmapram"),
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
-		m_spriteram2(*this, "spriteram2"),
-		m_gdfs_blitram(*this, "gdfs_blitram"),
+		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"){ }
 
 	optional_device<upd96050_device> m_dsp;
@@ -26,8 +26,7 @@ public:
 	required_shared_ptr<UINT16> m_irq_vectors;
 	optional_shared_ptr<UINT16> m_gdfs_tmapram;
 	optional_shared_ptr<UINT16> m_gdfs_tmapscroll;
-	optional_shared_ptr<UINT16> m_spriteram2;
-	optional_shared_ptr<UINT16> m_gdfs_blitram;
+	optional_device<st0020_device> m_gdfs_st0020;
 	optional_shared_ptr<UINT16> m_input_sel;
 
 	int m_tile_code[16];
