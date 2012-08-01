@@ -134,7 +134,7 @@ SCREEN_UPDATE_IND16(fitfight)
 //      else if (screen.machine().input().code_pressed(KEYCODE_R))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x0038) >> 3);
 //      else
-		scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5);
+		scrollbak = ((state->m_fof_a00000[0] & 0xffe0) >> 5);
 		state->m_fof_bak_tilemap->set_scrollx(0, scrollbak );
 		state->m_fof_bak_tilemap->set_scrolly(0, state->m_fof_a00000[0] & 0xff);
 		state->m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -150,7 +150,7 @@ SCREEN_UPDATE_IND16(fitfight)
 //      else if (screen.machine().input().code_pressed(KEYCODE_F))
 //          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x01c0) >> 6);
 //      else
-		scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5);
+		scrollmid = ((state->m_fof_900000[0] & 0xffe0) >> 5);
 		state->m_fof_mid_tilemap->set_scrollx(0, scrollmid );
 		state->m_fof_mid_tilemap->set_scrolly(0, state->m_fof_900000[0] & 0xff);
 //      if (!screen.machine().input().code_pressed(KEYCODE_F))
