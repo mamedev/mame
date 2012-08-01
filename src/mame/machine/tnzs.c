@@ -703,7 +703,7 @@ MACHINE_START( jpopnics )
 	state->m_bank1 = 2;
 	state->m_bank2 = 0;
 
-	state->save_item(NAME(*state->m_bankedram));
+	state->save_pointer(NAME(state->m_bankedram), 0x8000);
 	state->save_item(NAME(state->m_screenflip));
 	state->save_item(NAME(state->m_bank1));
 	state->save_item(NAME(state->m_bank2));

@@ -13,8 +13,15 @@ const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock)
 {
-
+	m_byteswapped = 0;
 }
+
+void st0020_device::set_byteswapped(device_t &device, int byteswapped)
+{
+	st0020_device &dev = downcast<st0020_device &>(device);
+	dev.m_byteswapped = byteswapped;
+}
+
 
 static const gfx_layout layout_16x8x8_2 =
 {
@@ -43,6 +50,9 @@ void st0020_device::device_start()
 
 	machine().gfx[m_gfx_index]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
+	save_pointer(NAME(m_st0020_gfxram), 4 * 0x100000/2);
+	save_pointer(NAME(m_st0020_spriteram), 0x80000/2);
+	save_pointer(NAME(m_st0020_blitram), 0x100/2);
 }
 
 void st0020_device::device_reset()
@@ -53,11 +63,20 @@ void st0020_device::device_reset()
 
 READ16_MEMBER(st0020_device::st0020_gfxram_r)
 {
-	return m_st0020_gfxram[offset + m_st0020_gfxram_bank * 0x100000/2];
+	UINT16 data;
+	ST0020_BYTESWAP_MEM_MASK
+
+	data = m_st0020_gfxram[offset + m_st0020_gfxram_bank * 0x100000/2];
+
+	ST0020_BYTESWAP_DATA
+	return data;
 }
 
 WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 {
+	ST0020_BYTESWAP_MEM_MASK
+	ST0020_BYTESWAP_DATA
+
 	offset += m_st0020_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&m_st0020_gfxram[offset]);
 	gfx_element_mark_dirty(machine().gfx[m_gfx_index], offset / (16*8/2));
@@ -65,15 +84,24 @@ WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 
 READ16_MEMBER(st0020_device::st0020_sprram_r)
 {
-	return m_st0020_spriteram[offset];
+	UINT16 data;
+	ST0020_BYTESWAP_MEM_MASK
+
+	data = m_st0020_spriteram[offset];
+
+	ST0020_BYTESWAP_DATA
+	return data;
 }
 
 WRITE16_MEMBER(st0020_device::st0020_sprram_w)
 {
+	ST0020_BYTESWAP_MEM_MASK
+	ST0020_BYTESWAP_DATA
+
 	COMBINE_DATA(&m_st0020_spriteram[offset]);
 }
 
-READ16_MEMBER(st0020_device::st0020_blitram_r)
+READ16_MEMBER(st0020_device::st0020_blit_r)
 {
 	switch (offset)
 	{
@@ -86,7 +114,19 @@ READ16_MEMBER(st0020_device::st0020_blitram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(st0020_device::st0020_blitram_w)
+READ16_MEMBER(st0020_device::st0020_blitram_r)
+{
+	UINT16 data;
+	ST0020_BYTESWAP_MEM_MASK
+
+	data = st0020_blit_r(space, offset, mem_mask);
+
+	ST0020_BYTESWAP_DATA
+	return data;
+
+}
+
+WRITE16_MEMBER(st0020_device::st0020_blit_w)
 {
 	UINT16 *st0020_blitram = m_st0020_blitram;
 
@@ -154,7 +194,12 @@ WRITE16_MEMBER(st0020_device::st0020_blitram_w)
 	}
 }
 
-
+WRITE16_MEMBER(st0020_device::st0020_blitram_w)
+{
+	ST0020_BYTESWAP_MEM_MASK
+	ST0020_BYTESWAP_DATA
+	st0020_blit_w(space, offset, data, mem_mask);
+}
 
 
 	

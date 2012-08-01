@@ -61,7 +61,7 @@ To do:
 #include "sound/st0016.h"
 #include "includes/st0016.h"
 #include "cpu/z80/z80.h"
-
+#include "video/st0020.h"
 
 class darkhors_state : public st0016_state
 {
@@ -72,8 +72,8 @@ public:
 		m_tmapscroll(*this, "tmapscroll"),
 		m_tmapram2(*this, "tmapram2"),
 		m_tmapscroll2(*this, "tmapscroll2"),
-		m_jclub2_tileram(*this, "jclub2_tileram"),
 		m_spriteram(*this, "spriteram"),
+		m_gdfs_st0020(*this, "st0020_spr"),
 		m_maincpu(*this, "maincpu") { }
 
 	virtual void machine_start()
@@ -88,10 +88,9 @@ public:
 	optional_shared_ptr<UINT32> m_tmapram2;
 	optional_shared_ptr<UINT32> m_tmapscroll2;
 	UINT32 m_input_sel;
-	optional_shared_ptr<UINT32> m_jclub2_tileram;
 	int m_jclub2_gfx_index;
 	optional_shared_ptr<UINT32> m_spriteram;
-
+	optional_device<st0020_device> m_gdfs_st0020;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
@@ -99,7 +98,6 @@ public:
 	DECLARE_WRITE32_MEMBER(darkhors_input_sel_w);
 	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
-	DECLARE_WRITE32_MEMBER(jclub2_tileram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
 };
 
@@ -339,12 +337,6 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 ADDRESS_MAP_END
 
 
-WRITE32_MEMBER(darkhors_state::jclub2_tileram_w)
-{
-	COMBINE_DATA(&m_jclub2_tileram[offset]);
-	gfx_element_mark_dirty(machine().gfx[m_jclub2_gfx_index], offset/(256/4));
-
-}
 
 static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -361,15 +353,15 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 
-	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM
+	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
 
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE(jclub2_tileram_w) AM_SHARE("jclub2_tileram") // tile data gets decompressed here by main cpu?
+	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
 ADDRESS_MAP_END
 
 
@@ -614,21 +606,6 @@ static GFXDECODE_START( darkhors )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 )	// color codes should be doubled
 GFXDECODE_END
 
-// wrong
-static const gfx_layout layout_16x16x8_jclub2 =
-{
-	16,16,
-	0x10000/256,
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 24,16,8,0,  56,48,40,32,  88,80,72,64,  120, 112, 104, 96},
-	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
-	256*8
-};
-
-static GFXDECODE_START( jclub2 )
-	//GFXDECODE_ENTRY( "maincpu", 0, layout_16x16x8_jclub2, 0, 0x10000/64 ) // color codes should be doubled
-GFXDECODE_END
 
 
 /***************************************************************************
@@ -685,22 +662,19 @@ MACHINE_CONFIG_END
 
 static VIDEO_START(jclub2)
 {
-	darkhors_state *state = machine.driver_data<darkhors_state>();
-	/* find first empty slot to decode gfx */
-	for (state->m_jclub2_gfx_index = 0; state->m_jclub2_gfx_index < MAX_GFX_ELEMENTS; state->m_jclub2_gfx_index++)
-		if (machine.gfx[state->m_jclub2_gfx_index] == 0)
-			break;
-
-	assert(state->m_jclub2_gfx_index != MAX_GFX_ELEMENTS);
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, reinterpret_cast<UINT8 *>(state->m_jclub2_tileram.target()), machine.total_colors() / 16, 0);
-
 
 }
 
 static SCREEN_UPDATE_IND16(jclub2)
 {
+	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
+
+	// nothing gets drawn, our data might be in the wrong order, we're
+	// already having to swap the data written for the tiles compared to
+	// gdfs, and are swapping the sprite + blit data too, but that could be
+	// incorrect
+	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+
 	return 0;
 }
 
@@ -719,7 +693,9 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_STATIC(jclub2)
 
-	MCFG_GFXDECODE(jclub2)
+	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
+	st0020_device::set_byteswapped(*device, 1);
+
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jclub2)
@@ -778,7 +754,6 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_STATIC(jclub2o)
 
-	MCFG_GFXDECODE(jclub2)
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jclub2o)

@@ -5,7 +5,7 @@
     driver by Aaron Giles
 
     Games supported:
-        * Crowns Golf (4 se   ts)
+        * Crowns Golf (4 sets)
         * Crowns Golf in Hawaii
 
     Known bugs:
