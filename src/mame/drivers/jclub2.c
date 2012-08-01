@@ -246,20 +246,6 @@ static SCREEN_UPDATE_IND16( darkhors )
 
 ***************************************************************************/
 
-static const eeprom_interface eeprom_intf =
-{
-	7,				// address bits 7
-	8,				// data bits    8
-	"*110",			// read         1 10 aaaaaaa
-	"*101",			// write        1 01 aaaaaaa dddddddd
-	"*111",			// erase        1 11 aaaaaaa
-	"*10000xxxx",	// lock         1 00 00xxxx
-	"*10011xxxx",	// unlock       1 00 11xxxx
-	1,
-//  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 {
 	device_t *device = machine().device("eeprom");
@@ -673,7 +659,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -723,7 +709,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -782,7 +768,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -965,22 +951,26 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) machine.root_device().memregion("maincpu")->base();
-//  UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
-//  int i;
+	// the dumped eeprom bytes are in a different order to how MAME expects them to be
+	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )
+	// I guess this is the difference between the internal organization on the real
+	// device, and how MAME represents it?
 
-#if 1
-	// eeprom error patch
-	rom[0x0444c/4]	=	0x02b34e71;
-	rom[0x04450/4]	=	0x4e710839;
-
-	rom[0x045fc/4]	=	0xbe224e71;
-	rom[0x04600/4]	=	0x4e714eb9;
-#endif
-
-//  if (eeprom != NULL)
-//      for (i = 0; i < (1<<7); i++)
-//          eeprom[i] = eeprom[i*2];
+	// the eeprom contains the game ID, which must be valid for it to boot
+	// is there a way (key sequence) to reprogram it??
+	// I bet the original sets need similar get further in their boot sequence
+	UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
+	if (eeprom != NULL)	
+	{
+		size_t len = machine.root_device().memregion("eeprom")->bytes();
+		UINT8* temp = (UINT8*)auto_alloc_array(machine, UINT8, len);
+		int i;
+		for (i = 0; i < len; i++)
+			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
+		
+		memcpy(eeprom, temp, len);
+		auto_free(machine, temp);
+	}
 }
 
 GAME( 199?, jclub2,   0,      jclub2,  darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
