@@ -17937,24 +17937,87 @@ ep_chock	// Chocks Away (Maygay)
 ep_chocka	//
 ep_chockb	//
 ep_cock		// Cock A Doodle Dosh (Maygay - Union)
+ep_cocka	//
+ep_cockb	//
+ep_cockc	//
+ep_cockd	//
+ep_cocke	//
 ep_commd	// Complete Madness (Maygay)
+ep_commda	//
+ep_commdb	//
+ep_commdc	//
+ep_commdd	//
 ep_cor2		// Coronation Street 2 (Maygay)
+ep_cor2a	//
+ep_cor2b	//
+ep_cor2c	//
 ep_cormn	// Coronation Street Monopoly Club (Maygay)
+ep_cormna	//
 ep_cycl		// Cyclone Club (Maygay)
+ep_cycla	//
+ep_cyclb	//
+ep_cyclc	//
 ep_duff		// Duff Beer Guide (Maygay)
+ep_duffa	//
+ep_duffb	//
+ep_duffc	//
 ep_flash	// Flashback (Maygay - Impulse)
+ep_flasha	//
+ep_flashb	//
+ep_flashc	//
+ep_flashd	//
+ep_flashe	//
+ep_flashf	//
 ep_fortg	// Fortune & Glory (Maygay - Impulse)
+ep_fortga	//
+ep_fortgb	//
 ep_fran		// Frantic (Maygay)
+ep_frana	//
 ep_fnclb	// Fruit & Nudge Club (Maygay)
+ep_fnclba	//
 ep_fgods	// Fruit Of The Gods (Maygay)
+ep_fgodsa	//
+ep_fgodsb	//
+ep_fgodsc	//
+ep_fgodsd	//
+ep_fgodse	//
+ep_fgodsf	//
+ep_fgodsg	//
 ep_fullm	// Full Moon Fever (Maygay - Impulse)
+ep_fullma	//
+ep_fullmb	//
+ep_fullmc	//
+ep_fullmd	//
+ep_fullme	//
+ep_fullmf	//
 ep_funny	// Funny Money (Maygay)
+ep_funnya	//
+ep_funnyb	//
+ep_funnyc	//
+ep_funnyd	//
+ep_funnye	//
+ep_funnyf	//
+ep_funnyg	//
 ep_geron	// Geronimo (Maygay - Impulse)
+ep_gerona	//
+ep_geronb	//
+ep_geronc	//
+ep_gerond	//
+ep_gerone	//
 ep_gldtp	// Gold Top (Maygay)
+ep_gldtpa	//
 ep_gesc2	// Great Escape 2 (Maygay)
+ep_gesc2a	//
 ep_geclb	// Great Escape Club (Maygay)
+ep_geclba	//
+ep_geclbb	//
 ep_gresc	// Great Escape (Maygay)
+ep_gresca	//
 ep_gridr	// Gridrunner (Maygay - Impulse)
+ep_gridra	//
+ep_gridrb	//
+ep_gridrc	//
+ep_gridrd	//
 ep_hhclb	// Haunted House Club (Maygay)
 ep_hvns		// Heavens Above (Maygay)
 ep_highv	// High Voltage (Maygay - Impulse)
@@ -18000,7 +18063,6 @@ ep_royrl	// Royal Roulette (Maygay)
 ep_scrm		// Screamin Demon (Maygay)
 ep_secag	// Secret Agent (Maygay)
 ep_simfr	// Simply Fruits (Maygay)
-ep_simbg	// The Simpsons Beer Guide (Maygay)
 ep_srwin	// Sir Winalot (Maygay)
 ep_spart	// Spartacash (Maygay - Impulse)
 ep_spcbw	// Special Brew (Maygay)

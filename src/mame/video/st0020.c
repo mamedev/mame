@@ -16,6 +16,7 @@ st0020_device::st0020_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock)
 {
 	m_is_st0032 = 0;
+	m_is_jclub2 = 0;
 }
 
 void st0020_device::set_is_st0032(device_t &device, int is_st0032)
@@ -23,6 +24,13 @@ void st0020_device::set_is_st0032(device_t &device, int is_st0032)
 	st0020_device &dev = downcast<st0020_device &>(device);
 	dev.m_is_st0032 = is_st0032;
 }
+
+void st0020_device::set_is_jclub2o(device_t &device, int is_st0032)
+{
+	st0020_device &dev = downcast<st0020_device &>(device);
+	dev.m_is_jclub2 = is_st0032;
+}
+
 
 
 static const gfx_layout layout_16x8x8_2 =
@@ -273,8 +281,8 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			// these seem to be swapped around on the st0032
 			xoffs	=		s1[ 2 ];
 			yoffs	=		s1[ 3 ];
-			sprite	=		s1[ 0 ];
-			num		=		s1[ 1 ] % 0x101; // how many?
+			sprite	=		s1[ 1 ];
+			num		=		s1[ 0 ] % 0x101; // how many?
 
 		}
 
@@ -337,6 +345,10 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			sy	=	(sy & 0x1ff) - (sy & 0x200);
 
 			sy	=	-sy;
+
+			// otherwise everything is off-screen
+			if (m_is_jclub2)
+				sy += 0x100;
 
 			/* Use fixed point values (16.16), for accuracy */
 			sx <<= 16;

@@ -748,6 +748,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_st0032(*device, 1);
+	st0020_device::set_is_jclub2o(*device, 1); // offsets
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
@@ -814,6 +815,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 
 	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
+	st0020_device::set_is_jclub2o(*device, 1);
 
 	MCFG_VIDEO_START(jclub2o)
 
