@@ -343,12 +343,17 @@ MACHINE_CONFIG_END
 ROM_START( pr_bears )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bs8pv26.rom", 0x0000, 0x008000, CRC(d6f7c02c) SHA1(d6549a5d47d644366c1c21ca2455ece3f282f5a5) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "p_bs37.bin", 0x0000, 0x008000, CRC(03f7f043) SHA1(437085466d8f1efa0359593e7f9c2616ed4033cb) )
+ROM_START( pr_bearsa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "p_bs47.bin", 0x0000, 0x008000, CRC(fa6fded4) SHA1(3dac6afcc03fce9f0c33d9776eb3b96e34d50ce5) )
 ROM_END
 
+ROM_START( pr_bearsb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p_bs37.bin", 0x0000, 0x008000, CRC(03f7f043) SHA1(437085466d8f1efa0359593e7f9c2616ed4033cb) )
+ROM_END
 
 ROM_START( pr_bearx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -450,18 +455,40 @@ ROM_START( pr_7hvn )
 	ROM_LOAD( "777 heaven pc90 8t 5c 5p (27512)", 0x0000, 0x010000, CRC(47214e06) SHA1(318f7d9891e7d37e2956c462bd04137af5bf972b) )
 	ROM_LOAD( "777 heaven pc90 v110 (27256)", 0x0000, 0x008000, CRC(2c7966a4) SHA1(67b10adf1440fd31e94c88b61f341734b381ca3f) )
 	ROM_LOAD( "777 heaven pc90 v23-0 (27256)", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
-	ROM_LOAD( "7775prb", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )//5p 3 pound cash 105
+	
 	ROM_LOAD( "777620p", 0x0000, 0x008000, CRC(83f3f72e) SHA1(ffa8a63bd81b5d316d21b3834939318a4079e024) )
 	ROM_LOAD( "777h54", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
 	ROM_LOAD( "777hea5p", 0x0000, 0x008000, CRC(cbbccb11) SHA1(3ed9bc244bafdb059c2d7d0303cc3483a9f12d62) )
 	ROM_LOAD( "777heav1020p.bin", 0x0000, 0x010000, CRC(a885298e) SHA1(eb378af28562a028d388cba5ead98644d5c9532f) )
 	ROM_LOAD( "777heaven.bin", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
-	ROM_LOAD( "777heaven10pd", 0x0000, 0x008000, CRC(9532dc9a) SHA1(6e8f763e523a5e1ec72665c11518350d533bec39) )
 	ROM_LOAD( "777heaven5p(27256)", 0x0000, 0x008000, CRC(d5a0a06d) SHA1(e6209d406319617d7b1462f788a4e68fa7142cde) )
 	ROM_LOAD( "77h5pcbs", 0x0000, 0x010000, CRC(15a61bbe) SHA1(3c98f43c6f229da9a3fc334568cdce4d39bd6563) )
 	ROM_LOAD( "cl7h1020", 0x0000, 0x010000, CRC(b12e3219) SHA1(634f6984d9ef6ef9964841b5586143d82d8b52f7) )
 ROM_END
 
+
+ROM_START( pr_7hvna )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777heaven10pd", 0x0000, 0x008000, CRC(9532dc9a) SHA1(6e8f763e523a5e1ec72665c11518350d533bec39) )//10GBP
+ROM_END
+
+ROM_START( pr_7hvnb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777h20p6_72.bin", 0x0000, 0x008000, CRC(c8b3f54d) SHA1(5e6f734970009131fc4ed0623854993baec08555) )//20p 6GBP 72%
+ROM_END
+
+ROM_START( pr_7hvnc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "7h10p3c_380.bin", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )//10p 3 pound cash rom 380
+ROM_END
+	
+ROM_START( pr_7hvnd )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "7775prb", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )//5p 3 pound cash 105
+ROM_END
+	
+	
+	
 ROM_START( pr_alwy9 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "always 9 10p.bin", 0x0000, 0x010000, CRC(aff337c0) SHA1(a335a857c1bba696150d51cabfd39a2996c1092f) )
@@ -787,7 +814,10 @@ ROM_START( pr_jumpj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "j jacks 994a20pn-040 (27512)", 0x0000, 0x010000, CRC(e6ffe171) SHA1(6fdb413621dd6e3f4185ff1f33af2f52b530a0a8) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_END
+
+ROM_START( pr_jumpja )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "jumping.bin", 0x0000, 0x010000, CRC(3d11a584) SHA1(580450b8bf3adc62ff71e2c3b5b086e702e3345f) )
 ROM_END
 
@@ -974,6 +1004,10 @@ DRIVER_INIT( proconn )
 GAME( 199?, pr_lday			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_5xcsh		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "5x Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_7hvn			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvna		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (10GBP Jackpot) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnb		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (20p 6GBP Jackpot Version 114) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnc		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (10p 3GBP Jackpot Version 380) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnd		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (5p 3GBP Jackpot Version 105) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_alwy9		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Always Nine (Pcp) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_barbl		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bars & Bells (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_batls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Battleships (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
@@ -1007,7 +1041,8 @@ GAME( 199?, pr_hotcs		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Cas
 GAME( 199?, pr_hotsp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Spots (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_jkpt7		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jackpot 7's (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_jkrwd		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jokers Wild (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_jumpj		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jumpj		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jumpja		,pr_jumpj	,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_medl			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Medalist (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_megmn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Mega Money (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_nudxs		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Nudge XS (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
@@ -1031,7 +1066,9 @@ GAME( 199?, pr_upnun		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Up & Un
 GAME( 199?, pr_sptb			,0			,proconn	,proconn	,proconn	,ROT0	,"Pcp", "Simply the Best (Pcp) (PROCONN?)",GAME_IS_SKELETON_MECHANICAL ) // not 100% sure this belongs here
 
 // Some of these are PC98 hardware.. I don't know how / if that differs
-GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearsa		,pr_bears	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearsb		,pr_bears	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_bearx		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_fspot		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_gnuc			,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Coinworld)",GAME_IS_SKELETON_MECHANICAL )

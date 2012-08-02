@@ -20362,6 +20362,10 @@ sp_crunb		//
 pr_lday			// 'L' Of A Day (Project)
 pr_5xcsh		// 5x Cash (Project)
 pr_7hvn			// 777 Heaven (Project)
+pr_7hvna
+pr_7hvnb
+pr_7hvnc
+pr_7hvnd
 pr_alwy9		// Always Nine (Pcp)
 pr_barbl		// Bars & Bells (Project)
 pr_batls		// Battleships (Project)
@@ -20396,6 +20400,7 @@ pr_hotsp		// Hot Spots (Project)
 pr_jkpt7		// Jackpot 7's (Project)
 pr_jkrwd		// Jokers Wild (Project)
 pr_jumpj		// Jumping Jacks (Project)
+pr_jumpja
 pr_medl			// Medalist (Project)
 pr_megmn		// Mega Money (Project)
 pr_nudxs		// Nudge XS (Project)
