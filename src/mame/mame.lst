@@ -1784,7 +1784,7 @@ vidvince		// GV-??? (c) 1984 Mylstar - never released
 wizwarz			// GV-??? (c) 1984 Mylstar - never released
 
 // Taito "Qix hardware" games
-qix				// LK  (c) 1981 Taito America Corporation
+qix			// LK  (c) 1981 Taito America Corporation
 qixa			// LK  (c) 1981 Taito America Corporation
 qixb			// LK  (c) 1981 Taito America Corporation
 qixo			// LK  (c) 1981 Taito America Corporation
@@ -1856,7 +1856,7 @@ lkageb			// bootleg
 lkageb2			// bootleg
 lkageb3			// bootleg
 skydest			// PD0 (c) 1985 Taito Corporation
-bygone			// prototype ? A53 (c) 1985 Taito Corporation
+bygone			// A53 (c) 1985 Taito Corporation - prototype ?
 msisaac			// A34 (c) 1985 Taito Corporation
 retofinv		// A37 (c) 1985 Taito Corporation
 retofinv1		// bootleg
@@ -2381,7 +2381,7 @@ landhigh		// E82 (c) 1999 Taito
 batlgr2			// E87 (c) 2000 Taito (2.04J)
 batlgr2a		// E87 (c) 2000 Taito (2.01J)
 
-invqix			// ??? (c) 2003 Taito Corporation
+invqix			// F34 (c) 2003 Taito Corporation
 
 // Toaplan games
 perfrman		// (c) 1985 Data East Corporation (Japan)
