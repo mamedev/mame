@@ -2676,7 +2676,7 @@ static DRIVER_INIT( plottinga )
 		tab[i] = v;
 	}
 	p = machine.root_device().memregion("maincpu")->base();
-	for (i = 0; i < 0x20000; i++)
+	for (i = 0; i < 0x10000; i++)
 	{
 		*p = tab[*p];
 		p++;
