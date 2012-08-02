@@ -18065,26 +18065,78 @@ ep_icebgg	//
 ep_icebgh	//
 ep_icebgi	//
 ep_inca		// Inca Dinka Do (Maygay - Extreme)
+ep_incaa	//
+ep_incab	//
 ep_itjb2	// Italian Job 2 (Maygay)
+ep_itjb2a	//
+ep_itjb2b	//
+ep_itjb2c	//
 ep_ijcl		// Italian Job Club (Maygay)
-ep_ijob		// Italian Job (Maygay) v2.1
-ep_ijoba	// Italian Job (Maygay) v1.1
+ep_ijcla	//
+ep_ijob		// Italian Job (Maygay)
+ep_ijoba	//
 ep_jakbn	// Jackpot & The Beanstreak (Extreme)
+ep_jakbna	//
+ep_jakbnb	//
+ep_jakbnc	//
 ep_jsttt	// Just The Ticket (Maygay)
+ep_jsttta	//
+ep_jstttb	//
+ep_jstttc	//
+ep_jstttd	//
+ep_jsttte	//
+ep_jstttf	//
+ep_jstttg	//
 ep_loadd	// Loaded (Maygay)
+ep_loadda	//
 ep_lukld	// Lucky Ladders (Maygay)
+ep_luklda	//
 ep_manic	// Manic Miner (Maygay - Impulse)
+ep_manica	//
+ep_manicb	//
+ep_manicc	//
+ep_manicd	//
+ep_manice	//
+ep_manicf	//
 ep_mkart	// Mario Kart (Maygay)
+ep_mkarta	//
+ep_mkartb	//
+ep_mkartc	//
+ep_mkartd	//
+ep_mkarte	//
 ep_matrx	// Matrix (Maygay - Impulse)
 ep_midas	// Midas Touch Club (Maygay)
+ep_midasa	//
 ep_monbs	// Monte Carlo Or Bust (Maygay)
+ep_monbsa	//
 ep_mwom		// Mortal Wombat (Maygay)
+ep_mwoma	//
+ep_mwomb	//
+ep_mwomc	//
+ep_mwomd	//
 ep_mrmus	// Mr Muscle (Maygay)
+ep_mrmusa	//
 ep_noter	// Note Runner (Maygay)
+ep_notera	//
+ep_noterb	//
+ep_noterc	//
+ep_noterd	//
+ep_notere	//
 ep_nuns		// Nuns Of Navarone (Maygay)
+ep_nunsa	//
 ep_otm		// Over The Moon (Maygay)
+ep_otma		//
 ep_otmcl	// Over The Moon Club (Maygay)
+ep_otmcla	//
 ep_ozzie	// Ozzie Ozzie Ozzie (Maygay)
+ep_ozziea	//
+ep_ozzieb	//
+ep_ozziec	//
+ep_ozzied	//
+ep_ozziee	//
+ep_ozzief	//
+ep_ozzieg	//
+ep_ozzieh	//
 ep_pascl	// Passport To Riches Classic Club (Maygay)
 ep_passp	// Passport To Riches Club (Maygay)
 ep_pharo	// Pharaoh's Treasure (Maygay)
@@ -18318,8 +18370,69 @@ m4alladv	// All Cash Advance (Barcrest)
 m4alpha		// Alphabet (Barcrest)
 m4ambass	// Ambassador (Barcrest)
 m4amhiwy	// American Highway (Barcrest)
-m4andycp	// Andy Capp (Barcrest)
-m4andycpd	//
+m4andycp		// Andy Capp (Barcrest)
+m4andycpacc_b	//
+m4andycpacc_c	//
+m4andycpaccsd	//
+m4andycpacc_d	//
+m4andycp10c_c	//
+m4andycpc2_a	//
+m4andycp20_b	//
+m4andycpdy_a	//
+m4andycpacc_e	//
+m4andycp10c_a	//
+m4andycp10c_b	//
+m4andycp8ad		//
+m4andycp8b		//
+m4andycp8c		//
+m4andycp8d		//
+m4andycp8kd		//
+m4andycp8yd	//
+m4andycp8k		//
+m4andycp8		//
+m4andycp8y		//
+m4andycpdc		//
+m4andycpdd		//
+m4andycpdyd		//
+m4andycpdk		//
+m4andycpd		//
+m4andycpdy		//
+m4andycpc2ad	//
+m4andycpc2b		//
+m4andycpc2bd	//
+m4andycpc2d		//
+m4andycpc2kd	//
+m4andycpc2rd	//
+m4andycpc2yd	//
+m4andycpc2k		//
+m4andycpc2r		//
+m4andycpc2		//
+m4andycpc2y		//
+m4andycpc5ad	//
+m4andycpc5b		//
+m4andycpc5bd	//
+m4andycpc5d		//
+m4andycpc5kd	//
+m4andycpc5yd	//
+m4andycpc5k		//
+m4andycpc5		//
+m4andycpc5y		//
+m4andycpack		//
+m4andycpac		//
+m4andycpacyd	//
+m4andycpacd		//
+m4andycp10k		//
+m4andycp10yd	//
+m4andycp10d		//
+m4andycpacc_a	//
+m4andycpac_a	//
+m4andycp10c_d	//
+m4andycp10_a	//
+m4andycp20		//
+m4andycp20_a	//
+m4andycpacc		//
+m4andycp10c		//
+m4andycpdut		// (Dutch set)
 m4andyfl	// Andy Loves Flo (Barcrest)
 m4andybt	// Andy's Big Time Club (Barcrest)
 m4andyfh	// Andy's Full House (Barcrest)

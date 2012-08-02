@@ -506,7 +506,7 @@ $(MAMEOBJ)/atlus.a: \
 $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu2.o \
 	$(DRIVERS)/mpu3.o \
-	$(DRIVERS)/mpu4hw.o $(DRIVERS)/mpu4.o \
+	$(DRIVERS)/mpu4hw.o $(DRIVERS)/mpu4sw.o $(DRIVERS)/mpu4.o \
 	$(DRIVERS)/mpu4vid.o \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
