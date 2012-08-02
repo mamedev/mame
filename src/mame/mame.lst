@@ -17792,7 +17792,6 @@ ep_simpe	//
 ep_simpf	//
 ep_simpg	//
 ep_simph	//
-ep_simpi	//
 ep_simpj	//
 ep_simpk	//
 ep_simpl	//
@@ -17809,7 +17808,6 @@ ep_wipeo	// Wipeout (Maygay)
 ep_wipeoa	//
 ep_wipeob	//
 ep_wipeoc	//
-ep_wipeod	//
 ep_wipeoe	//
 ep_bingb	// Bingo Belle (Maygay)
 ep_bingba	//
@@ -17826,7 +17824,6 @@ ep_cfalle	//
 ep_cfallf	//
 ep_cflow	// Cash Flow (Maygay)
 ep_cflowa	//
-ep_cflowb	//
 ep_cflowc	//
 ep_cflowd	//
 ep_doubl	// Double Top (Maygay)
@@ -18019,15 +18016,54 @@ ep_gridrb	//
 ep_gridrc	//
 ep_gridrd	//
 ep_hhclb	// Haunted House Club (Maygay)
+ep_hhclba	//
+ep_hhclbb	//
+ep_hhclbc	//
 ep_hvns		// Heavens Above (Maygay)
+ep_hvnsa	//
 ep_highv	// High Voltage (Maygay - Impulse)
+ep_highva	//
+ep_highvb	//
+ep_highvc	//
+ep_highvd	//
+ep_highve	//
+ep_highvf	//
 ep_hogmn	// Hog Money (Maygay - Impulse)
-ep_hmmlt	// Homer's Meltdown (Maygay)
+ep_hogmna	//
+ep_hogmnb	//
+ep_hogmnc	//
+ep_homer	// Homer's Meltdown (Maygay)
+ep_homera	//
+ep_homerb	//
+ep_homerc	//
+ep_homerd	//
+ep_homere	//
+ep_homerf	//
+ep_homerg	//
+ep_homerh	//
+ep_homeri	//
 ep_htdgs	// Hot Dogs (Maygay)
+ep_htdgsa	//
 ep_hubbl	// Hubble Bubble (Maygay)
+ep_hubbla	//
 ep_huric	// Hurricane (Maygay - Impulse)
+ep_hurica	//
+ep_huricb	//
+ep_huricc	//
+ep_huricd	//
+ep_hurice	//
 ep_hyst		// Hysteria (Maygay - Impulse)
+ep_hysta	//
 ep_icebg	// Ice Burger (Maygay)
+ep_icebga	//
+ep_icebgb	//
+ep_icebgc	//
+ep_icebgd	//
+ep_icebge	//
+ep_icebgf	//
+ep_icebgg	//
+ep_icebgh	//
+ep_icebgi	//
 ep_inca		// Inca Dinka Do (Maygay - Extreme)
 ep_itjb2	// Italian Job 2 (Maygay)
 ep_ijcl		// Italian Job Club (Maygay)
