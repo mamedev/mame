@@ -1,4 +1,42 @@
-/***************************************************************************
+/**************************************************************************************************************************************
+
+
+  Jockey Club II driver
+
+  various hardware revisions
+  all use a MC68EC020FG16 CPU
+
+	extra customs
+
+  jclub2  : SETA ST-0032 (video + sound? **1),                       SETA ST-0013, SETA ST-0017     ( PCB E79-001 rev 01a )
+  jclub2o : SETA ST-0020 (video), SETA ST-0016 (sound + video? **2), SETA ST-0013, SETA ST-0017     ( E06-00409 /  E06-00407 )
+  darkhors: (bootleg hardware)
+
+  ------
+
+  ST-0020 is a zooming sprite / blitter chip, also used by gdfs in ssv.c (see st0020.c)
+  ST-0016 is a z80 with integrated video + sound capabilities **1
+  ST-0017 is also used in srmp6.c, what is it? I/O? RLE?
+
+  ST-0013 doesn't seem to be used anywhere else?
+  ST-0032 doesn't seem to be used anywhere else? **2
+
+  ------
+
+  **1 ST-0032 seems to be similar to ST-0020 but the ram / list formats aren't the same, maybe it handles sound as there doesn't
+   seem to be any other dedicated sound chip
+
+  **2 ST-0016 video functionality is probably not used 
+
+
+
+**************************************************************************************************************************************/
+
+
+
+
+
+/*
 
                             -= Dark Horse =-
 
@@ -369,6 +407,23 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
+	AM_RANGE(0x490040, 0x490043) AM_WRITE(darkhors_eeprom_w)
+	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
+
+	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
+	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
+	AM_RANGE(0x580008, 0x58000b) AM_READ(darkhors_input_sel_r)
+	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(darkhors_input_sel_w)
+	AM_RANGE(0x580200, 0x580203) AM_READNOP
+	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
+	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
+
+	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
+	AM_RANGE(0x680000, 0x69ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
+	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
+	AM_RANGE(0x6C0000, 0x6C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
+	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
+
 ADDRESS_MAP_END
 
 
@@ -627,7 +682,7 @@ static TIMER_DEVICE_CALLBACK( darkhors_irq )
 	if(scanline == 0)
 		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 
-	if(scanline >= 1 && scanline <= 247)
+	if(scanline == 128)
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
@@ -669,10 +724,7 @@ static SCREEN_UPDATE_IND16(jclub2)
 {
 	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
 
-	// nothing gets drawn, our data might be in the wrong order, we're
-	// already having to swap the data written for the tiles compared to
-	// gdfs, and are swapping the sprite + blit data too, but that could be
-	// incorrect
+	// this isn't an st0020..
 	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 
 	return 0;
@@ -693,13 +745,16 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_STATIC(jclub2)
 
+	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
-	st0020_device::set_byteswapped(*device, 1);
+	st0020_device::set_is_st0032(*device, 1);
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jclub2)
 MACHINE_CONFIG_END
+
+
 
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -732,17 +787,20 @@ static VIDEO_START(jclub2o)
 
 static SCREEN_UPDATE_IND16(jclub2o)
 {
+	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
+	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 static MACHINE_CONFIG_START( jclub2o, darkhors_state )
+	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
+	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
+
 	MCFG_CPU_ADD("st0016",Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
@@ -755,6 +813,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_UPDATE_STATIC(jclub2o)
 
 	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 
 	MCFG_VIDEO_START(jclub2o)
 
@@ -817,9 +876,11 @@ Jockey Club II by SETA 1996
 
 PCB E79-001 rev 01a (Newer)
 
-Main CPU : SETA ST-0032 70C600JF505
+Main CPU : MC68EC020FG16
 
-Others : MC68EC020FG16
+Graphics : SETA ST-0032 70C600JF505
+
+Others : 
      SETA ST-0013
      SETA ST-0017
 
@@ -878,11 +939,13 @@ Other hardware version (older):
 Main PCB: E06-00409
 Sub PCb : E06-00407 (I/O nothing else)
 
-Main CPU : SETA ST-0020
+Main CPU :  MC68EC020FG16
 
 Many XTAL : 48.0000 MHz,33.3333 MHz,4.91520 MHz,42.9545 MHz(x2),105.0000 MHz (this 105.0000 Xtal is sometimes replaced by a tiny pcb silscreened 108.0000 MHz(!), with ICS ICS1494N, MB3771 and 14.3181 MHz Xtal)
 
-Others : MC68EC020FG16
+Graphics: SETA ST-0020
+
+Others :
      SETA ST-0013
      SETA ST-0016  <-- z80 core + simple gfx + sound, see st0016.c
      SETA ST-0017

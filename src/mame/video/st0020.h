@@ -6,10 +6,10 @@ class st0020_device : public device_t
 public:
 	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_byteswapped(device_t &device, int byteswapped);
+	static void set_is_st0032(device_t &device, int is_st0032);
 
 	int m_gfx_index;
-	int m_byteswapped;
+	int m_is_st0032;
 	
 	void st0020_draw_all(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -36,11 +36,11 @@ private:
 
 };
 
-#define ST0020_BYTESWAP_DATA \
-	if (m_byteswapped) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8); \
+#define ST0020_ST0032_BYTESWAP_DATA \
+	if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8); \
 
-#define ST0020_BYTESWAP_MEM_MASK \
-	if (m_byteswapped) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8); \
+#define ST0020_ST0032_BYTESWAP_MEM_MASK \
+	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8); \
 
 extern const device_type ST0020_SPRITES;
 

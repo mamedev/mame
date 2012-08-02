@@ -17784,43 +17784,158 @@ mg_kf		// Krypton Factor
 
 // Maygay EPOCH hardware
 ep_simp		// The Simpsons (Maygay)
+ep_simpa	//
+ep_simpb	//
+ep_simpc	//
+ep_simpd	//
+ep_simpe	//
+ep_simpf	//
+ep_simpg	//
+ep_simph	//
+ep_simpi	//
+ep_simpj	//
+ep_simpk	//
+ep_simpl	//
+ep_simpm	//
 ep_dblim	// Double Impact (Maygay - Impulse)
+ep_dblima	//
+ep_dblimb	//
+ep_dblimc	//
+ep_dblimd	//
 ep_itjb3	// Italian Job 3 (Maygay)
-ep_itj3a	//
+ep_itjb3a	//
 ep_merln	// Merlin's Magic (Maygay)
 ep_wipeo	// Wipeout (Maygay)
+ep_wipeoa	//
+ep_wipeob	//
+ep_wipeoc	//
+ep_wipeod	//
+ep_wipeoe	//
 ep_bingb	// Bingo Belle (Maygay)
+ep_bingba	//
 ep_calyp	// Calypso (Maygay)
+ep_calypa	//
 ep_cow		// Carry On Winning (Maygay)
+ep_cowa		//
 ep_cfall	// Cash Falls (Maygay)
+ep_cfalla	//
+ep_cfallb	//
+ep_cfallc	//
+ep_cfalld	//
+ep_cfalle	//
+ep_cfallf	//
 ep_cflow	// Cash Flow (Maygay)
+ep_cflowa	//
+ep_cflowb	//
+ep_cflowc	//
+ep_cflowd	//
 ep_doubl	// Double Top (Maygay)
+ep_doubla	//
+ep_doublb	//
+ep_doublc	//
+ep_doubld	//
 ep_evil		// Evil Streak (Maygay)
+ep_evila	//
+ep_evilb	//
 ep_nyny		// New York New York (Maygay)
+ep_nynya	//
+ep_nynyb	//
+ep_nynyc	//
+ep_nynyd	//
+ep_nynye	//
+ep_nynyf	//
 ep_pizza	// Pizza The Action (Maygay)
+ep_pizzaa	//
+ep_pizzab	//
+ep_pizzac	//
 ep_crazy	// Reel Crazy (Maygay)
+ep_crazya	//
+ep_crazyb	//
+ep_crazyc	//
+ep_crazyd	//
+ep_crazye	//
 ep_mario	// Super Mario (Maygay)
+ep_marioa	//
+ep_mariob	//
+ep_marioc	//
+ep_mariod	//
+ep_marioe	//
+ep_mariof	//
+ep_mariog	//
+ep_marioh	//
 ep_tincn	// Tin Can Alley (Maygay)
+ep_tincna	//
 ep_tonfn	// Tons Of Fun (Maygay)
+ep_tonfna	//
 ep_tcrwn	// Triple Crown (Maygay)
+ep_tcrwna	//
+ep_tcrwnb	//
+ep_tcrwnc	//
+ep_tcrwnd	//
+ep_tcrwne	//
 ep_word		// Word Up (Maygay)
+ep_worda	//
+ep_wordb	//
+ep_wordc	//
+ep_wordd	//
+ep_worde	//
+ep_wordf	//
+ep_wordg	//
 ep_xtra		// X-tra X-tra (Maygay)
+ep_xtraa	//
 ep_25crt	// 25 Carrot Gold (Maygay)
+ep_25crta	//
+ep_25crtb	//
+ep_25crtc	//
+ep_25crtd	//
 ep_bartk	// Bar Trekkin (Maygay)
+ep_bartka	//
+ep_bartkb	//
+ep_bartkc	//
+ep_bartkd	//
+ep_bartke	//
+ep_bartkf	//
 ep_batls	// Battleships (Maygay)
+ep_batlsa	//
+ep_batlsb	//
+ep_batlsc	//
 ep_bbonz	// Bingo Bonanza (Maygay - Union)
+ep_bbonza	//
 ep_bubsq	// Bubble & Squeak (Extreme)
+ep_bubsqa	//
+ep_bubsqb	//
+ep_bubsqc	//
+ep_bubsqd	//
 ep_cdspn	// Cardinal Spin (Maygay)
+ep_cdspna	//
 ep_cosc		// Carry On Screaming (Maygay)
+ep_cosca	//
 ep_cahoy	// Cash Ahoy (Maygay)
+ep_cahoya	//
+ep_cahoyb	//
 ep_ccock	// Cash Cocktail (Maygay)
+ep_ccocka	//
+ep_ccockb	//
+ep_ccockc	//
 ep_cgord	// Cash Gordon (Maygay)
+ep_cgorda	//
+ep_cgordb	//
+ep_cgordc	//
 ep_cshpn	// Cash In The Pan (Maygay)
+ep_cshpna	//
 ep_ctit		// Cash Of The Titans (Maygay)
+ep_ctita	//
 ep_cashn	// Cashino (Maygay - Extreme)
+ep_cashna	//
 ep_casgc	// Casino Grand Club (Maygay)
+ep_casgca	//
+ep_casgcb	//
+ep_casgcc	//
 ep_casrd	// Casino Royale Deluxe Club (Maygay)
+ep_casrda	//
 ep_chock	// Chocks Away (Maygay)
+ep_chocka	//
+ep_chockb	//
 ep_cock		// Cock A Doodle Dosh (Maygay - Union)
 ep_commd	// Complete Madness (Maygay)
 ep_cor2		// Coronation Street 2 (Maygay)

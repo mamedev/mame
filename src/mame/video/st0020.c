@@ -2,6 +2,8 @@
   
   (gdfs also has a tilemap, I don't know if this chip supplies that)
 
+ The ST0032 seems very similar, used by the newer Jockey Club II boards
+
 */
 
 
@@ -13,13 +15,13 @@ const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock)
 {
-	m_byteswapped = 0;
+	m_is_st0032 = 0;
 }
 
-void st0020_device::set_byteswapped(device_t &device, int byteswapped)
+void st0020_device::set_is_st0032(device_t &device, int is_st0032)
 {
 	st0020_device &dev = downcast<st0020_device &>(device);
-	dev.m_byteswapped = byteswapped;
+	dev.m_is_st0032 = is_st0032;
 }
 
 
@@ -64,18 +66,18 @@ void st0020_device::device_reset()
 READ16_MEMBER(st0020_device::st0020_gfxram_r)
 {
 	UINT16 data;
-	ST0020_BYTESWAP_MEM_MASK
+	ST0020_ST0032_BYTESWAP_MEM_MASK
 
 	data = m_st0020_gfxram[offset + m_st0020_gfxram_bank * 0x100000/2];
 
-	ST0020_BYTESWAP_DATA
+	ST0020_ST0032_BYTESWAP_DATA
 	return data;
 }
 
 WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 {
-	ST0020_BYTESWAP_MEM_MASK
-	ST0020_BYTESWAP_DATA
+	ST0020_ST0032_BYTESWAP_MEM_MASK
+	ST0020_ST0032_BYTESWAP_DATA
 
 	offset += m_st0020_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&m_st0020_gfxram[offset]);
@@ -85,19 +87,14 @@ WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 READ16_MEMBER(st0020_device::st0020_sprram_r)
 {
 	UINT16 data;
-	ST0020_BYTESWAP_MEM_MASK
 
 	data = m_st0020_spriteram[offset];
 
-	ST0020_BYTESWAP_DATA
 	return data;
 }
 
 WRITE16_MEMBER(st0020_device::st0020_sprram_w)
 {
-	ST0020_BYTESWAP_MEM_MASK
-	ST0020_BYTESWAP_DATA
-
 	COMBINE_DATA(&m_st0020_spriteram[offset]);
 }
 
@@ -117,13 +114,8 @@ READ16_MEMBER(st0020_device::st0020_blit_r)
 READ16_MEMBER(st0020_device::st0020_blitram_r)
 {
 	UINT16 data;
-	ST0020_BYTESWAP_MEM_MASK
-
 	data = st0020_blit_r(space, offset, mem_mask);
-
-	ST0020_BYTESWAP_DATA
 	return data;
-
 }
 
 WRITE16_MEMBER(st0020_device::st0020_blit_w)
@@ -196,8 +188,6 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 
 WRITE16_MEMBER(st0020_device::st0020_blitram_w)
 {
-	ST0020_BYTESWAP_MEM_MASK
-	ST0020_BYTESWAP_DATA
 	st0020_blit_w(space, offset, data, mem_mask);
 }
 
@@ -262,7 +252,6 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 	UINT16 *spriteram16_2 = m_st0020_spriteram;
 	UINT16 *s1	=	spriteram16_2;
 	UINT16 *end1	=	spriteram16_2 + 0x02000/2;
-	UINT16 *s2;
 
 	priority <<= 4;
 
@@ -272,25 +261,41 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, xdim, xscale;
 		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, ydim, yscale;
 
-		xoffs	=		s1[ 0 ];
-		yoffs	=		s1[ 1 ];
-		sprite	=		s1[ 2 ];
-		num		=		s1[ 3 ] % 0x101;
+		if (!m_is_st0032)
+		{
+			xoffs	=		s1[ 0 ];
+			yoffs	=		s1[ 1 ];
+			sprite	=		s1[ 2 ];
+			num		=		s1[ 3 ] % 0x101; // how many?
+		}
+		else
+		{
+			// these seem to be swapped around on the st0032
+			xoffs	=		s1[ 2 ];
+			yoffs	=		s1[ 3 ];
+			sprite	=		s1[ 0 ];
+			num		=		s1[ 1 ] % 0x101; // how many?
+
+		}
+
+
 
 		/* Last sprite */
 		if (sprite & 0x8000) break;
 
-		/* Single-sprite address */
-		s2		=		&spriteram16_2[ (sprite & 0x7fff) * 16/2 ];
+		int s2 = 0;
+		int spritebase = (sprite & 0x7fff) * 16/2;
 
 		for( ; num > 0; num--,s2+=16/2 )
 		{
-			code	=	s2[ 0 ];
-			attr	=	s2[ 1 ];
-			sx		=	s2[ 2 ];
-			sy		=	s2[ 3 ];
-			zoom	=	s2[ 4 ];
-			size	=	s2[ 5 ];
+			code	=	spriteram16_2[(spritebase + s2 + 0 )&0x3ffff];
+			attr	=	spriteram16_2[(spritebase + s2 + 1 )&0x3ffff];
+			sx		=	spriteram16_2[(spritebase + s2 + 2 )&0x3ffff];
+			sy		=	spriteram16_2[(spritebase + s2 + 3 )&0x3ffff];
+			zoom	=	spriteram16_2[(spritebase + s2 + 4 )&0x3ffff];
+			size	=	spriteram16_2[(spritebase + s2 + 5 )&0x3ffff];
+
+
 
 			if (priority != (size & 0xf0))
 				break;
@@ -374,6 +379,8 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			}
 #endif
 		}	/* single-sprites */
+
+
 
 	}	/* sprites list */
 }
