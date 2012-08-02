@@ -1404,6 +1404,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/gsword.o $(MACHINE)/tait8741.o $(VIDEO)/gsword.o \
 	$(DRIVERS)/gunbustr.o $(VIDEO)/gunbustr.o \
 	$(DRIVERS)/halleys.o \
+	$(DRIVERS)/invqix.o \
 	$(DRIVERS)/jollyjgr.o \
 	$(DRIVERS)/ksayakyu.o $(VIDEO)/ksayakyu.o \
 	$(DRIVERS)/lgp.o \

@@ -2184,9 +2184,9 @@ pwheelsj		// C78 (c) 1991 Taito Corporation (Japan)
 racingb			// C84 (c) 1991 Taito Coropration ..
 
 // Taito Air System games
+mlanding		// ??? (c) 1987 Taito America Corporation (US)
 topland			// B62 (c) 1988 Taito Coporation Japan (World)
 ainferno		// C45 (c) 1990 Taito America Corporation (US)
-mlanding		// ??? (c) 1990 Taito America Corporation (US)
 
 // enhanced Z-System hardware games
 gunbustr		// D27 (c) 1992 Taito Corporation Japan (World)
@@ -2376,10 +2376,12 @@ optiger			// 1998.09 E63 (c) 1998 Taito
 // Taito Type-Zero System
 taitotz
 batlgear		// E68 (c) 1999 Taito
-pwrshovl        // E74 (c) 1999 Taito
+pwrshovl		// E74 (c) 1999 Taito
 landhigh		// E82 (c) 1999 Taito
 batlgr2			// E87 (c) 2000 Taito (2.04J)
 batlgr2a		// E87 (c) 2000 Taito (2.01J)
+
+invqix			// ??? (c) 2003 Taito Corporation
 
 // Toaplan games
 perfrman		// (c) 1985 Data East Corporation (Japan)

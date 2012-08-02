@@ -2558,6 +2558,7 @@ src/mame/drivers/imolagp.c svneol=native#text/plain
 src/mame/drivers/inder.c svneol=native#text/plain
 src/mame/drivers/intrscti.c svneol=native#text/plain
 src/mame/drivers/inufuku.c svneol=native#text/plain
+src/mame/drivers/invqix.c svneol=native#text/plain
 src/mame/drivers/iqblock.c svneol=native#text/plain
 src/mame/drivers/irobot.c svneol=native#text/plain
 src/mame/drivers/ironhors.c svneol=native#text/plain
