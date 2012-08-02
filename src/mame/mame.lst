@@ -20360,12 +20360,30 @@ sp_crunb		//
 // Project - PROCONN
 
 pr_lday			// 'L' Of A Day (Project)
+pr_ldaya
 pr_5xcsh		// 5x Cash (Project)
 pr_7hvn			// 777 Heaven (Project)
 pr_7hvna
 pr_7hvnb
 pr_7hvnc
 pr_7hvnd
+pr_7hvne
+pr_7hvnf
+pr_7hvng
+pr_7hvnh
+pr_7hvni
+pr_7hvnj
+pr_7hvnk
+pr_7hvnl
+pr_7hvnm
+pr_7hvnn
+pr_7hvno
+pr_7hvnp
+pr_7hvnq
+pr_7hvnr
+pr_7hvns
+pr_7hvnt
+pr_7hvnu
 pr_alwy9		// Always Nine (Pcp)
 pr_barbl		// Bars & Bells (Project)
 pr_batls		// Battleships (Project)
@@ -20422,10 +20440,35 @@ pr_wldkn		// Wild Kings (Project)
 pr_nifty		// Nifty Fifty (Project)
 pr_upnun		// Up & Under (Project)
 pr_bears		// Bear Streak (Coinworld)
+pr_bearsa
+pr_bearsb	
 pr_bearx		// Bear X (Coinworld)
+pr_bearxa
+pr_bearxb
+pr_bearxc
+pr_bearxd
+pr_bearxe
+pr_bearxf
+pr_bearxg
+pr_bearxh
+pr_bearxi
+pr_bearxj
+pr_bearxk
+pr_bearxl
+pr_bearxlp
+pr_bearxm
 pr_fspot		// Fun Spot (Coinworld)
+pr_fspota
+pr_fspotb
+pr_fspotc
+pr_fspotd
+pr_fspote
+pr_fspotf
+pr_fspotg
 pr_gnuc			// Golden Nugget (Coinworld)
+pr_gnuca
 pr_magln		// Magic Lines (Coinworld)
+pr_maglna
 pr_swop			// Swop It (Ace)
 pr_sptb			// Simply The Best (Pcp)
 
