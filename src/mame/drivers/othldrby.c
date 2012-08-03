@@ -236,7 +236,7 @@ static MACHINE_RESET( othldrby )
 	state->m_vram_addr = 0;
 	state->m_vreg_addr = 0;
 
-	memset(state->m_vreg, 0, ARRAY_LENGTH(state->m_vreg));
+	memset(state->m_vreg, 0, sizeof(state->m_vreg));
 }
 
 static MACHINE_CONFIG_START( othldrby, othldrby_state )

@@ -826,7 +826,7 @@ static MACHINE_RESET( nycaptor )
 	state->m_from_main = 0;
 	state->m_from_mcu = 0;
 
-	memset(state->m_vol_ctrl, 0, ARRAY_LENGTH(state->m_vol_ctrl));
+	memset(state->m_vol_ctrl, 0, sizeof(state->m_vol_ctrl));
 }
 
 static MACHINE_CONFIG_START( nycaptor, nycaptor_state )

@@ -430,7 +430,7 @@ static DRIVER_INIT(mt_slot)
 	DRIVER_INIT_CALL(megatech_bios);
 
 	// this gets set in DEVICE_IMAGE_LOAD
-	memset(state->m_cart_is_genesis, 0, ARRAY_LENGTH(state->m_cart_is_genesis));
+	memset(state->m_cart_is_genesis, 0, sizeof(state->m_cart_is_genesis));
 }
 
 static DRIVER_INIT(mt_crt)

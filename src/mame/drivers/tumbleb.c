@@ -1889,7 +1889,7 @@ static MACHINE_RESET( tumbleb )
 	state->m_music_is_playing = 0;
 	state->m_flipscreen = 0;
 	state->m_tilebank = 0;
-	memset(state->m_control_0, 0, ARRAY_LENGTH(state->m_control_0));
+	memset(state->m_control_0, 0, sizeof(state->m_control_0));
 }
 
 static MACHINE_CONFIG_START( tumblepb, tumbleb_state )

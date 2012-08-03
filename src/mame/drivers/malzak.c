@@ -385,7 +385,7 @@ static MACHINE_RESET( malzak )
 {
 	malzak_state *state = machine.driver_data<malzak_state>();
 
-	memset(state->m_playfield_code, 0, 256);
+	memset(state->m_playfield_code, 0, 256 * sizeof(int));
 
 	state->m_malzak_x = 0;
 	state->m_malzak_y = 0;

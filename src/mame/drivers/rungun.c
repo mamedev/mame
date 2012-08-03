@@ -390,7 +390,7 @@ static MACHINE_RESET( rng )
 	machine.device<k054539_device>("k054539_1")->init_flags(k054539_device::REVERSE_STEREO);
 
 	memset(state->m_sysreg, 0, 0x20);
-	memset(state->m_ttl_vram, 0, 0x1000);
+	memset(state->m_ttl_vram, 0, 0x1000 * sizeof(UINT16));
 
 	state->m_z80_control = 0;
 	state->m_sound_status = 0;

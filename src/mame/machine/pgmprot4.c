@@ -362,7 +362,7 @@ static MACHINE_RESET( killbld )
 	state->m_kb_reg = 0;
 	state->m_kb_ptr = 0;
 	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10);
+	memset(state->m_kb_regs, 0, 0x10 * sizeof(UINT32));
 
 }
 
@@ -382,7 +382,7 @@ DRIVER_INIT( killbld )
 	state->m_kb_reg = 0;
 	state->m_kb_ptr = 0;
 	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10);
+	memset(state->m_kb_regs, 0, 0x10 * sizeof(UINT32));
 
 	state->save_item(NAME(state->m_kb_region_sequence_position));
 	state->save_item(NAME(state->m_kb_cmd));
@@ -442,7 +442,7 @@ static MACHINE_RESET( dw3 )
 	state->m_kb_reg = 0;
 	state->m_kb_ptr = 0;
 	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10);
+	memset(state->m_kb_regs, 0, 0x10 * sizeof(UINT32));
 
 }
 

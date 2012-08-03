@@ -1058,7 +1058,7 @@ static MACHINE_RESET( playmark )
 	state->m_bg_full_size = 0;
 	state->m_fgscrollx = 0;
 	state->m_fg_rowscroll_enable = 0;
-	memset(state->m_scroll, 0, ARRAY_LENGTH(state->m_scroll));
+	memset(state->m_scroll, 0, sizeof(state->m_scroll));
 
 	state->m_snd_command = 0;
 	state->m_oki_control = 0;

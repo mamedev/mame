@@ -939,7 +939,7 @@ static MACHINE_RESET( wgp )
 		state->m_piv_scrolly[i] = 0;
 	}
 
-	memset(state->m_rotate_ctrl, 0, 8);
+	memset(state->m_rotate_ctrl, 0, 8 * sizeof(UINT16));
 }
 
 static MACHINE_START( wgp )

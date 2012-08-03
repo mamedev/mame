@@ -291,7 +291,7 @@ void SEC::Cmd_Set_Mrk(void)
 
 void SEC::Cmd_Set_Txt(void)
 {
-	char valbuf[10];
+	char valbuf[8];
 	UINT8 meter = m_request[3];
 	memcpy( valbuf, &m_request[4], 7);
 	valbuf[7] = 0;

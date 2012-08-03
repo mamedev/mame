@@ -188,7 +188,7 @@ public:
 
 	int m_sc2gui_update_mmtr;
 	UINT8 *m_nvram;
-	UINT8 m_key[16];
+	UINT8 m_key[8];
 	UINT8 m_e2ram[1024];
 	int m_mmtr_latch;
 	int m_triac_latch;

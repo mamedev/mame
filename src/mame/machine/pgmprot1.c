@@ -1470,7 +1470,7 @@ DRIVER_INIT( pstar )
 	state->m_extra_ram[0] = 0;
 	state->m_extra_ram[1] = 0;
 	state->m_extra_ram[2] = 0;
-	memset(state->m_slots, 0, 16);
+	memset(state->m_slots, 0, 16 * sizeof(UINT32));
 
 	state->arm_sim_handler = command_handler_pstars;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
@@ -1519,8 +1519,8 @@ DRIVER_INIT( oldsplus )
 	pgm_basic_init(machine);
 	pgm_oldsplus_decrypt(machine);
 	pgm_arm7_type1_latch_init(machine);
-	memset(state->m_extra_ram, 0, 0x100);
-	memset(state->m_slots, 0, 0x100);
+	memset(state->m_extra_ram, 0, 0x100 * sizeof(UINT16));
+	memset(state->m_slots, 0, 0x100 * sizeof(UINT32));
 	state->arm_sim_handler = command_handler_oldsplus;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
