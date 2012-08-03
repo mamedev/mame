@@ -3,7 +3,7 @@
 /* many sets have the BARCREST or BWG string at FFE0 replaced with other things
   such at 'FATHER CHRISTMAS' are these hacked / bootlegs requiring special hw?
   
-  sets with 'D' in the ident code are Datapak sets, and play without a datapak connected
+  sets with 'D' in the ident code are Datapak sets, and do not play without a datapak connected
   sets with 'Y' seem to require the % key to be set
 
   */

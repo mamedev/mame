@@ -24,7 +24,6 @@
 #endif
 
 #define LOGSTUFF(x) do { if (MPU4VIDVERBOSE) logerror x; } while (0)
-#define LOG2674(x) do { if (MPU4VIDVERBOSE) logerror x; } while (0)
 
 
 
@@ -47,7 +46,6 @@
 
 static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
-static const UINT8 vsync_table[4] = {3,1,5,7}; //Video related
 
 static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
@@ -90,22 +88,6 @@ struct bwb_chr_table//dynamically populated table for BwB protection
 	UINT8 response;
 };
 
-/* Video stuff - see mpu4drvr.c */
-struct ef9369_t
-{
-	UINT32 addr;
-	UINT16 clut[16];	/* 13-bits - a marking bit and a 444 color */
-};
-
-struct bt471_t
-{
-	UINT8 address;
-	UINT8 addr_cnt;
-	UINT8 pixmask;
-	UINT8 command;
-	rgb_t color;
-};
-
 
 class mpu4_state : public driver_device
 {
@@ -119,10 +101,7 @@ public:
 		  m_pia5(*this, "pia_ic5"),
 		  m_pia6(*this, "pia_ic6"),
 		  m_pia7(*this, "pia_ic7"),
-		  m_pia8(*this, "pia_ic8"),
-		  m_vid_vidram(*this, "vid_vidram"),
-		  m_vid_mainram(*this, "vid_mainram"),
-		  m_dealem_videoram(*this, "dealem_videoram")
+		  m_pia8(*this, "pia_ic8")
 		   { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -195,79 +174,7 @@ public:
 	int m_t3h;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
-	//Video
-	UINT8 m_m6840_irq_state;
-	UINT8 m_m6850_irq_state;
-	UINT8 m_scn2674_irq_state;
-	UINT8 m_m68k_m6809_line;
-	UINT8 m_m6809_m68k_line;
-	UINT8 m_m68k_acia_cts;
-	UINT8 m_m6809_acia_cts;
-	UINT8 m_m6809_acia_rts;
-	UINT8 m_m6809_acia_dcd;
-	int m_gfx_index;
-	optional_shared_ptr<UINT16> m_vid_vidram;
-	optional_shared_ptr<UINT16> m_vid_mainram;
-//  UINT8 m_scn2674_IR[16];
-	UINT8 m_scn2674_IR_pointer;
-	UINT8 m_scn2674_screen1_l;
-	UINT8 m_scn2674_screen1_h;
-	UINT8 m_scn2674_cursor_l;
-	UINT8 m_scn2674_cursor_h;
-	UINT8 m_scn2674_screen2_l;
-	UINT8 m_scn2674_screen2_h;
-	UINT8 m_scn2674_irq_register;
-	UINT8 m_scn2674_status_register;
-	UINT8 m_scn2674_irq_mask;
-	UINT8 m_scn2674_gfx_enabled;
-	UINT8 m_scn2674_display_enabled;
-	UINT8 m_scn2674_display_enabled_field;
-	UINT8 m_scn2674_display_enabled_scanline;
-	UINT8 m_scn2674_cursor_enabled;
-	UINT8 m_IR0_scn2674_double_ht_wd;
-	UINT8 m_IR0_scn2674_scanline_per_char_row;
-	UINT8 m_IR0_scn2674_sync_select;
-	UINT8 m_IR0_scn2674_buffer_mode_select;
-	UINT8 m_IR1_scn2674_interlace_enable;
-	UINT8 m_IR1_scn2674_equalizing_constant;
-	UINT8 m_IR2_scn2674_row_table;
-	UINT8 m_IR2_scn2674_horz_sync_width;
-	UINT8 m_IR2_scn2674_horz_back_porch;
-	UINT8 m_IR3_scn2674_vert_front_porch;
-	UINT8 m_IR3_scn2674_vert_back_porch;
-	UINT8 m_IR4_scn2674_rows_per_screen;
-	UINT8 m_IR4_scn2674_character_blink_rate_divisor;
-	UINT8 m_IR5_scn2674_character_per_row;
-	UINT8 m_IR6_scn2674_cursor_first_scanline;
-	UINT8 m_IR6_scn2674_cursor_last_scanline;
-	UINT8 m_IR7_scn2674_cursor_underline_position;
-	UINT8 m_IR7_scn2674_cursor_rate_divisor;
-	UINT8 m_IR7_scn2674_cursor_blink;
-	UINT8 m_IR7_scn2674_vsync_width;
-	UINT8 m_IR8_scn2674_display_buffer_first_address_LSB;
-	UINT8 m_IR9_scn2674_display_buffer_first_address_MSB;
-	UINT8 m_IR9_scn2674_display_buffer_last_address;
-	UINT8 m_IR10_scn2674_display_pointer_address_lower;
-	UINT8 m_IR11_scn2674_display_pointer_address_upper;
-	UINT8 m_IR11_scn2674_reset_scanline_counter_on_scrollup;
-	UINT8 m_IR11_scn2674_reset_scanline_counter_on_scrolldown;
-	UINT8 m_IR12_scn2674_scroll_start;
-	UINT8 m_IR12_scn2674_split_register_1;
-	UINT8 m_IR13_scn2674_scroll_end;
-	UINT8 m_IR13_scn2674_split_register_2;
-	UINT8 m_IR14_scn2674_scroll_lines;
-	UINT8 m_IR14_scn2674_double_1;
-	UINT8 m_IR14_scn2674_double_2;
-	UINT8 m_scn2674_horz_front_porch;
-	UINT8 m_scn2674_spl1;
-	UINT8 m_scn2674_spl2;
-	UINT8 m_scn2674_dbl1;
-	INT8 m_cur[2];
-	optional_shared_ptr<UINT8> m_dealem_videoram;
-	int m_rowcounter;
-	int m_linecounter;
-	struct ef9369_t m_pal;
-	struct bt471_t m_bt471;
+
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankset_w);
