@@ -1511,13 +1511,8 @@ ROM_START( sc1cshwza )
 	ROM_LOAD( "95727205a_74-78_adj.bin"  , 0x8000, 0x8000, CRC(7c7ddabc) SHA1(b4c7a9ee929b5635091366948257f273a21d7818) )
 ROM_END
 
-ROM_START( sc1cshwzb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cwise_b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) )
-	ROM_LOAD( "cwise_a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) )
-ROM_END
 
-ROM_START( sc1cshwzc )
+ROM_START( sc1cshwzb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "95727211b_74-78_sw.bin"  , 0x0000, 0x8000, CRC(e20ee4d3) SHA1(3440ad647f8e009a13de6ff9797a47c636a50123) )
 	ROM_LOAD( "95727210a_74-78_sw.bin"  , 0x8000, 0x8000, CRC(6276ee67) SHA1(cc9b794f0add6d68677858719831e10afbdbc699) )
@@ -3121,7 +3116,6 @@ GAME( 198?, sc1cexpld		, sc1cexpl	, scorpion1			, scorpion1	, lotse			, 0,      
 GAME( 198?, sc1cshwz		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshwza		, sc1cshwz	, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshwzb		, sc1cshwz	, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cshwzc		, sc1cshwz	, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshin		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cashino (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1china		, 0			, scorpion1_viper	, scorpion1	, lotse			, 0,       "BFM",      "China Town Club (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1chinap		, sc1china	, scorpion1_viper	, scorpion1	, lotse			, 0,       "BFM",      "China Town Club (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
