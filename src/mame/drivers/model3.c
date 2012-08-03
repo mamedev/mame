@@ -3794,7 +3794,7 @@ ROM_START( von2 )	/* Step 2.0 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( von254g )	/* Step 2.0 */
+ROM_START( von254g )	/* Step 2.0, Sega game ID# is 833-13789 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21788.17",  0x000006, 0x200000, CRC(97066bcf) SHA1(234c45ee1f23b22f61893825eebf31d867cf420f) )
