@@ -1197,8 +1197,8 @@ ROM_START( xenophob ) /* Service mode shows "VERSION CO" */
 	ROM_LOAD( "0066-313bx-xxqx.bin", 0x0000B, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 15F */
 
 	/* PLD located on the "Sounds Good" board */
-	ROM_REGION( 0x0001, "snd_pld", 0 )
-	ROM_LOAD( "e36a31axnax00.bin",   0x00000, 0x00001, NO_DUMP ) /* PAL20L10 at U15 */
+	ROM_REGION( 0x00100, "snd_pld", 0 )
+	ROM_LOAD( "e36a31axnaxad.bin",   0x00000, 0x000cc, CRC(33e62608) SHA1(ab89ce32a5a351914a80e0e11830299425a22874) ) /* PAL20L10 at U15 */
 ROM_END
 
 
