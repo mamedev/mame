@@ -186,50 +186,50 @@ ROM_END
 
 ROM_START( j2adnoteb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 20p 1.1.bin", 0x0000, 0x8000, CRC(3f7365af) SHA1(734ed13c5943ff9b38ae061e3fb1b25e1cc9134c) )
-	ROM_LOAD( "addanote 20p 1.2.bin", 0x8000, 0x8000, CRC(ecfac3f4) SHA1(21f410e05cd30d3d936bba72dee6fabd709b32d1) )
+	ROM_LOAD( "addanote_20p_1.1.bin"  , 0x0000, 0x8000, CRC(3f7365af) SHA1(734ed13c5943ff9b38ae061e3fb1b25e1cc9134c) )
+	ROM_LOAD( "addanote_20p_1.2.bin"  , 0x8000, 0x8000, CRC(ecfac3f4) SHA1(21f410e05cd30d3d936bba72dee6fabd709b32d1) )
 ROM_END
 
 ROM_START( j2adnotec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 1.1.bin", 0x0000, 0x8000, CRC(67ff2728) SHA1(08bde11dcf20eaecac9b83072769b04dab465117) )
-	ROM_LOAD( "addanote 1.2.bin", 0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_1.1.bin" , 0x0000, 0x8000, CRC(67ff2728) SHA1(08bde11dcf20eaecac9b83072769b04dab465117) )
+	ROM_LOAD( "addanote_1.2.bin" , 0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 ROM_START( j2adnoted )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 1.1 a.bin", 0x0000, 0x8000, CRC(cf3a31ee) SHA1(0455a3e885a92a7a740a682c02c667dba69c8890) )
-	ROM_LOAD( "addanote 1.2.bin",   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_1.1_a.bin"  , 0x0000, 0x8000, CRC(cf3a31ee) SHA1(0455a3e885a92a7a740a682c02c667dba69c8890) )
+	ROM_LOAD( "addanote_1.2.bin" ,   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 ROM_START( j2adnotee )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 1.1 p.bin", 0x8000, 0x8000, CRC(54215e09) SHA1(0c2e7f80a7f67e014ea51e0b80397ee023b94288) )
-	ROM_LOAD( "addanote 1.2.bin",   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_1.1_p.bin"  , 0x8000, 0x8000, CRC(54215e09) SHA1(0c2e7f80a7f67e014ea51e0b80397ee023b94288) )
+	ROM_LOAD( "addanote_1.2.bin" ,   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 ROM_START( j2adnotef )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 1.1 s.bin", 0x8000, 0x8000, CRC(227de861) SHA1(b0a06193becd78fc24ff6175177a5f1a7d2a59c3) )
-	ROM_LOAD( "addanote 1.2.bin",   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_1.1_s.bin"  , 0x8000, 0x8000, CRC(227de861) SHA1(b0a06193becd78fc24ff6175177a5f1a7d2a59c3) )
+	ROM_LOAD( "addanote_1.2.bin" ,   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 ROM_START( j2adnoteg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 1.1 x.bin", 0x0000, 0x8000, CRC(0043d56a) SHA1(47ea7c4cf37f48f5753c62394529c45243a26859) )
-	ROM_LOAD( "addanote 1.2.bin",   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_1.1_x.bin"  , 0x0000, 0x8000, CRC(0043d56a) SHA1(47ea7c4cf37f48f5753c62394529c45243a26859) )
+	ROM_LOAD( "addanote_1.2.bin" ,   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 ROM_START( j2adnoteh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 1.1 y.bin", 0x0000, 0x8000, CRC(a886c3ac) SHA1(60c5ecdbf036b32bdafcc0f0bc4e599d72d9187f) )
-	ROM_LOAD( "addanote 1.2.bin",   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_1.1_y.bin"  , 0x0000, 0x8000, CRC(a886c3ac) SHA1(60c5ecdbf036b32bdafcc0f0bc4e599d72d9187f) )
+	ROM_LOAD( "addanote_1.2.bin" ,   0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 ROM_START( j2adnotei )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 74% fixed 1b1.bin", 0x0000, 0x8000, CRC(ecfab9ba) SHA1(ea273d82e11a62c847cbaaef58a7d8b24a834bca) )
-	ROM_LOAD( "addanote 1.2.bin",           0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
+	ROM_LOAD( "addanote_74%_fixed_1b1.bin"   , 0x0000, 0x8000, CRC(ecfab9ba) SHA1(ea273d82e11a62c847cbaaef58a7d8b24a834bca) )
+	ROM_LOAD( "addanote_1.2.bin" ,           0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 
 
@@ -242,17 +242,17 @@ ROM_START( j2bankch )
 	ROM_LOAD( "bank_chase_2_1.bin", 0x0000, 0x8000, CRC(152719d6) SHA1(5fe974f824caf7e1c38810a9f914225a5f4de8ce) )
 	ROM_LOAD( "bank_chase_2_2.bin", 0x8000, 0x8000, CRC(1ccb194a) SHA1(0a22a5195033e8d66026e264852bf3976c8dae3d) )
 
-	ROM_LOAD( "bankchase 1.1 10p 4.80 ebd9.bin", 0x0000, 0x8000, CRC(84c23924) SHA1(cf901ac19b4e980495e757e1570918690f43c607) )
-	ROM_LOAD( "bankchase 1.2 10p 4.80 csa7.bin", 0x8000, 0x8000, CRC(304e8979) SHA1(24459a4224f601ebb35d1b92e03245bd7293f23e) )
+	ROM_LOAD( "bankchase_1.1_10p_4.80_ebd9.bin"    , 0x0000, 0x8000, CRC(84c23924) SHA1(cf901ac19b4e980495e757e1570918690f43c607) )
+	ROM_LOAD( "bankchase_1.2_10p_4.80_csa7.bin"    , 0x8000, 0x8000, CRC(304e8979) SHA1(24459a4224f601ebb35d1b92e03245bd7293f23e) )
 
-	ROM_LOAD( "bankchase 1.1 20p.bin", 0x0000, 0x8000, CRC(33aa388b) SHA1(1ba80be7523a9177a16dd5d0fb80a8dd0ea16b97) )
-	ROM_LOAD( "bankchase 1.2 20p.bin", 0x8000, 0x8000, CRC(6414cea1) SHA1(e6c147ecb7197c66e47f4d2435e65a64d35867e2) )
+	ROM_LOAD( "bankchase_1.1_20p.bin"  , 0x0000, 0x8000, CRC(33aa388b) SHA1(1ba80be7523a9177a16dd5d0fb80a8dd0ea16b97) )
+	ROM_LOAD( "bankchase_1.2_20p.bin"  , 0x8000, 0x8000, CRC(6414cea1) SHA1(e6c147ecb7197c66e47f4d2435e65a64d35867e2) )
 
-	ROM_LOAD( "bankchase 1.1 a.bin", 0x0000, 0x8000, CRC(f40e2c1a) SHA1(be651adc06a03c63bb2c063da8a26947c21da5b9) )
-	ROM_LOAD( "bankchase 1.1 p.bin", 0x0000, 0x8000, CRC(6f1543fd) SHA1(9a1abc0b3f0072214de86fc76ad61bb0615695a4) )
-	ROM_LOAD( "bankchase 1.1 s.bin", 0x0000, 0x8000, CRC(1949f595) SHA1(f813a82ac85c1e8e8072ac2aeb18228e9baaa62e) )
-	ROM_LOAD( "bankchase 1.1 x.bin", 0x0000, 0x8000, CRC(3b77c89e) SHA1(82f27e131cb4e24ab6b57c0be2110e936325c82f) )
-	ROM_LOAD( "bankchase 1.1 y.bin", 0x0000, 0x8000, CRC(93b2de58) SHA1(19dd2cf5340893c6a4ceeee6a87cdee14453641f) )
+	ROM_LOAD( "bankchase_1.1_a.bin"  , 0x0000, 0x8000, CRC(f40e2c1a) SHA1(be651adc06a03c63bb2c063da8a26947c21da5b9) )
+	ROM_LOAD( "bankchase_1.1_p.bin"  , 0x0000, 0x8000, CRC(6f1543fd) SHA1(9a1abc0b3f0072214de86fc76ad61bb0615695a4) )
+	ROM_LOAD( "bankchase_1.1_s.bin"  , 0x0000, 0x8000, CRC(1949f595) SHA1(f813a82ac85c1e8e8072ac2aeb18228e9baaa62e) )
+	ROM_LOAD( "bankchase_1.1_x.bin"  , 0x0000, 0x8000, CRC(3b77c89e) SHA1(82f27e131cb4e24ab6b57c0be2110e936325c82f) )
+	ROM_LOAD( "bankchase_1.1_y.bin"  , 0x0000, 0x8000, CRC(93b2de58) SHA1(19dd2cf5340893c6a4ceeee6a87cdee14453641f) )
 
 	ROM_LOAD( "bankchase10p2.1", 0x0000, 0x8000, CRC(e2f0b079) SHA1(8476acdc9169d40c81774d6bf5e1e7d82ca236db) )
 ROM_END
@@ -270,11 +270,11 @@ ROM_START( j2bigbnk )
 	ROM_LOAD( "bb3-2.bin", 0x4000, 0x4000, CRC(17488088) SHA1(560ca909115fa16d196027b4517b4c32f963abdf) )//11554
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "bigbankerb11548 3.1.bin", 0x0000, 0x4000, CRC(c28a0f9a) SHA1(33740a31d2688d39ed79deead9f26cc3b8f17253) )
+	ROM_LOAD( "bigbankerb11548_3.1.bin" , 0x0000, 0x4000, CRC(c28a0f9a) SHA1(33740a31d2688d39ed79deead9f26cc3b8f17253) )
 
-	ROM_LOAD( "bigbankerb11593 3p1.bin", 0x0000, 0x4000, CRC(c8f291e0) SHA1(0f152c3e3797c04d50db417d4927c0671b6ae46c) )
-	ROM_LOAD( "bigbankerb12330 3y1.bin", 0x0000, 0x4000, CRC(eb687672) SHA1(d50b5153787f6cbd6c4dfe2bcfccde9aba57a9bf) )
-	ROM_LOAD( "bigbankerb12366 3x1.bin", 0x0000, 0x4000, CRC(d67b336e) SHA1(ddc97bab97f444cc914af1a0c997c17ad7635891) )
+	ROM_LOAD( "bigbankerb11593_3p1.bin" , 0x0000, 0x4000, CRC(c8f291e0) SHA1(0f152c3e3797c04d50db417d4927c0671b6ae46c) )
+	ROM_LOAD( "bigbankerb12330_3y1.bin" , 0x0000, 0x4000, CRC(eb687672) SHA1(d50b5153787f6cbd6c4dfe2bcfccde9aba57a9bf) )
+	ROM_LOAD( "bigbankerb12366_3x1.bin" , 0x0000, 0x4000, CRC(d67b336e) SHA1(ddc97bab97f444cc914af1a0c997c17ad7635891) )
 ROM_END
 
 
@@ -321,26 +321,26 @@ ROM_END
 
 ROM_START( j2cashfl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cashfalls b10602 3.1.bin", 0x0000, 0x4000, CRC(ec3c3123) SHA1(79eca1f8d5d99ba3532296681409057ffe9da244) )
-	ROM_LOAD( "cashfalls b10689 3.2.bin", 0x4000, 0x4000, CRC(2d1d1864) SHA1(45d24822e64d10f069fb470fdc20dbc17e7a2e17) )
+	ROM_LOAD( "cashfalls_b10602_3.1.bin"  , 0x0000, 0x4000, CRC(ec3c3123) SHA1(79eca1f8d5d99ba3532296681409057ffe9da244) )
+	ROM_LOAD( "cashfalls_b10689_3.2.bin"  , 0x4000, 0x4000, CRC(2d1d1864) SHA1(45d24822e64d10f069fb470fdc20dbc17e7a2e17) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "cashfalls b10759 3p1.bin", 0x0000, 0x4000, CRC(e644af59) SHA1(778bd16a4af27afd4620534af76658b352faa55e) ) //also b10764
-	ROM_LOAD( "cashfalls b11043 3y1.bin", 0x0000, 0x4000, CRC(c5de48cb) SHA1(f4536521a87f1adce19db4d74a85c14605fbe263) )
-	ROM_LOAD( "cashfalls b113-- 3a1.bin", 0x0000, 0x4000, CRC(d12f743f) SHA1(6d30dbf29258a446ec756da4e0a0d145807da8d6) )
-	ROM_LOAD( "cashfalls deluxe b12977 3x1.bin", 0x0000, 0x4000, CRC(f8cd0dd7) SHA1(3202f12019b4a511b92382a09621799fcb7659ec) )
+	ROM_LOAD( "cashfalls_b10759_3p1.bin"  , 0x0000, 0x4000, CRC(e644af59) SHA1(778bd16a4af27afd4620534af76658b352faa55e) ) //also b10764
+	ROM_LOAD( "cashfalls_b11043_3y1.bin"  , 0x0000, 0x4000, CRC(c5de48cb) SHA1(f4536521a87f1adce19db4d74a85c14605fbe263) )
+	ROM_LOAD( "cashfalls_b113--_3a1.bin"  , 0x0000, 0x4000, CRC(d12f743f) SHA1(6d30dbf29258a446ec756da4e0a0d145807da8d6) )
+	ROM_LOAD( "cashfalls_deluxe_b12977_3x1.bin"   , 0x0000, 0x4000, CRC(f8cd0dd7) SHA1(3202f12019b4a511b92382a09621799fcb7659ec) )
 ROM_END
 
 
 ROM_START( j2cashrl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cashreel a79069 1.1.bin", 0x0000, 0x4000, CRC(6a62ddd1) SHA1(3d28fe186fcf2ba7a0fd178372591cbb32cda2a3) )
-	ROM_LOAD( "cashreel a79679 1.2.bin", 0x4000, 0x4000, CRC(7bd6b009) SHA1(62fa6a110ca4d54c7ed0fc0e8e0fa1ac920f09b6) )
+	ROM_LOAD( "cashreel_a79069_1.1.bin"  , 0x0000, 0x4000, CRC(6a62ddd1) SHA1(3d28fe186fcf2ba7a0fd178372591cbb32cda2a3) )
+	ROM_LOAD( "cashreel_a79679_1.2.bin"  , 0x4000, 0x4000, CRC(7bd6b009) SHA1(62fa6a110ca4d54c7ed0fc0e8e0fa1ac920f09b6) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "cashreel b16361 1y1.bin", 0x0000, 0x4000, CRC(4380a439) SHA1(c18e2262f7f267fb1c256086d9febc684d929623) )
-	ROM_LOAD( "cashreel b16365 1x1.bin", 0x0000, 0x4000, CRC(7e93e125) SHA1(2e22c0a4040a4309522f03559f6eafc161f3944f) )
-	ROM_LOAD( "cashreel b16372 1a1.bin", 0x0000, 0x4000, CRC(577198cd) SHA1(05d2bb38d0225df5cd734bdf76673407317ab853) )
+	ROM_LOAD( "cashreel_b16361_1y1.bin"  , 0x0000, 0x4000, CRC(4380a439) SHA1(c18e2262f7f267fb1c256086d9febc684d929623) )
+	ROM_LOAD( "cashreel_b16365_1x1.bin"  , 0x0000, 0x4000, CRC(7e93e125) SHA1(2e22c0a4040a4309522f03559f6eafc161f3944f) )
+	ROM_LOAD( "cashreel_b16372_1a1.bin"  , 0x0000, 0x4000, CRC(577198cd) SHA1(05d2bb38d0225df5cd734bdf76673407317ab853) )
 ROM_END
 
 
@@ -365,23 +365,23 @@ ROM_END
 
 ROM_START( j2cashtk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cashtrack b16090 1x1.bin", 0x0000, 0x4000, CRC(166434ac) SHA1(38e61816c2c0f793c25228dc321d1922782ef047) )
+	ROM_LOAD( "cashtrack_b16090_1x1.bin"  , 0x0000, 0x4000, CRC(166434ac) SHA1(38e61816c2c0f793c25228dc321d1922782ef047) )
 	/* missing rom 2? */
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "cashtrack b16122 1a1.bin", 0x0000, 0x4000, CRC(3f864d44) SHA1(c0a52444849ee03570ee056f54ef61da0466b2f8) )
-	ROM_LOAD( "cashtrack b16123 1y1.bin", 0x0000, 0x4000, CRC(2b7771b0) SHA1(268891bfb5a7454bb4fdc21965ef0565caab7480) )
+	ROM_LOAD( "cashtrack_b16122_1a1.bin"  , 0x0000, 0x4000, CRC(3f864d44) SHA1(c0a52444849ee03570ee056f54ef61da0466b2f8) )
+	ROM_LOAD( "cashtrack_b16123_1y1.bin"  , 0x0000, 0x4000, CRC(2b7771b0) SHA1(268891bfb5a7454bb4fdc21965ef0565caab7480) )
 ROM_END
 
 
 
 ROM_START( j2cashtd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cashtrack deluxe a 1.1.bin",      0x0000, 0x4000, CRC(02950858) SHA1(84809b06bb7d9d470b407df655e3d45342a542e2) )
-	ROM_LOAD( "cashtrack deluxe b17560 1b2.bin", 0x4000, 0x4000, CRC(fffd95d1) SHA1(c80d131b4d93bdbbd7226859ddd356c432c92c7d) )
+	ROM_LOAD( "cashtrack_deluxe_a_1.1.bin"   ,      0x0000, 0x4000, CRC(02950858) SHA1(84809b06bb7d9d470b407df655e3d45342a542e2) )
+	ROM_LOAD( "cashtrack_deluxe_b17560_1b2.bin"   , 0x4000, 0x4000, CRC(fffd95d1) SHA1(c80d131b4d93bdbbd7226859ddd356c432c92c7d) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "cashtrack deluxe protocol 1p1.bin", 0x0000, 0x4000, CRC(08ed9622) SHA1(686701ad4db873ee90a042c2b39a4bc10cb9fcfd) )
+	ROM_LOAD( "cashtrack_deluxe_protocol_1p1.bin"   , 0x0000, 0x4000, CRC(08ed9622) SHA1(686701ad4db873ee90a042c2b39a4bc10cb9fcfd) )
 ROM_END
 
 
@@ -435,12 +435,12 @@ ROM_START( j2dropld )
 	ROM_LOAD( "dropthelotdeluxe1.3.bin", 0x4000, 0x2000, CRC(3e2ce507) SHA1(d59c7dbbd469caf4976a6e8b7b7f3e2e9d35535a) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "dropthelotdeluxe b14526 1b1.bin", 0x0000, 0x2000, CRC(b3d72289) SHA1(bfc9dafb05577673f62a349ac3a10659b60fcc30) )
-	ROM_LOAD( "dropthelotdeluxe b14542 1bp3.bin", 0x0000, 0x2000, CRC(b900b1d0) SHA1(e318224d5df62ec896624c1fb1c2353131bdcd69) )
-	ROM_LOAD( "dropthelotdeluxe b14554 1x1.bin", 0x0000, 0x2000, CRC(09f5438a) SHA1(fa164034b780104cb13701e2c15208036820d88e) )
-	ROM_LOAD( "dropthelotdeluxe b14561 1y1.bin", 0x0000, 0x2000, CRC(43198090) SHA1(7e058633901b7c3614a9b8ac29876ff6f31422f5) )
-	ROM_LOAD( "dropthelotdeluxe b17547 1a1.bin", 0x0000, 0x2000, CRC(47e73da7) SHA1(5dc0ee91099f8dae3defd945fcb0262c2c467128) )
-	ROM_LOAD( "dropthelotdeluxe b17557 1a2.bin", 0x0000, 0x2000, CRC(051ff3cd) SHA1(341abf5b9015089b632576ca8cfe388d81fe3ee7) )
+	ROM_LOAD( "dropthelotdeluxe_b14526_1b1.bin"  , 0x0000, 0x2000, CRC(b3d72289) SHA1(bfc9dafb05577673f62a349ac3a10659b60fcc30) )
+	ROM_LOAD( "dropthelotdeluxe_b14542_1bp3.bin"  , 0x0000, 0x2000, CRC(b900b1d0) SHA1(e318224d5df62ec896624c1fb1c2353131bdcd69) )
+	ROM_LOAD( "dropthelotdeluxe_b14554_1x1.bin"  , 0x0000, 0x2000, CRC(09f5438a) SHA1(fa164034b780104cb13701e2c15208036820d88e) )
+	ROM_LOAD( "dropthelotdeluxe_b14561_1y1.bin"  , 0x0000, 0x2000, CRC(43198090) SHA1(7e058633901b7c3614a9b8ac29876ff6f31422f5) )
+	ROM_LOAD( "dropthelotdeluxe_b17547_1a1.bin"  , 0x0000, 0x2000, CRC(47e73da7) SHA1(5dc0ee91099f8dae3defd945fcb0262c2c467128) )
+	ROM_LOAD( "dropthelotdeluxe_b17557_1a2.bin"  , 0x0000, 0x2000, CRC(051ff3cd) SHA1(341abf5b9015089b632576ca8cfe388d81fe3ee7) )
 ROM_END
 
 
@@ -491,12 +491,12 @@ ROM_START( j2exec )
 	ROM_LOAD( "clubexecutive2.3", 0x8000, 0x4000, CRC(cc286353) SHA1(13f19396972e6a65c88245ff291ff3618f1b7fa7) )//10p
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "150 2.1.bin", 0x0000, 0x4000, CRC(a1cd6f9f) SHA1(6137c7410b29d3ddf3d52a0e64b316d85f1b3e08) )
-	ROM_LOAD( "150 2.3.bin", 0x0000, 0x4000, CRC(8d9dc4da) SHA1(a6651d1dd50a28b6367330ec8aa311ef68f04356) )
-	ROM_LOAD( "20p 2.2.bin", 0x0000, 0x4000, CRC(c53bde72) SHA1(369257c57fded297e5625a857d3f4b0eace64763) )
-	ROM_LOAD( "5p 2.1.bin", 0x0000, 0x4000, CRC(8620217a) SHA1(25ed75529812c106fb32b1f7b93c8b26083d8fd8) )
-	ROM_LOAD( "5p 2.2.bin", 0x0000, 0x4000, CRC(dc09b228) SHA1(6f392025f6d9e8b5d03f8ad82a5ab072b272679b) )
-	ROM_LOAD( "5p 2.3.bin", 0x0000, 0x4000, CRC(b2be1986) SHA1(68e571187bf87bed8a2027e746d7ba8c6ed19282) )
+	ROM_LOAD( "150_2.1.bin" , 0x0000, 0x4000, CRC(a1cd6f9f) SHA1(6137c7410b29d3ddf3d52a0e64b316d85f1b3e08) )
+	ROM_LOAD( "150_2.3.bin" , 0x0000, 0x4000, CRC(8d9dc4da) SHA1(a6651d1dd50a28b6367330ec8aa311ef68f04356) )
+	ROM_LOAD( "20p_2.2.bin" , 0x0000, 0x4000, CRC(c53bde72) SHA1(369257c57fded297e5625a857d3f4b0eace64763) )
+	ROM_LOAD( "5p_2.1.bin" , 0x0000, 0x4000, CRC(8620217a) SHA1(25ed75529812c106fb32b1f7b93c8b26083d8fd8) )
+	ROM_LOAD( "5p_2.2.bin" , 0x0000, 0x4000, CRC(dc09b228) SHA1(6f392025f6d9e8b5d03f8ad82a5ab072b272679b) )
+	ROM_LOAD( "5p_2.3.bin" , 0x0000, 0x4000, CRC(b2be1986) SHA1(68e571187bf87bed8a2027e746d7ba8c6ed19282) )
 ROM_END
 
 
@@ -713,8 +713,8 @@ ROM_START( j2kingcl )
 	ROM_LOAD( "koc2v4.bin", 0x8000, 0x8000, CRC(6f9b132f) SHA1(14154898fcd2c75e15eeec282b2452c81234b00e) )
 
 	// these look like bellfruit (encrypted) roms
-	//  ROM_LOAD( "king of clubs 39340002.bin", 0x0000, 0x8000, CRC(028708bf) SHA1(9e6942f6a25b260faa4c14c4d61a373be1518f40) )
-	//  ROM_LOAD( "king of clubs 39340026.bin", 0x0000, 0x8000, CRC(d3b0746e) SHA1(2847cec108a99747a7e3e31a0f7bcf766cdc1546) )
+	//  ROM_LOAD( "king_of_clubs_39340002.bin"   , 0x0000, 0x8000, CRC(028708bf) SHA1(9e6942f6a25b260faa4c14c4d61a373be1518f40) )
+	//  ROM_LOAD( "king_of_clubs_39340026.bin"   , 0x0000, 0x8000, CRC(d3b0746e) SHA1(2847cec108a99747a7e3e31a0f7bcf766cdc1546) )
 ROM_END
 
 
@@ -1045,12 +1045,12 @@ ROM_END
 
 ROM_START( j2slvrgh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b16436 delux 3.1.bin", 0x0000, 0x2000, CRC(9f3486f7) SHA1(7dd066444ce5475b069d4c664ac505856a0a5e42) )//dil85
-	ROM_LOAD( "b16453 delux 3.2.bin", 0x2000, 0x2000, CRC(030168be) SHA1(b202f73ed6e9704ee3a26a56eb02c79695b4d54d) )//dil85
+	ROM_LOAD( "b16436_delux_3.1.bin"  , 0x0000, 0x2000, CRC(9f3486f7) SHA1(7dd066444ce5475b069d4c664ac505856a0a5e42) )//dil85
+	ROM_LOAD( "b16453_delux_3.2.bin"  , 0x2000, 0x2000, CRC(030168be) SHA1(b202f73ed6e9704ee3a26a56eb02c79695b4d54d) )//dil85
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "delux 1.1.bin", 0x0000, 0x2000, CRC(a0ba5a80) SHA1(4238f8a06b32a3f9a5523050b536696d5905d92e) )
-	ROM_LOAD( "delux 1.2.bin", 0x2000, 0x2000, CRC(e5a192e6) SHA1(daafcb34bf88cd9e79856e52e57635e1703fb931) )
+	ROM_LOAD( "delux_1.1.bin" , 0x0000, 0x2000, CRC(a0ba5a80) SHA1(4238f8a06b32a3f9a5523050b536696d5905d92e) )
+	ROM_LOAD( "delux_1.2.bin" , 0x2000, 0x2000, CRC(e5a192e6) SHA1(daafcb34bf88cd9e79856e52e57635e1703fb931) )
 ROM_END
 
 ROM_START( j2sldgld )
@@ -1084,32 +1084,32 @@ ROM_END
 
 ROM_START( j2supfrt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "supafruit 14.1.bin", 0x0000, 0x2000, CRC(a565a3bf) SHA1(a80a9b58d20627e64def7787012298beb36ebc70) )
-	ROM_LOAD( "supafruit 14.2.bin", 0x2000, 0x2000, CRC(7131b034) SHA1(8c7ef185dcbedb890e94d32db88c1a59f2b032b7) )
+	ROM_LOAD( "supafruit_14.1.bin" , 0x0000, 0x2000, CRC(a565a3bf) SHA1(a80a9b58d20627e64def7787012298beb36ebc70) )
+	ROM_LOAD( "supafruit_14.2.bin" , 0x2000, 0x2000, CRC(7131b034) SHA1(8c7ef185dcbedb890e94d32db88c1a59f2b032b7) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "supafruit 11.1 1m.bin",0x0000, 0x2000, CRC(b123ea7f) SHA1(0a5bbb9df5fee287cde8433c62b1c62d699b3d3a) )
-	ROM_LOAD( "supafruit 11.3.bin",   0x0000, 0x2000, CRC(b0b4c97b) SHA1(0d6e8f3cb2d5d68d1e15899d5bfda3911409d113) )
-	ROM_LOAD( "supafruit 11a2 m.bin", 0x0000, 0x2000, CRC(d5d27ece) SHA1(417b4e81ee6f2356dbeba5c23dee4f5e43157274) )
+	ROM_LOAD( "supafruit_11.1_1m.bin"  ,0x0000, 0x2000, CRC(b123ea7f) SHA1(0a5bbb9df5fee287cde8433c62b1c62d699b3d3a) )
+	ROM_LOAD( "supafruit_11.3.bin" ,   0x0000, 0x2000, CRC(b0b4c97b) SHA1(0d6e8f3cb2d5d68d1e15899d5bfda3911409d113) )
+	ROM_LOAD( "supafruit_11a2_m.bin"  , 0x0000, 0x2000, CRC(d5d27ece) SHA1(417b4e81ee6f2356dbeba5c23dee4f5e43157274) )
 ROM_END
 
 
 ROM_START( j2supfrc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "supafruitclubfruit 057529 6.1.bin", 0x0000, 0x2000, CRC(05f34d40) SHA1(bf665549d3826c0ca70726dd31b253885d7f41e7) )
-	ROM_LOAD( "supafruitclubfruit 057654 6.2.bin", 0x2000, 0x2000, CRC(70743781) SHA1(4b08aca7b40d183207de87d1df16b2965299d9e1) )
-	ROM_LOAD( "supafruitclubfruit 057741 6.3.bin", 0x4000, 0x2000, CRC(88f775a4) SHA1(2c74a106a80ed929e3b27671e50d4d4a8b69de84) )
+	ROM_LOAD( "supafruitclubfruit_057529_6.1.bin"  , 0x0000, 0x2000, CRC(05f34d40) SHA1(bf665549d3826c0ca70726dd31b253885d7f41e7) )
+	ROM_LOAD( "supafruitclubfruit_057654_6.2.bin"  , 0x2000, 0x2000, CRC(70743781) SHA1(4b08aca7b40d183207de87d1df16b2965299d9e1) )
+	ROM_LOAD( "supafruitclubfruit_057741_6.3.bin"  , 0x4000, 0x2000, CRC(88f775a4) SHA1(2c74a106a80ed929e3b27671e50d4d4a8b69de84) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "supafruitclubfruit 067290 10.1.bin", 0x0000, 0x2000, CRC(b6375d28) SHA1(7f8af10f8216ff10636ed4c954bae6c91128b42f) )
-	ROM_LOAD( "supafruitclubfruit 067339 10.2.bin", 0x2000, 0x2000, CRC(dcf75abb) SHA1(519640d99d72312a521c578d3b9ad1f66bbbcc58) )
-	ROM_LOAD( "supafruitclubfruit 067385 10.3.bin", 0x4000, 0x2000, CRC(b0fc5b2a) SHA1(a96d11f941133fb52041860093e92ec99a110275) )
-	ROM_LOAD( "supafruitclubfruit 113506 11.2.bin", 0x0000, 0x2000, CRC(32f8b492) SHA1(ef1a52dce32693fe5641c5e44f369c77a5563864) )
-	ROM_LOAD( "supafruitclubfruit 113585 14a2.bin", 0x0000, 0x2000, CRC(7131b034) SHA1(8c7ef185dcbedb890e94d32db88c1a59f2b032b7) )
-	ROM_LOAD( "supafruitclubfruit 113600 14.3.bin", 0x0000, 0x2000, CRC(6682e8b0) SHA1(9c0127d0b31b77df4a18dd969e1f450f61737179) )
-	ROM_LOAD( "supafruitclubfruit 15.1.bin", 0x0000, 0x2000, CRC(82ea80d2) SHA1(92f99b7588f0c4ca18af547df1f69e013e3b6887) )
-	ROM_LOAD( "supafruitclubfruit 15.2.bin", 0x2000, 0x2000, CRC(648ed61a) SHA1(8f034de605401e7ee9c37deef00f39554faf857e) )
-	ROM_LOAD( "supafruitclubfruit 15.3.bin", 0x4000, 0x2000, CRC(203908e7) SHA1(ace67b49c89847c37ff17bcbb6d2406028cb3c4d) )
+	ROM_LOAD( "supafruitclubfruit_067290_10.1.bin"  , 0x0000, 0x2000, CRC(b6375d28) SHA1(7f8af10f8216ff10636ed4c954bae6c91128b42f) )
+	ROM_LOAD( "supafruitclubfruit_067339_10.2.bin"  , 0x2000, 0x2000, CRC(dcf75abb) SHA1(519640d99d72312a521c578d3b9ad1f66bbbcc58) )
+	ROM_LOAD( "supafruitclubfruit_067385_10.3.bin"  , 0x4000, 0x2000, CRC(b0fc5b2a) SHA1(a96d11f941133fb52041860093e92ec99a110275) )
+	ROM_LOAD( "supafruitclubfruit_113506_11.2.bin"  , 0x0000, 0x2000, CRC(32f8b492) SHA1(ef1a52dce32693fe5641c5e44f369c77a5563864) )
+	ROM_LOAD( "supafruitclubfruit_113585_14a2.bin"  , 0x0000, 0x2000, CRC(7131b034) SHA1(8c7ef185dcbedb890e94d32db88c1a59f2b032b7) )
+	ROM_LOAD( "supafruitclubfruit_113600_14.3.bin"  , 0x0000, 0x2000, CRC(6682e8b0) SHA1(9c0127d0b31b77df4a18dd969e1f450f61737179) )
+	ROM_LOAD( "supafruitclubfruit_15.1.bin" , 0x0000, 0x2000, CRC(82ea80d2) SHA1(92f99b7588f0c4ca18af547df1f69e013e3b6887) )
+	ROM_LOAD( "supafruitclubfruit_15.2.bin" , 0x2000, 0x2000, CRC(648ed61a) SHA1(8f034de605401e7ee9c37deef00f39554faf857e) )
+	ROM_LOAD( "supafruitclubfruit_15.3.bin" , 0x4000, 0x2000, CRC(203908e7) SHA1(ace67b49c89847c37ff17bcbb6d2406028cb3c4d) )
 ROM_END
 
 
@@ -1299,13 +1299,13 @@ ROM_END
 
 ROM_START( j2cshfil )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cashfilla10p2.40 23.1.89.bin", 0x0000, 0x8000, CRC(6dc7225d) SHA1(6aea39871fdf92b520e86a8ba71df41d2ef72689) )
+	ROM_LOAD( "cashfilla10p2.40_23.1.89.bin" , 0x0000, 0x8000, CRC(6dc7225d) SHA1(6aea39871fdf92b520e86a8ba71df41d2ef72689) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "cashfilla10p4.80 23.1.89.bin", 0x0000, 0x8000, CRC(c007fcb8) SHA1(c704c32f141b94019afea8c33dd78374fbb1e808) )
+	ROM_LOAD( "cashfilla10p4.80_23.1.89.bin" , 0x0000, 0x8000, CRC(c007fcb8) SHA1(c704c32f141b94019afea8c33dd78374fbb1e808) )
 	ROM_LOAD( "cashfilla2.bin", 0x0000, 0x8000, CRC(d52a2c5d) SHA1(b97c099ef145ebf3ba6aded0b4efa910dfd83568) )
-	ROM_LOAD( "cashfilla2p2.40 23.1.89.bin", 0x0000, 0x8000, CRC(d52a2c5d) SHA1(b97c099ef145ebf3ba6aded0b4efa910dfd83568) )
-	ROM_LOAD( "cashfilla5p2.40 23.1.89.bin", 0x0000, 0x8000, CRC(2ec712b7) SHA1(24b85b46dad08b1cd4512f141523cdbfa7f3bd10) )
+	ROM_LOAD( "cashfilla2p2.40_23.1.89.bin" , 0x0000, 0x8000, CRC(d52a2c5d) SHA1(b97c099ef145ebf3ba6aded0b4efa910dfd83568) )
+	ROM_LOAD( "cashfilla5p2.40_23.1.89.bin" , 0x0000, 0x8000, CRC(2ec712b7) SHA1(24b85b46dad08b1cd4512f141523cdbfa7f3bd10) )
 	ROM_LOAD( "cf.bin", 0x0000, 0x8000, CRC(e097baa6) SHA1(60d8cd01c879d24ffbd97070f5431e8e1ca20f3f) )
 ROM_END
 
@@ -1336,14 +1336,14 @@ ROM_END
 
 ROM_START( j2criscr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ccjpot 20p.bin", 0x0000, 0x8000, CRC(8b00ab7d) SHA1(1986cb623c91272c7177402a68df1fdd0a3b1447) )
+	ROM_LOAD( "ccjpot_20p.bin" , 0x0000, 0x8000, CRC(8b00ab7d) SHA1(1986cb623c91272c7177402a68df1fdd0a3b1447) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "criss cross jackpot 10p 2.40.bin", 0x0000, 0x8000, CRC(fa12be2b) SHA1(3edd68b80e3694542c12fdd031bc2dc9dbe9f925) )
-	ROM_LOAD( "criss cross jackpot 10p 4.80.bin", 0x0000, 0x8000, CRC(dfe8b1fa) SHA1(a16d1e9b28d902f8bd4ef7dca08c9e79ca9385ea) )
-	ROM_LOAD( "criss cross jackpot 10p all cash 2.40.bin", 0x0000, 0x8000, CRC(fa12be2b) SHA1(3edd68b80e3694542c12fdd031bc2dc9dbe9f925) )
-	ROM_LOAD( "criss cross jackpot 20p 4.80 p1 15.2.91.bin", 0x0000, 0x8000, CRC(85ac71fe) SHA1(816d09b9fe7eec4bc4bda0c809100f2df29efe2d) )
-	ROM_LOAD( "criss cross jackpot 20p all cash 4.80.bin", 0x0000, 0x8000, CRC(44494281) SHA1(23721853cf279376743e7dd95ae9956e4fbd80a4) )
+	ROM_LOAD( "criss_cross_jackpot_10p_2.40.bin"    , 0x0000, 0x8000, CRC(fa12be2b) SHA1(3edd68b80e3694542c12fdd031bc2dc9dbe9f925) )
+	ROM_LOAD( "criss_cross_jackpot_10p_4.80.bin"    , 0x0000, 0x8000, CRC(dfe8b1fa) SHA1(a16d1e9b28d902f8bd4ef7dca08c9e79ca9385ea) )
+	ROM_LOAD( "criss_cross_jackpot_10p_all_cash_2.40.bin"      , 0x0000, 0x8000, CRC(fa12be2b) SHA1(3edd68b80e3694542c12fdd031bc2dc9dbe9f925) )
+	ROM_LOAD( "criss_cross_jackpot_20p_4.80_p1_15.2.91.bin"      , 0x0000, 0x8000, CRC(85ac71fe) SHA1(816d09b9fe7eec4bc4bda0c809100f2df29efe2d) )
+	ROM_LOAD( "criss_cross_jackpot_20p_all_cash_4.80.bin"      , 0x0000, 0x8000, CRC(44494281) SHA1(23721853cf279376743e7dd95ae9956e4fbd80a4) )
 	ROM_LOAD( "crisscrossjackpot.bin", 0x0000, 0x8000, CRC(3936b6a7) SHA1(c5ccb519acc8022ffb663ce6ddee71856b84f23a) )
 ROM_END
 
@@ -1359,13 +1359,13 @@ ROM_END
 
 ROM_START( j2frucnx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fruit connexion 2p 2.00.bin", 0x0000, 0x8000, CRC(9d02ff13) SHA1(d905406da87fb66b906e892a9fabd9eb02fd84ce) )
+	ROM_LOAD( "fruit_connexion_2p_2.00.bin"   , 0x0000, 0x8000, CRC(9d02ff13) SHA1(d905406da87fb66b906e892a9fabd9eb02fd84ce) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "fruit connexion 10p 4.80 7.11.89.bin", 0x0000, 0x8000, CRC(a0b34ba1) SHA1(7af4e9fe4c49eb4a129709485fed5cb685b5b487) )
-	ROM_LOAD( "fruit connexion 2p 2.40 7.11.89.bin", 0x0000, 0x8000, CRC(8666298a) SHA1(ac41d4c66e344a8aafdc94f7d9afb67342516f56) )
-	ROM_LOAD( "fruit connexion 5p 2.00.bin", 0x0000, 0x8000, CRC(0d05a2b1) SHA1(5f80f6b032078e6ad595b5494b150540dc65cf7b) )
-	ROM_LOAD( "fruit connexion 5p 2.40 7.11.89.bin", 0x0000, 0x8000, CRC(e907092a) SHA1(25cf4d399e37b4c1bc394f5d1a3d2dcd2dce1d92) )
+	ROM_LOAD( "fruit_connexion_10p_4.80_7.11.89.bin"    , 0x0000, 0x8000, CRC(a0b34ba1) SHA1(7af4e9fe4c49eb4a129709485fed5cb685b5b487) )
+	ROM_LOAD( "fruit_connexion_2p_2.40_7.11.89.bin"    , 0x0000, 0x8000, CRC(8666298a) SHA1(ac41d4c66e344a8aafdc94f7d9afb67342516f56) )
+	ROM_LOAD( "fruit_connexion_5p_2.00.bin"   , 0x0000, 0x8000, CRC(0d05a2b1) SHA1(5f80f6b032078e6ad595b5494b150540dc65cf7b) )
+	ROM_LOAD( "fruit_connexion_5p_2.40_7.11.89.bin"    , 0x0000, 0x8000, CRC(e907092a) SHA1(25cf4d399e37b4c1bc394f5d1a3d2dcd2dce1d92) )
 ROM_END
 
 
@@ -1461,9 +1461,9 @@ ROM_END
 
 ROM_START( j2nudmon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nudge money 2p-2 15.12.99 p1.bin", 0x0000, 0x4000, CRC(0afd836b) SHA1(3656d0ff3c60392f3819ebed05ffc9732553500f) )
-	ROM_LOAD( "nudge money 2p-2 15.12.99 p2.bin", 0x2000, 0x4000, CRC(e7e08048) SHA1(59580adcdb8bd92c29ed5e9b1f37f631b048f15e) )
-	ROM_LOAD( "nudge money 2p-2 15.12.99 p3.bin", 0x4000, 0x4000, CRC(010cc7b8) SHA1(0082f2f46b7668f8ee5b24e719ff65079074fbec) )
+	ROM_LOAD( "nudge_money_2p-2_15.12.99_p1.bin"    , 0x0000, 0x4000, CRC(0afd836b) SHA1(3656d0ff3c60392f3819ebed05ffc9732553500f) )
+	ROM_LOAD( "nudge_money_2p-2_15.12.99_p2.bin"    , 0x2000, 0x4000, CRC(e7e08048) SHA1(59580adcdb8bd92c29ed5e9b1f37f631b048f15e) )
+	ROM_LOAD( "nudge_money_2p-2_15.12.99_p3.bin"    , 0x4000, 0x4000, CRC(010cc7b8) SHA1(0082f2f46b7668f8ee5b24e719ff65079074fbec) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
 	ROM_LOAD( "pcp_nudge_money_2p_p1.bin", 0x0000, 0x2000, CRC(ed681bbb) SHA1(55b32e5814afcf0e1e6016d43a33078d2370c27f) )
@@ -1556,15 +1556,15 @@ ROM_END
 
 ROM_START( j2bkroll )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bank roll f28165 6.1.bin", 0x0000, 0x004000, CRC(0e016ab1) SHA1(7a5a15aee9970c0f33c4052238dbb2a4f28e9ab0) )
-	ROM_LOAD( "bank roll f28180 6.2.bin", 0x4000, 0x004000, CRC(87482480) SHA1(87d592428f32fc7119c3f22fc82c76ab16215502) )
-	ROM_LOAD( "bank roll f28196 6.3.bin", 0x8000, 0x004000, CRC(6db9539c) SHA1(4deaa4d4b7cce1c35372cabc77d463142c0dca83) )
+	ROM_LOAD( "bank_roll_f28165_6.1.bin"   , 0x0000, 0x004000, CRC(0e016ab1) SHA1(7a5a15aee9970c0f33c4052238dbb2a4f28e9ab0) )
+	ROM_LOAD( "bank_roll_f28180_6.2.bin"   , 0x4000, 0x004000, CRC(87482480) SHA1(87d592428f32fc7119c3f22fc82c76ab16215502) )
+	ROM_LOAD( "bank_roll_f28196_6.3.bin"   , 0x8000, 0x004000, CRC(6db9539c) SHA1(4deaa4d4b7cce1c35372cabc77d463142c0dca83) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "bank roll 6.a1.bin", 0x0000, 0x004000, CRC(33122fad) SHA1(99d65166058f6d15de3e0f0a3bf5c8f06139a708) )
-	ROM_LOAD( "bank roll 6.p1.bin", 0x0000, 0x004000, CRC(0479f4cb) SHA1(d5e8015b9611fb1da7d49f05336ee894b0da1017) )
-	ROM_LOAD( "bank roll 6.x1.bin", 0x0000, 0x004000, CRC(1af05645) SHA1(307cd8b7f6a06e8b0d12b95638d2113e456507d7) )
-	ROM_LOAD( "bank roll 6.y1.bin", 0x0000, 0x004000, CRC(90ae3e66) SHA1(f07602dfb9b4f15639ec06f54d7a0ca916543268) )
+	ROM_LOAD( "bank_roll_6.a1.bin"  , 0x0000, 0x004000, CRC(33122fad) SHA1(99d65166058f6d15de3e0f0a3bf5c8f06139a708) )
+	ROM_LOAD( "bank_roll_6.p1.bin"  , 0x0000, 0x004000, CRC(0479f4cb) SHA1(d5e8015b9611fb1da7d49f05336ee894b0da1017) )
+	ROM_LOAD( "bank_roll_6.x1.bin"  , 0x0000, 0x004000, CRC(1af05645) SHA1(307cd8b7f6a06e8b0d12b95638d2113e456507d7) )
+	ROM_LOAD( "bank_roll_6.y1.bin"  , 0x0000, 0x004000, CRC(90ae3e66) SHA1(f07602dfb9b4f15639ec06f54d7a0ca916543268) )
 	ROM_LOAD( "bnkrol61.bin", 0x0000, 0x004000, CRC(2298cbcc) SHA1(6ff074665cd1c2da3c17b88b987c7e6e165dd504) )
 	ROM_LOAD( "bnkrol62.bin", 0x0000, 0x004000, CRC(374872aa) SHA1(ce49edd745cd7d4eacc07ad02522db02d6f4b315) )
 	ROM_LOAD( "bnkrol63.bin", 0x0000, 0x004000, CRC(0f722140) SHA1(ca1b6821f31981d17ca3d6aca70decadbf2a7dc9) )
@@ -1582,14 +1582,14 @@ ROM_END
 
 ROM_START( j2cvault )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cashvault b15236 1.1 x.bin", 0x0000, 0x004000, CRC(ce5abe6f) SHA1(6682f8fc94ba1128cc5dce95ac476820c0cdf2df) )
-	ROM_LOAD( "cashvault b15244 1.2.bin", 0x4000, 0x004000, CRC(b72ab676) SHA1(9b0c51e9adf374f3ac72d1abee1f3b48599bfe17) )
+	ROM_LOAD( "cashvault_b15236_1.1_x.bin"   , 0x0000, 0x004000, CRC(ce5abe6f) SHA1(6682f8fc94ba1128cc5dce95ac476820c0cdf2df) )
+	ROM_LOAD( "cashvault_b15244_1.2.bin"  , 0x4000, 0x004000, CRC(b72ab676) SHA1(9b0c51e9adf374f3ac72d1abee1f3b48599bfe17) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "cashvault 1.1.bin", 0x0000, 0x004000, CRC(daab829b) SHA1(59dd52c375b5870c7355630db25ee01291328741) )
-	ROM_LOAD( "cashvault b11416 1a1.bin", 0x0000, 0x004000, CRC(e7b8c787) SHA1(ae71302c5a69a2bc982c1915e1a8ded86d04eb52) )
-	ROM_LOAD( "cashvault b11438 1p1.bin", 0x0000, 0x004000, CRC(d0d31ce1) SHA1(c3858e6b2f6bdfe55cf762d131484e393b79a2a0) )
-	ROM_LOAD( "cashvault b15232 1.1 y.bin", 0x0000, 0x004000, CRC(f349fb73) SHA1(b2ccdfefaa05075791579d9af711991f8c44a93b) )
+	ROM_LOAD( "cashvault_1.1.bin" , 0x0000, 0x004000, CRC(daab829b) SHA1(59dd52c375b5870c7355630db25ee01291328741) )
+	ROM_LOAD( "cashvault_b11416_1a1.bin"  , 0x0000, 0x004000, CRC(e7b8c787) SHA1(ae71302c5a69a2bc982c1915e1a8ded86d04eb52) )
+	ROM_LOAD( "cashvault_b11438_1p1.bin"  , 0x0000, 0x004000, CRC(d0d31ce1) SHA1(c3858e6b2f6bdfe55cf762d131484e393b79a2a0) )
+	ROM_LOAD( "cashvault_b15232_1.1_y.bin"   , 0x0000, 0x004000, CRC(f349fb73) SHA1(b2ccdfefaa05075791579d9af711991f8c44a93b) )
 ROM_END
 
 
@@ -1602,8 +1602,8 @@ ROM_START( j2cashab ) // check
 	ROM_LOAD( "2p_cashablanca.bin", 0x0000, 0x008000, CRC(a736a0e0) SHA1(2e295ee5501322eed1f00027c477bb4ea57b5c67) )
 	ROM_LOAD( "2p_cashablanca_v01.bin", 0x0000, 0x008000, CRC(53f06670) SHA1(4f60f9715d648525796a55c587d6ee1d54a1cbde) )
 	ROM_LOAD( "5p_cashablanca.bin", 0x0000, 0x008000, CRC(126d558a) SHA1(09c866dfe6c23e328252ab0e3f94788a0cfce3f7) )
-	ROM_LOAD( "casha blanca 20p.bin", 0x0000, 0x008000, CRC(81d85698) SHA1(343f5f1d251220287167ae4e600e200450236f39) )
-	ROM_LOAD( "casha blanca 2p.bin", 0x0000, 0x008000, CRC(53f06670) SHA1(4f60f9715d648525796a55c587d6ee1d54a1cbde) )
+	ROM_LOAD( "casha_blanca_20p.bin"  , 0x0000, 0x008000, CRC(81d85698) SHA1(343f5f1d251220287167ae4e600e200450236f39) )
+	ROM_LOAD( "casha_blanca_2p.bin"  , 0x0000, 0x008000, CRC(53f06670) SHA1(4f60f9715d648525796a55c587d6ee1d54a1cbde) )
 	ROM_LOAD( "cashablanca_5p_v0_1.bin", 0x0000, 0x008000, CRC(95d25467) SHA1(b77bb86e1ecab264bcae99bc02bb0370a4529081) )
 ROM_END
 
@@ -1974,7 +1974,7 @@ ROM_END
 
 ROM_START( j2clbbin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club bingo 3.1.bin", 0x0000, 0x008000, CRC(ad6d6c23) SHA1(247e2117e5285d1309a8a92be96ee67e46279aa6) )
+	ROM_LOAD( "club_bingo_3.1.bin"  , 0x0000, 0x008000, CRC(ad6d6c23) SHA1(247e2117e5285d1309a8a92be96ee67e46279aa6) )
 ROM_END
 
 

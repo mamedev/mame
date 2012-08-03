@@ -4488,7 +4488,7 @@ ROM_END
 
 ROM_START( sc2catms )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cat and mouse p1.bin", 0x0000, 0x010000, CRC(b33b2a75) SHA1(ac57b4d33ac1218e39b8bbd669c40bdbb3839ccf) )
+	ROM_LOAD( "cat_and_mouse_p1.bin"   , 0x0000, 0x010000, CRC(b33b2a75) SHA1(ac57b4d33ac1218e39b8bbd669c40bdbb3839ccf) )
 
 	sc2_catms_sound
 ROM_END
@@ -4593,7 +4593,7 @@ ROM_END
 
 ROM_START( sc2ctms25 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cat and mouse ver puss7.2.bin", 0x0000, 0x010000, CRC(6968bf9c) SHA1(c44faf2e5b391bee43021ad8544fb8d502f90433) )
+	ROM_LOAD( "cat_and_mouse_ver_puss7.2.bin"    , 0x0000, 0x010000, CRC(6968bf9c) SHA1(c44faf2e5b391bee43021ad8544fb8d502f90433) )
 
 	sc2_catms_sound
 ROM_END
@@ -5150,7 +5150,7 @@ ROM_END
 
 ROM_START( sc2ofool1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "game 147s only fools.bin", 0x0000, 0x010000, CRC(6cb6cef1) SHA1(bfa40f517b1455e4d563be5964605be63e950e87) )
+	ROM_LOAD( "game_147s_only_fools.bin"   , 0x0000, 0x010000, CRC(6cb6cef1) SHA1(bfa40f517b1455e4d563be5964605be63e950e87) )
 
 	sc2_ofool_matrix
 	sc2_ofool_sound
@@ -5158,7 +5158,7 @@ ROM_END
 
 ROM_START( sc2ofool2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fools & horses 10m 6.bin", 0x0000, 0x010000, CRC(5fe48a02) SHA1(fd5b07a58567e0c5eb75bf1526a853b3a60ddfa9) )
+	ROM_LOAD( "fools_&_horses_10m_6.bin"    , 0x0000, 0x010000, CRC(5fe48a02) SHA1(fd5b07a58567e0c5eb75bf1526a853b3a60ddfa9) )
 
 	sc2_ofool_matrix
 	sc2_ofool_sound
@@ -5175,7 +5175,7 @@ ROM_END
 
 ROM_START( sc2ofool4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fools scor ii 10p.bin", 0x0000, 0x010000, CRC(1d6245b7) SHA1(f73b4741cf07d96ec79d907b88d07cd20c748dd3) )
+	ROM_LOAD( "fools_scor_ii_10p.bin"   , 0x0000, 0x010000, CRC(1d6245b7) SHA1(f73b4741cf07d96ec79d907b88d07cd20c748dd3) )
 
 	sc2_ofool_matrix
 	sc2_ofool_sound
@@ -5393,7 +5393,7 @@ ROM_END
 //It'll probably becom clear when the casino hardware is working
 ROM_START( sc2cops )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cops & robbers 10 p1 (27512)", 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
+	ROM_LOAD( "cops_&_robbers_10_p1_(27512)"     , 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
 	ROM_LOAD( "95000578.p1", 0x0000, 0x010000, CRC(bdd56a09) SHA1(92d0416578c55075a127f1c2af8d6de5216dd189) )//official part number for cops-and-robbers-mtx-ass.bin, cops & robbers 10 p2 (27512
@@ -5474,7 +5474,7 @@ ROM_END
 //Does this even need a matrix?
 ROM_START( sc2cops5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cops & robbers 6 25p (27512)", 0x0000, 0x010000, CRC(0ad3fedf) SHA1(25775a80272c72234be9f528cc8f13cf9e1adbf7) )
+	ROM_LOAD( "cops_&_robbers_6_25p_(27512)"     , 0x0000, 0x010000, CRC(0ad3fedf) SHA1(25775a80272c72234be9f528cc8f13cf9e1adbf7) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
 	ROM_LOAD( "copsdot8", 0x0000, 0x010000, CRC(0eff2127) SHA1(e9788999ac6006faf0eb4e9d8ef1fd52f092be5a) )
@@ -6852,7 +6852,7 @@ ROM_START( sc2scshx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scx0v1e.bin", 0x0000, 0x010000, CRC(f0e52b5e) SHA1(431a56bbcb2c519ba5af9f58a3588ce5c2deb1f8) )
 	ROM_REGION( 0x20000, "altrevs", 0 )
-	ROM_LOAD( "scx 1p bin.dat", 0x0000, 0x010000, CRC(4a4d70d2) SHA1(9f14f6ba0a3c6c5c1a78c68b0bba49fb948142e5) )
+	ROM_LOAD( "scx_1p_bin.dat"  , 0x0000, 0x010000, CRC(4a4d70d2) SHA1(9f14f6ba0a3c6c5c1a78c68b0bba49fb948142e5) )
 	ROM_LOAD( "scx1.1b", 0x0000, 0x010000, CRC(7856b2bb) SHA1(cfa89418113bbbf9400c45b06a6e86fd15b57d52) )
 	ROM_LOAD( "scx1v0.bin", 0x0000, 0x010000, CRC(8ea1be86) SHA1(42bd63e94e3876f21643813de64f16e701c1429f) )
 	ROM_LOAD( "scx1v1.bin", 0x0000, 0x010000, CRC(4cb99292) SHA1(956b951a51d1dfae361f9e554eb918730c8013fc) )
@@ -6949,7 +6949,7 @@ ROM_END
 
 ROM_START( sc2cnile1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cash-nile 150 047s.bin", 0x0000, 0x010000, CRC(2d8e9037) SHA1(b3d93488d662260cfaaf624baec68dbe92f71640) )
+	ROM_LOAD( "cash-nile_150_047s.bin"  , 0x0000, 0x010000, CRC(2d8e9037) SHA1(b3d93488d662260cfaaf624baec68dbe92f71640) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 

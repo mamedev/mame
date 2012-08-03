@@ -8040,8 +8040,8 @@ ROM_END
 
 ROM_START( sc4kkongj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "king kon.lo", 0x00001, 0x080000, CRC(95e8e7d1) SHA1(6a6af285a2ebf197ed4f14e5275bdd2d1ebc5283) )
-	ROM_LOAD16_BYTE( "king kon.hi", 0x00000, 0x080000, CRC(859bcf1a) SHA1(6d2f81640f2045916b3bad52673de0c14a549a8f) )
+	ROM_LOAD16_BYTE( "king_kon.lo" , 0x00001, 0x080000, CRC(95e8e7d1) SHA1(6a6af285a2ebf197ed4f14e5275bdd2d1ebc5283) )
+	ROM_LOAD16_BYTE( "king_kon.hi" , 0x00000, 0x080000, CRC(859bcf1a) SHA1(6d2f81640f2045916b3bad52673de0c14a549a8f) )
 	sc_kkong_others
 ROM_END
 
@@ -16934,8 +16934,8 @@ ROM_END
 
 ROM_START( sc4czfrb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "crazyfruits game rom low.bin", 0x00001, 0x080000, CRC(0afc9913) SHA1(1b3122d9a16a6f58893d241b96aa8b9145c09151) )
-	ROM_LOAD16_BYTE( "crazyfruits game rom hi.bin", 0x00000, 0x080000, CRC(15d795db) SHA1(7f3d043c4abfb9116e700381cc4c2096c52e6fe7) )
+	ROM_LOAD16_BYTE( "crazyfruits_game_rom_low.bin"   , 0x00001, 0x080000, CRC(0afc9913) SHA1(1b3122d9a16a6f58893d241b96aa8b9145c09151) )
+	ROM_LOAD16_BYTE( "crazyfruits_game_rom_hi.bin"   , 0x00000, 0x080000, CRC(15d795db) SHA1(7f3d043c4abfb9116e700381cc4c2096c52e6fe7) )
 	sc_czfr_others
 ROM_END
 

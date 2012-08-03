@@ -357,17 +357,17 @@ ROM_END
 
 ROM_START( pr_bearx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "bear x 2.3 8.bin", 0x0000, 0x008000, CRC(db781396) SHA1(5b1755b481c1ccb02508d17fc2738878a5fe5f44) )
+	ROM_LOAD( "bear_x_2.3_8.bin"   , 0x0000, 0x008000, CRC(db781396) SHA1(5b1755b481c1ccb02508d17fc2738878a5fe5f44) )
 ROM_END
 
 ROM_START( pr_bearxa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "bear x v2-2 (27256)", 0x0000, 0x008000, CRC(86ec85b1) SHA1(49304d0c6cffc34a28a4205c3ed9893dabb95246) )
+	ROM_LOAD( "bear_x_v2-2_(27256)"   , 0x0000, 0x008000, CRC(86ec85b1) SHA1(49304d0c6cffc34a28a4205c3ed9893dabb95246) )
 ROM_END
 
 ROM_START( pr_bearxb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "bear x v1-3 (27256)", 0x0000, 0x008000, CRC(c81fd801) SHA1(4833fdeeb8fc4d5e5a087a1077482ddb811cded8) )
+	ROM_LOAD( "bear_x_v1-3_(27256)"   , 0x0000, 0x008000, CRC(c81fd801) SHA1(4833fdeeb8fc4d5e5a087a1077482ddb811cded8) )
 ROM_END
 
 ROM_START( pr_bearxc )
@@ -447,12 +447,12 @@ ROM_END
 
 ROM_START( pr_fspotc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "funspot v2.1 20p po 82%.bin", 0x0000, 0x008000, CRC(caa45a7f) SHA1(7b04be4157750817e77217ebad2c4d2092496347) )
+	ROM_LOAD( "funspot_v2.1_20p_po_82%.bin"    , 0x0000, 0x008000, CRC(caa45a7f) SHA1(7b04be4157750817e77217ebad2c4d2092496347) )
 ROM_END
 
 ROM_START( pr_fspotd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "funspot v2.1 7 button.bin", 0x0000, 0x008000, CRC(b8c90956) SHA1(dbf51ffee21b2a2017dd713b75029110d8cace33) )
+	ROM_LOAD( "funspot_v2.1_7_button.bin"   , 0x0000, 0x008000, CRC(b8c90956) SHA1(dbf51ffee21b2a2017dd713b75029110d8cace33) )
 ROM_END
 
 ROM_START( pr_fspote )
@@ -462,12 +462,12 @@ ROM_END
 
 ROM_START( pr_fspotf )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "funspot v1.1 20p po 82%.bin", 0x0000, 0x008000, CRC(9c50b37a) SHA1(cffd52ba9c452e51df0cab0e4766534b6b8a1386) )
+	ROM_LOAD( "funspot_v1.1_20p_po_82%.bin"    , 0x0000, 0x008000, CRC(9c50b37a) SHA1(cffd52ba9c452e51df0cab0e4766534b6b8a1386) )
 ROM_END
 
 ROM_START( pr_fspotg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "funspot v1.1 6 button.bin", 0x0000, 0x008000, CRC(ee3de053) SHA1(e4f6901aadf918ec19f475c1df440a3f09142c01) )
+	ROM_LOAD( "funspot_v1.1_6_button.bin"   , 0x0000, 0x008000, CRC(ee3de053) SHA1(e4f6901aadf918ec19f475c1df440a3f09142c01) )
 ROM_END
 
 ROM_START( pr_gnuc )
@@ -483,12 +483,12 @@ ROM_END
 
 ROM_START( pr_magln )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "magic lines v2-1.bin", 0x0000, 0x008000, CRC(b2619fac) SHA1(7a6603f538fde3ebda8025589bb562ee35a8a097) )
+	ROM_LOAD( "magic_lines_v2-1.bin"  , 0x0000, 0x008000, CRC(b2619fac) SHA1(7a6603f538fde3ebda8025589bb562ee35a8a097) )
 ROM_END
 
 ROM_START( pr_maglna )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "magic lines v1-1.bin", 0x0000, 0x008000, CRC(ff7103d0) SHA1(9c926d8f97d3cd95bd721cfb751f583ef610c6e2) )
+	ROM_LOAD( "magic_lines_v1-1.bin"  , 0x0000, 0x008000, CRC(ff7103d0) SHA1(9c926d8f97d3cd95bd721cfb751f583ef610c6e2) )
 ROM_END
 
 ROM_START( pr_swop )
@@ -509,7 +509,7 @@ ROM_END
 
 ROM_START( pr_5xcsh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "5 x_cash_v24a_15bingo", 0x0000, 0x010000, CRC(65949855) SHA1(50ea765a45ae6e28ccc71e46b9ee8d9e81614420) )
+	ROM_LOAD( "5_x_cash_v24a_15bingo" , 0x0000, 0x010000, CRC(65949855) SHA1(50ea765a45ae6e28ccc71e46b9ee8d9e81614420) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "5x_cash_235sound1", 0x0000, 0x020000, CRC(fad44418) SHA1(af41e6eb07f1b0665c7cd6d1a31b168532f5dbff) )
@@ -517,7 +517,7 @@ ROM_END
 
 ROM_START( pr_7hvn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "7 heaven v170 (27256)", 0x0000, 0x008000, CRC(6605c956) SHA1(ffa663dc9a5e6d9138aeef9f65c8d5ee4bd3a308) )
+	ROM_LOAD( "7_heaven_v170_(27256)"   , 0x0000, 0x008000, CRC(6605c956) SHA1(ffa663dc9a5e6d9138aeef9f65c8d5ee4bd3a308) )
 ROM_END
 
 
@@ -543,32 +543,32 @@ ROM_END
 	
 ROM_START( pr_7hvne )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven 892a20pn-390 (27256)", 0x0000, 0x008000, CRC(ffd1a8e0) SHA1(4b3a72c855d5b28d8be5db13166c58a44a1cbb59) )
+	ROM_LOAD( "777_heaven_892a20pn-390_(27256)"   , 0x0000, 0x008000, CRC(ffd1a8e0) SHA1(4b3a72c855d5b28d8be5db13166c58a44a1cbb59) )
 ROM_END
 	
 ROM_START( pr_7hvnf )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven 892a10pn-380 (27256)", 0x0000, 0x008000, CRC(ca9d2108) SHA1(ebbb54c6640c67ce905a2dbf83f9f2fde31d342f) )
+	ROM_LOAD( "777_heaven_892a10pn-380_(27256)"   , 0x0000, 0x008000, CRC(ca9d2108) SHA1(ebbb54c6640c67ce905a2dbf83f9f2fde31d342f) )
 ROM_END
 
 ROM_START( pr_7hvng )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven 892a10pn-370", 0x0000, 0x008000, CRC(26c875df) SHA1(fd5fbadd1d8455f855c60213c54e9976d4763227) )
+	ROM_LOAD( "777_heaven_892a10pn-370"  , 0x0000, 0x008000, CRC(26c875df) SHA1(fd5fbadd1d8455f855c60213c54e9976d4763227) )
 ROM_END
 
 ROM_START( pr_7hvnh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven 892a10po-340", 0x0000, 0x008000, CRC(ddd7c3e4) SHA1(853a3d41492392470d619701987bdb95ae01acdc) )
+	ROM_LOAD( "777_heaven_892a10po-340"  , 0x0000, 0x008000, CRC(ddd7c3e4) SHA1(853a3d41492392470d619701987bdb95ae01acdc) )
 ROM_END
 
 ROM_START( pr_7hvni )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven pc90 v23-0 (27256)", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
+	ROM_LOAD( "777_heaven_pc90_v23-0_(27256)"    , 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
 ROM_END
 
 ROM_START( pr_7hvnj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven pc90 v110 (27256)", 0x0000, 0x008000, CRC(2c7966a4) SHA1(67b10adf1440fd31e94c88b61f341734b381ca3f) )
+	ROM_LOAD( "777_heaven_pc90_v110_(27256)"    , 0x0000, 0x008000, CRC(2c7966a4) SHA1(67b10adf1440fd31e94c88b61f341734b381ca3f) )
 ROM_END
 
 ROM_START( pr_7hvnk )
@@ -593,27 +593,27 @@ ROM_END
 
 ROM_START( pr_7hvno )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven 8t 5c 10p (27512)", 0x0000, 0x010000, CRC(dadbb559) SHA1(f8bb6579446548f1d0519555eabfa0c076885832) )
+	ROM_LOAD( "777_heaven_8t_5c_10p_(27512)"     , 0x0000, 0x010000, CRC(dadbb559) SHA1(f8bb6579446548f1d0519555eabfa0c076885832) )
 ROM_END
 
 ROM_START( pr_7hvnp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven pc90 10 (27512)", 0x0000, 0x010000, CRC(91d67978) SHA1(de57a4095c814d6c396b3fa80f66fc3eb912d42f) )
+	ROM_LOAD( "777_heaven_pc90_10_(27512)"    , 0x0000, 0x010000, CRC(91d67978) SHA1(de57a4095c814d6c396b3fa80f66fc3eb912d42f) )
 ROM_END
 
 ROM_START( pr_7hvnq )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven pc90 8t 4c 20p (27512)", 0x0000, 0x010000, CRC(7cadbd6c) SHA1(fb0ec1b8e43e772b2fd2b71b82fafc6c06d4d3a4) )
+	ROM_LOAD( "777_heaven_pc90_8t_4c_20p_(27512)"      , 0x0000, 0x010000, CRC(7cadbd6c) SHA1(fb0ec1b8e43e772b2fd2b71b82fafc6c06d4d3a4) )
 ROM_END
 
 ROM_START( pr_7hvnr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven pc90 8t 4c 5p (27512)", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
+	ROM_LOAD( "777_heaven_pc90_8t_4c_5p_(27512)"      , 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
 ROM_END
 
 ROM_START( pr_7hvns )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "777 heaven pc90 8t 5c 5p (27512)", 0x0000, 0x010000, CRC(47214e06) SHA1(318f7d9891e7d37e2956c462bd04137af5bf972b) )
+	ROM_LOAD( "777_heaven_pc90_8t_5c_5p_(27512)"      , 0x0000, 0x010000, CRC(47214e06) SHA1(318f7d9891e7d37e2956c462bd04137af5bf972b) )
 ROM_END
 
 ROM_START( pr_7hvnt )
@@ -629,7 +629,7 @@ ROM_END
 	
 ROM_START( pr_alwy9 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "always 9 10p.bin", 0x0000, 0x010000, CRC(aff337c0) SHA1(a335a857c1bba696150d51cabfd39a2996c1092f) )
+	ROM_LOAD( "always_9_10p.bin"  , 0x0000, 0x010000, CRC(aff337c0) SHA1(a335a857c1bba696150d51cabfd39a2996c1092f) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "always9.bin", 0x0000, 0x010000, CRC(6372d4d6) SHA1(7e767fe531c50e6d8f810193d7cdb55703114914) )
@@ -637,7 +637,7 @@ ROM_END
 
 ROM_START( pr_barbl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "bars and bells.bin", 0x0000, 0x010000, CRC(a5d65329) SHA1(e28954a4555b8d7f0781cb26f2a10390e142af34) )
+	ROM_LOAD( "bars_and_bells.bin"  , 0x0000, 0x010000, CRC(a5d65329) SHA1(e28954a4555b8d7f0781cb26f2a10390e142af34) )
 ROM_END
 
 ROM_START( pr_batls )
@@ -667,7 +667,7 @@ ROM_START( pr_bigdp )
 	ROM_LOAD( "962a206n.368", 0x0000, 0x010000, CRC(a59a22c9) SHA1(d1500dfab69ec3e19dbb709122a55227cfef05a1) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "big dipper ndp.bin", 0x0000, 0x010000, CRC(23f483c6) SHA1(acc45b30aaa22c35f6cfe44bf92997c8ac1a3cff) )
+	ROM_LOAD( "big_dipper_ndp.bin"  , 0x0000, 0x010000, CRC(23f483c6) SHA1(acc45b30aaa22c35f6cfe44bf92997c8ac1a3cff) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "962snd1.050", 0x000000, 0x020000, CRC(618003a0) SHA1(01d5ab57dbe481729ef5dccca53c458eadaf042e) )
@@ -679,15 +679,15 @@ ROM_START( pr_bulls )
 	ROM_LOAD( "beye58c", 0x0000, 0x010000, CRC(5fc52311) SHA1(dd4d3f29ec608c37d3d644bfbfa3ba06cc134b59) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "bullseye std 6 tok 6de7.bin", 0x0000, 0x010000, CRC(c3b6e153) SHA1(03a3a4e781f1b9029bfbe976a8223df1bacb0f67) )
+	ROM_LOAD( "bullseye_std_6_tok_6de7.bin"    , 0x0000, 0x010000, CRC(c3b6e153) SHA1(03a3a4e781f1b9029bfbe976a8223df1bacb0f67) )
 	ROM_LOAD( "bullseye10", 0x0000, 0x010000, CRC(de43085c) SHA1(bdd1e22545680c9a2cc3cb4244a4887cb0f5519e) )
 
 	ROM_REGION( 0x80000, "unknown", 0 ) // don't know what this is, doesn't look the same
 	ROM_LOAD( "bb10p1", 0x0000, 0x020000, CRC(afe7b7bb) SHA1(dcf65e2113354171dc8858c6bfd8b97955b470a0) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
-	ROM_LOAD( "010snd1 316e.bin", 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )//bullseyesnd
-	ROM_LOAD( "010snd2 9e9a.bin", 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
+	ROM_LOAD( "010snd1_316e.bin" , 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )//bullseyesnd
+	ROM_LOAD( "010snd2_9e9a.bin" , 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
 ROM_END
 
 ROM_START( pr_bulbn )
@@ -751,14 +751,14 @@ ROM_END
 
 ROM_START( pr_crz77 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "crazy 777", 0x0000, 0x010000, CRC(c77e0b92) SHA1(7558fda85cb68ef0e1b183ce9e4824f6968a931e) )
+	ROM_LOAD( "crazy_777" , 0x0000, 0x010000, CRC(c77e0b92) SHA1(7558fda85cb68ef0e1b183ce9e4824f6968a931e) )
 ROM_END
 
 ROM_START( pr_crzbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazybars.bin", 0x0000, 0x010000, CRC(896ad5d3) SHA1(6df42dc8016d50239f9467af016e3a4224065599) )
 	ROM_REGION( 0x80000, "altrevs", 0 ) // 'PCP' Super Bars seems to be the same thing
-	ROM_LOAD( "s bars 052a20p0.050 procon.bin", 0x0000, 0x010000, CRC(037a6a82) SHA1(6f804e80e529293f9de540623cd4e4c5a4fd1022) )
+	ROM_LOAD( "s_bars_052a20p0.050_procon.bin"   , 0x0000, 0x010000, CRC(037a6a82) SHA1(6f804e80e529293f9de540623cd4e4c5a4fd1022) )
 ROM_END
 
 ROM_START( pr_coyot )
@@ -786,7 +786,7 @@ ROM_START( pr_dblup )
 	ROM_LOAD( "896a10po.050", 0x0000, 0x008000, CRC(b562bbc5) SHA1(439007dfb4153d3ed635738e82647c0b6ee13cb9) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "double up 5p.bin", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
+	ROM_LOAD( "double_up_5p.bin"  , 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
 //  ROM_LOAD( "doubleupprocon5p(27256)", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
 ROM_END
 
@@ -859,10 +859,10 @@ ROM_START( pr_gldng )
 	ROM_LOAD( "311a30pn.120", 0x0000, 0x010000, CRC(13b2d335) SHA1(5bb26516f527a2b7a5ae9d2b90ae1a8551f09925) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 ) // not sure these are the same game..
-	ROM_LOAD( "golden n v1.1 4-8.bin", 0x0000, 0x008000, CRC(9448ecaf) SHA1(d43f529a94b09f13aa544279b6036f40f620c51f) )
-	ROM_LOAD( "golden n v2.2 4-8.bin", 0x0000, 0x008000, CRC(fab559cd) SHA1(884e5f2a8ae386eee5d5e5c18a6e8d2da1449c8f) )
-	ROM_LOAD( "golden n v3-1.bin", 0x0000, 0x008000, CRC(da302ec7) SHA1(c1dd565f288f7ed55f88e0460739811ce95204dd) )
-	ROM_LOAD( "golden n v4-1.bin", 0x0000, 0x008000, CRC(57346840) SHA1(8eb014968d65326e78a5fc3a6379936db78daf92) )
+	ROM_LOAD( "golden_n_v1.1_4-8.bin"   , 0x0000, 0x008000, CRC(9448ecaf) SHA1(d43f529a94b09f13aa544279b6036f40f620c51f) )
+	ROM_LOAD( "golden_n_v2.2_4-8.bin"   , 0x0000, 0x008000, CRC(fab559cd) SHA1(884e5f2a8ae386eee5d5e5c18a6e8d2da1449c8f) )
+	ROM_LOAD( "golden_n_v3-1.bin"  , 0x0000, 0x008000, CRC(da302ec7) SHA1(c1dd565f288f7ed55f88e0460739811ce95204dd) )
+	ROM_LOAD( "golden_n_v4-1.bin"  , 0x0000, 0x008000, CRC(57346840) SHA1(8eb014968d65326e78a5fc3a6379936db78daf92) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "235snd.003", 0x0000, 0x020000, CRC(71c32280) SHA1(3f6e44b9b43515e08db7266c52b94c5b0a2a7d17) )
@@ -870,10 +870,10 @@ ROM_END
 
 ROM_START( pr_gdft )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "249a05pn-010 (27512)", 0x0000, 0x010000, CRC(99c99d02) SHA1(50e4be53e07de1ace47593a112628f1f76576313) )
+	ROM_LOAD( "249a05pn-010_(27512)" , 0x0000, 0x010000, CRC(99c99d02) SHA1(50e4be53e07de1ace47593a112628f1f76576313) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
-	ROM_LOAD( "249 sound 1-000 (27c040)", 0x0000, 0x080000, CRC(d4b5390f) SHA1(9efee17e0c343e286d3c6eddef85d641664d039f) )
+	ROM_LOAD( "249_sound_1-000_(27c040)"   , 0x0000, 0x080000, CRC(d4b5390f) SHA1(9efee17e0c343e286d3c6eddef85d641664d039f) )
 ROM_END
 
 ROM_START( pr_happy )
@@ -899,12 +899,12 @@ ROM_END
 
 ROM_START( pr_hiclm )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "hi-climber 7 button v2.2.bin", 0x0000, 0x008000, CRC(589fdc5f) SHA1(bb6b4921eb034fcd4ec26aafcdb2366b35ef83f7) )
+	ROM_LOAD( "hi-climber_7_button_v2.2.bin"   , 0x0000, 0x008000, CRC(589fdc5f) SHA1(bb6b4921eb034fcd4ec26aafcdb2366b35ef83f7) )
 ROM_END
 
 ROM_START( pr_hit6 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "hit the six (27512)", 0x0000, 0x010000, CRC(6d4c2139) SHA1(8ee1316e644590d679646f52b7816a9634265737) )
+	ROM_LOAD( "hit_the_six_(27512)"   , 0x0000, 0x010000, CRC(6d4c2139) SHA1(8ee1316e644590d679646f52b7816a9634265737) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "hitthesix.bin", 0x0000, 0x010000, CRC(993990ff) SHA1(9ac16aaf52599a310498eb0ba6f40a763b01dc59) )
@@ -917,7 +917,7 @@ ROM_END
 
 ROM_START( pr_hotsp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "hot spots 5p.bin", 0x0000, 0x008000, CRC(456ba6bf) SHA1(b28d6fe63650e6ce17c279fdb217ce4e9cdd4f2f) )
+	ROM_LOAD( "hot_spots_5p.bin"  , 0x0000, 0x008000, CRC(456ba6bf) SHA1(b28d6fe63650e6ce17c279fdb217ce4e9cdd4f2f) )
 ROM_END
 
 ROM_START( pr_jkpt7 )
@@ -925,8 +925,8 @@ ROM_START( pr_jkpt7 )
 	ROM_LOAD( "j77754.bin", 0x0000, 0x008000, CRC(c8b72a0e) SHA1(b5a93afbf881a98d9b605a5d1b4c5b34735f01d2) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "jackpot 7 10 (27512)", 0x0000, 0x010000, CRC(4230fa35) SHA1(af4bcebf934d2674f9c364a93cb6142cb3d75856) )
-	ROM_LOAD( "jackpot 7 5p.bin", 0x0000, 0x010000, CRC(84e5803c) SHA1(4c4226a18b9fb60ccf9a6fda92e86983eb5bd95c) )
+	ROM_LOAD( "jackpot_7_10_(27512)"   , 0x0000, 0x010000, CRC(4230fa35) SHA1(af4bcebf934d2674f9c364a93cb6142cb3d75856) )
+	ROM_LOAD( "jackpot_7_5p.bin"  , 0x0000, 0x010000, CRC(84e5803c) SHA1(4c4226a18b9fb60ccf9a6fda92e86983eb5bd95c) )
 	ROM_LOAD( "jackpot7s4-80.bin", 0x0000, 0x010000, CRC(8bb8b893) SHA1(ab02aa826b4741196a355299995545bf3617120c) )
 	ROM_LOAD( "jp7.bin", 0x0000, 0x008000, CRC(8b54a58d) SHA1(1663463eb0d3837eb3e2c2baf71c93c776892e11) )
 	ROM_LOAD( "jpot7-10-0a-b.bin", 0x0000, 0x008000, CRC(bd9f6cea) SHA1(4b7e2a12efac325124bc5d3ce76bf68b77d5b9c5) )
@@ -934,20 +934,20 @@ ROM_END
 
 ROM_START( pr_jkrwd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "jokers wild 5p 256.bin", 0x0000, 0x008000, CRC(10dc7dc7) SHA1(a0cc4a880a828742d5bce3c4dfb89797f47f095b) )
+	ROM_LOAD( "jokers_wild_5p_256.bin"   , 0x0000, 0x008000, CRC(10dc7dc7) SHA1(a0cc4a880a828742d5bce3c4dfb89797f47f095b) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "jokerswild.bin", 0x0000, 0x008000, CRC(35c241e5) SHA1(23a639a36711127bae8b0ce68faf396938071006) )
 	ROM_LOAD( "jokerswild220.bin", 0x0000, 0x008000, CRC(24e1ce4d) SHA1(cc606f9abfbaeb4aeeebc2b5acbe66a5e229318e) )
 	ROM_LOAD( "jokerswildprocon10p(27256)", 0x0000, 0x008000, CRC(3c2d9c46) SHA1(6d21c3dfa5df21dc991d3117a516dc4255fffab4) )
-	ROM_LOAD( "jw 5p mk2.bin", 0x0000, 0x008000, CRC(344150e9) SHA1(a92313956536ff5772deee25209d2e580be64214) )
-	ROM_LOAD( "jwild 10m.bin", 0x0000, 0x008000, CRC(bde648bd) SHA1(523ad5887cf61affac0773df4a1d912a2b38f34c) )
+	ROM_LOAD( "jw_5p_mk2.bin"  , 0x0000, 0x008000, CRC(344150e9) SHA1(a92313956536ff5772deee25209d2e580be64214) )
+	ROM_LOAD( "jwild_10m.bin" , 0x0000, 0x008000, CRC(bde648bd) SHA1(523ad5887cf61affac0773df4a1d912a2b38f34c) )
 	ROM_LOAD( "jwild54.bin", 0x0000, 0x008000, CRC(085c1d29) SHA1(393f7c5f78314bd2dadef0d7f1e5bce3f69188af) )
 ROM_END
 
 ROM_START( pr_jumpj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "j jacks 994a20pn-040 (27512)", 0x0000, 0x010000, CRC(e6ffe171) SHA1(6fdb413621dd6e3f4185ff1f33af2f52b530a0a8) )
+	ROM_LOAD( "j_jacks_994a20pn-040_(27512)"   , 0x0000, 0x010000, CRC(e6ffe171) SHA1(6fdb413621dd6e3f4185ff1f33af2f52b530a0a8) )
 
 ROM_END
 
@@ -966,12 +966,12 @@ ROM_END
 
 ROM_START( pr_megmn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "mega mon 5p 3.bin", 0x0000, 0x010000, CRC(a26e041c) SHA1(a0f31e7aff8beb19c8dd8712183a60f08e55cf6b) )
+	ROM_LOAD( "mega_mon_5p_3.bin"   , 0x0000, 0x010000, CRC(a26e041c) SHA1(a0f31e7aff8beb19c8dd8712183a60f08e55cf6b) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "mega money.bin", 0x0000, 0x010000, CRC(16b42417) SHA1(dfa49f973dfeda40c6d2a26a26f7e588832c23c3) )
+	ROM_LOAD( "mega_money.bin" , 0x0000, 0x010000, CRC(16b42417) SHA1(dfa49f973dfeda40c6d2a26a26f7e588832c23c3) )
 	ROM_LOAD( "mm05.bin", 0x0000, 0x008000, CRC(93b9b992) SHA1(7a93444d004f01b9205f3105e4ea06e48e6f5ec4) )
-	ROM_LOAD( "954p206n.066 (labelled - mm pro).bin", 0x0000, 0x008000, CRC(9162f89b) SHA1(8134eaff3211a2423794875ebdb25c5412b54e96) )
+	ROM_LOAD( "954p206n.066_(labelled_-_mm_pro).bin"    , 0x0000, 0x008000, CRC(9162f89b) SHA1(8134eaff3211a2423794875ebdb25c5412b54e96) )
 ROM_END
 
 ROM_START( pr_nudxs )
@@ -990,18 +990,18 @@ ROM_END
 
 ROM_START( pr_reflx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "reflex 5p.bin", 0x0000, 0x010000, CRC(172d00b8) SHA1(b0eb70d273664428994c4bfff4ccdfb023a842ee) )
+	ROM_LOAD( "reflex_5p.bin" , 0x0000, 0x010000, CRC(172d00b8) SHA1(b0eb70d273664428994c4bfff4ccdfb023a842ee) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "reflex pc90 v0-36 (27256)", 0x0000, 0x008000, CRC(25eca9b0) SHA1(32ee614a2c82d872346633104d221977fec390a5) )//reflex_4_80_20p.bin
-	ROM_LOAD( "reflex_5p (27512)", 0x0000, 0x010000, CRC(0788e2cc) SHA1(1ff6f517536e6394a92efdea0a90f8013871dab1) )
+	ROM_LOAD( "reflex_pc90_v0-36_(27256)"   , 0x0000, 0x008000, CRC(25eca9b0) SHA1(32ee614a2c82d872346633104d221977fec390a5) )//reflex_4_80_20p.bin
+	ROM_LOAD( "reflex_5p_(27512)" , 0x0000, 0x010000, CRC(0788e2cc) SHA1(1ff6f517536e6394a92efdea0a90f8013871dab1) )
 	ROM_LOAD( "reflexprocon5p(27256)", 0x0000, 0x008000, CRC(da5db154) SHA1(f549169bdcce0a556e3d65fbbe4f69b175a82a9a) )
 	ROM_LOAD( "reflx54", 0x0000, 0x010000, CRC(f6668f0e) SHA1(8d033de303d5474588c8e2e55a066e79bb68668e) )
 ROM_END
 
 ROM_START( pr_roadr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "road riot sp v0.0 6.bin", 0x0000, 0x010000, CRC(39e0dcef) SHA1(ea41225529fee5a36ab13592bfaa00b780e0c279) )
+	ROM_LOAD( "road_riot_sp_v0.0_6.bin"    , 0x0000, 0x010000, CRC(39e0dcef) SHA1(ea41225529fee5a36ab13592bfaa00b780e0c279) )
 ROM_END
 
 ROM_START( pr_roll )
@@ -1021,7 +1021,7 @@ ROM_END
 
 ROM_START( pr_sevab )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "7's above s_s.bin", 0x0000, 0x010000, CRC(f88bdceb) SHA1(9111616c162990cb5b89e073f9791b15645f5d91) )
+	ROM_LOAD( "7's_above_s_s.bin"  , 0x0000, 0x010000, CRC(f88bdceb) SHA1(9111616c162990cb5b89e073f9791b15645f5d91) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "7sab.bin", 0x0000, 0x010000, CRC(f7381284) SHA1(244c8981ce5080168eba117abc905f0a5339711b) )
@@ -1059,7 +1059,7 @@ ROM_START( pr_ttrai )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "treasuretrail.bin", 0x0000, 0x010000, CRC(2be4e149) SHA1(d8cd8f9196b7f2131c78e3e00384872d3ecc0f5f) )
-	ROM_LOAD( "ttrail 10_93.bin", 0x0000, 0x010000, CRC(88f97fff) SHA1(e6954030e13cc069e561f3a4729eca077ca8df20) )
+	ROM_LOAD( "ttrail_10_93.bin" , 0x0000, 0x010000, CRC(88f97fff) SHA1(e6954030e13cc069e561f3a4729eca077ca8df20) )
 	ROM_LOAD( "bifi-projectcoin.bin", 0x0000, 0x010000, CRC(463dd269) SHA1(da647f5942491f574aec17e6fdd99f75641ff332) )
 ROM_END
 
