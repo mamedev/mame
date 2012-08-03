@@ -18,6 +18,7 @@ JPM style Reel MCU?
 
 
  - some of the roms appear to have been merged to larger files, or there are two versions of the board?
+ - Looks like the merging is to account for an MFME issue - no known ROM board supports an all in one set.
 
 */
 
@@ -340,12 +341,6 @@ ROM_START( ac1clbmn )
 	ROM_LOAD( "cm388p74.bin", 0x6000, 0x2000, CRC(db3e2581) SHA1(26d1b58318f126e88190b67d87ba5bbb802d45ba) )
 ROM_END
 
-ROM_START( ac1clbmna )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "cmoney.bin", 0x0000, 0x8000, CRC(db1ce4df) SHA1(315a94d8ddad96e86e082e5ded1fbcdb7ef41908) )
-ROM_END
-
-
 ROM_START( ac1gogld )
 	ROM_REGION( 0x8000, "maincpu", 0 ) // same thing but in smaller roms? should they all really be like this?
 	ROM_LOAD( "370gg_1.bin", 0x0000, 0x2000, CRC(c1337c4c) SHA1(e8d372e2faeb84eec50e297b183f2416891bd2ec) )
@@ -354,19 +349,10 @@ ROM_START( ac1gogld )
 	ROM_LOAD( "370gg_4.bin", 0x6000, 0x2000, CRC(0af03fb2) SHA1(2966f5954635d96287a9bca8ea33bd0b55ad51ce) )
 ROM_END
 
-ROM_START( ac1goglda )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "goforgold.bin", 0x0000, 0x8000, CRC(2ce24d23) SHA1(72807c37fee5853ffe21df2cdf2802cc3c96f1c6) )
-ROM_END
-
-
-
-
 ROM_START( ac1hotpf )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ace_hot_profit_systemone.bin", 0x0000, 0x8000, CRC(951a750d) SHA1(feff32617321c5403f8e38a3aca1b49d065d5616) )
 ROM_END
-
 
 ROM_START( ac1pster )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -387,12 +373,6 @@ ROM_START( ac1primt )
 	ROM_LOAD( "403ptp24.bin", 0x6000, 0x2000, CRC(12578388) SHA1(7e16dad8bc19c34c23f7fa3e627a1c85f669a19e) )
 ROM_END
 
-ROM_START( ac1primta )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "403pt_p21.bin", 0x0000, 0x8000, CRC(83a87319) SHA1(e51cd1a3e5261140c9390c52ed7ae81b097ed2e8) )
-ROM_END
-
-
 ROM_START( ac1taklv )
 	ROM_REGION( 0x8000, "maincpu", 0 ) // same thing but in smaller roms? should they all really be like this?
 	ROM_LOAD( "430tlp11.bin", 0x0000, 0x2000, CRC(32241ccd) SHA1(5aa46b0f45ab92ad8d1b9d500a6f8416888e4094) )
@@ -402,10 +382,6 @@ ROM_START( ac1taklv )
 ROM_END
 
 /*
-ROM_START( ac1taklva ) // set 2, just a merged rom of the above, probably for another emulator
-    ROM_REGION( 0x8000, "maincpu", 0 )
-    ROM_LOAD( "430tl.bin", 0x0000, 0x8000, CRC(2fabb08f) SHA1(b737930e428f9258ab22394229c2b5039edf8f97) )
-ROM_END
 
 ROM_START( ac1cshtw ) // Cash Towers, same ROM as above, original machine apparently plays the same, reskinned machine?
     ROM_REGION( 0x8000, "maincpu", 0 )
@@ -722,16 +698,12 @@ DRIVER_INIT( aces1 )
 }
 
 GAME( 199?, ac1clbmn		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Club Money (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, ac1clbmna		,ac1clbmn	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Club Money (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // same but different rom size?
 GAME( 199?, ac1gogld		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, ac1goglda		,ac1gogld	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Go For Gold (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // same but different rom size?
 GAME( 199?, ac1hotpf		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Hot Profit (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1pster		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Pound Sterling (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1pstrt		,0			,aces1	,aces1	,aces1	,ROT0	,"Pcp", "Pound Stretcher (Pcp) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1primt		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Primetime (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, ac1primta		,ac1primt	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Primetime (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // same but different rom size?
 GAME( 199?, ac1taklv		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-//GAME( 199?, ac1taklva     ,ac1taklv   ,aces1  ,aces1  ,aces1  ,ROT0   ,"Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL ) // just a merged rom of the above, probably for another emulator
 //GAME( 199?, ac1cshtw      ,0          ,aces1  ,aces1  ,aces1  ,ROT0   ,"Ace", "Cash Towers (Ace) (ACESYS1)",GAME_IS_SKELETON_MECHANICAL ) // same ROM as above, original machine apparently plays the same, reskinned machine?
 GAME( 199?, ac1bbclb		,0			,aces1	,aces1	,aces1	,ROT0	,"Ace", "Big Break Club (Ace) (ACESYS1) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ac1bbclba		,ac1bbclb	,aces1	,aces1	,aces1	,ROT0	,"Ace", "Big Break Club (Ace) (ACESYS1) (set 2)",GAME_IS_SKELETON_MECHANICAL )
