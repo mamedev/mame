@@ -20608,20 +20608,36 @@ pr_7hvns
 pr_7hvnt
 pr_7hvnu
 pr_alwy9		// Always Nine (Pcp)
+pr_alwy9a
 pr_barbl		// Bars & Bells (Project)
 pr_batls		// Battleships (Project)
+pr_batlsa
+pr_batlsb
 pr_btwar		// Beat The Warden (Project)
+pr_btwara
+pr_btwarb
 pr_bigdp		// Big Dipper (Project)
+pr_bigdpa
 pr_bulls		// Bullseye (Project)
+pr_bullsa
+pr_bullsb
 pr_bulbn		// Bully's Big Night (Project)
+pr_bulbna
+pr_bulbnb
 pr_buljp		// Bully's Jackpot (Project)
+pr_buljpa
 pr_cashb		// Cash Back (Project)
 pr_cas7			// Casino Jackpot 7s (Project)
 pr_chico		// Chico the Bandit (Project)
+pr_chicoa
+pr_chicob
 pr_coolm		// Cool Million (Project)
+pr_coolma
+pr_coolmb
 pr_crz77		// Crazy 777s (Project)
 pr_crzbr		// Crazy Bars (Project)
 pr_coyot		// Crazy Coyote (Pcp)
+pr_coyota
 pr_crzpy		// Crazy Pays (Project)
 pr_dblup		// Double Up (Project)
 pr_fire			// Fircecracker (Project)
@@ -20650,6 +20666,7 @@ pr_rags			// Rags To Riches (Project)
 pr_reflx		// Reflex (Project)
 pr_roadr		// Road Riot (Project)
 pr_roll			// The Roll (Project)
+pr_supbr		// Super Bars (PCP)
 pr_sevab		// Seven's Above (Project)
 pr_sevml		// Sevens & Melons (Project)
 pr_theme		// Theme Park (Project)
