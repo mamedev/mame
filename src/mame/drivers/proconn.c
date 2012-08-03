@@ -1248,7 +1248,7 @@ GAME( 199?, pr_fspotf		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", 
 GAME( 199?, pr_fspotg		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, 6 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, pr_gnuc			,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gnuca		,pr_gnuca	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gnuca		,pr_gnuc	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_magln		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Magic Lines (Version 2.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_maglna		,pr_magln	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Magic Lines (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_swop			,0			,proconn	,proconn	,proconn	,ROT0	,"Ace", "Swop It (Ace)",GAME_IS_SKELETON_MECHANICAL )
