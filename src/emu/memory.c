@@ -1894,19 +1894,23 @@ void address_space::prepare_map()
 //  each case
 //-------------------------------------------------
 
-void address_space::populate_from_map()
+void address_space::populate_from_map(address_map *map)
 {
+	// no map specified, use the space-specific one
+	if (map == NULL)
+		map = m_map;
+
 	// no map, nothing to do
-	if (m_map == NULL)
+	if (map == NULL)
 		return;
 
 	// install the handlers, using the original, unadjusted memory map
 	const address_map_entry *last_entry = NULL;
-	while (last_entry != m_map->m_entrylist.first())
+	while (last_entry != map->m_entrylist.first())
 	{
 		// find the entry before the last one we processed
 		const address_map_entry *entry;
-		for (entry = m_map->m_entrylist.first(); entry->next() != last_entry; entry = entry->next()) ;
+		for (entry = map->m_entrylist.first(); entry->next() != last_entry; entry = entry->next()) ;
 		last_entry = entry;
 
 		// map both read and write halves
@@ -2304,6 +2308,20 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 	if (readorwrite == ROW_WRITE || readorwrite == ROW_READWRITE)
 		write().map_range(addrstart, addrend, addrmask, addrmirror, quiet ? STATIC_NOP : STATIC_UNMAP);
 }
+
+
+//-------------------------------------------------
+//  install_device_delegate - install the memory map
+//  of a live device into this address space
+//-------------------------------------------------
+
+void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, UINT64 unitmask)
+{
+	address_map map(*this, addrstart, addrend, bits, unitmask, device, delegate);
+	map.uplift_submaps(machine(), m_device, endianness());
+	populate_from_map(&map);
+}
+
 
 
 //-------------------------------------------------

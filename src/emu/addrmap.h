@@ -74,9 +74,6 @@ enum map_handler_type
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// submap retriever delegate
-typedef delegate<void (address_map &, const device_t &)> address_map_delegate;
-
 // address map handler data
 class map_handler_data
 {
@@ -411,6 +408,7 @@ public:
 	// construction/destruction
 	address_map(const device_t &device, address_spacenum spacenum);
 	address_map(const device_t &device, address_map_entry *entry);
+	address_map(const address_space &space, offs_t start, offs_t end, int bits, UINT64 unitmask, const device_t &device, address_map_delegate submap_delegate);
 	~address_map();
 
 	// configuration

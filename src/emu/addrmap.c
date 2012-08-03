@@ -739,6 +739,38 @@ address_map::address_map(const device_t &device, address_map_entry *entry)
 }
 
 
+
+//----------------------------------------------------------
+//  address_map - constructor dynamic device mapping case
+//----------------------------------------------------------
+
+address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, UINT64 unitmask, const device_t &device, address_map_delegate submap_delegate)
+	: m_spacenum(space.spacenum()),
+	  m_databits(space.data_width()),
+	  m_unmapval(space.unmap()),
+	  m_globalmask(space.bytemask())
+{
+	address_map_entry *e;
+	switch(m_databits) {
+	case 8:
+		e = add(start, end, (address_map_entry8 *)NULL);
+		break;
+	case 16:
+		e = add(start, end, (address_map_entry16 *)NULL);
+		break;
+	case 32:
+		e = add(start, end, (address_map_entry32 *)NULL);
+		break;
+	case 64:
+		e = add(start, end, (address_map_entry64 *)NULL);
+		break;
+	default:
+		throw emu_fatalerror("Trying to dynamically map a device on a space with a corrupt databits width");
+	}
+	e->set_submap(device, DEVICE_SELF, submap_delegate, bits, unitmask);
+}
+
+
 //-------------------------------------------------
 //  ~address_map - destructor
 //-------------------------------------------------

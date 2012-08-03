@@ -107,6 +107,9 @@ typedef UINT32	offs_t;
 // address map constructors are functions that build up an address_map
 typedef void (*address_map_constructor)(address_map &map, const device_t &devconfig);
 
+// submap retriever delegate
+typedef delegate<void (address_map &, const device_t &)> address_map_delegate;
+
 
 // legacy space read/write handlers
 typedef UINT8	(*read8_space_func)  (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset);
@@ -433,6 +436,14 @@ public:
 	void *install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = NULL) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_WRITE, baseptr); }
 	void *install_ram(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = NULL) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_READWRITE, baseptr); }
 
+	// install device memory maps
+	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map, const device_t &device), int bits = 0, UINT64 unitmask = 0) {
+		address_map_delegate delegate(map, "dynamic_device_install", &device);
+		install_device_delegate(addrstart, addrend, device, delegate, bits, unitmask);
+	}
+
+	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &map, int bits = 0, UINT64 unitmask = 0);
+
 	// install new-style delegate handlers (short form)
 	UINT8 *install_read_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, UINT64 unitmask = 0) { return install_read_handler(addrstart, addrend, 0, 0, rhandler, unitmask); }
 	UINT8 *install_write_handler(offs_t addrstart, offs_t addrend, write8_delegate whandler, UINT64 unitmask = 0) { return install_write_handler(addrstart, addrend, 0, 0, whandler, unitmask); }
@@ -519,7 +530,7 @@ public:
 
 	// setup
 	void prepare_map();
-	void populate_from_map();
+	void populate_from_map(address_map *map = NULL);
 	void allocate_memory();
 	void locate_memory();
 
