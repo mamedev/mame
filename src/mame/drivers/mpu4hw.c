@@ -12,7 +12,7 @@
 */
 
 /***********************************************************************************************************
-  Barcrest MPU4 highly preliminary driver by J.Wallace, and Haze.
+  Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
 
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
@@ -238,18 +238,7 @@ TODO: - Distinguish door switches using manual
       - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
 ***********************************************************************************************************/
 #include "emu.h"
-#include "machine/6821pia.h"
-#include "machine/6840ptm.h"
-#include "machine/nvram.h"
 
-#include "cpu/m6809/m6809.h"
-#include "sound/ay8910.h"
-#include "sound/okim6376.h"
-#include "sound/2413intf.h"
-#include "sound/upd7759.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
 #include "includes/mpu4.h"
 
 
@@ -2959,15 +2948,6 @@ MACHINE_CONFIG_START( mpu4base, mpu4_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(mpu4_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_LENGTH(0x200)
-
 
 	MCFG_DEFAULT_LAYOUT(layout_mpu4)
 MACHINE_CONFIG_END

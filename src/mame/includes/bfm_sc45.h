@@ -237,7 +237,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_blue_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "brinse_sounds" , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "brinse sounds", 0x0000, 0x100000, NO_DUMP ) \
 
 #define sc_bob_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -262,11 +262,11 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_brix_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "brix_sounds" , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "brix sounds", 0x0000, 0x100000, NO_DUMP ) \
 
 #define sc_bugs_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pr7109_bugs_money_sounds11"   , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "pr7109 bugs money sounds11", 0x0000, 0x100000, NO_DUMP ) \
 
 
 
@@ -448,23 +448,23 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_cconx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "mtom_sounds" , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "mtom sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_ccrus_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cash_sounds" , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "cash sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_cerup_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cash_eruption_sounds"  , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "cash erruption sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_cexpl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cash_explosion_sounds"  , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "cash explosion sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_chand_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pr7108_cash_in_hand_sounds11"    , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "pr7108 cash in hand sounds11", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_clash_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -497,7 +497,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_clucl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "clucl_sounds" , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "clucl sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_colos_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -520,7 +520,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_crzwl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "crazy_world_sounds"  , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "crazy world sounds", 0x0000, 0x100000, NO_DUMP ) \
 
 #define sc_cccsh_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -571,7 +571,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_clue_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "clue_sounds" , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "clue sounds", 0x0000, 0x100000, NO_DUMP ) \
 	ROM_REGION( 0x5000, "pics", 0 ) \
 	ROM_LOAD( "95890356.bin", 0x0000, 0x5000, CRC(fd78e03f) SHA1(029e2fd7e9cff3793d905d192c889873ad2a0d26) ) \
 	ROM_LOAD( "95890357.bin", 0x0000, 0x5000, CRC(88eea40b) SHA1(5a730add3f9941dfcbfa5cd8f6a6142d19065482) ) \
@@ -602,8 +602,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_czfr_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR6813 CRAZY FRUITS SOUNDS11 */ \
-	ROM_LOAD( "crazy_sound_1.bin"  , 0x000000, 0x080000, CRC(31e5785a) SHA1(8da2bd3571640b0ae23e9fdcc2235dcf9d2de122) ) \
-	ROM_LOAD( "crazy_sound_2.bin"  , 0x080000, 0x080000, CRC(bf059b21) SHA1(89a96c593e5385e9b40f694768986691eed4b5c5) ) \
+	ROM_LOAD( "crazy sound 1.bin", 0x000000, 0x080000, CRC(31e5785a) SHA1(8da2bd3571640b0ae23e9fdcc2235dcf9d2de122) ) \
+	ROM_LOAD( "crazy sound 2.bin", 0x080000, 0x080000, CRC(bf059b21) SHA1(89a96c593e5385e9b40f694768986691eed4b5c5) ) \
 	\
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "oki_sound_rom--ccfsnd.bin", 0x0000, 0x02196a, CRC(15e542c2) SHA1(9bd9218b7392c882f68e330619bea7996afd001e) ) /* oki sound rom, doubt it belongs here */ \
@@ -645,7 +645,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_cinv_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pr6809_cashinvaders_sounds"  , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "pr6809 cashinvaders sounds", 0x0000, 0x100000, NO_DUMP ) \
 
 #define sc_crotr_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1182,8 +1182,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95008356.bin", 0x0000, 0x080000, CRC(c8f1ca20) SHA1(13136df35c09fea102c5176e249436f9e64616a5) ) /* golden winner */ \
 	ROM_LOAD( "95008423.bin", 0x0000, 0x100000, CRC(4cab20ee) SHA1(e27221a94e54db340eaf7fc30e722b354c85686d) ) /* triple casino */ \
 	ROM_REGION( 0x400000, "sc1", ROMREGION_ERASE00 ) /* looks like a sc1/sc2 game, move */ \
-	ROM_LOAD16_BYTE( "958402.11_10p_no_enrich.bin"   , 0x0000, 0x008000, CRC(00ed0ab4) SHA1(60e6a4abcf74ed705007cda699cdf8f52160a683) ) \
-	ROM_LOAD16_BYTE( "958402.12_10p_no_enrich.bin"   , 0x0000, 0x008000, CRC(51af0108) SHA1(e6333e2879f7b2b3b558b6909e177f3101f503e6) ) \
+	ROM_LOAD16_BYTE( "958402.11 10p no enrich.bin", 0x0000, 0x008000, CRC(00ed0ab4) SHA1(60e6a4abcf74ed705007cda699cdf8f52160a683) ) \
+	ROM_LOAD16_BYTE( "958402.12 10p no enrich.bin", 0x0000, 0x008000, CRC(51af0108) SHA1(e6333e2879f7b2b3b558b6909e177f3101f503e6) ) \
 
 #define sc_gx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1540,7 +1540,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95890713.bin", 0x0000, 0x5000, CRC(f0bb40b7) SHA1(33c19dab3086cdeae4f503fbf3f3cc5f0dad98c4) ) \
 	ROM_LOAD( "95890714.bin", 0x0000, 0x5000, CRC(33e16227) SHA1(87efc1a046ef6af0b72cc76a6ee393a4d1ddbce3) ) \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	/* WOW SOUNDS - wrong for this game, wants "WOTW SOUNDS"  */ \
+	/* WOW SOUNDS - wrong for this game, wants "WOTW SOUNDS" */ \
 	ROM_LOAD( "95008850.bin", 0x000000, 0x0af41f, CRC(8ca16e09) SHA1(9b494ad6946c2c7bbfad6591e62fa699fd53b6dc) ) \
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
 	/* 95008551 STEPITS5 PR1666  - wrong game?? */ \
@@ -2102,7 +2102,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define PR1918_POTS_OF_GOLD_SOUNDS11 \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pr1918_pots_of_gold_sounds11"    , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "pr1918 pots of gold sounds11", 0x000000, 0x100000, NO_DUMP ) \
 
 #define PR3082_C_POTS_OF_GOLD_SOUNDS11 \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2133,8 +2133,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_starp_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "star_prize_snd1.bin"  , 0x000000, 0x080000, CRC(9f7f7442) SHA1(576e5e92455455ad18ae596a9dae500a17912faa) ) \
-	ROM_LOAD( "star_prize_snd2.bin"  , 0x080000, 0x080000, CRC(0ae992b5) SHA1(b3a8ba472aa3a6785678a554a7fe789f9f3dc6c0) ) \
+	ROM_LOAD( "star prize snd1.bin", 0x000000, 0x080000, CRC(9f7f7442) SHA1(576e5e92455455ad18ae596a9dae500a17912faa) ) \
+	ROM_LOAD( "star prize snd2.bin", 0x080000, 0x080000, CRC(0ae992b5) SHA1(b3a8ba472aa3a6785678a554a7fe789f9f3dc6c0) ) \
 	ROM_REGION( 0x400000, "altymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "sprizesn.1", 0x0000, 0x080000, CRC(5a9a9903) SHA1(ac79fedeaa1b37661d0ec28bf6c5b141c7fcc328) ) \
 
@@ -2231,7 +2231,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_broll_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "rol_sounds" , 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "rol sounds", 0x0000, 0x100000, NO_DUMP ) \
 
 #define sc_bulcl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2261,7 +2261,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95008124_2.bin", 0x100000, 0x100000, CRC(4795c128) SHA1(7b55b39f335b81f6a895ed9beb123464e10a48ee) ) \
 
 #define sc_cashm_german_others \
-	ROM_LOAD( "cash_german_sounds"  , 0x000000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "cash german sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_casry_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2391,8 +2391,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_fd7th_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "frankie_snd1.bin" , 0x000000, 0x080000, CRC(5d74001e) SHA1(f157706c0970af9b396c2973774c828ed1c0d275) ) \
-	ROM_LOAD( "frankie_snd2.bin" , 0x080000, 0x080000, CRC(8863c8e6) SHA1(0e852155cb2d50d8f0b892c055b37e9955fd8da4) ) \
+	ROM_LOAD( "frankie snd1.bin", 0x000000, 0x080000, CRC(5d74001e) SHA1(f157706c0970af9b396c2973774c828ed1c0d275) ) \
+	ROM_LOAD( "frankie snd2.bin", 0x080000, 0x080000, CRC(8863c8e6) SHA1(0e852155cb2d50d8f0b892c055b37e9955fd8da4) ) \
 	\
 	ROM_REGION( 0x400000, "altymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "frdesnd1", 0x0000, 0x080000, CRC(deb93ffa) SHA1(5a549b6bde6f92561952584e3184c1985903464f) ) \
@@ -2543,7 +2543,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_jack_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008289.bin", 0x0000, 0x0ffb45, CRC(76d2af0f) SHA1(0460ecc4f80cceb6861b8b0ebf59f0e87bf2b38c) ) \
-	ROM_LOAD( "jack_the_kipper_sound_1_maz_fc64.bin"      , 0x0000, 0x100000, CRC(f31090f9) SHA1(4e9edfdf6472b4229d4393cb3033134f6b27920b) ) \
+	ROM_LOAD( "jack the kipper sound 1 maz fc64.bin", 0x0000, 0x100000, CRC(f31090f9) SHA1(4e9edfdf6472b4229d4393cb3033134f6b27920b) ) \
 
 #define sc_jjunc_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

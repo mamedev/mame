@@ -507,6 +507,7 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu2.o \
 	$(DRIVERS)/mpu3.o \
 	$(DRIVERS)/mpu4hw.o $(DRIVERS)/mpu4sw.o $(DRIVERS)/mpu4.o \
+	$(DRIVERS)/mpu4plasma.o \
 	$(DRIVERS)/mpu4vid.o \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
@@ -2076,6 +2077,9 @@ $(DRIVERS)/mpu4hw.o:	$(LAYOUT)/mpu4.lh \
 
 $(DRIVERS)/mpu4vid.o:	$(LAYOUT)/crmaze2p.lh \
 			$(LAYOUT)/crmaze4p.lh
+
+$(DRIVERS)/mpu4plasma.o: $(LAYOUT)/mpu4plasma.lh \
+
 
 $(DRIVERS)/mw18w.o:	$(LAYOUT)/18w.lh
 

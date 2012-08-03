@@ -750,8 +750,8 @@ ROM_END
 
 ROM_START( sp_goldml )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "723_gmsv_all_cash_p1.2.bin"    , 0x0000, 0x8000, CRC(fe8c99dc) SHA1(79e124e2e1e300e78955d7764e52c5e4d47eb07d) )
-	ROM_LOAD( "723_gm_all_cash_p1.1.bin"    , 0x8000, 0x8000, CRC(990236ac) SHA1(2c02a478e71858d7109dd2558e4ccf885d93f2e2) )
+	ROM_LOAD( "723 gmsv all cash p1.2.bin", 0x0000, 0x8000, CRC(fe8c99dc) SHA1(79e124e2e1e300e78955d7764e52c5e4d47eb07d) )
+	ROM_LOAD( "723 gm all cash p1.1.bin", 0x8000, 0x8000, CRC(990236ac) SHA1(2c02a478e71858d7109dd2558e4ccf885d93f2e2) )
 	SP_GOLDM_SOUND
 ROM_END
 
@@ -990,7 +990,7 @@ ROM_END
 
 ROM_START( sp_gnatn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "597_gnsk_all_cash_p6.2.bin"    , 0x0000, 0x8000, CRC(2bd1c9c6) SHA1(4b1249fc7aca548e8acd4ee75bf2260dd512ac72) )
+	ROM_LOAD( "597 gnsk all cash p6.2.bin", 0x0000, 0x8000, CRC(2bd1c9c6) SHA1(4b1249fc7aca548e8acd4ee75bf2260dd512ac72) )
 	ROM_LOAD( "gn597p6a", 0x8000, 0x8000, CRC(77a45042) SHA1(b2718b33274b570cce034d84ce9eb1afe4b38ef0) )
 	SP_GNAT_SOUND
 ROM_END
@@ -1065,7 +1065,7 @@ ROM_END
 
 ROM_START( sp_gprixh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "567_gpsk_all_cash_p6.2.bin"    , 0x0000, 0x8000, CRC(f556e1ea) SHA1(512189c051863f79a1e1b3c256e62cca8840429f) )
+	ROM_LOAD( "567 gpsk all cash p6.2.bin", 0x0000, 0x8000, CRC(f556e1ea) SHA1(512189c051863f79a1e1b3c256e62cca8840429f) )
 	ROM_LOAD( "gp567p6a", 0x8000, 0x8000, CRC(40067f1f) SHA1(e4508c31a3d69e84304915184634bb007793cb11) ) // aka 567 gp p6.1.bin
 	SP_GPRIX_SOUND
 ROM_END
@@ -1189,8 +1189,8 @@ ROM_END
 
 ROM_START( sp_hidehp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "577_hhsk_p6.2.bin"  , 0x0000, 0x8000, CRC(5f6ffe4a) SHA1(e1817342a2c58225a98d71bff51de925de9e097b) )
-	ROM_LOAD( "577_hh_p6.1.bin"  , 0x8000, 0x8000, CRC(780515ae) SHA1(8e350aa248a6fb5bf272961472966249643208fe) ) // hacked maybe? doesn't match the other 577 'a' rom
+	ROM_LOAD( "577 hhsk p6.2.bin", 0x0000, 0x8000, CRC(5f6ffe4a) SHA1(e1817342a2c58225a98d71bff51de925de9e097b) )
+	ROM_LOAD( "577 hh p6.1.bin", 0x8000, 0x8000, CRC(780515ae) SHA1(8e350aa248a6fb5bf272961472966249643208fe) ) // hacked maybe? doesn't match the other 577 'a' rom
 	SP_HIDEH_SOUND
 ROM_END
 
@@ -1308,7 +1308,7 @@ ROM_END
 
 ROM_START( sp_hiflyo )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "572_hfsv_all_cash_p6.2.bin"    , 0x0000, 0x8000, CRC(ea129385) SHA1(0cbc62a8cf511553388fb11cf810b1a8a5bb9623) )
+	ROM_LOAD( "572 hfsv all cash p6.2.bin", 0x0000, 0x8000, CRC(ea129385) SHA1(0cbc62a8cf511553388fb11cf810b1a8a5bb9623) )
 	ROM_LOAD( "hf572p6a", 0x8000, 0x8000, CRC(e6efe3ea) SHA1(6e30df4659945008defdd2f2069fb4eff45929e2) ) // aka 572 hf all cash p6.1.bin
 	SP_HIFLY_SOUND
 ROM_END
@@ -1396,7 +1396,7 @@ ROM_END
 
 ROM_START( sp_openbh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "578_obsk_p5.2.bin"  , 0x0000, 0x8000, CRC(bc4b6cf1) SHA1(99dd18004b6699f92b2cfb7ae2cff45a458239a0) )
+	ROM_LOAD( "578 obsk p5.2.bin", 0x0000, 0x8000, CRC(bc4b6cf1) SHA1(99dd18004b6699f92b2cfb7ae2cff45a458239a0) )
 	ROM_LOAD( "ob568p5a", 0x8000, 0x8000, CRC(29d57828) SHA1(62122bc44ce36c40afa3053b92b846e5d525eb99) ) // aka 578 ob p5.1.bin
 	SP_OPENB_SOUND
 ROM_END
@@ -1473,8 +1473,8 @@ ROM_END
 
 ROM_START( sp_payrsh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "570_prsk_p6.2.bin"  , 0x0000, 0x8000, CRC(6a754bf7) SHA1(1aa2eb32500a9c7fd0201cabb76b4eb77edfb1ae) )
-	ROM_LOAD( "570_pr_p6.1.bin"  , 0x8000, 0x8000, CRC(c365090f) SHA1(fa596444696bf5f19058ba36ba285b49457778db) ) // doesn't match the other 570 roms, hacked?
+	ROM_LOAD( "570 prsk p6.2.bin", 0x0000, 0x8000, CRC(6a754bf7) SHA1(1aa2eb32500a9c7fd0201cabb76b4eb77edfb1ae) )
+	ROM_LOAD( "570 pr p6.1.bin", 0x8000, 0x8000, CRC(c365090f) SHA1(fa596444696bf5f19058ba36ba285b49457778db) ) // doesn't match the other 570 roms, hacked?
 	SP_PAYRS_SOUND
 ROM_END
 
@@ -1493,22 +1493,22 @@ ROM_END
 
 ROM_START( sp_playaa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "575_pask_p3.2.bin"  , 0x0000, 0x8000, CRC(f7d2d40d) SHA1(83e4e83217fef8d92bcba3edf1250d09243f9f79) )
-	ROM_LOAD( "575_pa_p3.1.bin"  , 0x0000, 0x8000, CRC(9e51ff86) SHA1(a2da9eee6b5f7211296e8633e5ec8eeec8ec77fd) )
+	ROM_LOAD( "575 pask p3.2.bin", 0x0000, 0x8000, CRC(f7d2d40d) SHA1(83e4e83217fef8d92bcba3edf1250d09243f9f79) )
+	ROM_LOAD( "575 pa p3.1.bin", 0x0000, 0x8000, CRC(9e51ff86) SHA1(a2da9eee6b5f7211296e8633e5ec8eeec8ec77fd) )
 	SP_PLAYA_SOUND
 ROM_END
 
 ROM_START( sp_playab )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "20p_payout_pia05_1.2-2.bin"   , 0x0000, 0x8000, CRC(8ad38f97) SHA1(51af3c3987137dc9ed16fe69e0685e08c4370611) ) ROM_IGNORE(0x8000) // overdump
-	ROM_LOAD( "20p_payout_pia05_1.2-1.bin"   , 0x8000, 0x8000, NO_DUMP )
+	ROM_LOAD( "20p payout pia05 1.2-2.bin", 0x0000, 0x8000, CRC(8ad38f97) SHA1(51af3c3987137dc9ed16fe69e0685e08c4370611) ) ROM_IGNORE(0x8000) // overdump
+	ROM_LOAD( "20p payout pia05 1.2-1.bin", 0x8000, 0x8000, NO_DUMP )
 	SP_PLAYA_SOUND
 ROM_END
 
 ROM_START( sp_playac )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "pia_p2_master_10_10p.bin"   , 0x0000, 0x8000, CRC(79f5be36) SHA1(8af5f4eb5207afdec53a107d44ba63409e6f78ef) )
-	ROM_LOAD( "pia_p1_master_10_10p.bin"   , 0x8000, 0x8000, NO_DUMP )
+	ROM_LOAD( "pia p2 master 10_10p.bin", 0x0000, 0x8000, CRC(79f5be36) SHA1(8af5f4eb5207afdec53a107d44ba63409e6f78ef) )
+	ROM_LOAD( "pia p1 master 10_10p.bin", 0x8000, 0x8000, NO_DUMP )
 	SP_PLAYA_SOUND
 ROM_END
 
@@ -1846,7 +1846,7 @@ ROM_END
 
 ROM_START( sp_tzh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "576_tzsk_p4.2.bin"  , 0x0000, 0x8000, CRC(78b33965) SHA1(7e865126113b81af7013a8e0a8a6ed72fd6ae743) )
+	ROM_LOAD( "576 tzsk p4.2.bin", 0x0000, 0x8000, CRC(78b33965) SHA1(7e865126113b81af7013a8e0a8a6ed72fd6ae743) )
 	ROM_LOAD( "tz576p4a", 0x8000, 0x8000, CRC(89247bc3) SHA1(3da13069111169367fc734729ba45eb097e2bd03) ) // aka 576 tz p4.1.bin
 	SP_TZ_SOUND
 ROM_END
@@ -2081,7 +2081,7 @@ ROM_END
 
 ROM_START( sp_beauh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "619_bpsv_all_cash_d3.2.bin"    , 0x0000, 0x8000, CRC(2fe21603) SHA1(6f22fc33e52c003f0734cc4773c4c0e0a1711b40) )
+	ROM_LOAD( "619 bpsv all cash d3.2.bin", 0x0000, 0x8000, CRC(2fe21603) SHA1(6f22fc33e52c003f0734cc4773c4c0e0a1711b40) )
 	ROM_LOAD( "bp619d3a", 0x8000, 0x8000, CRC(6ccd693a) SHA1(97d281509883623615b1d634e736d16814963cb8) ) // aka 619 bp all cash d3.1.bin
 	SP_BEAU_SOUND
 ROM_END
@@ -3803,15 +3803,15 @@ ROM_END
 
 ROM_START( sp_carry )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "carry_on_10p_payout_p2.bin"    , 0x0000, 0x8000, CRC(1db4062c) SHA1(92098a145c9cdf04758b92998dd4fca7945cf991) )
-	ROM_LOAD( "carry_on_p1.bin"  , 0x8000, 0x8000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) ) // aka carry on v6 p1.bin
+	ROM_LOAD( "carry on 10p payout p2.bin", 0x0000, 0x8000, CRC(1db4062c) SHA1(92098a145c9cdf04758b92998dd4fca7945cf991) )
+	ROM_LOAD( "carry on p1.bin", 0x8000, 0x8000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) ) // aka carry on v6 p1.bin
 	SP_CARRY_SOUND
 ROM_END
 
 ROM_START( sp_carrya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "carry_on_20p_payout_p2.bin"    , 0x0000, 0x8000, CRC(ae1b2c66) SHA1(47a17c5178520d7ed6bc3aaaef111e8188d9a6b0) )
-	ROM_LOAD( "carry_on_p1.bin"  , 0x8000, 0x8000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) ) // aka carry on v6 p1.bin
+	ROM_LOAD( "carry on 20p payout p2.bin", 0x0000, 0x8000, CRC(ae1b2c66) SHA1(47a17c5178520d7ed6bc3aaaef111e8188d9a6b0) )
+	ROM_LOAD( "carry on p1.bin", 0x8000, 0x8000, CRC(9a989d88) SHA1(e4cb4107c30b22fe9d952888285eb23de3005d2c) ) // aka carry on v6 p1.bin
 	SP_CARRY_SOUND
 ROM_END
 

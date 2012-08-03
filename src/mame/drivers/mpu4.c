@@ -276,7 +276,7 @@ ROM_START( m4addr )
 	ROM_LOAD( "a6pcx.p1", 0x0000, 0x010000, CRC(517d8c9a) SHA1(487cecfb10b24eff1582ca6bc97a2dc004e65b0f) )
 	ROM_LOAD( "a6ps.p1", 0x0000, 0x010000, CRC(41e375c7) SHA1(93556a90227cde6814123c8a7f29f734884e182c) )
 	ROM_LOAD( "ad05.6c", 0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5) )
-	ROM_LOAD( "adders_ladders_20p_6.bin"   , 0x0000, 0x010000, CRC(62abeb34) SHA1(8069e6fde0673fdbc124a1a172dc988bb3205ff6) )
+	ROM_LOAD( "adders ladders 20p 6.bin", 0x0000, 0x010000, CRC(62abeb34) SHA1(8069e6fde0673fdbc124a1a172dc988bb3205ff6) )
 	ROM_LOAD( "adl5pv2", 0x0000, 0x010000, CRC(09c39527) SHA1(16af3e552a7d6c6b802d2b1923523e9aa9de766a) )
 
 	// these appear to be MPU4 VIDEO (incomplete / bad?)
@@ -335,12 +335,12 @@ ROM_START( m4addrc )
 	ROM_LOAD( "add20_101", 0x0000, 0x010000, CRC(361b7173) SHA1(dea2b1b0f5910e2fd3f45d220554f0e712dedada) )
 	ROM_LOAD( "add55", 0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700) )
 	ROM_LOAD( "alddr20", 0x0000, 0x010000, CRC(19cf4437) SHA1(b528823c476bebd1a9a6c720a4144294743693d2) )
-	ROM_LOAD( "classic_adders_&_ladders_(labelled_-_nudge_w_5p_10p_1p10).bin"          , 0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20) )
-	ROM_LOAD( "classic_adders_&_ladders_(labelled_connect_4_v1-9_(27512)_15-3-90)"         , 0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1) )
+	ROM_LOAD( "classic adders & ladders (labelled - nudge w 5p 10p 1p10).bin", 0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20) )
+	ROM_LOAD( "classic adders & ladders (labelled connect 4 v1-9 (27512) 15-3-90)", 0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1) )
 
 	ROM_REGION( 0x10000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "ad_05s___183.bin", 0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1) )
-	ROM_LOAD( "adders_classic.bin" , 0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef) )
+	ROM_LOAD( "adders classic.bin", 0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef) )
 	ROM_LOAD( "addl_10_.4", 0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715) )
 	ROM_LOAD( "addl_10_.8", 0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c) )
 	ROM_LOAD( "addl_20_.8", 0x0000, 0x010000, CRC(43c98f46) SHA1(0ca4a093b38fc04639e3f4bb742a8923b90d2ed1) )
@@ -716,24 +716,11 @@ ROM_START( m4bigbn )
 	ROM_LOAD( "dbb12.bin", 0x0000, 0x010000, CRC(7acec20d) SHA1(5f3a21227329608c0afdb5facac977dee94ab9f5) )
 ROM_END
 
-ROM_START( m4bigchfd )
+ROM_START( m4bigchd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bch15.bin", 0x0000, 0x010000, CRC(b745b19f) SHA1(b654af35200c69604a3c30e3df1252f8bedc2000) )
 ROM_END
 
-ROM_START( m4bigchf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b6cc.p1", 0x0000, 0x010000, CRC(8d3916b4) SHA1(1818137da9d53000053a8023c4994c6539459df0) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "b6cs.p1", 0x0000, 0x010000, CRC(4f45086b) SHA1(e1d639b068951df8f25b9c77d4fb86336ad19933) )
-	ROM_LOAD( "bchf20-6", 0x0000, 0x010000, CRC(7940eb01) SHA1(b23537e91842a0d9b25b9c76b245d2be3d9af57f) )
-	ROM_LOAD( "big_chief_6.bin"  , 0x0000, 0x010000, CRC(edee08b7) SHA1(8de6160a4a4e5cd57f64c49d913f763aa87dc69a) )
-
-	// 68k.. doesn't seem to be mpu4 video, so what is it?
-	ROM_LOAD( "b6cpl.p0", 0x0000, 0x020000, CRC(7fbb2efb) SHA1(c21136bf10407f1685f3933d426ef53925aca8d8) )
-	ROM_LOAD( "b6cpl.p1", 0x0000, 0x020000, CRC(a9f67f3e) SHA1(1309cc2dc8565ee79ac8cdc754187c8db6ddb3ea) )
-ROM_END
 
 ROM_START( m4blkwhd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -932,12 +919,12 @@ ROM_END
 
 ROM_START( m4brktak )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b-t_v1-0_p1"  , 0xc000, 0x004000, CRC(a3457409) SHA1(ceaca37f20a055b18a24ee99e43991df95e9b520) )
-	ROM_LOAD( "b-t_v1-0_p2"  , 0x8000, 0x004000, CRC(7465cc6f) SHA1(f984e41c310bc58d7a668ec9f31c238fbf5de9c6) )
+	ROM_LOAD( "b-t v1-0 p1", 0xc000, 0x004000, CRC(a3457409) SHA1(ceaca37f20a055b18a24ee99e43991df95e9b520) )
+	ROM_LOAD( "b-t v1-0 p2", 0x8000, 0x004000, CRC(7465cc6f) SHA1(f984e41c310bc58d7a668ec9f31c238fbf5de9c6) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "breakntake_p1.bin" , 0xc000, 0x004000, CRC(a3457409) SHA1(ceaca37f20a055b18a24ee99e43991df95e9b520) )
-	ROM_LOAD( "breakntake_p2.bin" , 0x8000, 0x004000, CRC(7465cc6f) SHA1(f984e41c310bc58d7a668ec9f31c238fbf5de9c6) )
+	ROM_LOAD( "breakntake p1.bin", 0xc000, 0x004000, CRC(a3457409) SHA1(ceaca37f20a055b18a24ee99e43991df95e9b520) )
+	ROM_LOAD( "breakntake p2.bin", 0x8000, 0x004000, CRC(7465cc6f) SHA1(f984e41c310bc58d7a668ec9f31c238fbf5de9c6) )
 ROM_END
 
 ROM_START( m4brdway )
@@ -1171,7 +1158,7 @@ ROM_END
 
 ROM_START( m4cashcn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cash_connect_70.bin"  , 0x0000, 0x010000, CRC(8b4f8056) SHA1(a9e7927ac9aa2ee1dccf207f4b249ae90c4c713d) )
+	ROM_LOAD( "cash connect 70.bin", 0x0000, 0x010000, CRC(8b4f8056) SHA1(a9e7927ac9aa2ee1dccf207f4b249ae90c4c713d) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "cc032h2.bin", 0x0000, 0x010000, CRC(f29c01e0) SHA1(6e302ce02e4568d582c6f55741334b3fb6ea0746) )
@@ -1183,7 +1170,7 @@ ROM_START( m4cashco )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "c318d.bin", 0x0000, 0x010000, CRC(980df80c) SHA1(bf513d72a3e56c7f8c2a1c50d8ebf82496cd7ee3) )
-	ROM_LOAD( "cash_counter_v0-5"  , 0x0000, 0x010000, CRC(69012475) SHA1(e850de5b9c3ff83f758bee0e74f0f44108997305) )
+	ROM_LOAD( "cash counter v0-5", 0x0000, 0x010000, CRC(69012475) SHA1(e850de5b9c3ff83f758bee0e74f0f44108997305) )
 	ROM_LOAD( "cashcounter-1-2.bin", 0x0000, 0x010000, CRC(e4fa4e0f) SHA1(e78fbf0fc550aca3dc9139cdd5791875206d80bf) )
 ROM_END
 
@@ -1279,7 +1266,7 @@ ROM_START( m4cashln )
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cash_lines_0.1_snd_1_9c3f.bin"     , 0x0000, 0x080000, CRC(1746f091) SHA1(d57fcaec3e3b0344671f2c984974bfdac50ec3d7) )
+	ROM_LOAD( "cash lines 0.1 snd 1 9c3f.bin", 0x0000, 0x080000, CRC(1746f091) SHA1(d57fcaec3e3b0344671f2c984974bfdac50ec3d7) )
 
 	ROM_LOAD( "cls1.hex", 0x000000, 0x080000, CRC(d6b5d862) SHA1(eab2ef2999229db7182896267cd83742b2390237) )
 	ROM_LOAD( "cls2.hex", 0x080000, 0x080000, CRC(e42e674b) SHA1(1cda06425f3d4797ee0c4ff7426970150e5af4b6) )
@@ -1396,12 +1383,12 @@ ROM_END
 
 ROM_START( m4centpt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "centrepoint_v1.6.bin" , 0x0000, 0x010000, CRC(adcf0330) SHA1(b68b8c808b2dc1965d37d912adec714547466522) )
+	ROM_LOAD( "centrepoint v1.6.bin", 0x0000, 0x010000, CRC(adcf0330) SHA1(b68b8c808b2dc1965d37d912adec714547466522) )
 ROM_END
 
 ROM_START( m4centpta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "centrepoint_v1.3.bin" , 0x0000, 0x010000, CRC(24d117a5) SHA1(bd48a1687d11e32ea8cda19318e8936d1ffd9fd7) )
+	ROM_LOAD( "centrepoint v1.3.bin", 0x0000, 0x010000, CRC(24d117a5) SHA1(bd48a1687d11e32ea8cda19318e8936d1ffd9fd7) )
 ROM_END
 
 
@@ -1428,7 +1415,7 @@ ROM_START( m4chasei )
 	ROM_LOAD( "circ-71a.p1", 0x0000, 0x010000, CRC(a4b3b276) SHA1(fe88345ce04a8e60dae92cd112e11a822775a2ac) )
 
 	ROM_LOAD( "chinv", 0x0000, 0x020000, CRC(c4b83744) SHA1(673d55c01c0f82cd89a3740f87750bb6c36d2a79) ) // bad dump of sound rom (part of cha.s1)
-	ROM_LOAD( "chase_invaders_8.bin"  , 0x0000, 0x010000, CRC(0bf6a8a0) SHA1(cea5ea40d71484a455615e14f6708b1bc06bbbe8) ) // bad prg (no vectors?)
+	ROM_LOAD( "chase invaders 8.bin", 0x0000, 0x010000, CRC(0bf6a8a0) SHA1(cea5ea40d71484a455615e14f6708b1bc06bbbe8) ) // bad prg (no vectors?)
 
 
 	ROM_REGION( 0x48, "fakechr", 0 )
@@ -1478,7 +1465,7 @@ ROM_END
 // at the very least some of these (such as the parent) don't use the oki.. but instead the basic AY
 ROM_START( m4c999 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "c999_2p_unprotected.bin"  , 0x0000, 0x010000, CRC(7637e074) SHA1(3b9e724cc1e657ab2a6cf6fe237f0ca43990aa53) )
+	ROM_LOAD( "c999 2p unprotected.bin", 0x0000, 0x010000, CRC(7637e074) SHA1(3b9e724cc1e657ab2a6cf6fe237f0ca43990aa53) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "c910.hex", 0x0000, 0x010000, CRC(80c1d5bb) SHA1(5928f58f7963710e4ec9043aae4f656d98888e5b) )
@@ -1864,7 +1851,7 @@ ROM_START( m4denmen )
 	ROM_LOAD( "denc.p1", 0x0000, 0x010000, CRC(549e17bc) SHA1(78271e11d4c8e742acce9087f194a1db8fc8c3eb) )
 	ROM_LOAD( "dend.p1", 0x0000, 0x010000, CRC(176cd283) SHA1(f72c69b346f926a6e11b685ab9a6a2783b836450) )
 	ROM_LOAD( "denk.p1", 0x0000, 0x010000, CRC(8983cbe0) SHA1(159dcbc3f5d24b6be03ae9c3c2af58993bebd38c) )
-	ROM_LOAD( "dennis_the_menace_8_10m.bin"    , 0x0000, 0x010000, CRC(f5bd6c61) SHA1(ec443a284dae480c944f437426c28481a61c8ebb) )
+	ROM_LOAD( "dennis the menace 8 10m.bin", 0x0000, 0x010000, CRC(f5bd6c61) SHA1(ec443a284dae480c944f437426c28481a61c8ebb) )
 	ROM_LOAD( "dens.p1", 0x0000, 0x010000, CRC(d3687138) SHA1(611985a9116ea14992b34a84ed31693f88d99797) )
 	ROM_LOAD( "deny.p1", 0x0000, 0x010000, CRC(83ebd9f6) SHA1(f59e9d34295df8200f85a51d725437954acf9bdc) )
 	ROM_LOAD( "dm5ad.p1", 0x0000, 0x010000, CRC(f01125cc) SHA1(faa80bfb107db127b2f9c4c7d23ec495775d2162) )
@@ -2073,7 +2060,7 @@ ROM_START( m4eaw )
 	ROM_LOAD( "eun01s.p1", 0x0000, 0x010000, CRC(d0b49fc6) SHA1(4062d9763010d42666660e383e52818d572b61b9) )
 	ROM_LOAD( "eun01y.p1", 0x0000, 0x010000, CRC(88d3c370) SHA1(6c3839a9c89ae67f80ab932ec70ebaf1240de9bb) )
 	ROM_LOAD( "every1.hex", 0x0000, 0x010000, CRC(406843a2) SHA1(7d4bf6cd3c5be0f6df687b0ba97b3b88fd377170) )
-	ROM_LOAD( "everyones_a_winner_v2-5p_(27256)"    , 0x0000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b) )
+	ROM_LOAD( "everyones a winner v2-5p (27256)", 0x0000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "m683.chr", 0x0000, 0x000048, CRC(cbe68b44) SHA1(60efc69eba86531f51230dee17efdbbf8917f907) )
@@ -2228,7 +2215,7 @@ ROM_END
 
 ROM_START( m4gbust )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ghostbusters_2p.bin" , 0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b) )
+	ROM_LOAD( "ghostbusters 2p.bin", 0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b) )
 
 	ROM_REGION( 0x10000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "gb_02___.2n3", 0x0000, 0x010000, CRC(973b3538) SHA1(31df04d9f35cbde4d5e395256927f146d1613178) )
@@ -2561,7 +2548,7 @@ ROM_START( m4hotrod )
 	ROM_LOAD( "rodk.p1", 0x0000, 0x010000, CRC(298d85ff) SHA1(3c9374be1f6b5e58a1b9004f74f3a33d0fff4214) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "hot_rod_5p_4_p1_(27512)"     , 0x0000, 0x010000, CRC(b6212af8) SHA1(9453c4424244895b3ad15d5fba45fe8822e7ff2b) )
+	ROM_LOAD( "hot rod 5p 4 p1 (27512)", 0x0000, 0x010000, CRC(b6212af8) SHA1(9453c4424244895b3ad15d5fba45fe8822e7ff2b) )
 	ROM_LOAD( "hr056c", 0x0000, 0x010000, CRC(c062f285) SHA1(917e82cadf242aa815c525ff435cd4b04ea87e39) )
 	ROM_LOAD( "hrod05_11", 0x0000, 0x010000, CRC(61f35723) SHA1(743b71ecde4923c359a1202eaad7e4d74b0d1611) )
 	ROM_LOAD( "hrod10_11", 0x0000, 0x010000, CRC(5b924a86) SHA1(6b86dce6ba3789750de05dca996202c000ecfbae) )
@@ -4953,7 +4940,7 @@ ROM_START( m4rhog )
 	ROM_LOAD( "rr6s.p1", 0x0000, 0x010000, CRC(f978ca0b) SHA1(11eeac41f4c77b38b33baefb16dab7de1268d161) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "road_hog_5p_6.bin"   , 0x0000, 0x010000, CRC(b365d1f0) SHA1(af3b4f5162af6c033039a1e004bc803175a4e996) )
+	ROM_LOAD( "road hog 5p 6.bin", 0x0000, 0x010000, CRC(b365d1f0) SHA1(af3b4f5162af6c033039a1e004bc803175a4e996) )
 	ROM_LOAD( "rdhogvkn", 0x0000, 0x010000, CRC(3db03ada) SHA1(9b26f466c1dc1d03edacf64cbe507e084edf5f90) )
 	ROM_LOAD( "rh5p8.bin", 0x0000, 0x010000, CRC(35d56379) SHA1(ab70ef8151823c3157cf4cc4f9b29875c6ac81cc) )
 	ROM_LOAD( "rh8c.p1", 0x0000, 0x010000, CRC(e36d7ca0) SHA1(73970761c5c7004669b02ba9f3a299f36f2d00e9) )
@@ -5216,11 +5203,11 @@ ROM_END
 
 ROM_START( m4sayno )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "say_no_more_425b.bin"   , 0x0000, 0x010000, CRC(2cf27394) SHA1(fb7688b7d9d2e68f0c84a57b66dd02dbbc6accc7) )
+	ROM_LOAD( "say no more 425b.bin", 0x0000, 0x010000, CRC(2cf27394) SHA1(fb7688b7d9d2e68f0c84a57b66dd02dbbc6accc7) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "snm_5p.bin" , 0x0000, 0x010000, CRC(4fba5c0a) SHA1(85438c531d4122bc31f59127a577dc6d71a4ba9d) )
-	ROM_LOAD( "snm_6.bin" , 0x0000, 0x010000, CRC(0d14730b) SHA1(2a35d72bdcc9402b00153621ec852f902720c104) )
+	ROM_LOAD( "snm 5p.bin", 0x0000, 0x010000, CRC(4fba5c0a) SHA1(85438c531d4122bc31f59127a577dc6d71a4ba9d) )
+	ROM_LOAD( "snm 6.bin", 0x0000, 0x010000, CRC(0d14730b) SHA1(2a35d72bdcc9402b00153621ec852f902720c104) )
 	ROM_LOAD( "snms.p1", 0x0000, 0x010000, CRC(be1f2222) SHA1(7d8319796e1d45a3d0246bf13b6d818f20796db3) )
 	ROM_LOAD( "snmx.p1", 0x0000, 0x010000, CRC(61a78035) SHA1(1d6c553c60fee0b80e06f8421b8a3806d1f3a587) )
 ROM_END
@@ -5292,7 +5279,7 @@ ROM_END
 
 ROM_START( m4nud2p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "classic_2p_nudger_v0-1_(27512)"    , 0x0000, 0x010000, CRC(9c22f5f8) SHA1(5391f5d5b3a0861b93702e476d9635ff304a02a2) )
+	ROM_LOAD( "classic 2p nudger v0-1 (27512)", 0x0000, 0x010000, CRC(9c22f5f8) SHA1(5391f5d5b3a0861b93702e476d9635ff304a02a2) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "ctnsnd.hex", 0x0000, 0x080000, CRC(150a4513) SHA1(97147e11b49d18225c527d8a0926118a83ee906c)) // == 2p Unlimited?
@@ -5350,7 +5337,7 @@ ROM_END
 
 ROM_START( m4sss )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spend6_10m.bin" , 0x0000, 0x010000, CRC(a7519725) SHA1(cdab0ae00b865291ff7389122d174ef2e2676c6e) )
+	ROM_LOAD( "spend6 10m.bin", 0x0000, 0x010000, CRC(a7519725) SHA1(cdab0ae00b865291ff7389122d174ef2e2676c6e) )
 
 	ROM_REGION( 0x10000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "sp_05a__.1o3", 0x0000, 0x010000, CRC(044a0133) SHA1(7cf85cf19f5c3f588daf5c0d7efe4204d67161a2) )
@@ -5899,7 +5886,7 @@ ROM_START( m4ttdia )
 	ROM_LOAD( "tda04y.p1", 0x0000, 0x020000, CRC(1151d6c2) SHA1(0048447537061d15c4173366ac1b431e4eef4d57) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-//  ROM_LOAD( "tda0.1_snd_p1.bin"  , 0x0000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) )
+//  ROM_LOAD( "tda0.1 snd p1.bin", 0x0000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) )
 	ROM_LOAD( "tdasnd.p1", 0x000000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) )
 	ROM_LOAD( "tdasnd.p2", 0x080000, 0x080000, CRC(66cc2f87) SHA1(6d8af6090b2ab29039aa89a125512190e7e34a03) )
 ROM_END
@@ -6469,13 +6456,13 @@ ROM_START( m4vivaes )
 	ROM_LOAD( "vesp510l", 0x0000, 0x010000, CRC(15c33530) SHA1(888625c383e52825c06cbf1e7022cd8b02bf549c) )
 	ROM_LOAD( "vesp55", 0x0000, 0x010000, CRC(9cc395ef) SHA1(d62cb55664246e3fada3d971ee317eef51739018) )
 	ROM_LOAD( "vesp58c", 0x0000, 0x010000, CRC(d8cc868d) SHA1(0b9fa8b61998badbd870827e32af4937548b583e) )
-	ROM_LOAD( "vesp_10_(2).4" , 0x0000, 0x010000, CRC(95e95339) SHA1(59633b7c01da25237342bce7e989259bf723ba6f) )
-	ROM_LOAD( "vesp_10_(2).8" , 0x0000, 0x010000, CRC(8054766d) SHA1(8e7fd6f8cd74d2760e2923af32813ca93fbf98e6) )
+	ROM_LOAD( "vesp_10 (2).4", 0x0000, 0x010000, CRC(95e95339) SHA1(59633b7c01da25237342bce7e989259bf723ba6f) )
+	ROM_LOAD( "vesp_10 (2).8", 0x0000, 0x010000, CRC(8054766d) SHA1(8e7fd6f8cd74d2760e2923af32813ca93fbf98e6) )
 	ROM_LOAD( "vesp_10.4", 0x0000, 0x010000, CRC(95e95339) SHA1(59633b7c01da25237342bce7e989259bf723ba6f) )
 	ROM_LOAD( "vesp_10.8", 0x0000, 0x010000, CRC(8054766d) SHA1(8e7fd6f8cd74d2760e2923af32813ca93fbf98e6) )
 	ROM_LOAD( "vesp_20_.8", 0x0000, 0x010000, CRC(35f90f05) SHA1(0013ff32c809603efdad782306140bd7086be965) )
-	ROM_LOAD( "vesp_5_(2).4" , 0x0000, 0x010000, CRC(3b6762ce) SHA1(9dc53dce453a7b124ea2b65a590aff6c7d05831f) )
-	ROM_LOAD( "vesp_5_(2).8" , 0x0000, 0x010000, CRC(63abf642) SHA1(6b585147a771e4bd445b525aafc25293845f660b) )
+	ROM_LOAD( "vesp_5 (2).4", 0x0000, 0x010000, CRC(3b6762ce) SHA1(9dc53dce453a7b124ea2b65a590aff6c7d05831f) )
+	ROM_LOAD( "vesp_5 (2).8", 0x0000, 0x010000, CRC(63abf642) SHA1(6b585147a771e4bd445b525aafc25293845f660b) )
 	ROM_LOAD( "vesp_5.4", 0x0000, 0x010000, CRC(3b6762ce) SHA1(9dc53dce453a7b124ea2b65a590aff6c7d05831f) )
 	ROM_LOAD( "vesp_5.8", 0x0000, 0x010000, CRC(63abf642) SHA1(6b585147a771e4bd445b525aafc25293845f660b) )
 
@@ -6530,7 +6517,7 @@ ROM_START( m4vivalv )
 	ROM_LOAD( "5p5vivalasvegas6.bin", 0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e) )
 
 	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "v.las_vegas_6_10p_10m.bin"    , 0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d) )
+	ROM_LOAD( "v.las vegas 6 10p 10m.bin", 0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d) )
 	ROM_LOAD( "vegas15g", 0x0000, 0x020000, CRC(5b804e4d) SHA1(5967b9f4e28e5a5e5e7005a29ecb30fc661800e0) )
 	ROM_LOAD( "vegas15t", 0x0000, 0x020000, CRC(9d15f44f) SHA1(3a3f2034de9ba56cb2cb18b4898f2829a2019d4e) )
 	ROM_LOAD( "viv55", 0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e) )
@@ -6680,7 +6667,7 @@ ROM_START( m4wta )
 	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "pwnk.p1", 0x0000, 0x020000, CRC(7c6e21e3) SHA1(d6aeb5948e0800050193575a3b5c06c11f46eed8) )
 	ROM_LOAD( "windy.p1", 0x0000, 0x010000, CRC(d8b78c2d) SHA1(d8c2a2ac30a9b876acfbe99e3c540ba0e82cde33) )
-	ROM_LOAD( "winner_takes_all_wn80.1c_20p_8_idm.bin"      , 0x0000, 0x010000, CRC(471ba65a) SHA1(6ede860bcf323ee75dd7f75a51e5d1166ee72abc) )
+	ROM_LOAD( "winner takes all wn80.1c 20p 8 idm.bin", 0x0000, 0x010000, CRC(471ba65a) SHA1(6ede860bcf323ee75dd7f75a51e5d1166ee72abc) )
 	ROM_LOAD( "wins.p1", 0x0000, 0x010000, CRC(d79d1e5b) SHA1(722657423a605d6d272d61e4e00b4055ed05f98d) )
 	ROM_LOAD( "winy.p1", 0x0000, 0x010000, CRC(5ff8ed08) SHA1(9567db64e8ebf25ecb22236598cc88a3106f0e36) )
 	ROM_LOAD( "wn5ad.p1", 0x0000, 0x010000, CRC(0eb0845d) SHA1(57a2ca27672119e71af3b990cedcf52dd89e24cc) )
@@ -6881,7 +6868,7 @@ ROM_END
 
 ROM_START( m4czne )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "czone_6.bin" , 0x0000, 0x010000, CRC(e5b2b64e) SHA1(b73a2aed7b04184bc7c5c3d0a11d44e624a47428) )
+	ROM_LOAD( "czone 6.bin", 0x0000, 0x010000, CRC(e5b2b64e) SHA1(b73a2aed7b04184bc7c5c3d0a11d44e624a47428) )
 ROM_END
 
 ROM_START( m4csoc )
@@ -7187,7 +7174,7 @@ ROM_END
 
 ROM_START( m4holywd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hollywood_5p.bin" , 0x0000, 0x010000, CRC(fb4ebb6e) SHA1(1ccfa81c173011ce70640097c85b532fd44f5a6e) )
+	ROM_LOAD( "hollywood 5p.bin", 0x0000, 0x010000, CRC(fb4ebb6e) SHA1(1ccfa81c173011ce70640097c85b532fd44f5a6e) )
 ROM_END
 
 
@@ -7490,7 +7477,7 @@ ROM_END
 
 ROM_START( m4orland )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "or_05a_v2-1(27c010)"  , 0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29) )
+	ROM_LOAD( "or 05a v2-1(27c010)", 0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29) )
 
 	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "or_05a__.1_1", 0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed) )
@@ -8702,7 +8689,7 @@ ROM_END
 
 ROM_START( m4boltblb )
 	ROM_REGION( 0x010000, "maincpu", 0 )
-	ROM_LOAD( "bfb9_5p_cash.bin"  , 0x8000, 0x008000, CRC(792bff34) SHA1(6996e87f22df6bac7bbe9908534b7e0480f03ede) )
+	ROM_LOAD( "bfb9 5p cash.bin", 0x8000, 0x008000, CRC(792bff34) SHA1(6996e87f22df6bac7bbe9908534b7e0480f03ede) )
 ROM_END
 
 ROM_START( m4boltblc )
@@ -9576,7 +9563,7 @@ ROM_END
 
 ROM_START( m4pbnudg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pinball_nudger_v0-1"  , 0x0000, 0x010000, CRC(8d2e5ded) SHA1(51d4ea44d4e8a7bd53f321fd677b12f6bafbc721) )
+	ROM_LOAD( "pinball nudger v0-1", 0x0000, 0x010000, CRC(8d2e5ded) SHA1(51d4ea44d4e8a7bd53f321fd677b12f6bafbc721) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "pinsnd.bin", 0x0000, 0x080000, CRC(30f61dcb) SHA1(c844272ffc264d6dabe1958ef57d10d1ba0c2b1e) )
@@ -9794,7 +9781,7 @@ ROM_END
 
 ROM_START( m4stand2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "stand_2_del_8.bin"   , 0x08000, 0x08000, CRC(a9a5edc7) SHA1(035d3f3b3373cec475753f1b0de2f4db48d6d288) )
+	ROM_LOAD( "stand 2 del 8.bin", 0x08000, 0x08000, CRC(a9a5edc7) SHA1(035d3f3b3373cec475753f1b0de2f4db48d6d288) )
 ROM_END
 
 
@@ -9911,8 +9898,8 @@ ROM_END
 
 ROM_START( m4exlin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "extra_lines_10p_4.80-2.40_16.3.90.bin"    , 0x8000, 0x008000, CRC(5e9b81e9) SHA1(84d446542533495b28692ba5f12cfd4fa5deabdd) )
-	ROM_LOAD( "extra_lines_2p_2.40_21.3.90.bin"    , 0x8000, 0x008000, CRC(b9736cd1) SHA1(c275e5c4ea550a6814b2b2143e4b84198739524c) )
+	ROM_LOAD( "extra lines 10p 4.80-2.40 16.3.90.bin", 0x8000, 0x008000, CRC(5e9b81e9) SHA1(84d446542533495b28692ba5f12cfd4fa5deabdd) )
+	ROM_LOAD( "extra lines 2p 2.40 21.3.90.bin", 0x8000, 0x008000, CRC(b9736cd1) SHA1(c275e5c4ea550a6814b2b2143e4b84198739524c) )
 ROM_END
 
 ROM_START( m4jjc )
@@ -9923,17 +9910,17 @@ ROM_END
 
 ROM_START( m4spton )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spot_on_v8_2_5_10_20p.bin" , 0x0000, 0x010000, CRC(d0e27431) SHA1(cbcf637f2c8cf349e6386a54343d35da8aa24186) )
+	ROM_LOAD( "spot_on_v8 2_5_10_20p.bin", 0x0000, 0x010000, CRC(d0e27431) SHA1(cbcf637f2c8cf349e6386a54343d35da8aa24186) )
 ROM_END
 
 ROM_START( m4supjst )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "super_jester_16.2.90_2p_1.bin"    , 0x8000, 0x008000, CRC(a55dae4f) SHA1(c426a202c312e0aefc5718c844f70b0af9b1c724) )
-	ROM_LOAD( "super_jester_19.2.90_5p_2.40.bin"    , 0x8000, 0x008000, CRC(754d821a) SHA1(9b00d0e028e46f8dfed60f3b49ef7c5cc40ac70c) )
-	ROM_LOAD( "super_jester_2.1.90_10p_4.80_p1.bin"     , 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) )
-	ROM_LOAD( "super_jester_20p.bin"  , 0x8000, 0x008000, CRC(be725101) SHA1(b2352e56bec5c8929075697f29526d25626cbc38) )
-	ROM_LOAD( "super_jester_4.10.89_10p_4_cash.bin"     , 0x8000, 0x008000, CRC(ca1797b2) SHA1(afd6b365e7bef721084dc33442bb685fef6f7b76) )
-	ROM_LOAD( "super_jester_4.10.89_10p_4_token.bin"     , 0x8000, 0x008000, CRC(3b4e4444) SHA1(a3cbbd2657be087c346a5ada7c301584125f8fbc) )
+	ROM_LOAD( "super jester 16.2.90 2p 1.bin", 0x8000, 0x008000, CRC(a55dae4f) SHA1(c426a202c312e0aefc5718c844f70b0af9b1c724) )
+	ROM_LOAD( "super jester 19.2.90 5p 2.40.bin", 0x8000, 0x008000, CRC(754d821a) SHA1(9b00d0e028e46f8dfed60f3b49ef7c5cc40ac70c) )
+	ROM_LOAD( "super jester 2.1.90 10p 4.80 p1.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) )
+	ROM_LOAD( "super jester 20p.bin", 0x8000, 0x008000, CRC(be725101) SHA1(b2352e56bec5c8929075697f29526d25626cbc38) )
+	ROM_LOAD( "super jester 4.10.89 10p 4 cash.bin", 0x8000, 0x008000, CRC(ca1797b2) SHA1(afd6b365e7bef721084dc33442bb685fef6f7b76) )
+	ROM_LOAD( "super jester 4.10.89 10p 4 token.bin", 0x8000, 0x008000, CRC(3b4e4444) SHA1(a3cbbd2657be087c346a5ada7c301584125f8fbc) )
 	ROM_LOAD( "superjester", 0x8000, 0x008000, CRC(754d821a) SHA1(9b00d0e028e46f8dfed60f3b49ef7c5cc40ac70c) )
 	ROM_LOAD( "31.1.90cj10p4.80v6.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) ) // marked crown jester?
 ROM_END
@@ -10022,9 +10009,9 @@ ROM_END
 
 ROM_START( m4dnj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d.n.j_1-02" , 0x0000, 0x010000, CRC(5750843d) SHA1(b87923e84071ea4a1af7566a7f413f8e30e208e9) )
-	ROM_LOAD( "d.n.j_1-03" , 0x0000, 0x010000, CRC(7b805255) SHA1(f62765bfa66e2422ac0a71ebaff27f1ccd470fe2) )
-	ROM_LOAD( "d.n.j_1-06" , 0x0000, 0x010000, CRC(aab770c7) SHA1(f24fff8346915017bc43fef9fac356a067676d86) )
+	ROM_LOAD( "d.n.j 1-02", 0x0000, 0x010000, CRC(5750843d) SHA1(b87923e84071ea4a1af7566a7f413f8e30e208e9) )
+	ROM_LOAD( "d.n.j 1-03", 0x0000, 0x010000, CRC(7b805255) SHA1(f62765bfa66e2422ac0a71ebaff27f1ccd470fe2) )
+	ROM_LOAD( "d.n.j 1-06", 0x0000, 0x010000, CRC(aab770c7) SHA1(f24fff8346915017bc43fef9fac356a067676d86) )
 ROM_END
 
 
@@ -10054,9 +10041,9 @@ ROM_START( m4sbx )
 
 	ROM_REGION( 0x10000, "altrevs", 0 )
 	ROM_LOAD( "b_sbx23.bin", 0x8000, 0x008000, CRC(8188e94f) SHA1(dfbfc549d12c8f7c7db6c12ba766c28f1cf0873f) )
-	ROM_LOAD( "s_bears_v1-4_20p_po.bin"    , 0x8000, 0x008000, CRC(03486714) SHA1(91c237956bbec58cc08a3e92543488d8e2daa673) )
-	ROM_LOAD( "s_bears_v2-4_10p_8.bin"    , 0x8000, 0x008000, CRC(9b94f8d0) SHA1(9808386def14c8a058730e90135a4d6506e6ed3d) )
-	ROM_LOAD( "s_bears_v2-4_20p_po.bin"    , 0x8000, 0x008000, CRC(ad8f8d9d) SHA1(abd808f95b587a84e8b3aad1af9fe1cb613c9821) )
+	ROM_LOAD( "s bears v1-4 20p po.bin", 0x8000, 0x008000, CRC(03486714) SHA1(91c237956bbec58cc08a3e92543488d8e2daa673) )
+	ROM_LOAD( "s bears v2-4 10p 8.bin", 0x8000, 0x008000, CRC(9b94f8d0) SHA1(9808386def14c8a058730e90135a4d6506e6ed3d) )
+	ROM_LOAD( "s bears v2-4 20p po.bin", 0x8000, 0x008000, CRC(ad8f8d9d) SHA1(abd808f95b587a84e8b3aad1af9fe1cb613c9821) )
 	ROM_LOAD( "superbea.10p", 0x8000, 0x008000, CRC(70020466) SHA1(473c9feb9ce0024b870612af19ec8a47a7798506) )
 
 	ROM_REGION( 0x40000, "upd", 0 ) // not oki at least...
@@ -10129,7 +10116,7 @@ ROM_START( m4ccc )
 	ROM_LOAD( "ccc12.bin", 0x8000, 0x008000, CRC(570cc766) SHA1(036c95ff6428ab38cceb0537dcc990be78fb331a) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "criss_cross_crazy_sound_(27c2001)"    , 0x0000, 0x040000, CRC(1994c509) SHA1(2bbe91a43aa9953b7776faf67e81e30a4f7b7cb2) )
+	ROM_LOAD( "criss cross crazy sound (27c2001)", 0x0000, 0x040000, CRC(1994c509) SHA1(2bbe91a43aa9953b7776faf67e81e30a4f7b7cb2) )
 ROM_END
 
 
@@ -10147,10 +10134,10 @@ ROM_END
 
 ROM_START( m4unkjok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "joker_10p_3.bin"  , 0x0000, 0x010000, CRC(009823ac) SHA1(5ab25da5876c87a8d8701f84446bb3d377e4c1ca) )
-	ROM_LOAD( "joker_10p_6.bin"  , 0x0000, 0x010000, CRC(f25f0704) SHA1(35298b49f79c5029277f4777fe88d5e4344c115f) )
-	ROM_LOAD( "joker_20p_3_or_6.bin"    , 0x0000, 0x010000, CRC(cae4397e) SHA1(53b61fd41c97a6ed29ce6a7b555e061ecf2b0ae2) )
-	ROM_LOAD( "joker_new_20p_6_or_3.bin"     , 0x0000, 0x010000, CRC(b8d77b97) SHA1(54f69823bb3fd9c2cca014dc7c51913b2d6c8058) )
+	ROM_LOAD( "joker 10p 3.bin", 0x0000, 0x010000, CRC(009823ac) SHA1(5ab25da5876c87a8d8701f84446bb3d377e4c1ca) )
+	ROM_LOAD( "joker 10p 6.bin", 0x0000, 0x010000, CRC(f25f0704) SHA1(35298b49f79c5029277f4777fe88d5e4344c115f) )
+	ROM_LOAD( "joker 20p 3 or 6.bin", 0x0000, 0x010000, CRC(cae4397e) SHA1(53b61fd41c97a6ed29ce6a7b555e061ecf2b0ae2) )
+	ROM_LOAD( "joker new 20p 6 or 3.bin", 0x0000, 0x010000, CRC(b8d77b97) SHA1(54f69823bb3fd9c2cca014dc7c51913b2d6c8058) )
 ROM_END
 
 ROM_START( m4remag )
@@ -10170,7 +10157,7 @@ ROM_END
 
 ROM_START( m4t266 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "t2_66.bin" , 0x0000, 0x010000, CRC(5c99c6bb) SHA1(7b74e0e5207c00b31cb1859e0cc458c0412a1a07) )
+	ROM_LOAD( "t2 66.bin", 0x0000, 0x010000, CRC(5c99c6bb) SHA1(7b74e0e5207c00b31cb1859e0cc458c0412a1a07) )
 ROM_END
 
 ROM_START( m4brnze )
@@ -10633,9 +10620,9 @@ ROM_START( m4blkgd )
 	ROM_LOAD( "blackgoldsnd1.bin", 0x000000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
 	ROM_LOAD( "blackgoldsnd2.bin", 0x080000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
 	ROM_LOAD( "blackgoldsnd3.bin", 0x100000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
-//  ROM_LOAD( "blackgoldsound_1.bin" , 0x0000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
-//  ROM_LOAD( "blackgoldsound_2.bin" , 0x0000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
-//  ROM_LOAD( "blackgoldsound_3.bin" , 0x0000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
+//  ROM_LOAD( "blackgoldsound 1.bin", 0x0000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
+//  ROM_LOAD( "blackgoldsound 2.bin", 0x0000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
+//  ROM_LOAD( "blackgoldsound 3.bin", 0x0000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
 ROM_END
 
 
@@ -11962,8 +11949,8 @@ ROM_END
 ROM_START( m4jok2k )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// latvia
-	ROM_LOAD( "j300_1.512" , 0x0000, 0x010000, CRC(3a52da14) SHA1(b2b7f32093938f8b793fa4c425cd5beaeaa83286) )
-	ROM_LOAD( "j300_2.512" , 0x0000, 0x010000, CRC(6d3c6b99) SHA1(b5f34043e3cc93908b7ff969ae2546862a3a79ce) )
+	ROM_LOAD( "j300 1.512", 0x0000, 0x010000, CRC(3a52da14) SHA1(b2b7f32093938f8b793fa4c425cd5beaeaa83286) )
+	ROM_LOAD( "j300 2.512", 0x0000, 0x010000, CRC(6d3c6b99) SHA1(b5f34043e3cc93908b7ff969ae2546862a3a79ce) )
 	ROM_LOAD( "joker2000.dat", 0x0000, 0x020000, CRC(339c5b70) SHA1(17d8ad7a4458780c574ca8b1e30c63d5749d5ec1) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
@@ -12033,8 +12020,7 @@ GAME(199?, m4bnkrol	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest
 GAME(199?, m4btclok	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4berser	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Berserk (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // crashes mame
 GAME(199?, m4bigbn	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Ben (Barcrest) [DBB, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bigchfd,m4bigchf	,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // why code BCH on a dutch?
-GAME(199?, m4bigchf	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bigchd,0	        ,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // why code BCH on a dutch?
 GAME(199?, m4blkwhd	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4blkbuld,m4blkbul	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Black Bull (Barcrest) [Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4blkbul	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Black Bull (Barcrest) [XSP] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // XSP??

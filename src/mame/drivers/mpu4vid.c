@@ -3048,8 +3048,8 @@ ROM_START( v4reno )
 	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
 
 	ROM_REGION( 0x800000, "altvideo", 0 ) // alt revs of the video roms?
-	ROM_LOAD16_BYTE( "reno_reels_5-1"  ,    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
-	ROM_LOAD16_BYTE( "reno_reels_5-2"  ,    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
+	ROM_LOAD16_BYTE( "reno reels 5-1",    0x000000, 0x080000,  CRC(9ebd0eaf) SHA1(3d326509240fe8a83df9d2369f184838bee2b407) )
+	ROM_LOAD16_BYTE( "reno reels 5-2",    0x000001, 0x080000,  CRC(1cbcd9b5) SHA1(989d64e10c67dab7d20229e5c63d24111d556138) )
 	ROM_LOAD16_BYTE( "reno_71_27c040.bin",0x000000, 0x080000,  CRC(c1125c51) SHA1(a461049cd3768096c03f3a5149cdef31d0ab447e) )
 	ROM_LOAD16_BYTE( "reno_72_27c040.bin",0x000001, 0x080000,  CRC(31773743) SHA1(e1245f6b35c9049b3d1478e93fb1b6cfff34733e) )
 	ROM_LOAD16_BYTE( "rr8p1",			  0x000000, 0x080000,  CRC(68992dd3) SHA1(75ab1cd02ac627b6191e9b61ee7c072029becaeb) )
@@ -3083,7 +3083,7 @@ ROM_START( v4reno )
 
 
 	ROM_REGION( 0x800000, "altsnd", 0 ) // alt revs of the sound roms?
-	ROM_LOAD( "reno_reels_sound_1a"   ,  0x000000, 0x080000,  CRC(a8b7bba7) SHA1(5fa3512a6fdcf512fafa6261b3a99922a00d6874) ) // bad dump, only one ROM?
+	ROM_LOAD( "reno reels sound 1a",  0x000000, 0x080000,  CRC(a8b7bba7) SHA1(5fa3512a6fdcf512fafa6261b3a99922a00d6874) ) // bad dump, only one ROM?
 
 ROM_END
 
