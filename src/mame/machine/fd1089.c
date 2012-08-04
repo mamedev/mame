@@ -1,135 +1,147 @@
 /***************************************************************************
 
-Hitachi FD1089A/FD1089B encryption emulation
+    Hitachi FD1089A/FD1089B encryption emulation
 
-Decryption tables provided by Charles MacDonald
-Decryption algorithm by Nicola Salmoria
-LCG algorithm by Andreas Naive
+****************************************************************************
 
-The FD1089 is a 68000 with built-in encryption.
-It contains some battery-backed RAM, when the battery dies the CPU stops
-working.
+    Copyright Nicola Salmoria, Andreas Naive, and Charles MacDonald.
 
-Both opcodes and data are encrypted, using different (but related) mappings.
-Decryption works on 16-bit words, but only 8 bits are affected, the other 8 are
-left untouched. A special value in internal RAM disables the encryption, this
-is necessary otherwise RAM would not work as expected (writing data and reading
-it back would return a different number).
+    All rights reserved.
 
-The FD1089A and FD1089B work in the same way, but the decryption tables are
-different. The internal RAM contains the 8-bit key to use at every address
-(only 12 bits of the address are used, so the encryption repeats).
+****************************************************************************
 
-The FD1089 design is clearly derived from the MC8123. The MC8123 is a Z80 so it
-made sense to encrypt all 8 data bits and use 12 of the 16 address bits. It makes
-a lot less sense to encrypt only half of the 16 data bits; using 12 of the 24
-address bits might be ok, but not in the way it was done. The choice of address
-bits to use was probably dictated by the need to not encrypt data in certain areas
-of the address space, so they had to include the top 8 bits of the address.
-However this means that if you pick e.g. area 000000-00FFFF, where most of the
-program code resides, just 4 address bits affect the encryption, making it very
-weak when compared to the MC8123. Out of the 16KB of internal RAM, you need less
-than 128 bytes to decrypt a whole game - the rest is not used. A waste of space
-and security. Also, since only 8 of the 16 bits are encrypted, it is very easy
-to use the unencrypted ones to search for known sequences of code or data.
+	Decryption tables provided by Charles MacDonald
+	Decryption algorithm by Nicola Salmoria
+	LCG algorithm by Andreas Naive
 
-Like for the MC8123, the contents of the internal RAM were generated using a
-linear congruential generator, so the whole key can be generated starting from
-a single 24-bit seed. Note however that the "don't decrypt" data sections need
-special treatment so it's not possible to derive the precise key without access
-to the CPU.
+	The FD1089 is a 68000 with built-in encryption.
+	It contains some battery-backed RAM, when the battery dies the CPU stops
+	working.
 
-static int rndseed;
+	Both opcodes and data are encrypted, using different (but related) mappings.
+	Decryption works on 16-bit words, but only 8 bits are affected, the other 8 are
+	left untouched. A special value in internal RAM disables the encryption, this
+	is necessary otherwise RAM would not work as expected (writing data and reading
+	it back would return a different number).
 
-int rnd()
-{
-    rndseed = rndseed * 0x290029;
-    return (rndseed >> 16) & 0xff;
-}
+	The FD1089A and FD1089B work in the same way, but the decryption tables are
+	different. The internal RAM contains the 8-bit key to use at every address
+	(only 12 bits of the address are used, so the encryption repeats).
 
-void generate_key(int seed)
-{
-    int i;
+	The FD1089 design is clearly derived from the MC8123. The MC8123 is a Z80 so it
+	made sense to encrypt all 8 data bits and use 12 of the 16 address bits. It makes
+	a lot less sense to encrypt only half of the 16 data bits; using 12 of the 24
+	address bits might be ok, but not in the way it was done. The choice of address
+	bits to use was probably dictated by the need to not encrypt data in certain areas
+	of the address space, so they had to include the top 8 bits of the address.
+	However this means that if you pick e.g. area 000000-00FFFF, where most of the
+	program code resides, just 4 address bits affect the encryption, making it very
+	weak when compared to the MC8123. Out of the 16KB of internal RAM, you need less
+	than 128 bytes to decrypt a whole game - the rest is not used. A waste of space
+	and security. Also, since only 8 of the 16 bits are encrypted, it is very easy
+	to use the unencrypted ones to search for known sequences of code or data.
 
-    rndseed = seed;
-    for (i = 0; i < 0x1000; ++i)
-    {
-        if ("we must encrypt this data table position")
-        {
-            UINT8 byteval;
+	Like for the MC8123, the contents of the internal RAM were generated using a
+	linear congruential generator, so the whole key can be generated starting from
+	a single 24-bit seed. Note however that the "don't decrypt" data sections need
+	special treatment so it's not possible to derive the precise key without access
+	to the CPU.
 
-            do
-            {
-                byteval = rnd();
-            } while (byteval == 0x40);
+	static int rndseed;
 
-            opcode_key[i] = byteval;
+	int rnd()
+	{
+	    rndseed = rndseed * 0x290029;
+	    return (rndseed >> 16) & 0xff;
+	}
 
-            do
-            {
-                byteval = rnd();
-            } while (byteval == 0x40);
+	void generate_key(int seed)
+	{
+	    int i;
 
-            data_key[i] = byteval;
-        }
-    }
+	    rndseed = seed;
+	    for (i = 0; i < 0x1000; ++i)
+	    {
+	        if ("we must encrypt this data table position")
+	        {
+	            UINT8 byteval;
 
-    for (i = 0; i < 0x1000; ++i)
-    {
-        if ("we mustn't encrypt this data table position")
-        {
-            UINT8 byteval;
+	            do
+	            {
+	                byteval = rnd();
+	            } while (byteval == 0x40);
 
-            do
-            {
-                byteval = rnd();
-            } while (byteval == 0x40);
+	            opcode_key[i] = byteval;
 
-            opcode_key[i] = byteval;
-            data_key[i] = 0x40;
-        }
-    }
-}
+	            do
+	            {
+	                byteval = rnd();
+	            } while (byteval == 0x40);
+
+	            data_key[i] = byteval;
+	        }
+	    }
+
+	    for (i = 0; i < 0x1000; ++i)
+	    {
+	        if ("we mustn't encrypt this data table position")
+	        {
+	            UINT8 byteval;
+
+	            do
+	            {
+	                byteval = rnd();
+	            } while (byteval == 0x40);
+
+	            opcode_key[i] = byteval;
+	            data_key[i] = 0x40;
+	        }
+	    }
+	}
 
 
-Note that when both FD1089A and FD1089B versions of a game exist, they use the
-same key.
+	Note that when both FD1089A and FD1089B versions of a game exist, they use the
+	same key.
 
-Known games that use this CPU:
+	Known games that use this CPU:
 
-CPU #     Type  Status   Game              Seed   Unencrypted data range
---------- ------- --- -------------------- ------ -----------------------------------
-317-0013A FD1089B [1] Enduro Racer         400001 030000-04ffff + 100000-1fffff
-317-0018  FD1089A [1] Action Fighter       400003 400000-4fffff + 840000-8dffff + c00000-c4ffff + ff0000-ffffff
-317-0021  FD1089A [2] Alex Kidd            40000b ?
-317-0022  FD1089A [1] Dunk Shot            40000d 030000-ffffff
-317-0024  FD1089B [2] Time Scanner         40000f ?
-317-0027  FD1089B [2] SDI                  400011 ?
-317-0028  FD1089A [2] Defense              400011 ?
-317-0033  FD1089A [1] Alien Syndrome       400013 030000-ffffff
-317-0037  FD1089B [2] Alien Syndrome       400013 030000-ffffff
-317-0034  FD1089B [1] Super Hang-On        400015 030000-06ffff + 100000-2fffff + ff0000-ffffff
-317-0167  FD1089A [2] Aurail               400030 010000-ffffff
-317-0168  FD1089B [1] Aurail               400030 010000-ffffff
-317-????  FD1089A [2] Wonder Boy III       400043 ?
-317-5021  FD1089B [2] Sukeban Jansi Ryuko  40004b ?
+	CPU #     Type  Status   Game              Seed   Unencrypted data range
+	--------- ------- --- -------------------- ------ -----------------------------------
+	317-0013A FD1089B [1] Enduro Racer         400001 030000-04ffff + 100000-1fffff
+	317-0018  FD1089A [1] Action Fighter       400003 400000-4fffff + 840000-8dffff + c00000-c4ffff + ff0000-ffffff
+	317-0021  FD1089A [2] Alex Kidd            40000b ?
+	317-0022  FD1089A [1] Dunk Shot            40000d 030000-ffffff
+	317-0024  FD1089B [2] Time Scanner         40000f ?
+	317-0027  FD1089B [2] SDI                  400011 ?
+	317-0028  FD1089A [2] Defense              400011 ?
+	317-0033  FD1089A [1] Alien Syndrome       400013 030000-ffffff
+	317-0037  FD1089B [2] Alien Syndrome       400013 030000-ffffff
+	317-0034  FD1089B [1] Super Hang-On        400015 030000-06ffff + 100000-2fffff + ff0000-ffffff
+	317-0167  FD1089A [2] Aurail               400030 010000-ffffff
+	317-0168  FD1089B [1] Aurail               400030 010000-ffffff
+	317-????  FD1089A [2] Wonder Boy III       400043 ?
+	317-5021  FD1089B [2] Sukeban Jansi Ryuko  40004b ?
 
-[1] Complete
-[2] Partial
+	[1] Complete
+	[2] Partial
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "fd1089.h"
+#include "segaic16.h"
 
 
-struct parameters
-{
-	int xorval;
-	int s7,s6,s5,s4,s3,s2,s1,s0;
-};
+//**************************************************************************
+//	CONSTANTS
+//**************************************************************************
 
-static const UINT8 basetable_fd1089[0x100] =
+// device type definition
+const device_type FD1089A = &device_creator<fd1089a_device>;
+const device_type FD1089B = &device_creator<fd1089b_device>;
+
+// common base lookup table, shared between A and B variants
+const UINT8 fd1089_base_device::s_basetable_fd1089[0x100] =
 {
 	0x00,0x1c,0x76,0x6a,0x5e,0x42,0x24,0x38,0x4b,0x67,0xad,0x81,0xe9,0xc5,0x03,0x2f,
 	0x45,0x69,0xaf,0x83,0xe7,0xcb,0x01,0x2d,0x02,0x1e,0x78,0x64,0x5c,0x40,0x2a,0x36,
@@ -149,9 +161,8 @@ static const UINT8 basetable_fd1089[0x100] =
 	0x35,0x19,0xd3,0xff,0xc9,0xe5,0x23,0x0f,0xbe,0xa2,0xc8,0xd4,0x4e,0x52,0x34,0x28,
 };
 
-
-/* common to FD1089A and FD1089B */
-static const struct parameters addr_params[16] =
+// address decryption parameters, shared between A and B variants
+const fd1089_base_device::decrypt_parameters fd1089_base_device::s_addr_params[16] =
 {
 	{ 0x23, 6,4,5,7,3,0,1,2 },
 	{ 0x92, 2,5,3,6,7,1,0,4 },
@@ -171,9 +182,97 @@ static const struct parameters addr_params[16] =
 	{ 0x5b, 0,7,5,3,1,4,2,6 },
 };
 
-static UINT8 rearrange_key(UINT8 table, int opcode)
+// data decryption parameters for the A variant
+const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a[16] =
 {
-	if (opcode == 0)
+	{ 0x55, 6,5,1,0,7,4,2,3 },
+	{ 0x94, 7,6,4,2,0,5,1,3 },
+	{ 0x8d, 1,4,2,3,0,6,7,5 },
+	{ 0x9a, 4,3,5,6,0,2,1,7 },
+	{ 0x72, 4,3,7,0,5,6,1,2 },
+	{ 0xff, 1,7,2,3,6,4,5,0 },
+	{ 0x06, 6,5,3,2,4,1,0,7 },
+	{ 0xc5, 3,5,1,4,2,7,0,6 },
+	{ 0xec, 4,7,5,1,6,0,2,3 },
+	{ 0x89, 3,5,0,6,1,2,7,4 },
+	{ 0x5c, 1,3,0,7,5,2,4,6 },
+	{ 0x3f, 7,3,0,2,4,6,1,5 },
+	{ 0x57, 6,4,7,2,1,5,3,0 },
+	{ 0xf7, 6,3,7,0,5,4,2,1 },
+	{ 0x3a, 6,1,3,2,7,4,5,0 },
+	{ 0xac, 1,6,3,5,0,7,4,2 },
+};
+
+
+
+//**************************************************************************
+//	CORE IMPLEMENTATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  fd1089_base_device - constructor
+//-------------------------------------------------
+
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, char cputype)
+	: m68000_device(mconfig, M68000, tag, owner, clock),
+	  m_cputype(cputype)
+{
+	// override the name after the m68000 initializes
+	m_name.printf("FD1089%c", m_cputype);
+}
+
+
+//-------------------------------------------------
+//  device_start - one-time device initialization
+//-------------------------------------------------
+
+void fd1089_base_device::device_start()
+{
+	// start the base device
+	m68000_device::device_start();
+
+	// find the key
+	m_key = memregion("key")->base();
+	if (m_key == NULL)
+		throw emu_fatalerror("FD1089 key region not found!");
+
+	// get a pointer to the ROM region
+	UINT16 *rombase = reinterpret_cast<UINT16 *>(region()->base());
+	if (rombase == NULL)
+		throw emu_fatalerror("FD1089 found no ROM data to decrypt!");
+
+	// determine length and resize our internal buffers
+	UINT32 romsize = region()->bytes();
+	m_plaintext.resize(romsize/2);
+	m_decrypted_opcodes.resize(romsize/2);
+	
+	// copy the plaintext
+	memcpy(m_plaintext, rombase, romsize);
+	
+	// decrypt it, overwriting original data with the decrypted data
+	decrypt(0x000000, romsize, m_plaintext, m_decrypted_opcodes, rombase);
+
+	// mark the ROM region as decrypted, pointing to the opcodes (if it is mapped)
+	address_space *program = space(AS_PROGRAM);
+	if (program->get_read_ptr(0) != NULL)
+		program->set_decrypted_region(0x000000, romsize - 1, m_decrypted_opcodes);
+}
+
+
+
+//**************************************************************************
+//	INTERNAL HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  rearrange_key - shuffle bits in the table
+//	based on whether this is an opcode or a data
+//	decode
+//-------------------------------------------------
+
+UINT8 fd1089_base_device::rearrange_key(UINT8 table, bool opcode)
+{
+	if (!opcode)
 	{
 		table ^= (1<<4);
 		table ^= (1<<5);
@@ -223,41 +322,21 @@ static UINT8 rearrange_key(UINT8 table, int opcode)
 }
 
 
-static int decode_fd1089a(int val,int key,int opcode)
+//-------------------------------------------------
+//  decode_fd1089a - decode an 8-bit value
+//	according to FD1089A rules
+//-------------------------------------------------
+
+UINT8 fd1089_base_device::decode_fd1089a(UINT8 val, UINT8 key, bool opcode)
 {
-	int table;
-
-	static const struct parameters data_params[16] =
-	{
-		{ 0x55, 6,5,1,0,7,4,2,3 },
-		{ 0x94, 7,6,4,2,0,5,1,3 },
-		{ 0x8d, 1,4,2,3,0,6,7,5 },
-		{ 0x9a, 4,3,5,6,0,2,1,7 },
-		{ 0x72, 4,3,7,0,5,6,1,2 },
-		{ 0xff, 1,7,2,3,6,4,5,0 },
-		{ 0x06, 6,5,3,2,4,1,0,7 },
-		{ 0xc5, 3,5,1,4,2,7,0,6 },
-		{ 0xec, 4,7,5,1,6,0,2,3 },
-		{ 0x89, 3,5,0,6,1,2,7,4 },
-		{ 0x5c, 1,3,0,7,5,2,4,6 },
-		{ 0x3f, 7,3,0,2,4,6,1,5 },
-		{ 0x57, 6,4,7,2,1,5,3,0 },
-		{ 0xf7, 6,3,7,0,5,4,2,1 },
-		{ 0x3a, 6,1,3,2,7,4,5,0 },
-		{ 0xac, 1,6,3,5,0,7,4,2 },
-	};
-	const struct parameters *p;
-	const struct parameters *q;
-	int family;
-
-	/* special case - don't decrypt */
+	// special case - don't decrypt
 	if (key == 0x40)
 		return val;
 
-	table = rearrange_key(key, opcode);
+	UINT8 table = rearrange_key(key, opcode);
 
-	p = &addr_params[table >> 4];
-	val = BITSWAP8(val, p->s7,p->s6,p->s5,p->s4,p->s3,p->s2,p->s1,p->s0) ^ p->xorval;
+	const decrypt_parameters &p = s_addr_params[table >> 4];
+	val = BITSWAP8(val, p.s7,p.s6,p.s5,p.s4,p.s3,p.s2,p.s1,p.s0) ^ p.xorval;
 
 	if (BIT(table,3)) val ^= 0x01;
 	if (BIT(table,0)) val ^= 0xb1;
@@ -266,9 +345,9 @@ static int decode_fd1089a(int val,int key,int opcode)
 		if (BIT(table,6))
 			val ^= 0x01;
 
-	val = basetable_fd1089[val];
+	val = s_basetable_fd1089[val];
 
-	family = table & 0x07;
+	UINT8 family = table & 0x07;
 	if (opcode == 0)
 	{
 		if (BIT(~table,6) & BIT(table,2)) family ^= 8;
@@ -294,29 +373,30 @@ static int decode_fd1089a(int val,int key,int opcode)
 	if (BIT(~val,6))
 		val = BITSWAP8(val, 7,6,5,4,2,3,0,1);
 
-	q = &data_params[family];
+	const decrypt_parameters &q = s_data_params_a[family];
 
-	val ^= q->xorval;
-	val = BITSWAP8(val, q->s7,q->s6,q->s5,q->s4,q->s3,q->s2,q->s1,q->s0);
+	val ^= q.xorval;
+	val = BITSWAP8(val, q.s7,q.s6,q.s5,q.s4,q.s3,q.s2,q.s1,q.s0);
 
 	return val;
 }
 
-static int decode_fd1089b(int val,int key,int opcode)
+
+//-------------------------------------------------
+//  decode_fd1089b - decode an 8-bit value
+//	according to FD1089B rules
+//-------------------------------------------------
+
+UINT8 fd1089_base_device::decode_fd1089b(UINT8 val, UINT8 key, bool opcode)
 {
-	int table;
-	int xorval;
-
-	const struct parameters *p;
-
-	/* special case - don't decrypt */
+	// special case - don't decrypt
 	if (key == 0x40)
 		return val;
 
-	table = rearrange_key(key, opcode);
+	UINT8 table = rearrange_key(key, opcode);
 
-	p = &addr_params[table >> 4];
-	val = BITSWAP8(val, p->s7,p->s6,p->s5,p->s4,p->s3,p->s2,p->s1,p->s0) ^ p->xorval;
+	const decrypt_parameters &p = s_addr_params[table >> 4];
+	val = BITSWAP8(val, p.s7,p.s6,p.s5,p.s4,p.s3,p.s2,p.s1,p.s0) ^ p.xorval;
 
 	if (BIT(table,3)) val ^= 0x01;
 	if (BIT(table,0)) val ^= 0xb1;
@@ -325,9 +405,9 @@ static int decode_fd1089b(int val,int key,int opcode)
 		if (BIT(table,6))
 			val ^= 0x01;
 
-	val = basetable_fd1089[val];
+	val = s_basetable_fd1089[val];
 
-	xorval = 0;
+	UINT8 xorval = 0;
 	if (opcode == 0)
 	{
 		if (BIT(~table,6) & BIT(table,2)) xorval ^= 0x01;
@@ -360,32 +440,29 @@ static int decode_fd1089b(int val,int key,int opcode)
 }
 
 
-enum
+//-------------------------------------------------
+//  decrypt_one - decrypt a single 16-bit value
+//	interpreted as being read at the given address
+//	as either an opcode or as data
+//-------------------------------------------------
+
+UINT16 fd1089_base_device::decrypt_one(offs_t addr, UINT16 val, const UINT8 *key, bool opcode, char cputype)
 {
-	FD1089A,
-	FD1089B
-};
+	// pick the translation table from bits ff022a of the address
+	int tbl_num =	((addr & 0x000002) >> 1) |
+					((addr & 0x000008) >> 2) |
+					((addr & 0x000020) >> 3) |
+					((addr & 0x000200) >> 6) |
+					((addr & 0xff0000) >> 12);
 
-static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,int cputype)
-{
-	int tbl_num,src;
-
-	/* pick the translation table from bits ff022a of the address */
-	tbl_num =	((addr & 0x000002) >> 1) |
-				((addr & 0x000008) >> 2) |
-				((addr & 0x000020) >> 3) |
-				((addr & 0x000200) >> 6) |
-				((addr & 0xff0000) >> 12);
-
-	src =	((val & 0x0008) >> 3) |
-			((val & 0x0040) >> 5) |
-			((val & 0xfc00) >> 8);
-
+	UINT16 src =	((val & 0x0008) >> 3) |
+					((val & 0x0040) >> 5) |
+					((val & 0xfc00) >> 8);
 
 	switch (cputype)
 	{
-		case FD1089A: src = decode_fd1089a(src, key[tbl_num + (1^opcode) * 0x1000], opcode); break;
-		case FD1089B: src = decode_fd1089b(src, key[tbl_num + (1^opcode) * 0x1000], opcode); break;
+		case 'A': src = decode_fd1089a(src, key[tbl_num + (opcode ? 0 : 1) * 0x1000], opcode); break;
+		case 'B': src = decode_fd1089b(src, key[tbl_num + (opcode ? 0 : 1) * 0x1000], opcode); break;
 	}
 
 	src =	((src & 0x01) << 3) |
@@ -395,48 +472,18 @@ static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,
 	return (val & ~0xfc48) | src;
 }
 
-static UINT16 *decrypted;
 
-static void clear_decrypted(running_machine &machine)
+//-------------------------------------------------
+//  decrypt - decrypt a buffers' worth of opcodes
+//	and data
+//-------------------------------------------------
+
+void fd1089_base_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT16 *dataptr)
 {
-	decrypted = NULL;
-}
-
-static void sys16_decrypt(running_machine &machine, const UINT8 *key,int cputype)
-{
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	int size = machine.root_device().memregion("maincpu")->bytes();
-	int A;
-	decrypted = auto_alloc_array(machine, UINT16, size/2);
-
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(clear_decrypted), &machine));
-	space->set_decrypted_region(0x000000, size - 1, decrypted);
-
-	for (A = 0;A < size;A+=2)
+	for (offs_t offset = 0; offset < size; offset += 2)
 	{
-		UINT16 src = rom[A/2];
-
-		/* decode the opcodes */
-		decrypted[A/2] = fd1089_decrypt(A,src,key,1,cputype);
-
-		/* decode the data */
-		rom[A/2] = fd1089_decrypt(A,src,key,0,cputype);
+		UINT16 src = srcptr[offset / 2];
+		opcodesptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, true, m_cputype);
+		dataptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, false, m_cputype);
 	}
 }
-
-void *fd1089_get_decrypted_base(void)
-{
-	return decrypted;
-}
-
-void fd1089a_decrypt(running_machine &machine)
-{
-	sys16_decrypt(machine, machine.root_device().memregion("fd1089a")->base(), FD1089A);
-}
-
-void fd1089b_decrypt(running_machine &machine)
-{
-	sys16_decrypt(machine, machine.root_device().memregion("fd1089b")->base(), FD1089B);
-}
-

@@ -1031,10 +1031,11 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 		/* count how many identical CPUs we have */
 		int count = 1;
+		const char *name = exec->device().name();
 		execute_interface_iterator execinneriter(machine.root_device());
 		for (device_execute_interface *scan = execinneriter.first(); scan != NULL; scan = execinneriter.next())
 		{
-			if (exec->device().type() == scan->device().type() && exec->device().clock() == scan->device().clock())
+			if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
 				if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
 					count++;
 		}
@@ -1042,7 +1043,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
-		string.cat(exec->device().name());
+		string.cat(name);
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)

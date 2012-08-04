@@ -120,6 +120,90 @@ struct game_driver
 #define GAME_NAME(name) driver_##name
 #define GAME_EXTERN(name) extern const game_driver GAME_NAME(name)
 
+#ifdef MODERN_DRIVER_INIT
+
+// standard GAME() macro
+#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
+	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
+
+// standard macro with additional layout
+#define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::INIT>,	\
+	ROM_NAME(NAME),							\
+	NULL,									\
+	(MONITOR)|(FLAGS)|GAME_TYPE_ARCADE,		\
+	&LAYOUT[0]								\
+};
+
+// standard console definition macro
+#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::INIT>,	\
+	ROM_NAME(NAME),							\
+	#COMPAT,								\
+	ROT0|(FLAGS)|GAME_TYPE_CONSOLE,			\
+	NULL									\
+};
+
+// standard computer definition macro
+#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::INIT>,	\
+	ROM_NAME(NAME),							\
+	#COMPAT,								\
+	ROT0|(FLAGS)|GAME_TYPE_COMPUTER,		\
+	NULL									\
+};
+
+// standard system definition macro
+#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::INIT>,	\
+	ROM_NAME(NAME),							\
+	#COMPAT,								\
+	ROT0|(FLAGS)|GAME_TYPE_OTHER,			\
+	NULL									\
+};
+
+#else
+
 // standard GAME() macro
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
 	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
@@ -200,6 +284,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 	NULL									\
 };
 
+#endif
 
 
 //**************************************************************************

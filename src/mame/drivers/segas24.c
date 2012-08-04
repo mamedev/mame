@@ -338,6 +338,7 @@ Notes:
 #include "sound/ym2151.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
+#include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "video/segaic24.h"
 #include "includes/segas24.h"
@@ -686,14 +687,13 @@ void segas24_state::reset_reset()
 	int changed = resetcontrol ^ prev_resetcontrol;
 	if(changed & 2) {
 		if(resetcontrol & 2) {
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(machine(), "subcpu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine(), "subcpu", INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
-			s24_fd1094_machine_init(machine());
 
 		} else
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine(), "subcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
 		devtag_reset(machine(), "ymsnd");
@@ -757,7 +757,7 @@ WRITE8_MEMBER( segas24_state::frc_w )
 {
 	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
 	cputag_set_input_line(machine(), "maincpu", IRQ_FRC+1, CLEAR_LINE);
-	cputag_set_input_line(machine(), "sub", IRQ_FRC+1, CLEAR_LINE);
+	cputag_set_input_line(machine(), "subcpu", IRQ_FRC+1, CLEAR_LINE);
 }
 
 
@@ -876,7 +876,7 @@ static TIMER_DEVICE_CALLBACK( irq_timer_cb )
 	if(state->irq_allow0 & (1 << IRQ_TIMER))
 		cputag_set_input_line(timer.machine(), "maincpu", IRQ_TIMER+1, ASSERT_LINE);
 	if(state->irq_allow1 & (1 << IRQ_TIMER))
-		cputag_set_input_line(timer.machine(), "sub", IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "subcpu", IRQ_TIMER+1, ASSERT_LINE);
 
 	if(state->irq_tmode == 1 || state->irq_tmode == 2)
 		timer.machine().primary_screen->update_now();
@@ -888,8 +888,8 @@ static TIMER_DEVICE_CALLBACK( irq_timer_clear_cb )
 	state->irq_sprite = state->irq_vblank = 0;
 	cputag_set_input_line(timer.machine(), "maincpu", IRQ_VBLANK+1, CLEAR_LINE);
 	cputag_set_input_line(timer.machine(), "maincpu", IRQ_SPRITE+1, CLEAR_LINE);
-	cputag_set_input_line(timer.machine(), "sub", IRQ_VBLANK+1, CLEAR_LINE);
-	cputag_set_input_line(timer.machine(), "sub", IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(timer.machine(), "subcpu", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(timer.machine(), "subcpu", IRQ_SPRITE+1, CLEAR_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( irq_frc_cb )
@@ -900,7 +900,7 @@ static TIMER_DEVICE_CALLBACK( irq_frc_cb )
 		cputag_set_input_line(timer.machine(), "maincpu", IRQ_FRC+1, ASSERT_LINE);
 
 	if(state->irq_allow1 & (1 << IRQ_FRC) && state->frc_mode == 1)
-		cputag_set_input_line(timer.machine(), "sub", IRQ_FRC+1, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "subcpu", IRQ_FRC+1, ASSERT_LINE);
 }
 
 void segas24_state::irq_init()
@@ -950,11 +950,11 @@ WRITE16_MEMBER(segas24_state::irq_w)
 	case 3:
 		irq_allow1 = data & 0x3f;
 		irq_timer_pend1 = 0;
-		cputag_set_input_line(machine(), "sub", IRQ_TIMER+1, CLEAR_LINE);
-		cputag_set_input_line(machine(), "sub", IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine(), "sub", IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine(), "sub", IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
-		//cputag_set_input_line(machine(), "sub", IRQ_FRC+1, irq_frc && (irq_allow1 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine(), "subcpu", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(machine(), "subcpu", IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine(), "subcpu", IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine(), "subcpu", IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		//cputag_set_input_line(machine(), "subcpu", IRQ_FRC+1, irq_frc && (irq_allow1 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -978,7 +978,7 @@ READ16_MEMBER(segas24_state::irq_r)
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
-		cputag_set_input_line(machine(), "sub", IRQ_TIMER+1, CLEAR_LINE);
+		cputag_set_input_line(machine(), "subcpu", IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	irq_timer_sync();
@@ -1005,7 +1005,7 @@ static TIMER_DEVICE_CALLBACK(irq_vbl)
 		cputag_set_input_line(timer.machine(), "maincpu", 1+irq, ASSERT_LINE);
 
 	if(state->irq_allow1 & mask)
-		cputag_set_input_line(timer.machine(), "sub", 1+irq, ASSERT_LINE);
+		cputag_set_input_line(timer.machine(), "subcpu", 1+irq, ASSERT_LINE);
 
 	if(scanline == 384) {
 		// Ensure one index pulse every 20 frames
@@ -1025,7 +1025,7 @@ static void irq_ym(device_t *device, int irq)
 	segas24_state *state = device->machine().driver_data<segas24_state>();
 	state->irq_yms = irq;
 	cputag_set_input_line(device->machine(), "maincpu", IRQ_YM2151+1, state->irq_yms && (state->irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(device->machine(), "sub", IRQ_YM2151+1, state->irq_yms && (state->irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "subcpu", IRQ_YM2151+1, state->irq_yms && (state->irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1205,7 +1205,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xcc0002, 0xcc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
 	AM_RANGE(0xcc0004, 0xcc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -1218,7 +1218,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
@@ -1246,7 +1246,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xcc0002, 0xcc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
 	AM_RANGE(0xcc0004, 0xcc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -1279,7 +1279,7 @@ static MACHINE_START( system24 )
 static MACHINE_RESET( system24 )
 {
 	segas24_state *state = machine.driver_data<segas24_state>();
-	cputag_set_input_line(machine, "sub", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "subcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	state->prev_resetcontrol = state->resetcontrol = 0x06;
 	state->fdc_init();
 	state->curbank = 0;
@@ -1950,7 +1950,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_CPU_PROGRAM_MAP(system24_cpu1_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", irq_vbl, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
+	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1989,6 +1989,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
 	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( system24_floppy_fd1094, system24_floppy )
+	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
 MACHINE_CONFIG_END
 
 
@@ -2154,7 +2159,7 @@ ROM_START( sspirtfc )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-02c.key", 0x0000, 0x2000,  CRC(ebae170e) SHA1(b6d1e1b6943a35b96e98e426ecb39bb5a42fb643) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2166,7 +2171,7 @@ ROM_START( sgmast )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-05d.key", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2182,7 +2187,7 @@ ROM_START( sgmastc )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-05c.key", 0x0000, 0x2000, CRC(ae0eabe5) SHA1(692d7565bf9c5b32cc80bb4bd88c9193aa04cbb0) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2194,7 +2199,7 @@ ROM_START( sgmastj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-05b.key", 0x0000, 0x2000, CRC(adc0c83b) SHA1(2328d82d5057062eeb0072fd57f0422218cf24fc) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2206,7 +2211,7 @@ ROM_START( qsww )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-08b.key", 0x0000, 0x2000,  CRC(fe0a336a) SHA1(f7a5b2c1a057d0bb8c1ae0453c58aa8f5fb731b9) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2218,7 +2223,7 @@ ROM_START( gground )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-03d.key", 0x0000, 0x2000,  CRC(e1785bbd) SHA1(b4bebb2829299f1c0815d6a5f317a2526b322f63) ) /* Also labeled "rev-A" but is it different? */
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2230,7 +2235,7 @@ ROM_START( ggroundj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-03b.key", 0x0000, 0x2000,  CRC(84aecdba) SHA1(ceddf967359a6e76543fe1ab00be53d0a11fe1ab) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2242,7 +2247,7 @@ ROM_START( crkdown )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-04c.key", 0x0000, 0x2000,  CRC(16e978cc) SHA1(0e1482b5efa93b732d4cf0990919cb3fc903dca7) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2254,7 +2259,7 @@ ROM_START( crkdownu )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-04d.key", 0x0000, 0x2000,  CRC(934ac358) SHA1(73418e22c9d201bc3fec5c63284858958c010e05) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2266,7 +2271,7 @@ ROM_START( crkdownj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-04b.key", 0x0000, 0x2000,  CRC(4a99a202) SHA1(d7375f09e7246ecd60ba0e48f049e9e252af92a8) ) /* Also labeled "rev-A" but is it different? */
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2302,7 +2307,7 @@ ROM_START( dcclubfd )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-09d.key", 0x0000, 0x2000, CRC(a91ebffb) SHA1(70b8b4272ca456491f254d115b434bb4ce73f049) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2314,7 +2319,7 @@ ROM_START( roughrac )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-06b.key",    0x000000, 0x2000, CRC(6a5bf536) SHA1(3fc3e93ce8a47d7ee86da889efad2e7eca6e2ee9) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2434,7 +2439,6 @@ static DRIVER_INIT( sspirits )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT( sspiritj )
@@ -2444,7 +2448,6 @@ static DRIVER_INIT( sspiritj )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2f00;
-	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT( dcclubfd )
@@ -2454,7 +2457,6 @@ static DRIVER_INIT( dcclubfd )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = segas24_state::dcclub_mlt;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 
@@ -2465,7 +2467,6 @@ static DRIVER_INIT( sgmast )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT( qsww )
@@ -2475,7 +2476,6 @@ static DRIVER_INIT( qsww )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT( gground )
@@ -2485,7 +2485,6 @@ static DRIVER_INIT( gground )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT( crkdown )
@@ -2495,7 +2494,6 @@ static DRIVER_INIT( crkdown )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT( roughrac )
@@ -2505,7 +2503,6 @@ static DRIVER_INIT( roughrac )
 	state->io_w = &segas24_state::hotrod_io_w;
 	state->mlatch_table = 0;
 	state->track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
 }
 
 
@@ -2515,27 +2512,27 @@ static DRIVER_INIT( roughrac )
  *
  *************************************/
 
-//            YEAR, NAME,      PARENT,   MACHINE,         INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+//            YEAR, NAME,      PARENT,   MACHINE,                INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 /* Disk Based Games */
-/* 01 */GAME( 1988, hotrod,    0,        system24_floppy, hotrod,   hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy, hotrod,   hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy, hotrodj,  hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based)", 0 )
-/* 02 */GAME( 1988, sspirits,  0,        system24_floppy, sspirits, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
-/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy, sspirits, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
-/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy, sspirits, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", GAME_NOT_WORKING ) /* MISSING disk image */
-/* 03 */GAME( 1988, gground,   0,        system24_floppy, gground,  gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
-/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy, gground,  gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
-/* 04 */GAME( 1989, crkdown,   0,        system24_floppy, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 05 */GAME( 1989, sgmast,    0,        system24_floppy, sgmast,   sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ) // NOT decrypted
-/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy, sgmast,   sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy, sgmastj,  sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 06 */GAME( 1990, roughrac,  0,        system24_floppy, roughrac, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
-/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
-/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy, bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
-/* 08 */GAME( 1991, qsww,      0,        system24_floppy, qsww,     qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", GAME_IMPERFECT_GRAPHICS ) // wrong bg colour on title
-/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy, dcclub,   dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
+/* 01 */GAME( 1988, hotrod,    0,        system24_floppy,        hotrod,   hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy,        hotrod,   hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy,        hotrodj,  hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based)", 0 )
+/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
+/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
+/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", GAME_NOT_WORKING ) /* MISSING disk image */
+/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
+/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
+/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ) // NOT decrypted
+/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd1094, sgmastj,  sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd1094, roughrac, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
+/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy,        bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
+/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy,        bnzabros, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
+/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", GAME_IMPERFECT_GRAPHICS ) // wrong bg colour on title
+/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_fd1094, dcclub,   dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 /* ROM Based */

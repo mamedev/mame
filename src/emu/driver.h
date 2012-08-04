@@ -178,9 +178,9 @@ public:
 
 	// generic helpers
 	template<class _DriverClass, void (_DriverClass::*_Function)()>
-	static void static_wrapper(driver_device &device)
+	static void driver_init_wrapper(running_machine &machine)
 	{
-		(downcast<_DriverClass &>(device).*_Function)();
+		(machine.driver_data<_DriverClass>()->*_Function)();
 	}
 
 	// generic interrupt generators
@@ -234,6 +234,7 @@ public:
 	void soundlatch_setclearedvalue(UINT16 value) { m_latch_clear_value = value; }
 
 	// sound latch readers
+	UINT32 soundlatch_read(UINT8 index = 0);
 	DECLARE_READ8_MEMBER( soundlatch_byte_r );
 	DECLARE_READ8_MEMBER( soundlatch2_byte_r );
 	DECLARE_READ8_MEMBER( soundlatch3_byte_r );
@@ -244,6 +245,8 @@ public:
 	DECLARE_READ16_MEMBER( soundlatch4_word_r );
 
 	// sound latch writers
+	void soundlatch_write(UINT8 index, UINT32 data);
+	void soundlatch_write(UINT32 data) { soundlatch_write(0, data); }
 	DECLARE_WRITE8_MEMBER( soundlatch_byte_w );
 	DECLARE_WRITE8_MEMBER( soundlatch2_byte_w );
 	DECLARE_WRITE8_MEMBER( soundlatch3_byte_w );
@@ -254,6 +257,7 @@ public:
 	DECLARE_WRITE16_MEMBER( soundlatch4_word_w );
 
 	// sound latch clearers
+	void soundlatch_clear(UINT8 index = 0);
 	DECLARE_WRITE8_MEMBER( soundlatch_clear_byte_w );
 	DECLARE_WRITE8_MEMBER( soundlatch2_clear_byte_w );
 	DECLARE_WRITE8_MEMBER( soundlatch3_clear_byte_w );

@@ -2,18 +2,51 @@
 
     Sega Y-board hardware
 
-Games supported:
+****************************************************************************
 
-    G-LOC Air Battle
-    G-LOC R360
-    Galaxy Force 2
-    Power Drift
-    Rail Chase
-    Strike Fighter
+    Copyright Aaron Giles
+    All rights reserved.
 
-Known games currently not dumped:
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
 
-    Galaxy Force
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************
+
+	Games supported:
+
+	    G-LOC Air Battle
+	    G-LOC R360
+	    Galaxy Force 2
+	    Power Drift
+	    Rail Chase
+	    Strike Fighter
+
+	Known games currently not dumped:
+
+	    Galaxy Force
 
 ****************************************************************************
 
@@ -30,7 +63,6 @@ Known games currently not dumped:
 #include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
-#include "video/segaic16.h"
 #include "includes/segaipt.h"
 
 #include "pdrift.lh"
@@ -64,7 +96,7 @@ static UINT16 pdrift_bank;
 
 static void yboard_generic_init( running_machine &machine )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
+	segaybd_state *state = machine.driver_data<segaybd_state>();
 
 	/* reset globals */
 	state->m_vblank_irq_state = 0;
@@ -84,7 +116,7 @@ static void yboard_generic_init( running_machine &machine )
 
 static void update_main_irqs(running_machine &machine)
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
+	segaybd_state *state = machine.driver_data<segaybd_state>();
 
 	device_set_input_line(state->m_maincpu, 2, state->m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	device_set_input_line(state->m_subx, 2, state->m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -135,9 +167,9 @@ static void update_main_irqs(running_machine &machine)
         150-200 = ok
 */
 
-static TIMER_DEVICE_CALLBACK( scanline_callback )
+static TIMER_CALLBACK( scanline_callback )
 {
-	segas1x_state *state = timer.machine().driver_data<segas1x_state>();
+	segaybd_state *state = machine.driver_data<segaybd_state>();
 	int scanline = param;
 
 	/* on scanline 'irq2_scanline' generate an IRQ2 */
@@ -169,10 +201,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	}
 
 	/* update IRQs on the main CPU */
-	update_main_irqs(timer.machine());
+	update_main_irqs(machine);
 
 	/* come back at the next appropriate scanline */
-	timer.adjust(timer.machine().primary_screen->time_until_pos(scanline), scanline);
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -180,10 +212,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		int old = state->m_irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (timer->machine().input().code_pressed(KEYCODE_Q)) { while (timer->machine().input().code_pressed(KEYCODE_Q)) ; state->m_irq2_scanline -= 10; }
-		if (timer->machine().input().code_pressed(KEYCODE_W)) { while (timer->machine().input().code_pressed(KEYCODE_W)) ; state->m_irq2_scanline -= 1; }
-		if (timer->machine().input().code_pressed(KEYCODE_E)) { while (timer->machine().input().code_pressed(KEYCODE_E)) ; state->m_irq2_scanline += 1; }
-		if (timer->machine().input().code_pressed(KEYCODE_R)) { while (timer->machine().input().code_pressed(KEYCODE_R)) ; state->m_irq2_scanline += 10; }
+		if (machine.input().code_pressed(KEYCODE_Q)) { while (machine.input().code_pressed(KEYCODE_Q)) ; state->m_irq2_scanline -= 10; }
+		if (machine.input().code_pressed(KEYCODE_W)) { while (machine.input().code_pressed(KEYCODE_W)) ; state->m_irq2_scanline -= 1; }
+		if (machine.input().code_pressed(KEYCODE_E)) { while (machine.input().code_pressed(KEYCODE_E)) ; state->m_irq2_scanline += 1; }
+		if (machine.input().code_pressed(KEYCODE_R)) { while (machine.input().code_pressed(KEYCODE_R)) ; state->m_irq2_scanline += 10; }
 		if (old != state->m_irq2_scanline)
 			popmessage("scanline = %d", state->m_irq2_scanline);
 	}
@@ -193,28 +225,25 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 
 static MACHINE_START( yboard )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
-
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
-	state->m_subx = machine.device("subx");
-	state->m_suby = machine.device("suby");
+	segaybd_state *state = machine.driver_data<segaybd_state>();
 
 	state->save_item(NAME(state->m_vblank_irq_state));
 	state->save_item(NAME(state->m_timer_irq_state));
 	state->save_item(NAME(state->m_irq2_scanline));
 	state->save_item(NAME(state->m_misc_io_data));
 	state->save_item(NAME(state->m_analog_data));
+	
+	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 }
 
 
 static MACHINE_RESET( yboard )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
+	segaybd_state *state = machine.driver_data<segaybd_state>();
 
 	state->m_irq2_scanline = 170;
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(223), 223);
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(223), 223);
 }
 
 
@@ -227,7 +256,7 @@ static MACHINE_RESET( yboard )
 
 static void sound_cpu_irq(device_t *device, int state)
 {
-	segas1x_state *driver = device->machine().driver_data<segas1x_state>();
+	segaybd_state *driver = device->machine().driver_data<segaybd_state>();
 
 	device_set_input_line(driver->m_soundcpu, 0, state);
 }
@@ -235,7 +264,7 @@ static void sound_cpu_irq(device_t *device, int state)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
+	segaybd_state *state = machine.driver_data<segaybd_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 	state->soundlatch_byte_w(*space, 0, param);
@@ -252,7 +281,7 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	segaybd_state *state = space->machine().driver_data<segaybd_state>();
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->soundlatch_byte_r(*space, offset);
 }
@@ -267,7 +296,7 @@ static READ8_HANDLER( sound_data_r )
 
 static READ16_HANDLER( io_chip_r )
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	segaybd_state *state = space->machine().driver_data<segaybd_state>();
 	static const char *const portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -315,7 +344,7 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	segaybd_state *state = space->machine().driver_data<segaybd_state>();
 	UINT8 old;
 
 	/* generic implementation */
@@ -387,7 +416,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 static READ16_HANDLER( analog_r )
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	segaybd_state *state = space->machine().driver_data<segaybd_state>();
 	int result = 0xff;
 	if (ACCESSING_BITS_0_7)
 	{
@@ -400,7 +429,7 @@ static READ16_HANDLER( analog_r )
 
 static WRITE16_HANDLER( analog_w )
 {
-	segas1x_state *state = space->machine().driver_data<segas1x_state>();
+	segaybd_state *state = space->machine().driver_data<segaybd_state>();
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (state->m_misc_io_data[0x08/2] & 3)) : (offset & 3);
 	int value = state->ioport(ports[selected])->read_safe(0xff);
@@ -416,7 +445,7 @@ static WRITE16_HANDLER( analog_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segas1x_state )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -438,7 +467,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segas1x_state )
+static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -451,7 +480,7 @@ static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segas1x_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16, segas1x_state )
+static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -473,14 +502,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE_LEGACY("pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
@@ -934,7 +963,7 @@ static const sega_pcm_interface segapcm_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yboard, segas1x_state )
+static MACHINE_CONFIG_START( yboard, segaybd_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -954,8 +983,6 @@ static MACHINE_CONFIG_START( yboard, segas1x_state )
 	MCFG_MACHINE_RESET(yboard)
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_TIMER_ADD("int_timer", scanline_callback)
 
 	MCFG_315_5248_ADD("5248_main")
 	MCFG_315_5248_ADD("5248_subx")

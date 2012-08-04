@@ -1262,8 +1262,6 @@ $(MAMEOBJ)/sega.a: \
 	$(MACHINE)/fd1094.o \
 	$(MACHINE)/fddebug.o \
 	$(MACHINE)/mc8123.o \
-	$(MACHINE)/s16fd.o \
-	$(MACHINE)/s24fd.o \
 	$(MACHINE)/scudsp.o \
 	$(MACHINE)/segaic16.o \
 	$(AUDIO)/carnival.o \

@@ -96,12 +96,6 @@ public:
 	void reset_control_w(UINT8 data);
 };
 
-/*----------- defined in machine/s24fd.c -----------*/
-
-extern void s24_fd1094_machine_init(running_machine &machine);
-extern void s24_fd1094_driver_init(running_machine &machine);
-
-
 /*----------- defined in video/segas24.c -----------*/
 
 SCREEN_UPDATE_IND16(system24);
