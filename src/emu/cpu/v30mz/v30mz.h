@@ -1,358 +1,226 @@
-typedef enum { ES, CS, SS, DS } SREGS;
-typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;
-
-#define NEC_NMI_INT_VECTOR 2
-
-typedef enum {
-   AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
-   AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
-   CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
-   CH = NATIVE_ENDIAN_VALUE_LE_BE(0x3, 0x2),
-   DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
-   DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
-   BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
-   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
-  SPL = NATIVE_ENDIAN_VALUE_LE_BE(0x8, 0x9),
-  SPH = NATIVE_ENDIAN_VALUE_LE_BE(0x9, 0x8),
-  BPL = NATIVE_ENDIAN_VALUE_LE_BE(0xa, 0xb),
-  BPH = NATIVE_ENDIAN_VALUE_LE_BE(0xb, 0xa),
-  IXL = NATIVE_ENDIAN_VALUE_LE_BE(0xc, 0xd),
-  IXH = NATIVE_ENDIAN_VALUE_LE_BE(0xd, 0xc),
-  IYL = NATIVE_ENDIAN_VALUE_LE_BE(0xe, 0xf),
-  IYH = NATIVE_ENDIAN_VALUE_LE_BE(0xf, 0xe)
-} BREGS;
+#ifndef __V30MZ_H__
+#define __V30MZ_H__
 
 
-/* parameter x = result, y = source 1, z = source 2 */
+typedef struct _nec_config nec_config;
+struct _nec_config
+{
+	const UINT8*	v25v35_decryptiontable; // internal decryption table
+};
 
-#define SetTF(x)		(cpustate->TF = (x))
-#define SetIF(x)		(cpustate->IF = (x))
-#define SetDF(x)		(cpustate->DF = (x))
-#define SetMD(x)		(cpustate->MF = (x))	/* OB [19.07.99] Mode Flag V30 */
-
-#define SetCFB(x)		(cpustate->CarryVal = (x) & 0x100)
-#define SetCFW(x)		(cpustate->CarryVal = (x) & 0x10000)
-#define SetAF(x,y,z)	(cpustate->AuxVal = ((x) ^ ((y) ^ (z))) & 0x10)
-#define SetSF(x)		(cpustate->SignVal = (x))
-#define SetZF(x)		(cpustate->ZeroVal = (x))
-#define SetPF(x)		(cpustate->ParityVal = (x))
-
-#define SetSZPF_Byte(x) (cpustate->SignVal=cpustate->ZeroVal=cpustate->ParityVal=(INT8)(x))
-#define SetSZPF_Word(x) (cpustate->SignVal=cpustate->ZeroVal=cpustate->ParityVal=(INT16)(x))
-
-#define SetOFW_Add(x,y,z)	(cpustate->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x8000)
-#define SetOFB_Add(x,y,z)	(cpustate->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x80)
-#define SetOFW_Sub(x,y,z)	(cpustate->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x8000)
-#define SetOFB_Sub(x,y,z)	(cpustate->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x80)
-
-#define ADDB { UINT32 res=dst+src; SetCFB(res); SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(UINT8)res; }
-#define ADDW { UINT32 res=dst+src; SetCFW(res); SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(UINT16)res; }
-
-#define SUBB { UINT32 res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(UINT8)res; }
-#define SUBW { UINT32 res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(UINT16)res; }
-
-#define ORB dst|=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Byte(dst)
-#define ORW dst|=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Word(dst)
-
-#define ANDB dst&=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Byte(dst)
-#define ANDW dst&=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Word(dst)
-
-#define XORB dst^=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Byte(dst)
-#define XORW dst^=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Word(dst)
-
-#define CF		(cpustate->CarryVal!=0)
-#define SF		(cpustate->SignVal<0)
-#define ZF		(cpustate->ZeroVal==0)
-#define PF		parity_table[(UINT8)cpustate->ParityVal]
-#define AF		(cpustate->AuxVal!=0)
-#define OF		(cpustate->OverVal!=0)
-#define MD		(cpustate->MF!=0)
-
-/************************************************************************/
-
-#define SegBase(Seg) (cpustate->sregs[Seg] << 4)
-
-#define DefaultBase(Seg) ((cpustate->seg_prefix && (Seg==DS || Seg==SS)) ? cpustate->prefix_base : cpustate->sregs[Seg] << 4)
-
-#define GetMemB(Seg,Off) ((UINT8)cpustate->program->read_byte((DefaultBase(Seg)+(Off))))
-#define GetMemW(Seg,Off) ((UINT16) cpustate->program->read_byte((DefaultBase(Seg)+(Off))) + (cpustate->program->read_byte((DefaultBase(Seg)+((Off)+1)))<<8) )
-
-#define PutMemB(Seg,Off,x) { cpustate->program->write_byte((DefaultBase(Seg)+(Off)),(x)); }
-#define PutMemW(Seg,Off,x) { PutMemB(Seg,Off,(x)&0xff); PutMemB(Seg,(Off)+1,(UINT8)((x)>>8)); }
-
-/* Todo:  Remove these later - plus readword could overflow */
-#define ReadByte(ea) ((UINT8)cpustate->program->read_byte((ea)))
-#define ReadWord(ea) (cpustate->program->read_byte((ea))+(cpustate->program->read_byte(((ea)+1))<<8))
-#define WriteByte(ea,val) { cpustate->program->write_byte((ea),val); }
-#define WriteWord(ea,val) { cpustate->program->write_byte((ea),(UINT8)(val)); cpustate->program->write_byte(((ea)+1),(val)>>8); }
-
-#define read_port(port) cpustate->io->read_byte(port)
-#define write_port(port,val) cpustate->io->write_byte(port,val)
-
-#define FETCH (cpustate->direct->read_raw_byte((cpustate->sregs[CS]<<4)+cpustate->ip++))
-#define FETCHOP (cpustate->direct->read_decrypted_byte((cpustate->sregs[CS]<<4)+cpustate->ip++))
-#define FETCHWORD(var) { var=cpustate->direct->read_raw_byte((((cpustate->sregs[CS]<<4)+cpustate->ip)))+(cpustate->direct->read_raw_byte((((cpustate->sregs[CS]<<4)+cpustate->ip+1)))<<8); cpustate->ip+=2; }
-#define PUSH(val) { cpustate->regs.w[SP]-=2; WriteWord((((cpustate->sregs[SS]<<4)+cpustate->regs.w[SP])),val); }
-#define POP(var) { var = ReadWord((((cpustate->sregs[SS]<<4)+cpustate->regs.w[SP]))); cpustate->regs.w[SP]+=2; }
-#define PEEK(addr) ((UINT8)cpustate->direct->read_raw_byte(addr))
-#define PEEKOP(addr) ((UINT8)cpustate->direct->read_decrypted_byte(addr))
-
-#define GetModRM UINT32 ModRM=cpustate->direct->read_raw_byte((cpustate->sregs[CS]<<4)+cpustate->ip++)
-
-/* Cycle count macros:
-    CLK  - cycle count is the same on all processors
-    CLKS - cycle count differs between processors, list all counts
-    CLKW - cycle count for word read/write differs for odd/even source/destination address
-    CLKM - cycle count for reg/mem instructions
-    CLKR - cycle count for reg/mem instructions with different counts for odd/even addresses
+enum
+{
+	NEC_PC=0,
+	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
+	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
+	NEC_VECTOR, NEC_PENDING
+};
 
 
-    Prefetch & buswait time is not emulated.
-    Extra cycles for PUSH'ing or POP'ing registers to odd addresses is not emulated.
-*/
+/////////////////////////////////////////////////////////////////
 
-#define CLK(v30mz) { cpustate->icount-=v30mz; }
-#define CLKM(v30mz,v30mzm) { cpustate->icount-=( ModRM >=0xc0 )?v30mz:v30mzm; }
+extern const device_type V30MZ;
 
-/************************************************************************/
-#define CompressFlags() (UINT16)(CF | (PF << 2) | (AF << 4) | (ZF << 6) \
-				| (SF << 7) | (cpustate->TF << 8) | (cpustate->IF << 9) \
-				| (cpustate->DF << 10) | (OF << 11)| (MD << 15))
+class v30mz_cpu_device : public cpu_device
+{
+public:
+	// construction/destruction
+	v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-#define ExpandFlags(f) \
-{ \
-	cpustate->CarryVal = (f) & 1; \
-	cpustate->ParityVal = !((f) & 4); \
-	cpustate->AuxVal = (f) & 16; \
-	cpustate->ZeroVal = !((f) & 64); \
-	cpustate->SignVal = (f) & 128 ? -1 : 0; \
-	cpustate->TF = ((f) & 256) == 256; \
-	cpustate->IF = ((f) & 512) == 512; \
-	cpustate->DF = ((f) & 1024) == 1024; \
-	cpustate->OverVal = (f) & 2048; \
-	cpustate->MF = ((f) & 0x8000) == 0x8000; \
-}
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
-#define IncWordReg(Reg) 					\
-	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
-	unsigned tmp1 = tmp+1;					\
-	cpustate->OverVal = (tmp == 0x7fff);			\
-	SetAF(tmp1,tmp,1);						\
-	SetSZPF_Word(tmp1); 					\
-	cpustate->regs.w[Reg]=tmp1
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 80; }
+	virtual UINT32 execute_input_lines() const { return 1; }
+	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
 
-#define DecWordReg(Reg) 					\
-	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
-    unsigned tmp1 = tmp-1;					\
-	cpustate->OverVal = (tmp == 0x8000);			\
-    SetAF(tmp1,tmp,1);						\
-    SetSZPF_Word(tmp1); 					\
-	cpustate->regs.w[Reg]=tmp1
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
-#define JMP(flag)							\
-	int tmp = (int)((INT8)FETCH);			\
-	if (flag)								\
-	{										\
-		cpustate->ip = (UINT16)(cpustate->ip+tmp);			\
-		cpustate->icount-=10;		\
-		return;								\
-	}
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
 
-#define ADJ4(param1,param2)					\
-	if (AF || ((cpustate->regs.b[AL] & 0xf) > 9))	\
-	{										\
-		UINT16 tmp;							\
-		tmp = cpustate->regs.b[AL] + param1;		\
-		cpustate->regs.b[AL] = tmp;					\
-		cpustate->AuxVal = 1;						\
-		cpustate->CarryVal |= tmp & 0x100;			\
-	}										\
-	if (CF || (cpustate->regs.b[AL]>0x9f))			\
-	{										\
-		cpustate->regs.b[AL] += param2;				\
-		cpustate->CarryVal = 1;						\
-	}										\
-	SetSZPF_Byte(cpustate->regs.b[AL])
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 6; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-#define ADJB(param1,param2)					\
-	if (AF || ((cpustate->regs.b[AL] & 0xf) > 9))	\
-    {										\
-		cpustate->regs.b[AL] += param1;				\
-		cpustate->regs.b[AH] += param2;				\
-		cpustate->AuxVal = 1;						\
-		cpustate->CarryVal = 1;						\
-    }										\
-	else									\
-	{										\
-		cpustate->AuxVal = 0;						\
-		cpustate->CarryVal = 0;						\
-    }										\
-	cpustate->regs.b[AL] &= 0x0F
+	void interrupt(int int_num);
 
-#define BITOP_BYTE							\
-	ModRM = FETCH;							\
-	if (ModRM >= 0xc0) {					\
-		tmp=cpustate->regs.b[Mod_RM.RM.b[ModRM]];	\
-	}										\
-	else {									\
-		(*GetEA[ModRM])(cpustate);					\
-		tmp=ReadByte(cpustate->ea);					\
-    }
+	inline UINT32 pc();
+	// Accessing memory and io
+	inline UINT8 read_byte(UINT32 addr);
+	inline UINT16 read_word(UINT32 addr);
+	inline void write_byte(UINT32 addr, UINT8 data);
+	inline void write_word(UINT32 addr, UINT16 data);
+	inline UINT8 read_port(UINT16 port);
+	inline void write_port(UINT16 port, UINT8 data);
 
-#define BITOP_WORD							\
-	ModRM = FETCH;							\
-	if (ModRM >= 0xc0) {					\
-		tmp=cpustate->regs.w[Mod_RM.RM.w[ModRM]];	\
-	}										\
-	else {									\
-		(*GetEA[ModRM])(cpustate);					\
-		tmp=ReadWord(cpustate->ea);					\
-    }
+	// Executing instructions
+	inline UINT8 fetch_op();
+	inline UINT8 fetch();
+	inline UINT16 fetch_word();
+	inline UINT8 repx_op();
 
-#define BIT_NOT								\
-	if (tmp & (1<<tmp2))					\
-		tmp &= ~(1<<tmp2);					\
-	else									\
-		tmp |= (1<<tmp2)
+	// Cycles passed while executing instructions
+	inline void CLK(UINT32 cycles);
+	inline void CLKM(UINT32 cycles_reg, UINT32 cycles_mem);
 
-#define XchgAWReg(Reg)						\
-    UINT16 tmp;								\
-	tmp = cpustate->regs.w[Reg];					\
-	cpustate->regs.w[Reg] = cpustate->regs.w[AW];			\
-	cpustate->regs.w[AW] = tmp
+	// Memory handling while executing instructions
+	inline UINT32 default_base(int seg);
+	inline UINT32 get_ea();
+	inline void PutbackRMByte(UINT8 data);
+	inline void PutbackRMWord(UINT16 data);
+	inline void RegByte(UINT8 data);
+	inline void RegWord(UINT16 data);
+	inline UINT8 RegByte();
+	inline UINT16 RegWord();
+	inline UINT16 GetRMWord();
+	inline UINT16 GetnextRMWord();
+	inline UINT8 GetRMByte();
+	inline void PutMemB(int seg, UINT16 offset, UINT8 data);
+	inline void PutMemW(int seg, UINT16 offset, UINT16 data);
+	inline UINT8 GetMemB(int seg, UINT16 offset);
+	inline UINT16 GetMemW(int seg, UINT16 offset);
+	inline void PutImmRMWord();
+	inline void PutRMWord(UINT16 val);
+	inline void PutRMByte(UINT8 val);
+	inline void PutImmRMByte();
+	inline void DEF_br8();
+	inline void DEF_wr16();
+	inline void DEF_r8b();
+	inline void DEF_r16w();
+	inline void DEF_ald8();
+	inline void DEF_axd16();
 
-#define ROL_BYTE cpustate->CarryVal = dst & 0x80; dst = (dst << 1)+CF
-#define ROL_WORD cpustate->CarryVal = dst & 0x8000; dst = (dst << 1)+CF
-#define ROR_BYTE cpustate->CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<7)
-#define ROR_WORD cpustate->CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<15)
-#define ROLC_BYTE dst = (dst << 1) + CF; SetCFB(dst)
-#define ROLC_WORD dst = (dst << 1) + CF; SetCFW(dst)
-#define RORC_BYTE dst = (CF<<8)+dst; cpustate->CarryVal = dst & 0x01; dst >>= 1
-#define RORC_WORD dst = (CF<<16)+dst; cpustate->CarryVal = dst & 0x01; dst >>= 1
-#define SHL_BYTE(c) cpustate->icount-=c; dst <<= c;	SetCFB(dst); SetSZPF_Byte(dst);	PutbackRMByte(ModRM,(UINT8)dst)
-#define SHL_WORD(c) cpustate->icount-=c; dst <<= c;	SetCFW(dst); SetSZPF_Word(dst);	PutbackRMWord(ModRM,(UINT16)dst)
-#define SHR_BYTE(c) cpustate->icount-=c; dst >>= c-1; cpustate->CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(UINT8)dst)
-#define SHR_WORD(c) cpustate->icount-=c; dst >>= c-1; cpustate->CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(UINT16)dst)
-#define SHRA_BYTE(c) cpustate->icount-=c; dst = ((INT8)dst) >> (c-1);	cpustate->CarryVal = dst & 0x1;	dst = ((INT8)((UINT8)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(UINT8)dst)
-#define SHRA_WORD(c) cpustate->icount-=c; dst = ((INT16)dst) >> (c-1);	cpustate->CarryVal = dst & 0x1;	dst = ((INT16)((UINT16)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(UINT16)dst)
+	// Flags
+	inline void set_CFB(UINT32 x);
+	inline void set_CFW(UINT32 x);
+	inline void set_AF(UINT32 x,UINT32 y,UINT32 z);
+	inline void set_SF(UINT32 x);
+	inline void set_ZF(UINT32 x);
+	inline void set_PF(UINT32 x);
+	inline void set_SZPF_Byte(UINT32 x);
+	inline void set_SZPF_Word(UINT32 x);
+	inline void set_OFW_Add(UINT32 x,UINT32 y,UINT32 z);
+	inline void set_OFB_Add(UINT32 x,UINT32 y,UINT32 z);
+	inline void set_OFW_Sub(UINT32 x,UINT32 y,UINT32 z);
+	inline void set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z);
+	inline UINT16 CompressFlags();
+	inline void ExpandFlags(UINT16 f);
 
-#define DIVUB												\
-	uresult = cpustate->regs.w[AW];									\
-	uresult2 = uresult % tmp;								\
-	if ((uresult /= tmp) > 0xff) {							\
-		nec_interrupt(cpustate,0); break;							\
-	} else {												\
-		cpustate->regs.b[AL] = uresult;								\
-		cpustate->regs.b[AH] = uresult2;							\
-	}
+	// rep instructions
+	inline void i_insb();
+	inline void i_insw();
+	inline void i_outsb();
+	inline void i_outsw();
+	inline void i_movsb();
+	inline void i_movsw();
+	inline void i_cmpsb();
+	inline void i_cmpsw();
+	inline void i_stosb();
+	inline void i_stosw();
+	inline void i_lodsb();
+	inline void i_lodsw();
+	inline void i_scasb();
+	inline void i_scasw();
+	inline void i_popf();
 
-#define DIVB												\
-	result = (INT16)cpustate->regs.w[AW];							\
-	result2 = result % (INT16)((INT8)tmp);					\
-	if ((result /= (INT16)((INT8)tmp)) > 0xff) {			\
-		nec_interrupt(cpustate,0); break;							\
-	} else {												\
-		cpustate->regs.b[AL] = result;								\
-		cpustate->regs.b[AH] = result2;								\
-	}
+	// sub implementations
+	inline void ADDB();
+	inline void ADDW();
+	inline void SUBB();
+	inline void SUBW();
+	inline void ORB();
+	inline void ORW();
+	inline void ANDB();
+	inline void ANDW();
+	inline void XORB();
+	inline void XORW();
+	inline void ROL_BYTE();
+	inline void ROL_WORD();
+	inline void ROR_BYTE();
+	inline void ROR_WORD();
+	inline void ROLC_BYTE();
+	inline void ROLC_WORD();
+	inline void RORC_BYTE();
+	inline void RORC_WORD();
+	inline void SHL_BYTE(UINT8 c);
+	inline void SHL_WORD(UINT8 c);
+	inline void SHR_BYTE(UINT8 c);
+	inline void SHR_WORD(UINT8 c);
+	inline void SHRA_BYTE(UINT8 c);
+	inline void SHRA_WORD(UINT8 c);
+	inline void XchgAWReg(UINT8 reg);
+	inline void IncWordReg(UINT8 reg);
+	inline void DecWordReg(UINT8 reg);
+	inline void PUSH(UINT16 data);
+	inline UINT16 POP();
+	inline void JMP(bool cond);
+	inline void ADJ4(INT8 param1, INT8 param2);
+	inline void ADJB(INT8 param1, INT8 param2);
 
-#define DIVUW												\
-	uresult = (((UINT32)cpustate->regs.w[DW]) << 16) | cpustate->regs.w[AW];\
-	uresult2 = uresult % tmp;								\
-	if ((uresult /= tmp) > 0xffff) {						\
-		nec_interrupt(cpustate,0); break;							\
-	} else {												\
-		cpustate->regs.w[AW]=uresult;								\
-		cpustate->regs.w[DW]=uresult2;								\
-	}
+protected:
+	address_space_config m_program_config;
+	address_space_config m_io_config;
 
-#define DIVW												\
-	result = ((UINT32)cpustate->regs.w[DW] << 16) + cpustate->regs.w[AW];	\
-	result2 = result % (INT32)((INT16)tmp);					\
-	if ((result /= (INT32)((INT16)tmp)) > 0xffff) {			\
-		nec_interrupt(cpustate,0); break;							\
-	} else {												\
-		cpustate->regs.w[AW]=result;								\
-		cpustate->regs.w[DW]=result2;								\
-	}
+	union
+	{                   /* eight general registers */
+		UINT16 w[8];    /* viewed as 16 bits registers */
+		UINT8  b[16];   /* or as 8 bit registers */
+	} m_regs;
+	UINT16	m_sregs[4];
 
-#define ADD4S {												\
-	int i,v1,v2,result;										\
-	int count = (cpustate->regs.b[CL]+1)/2;							\
-	unsigned di = cpustate->regs.w[IY];								\
-	unsigned si = cpustate->regs.w[IX];								\
-	if (cpustate->seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC(cpustate));	\
-	cpustate->ZeroVal = cpustate->CarryVal = 0;								\
-	for (i=0;i<count;i++) {									\
-		cpustate->icount-=19;						\
-		tmp = GetMemB(DS, si);								\
-		tmp2 = GetMemB(ES, di);								\
-		v1 = (tmp>>4)*10 + (tmp&0xf);						\
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		result = v1+v2+cpustate->CarryVal;							\
-		cpustate->CarryVal = result > 99 ? 1 : 0;					\
-		result = result % 100;								\
-		v1 = ((result/10)<<4) | (result % 10);				\
-		PutMemB(ES, di,v1);									\
-		if (v1) cpustate->ZeroVal = 1;								\
-		si++;												\
-		di++;												\
-	}														\
-}
+	UINT16	m_ip;
 
-#define SUB4S {												\
-	int count = (cpustate->regs.b[CL]+1)/2;							\
-	int i,v1,v2,result;										\
-    unsigned di = cpustate->regs.w[IY];								\
-	unsigned si = cpustate->regs.w[IX];								\
-	if (cpustate->seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC(cpustate));	\
-	cpustate->ZeroVal = cpustate->CarryVal = 0;								\
-	for (i=0;i<count;i++) {									\
-		cpustate->icount-=19;						\
-		tmp = GetMemB(ES, di);								\
-		tmp2 = GetMemB(DS, si);								\
-		v1 = (tmp>>4)*10 + (tmp&0xf);						\
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		if (v1 < (v2+cpustate->CarryVal)) {							\
-			v1+=100;										\
-			result = v1-(v2+cpustate->CarryVal);					\
-			cpustate->CarryVal = 1;									\
-		} else {											\
-			result = v1-(v2+cpustate->CarryVal);					\
-			cpustate->CarryVal = 0;									\
-		}													\
-		v1 = ((result/10)<<4) | (result % 10);				\
-		PutMemB(ES, di,v1);									\
-		if (v1) cpustate->ZeroVal = 1;								\
-		si++;												\
-		di++;												\
-	}														\
-}
+	INT32	m_SignVal;
+	UINT32  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; /* 0 or non-0 valued flags */
+	UINT8	m_TF, m_IF, m_DF, m_MF; 	/* 0 or 1 valued flags */	/* OB[19.07.99] added Mode Flag V30 */
+	UINT32	m_int_vector;
+	UINT32	m_pending_irq;
+	UINT32	m_nmi_state;
+	UINT32	m_irq_state;
+	UINT8	m_no_interrupt;
+	UINT8	m_fire_trap;
 
-#define CMP4S {												\
-	int count = (cpustate->regs.b[CL]+1)/2;							\
-	int i,v1,v2,result;										\
-    unsigned di = cpustate->regs.w[IY];								\
-	unsigned si = cpustate->regs.w[IX];								\
-	if (cpustate->seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC(cpustate));	\
-	cpustate->ZeroVal = cpustate->CarryVal = 0;								\
-	for (i=0;i<count;i++) {									\
-		cpustate->icount-=19;						\
-		tmp = GetMemB(ES, di);								\
-		tmp2 = GetMemB(DS, si);								\
-		v1 = (tmp>>4)*10 + (tmp&0xf);						\
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		if (v1 < (v2+cpustate->CarryVal)) {							\
-			v1+=100;										\
-			result = v1-(v2+cpustate->CarryVal);					\
-			cpustate->CarryVal = 1;									\
-		} else {											\
-			result = v1-(v2+cpustate->CarryVal);					\
-			cpustate->CarryVal = 0;									\
-		}													\
-		v1 = ((result/10)<<4) | (result % 10);				\
-		if (v1) cpustate->ZeroVal = 1;								\
-		si++;												\
-		di++;												\
-	}														\
-}
+	device_irq_acknowledge_callback m_irq_callback;
+	address_space *m_program;
+	direct_read_data *m_direct;
+	address_space *m_io;
+	int m_icount;
+
+	UINT32 m_prefix_base;	/* base address of the latest prefix segment */
+	bool m_seg_prefix;		/* prefix segment indicator */
+	bool m_seg_prefix_next;	/* prefix segment for next instruction */
+
+	UINT32 m_ea;
+	UINT16 m_eo;
+	UINT16 m_e16;
+
+	// Used during execution of instructions
+	UINT8	m_modrm;
+	UINT32	m_dst;
+	UINT32	m_src;
+	UINT32	m_pc;
+
+	// Lookup tables
+	UINT8 m_parity_table[256];
+	struct {
+		struct {
+			int w[256];
+			int b[256];
+		} reg;
+		struct {
+			int w[256];
+			int b[256];
+		} RM;
+	} m_Mod_RM;
+};
+
+
+#endif /* __V30MZ_H__ */
