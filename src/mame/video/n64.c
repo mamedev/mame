@@ -370,7 +370,7 @@ void n64_rdp::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	}
 	//compute clamp flags
 	int under_s = 0;
-//  int under_t = 0;
+	int under_t = 0;
 	int over_s = 0;
 	int over_t = 0;
 
@@ -390,7 +390,7 @@ void n64_rdp::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	{
 		if (tprod & (1 << 29))
 		{
-//          under_t = 1;
+			under_t = 1;
 		}
 		else
 		{
@@ -402,7 +402,7 @@ void n64_rdp::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	over_t |= w_carry;
 
 	*sss = (*sss & 0x1ffff) | (over_s << 18) | (under_s << 17);
-	*sst = (*sst & 0x1ffff) | (over_s << 18) | (under_s << 17);
+	*sst = (*sst & 0x1ffff) | (over_t << 18) | (under_t << 17);
 }
 
 INT32 n64_rdp::ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d)
