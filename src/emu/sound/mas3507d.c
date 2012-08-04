@@ -69,7 +69,7 @@ void mas3507d_device::i2c_scl_w(bool line)
 
 void mas3507d_device::i2c_nak()
 {
-	assert(i2c_bus_state = ACK);
+	assert(i2c_bus_state == ACK);
 	i2c_bus_state = NAK;
 }
 

@@ -902,7 +902,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			led_write_latch(state, data & 0x1f, pia_ic4->a_output(),m_input_strobe);
 		}
-		else if ((m_led_extender != CARD_A)||(m_led_extender != NO_EXTENDER))
+		else if ((m_led_extender != CARD_A)&&(m_led_extender != NO_EXTENDER))
 		{
 			for(i=0; i<8; i++)
 			{
