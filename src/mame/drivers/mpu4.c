@@ -240,70 +240,6 @@ ROM_START( m4addrd )
 	ROM_LOAD( "dal12.bin", 0x0000, 0x010000, CRC(4affa79a) SHA1(68bceab42b3616641a34a64a83306175ffc1ce32) )
 ROM_END
 
-ROM_START( m4addr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a6ls.p1", 0x0000, 0x010000, CRC(9f97f57b) SHA1(402d1518bb78fdc489b06c2aabc771e5ce151847) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "5p4addersladders.bin", 0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97) )
-	ROM_LOAD( "a6lbdy.p1", 0x0000, 0x010000, CRC(28064099) SHA1(c916f73911974440d4c79ecb51b343aad78f115b) )
-	ROM_LOAD( "a6lc.p1", 0x0000, 0x010000, CRC(1e75fe67) SHA1(4497b19d4c512c934d445b4acf607dc2dc080d44) )
-	ROM_LOAD( "a6ld.p1", 0x0000, 0x010000, CRC(de555e12) SHA1(2233160f1c734c889c1c00dee202a928f18ad763) )
-	ROM_LOAD( "a6ldy.p1", 0x0000, 0x010000, CRC(82f060a5) SHA1(2e8474e6c17def07e35448b5bf8d453cce0f292c) )
-	ROM_LOAD( "a6lk.p1", 0x0000, 0x010000, CRC(af5ae5c4) SHA1(20e40cf996c2c3b7b18ec104a374be1da193b94e) )
-	ROM_LOAD( "a6pcx.p1", 0x0000, 0x010000, CRC(517d8c9a) SHA1(487cecfb10b24eff1582ca6bc97a2dc004e65b0f) )
-	ROM_LOAD( "a6ps.p1", 0x0000, 0x010000, CRC(41e375c7) SHA1(93556a90227cde6814123c8a7f29f734884e182c) )
-	ROM_LOAD( "ad05.6c", 0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5) )
-	ROM_LOAD( "adders ladders 20p 6.bin", 0x0000, 0x010000, CRC(62abeb34) SHA1(8069e6fde0673fdbc124a1a172dc988bb3205ff6) )
-	ROM_LOAD( "adl5pv2", 0x0000, 0x010000, CRC(09c39527) SHA1(16af3e552a7d6c6b802d2b1923523e9aa9de766a) )
-
-	// these appear to be MPU4 VIDEO (incomplete / bad?)
-	//ROM_LOAD( "a6ppl.p0", 0x0000, 0x020000, CRC(350da2df) SHA1(a390e0c7e1e624c17f0e254e0b99ef9dbf56269d) )
-	//ROM_LOAD( "a6ppl.p1", 0x0000, 0x020000, CRC(63038aba) SHA1(8ec4e02109e872460a9598e469b59919cc5450dd) )
-	//ROM_LOAD( "al.p2", 0x0000, 0x010000, CRC(d5909619) SHA1(eb8d978ed28cd3afab6b3c1274d79bc6b188d240) )
-	//ROM_LOAD( "al.p3", 0x0000, 0x010000, CRC(5dc65d9f) SHA1(52dffb162a0e5649e056817e9db567cc7653538c) )
-	//ROM_LOAD( "al.p4", 0x0000, 0x010000, CRC(17c77264) SHA1(321372c1c0d25cfc5a1302ccfd5680d9bf62d31b) )
-	//ROM_LOAD( "ald.p1", 0x0000, 0x010000, CRC(ecc7c79c) SHA1(e03f470d0b83ed81af737a1d16a02528df733149) )
-	//ROM_LOAD( "als.p1", 0x0000, 0x010000, CRC(c2c4ceea) SHA1(0c5ea4d02ba053191855547b714da9a7f61f3713) )
-	ROM_REGION( 0x10000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ad_05___.1o3", 0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1) )
-	ROM_LOAD( "ad_05___.3q3", 0x0000, 0x010000, CRC(ec6ed7ce) SHA1(dfad04b5f6c4ff0fd784ad20471f1cf84586f2cd) )
-	ROM_LOAD( "ad_05___.4s3", 0x0000, 0x010000, CRC(6d1a3c51) SHA1(0e4b985173c7c3bd5804573d99913d66a05d54fb) )
-	ROM_LOAD( "ad_05___.5a3", 0x0000, 0x010000, CRC(9821a988) SHA1(2be85a0b68e5e31401a5c753b40f3cf803589444) )
-	ROM_LOAD( "ad_05___.5n3", 0x0000, 0x010000, CRC(86ac3564) SHA1(1dd9cf39d2aee11a3e1bbc68460c12f10e62aeaf) )
-	ROM_LOAD( "ad_05_b_.1o3", 0x0000, 0x010000, CRC(b10b194a) SHA1(4dc3f14ff3b903c49829f4a91136f9b03a5cb1ae) )
-	ROM_LOAD( "ad_05_b_.3q3", 0x0000, 0x010000, CRC(d4c06db1) SHA1(dacb66b98f9d1d51eddc48b6946d517c277e588e) )
-	ROM_LOAD( "ad_05_b_.4s3", 0x0000, 0x010000, CRC(6bd6fdb6) SHA1(7ee1e80da5833b3eaf4b23035690a09379781584) )
-	ROM_LOAD( "ad_05_b_.5a3", 0x0000, 0x010000, CRC(592cb1ae) SHA1(5696ecb3e9e6419f73087120b6a832fde606bacc) )
-	ROM_LOAD( "ad_05_b_.5n3", 0x0000, 0x010000, CRC(cdc8ca39) SHA1(33fdeef8ab8908f6908120aedf501ec3e9d7d23e) )
-	ROM_LOAD( "ad_05_d_.1o3", 0x0000, 0x010000, CRC(2d29040f) SHA1(ee2bdd5da1a7e4146419ffd8bad521a9c1b49aa2) )
-	ROM_LOAD( "ad_05_d_.3q3", 0x0000, 0x010000, CRC(8d05fba9) SHA1(9c69d7eec7ce0d647d4f8b8b0a6b7e54daa7a79f) )
-	ROM_LOAD( "ad_05_d_.4s3", 0x0000, 0x010000, CRC(e672baf0) SHA1(bae2e2fe9f51b3b8da20fcefb145f6d35fa2d604) )
-	ROM_LOAD( "ad_05_d_.5a3", 0x0000, 0x010000, CRC(b5be8114) SHA1(28dfe1d1cc1d9fc2bcc13fd6437602a6e8c90de2) )
-	ROM_LOAD( "ad_05_d_.5n3", 0x0000, 0x010000, CRC(ca2653d5) SHA1(30cd35627be8fb4fff2f0d61a6ab43cf3e4c1742) )
-	ROM_LOAD( "ad_10___.1o3", 0x0000, 0x010000, CRC(d587cb00) SHA1(6574c42402f13e5f9cb8f951e0f59b499b2d025d) )
-	ROM_LOAD( "ad_10___.4a3", 0x0000, 0x010000, CRC(9151dac3) SHA1(bf1c065a62e84a8073f8f9854981bedad60805be) )
-	ROM_LOAD( "ad_10_b_.1o3", 0x0000, 0x010000, CRC(e2b5c0db) SHA1(9e1716186bb049c61dddaef2465fb1e55d2d93fd) )
-	ROM_LOAD( "ad_10_d_.1o3", 0x0000, 0x010000, CRC(d7670d32) SHA1(09dfe2a7fe267f485efed234411efc92d9cce414) )
-	ROM_LOAD( "ad_20___.3a3", 0x0000, 0x010000, CRC(c2431657) SHA1(b2b7541207eb3c898f9cf3df520bff396213b78a) )
-	ROM_LOAD( "ad_20___.3n3", 0x0000, 0x010000, CRC(883ff001) SHA1(50540270dba31820ad99a4a4034c69d4a58d87c5) )
-	ROM_LOAD( "ad_20___.3s3", 0x0000, 0x010000, CRC(b1d54cb6) SHA1(35205975ccdaccd5bf3c1b7bf9a26c5ef30050b3) )
-	ROM_LOAD( "ad_20_b_.3a3", 0x0000, 0x010000, CRC(19990a19) SHA1(ab1031513fb1e499da4a3001b5b26ff1e86cc628) )
-	ROM_LOAD( "ad_20_b_.3n3", 0x0000, 0x010000, CRC(65f9946f) SHA1(6bf6f315ed2dc6f603381d36dd408e951ace76bc) )
-	ROM_LOAD( "ad_20_b_.3s3", 0x0000, 0x010000, CRC(86982248) SHA1(a6d876333777a29eb0504fa3636727ebcc104f0a) )
-	ROM_LOAD( "ad_20_d_.3a3", 0x0000, 0x010000, CRC(62304025) SHA1(59b7815bf1b5337f46083cef186fedd078a4ad37) )
-	ROM_LOAD( "ad_20_d_.3n3", 0x0000, 0x010000, CRC(cf254a00) SHA1(1e430b652e4023e28b5648b8bea63e778c6dafc9) )
-	ROM_LOAD( "ad_20_d_.3s3", 0x0000, 0x010000, CRC(89d2301b) SHA1(62ad1a9e008063eb16442b50af806f061669dba7) )
-	ROM_LOAD( "adi05___.1o3", 0x0000, 0x010000, CRC(050764b1) SHA1(364c50e4887c9fdd7ff62e63a6be4513336b4814) )
-	ROM_LOAD( "adi05___.4s3", 0x0000, 0x010000, CRC(a4343a89) SHA1(cef67bbe03e6f535b530fc099f1b9a8bc7a2f864) )
-	ROM_LOAD( "adi05___.5a3", 0x0000, 0x010000, CRC(03777f8c) SHA1(9e3fddc2130600f343df0531bf3e636b82c2f108) )
-	ROM_LOAD( "adi05___.5n3", 0x0000, 0x010000, CRC(13003560) SHA1(aabad24748f9b1b09f1820bf1af932160e64fe3e) )
-	ROM_LOAD( "adi10___.1o3", 0x0000, 0x010000, CRC(005caaa1) SHA1(b4b421c045012b5fbeaca95fa09d087a9c5e6b5b) )
-	ROM_LOAD( "adi10___.4a3", 0x0000, 0x010000, CRC(2d2aa3cc) SHA1(21a7690c3fb7d158f4b4e6da63663778246ac902) )
-	ROM_LOAD( "adi10___.4n3", 0x0000, 0x010000, CRC(af9aad00) SHA1(09729e73f27d9ac5d6ac7171191ed76aeaac3e3d) )
-
-ROM_END
-
 ROM_START( m4addrc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "add05_101", 0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba) )
@@ -473,7 +409,12 @@ ROM_END
 ROM_START( m4apach )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a6ps.p1", 0x0000, 0x010000, CRC(41e375c7) SHA1(93556a90227cde6814123c8a7f29f734884e182c) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "a6pcx.p1", 0x0000, 0x010000, CRC(517d8c9a) SHA1(487cecfb10b24eff1582ca6bc97a2dc004e65b0f) ) // was in adders & ladders set
 ROM_END
+
+
 
 ROM_START( m4atlan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -11323,7 +11264,6 @@ GAME(199?, m4actbnk	,0			,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcre
 GAME(199?, m4actbnka,m4actbnk	,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (set 2) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
 GAME(199?, m4actclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4)",						GAME_FLAGS )
 GAME(199?, m4addrd	,m4addr		,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) [DAL, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4addr	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4addrc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4addrcc	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4addrcb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Adders & Ladders Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
