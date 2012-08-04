@@ -1292,7 +1292,7 @@ static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *e
 	INT32 dzdx = extent->param[0].dpdx;
 	INT32 dudx = extent->param[1].dpdx;
 	INT32 dvdx = extent->param[2].dpdx;
-	INT32 didx = extent->param[3].dpdx;
+	//INT32 didx = extent->param[3].dpdx;
 	const void *texbase = extra->texbase;
 	const void *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
