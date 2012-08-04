@@ -363,4 +363,4 @@ static DRIVER_INIT( warpspeed )
 {
 }
 
-GAME( 197?, warpsped,  0,      warpspeed, warpspeed, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND )
+GAME( 197?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND )

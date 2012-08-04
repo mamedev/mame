@@ -609,6 +609,6 @@ static DRIVER_INIT( cashquiz )
 }
 
 
-GAME( 1985, pingpong, 0, pingpong, pingpong, 0,		   ROT0, "Konami", "Konami's Ping-Pong", 0 )
-GAME( 1986, merlinmm, 0, merlinmm, merlinmm, merlinmm, ROT90,"Zilec-Zenitone", "Merlins Money Maze", 0 )
-GAME( 1986, cashquiz, 0, merlinmm, cashquiz, cashquiz, ROT0, "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, 0,		   ROT0, "Konami", "Konami's Ping-Pong", 0 )
+GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, merlinmm, ROT90,"Zilec-Zenitone", "Merlins Money Maze", 0 )
+GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, cashquiz, ROT0, "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", GAME_IMPERFECT_GRAPHICS )

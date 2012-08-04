@@ -444,10 +444,10 @@ static DRIVER_INIT( yard85 )
 	memcpy(region+0x200, buffer, 0x10);
 }
 
-GAME( 1983, 10yard,   0,        yard,     yard,     0, ROT0, "Irem", "10-Yard Fight (World, set 1)", GAME_SUPPORTS_SAVE ) // no copyright
-GAME( 1983, 10yardj,  10yard,   yard,     yard,     0, ROT0, "Irem", "10-Yard Fight (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, vs10yard, 10yard,   yard,     vs10yard, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", GAME_SUPPORTS_SAVE )
-GAME( 1984, vs10yardj,10yard,   yard,     vs10yarj, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, vs10yardu,10yard,   yard,     vs10yard, yard85, ROT0, "Irem (Taito license)", "Vs 10-Yard Fight (US, Taito license)", GAME_SUPPORTS_SAVE ) // had '85 stickers, but doesn't have '85 on the title screen like the set below
-GAME( 1985, 10yard85, 10yard,   yard,     yard,     yard85, ROT0, "Irem (Taito license)", "10-Yard Fight '85 (US, Taito license)", GAME_SUPPORTS_SAVE )
+GAME( 1983, 10yard,   0,        yard,     yard, m58_state,     0, ROT0, "Irem", "10-Yard Fight (World, set 1)", GAME_SUPPORTS_SAVE ) // no copyright
+GAME( 1983, 10yardj,  10yard,   yard,     yard, m58_state,     0, ROT0, "Irem", "10-Yard Fight (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, vs10yard, 10yard,   yard,     vs10yard, m58_state, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", GAME_SUPPORTS_SAVE )
+GAME( 1984, vs10yardj,10yard,   yard,     vs10yarj, m58_state, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, vs10yardu,10yard,   yard,     vs10yard, m58_state, yard85, ROT0, "Irem (Taito license)", "Vs 10-Yard Fight (US, Taito license)", GAME_SUPPORTS_SAVE ) // had '85 stickers, but doesn't have '85 on the title screen like the set below
+GAME( 1985, 10yard85, 10yard,   yard,     yard, m58_state,     yard85, ROT0, "Irem (Taito license)", "10-Yard Fight '85 (US, Taito license)", GAME_SUPPORTS_SAVE )
 

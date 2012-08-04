@@ -409,5 +409,5 @@ static DRIVER_INIT( sparkz )
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, 0,      ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, arcadecl, sparkz,   sparkz, ROT0, "Atari Games", "Sparkz (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0,      ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, arcadecl, sparkz, arcadecl_state,   sparkz, ROT0, "Atari Games", "Sparkz (prototype)", GAME_SUPPORTS_SAVE )

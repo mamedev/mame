@@ -541,6 +541,6 @@ static DRIVER_INIT( blmbycar )
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", GAME_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru,blmbycar, blmbycar, blmbycar, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1996, watrball, 0,        watrball, watrball, 0,        ROT0, "ABM", "Water Balls", GAME_SUPPORTS_SAVE )
+GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", GAME_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru,blmbycar, blmbycar, blmbycar, blmbycar_state, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1996, watrball, 0,        watrball, watrball, blmbycar_state, 0,        ROT0, "ABM", "Water Balls", GAME_SUPPORTS_SAVE )

@@ -684,8 +684,8 @@ ROM_START( cobra )
 	DISK_IMAGE_READONLY( "cobra", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) )
 ROM_END
 
-GAME( 1983, begas,  0,       begas,  cobra,  0, ROT0,    "Data East", "Bega's Battle (Revision 3)", GAME_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  cobra,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", GAME_NOT_WORKING )
-GAME( 1984, cobra,  0,       cobra,     cobra,  0, ROT0, "Data East", "Cobra Command (Data East LD)", GAME_NOT_WORKING )
+GAME( 1983, begas,  0,       begas,  cobra, deco_ld_state,  0, ROT0,    "Data East", "Bega's Battle (Revision 3)", GAME_NOT_WORKING )
+GAME( 1983, begas1, begas,   rblaster,  cobra, deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", GAME_NOT_WORKING )
+GAME( 1984, cobra,  0,       cobra,     cobra, deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD)", GAME_NOT_WORKING )
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster,  0, ROT0, "Data East", "Road Blaster (Data East LD)", GAME_NOT_WORKING )
+GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", GAME_NOT_WORKING )

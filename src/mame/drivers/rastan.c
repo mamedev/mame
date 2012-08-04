@@ -684,12 +684,12 @@ ROM_START( rastsagaa )
 ROM_END
 
 /* Newer revised code base */
-GAME( 1987, rastan,    0,      rastan, rastan,   0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastana,   rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastanu,   rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastanua,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastan,    0,      rastan, rastan, rastan_state,   0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US)", GAME_SUPPORTS_SAVE )
 
 /* Based on earliest code base */
-GAME( 1987, rastanub,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastsaga,  rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, rastsagaa, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", GAME_SUPPORTS_SAVE )

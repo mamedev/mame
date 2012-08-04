@@ -495,5 +495,5 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME      PARENT  MACHINE  INPUT      INIT  ROT    COMPANY        FULLNAME     FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,   0,    ROT0, "Game-A-Tron", "Poker 4-1",  0,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  0,    ROT0, "Game-A-Tron", "Pull Tabs",  0,     layout_pulltabs )
+GAMEL( 1983, poker41,  0,      gat,     poker41, gatron_state,   0,    ROT0, "Game-A-Tron", "Poker 4-1",  0,     layout_poker41  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state,  0,    ROT0, "Game-A-Tron", "Pull Tabs",  0,     layout_pulltabs )

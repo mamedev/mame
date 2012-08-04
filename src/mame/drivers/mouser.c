@@ -308,5 +308,5 @@ static DRIVER_INIT( mouser )
 }
 
 
-GAME( 1983, mouser,   0,      mouser, mouser, mouser, ROT90, "UPL", "Mouser", GAME_SUPPORTS_SAVE )
-GAME( 1983, mouserc,  mouser, mouser, mouser, mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL", "Mouser", GAME_SUPPORTS_SAVE )
+GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", GAME_SUPPORTS_SAVE )

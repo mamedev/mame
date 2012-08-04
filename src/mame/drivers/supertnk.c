@@ -500,4 +500,4 @@ static DRIVER_INIT( supertnk )
 }
 
 
-GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )
+GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )

@@ -1111,12 +1111,12 @@ static DRIVER_INIT( wiz )
 }
 
 
-GAME( 1983, stinger,  0,       stinger, stinger,  stinger, ROT90,  "Seibu Denshi", "Stinger", GAME_IMPERFECT_SOUND )
-GAME( 1983, stinger2, stinger, stinger, stinger2, stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", GAME_IMPERFECT_SOUND )
-GAME( 1984, scion,    0,       scion,   scion,    scion,   ROT0,   "Seibu Denshi", "Scion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1984, scionc,   scion,   scion,   scion,    scion,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1984, kungfut,  0,       kungfut, kungfut,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", 0 )
-GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)" , 0) /* board was a bootleg but set might still be original */
-GAME( 1985, wiz,      0,       wiz,     wiz,      wiz,     ROT270, "Seibu Kaihatsu", "Wiz", 0 )
-GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz,     ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", 0 )
-GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz,     ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", 0 )
+GAME( 1983, stinger,  0,       stinger, stinger, wiz_state,  stinger, ROT90,  "Seibu Denshi", "Stinger", GAME_IMPERFECT_SOUND )
+GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", GAME_IMPERFECT_SOUND )
+GAME( 1984, scion,    0,       scion,   scion, wiz_state,    scion,   ROT0,   "Seibu Denshi", "Scion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1984, scionc,   scion,   scion,   scion, wiz_state,    scion,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1984, kungfut,  0,       kungfut, kungfut, wiz_state,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", 0 )
+GAME( 1984, kungfuta, kungfut, kungfut, kungfut, wiz_state,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)" , 0) /* board was a bootleg but set might still be original */
+GAME( 1985, wiz,      0,       wiz,     wiz, wiz_state,      wiz,     ROT270, "Seibu Kaihatsu", "Wiz", 0 )
+GAME( 1985, wizt,     wiz,     wiz,     wiz, wiz_state,      wiz,     ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", 0 )
+GAME( 1985, wizta,    wiz,     wiz,     wiz, wiz_state,      wiz,     ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", 0 )

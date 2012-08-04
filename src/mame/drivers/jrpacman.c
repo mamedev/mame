@@ -408,4 +408,4 @@ static DRIVER_INIT( jrpacman )
  *
  *************************************/
 
-GAME( 1983, jrpacman, 0, jrpacman, jrpacman, jrpacman, ROT90, "Bally Midway", "Jr. Pac-Man", GAME_SUPPORTS_SAVE )
+GAME( 1983, jrpacman, 0, jrpacman, jrpacman, jrpacman_state, jrpacman, ROT90, "Bally Midway", "Jr. Pac-Man", GAME_SUPPORTS_SAVE )

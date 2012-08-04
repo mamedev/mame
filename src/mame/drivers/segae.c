@@ -1151,11 +1151,11 @@ MACHINE_CONFIG_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT, MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr, hangonjr, 0,    ROT0,   "Sega", "Hang-On Jr.", 0 )
-GAME( 1986, transfrm, 0,        systeme,  transfrm, 0,    ROT0,   "Sega", "Transformer", 0 )
-GAME( 1986, astrofl,  transfrm, astrofl,  transfrm, 0,    ROT0,   "Sega", "Astro Flash (Japan)", 0 )
-GAME( 1986, ridleofp, 0,        ridleofp, ridleofp, 0,    ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", 0 )
-GAME( 1987, opaopa,   0,        opaopa,   opaopa,   0,    ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", 0 )
-GAME( 1988, fantzn2,  0,        fantzn2,  fantzn2,  0,    ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", 0 )
-GAME( 1988, tetrisse, 0,        systeme,  tetrisse, 0,    ROT0,   "Sega", "Tetris (Japan, System E)", 0 )
+GAME( 1985, hangonjr, 0,        hangonjr, hangonjr, hangonjr_state, 0,    ROT0,   "Sega", "Hang-On Jr.", 0 )
+GAME( 1986, transfrm, 0,        systeme,  transfrm, systeme_state, 0,    ROT0,   "Sega", "Transformer", 0 )
+GAME( 1986, astrofl,  transfrm, astrofl,  transfrm, astrofl_state, 0,    ROT0,   "Sega", "Astro Flash (Japan)", 0 )
+GAME( 1986, ridleofp, 0,        ridleofp, ridleofp, ridleofp_state, 0,    ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", 0 )
+GAME( 1987, opaopa,   0,        opaopa,   opaopa, opaopa_state,   0,    ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", 0 )
+GAME( 1988, fantzn2,  0,        fantzn2,  fantzn2, fantzn2_state,  0,    ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", 0 )
+GAME( 1988, tetrisse, 0,        systeme,  tetrisse, systeme_state, 0,    ROT0,   "Sega", "Tetris (Japan, System E)", 0 )
 

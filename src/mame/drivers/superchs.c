@@ -459,5 +459,5 @@ static DRIVER_INIT( superchs )
 	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),state));
 }
 
-GAMEL( 1992, superchs,         0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )
-GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs, ROT0, "Taito Corporation", "Super Chase - Criminal Termination (Japan)", 0, layout_superchs )
+GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )
+GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs_state, superchs, ROT0, "Taito Corporation", "Super Chase - Criminal Termination (Japan)", 0, layout_superchs )

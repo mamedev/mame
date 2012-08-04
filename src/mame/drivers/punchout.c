@@ -1375,8 +1375,8 @@ ROM_END
 
 
 
-GAME( 1984, punchout, 0,        punchout, punchout, punchout, ROT0, "Nintendo", "Punch-Out!!", 0 )
-GAME( 1984, punchita, punchout, punchout, punchout, spnchout, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout, 0,        punchout, spnchout, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
-GAME( 1984, spnchoutj,spnchout, punchout, spnchout, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
-GAME( 1985, armwrest, 0,        armwrest, armwrest, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
+GAME( 1984, punchout, 0,        punchout, punchout, punchout_state, punchout, ROT0, "Nintendo", "Punch-Out!!", 0 )
+GAME( 1984, punchita, punchout, punchout, punchout, punchout_state, spnchout, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout, 0,        punchout, spnchout, punchout_state, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
+GAME( 1984, spnchoutj,spnchout, punchout, spnchout, punchout_state, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1985, armwrest, 0,        armwrest, armwrest, punchout_state, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )

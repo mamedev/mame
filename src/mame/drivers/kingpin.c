@@ -217,5 +217,5 @@ ROM_START( kingpinm )
 	ROM_LOAD( "n82s123n.u43", 0x20, 0x20, CRC(55569a2a) SHA1(5b0482546161c9d14a7d2c719d40774539cb41ca) )
 ROM_END
 
-GAME( 1983, kingpin,  0, kingpin, kingpin, kingpin, 0, "American Communication Laboratories Inc.", "King Pin",GAME_NO_SOUND)
-GAME( 1983, kingpinm, 0, kingpin, kingpin, kingpin, 0, "American Communication Laboratories Inc.", "King Pin Multi-Game",GAME_NO_SOUND)
+GAME( 1983, kingpin,  0, kingpin, kingpin, kingpin_state, kingpin, 0, "American Communication Laboratories Inc.", "King Pin",GAME_NO_SOUND)
+GAME( 1983, kingpinm, 0, kingpin, kingpin, kingpin_state, kingpin, 0, "American Communication Laboratories Inc.", "King Pin Multi-Game",GAME_NO_SOUND)

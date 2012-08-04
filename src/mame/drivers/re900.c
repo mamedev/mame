@@ -466,5 +466,5 @@ static DRIVER_INIT( re900 )
 *************************/
 
 /*     YEAR  NAME   PARENT MACHINE INPUT  INIT   ROT     COMPANY                    FULLNAME            FLAGS LAYOUT */
-GAMEL( 1993, re900, 0,     re900,  re900, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    0,    layout_re900)
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900, ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", 0)
+GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    0,    layout_re900)
+GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, re900, ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", 0)

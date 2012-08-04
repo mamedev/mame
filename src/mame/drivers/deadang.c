@@ -430,6 +430,6 @@ static DRIVER_INIT( ghunter )
 
 /* Game Drivers */
 
-GAME( 1988, deadang, 0,       deadang, deadang, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", 0 )
-GAME( 1988, leadang, deadang, deadang, deadang, deadang, ROT0, "Seibu Kaihatsu", "Lead Angle (Japan)", 0 )
-GAME( 1988, ghunter, deadang, deadang, ghunter, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", 0 )
+GAME( 1988, deadang, 0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", 0 )
+GAME( 1988, leadang, deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu", "Lead Angle (Japan)", 0 )
+GAME( 1988, ghunter, deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", 0 )

@@ -853,4 +853,4 @@ static DRIVER_INIT(mlanding)
 //  rom[0x88a]=0x71;
 }
 
-GAME( 1987, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito America Corporation", "Midnight Landing (Germany)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1987, mlanding, 0,        mlanding,   mlanding, mlanding_state, mlanding,        ROT0,    "Taito America Corporation", "Midnight Landing (Germany)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

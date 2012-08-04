@@ -743,13 +743,13 @@ static DRIVER_INIT( diamond )
 
 
 
-GAME( 1985, gng,       0,   gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gnga,      gng, gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gngbl,     gng, gng, gng,      0,       ROT0, "bootleg", "Ghosts'n Goblins (bootleg with Cross)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gngblita,  gng, gng, gng,      0,       ROT0, "bootleg", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gngc,      gng, gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 3)", GAME_SUPPORTS_SAVE ) // rev c?
-GAME( 1985, gngt,      gng, gng, gng,      0,       ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, makaimur,  gng, gng, makaimur, 0,       ROT0, "Capcom", "Makai-Mura (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, makaimurc, gng, gng, makaimur, 0,       ROT0, "Capcom", "Makai-Mura (Japan Revision C)", GAME_SUPPORTS_SAVE )
-GAME( 1985, makaimurg, gng, gng, makaimur, 0,       ROT0, "Capcom", "Makai-Mura (Japan Revision G)", GAME_SUPPORTS_SAVE )
-GAME( 1989, diamond,   0,   gng, diamond,  diamond, ROT0, "KH Video", "Diamond Run", GAME_SUPPORTS_SAVE )
+GAME( 1985, gng,       0,   gng, gng, gng_state,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gnga,      gng, gng, gng, gng_state,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngbl,     gng, gng, gng, gng_state,      0,       ROT0, "bootleg", "Ghosts'n Goblins (bootleg with Cross)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngblita,  gng, gng, gng, gng_state,      0,       ROT0, "bootleg", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngc,      gng, gng, gng, gng_state,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 3)", GAME_SUPPORTS_SAVE ) // rev c?
+GAME( 1985, gngt,      gng, gng, gng, gng_state,      0,       ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, makaimur,  gng, gng, makaimur, gng_state, 0,       ROT0, "Capcom", "Makai-Mura (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, makaimurc, gng, gng, makaimur, gng_state, 0,       ROT0, "Capcom", "Makai-Mura (Japan Revision C)", GAME_SUPPORTS_SAVE )
+GAME( 1985, makaimurg, gng, gng, makaimur, gng_state, 0,       ROT0, "Capcom", "Makai-Mura (Japan Revision G)", GAME_SUPPORTS_SAVE )
+GAME( 1989, diamond,   0,   gng, diamond, gng_state,  diamond, ROT0, "KH Video", "Diamond Run", GAME_SUPPORTS_SAVE )

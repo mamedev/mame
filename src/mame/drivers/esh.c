@@ -397,6 +397,6 @@ static DRIVER_INIT( esh )
 }
 
 /*    YEAR  NAME  PARENT       MACHINE  INPUT    INIT     MONITOR  COMPANY          FULLNAME                     FLAGS */
-GAME( 1983, esh,      0,       esh,     esh,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, esha,     esh,     esh,     esh,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, eshb,     esh,     esh,     esh,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, esh,      0,       esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, esha,     esh,     esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, eshb,     esh,     esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  GAME_NOT_WORKING|GAME_NO_SOUND)

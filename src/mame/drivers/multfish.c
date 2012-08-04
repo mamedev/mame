@@ -2704,141 +2704,141 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 
 #define mfish_parent mfish_13
-  GAME( 2002, goldfish,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Gold Fish (020903, prototype)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish,       mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021120)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_2,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021121)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_3,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021124)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_4,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021219)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_5,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (021227)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_6,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (030124)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_7,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (030511)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_8,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (030522)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_9,     mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (031026)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2002, mfish_10,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (031117)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_11,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (031124)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_12,    mfish_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (040308)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_13,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Multi Fish (040316)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, goldfish,    mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Gold Fish (020903, prototype)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish,       mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (021120)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_2,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (021121)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, mfish_3,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (021124)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_4,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (021219)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_5,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (021227)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, mfish_6,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (030124)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_7,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (030511)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, mfish_8,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (030522)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_9,     mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (031026)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2002, mfish_10,    mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (031117)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, mfish_11,    mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (031124)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, mfish_12,    mfish_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (040308)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2002, mfish_13,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Multi Fish (040316)", GAME_SUPPORTS_SAVE ) /* World */
 
 #define crzmon_parent crzmon_8
-//GAME( 2003, crzmon,      crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (030217 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, crzmon_2,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (030225 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, crzmon_3,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (030227 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, crzmon_4,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (030404 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_5,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (030421 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, crzmon_6,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (031016 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_7,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (031110 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_8,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (050120 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_9,    crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (070315 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-//GAME( 2003, crzmon_10,   crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (081027 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-//GAME( 2003, crzmon_11,   crzmon_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, crzmon,      crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (030217 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, crzmon_2,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (030225 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, crzmon_3,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (030227 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, crzmon_4,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (030404 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, crzmon_5,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (030421 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, crzmon_6,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (031016 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, crzmon_7,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (031110 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, crzmon_8,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (050120 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, crzmon_9,    crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (070315 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2003, crzmon_10,   crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (081027 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, crzmon_11,   crzmon_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 
 
 #define fcockt_parent fcockt_8
-//GAME( 2003, fcockt,      fcockt_parent    multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030505 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, fcockt_2,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030512 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_3,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030623 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, fcockt_4,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031028 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_5,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_6,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_7,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (050118 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_8,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (060111 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_9,    fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070305 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, fcockt_10,   fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070517 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, fcockt_11,   fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, fcockt_12,   fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-//GAME( 2003, fcockt_13,   fcockt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail (081124 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, fcockt,      fcockt_parent    multfish, multfish,  0, multfish_state,        ROT0, "Igrosoft", "Fruit Cocktail (030505 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, fcockt_2,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030512 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, fcockt_3,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030623 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, fcockt_4,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031028 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, fcockt_5,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, fcockt_6,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, fcockt_7,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (050118 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, fcockt_8,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (060111 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, fcockt_9,    fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070305 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2003, fcockt_10,   fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070517 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2003, fcockt_11,   fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2003, fcockt_12,   fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2003, fcockt_13,   fcockt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail (081124 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 
 #define lhaunt_parent lhaunt_6
-//GAME( 2003, lhaunt,      lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (030707 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_2,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (030804 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2003, lhaunt_3,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (031027 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_4,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_5,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_6,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (040825 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_7,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, lhaunt_8,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-//GAME( 2003, lhaunt_9,    lhaunt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Lucky Haunter (081208 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2003, lhaunt,      lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (030707 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, lhaunt_2,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (030804 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, lhaunt_3,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (031027 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, lhaunt_4,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, lhaunt_5,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, lhaunt_6,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (040825 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, lhaunt_7,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2003, lhaunt_8,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2003, lhaunt_9,    lhaunt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Lucky Haunter (081208 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 
 
 #define rollfr_parent rollfr_4
-//GAME( 2003, rollfr,      rollfr_parent,   rollfr,   rollfr,    0,        ROT0, "Igrosoft", "Roll Fruit (030821)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, rollfr_2,    rollfr_parent,   rollfr,   rollfr,    0,        ROT0, "Igrosoft", "Roll Fruit (040318)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, rollfr_3,    rollfr_parent,   rollfr,   rollfr,    0,        ROT0, "Igrosoft", "Roll Fruit (080327)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, rollfr_4,    0,               rollfr,   rollfr,    0,        ROT0, "Igrosoft", "Roll Fruit (080331)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2003, rollfr,      rollfr_parent,   rollfr,   rollfr, multfish_state,    0,        ROT0, "Igrosoft", "Roll Fruit (030821)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, rollfr_2,    rollfr_parent,   rollfr,   rollfr, multfish_state,    0,        ROT0, "Igrosoft", "Roll Fruit (040318)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, rollfr_3,    rollfr_parent,   rollfr,   rollfr, multfish_state,    0,        ROT0, "Igrosoft", "Roll Fruit (080327)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2003, rollfr_4,    0,               rollfr,   rollfr, multfish_state,    0,        ROT0, "Igrosoft", "Roll Fruit (080331)", GAME_SUPPORTS_SAVE ) /* World */
 
 #define garage_parent garage_5
-//GAME( 2004, garage,      garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (040122 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, garage_2,    garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (040123 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, garage_3,    garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, garage_4,    garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (040219 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, garage_5,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (050311 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, garage_6,    garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (070213 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2004, garage_7,    garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (070329 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-//GAME( 2004, garage_8,    garage_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Garage (081229 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//GAME( 2004, garage,      garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (040122 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, garage_2,    garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (040123 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, garage_3,    garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, garage_4,    garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (040219 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, garage_5,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (050311 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, garage_6,    garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (070213 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2004, garage_7,    garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (070329 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2004, garage_8,    garage_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Garage (081229 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 
 
 #define rclimb_parent rclimb_3
-  GAME( 2004, rclimb,      rclimb_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Rock Climber (040815 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2004, rclimb_2,    rclimb_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Rock Climber (040823 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, rclimb_3,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Rock Climber (040827 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, rclimb_4,    rclimb_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Rock Climber (070322 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2004, rclimb_5,    rclimb_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Rock Climber (070621 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2004, rclimb,      rclimb_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Rock Climber (040815 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2004, rclimb_2,    rclimb_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Rock Climber (040823 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, rclimb_3,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Rock Climber (040827 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, rclimb_4,    rclimb_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Rock Climber (070322 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2004, rclimb_5,    rclimb_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Rock Climber (070621 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 
 #define sweetl_parent sweetl
-  GAME( 2004, sweetl,      0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Sweet Life (041220 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, sweetl_2,    sweetl_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Sweet Life (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2004, sweetl,      0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Sweet Life (041220 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, sweetl_2,    sweetl_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Sweet Life (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #define resdnt_parent resdnt_2
-  GAME( 2004, resdnt,      resdnt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Resident (040415 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, resdnt_2,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Resident (040513 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, resdnt_3,    resdnt_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Resident (070222 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2004, resdnt,      resdnt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Resident (040415 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, resdnt_2,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Resident (040513 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2004, resdnt_3,    resdnt_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Resident (070222 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 
 #define island_parent island
-  GAME( 2005, island,      0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Island (050713 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, island_2,    island_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Island (070409 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2005, island,      0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Island (050713 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2005, island_2,    island_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Island (070409 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #define pirate_parent pirate_3
-//GAME( 2005, pirate,      pirate_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Pirate (051229 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, pirate_2,    pirate_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Pirate (060210 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, pirate_3,    0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Pirate (060803 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, pirate_4,    pirate_parent,   multfish, multfish,  0,        ROT0, "Igrosoft", "Pirate (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2005, pirate,      pirate_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Pirate (051229 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2005, pirate_2,    pirate_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Pirate (060210 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2005, pirate_3,    0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Pirate (060803 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2005, pirate_4,    pirate_parent,   multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Pirate (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #define island2_parent island2
-  GAME( 2006, island2,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Island 2 (060529 World)", GAME_SUPPORTS_SAVE ) /* World */
-//GAME( 2006, island2_2,   island2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Island 2 (061214 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, island2_3,   island2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Island 2 (061218 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, island2_4,   island2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Island 2 (070205 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2006, island2,     0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Island 2 (060529 World)", GAME_SUPPORTS_SAVE ) /* World */
+//GAME( 2006, island2_2,   island2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Island 2 (061214 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2006, island2_3,   island2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Island 2 (061218 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2006, island2_4,   island2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Island 2 (070205 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 
 #define pirate2_parent pirate2
-  GAME( 2006, pirate2,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Pirate 2 (061005 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, pirate2_2,   pirate2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Pirate 2 (070126 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2006, pirate2,     0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Pirate 2 (061005 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2006, pirate2_2,   pirate2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Pirate 2 (070126 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 
 #define keks_parent keks_2
-  GAME( 2006, keks,        keks_parent,     multfish, multfish,  0,        ROT0, "Igrosoft", "Keks (060328 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, keks_2,      0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Keks (060403 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, keks_3,      keks_parent,     multfish, multfish,  0,        ROT0, "Igrosoft", "Keks (070119 Russia)", GAME_SUPPORTS_SAVE )  /* Russia */
+  GAME( 2006, keks,        keks_parent,     multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Keks (060328 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2006, keks_2,      0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Keks (060403 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2006, keks_3,      keks_parent,     multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Keks (070119 Russia)", GAME_SUPPORTS_SAVE )  /* Russia */
 
 
 #define gnome_parent gnome_3
-  GAME( 2007, gnome,       gnome_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Gnome (070906 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, gnome_2,     gnome_parent,    multfish, multfish,  0,        ROT0, "Igrosoft", "Gnome (071115 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, gnome_3,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Gnome (080303 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2007, gnome,       gnome_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Gnome (070906 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2007, gnome_2,     gnome_parent,    multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Gnome (071115 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2007, gnome_3,     0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Gnome (080303 World)", GAME_SUPPORTS_SAVE ) /* World */
 
 
 #define sweetl2_parent sweetl2
-  GAME( 2007, sweetl2,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, sweetl2_2,   sweetl2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Sweet Life 2 (080320 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2007, sweetl2,     0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2007, sweetl2_2,   sweetl2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Sweet Life 2 (080320 World)", GAME_SUPPORTS_SAVE ) /* World */
 
 #define fcockt2_parent fcockt2
-  GAME( 2008, fcockt2,     0,               multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-//GAME( 2008, fcockt2_2,   fcockt2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2008, fcockt2_3,   fcockt2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080909 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2008, fcockt2_4,   fcockt2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081105 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2008, fcockt2_5,   fcockt2_parent,  multfish, multfish,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081106 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2008, fcockt2,     0,               multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+//GAME( 2008, fcockt2_2,   fcockt2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+  GAME( 2008, fcockt2_3,   fcockt2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080909 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2008, fcockt2_4,   fcockt2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081105 World)", GAME_SUPPORTS_SAVE ) /* World */
+  GAME( 2008, fcockt2_5,   fcockt2_parent,  multfish, multfish, multfish_state,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081106 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 
 
@@ -4475,126 +4475,126 @@ ROM_START( fcockt2_4f ) // 081105 custom alteras, modified graphics, bank F9, ma
 ROM_END
 
 
-GAME( 2002, mfish_3a,    mfish_parent,    multfish, multfish,  0,             ROT0,  "bootleg", "Multi Fish (bootleg, 021124, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2002, mfish_12a,   mfish_parent,    multfish, multfish,  0,             ROT0,  "bootleg", "Multi Fish (bootleg, 040308, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2002, mfish_3a,    mfish_parent,    multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Multi Fish (bootleg, 021124, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2002, mfish_12a,   mfish_parent,    multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Multi Fish (bootleg, 040308, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
 
-GAME( 2003, crzmon_7a,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 031110, backdoor set 1)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2003, crzmon_7b,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 031110, backdoor set 2)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 5,5 1,7 3,2  3,3  3,4
-GAME( 2003, crzmon_8a,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2003, crzmon_8b,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070315
-GAME( 2003, crzmon_8c,   crzmon_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, VIDEO GAME-1 CM01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 CM01"
-GAME( 2003, crzmon_8d,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2003, crzmon_8e,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTO PROGRAM V-CM2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-CM2"
-GAME( 2003, crzmon_8f,   crzmon_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTOS CM01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS CM01"
-GAME( 2003, crzmon_9a,   crzmon_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, VIDEO GAME-1 O01 set 1)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 O01"
-GAME( 2003, crzmon_9b,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, VIDEO GAME-1 O01 set 2)", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "VIDEO GAME-1 O01" (crzmon_9a, decoded gfx)
-GAME( 2003, crzmon_9c,   crzmon_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, payout percentage 70)", GAME_SUPPORTS_SAVE ) // payout percentage 70%
+GAME( 2003, crzmon_7a,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 031110, backdoor set 1)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2003, crzmon_7b,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 031110, backdoor set 2)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 5,5 1,7 3,2  3,3  3,4
+GAME( 2003, crzmon_8a,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2003, crzmon_8b,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070315
+GAME( 2003, crzmon_8c,   crzmon_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, VIDEO GAME-1 CM01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 CM01"
+GAME( 2003, crzmon_8d,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2003, crzmon_8e,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTO PROGRAM V-CM2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-CM2"
+GAME( 2003, crzmon_8f,   crzmon_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTOS CM01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS CM01"
+GAME( 2003, crzmon_9a,   crzmon_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, VIDEO GAME-1 O01 set 1)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 O01"
+GAME( 2003, crzmon_9b,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, VIDEO GAME-1 O01 set 2)", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "VIDEO GAME-1 O01" (crzmon_9a, decoded gfx)
+GAME( 2003, crzmon_9c,   crzmon_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, payout percentage 70)", GAME_SUPPORTS_SAVE ) // payout percentage 70%
 
-GAME( 2003, fcockt_6a,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F8
-GAME( 2003, fcockt_6b,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2003, fcockt_6c,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, LotoRossy+)", GAME_SUPPORTS_SAVE ) // modified graphics, some code changes, description says "for Lat-02 terminals", older set
-GAME( 2003, fcockt_6d,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, VIDEO GAME-1 FR01)", GAME_SUPPORTS_SAVE ) // modified graphics, some code changes, changed version text to "VIDEO GAME-1 FR01", description says "for Lat-02 terminals", newer set
-GAME( 2003, fcockt_7a,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2003, fcockt_7b,   fcockt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, VIDEO GAME-1 FR01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 FR01"
-GAME( 2003, fcockt_7c,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, payout percentage 40)", GAME_SUPPORTS_SAVE ) // payout percentage 40%
-GAME( 2003, fcockt_7d,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, payout percentage 60)", GAME_SUPPORTS_SAVE ) // payout percentage 60%
-GAME( 2003, fcockt_7e,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, payout percentage 70)", GAME_SUPPORTS_SAVE ) // payout percentage 70%
-GAME( 2003, fcockt_7f,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070305
-GAME( 2003, fcockt_7g,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, LOTO PROGRAM V-FC2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-FC2"
-GAME( 2003, fcockt_7h,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, LOTOS FR01)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTOS FR01"
-GAME( 2003, fcockt_8a,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 060111, LOTO COCKTAIL V01-0001)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO COCKTAIL V01-0001"
-GAME( 2003, fcockt_8b,   fcockt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 060111, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2003, fcockt_6a,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F8
+GAME( 2003, fcockt_6b,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2003, fcockt_6c,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, LotoRossy+)", GAME_SUPPORTS_SAVE ) // modified graphics, some code changes, description says "for Lat-02 terminals", older set
+GAME( 2003, fcockt_6d,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 040216, VIDEO GAME-1 FR01)", GAME_SUPPORTS_SAVE ) // modified graphics, some code changes, changed version text to "VIDEO GAME-1 FR01", description says "for Lat-02 terminals", newer set
+GAME( 2003, fcockt_7a,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2003, fcockt_7b,   fcockt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, VIDEO GAME-1 FR01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 FR01"
+GAME( 2003, fcockt_7c,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, payout percentage 40)", GAME_SUPPORTS_SAVE ) // payout percentage 40%
+GAME( 2003, fcockt_7d,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, payout percentage 60)", GAME_SUPPORTS_SAVE ) // payout percentage 60%
+GAME( 2003, fcockt_7e,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, payout percentage 70)", GAME_SUPPORTS_SAVE ) // payout percentage 70%
+GAME( 2003, fcockt_7f,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070305
+GAME( 2003, fcockt_7g,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, LOTO PROGRAM V-FC2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-FC2"
+GAME( 2003, fcockt_7h,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 050118, LOTOS FR01)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTOS FR01"
+GAME( 2003, fcockt_8a,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 060111, LOTO COCKTAIL V01-0001)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO COCKTAIL V01-0001"
+GAME( 2003, fcockt_8b,   fcockt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail (bootleg, 060111, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 
-GAME( 2003, lhaunt_4a,   lhaunt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 031111, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2003, lhaunt_5a,   lhaunt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040216, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2003, lhaunt_6a,   lhaunt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,1 1,5  3,3  3,4
-GAME( 2003, lhaunt_6b,   lhaunt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, VIDEO GAME-1 PB01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PB01"
-GAME( 2003, lhaunt_6c,   lhaunt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070604
-GAME( 2003, lhaunt_6d,   lhaunt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2003, lhaunt_6e,   lhaunt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, LOTO PROGRAM V-LH2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-LH2"
-GAME( 2003, lhaunt_6f,   lhaunt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, LOTOS PB01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PB01"
+GAME( 2003, lhaunt_4a,   lhaunt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 031111, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2003, lhaunt_5a,   lhaunt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040216, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2003, lhaunt_6a,   lhaunt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,1 1,5  3,3  3,4
+GAME( 2003, lhaunt_6b,   lhaunt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, VIDEO GAME-1 PB01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PB01"
+GAME( 2003, lhaunt_6c,   lhaunt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070604
+GAME( 2003, lhaunt_6d,   lhaunt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2003, lhaunt_6e,   lhaunt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, LOTO PROGRAM V-LH2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-LH2"
+GAME( 2003, lhaunt_6f,   lhaunt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Lucky Haunter (bootleg, 040825, LOTOS PB01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PB01"
 
-GAME( 2004, garage_4a,   garage_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Garage (bootleg, 040219, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2004, garage_4b,   garage_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Garage (bootleg, 040219, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070329
-GAME( 2004, garage_4c,   garage_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Garage (bootleg, 040219, LOTO PROGRAM V-GG2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-GG2"
-GAME( 2004, garage_5a,   garage_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Garage (bootleg, 050311, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2004, garage_5b,   garage_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Garage (bootleg, 050311, VIDEO GAME-1 GA01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 GA01"
-GAME( 2004, garage_5c,   garage_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Garage (bootleg, 050311, payout percentage 70)", GAME_SUPPORTS_SAVE ) // payout percentage 70%
-GAME( 2004, garage_5d,   garage_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Garage (bootleg, 050311, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2004, garage_5e,   garage_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Garage (bootleg, 050311, LOTOS GA01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS GA01"
+GAME( 2004, garage_4a,   garage_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Garage (bootleg, 040219, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2004, garage_4b,   garage_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Garage (bootleg, 040219, changed version text)", GAME_SUPPORTS_SAVE ) // changed version text to 070329
+GAME( 2004, garage_4c,   garage_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Garage (bootleg, 040219, LOTO PROGRAM V-GG2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-GG2"
+GAME( 2004, garage_5a,   garage_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Garage (bootleg, 050311, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2004, garage_5b,   garage_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Garage (bootleg, 050311, VIDEO GAME-1 GA01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 GA01"
+GAME( 2004, garage_5c,   garage_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Garage (bootleg, 050311, payout percentage 70)", GAME_SUPPORTS_SAVE ) // payout percentage 70%
+GAME( 2004, garage_5d,   garage_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Garage (bootleg, 050311, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2004, garage_5e,   garage_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Garage (bootleg, 050311, LOTOS GA01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS GA01"
 
-GAME( 2004, rclimb_3a,   rclimb_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Rock Climber (bootleg, 040827, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,1 1,5  3,3  3,4
-GAME( 2004, rclimb_3b,   rclimb_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Rock Climber (bootleg, 040827, new service menu)", GAME_SUPPORTS_SAVE ) // new service menu
-GAME( 2004, rclimb_3c,   rclimb_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Rock Climber (bootleg, 040827, VIDEO GAME-1 SK01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SK01"
-GAME( 2004, rclimb_3d,   rclimb_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Rock Climber (bootleg, 040827, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2004, rclimb_3e,   rclimb_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Rock Climber (bootleg, 040827, LOTOS SK01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SK01"
+GAME( 2004, rclimb_3a,   rclimb_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Rock Climber (bootleg, 040827, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,1 1,5  3,3  3,4
+GAME( 2004, rclimb_3b,   rclimb_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Rock Climber (bootleg, 040827, new service menu)", GAME_SUPPORTS_SAVE ) // new service menu
+GAME( 2004, rclimb_3c,   rclimb_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Rock Climber (bootleg, 040827, VIDEO GAME-1 SK01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SK01"
+GAME( 2004, rclimb_3d,   rclimb_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Rock Climber (bootleg, 040827, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2004, rclimb_3e,   rclimb_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Rock Climber (bootleg, 040827, LOTOS SK01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SK01"
 
-GAME( 2004, sweetla,     sweetl_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life (bootleg, 041220, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,3 1,5  3,3  3,4
-GAME( 2004, sweetlb,     sweetl_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life (bootleg, 041220, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070412
+GAME( 2004, sweetla,     sweetl_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Sweet Life (bootleg, 041220, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,3 1,5  3,3  3,4
+GAME( 2004, sweetlb,     sweetl_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Sweet Life (bootleg, 041220, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070412
 
-GAME( 2004, resdnt_2a,   resdnt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Resident (bootleg, 040513, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,1 1,5  3,3  3,4
-GAME( 2004, resdnt_2b,   resdnt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, VIDEO GAME-1 SE01 set 1)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
-GAME( 2004, resdnt_2c,   resdnt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, VIDEO GAME-1 SE01 set 2)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
-GAME( 2004, resdnt_2d,   resdnt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, VIDEO GAME-1 SE01 set 3)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SE01"
-GAME( 2004, resdnt_2e,   resdnt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Resident (bootleg, 040513, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2004, resdnt_2f,   resdnt_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Resident (bootleg, 040513, LOTO PROGRAM V-RS2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-RS2"
-GAME( 2004, resdnt_2g,   resdnt_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, LOTOS SE01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SE01"
+GAME( 2004, resdnt_2a,   resdnt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Resident (bootleg, 040513, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,5 9,1 5,1 1,5  3,3  3,4
+GAME( 2004, resdnt_2b,   resdnt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, VIDEO GAME-1 SE01 set 1)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
+GAME( 2004, resdnt_2c,   resdnt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, VIDEO GAME-1 SE01 set 2)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
+GAME( 2004, resdnt_2d,   resdnt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, VIDEO GAME-1 SE01 set 3)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SE01"
+GAME( 2004, resdnt_2e,   resdnt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Resident (bootleg, 040513, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2004, resdnt_2f,   resdnt_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Resident (bootleg, 040513, LOTO PROGRAM V-RS2)", GAME_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-RS2"
+GAME( 2004, resdnt_2g,   resdnt_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Resident (bootleg, 040513, LOTOS SE01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SE01"
 
-GAME( 2005, islanda,     island_parent,   multfish, multfish,  0,             ROT0,  "bootleg", "Island (bootleg, 050713, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2005, islandb,     island_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Island (bootleg, 050713, VIDEO GAME-1 OS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 OS01"
-GAME( 2005, islandc,     island_parent,   multfish, multfish,  customl,       ROT0,  "bootleg", "Island (bootleg, 050713, LOTOS OS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS OS01"
+GAME( 2005, islanda,     island_parent,   multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Island (bootleg, 050713, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2005, islandb,     island_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Island (bootleg, 050713, VIDEO GAME-1 OS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 OS01"
+GAME( 2005, islandc,     island_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Island (bootleg, 050713, LOTOS OS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS OS01"
 
-GAME( 2006, island2a,    island2_parent,  island2a, multfish,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9 (not standart, game not work)
-GAME( 2006, island2b,    island2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070205, skip some start tests
-GAME( 2006, island2c,    island2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2006, island2_3a,  island2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 061218, VIDEO GAME-1 OS2-01)", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "VIDEO GAME-1 OS2-01"
-GAME( 2006, island2_4a,  island2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 070205, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, island2a,    island2_parent,  island2a, multfish, multfish_state,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9 (not standart, game not work)
+GAME( 2006, island2b,    island2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070205, skip some start tests
+GAME( 2006, island2c,    island2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2006, island2_3a,  island2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 061218, VIDEO GAME-1 OS2-01)", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "VIDEO GAME-1 OS2-01"
+GAME( 2006, island2_4a,  island2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 070205, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
 
-GAME( 2006, pirate2a,    pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2006, pirate2b,    pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, skip raster beam position check
-GAME( 2006, pirate2c,    pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack, changed version text set 1)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070126
-GAME( 2006, pirate2d,    pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack, changed version text set 2)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070126
-GAME( 2006, pirate2e,    pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack, changed version text set 3)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070126, skip some start tests
-GAME( 2006, pirate2f,    pirate2_parent,  multfish, multfish,  customl,       ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, VIDEO GAME-1 PR01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PR01"
-GAME( 2006, pirate2g,    pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2006, pirate2h,    pirate2_parent,  multfish, multfish,  customl,       ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, LOTOS PR01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PR01"
-GAME( 2006, pirate2_2a,  pirate2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 070126, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, pirate2a,    pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, pirate2b,    pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, skip raster beam position check
+GAME( 2006, pirate2c,    pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack, changed version text set 1)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070126
+GAME( 2006, pirate2d,    pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack, changed version text set 2)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070126
+GAME( 2006, pirate2e,    pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, banking address hack, changed version text set 3)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070126, skip some start tests
+GAME( 2006, pirate2f,    pirate2_parent,  multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, VIDEO GAME-1 PR01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PR01"
+GAME( 2006, pirate2g,    pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2006, pirate2h,    pirate2_parent,  multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Pirate 2 (bootleg, 061005, LOTOS PR01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PR01"
+GAME( 2006, pirate2_2a,  pirate2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Pirate 2 (bootleg, 070126, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
 
-GAME( 2006, keksa,       keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060328, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2006, keksb,       keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060328, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
-GAME( 2006, keksc,       keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060328, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070119
-GAME( 2006, keks_2a,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2006, keks_2b,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070119
-GAME( 2006, keks_2c,     keks_parent,     multfish, multfish,  customl,       ROT0,  "bootleg", "Keks (bootleg, 060403, VIDEO GAME-1 KS01 set 1)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01"
-GAME( 2006, keks_2d,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, VIDEO GAME-1 KS01 set 2)", GAME_SUPPORTS_SAVE ) // modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01" (keks_2c, decoded gfx)
-GAME( 2006, keks_2e,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, banking address hack, payout percentage 60)", GAME_SUPPORTS_SAVE ) // bank F9, payout percentage 60%
-GAME( 2006, keks_2f,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2006, keks_2g,     keks_parent,     multfish, multfish,  customl,       ROT0,  "bootleg", "Keks (bootleg, 060403, LOTOS KS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS KS01"
-GAME( 2006, keks_3a,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 070119, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2006, keks_3b,     keks_parent,     multfish, multfish,  0,             ROT0,  "bootleg", "Keks (bootleg, 070119, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, keksa,       keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060328, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, keksb,       keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060328, backdoor)", GAME_SUPPORTS_SAVE ) // backdoor 1,1 1,3 1,5 1,7  3,3  3,4
+GAME( 2006, keksc,       keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060328, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070119
+GAME( 2006, keks_2a,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, keks_2b,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070119
+GAME( 2006, keks_2c,     keks_parent,     multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Keks (bootleg, 060403, VIDEO GAME-1 KS01 set 1)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01"
+GAME( 2006, keks_2d,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, VIDEO GAME-1 KS01 set 2)", GAME_SUPPORTS_SAVE ) // modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01" (keks_2c, decoded gfx)
+GAME( 2006, keks_2e,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, banking address hack, payout percentage 60)", GAME_SUPPORTS_SAVE ) // bank F9, payout percentage 60%
+GAME( 2006, keks_2f,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 060403, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2006, keks_2g,     keks_parent,     multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Keks (bootleg, 060403, LOTOS KS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS KS01"
+GAME( 2006, keks_3a,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 070119, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2006, keks_3b,     keks_parent,     multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Keks (bootleg, 070119, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9
 
-GAME( 2007, gnomea,      gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, gnomeb,      gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, gnomec,      gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 3)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, gnomed,      gnome_parent,    multfish, multfish,  customl,       ROT0, "bootleg",  "Gnome (bootleg, 070906, VIDEO GAME-1 GN01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 GN01"
-GAME( 2007, gnomee,      gnome_parent,    multfish, multfish,  customl,       ROT0, "bootleg",  "Gnome (bootleg, 070906, LOTOS GN01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS GN01"
-GAME( 2007, gnome_2a,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 071115, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, gnome_3a,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, gnome_3b,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 45)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 45%
-GAME( 2007, gnome_3c,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 60)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 60%
+GAME( 2007, gnomea,      gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2007, gnomeb,      gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2007, gnomec,      gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 3)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2007, gnomed,      gnome_parent,    multfish, multfish, multfish_state,  customl,       ROT0, "bootleg",  "Gnome (bootleg, 070906, VIDEO GAME-1 GN01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 GN01"
+GAME( 2007, gnomee,      gnome_parent,    multfish, multfish, multfish_state,  customl,       ROT0, "bootleg",  "Gnome (bootleg, 070906, LOTOS GN01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS GN01"
+GAME( 2007, gnome_2a,    gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 071115, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2007, gnome_3a,    gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2007, gnome_3b,    gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 45)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 45%
+GAME( 2007, gnome_3c,    gnome_parent,    multfish, multfish, multfish_state,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 60)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 60%
 
-GAME( 2007, sweetl2_2a,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, sweetl2_2b,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, some fixes
-GAME( 2007, sweetl2_2c,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, VIDEO GAME-1 MD01)", GAME_SUPPORTS_SAVE ) // modified graphics, bank F9, changed version text to "VIDEO GAME-1 MD01"
-GAME( 2007, sweetl2_2d,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2007, sweetl2_2a,  sweetl2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2007, sweetl2_2b,  sweetl2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, some fixes
+GAME( 2007, sweetl2_2c,  sweetl2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, VIDEO GAME-1 MD01)", GAME_SUPPORTS_SAVE ) // modified graphics, bank F9, changed version text to "VIDEO GAME-1 MD01"
+GAME( 2007, sweetl2_2d,  sweetl2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 
-GAME( 2008, fcockt2a,    fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 080707, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2008, fcockt2_4a,  fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2008, fcockt2_4b,  fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, banking address hack, no credit limit)", GAME_SUPPORTS_SAVE ) // bank F9, no credit limit, "MaxVin" signature
-GAME( 2008, fcockt2_4c,  fcockt2_parent,  multfish, multfish,  customl,       ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, VIDEO GAME-1 FR02)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "VIDEO GAME-1 FR02"
-GAME( 2008, fcockt2_4d,  fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, banking address hack, payout percentage 70)", GAME_SUPPORTS_SAVE ) // bank F9, no credit limit, "MaxVin" signature, payout percentage 70%
-GAME( 2008, fcockt2_4e,  fcockt2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
-GAME( 2008, fcockt2_4f,  fcockt2_parent,  multfish, multfish,  customl,       ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, LOTOS FR02)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS FR02"
+GAME( 2008, fcockt2a,    fcockt2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 080707, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2008, fcockt2_4a,  fcockt2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
+GAME( 2008, fcockt2_4b,  fcockt2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, banking address hack, no credit limit)", GAME_SUPPORTS_SAVE ) // bank F9, no credit limit, "MaxVin" signature
+GAME( 2008, fcockt2_4c,  fcockt2_parent,  multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, VIDEO GAME-1 FR02)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "VIDEO GAME-1 FR02"
+GAME( 2008, fcockt2_4d,  fcockt2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, banking address hack, payout percentage 70)", GAME_SUPPORTS_SAVE ) // bank F9, no credit limit, "MaxVin" signature, payout percentage 70%
+GAME( 2008, fcockt2_4e,  fcockt2_parent,  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
+GAME( 2008, fcockt2_4f,  fcockt2_parent,  multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Fruit Cocktail 2 (bootleg, 081105, LOTOS FR02)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS FR02"
 
 
 /* 0x000000 - 0x03ffff Crazy Monkey V03-1110
@@ -4648,6 +4648,6 @@ ROM_START( igromula )
 	ROM_LOAD( "15games.gfx", 0x000000, 0x4000000, NO_DUMP )
 ROM_END
 
-GAME( 2003, igromult,   0,		  multfish, multfish,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (10 Games)", GAME_NOT_WORKING ) // no GFX roms
-GAME( 2003, igromula,   igromult, multfish, multfish,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (15 Games)", GAME_NOT_WORKING ) // no GFX roms
+GAME( 2003, igromult,   0,		  multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (10 Games)", GAME_NOT_WORKING ) // no GFX roms
+GAME( 2003, igromula,   igromult, multfish, multfish, multfish_state,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (15 Games)", GAME_NOT_WORKING ) // no GFX roms
 

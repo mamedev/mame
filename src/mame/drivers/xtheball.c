@@ -388,4 +388,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, xtheball, 0, xtheball, xtheball, 0,  ROT0, "Rare", "X the Ball", 0 )
+GAME( 1991, xtheball, 0, xtheball, xtheball, xtheball_state, 0,  ROT0, "Rare", "X the Ball", 0 )

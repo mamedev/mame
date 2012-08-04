@@ -448,4 +448,4 @@ static DRIVER_INIT( quizshow )
 }
 
 
-GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", GAME_NOT_WORKING, layout_quizshow )
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", GAME_NOT_WORKING, layout_quizshow )

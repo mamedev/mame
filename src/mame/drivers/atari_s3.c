@@ -66,4 +66,4 @@ ROM_START(roadrunr)
 ROM_END
 
 
-GAME( 1979,  roadrunr,  0,  atari_s3,  atari_s3,  atari_s3,  ROT0,  "Atari",    "Road Runner",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1979,  roadrunr,  0,  atari_s3,  atari_s3, atari_s3_state,  atari_s3,  ROT0,  "Atari",    "Road Runner",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

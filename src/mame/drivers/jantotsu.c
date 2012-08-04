@@ -572,4 +572,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, jantotsu,  0,    jantotsu, jantotsu,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", GAME_SUPPORTS_SAVE )
+GAME( 1983, jantotsu,  0,    jantotsu, jantotsu, jantotsu_state,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", GAME_SUPPORTS_SAVE )

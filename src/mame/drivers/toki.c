@@ -851,14 +851,14 @@ static DRIVER_INIT(jujub)
 
 
 // these 2 are both unique revisions
-GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", 0 )
-GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", 0 )
+GAME( 1989, toki,  0,    toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", 0 )
+GAME( 1989, tokiu, toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", 0 )
 
 // these 3 are all the same revision, only the region byte differs
-GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", 0 )
-GAME( 1989, tokiua,toki, toki,  toki,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", 0 )
-GAME( 1989, juju,  toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", 0 )
+GAME( 1989, tokia, toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", 0 )
+GAME( 1989, tokiua,toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", 0 )
+GAME( 1989, juju,  toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", 0 )
 
-GAME( 1990, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", 0 )
+GAME( 1990, tokib, toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", 0 )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
-GAME( 1989, jujub, toki, toki,  toki,  jujub, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND ) // bootleg of tokia/juju revison
+GAME( 1989, jujub, toki, toki,  toki, toki_state,  jujub, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND ) // bootleg of tokia/juju revison

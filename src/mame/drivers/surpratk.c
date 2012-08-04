@@ -327,6 +327,6 @@ static KONAMI_SETLINES_CALLBACK( surpratk_banking )
 }
 
 
-GAME( 1990, suratk,  0,      surpratk, surpratk, 0, ROT0, "Konami", "Surprise Attack (World ver. K)", GAME_SUPPORTS_SAVE )
-GAME( 1990, suratka, suratk, surpratk, surpratk, 0, ROT0, "Konami", "Surprise Attack (Asia ver. L)", GAME_SUPPORTS_SAVE )
-GAME( 1990, suratkj, suratk, surpratk, surpratk, 0, ROT0, "Konami", "Surprise Attack (Japan ver. M)", GAME_SUPPORTS_SAVE )
+GAME( 1990, suratk,  0,      surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (World ver. K)", GAME_SUPPORTS_SAVE )
+GAME( 1990, suratka, suratk, surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (Asia ver. L)", GAME_SUPPORTS_SAVE )
+GAME( 1990, suratkj, suratk, surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (Japan ver. M)", GAME_SUPPORTS_SAVE )

@@ -362,4 +362,4 @@ static DRIVER_INIT( vegaeo )
 	init_eolith_speedup(machine);
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND )

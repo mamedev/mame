@@ -1250,8 +1250,8 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World, Analog buttons)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sfu,  sf, sfus, sfus, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", GAME_SUPPORTS_SAVE ) // Shows Capcom copyright
-GAME( 1987, sfua, sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", GAME_SUPPORTS_SAVE ) // Shows Capcom USA copyright
-GAME( 1987, sfj,  sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sf,   0, ROT0, "Capcom", "Street Fighter (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sf,   0,  sf,   sf, sf_state,   0, ROT0, "Capcom", "Street Fighter (World, Analog buttons)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sfu,  sf, sfus, sfus, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", GAME_SUPPORTS_SAVE ) // Shows Capcom copyright
+GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", GAME_SUPPORTS_SAVE ) // Shows Capcom USA copyright
+GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sf, sf_state,   0, ROT0, "Capcom", "Street Fighter (prototype)", GAME_SUPPORTS_SAVE )

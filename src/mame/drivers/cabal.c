@@ -880,10 +880,10 @@ static DRIVER_INIT( cabalbl2 )
 }
 
 
-GAME( 1988, cabal,   0,     cabal,   cabalj,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", 0 )
-GAME( 1989, cabala,  cabal, cabal,   cabalj,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND )
-GAME( 1988, cabalbl2,cabal, cabal,   cabalj,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", 0 )
+GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", 0 )
+GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, cabal_state,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND )
+GAME( 1988, cabalbl2,cabal, cabal,   cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", 0 )
 
-GAME( 1988, cabalus, cabal, cabal,   cabalt,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", 0 )
-GAME( 1988, cabalus2,cabal, cabal,   cabalt,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", 0 )
+GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", 0 )
+GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", 0 )

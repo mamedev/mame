@@ -385,10 +385,10 @@ ROM_START( usg252 )
 ROM_END
 
 
-GAME( 1987, usg32,  0,     usg32,  usg32, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
-GAME( 1988, usg83,  0,     usg32,  usg83, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
-GAME( 1988, usg83x, usg83, usg32,  usg83, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 )
-GAME( 1988, usg82,  usg83, usg32,  usg83, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)	// "Feb.08,1988"
-GAME( 1989, usg182, 0,     usg185, usg83, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
-GAME( 1991, usg185, 0,     usg185, usg83, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
-GAME( 1992, usg252, 0,     usg185, usg83, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )
+GAME( 1987, usg32,  0,     usg32,  usg32, usgames_state, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
+GAME( 1988, usg83,  0,     usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
+GAME( 1988, usg83x, usg83, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 )
+GAME( 1988, usg82,  usg83, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)	// "Feb.08,1988"
+GAME( 1989, usg182, 0,     usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
+GAME( 1991, usg185, 0,     usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
+GAME( 1992, usg252, 0,     usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )

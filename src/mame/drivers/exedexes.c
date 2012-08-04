@@ -348,5 +348,5 @@ ROM_END
 
 
 
-GAME( 1985, exedexes, 0,        exedexes, exedexes, 0, ROT270, "Capcom", "Exed Exes", GAME_SUPPORTS_SAVE )
-GAME( 1985, savgbees, exedexes, exedexes, exedexes, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", GAME_SUPPORTS_SAVE )
+GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom", "Exed Exes", GAME_SUPPORTS_SAVE )
+GAME( 1985, savgbees, exedexes, exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", GAME_SUPPORTS_SAVE )

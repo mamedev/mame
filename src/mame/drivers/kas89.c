@@ -892,4 +892,4 @@ static DRIVER_INIT(kas89)
 **************************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT    ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
-GAMEL( 1989, kas89,    0,      kas89,    kas89,    kas89,  ROT90, "SFC S.R.L.", "Kasino '89", GAME_IMPERFECT_SOUND, layout_kas89 )
+GAMEL( 1989, kas89,    0,      kas89,    kas89, kas89_state,    kas89,  ROT90, "SFC S.R.L.", "Kasino '89", GAME_IMPERFECT_SOUND, layout_kas89 )

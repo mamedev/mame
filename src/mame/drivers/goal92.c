@@ -418,4 +418,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -1656,6 +1656,6 @@ ROM_START( 48in1a )
 	ROM_LOAD16_WORD_SWAP( "48in1_93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
-GAME(2004, 39in1,  0,     39in1, 39in1, 39in1, ROT270, "bootleg", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, 39in1, 39in1, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (ver 3.09)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, 39in1, 39in1, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (ver 3.02)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 39in1,  0,     39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (ver 3.09)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (ver 3.02)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)

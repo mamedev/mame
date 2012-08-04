@@ -883,7 +883,7 @@ static DRIVER_INIT( skylncr )
 ****************************************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT     ROT    COMPANY                 FULLNAME                            FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, ver.U450C)",    0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (ver.U350C)",  0 )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr, ROT0, "Bordun International", "Mad Zoo (ver.U450C)",               0 )
-GAME( 1995, leader,   0,       skylncr,  skylncr,  skylncr, ROT0, "bootleg",              "Leader",                            GAME_NOT_WORKING )
+GAME( 1995, skylncr,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, ver.U450C)",    0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (ver.U350C)",  0 )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (ver.U450C)",               0 )
+GAME( 1995, leader,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "bootleg",              "Leader",                            GAME_NOT_WORKING )

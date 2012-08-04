@@ -910,7 +910,7 @@ static DRIVER_INIT( minferno )
  *
  *************************************/
 
-GAMEL( 1978, deadeye,  0, meadows,  meadows,  0,        ROT0,  "Meadows Games, Inc.", "Dead Eye", 0, layout_deadeye )
-GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d,   0,        ROT90, "Meadows Games, Inc.", "3-D Bowling", GAME_NO_SOUND )
-GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler", GAME_IMPERFECT_GRAPHICS, layout_gypsyjug )
-GAME ( 1978, minferno, 0, minferno, minferno, minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", GAME_NO_SOUND )
+GAMEL( 1978, deadeye,  0, meadows,  meadows, meadows_state,  0,        ROT0,  "Meadows Games, Inc.", "Dead Eye", 0, layout_deadeye )
+GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d, meadows_state,   0,        ROT90, "Meadows Games, Inc.", "3-D Bowling", GAME_NO_SOUND )
+GAMEL( 1978, gypsyjug, 0, meadows,  meadows, meadows_state,  gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler", GAME_IMPERFECT_GRAPHICS, layout_gypsyjug )
+GAME ( 1978, minferno, 0, minferno, minferno, meadows_state, minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", GAME_NO_SOUND )

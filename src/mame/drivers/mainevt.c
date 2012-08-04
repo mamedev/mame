@@ -789,11 +789,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, 0, ROT90, "Konami", "Devastators (ver. Z)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, 0, ROT90, "Konami", "Devastators (ver. X)", GAME_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, 0, ROT90, "Konami", "Devastators (ver. V)", GAME_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, 0, ROT90, "Konami", "Garuka (Japan ver. W)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt, mainevt_state,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt, mainevt_state,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", GAME_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. Z)", GAME_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. X)", GAME_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. V)", GAME_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Garuka (Japan ver. W)", GAME_SUPPORTS_SAVE )

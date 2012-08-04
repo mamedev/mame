@@ -2325,28 +2325,28 @@ ROM_START( 86lions )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-GAMEL( 1985, 86lions,  0,	 86lions,  aristmk4, aristmk4, ROT0, "Aristocrat", "86 Lions",					GAME_NOT_WORKING, layout_topgear  )
-GAMEL( 1996, eforest,  0,	 aristmk4, eforest,  aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",		0, layout_eforest  ) // multiple denominations
-GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",		0,		  layout_aristmk4 ) // 10c, $1 = 10 credits
-GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1996, 3bagflvt, 0,	 aristmk4, 3bagflvt, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",		0,		  layout_3bagflvt ) // 5c, $1 = 20 credits
-GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",	0,		  layout_3bagflnz ) // 5c, $2 = 40 credits
-GAMEL( 1996, blkrhino, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1996, kgbird,   0,	 aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 87.98%)",0,		  layout_kgbird   ) // 5c, $2 = 40 credits
-GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 91.97%)",0,		  layout_kgbird   ) // 10c, $2 = 20 credits
-GAMEL( 1998, swtht2nz, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Sweet Hearts II (1VXFC5461, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1996, goldenc,  0,	 aristmk4, goldenc,  aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",	0,		  layout_goldenc  ) // 2c, $2 = 100 credits
-GAMEL( 1996, topgear,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",		0,		  layout_topgear  ) // 10c, 1 coin = 1 credit
-GAMEL( 1996, wtigernz, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1998, phantomp, 0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 2000, coralr2,  0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",	0,		  layout_arimk4nz ) // 2c, $2 = 100 credits
-GAMEL( 1998, ffortune, 0,	 aristmk4, goldenc,  aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",	0,		  layout_goldenc  ) // 5c, $2 = 40 credits
-GAMEL( 1999, autmoon,  0,	 aristmk4, arimk4nz, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1986, gtroppo,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, NSW)",	0,		  layout_topgear  ) // possibly 20c, 1 coin = 1 credit
-GAMEL( 1986, clkwise,  0,	 aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)", GAME_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
-GAMEL( 1995, cgold2,   0,	 aristmk4, cgold2,   aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, US)",	GAME_NOT_WORKING, layout_cgold2   ) // multiple denominations
-GAMEL( 1996, fhunter,  0,	 aristmk4, fhunter,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
-GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
-GAMEL( 1996, arcwins,  0,	 aristmk4, arcwins,  aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",		0, layout_arcwins  ) // multiple denominations
-GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",		0,		  layout_wildone  ) // 20c, $2 = 10 credits, video poker
-GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, NSW)",	0,		  layout_gldnpkr  ) // possibly 20c, 1 coin = 1 credit, video poker
+GAMEL( 1985, 86lions,  0,	 86lions,  aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions",					GAME_NOT_WORKING, layout_topgear  )
+GAMEL( 1996, eforest,  0,	 aristmk4, eforest, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",		0, layout_eforest  ) // multiple denominations
+GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",		0,		  layout_aristmk4 ) // 10c, $1 = 10 credits
+GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1996, 3bagflvt, 0,	 aristmk4, 3bagflvt, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",		0,		  layout_3bagflvt ) // 5c, $1 = 20 credits
+GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",	0,		  layout_3bagflnz ) // 5c, $2 = 40 credits
+GAMEL( 1996, blkrhino, 0,	 aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1996, kgbird,   0,	 aristmk4, kgbird, aristmk4_state,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 87.98%)",0,		  layout_kgbird   ) // 5c, $2 = 40 credits
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird, aristmk4_state,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 91.97%)",0,		  layout_kgbird   ) // 10c, $2 = 20 credits
+GAMEL( 1998, swtht2nz, 0,	 aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Sweet Hearts II (1VXFC5461, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1996, goldenc,  0,	 aristmk4, goldenc, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",	0,		  layout_goldenc  ) // 2c, $2 = 100 credits
+GAMEL( 1996, topgear,  0,	 aristmk4, topgear, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",		0,		  layout_topgear  ) // 10c, 1 coin = 1 credit
+GAMEL( 1996, wtigernz, 0,	 aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1998, phantomp, 0,	 aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 2000, coralr2,  0,	 aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",	0,		  layout_arimk4nz ) // 2c, $2 = 100 credits
+GAMEL( 1998, ffortune, 0,	 aristmk4, goldenc, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",	0,		  layout_goldenc  ) // 5c, $2 = 40 credits
+GAMEL( 1999, autmoon,  0,	 aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",	0,		  layout_arimk4nz ) // 5c, $2 = 40 credits
+GAMEL( 1986, gtroppo,  0,	 aristmk4, topgear, aristmk4_state,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, NSW)",	0,		  layout_topgear  ) // possibly 20c, 1 coin = 1 credit
+GAMEL( 1986, clkwise,  0,	 aristmk4, topgear, aristmk4_state,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)", GAME_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
+GAMEL( 1995, cgold2,   0,	 aristmk4, cgold2, aristmk4_state,   aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, US)",	GAME_NOT_WORKING, layout_cgold2   ) // multiple denominations
+GAMEL( 1996, fhunter,  0,	 aristmk4, fhunter, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
+GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, US)",		GAME_NOT_WORKING, layout_fhunter  ) // multiple denominations
+GAMEL( 1996, arcwins,  0,	 aristmk4, arcwins, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",		0, layout_arcwins  ) // multiple denominations
+GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone, aristmk4_state,  aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",		0,		  layout_wildone  ) // 20c, $2 = 10 credits, video poker
+GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr, aristmk4_state,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, NSW)",	0,		  layout_gldnpkr  ) // possibly 20c, 1 coin = 1 credit, video poker

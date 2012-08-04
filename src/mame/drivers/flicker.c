@@ -60,4 +60,4 @@ ROM_START(flicker)
 ROM_END
 
 
-GAME(1974,  flicker,  0,  flicker,  flicker,  flicker,  ROT0,  "Nutting Associates",    "Flicker (Prototype)",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1974,  flicker,  0,  flicker,  flicker, flicker_state,  flicker,  ROT0,  "Nutting Associates",    "Flicker (Prototype)",    GAME_IS_SKELETON_MECHANICAL)

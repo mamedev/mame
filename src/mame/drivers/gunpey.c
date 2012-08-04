@@ -422,4 +422,4 @@ static DRIVER_INIT( gunpey )
 
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey,	ROT0, "Banpresto", "Gunpey",GAME_NOT_WORKING)
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,	ROT0, "Banpresto", "Gunpey",GAME_NOT_WORKING)

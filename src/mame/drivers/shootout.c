@@ -429,6 +429,6 @@ static DRIVER_INIT( shootouj )
 }
 
 
-GAME( 1985, shootout,  0,        shootout, shootout, shootout, ROT0, "Data East USA", "Shoot Out (US)", 0)
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootouj, ROT0, "Data East Corporation", "Shoot Out (Japan)", 0 )
-GAME( 1985, shootoutb, shootout, shootouj, shootout, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 )
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA", "Shoot Out (US)", 0)
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootouj, ROT0, "Data East Corporation", "Shoot Out (Japan)", 0 )
+GAME( 1985, shootoutb, shootout, shootouj, shootout, shootout_state, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 )

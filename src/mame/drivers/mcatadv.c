@@ -667,9 +667,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, 0, ROT0,   "Wintechno", "Magical Cat Adventure", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, 0, ROT0,   "Wintechno", "Catt (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost,    0, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost,    0, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost,    0, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Catt (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost, mcatadv_state,    0, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost, mcatadv_state,    0, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost, mcatadv_state,    0, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

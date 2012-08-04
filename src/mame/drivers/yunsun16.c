@@ -953,9 +953,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub,  0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 199?, magicbuba, magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,  0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, shocking,  0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, shockingk, shocking, shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking (Korea)",             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1998, bombkick,  0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 199?, magicbub,  0,        magicbub, magicbub, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 199?, magicbuba, magicbub, magicbub, magicbua, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,  0,        shocking, paprazzi, yunsun16_state, 0,        ROT270, "Yun Sung", "Paparazzi",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shocking,  0,        shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shockingk, shocking, shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking (Korea)",             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, bombkick,  0,        shocking, bombkick, yunsun16_state, 0,        ROT0,   "Yun Sung", "Bomb Kick",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

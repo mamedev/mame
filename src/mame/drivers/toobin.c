@@ -613,9 +613,9 @@ static DRIVER_INIT( toobin )
  *
  *************************************/
 
-GAME( 1988, toobin,   0,      toobin, toobin, toobin, ROT270, "Atari Games", "Toobin' (rev 3)", 0 )
-GAME( 1988, toobine,  toobin, toobin, toobin, toobin, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", 0 )
-GAME( 1988, toobing,  toobin, toobin, toobin, toobin, ROT270, "Atari Games", "Toobin' (German, rev 3)", 0 )
-GAME( 1988, toobin2,  toobin, toobin, toobin, toobin, ROT270, "Atari Games", "Toobin' (rev 2)", 0 )
-GAME( 1988, toobin2e, toobin, toobin, toobin, toobin, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", 0 )
-GAME( 1988, toobin1,  toobin, toobin, toobin, toobin, ROT270, "Atari Games", "Toobin' (rev 1)", 0 )
+GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (rev 3)", 0 )
+GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", 0 )
+GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (German, rev 3)", 0 )
+GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (rev 2)", 0 )
+GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", 0 )
+GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (rev 1)", 0 )

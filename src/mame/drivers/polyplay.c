@@ -353,4 +353,4 @@ static TIMER_DEVICE_CALLBACK( polyplay_timer_callback )
 }
 
 /* game driver */
-GAME( 1985, polyplay, 0, polyplay, polyplay, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play", 0 )
+GAME( 1985, polyplay, 0, polyplay, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play", 0 )

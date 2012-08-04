@@ -600,5 +600,5 @@ static DRIVER_INIT( crshrace2 )
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace, crshrace_state,  crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

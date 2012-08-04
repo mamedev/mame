@@ -930,5 +930,5 @@ ROM_START( gp98 )
 	// no OKI on this
 ROM_END
 
-GAME( 1995?, jingbell, 0, jingbell, jingbell, jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", 0 )
-GAME( 1998,  gp98,     0, gp98,     jingbell, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995?, jingbell, 0, jingbell, jingbell, igs009_state, jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", 0 )
+GAME( 1998,  gp98,     0, gp98,     jingbell, igs009_state, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )

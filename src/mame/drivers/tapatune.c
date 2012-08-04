@@ -426,4 +426,4 @@ ROM_START(tapatune)
 	ROM_LOAD( "arom1.u16",  0x000000, 0x80000,  CRC(e51696bc) SHA1(b002f8705ad1877f91a860dddb0ae16b2e73dd15) )
 ROM_END
 
-GAME(1994, tapatune, 0, tapatune, tapatune, 0, ROT0, "Creative Electronics And Software", "Tap-a-Tune", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME(1994, tapatune, 0, tapatune, tapatune, tapatune_state, 0, ROT0, "Creative Electronics And Software", "Tap-a-Tune", GAME_NOT_WORKING | GAME_NO_SOUND )

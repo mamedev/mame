@@ -962,5 +962,5 @@ ROM_START( hammer )
 	ROM_LOAD( "s1.u26", 0x200000, 0x200000, CRC(9cc4b3ec) SHA1(b91a8747074a1032eb7f70a015d394fe8e896d7e) )
 ROM_END
 
-GAME( 1999, livequiz, 0, livequiz, livequiz, livequiz, ROT0, "Andamiro", "Live Quiz Show", GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, hammer,   0, hammer,   hammer,   0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, hammer,   0, hammer,   hammer, midas_state,   0,        ROT0, "Andamiro", "Hammer",         0 )

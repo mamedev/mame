@@ -739,8 +739,8 @@ ROM_END
 
 
 
-GAME( 2002, bingor1,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 1)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, bingor2,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 2)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, bingor3,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 3)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, bingor4,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 4)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, bingor5,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star V3? (set 5)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor1,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 1)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor2,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 2)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor3,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 3)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor4,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 4)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor5,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star V3? (set 5)",  GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -599,5 +599,5 @@ ROM_START( quizpun )
 
 ROM_END
 
-GAME( 1988, quizpun, 0, quizpun2, quizpun2, 0, ROT270, "Space Computer", "Quiz Punch", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1989, quizpun2, 0, quizpun2, quizpun2, 0, ROT270, "Space Computer", "Quiz Punch 2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1988, quizpun, 0, quizpun2, quizpun2, quizpun2_state, 0, ROT270, "Space Computer", "Quiz Punch", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, 0, ROT270, "Space Computer", "Quiz Punch 2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )

@@ -299,4 +299,4 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj,  0,        parentj,  parentj,  0,        ROT0,    "Taito", "Parent Jack", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1989, parentj,  0,        parentj,  parentj, taitoo_state,  0,        ROT0,    "Taito", "Parent Jack", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

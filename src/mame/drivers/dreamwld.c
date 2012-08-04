@@ -702,5 +702,5 @@ ROM_END
 
 
 
-GAME( 1997, baryon,   0, baryon,   dreamwld, 0, ROT270,  "SemiCom", "Baryon - Future Assault", GAME_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0, dreamwld, dreamwld, 0, ROT0,  "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0, baryon,   dreamwld, dreamwld_state, 0, ROT270,  "SemiCom", "Baryon - Future Assault", GAME_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0, dreamwld, dreamwld, dreamwld_state, 0, ROT0,  "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )

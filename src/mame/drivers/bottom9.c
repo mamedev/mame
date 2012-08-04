@@ -576,6 +576,6 @@ ROM_END
 
 
 
-GAME( 1989, bottom9,  0,       bottom9, bottom9,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1989, bottom9n, bottom9, bottom9, bottom9,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mstadium, bottom9, bottom9, mstadium, 0, ROT0, "Konami", "Main Stadium (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, bottom9,  0,       bottom9, bottom9, bottom9_state,  0, ROT0, "Konami", "Bottom of the Ninth (version T)", GAME_SUPPORTS_SAVE )
+GAME( 1989, bottom9n, bottom9, bottom9, bottom9, bottom9_state,  0, ROT0, "Konami", "Bottom of the Ninth (version N)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mstadium, bottom9, bottom9, mstadium, bottom9_state, 0, ROT0, "Konami", "Main Stadium (Japan)", GAME_SUPPORTS_SAVE )

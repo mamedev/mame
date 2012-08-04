@@ -338,6 +338,6 @@ static DRIVER_INIT(chwrestl)
  *
  *************************************/
 
-GAME( 1984, chboxing, 0, sg1000a, chboxing, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
-GAME( 1985, chwrestl, 0, sg1000a, chwrestl, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0 )
-GAME( 1985, dokidoki, 0, sg1000a, dokidoki, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )
+GAME( 1984, chboxing, 0, sg1000a, chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
+GAME( 1985, chwrestl, 0, sg1000a, chwrestl, sg1000a_state, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0 )
+GAME( 1985, dokidoki, 0, sg1000a, dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )

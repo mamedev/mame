@@ -1995,14 +1995,14 @@ static DRIVER_INIT( polepos2 )
  * Game drivers
  *********************************************************************/
 
-GAME( 1982, polepos,    0,        polepos,    polepos,  0,        ROT0, "Namco", "Pole Position", 0 )
-GAME( 1982, poleposa,   polepos,  polepos,    poleposa, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
-GAME( 1982, polepos1,   polepos,  polepos,    poleposa, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 1)", 0 )
-GAME( 1984, topracer,   polepos,  polepos,    polepos,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1984)", 0 ) // the NAMCO customs have been cloned on these bootlegs
-GAME( 1983, topracera,  polepos,  polepos,    polepos,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1983)", 0 ) // the only difference between them is the year displayed on the title screen
-GAME( 1982, topracern,  polepos,  topracern,  topracern,topracern,ROT0, "bootleg", "Top Racer (no MB8841 + MB8842)", 0 )
+GAME( 1982, polepos,    0,        polepos,    polepos, polepos_state,  0,        ROT0, "Namco", "Pole Position", 0 )
+GAME( 1982, poleposa,   polepos,  polepos,    poleposa, polepos_state, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
+GAME( 1982, polepos1,   polepos,  polepos,    poleposa, polepos_state, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 1)", 0 )
+GAME( 1984, topracer,   polepos,  polepos,    polepos, polepos_state,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1984)", 0 ) // the NAMCO customs have been cloned on these bootlegs
+GAME( 1983, topracera,  polepos,  polepos,    polepos, polepos_state,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1983)", 0 ) // the only difference between them is the year displayed on the title screen
+GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state,topracern,ROT0, "bootleg", "Top Racer (no MB8841 + MB8842)", 0 )
 
-GAME( 1983, polepos2,   0,        polepos,    polepos2, polepos2, ROT0, "Namco", "Pole Position II", 0 )
-GAME( 1983, polepos2a,  polepos2, polepos,    polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
-GAME( 1983, polepos2b,  polepos2, polepos,    polepos2, 0,        ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
-GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern,topracern,ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices
+GAME( 1983, polepos2,   0,        polepos,    polepos2, polepos_state, polepos2, ROT0, "Namco", "Pole Position II", 0 )
+GAME( 1983, polepos2a,  polepos2, polepos,    polepos2, polepos_state, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
+GAME( 1983, polepos2b,  polepos2, polepos,    polepos2, polepos_state, 0,        ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
+GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern, polepos_state,topracern,ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices

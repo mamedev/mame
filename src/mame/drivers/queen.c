@@ -715,4 +715,4 @@ ROM_START( queen )
 ROM_END
 
 
-GAME( 2002?, queen,  0,    queen, at_keyboard,  0, ROT0, "STG", "Queen?", GAME_IS_SKELETON )
+GAME( 2002?, queen,  0,    queen, at_keyboard, queen_state,  0, ROT0, "STG", "Queen?", GAME_IS_SKELETON )

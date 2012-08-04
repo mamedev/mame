@@ -404,5 +404,5 @@ static DRIVER_INIT( unkpacg )
 	}
 }
 
-GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0,       ROT0, "IDSA",      "4 En Raya", GAME_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,   unkpacg,  unkpacg,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )
+GAME( 1990, 4enraya,  0,   4enraya,  4enraya, _4enraya_state,  0,       ROT0, "IDSA",      "4 En Raya", GAME_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,   unkpacg,  unkpacg, _4enraya_state,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )

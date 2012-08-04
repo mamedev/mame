@@ -630,9 +630,9 @@ static DRIVER_INIT( crgolfhi )
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf,  0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", GAME_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf,  0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", GAME_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf,  0,        ROT0, "Nasco Japan", "Crowns Golf (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf,  0,        ROT0, "Nasco Japan", "Champion Golf", GAME_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf,  0,        ROT0, "bootleg", "Champion Golf (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf,  crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii" , GAME_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state,  0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", GAME_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state,  0,        ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", GAME_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state,  0,        ROT0, "Nasco Japan", "Crowns Golf (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state,  0,        ROT0, "Nasco Japan", "Champion Golf", GAME_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state,  0,        ROT0, "bootleg", "Champion Golf (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state,  crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii" , GAME_SUPPORTS_SAVE )

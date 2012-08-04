@@ -343,4 +343,4 @@ static DRIVER_INIT( batman )
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, batman, ROT0, "Atari Games", "Batman", GAME_SUPPORTS_SAVE )
+GAME( 1991, batman, 0, batman, batman, batman_state, batman, ROT0, "Atari Games", "Batman", GAME_SUPPORTS_SAVE )

@@ -878,5 +878,5 @@ static DRIVER_INIT(witch)
 	state->m_bank = -1;
 }
 
-GAME( 1992, witch,    0,     witch, witch, witch, ROT0, "Sega / Vic Tokai", "Witch", 0 )
-GAME( 1995, pbchmp95, witch, witch, witch, witch, ROT0, "bootleg? (Veltmeijer Automaten)", "Pinball Champ '95 (bootleg?)", 0 )
+GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai", "Witch", 0 )
+GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "bootleg? (Veltmeijer Automaten)", "Pinball Champ '95 (bootleg?)", 0 )

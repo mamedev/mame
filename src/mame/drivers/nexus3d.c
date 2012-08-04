@@ -267,5 +267,5 @@ static DRIVER_INIT( nexus3d )
 	state->m_flash_region = state->memregion("user1")->base();
 }
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart Full",GAME_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full",GAME_IS_SKELETON )

@@ -298,5 +298,5 @@ ROM_END
 
 
 
-GAME( 1987, mx5000,  0,      flkatck, flkatck, 0, ROT90, "Konami", "MX5000", GAME_SUPPORTS_SAVE )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, 0, ROT90, "Konami", "Flak Attack (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "MX5000", GAME_SUPPORTS_SAVE )
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan)", GAME_SUPPORTS_SAVE )

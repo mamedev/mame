@@ -687,6 +687,6 @@ static DRIVER_INIT(jwildb52)
 *************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY  FULLNAME                                  FLAGS */
-GAME( 199?, jwildb52,  0,        jwildb52, jwildb52, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", GAME_NO_SOUND | GAME_NOT_WORKING )

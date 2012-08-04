@@ -430,9 +430,9 @@ static DRIVER_INIT( rackemup )
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (program code G)",         GAME_SUPPORTS_SAVE )
-GAME( 1987, battlntsa, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (program code F)",         GAME_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan, program code E)",  GAME_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, rackemup, ROT90, "Konami", "Rack 'em Up (program code L)",        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, 0,        ROT90, "Konami", "The Hustler (Japan, program code M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, 0,        ROT90, "Konami", "The Hustler (Japan, program code J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, 0,        ROT90, "Konami", "Battlantis (program code G)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, 0,        ROT90, "Konami", "Battlantis (program code F)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, 0,        ROT90, "Konami", "Battlantis (Japan, program code E)",  GAME_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, rackemup, ROT90, "Konami", "Rack 'em Up (program code L)",        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, 0,        ROT90, "Konami", "The Hustler (Japan, program code M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, 0,        ROT90, "Konami", "The Hustler (Japan, program code J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

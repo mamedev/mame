@@ -932,7 +932,7 @@ ROM_END
 
 
 
-GAME( 1988, othunder,   0,        othunder, othunder, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, othunderu,  othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, othunderuo, othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", GAME_SUPPORTS_SAVE )
-GAME( 1988, othunderj,  othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunder,   0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunderu,  othunder, othunder, othundu, othunder_state,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunderuo, othunder, othunder, othundu, othunder_state,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", GAME_SUPPORTS_SAVE )
+GAME( 1988, othunderj,  othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", GAME_SUPPORTS_SAVE )

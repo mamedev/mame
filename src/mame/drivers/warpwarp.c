@@ -994,18 +994,18 @@ static DRIVER_INIT( warpwarp )
 
 
 /* B & W games */
-GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "Gee Bee (Japan)", 0, layout_geebee )
-GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", 0, layout_geebee ) // Fratelli Bertolino
-GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", 0, layout_geebee )
+GAMEL(1978, geebee,   0,        geebee,   geebee, warpwarp_state,   geebee,   ROT90, "Namco", "Gee Bee (Japan)", 0, layout_geebee )
+GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb, warpwarp_state,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", 0, layout_geebee ) // Fratelli Bertolino
+GAMEL(1978, geebeeg,  geebee,   geebee,   geebee, warpwarp_state,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", 0, layout_geebee )
 
-GAMEL(1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND, layout_navarone )
-GAME( 1980, kaitein,  kaitei,   navarone, kaitein,  kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 ) // pretty sure it didn't have a color overlay
-GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 ) // "
-GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos ) // developed by Shoei?
+GAMEL(1980, navarone, 0,        navarone, navarone, warpwarp_state, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND, layout_navarone )
+GAME( 1980, kaitein,  kaitei,   navarone, kaitein, warpwarp_state,  kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 ) // pretty sure it didn't have a color overlay
+GAME( 1980, kaitei,   0,        navarone, kaitei, warpwarp_state,   kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 ) // "
+GAMEL(1980, sos,      0,        navarone, sos, warpwarp_state,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos ) // developed by Shoei?
 
 /* Color games */
-GAME( 1979, bombbee,    0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
-GAME( 1979, cutieq,     0,        bombbee,  cutieq,   bombbee,  ROT90, "Namco", "Cutie Q", 0 )
-GAME( 1981, warpwarp,   0,        warpwarp, warpwarp, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
-GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarpr,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", 0 )
-GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarpr,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", 0 )
+GAME( 1979, bombbee,    0,        bombbee,  bombbee, warpwarp_state,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
+GAME( 1979, cutieq,     0,        bombbee,  cutieq, warpwarp_state,   bombbee,  ROT90, "Namco", "Cutie Q", 0 )
+GAME( 1981, warpwarp,   0,        warpwarp, warpwarp, warpwarp_state, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
+GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarpr, warpwarp_state,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", 0 )
+GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarpr, warpwarp_state,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", 0 )

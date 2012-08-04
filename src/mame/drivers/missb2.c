@@ -594,5 +594,5 @@ static DRIVER_INIT( missb2 )
 
 /* Game Drivers */
 
-GAME( 1996, missb2,   0,      missb2,   missb2, missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1996, bublpong, missb2, bublpong, missb2, missb2, ROT0,  "Top Ltd.", "Bubble Pong Pong",  GAME_SUPPORTS_SAVE )
+GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.", "Bubble Pong Pong",  GAME_SUPPORTS_SAVE )

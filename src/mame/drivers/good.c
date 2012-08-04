@@ -317,4 +317,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,   0,   good,   good,   0,  ROT0,  "<unknown>", "Good (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1998, good,   0,   good,   good, good_state,   0,  ROT0,  "<unknown>", "Good (Korea)", GAME_SUPPORTS_SAVE )

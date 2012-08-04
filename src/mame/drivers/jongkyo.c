@@ -569,4 +569,4 @@ static DRIVER_INIT( jongkyo )
  *
  *************************************/
 
-GAME( 1985, jongkyo,  0,    jongkyo, jongkyo,  jongkyo, ROT0, "Kiwako", "Jongkyo", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, jongkyo,  0,    jongkyo, jongkyo, jongkyo_state,  jongkyo, ROT0, "Kiwako", "Jongkyo", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

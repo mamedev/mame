@@ -780,8 +780,8 @@ static DRIVER_INIT( kchampvs2 )
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   0,         ROT90, "Data East USA",         "Karate Champ (US)", GAME_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East USA",         "Karate Champ (US, VS version set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchampvs2, ROT90, "Data East USA",         "Karate Champ (US, VS version set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp, kchamp_state,   0,         ROT90, "Data East USA",         "Karate Champ (US)", GAME_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp, kchamp_state,   0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state, kchampvs,  ROT90, "Data East USA",         "Karate Champ (US, VS version set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state, kchampvs2, ROT90, "Data East USA",         "Karate Champ (US, VS version set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state, kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", GAME_SUPPORTS_SAVE )

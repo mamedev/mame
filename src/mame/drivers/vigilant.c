@@ -947,12 +947,12 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant, 0,        vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World, set 1)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilant1,vigilant, vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (World, set 2)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu,vigilant, vigilant, vigilant, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu2,vigilant,vigilant, vigilant, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US) - Rev. G", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantj,vigilant, vigilant, vigilant, 0, ROT0, "Irem", "Vigilante (Japan)", GAME_NO_COCKTAIL )
-GAME( 1988, kikcubic, 0,        kikcubic, kikcubic, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )	/* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,kikcubic, kikcubic, kikcubic, 0, ROT0, "bootleg", "Kickle Cubele", GAME_NO_COCKTAIL )
-GAME( 1989, buccanrs, 0,        buccanrs, buccanrs, 0, ROT0, "Duintronic", "Buccaneers (set 1)", GAME_NO_COCKTAIL )
-GAME( 1989, buccanrsa,buccanrs, buccanrs, buccanra, 0, ROT0, "Duintronic", "Buccaneers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant, 0,        vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, set 1)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant1,vigilant, vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, set 2)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantu,vigilant, vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantu2,vigilant,vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US) - Rev. G", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantj,vigilant, vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (Japan)", GAME_NO_COCKTAIL )
+GAME( 1988, kikcubic, 0,        kikcubic, kikcubic, vigilant_state, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )	/* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb,kikcubic, kikcubic, kikcubic, vigilant_state, 0, ROT0, "bootleg", "Kickle Cubele", GAME_NO_COCKTAIL )
+GAME( 1989, buccanrs, 0,        buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 1)", GAME_NO_COCKTAIL )
+GAME( 1989, buccanrsa,buccanrs, buccanrs, buccanra, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 2)", GAME_NO_COCKTAIL )

@@ -682,11 +682,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ccastles,  0,        ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 4)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastles3, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 3)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastles2, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastles1, ccastles, ccastles, ccastles, 0, ROT0, "Atari", "Crystal Castles (version 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj,0, ROT0, "Atari", "Crystal Castles (joystick version)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles,  0,        ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 4)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesg, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, German)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesp, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesf, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3, French)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles3, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 3)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles2, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastles1, ccastles, ccastles, ccastles, ccastles_state, 0, ROT0, "Atari", "Crystal Castles (version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, ccastles_state,0, ROT0, "Atari", "Crystal Castles (joystick version)", GAME_SUPPORTS_SAVE )

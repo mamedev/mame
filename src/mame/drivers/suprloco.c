@@ -291,5 +291,5 @@ static DRIVER_INIT( suprloco )
 
 
 
-GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco, ROT0, "Sega", "Super Locomotive", 0 )
-GAME( 1982, suprlocoa, suprloco, suprloco, suprloco, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", 0 )
+GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", 0 )
+GAME( 1982, suprlocoa, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", 0 )

@@ -517,6 +517,6 @@ static DRIVER_INIT( sidepctj )
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt, sidepckt,  sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktj, sidepckt, sidepckt, sidepcktj, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktb, sidepckt, sidepckt, sidepcktb, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepckt,  0,        sidepckt, sidepckt, sidepckt_state,  sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktj, sidepckt, sidepckt, sidepcktj, sidepckt_state, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktb, sidepckt, sidepckt, sidepcktb, sidepckt_state, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )

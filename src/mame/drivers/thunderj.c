@@ -421,4 +421,4 @@ static DRIVER_INIT( thunderj )
  *
  *************************************/
 
-GAME( 1990, thunderj, 0, thunderj, thunderj, thunderj, ROT0, "Atari Games", "ThunderJaws", 0 )
+GAME( 1990, thunderj, 0, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws", 0 )

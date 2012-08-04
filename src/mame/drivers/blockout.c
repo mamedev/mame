@@ -439,8 +439,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, blockout2,blockout, blockout, blockout, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, blockoutj,blockout, blockout, blockoutj,0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress,   0, ROT0, "Palco", "Agress", GAME_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress,   0, ROT0, "bootleg", "Agress (English bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockout, 0,        blockout, blockout, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockout2,blockout, blockout, blockout, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state,0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, agress,   0,        agress,   agress, blockout_state,   0, ROT0, "Palco", "Agress", GAME_SUPPORTS_SAVE )
+GAME( 2003, agressb,  agress,   agress,   agress, blockout_state,   0, ROT0, "bootleg", "Agress (English bootleg)", GAME_SUPPORTS_SAVE )

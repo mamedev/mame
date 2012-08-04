@@ -65,5 +65,5 @@ ROM_START(pentacup2)
 ROM_END
 
 
-GAME(1978,  pentacup,  0,         micropin,  micropin,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 1)",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  pentacup2, pentacup,  micropin,  micropin,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 2)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  pentacup,  0,         micropin,  micropin, micropin_state,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 1)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  pentacup2, pentacup,  micropin,  micropin, micropin_state,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 2)",     GAME_IS_SKELETON_MECHANICAL)

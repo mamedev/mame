@@ -265,4 +265,4 @@ static DRIVER_INIT( eolith16 )
 	init_eolith_speedup(machine);
 }
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16, ROT0, "Eolith", "KlonDike+", 0 )
+GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, eolith16, ROT0, "Eolith", "KlonDike+", 0 )

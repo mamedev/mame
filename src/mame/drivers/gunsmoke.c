@@ -534,7 +534,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1985, gunsmoke,  0,        gunsmoke, gunsmoke,  0, ROT270, "Capcom", "Gun.Smoke (World)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gunsmokej, gunsmoke, gunsmoke, gunsmoke,  0, ROT270, "Capcom", "Gun.Smoke (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gunsmokeu, gunsmoke, gunsmoke, gunsmoke,  0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, gunsmokeua,gunsmoke, gunsmoke, gunsmokeua,0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gunsmoke,  0,        gunsmoke, gunsmoke, gunsmoke_state,  0, ROT270, "Capcom", "Gun.Smoke (World)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gunsmokej, gunsmoke, gunsmoke, gunsmoke, gunsmoke_state,  0, ROT270, "Capcom", "Gun.Smoke (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gunsmokeu, gunsmoke, gunsmoke, gunsmoke, gunsmoke_state,  0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, gunsmokeua,gunsmoke, gunsmoke, gunsmokeua, gunsmoke_state,0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", GAME_SUPPORTS_SAVE )

@@ -626,4 +626,4 @@ ROM_START( jackie )
 ROM_END
 
 
-GAME( 1993,  jackie,   0,        jackie,   jackie, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)",       0 )
+GAME( 1993,  jackie,   0,        jackie,   jackie, jackie_state, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)",       0 )

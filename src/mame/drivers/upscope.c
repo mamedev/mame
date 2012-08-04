@@ -417,4 +417,4 @@ static DRIVER_INIT( upscope )
  *
  *************************************/
 
-GAME( 1986, upscope, 0, upscope, upscope, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", GAME_IMPERFECT_SOUND )
+GAME( 1986, upscope, 0, upscope, upscope, upscope_state, upscope, ORIENTATION_FLIP_X, "Grand Products", "Up Scope", GAME_IMPERFECT_SOUND )

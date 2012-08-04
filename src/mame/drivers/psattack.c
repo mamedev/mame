@@ -220,5 +220,5 @@ static DRIVER_INIT(psattack)
 
 }
 
-GAME( 2004, psattack, 0, psattack, psattack, psattack, ROT0, "Uniana", "P's Attack", GAME_IS_SKELETON )
+GAME( 2004, psattack, 0, psattack, psattack, psattack_state, psattack, ROT0, "Uniana", "P's Attack", GAME_IS_SKELETON )
 

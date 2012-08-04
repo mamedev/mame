@@ -134,4 +134,4 @@ ROM_START( neptunp2 )
 ROM_END
 
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", GAME_NOT_WORKING | GAME_NO_SOUND )

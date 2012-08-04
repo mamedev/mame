@@ -882,9 +882,9 @@ static DRIVER_INIT( gaplus )
 }
 
 
-GAME( 1984, gaplus,   0,        gaplus,   gaplus,   gaplus, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gapluso,  gaplus,   gapluso,  gapluso,  gaplus, ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gaplusa,  gaplus,   gaplusa,  gapluso,  gaplus, ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, gaplus, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplus,   0,        gaplus,   gaplus, gaplus_state,   gaplus, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus, gaplus_state,   gaplus, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gapluso,  gaplus,   gapluso,  gapluso, gaplus_state,  gaplus, ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplusa,  gaplus,   gaplusa,  gapluso, gaplus_state,  gaplus, ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

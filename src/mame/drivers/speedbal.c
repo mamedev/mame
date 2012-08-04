@@ -283,4 +283,4 @@ ROM_START( speedbal )
 ROM_END
 
 
-GAME( 1987, speedbal, 0, speedbal, speedbal, 0, ROT270, "Tecfri", "Speed Ball", 0 )
+GAME( 1987, speedbal, 0, speedbal, speedbal, speedbal_state, 0, ROT270, "Tecfri", "Speed Ball", 0 )

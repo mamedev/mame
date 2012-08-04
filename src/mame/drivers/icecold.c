@@ -462,5 +462,5 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME(1983,  icecold ,  0      ,  icecold,  icecold,  0,  ROT0,  "Taito",    "Ice Cold Beer",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,  zekepeak,  icecold,  icecold,  icecold,  0,  ROT0,  "Taito",    "Zeke's Peak"  ,      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,  icecold ,  0      ,  icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Ice Cold Beer",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,  zekepeak,  icecold,  icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Zeke's Peak"  ,      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

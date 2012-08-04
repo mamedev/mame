@@ -63,4 +63,4 @@ ROM_END
 / The Games (1985)
 /-------------------------------------------------------------------*/
 
-GAME(1985,  firebird,  0,  nsm,  nsm,  nsm,  ROT0,  "NSM",    "Hot Fire Birds",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state,  nsm,  ROT0,  "NSM",    "Hot Fire Birds",     GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

@@ -2295,13 +2295,13 @@ static DRIVER_INIT( haekaka )
 
 ***************************************************************************/
 
-GAME( 1997, gegege,   0,        gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0 )
-GAME( 1997, pepsiman, 0,        gegege,   pepsiman, pepsiman, ROT0, "Sigma",             "PEPSI Man",                     0 )
-GAME( 1997, ucytokyu, 0,        gegege,   ucytokyu, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",        0 )	// Banpresto + others in the ROM
+GAME( 1997, gegege,   0,        gegege,   gegege, sigmab98_state,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0 )
+GAME( 1997, pepsiman, 0,        gegege,   pepsiman, sigmab98_state, pepsiman, ROT0, "Sigma",             "PEPSI Man",                     0 )
+GAME( 1997, ucytokyu, 0,        gegege,   ucytokyu, sigmab98_state, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",        0 )	// Banpresto + others in the ROM
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
-GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  0 )
-GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                0 )
-GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",               0 )
-GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  haekaka,  ROT0, "Sammy",             "Taihou de Doboon",              0 )
-GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              0 )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sigmab98_state, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
+GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Animal Catch",                  0 )
+GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, ROT0, "Sammy",             "Itazura Monkey",                0 )
+GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",               0 )
+GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka, sigmab98_state,  haekaka,  ROT0, "Sammy",             "Taihou de Doboon",              0 )
+GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka, sigmab98_state,  haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              0 )

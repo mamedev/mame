@@ -339,5 +339,5 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 }
 
 
-GAME( 1989, blockhl, 0,       blockhl, blockhl, 0, ROT0, "Konami", "Block Hole", GAME_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, 0, ROT0, "Konami", "Quarth (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, 0, ROT0, "Konami", "Block Hole", GAME_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, 0, ROT0, "Konami", "Quarth (Japan)", GAME_SUPPORTS_SAVE )

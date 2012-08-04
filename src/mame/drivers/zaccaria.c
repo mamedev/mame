@@ -788,7 +788,7 @@ ROM_END
 
 
 
-GAME( 1983, monymony,  0,        zaccaria, monymony, 0, ROT90, "Zaccaria", "Money Money", GAME_IMPERFECT_SOUND )
-GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", GAME_IMPERFECT_SOUND )
+GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, 0, ROT90, "Zaccaria", "Money Money", GAME_IMPERFECT_SOUND )
+GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", GAME_IMPERFECT_SOUND )

@@ -412,6 +412,6 @@ static DRIVER_INIT( funkyjet )
 
 /******************************************************************************/
 
-GAME( 1992, funkyjet, 0,        funkyjet, funkyjet, funkyjet, ROT0, "Data East (Mitchell license)", "Funky Jet (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, funkyjetj,funkyjet, funkyjet, funkyjetj,funkyjet, ROT0, "Data East Corporation", "Funky Jet (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1995, sotsugyo, 0,        funkyjet, sotsugyo, funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", GAME_SUPPORTS_SAVE )
+GAME( 1992, funkyjet, 0,        funkyjet, funkyjet, funkyjet_state, funkyjet, ROT0, "Data East (Mitchell license)", "Funky Jet (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, funkyjetj,funkyjet, funkyjet, funkyjetj, funkyjet_state,funkyjet, ROT0, "Data East Corporation", "Funky Jet (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1995, sotsugyo, 0,        funkyjet, sotsugyo, funkyjet_state, funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", GAME_SUPPORTS_SAVE )

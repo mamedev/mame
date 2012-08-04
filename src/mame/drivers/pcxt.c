@@ -824,5 +824,5 @@ static DRIVER_INIT( tetriskr )
 	//...
 }
 
-GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_IMPERFECT_SOUND )
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, tetriskr, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, filetto,  0, filetto,  filetto, pcxt_state,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_IMPERFECT_SOUND )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state, tetriskr, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

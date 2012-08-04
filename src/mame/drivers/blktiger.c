@@ -581,9 +581,9 @@ ROM_START( blkdrgonb )
 ROM_END
 
 
-GAME( 1987, blktiger,   0,        blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
-GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger (older)",         GAME_SUPPORTS_SAVE )
-GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        GAME_SUPPORTS_SAVE )
-GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      GAME_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger (older)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        GAME_SUPPORTS_SAVE )
+GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      GAME_SUPPORTS_SAVE )

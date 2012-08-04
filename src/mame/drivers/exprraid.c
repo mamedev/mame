@@ -824,9 +824,9 @@ static DRIVER_INIT( wexpressb3 )
 }
 
 
-GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid,  ROT0, "Data East USA",         "Express Raider (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid,  ROT0, "Data East USA",         "Express Raider (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, exprraidi, exprraid, exprraid, exprraid, exprraid,  ROT0, "Data East Corporation", "Express Raider (Italy)",    GAME_SUPPORTS_SAVE )
-GAME( 1986, wexpressb, exprraid, exprraid, exprraid, wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, wexpressb2,ROT0, "bootleg",               "Western Express (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wexpressb3,exprraid, exprboot, exprboot, wexpressb3,ROT0, "bootleg",               "Western Express (bootleg set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraidi, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (Italy)",    GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb, exprraid, exprraid, exprraid, exprraid_state, wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, exprraid_state, wexpressb2,ROT0, "bootleg",               "Western Express (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb3,exprraid, exprboot, exprboot, exprraid_state, wexpressb3,ROT0, "bootleg",               "Western Express (bootleg set 3)", GAME_SUPPORTS_SAVE )

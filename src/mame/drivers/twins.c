@@ -334,5 +334,5 @@ ROM_START( twinsa )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
 ROM_END
 
-GAME( 1994, twins,  0,     twins,  twins, 0, ROT0, "Electronic Devices", "Twins (set 1)", 0 )
-GAME( 1994, twinsa, twins, twinsa, twins, 0, ROT0, "Electronic Devices", "Twins (set 2)", 0 )
+GAME( 1994, twins,  0,     twins,  twins, twins_state, 0, ROT0, "Electronic Devices", "Twins (set 1)", 0 )
+GAME( 1994, twinsa, twins, twinsa, twins, twins_state, 0, ROT0, "Electronic Devices", "Twins (set 2)", 0 )

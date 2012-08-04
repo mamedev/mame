@@ -83,4 +83,4 @@ ROM_START(megaaton)
 	ROM_RELOAD(0xe000, 0x1000)
 ROM_END
 
-GAME(1983,  megaaton,  0,  play_3,  play_3,  play_3,  ROT0,  "Playmatic",    "Meg Aaton",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1983,  megaaton,  0,  play_3,  play_3, play_3_state,  play_3,  ROT0,  "Playmatic",    "Meg Aaton",     GAME_IS_SKELETON_MECHANICAL)

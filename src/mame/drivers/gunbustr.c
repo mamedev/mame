@@ -456,6 +456,6 @@ static DRIVER_INIT( gunbustrj )
 	state->m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)", 0 )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)", 0 )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )

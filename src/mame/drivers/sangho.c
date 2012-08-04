@@ -521,5 +521,5 @@ static DRIVER_INIT(sangho)
 	state->m_ram = auto_alloc_array(machine, UINT8, 0x20000);
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )

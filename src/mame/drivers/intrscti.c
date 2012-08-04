@@ -139,4 +139,4 @@ static DRIVER_INIT( intrscti )
 	}
 }
 
-GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti, ROT0, "<unknown>", "Intersecti", GAME_IS_SKELETON )
+GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti_state, intrscti, ROT0, "<unknown>", "Intersecti", GAME_IS_SKELETON )

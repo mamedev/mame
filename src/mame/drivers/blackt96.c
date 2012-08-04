@@ -554,4 +554,4 @@ ROM_START( blackt96 )
 	ROM_LOAD16_BYTE( "10", 0x00001, 0x10000, CRC(b78232a2) SHA1(36a4f01011faf64e46b73f0082ab04843ac8b0e2) )
 ROM_END
 
-GAME( 1996, blackt96,    0,        blackt96,    blackt96,    0, ROT0,  "D.G.R.M.", "Black Touch '96", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1996, blackt96,    0,        blackt96,    blackt96, blackt96_state,    0, ROT0,  "D.G.R.M.", "Black Touch '96", GAME_NOT_WORKING | GAME_NO_SOUND )

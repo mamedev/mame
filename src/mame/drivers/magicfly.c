@@ -894,5 +894,5 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY      FULLNAME    FLAGS... */
-GAME( 198?, magicfly, 0,      magicfly, magicfly, 0,     ROT0, "P&A Games", "Magic Fly", 0 )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   0,     ROT0, "<unknown>", "7 e Mezzo", 0 )
+GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, 0,     ROT0, "P&A Games", "Magic Fly", 0 )
+GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo, magicfly_state,   0,     ROT0, "<unknown>", "7 e Mezzo", 0 )

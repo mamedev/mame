@@ -57,4 +57,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico,  wico,  ROT0,  "Wico",    "Af-Tor",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state,  wico,  ROT0,  "Wico",    "Af-Tor",     GAME_IS_SKELETON_MECHANICAL)

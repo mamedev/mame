@@ -2359,18 +2359,18 @@ static DRIVER_INIT( suna8 )
 }
 
 /* Working Games */
-GAME( 1988, sranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", 0 )
-GAME( 1988, rranger,  sranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0) //protection is patched out in this.
-GAME( 1988, srangerb, sranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", 0 )
-GAME( 1988, srangerw, sranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", 0 )
-GAME( 1988, hardhead, 0,        hardhead, hardhead, hardhead, ROT0,  "SunA", "Hard Head" , 0)
-GAME( 1988, hardheadb,hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Hard Head (bootleg)" , 0)
-GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Popper (Hard Head bootleg)" , 0)
-GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
+GAME( 1988, sranger,  0,        rranger,  rranger, suna8_state,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", 0 )
+GAME( 1988, rranger,  sranger,  rranger,  rranger, suna8_state,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0) //protection is patched out in this.
+GAME( 1988, srangerb, sranger,  rranger,  rranger, suna8_state,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", 0 )
+GAME( 1988, srangerw, sranger,  rranger,  rranger, suna8_state,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", 0 )
+GAME( 1988, hardhead, 0,        hardhead, hardhead, suna8_state, hardhead, ROT0,  "SunA", "Hard Head" , 0)
+GAME( 1988, hardheadb,hardhead, hardhead, hardhead, suna8_state, hardhedb, ROT0,  "bootleg", "Hard Head (bootleg)" , 0)
+GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, suna8_state, hardhedb, ROT0,  "bootleg", "Popper (Hard Head bootleg)" , 0)
+GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, suna8_state, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
 
 /* Non Working Games */
-GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 1)", GAME_NOT_WORKING )
-GAME( 1989, sparkmana,sparkman, sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 2)", GAME_NOT_WORKING )
-GAME( 1990, starfigh, 0,        starfigh, hardhea2, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
-GAME( 1992, brickzn,  0,        brickzn,  brickzn,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )
-GAME( 1992, brickzn3, brickzn,  brickzn,  brickzn,  brickzn3, ROT90, "SunA", "Brick Zone (v4.0)", GAME_NOT_WORKING )
+GAME( 1989, sparkman, 0,        sparkman, sparkman, suna8_state, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 1)", GAME_NOT_WORKING )
+GAME( 1989, sparkmana,sparkman, sparkman, sparkman, suna8_state, sparkman, ROT0,  "SunA", "Spark Man (v 2.0, set 2)", GAME_NOT_WORKING )
+GAME( 1990, starfigh, 0,        starfigh, hardhea2, suna8_state, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
+GAME( 1992, brickzn,  0,        brickzn,  brickzn, suna8_state,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )
+GAME( 1992, brickzn3, brickzn,  brickzn,  brickzn, suna8_state,  brickzn3, ROT90, "SunA", "Brick Zone (v4.0)", GAME_NOT_WORKING )

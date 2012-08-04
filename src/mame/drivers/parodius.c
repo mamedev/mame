@@ -411,6 +411,6 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking )
 	device->machine().root_device().membank("bank1")->set_entry((lines & 0x0f) ^ 0x0f);
 }
 
-GAME( 1990, parodius,  0,        parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, parodiusa, parodius, parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, parodiusj, parodius, parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (Japan)", GAME_SUPPORTS_SAVE )

@@ -392,5 +392,5 @@ static DRIVER_INIT( ginganin )
 }
 
 
-GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", GAME_SUPPORTS_SAVE )

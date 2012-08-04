@@ -1297,13 +1297,13 @@ static DRIVER_INIT( bigd2 )
 
 ***************************************************************************/
 
-GAME( 2002,  sdwx,		0, igs_majhong, sdwx, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", GAME_NO_SOUND | GAME_NOT_WORKING ) // aka Christmas 5 Line?
-GAME( 200?,  sddz,		0, igs_majhong, sdwx, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000,  bigd2,		0, igs_majhong, sdwx, bigd2,       ROT0, "IGS", "Big D2",  GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  lhzb3,		0, igs_majhong, sdwx, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  lhzb4,		0, igs_majhong, sdwx, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  klxyj,		0, igs_majhong, sdwx, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000,  mgfx,		0, igs_majhong, sdwx, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  gonefsh2,	0, igs_majhong, sdwx, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  chessc2,	0, igs_majhong, sdwx, chessc2,     ROT0, "IGS", "Chess Challenge 2",   GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  haunthig,	0, igs_majhong, sdwx, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2002,  sdwx,		0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", GAME_NO_SOUND | GAME_NOT_WORKING ) // aka Christmas 5 Line?
+GAME( 200?,  sddz,		0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000,  bigd2,		0, igs_majhong, sdwx, igs_m027_state, bigd2,       ROT0, "IGS", "Big D2",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  lhzb3,		0, igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  lhzb4,		0, igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  klxyj,		0, igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000,  mgfx,		0, igs_majhong, sdwx, igs_m027_state, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  gonefsh2,	0, igs_majhong, sdwx, igs_m027_state, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  chessc2,	0, igs_majhong, sdwx, igs_m027_state, chessc2,     ROT0, "IGS", "Chess Challenge 2",   GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  haunthig,	0, igs_majhong, sdwx, igs_m027_state, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   GAME_NO_SOUND | GAME_NOT_WORKING )

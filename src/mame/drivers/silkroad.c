@@ -385,4 +385,4 @@ ROM_START( silkroad )
 ROM_END
 
 
-GAME( 1999, silkroad, 0, silkroad, silkroad, silkroad, ROT0, "Unico", "The Legend of Silkroad", 0 )
+GAME( 1999, silkroad, 0, silkroad, silkroad, silkroad_state, silkroad, ROT0, "Unico", "The Legend of Silkroad", 0 )

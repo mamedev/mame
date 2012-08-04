@@ -308,5 +308,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", 0 )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", 0 )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", 0 )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, tagteam_state,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", 0 )

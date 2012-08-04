@@ -326,5 +326,5 @@ static DRIVER_INIT(wildpkr)
 *************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                   FLAGS */
-GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 

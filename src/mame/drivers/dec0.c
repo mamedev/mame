@@ -3053,39 +3053,39 @@ static DRIVER_INIT( midresb )
 /******************************************************************************/
 
 //    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
-GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
-GAME( 1988, baddudes,   0,        baddudes, baddudes, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", 0 )
-GAME( 1988, drgninja,   baddudes, baddudes, drgninja, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", 0 )
-GAME( 1988, birdtry,    0,        birdtry,  birdtry,  birdtry,  ROT270, "Data East Corporation", "Birdie Try (Japan)", GAME_UNEMULATED_PROTECTION )
-GAME( 1988, robocop,    0,        robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 4)", 0 )
-GAME( 1988, robocopw,   robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 3)", 0 )
-GAME( 1988, robocopj,   robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (Japan)", 0 )
-GAME( 1988, robocopu,   robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 1)", 0 )
-GAME( 1988, robocopu0,  robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 0)", 0 )
-GAME( 1989, hippodrm,   0,        hippodrm, hippodrm, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", 0 )
-GAME( 1989, ffantasy,   hippodrm, hippodrm, ffantasy, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", 0 )
-GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", 0 )
-GAME( 1989, slyspy,     0,        slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
-GAME( 1989, slyspy2,    slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
-GAME( 1989, secretag,   slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )
-GAME( 1989, midres,     0,        midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
-GAME( 1989, midresu,    midres,   midres,   midresu,  0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
-GAME( 1989, midresj,    midres,   midres,   midresu,  0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
-GAME( 1990, bouldash,   0,        slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
-GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )
+GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel, dec0_state,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
+GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel, dec0_state,  hbarrel,  ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
+GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", 0 )
+GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", 0 )
+GAME( 1988, birdtry,    0,        birdtry,  birdtry, dec0_state,  birdtry,  ROT270, "Data East Corporation", "Birdie Try (Japan)", GAME_UNEMULATED_PROTECTION )
+GAME( 1988, robocop,    0,        robocop,  robocop, dec0_state,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 4)", 0 )
+GAME( 1988, robocopw,   robocop,  robocop,  robocop, dec0_state,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 3)", 0 )
+GAME( 1988, robocopj,   robocop,  robocop,  robocop, dec0_state,  robocop,  ROT0,   "Data East Corporation", "Robocop (Japan)", 0 )
+GAME( 1988, robocopu,   robocop,  robocop,  robocop, dec0_state,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 1)", 0 )
+GAME( 1988, robocopu0,  robocop,  robocop,  robocop, dec0_state,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 0)", 0 )
+GAME( 1989, hippodrm,   0,        hippodrm, hippodrm, dec0_state, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", 0 )
+GAME( 1989, ffantasy,   hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", 0 )
+GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", 0 )
+GAME( 1989, slyspy,     0,        slyspy,   slyspy, dec0_state,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
+GAME( 1989, slyspy2,    slyspy,   slyspy,   slyspy, dec0_state,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
+GAME( 1989, secretag,   slyspy,   slyspy,   slyspy, dec0_state,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )
+GAME( 1989, midres,     0,        midres,   midres, dec0_state,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
+GAME( 1989, midresu,    midres,   midres,   midresu, dec0_state,  0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
+GAME( 1989, midresj,    midres,   midres,   midresu, dec0_state,  0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
+GAME( 1990, bouldash,   0,        slyspy,   bouldash, dec0_state, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
+GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )
 
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb, robocop,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", 0)
-GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", 0 )
+GAME( 1988, robocopb,   robocop,  robocopb, robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", 0)
+GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", 0 )
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,  midresb,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
-GAME( 1989, ffantasybl, hippodrm, midres,   midres,   0,        ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
+GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
+GAME( 1989, ffantasybl, hippodrm, midres,   midres, dec0_state,   0,        ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
 /* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,  robocop,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", GAME_NOT_WORKING ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   slyspy,   secretab, slyspy,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", GAME_NOT_WORKING )
+GAME( 1988, automat,    robocop,  automat,  robocop, dec0_automat_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", GAME_NOT_WORKING ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   slyspy,   secretab, slyspy, dec0_automat_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", GAME_NOT_WORKING )

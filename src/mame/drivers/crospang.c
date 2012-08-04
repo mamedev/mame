@@ -586,6 +586,6 @@ static DRIVER_INIT( crospang )
 	tumblepb_gfx1_rearrange(machine);
 }
 
-GAME( 1998, crospang, 0, crospang, crospang, crospang, ROT0, "F2 System", "Cross Pang", GAME_SUPPORTS_SAVE )
-GAME( 199?, heuksun,  0, crospang, heuksun,  crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 1998, bestri,   0, bestri,   bestri,   crospang, ROT0, "F2 System", "Bestri (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, crospang, 0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System", "Cross Pang", GAME_SUPPORTS_SAVE )
+GAME( 199?, heuksun,  0, crospang, heuksun, crospang_state,  crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0, bestri,   bestri, crospang_state,   crospang, ROT0, "F2 System", "Bestri (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

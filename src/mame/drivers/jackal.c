@@ -505,7 +505,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,   0, ROT90, "Konami", "Jackal (World)", 0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,   0, ROT90, "Konami", "Top Gunner (US)", 0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,   0, ROT90, "Konami", "Tokushu Butai Jackal (Japan)", 0 )
-GAME( 1986, topgunbl, jackal, jackal, topgunbl, 0, ROT90, "bootleg", "Top Gunner (bootleg)", 0 )
+GAME( 1986, jackal,   0,      jackal, jackal, jackal_state,   0, ROT90, "Konami", "Jackal (World)", 0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal, jackal_state,   0, ROT90, "Konami", "Top Gunner (US)", 0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal, jackal_state,   0, ROT90, "Konami", "Tokushu Butai Jackal (Japan)", 0 )
+GAME( 1986, topgunbl, jackal, jackal, topgunbl, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg)", 0 )

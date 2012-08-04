@@ -282,5 +282,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mystston, 0,        mystston, mystston, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure", GAME_SUPPORTS_SAVE )
-GAME( 1984, myststono,mystston, mystston, mystston, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure", GAME_SUPPORTS_SAVE )
+GAME( 1984, mystston, 0,        mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure", GAME_SUPPORTS_SAVE )
+GAME( 1984, myststono,mystston, mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure", GAME_SUPPORTS_SAVE )

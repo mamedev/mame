@@ -596,9 +596,9 @@ static DRIVER_INIT( bwing )
 //****************************************************************************
 // Game Entries
 
-GAME( 1984, bwings,       0, bwing, bwing, bwing, ROT90, "Data East Corporation", "B-Wings (Japan new Ver.)", 0 )
-GAME( 1984, bwingso, bwings, bwing, bwing, bwing, ROT90, "Data East Corporation", "B-Wings (Japan old Ver.)", 0 )
-GAME( 1984, bwingsa, bwings, bwing, bwing, bwing, ROT90, "Data East Corporation", "B-Wings (Alt Ver.?)", 0 )
+GAME( 1984, bwings,       0, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Japan new Ver.)", 0 )
+GAME( 1984, bwingso, bwings, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Japan old Ver.)", 0 )
+GAME( 1984, bwingsa, bwings, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Alt Ver.?)", 0 )
 
-GAME( 1984, zaviga,       0, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga", 0 )
-GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", 0 )
+GAME( 1984, zaviga,       0, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "Zaviga", 0 )
+GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", 0 )

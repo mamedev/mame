@@ -442,10 +442,10 @@ ROM_END
 
 
 
-GAME( 1987, contra,   0,      contra, contra, 0, ROT90, "Konami", "Contra (US, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contra1,  contra, contra, contra, 0, ROT90, "Konami", "Contra (US, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contrab,  contra, contra, contra, 0, ROT90, "bootleg", "Contra (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contraj,  contra, contra, contra, 0, ROT90, "Konami", "Contra (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contrajb, contra, contra, contra, 0, ROT90, "bootleg", "Contra (Japan bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1987, gryzor,   contra, contra, contra, 0, ROT90, "Konami", "Gryzor (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, gryzora,  contra, contra, contra, 0, ROT90, "Konami", "Gryzor (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contra,   0,      contra, contra, contra_state, 0, ROT90, "Konami", "Contra (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contra1,  contra, contra, contra, contra_state, 0, ROT90, "Konami", "Contra (US, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrab,  contra, contra, contra, contra_state, 0, ROT90, "bootleg", "Contra (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contraj,  contra, contra, contra, contra_state, 0, ROT90, "Konami", "Contra (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrajb, contra, contra, contra, contra_state, 0, ROT90, "bootleg", "Contra (Japan bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gryzor,   contra, contra, contra, contra_state, 0, ROT90, "Konami", "Gryzor (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gryzora,  contra, contra, contra, contra_state, 0, ROT90, "Konami", "Gryzor (set 2)", GAME_SUPPORTS_SAVE )

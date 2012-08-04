@@ -242,4 +242,4 @@ ROM_START( tryout )
 	ROM_LOAD( "ch14.bpr",     0x00000, 0x0020, CRC(8ce19925) SHA1(12f8f6022f1148b6ba1d019a34247452637063a7) )
 ROM_END
 
-GAME( 1985, tryout, 0, tryout, tryout, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", GAME_NO_COCKTAIL )
+GAME( 1985, tryout, 0, tryout, tryout, tryout_state, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", GAME_NO_COCKTAIL )

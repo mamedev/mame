@@ -598,7 +598,7 @@ static DRIVER_INIT( badlands )
  *
  *************************************/
 
-GAME( 1989, badlands, 0, badlands, badlands, badlands, ROT0, "Atari Games", "Bad Lands", 0 )
+GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "Atari Games", "Bad Lands", 0 )
 
 /* Badlands - Playmark Bootleg support - split this into its own file?
 
@@ -810,5 +810,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlands, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlands, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandsb, badlands, badlands_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb2,badlands, badlandsb, badlands, badlands_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )

@@ -364,4 +364,4 @@ ROM_START( sshot )
 	ROM_LOAD( "ss_b.b10",  0x0400, 0x0400, CRC(ba70e619) SHA1(df39512de881df26ccc7fa74f6bae82d92cd9008) )
 ROM_END
 
-GAME( 1979, sshot,  0,      supershot, supershot, 0, ROT0, "Model Racing", "Super Shot", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1979, sshot,  0,      supershot, supershot, supershot_state, 0, ROT0, "Model Racing", "Super Shot", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

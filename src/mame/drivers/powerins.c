@@ -717,7 +717,7 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins,  0,        powerins, powerins, 0, ROT0, "Atlus", "Power Instinct (USA)", 0 )
-GAME( 1993, powerinsj, powerins, powerins, powerinj, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
-GAME( 1993, powerinsa, powerins, powerina, powerins, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", 0 )
-GAME( 1993, powerinsb, powerins, powerinb, powerins, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", 0 )
+GAME( 1993, powerins,  0,        powerins, powerins, powerins_state, 0, ROT0, "Atlus", "Power Instinct (USA)", 0 )
+GAME( 1993, powerinsj, powerins, powerins, powerinj, powerins_state, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
+GAME( 1993, powerinsa, powerins, powerina, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", 0 )
+GAME( 1993, powerinsb, powerins, powerinb, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", 0 )

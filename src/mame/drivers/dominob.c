@@ -363,5 +363,5 @@ ROM_START( dominobv2 )
 	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
 ROM_END
 
-GAME( 1996, dominob,  0,       dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block", GAME_SUPPORTS_SAVE )
-GAME( 1996, dominobv2,dominob, dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", GAME_SUPPORTS_SAVE )
+GAME( 1996, dominob,  0,       dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block", GAME_SUPPORTS_SAVE )
+GAME( 1996, dominobv2,dominob, dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", GAME_SUPPORTS_SAVE )

@@ -52,7 +52,7 @@ ROM_START( gp_110 )
 	ROM_LOAD( "b1-110.u13", 0x0800, 0x0800, CRC(a223f2e8) SHA1(767e15e19e11399935c890c1d1034dccf1ad7f92))
 ROM_END
 
-GAME(1978,	gp_110,	0,	gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",	"Model 110",	GAME_IS_BIOS_ROOT)
+GAME(1978,	gp_110,	0,	gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",	"Model 110",	GAME_IS_BIOS_ROOT)
 
 /*-------------------------------------------------------------------
 / Black Velvet (May 1978) - Model: Cocktail #110
@@ -96,11 +96,11 @@ ROM_START(startrip)
 	ROM_LOAD( "startrip.u13", 0x0800, 0x0800, CRC(b941a1a8) SHA1(a43f8acadb3db3e2274162d5305e30006f912339))
 ROM_END
 
-GAME(1978,	blvelvet,	gp_110,		gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Black Velvet",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	camlight,	gp_110,		gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Camel Lights",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	chucklck,	gp_110,		gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Chuck-A-Luck",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	famlyfun,	0,			gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Family Fun!",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	foxylady,	gp_110,		gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Foxy Lady",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	real,		gp_110,		gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Real",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	rio,		gp_110,		gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Rio",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	startrip,	0,			gp_1,	gp_1,	gp_1,	ROT0,	"Game Plan",				"Star Trip",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,	blvelvet,	gp_110,		gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Black Velvet",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,	camlight,	gp_110,		gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Camel Lights",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,	chucklck,	gp_110,		gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Chuck-A-Luck",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,	famlyfun,	0,			gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Family Fun!",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,	foxylady,	gp_110,		gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Foxy Lady",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,	real,		gp_110,		gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Real",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,	rio,		gp_110,		gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Rio",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,	startrip,	0,			gp_1,	gp_1, gp_1_state,	gp_1,	ROT0,	"Game Plan",				"Star Trip",		GAME_IS_SKELETON_MECHANICAL)

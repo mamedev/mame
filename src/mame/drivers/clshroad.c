@@ -479,7 +479,7 @@ die once, it would be nice to avoid the hack however
 	ROM[0x05C8] = 0x23;
 }
 
-GAME( 1984, firebatl, 0,        firebatl, firebatl, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", 0 )
+GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, clshroad, 0,        clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
+GAME( 1986, clshroadd,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", 0 )

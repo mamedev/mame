@@ -233,4 +233,4 @@ ROM_START( invqix )
 ROM_END
 
 
-GAME( 2003, invqix,  0,   invqix,  invqix,  0,       ROT270, "Taito Corporation",      "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2003, invqix,  0,   invqix,  invqix, invqix_state,  0,       ROT270, "Taito Corporation",      "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", GAME_NOT_WORKING | GAME_NO_SOUND )

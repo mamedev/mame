@@ -590,9 +590,9 @@ static DRIVER_INIT( ripcord )
 }
 
 
-GAMEL(1977, circus,   0,      circus,   circus,   circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus )
-GAMEL(1977, springbd, circus, circus,   circus,   circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
-GAME( 1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl, ROT0, "Exidy", "Robot Bowl", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAMEL(1979, crash,    0,      crash,    crash,    crash,    ROT0, "Exidy", "Crash", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash )
-GAMEL(1979, smash,    crash,  crash,    crash,    crash,    ROT0, "bootleg", "Smash (Crash bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
-GAME( 1979, ripcord,  0,      ripcord,  ripcord,  ripcord,  ROT0, "Exidy", "Rip Cord", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAMEL(1977, circus,   0,      circus,   circus, circus_state,   circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus )
+GAMEL(1977, springbd, circus, circus,   circus, circus_state,   circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
+GAME( 1977, robotbwl, 0,      robotbwl, robotbwl, circus_state, robotbwl, ROT0, "Exidy", "Robot Bowl", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAMEL(1979, crash,    0,      crash,    crash, circus_state,    crash,    ROT0, "Exidy", "Crash", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash )
+GAMEL(1979, smash,    crash,  crash,    crash, circus_state,    crash,    ROT0, "bootleg", "Smash (Crash bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
+GAME( 1979, ripcord,  0,      ripcord,  ripcord, circus_state,  ripcord,  ROT0, "Exidy", "Rip Cord", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

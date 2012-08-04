@@ -561,5 +561,5 @@ static DRIVER_INIT( mirax )
 	state->m_flipscreen_y = 0;
 }
 
-GAME( 1985, mirax,    0,        mirax,    mirax,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", 0 )
-GAME( 1985, miraxa,   mirax,    mirax,    miraxa,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", 0 )
+GAME( 1985, mirax,    0,        mirax,    mirax, mirax_state,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", 0 )
+GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", 0 )

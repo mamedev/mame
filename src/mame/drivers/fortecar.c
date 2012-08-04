@@ -771,5 +771,5 @@ static DRIVER_INIT( fortecar )
 
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                        FLAGS             LAYOUT */
-GAMEL( 1994, fortecar, 0,        fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", GAME_NOT_WORKING, layout_fortecrd )
-GAMEL( 1994, fortecrd, fortecar, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                layout_fortecrd )
+GAMEL( 1994, fortecar, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", GAME_NOT_WORKING, layout_fortecrd )
+GAMEL( 1994, fortecrd, fortecar, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                layout_fortecrd )

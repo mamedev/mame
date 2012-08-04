@@ -938,10 +938,10 @@ static DRIVER_INIT( senjyo )
 }
 
 
-GAME( 1983, senjyo,   0,        senjyo,  senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
-GAME( 1984, starforc, 0,        senjyo,  starforc, starforc, ROT90, "Tehkan", "Star Force", 0 )
-GAME( 1984, starforce,starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", 0 )
-GAME( 1984, starforcb,starforc, starforb,starforc, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", 0 )
-GAME( 1984, starforca,starforc, senjyo,  starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
-GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
-GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", 0 )
+GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
+GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", 0 )
+GAME( 1984, starforce,starforc, senjyo,  starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", 0 )
+GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", 0 )
+GAME( 1984, starforca,starforc, senjyo,  starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
+GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
+GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", 0 )

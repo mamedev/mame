@@ -382,4 +382,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, 0,  ROT0, "Rare", "Battle Toads", GAME_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, btoads_state, 0,  ROT0, "Rare", "Battle Toads", GAME_SUPPORTS_SAVE )

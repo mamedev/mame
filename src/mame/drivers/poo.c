@@ -387,4 +387,4 @@ ROM_START( unclepoo )
 	ROM_LOAD( "diatec_l.bin", 0x100, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
 ROM_END
 
-GAME( 1983, unclepoo, 0, unclepoo, unclepoo, 0, ROT90, "Diatec",         "Uncle Poo", GAME_NO_COCKTAIL )
+GAME( 1983, unclepoo, 0, unclepoo, unclepoo, poo_state, 0, ROT90, "Diatec",         "Uncle Poo", GAME_NO_COCKTAIL )

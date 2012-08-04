@@ -505,8 +505,8 @@ static DRIVER_INIT( pbactio4 )
 
 
 
-GAME( 1985, pbaction,  0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbaction, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbaction, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbaction, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )

@@ -412,7 +412,7 @@ static DRIVER_INIT( goindol )
 
 
 
-GAME( 1987, goindol,  0,       goindol, goindol, goindol, ROT90, "SunA",    "Goindol (World)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1987, goindolu, goindol, goindol, goindol, goindol, ROT90, "SunA",    "Goindol (US)",    GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1987, goindolk, goindol, goindol, goindol, goindol, ROT90, "SunA",    "Goindol (Korea)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1987, homo,     goindol, goindol, homo,    0,       ROT90, "bootleg", "Homo", GAME_SUPPORTS_SAVE )
+GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (World)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (US)",    GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (Korea)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo, goindol_state,    0,       ROT90, "bootleg", "Homo", GAME_SUPPORTS_SAVE )

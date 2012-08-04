@@ -308,6 +308,6 @@ ROM_END
  *************************************/
 
 //    YEAR, NAME,    PARENT, MACHINE,INPUT,  INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1982, pooyan,  0,      pooyan, pooyan, 0,   ROT90,  "Konami", "Pooyan", GAME_SUPPORTS_SAVE )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0,   ROT90,  "bootleg", "Pootan", GAME_SUPPORTS_SAVE )
+GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami", "Pooyan", GAME_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "bootleg", "Pootan", GAME_SUPPORTS_SAVE )

@@ -414,4 +414,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, popper, 0, popper, popper, 0, ROT90, "Omori Electric Co., Ltd.", "Popper", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, popper, 0, popper, popper, popper_state, 0, ROT90, "Omori Electric Co., Ltd.", "Popper", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

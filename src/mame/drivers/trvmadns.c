@@ -398,4 +398,4 @@ ROM_START( trvmadns )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)
 ROM_END
 
-GAME( 1985, trvmadns, 0, trvmadns, trvmadns, 0, ROT0, "Thunderhead Inc.", "Trivia Madness", GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1985, trvmadns, 0, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness", GAME_WRONG_COLORS | GAME_NOT_WORKING )

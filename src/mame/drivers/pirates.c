@@ -467,5 +467,5 @@ static DRIVER_INIT( genix )
 
 /* GAME */
 
-GAME( 1994, pirates, 0, pirates, pirates, pirates, 0, "NIX", "Pirates", 0 )
-GAME( 1994, genix,   0, pirates, pirates, genix,   0, "NIX", "Genix Family", 0 )
+GAME( 1994, pirates, 0, pirates, pirates, pirates_state, pirates, 0, "NIX", "Pirates", 0 )
+GAME( 1994, genix,   0, pirates, pirates, pirates_state, genix,   0, "NIX", "Genix Family", 0 )

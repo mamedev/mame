@@ -995,10 +995,10 @@ static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 	device->machine().root_device().membank("bank1")->set_entry(((lines & 0x0f) ^ 0x08));
 }
 
-GAME( 1988, scontra,   0,        scontra,  scontra,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  0, ROT90, "Konami", "Super Contra (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderx,  0,        thunderx, thunderx, 0, ROT0,  "Konami", "Thunder Cross (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderxa, thunderx, thunderx, thunderx, 0, ROT0,  "Konami", "Thunder Cross (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderxb, thunderx, thunderx, thunderx, 0, ROT0,  "Konami", "Thunder Cross (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, 0, ROT0,  "Konami", "Thunder Cross (Japan)", GAME_SUPPORTS_SAVE )
-//GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, 0, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", GAME_SUPPORTS_SAVE )
+GAME( 1988, scontra,   0,        scontra,  scontra, thunderx_state,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra, thunderx_state,  0, ROT90, "Konami", "Super Contra (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, 0, ROT0,  "Konami", "Thunder Cross (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, 0, ROT0,  "Konami", "Thunder Cross (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, 0, ROT0,  "Konami", "Thunder Cross (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, 0, ROT0,  "Konami", "Thunder Cross (Japan)", GAME_SUPPORTS_SAVE )
+//GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, thunderx_state, 0, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", GAME_SUPPORTS_SAVE )

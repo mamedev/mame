@@ -872,11 +872,11 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, lastduel,  0,        lastduel, lastduel, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1988, lastduelo, lastduel, lastduel, lastduel, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1988, lastduelj, lastduel, lastduel, lastduel, 0, ROT270, "Capcom",  "Last Duel (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, lastduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last Duel (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1989, madgear,   0,        madgear,  madgear,  0, ROT270, "Capcom",  "Mad Gear (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, madgearj,  madgear,  madgear,  madgear,  0, ROT270, "Capcom",  "Mad Gear (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  0, ROT270, "Capcom",  "Led Storm (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ledstorm2, madgear,  madgear,  madgear,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* game still has wrong sprite issues */
+GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "bootleg", "Last Duel (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, madgear,   0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, madgearj,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ledstorm,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ledstorm2, madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* game still has wrong sprite issues */

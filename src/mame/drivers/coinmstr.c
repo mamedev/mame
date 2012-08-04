@@ -1244,8 +1244,8 @@ static DRIVER_INIT( coinmstr )
 
 
 
-GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_UNEMULATED_PROTECTION )
-GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
-GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1990, pokeroul, 0, pokeroul, pokeroul, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
-GAME( 1990, jpcoin,   0, pokeroul, pokeroul, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster)",  GAME_NOT_WORKING ) // io stuff is different at least
+GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_UNEMULATED_PROTECTION )
+GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
+GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1990, pokeroul, 0, pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
+GAME( 1990, jpcoin,   0, pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster)",  GAME_NOT_WORKING ) // io stuff is different at least

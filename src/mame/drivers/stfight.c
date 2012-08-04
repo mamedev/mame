@@ -803,9 +803,9 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
-GAME( 1986, empcity,  0,       stfight, stfight, empcity, ROT0, "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", 0 )
-GAME( 1986, empcityu, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", 0 ) // different title logo
-GAME( 1986, empcityj, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)", 0 )
-GAME( 1986, empcityi, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", 0 )
-GAME( 1986, stfight,  empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", 0 )
-GAME( 1986, stfighta, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu",                           "Street Fight (bootleg?)", 0 )
+GAME( 1986, empcity,  0,       stfight, stfight, stfight_state, empcity, ROT0, "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", 0 )
+GAME( 1986, empcityu, empcity, stfight, stfight, stfight_state, stfight, ROT0, "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", 0 ) // different title logo
+GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0, "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)", 0 )
+GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0, "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", 0 )
+GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0, "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", 0 )
+GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0, "Seibu Kaihatsu",                           "Street Fight (bootleg?)", 0 )

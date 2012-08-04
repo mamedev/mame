@@ -608,6 +608,6 @@ static DRIVER_INIT( omegrace )
  *
  *************************************/
 
-GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace, ROT0, "Midway", "Omega Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
-GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace, ROT0, "Midway", "Omega Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
-GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
+GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
+GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
+GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )

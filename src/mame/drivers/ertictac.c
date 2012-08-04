@@ -335,7 +335,7 @@ ROM_START( poizone )
 	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_IMPERFECT_SOUND)
-GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)" ,GAME_IMPERFECT_SOUND)
-GAME( 1991, poizone,          0, ertictac, poizone, ertictac,  ROT0, "Eterna" ,"Poizone" ,GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS)
+GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_IMPERFECT_SOUND)
+GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)" ,GAME_IMPERFECT_SOUND)
+GAME( 1991, poizone,          0, ertictac, poizone, ertictac_state, ertictac,  ROT0, "Eterna" ,"Poizone" ,GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS)
 

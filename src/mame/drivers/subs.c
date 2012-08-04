@@ -247,4 +247,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, 0, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND )
+GAME( 1977, subs, 0, subs, subs, subs_state, 0, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND )

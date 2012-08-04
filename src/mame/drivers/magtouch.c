@@ -251,4 +251,4 @@ static DRIVER_INIT(magtouch)
 	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch, ROT0, "Micro Manufacturing",     "Magical Touch", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, magtouch, ROT0, "Micro Manufacturing",     "Magical Touch", GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -352,4 +352,4 @@ ROM_START( drtomy )
 ROM_END
 
 
-GAME( 1993, drtomy, 0, drtomy, drtomy, 0, ROT0, "Playmark", "Dr. Tomy", GAME_SUPPORTS_SAVE )
+GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, 0, ROT0, "Playmark", "Dr. Tomy", GAME_SUPPORTS_SAVE )

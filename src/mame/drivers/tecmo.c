@@ -1155,11 +1155,11 @@ static DRIVER_INIT( backfirt )
 
 
 
-GAME( 1986, rygar,     0,        rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 )
-GAME( 1986, rygar2,    rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 )
-GAME( 1986, rygar3,    rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", 0 )
-GAME( 1986, rygarj,    rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", 0 )
-GAME( 1987, gemini,    0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", 0 ) /* Japan regional warning screen */
-GAME( 1988, silkworm,  0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", 0 )   /* No regional "Warning, if you are playing ..." screen */
-GAME( 1988, silkwormj, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", 0 )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )
+GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 )
+GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 )
+GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", 0 )
+GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", 0 )
+GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", 0 ) /* Japan regional warning screen */
+GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", 0 )   /* No regional "Warning, if you are playing ..." screen */
+GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", 0 )   /* Japan regional warning screen */
+GAME( 1988, backfirt,  0,        gemini,   backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )

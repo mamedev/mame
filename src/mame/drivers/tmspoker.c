@@ -647,4 +647,4 @@ static DRIVER_INIT( bus )
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY      FULLNAME                     FLAGS */
-GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, bus,  ROT0, "<unknown>", "unknown TMS9980 Poker Game", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, bus,  ROT0, "<unknown>", "unknown TMS9980 Poker Game", GAME_NO_SOUND | GAME_NOT_WORKING )

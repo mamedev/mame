@@ -314,5 +314,5 @@ ROM_START( hyhoo2 )
 ROM_END
 
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo,  ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", 0 )
-GAME( 1987, hyhoo2, 0, hyhoo,  hyhoo2, hyhoo2, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", 0 )
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo, hyhoo_state,  hyhoo,  ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", 0 )
+GAME( 1987, hyhoo2, 0, hyhoo,  hyhoo2, hyhoo_state, hyhoo2, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", 0 )

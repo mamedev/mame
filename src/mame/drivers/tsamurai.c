@@ -1237,20 +1237,20 @@ ROM_START( ringfgt2 )
 	ROM_LOAD( "clr.6p",  0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
 ROM_END
 
-GAME( 1984, vsgongf,  0,        vsgongf,  vsgongf,  0, ROT90, "Kaneko", "VS Gong Fight", GAME_IMPERFECT_COLORS )
-GAME( 1984, ringfgt,  vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", GAME_IMPERFECT_COLORS )
-GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", GAME_IMPERFECT_COLORS )
+GAME( 1984, vsgongf,  0,        vsgongf,  vsgongf, tsamurai_state,  0, ROT90, "Kaneko", "VS Gong Fight", GAME_IMPERFECT_COLORS )
+GAME( 1984, ringfgt,  vsgongf,  vsgongf,  vsgongf, tsamurai_state,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", GAME_IMPERFECT_COLORS )
+GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf, tsamurai_state,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", GAME_IMPERFECT_COLORS )
 
-GAME( 1985, tsamurai, 0,        tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", 0 )
-GAME( 1985, tsamurai2,tsamurai, tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", 0 )
-GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, 0, ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", 0 )
+GAME( 1985, tsamurai, 0,        tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", 0 )
+GAME( 1985, tsamurai2,tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", 0 )
+GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", 0 )
 
-GAME( 1985, ladymstr, 0,        tsamurai, ladymstr, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", 0 )
-GAME( 1985, nunchaku, ladymstr, tsamurai, nunchaku, 0, ROT90, "Kaneko / Taito", "Nunchackun", GAME_IMPERFECT_COLORS )
+GAME( 1985, ladymstr, 0,        tsamurai, ladymstr, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", 0 )
+GAME( 1985, nunchaku, ladymstr, tsamurai, nunchaku, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Nunchackun", GAME_IMPERFECT_COLORS )
 
-GAME( 1985, yamagchi, 0,        tsamurai, yamagchi, 0, ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", GAME_IMPERFECT_COLORS )
+GAME( 1985, yamagchi, 0,        tsamurai, yamagchi, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", GAME_IMPERFECT_COLORS )
 
-GAME( 1986, m660,     0,        m660,     m660,     0, ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", 0 )
-GAME( 1986, m660j,    m660,     m660,     m660,     0, ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", 0 )
-GAME( 1986, m660b,    m660,     m660,     m660,     0, ROT90, "bootleg", "Mission 660 (bootleg)", 0 )
-GAME( 1986, alphaxz,  m660,     m660,     m660,     0, ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", 0 )
+GAME( 1986, m660,     0,        m660,     m660, tsamurai_state,     0, ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", 0 )
+GAME( 1986, m660j,    m660,     m660,     m660, tsamurai_state,     0, ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", 0 )
+GAME( 1986, m660b,    m660,     m660,     m660, tsamurai_state,     0, ROT90, "bootleg", "Mission 660 (bootleg)", 0 )
+GAME( 1986, alphaxz,  m660,     m660,     m660, tsamurai_state,     0, ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", 0 )

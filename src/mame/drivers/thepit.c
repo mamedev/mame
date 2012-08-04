@@ -1099,20 +1099,20 @@ static DRIVER_INIT( rtriv )
 }
 
 
-GAME( 1981, roundup,  0,        thepit,   roundup,  0,     ROT90, "Taito Corporation (Amenip/Centuri license)", "Round-Up", 0 )
-GAME( 1981, fitter,   roundup,  thepit,   fitter,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
-GAME( 1981, fitterbl, roundup,  thepit,   fitter,   0,     ROT90, "bootleg", "Fitter (bootleg)", 0 )
-GAME( 1982, thepit,   0,        thepit,   thepit,   0,     ROT90, "Zilec Electronics", "The Pit", 0 ) // AW == Andy Walker
-GAME( 1982, thepitu1, thepit,   thepit,   thepit,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US, set 1)", 0 )
-GAME( 1982, thepitu2, thepit,   thepit,   thepit,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US, set 2)", 0 ) // Bally PCB
-GAME( 1982, thepitj,  thepit,   thepit,   thepit,   0,     ROT90, "Zilec Electronics (Taito license)", "The Pit (Japan)", 0 )
-GAME( 1982, dockman,  0,        intrepid, dockman,  0,     ROT90, "Taito Corporation", "Dock Man", 0 )
-GAME( 1982, portman,  dockman,  intrepid, dockman,  0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", 0 )
-GAME( 1982, suprmous, 0,        suprmous, suprmous, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
-GAME( 1982, funnymou, suprmous, suprmous, suprmous, 0,     ROT90, "bootleg? (Chuo Co. Ltd)", "Funny Mouse", 0 )
-GAME( 1982, machomou, 0,        suprmous, suprmous, 0,     ROT90, "Techstar", "Macho Mouse", 0 )
-GAME( 1983, intrepid, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 1)", 0 )
-GAME( 1983, intrepid2,intrepid, intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
-GAME( 1984, intrepidb,intrepid, intrepid, intrepid, 0,     ROT90, "bootleg (Elsys)", "Intrepid (bootleg)", 0 )
-GAME( 1984, zaryavos, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games of Canada", "Zarya Vostoka", GAME_NOT_WORKING )
-GAME( 198?, rtriv,    0,        intrepid, rtriv,    rtriv, ROT90, "Romar", "Romar Triv", GAME_WRONG_COLORS )
+GAME( 1981, roundup,  0,        thepit,   roundup, thepit_state,  0,     ROT90, "Taito Corporation (Amenip/Centuri license)", "Round-Up", 0 )
+GAME( 1981, fitter,   roundup,  thepit,   fitter, thepit_state,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
+GAME( 1981, fitterbl, roundup,  thepit,   fitter, thepit_state,   0,     ROT90, "bootleg", "Fitter (bootleg)", 0 )
+GAME( 1982, thepit,   0,        thepit,   thepit, thepit_state,   0,     ROT90, "Zilec Electronics", "The Pit", 0 ) // AW == Andy Walker
+GAME( 1982, thepitu1, thepit,   thepit,   thepit, thepit_state,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US, set 1)", 0 )
+GAME( 1982, thepitu2, thepit,   thepit,   thepit, thepit_state,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US, set 2)", 0 ) // Bally PCB
+GAME( 1982, thepitj,  thepit,   thepit,   thepit, thepit_state,   0,     ROT90, "Zilec Electronics (Taito license)", "The Pit (Japan)", 0 )
+GAME( 1982, dockman,  0,        intrepid, dockman, thepit_state,  0,     ROT90, "Taito Corporation", "Dock Man", 0 )
+GAME( 1982, portman,  dockman,  intrepid, dockman, thepit_state,  0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", 0 )
+GAME( 1982, suprmous, 0,        suprmous, suprmous, thepit_state, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
+GAME( 1982, funnymou, suprmous, suprmous, suprmous, thepit_state, 0,     ROT90, "bootleg? (Chuo Co. Ltd)", "Funny Mouse", 0 )
+GAME( 1982, machomou, 0,        suprmous, suprmous, thepit_state, 0,     ROT90, "Techstar", "Macho Mouse", 0 )
+GAME( 1983, intrepid, 0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 1)", 0 )
+GAME( 1983, intrepid2,intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
+GAME( 1984, intrepidb,intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)", "Intrepid (bootleg)", 0 )
+GAME( 1984, zaryavos, 0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games of Canada", "Zarya Vostoka", GAME_NOT_WORKING )
+GAME( 198?, rtriv,    0,        intrepid, rtriv, thepit_state,    rtriv, ROT90, "Romar", "Romar Triv", GAME_WRONG_COLORS )

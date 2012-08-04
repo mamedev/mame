@@ -5368,89 +5368,89 @@ static DRIVER_INIT( driveout )
 }
 
 
-GAME( 1988, finalb,     0,        finalb,    finalb,    finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, finalbu,    finalb,   finalb,    finalbu,   finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, finalbj,    finalb,   finalb,    finalbj,   finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, finalb,     0,        finalb,    finalb, taitof2_state,    finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, finalbu,    finalb,   finalb,    finalbu, taitof2_state,   finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, finalbj,    finalb,   finalb,    finalbj, taitof2_state,   finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, dondokod,   0,        dondokod,  dondokod,  0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dondokod,   0,        dondokod,  dondokod, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu, taitof2_state, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj, taitof2_state, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, megablst,   0,        megab,     megab,     0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, megablstu,  megablst, megab,     megabu,    0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, megablstj,  megablst, megab,     megabj,    0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, megablst,   0,        megab,     megab, taitof2_state,     0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, megablstu,  megablst, megab,     megabu, taitof2_state,    0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, megablstj,  megablst, megab,     megabj, taitof2_state,    0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, thundfox,   0,        thundfox,  thundfox,  0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, thundfox,   0,        thundfox,  thundfox, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu, taitof2_state, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj, taitof2_state, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, cameltry,   0,        cameltry,  cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltry,   0,        cameltry,  cameltry, taitof2_state,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj, taitof2_state, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry, taitof2_state,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cameltryau, cameltry, cameltrya, cameltry, taitof2_state,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,  0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon, taitof2_state,  0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, liquidk,    0,        liquidk,   liquidk,   0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,  0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,  0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, liquidk,    0,        liquidk,   liquidk, taitof2_state,   0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku, taitof2_state,  0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku, taitof2_state,  0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, quizhq,     0,        quizhq,    quizhq,    0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, quizhq,     0,        quizhq,    quizhq, taitof2_state,    0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, ssi,        0,        ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ssia,       ssi,      ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, majest12,   ssi,      ssi,       majest12,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ssi,        0,        ssi,       ssi, taitof2_state,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ssia,       ssi,      ssi,       ssi, taitof2_state,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, majest12,   ssi,      ssi,       majest12, taitof2_state,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, gunfront,   0,        gunfront,  gunfront,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gunfront,   0,        gunfront,  gunfront, taitof2_state,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, taitof2_state, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, growl,      0,        growl,     growl,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, growlu,     growl,    growl,     growlu,    0,        ROT0,   "Taito America Corporation", "Growl (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, runark,     growl,    growl,     runark,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, growl,      0,        growl,     growl, taitof2_state,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, growlu,     growl,    growl,     growlu, taitof2_state,    0,        ROT0,   "Taito America Corporation", "Growl (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, runark,     growl,    growl,     runark, taitof2_state,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, footchmp,   0,        footchmp,  footchmp,  0,        ROT0,   "Taito Corporation Japan",   "Football Champ (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hthero,     footchmp, hthero,    hthero,    0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1992, euroch92,   footchmp, footchmp,  footchmp,  0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl,0,        ROT0,   "bootleg",                   "Football Champ (World) (bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // very different hw register etc.
+GAME( 1990, footchmp,   0,        footchmp,  footchmp, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "Football Champ (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hthero,     footchmp, hthero,    hthero, taitof2_state,    0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, euroch92,   footchmp, footchmp,  footchmp, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state,0,        ROT0,   "bootleg",                   "Football Champ (World) (bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // very different hw register etc.
 
-GAME( 1990, koshien,    0,        koshien,   koshien,   0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, koshien,    0,        koshien,   koshien, taitof2_state,   0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo,  0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo, taitof2_state,  0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, ninjak,     0,        ninjak,    ninjak,    0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku,   0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj,   0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ninjak,     0,        ninjak,    ninjak, taitof2_state,    0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku, taitof2_state,   0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj, taitof2_state,   0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,  0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, qzquest,    0,        qzquest ,  qzquest,   0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, qzquest,    0,        qzquest ,  qzquest, taitof2_state,   0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, pulirula,   0,        pulirula,  pulirula,  0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pulirula,   0,        pulirula,  pulirula, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj, taitof2_state, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, metalb,     0,        metalb,    metalb,    0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, metalbj,    metalb,   metalb,    metalbj,   0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, metalb,     0,        metalb,    metalb, taitof2_state,    0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, metalbj,    metalb,   metalb,    metalbj, taitof2_state,   0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,  0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu, taitof2_state,  0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,    0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", GAME_SUPPORTS_SAVE )
+GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj, taitof2_state,    0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, deadconx,   0,        deadconx,  deadconx,  0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, deadconx,   0,        deadconx,  deadconx, taitof2_state,  0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj, taitof2_state, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dinorex,    0,        dinorex,   dinorex,   0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorexu,  0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj,  0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dinorex,    0,        dinorex,   dinorex, taitof2_state,   0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorexu, taitof2_state,  0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj, taitof2_state,  0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei,   0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei, taitof2_state,   0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,   0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon, taitof2_state,   0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,  0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2, taitof2_state,  0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, driftout,   0,        driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Europe)", GAME_SUPPORTS_SAVE )
-GAME( 1991, driftoutj,  driftout, driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, driveout,   driftout, driveout,  driftout,  driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driftout,   0,        driftout,  driftout, taitof2_state,  0,        ROT270, "Visco",                     "Drift Out (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driftoutj,  driftout, driftout,  driftout, taitof2_state,  0,        ROT270, "Visco",                     "Drift Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout, taitof2_state,  driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", GAME_SUPPORTS_SAVE )

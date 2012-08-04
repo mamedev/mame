@@ -630,4 +630,4 @@ static DRIVER_INIT(lastfght)
 	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght, ROT0, "Subsino", "Last Fighting", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, lastfght, ROT0, "Subsino", "Last Fighting", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

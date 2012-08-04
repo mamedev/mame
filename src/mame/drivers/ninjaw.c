@@ -1178,7 +1178,7 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", 0 )
-GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", 0 )
-GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjaw,  0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", 0 ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2, 0,      darius2, darius2, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", 0 )
+GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw, ninjaw_state,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", 0 )
+GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", 0 )
+GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjaw, ninjaw_state,  0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", 0 ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2, 0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", 0 )

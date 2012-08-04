@@ -428,4 +428,4 @@ ROM_START( pandoras )
 ROM_END
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", GAME_SUPPORTS_SAVE )
+GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", GAME_SUPPORTS_SAVE )

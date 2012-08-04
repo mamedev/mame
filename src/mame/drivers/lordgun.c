@@ -1041,6 +1041,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun,   ROT0, "IGS", "Lord of Gun (USA)",       GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, aliencha,  ROT0, "IGS", "Alien Challenge (World)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, alienchac, ROT0, "IGS", "Alien Challenge (China)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun, lordgun_state,  lordgun,   ROT0, "IGS", "Lord of Gun (USA)",       GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, aliencha,  ROT0, "IGS", "Alien Challenge (World)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, alienchac, ROT0, "IGS", "Alien Challenge (China)", GAME_UNEMULATED_PROTECTION )

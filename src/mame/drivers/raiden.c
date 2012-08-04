@@ -635,16 +635,16 @@ static DRIVER_INIT( raidenu ) /* Decrypt Sound only code */
 /***************************************************************************/
 
 /* Same PCB, differ by region byte(s) */
-GAME( 1990, raiden,   0,      raidena, raiden, raiden, ROT270, "Seibu Kaihatsu",                                 "Raiden (set 1)", 0 )
-GAME( 1990, raidena,  raiden, raidena, raiden, raiden, ROT270, "Seibu Kaihatsu",                                 "Raiden (set 2)", 0 )
-GAME( 1990, raidenu,  raiden, raidena, raiden, raiden, ROT270, "Seibu Kaihatsu (Fabtek license)",                "Raiden (US, set 1)", 0 )
-GAME( 1990, raident,  raiden, raidena, raiden, raiden, ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", 0 )
+GAME( 1990, raiden,   0,      raidena, raiden, raiden_state, raiden, ROT270, "Seibu Kaihatsu",                                 "Raiden (set 1)", 0 )
+GAME( 1990, raidena,  raiden, raidena, raiden, raiden_state, raiden, ROT270, "Seibu Kaihatsu",                                 "Raiden (set 2)", 0 )
+GAME( 1990, raidenu,  raiden, raidena, raiden, raiden_state, raiden, ROT270, "Seibu Kaihatsu (Fabtek license)",                "Raiden (US, set 1)", 0 )
+GAME( 1990, raident,  raiden, raidena, raiden, raiden_state, raiden, ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", 0 )
 
 /* Same as above, but the sound CPU code is not encrypted */
-GAME( 1990, raidenk,  raiden, raidena, raiden, raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)",       "Raiden (Korea)", 0 )
+GAME( 1990, raidenk,  raiden, raidena, raiden, raiden_state, raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)",       "Raiden (Korea)", 0 )
 
 /* Alternate hardware. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu, raiden, raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)",                "Raiden (US, set 2, SEI8904 + SEI9008 PCBs)", 0 )
+GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state, raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)",                "Raiden (US, set 2, SEI8904 + SEI9008 PCBs)", 0 )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted */
-GAME( 1990, raidenb,  raiden, raiden,  raiden, raidena, ROT270, "Seibu Kaihatsu",                                 "Raiden (set 3, Alternate hardware)", 0 )
+GAME( 1990, raidenb,  raiden, raiden,  raiden, raiden_state, raidena, ROT270, "Seibu Kaihatsu",                                 "Raiden (set 3, Alternate hardware)", 0 )

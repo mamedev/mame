@@ -435,5 +435,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, 0, ROT90, "Taito", "Field Goal", GAME_NO_SOUND )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, 0, ROT90, "Taito", "Field Goal (different)", GAME_NO_SOUND )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal", GAME_NO_SOUND )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (different)", GAME_NO_SOUND )

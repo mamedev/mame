@@ -247,4 +247,4 @@ ROM_START( quizpani )
 	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) /* unknown */
 ROM_END
 
-GAME( 1993, quizpani, 0, quizpani, quizpani, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", 0 )
+GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", 0 )

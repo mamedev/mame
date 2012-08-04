@@ -127,4 +127,4 @@ ROM_START(comebaby)
 ROM_END
 
 
-GAME( 2000, comebaby,  0,   comebaby,  comebaby,  0,  ROT0,  "ExPotato",    "Come On Baby",   GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, comebaby,  0,   comebaby,  comebaby, comebaby_state,  0,  ROT0,  "ExPotato",    "Come On Baby",   GAME_NOT_WORKING|GAME_NO_SOUND )

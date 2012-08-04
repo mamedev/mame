@@ -901,8 +901,8 @@ ROM_END
 
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", 0 )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", 0 )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)", GAME_NOT_WORKING ) // aka 'World Cup 85', different inputs?
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0, layout_gridiron )
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", 0 )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", 0 )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", 0 )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)", GAME_NOT_WORKING ) // aka 'World Cup 85', different inputs?
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0, layout_gridiron )
+GAME( 1986, teedoff,   0,        tehkanwc, teedoff, tehkanwc_state,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", 0 )

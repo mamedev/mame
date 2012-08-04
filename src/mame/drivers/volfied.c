@@ -422,7 +422,7 @@ ROM_START( volfiedjo )
 ROM_END
 
 
-GAME( 1989, volfied,   0,       volfied, volfied,  0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, volfiedu,  volfied, volfied, volfiedu, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, volfiedj,  volfied, volfied, volfiedj, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, volfiedjo, volfied, volfied, volfiedj, 0, ROT270, "Taito Corporation",         "Volfied (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfied,   0,       volfied, volfied, volfied_state,  0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfiedj,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, volfiedjo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan)", GAME_SUPPORTS_SAVE )

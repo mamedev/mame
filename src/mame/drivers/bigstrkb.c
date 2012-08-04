@@ -291,5 +291,5 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, 0, ROT0, "bootleg", "Big Striker (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, bigstrkba,bigstrik, bigstrkb, bigstrkb, 0, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1992, bigstrkba,bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )

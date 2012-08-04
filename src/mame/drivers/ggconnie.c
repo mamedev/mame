@@ -197,4 +197,4 @@ static DRIVER_INIT(ggconnie)
 	DRIVER_INIT_CALL(pce);
 }
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, ggconnie, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", GAME_NO_SOUND | GAME_NOT_WORKING )

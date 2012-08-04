@@ -994,4 +994,4 @@ DRIVER_INIT( cybertnk )
 
 }
 
-GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.4)", GAME_NOT_WORKING )
+GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk, cybertnk_state,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.4)", GAME_NOT_WORKING )

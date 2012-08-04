@@ -337,4 +337,4 @@ static DRIVER_INIT( carpolo )
 		ROM[i] ^= 0x0f;
 }
 
-GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo, ROT0, "Exidy", "Car Polo", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, carpolo, ROT0, "Exidy", "Car Polo", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )

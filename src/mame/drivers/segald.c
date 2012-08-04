@@ -603,9 +603,9 @@ static DRIVER_INIT( astron )
 
 
 //    YEAR, NAME,     PARENT,  MACHINE,INPUT,  INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, astron,   0,       astron, astron, astron, ROT0,   "Sega", "Astron Belt", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, astronp,  astron,  astron, astron, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, cobraseg, astron,  astron, astron, astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, galaxyr,  0,       astron, astron, astron, ROT0,   "Sega", "Galaxy Ranger", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, galaxyrp, galaxyr, astron, astron, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1983, sblazerp, galaxyr, astron, astron, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, cobraseg, astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)", GAME_NOT_WORKING|GAME_NO_SOUND)

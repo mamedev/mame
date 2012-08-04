@@ -897,9 +897,9 @@ static DRIVER_INIT( bradley )
  *
  *************************************/
 
-GAMEL(1980, bzone,     0,        bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (rev 2)", GAME_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (rev 1)", GAME_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (cocktail)", GAME_SUPPORTS_SAVE|GAME_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bradley, ROT0, "Atari", "Bradley Trainer", GAME_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, 0,       ROT0, "Atari", "Red Baron", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, bzone,     0,        bzone,    bzone, bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 2)", GAME_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone, bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 1)", GAME_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone, bzone_state,    0,       ROT0, "Atari", "Battle Zone (cocktail)", GAME_SUPPORTS_SAVE|GAME_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bzone,    bradley, bzone_state,  bradley, ROT0, "Atari", "Bradley Trainer", GAME_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, bzone_state, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, bzone_state, 0,       ROT0, "Atari", "Red Baron", GAME_SUPPORTS_SAVE, layout_ho88ffff )

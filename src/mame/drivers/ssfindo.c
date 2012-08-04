@@ -885,6 +885,6 @@ static DRIVER_INIT(tetfight)
 	state->m_iocr_hack=1;
 }
 
-GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )
-GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ppcar,	ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND )
-GAME( 2001, tetfight,0,        tetfight, tetfight,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo, ssfindo_state,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )
+GAME( 1999, ppcar,   0,        ppcar,    ppcar, ssfindo_state,    ppcar,	ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND )
+GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )

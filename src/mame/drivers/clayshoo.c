@@ -373,4 +373,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, clayshoo, 0, clayshoo, clayshoo, 0, ROT0, "Allied Leisure", "Clay Shoot", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, clayshoo, 0, clayshoo, clayshoo, clayshoo_state, 0, ROT0, "Allied Leisure", "Clay Shoot", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

@@ -482,5 +482,5 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY   FULLNAME                       FLAGS                   LAYOUT  */
-GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   0,    ROT0,  "B.R.L.", "Galaxi (v2.0)",               GAME_SUPPORTS_SAVE,     layout_galaxi )
-GAMEL( 2000, magjoker, 0,      magjoker, magjoker, 0,    ROT0,  "B.R.L.", "Magic Joker (v1.25.10.2000)", GAME_SUPPORTS_SAVE,     layout_galaxi )
+GAMEL( 2000, galaxi,   0,      galaxi,   galaxi, galaxi_state,   0,    ROT0,  "B.R.L.", "Galaxi (v2.0)",               GAME_SUPPORTS_SAVE,     layout_galaxi )
+GAMEL( 2000, magjoker, 0,      magjoker, magjoker, galaxi_state, 0,    ROT0,  "B.R.L.", "Magic Joker (v1.25.10.2000)", GAME_SUPPORTS_SAVE,     layout_galaxi )

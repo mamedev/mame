@@ -118,10 +118,10 @@ ROM_END
 
 
 
-GAME(198?, j_ewnud	,0			,jpmsru,jpmsru,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ewnda	,j_ewnud	,jpmsru,jpmsru,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_luckac	,0			,jpmsru,jpmsru,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_super2	,0			,jpmsru,jpmsru,jpmsru,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnud	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnda	,j_ewnud	,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_luckac	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_super2	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
-GAME(198?, j_plus2	,0			,jpmsru_4,jpmsru,jpmsru,ROT0,   "Jpm","Plus 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_plus2	,0			,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "Jpm","Plus 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )

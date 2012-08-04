@@ -819,5 +819,5 @@ static DRIVER_INIT( kickgoal )
 }
 
 
-GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal, ROT0, "TCH", "Kick Goal", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal, ROT0, "TCH", "Action Hollywood", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

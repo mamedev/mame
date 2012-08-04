@@ -290,4 +290,4 @@ ROM_START( pass )
 ROM_END
 
 
-GAME( 1992, pass, 0, pass, pass, 0, ROT0, "Oksan", "Pass", GAME_SUPPORTS_SAVE )
+GAME( 1992, pass, 0, pass, pass, pass_state, 0, ROT0, "Oksan", "Pass", GAME_SUPPORTS_SAVE )

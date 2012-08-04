@@ -3517,27 +3517,27 @@ static DRIVER_INIT( ssa )
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
 
-GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Poker",                        0,                layout_noraut11 )
-GAMEL( 198?, norautdx, 0,       norautp,  norautpn, 0,   ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                layout_noraut12 )
-GAMEL( 198?, norautpn, norautp, norautp,  norautpn, 0,   ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                layout_noraut12 )
-GAMEL( 198?, norautjo, 0,       norautp,  mainline, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",       0,                layout_noraut12 )
-GAMEL( 198?, norautpl, 0,       norautpl, mainline, 0,   ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                layout_noraut12 )
-GAMEL( 198?, norautra, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                layout_noraut12 ) // 1-bet?? where??...
-GAME(  1988, norautu,  0,       norautxp, norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",               GAME_NOT_WORKING )
-GAME(  2002, noraut3a, 0,       norautxp, norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        GAME_NOT_WORKING )
-GAME(  2003, noraut3b, 0,       norautxp, norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        GAME_NOT_WORKING )
-GAMEL( 198?, norautua, 0,       norautp,  norautp,  enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 1 (console)",      GAME_NOT_WORKING, layout_noraut12 )
-GAMEL( 198?, norautub, 0,       norautp,  norautp,  enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 2 (console)",      GAME_NOT_WORKING, layout_noraut12 )
-GAMEL( 198?, mainline, 0,       norautp,  mainline, 0,   ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                layout_noraut12 )
-GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, 0,   ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                layout_noraut12 )
-GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, 0,   ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                layout_noraut12 )
-GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, deb, ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                layout_noraut12 )
-GAME(  198?, kimblz80, 0,       kimble,   norautp,  0,   ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   GAME_NOT_WORKING )
-GAME(  1983, pma,      0,       nortest1, norautp,  0,   ROT0, "PMA",                      "PMA Poker",                           GAME_NOT_WORKING )
-GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, 0,   ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
-GAME(  19??, newhilop, 0,       newhilop, norautp,  0,   ROT0, "Song Won?",                "New Hi-Low Poker",                    GAME_NOT_WORKING )
+GAMEL( 1988, norautp,  0,       norautp,  norautp, norautp_state,  0,   ROT0, "Noraut Ltd.",              "Noraut Poker",                        0,                layout_noraut11 )
+GAMEL( 198?, norautdx, 0,       norautp,  norautpn, norautp_state, 0,   ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                layout_noraut12 )
+GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautp_state, 0,   ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                layout_noraut12 )
+GAMEL( 198?, norautjo, 0,       norautp,  mainline, norautp_state, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",       0,                layout_noraut12 )
+GAMEL( 198?, norautpl, 0,       norautpl, mainline, norautp_state, 0,   ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp, norautp_state,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautp_state, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                layout_noraut12 )
+GAMEL( 198?, norautra, 0,       norautp,  norautrh, norautp_state, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                layout_noraut12 ) // 1-bet?? where??...
+GAME(  1988, norautu,  0,       norautxp, norautp, norautp_state,  0,   ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",               GAME_NOT_WORKING )
+GAME(  2002, noraut3a, 0,       norautxp, norautp, norautp_state,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        GAME_NOT_WORKING )
+GAME(  2003, noraut3b, 0,       norautxp, norautp, norautp_state,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        GAME_NOT_WORKING )
+GAMEL( 198?, norautua, 0,       norautp,  norautp, norautp_state,  enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 1 (console)",      GAME_NOT_WORKING, layout_noraut12 )
+GAMEL( 198?, norautub, 0,       norautp,  norautp, norautp_state,  enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 2 (console)",      GAME_NOT_WORKING, layout_noraut12 )
+GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, 0,   ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                layout_noraut12 )
+GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, 0,   ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                layout_noraut12 )
+GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, 0,   ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                layout_noraut12 )
+GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, deb, ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                layout_noraut12 )
+GAME(  198?, kimblz80, 0,       kimble,   norautp, norautp_state,  0,   ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   GAME_NOT_WORKING )
+GAME(  1983, pma,      0,       nortest1, norautp, norautp_state,  0,   ROT0, "PMA",                      "PMA Poker",                           GAME_NOT_WORKING )
+GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, 0,   ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
+GAME(  19??, newhilop, 0,       newhilop, norautp, norautp_state,  0,   ROT0, "Song Won?",                "New Hi-Low Poker",                    GAME_NOT_WORKING )
 
 
 /************************************* 8080 sets **************************************/
@@ -3546,18 +3546,18 @@ GAME(  19??, newhilop, 0,       newhilop, norautp,  0,   ROT0, "Song Won?",     
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                        FULLNAME                           FLAGS             LAYOUT */
 
-GAME(  1983, dphl,     0,       dphl,     norautp,  0,   ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      GAME_NOT_WORKING )
-GAME(  1983, dphla,    0,       dphla,    norautp,  0,   ROT0, "<unknown>",                   "Draw Poker HI-LO (Alt)",           GAME_NOT_WORKING )
-GAME(  1983, dphljp,   0,       dphl,     norautp,  0,   ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      GAME_NOT_WORKING )
-GAME(  198?, kimbldhl, 0,       kimbldhl, norautp,  0,   ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              GAME_NOT_WORKING )
-GAME(  1983, gtipoker, 0,       dphl,     norautp,  0,   ROT0, "GTI Inc",                     "GTI Poker",                        GAME_NOT_WORKING )
-GAME(  1983, smshilo,  0,       dphla,    norautp,  0,   ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      GAME_NOT_WORKING )
-GAME(  1986, drhl,     0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    GAME_NOT_WORKING )
-GAME(  1986, drhla,    0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    GAME_NOT_WORKING )
-GAME(  1982, ssjkrpkr, 0,       ssjkrpkr, norautp,  ssa, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     GAME_NOT_WORKING )
+GAME(  1983, dphl,     0,       dphl,     norautp, norautp_state,  0,   ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      GAME_NOT_WORKING )
+GAME(  1983, dphla,    0,       dphla,    norautp, norautp_state,  0,   ROT0, "<unknown>",                   "Draw Poker HI-LO (Alt)",           GAME_NOT_WORKING )
+GAME(  1983, dphljp,   0,       dphl,     norautp, norautp_state,  0,   ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      GAME_NOT_WORKING )
+GAME(  198?, kimbldhl, 0,       kimbldhl, norautp, norautp_state,  0,   ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              GAME_NOT_WORKING )
+GAME(  1983, gtipoker, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "GTI Inc",                     "GTI Poker",                        GAME_NOT_WORKING )
+GAME(  1983, smshilo,  0,       dphla,    norautp, norautp_state,  0,   ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      GAME_NOT_WORKING )
+GAME(  1986, drhl,     0,       drhl,     norautp, norautp_state,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    GAME_NOT_WORKING )
+GAME(  1986, drhla,    0,       drhl,     norautp, norautp_state,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    GAME_NOT_WORKING )
+GAME(  1982, ssjkrpkr, 0,       ssjkrpkr, norautp, norautp_state,  ssa, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     GAME_NOT_WORKING )
 
 /* The following one also has a custom 68705 MCU */
-GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    GAME_NOT_WORKING )
+GAME(  1993, tpoker2,  0,       dphltest, norautp, norautp_state,  0,   ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    GAME_NOT_WORKING )
 
 
 /************************************ unknown sets ************************************/
@@ -3566,6 +3566,6 @@ GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufactur
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
 
-GAME(  198?, fastdrwp, 0,       dphl,     norautp,  0,   ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   GAME_NOT_WORKING )
-GAME(  198?, dphlunka, 0,       dphl,     norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   GAME_NOT_WORKING )
-GAME(  198?, dphlunkb, 0,       dphl,     norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   GAME_NOT_WORKING )
+GAME(  198?, fastdrwp, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   GAME_NOT_WORKING )
+GAME(  198?, dphlunka, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   GAME_NOT_WORKING )
+GAME(  198?, dphlunkb, 0,       dphl,     norautp, norautp_state,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   GAME_NOT_WORKING )

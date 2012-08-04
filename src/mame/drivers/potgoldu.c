@@ -113,5 +113,5 @@ ROM_START( potgoldu )
 ROM_END
 
 
-GAME( 200?, potgoldu,    0,        potgold,   potgold,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", GAME_IS_SKELETON | GAME_NO_SOUND )
+GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", GAME_IS_SKELETON | GAME_NO_SOUND )
 

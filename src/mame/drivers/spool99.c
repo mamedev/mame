@@ -432,6 +432,6 @@ static DRIVER_INIT( spool99 )
 
 
 
-GAME( 1998, spool99,    0,        spool99,    spool99,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", 0 )
-GAME( 1998, spool99a,   spool99,  spool99,    spool99,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", 0 )
-GAME( 1998, vcarn,      0,        vcarn,      spool99,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", 0 ) //MAME screen says '98, PCB screen says '99?
+GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", 0 )
+GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", 0 )
+GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", 0 ) //MAME screen says '98, PCB screen says '99?

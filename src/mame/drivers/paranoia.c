@@ -232,4 +232,4 @@ static DRIVER_INIT(paranoia)
 	DRIVER_INIT_CALL(pce);
 }
 
-GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, paranoia, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

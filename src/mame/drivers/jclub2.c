@@ -1013,6 +1013,6 @@ static DRIVER_INIT( darkhors )
 	}
 }
 
-GAME( 199?, jclub2,   0,      jclub2,  darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, jclub2o,  jclub2, jclub2o, darkhors, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2001, darkhors, jclub2, darkhors,darkhors, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, jclub2,   0,      jclub2,  darkhors, darkhors_state, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, jclub2o,  jclub2, jclub2o, darkhors, darkhors_state, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, darkhors, jclub2, darkhors,darkhors, darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )

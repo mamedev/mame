@@ -285,4 +285,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", 0 )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", 0 )

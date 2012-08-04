@@ -1001,5 +1001,5 @@ static DRIVER_INIT( mastboy )
 	state->m_vram = state->memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
 }
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", 0 )
+GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )
+GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, mastboy, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", 0 )

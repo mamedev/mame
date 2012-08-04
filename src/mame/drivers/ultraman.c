@@ -302,4 +302,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", GAME_SUPPORTS_SAVE )

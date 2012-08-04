@@ -1256,7 +1256,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest, 0, bestbest, bestbest, 0,        ROT0, "SunA", "Best Of Best", 0 )
-GAME( 1994, sunaq,    0, sunaq,    sunaq,    0,        ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )	// Date/Version on-screen is 940620-6, but in the program rom it's 1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer, 0, bssoccer, bssoccer, 0,        ROT0, "SunA", "Back Street Soccer", 0 )
-GAME( 1996, uballoon, 0, uballoon, uballoon, uballoon, ROT0, "SunA", "Ultra Balloon", 0 )
+GAME( 1994, bestbest, 0, bestbest, bestbest, suna16_state, 0,        ROT0, "SunA", "Best Of Best", 0 )
+GAME( 1994, sunaq,    0, sunaq,    sunaq, suna16_state,    0,        ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )	// Date/Version on-screen is 940620-6, but in the program rom it's 1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer, 0, bssoccer, bssoccer, suna16_state, 0,        ROT0, "SunA", "Back Street Soccer", 0 )
+GAME( 1996, uballoon, 0, uballoon, uballoon, suna16_state, uballoon, ROT0, "SunA", "Ultra Balloon", 0 )

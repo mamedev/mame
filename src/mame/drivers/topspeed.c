@@ -935,6 +935,6 @@ ROM_START( fullthrl )
 ROM_END
 
 
-GAMEL( 1987, topspeed, 0,        topspeed, topspeed, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed, 0,        topspeed, topspeed, topspeed_state, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, topspeed_state, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed_state, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_topspeed )

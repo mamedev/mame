@@ -577,11 +577,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacefb,  0,       spacefb, spacefb,  0, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbe, spacefb, spacefb, spacefb,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbe2,spacefb, spacefb, spacefb,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefba, spacefb, spacefb, spacefb,  0, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbg, spacefb, spacefb, spacefb,  0, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacebrd, spacefb, spacefb, spacefb,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbb, spacefb, spacefb, spacefb,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacedem, spacefb, spacefb, spacedem, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefb,  0,       spacefb, spacefb, spacefb_state,  0, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefbe, spacefb, spacefb, spacefb, spacefb_state,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefbe2,spacefb, spacefb, spacefb, spacefb_state,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefba, spacefb, spacefb, spacefb, spacefb_state,  0, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefbg, spacefb, spacefb, spacefb, spacefb_state,  0, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacebrd, spacefb, spacefb, spacefb, spacefb_state,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefbb, spacefb, spacefb, spacefb, spacefb_state,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacedem, spacefb, spacefb, spacedem, spacefb_state, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )

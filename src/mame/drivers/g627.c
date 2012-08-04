@@ -60,4 +60,4 @@ ROM_START(rotation)
 ROM_END
 
 
-GAME(1978,  rotation,  0,  g627,  g627,  g627,  ROT0,  "Midway",    "Rotation VIII",      GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  rotation,  0,  g627,  g627, g627_state,  g627,  ROT0,  "Midway",    "Rotation VIII",      GAME_IS_SKELETON_MECHANICAL)

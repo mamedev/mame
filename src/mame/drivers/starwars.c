@@ -551,7 +551,7 @@ static DRIVER_INIT( esb )
  *
  *************************************/
 
-GAME( 1983, starwars, 0,        starwars, starwars, starwars, ROT0, "Atari", "Star Wars (rev 2)", 0 )
-GAME( 1983, starwars1,starwars, starwars, starwars, starwars, ROT0, "Atari", "Star Wars (rev 1)", 0 )
-GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", GAME_NO_SOUND )
-GAME( 1985, esb,      0,        starwars, esb,      esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )
+GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, starwars, ROT0, "Atari", "Star Wars (rev 2)", 0 )
+GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, starwars, ROT0, "Atari", "Star Wars (rev 1)", 0 )
+GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", GAME_NO_SOUND )
+GAME( 1985, esb,      0,        starwars, esb, starwars_state,      esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )

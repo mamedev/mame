@@ -785,6 +785,6 @@ static DRIVER_INIT( cliff )
  *
  *************************************/
 
-GAME( 1983, cliffhgr, 0,        cliffhgr, cliffhgr,  cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0)
-GAME( 1983, cliffhgra,cliffhgr, cliffhgr, cliffhgra, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0)
-GAME( 1983, goaltogo, 0,        cliffhgr, goaltogo,  cliff, ROT0, "Stern Electronics", "Goal To Go", GAME_NOT_WORKING)
+GAME( 1983, cliffhgr, 0,        cliffhgr, cliffhgr, cliffhgr_state,  cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0)
+GAME( 1983, cliffhgra,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0)
+GAME( 1983, goaltogo, 0,        cliffhgr, goaltogo, cliffhgr_state,  cliff, ROT0, "Stern Electronics", "Goal To Go", GAME_NOT_WORKING)

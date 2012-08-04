@@ -307,4 +307,4 @@ ROM_START( monzagp )
 	ROM_LOAD( "74s287.7",        0x0600, 0x0100, CRC(3248ba56) SHA1(d449f4be8df1b4189afca55a4cf0cc2e19eb4dd4) )
 ROM_END
 
-GAME( 1981, monzagp,   0, monzagp, monzagp, 0, ROT270, "Olympia", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1981, monzagp,   0, monzagp, monzagp, monzagp_state, 0, ROT270, "Olympia", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND )

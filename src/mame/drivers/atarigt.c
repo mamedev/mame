@@ -1306,10 +1306,10 @@ static DRIVER_INIT( primrage20 ) { primrage_init_common(machine, 0x48a4); }
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        atarigt,  tmek,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     atarigt,  tmek,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, prototype)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     atarigt,  tmek,     tmek,       ROT0, "Atari Games", "T-MEK (v4.5)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     atarigt,  tmek,     tmek,       ROT0, "Atari Games", "T-MEK (v4.4)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     atarigt,  tmek,     tmek,       ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
-GAME( 1994, primrage,   0,        atarigt,  primrage, primrage,   ROT0, "Atari Games", "Primal Rage (version 2.3)", GAME_UNEMULATED_PROTECTION )
-GAME( 1994, primrage20, primrage, atarigt,  primrage, primrage20, ROT0, "Atari Games", "Primal Rage (version 2.0)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek,       0,        atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek51p,    tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, prototype)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek45,     tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.5)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek44,     tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.4)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, tmek20,     tmek,     atarigt,  tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, primrage,   0,        atarigt,  primrage, atarigt_state, primrage,   ROT0, "Atari Games", "Primal Rage (version 2.3)", GAME_UNEMULATED_PROTECTION )
+GAME( 1994, primrage20, primrage, atarigt,  primrage, atarigt_state, primrage20, ROT0, "Atari Games", "Primal Rage (version 2.0)", GAME_UNEMULATED_PROTECTION )

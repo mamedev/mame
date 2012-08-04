@@ -430,9 +430,9 @@ static DRIVER_INIT(pcat_nit)
 	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
-GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, bonanzar2,  bonanza,   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg,    0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg2,   0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND )
-GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NO_SOUND )
+GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, bonanzar2,  bonanza,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg2,   0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND )
+GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NO_SOUND )

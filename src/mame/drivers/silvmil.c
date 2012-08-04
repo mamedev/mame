@@ -433,4 +433,4 @@ static DRIVER_INIT( silvmil )
 	tumblepb_gfx1_rearrange(machine);
 }
 
-GAME( 1995, silvmil, 0, silvmil, silvmil, silvmil, ROT270, "Para", "Silver Millennium", 0 )
+GAME( 1995, silvmil, 0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", 0 )

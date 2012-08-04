@@ -503,6 +503,6 @@ ROM_END
 
 
 
-GAME( 1989, gradius3,  0,        gradius3, gradius3, 0, ROT0, "Konami", "Gradius III (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, gradius3a, gradius3, gradius3, gradius3, 0, ROT0, "Konami", "Gradius III (Asia)", GAME_SUPPORTS_SAVE )
-GAME( 1989, gradius3e, gradius3, gradius3, gradius3, 0, ROT0, "Konami", "Gradius III (World ?)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gradius3,  0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gradius3a, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gradius3e, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World ?)", GAME_SUPPORTS_SAVE )

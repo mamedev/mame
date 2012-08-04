@@ -760,8 +760,8 @@ static DRIVER_INIT( kingtut )
 	rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Viking Treasure", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Viking Treasure", GAME_NOT_WORKING | GAME_NO_SOUND )

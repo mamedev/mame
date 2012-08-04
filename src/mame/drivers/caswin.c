@@ -360,5 +360,5 @@ ROM_START( rcasino )
 	ROM_LOAD( "prom2.8e",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) )
 ROM_END
 
-GAME( 1984, rcasino, 0,        vvillage, vvillage, 0, ROT270, "Dyna Electronics", "Royal Casino", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, caswin,  rcasino,  vvillage, vvillage, 0, ROT270, "Aristocrat",  "Casino Winner", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino, 0,        vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin,  rcasino,  vvillage, vvillage, caswin_state, 0, ROT270, "Aristocrat",  "Casino Winner", GAME_IMPERFECT_GRAPHICS )

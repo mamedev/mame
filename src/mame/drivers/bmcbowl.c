@@ -555,4 +555,4 @@ static DRIVER_INIT(bmcbowl)
 	state->m_bmc_colorram = auto_alloc_array(machine, UINT8, 768);
 }
 
-GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "Konkyuu no Hoshi", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl, bmcbowl_state,    bmcbowl, ROT0,  "BMC", "Konkyuu no Hoshi", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

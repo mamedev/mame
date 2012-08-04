@@ -550,8 +550,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   marioo,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   mario,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioo,   mario,   mario,   marioo,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   masao,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )
+GAME( 1983, mario,    0,       mario,   marioo, mario_state,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", GAME_SUPPORTS_SAVE )
+GAME( 1983, marioe,   mario,   mario,   mario, mario_state,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", GAME_SUPPORTS_SAVE )
+GAME( 1983, marioo,   mario,   mario,   marioo, mario_state,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", GAME_SUPPORTS_SAVE )
+GAME( 1983, marioj,   mario,   mario,   marioj, mario_state,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, masao,    mario,   masao,   masao, mario_state,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )

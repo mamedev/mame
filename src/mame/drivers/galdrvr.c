@@ -6375,81 +6375,81 @@ ROM_END
  *************************************/
 
 /* basic galaxian hardware */
-GAME( 1979, galaxian,   0,        galaxian, galaxian, galaxian, ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxiana,  galaxian, galaxian, superg,   galaxian, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxiant,  galaxian, galaxian, superg,   galaxian, ROT90,  "Namco (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxian,   0,        galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiana,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiant,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
-GAME( 1979, moonaln,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu (Karateco license)", "Moon Alien", GAME_SUPPORTS_SAVE )
-GAME( 1979, superg,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Super Galaxians (galaxiana hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galturbo, galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Galaxian Turbo (superg hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galapx,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Galaxian Part X (moonaln hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galap1,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Space Invaders Galactica (galaxiana hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galap4,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack (G.G.I)", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, swarm,    galaxian, galaxian, swarm,    galaxian, ROT90,  "bootleg? (Subelectro)", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", GAME_SUPPORTS_SAVE )
-GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, supergx,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
+GAME( 1979, moonaln,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Nichibutsu (Karateco license)", "Moon Alien", GAME_SUPPORTS_SAVE )
+GAME( 1979, superg,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Super Galaxians (galaxiana hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galturbo, galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Galaxian Turbo (superg hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galapx,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Galaxian Part X (moonaln hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galap1,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Space Invaders Galactica (galaxiana hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galap4,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack (G.G.I)", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, swarm,    galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg? (Subelectro)", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian_state, galaxian, ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", GAME_SUPPORTS_SAVE )
+GAME( 1979, starfght, galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
-GAME( 1981, blkhole,  0,        galaxian, blkhole,  galaxian, ROT90,  "TDS & MINTS", "Black Hole", GAME_SUPPORTS_SAVE )
-GAME( 1982, orbitron, 0,        galaxian, orbitron, galaxian, ROT270, "Signatron USA", "Orbitron", GAME_SUPPORTS_SAVE )
-GAME( 1980, luctoday, 0,        galaxian, luctoday, galaxian, ROT270, "Sigma", "Lucky Today",GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 19??, chewing,  luctoday, galaxian, luctoday, galaxian, ROT90,  "<unknown>", "Chewing Gum", GAME_SUPPORTS_SAVE )
-GAME( 1982, catacomb, 0,        galaxian, catacomb, galaxian, ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?", "Omega", GAME_SUPPORTS_SAVE )
+GAME( 1981, blkhole,  0,        galaxian, blkhole, galaxian_state,  galaxian, ROT90,  "TDS & MINTS", "Black Hole", GAME_SUPPORTS_SAVE )
+GAME( 1982, orbitron, 0,        galaxian, orbitron, galaxian_state, galaxian, ROT270, "Signatron USA", "Orbitron", GAME_SUPPORTS_SAVE )
+GAME( 1980, luctoday, 0,        galaxian, luctoday, galaxian_state, galaxian, ROT270, "Sigma", "Lucky Today",GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 19??, chewing,  luctoday, galaxian, luctoday, galaxian_state, galaxian, ROT90,  "<unknown>", "Chewing Gum", GAME_SUPPORTS_SAVE )
+GAME( 1982, catacomb, 0,        galaxian, catacomb, galaxian_state, galaxian, ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 19??, omega,    theend,   galaxian, omega, galaxian_state,    galaxian, ROT270, "bootleg?", "Omega", GAME_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
-GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
-GAME( 1981, warofbugu,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia / Super Video Games", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (US)", GAME_SUPPORTS_SAVE )
-GAME( 1981, warofbugg,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT270, "Artic", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE ) // is this the original?
-GAME( 1981, redufob,  redufo,   galaxian, redufob,  nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg)", GAME_SUPPORTS_SAVE ) // rev A?
-GAME( 19??, exodus,   redufo,   galaxian, redufo,   nolock,   ROT90,  "bootleg? (Subelectro)", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
-GAME( 1979, kamakazi3,galaxian, galaxian, superg,   nolock,	  ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
+GAME( 1981, warofbug, 0,        galaxian, warofbug, galaxian_state, nolock,   ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
+GAME( 1981, warofbugu,warofbug, galaxian, warofbug, galaxian_state, nolock,   ROT90,  "Armenia / Super Video Games", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (US)", GAME_SUPPORTS_SAVE )
+GAME( 1981, warofbugg,warofbug, galaxian, warofbug, galaxian_state, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, redufo,   0,        galaxian, redufo, galaxian_state,   nolock,   ROT270, "Artic", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE ) // is this the original?
+GAME( 1981, redufob,  redufo,   galaxian, redufob, galaxian_state,  nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg)", GAME_SUPPORTS_SAVE ) // rev A?
+GAME( 19??, exodus,   redufo,   galaxian, redufo, galaxian_state,   nolock,   ROT90,  "bootleg? (Subelectro)", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1983, tdpgal,   0,        galaxian, tdpgal, galaxian_state,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
+GAME( 1979, kamakazi3,galaxian, galaxian, superg, galaxian_state,   nolock,	  ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
 
 /* different bullet color */
-GAME( 1982, azurian,  0,        galaxian, azurian,  azurian,  ROT90,  "Rait Electronics Ltd", "Azurian Attack", GAME_SUPPORTS_SAVE )
+GAME( 1982, azurian,  0,        galaxian, azurian, galaxian_state,  azurian,  ROT90,  "Rait Electronics Ltd", "Azurian Attack", GAME_SUPPORTS_SAVE )
 
 /* extra characters controlled via bank at $6002 */
-GAME( 19??, pisces,   0,        galaxian, pisces,   pisces,   ROT90,  "Subelectro", "Pisces", GAME_SUPPORTS_SAVE )
-GAME( 19??, piscesb,  pisces,   galaxian, piscesb,  pisces,   ROT90,  "bootleg", "Pisces (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 19??, omni,     pisces,   galaxian, piscesb,  pisces,   ROT90,  "bootleg", "Omni", GAME_SUPPORTS_SAVE )
-GAME( 1980, uniwars,  0,        galaxian, superg,   pisces,   ROT90,  "Irem", "UniWar S", GAME_SUPPORTS_SAVE )
-GAME( 1980, gteikoku, uniwars,  galaxian, superg,   pisces,   ROT90,  "Irem", "Gingateikoku No Gyakushu", GAME_SUPPORTS_SAVE )
-GAME( 1980, gteikokb, uniwars,  galaxian, gteikokb, pisces,   ROT270, "bootleg", "Gingateikoku No Gyakushu (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, gteikob2, uniwars,  galaxian, gteikob2, pisces,   ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spacbatt, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spacbat2, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Empire (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg", "Sky Raider (Uniwars bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, galemp,   uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg (Taito do Brasil)", "Galaxy Empire (bootleg?)", GAME_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
+GAME( 19??, pisces,   0,        galaxian, pisces, galaxian_state,   pisces,   ROT90,  "Subelectro", "Pisces", GAME_SUPPORTS_SAVE )
+GAME( 19??, piscesb,  pisces,   galaxian, piscesb, galaxian_state,  pisces,   ROT90,  "bootleg", "Pisces (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 19??, omni,     pisces,   galaxian, piscesb, galaxian_state,  pisces,   ROT90,  "bootleg", "Omni", GAME_SUPPORTS_SAVE )
+GAME( 1980, uniwars,  0,        galaxian, superg, galaxian_state,   pisces,   ROT90,  "Irem", "UniWar S", GAME_SUPPORTS_SAVE )
+GAME( 1980, gteikoku, uniwars,  galaxian, superg, galaxian_state,   pisces,   ROT90,  "Irem", "Gingateikoku No Gyakushu", GAME_SUPPORTS_SAVE )
+GAME( 1980, gteikokb, uniwars,  galaxian, gteikokb, galaxian_state, pisces,   ROT270, "bootleg", "Gingateikoku No Gyakushu (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, gteikob2, uniwars,  galaxian, gteikob2, galaxian_state, pisces,   ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacbatt, uniwars,  galaxian, spacbatt, galaxian_state, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacbat2, uniwars,  galaxian, spacbatt, galaxian_state, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, galaxian_state, pisces,   ROT90,  "bootleg", "Space Empire (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, skyraidr, uniwars,  galaxian, superg, galaxian_state,   pisces,   ROT90,  "bootleg", "Sky Raider (Uniwars bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, galemp,   uniwars,  galaxian, superg, galaxian_state,   pisces,   ROT90,  "bootleg (Taito do Brasil)", "Galaxy Empire (bootleg?)", GAME_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
 
 
 /* Artic Multi-System games - separate tile/sprite ROMs */
-GAME( 1980, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking (set 1)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1980, streaknga,streakng, pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking (set 2)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, phoenxp2, phoenix,  galaxian, phoenxp2, batman2,  ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
-GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
-GAME( 1981, atlantisb,atlantis, galaxian, atlantib, galaxian, ROT270, "bootleg", "Battle of Atlantis (bootleg)", GAME_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
-GAME( 1982, tenspot,  0,        tenspot,  tenspot,  tenspot,  ROT270, "Thomas Automatics", "Ten Spot", GAME_NOT_WORKING ) // work out how menu works
+GAME( 1980, streakng, 0,        pacmanbl, streakng, galaxian_state, galaxian, ROT90,  "Shoei", "Streaking (set 1)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, streaknga,streakng, pacmanbl, streakng, galaxian_state, galaxian, ROT90,  "Shoei", "Streaking (set 2)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, galaxian_state, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, galaxian_state, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenxp2, phoenix,  galaxian, phoenxp2, galaxian_state, batman2,  ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
+GAME( 1981, batman2,  phoenix,  galaxian, batman2, galaxian_state,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
+GAME( 1981, atlantisb,atlantis, galaxian, atlantib, galaxian_state, galaxian, ROT270, "bootleg", "Battle of Atlantis (bootleg)", GAME_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
+GAME( 1982, tenspot,  0,        tenspot,  tenspot, galaxian_state,  tenspot,  ROT270, "Thomas Automatics", "Ten Spot", GAME_NOT_WORKING ) // work out how menu works
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
-GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, galaxian_state, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )
 
 /* sound hardware replaced with AY8910 */
-GAME( 1982, zigzag,   0,        zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE ) // maybe by Taito do Brasil?
-GAME( 1982, zigzag2,  zigzag,   zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1982, zigzag,   0,        zigzag,   zigzag, galaxian_state,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE ) // maybe by Taito do Brasil?
+GAME( 1982, zigzag2,  zigzag,   zigzag,   zigzag, galaxian_state,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE ) // "
 
 /* multi-game select via external switch */
-GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax, galaxian_state,  gmgalax,  ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
 
 
 
@@ -6463,65 +6463,65 @@ GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg",
  *************************************/
 
 /* based on Galaxian, but with altered address map for more ROM */
-GAME( 1980, mooncrst,   0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstuk, mooncrst, mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstuku,mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK, unencrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstu,  mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrsto,  mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstg,  mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrst,   0,        mooncrst, mooncrst, galaxian_state, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuk, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuku,mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstu,  mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrsto,  mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstg,  mooncrst, mooncrst, mooncrsg, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
 
 /* straight Moon Cresta ripoffs on basic mooncrst hardware */
-GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
-GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
-GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
-GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", GAME_SUPPORTS_SAVE )
-GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
-GAME( 1980?,sstarcrs, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", GAME_SUPPORTS_SAVE )
-GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
+GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, galaxian_state, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", GAME_SUPPORTS_SAVE )
+GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
+GAME( 1980?,sstarcrs, mooncrst, mooncrst, mooncrsg, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", GAME_SUPPORTS_SAVE )
+GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
-GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spcdraga, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, stera,    mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrgx, mooncrst, galaxian, mooncrgx, mooncrgx, ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1980, moonqsr,  0,        mooncrst, moonqsr,  moonqsr,  ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
-GAME( 1980, moonal2,  galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
-GAME( 1980, moonal2b, galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spcdraga, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, stera,    mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrgx, mooncrst, galaxian, mooncrgx, galaxian_state, mooncrgx, ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1980, moonqsr,  0,        mooncrst, moonqsr, galaxian_state,  moonqsr,  ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
+GAME( 1980, moonal2,  galaxian, mooncrst, moonal2, galaxian_state,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
+GAME( 1980, moonal2b, galaxian, mooncrst, moonal2, galaxian_state,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
 
 /* larger romspace, interrupt enable moved */
-GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", GAME_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
+GAME( 198?, thepitm,  thepit,   mooncrst, thepitm, galaxian_state,  thepitm,  ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", GAME_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
 
 
 /* other games on basic mooncrst hardware */
-GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
-GAME( 198?, kong,     0,        mooncrst, kong,     kong,     ROT90,  "Taito do Brasil", "Kong (Brazil)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
+GAME( 1982, skybase,  0,        mooncrst, skybase, galaxian_state,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
+GAME( 198?, kong,     0,        mooncrst, kong, galaxian_state,     kong,     ROT90,  "Taito do Brasil", "Kong (Brazil)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
-GAME( 198?, fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
+GAME( 198?, fantastc, 0,        fantastc, fantastc, galaxian_state, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
-GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
-GAME( 1981, jumpbugb, jumpbug,  jumpbug,  jumpbug,  jumpbug,  ROT90,  "bootleg", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE ) // bootleg of Sega license
-GAME( 1983, levers,   0,        jumpbug,  levers,   jumpbug,  ROT90,  "Rock-Ola", "Levers", GAME_SUPPORTS_SAVE )
+GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug, galaxian_state,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
+GAME( 1981, jumpbugb, jumpbug,  jumpbug,  jumpbug, galaxian_state,  jumpbug,  ROT90,  "bootleg", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE ) // bootleg of Sega license
+GAME( 1983, levers,   0,        jumpbug,  levers, galaxian_state,   jumpbug,  ROT90,  "Rock-Ola", "Levers", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving AY8910 for sound */
-GAME( 1982, checkman, 0,        checkman, checkman, checkman, ROT90,  "Zilec-Zenitone", "Check Man", GAME_SUPPORTS_SAVE )
-GAME( 1982, checkmanj,checkman, checkmaj, checkmaj, checkmaj, ROT90,  "Zilec-Zenitone (Jaleco license)", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, dingo,    0,        checkmaj, dingo,    dingo,    ROT90,  "Ashby Computers and Graphics Ltd. (Jaleco license)", "Dingo", GAME_SUPPORTS_SAVE )
-GAME( 1983, dingoe,   dingo,    checkman, dingo,    dingoe,   ROT90,  "Ashby Computers and Graphics Ltd.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, checkman, 0,        checkman, checkman, galaxian_state, checkman, ROT90,  "Zilec-Zenitone", "Check Man", GAME_SUPPORTS_SAVE )
+GAME( 1982, checkmanj,checkman, checkmaj, checkmaj, galaxian_state, checkmaj, ROT90,  "Zilec-Zenitone (Jaleco license)", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, dingo,    0,        checkmaj, dingo, galaxian_state,    dingo,    ROT90,  "Ashby Computers and Graphics Ltd. (Jaleco license)", "Dingo", GAME_SUPPORTS_SAVE )
+GAME( 1983, dingoe,   dingo,    checkman, dingo, galaxian_state,    dingoe,   ROT90,  "Ashby Computers and Graphics Ltd.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Crazy Climber sound plus AY8910 instead of galaxian sound, plus INT instead of NMI */
-GAME( 1981, mshuttle,  0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US? set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshuttle2, mshuttle, mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US? set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshuttlej, mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshuttlej2,mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttle,  0,        mshuttle, mshuttle, galaxian_state, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US? set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttle2, mshuttle, mshuttle, mshuttle, galaxian_state, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US? set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttlej, mshuttle, mshuttle, mshuttle, galaxian_state, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttlej2,mshuttle, mshuttle, mshuttle, galaxian_state, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving DAC for sound */
-GAME( 1980, kingball, 0,        kingball, kingball, kingball, ROT90,  "Namco", "King & Balloon (US)", GAME_SUPPORTS_SAVE )
-GAME( 1980, kingballj,kingball, kingball, kingball, kingball, ROT90,  "Namco", "King & Balloon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1980, kingball, 0,        kingball, kingball, galaxian_state, kingball, ROT90,  "Namco", "King & Balloon (US)", GAME_SUPPORTS_SAVE )
+GAME( 1980, kingballj,kingball, kingball, kingball, galaxian_state, kingball, ROT90,  "Namco", "King & Balloon (Japan)", GAME_SUPPORTS_SAVE )
 
 
 
@@ -6533,13 +6533,13 @@ GAME( 1980, kingballj,kingball, kingball, kingball, kingball, ROT90,  "Namco", "
  *************************************/
 
 /* Frogger based hardware: 2nd Z80, AY-8910A, 2 8255 PPI for I/O, custom background */
-GAME( 1981, frogger,  0,        frogger,  frogger,  frogger,  ROT90,  "Konami", "Frogger", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggers1,frogger,  frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggers2,frogger,  frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggermc,frogger,  froggrmc, froggrmc, froggrmc, ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggers, frogger,  froggers, frogger,  froggers, ROT90,  "bootleg", "Frog", GAME_SUPPORTS_SAVE )
-GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, frogger,  0,        frogger,  frogger, galaxian_state,  frogger,  ROT90,  "Konami", "Frogger", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers1,frogger,  frogger,  frogger, galaxian_state,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers2,frogger,  frogger,  frogger, galaxian_state,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggermc,frogger,  froggrmc, froggrmc, galaxian_state, froggrmc, ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggers, frogger,  froggers, frogger, galaxian_state,  froggers, ROT90,  "bootleg", "Frog", GAME_SUPPORTS_SAVE )
+GAME( 1981, frogf,    frogger,  frogf,    frogger, galaxian_state,  froggers, ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, frogg,    frogger,  galaxian, frogg, galaxian_state,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 
 
 /*
@@ -6548,45 +6548,45 @@ GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg",
     CPU/Video Board: KT-4108-2
     Sound Board:     KT-4108-1
 */
-GAME( 1981, turtles,  0,        turtles,  turtles,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Turtles", GAME_SUPPORTS_SAVE )
-GAME( 1981, turpin,   turtles,  turtles,  turpin,   turtles,  ROT90,  "Konami (Sega license)", "Turpin", GAME_SUPPORTS_SAVE )
-GAME( 1981, 600,      turtles,  turtles,  turtles,  turtles,  ROT90,  "Konami", "600", GAME_SUPPORTS_SAVE )
+GAME( 1981, turtles,  0,        turtles,  turtles, galaxian_state,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Turtles", GAME_SUPPORTS_SAVE )
+GAME( 1981, turpin,   turtles,  turtles,  turpin, galaxian_state,   turtles,  ROT90,  "Konami (Sega license)", "Turpin", GAME_SUPPORTS_SAVE )
+GAME( 1981, 600,      turtles,  turtles,  turtles, galaxian_state,  turtles,  ROT90,  "Konami", "600", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, amidar,   0,        turtles,  amidaru,  turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
-GAME( 1981, amidar1,  amidar,   turtles,  amidar,   turtles,  ROT90,  "Konami", "Amidar (older)", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidaru,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidaro,  amidar,   turtles,  amidaro,  turtles,  ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
-GAME( 1982, amigo,    amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amigo", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidars,  amidar,   scramble, amidars,  scramble, ROT90,  "Konami", "Amidar (Scramble hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidar,   0,        turtles,  amidaru, galaxian_state,  turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
+GAME( 1981, amidar1,  amidar,   turtles,  amidar, galaxian_state,   turtles,  ROT90,  "Konami", "Amidar (older)", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidaru,  amidar,   turtles,  amidaru, galaxian_state,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidaro,  amidar,   turtles,  amidaro, galaxian_state,  turtles,  ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidarb,  amidar,   turtles,  amidaru, galaxian_state,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
+GAME( 1982, amigo,    amidar,   turtles,  amidaru, galaxian_state,  turtles,  ROT90,  "bootleg", "Amigo", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidars,  amidar,   scramble, amidars, galaxian_state,  scramble, ROT90,  "Konami", "Amidar (Scramble hardware)", GAME_SUPPORTS_SAVE )
 
 
 /* The End/Scramble based hardware */
-GAME( 1980, theend,   0,        theend,   theend,   theend,   ROT90,  "Konami", "The End", GAME_SUPPORTS_SAVE )
-GAME( 1980, theends,  theend,   theend,   theend,   theend,   ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1980, theendb,  theend,   theend,   theend,   theend,   ROT90,  "bootleg?", "The End (bootleg?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1980, theend,   0,        theend,   theend, galaxian_state,   theend,   ROT90,  "Konami", "The End", GAME_SUPPORTS_SAVE )
+GAME( 1980, theends,  theend,   theend,   theend, galaxian_state,   theend,   ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1980, theendb,  theend,   theend,   theend, galaxian_state,   theend,   ROT90,  "bootleg?", "The End (bootleg?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 1981, scramble, 0,        scramble, scramble, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
-GAME( 1981, scrambles,scramble, scramble, scramble, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1981, strfbomb, scramble, scramble, strfbomb, scramble, ROT90,  "bootleg? (Omni)", "Strafe Bomb", GAME_SUPPORTS_SAVE )
-GAME( 1981, explorer, scramble, explorer, explorer, explorer, ROT90,  "bootleg", "Explorer", GAME_SUPPORTS_SAVE )
-GAME( 1981, scramblebf,scramble,scramble, scramble, scramble, ROT90,  "bootleg (Karateko)", "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scramblebb,scramble,scramble, scramble, scramble, ROT90,  "bootleg?", "Scramble (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scramble, 0,        scramble, scramble, galaxian_state, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
+GAME( 1981, scrambles,scramble, scramble, scramble, galaxian_state, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1981, strfbomb, scramble, scramble, strfbomb, galaxian_state, scramble, ROT90,  "bootleg? (Omni)", "Strafe Bomb", GAME_SUPPORTS_SAVE )
+GAME( 1981, explorer, scramble, explorer, explorer, galaxian_state, explorer, ROT90,  "bootleg", "Explorer", GAME_SUPPORTS_SAVE )
+GAME( 1981, scramblebf,scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Karateko)", "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scramblebb,scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg?", "Scramble (bootleg?)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, atlantis, 0,        theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, atlantis2,atlantis, theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, atlantis, 0,        theend,   atlantis, galaxian_state, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, atlantis2,atlantis, theend,   atlantis, galaxian_state, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 2)", GAME_SUPPORTS_SAVE )
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
-GAME( 1982, scorpion, 0,		scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1982, scorpiona,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1982, scorpionb,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 19??, scorpionmc,scorpion,mooncrst, scorpnmc, scorpnmc, ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
-GAME( 19??, aracnis,   scorpion,mooncrst, aracnis,  scorpnmc, ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1982, scorpion, 0,		scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1982, scorpiona,scorpion, scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1982, scorpionb,scorpion, scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 19??, scorpionmc,scorpion,mooncrst, scorpnmc, galaxian_state, scorpnmc, ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 19??, aracnis,   scorpion,mooncrst, aracnis, galaxian_state,  scorpnmc, ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
-GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
-GAME( 1983, skelagon, sfx,      sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
-GAME( 1982, monsterz, 0,        monsterz, sfx,      sfx,      ORIENTATION_FLIP_X, "Nihon Game", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1983, sfx,      0,        sfx,      sfx, galaxian_state,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
+GAME( 1983, skelagon, sfx,      sfx,      sfx, galaxian_state,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
+GAME( 1982, monsterz, 0,        monsterz, sfx, galaxian_state,      sfx,      ORIENTATION_FLIP_X, "Nihon Game", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 
 /*
@@ -6595,19 +6595,19 @@ GAME( 1982, monsterz, 0,        monsterz, sfx,      sfx,      ORIENTATION_FLIP_X
     CPU/Video Board: A969
     Sound Board:     A970
 */
-GAME( 1981, scobra,    0,        scobra,   scobra,    scobra,   ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobrase,  scobra,   scobra,   scobra,    scobra,   ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobras,   scobra,   scobra,   scobras,   scobra,   ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobrab,   scobra,   scobra,   scobras,   scobra,   ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, suprheli,  scobra,   scobra,   scobras,   scobra,   ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scobra,    0,        scobra,   scobra, galaxian_state,    scobra,   ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
+GAME( 1981, scobrase,  scobra,   scobra,   scobra, galaxian_state,    scobra,   ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scobras,   scobra,   scobra,   scobras, galaxian_state,   scobra,   ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scobrab,   scobra,   scobra,   scobras, galaxian_state,   scobra,   ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, suprheli,  scobra,   scobra,   scobras, galaxian_state,   scobra,   ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, moonwar,   0,        moonwar,  moonwar,   moonwar,  ROT90,  "Stern Electronics", "Moonwar", GAME_SUPPORTS_SAVE )
-GAME( 1981, moonwara,  moonwar,  moonwar,  moonwara,  moonwar,  ROT90,  "Stern Electronics", "Moonwar (older)", GAME_SUPPORTS_SAVE )
+GAME( 1981, moonwar,   0,        moonwar,  moonwar, galaxian_state,   moonwar,  ROT90,  "Stern Electronics", "Moonwar", GAME_SUPPORTS_SAVE )
+GAME( 1981, moonwara,  moonwar,  moonwar,  moonwara, galaxian_state,  moonwar,  ROT90,  "Stern Electronics", "Moonwar (older)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, armorcar,  0,        scobra,   armorcar,  scobra,   ROT90,  "Stern Electronics", "Armored Car (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, armorcar2, armorcar, scobra,   armorcar2, scobra,   ROT90,  "Stern Electronics", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, armorcar,  0,        scobra,   armorcar, galaxian_state,  scobra,   ROT90,  "Stern Electronics", "Armored Car (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, armorcar2, armorcar, scobra,   armorcar2, galaxian_state, scobra,   ROT90,  "Stern Electronics", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern Electronics", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazmania,  0,        scobra,   tazmania, galaxian_state,  scobra,   ROT90,  "Stern Electronics", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 
 /*
     Anteater (sold as conversion kit)
@@ -6615,11 +6615,11 @@ GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern E
     CPU/Video Board: A969 (Has various wire mods)
     Sound Board:     A970
 */
-GAME( 1982, anteater,  0,        anteater,  anteater,  anteater,  ROT90,  "Tago Electronics", "Anteater", GAME_SUPPORTS_SAVE )
-GAME( 1982, anteateruk,anteater, anteateruk,anteateruk,anteateruk,ROT90,  "Tago Electronics (Free Enterprise Games license", "The Anteater (UK)", GAME_SUPPORTS_SAVE ) // distributed in 1983
-GAME( 1982, anteaterg, anteater, anteaterg, anteateruk,anteateruk,ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
+GAME( 1982, anteater,  0,        anteater,  anteater, galaxian_state,  anteater,  ROT90,  "Tago Electronics", "Anteater", GAME_SUPPORTS_SAVE )
+GAME( 1982, anteateruk,anteater, anteateruk,anteateruk, galaxian_state,anteateruk,ROT90,  "Tago Electronics (Free Enterprise Games license", "The Anteater (UK)", GAME_SUPPORTS_SAVE ) // distributed in 1983
+GAME( 1982, anteaterg, anteater, anteaterg, anteateruk, galaxian_state,anteateruk,ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, calipso,   0,        scobra,    calipso,   calipso,   ROT90,  "Tago Electronics", "Calipso",  GAME_SUPPORTS_SAVE )
+GAME( 1982, calipso,   0,        scobra,    calipso, galaxian_state,   calipso,   ROT90,  "Tago Electronics", "Calipso",  GAME_SUPPORTS_SAVE )
 
 /*
     Lost Tomb
@@ -6627,77 +6627,77 @@ GAME( 1982, calipso,   0,        scobra,    calipso,   calipso,   ROT90,  "Tago 
     CPU/Video Board: A969 (Has various wire mods)
     Sound Board:     A2048
 */
-GAME( 1982, losttomb,  0,        scobra,   losttomb,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
-GAME( 1982, losttombh, losttomb, scobra,   losttomb,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
+GAME( 1982, losttomb,  0,        scobra,   losttomb, galaxian_state,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
+GAME( 1982, losttombh, losttomb, scobra,   losttomb, galaxian_state,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
 
-GAME( 1984, spdcoin,   0,        scobra,   spdcoin,   scobra,   ROT90,  "Stern Electronics", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1984, spdcoin,   0,        scobra,   spdcoin, galaxian_state,   scobra,   ROT90,  "Stern Electronics", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
 
-GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, superbon,  0,        scobra,   superbon, galaxian_state,  superbon, ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
 
 
 /* currently in galaxold.c and should be moved here */
-//GAME( 1981, 4in1,     0,        4in1,     4in1,     4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-//GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, galaxian, ROT90,  "bootleg", "Bagman (Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-//GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, galaxian, ROT90,  "bootleg", "Donkey Kong Jr. (Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-//GAME( 1981, rockclim, 0,        rockclim, rockclim, galaxian, ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
-//GAME( 1983, ozon1,    0,        ozon1,    ozon1,    galaxian, ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
-//GAME( 1983, ladybugg, ladybug,  galaxian/*batman2*/,  ladybugg, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1980, vpool,    hustler,  mooncrst, vpool,    galaxian, ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, galaxian, ROT90,  "Shinkai Inc. (Magic Eletronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
-//GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, galaxian, ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, bongo,    0,        bongo,    bongo,    galaxian, ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
-//GAME( 1983, hunchbkg, hunchbak,   hunchbkg, hunchbkg, galaxian, ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, harem,    0,        harem,    harem,    galaxian, ROT90,  "I.G.R.", "Harem", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//GAME( 1982, tazzmang, tazmania,   tazzmang, tazzmang, galaxian, ROT90,  "bootleg", "Tazz-Mania (Galaxian Hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1986, racknrol, 0,        racknrol, racknrol, galaxian, ROT0,   "Status (Shinkai license)", "Rack + Roll", GAME_SUPPORTS_SAVE )
-//GAME( 1986, hexpool,  racknrol, racknrol, racknrol, galaxian, ROT90,  "Shinkai", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE )
-//GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, galaxian, ROT90,  "Senko", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
-//GAME( 1985, trvchlng, 0,        racknrol, trvchlng, galaxian, ROT90,  "Joyland (Senko license)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//GAME( 1981, ckongg,   0,        ckongg  , ckongg,   galaxian, ROT90,  "bootleg", "Crazy Kong (galaxian)", GAME_SUPPORTS_SAVE )
-//GAME( 1981, kkgalax,  ckongg,   ckongg  , ckongg,   galaxian, ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
-//GAME( 19??, porter,   0,        mooncrst, porter,   mooncrst, ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS ) // missing GFX bank switch!
+//GAME( 1981, 4in1,     0,        4in1,     4in1, galaxian_state,     4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+//GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, galaxian_state, galaxian, ROT90,  "bootleg", "Bagman (Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+//GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, galaxian_state, galaxian, ROT90,  "bootleg", "Donkey Kong Jr. (Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+//GAME( 1981, rockclim, 0,        rockclim, rockclim, galaxian_state, galaxian, ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
+//GAME( 1983, ozon1,    0,        ozon1,    ozon1, galaxold_state,    galaxian, ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
+//GAME( 1983, ladybugg, ladybug,  galaxian/*batman2*/,  ladybugg, XXX_CLASS, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1980, vpool,    hustler,  mooncrst, vpool, galaxian_state,    galaxian, ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, galaxold_state, galaxian, ROT90,  "Shinkai Inc. (Magic Eletronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
+//GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, galaxold_state, galaxian, ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, bongo,    0,        bongo,    bongo, galaxold_state,    galaxian, ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
+//GAME( 1983, hunchbkg, hunchbak,   hunchbkg, hunchbkg, galaxold_state, galaxian, ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, harem,    0,        harem,    harem, galaxold_state,    galaxian, ROT90,  "I.G.R.", "Harem", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//GAME( 1982, tazzmang, tazmania,   tazzmang, tazzmang, galaxian_state, galaxian, ROT90,  "bootleg", "Tazz-Mania (Galaxian Hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1986, racknrol, 0,        racknrol, racknrol, galaxold_state, galaxian, ROT0,   "Status (Shinkai license)", "Rack + Roll", GAME_SUPPORTS_SAVE )
+//GAME( 1986, hexpool,  racknrol, racknrol, racknrol, galaxold_state, galaxian, ROT90,  "Shinkai", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE )
+//GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, galaxold_state, galaxian, ROT90,  "Senko", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
+//GAME( 1985, trvchlng, 0,        racknrol, trvchlng, galaxold_state, galaxian, ROT90,  "Joyland (Senko license)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//GAME( 1981, ckongg,   0,        ckongg  , ckongg, galaxian_state,   galaxian, ROT90,  "bootleg", "Crazy Kong (galaxian)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, kkgalax,  ckongg,   ckongg  , ckongg, galaxian_state,   galaxian, ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+//GAME( 19??, porter,   0,        mooncrst, porter, galaxian_state,   mooncrst, ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS ) // missing GFX bank switch!
 
 /* currently in scramble.c and should be moved here */
-//GAME( 1982, triplep,  0,        theend  /*triplep*/,  triplep,  scramble_ppi, ROT90, "KKI", "Triple Punch", GAME_SUPPORTS_SAVE )
-//GAME( 1982, knockout, triplep,  theend  /*triplep*/,  triplep,  scramble_ppi, ROT90, "KKK", "Knock Out!!", GAME_SUPPORTS_SAVE )
-//GAME( 1981, mariner,  0,        theend  /*mariner*/,  scramble, mariner,      ROT90, "Amenip", "Mariner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-//GAME( 1981, 800fath,  mariner,  theend  /*mariner*/,  scramble, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms", GAME_SUPPORTS_SAVE )
-//GAME( 1981, ckongs,   ckong,    theend  /*ckongs*/,   ckongs,   ckongs,       ROT90, "bootleg", "Crazy Kong (Scramble hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1981, mars,     0,        theend  /*mars*/,     mars,     mars,         ROT90, "Artic", "Mars", GAME_SUPPORTS_SAVE )
-//GAME( 1982, devilfsh, 0,        theend  /*devilfsh*/, devilfsh, devilfsh,     ROT90, "Artic", "Devil Fish", GAME_SUPPORTS_SAVE )
-//GAME( 1983, newsin7,  0,        theend  /*newsin7*/,  newsin7,  mars,         ROT90, "ATW USA, Inc.", "New Sinbad 7", GAME_SUPPORTS_SAVE )
-//GAME( 1984, mrkougar, 0,        theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar", GAME_SUPPORTS_SAVE )
-//GAME( 1983, mrkougr2, mrkougar, theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar (earlier)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 1)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, hotshock, 0,        theend  /*hotshock*/, hotshock, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
-//GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
-//GAME( 1983, hunchbks, hunchbak, theend  /*hunchbks*/, hunchbks, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1984, hncholms, huncholy, theend  /*hncholms*/, hncholms, scramble_ppi, ROT90, "Century Electronics", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, cavelon,  0,        theend  /*cavelon*/,  cavelon,  cavelon,      ROT90, "Jetsoft", "Cavelon", GAME_SUPPORTS_SAVE )
-//GAME( 1982, mimonscr, mimonkey, theend  /*mimonscr*/, mimonscr, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, ad2083,   0,        theend  /*ad2083*/,   ad2083,   ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-//GAME( 1981, turpins,  turtles,  turtles,  turpins,  0,              ROT90, "bootleg", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
+//GAME( 1982, triplep,  0,        theend  /*triplep*/,  triplep, XXX_CLASS,  scramble_ppi, ROT90, "KKI", "Triple Punch", GAME_SUPPORTS_SAVE )
+//GAME( 1982, knockout, triplep,  theend  /*triplep*/,  triplep, XXX_CLASS,  scramble_ppi, ROT90, "KKK", "Knock Out!!", GAME_SUPPORTS_SAVE )
+//GAME( 1981, mariner,  0,        theend  /*mariner*/,  scramble, XXX_CLASS, mariner,      ROT90, "Amenip", "Mariner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+//GAME( 1981, 800fath,  mariner,  theend  /*mariner*/,  scramble, XXX_CLASS, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms", GAME_SUPPORTS_SAVE )
+//GAME( 1981, ckongs,   ckong,    theend  /*ckongs*/,   ckongs, XXX_CLASS,   ckongs,       ROT90, "bootleg", "Crazy Kong (Scramble hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, mars,     0,        theend  /*mars*/,     mars, XXX_CLASS,     mars,         ROT90, "Artic", "Mars", GAME_SUPPORTS_SAVE )
+//GAME( 1982, devilfsh, 0,        theend  /*devilfsh*/, devilfsh, XXX_CLASS, devilfsh,     ROT90, "Artic", "Devil Fish", GAME_SUPPORTS_SAVE )
+//GAME( 1983, newsin7,  0,        theend  /*newsin7*/,  newsin7, XXX_CLASS,  mars,         ROT90, "ATW USA, Inc.", "New Sinbad 7", GAME_SUPPORTS_SAVE )
+//GAME( 1984, mrkougar, 0,        theend  /*mrkougar*/, mrkougar, XXX_CLASS, mrkougar,     ROT90, "ATW", "Mr. Kougar", GAME_SUPPORTS_SAVE )
+//GAME( 1983, mrkougr2, mrkougar, theend  /*mrkougar*/, mrkougar, XXX_CLASS, mrkougar,     ROT90, "ATW", "Mr. Kougar (earlier)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, XXX_CLASS, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 1)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, XXX_CLASS, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, hotshock, 0,        theend  /*hotshock*/, hotshock, XXX_CLASS, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
+//GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, XXX_CLASS, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
+//GAME( 1983, hunchbks, hunchbak, theend  /*hunchbks*/, hunchbks, XXX_CLASS, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1984, hncholms, huncholy, theend  /*hncholms*/, hncholms, XXX_CLASS, scramble_ppi, ROT90, "Century Electronics", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, cavelon,  0,        theend  /*cavelon*/,  cavelon, XXX_CLASS,  cavelon,      ROT90, "Jetsoft", "Cavelon", GAME_SUPPORTS_SAVE )
+//GAME( 1982, mimonscr, mimonkey, theend  /*mimonscr*/, mimonscr, XXX_CLASS, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, ad2083,   0,        theend  /*ad2083*/,   ad2083, XXX_CLASS,   ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+//GAME( 1981, turpins,  turtles,  turtles,  turpins, galaxian_state,  0,              ROT90, "bootleg", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
 
 /* currently in scobra.c and should be moved here */
-//GAME( 1981, stratgyx, 0,        scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
-//GAME( 1981, stratgys, stratgyx, scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
-//GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, rescue,   0,        scobra/*rescue*/,   rescue,   rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
-//GAME( 1982, aponow,   rescue,   scobra/*rescue*/,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
-//GAME( 1983, minefld,  0,        scobra/*minefld*/,  minefld,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
-//GAME( 1981, hustler,  0,        scobra/*hustler*/,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
-//GAME( 1981, billiard, hustler,  scobra/*hustler*/,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
-//GAME( 1981, hustlerb, hustler,  scobra/*hustlerb*/, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, mimonkey, 0,        scobra/*mimonkey*/, mimonkey, mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
-//GAME( 1982, mimonsco, mimonkey, scobra/*mimonkey*/, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, stratgyx, 0,        scobra/*stratgyx*/, stratgyx, XXX_CLASS, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
+//GAME( 1981, stratgys, stratgyx, scobra/*stratgyx*/, stratgyx, XXX_CLASS, stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, XXX_CLASS, darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
+//GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, XXX_CLASS, tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, rescue,   0,        scobra/*rescue*/,   rescue, XXX_CLASS,   rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
+//GAME( 1982, aponow,   rescue,   scobra/*rescue*/,   rescue, XXX_CLASS,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
+//GAME( 1983, minefld,  0,        scobra/*minefld*/,  minefld, XXX_CLASS,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
+//GAME( 1981, hustler,  0,        scobra/*hustler*/,  hustler, XXX_CLASS,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
+//GAME( 1981, billiard, hustler,  scobra/*hustler*/,  hustler, XXX_CLASS,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
+//GAME( 1981, hustlerb, hustler,  scobra/*hustlerb*/, hustler, XXX_CLASS,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, mimonkey, 0,        scobra/*mimonkey*/, mimonkey, XXX_CLASS, mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
+//GAME( 1982, mimonsco, mimonkey, scobra/*mimonkey*/, mimonsco, XXX_CLASS, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
 /* currently in dambustr.c and should be moved here */
-//GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (US)", 0 )
-//GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+//GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US)", 0 )
+//GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
 
 /* misc stuff that should eventually be moved here */
-//GAME( 1981, scramblb, scramble, scramblb, scramblb, galaxian, ROT90,  "bootleg", "Scramble (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1981, scramb2,  scramble, scramb2,  scramb2,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, scramblb, scramble, scramblb, scramblb, galaxian_state, galaxian, ROT90,  "bootleg", "Scramble (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, scramb2,  scramble, scramb2,  scramb2, galaxian_state,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_SUPPORTS_SAVE )

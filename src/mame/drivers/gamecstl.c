@@ -800,5 +800,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl, ROT0, "Cristaltec", "GameCristal", GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal", GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", GAME_NOT_WORKING | GAME_NO_SOUND)

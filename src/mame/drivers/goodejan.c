@@ -465,6 +465,6 @@ ROM_START( goodejana )
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
-GAME( 1991, totmejan, 0,        totmejan, goodejan, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, goodejan, 0,        goodejan, goodejan, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, goodejana,goodejan, goodejan, goodejan, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, totmejan, 0,        totmejan, goodejan, goodejan_state, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, goodejan, 0,        goodejan, goodejan, goodejan_state, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, goodejana,goodejan, goodejan, goodejan, goodejan_state, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS )

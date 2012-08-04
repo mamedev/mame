@@ -389,5 +389,5 @@ ROM_START( togenkyo )
 ROM_END
 
 //    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
-GAME( 1989, ohpaipee,        0, ohpaipee, ohpaipee, ohpaipee,  ROT270, "Nichibutsu", "Oh! Paipee (Japan 890227)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, togenkyo,        0, togenkyo, togenkyo, togenkyo,    ROT0, "Nichibutsu", "Tougenkyou (Japan 890418)", 0 )
+GAME( 1989, ohpaipee,        0, ohpaipee, ohpaipee, nbmj8900_state, ohpaipee,  ROT270, "Nichibutsu", "Oh! Paipee (Japan 890227)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, togenkyo,        0, togenkyo, togenkyo, nbmj8900_state, togenkyo,    ROT0, "Nichibutsu", "Tougenkyou (Japan 890418)", 0 )

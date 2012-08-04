@@ -538,4 +538,4 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY                FULLNAME            FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

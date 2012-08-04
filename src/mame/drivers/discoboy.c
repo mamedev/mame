@@ -584,4 +584,4 @@ static DRIVER_INIT( discoboy )
 }
 
 
-GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

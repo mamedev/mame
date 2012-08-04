@@ -971,15 +971,15 @@ ROM_START( helifirea )
 ROM_END
 
 
-GAME( 1979, spacefev,   0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1979, highsplt,   0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, highsplta,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, highspltb,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", GAME_SUPPORTS_SAVE )
-GAME( 1979, spacelnc,   0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", GAME_SUPPORTS_SAVE )
-GAME( 1979, sheriff,    0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", GAME_SUPPORTS_SAVE )
-GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  0, ROT270, "Nintendo (Exidy license)", "Bandido", GAME_SUPPORTS_SAVE )
-GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, 0, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", GAME_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
-GAME( 1980, helifire,   0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1980, helifirea,  helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1979, spacefev,   0,        spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1979, highsplt,   0,        spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, highsplta,  highsplt, spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, highspltb,  highsplt, spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spacelnc,   0,        spacefev, spacelnc, n8080_state, 0, ROT270, "Nintendo", "Space Launcher", GAME_SUPPORTS_SAVE )
+GAME( 1979, sheriff,    0,        sheriff,  sheriff, n8080_state,  0, ROT270, "Nintendo", "Sheriff", GAME_SUPPORTS_SAVE )
+GAME( 1980, bandido,    sheriff,  sheriff,  bandido, n8080_state,  0, ROT270, "Nintendo (Exidy license)", "Bandido", GAME_SUPPORTS_SAVE )
+GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, n8080_state, 0, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", GAME_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
+GAME( 1980, helifire,   0,        helifire, helifire, n8080_state, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1980, helifirea,  helifire, helifire, helifire, n8080_state, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

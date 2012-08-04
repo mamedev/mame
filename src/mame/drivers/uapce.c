@@ -379,7 +379,7 @@ static DRIVER_INIT(uapce)
 	DRIVER_INIT_CALL(pce);
 }
 
-GAME( 1989, blazlaz, 0, uapce, uapce, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, uapce, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones", GAME_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, uapce, ROT0, "Hudson Soft", "Alien Crush", GAME_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, uapce, ROT0, "Namco", "Pac-Land (United Amusements PC Engine)", GAME_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones", GAME_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Alien Crush", GAME_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, uapce_state, uapce, ROT0, "Namco", "Pac-Land (United Amusements PC Engine)", GAME_IMPERFECT_SOUND )

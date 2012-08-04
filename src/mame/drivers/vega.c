@@ -145,4 +145,4 @@ DRIVER_INIT(vegaa)
 }
 #endif
 
-GAME( 1982, vega,   0, vega, vega, 0, ROT270, "Olympia", "Vega", GAME_IS_SKELETON )
+GAME( 1982, vega,   0, vega, vega, vega_state, 0, ROT270, "Olympia", "Vega", GAME_IS_SKELETON )

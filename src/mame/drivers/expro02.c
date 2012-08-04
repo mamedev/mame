@@ -758,9 +758,9 @@ static DRIVER_INIT(galsnew)
  *
  *************************************/
 
-GAME( 1990, galsnew,  0,       galsnew, galsnew,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewj, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewk, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Inter license)", "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnew,  0,       galsnew, galsnew, expro02_state,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, expro02_state, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnewj, galsnew, galsnew, galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnewk, galsnew, galsnew, galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Inter license)", "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
 
-GAME( 1994, fantasia, 0,       fantasia,fantasia, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasia, 0,       fantasia,fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

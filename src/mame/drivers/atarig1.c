@@ -1246,15 +1246,15 @@ static DRIVER_INIT( pitfightb ) { init_g1_common(machine, 0x038000,  -1, 1); }
  *
  *************************************/
 
-GAME( 1990, hydra,    0,        hydra, hydra,    hydra,    ROT0, "Atari Games", "Hydra", GAME_SUPPORTS_SAVE )
-GAME( 1990, hydrap,   hydra,    hydra, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,  hydra,    hydra, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hydra,    0,        hydra, hydra, atarig1_state,    hydra,    ROT0, "Atari Games", "Hydra", GAME_SUPPORTS_SAVE )
+GAME( 1990, hydrap,   hydra,    hydra, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,  hydra,    hydra, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight,  0,        pitfight, pitfight, pitfight9, ROT0, "Atari Games", "Pit Fighter (rev 9)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight7, pitfight, pitfight, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight6, pitfight, pitfight, pitfight, pitfightj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight5, pitfight, pitfight, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight4, pitfight, pitfight, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight3, pitfight, pitfight, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightj, pitfight, pitfight, pitfightj,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, pitfight, pitfight, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight,  0,        pitfight, pitfight, atarig1_state, pitfight9, ROT0, "Atari Games", "Pit Fighter (rev 9)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight7, pitfight, pitfight, pitfight, atarig1_state, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight6, pitfight, pitfight, pitfight, atarig1_state, pitfightj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight5, pitfight, pitfight, pitfight, atarig1_state, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight4, pitfight, pitfight, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight3, pitfight, pitfight, pitfight, atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightj, pitfight, pitfight, pitfightj, atarig1_state,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, pitfight, pitfight, atarig1_state, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )

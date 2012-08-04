@@ -474,5 +474,5 @@ static DRIVER_INIT( grndtour )
 
 
 
-GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock,  ROT0, "IGS", "IQ-Block", 0 )
-GAME( 1993, grndtour, 0, iqblock,  iqblock, grndtour, ROT0, "IGS", "Grand Tour", 0 )
+GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock_state, iqblock,  ROT0, "IGS", "IQ-Block", 0 )
+GAME( 1993, grndtour, 0, iqblock,  iqblock, iqblock_state, grndtour, ROT0, "IGS", "Grand Tour", 0 )

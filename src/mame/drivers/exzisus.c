@@ -439,6 +439,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  0 )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", 0 )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", 0 )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  0 )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", 0 )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", 0 )

@@ -263,5 +263,5 @@ static DRIVER_INIT(quizo)
 	state->m_videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 
-GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )
-GAME( 1985, quizoa, quizo,   quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", 0 )
+GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )
+GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", 0 )

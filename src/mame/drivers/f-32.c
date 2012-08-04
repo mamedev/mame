@@ -239,4 +239,4 @@ ROM_START( mosaicf2 )
 	ROM_LOAD( "snd.bin",             0x000000, 0x040000, CRC(4584589c) SHA1(5f9824724f840767c3dc1dc04b203ddf3d78b84c) )
 ROM_END
 
-GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, 0,        ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE )
+GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, 0,        ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE )

@@ -82,5 +82,5 @@ ROM_START(hercules)
 ROM_END
 
 
-GAME( 1979,  supermap,  0,  atari_s2,  atari_s2,  atari_s2,  ROT0,  "Atari",    "Superman (Pinball)",    GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979,  hercules,  0,  atari_s2,  atari_s2,  atari_s2,  ROT0,  "Atari",    "Hercules",              GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979,  supermap,  0,  atari_s2,  atari_s2, atari_s2_state,  atari_s2,  ROT0,  "Atari",    "Superman (Pinball)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979,  hercules,  0,  atari_s2,  atari_s2, atari_s2_state,  atari_s2,  ROT0,  "Atari",    "Hercules",              GAME_IS_SKELETON_MECHANICAL)

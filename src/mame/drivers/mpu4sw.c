@@ -63,7 +63,7 @@ static DRIVER_INIT( m_grtecpss )
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,mpu4 ,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
 
 
 // "(C)1994  B.W.B."  and  "AC101.0"
@@ -154,7 +154,7 @@ ROM_START( m4andycpdut )
 ROM_END
 
 // blank copyright  and "DAC 1.3" (6 reel game, not the same as the UK version?)
-GAME(199?, m4andycpdut,		m4andycp	,mod4oki	,mpu4				,m4_showstring			,ROT0,   "Barcrest","Andy Capp (Barcrest) [DAC 1.3, Dutch] (MPU4)",			GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4andycpdut,		m4andycp	,mod4oki	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Andy Capp (Barcrest) [DAC 1.3, Dutch] (MPU4)",			GAME_FLAGS|GAME_NO_SOUND )
 
 
 #define M4ANDYFL_EXTRA_ROMS \
@@ -169,7 +169,7 @@ GAME(199?, m4andycpdut,		m4andycp	,mod4oki	,mpu4				,m4_showstring			,ROT0,   "B
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYFL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,mpu4 ,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
 
 // "(C)1996  B.W.B."  and "AL4 2.1"
 M4ANDYFL_SET( 1996, m4andyfl,		0,			 "andy loves flo 05a 4 2-1",0x0000, 0x010000, CRC(773d2c6f) SHA1(944be6fff70439077a9c0d858e76806e0317585c), "Bwb", "Andy Loves Flo (Bwb / Barcrest) (MPU4) (AL4 2.1KS)" )
@@ -239,7 +239,7 @@ M4ANDYFL_SET( 1991, m4andyfluyd,	m4andyfl,	 "alu03dy.p1",				0x0000, 0x010000, C
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DTYFRE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,mpu4 ,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
 
 // "(C)1993 BARCREST"  and "DUT 0.4"
 M4DTYFRE_SET( 1993, m4dtyfre,		0,			"duts.p1",					0x0000, 0x010000, CRC(8c7d6567) SHA1(8e82c4168d4d455c7cb95a895c04f7ad327894ec), "Barcrest","Duty Free (Barcrest) (MPU4) (DUT 0.4)" )
@@ -332,7 +332,7 @@ M4DTYFRE_SET( 199?, m4dtyfre_h2,	m4dtyfre,	"duty2010",					0x0000, 0x010000, CRC
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,mpu4 ,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
 
 // "(C)1991 BARCREST"  and "RR6 1.2"
 M4RHOG_SET( 1991, m4rhog,			0,			"rr6s.p1",					0x0000, 0x010000, CRC(f978ca0b) SHA1(11eeac41f4c77b38b33baefb16dab7de1268d161), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2)" )
@@ -401,7 +401,7 @@ M4RHOG_SET( 1991, m4rh8,			m4rhog,		"rh8c.p1",					0x0000, 0x010000, CRC(e36d7ca
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYGE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,grtecp ,m_grtecpss ,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,grtecp , mpu4_state,m_grtecpss ,ROT0,company,title,GAME_FLAGS ) \
 
 // "(C)1991 BARCREST"  and "AN2 0.3"
 M4ANDYGE_SET( 1991, m4andyge,			0,			"an2s.p1",					0x0000, 0x010000, CRC(65399fa0) SHA1(ecefdf63e7aa477001fa530ed340e90e85252c3c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 1)" ) // one of these is probably hacked
@@ -477,7 +477,7 @@ M4ANDYGE_SET( 199?, m4andyge_h4,		m4andyge,	"age20_101",				0x0000, 0x010000, CR
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2	,mpu4 ,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod2	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
 
 // all the adders and ladders sets kill the cpu, end up jumping to the ram area after an RTI/RTS combo? are we saturating the CPU with too many interrupts or is there a bug?
 // also the BWB versioning is.. illogical

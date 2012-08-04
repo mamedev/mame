@@ -862,8 +862,8 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY                      FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation",         "Syvalion (Japan)",        GAME_SUPPORTS_SAVE )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",   GAME_SUPPORTS_SAVE )
-GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation",         "Go For The Gold (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito America Corporation", "Dynamite League (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, 0,       ROT0,    "Taito Corporation",         "Dynamite League (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, syvalion, 0,        syvalion, syvalion, taitoh_state, 0,       ROT0,    "Taito Corporation",         "Syvalion (Japan)",        GAME_SUPPORTS_SAVE )
+GAME( 1988, recordbr, 0,        recordbr, recordbr, taitoh_state, 0,       ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",   GAME_SUPPORTS_SAVE )
+GAME( 1988, gogold,   recordbr, recordbr, gogold, taitoh_state,   0,       ROT0,    "Taito Corporation",         "Go For The Gold (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, dleague,  0,        dleague,  dleague, taitoh_state,  0,       ROT0,    "Taito America Corporation", "Dynamite League (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, taitoh_state, 0,       ROT0,    "Taito Corporation",         "Dynamite League (Japan)", GAME_SUPPORTS_SAVE )

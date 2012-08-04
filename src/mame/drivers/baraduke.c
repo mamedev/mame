@@ -550,7 +550,7 @@ static DRIVER_INIT( baraduke )
 
 
 
-GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
-GAME( 1985, metrocrsa,metrocrs, baraduke, metrocrs, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
-GAME( 1985, aliensec, 0,        baraduke, baraduke, baraduke, ROT0, "Namco", "Alien Sector", 0 )
-GAME( 1985, baraduke, aliensec, baraduke, baraduke, baraduke, ROT0, "Namco", "Baraduke", 0 )
+GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke_state, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
+GAME( 1985, metrocrsa,metrocrs, baraduke, metrocrs, baraduke_state, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
+GAME( 1985, aliensec, 0,        baraduke, baraduke, baraduke_state, baraduke, ROT0, "Namco", "Alien Sector", 0 )
+GAME( 1985, baraduke, aliensec, baraduke, baraduke, baraduke_state, baraduke, ROT0, "Namco", "Baraduke", 0 )

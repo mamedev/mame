@@ -863,6 +863,6 @@ static DRIVER_INIT( thndzone )
 
 /**********************************************************************************/
 
-GAME( 1991, thndzone, 0,        dassault, thndzone, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, dassault, thndzone, dassault, dassault, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", GAME_SUPPORTS_SAVE )
-GAME( 1991, dassault4,thndzone, dassault, dassault4,dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndzone, 0,        dassault, thndzone, dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, dassault, thndzone, dassault, dassault, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", GAME_SUPPORTS_SAVE )
+GAME( 1991, dassault4,thndzone, dassault, dassault4, dassault_state,dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", GAME_SUPPORTS_SAVE )

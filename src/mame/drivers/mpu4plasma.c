@@ -132,7 +132,7 @@ ROM_END
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
-GAMEL(199?, m4bigchf	,0			,mpu4plasma   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 1)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
-GAMEL(199?, m4bigchfa	,m4bigchf	,mpu4plasma   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 2)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
-GAMEL(199?, m4bigchfb	,m4bigchf	,mpu4plasma   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 3)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
-GAMEL(199?, m4bigchfc	,m4bigchf	,mpu4plasma   	,mpu4				,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 4)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchf	,0			,mpu4plasma   	,mpu4				, mpu4plasma_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 1)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchfa	,m4bigchf	,mpu4plasma   	,mpu4				, mpu4plasma_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 2)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchfb	,m4bigchf	,mpu4plasma   	,mpu4				, mpu4plasma_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 3)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchfc	,m4bigchf	,mpu4plasma   	,mpu4				, mpu4plasma_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 4)",						GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
