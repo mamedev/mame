@@ -12,14 +12,14 @@
 
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( grtecp );
 extern DRIVER_INIT( m4default );
+extern DRIVER_INIT( m_grtecp );
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
-static DRIVER_INIT( m4_showstring )
+static DRIVER_INIT( m4debug )
 {
-	DRIVER_INIT_CALL( m4default );
-
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
 	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
@@ -35,6 +35,18 @@ static DRIVER_INIT( m4_showstring )
 	}
 }
 
+static DRIVER_INIT( m4_showstring )
+{
+	DRIVER_INIT_CALL( m4default );
+	DRIVER_INIT_CALL( m4debug );
+
+}
+
+static DRIVER_INIT( m_grtecpss )
+{
+	DRIVER_INIT_CALL( m_grtecp );
+	DRIVER_INIT_CALL( m4debug );
+}
 
 #define M4ANDYCP_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -299,8 +311,161 @@ M4DTYFRE_SET( 1996, m4dtyfrebwb_e,	m4dtyfre,	"4df5.4",					0x0000, 0x010000, CRC
 M4DTYFRE_SET( 1996, m4dtyfrebwb_f,	m4dtyfre,	"df5.4",					0x0000, 0x010000, CRC(14de7ecb) SHA1(f7445b33b2febbf93fd0398ab310ac104e79443c), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 2.1)" )
 M4DTYFRE_SET( 1996, m4dtyfrebwb_g,	m4dtyfre,	"df5 (2).4",				0x0000, 0x010000, CRC(50f8566c) SHA1(364d33de4b34d0052ffc98536468c0a13f847a2a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 1.1)" )
 M4DTYFRE_SET( 1996, m4dtyfrebwb_h,	m4dtyfre,	"df5.10",					0x0000, 0x010000, CRC(96acf53f) SHA1(1297a9162dea474079d0ea63b2b1b8e7f649230a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DFC 2.3)" )
-
 // "1997  COCO"  and "DF4  4.1" (hack?)
 M4DTYFRE_SET( 199?, m4dtyfre_h1,	m4dtyfre,	"dfre55",					0x0000, 0x010000, CRC(01e7d367) SHA1(638b709e4bb997998ccc7c4ea8adc33cabf2fe36), "hack?","Duty Free (Bwb / Barcrest) (MPU4) (DF4 4.1, hack?)" ) // bad chr
 // "HI BIG BOY"  and "DFT 0.1" (hack?)
 M4DTYFRE_SET( 199?, m4dtyfre_h2,	m4dtyfre,	"duty2010",					0x0000, 0x010000, CRC(48617f20) SHA1(dd35eef2357af6f88be42bb81608696ed97522c5), "hack?","Duty Free (Barcrest) (MPU4) (DFT 0.1, hack?)" ) // bad chr
+
+#define M4RHOG_EXTRA_ROMS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "rhm.chr", 0x0000, 0x000048, CRC(e8417c98) SHA1(460c43327b41c95b7d091c04dbc9ce7b2e4773f6) ) \
+	ROM_LOAD( "rr6s.chr", 0x0000, 0x000048, CRC(ca08d53a) SHA1(b419c45f46ee352cbdb0b38a8c3fd33383b61f3a) ) \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "rr6snd.p1", 0x000000, 0x080000, CRC(a5ec3f46) SHA1(2d6f1adbbd8ac931a99a7d3d9caa2a7a117ac3fa) ) \
+	ROM_LOAD( "rr6snd.p2", 0x080000, 0x080000, CRC(e5b72ef2) SHA1(dcdfa162db8bf3f9610709b5a8f3b695f42b2371) )
+
+
+#define M4RHOG_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 ,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
+
+// "(C)1991 BARCREST"  and "RR6 1.2"
+M4RHOG_SET( 1991, m4rhog,			0,			"rr6s.p1",					0x0000, 0x010000, CRC(f978ca0b) SHA1(11eeac41f4c77b38b33baefb16dab7de1268d161), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2)" )
+M4RHOG_SET( 1991, m4rhogr6d,		m4rhog,		"rr6d.p1",					0x0000, 0x010000, CRC(b61115ea) SHA1(92b97cc8b71eb31e8377a59344faaf0d800d1bdc), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2D)" )
+M4RHOG_SET( 1991, m4rhogr6ad,		m4rhog,		"rr6ad.p1",					0x0000, 0x010000, CRC(f328204d) SHA1(057f28e7eaaa372b901a76250fb7ebf4403348ad), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2AD)" )
+M4RHOG_SET( 1991, m4rhogr6b,		m4rhog,		"rr6b.p1",					0x0000, 0x010000, CRC(ccacd58e) SHA1(64b67e54e5568378a18ba99017078fcd4e6bc749), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2B)" )
+M4RHOG_SET( 1991, m4rhogr6c,		m4rhog,		"rr6c.p1",					0x0000, 0x010000, CRC(b5783c69) SHA1(38c122455bed904c9fd683be1a8508a69cbad03f), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2C)" )
+M4RHOG_SET( 1991, m4rhogr6k,		m4rhog,		"rr6k.p1",					0x0000, 0x010000, CRC(121d29bf) SHA1(8a6dcf345012b2c499acd32c6bb76eb81ada6fa9), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2K)" )
+M4RHOG_SET( 1991, m4rhogr6y,		m4rhog,		"rr6y.p1",					0x0000, 0x010000, CRC(56344b28) SHA1(7f6c740d0991a646393a47e2e85322a7c92bdd62), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2Y)" )
+M4RHOG_SET( 1991, m4rhogr6yd,		m4rhog,		"rr6dy.p1",					0x0000, 0x010000, CRC(0e540e0d) SHA1(a783e73822e436669c8cc1504619990725306df1), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2YD)" )
+// "(C)1991 BARCREST"  and "RR6 1.1"
+M4RHOG_SET( 1991, m4rhogr6y_a,		m4rhog,		"rdhogvkn",					0x0000, 0x010000, CRC(3db03ada) SHA1(9b26f466c1dc1d03edacf64cbe507e084edf5f90), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.1Y)" )
+// "(C)1995  B.W.B."  and "RO_ 3.0"
+M4RHOG_SET( 1995, m4rhogr3,			m4rhog,		"rh5p8.bin",				0x0000, 0x010000, CRC(35d56379) SHA1(ab70ef8151823c3157cf4cc4f9b29875c6ac81cc), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 3.0)" )
+// "(C)1994  B.W.B."  and "RO_ 2.0"
+M4RHOG_SET( 1994, m4rhogr2,			m4rhog,		"ro_05s__.2_1",				0x0000, 0x010000, CRC(dc18f70f) SHA1(da81b8279e4f58b1447f51beb446a6007eb39df9), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0)" )
+M4RHOG_SET( 1994, m4rhogr2d,		m4rhog,		"ro_05sd_.2_1",				0x0000, 0x010000, CRC(f230ae7e) SHA1(5525ed33d115b01722186587de20013265ac19b2), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0D)" )
+M4RHOG_SET( 1994, m4rhogr2c,		m4rhog,		"roi05___.2_1",				0x0000, 0x010000, CRC(85fbd24a) SHA1(653a3cf3e651d94611caacddbd0692111667424a), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0C)" )
+M4RHOG_SET( 1994, m4rhogr2k,		m4rhog,		"ro_05a__.2_1",				0x0000, 0x010000, CRC(67450ed1) SHA1(84cab7bb2411eb47c1336159bd1941862da59db3), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0K)" )
+M4RHOG_SET( 1994, m4rhogr2y,		m4rhog,		"ro_05sk_.2_1",				0x0000, 0x010000, CRC(3e1dfedd) SHA1(a750663c96060b858e194445bc1e677b49da85b8), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0Y)" )
+M4RHOG_SET( 1994, m4rhogr2yd,		m4rhog,		"ro_05sb_.2_1",				0x0000, 0x010000, CRC(4a33cfcf) SHA1(ac5d4873df74b521018d5eeac96fd7003ee093e8), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0YD)" )
+// "(C)1994  B.W.B."  and "RO_ 1.0"
+M4RHOG_SET( 1994, m4rhogr1,			m4rhog,		"ro_10s__.1_1",				0x0000, 0x010000, CRC(d140597a) SHA1(0ddf898b5db2a1cbfda84e8a63e0be3de7582cbd), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0)" )
+M4RHOG_SET( 1994, m4rhogr1d,		m4rhog,		"ro_10sd_.1_1",				0x0000, 0x010000, CRC(3f9152f3) SHA1(97e0c0461b8d4994515ac9e20d001dc7e74042ec), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0D)" )
+M4RHOG_SET( 1994, m4rhogr1c,		m4rhog,		"roi10___.1_1",				0x0000, 0x010000, CRC(2f832f4b) SHA1(b9228e2585cff6d4d9df64048c77e0b9ad3e75d7), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0C)" )
+M4RHOG_SET( 1994, m4rhogr1k,		m4rhog,		"ro_10a__.1_1",				0x0000, 0x010000, CRC(1772bce6) SHA1(c5d0cec8e5bcfcef5003325169522f1da066354b), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0K, set 1)" )
+M4RHOG_SET( 1994, m4rhogr1y,		m4rhog,		"ro_10sk_.1_1",				0x0000, 0x010000, CRC(5d5118d1) SHA1(c4abc5ccdeb711b6ec2a2c82bb2f8da9d824fe4e), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0Y)" )
+M4RHOG_SET( 1994, m4rhogr1yd,		m4rhog,		"ro_10sb_.1_1",				0x0000, 0x010000, CRC(34febd6f) SHA1(e1d5e178771714f9633dd9782c1f9d373a9ca5e1), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0YD)" )
+M4RHOG_SET( 1994, m4rhogr1k_a,		m4rhog,		"rhog5p",					0x0000, 0x010000, CRC(49b11beb) SHA1(89c2320de4b3f2ff6ba28501f88147b659f1ee20), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0K, set 2, wrong version number?)" ) // clearly not the same version as above, more code...
+// "HAVE A NICE DAY"  and "RO_ 2.0" (won't boot)
+M4RHOG_SET( 1994, m4rhog_h1,		m4rhog,		"road hog 5p 6.bin",		0x0000, 0x010000, CRC(b365d1f0) SHA1(af3b4f5162af6c033039a1e004bc803175a4e996), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 1)" )
+M4RHOG_SET( 1994, m4rhog_h2,		m4rhog,		"rhog05_11",				0x0000, 0x010000, CRC(8e4b14aa) SHA1(8b67b34597c0d30b0b3cf2566536c02f880a74bc), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 2)" )
+M4RHOG_SET( 1994, m4rhog_h3,		m4rhog,		"rhog55",					0x0000, 0x010000, CRC(29395082) SHA1(538434b82e31f7e40770a9b882e54a16195ee998), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 3)" )
+M4RHOG_SET( 1994, m4rhog_h4,		m4rhog,		"rhog58c",					0x0000, 0x010000, CRC(e02b6da6) SHA1(7d329adcac594c98685dc5404f2b9e8f717cc47f), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 4)" )
+M4RHOG_SET( 1994, m4rhog_h5,		m4rhog,		"rh056c",					0x0000, 0x010000, CRC(073845e2) SHA1(5e6f3ccdfc346f95e5e7e955144332e727da1d9e), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 5)" )
+M4RHOG_SET( 1994, m4rhog_h6,		m4rhog,		"rhog_05_.4",				0x0000, 0x010000, CRC(a75a2bd4) SHA1(d21505d27792acf8fa20a7cdc830efbe8756fe81), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 6)" )
+M4RHOG_SET( 1994, m4rhog_h7,		m4rhog,		"rhog_05_.8",				0x0000, 0x010000, CRC(5476f9b4) SHA1(fbd038e8710a79ea697d5acb482bed2f307cefbb), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 7)" )
+// "HAVE A NICE DAY"  and "RO_ 1.0" (won't boot)
+M4RHOG_SET( 1994, m4rhog_h8,		m4rhog,		"rhog10_11",				0x0000, 0x010000, CRC(83575be7) SHA1(2cb549554028f2fdc32ecfa58b786de375b8fa35), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 1)" )
+M4RHOG_SET( 1994, m4rhog_h9,		m4rhog,		"rhog10c",					0x0000, 0x010000, CRC(308c6d4f) SHA1(f7f8063fe8dd4ef204f225d0aa5202732ead5fa0), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 2)" )
+M4RHOG_SET( 1994, m4rhog_h10,		m4rhog,		"rhog_10_.4",				0x0000, 0x010000, CRC(8efa581c) SHA1(03c25b674cfb02792edc9ef8a76b16af31d80aae), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 3)" )
+M4RHOG_SET( 1994, m4rhog_h11,		m4rhog,		"rhog_10_.8",				0x0000, 0x010000, CRC(84d1f95d) SHA1(33f10e0e1e5abe6011b05f32f55c7dd6d3298945), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 4)" )
+// "(C)1991 BARCREST"  and "RR6 1.2" but won't boot, and we already have valid roms above, hacked?
+M4RHOG_SET( 1991, m4rhog_h12,		m4rhog,		"rhog20c",					0x0000, 0x010000, CRC(74ec16f7) SHA1(995d75b3a4e88d8a34dc395b185f728c18e00a2b), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2?, hack?)" )
+M4RHOG_SET( 1991, m4rhog_h13,		m4rhog,		"rhog_20_.8",				0x0000, 0x010000, CRC(3a82e4bf) SHA1(6582951c2afe14502c37460381bf4c28ec02f3c9), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2, hack?)" )
+M4RHOG_SET( 1991, m4rhog_h14,		m4rhog,		"rhog_20_.4",				0x0000, 0x010000, CRC(15e28457) SHA1(2a758a727a6956e3029b2026cd189f6249677c6a), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 1)" )
+M4RHOG_SET( 1991, m4rhog_h15,		m4rhog,		"rhog20_11",				0x0000, 0x010000, CRC(63c80ee0) SHA1(22a3f11007acedd833af9e73e3038fb3542781fe), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 2)" )
+// "(C)1995  B.W.B."  and "ROC 2.0"  (bad, and possible wrong game, club version?)
+M4RHOG_SET( 1995, m4rhog_roc,		m4rhog,		"roadhog5p4std.bin",		0x0000, 0x010000, BAD_DUMP CRC(0ff60341) SHA1(c12d5b160d9e47a6f1aa6f378c2a70186be6bdff), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (ROC 2.0, bad)" )
+// "(C)1991 BARCREST"  and "RH8 0.1" (wrong game!)
+M4RHOG_SET( 1991, m4rh8,			m4rhog,		"rh8c.p1",					0x0000, 0x010000, CRC(e36d7ca0) SHA1(73970761c5c7004669b02ba9f3a299f36f2d00e9), "Barcrest","unknown (Barcrest) (MPU4) (RH8 0.1C)" )
+
+
+#define M4ANDYGE_EXTRA_ROMS \
+	ROM_REGION( 0x1200, "plds", 0 ) /* PAL16V8 PLD, like others - CHR? Guess it should be here... */  \
+	ROM_LOAD( "age.bin", 0x0000, 0x000117, CRC(901359e5) SHA1(7dbcd6023e7ce68f4aa7f191f572d74f21f978aa) ) \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "char.chr", 0x0000, 0x000048, CRC(053a5846) SHA1(c92de79e568c9f253bb71dbda2ca32b7b3b6661a) ) \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "an2snd.p1",  0x000000, 0x080000,  CRC(5394e9ae) SHA1(86ccd8531fc87f34d3c5482ba7e5a2c06ea69491) ) \
+	ROM_LOAD( "an2snd.p2",  0x080000, 0x080000,  CRC(109ace1f) SHA1(9f0e8065186beb61ed50fea834de2d91e68db953) )
+
+#define M4ANDYGE_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ANDYGE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,grtecp ,m_grtecpss ,ROT0,company,title,GAME_FLAGS ) \
+
+// "(C)1991 BARCREST"  and "AN2 0.3"
+M4ANDYGE_SET( 1991, m4andyge,			0,			"an2s.p1",					0x0000, 0x010000, CRC(65399fa0) SHA1(ecefdf63e7aa477001fa530ed340e90e85252c3c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 1)" ) // one of these is probably hacked
+M4ANDYGE_SET( 1991, m4andygen2_a,		m4andyge,	"agesc20p",					0x0000, 0x010000, CRC(94fec0f3) SHA1(7678e01a4e0fcc4136f6d4a668c4d1dd9a8f1246), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 2)" ) // or has the wrong id strings
+M4ANDYGE_SET( 1991, m4andygen2d,		m4andyge,	"an2d.p1",					0x0000, 0x010000, CRC(5651ed3d) SHA1(6a1fbff252bf266b03c4cb64294053f686a523d6), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3D)" )
+M4ANDYGE_SET( 1991, m4andygen2c,		m4andyge,	"an2c.p1",					0x0000, 0x010000, CRC(3e233c24) SHA1(4e8f0cb45851db509020afd47821893ab49448d7), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3C)" )
+M4ANDYGE_SET( 1991, m4andygen2k,		m4andyge,	"an2k.p1",					0x0000, 0x010000, CRC(c0886dff) SHA1(ef2b509fde05ef4ef055a09275afc9e153f50efc), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3K)" )
+M4ANDYGE_SET( 1991, m4andygen2y,		m4andyge,	"an2y.p1",					0x0000, 0x010000, CRC(a9cd1ed2) SHA1(052fc711efe633a2ece6bf24fabdc0b69b9355fd), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3Y)" )
+// "(C)1991 BARCREST"  and "A28 0.1"
+M4ANDYGE_SET( 1991, m4andyge28,			m4andyge,	"a28s.p1",					0x0000, 0x010000, CRC(40529bad) SHA1(d22b0e8a8f4acec78dc05cde01d68b625008f3b0), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1)" )
+M4ANDYGE_SET( 1991, m4andyge28d,		m4andyge,	"a28d.p1",					0x0000, 0x010000, CRC(e8eee34e) SHA1(c223a8c1fd2c609376bab9e780020523c4e76b08), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1D)" )
+M4ANDYGE_SET( 1991, m4andyge28ad,		m4andyge,	"a28ad.p1",					0x0000, 0x010000, CRC(ecb0b180) SHA1(23d68e34e7a58fc6574e6c8524ce2e4e4cd25582), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1AD)" )
+M4ANDYGE_SET( 1991, m4andyge28b,		m4andyge,	"a28b.p1",					0x0000, 0x010000, CRC(481c6c1c) SHA1(d8133d87e481f9c01c60324e918f706da6486c1b), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1B)" )
+M4ANDYGE_SET( 1991, m4andyge28bd,		m4andyge,	"a28bd.p1",					0x0000, 0x010000, CRC(a59430b1) SHA1(000a00ba115408ab35fea74faa745220a9fcad68), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1BD)" )
+M4ANDYGE_SET( 1991, m4andyge28c,		m4andyge,	"a28c.p1",					0x0000, 0x010000, CRC(e74533db) SHA1(f6f77dc61c08cdced0dca9133dfeeb5fdd4076f0), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1C)" )
+M4ANDYGE_SET( 1991, m4andyge28k,		m4andyge,	"a28k.p1",					0x0000, 0x010000, CRC(c83b94fa) SHA1(8194b25bfcb8ba0323c63ee2f2b45f030aa1caeb), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1K)" )
+M4ANDYGE_SET( 1991, m4andyge28kd,		m4andyge,	"a28dk.p1",					0x0000, 0x010000, CRC(115a2bc1) SHA1(31736f9583b4f110a6c838cecbd47acb7baa58c9), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1KD)" )
+M4ANDYGE_SET( 1991, m4andyge28y,		m4andyge,	"a28y.p1",					0x0000, 0x010000, CRC(fb1c83b7) SHA1(76b40e1ea47732ae0f6e9557c2d0445421122ac8), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1Y)" )
+M4ANDYGE_SET( 1991, m4andyge28yd,		m4andyge,	"a28dy.p1",					0x0000, 0x010000, CRC(05ef8b21) SHA1(762aaad6892511ba1f3266c1ed0a09850339cc63), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1YD)" )
+// "(C)1991 BARCREST"  and "A2T 0.1"
+M4ANDYGE_SET( 1991, m4andyge2t,			m4andyge,	"a2ts.p1",					0x0000, 0x010000, CRC(d47c9c42) SHA1(5374cb5739a5c2ab2be32166c4819682f3266320), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1)" )
+M4ANDYGE_SET( 1991, m4andyge2td,		m4andyge,	"a2td.p1",					0x0000, 0x010000, CRC(ad17a652) SHA1(86006c706768a9227a21eb8da25817f4efacaa39), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1D)" )
+M4ANDYGE_SET( 1991, m4andyge2tad,		m4andyge,	"a2tad.p1",					0x0000, 0x010000, CRC(0e3971d7) SHA1(f8de4a932937923d585f816fc9bffbe9887011c1), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1AD)" )
+M4ANDYGE_SET( 1991, m4andyge2tb,		m4andyge,	"a2tb.p1",					0x0000, 0x010000, CRC(d8c4bf4d) SHA1(06e082db39576f2da39866bdb8daab49e2b4108d), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1B)" )
+M4ANDYGE_SET( 1991, m4andyge2tbd,		m4andyge,	"a2tbd.p1",					0x0000, 0x010000, CRC(ed048ad0) SHA1(a2ffae901171363ccb827c7bf6299f29b0347e3c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1BD)" )
+M4ANDYGE_SET( 1991, m4andyge2tk,		m4andyge,	"a2tk.p1",					0x0000, 0x010000, CRC(8ca6ce3d) SHA1(6c869eceea88109b23a2b850deda6c5a46ca5a48), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1K)" )
+M4ANDYGE_SET( 1991, m4andyge2tkd,		m4andyge,	"a2tdk.p1",					0x0000, 0x010000, CRC(f11bd420) SHA1(0904ecf296474ee5283da26d8c728af438aac595), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1KD)" )
+M4ANDYGE_SET( 1991, m4andyge2ty,		m4andyge,	"a2ty.p1",					0x0000, 0x010000, CRC(30c22b5d) SHA1(be87fcbfb13c34c3d0ee1f586e887c80ffa01245), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1Y)" )
+M4ANDYGE_SET( 1991, m4andyge2tyd,		m4andyge,	"a2tdy.p1",					0x0000, 0x010000, CRC(0ffcb8d7) SHA1(b1d591eed982d2bc2e02b96e2561bbb372242480), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A2T 0.1YD)" )
+// "(C)1991 BARCREST"  and "A5T 0.1"
+M4ANDYGE_SET( 1991, m4andyge5t,			m4andyge,	"a5ts.p1",					0x0000, 0x010000, CRC(9ab99a1e) SHA1(605c5ee71aa0583f02e9ced604692814e33b741a), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1)" )
+M4ANDYGE_SET( 1991, m4andyge5td,		m4andyge,	"a5td.p1",					0x0000, 0x010000, CRC(b3ebc357) SHA1(6d0718474f83f71151189c3175b687564c1d49b0), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1D)" )
+M4ANDYGE_SET( 1991, m4andyge5tad,		m4andyge,	"a5tad.p1",					0x0000, 0x010000, CRC(df767538) SHA1(17ca5ea5b217fda448f61412cae82ae61447c5ad), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1AD)" )
+M4ANDYGE_SET( 1991, m4andyge5tb,		m4andyge,	"a5tb.p1",					0x0000, 0x010000, CRC(e6f22d3f) SHA1(f6da8edc0b058ce316ccca306f930469ef6d016c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1B)" )
+M4ANDYGE_SET( 1991, m4andyge5tbd,		m4andyge,	"a5tbd.p1",					0x0000, 0x010000, CRC(24aa63c8) SHA1(838f1fff46c65dd56f25fd491f8aab3be826a845), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1BD)" )
+M4ANDYGE_SET( 1991, m4andyge5tk,		m4andyge,	"a5tk.p1",					0x0000, 0x010000, CRC(c63209f8) SHA1(71968dd94431610ddef35bb4cf8dcba749470a26), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1K)" )
+M4ANDYGE_SET( 1991, m4andyge5tkd,		m4andyge,	"a5tdk.p1",					0x0000, 0x010000, CRC(67472634) SHA1(aae14b9ea4125b94dd1a7325c000629258573499), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1KD)" )
+M4ANDYGE_SET( 1991, m4andyge5ty,		m4andyge,	"a5ty.p1",					0x0000, 0x010000, CRC(86ef0bd8) SHA1(870b8165e206f84e59a3badfba441a567626f297), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1Y)" )
+M4ANDYGE_SET( 1991, m4andyge5tyd,		m4andyge,	"a5tdy.p1",					0x0000, 0x010000, CRC(9f9c15c2) SHA1(0e6471c62450bd8468adde1a2d69c5b24c472bfc), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A5T 0.1YD)" )
+// "(C)1995  B.W.B."  and "AGC 2.0"
+M4ANDYGE_SET( 1995, m4andygegc2,		m4andyge,	"ag_05__c.2_1",				0x0000, 0x010000, CRC(c38c11a3) SHA1(c2d81d99a842eac8dff3e0be57f37af9eb534ad1), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AGC 2.0)" )
+M4ANDYGE_SET( 1995, m4andygegc2d,		m4andyge,	"ag_05_d4.2_1",				0x0000, 0x010000, CRC(29953aa1) SHA1(c1346ab7e651c35d704e5127c4d44d2086fd48e3), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AGC 2.0D)" )
+// "(C)1994  B.W.B."  and "AG5 3.0"
+M4ANDYGE_SET( 1994, m4andygeg5,			m4andyge,	"ag_05s__.3_1",				0x0000, 0x010000, CRC(c0e45872) SHA1(936ca3230cd36dd4ad2c74ea33ea469c482e5688), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0)" )
+M4ANDYGE_SET( 1994, m4andygeg5d,		m4andyge,	"ag_05sd_.3_1",				0x0000, 0x010000, CRC(b7fced5c) SHA1(6b359b29019bf22b2ebdd96a69f919b18935a98c), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0D)" )
+M4ANDYGE_SET( 1994, m4andygeg5a,		m4andyge,	"agesc5p",					0x0000, 0x010000, CRC(9de05e25) SHA1(b4d6aea5cffb14babd89cfa76575a68277bfaa4b), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0A)" )
+M4ANDYGE_SET( 1994, m4andygeg5c,		m4andyge,	"agi05___.3_1",				0x0000, 0x010000, CRC(b061a468) SHA1(a1f1a8bd55eb7a684de270bace9464812172ed92), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0C)" )
+M4ANDYGE_SET( 1994, m4andygeg5k,		m4andyge,	"ag_05a__.3_1",				0x0000, 0x010000, CRC(89f4281e) SHA1(3ada70d7c5ef523f1a4eddfc8f1967e4a6de190d), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0K)" )
+M4ANDYGE_SET( 1994, m4andygeg5yd,		m4andyge,	"ag_05sb_.3_1",				0x0000, 0x010000, CRC(f5055b62) SHA1(b12a7d2a1143ce47e6a327831d5df21483d78b03), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0YD)" )
+// "(C)1994  B.W.B."  and "AG__2.0"
+M4ANDYGE_SET( 1994, m4andygeg_2,		m4andyge,	"ag_10s__.2_1",				0x0000, 0x010000, CRC(0dfeda46) SHA1(27e7548845f116537043e26002d8a5458275389d), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG__2.0)" )
+M4ANDYGE_SET( 1994, m4andygeg_2d,		m4andyge,	"ag_10sd_.2_1",				0x0000, 0x010000, CRC(03ab435f) SHA1(3b04324c1ae839529d99255008874df3744769a4), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG__2.0D)" )
+M4ANDYGE_SET( 1994, m4andygeg_2c,		m4andyge,	"agi10___.2_1",				0x0000, 0x010000, CRC(7c56a6ca) SHA1(adb567b8e1b6cc727bcfa694ade947f8c695f44a), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG__2.0C)" )
+M4ANDYGE_SET( 1994, m4andygeg_2k,		m4andyge,	"ag_10a__.2_1",				0x0000, 0x010000, CRC(ca80d891) SHA1(17bf51fecc3cecbb1e0ef0550296c8bf81d3d879), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG__2.0K)" )
+M4ANDYGE_SET( 1994, m4andygeg_2yd,		m4andyge,	"ag_10sb_.2_1",				0x0000, 0x010000, CRC(6f025416) SHA1(bb0167ba0a67dd1a03ec3e69e2050e2bf1d35244), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG__2.0YD)" )
+// "(C)1994  B.W.B."  and "AG5 3.0"  (are these legit? they don't seem to care much about the chr)
+M4ANDYGE_SET( 1994, m4andyge_hx1,		m4andyge,	"acappgreatescape5p4.bin",	0x0000, 0x010000, CRC(87733a0d) SHA1(6e2fc0f43eb48740b120af77302f1322a27e8a5a), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0CX, hack?, set 1)" )
+M4ANDYGE_SET( 1994, m4andyge_hx2,		m4andyge,	"age55",					0x0000, 0x010000, CRC(481e942d) SHA1(23ac3c4f624ae73940baf515002a178d39ba32b0), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0CX, hack?, set 2)" )
+M4ANDYGE_SET( 1994, m4andyge_hx3,		m4andyge,	"age58c",					0x0000, 0x010000, CRC(0b1e4a0e) SHA1(e2bcd590a358e48b26b056f83c7180da0e036024), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0CX, hack?, set 3)" )
+M4ANDYGE_SET( 1994, m4andyge_hx4,		m4andyge,	"age05_101",				0x0000, 0x010000, CRC(70c1d1ab) SHA1(478891cadaeba76666af5c4f25531456ebbe789a), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0CX, hack?, set 4)" )
+// "               "  and "AG__2.0"
+M4ANDYGE_SET( 1994, m4andyge_hx5,		m4andyge,	"age10_101",				0x0000, 0x010000, CRC(55e3a27e) SHA1(209166d052cc296f135225c77bb57abbef1a86ae), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG__2.0CX, hack?)" )
+// "RICK LUVS BRIAN"  and "8V1 3.0"
+M4ANDYGE_SET( 199?, m4andyge_h1,		m4andyge,	"age5p8p.bin",				0x0000, 0x010000, CRC(c3b40981) SHA1(da56e468ae67f1a231fea721235036c75c5efac3), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (8V1 3.0, hack?, set 1)" )
+M4ANDYGE_SET( 199?, m4andyge_h2,		m4andyge,	"ages58c",					0x0000, 0x010000, CRC(af479dc9) SHA1(7e0e3b36289d689bbd0c022730d7aee62192f49f), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (8V1 3.0, hack?, set 2)" )
+// "               "  and "8V1 0.3"
+M4ANDYGE_SET( 199?, m4andyge_h3,		m4andyge,	"age_20_.8",				0x0000, 0x010000, CRC(b1f91b2a) SHA1(9340f87d6d186b3af0384ab546c3d3f487e797d4), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (8V1 0.3, hack?, set 1)" )
+M4ANDYGE_SET( 199?, m4andyge_h4,		m4andyge,	"age20_101",				0x0000, 0x010000, CRC(7e3674f0) SHA1(351e353da24b63d2ef7cb09690b770b26505569a), "hack?","Andy's Great Escape (Bwb / Barcrest) (MPU4) (8V1 0.3, hack?, set 2)" )
