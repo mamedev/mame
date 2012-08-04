@@ -381,14 +381,14 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			track_header tr;
 			io_generic_read(io, &tr,track_offsets[(track<<1)+side],sizeof(tr));
 			//printf("%d,%d %d, %d\n",track,side,tr.track_number, tr.gap3_length);
-			int sec_location = track_offsets[(track<<1)+side] + 0x100;
+			//int sec_location = track_offsets[(track<<1)+side] + 0x100;
 			for(int j=0;j<tr.number_of_sector;j++)
 			{
 				sector_header sector;
 				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
 				//printf("sec %02x %08x\n",sector.sector_id,sec_location);
 
-				sec_location += sector.data_lenght;
+				//sec_location += sector.data_lenght;
 			}
 			counter++;
 		}

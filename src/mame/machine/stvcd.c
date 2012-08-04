@@ -1948,7 +1948,7 @@ WRITE32_HANDLER( stvcd_w )
 static void read_new_dir(running_machine &machine, UINT32 fileno)
 {
 	int foundpd, i;
-	UINT32 cfad, dirfad;
+	UINT32 cfad;//, dirfad;
 	UINT8 sect[2048];
 
 	if (fileno == 0xffffff)
@@ -1991,8 +1991,8 @@ static void read_new_dir(running_machine &machine, UINT32 fileno)
 		// got primary vol. desc.
 		if (foundpd)
 		{
-			dirfad = sect[140] | (sect[141]<<8) | (sect[142]<<16) | (sect[143]<<24);
-			dirfad += 150;
+			//dirfad = sect[140] | (sect[141]<<8) | (sect[142]<<16) | (sect[143]<<24);
+			//dirfad += 150;
 
 			// parse root entry
 			curroot.firstfad = sect[158] | (sect[159]<<8) | (sect[160]<<16) | (sect[161]<<24);
