@@ -1,4 +1,56 @@
 /*  Konami Cobra System
+
+
+    Games on this hardware
+	----------------------
+
+	Game                                     ID        Year    Notes
+	-----------------------------------------------------------------------
+	Fighting Bujutsu / Fighting Wu-Shu     | G?645   | 1997  | 
+	Racing Jam DX                          | GY676   | 1997  | GY676-PWB(F) LAN board
+
+
+	Hardware overview:
+	
+	COBRA/603 GN645-PWB(A)   CPU Board
+	----------------------------------
+	    IBM PowerPC 603EV
+		Motorola XPC105ARX66CD
+
+	COBRA/403 GN645-PWB(B)   SUB Board
+	----------------------------------
+		IBM PowerPC 403GA-JC33C1 (32MHz)
+		TI TMS57002
+		Ricoh RF5c400
+		M48T58-70PC1 Timekeeper
+		ADC1038CIN A/D Converter
+		2x AM7203A(?) FIFO (2K x 9)
+
+	COBRA/604 GN645-PWB(C)   GFX Board
+	----------------------------------
+		IBM PowerPC 604
+		Motorola XPC105ARX66CD
+		Toshiba TMP47P241VM MCU (internal ROM?)
+		4x CY7C4231 FIFO (2K x 9)
+		Xilinx XC4300E FPGA
+		Xilinx XC9536 FPGA
+
+	GN645-PWB(D) Video Board (Also labeled IBM 36H3800. Seems to be related to the RS/6000 OpenGL accelerators.)
+	-----------------------------------
+		89G9380 (Xilinx part with an IBM sticker)
+		PKA0702
+		PLA0702 (4 dies on the chip)
+		RAA0800
+		BTA0803
+		4x TOA2602
+		Bt121KPJ80 RAMDAC
+
+	GY676-PWB(F) LAN Board
+	----------------------
+	    Xilinx XC5210 FPGA
+		Xilinx XC5204 FPGA
+		Konami K001604 (2D tilemaps + 2x ROZ)
+		Bt121KPC80 RAMDAC
 */
 
 /*
@@ -52,6 +104,82 @@
         gfxfifo_exec: ram write 80104: 00000200
         gfxfifo_exec: ram write 80110: 00000200
         gfxfifo_exec: ram write 800A8: 80000000
+
+
+
+	Bujutsu GL functions (603 board):
+	
+	?         : glDebugSwitch
+	0x0000b784: glBindTexture?
+	0x0000d40c: glEnable?
+	0x0000d7f4: glDisable?
+	0x0000d840: glAlphaFunc
+	0x0000d9a4: glNewList
+	0x0000dab0: glMatrixMode
+	?         : glOrtho
+	?         : glViewport
+	0x0000db6c: glIdentity?
+	0x0000dbf0: glFrustum
+	?         : glCullFace
+	?         : glClear
+	?         : glCallList
+	?         : glLightfv
+	?         : glMaterialfv
+	0x0001b5c8: glBlendFunc
+	0x0001b8b0: glStencilOp
+	?         : glStencilFunc
+	0x000471e0: glTexParameterf
+	0x0004a228: glColorMaterial
+	?         : glFogfv
+	?         : glFogf
+	0x0004a7a8: glDepthFunc
+	0x000508a8: glMaterialf
+	0x000508fc: glLightModelfv
+	0x00050a50: glTexEnvf
+	?         : glTexEnvfv
+	0x00050cc8: ? (param 0xff) could be glStencilMask
+	0x00050d54: glFogi
+	0x00050da0: glHint
+	0x000cba6c: glTexParameteri
+
+
+	Main:
+	-
+	0x1b14():
+		-> 0xa6a8():   loop at 0xa7e0, waiting for [0x1790e8] to != 1
+
+	Sub:
+	-
+	State 0xc00: waiting for?
+
+	Gfx:
+	-
+	Fails on memcheck_teximage(), memcheck_framebuf(), drawcheck()
+	0x3806dc():   Waits for [0x7f7ffc] to change (in main)
+
+
+	GFX Registers:
+
+		0x00090:	Floating-point register (seen values 1.0f and 128.0f)
+		0x0009c:	Floating-point register (seen values 0.0f and 256.0f)
+		0x000a4:	Floating-point register (seen values 1.0f and -100.0f)
+		0x000ac:	Floating-point register (seen values 0.0f and 200.0f)
+
+		maybe a matrix?
+		0x90 0x94 0x98 0x9c
+		0xa0 0xa4 0xa8 0xac
+		0xb0 0xb4 0xb8 0xbc
+
+		0x40160:		Some viewport register? (high word: 192, low word: 150)
+		0x40164:		Some viewport register? (high word: 352, low word: 275)
+		0x40170:		Some viewport register? (high word: 160, low word: 125)
+		0x40174:		Some viewport register? (high word: 320, low word: 250)
+		0xc0c00..fff:	Texture RAM readback
+		0xc3020:		Start address for texram writes?
+		0xc3028:		Reads address from texram?
+		0xc4c00..fff:	Texture RAM readback
+		0xc8c00..fff:	Texture RAM readback
+		0xccc00..fff:	Texture RAM readback
 */
 
 
@@ -80,7 +208,7 @@ public:
 	{
 		m_fb = fb;
 
-		m_gfx_texture = auto_alloc_array(machine, UINT32, 0x1000);
+		m_texture_ram = auto_alloc_array(machine, UINT32, 0x1000000);
 
 		// TODO: these are probably set by some 3D registers
 		m_texture_width = 128;
@@ -92,14 +220,20 @@ public:
 	void draw_point(const rectangle &visarea, vertex_t &v, UINT32 color);
 	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
 
+	void gfx_init(running_machine &machine);
+	void gfx_reset(running_machine &machine);
 	void gfx_fifo_exec(running_machine &machine);
+	UINT32 gfx_read_gram(UINT32 address);
+	void gfx_write_gram(UINT32 address, UINT32 data);
 
 private:
 	bitmap_rgb32 *m_fb;
 
-	UINT32 *m_gfx_texture;
+	UINT32 *m_texture_ram;
 	int m_texture_width;
 	int m_texture_height;
+
+	UINT32 *m_gfx_gram;
 };
 
 class cobra_fifo
@@ -165,6 +299,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
 	DECLARE_READ32_MEMBER(sub_sound_r);
 	DECLARE_WRITE32_MEMBER(sub_sound_w);
+	DECLARE_READ32_MEMBER(sub_unk7e_r);
 	DECLARE_WRITE32_MEMBER(sub_debug_w);
 	DECLARE_READ32_MEMBER(sub_unk1_r);
 	DECLARE_WRITE32_MEMBER(sub_unk1_w);
@@ -219,11 +354,11 @@ public:
 	UINT32 m_sub_interrupt;
 
 	UINT8 m_gfx_unk_flag;
-	UINT8 *m_gfx_gram;
 	UINT32 m_gfx_re_command_word1;
 	UINT32 m_gfx_re_command_word2;
 	int m_gfx_re_word_count;
 	int m_gfx_re_status;
+	UINT32 m_gfx_unk_status;
 
 	int m_gfx_register_select;
 	UINT64 *m_gfx_register;
@@ -264,7 +399,7 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 		iu = (int)(u * m_texture_width);
 		iv = (int)(v * m_texture_height);
 
-		texel = m_gfx_texture[((iv * m_texture_width) + iu) / 2];
+		texel = m_texture_ram[((iv * m_texture_width) + iu) / 2];
 
 		if (iu & 1)
 		{
@@ -353,9 +488,10 @@ VIDEO_START( cobra )
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine));
 
-	cobra->m_framebuffer = auto_bitmap_rgb32_alloc(machine, 64*8, 32*8);
+	cobra->m_framebuffer = auto_bitmap_rgb32_alloc(machine, 512, 384);
 
 	cobra->m_renderer = auto_alloc(machine, cobra_renderer(machine, cobra->m_framebuffer));
+	cobra->m_renderer->gfx_init(machine);
 }
 
 SCREEN_UPDATE_RGB32( cobra )
@@ -1034,6 +1170,11 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 	}
 }
 
+READ32_MEMBER(cobra_state::sub_unk7e_r)
+{
+	return 0xffffffff;
+}
+
 WRITE32_MEMBER(cobra_state::sub_debug_w)
 {
 	if (ACCESSING_BITS_24_31)
@@ -1192,15 +1333,15 @@ static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
 }
 
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM
-	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM											// Main RAM
+	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)			// Double buffered shared RAM between Main and Sub
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16_LEGACY("rfsnd", rf5c400_r, rf5c400_w, 0xffffffff)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
 	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_RAM											// PSAC RAM
 	AM_RANGE(0x78240000, 0x78241fff) AM_MIRROR(0x80000000) AM_RAM											// PSAC unknown
 	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_psac2_r, sub_psac2_w)			// PSAC
-	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_WRITE(sub_debug_w)
+	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk7e_r, sub_debug_w)
 	AM_RANGE(0x7e040000, 0x7e041fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)				// TMS57002?
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
@@ -1245,15 +1386,66 @@ ADDRESS_MAP_END
 #define RE_STATUS_IDLE			0
 #define RE_STATUS_COMMAND		1
 
-static void cobra_gfx_init(cobra_state *cobra)
+void cobra_renderer::gfx_init(running_machine &machine)
 {
-	cobra->m_gfx_gram = auto_alloc_array(cobra->machine(), UINT8, 0x100000);
-	cobra->m_gfx_register = auto_alloc_array(cobra->machine(), UINT64, 0x3000);
+	cobra_state *cobra = machine.driver_data<cobra_state>();
+
+	m_gfx_gram = auto_alloc_array(machine, UINT32, 0x40000);
+	
+	cobra->m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
 }
 
-static void cobra_gfx_reset(cobra_state *cobra)
+void cobra_renderer::gfx_reset(running_machine &machine)
 {
+	cobra_state *cobra = machine.driver_data<cobra_state>();
+
 	cobra->m_gfx_re_status = RE_STATUS_IDLE;
+}
+
+UINT32 cobra_renderer::gfx_read_gram(UINT32 address)
+{
+	if (address & 3)
+	{
+		printf("gfx_read_gram: %08X, not dword aligned!\n", address);
+		return 0;
+	}
+
+	switch ((address >> 16) & 0xf)
+	{
+		case 0xc:		// 0xCxxxx
+		{
+			if ((address >= 0xc0c00 && address < 0xc1000) ||
+				(address >= 0xc4c00 && address < 0xc5000) ||
+				(address >= 0xc8c00 && address < 0xc9000) ||
+				(address >= 0xccc00 && address < 0xcd000))
+			{
+				UINT32 a = (((address >> 2) & 0xff) * 2) + ((address & 0x4000) ? 1 : 0);
+				UINT32 page = ((m_gfx_gram[0xc3028/4] >> 9) * 0x800) +
+							  ((address & 0x8000) ? 0x400 : 0) +
+							  ((m_gfx_gram[0xc3028/4] & 0x100) ? 0x200 : 0);
+
+				return m_texture_ram[page + a];
+			}
+			break;
+		}
+	}
+
+	return m_gfx_gram[address/4];
+}
+
+void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 data)
+{
+	if (address & 3)
+	{
+		printf("gfx_write_gram: %08X, %08X, not dword aligned!\n", address, data);
+		return;
+	}
+
+	switch (address)
+	{
+	}
+
+	m_gfx_gram[address/4] = data;
 }
 
 void cobra_renderer::gfx_fifo_exec(running_machine &machine)
@@ -1293,14 +1485,6 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			w2 = cobra->m_gfx_re_command_word2;
 		}
 
-	//  fifo_pop(GFXFIFO_IN, &in1);
-	//  fifo_pop(GFXFIFO_IN, &in2);
-
-	//  in1 = fifo_peek_top(GFXFIFO_IN);
-	//  in2 = fifo_peek_next(GFXFIFO_IN);
-
-	//  w1 = (UINT32)(in1);
-	//  w2 = (UINT32)(in2);
 
 		switch ((w1 >> 24) & 0xff)
 		{
@@ -1332,8 +1516,8 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 				if (w2 == 0x10500010)
 				{
-					// GFX register select?
-					cobra->m_gfx_register_select = w[3];		// word 3 is the only non-zero so far...
+					// GFX register select
+					cobra->m_gfx_register_select = w[3];
 
 					printf("GFX: register select %04X\n", cobra->m_gfx_register_select);
 				}
@@ -1391,65 +1575,6 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					fifo_out->push(NULL, w2);
 					fifo_out->push(NULL, in3);
 					fifo_out->push(NULL, in4);
-				}
-
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
-				break;
-			}
-			case 0x80:
-			case 0xa4:
-			case 0xa8:
-			case 0xac:
-			{
-				// 0xA80114CC           prm_flashcolor()
-				// 0xA80118CC
-				// 0xA80108FF
-
-				// 0xA80108FF           prm_flashmisc()
-				// 0xA80110FF
-				// 0xA8011CE0
-
-				// 0xA401BCC0           texenvmode()
-
-				// 0xA4019CC0           mode_fog()
-
-				// 0xA40018C0           mode_stipple()
-				// 0xA400D080
-
-				// 0xA40138E0           mode_viewclip()
-
-				// 0xA4011410           mode_scissor()
-
-				// 0xA40198A0           mode_alphatest()
-
-				// 0xA8002010           mode_depthtest()
-
-				// 0xA800507C           mode_blend()
-
-				// 0xA8001CFE           mode_stenciltest()
-
-				// 0xA8002010           mode_stencilmod()
-				// 0xA80054E0
-				// 0xA8001CFE
-
-				// 0xA80118CC           mode_colormask()
-				// 0xA80114CC
-
-				// 0xAxxxxxxx is different form in mbuslib_regwrite()
-
-				// mbuslib_regwrite(): 0x800000FF 0x00000001
-				//                     0xa40000FF 0x00000001
-
-				int reg = (w1 >> 8) & 0xfffff;
-
-				cobra->m_gfx_gram[reg + 0] = (w2 >> 24) & 0xff;
-				cobra->m_gfx_gram[reg + 1] = (w2 >> 16) & 0xff;
-				cobra->m_gfx_gram[reg + 2] = (w2 >>  8) & 0xff;
-				cobra->m_gfx_gram[reg + 3] = (w2 >>  0) & 0xff;
-
-				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
-				{
-					printf("gfxfifo_exec: ram write %05X: %08X\n", reg, w2);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -1825,8 +1950,68 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
+
+			case 0x80:
+			case 0xa4:
+			case 0xa8:
+			case 0xac:
+			{
+				// 0xA80114CC           prm_flashcolor()
+				// 0xA80118CC
+				// 0xA80108FF
+
+				// 0xA80108FF           prm_flashmisc()
+				// 0xA80110FF
+				// 0xA8011CE0
+
+				// 0xA401BCC0           texenvmode()
+
+				// 0xA4019CC0           mode_fog()
+
+				// 0xA40018C0           mode_stipple()
+				// 0xA400D080
+
+				// 0xA40138E0           mode_viewclip()
+
+				// 0xA4011410           mode_scissor()
+
+				// 0xA40198A0           mode_alphatest()
+
+				// 0xA8002010           mode_depthtest()
+
+				// 0xA800507C           mode_blend()
+
+				// 0xA8001CFE           mode_stenciltest()
+
+				// 0xA8002010           mode_stencilmod()
+				// 0xA80054E0
+				// 0xA8001CFE
+
+				// 0xA80118CC           mode_colormask()
+				// 0xA80114CC
+
+				// 0xAxxxxxxx is different form in mbuslib_regwrite()
+
+				// mbuslib_regwrite(): 0x800000FF 0x00000001
+				//                     0xa40000FF 0x00000001
+
+				int reg = (w1 >> 8) & 0xfffff;
+
+				gfx_write_gram(reg, w2);
+
+				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
+				{
+					printf("gfxfifo_exec: ram write %05X: %08X (%f)\n", reg, w2, u2f(w2));
+				}
+
+				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				break;
+			}
+
 			case 0xb0:
 			{
+				// write multiple registers
+
 				// mbuslib_pip_ints(): 0xB0300800 0x000001FE
 
 				int reg = (w1 >> 8) & 0xfffff;
@@ -1840,38 +2025,19 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 				printf("gfxfifo_exec: pip_ints %d\n", num);
 
-				/*
-                if (reg != 0x3008)
-                {
-                    fatalerror("gfxfifo_exec: pip_ints: %08X %08X\n", w1, w2);
-                }
-
-                printf("gfxfifo_exec: pip_ints %d\n", num);
-
-                for (i = 0; i < num; i++)
-                {
-                    UINT64 value;
-                    fifo_pop(GFXFIFO_IN, &value);
-
-                    gfx_unk_reg[i] = value;
-                }
-                */
-
 				// writes to n ram location starting from x?
 				for (i = 0; i < num; i++)
 				{
 					UINT64 value = 0;
 					fifo_in->pop(NULL, &value);
 
-					cobra->m_gfx_gram[reg + (i*4) + 0] = (value >> 24) & 0xff;
-					cobra->m_gfx_gram[reg + (i*4) + 1] = (value >> 16) & 0xff;
-					cobra->m_gfx_gram[reg + (i*4) + 2] = (value >>  8) & 0xff;
-					cobra->m_gfx_gram[reg + (i*4) + 3] = (value >>  0) & 0xff;
+					gfx_write_gram(reg + (i*4), value);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
+
 			case 0xc0:
 			case 0xc4:
 			case 0xc8:
@@ -1879,42 +2045,21 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			{
 				// mbuslib_regread(): 0xC0300800 0x00000000
 
-				/*
-                if (reg == 0x3008)
-                {
-                    // TODO...
-                    fifo_push(GFXFIFO_OUT, gfx_unk_reg[0]);
-
-                }
-                else if (reg == 0x300c)
-                {
-                    // TODO...
-                    fifo_push(GFXFIFO_OUT, gfx_unk_reg[1]);
-                }
-                else
-                {
-                    fatalerror("gfxfifo_exec: regread: %08X %08X\n", w1, w2);
-                }
-                */
-
-				// returns ram location x?
+				// read from register
 
 				int reg = (w1 >> 8) & 0xfffff;
-				UINT32 ret = 0;
 
-				ret |= cobra->m_gfx_gram[reg + 0] << 24;
-				ret |= cobra->m_gfx_gram[reg + 1] << 16;
-				ret |= cobra->m_gfx_gram[reg + 2] <<  8;
-				ret |= cobra->m_gfx_gram[reg + 3] <<  0;
-
+				UINT32 ret = gfx_read_gram(reg);
 				fifo_out->push(NULL, ret);
+
+		//		printf("GFX: reg read %08X\n", reg);
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 			case 0xd0:
 			{
-				// register readback of some sort
+				// read multiple registers
 
 				// 0xD0301000 0x000001FC
 
@@ -1927,29 +2072,10 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					return;
 				}
 
-				/*
-                if (reg == 0x3010)
-                {
-                    for (i = 0; i < num; i++)
-                    {
-                        fifo_push(GFXFIFO_OUT, gfx_unk_reg[2+i]);
-                    }
-                }
-                else
-                {
-                    fatalerror("gfxfifo_exec: 0xD0: %08X %08X\n", w1, w2);
-                }
-                */
-
 				// reads back n ram locations starting from x?
 				for (i=0; i < num; i++)
 				{
-					UINT32 value = 0;
-
-					value |= cobra->m_gfx_gram[reg + (i*4) + 0] << 24;
-					value |= cobra->m_gfx_gram[reg + (i*4) + 1] << 16;
-					value |= cobra->m_gfx_gram[reg + (i*4) + 2] <<  8;
-					value |= cobra->m_gfx_gram[reg + (i*4) + 3] <<  0;
+					UINT32 value = gfx_read_gram(reg + (i*4));
 
 					fifo_out->push(NULL, value);
 				}
@@ -1964,54 +2090,28 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				//int reg = (w1 >> 8) & 0xff;
 				int num = w2;
 
-				int c = 0;
-				int i;
-
 				int num_left = num - cobra->m_gfx_re_word_count;
-				int start = cobra->m_gfx_re_word_count;
 
 				if (fifo_in->current_num() < num_left)
 				{
 					num_left = fifo_in->current_num();
 				}
 
+				cobra->m_gfx_unk_status |= 0x400;
 
-				if (num >= 0x100000)
+				printf("gfxfifo_exec: tex_ints %d words left\n", num-cobra->m_gfx_re_word_count);
+
+				for (int i=0; i < num_left; i++)
 				{
-					printf("gfxfifo_exec: tex_ints %d words left\n", num-cobra->m_gfx_re_word_count);
-					for (i=0; i < num_left; i++)
-					{
-						UINT64 param;
-						fifo_in->pop(NULL, &param);
-						cobra->m_gfx_re_word_count++;
-					}
+					UINT64 param = 0;
+					fifo_in->pop(NULL, &param);
+					cobra->m_gfx_re_word_count++;
+
+					UINT32 addr = m_gfx_gram[0xc3020/4];
+					m_texture_ram[addr] = (UINT32)(param);
+					m_gfx_gram[0xc3020/4]++;
 				}
-				else
-				{
-					printf("gfxfifo_exec: tex_ints %08X %08X\n", w1, w2);
 
-					for (i=0; i < num_left; i++)
-					{
-						UINT64 param = 0;
-						fifo_in->pop(NULL, &param);
-						cobra->m_gfx_re_word_count++;
-
-						m_gfx_texture[start+i] = (UINT32)(param);
-
-						if (c == 0)
-							printf("              ");
-						printf("%08X ", (UINT32)(param));
-
-						c++;
-
-						if (c == 4)
-						{
-							printf("\n");
-							c = 0;
-						}
-					}
-					printf("\n");
-				}
 
 				if (cobra->m_gfx_re_word_count >= num)
 				{
@@ -2204,11 +2304,14 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 		// in teximage_load()
 		// some kind of busy flag for mbuslib_tex_ints()...
 
-		// the code waits for bit 0x400 to be set
+		// mbuslib_tex_ints() waits for bit 0x400 to be set
+		// memcheck_teximage() wants 0x400 cleared
 
-		m_gfxfifo_out->push(&space.device(), 0x400);
+		m_gfxfifo_out->push(&space.device(), m_gfx_unk_status);
+
+		m_gfx_unk_status &= ~0x400;
 	}
-	else if (data != U64(0x00a0000110520200))
+	else if (data != U64(0x00a0000110520200))		// mbuslib_regread()
 	{
 		// prc_read always expects a value...
 
@@ -2352,7 +2455,7 @@ static MACHINE_RESET( cobra )
 	ide_features[67*2+0] = 0xe0;		/* 67: minimum PIO transfer cycle time without flow control */
 	ide_features[67*2+1] = 0x01;
 
-	cobra_gfx_reset(cobra);
+	cobra->m_renderer->gfx_reset(machine);
 }
 
 static MACHINE_CONFIG_START( cobra, cobra_state )
@@ -2384,8 +2487,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 48*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_SIZE(512, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_PALETTE_LENGTH(65536)
 	MCFG_SCREEN_UPDATE_STATIC(cobra)
 
@@ -2420,7 +2523,6 @@ static DRIVER_INIT(cobra)
 	ppc4xx_set_dma_write_handler(cobra->m_subcpu, 0, sub_unknown_dma_w);
 
 
-	cobra_gfx_init(cobra);
 
 	cobra->m_comram[0] = auto_alloc_array(machine, UINT32, 0x40000/4);
 	cobra->m_comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
