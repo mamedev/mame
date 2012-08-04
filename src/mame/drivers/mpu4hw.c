@@ -2504,7 +2504,6 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 			case 34:
 			{
 				return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)].response;
-				break;
 			}
 			default:
 			{

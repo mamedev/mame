@@ -644,7 +644,7 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s, "AC:0%06o", AC); break;
 	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s, "LR:0%06o", LR); break;
 	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s, "XR:0%05o", XR); break;
-	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF); break;							break;
+	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF); break;
 	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", cpustate->tbr); break;
 	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", cpustate->tac); break;
 	case CPUINFO_STR_REGISTER + TX0_TSS00:

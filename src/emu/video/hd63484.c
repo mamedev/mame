@@ -745,7 +745,7 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 						dot(device, xxd, yyd, opcode & 0x0007, hd63484->cl0);
 					break;
 				case 0x0003:
-					logerror("PTN: not supported"); break;
+					logerror("PTN: not supported");
 					break;
 			}
 

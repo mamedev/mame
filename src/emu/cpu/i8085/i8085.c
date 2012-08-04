@@ -1241,7 +1241,6 @@ CPU_GET_INFO( i8085 )
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.1");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
-			break;
 	}
 }
 

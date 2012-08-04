@@ -1709,7 +1709,6 @@ static READ16_HANDLER( bwb_characteriser16_r )
 			case 34:
 			{
 				return state->m_bwb_chr_table1[(((state->m_chr_counter + 1) / 7) - 1)].response;
-				break;
 			}
 			default:
 			{

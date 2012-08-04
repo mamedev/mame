@@ -216,7 +216,6 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
 			else
 				logerror("sub32 (r%x)\n", reg);
 			break;
-			break;
 		case 0x17:
 			if(off)
 				logerror("addmem16 %x(r%x)\n", off, reg);

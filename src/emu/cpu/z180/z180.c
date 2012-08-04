@@ -2731,7 +2731,6 @@ CPU_GET_INFO( z180 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.4");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
-			break;
 	}
 }
 

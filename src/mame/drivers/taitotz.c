@@ -1399,7 +1399,6 @@ static UINT32 video_reg_r(taitotz_state *state, UINT32 reg)
 
 			logerror("video_reg_r: reg: %08X\n", reg);
 			return 0xffffffff;
-			break;
 		}
 		case 0x2:
 		{

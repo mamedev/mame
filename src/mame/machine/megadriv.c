@@ -519,18 +519,14 @@ WRITE16_HANDLER( megadriv_68k_io_write )
 		case 0x8: megadrive_io_write_rx_port(space->machine(),0,data); break;
 		case 0x9: megadrive_io_write_sctrl_port(space->machine(),0,data); break;
 
-
 		case 0xa: megadrive_io_write_tx_port(space->machine(),1,data); break;
 		case 0xb: megadrive_io_write_rx_port(space->machine(),1,data); break;
 		case 0xc: megadrive_io_write_sctrl_port(space->machine(),1,data); break;
-			break;
 
 		case 0xd: megadrive_io_write_tx_port(space->machine(),2,data); break;
 		case 0xe: megadrive_io_write_rx_port(space->machine(),2,data); break;
 		case 0xf: megadrive_io_write_sctrl_port(space->machine(),2,data); break;
-			break;
 	}
-
 }
 
 
