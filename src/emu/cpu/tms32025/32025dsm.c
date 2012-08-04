@@ -388,7 +388,7 @@ static void InitDasm32025(void)
 CPU_DISASSEMBLE( tms32025 )
 {
 	UINT32 flags = 0;
-	int a, b, c, d, k, m, n, p, r, s, t, w, x;	/* these can all be filled in by parsing an instruction */
+	int a, b, c, d, k, m, n, p, r, s, t, w;	/* these can all be filled in by parsing an instruction */
 	int i;
 	int op;
 	int cnt = 1;
@@ -433,7 +433,7 @@ CPU_DISASSEMBLE( tms32025 )
 
 	/* shift out operands */
 	cp = Op[op].parse;
-	a = b = c = d = k = m = n = p = r = s = t = w = x = 0;
+	a = b = c = d = k = m = n = p = r = s = t = w = 0;
 
 	while (bit >= 0)
 	{

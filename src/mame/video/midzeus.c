@@ -1288,7 +1288,7 @@ static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *e
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
-	INT32 curi = extent->param[3].start;
+	//INT32 curi = extent->param[3].start;
 	INT32 dzdx = extent->param[0].dpdx;
 	INT32 dudx = extent->param[1].dpdx;
 	INT32 dvdx = extent->param[2].dpdx;
@@ -1334,7 +1334,7 @@ static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *e
 		curz += dzdx;
 		curu += dudx;
 		curv += dvdx;
-		curi += didx;
+		//curi += didx;
 	}
 }
 

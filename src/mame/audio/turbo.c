@@ -75,7 +75,9 @@ WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 	samples_device *samples = device->machine().device<samples_device>("samples");
 #endif
 	turbo_state *state = device->machine().driver_data<turbo_state>();
+#if (!DISCRETE_TEST)
 	UINT8 diff = data ^ state->m_sound_state[0];
+#endif
 	state->m_sound_state[0] = data;
 
 #if (!DISCRETE_TEST)

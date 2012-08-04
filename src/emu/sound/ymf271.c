@@ -1221,13 +1221,13 @@ static void write_register(YMF271Chip *chip, int slotnum, int reg, int data)
 static void ymf271_write_fm(YMF271Chip *chip, int grp, int adr, int data)
 {
 	int reg;
-	int slotnum;
+	//int slotnum;
 	int slot_group;
 	int sync_mode, sync_reg;
 	//YMF271Slot *slot;
 
-	slotnum = 12*grp;
-	slotnum += fm_tab[adr & 0xf];
+	//slotnum = 12*grp;
+	//slotnum += fm_tab[adr & 0xf];
 	//slot = &chip->slots[slotnum];
 	slot_group = fm_tab[adr & 0xf];
 
