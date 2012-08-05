@@ -1951,6 +1951,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					}
 
 					UINT64 param[4];
+					param[0] = param[1] = param[2] = param[3] = 0;
 					fifo_in->pop(NULL, &param[0]);
 					fifo_in->pop(NULL, &param[1]);
 					fifo_in->pop(NULL, &param[2]);
