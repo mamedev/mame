@@ -9,6 +9,8 @@
 #ifndef __H8PRIV_H__
 #define __H8PRIV_H__
 
+#define H8_MAX_PORTS (16)  // number of I/O ports defined architecturally (1-9 and A-G = 16)
+
 typedef struct
 {
 	UINT32 tgr, irq, out;
@@ -45,10 +47,12 @@ struct _h83xx_state
 	UINT32 irq_req[3];
 	INT32 cyccnt;
 
-	UINT8  ccr;
+	UINT8  ccr, exr;
 	UINT8  h8nflag, h8vflag, h8cflag, h8zflag, h8iflag, h8hflag;
 	UINT8  h8uflag, h8uiflag;
 	UINT8  incheckirqs;
+
+    bool   has_exr;
 
 	device_irq_acknowledge_callback irq_cb;
 	legacy_cpu_device *device;
@@ -73,6 +77,8 @@ struct _h83xx_state
 	H8S2XXX_TPU tpu[6];
 	H8S2XXX_SCI sci[3];
 
+    UINT8 ddrs[H8_MAX_PORTS], drs[H8_MAX_PORTS], pcrs[H8_MAX_PORTS], odrs[H8_MAX_PORTS];
+
 	int mode_8bit;
     bool has_h8speriphs;
 };
@@ -93,7 +99,8 @@ INLINE h83xx_state *get_safe_token(device_t *device)
 		   device->type() == H83334 ||
 		   device->type() == H8S2241 ||
 		   device->type() == H8S2246 ||
-		   device->type() == H8S2323);
+		   device->type() == H8S2323 ||
+		   device->type() == H8S2394);
 	return (h83xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -115,17 +122,21 @@ void h8_3007_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val);
 UINT8 h8s2241_per_regs_read_8(h83xx_state *h8, int offset);
 UINT8 h8s2246_per_regs_read_8(h83xx_state *h8, int offset);
 UINT8 h8s2323_per_regs_read_8(h83xx_state *h8, int offset);
+UINT8 h8s2394_per_regs_read_8(h83xx_state *h8, int offset);
 
 UINT16 h8s2241_per_regs_read_16(h83xx_state *h8, int offset);
 UINT16 h8s2246_per_regs_read_16(h83xx_state *h8, int offset);
 UINT16 h8s2323_per_regs_read_16(h83xx_state *h8, int offset);
+UINT16 h8s2394_per_regs_read_16(h83xx_state *h8, int offset);
 
 void h8s2241_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 void h8s2246_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 void h8s2323_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
+void h8s2394_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 
 void h8s2241_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 void h8s2246_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 void h8s2323_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
+void h8s2394_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 
 #endif /* __H8PRIV_H__ */

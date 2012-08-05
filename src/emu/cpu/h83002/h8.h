@@ -31,7 +31,8 @@ enum
 	H8_E7,
 
 	H8_PC,
-	H8_CCR
+	H8_CCR,
+    H8_EXR
 };
 
 // external input lines
@@ -43,7 +44,7 @@ enum
 	H8_IRQ3,
 	H8_IRQ4,
 	H8_IRQ5,
-	H8_IRQ6,	// IRQs 6+ only available on 8-bit H8/3xx
+	H8_IRQ6,	// IRQs 6+ only available on 8-bit H8/3xx or 16-bit H8S/2394
 	H8_IRQ7,
 	H8_NMI,
 
@@ -58,6 +59,7 @@ enum
 {
 	// digital I/O ports
 	// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
+    // H8S/2394 has 12 ports named 1-6 and A-G
 	H8_PORT_1 = 0,	// 0
 	H8_PORT_2,	// 1
 	H8_PORT_3,	// 2
@@ -69,9 +71,14 @@ enum
 	H8_PORT_9,	// 8
 	H8_PORT_A,	// 9
 	H8_PORT_B,	// A
+	H8_PORT_C,	// B
+	H8_PORT_D,	// C
+	H8_PORT_E,	// D
+	H8_PORT_F,	// E
+	H8_PORT_G,	// F
 
 	// analog inputs
-	H8_ADC_0_H = 0x10,
+	H8_ADC_0_H = 0x20,
 	H8_ADC_0_L,
 	H8_ADC_1_H,
 	H8_ADC_1_L,
@@ -81,8 +88,9 @@ enum
 	H8_ADC_3_L,
 
 	// serial ports
-	H8_SERIAL_0 = 0x20,
+	H8_SERIAL_0 = 0x30,
 	H8_SERIAL_1,
+    H8_SERIAL_2
 };
 
 ////////////////////////////
@@ -94,11 +102,13 @@ enum
 
 #define H8S_IO(xxxx) ((xxxx) - 0xFE40)
 
-// port
+// port data direction registers
 #define H8S_IO_P1DDR  H8S_IO(0xFEB0)
 #define H8S_IO_P2DDR  H8S_IO(0xFEB1)
 #define H8S_IO_P3DDR  H8S_IO(0xFEB2)
+#define H8S_IO_P4DDR  H8S_IO(0xFEB3)
 #define H8S_IO_P5DDR  H8S_IO(0xFEB4)
+#define H8S_IO_P6DDR  H8S_IO(0xFEB5)
 #define H8S_IO_PADDR  H8S_IO(0xFEB9)
 #define H8S_IO_PBDDR  H8S_IO(0xFEBA)
 #define H8S_IO_PCDDR  H8S_IO(0xFEBB)
@@ -110,6 +120,11 @@ enum
 #define H8S_IO_ICRA   H8S_IO(0xFEC0)
 #define H8S_IO_ICRB   H8S_IO(0xFEC1)
 #define H8S_IO_ICRC   H8S_IO(0xFEC2)
+
+// for H8S/2394
+#define H8S_IO_IER    H8S_IO(0xFF2E)
+#define H8S_IO_IFR    H8S_IO(0xFF2F)
+
 // dtc (data transfer controller)
 #define H8S_IO_DTCEA  H8S_IO(0xFF30)
 #define H8S_IO_DTCEB  H8S_IO(0xFF31)
@@ -117,12 +132,14 @@ enum
 #define H8S_IO_DTCED  H8S_IO(0xFF33)
 #define H8S_IO_DTCEE  H8S_IO(0xFF34)
 #define H8S_IO_DTCEF  H8S_IO(0xFF35)
-// port
+
+// port read registers
 #define H8S_IO_PORT1  H8S_IO(0xFF50)
 #define H8S_IO_PORT2  H8S_IO(0xFF51)
 #define H8S_IO_PORT3  H8S_IO(0xFF52)
 #define H8S_IO_PORT4  H8S_IO(0xFF53)
 #define H8S_IO_PORT5  H8S_IO(0xFF54)
+#define H8S_IO_PORT6  H8S_IO(0xFF55)
 #define H8S_IO_PORTA  H8S_IO(0xFF59)
 #define H8S_IO_PORTB  H8S_IO(0xFF5A)
 #define H8S_IO_PORTC  H8S_IO(0xFF5B)
@@ -130,11 +147,13 @@ enum
 #define H8S_IO_PORTE  H8S_IO(0xFF5D)
 #define H8S_IO_PORTF  H8S_IO(0xFF5E)
 #define H8S_IO_PORTG  H8S_IO(0xFF5F)
+// port data write registers
 #define H8S_IO_P1DR   H8S_IO(0xFF60)
 #define H8S_IO_P2DR   H8S_IO(0xFF61)
 #define H8S_IO_P3DR   H8S_IO(0xFF62)
 #define H8S_IO_P4DR   H8S_IO(0xFF63)
 #define H8S_IO_P5DR   H8S_IO(0xFF64)
+#define H8S_IO_P6DR   H8S_IO(0xFF65)
 #define H8S_IO_PADR   H8S_IO(0xFF69)
 #define H8S_IO_PBDR   H8S_IO(0xFF6A)
 #define H8S_IO_PCDR   H8S_IO(0xFF6B)
@@ -397,5 +416,6 @@ DECLARE_LEGACY_CPU_DEVICE(H83334, h8_3334);
 DECLARE_LEGACY_CPU_DEVICE(H8S2241, h8s_2241);
 DECLARE_LEGACY_CPU_DEVICE(H8S2246, h8s_2246);
 DECLARE_LEGACY_CPU_DEVICE(H8S2323, h8s_2323);
+DECLARE_LEGACY_CPU_DEVICE(H8S2394, h8s_2394);
 
 #endif /* __H83002_H__ */

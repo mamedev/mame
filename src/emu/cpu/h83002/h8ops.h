@@ -702,6 +702,11 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			h8_setreg8(h8, opcode & 0xf, h8_get_ccr(h8));
 			H8_IFETCH_TIMING(1);
 		}
+		else if(((opcode>>4) & 0xf) == 1)
+        {
+			h8_setreg8(h8, opcode & 0xf, h8_get_exr(h8));
+			H8_IFETCH_TIMING(1);
+        }
 		else
 		{
 			logerror("H8/3xx: Unk. group 0 2 %x\n", opcode);
@@ -716,6 +721,12 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			h8_set_ccr(h8, udata8);
 			H8_IFETCH_TIMING(1);
 		}
+		else if(((opcode>>4) & 0xf) == 1)
+        {
+			udata8 = h8_getreg8(h8, opcode & 0xf);
+			h8_set_exr(h8, udata8);
+			H8_IFETCH_TIMING(1);
+        }
 		else
 		{
 			logerror("H8/3xx: Unk. group 0 3 %x\n", opcode);

@@ -104,6 +104,11 @@ static UINT8 h8_get_ccr(h83xx_state *h8)
 	return h8->ccr;
 }
 
+static UINT8 h8_get_exr(h83xx_state *h8)
+{
+    return h8->exr;
+}
+
 static char *h8_get_ccr_str(h83xx_state *h8)
 {
 	static char res[10];
@@ -144,6 +149,11 @@ static void h8_set_ccr(h83xx_state *h8, UINT8 data)
 	if(h8->ccr & IFLAG) h8->h8iflag = 1;
 
 	if (!h8->incheckirqs) h8_check_irqs(h8);
+}
+
+static void h8_set_exr(h83xx_state *h8, UINT8 data)
+{
+	h8->exr = data;
 }
 
 static INT16 h8_getreg16(h83xx_state *h8, UINT8 reg)
@@ -468,7 +478,8 @@ static CPU_SET_INFO( h8 )
 	switch(state) {
 	case CPUINFO_INT_PC:			    		h8->pc = info->i;								break;
 	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i;								break;
-	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
+    case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
+    case CPUINFO_INT_REGISTER + H8_EXR:         h8_set_exr(h8, info->i);                        break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;
 	case CPUINFO_INT_REGISTER + H8_E1:			h8->regs[1] = info->i;							break;
@@ -788,6 +799,7 @@ CPU_GET_INFO( h8_3334 )
 
 	case CPUINFO_INT_REGISTER + H8_PC:			info->i = h8->pc;								break;
 	case CPUINFO_INT_REGISTER + H8_CCR:			info->i = h8_get_ccr(h8);							break;
+	case CPUINFO_INT_REGISTER + H8_EXR:			info->i = h8_get_exr(h8);							break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			info->i = h8->regs[0];							break;
 	case CPUINFO_INT_REGISTER + H8_E1:			info->i = h8->regs[1];							break;
@@ -801,6 +813,7 @@ CPU_GET_INFO( h8_3334 )
 	// CPU debug stuff
 	case CPUINFO_STR_REGISTER + H8_PC:			sprintf(info->s, "PC   :%08x", h8->pc);			break;
 	case CPUINFO_STR_REGISTER + H8_CCR:			sprintf(info->s, "CCR  :%08x", h8_get_ccr(h8));	break;
+	case CPUINFO_STR_REGISTER + H8_EXR:			sprintf(info->s, "EXR  :%02x", h8_get_exr(h8));	break;
 
 	case CPUINFO_STR_REGISTER + H8_E0:			sprintf(info->s, " R0  :%08x", h8->regs[0]);		break;
 	case CPUINFO_STR_REGISTER + H8_E1:			sprintf(info->s, " R1  :%08x", h8->regs[1]);		break;

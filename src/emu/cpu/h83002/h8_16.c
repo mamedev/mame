@@ -88,6 +88,11 @@ static UINT8 h8_get_ccr(h83xx_state *h8)
 	return h8->ccr;
 }
 
+static UINT8 h8_get_exr(h83xx_state *h8)
+{
+    return h8->exr;
+}
+
 static char *h8_get_ccr_str(h83xx_state *h8)
 {
 	static char res[10];
@@ -128,6 +133,11 @@ static void h8_set_ccr(h83xx_state *h8, UINT8 data)
 	if(h8->ccr & IFLAG) h8->h8iflag = 1;
 
 	if (!h8->incheckirqs) h8_check_irqs(h8);
+}
+
+static void h8_set_exr(h83xx_state *h8, UINT8 data)
+{
+	h8->exr = data;
 }
 
 static INT16 h8_getreg16(h83xx_state *h8, UINT8 reg)
@@ -255,6 +265,8 @@ static CPU_RESET(h8)
 	h8->pc = h8_mem_read32(h8, 0) & 0xffffff;
 
 	h8->incheckirqs = 0;
+    h8->exr = 0;
+    h8->has_exr = false;
 
 	// disable timers
 	h8->h8TSTR = 0;
@@ -269,6 +281,26 @@ static CPU_RESET(h8s_2xxx)
 	h83xx_state *h8 = get_safe_token(device);
 
 	CPU_RESET_CALL(h8);
+
+    h8->exr = 7;        // set the 3 interrupt bits, clear TRACE
+
+	h8s_periph_reset(h8);
+	h8->has_h8speriphs = true;
+
+}
+
+static CPU_RESET(h8s_2394)
+{
+	h83xx_state *h8 = get_safe_token(device);
+
+	CPU_RESET_CALL(h8);
+
+    h8->exr = 7;        // set the 3 interrupt bits, clear TRACE
+    h8->has_exr = true;
+
+    // port 4 is fixed to input only
+    h8->drs[3] = 0;
+    h8->ddrs[3] = 0;
 
 	h8s_periph_reset(h8);
 	h8->has_h8speriphs = true;
@@ -339,18 +371,25 @@ static void h8_check_irqs(h83xx_state *h8)
 
 	h8->incheckirqs = 1;
 
-	if (h8->h8iflag == 0)
-	{
-		lv = 0;
-	}
-	else
-	{
-		if ((h8->per_regs[0xF2]&0x08)/*SYSCR*/ == 0)
-		{
-			if (h8->h8uiflag == 0)
-				lv = 1;
-		}
-	}
+    if (h8->has_exr)
+    {
+        lv = (h8->exr & 7);
+    }
+    else
+    {
+        if (h8->h8iflag == 0)
+        {
+            lv = 0;
+        }
+        else
+        {
+            if ((h8->per_regs[0xF2]&0x08)/*SYSCR*/ == 0)
+            {
+                if (h8->h8uiflag == 0)
+                    lv = 1;
+            }
+        }
+    }
 
 	// any interrupts wanted and can accept ?
 	if(((h8->irq_req[0] != 0) || (h8->irq_req[1]!= 0) || (h8->irq_req[2] != 0)) && (lv >= 0))
@@ -429,6 +468,7 @@ static CPU_SET_INFO( h8 )
 	case CPUINFO_INT_PC:						h8->pc = info->i;								break;
 	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i;								break;
 	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
+	case CPUINFO_INT_REGISTER + H8_EXR:			h8_set_exr(h8, info->i);						break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;
 	case CPUINFO_INT_REGISTER + H8_E1:			h8->regs[1] = info->i;							break;
@@ -450,6 +490,43 @@ static CPU_SET_INFO( h8 )
 
 	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	h8_3002_InterruptRequest(h8, 53, info->i);		break;
 	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_3002_InterruptRequest(h8, 57, info->i);		break;
+
+	default:
+		fatalerror("h8_set_info unknown request %x", state);
+		break;
+	}
+}
+
+static CPU_SET_INFO( h8s_2394 )
+{
+	h83xx_state *h8 = get_safe_token(device);
+
+	switch(state) {
+	case CPUINFO_INT_PC:						h8->pc = info->i;								break;
+	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i;								break;
+	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
+	case CPUINFO_INT_REGISTER + H8_EXR:			h8_set_exr(h8, info->i);						break;
+
+	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E1:			h8->regs[1] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E2:			h8->regs[2] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E3:			h8->regs[3] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E4:			h8->regs[4] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E5:			h8->regs[5] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E6:			h8->regs[6] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E7:			h8->regs[7] = info->i;							break;
+
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:		h8_3002_InterruptRequest(h8, 16, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:		h8_3002_InterruptRequest(h8, 17, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:		h8_3002_InterruptRequest(h8, 18, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:		h8_3002_InterruptRequest(h8, 19, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:		h8_3002_InterruptRequest(h8, 20, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:		h8_3002_InterruptRequest(h8, 21, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ6:		h8_3002_InterruptRequest(h8, 22, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ7:		h8_3002_InterruptRequest(h8, 23, info->i);		break;
+
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	h8_3002_InterruptRequest(h8, 81, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_3002_InterruptRequest(h8, 85, info->i);		break;
 
 	default:
 		fatalerror("h8_set_info unknown request %x", state);
@@ -578,7 +655,7 @@ static WRITE16_HANDLER( h8_3007_itu1_w )
 	}
 }
 
-WRITE16_HANDLER( h8s2241_per_regs_w )
+static WRITE16_HANDLER( h8s2241_per_regs_w )
 {
 	h83xx_state *h8 = get_safe_token(&space->device());
 	if (mem_mask == 0xffff)
@@ -595,7 +672,7 @@ WRITE16_HANDLER( h8s2241_per_regs_w )
 	}
 }
 
-WRITE16_HANDLER( h8s2246_per_regs_w )
+static WRITE16_HANDLER( h8s2246_per_regs_w )
 {
 	h83xx_state *h8 = get_safe_token(&space->device());
 	if (mem_mask == 0xffff)
@@ -612,7 +689,7 @@ WRITE16_HANDLER( h8s2246_per_regs_w )
 	}
 }
 
-WRITE16_HANDLER( h8s2323_per_regs_w )
+static WRITE16_HANDLER( h8s2323_per_regs_w )
 {
 	h83xx_state *h8 = get_safe_token(&space->device());
 	if (mem_mask == 0xffff)
@@ -629,7 +706,24 @@ WRITE16_HANDLER( h8s2323_per_regs_w )
 	}
 }
 
-READ16_HANDLER( h8s2241_per_regs_r )
+static WRITE16_HANDLER( h8s2394_per_regs_w )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		h8s2394_per_regs_write_16(h8, (offset << 1), data);
+	}
+	else if (mem_mask & 0xff00)
+	{
+		h8s2394_per_regs_write_8(h8, (offset << 1), (data >> 8) & 0xff);
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		h8s2394_per_regs_write_8(h8, (offset << 1) + 1, data & 0xff);
+	}
+}
+
+static READ16_HANDLER( h8s2241_per_regs_r )
 {
 	h83xx_state *h8 = get_safe_token(&space->device());
 	if (mem_mask == 0xffff)
@@ -647,7 +741,7 @@ READ16_HANDLER( h8s2241_per_regs_r )
 	return 0;
 }
 
-READ16_HANDLER( h8s2246_per_regs_r )
+static READ16_HANDLER( h8s2246_per_regs_r )
 {
 	h83xx_state *h8 = get_safe_token(&space->device());
 	if (mem_mask == 0xffff)
@@ -665,7 +759,7 @@ READ16_HANDLER( h8s2246_per_regs_r )
 	return 0;
 }
 
-READ16_HANDLER( h8s2323_per_regs_r )
+static READ16_HANDLER( h8s2323_per_regs_r )
 {
 	h83xx_state *h8 = get_safe_token(&space->device());
 	if (mem_mask == 0xffff)
@@ -679,6 +773,24 @@ READ16_HANDLER( h8s2323_per_regs_r )
 	else if (mem_mask == 0x00ff)
 	{
 		return h8s2323_per_regs_read_8(h8, (offset << 1) + 1);
+	}
+	return 0;
+}
+
+static READ16_HANDLER( h8s2394_per_regs_r )
+{
+	h83xx_state *h8 = get_safe_token(&space->device());
+	if (mem_mask == 0xffff)
+	{
+		return h8s2394_per_regs_read_16(h8, (offset << 1));
+	}
+	else if (mem_mask == 0xff00)
+	{
+		return h8s2394_per_regs_read_8(h8, (offset << 1)) << 8;
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		return h8s2394_per_regs_read_8(h8, (offset << 1) + 1);
 	}
 	return 0;
 }
@@ -716,6 +828,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( h8s_2323_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
 	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2323_per_regs_r, h8s2323_per_regs_w ) // internal i/o registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( h8s_2394_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
+	AM_RANGE( 0xFF7C00, 0xFFFBFF ) AM_RAM // 32K of on-chip ram
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2394_per_regs_r, h8s2394_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
@@ -768,6 +885,7 @@ CPU_GET_INFO( h8_3002 )
 
 	case CPUINFO_INT_REGISTER + H8_PC:			info->i = h8->pc;								break;
 	case CPUINFO_INT_REGISTER + H8_CCR:			info->i = h8_get_ccr(h8);							break;
+	case CPUINFO_INT_REGISTER + H8_EXR:			info->i = h8_get_exr(h8);							break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			info->i = h8->regs[0];							break;
 	case CPUINFO_INT_REGISTER + H8_E1:			info->i = h8->regs[1];							break;
@@ -781,6 +899,7 @@ CPU_GET_INFO( h8_3002 )
 	// CPU debug stuff
 	case CPUINFO_STR_REGISTER + H8_PC:			sprintf(info->s, "PC   :%08x", h8->pc);			break;
 	case CPUINFO_STR_REGISTER + H8_CCR:			sprintf(info->s, "CCR  :%08x", h8_get_ccr(h8));	break;
+	case CPUINFO_STR_REGISTER + H8_EXR:			sprintf(info->s, "EXR  :%02x", h8_get_exr(h8));	break;
 
 	case CPUINFO_STR_REGISTER + H8_E0:			sprintf(info->s, "ER0  :%08x", h8->regs[0]);		break;
 	case CPUINFO_STR_REGISTER + H8_E1:			sprintf(info->s, "ER1  :%08x", h8->regs[1]);		break;
@@ -856,6 +975,20 @@ CPU_GET_INFO( h8s_2323 )
 	}
 }
 
+CPU_GET_INFO( h8s_2394 )
+{
+	switch (state)
+	{
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2394_internal_map);  break;
+        case CPUINFO_FCT_SET_INFO:			info->setinfo = CPU_SET_INFO_NAME(h8s_2394);		break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
+		case CPUINFO_FCT_RESET:				info->reset= CPU_RESET_NAME(h8s_2394);			break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "H8S/2394");		break;
+		default:
+			CPU_GET_INFO_CALL(h8_3002);
+	}
+}
+
 DEFINE_LEGACY_CPU_DEVICE(H83002, h8_3002);
 DEFINE_LEGACY_CPU_DEVICE(H83007, h8_3007);
 DEFINE_LEGACY_CPU_DEVICE(H83044, h8_3044);
@@ -863,4 +996,5 @@ DEFINE_LEGACY_CPU_DEVICE(H83044, h8_3044);
 DEFINE_LEGACY_CPU_DEVICE(H8S2241, h8s_2241);
 DEFINE_LEGACY_CPU_DEVICE(H8S2246, h8s_2246);
 DEFINE_LEGACY_CPU_DEVICE(H8S2323, h8s_2323);
+DEFINE_LEGACY_CPU_DEVICE(H8S2394, h8s_2394);
 
