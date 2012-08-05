@@ -66,7 +66,7 @@ The other has the secondary label 351100210 with a serial number labeled:
     Memory map:
     000000-1fffff: program ROM
     200000-20ffff: VRAM?
-    400000-400001: ???
+    400000-400001: ??? (M5296 Watchdog??)
     600000-61ffff: work RAM?
  
     I/O map:
@@ -106,26 +106,26 @@ class invqix_state : public driver_device
 public:
 	invqix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-          m_eeprom(*this, "eeprom")
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-    DECLARE_READ8_MEMBER(port1_r);
-    DECLARE_READ8_MEMBER(port2_r);
-    DECLARE_WRITE8_MEMBER(port2_w);
-    DECLARE_READ8_MEMBER(port3_r);
-    DECLARE_WRITE8_MEMBER(port3_w);
-    DECLARE_READ8_MEMBER(port6_r);
-    DECLARE_WRITE8_MEMBER(port6_w);
-    DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_READ8_MEMBER(port2_r);
+	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_READ8_MEMBER(port3_r);
+	DECLARE_WRITE8_MEMBER(port3_w);
+	DECLARE_READ8_MEMBER(port6_r);
+	DECLARE_WRITE8_MEMBER(port6_w);
+	DECLARE_READ8_MEMBER(porta_r);
 
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-    required_device<eeprom_device> m_eeprom;
+	required_device<eeprom_device> m_eeprom;
 
 	// driver_device overrides
 	virtual void video_start();
@@ -143,12 +143,12 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 READ8_MEMBER(invqix_state::port1_r)
 {
-    return 0xff;
+	return 0xff;
 }
 
 READ8_MEMBER(invqix_state::port2_r)
 {
-    return 1;
+	return 1;
 }
 
 WRITE8_MEMBER(invqix_state::port2_w)
@@ -158,19 +158,19 @@ WRITE8_MEMBER(invqix_state::port2_w)
 
 READ8_MEMBER(invqix_state::port3_r)
 {
-    return (m_eeprom->read_bit() << 5) | 0x03;
+	return (m_eeprom->read_bit() << 5) | 0x03;
 }
 
 WRITE8_MEMBER(invqix_state::port3_w)
 {
-    m_eeprom->set_cs_line(((data >> 2) & 1) ^ 1);
-    m_eeprom->write_bit((data >> 4) & 1);
-    m_eeprom->set_clock_line((data >> 3) & 1);
+	m_eeprom->set_cs_line(((data >> 2) & 1) ^ 1);
+	m_eeprom->write_bit((data >> 4) & 1);
+	m_eeprom->set_clock_line((data >> 3) & 1);
 }
 
 READ8_MEMBER(invqix_state::port6_r)
 {
-    return 0;
+	return 0;
 }
 
 WRITE8_MEMBER(invqix_state::port6_w)
@@ -180,22 +180,22 @@ WRITE8_MEMBER(invqix_state::port6_w)
 
 READ8_MEMBER(invqix_state::porta_r)
 {
-    return 0xff;
+	return 0xff;
 }
 
 static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 32, invqix_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("program", 0)
-    AM_RANGE(0x200000, 0x20ffff) AM_RAM
-    AM_RANGE(0x600000, 0x61ffff) AM_RAM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(invqix_io_map, AS_IO, 8, invqix_state)
-    AM_RANGE(H8_PORT_1, H8_PORT_1) AM_READ(port1_r)
-    AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READWRITE(port2_r, port2_w)
-    AM_RANGE(H8_PORT_3, H8_PORT_3) AM_READWRITE(port3_r, port3_w)
-    AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w)
-    AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READ(porta_r)
-    AM_RANGE(H8_PORT_G, H8_PORT_G) AM_NOP
+	AM_RANGE(H8_PORT_1, H8_PORT_1) AM_READ(port1_r)
+	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READWRITE(port2_r, port2_w)
+	AM_RANGE(H8_PORT_3, H8_PORT_3) AM_READWRITE(port3_r, port3_w)
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w)
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READ(porta_r)
+	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( invqix )
@@ -204,9 +204,9 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( invqix, invqix_state )
 	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
-    MCFG_CPU_IO_MAP(invqix_io_map)
-    MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
-    MCFG_CPU_PERIODIC_INT(irq0_line_hold, 60)   
+	MCFG_CPU_IO_MAP(invqix_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 60)   
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -228,14 +228,14 @@ static MACHINE_CONFIG_START( invqix, invqix_state )
 MACHINE_CONFIG_END
 
 ROM_START( invqix )
-    ROM_REGION(0x200000, "program", 0)
-    ROM_LOAD( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) ) 
+	ROM_REGION(0x200000, "program", 0)
+	ROM_LOAD( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) ) 
 
-    ROM_REGION(0x1000000, "oki", 0)
-    ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) 
+	ROM_REGION(0x1000000, "oki", 0)
+	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) 
 
-    ROM_REGION(0x80, "eeprom", 0)
-    ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) ) 
+	ROM_REGION(0x80, "eeprom", 0)
+	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) ) 
 ROM_END
 
 GAME(2003, invqix, 0, invqix, invqix, invqix_state, 0, ROT0, "Namco/Taito", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", GAME_NOT_WORKING )
