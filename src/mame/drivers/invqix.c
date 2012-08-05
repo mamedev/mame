@@ -2,14 +2,66 @@
 
     invqix.c
 
-    Namco/Taito Space Invaders/Qix Silver Anniversary Edition
+Space Invaders / Qix Silver Anniversary Edition
+Taito/Namco America inc.
 
-    Hardware:
-    HD6412394TE20 H8S/2394 ROMless microcontroller @ 20 MHz
-    OKI MSM9810 8-channel ADPCM audio
-    Xilinx Spartan FPGA
-    3xCY7C1021B 64kx16 (128Kbyte) SRAMs marked "FRAM0", "FRAM1", and "WORK"
-    93C46 EEPROM
+INVADERS-QIX    Secondary label 351100210 (or 351100195 see below)
+K11T0976B
+
++----------------------------------------------------------------+
+|        "PCM"          "FRAM1"     "FRAM0"        "PRG"         |
+|   +--------------+  +---------+ +---------+ +--------------+   |
+|   |  F34-01 IC13 |  |CY7C1021B| |CY7C1021B| |  F34-02  IC2 |   |
+|   +--------------+  +---------+ +---------+ +--------------+   |
+|      +------+                                                  |
+|      | OKI  |   LT1086                                         |
+|      |M9810B|                 +-------------+                  |
+|      |      |                 |             |                  |
+|      +------+   LM1085        |   XILINX    | 44.8MHz          |
+|                               |   Spartan   |     +---------+  |
+|                               |   XC2S50    |     |CY7C1021B|  |
+| +---+                         |             |     +---------+  |
+| | T |          +-------+      |             |       "WORK"     |
+| | A |          |THS8134|      +-------------+                  |
+| | 2 |          +-------+                                       |
+| | 8 |                          93C46                           |
+| | 0 |                +-------+  20MHz  +-------+               |
+| | 0 |                |M5296FP|         | H8S/  |      BT1 SW3  |
+| | A |                +-------+         | 2394  |               |
+| | H |                                  | TE20  |               |
+| +---+     TPD1030                      +-------+               |
+|                X2                                              |
+|                                                                |
++-------------+          JAMMA Connector           +-------------+
+              +------------------------------------+
+
+Main CPU: Renesas HD6412394TE20 H8S/2394 (ROMless microcontroller @ 20MHz)
+   Sound: OKI MSM9810B 8-channel ADPCM audio
+   Video: Sigma Xilinx Spartan XC2S50 FPGA
+          TI THS8134 Triple 8-Bit, 80 MSPS Video D/A Converter
+     OSC: 20MHz & 44.8MHz
+  EEPROM: AT93C46 @ IC6
+     RAM: Cypress CY7C1021B 64K x 16 Static RAM (44-pin TSOP) x 3 (silkscreened WORK, FRAM0 & FRAM1)
+   Other: Renesas M5296FP Watchdog Timer IC with +5v constant-voltage power supply
+          SW3 - TEST Push Button
+          BT1 - 0.22F Memory Backup Capacitor
+          LT1086 - 1.5A Low Dropout Positive Regulator
+          LM1085 - 3A Low Dropout Positive Regulator
+          TA8200AH - Dual Audio Power Amplifier (13Watts per channel)
+          TDP1030 - 2-In-1 Low-Side Switch for Motor, Solenoid and Lamp Drive
+
+ROMS: F34-01 (IC13 M27C160 silkscreened PCM)
+      F34-02 (IC2  M27C160 silkscreened PRG)
+
+There are two known types of PCB.
+
+One has the secondary label 351100195 with a serial number labeled:
+ S/N: SICABN/Cxxxx (xxxx=number of PCB)
+ SPC INV CAB NO COIN
+
+The other has the secondary label 351100210 with a serial number labeled:
+ S/N: SIURxxxx (xxxx=number of PCB)
+ SPACE INVADERS U/R
  
     Memory map:
     000000-1fffff: program ROM
