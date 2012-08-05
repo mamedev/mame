@@ -1131,14 +1131,14 @@ static INPUT_PORTS_START( lastsurv )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)	
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)	
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)	
-	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W)
+	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W)
 
 	PORT_START("MUX1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)	
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)	
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)	
-	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(1) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(1) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("MUX2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1531,6 +1531,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( xboard_fd1094, xboard )
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( lastsurv_fd1094, xboard_fd1094 )
+
+	/* basic machine hardware */
+	// TODO: network board
+
+	/* sound hardware - ym2151 stereo is reversed */
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
 MACHINE_CONFIG_END
 
 
@@ -3277,7 +3290,7 @@ GAME( 1987, aburner2, 0,        xboard,        aburner2, segaxbd_state, aburner2
 GAME( 1987, aburner,  aburner2, xboard,        aburner, segaxbd_state,  aburner2,       ROT0,   "Sega", "After Burner (Japan)", 0 )
 GAME( 1987, thndrbld, 0,        xboard_fd1094, thndrbld, segaxbd_state, generic_xboard, ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1,thndrbld, xboard,        thndrbd1, segaxbd_state, generic_xboard, ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
-GAME( 1989, lastsurv, 0,        xboard_fd1094, lastsurv, segaxbd_state, lastsurv,       ROT0,   "Sega", "Last Survivor (FD1094 317-0083)", 0 )
+GAME( 1989, lastsurv, 0,        lastsurv_fd1094, lastsurv, segaxbd_state, lastsurv,       ROT0,   "Sega", "Last Survivor (Japan, FD1094 317-0083)", 0 )
 GAME( 1989, loffire,  0,        xboard_fd1094, loffire, segaxbd_state,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
 GAME( 1989, loffireu, loffire,  xboard_fd1094, loffire, segaxbd_state,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
 GAME( 1989, loffirej, loffire,  xboard_fd1094, loffire, segaxbd_state,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
