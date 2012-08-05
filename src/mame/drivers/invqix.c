@@ -66,11 +66,12 @@ The other has the secondary label 351100210 with a serial number labeled:
     Memory map:
     000000-1fffff: program ROM
     200000-20ffff: Work RAM
-    400000-400001: ??? (M5296 Watchdog??)
+    400000-400003: OKIM9810
     600000-61ffff: VRAM
 
     I/O map:
-    port 2 bit 6: FPGA chip select
+    port 2 bit 3: must be "1" to avoid SERVICE ERROR
+	port 2 bit 6: FPGA chip select
     port 2 bit 7: FPGA clock in
 
     port 3 bit 0: FPGA status (1 for ready)
@@ -113,15 +114,17 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port3_r);
 	DECLARE_WRITE8_MEMBER(port3_w);
+	DECLARE_READ8_MEMBER(port5_r);
+	DECLARE_WRITE8_MEMBER(port5_w);
 	DECLARE_READ8_MEMBER(port6_r);
 	DECLARE_WRITE8_MEMBER(port6_w);
 	DECLARE_READ8_MEMBER(porta_r);
 
+	DECLARE_WRITE16_MEMBER(oki_w);
 protected:
 
 	// devices
@@ -165,14 +168,9 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(invqix_state::port1_r)
-{
-	return 0xff;
-}
-
 READ8_MEMBER(invqix_state::port2_r)
 {
-	return 1;
+	return machine().root_device().ioport("SYSTEM")->read(); // | 0x01;
 }
 
 WRITE8_MEMBER(invqix_state::port2_w)
@@ -192,9 +190,18 @@ WRITE8_MEMBER(invqix_state::port3_w)
 	m_eeprom->set_clock_line((data >> 3) & 1);
 }
 
+READ8_MEMBER(invqix_state::port5_r)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(invqix_state::port5_w)
+{
+}
+
 READ8_MEMBER(invqix_state::port6_r)
 {
-	return 0;
+	return 0xff;
 }
 
 WRITE8_MEMBER(invqix_state::port6_w)
@@ -207,22 +214,56 @@ READ8_MEMBER(invqix_state::porta_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 32, invqix_state)
+static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM
+	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_TMP_register, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write, 0xff00)
+	AM_RANGE(0x400002, 0x400003) AM_DEVREAD8("oki", okim9810_device, read, 0xff00)
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(invqix_io_map, AS_IO, 8, invqix_state)
-	AM_RANGE(H8_PORT_1, H8_PORT_1) AM_READ(port1_r)
+	AM_RANGE(H8_PORT_1, H8_PORT_1) AM_READ_PORT("P1")
 	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READWRITE(port2_r, port2_w)
 	AM_RANGE(H8_PORT_3, H8_PORT_3) AM_READWRITE(port3_r, port3_w)
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w)
+	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READ_PORT("P4")
+	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_READWRITE(port5_r, port5_w) 
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w) 
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READ(porta_r)
 	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( invqix )
+	PORT_START("SYSTEM")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1 )	// coin 1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )	// start A-1 ("left start" - picks Space Invaders)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1 ) // service
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 )   // coin 2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNUSED )	// start A-2
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )	// 0x40 - start B-2 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
+	
+	PORT_START("P4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )	// start B-1 ("right start" - picks Qix)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( invqix, invqix_state )
@@ -262,4 +303,4 @@ ROM_START( invqix )
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
 
-GAME(2003, invqix, 0, invqix, invqix, invqix_state, 0, ROT270, "Namco/Taito", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", GAME_NOT_WORKING )
+GAME(2003, invqix, 0, invqix, invqix, invqix_state, 0, ROT270, "Namco/Taito", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", GAME_IMPERFECT_GRAPHICS)
