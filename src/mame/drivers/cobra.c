@@ -174,10 +174,17 @@
 		0x00118:		High word: FB pixel read X pos,   Low word: FB pixel read Y pos
 		0x0011c:		Same as above?
 
+		0x40018:		Set to 0x0001040a by mode_stipple()
+		0x400d0:		Set to 0x80000000 by mode_stipple()
+		0x40114:		Set to 0x00080000 by mode_scissor()
+		0x40138:		Set to 0x88800000 by mode_viewclip()
 		0x40160:		Some viewport register? (high word: 192, low word: 150)
 		0x40164:		Some viewport register? (high word: 352, low word: 275)
 		0x40170:		Some viewport register? (high word: 160, low word: 125)
 		0x40174:		Some viewport register? (high word: 320, low word: 250)
+		0x40198:		Set to 0x80800000 by mode_alphatest()
+		0x4019c:		Set to 0x88000000 by mode_fog()
+		0x80020:		Set to 0x00020000 by mode_depthtest()
 		0xc0c00..fff:	Texture RAM readback
 		0xc3020:		Start address for texram writes?
 		0xc3028:		Reads address from texram?
@@ -221,6 +228,22 @@ public:
 		// TODO: these are probably set by some 3D registers
 		m_texture_width = 128;
 		m_texture_height = 8;
+
+		m_gfx_regmask = auto_alloc_array(machine, UINT32, 0x100);
+		for (int i=0; i < 0x100; i++)
+		{
+			UINT32 mask = 0;
+			if (i & 0x01) mask |= 0x0000000f;
+			if (i & 0x02) mask |= 0x000000f0;
+			if (i & 0x04) mask |= 0x00000f00;
+			if (i & 0x08) mask |= 0x0000f000;
+			if (i & 0x10) mask |= 0x000f0000;
+			if (i & 0x20) mask |= 0x00f00000;
+			if (i & 0x40) mask |= 0x0f000000;
+			if (i & 0x80) mask |= 0xf0000000;
+
+			m_gfx_regmask[i] = mask;
+		}
 	}
 
 	void render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
@@ -232,7 +255,7 @@ public:
 	void gfx_reset(running_machine &machine);
 	void gfx_fifo_exec(running_machine &machine);
 	UINT32 gfx_read_gram(UINT32 address);
-	void gfx_write_gram(UINT32 address, UINT32 data);
+	void gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data);
 
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 
@@ -248,6 +271,7 @@ private:
 	int m_texture_height;
 
 	UINT32 *m_gfx_gram;
+	UINT32 *m_gfx_regmask;
 };
 
 class cobra_fifo
@@ -1448,7 +1472,7 @@ UINT32 cobra_renderer::gfx_read_gram(UINT32 address)
 	return m_gfx_gram[address/4];
 }
 
-void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 data)
+void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 {
 	if (address & 3)
 	{
@@ -1460,7 +1484,8 @@ void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 data)
 	{
 	}
 
-	m_gfx_gram[address/4] = data;
+	m_gfx_gram[address/4] &= ~mask;
+	m_gfx_gram[address/4] |= data & mask;
 }
 
 void cobra_renderer::gfx_fifo_exec(running_machine &machine)
@@ -2036,12 +2061,13 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				//                     0xa40000FF 0x00000001
 
 				int reg = (w1 >> 8) & 0xfffff;
+				UINT32 mask = m_gfx_regmask[w1 & 0xff];
 
-				gfx_write_gram(reg, w2);
+				gfx_write_gram(reg, mask, w2);
 
 				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
 				{
-					printf("gfxfifo_exec: ram write %05X: %08X (%f)\n", reg, w2, u2f(w2));
+					printf("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2071,7 +2097,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					UINT64 value = 0;
 					fifo_in->pop(NULL, &value);
 
-					gfx_write_gram(reg + (i*4), value);
+					gfx_write_gram(reg + (i*4), 0xffffffff, value);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
