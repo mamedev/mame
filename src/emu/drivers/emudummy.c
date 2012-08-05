@@ -62,6 +62,6 @@ ROM_START( __dummy )
 ROM_END
 
 
-GAME( 1900, __dummy, 0, __dummy, 0, 0, ROT0, "(none)", "Dummy", GAME_NO_SOUND )
+GAME( 1900, __dummy, 0, __dummy, 0, driver_device, 0, ROT0, "(none)", "Dummy", GAME_NO_SOUND )
 
 
