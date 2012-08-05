@@ -3,8 +3,8 @@ Funai / Gakken Interstellar Laser Fantasy laserdisc hardware
 Driver by Andrew Gardner with help from Daphne Source
 
 Notes:
-    Holding down the TEST switch (T) while hitting reset will bring up the Self Test.
-    Hit T twice more for color and monitor calibration.
+    Holding down the TEST switch while hitting reset will bring up the Self Test.
+    Hit TEST switch again for color and monitor calibration.
     This is somewhat strange hardware : More z80's than necessary
                                         3 bpp sprites
                                         6-pin dip switches with odd handling
@@ -58,34 +58,23 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE_IND16( istellar )
+static SCREEN_UPDATE_RGB32( istellar )
 {
 	istellar_state *state = screen.machine().driver_data<istellar_state>();
-	int charx, chary;
+	int x, y;
 
 	/* clear */
 	bitmap.fill(0, cliprect);
 
-	/* DEBUG */
-	/*
-    for (charx = 0; charx < 0x400; charx ++)
-    {
-        printf ("%x ", state->m_sprite_ram[charx]) ;
-    }
-    printf("\n\n\n");
-    */
-
 	/* Draw tiles */
-	for (charx = 0; charx < 32; charx++)
+	for (y = 0; y < 32; y++)
 	{
-		for (chary = 0; chary < 32; chary++)
+		for (x = 0; x < 32; x++)
 		{
-			int current_screen_character = (chary*32) + charx;
+			int tile = state->m_tile_ram[x+y*32];
+			int attr = state->m_tile_control_ram[x+y*32];
 
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-					state->m_tile_ram[current_screen_character],
-					(state->m_tile_control_ram[current_screen_character] & 0x0f),
-					0, 0, charx*8, chary*8, 0);
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],tile,attr & 0x0f,0, 0, x*8, y*8, 0);
 		}
 	}
 
@@ -256,7 +245,7 @@ static INPUT_PORTS_START( istellar )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:!5")		/* Maybe SERVICE? */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "TEST" ) PORT_CODE( KEYCODE_T )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
@@ -277,7 +266,6 @@ static PALETTE_INIT( istellar )
 	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
-	/* Oddly enough, the top 4 bits of each byte is 0 */
 	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int r,g,b;
@@ -308,30 +296,27 @@ static PALETTE_INIT( istellar )
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
-
-	/* make color 0 transparent */
-	palette_set_color(machine, 0, MAKE_ARGB(0,0,0,0));
 }
 
 static const gfx_layout istellar_gfx_layout =
 {
 	8,8,
-	0x2000/8,
+	RGN_FRAC(1,3),
 	3,
-	{ 0, 0x2000*8, 0x4000*8 },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
 
 static GFXDECODE_START( istellar )
-	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( vblank_callback_istellar )
 {
 	/* Interrupt presumably comes from VBlank */
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 
 	/* Interrupt presumably comes from the LDP's status strobe */
 	cputag_set_input_line(device->machine(), "sub", 0, ASSERT_LINE);
@@ -417,6 +402,22 @@ static DRIVER_INIT( istellar )
 {
 	istellar_state *state = machine.driver_data<istellar_state>();
 	state->m_z80_2_nmi_enable = 0;
+
+	#if 0
+	{
+		UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+
+		ROM[0x4465] = 0x00;
+		ROM[0x4466] = 0x00;
+		ROM[0x4478] = 0x00;
+		ROM[0x4479] = 0x00;
+		ROM[0x43b4] = 0x00;
+		ROM[0x43b5] = 0x00;
+		ROM[0x4409] = 0x20;
+		ROM[0x46de] = 0x00;
+		ROM[0x46df] = 0x00;
+	}
+	#endif
 }
 
 /*    YEAR  NAME    PARENT   MACHINE  INPUT    INIT    MONITOR  COMPANY          FULLNAME                       FLAGS) */
