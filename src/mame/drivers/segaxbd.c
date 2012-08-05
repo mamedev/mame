@@ -711,7 +711,7 @@ static void smgp_iochip0_motor_w(running_machine &machine, UINT8 data)
 
 
 // Last Survivor
-static UINT8 lastsurv_iochip0_port_r(running_machine &machine, UINT8 data)
+static UINT8 lastsurv_iochip1_port_r(running_machine &machine, UINT8 data)
 {
 	static const char * const port_names[] = { "MUX0", "MUX1", "MUX2", "MUX3" };
 	segaxbd_state *state = machine.driver_data<segaxbd_state>();
@@ -722,6 +722,7 @@ static void lastsurv_iochip0_muxer_w(running_machine &machine, UINT8 data)
 {
 	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 	state->m_lastsurv_mux = (data >> 5) & 3;
+	generic_iochip0_lamps_w(machine, data & 0x9f);
 }
 
 
@@ -3203,7 +3204,7 @@ static DRIVER_INIT( lastsurv )
 	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
 	DRIVER_INIT_CALL( generic_xboard );
-	state->m_iochip_custom_io_r[1][1] = lastsurv_iochip0_port_r;
+	state->m_iochip_custom_io_r[1][1] = lastsurv_iochip1_port_r;
 	state->m_iochip_custom_io_w[0][3] = lastsurv_iochip0_muxer_w;
 }
 
