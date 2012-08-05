@@ -3681,9 +3681,9 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 static DRIVER_INIT( 64street )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
-//  UINT16 *RAM = (UINT16 *) state->memregion("maincpu")->base();
-//  RAM[0x006b8/2] = 0x6004;        // d8001 test
-//  RAM[0x10EDE/2] = 0x6012;        // watchdog
+//  UINT16 *ROM = (UINT16 *) state->memregion("maincpu")->base();
+//  ROM[0x006b8/2] = 0x6004;        // d8001 test
+//  ROM[0x10EDE/2] = 0x6012;        // watchdog
 
 	state->m_ip_select_values[0] = 0x57;
 	state->m_ip_select_values[1] = 0x53;
@@ -3867,16 +3867,16 @@ WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 
 static DRIVER_INIT( iganinju )
 {
-	//UINT16 *RAM;
+	//UINT16 *ROM;
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	//RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	//ROM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),state));
 
-	//RAM[0x00006e/2] = 0x0420; // the only game that does
+	//ROM[0x00006e/2] = 0x0420; // the only game that does
 								// not like lev 3 interrupts
 }
 
@@ -3895,7 +3895,7 @@ WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
 
 static DRIVER_INIT( jitsupro )
 {
-	//UINT16 *RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	//UINT16 *ROM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 
 	astyanax_rom_decode(machine, "maincpu");		// Code
 
