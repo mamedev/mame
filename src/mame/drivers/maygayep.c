@@ -566,7 +566,7 @@ ROM_START( ep_cbrun )
 	ROM_LOAD16_BYTE( "cann2-2n.p2", 0x040000, 0x020000, CRC(c45a5577) SHA1(7aafc4d68e04b6c6d7ea09fbab084e3e2fc93d4a) )
 	ROM_LOAD16_BYTE( "cann2-2n.p3", 0x040001, 0x020000, CRC(a02bf498) SHA1(15f3250afc5e5567d658baf43b279bf448374c63) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 ) /* split into clones later */
+	ROM_REGION( 0x400000, "altrevs", 0 ) /* split into clones later */
 	ROM_LOAD16_BYTE( "cann2-2p.p0", 0x000000, 0x020000, CRC(b857a27b) SHA1(051cba9eef10269a70a88ea3be279d98fb24f9d1) )
 	ROM_LOAD16_BYTE( "cann2-2p.p1", 0x000001, 0x020000, CRC(a6823856) SHA1(b2a90a1dd983b36f39a8ed2adb8408c0e2b9b7f8) )
 	ROM_LOAD16_BYTE( "cann2-2p.p2", 0x040000, 0x020000, CRC(c45a5577) SHA1(7aafc4d68e04b6c6d7ea09fbab084e3e2fc93d4a) )
