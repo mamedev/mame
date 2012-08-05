@@ -561,7 +561,7 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, AD_STICK_Y,          "AD Stick Y 7",           input_seq(JOYCODE_Y_INDEXED(6), input_seq::or_code, MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, AD_STICK_Y,          "AD Stick Y 8",           input_seq(JOYCODE_Y_INDEXED(7), input_seq::or_code, MOUSECODE_Y_INDEXED(7)), input_seq(), input_seq() )
 
-	INPUT_PORT_ANALOG_TYPE(  1, PLAYER1, AD_STICK_Z,          "AD Stick Z",             input_seq(JOYCODE_Z_INDEXED(0)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  1, PLAYER1, AD_STICK_Z,          "AD Stick Z",             input_seq(JOYCODE_Z_INDEXED(0)), input_seq(KEYCODE_A), input_seq(KEYCODE_Z) )
 	INPUT_PORT_ANALOG_TYPE(  2, PLAYER2, AD_STICK_Z,          "AD Stick Z 2",           input_seq(JOYCODE_Z_INDEXED(1)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  3, PLAYER3, AD_STICK_Z,          "AD Stick Z 3",           input_seq(JOYCODE_Z_INDEXED(2)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  4, PLAYER4, AD_STICK_Z,          "AD Stick Z 4",           input_seq(JOYCODE_Z_INDEXED(3)), input_seq(), input_seq() )
