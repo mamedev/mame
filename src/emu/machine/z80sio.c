@@ -599,7 +599,7 @@ UINT8 z80sio_device::sio_channel::control_read()
 
 	VPRINTF(("%s:sio_reg_r(%c,%d) = %02x\n", m_device->machine().describe_context(), 'A' + m_index, regnum, m_status[regnum]));
 
-	return m_status[regnum];
+	return result;
 }
 
 
