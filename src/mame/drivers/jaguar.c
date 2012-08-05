@@ -2517,8 +2517,8 @@ static DRIVER_INIT( vcircle )
  *************************************/
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   "Atari",   "Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar,   "Atari",   "Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   cojag_state, jaguar,   "Atari",   "Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   cojag_state, jaguar,   "Atari",   "Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 GAME( 1996, area51,    0,        cojagr3k,  area51, cojag_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,   area51,   cojag68k,  area51, cojag_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license)", 0 )

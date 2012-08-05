@@ -2504,10 +2504,10 @@ ROM_START(hisaturn)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        COMPANY     FULLNAME            FLAGS */
-CONS( 1994, saturn,     0,      0,      saturnus, saturn, saturnus,   "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
-CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, saturnjp,   "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
-CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, saturneu,   "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
-CONS( 1995, vsaturn,    saturn, 0,      saturnjp, saturn, saturnjp,   "JVC",      "V-Saturn",         GAME_NOT_WORKING )
-CONS( 1995, hisaturn,   saturn, 0,      saturnjp, saturn, saturnjp,   "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
+CONS( 1994, saturn,     0,      0,      saturnus, saturn, saturn_state, saturnus,   "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
+CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, saturn_state, saturnjp,   "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
+CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, saturn_state, saturneu,   "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
+CONS( 1995, vsaturn,    saturn, 0,      saturnjp, saturn, saturn_state, saturnjp,   "JVC",      "V-Saturn",         GAME_NOT_WORKING )
+CONS( 1995, hisaturn,   saturn, 0,      saturnjp, saturn, saturn_state, saturnjp,   "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
 
 #include "stv.c"

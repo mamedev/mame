@@ -11006,8 +11006,8 @@ GAME( 1995, pang3b,      pang3,    pang3,      pang3b, cps_state,     pang3b,   
 
 /* Home 'CPS Changer' Unit - For MESS */
 
-CONS( 1994, wofch,  0, 0,     qsound,     wofch,      wof,      "Capcom", "Tenchi wo Kurau II: Sekiheki no Tatakai (CPS Changer, Japan 921031)", 0 )
-CONS( 1995, sfzch,  0, 0,     cps1_12MHz, sfzch,      cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Japan 951020)", 0 )
+CONS( 1994, wofch,  0, 0,     qsound,     wofch,      cps_state, wof,      "Capcom", "Tenchi wo Kurau II: Sekiheki no Tatakai (CPS Changer, Japan 921031)", 0 )
+CONS( 1995, sfzch,  0, 0,     cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Japan 951020)", 0 )
 // are the 2 legit sets, or did somebody region hack it?
-CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch,      cps1,     "Capcom", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", 0 )
-CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch,      cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", 0 )
+CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", 0 )
+CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", 0 )

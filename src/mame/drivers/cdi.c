@@ -605,7 +605,7 @@ ROM_END
 *************************/
 
 // BIOS / System
-CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      0,        "Philips",  "CD-i (Mono-I) (PAL)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_IS_BIOS_ROOT )
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      cdi_state, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_IS_BIOS_ROOT )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 

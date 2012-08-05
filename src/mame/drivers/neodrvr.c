@@ -10019,7 +10019,7 @@ void mvs_install_protection(device_image_interface& image)
 
 
 /*    YEAR  NAME        PARENT    COMPAT    MACHINE   INPUT     INIT    */
-CONS( 1990, neogeo,     0,        0,        mvs,      neogeo,   mvs,  "SNK", "Neo-Geo", GAME_IS_BIOS_ROOT | GAME_SUPPORTS_SAVE )
+CONS( 1990, neogeo,     0,        0,        mvs,      neogeo,   neogeo_state, mvs,  "SNK", "Neo-Geo", GAME_IS_BIOS_ROOT | GAME_SUPPORTS_SAVE )
 
 /*    YEAR  NAME        PARENT    MACHINE   INPUT     INIT      MONITOR */
 /* SNK */

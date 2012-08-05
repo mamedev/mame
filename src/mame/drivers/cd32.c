@@ -862,7 +862,7 @@ static DRIVER_INIT( cd32 )
 }
 
 /* BIOS */
-CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   "Commodore Business Machines",  "Amiga CD32 (PAL)" , GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32_state, cd32,   "Commodore Business Machines",  "Amiga CD32 (PAL)" , GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 
 /*
@@ -1485,7 +1485,7 @@ static DRIVER_INIT( odeontw2 )
 // these are clones of the cd32 SYSTEM because they run on a stock retail unit, with additional HW
 GAME( 1995, cndypuzl, cd32, cd32base, cndypuzl, cd32_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cd32, cd32base, haremchl, cd32_state, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cd32, cd32base, lsrquiz, cd32_state,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
+GAME( 1995, lsrquiz,  cd32, cd32base, lsrquiz,  cd32_state,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
 GAME( 1995, lsrquiz2, cd32, cd32base, lsrquiz2, cd32_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, lasstixx, cd32, cd32base, lasstixx, cd32_state, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, mgnumber, cd32, cd32base, mgnumber, cd32_state, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
