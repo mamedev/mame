@@ -20,33 +20,124 @@ class intrscti_state : public driver_device
 public:
 	intrscti_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_ram(*this, "ram"){ }
+		m_vram(*this, "vram"){ }
 
-	required_shared_ptr<UINT8> m_ram;
-	DECLARE_READ8_MEMBER(unk_r);
+	required_shared_ptr<UINT8> m_vram;
+//	DECLARE_READ8_MEMBER(unk_r);
 };
 
+static VIDEO_START(intrscti)
+{
+}
 
+static SCREEN_UPDATE_IND16(intrscti)
+{
+	intrscti_state *state = screen.machine().driver_data<intrscti_state>();
+	int y,x;
+	int count;
+
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+
+	count = 0;
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int dat;
+			dat = state->m_vram[count];
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
+			count++;
+		}
+	}
+
+	count = 0x400;
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int dat;
+			dat = state->m_vram[count];
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat+0x100,0,0,0,x*8,y*8,0);
+			count++;
+		}
+	}
+
+	return 0;
+}
+
+#if 0
 READ8_MEMBER(intrscti_state::unk_r)
 {
 	return machine().rand();
 }
+#endif
 
 static ADDRESS_MAP_START( intrscti_map, AS_PROGRAM, 8, intrscti_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("ram") // video ram
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, AS_IO, 8, intrscti_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(unk_r )
-	AM_RANGE(0x01, 0x01) AM_READ(unk_r )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( intrscti )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -64,33 +155,6 @@ static GFXDECODE_START( intrscti )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static VIDEO_START(intrscti)
-{
-}
-
-static SCREEN_UPDATE_IND16(intrscti)
-{
-	intrscti_state *state = screen.machine().driver_data<intrscti_state>();
-	int y,x;
-	int count;
-
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-	count = 0;
-	for (y=0;y<64;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			int dat;
-			dat = state->m_ram[count];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
-			count++;
-		}
-	}
-
-
-	return 0;
-}
 
 static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	/* basic machine hardware */
@@ -103,8 +167,8 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 512-1)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(intrscti)
 
 	MCFG_GFXDECODE(intrscti)
@@ -131,12 +195,22 @@ ROM_END
 
 static DRIVER_INIT( intrscti )
 {
+	intrscti_state *state = machine.driver_data<intrscti_state>();
 	UINT8 *cpu = machine.root_device().memregion( "maincpu" )->base();
 	int i;
-	for (i=0x8000;i<0x8fff;i++)
+	for (i=0;i<0x1000;i++)
+		cpu[i+0x8000]=0xc9; // ret
+
+	/*
+	0x8208 -> string copy
+	*/
+
+	/* one of the protection sub-routines does this */
+	for (i=0;i<0x400;i++)
 	{
-		cpu[i]=0xc9; // ret
+		state->m_vram[i+0x000] = 0x0e;
+		state->m_vram[i+0x400] = 0xff;
 	}
 }
 
-GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti_state, intrscti, ROT0, "<unknown>", "Intersecti", GAME_IS_SKELETON )
+GAME( 19??, intrscti,  0,    intrscti, intrscti, intrscti_state, intrscti, ROT0, "<unknown>", "Intersecti", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
