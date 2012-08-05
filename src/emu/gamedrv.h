@@ -228,7 +228,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 };
 
 // standard console definition macro
-#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
@@ -247,7 +247,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 };
 
 // standard computer definition macro
-#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
@@ -266,7 +266,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 };
 
 // standard system definition macro
-#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
