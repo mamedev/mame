@@ -2755,6 +2755,7 @@ src/mame/drivers/mpu4.c svneol=native#text/plain
 src/mame/drivers/mpu4dealem.c svneol=native#text/plain
 src/mame/drivers/mpu4hw.c svneol=native#text/plain
 src/mame/drivers/mpu4mod2sw.c svneol=native#text/plain
+src/mame/drivers/mpu4mod4yam.c svneol=native#text/plain
 src/mame/drivers/mpu4plasma.c svneol=native#text/plain
 src/mame/drivers/mpu4sw.c svneol=native#text/plain
 src/mame/drivers/mpu4vid.c svneol=native#text/plain

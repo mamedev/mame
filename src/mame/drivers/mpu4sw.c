@@ -536,3 +536,56 @@ M4ADDR_SET( 1994, m4addr4c_b,	m4addr,	"adi10___.4n3",				0x0000, 0x010000, CRC(a
 M4ADDR_SET( 1994, m4addr_h1,	m4addr,	"5p4addersladders.bin",		0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97), "hack?","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack?, set 1)" )
 M4ADDR_SET( 1994, m4addr_h2,	m4addr,	"ad05.6c",					0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5), "hack?","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack?, set 2)" )
 
+
+#define M4DENMEN_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "densnd1.hex", 0x000000, 0x080000, CRC(468a8ec7) SHA1(ec450cd86fda09bc94caf913e9ee7900cfeaa0f2) ) \
+	ROM_LOAD( "densnd2.hex", 0x080000, 0x080000, CRC(1c20a490) SHA1(62eddc469e4b93ea1f82070600fce628dc526f54) ) \
+
+#define M4DENMEN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DENMEN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4DENMEN_SET( 199?, m4denmen,		0,			"dens.p1",						0x0000, 0x010000, CRC(d3687138) SHA1(611985a9116ea14992b34a84ed31693f88d99797), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2)" )
+M4DENMEN_SET( 199?, m4denmendnd,	m4denmen,	"dend.p1",						0x0000, 0x010000, CRC(176cd283) SHA1(f72c69b346f926a6e11b685ab9a6a2783b836450), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2D)" )
+M4DENMEN_SET( 199?, m4denmendnb,	m4denmen,	"denb.p1",						0x0000, 0x010000, CRC(b0164796) SHA1(61ff7e7ea2c27742177d851a4eb9a041d95b37d7), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2B)" )
+M4DENMEN_SET( 199?, m4denmendnc,	m4denmen,	"denc.p1",						0x0000, 0x010000, CRC(549e17bc) SHA1(78271e11d4c8e742acce9087f194a1db8fc8c3eb), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2C)" )
+M4DENMEN_SET( 199?, m4denmendnk,	m4denmen,	"denk.p1",						0x0000, 0x010000, CRC(8983cbe0) SHA1(159dcbc3f5d24b6be03ae9c3c2af58993bebd38c), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2K)" )
+M4DENMEN_SET( 199?, m4denmendny,	m4denmen,	"deny.p1",						0x0000, 0x010000, CRC(83ebd9f6) SHA1(f59e9d34295df8200f85a51d725437954acf9bdc), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2Y)" )
+
+M4DENMEN_SET( 199?, m4denmend5,		m4denmen,	"dm5s.p1",						0x0000, 0x010000, CRC(49672daa) SHA1(92e327b59b532e58b8c2a4e507f56c2ae069420c), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1))" )
+M4DENMEN_SET( 199?, m4denmend5d,	m4denmen,	"dm5d.p1",						0x0000, 0x010000, CRC(0c6250d5) SHA1(56b316df56d6448137332044bfe1081401eef3e8), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1D)" )
+M4DENMEN_SET( 199?, m4denmend5ad,	m4denmen,	"dm5ad.p1",						0x0000, 0x010000, CRC(f01125cc) SHA1(faa80bfb107db127b2f9c4c7d23ec495775d2162), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1AD)" )
+M4DENMEN_SET( 199?, m4denmend5b,	m4denmen,	"dm5b.p1",						0x0000, 0x010000, CRC(2c6dae4c) SHA1(281e4ba31a60fb5600790f21095e697db80736b7), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1B)" )
+M4DENMEN_SET( 199?, m4denmend5bd,	m4denmen,	"dm5bd.p1",						0x0000, 0x010000, CRC(a65c534d) SHA1(e5c38a9a06e20878cb820e5a12545405d699ff9d), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1BD)" )
+M4DENMEN_SET( 199?, m4denmend5k,	m4denmen,	"dm5k.p1",						0x0000, 0x010000, CRC(581572d6) SHA1(ac7303ea828846e770f8f1c7c818369d4b006495), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1K)" )
+M4DENMEN_SET( 199?, m4denmend5kd,	m4denmen,	"dm5dk.p1",						0x0000, 0x010000, CRC(848412a1) SHA1(bb385e2abdc2651b4a7ea9d30108dfa8adab0aea), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1KD)" )
+M4DENMEN_SET( 199?, m4denmend5y,	m4denmen,	"dm5y.p1",						0x0000, 0x010000, CRC(e6b9a800) SHA1(543ef65352a98676d66f6a5d3d7f568e10aac084), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1Y)" )
+M4DENMEN_SET( 199?, m4denmend5yd,	m4denmen,	"dm5dy.p1",						0x0000, 0x010000, CRC(0c091457) SHA1(930b87211b8df5846fa857744aafae2f2985e578), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM5 0.1YD)" )
+
+M4DENMEN_SET( 199?, m4denmend8,		m4denmen,	"dm8s.p1",						0x0000, 0x010000, CRC(27484793) SHA1(872ad9bdbad793aa3bb4b8d227627f901a04d70e), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM8 0.1)" )
+M4DENMEN_SET( 199?, m4denmend8d,	m4denmen,	"dm8d.p1",						0x0000, 0x010000, CRC(23258932) SHA1(03b929bd86c429a7806f75639569534bfe7634a8), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM8 0.1D)" )
+M4DENMEN_SET( 199?, m4denmend8c,	m4denmen,	"dm8c.p1",						0x0000, 0x010000, CRC(f5bd6c61) SHA1(ec443a284dae480c944f437426c28481a61c8ebb), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM8 0.1C)" )
+M4DENMEN_SET( 199?, m4denmend8k,	m4denmen,	"dm8k.p1",						0x0000, 0x010000, CRC(9b3c3827) SHA1(2f584cfbbf38435377785dd654fe7b97c78e731a), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM8 0.1K)" )
+M4DENMEN_SET( 199?, m4denmend8y,	m4denmen,	"dm8y.p1",						0x0000, 0x010000, CRC(ebfcb926) SHA1(c6a623de9163e3f49ee7e5dbb8df867a90d0d0a9), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM8 0.1Y)" )
+M4DENMEN_SET( 199?, m4denmend8yd,	m4denmen,	"dm8dy.p1",						0x0000, 0x010000, CRC(3c5ef7c8) SHA1(ac102525900f34c53082d37fb1bd14db9ce928fe), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DM8 0.1YD)" )
+
+M4DENMEN_SET( 199?, m4denmendt,		m4denmen,	"dmts.p1",						0x0000, 0x010000, CRC(1a2776e3) SHA1(4d5029a5abafb3945d533ca5ca23b32c036fbb31), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1)" )
+M4DENMEN_SET( 199?, m4denmendtd,	m4denmen,	"dmtd.p1",						0x0000, 0x010000, CRC(9b38fa46) SHA1(ce6509349c82a651336753a3062c1cf2390d0b9a), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1D)" )
+M4DENMEN_SET( 199?, m4denmendtad,	m4denmen,	"dmtad.p1",						0x0000, 0x010000, CRC(2edab31e) SHA1(c1cb258aba42e6ae33df731504d23162118054be), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1AD)" )
+M4DENMEN_SET( 199?, m4denmendtb,	m4denmen,	"dmtb.p1",						0x0000, 0x010000, CRC(c40fe8a4) SHA1(e182b0b1b975947da3b0a94afd17cdf166d7a8ac), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1B)" )
+M4DENMEN_SET( 199?, m4denmendtbd,	m4denmen,	"dmtbd.p1",						0x0000, 0x010000, CRC(d9140665) SHA1(cba8fc1c285c9192a6ea80b3f0c958781a818489), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1BD)" )
+M4DENMEN_SET( 199?, m4denmendtk,	m4denmen,	"dmtk.p1",						0x0000, 0x010000, CRC(b64b6b3f) SHA1(f39b2143b811375564ec82030a7d34057f79b3f7), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1K)" )
+M4DENMEN_SET( 199?, m4denmendtkd,	m4denmen,	"dmtdk.p1",						0x0000, 0x010000, CRC(b6211765) SHA1(3a2c5b1ef27113221ce7b61562f06589bcfa9072), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1KD)" )
+M4DENMEN_SET( 199?, m4denmendty,	m4denmen,	"dmty.p1",						0x0000, 0x010000, CRC(dbfa78a5) SHA1(edd9a1f286f3aa56a919e9e0c0013e9940d139ac), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1Y)" )
+M4DENMEN_SET( 199?, m4denmendtyd,	m4denmen,	"dmtdy.p1",						0x0000, 0x010000, CRC(66064a45) SHA1(3f64212b85320fba66afd40c0bb0cd58a5a616bf), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1YD)" )
+// "(C)1993 BARCREST"  and "DMT 0.1" (but hack? similar to other DMT sets, but with extra code inserted in places etc. different chr check)
+M4DENMEN_SET( 199?, m4denmen_h1,	m4denmen,	"dtm205",						0x0000, 0x010000, CRC(af76a460) SHA1(325021a92042c87e804bc17d6a7ccfda8bf865b8), "hack","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1, hack?)" )
+// "DAFFY   DUCK"  and "V1   0.1" (display message R.E.O instead of Barcrest)
+M4DENMEN_SET( 199?, m4denmen_h2,	m4denmen,	"den20.10",						0x0000, 0x010000, CRC(e002932d) SHA1(0a9b31c138a79695e1c1c29eee40c5a741275da6), "hack","Dennis The Menace (Barcrest) (MPU4) (V1 0.1, hack, set 1)" )
+M4DENMEN_SET( 199?, m4denmen_h3,	m4denmen,	"denm2010",						0x0000, 0x010000, CRC(dbed5e48) SHA1(f374f01aeefca7cc19fc46c93e2ca7a10606b183), "hack","Dennis The Menace (Barcrest) (MPU4) (V1 0.1, hack, set 2)" )

@@ -508,6 +508,7 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu3.o \
 	$(DRIVERS)/mpu4hw.o $(DRIVERS)/mpu4sw.o $(DRIVERS)/mpu4.o \
 	$(DRIVERS)/mpu4mod2sw.o \
+	$(DRIVERS)/mpu4mod4yam.o \
 	$(DRIVERS)/mpu4plasma.o \
 	$(DRIVERS)/mpu4dealem.o \
 	$(DRIVERS)/mpu4vid.o \
@@ -2072,7 +2073,7 @@ $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 
 $(DRIVERS)/mpu4mod2sw.o:	$(LAYOUT)/connect4.lh \
 			
-$(DRIVERS)/mpu4.o: $(LAYOUT)/gamball.lh \
+$(DRIVERS)/mpu4mod4yam.o: $(LAYOUT)/gamball.lh \
 
 $(DRIVERS)/mpu4hw.o:	$(LAYOUT)/mpu4.lh \
 			$(LAYOUT)/mpu4ext.lh

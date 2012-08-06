@@ -556,62 +556,18 @@ INPUT_PORTS_END
 
 /* GFX Decodes ***************************************************************/
 
-static const gfx_layout fg816_charlayout =
+static const gfx_layout fg88_charlayout =
 {
-	8,16,
+	8,8,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8  },  // note 1*3, 3*8, 5*8 etc. not used, the pixel data is the same, CPS1-like
 	16*8
 };
 
-static const gfx_layout bg1632_charlayout =
-{
-	16,32,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 0*16, 1*16, 1*16, 2*16,  2*16,  3*16,  3*16,  4*16,  4*16,  5*16,  5*16,  6*16,  6*16,  7*16, 7*16,
-	  8*16, 8*16, 9*16, 9*16, 10*16, 10*16, 11*16, 11*16, 12*16, 12*16, 13*16, 13*16, 14*16, 14*16, 15*16, 15*16 },
-	16*16
-};
-
-static const UINT32 bg3264_charlayout_yoffset[64] =
-{
-	0*32,  0*32,  1*32,  1*32,  2*32,  2*32,  3*32,  3*32,  4*32,  4*32,  5*32,  5*32,  6*32,  6*32,  7*32,  7*32,
-	8*32,  8*32,  9*32,  9*32,  10*32, 10*32, 11*32, 11*32, 12*32, 12*32, 13*32, 13*32, 14*32, 14*32, 15*32, 15*32,
-	16*32, 16*32, 17*32, 17*32, 18*32, 18*32, 19*32, 19*32, 20*32, 20*32, 21*32, 21*32, 22*32, 22*32, 23*32, 23*32,
-	24*32, 24*32, 25*32, 25*32, 26*32, 26*32, 27*32, 27*32, 28*32, 28*32, 29*32, 29*32, 30*32, 30*32, 31*32, 31*32
-};
-
-static const gfx_layout bg3264_charlayout =
-{
-	32,64,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-	},
-	EXTENDED_YOFFS,
-	32*32,
-	NULL,
-	bg3264_charlayout_yoffset
-};
-
-
-static GFXDECODE_START( kickgoal )
-	GFXDECODE_ENTRY( "gfx1", 0, fg816_charlayout,   0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg1632_charlayout,  0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg3264_charlayout,  0x000, 0x40 )
-GFXDECODE_END
-
-static const gfx_layout actionhw_fg88_alt_charlayout =
+static const gfx_layout fg88_alt_charlayout =
 {
 	8,8,
 	RGN_FRAC(1,4),
@@ -623,23 +579,41 @@ static const gfx_layout actionhw_fg88_alt_charlayout =
 };
 
 
-static const gfx_layout actionhw_bg1616_charlayout =
+static const gfx_layout bg1616_charlayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16,  1*16,  2*16,  3*16,   4*16,   5*16,   6*16,   7*16,
-	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP16(0,16) },
 	16*16
 };
 
 
+static const gfx_layout bg3232_charlayout =
+{
+	32,32,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
+	{
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+	},
+	{ STEP32(0,32) },
+	32*32,
+};
+
+static GFXDECODE_START( kickgoal )
+	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,	0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, bg3232_charlayout,  0x000, 0x40 )
+GFXDECODE_END
 
 static GFXDECODE_START( actionhw )
-	GFXDECODE_ENTRY( "gfx1", 0, actionhw_fg88_alt_charlayout,   0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, actionhw_bg1616_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,	0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,		0x000, 0x40 )
 GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/
@@ -694,8 +668,8 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 4*8, 60*8-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(kickgoal)
 
 	MCFG_GFXDECODE(kickgoal)
@@ -731,9 +705,9 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(actionhw)
+	MCFG_SCREEN_UPDATE_STATIC(kickgoal)
 
 	MCFG_GFXDECODE(actionhw)
 	MCFG_PALETTE_LENGTH(1024)
