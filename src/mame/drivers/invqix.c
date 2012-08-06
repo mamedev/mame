@@ -68,8 +68,11 @@ The other has the secondary label 351100210 with a serial number labeled:
     200000-20ffff: Work RAM
     400000-400003: OKIM9810
     600000-61ffff: VRAM
-
+    620000-620005: video registers
+ 
     I/O map:
+    port 1: player 2 inputs
+ 
     port 2 bit 3: must be "1" to avoid SERVICE ERROR
 	port 2 bit 6: FPGA chip select
     port 2 bit 7: FPGA clock in
@@ -80,10 +83,12 @@ The other has the secondary label 351100210 with a serial number labeled:
     port 3 bit 3: EEPROM clock
     port 3 bit 4: EEPROM data to EEPROM
     port 3 bit 5: EEPROM data from EEPROM
-
+ 
+    port 4: player 1 inputs
+ 
     port 6 bit 3: FPGA data bit in
 
-    port G bit 0: framebuffer bank select?  toggled each frame
+    port G bit 0: watchdog (toggled each frame)
 
     IRQ0 and IRQ1 are valid.  Mainline explicitly waits on IRQ1, but IRQ0 does a ton of processing.
     No other IRQ vectors are valid.
@@ -162,7 +167,7 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
                 UINT8 r,g,b;
                 int pen_data;
 
-                pen_data = (m_vram[x+y*256]);
+                pen_data = (m_vram[(x+y*256)]);
                 b = (pen_data & 0x001f);
                 g = (pen_data & 0x03e0) >> 5;
                 r = (pen_data & 0x7c00) >> 10;
@@ -262,13 +267,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(invqix_io_map, AS_IO, 8, invqix_state)
 	AM_RANGE(H8_PORT_1, H8_PORT_1) AM_READ_PORT("P1")
-	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READ_PORT("SYSTEM") 
+	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(H8_PORT_3, H8_PORT_3) AM_READWRITE(port3_r, port3_w)
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READ_PORT("P4")
 	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_READWRITE(port5_r, port5_w) 
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w) 
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READ(porta_r)
-	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_READ(portg_r)
+	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_READ(portg_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( invqix )
