@@ -303,7 +303,7 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 				if (show_warnings && warnings_string(machine, messagebox_text).len() > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
-					if (machine.system().flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
+					if (machine.system().flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
 					if (machine.system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 						messagebox_backcolor = UI_RED_COLOR;
@@ -903,6 +903,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 						GAME_NO_SOUND |  \
 						GAME_IMPERFECT_SOUND |  \
 						GAME_IMPERFECT_GRAPHICS | \
+						GAME_IMPERFECT_KEYBOARD | \
 						GAME_NO_COCKTAIL)
 
 	string.reset();
@@ -935,7 +936,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 			string.cat(" have not been correctly dumped.\n");
 		}
 		/* add one line per warning flag */
-		if (machine.ioport().has_keyboard())
+		if (machine.system().flags & GAME_IMPERFECT_KEYBOARD)
 			string.cat("The keyboard emulation may not be 100% accurate.\n");
 		if (machine.system().flags & GAME_IMPERFECT_COLORS)
 			string.cat("The colors aren't 100% accurate.\n");
