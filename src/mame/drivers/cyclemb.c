@@ -1,7 +1,7 @@
 /***************************************************************************************************
 
     Cycle Maabou (c) 1984 Taito Corporation / Seta
-	Sky Destroyer (c9 1985 Taito Corporation
+	Sky Destroyer (c) 1985 Taito Corporation
 
     appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
@@ -11,8 +11,8 @@
 	- inputs in Cycle Maabou;
     - sound (controlled by three i8741);
     - add flipscreen;
-
-    (wait until it completes the post test, then put 1 to be23)
+    - color prom resistor network is guessed;
+    - standing cones in cyclemb are yellow/black instead of red/white?? need to verify on hw
 
 =====================================================================================================
 
@@ -83,7 +83,8 @@ public:
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
-		m_obj3_ram(*this, "obj3_ram"){ }
+		m_obj3_ram(*this, "obj3_ram")
+	{ }
 
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
@@ -98,7 +99,7 @@ public:
 		UINT8 rst;
 		UINT8 state;
 		UINT8 packet_type;
-	}m_mcu[2];
+	} m_mcu[2];
 
 	UINT16 m_dsw_pc_hack;
 
