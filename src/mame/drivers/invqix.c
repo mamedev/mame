@@ -114,8 +114,6 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port3_r);
 	DECLARE_WRITE8_MEMBER(port3_w);
 	DECLARE_READ8_MEMBER(port5_r);
@@ -123,10 +121,11 @@ public:
 	DECLARE_READ8_MEMBER(port6_r);
 	DECLARE_WRITE8_MEMBER(port6_w);
 	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(portg_r);
 
-	DECLARE_WRITE16_MEMBER(oki_w);
+    DECLARE_WRITE16_MEMBER(vctl_w);
+
 protected:
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_device> m_eeprom;
@@ -134,6 +133,9 @@ protected:
 
 	// driver_device overrides
 	virtual void video_start();
+
+private:
+    UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
 
@@ -145,37 +147,62 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	int x,y;
 
-	for(y=0;y<256;y++)
-	{
-		for(x=0;x<256;x++)
-		{
-			UINT8 r,g,b;
-			int pen_data;
+    // this means freeze or blank or something
+    if (m_vctl == 0x100)
+    {
+        return 0;
+    }
 
-			pen_data = (m_vram[x+y*256]);
-			b = (pen_data & 0x001f);
-			g = (pen_data & 0x03e0) >> 5;
-			r = (pen_data & 0x7c00) >> 10;
-			r = (r << 3) | (r & 0x7);
-			g = (g << 3) | (g & 0x7);
-			b = (b << 3) | (b & 0x7);
+    if (m_vctl == 0x0000)
+    {
+        for(y=0;y<256;y++)
+        {
+            for(x=0;x<256;x++)
+            {
+                UINT8 r,g,b;
+                int pen_data;
 
-			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = r << 16 | g << 8 | b;
-		}
-	}
+                pen_data = (m_vram[x+y*256]);
+                b = (pen_data & 0x001f);
+                g = (pen_data & 0x03e0) >> 5;
+                r = (pen_data & 0x7c00) >> 10;
+                r = (r << 3) | (r & 0x7);
+                g = (g << 3) | (g & 0x7);
+                b = (b << 3) | (b & 0x7);
+
+                if(cliprect.contains(x, y))
+                    bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+            }
+        }
+    }
+    else if (m_vctl == 0x0001)  // flip
+    {
+        for(y=0;y<256;y++)
+        {
+            for(x=0;x<256;x++)
+            {
+                UINT8 r,g,b;
+                int pen_data;
+
+                pen_data = (m_vram[(256-x)+((256-y)*256)]);
+                b = (pen_data & 0x001f);
+                g = (pen_data & 0x03e0) >> 5;
+                r = (pen_data & 0x7c00) >> 10;
+                r = (r << 3) | (r & 0x7);
+                g = (g << 3) | (g & 0x7);
+                b = (b << 3) | (b & 0x7);
+
+                if(cliprect.contains(x, y))
+                    bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+            }
+        }
+    }
+    else
+    {
+        logerror("invqix: Unhandled vctl %04x\n", m_vctl);
+    }
 
 	return 0;
-}
-
-READ8_MEMBER(invqix_state::port2_r)
-{
-	return machine().root_device().ioport("SYSTEM")->read(); // | 0x01;
-}
-
-WRITE8_MEMBER(invqix_state::port2_w)
-{
-
 }
 
 READ8_MEMBER(invqix_state::port3_r)
@@ -192,7 +219,7 @@ WRITE8_MEMBER(invqix_state::port3_w)
 
 READ8_MEMBER(invqix_state::port5_r)
 {
-	return 0xff;
+	return 0;
 }
 
 WRITE8_MEMBER(invqix_state::port5_w)
@@ -201,17 +228,26 @@ WRITE8_MEMBER(invqix_state::port5_w)
 
 READ8_MEMBER(invqix_state::port6_r)
 {
-	return 0xff;
+	return 0;
 }
 
 WRITE8_MEMBER(invqix_state::port6_w)
 {
-
 }
 
 READ8_MEMBER(invqix_state::porta_r)
 {
-	return 0xff;
+	return 0xf0;
+}
+
+READ8_MEMBER(invqix_state::portg_r)
+{
+	return 0;
+}
+
+WRITE16_MEMBER(invqix_state::vctl_w)
+{
+    m_vctl = data;
 }
 
 static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
@@ -221,27 +257,28 @@ static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREAD8("oki", okim9810_device, read, 0xff00)
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
+    AM_RANGE(0x620004, 0x620005) AM_WRITE(vctl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(invqix_io_map, AS_IO, 8, invqix_state)
 	AM_RANGE(H8_PORT_1, H8_PORT_1) AM_READ_PORT("P1")
-	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READWRITE(port2_r, port2_w)
+	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READ_PORT("SYSTEM") 
 	AM_RANGE(H8_PORT_3, H8_PORT_3) AM_READWRITE(port3_r, port3_w)
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READ_PORT("P4")
 	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_READWRITE(port5_r, port5_w) 
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w) 
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READ(porta_r)
-	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_NOP
+	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_READ(portg_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( invqix )
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1 )	// coin 1
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )	// start A-1 ("left start" - picks Space Invaders)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Left 1 player start")   // start A-1 ("left start" - picks Space Invaders)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1 ) // service
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 )   // coin 2
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNUSED )	// start A-2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_START3 ) PORT_NAME("Left 2 players start")   // start A-2
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
@@ -252,8 +289,8 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )	// 0x40 - start B-2 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START4 )	PORT_NAME("Right 2 players start") // start B-2 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	
 	PORT_START("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -262,7 +299,7 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )	// start B-1 ("right start" - picks Qix)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )	PORT_NAME("Right 1 player start")   // start B-1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
