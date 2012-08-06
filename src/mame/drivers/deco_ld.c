@@ -5,9 +5,14 @@ Bega's Battle (c) 1983 Data East Corporation
 preliminary driver by Angelo Salese
 
 TODO:
-- laserdisc hook-ups;
-- video emulation is bare bones;
-- i/os
+- laserdisc hook-up and 6850 comms;
+- "RAM TEST ERROR 5J" in Bega's Battle and Cobra Command
+- "SOUND TEST READ ERROR"
+- color offset is unknown;
+- Bega's Battle VBLANK hack (ld/framework fault most likely)
+- CPU clocks
+- dip-switches
+- clean-ups
 
 ***************************************************************************
 
@@ -112,60 +117,120 @@ class deco_ld_state : public driver_device
 public:
 	deco_ld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
-		m_videoram(*this, "videoram"){ }
+		  m_maincpu(*this, "maincpu"),
+		  m_audiocpu(*this, "audiocpu"),
+		  m_laserdisc(*this, "laserdisc"),
+		  m_vram0(*this, "vram0"),
+		  m_attr0(*this, "attr0"),
+		  m_vram1(*this, "vram1"),
+		  m_attr1(*this, "attr1")
+		  { }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	required_shared_ptr<UINT8> m_videoram;
-	UINT8 m_vram_bank;
+	required_shared_ptr<UINT8> m_vram0;
+	required_shared_ptr<UINT8> m_attr0;
+	required_shared_ptr<UINT8> m_vram1;
+	required_shared_ptr<UINT8> m_attr1;
+
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_WRITE8_MEMBER(rblaster_sound_w);
-	DECLARE_WRITE8_MEMBER(rblaster_vram_bank_w);
 	DECLARE_READ8_MEMBER(laserdisc_r);
 	DECLARE_WRITE8_MEMBER(laserdisc_w);
-	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(nmimask_w);
+	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(decold_palette_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
+{
+	const gfx_element *gfx = machine.gfx[1];
+	int i,spr_offs,x,y,col,fx,fy;
 
+	/*
+	[+0] ---- -x-- flip X
+	[+0] ---- --x- flip Y
+	[+0] ---- ---x enable this sprite
+	[+1] tile number
+	[+2] y coord
+	[+3] x coord
+	*/
 
-static SCREEN_UPDATE_IND16( rblaster )
+	for(i=0;i<0x20;i+=4)
+	{
+		if(!spriteram[i+0] & 1)
+			continue;
+
+		spr_offs = spriteram[i+1]|tile_bank;
+		x = spriteram[i+3];
+		y = spriteram[i+2];
+		col = 6; /* TODO */
+		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
+		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
+
+		drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,0);
+	}
+
+	for(i=0x3e0;i<0x400;i+=4)
+	{
+		if(!spriteram[i+0] & 1)
+			continue;
+
+		spr_offs = spriteram[i+1]|tile_bank;
+		x = spriteram[i+3];
+		y = spriteram[i+2];
+		col = 6; /* TODO */
+		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
+		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
+
+		drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,0);
+	}
+}
+
+static SCREEN_UPDATE_RGB32( rblaster )
 {
 	deco_ld_state *state = screen.machine().driver_data<deco_ld_state>();
-	UINT8 *videoram = state->m_videoram;
 	const gfx_element *gfx = screen.machine().gfx[0];
-	int count = 0x0000;
-
 	int y,x;
 
-	for (y=0;y<32;y++)
+	bitmap.fill(0, cliprect);
+
+	draw_sprites(screen.machine(), bitmap,cliprect,state->m_vram1,0x000);
+	draw_sprites(screen.machine(), bitmap,cliprect,state->m_vram0,0x100);
+
+	for (y=1;y<31;y++)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = videoram[count];
-			int colour = (state->m_vram_bank & 0x7);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,colour,0,0,x*8,y*8);
+			int attr = state->m_attr0[x+y*32];
+			int tile = state->m_vram0[x+y*32] | ((attr & 3) << 8);
+			int colour = (6 & 0x7); /* TODO */
 
-			count++;
+			drawgfx_transpen(bitmap,cliprect,gfx,tile|0x400,colour,0,0,x*8,y*8,0);
+		}
+	}
+
+	for (y=1;y<31;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int attr = state->m_attr1[x+y*32];
+			int tile = state->m_vram1[x+y*32] | ((attr & 3) << 8);
+			int colour = (6 & 0x7); /* TODO */
+
+			drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,0,0,x*8,y*8,0);
 		}
 	}
 
 	return 0;
 }
 
-#if 0
-WRITE8_MEMBER(deco_ld_state::rblaster_sound_w)
-{
-	soundlatch_byte_w(space,0,data);
-	device_set_input_line(machine().cpu[1], 0, HOLD_LINE);
-}
-#endif
 
-WRITE8_MEMBER(deco_ld_state::rblaster_vram_bank_w)
-{
-	m_vram_bank = data;
-}
 
 READ8_MEMBER(deco_ld_state::laserdisc_r)
 {
@@ -180,62 +245,45 @@ WRITE8_MEMBER(deco_ld_state::laserdisc_w)
 	m_laserdisc_data = data;
 }
 
-READ8_MEMBER(deco_ld_state::test_r)
+
+WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 {
-	return machine().rand();
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8, deco_ld_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-//  AM_RANGE(0x1000, 0x1007) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_READ(test_r)
-	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)
-	AM_RANGE(0x1002, 0x1002) AM_READ(test_r)
-	AM_RANGE(0x1003, 0x1003) AM_READ(test_r)
-	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
-//  AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
-	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
-	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
-	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+/* same as Burger Time HW */
+WRITE8_MEMBER(deco_ld_state::decold_palette_w)
+{
+	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+}
 
-static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, deco_ld_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN1")
-	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)//_PORT("IN2")
-	AM_RANGE(0x1002, 0x1002) AM_READ(test_r)//_PORT("IN3")
-	AM_RANGE(0x1003, 0x1003) AM_READ(test_r)//AM_READ_PORT("IN0")
-//  AM_RANGE(0x1004, 0x1004) AM_READ(test_r)//_PORT("IN4")
-//  AM_RANGE(0x1005, 0x1005) AM_READ(test_r)//_PORT("IN5")
-	AM_RANGE(0x1004, 0x1004) AM_WRITE(rblaster_vram_bank_w) //might be 1001
-	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
-	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM //vram attr?
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
+/* unknown, but certainly related to audiocpu somehow */
+READ8_MEMBER(deco_ld_state::sound_status_r)
+{
+	return 0xff ^ 0x40;
+}
 
 static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-//  AM_RANGE(0x1000, 0x1007) AM_NOP
-	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
-	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
-	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
-	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0") AM_WRITENOP // (w) coin lockout
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN1")
+	AM_RANGE(0x1004, 0x1004) AM_READ(soundlatch2_byte_r) AM_WRITE(decold_sound_cmd_w)
+	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
+	AM_RANGE(0x1006, 0x1006) AM_NOP // 6850 status
+	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // 6850 data
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(decold_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram0")
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("attr0")
+	AM_RANGE(0x3000, 0x37ff) AM_RAM
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("vram1")
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM AM_SHARE("attr1")
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
 
 /* sound arrangement is pratically identical to Zero Target. */
 
@@ -259,242 +307,117 @@ static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(soundlatch_byte_r,soundlatch2_byte_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( cobra )
+CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
+{
+	return machine().primary_screen->vpos() >= 240*2;
+}
+
+INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)
+{
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static INPUT_PORTS_START( begas )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x00, "SYS0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x00, "SYS1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, NULL) // TODO: IPT_VBLANK doesn't seem to work fine?
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "SYS2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, deco_ld_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, deco_ld_state,coin_inserted, 0)
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x00, "SYS3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x00, "SYS4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x00, "SYS5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+static INPUT_PORTS_START( cobra )
+	PORT_INCLUDE( begas )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	/* TODO: dips */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rblaster )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x00, "SYS0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_INCLUDE( begas )
+
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x00, "SYS1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "SYS2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	/* TODO: dips */
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -502,14 +425,28 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
 	8*8
 };
 
+
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
+	{ 7, 6, 5, 4, 3, 2, 1, 0, 16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0 },
+	{ 15*8, 14*8, 13*8, 12*8, 11*8, 10*8, 9*8, 8*8,
+			7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
+	16*16
+};
+
 static GFXDECODE_START( rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
 
 static MACHINE_START( rblaster )
@@ -521,13 +458,13 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(rblaster_map)
-//  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
-	MCFG_CPU_VBLANK_INT("screen",nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",M6502,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
-//  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold) //test
 	MCFG_CPU_PERIODIC_INT(sound_interrupt, 640)
+
+//	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, rblaster)
@@ -539,28 +476,19 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_MACHINE_START(rblaster)
 
 	/* sound hardware */
+	/* TODO: mixing */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( begas, rblaster )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(begas_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( cobra, rblaster )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cobra_map)
-
-	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -575,13 +503,13 @@ ROM_START( begas )
 	ROM_LOAD( "an04-3",   0x6000, 0x2000, CRC(935b2b0a) SHA1(e7c09960607569bd88e9af396aa70661f4352efb) )
 	ROM_LOAD( "an03-3",   0x8000, 0x2000, CRC(79438d80) SHA1(e641336f23c6b84d84313ef3e94871ac9aa8b612) )
 	ROM_LOAD( "an02-3",   0xa000, 0x2000, CRC(98ce4ca0) SHA1(e7db66b1f0f06b0a21e7450962ba70f460a24847) )
-	ROM_LOAD( "an01",     0xc000, 0x2000, CRC(15f8921d) SHA1(32f945bee8f30e5896da38ac6184a11c0a8194bb) ) //ok?
+	ROM_LOAD( "an01",     0xc000, 0x2000, CRC(15f8921d) SHA1(32f945bee8f30e5896da38ac6184a11c0a8194bb) )
 	ROM_LOAD( "an00-3",   0xe000, 0x2000, CRC(124a3a36) SHA1(e2f7110196cb46fcda429c613388285b46ec1a9e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "an06",   0xe000, 0x2000, CRC(cbbcd730) SHA1(2f2e78fcf2eba71044bec60d27d8756d9b5af551) )
 
-	ROM_REGION( 0xc000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "an0a",   0x0000, 0x2000, CRC(e429305d) SHA1(9a05ab7916235d028b6b05270703516581825660) )
 	ROM_LOAD( "an0b",   0x4000, 0x2000, CRC(09e4b780) SHA1(0735420b8529017e507feecf8f74fecd80fbf7d5) )
 	ROM_LOAD( "an0c",   0x8000, 0x2000, CRC(0c127207) SHA1(b8372b2fa20ffe5ac278f558c07fd761c86e514b) )
@@ -618,7 +546,7 @@ ROM_START( begas1 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "an06",   0xe000, 0x2000, CRC(cbbcd730) SHA1(2f2e78fcf2eba71044bec60d27d8756d9b5af551) )
 
-	ROM_REGION( 0xc000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "an0a",   0x0000, 0x2000, CRC(e429305d) SHA1(9a05ab7916235d028b6b05270703516581825660) )
 	ROM_LOAD( "an0b",   0x4000, 0x2000, CRC(09e4b780) SHA1(0735420b8529017e507feecf8f74fecd80fbf7d5) )
 	ROM_LOAD( "an0c",   0x8000, 0x2000, CRC(0c127207) SHA1(b8372b2fa20ffe5ac278f558c07fd761c86e514b) )
@@ -651,7 +579,7 @@ ROM_START( rblaster )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "02.bin",   0xe000, 0x2000, CRC(6c20335d) SHA1(b28e80f112553af8e3fba9ebbfc10d1f56396ac1) )
 
-	ROM_REGION( 0xc000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "03.bin",   0x0000, 0x2000, CRC(d1ff5ffb) SHA1(29df207e225e3b0477d5566d256198310d6ae526) )
 	ROM_LOAD( "06.bin",   0x2000, 0x2000, CRC(d1ff5ffb) SHA1(29df207e225e3b0477d5566d256198310d6ae526) )
 	ROM_LOAD( "04.bin",   0x4000, 0x2000, CRC(da2c84d9) SHA1(3452b0e2a45fa771e226c3a3668afbf3ceb0ec11) )
@@ -671,7 +599,10 @@ ROM_START( cobra )
 	ROM_LOAD( "au00-2",   0xe000, 0x2000, CRC(6c0f1f16) SHA1(ed05d3eaa24e84b1dfb4e1eb5f69b23e4a1494ba) )
 	ROM_COPY( "maincpu",  0x8000, 0x4000, 0x4000 )
 
-	ROM_REGION( 0xc000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "au06",   0xe000, 0x2000, CRC(ccc94eb0) SHA1(354a933ddc6a1e1118c2bf176faaab5d01fc92d3) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "au0a",   0x0000, 0x2000, CRC(6aaedcf3) SHA1(52dc913eecf8a159784d500217cffd7a6d8eb45c) )
 	ROM_LOAD( "au0b",   0x4000, 0x2000, CRC(92247877) SHA1(f9bb0c20212ab13caabfb5beb9b6afc807bc9555) )
 	ROM_LOAD( "au0c",   0x8000, 0x2000, CRC(d00a2762) SHA1(84d4329b39b9fd30682b7efa5cb2744934c5ee5c) )
@@ -684,8 +615,8 @@ ROM_START( cobra )
 	DISK_IMAGE_READONLY( "cobra", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) )
 ROM_END
 
-GAME( 1983, begas,  0,       begas,  cobra, deco_ld_state,  0, ROT0,    "Data East", "Bega's Battle (Revision 3)", GAME_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  cobra, deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", GAME_NOT_WORKING )
-GAME( 1984, cobra,  0,       cobra,     cobra, deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD)", GAME_NOT_WORKING )
+GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", GAME_NOT_WORKING )
+GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", GAME_NOT_WORKING )
+GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD)", GAME_NOT_WORKING )
 // Thunder Storm (Cobra Command Japanese version)
 GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", GAME_NOT_WORKING )
