@@ -54,7 +54,7 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE_IND16( esh )
+static SCREEN_UPDATE_RGB32( esh )
 {
 	esh_state *state = screen.machine().driver_data<esh_state>();
 	int charx, chary;
@@ -263,16 +263,16 @@ static PALETTE_INIT( esh )
 static const gfx_layout esh_gfx_layout =
 {
 	8,8,
-	0x1000/8,
+	RGN_FRAC(1,3),
 	3,
-	{ 0, 0x1000*8, 0x2000*8 },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
 
 static GFXDECODE_START( esh )
-	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x100)
+	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
 static TIMER_CALLBACK( irq_stop )

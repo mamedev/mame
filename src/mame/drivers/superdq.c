@@ -63,7 +63,7 @@ static VIDEO_START( superdq )
 	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static SCREEN_UPDATE_IND16( superdq )
+static SCREEN_UPDATE_RGB32( superdq )
 {
 	superdq_state *state = screen.machine().driver_data<superdq_state>();
 

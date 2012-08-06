@@ -780,7 +780,7 @@ static VIDEO_START(dwarfd)
 {
 }
 
-static void drawCrt( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect )
 {
 	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 	int x, y;
@@ -841,7 +841,7 @@ static void drawCrt( running_machine &machine, bitmap_ind16 &bitmap,const rectan
 }
 
 
-static SCREEN_UPDATE_IND16( dwarfd )
+static SCREEN_UPDATE_RGB32( dwarfd )
 {
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	drawCrt(screen.machine(), bitmap, cliprect);

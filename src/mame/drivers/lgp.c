@@ -93,7 +93,7 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE_IND16( lgp )
+static SCREEN_UPDATE_RGB32( lgp )
 {
 	lgp_state *state = screen.machine().driver_data<lgp_state>();
 	int charx, chary;

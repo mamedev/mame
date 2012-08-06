@@ -8,7 +8,7 @@ TODO:
 - laserdisc hook-up and 6850 comms;
 - "RAM TEST ERROR 5J" in Bega's Battle and Cobra Command
 - "SOUND TEST READ ERROR"
-- color offset is unknown;
+- color offset number origin is unknown;
 - Bega's Battle VBLANK hack (ld/framework fault most likely)
 - CPU clocks
 - dip-switches

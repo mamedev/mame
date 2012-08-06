@@ -50,7 +50,7 @@ static VIDEO_START( timetrv )
 
 }
 
-static SCREEN_UPDATE_IND16( timetrv )
+static SCREEN_UPDATE_RGB32( timetrv )
 {
 	timetrv_state *state = screen.machine().driver_data<timetrv_state>();
 	popmessage("%s%s",reinterpret_cast<char *>(state->m_led_vram_lo.target()),reinterpret_cast<char *>(state->m_led_vram_hi.target()));
