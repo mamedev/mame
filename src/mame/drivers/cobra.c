@@ -173,18 +173,26 @@
 		0x00114:		High word: framebuffer pitch?   Low word: framebuffer pixel size?
 		0x00118:		High word: FB pixel read X pos,   Low word: FB pixel read Y pos
 		0x0011c:		Same as above?
+		0x00458:		Set to 0x02100000 (0xff) by texselect()
 
-		0x40018:		Set to 0x0001040a by mode_stipple()
-		0x400d0:		Set to 0x80000000 by mode_stipple()
-		0x40114:		Set to 0x00080000 by mode_scissor()
-		0x40138:		Set to 0x88800000 by mode_viewclip()
+		0x40018:		Set to 0x0001040a (0xc0) by mode_stipple()
+		0x400d0:		Set to 0x80000000 (0x80) by mode_stipple()
+		0x400f4:		Set to 0x40000000 (0x80) by texselect()
+		0x40114:		Set to 0x00080000 (0x10) by mode_scissor()
+		0x40138:		Set to 0x88800000 (0xe0) by mode_viewclip()
 		0x40160:		Some viewport register? (high word: 192, low word: 150)
 		0x40164:		Some viewport register? (high word: 352, low word: 275)
 		0x40170:		Some viewport register? (high word: 160, low word: 125)
 		0x40174:		Some viewport register? (high word: 320, low word: 250)
-		0x40198:		Set to 0x80800000 by mode_alphatest()
-		0x4019c:		Set to 0x88000000 by mode_fog()
-		0x80020:		Set to 0x00020000 by mode_depthtest()
+		0x40198:		Set to 0x80800000 (0xa0) by mode_alphatest()
+		0x4019c:		Set to 0x88000000 (0xc0) by mode_fog()
+		0x8001c:		Set to 0xc1d60060 (0xfe) by mode_stenciltest()
+		0x80020:		Set to 0x00020000 (0x10) by mode_depthtest()
+		0x80050:		Set to 0x04445500 (0x7c) by mode_blend()
+		0x80054:		Set to 0x02400000 (0xe0) by mode_stencilmod()
+		0x80114:		(0xcc) by mode_colormask()
+		0x80118:		(0xcc) by mode_colormask()
+		0x8011c:		(0xe0) by mode_stencilmask()
 		0xc0c00..fff:	Texture RAM readback
 		0xc3020:		Start address for texram writes?
 		0xc3028:		Reads address from texram?
@@ -1634,81 +1642,36 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			case 0xe2:
 			case 0xe3:
 			{
-				// E0C00004 18C003C0 - 32 params
-				// E0C00004 18F803C1 - 48 params
-				// E0C00003 18C003C0 - 24 params        prm_triangle()
-				// E0C00008 18C003C0 - 64 params        prm_trianglestrip()
-				// E0C00001 58C003C1 - 10 params        prm_trianglefan() (start vertex?)
-				// E0800004 18C003C0 - 32 params        prm_trianglefan()
-				// E3000002 58C003C1 - 20 params        prm_line()
-				// E3000008 58C003C1 - 80 params        prm_lines()
-				// E3000005 58C003C1 - 50 params        prm_linestrip()
-				// E2000001 18C003C0 - 8 params         prm_point()
-				// E2000008 18C003C0 - 64 params        prm_points()
-				// E0C00003 38C003C1 - 30 params
-				// E0C00008 38C003C1 - 80 params
-				// E0C00001 78C003C0 - 10 params
-				// E0800004 38C003C1 - 40 params
-				// E3000002 78C003C0 - 20 params        prm_line()
-				// E3400002 58C003C1 - 20 params
-				// E0C00003 18F803C1 - 36 params
-				// E0C00001 58F803C0 - 12 params
+				// Draw graphics primitives
 
-				// These seem to be 3d graphics polygon packets...
-				// The low part of the first word could be number of vertices...
+				// 0x00: xxxx---- -------- -------- --------    Command
+				// 0x00: ----xxxx -------- -------- --------	Primitive type (0 = triangle, 2 = point, 3 = line)
+				// 0x00: -------- xx------ -------- --------	?
+				// 0x00: -------- -------- -------- xxxxxxxx	Number of units (amount of bits is uncertain)
+				//
+				// 0x01: -x------ -------- -------- --------    Has extra flags word (used by lines only)
+				// 0x01: --x----- -------- -------- --------    Has extra unknown float
+				// 0x01: ---x---- -------- -------- --------    Always 1?
+				// 0x01: -------- xx------ -------- --------    ?
+				// 0x01: -------- --x----- -------- --------    Has texture coords
+				// 0x01: -------- ---x---- -------- --------	?
+				// 0x01: -------- ----x--- -------- --------	?
+				// 0x01: -------- -------- ------xx xx------	? (always set to 1s?)
+				// 0x01: -------- -------- -------- -------x	Has extra unknown float
 
 				int i;
 				int num = 0;
 				int units = w1 & 0xff;
-				int unit_size = 0;
 
 				// determine the expected packet size to see if we can process it yet
-				if (w2 == 0x18c003c0)
-				{
-					unit_size = 8;
-					num = units * unit_size;
-				}
-				else if (w2 == 0x38c003c1 || w2 == 0x58c003c1 || w2 == 0x78c003c0)
-				{
-					unit_size = 10;
-					num = units * unit_size;
-				}
-				else if (w2 == 0x18f803c1 || w2 == 0x38f803c0 || w2 == 0x58f803c0)
-				{
-					unit_size = 12;
-					num = units * unit_size;
-				}
-				else if (w2 == 0x78f803c1)
-				{
-					unit_size = 14;
-					num = units * unit_size;
-				}
-				else
-				{
-					int c = 0;
-					printf("gfxfifo_exec: E0 unhandled %08X %08X\n", w1, w2);
-					while (fifo_in->current_num() > 0)
-					{
-						UINT64 param;
-						fifo_in->pop(NULL, &param);
+				int unit_size = 8;
+				if (w2 & 0x40000000)	unit_size += 1;		// lines only
+				if (w2 & 0x20000000)	unit_size += 1;		// unknown float
+				if (w2 & 0x00200000)	unit_size += 3;		// texture coords?
+				if (w2 & 0x00000001)	unit_size += 1;		// ?
 
-						if (c == 0)
-							printf("              ");
-						printf("%08X ", (UINT32)(param));
+				num = unit_size * units;
 
-						c++;
-
-						if (c == 4)
-						{
-							printf("\n");
-							c = 0;
-						}
-					};
-					printf("\n");
-
-					cobra->m_gfx_re_status = RE_STATUS_IDLE;
-					return;
-				}
 
 				if (fifo_in->current_num() < num)
 				{
@@ -1718,132 +1681,49 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 
 				// extract vertex data
-				if (w2 == 0x18c003c0)							
+				for (int i=0; i < units; i++)
 				{
-					for (int i=0; i < units; i++)				// in screen coords!
+					UINT64 in;
+					if (w2 & 0x40000000)		// line flags
 					{
-						UINT64 in;
-						fifo_in->pop(NULL, &vert[i].x);			// X coord
-						fifo_in->pop(NULL, &vert[i].y);			// Y coord
-						fifo_in->pop(NULL, &in);				// ? (usually 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (usually 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (usually 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (usually 0.0f)
-						fifo_in->pop(NULL, &in);				// ? (usually 0.0f)
-						fifo_in->pop(NULL, &in);				// ? (usually 0.0f)
+						fifo_in->pop(NULL, &in);
 					}
-				}
-				else if (w2 == 0x38c003c1)
-				{
-					for (int i=0; i < units; i++)				// 3d coords?
+					
+					if (w2 & 0x20000000)		// unknown float (0.0f ... 1.0f)
 					{
-						float x, y;
+						fifo_in->pop(NULL, &in);
+					}
+					
+					fifo_in->pop(NULL, &vert[i].x);				// X coord
+					fifo_in->pop(NULL, &vert[i].y);				// Y coord
+					fifo_in->pop(NULL, &in);					// coord?
+					fifo_in->pop(NULL, &in);					// coord?
 
-						UINT64 in;
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &x);					// X coord?
-						fifo_in->pop(NULL, &y);					// Y coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].p[0]);		// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].p[1]);		// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// always 0?
-						vert[i].x = 256  + (x / 16);
-						vert[i].y = 192  + (y / 16);
-					}
-				}
-				else if (w2 == 0x58c003c1)
-				{
-					for (int i=0; i < units; i++)				// screen coords (used by the boot screen box lines)
+					if (w2 & 0x00200000)		// texture coords
 					{
-						float x, y;
+						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &vert[i].p[0]);		// U coord
+						fifo_in->pop(NULL, &vert[i].p[1]);		// V coord
+					}
 
-						UINT64 in;
-						fifo_in->pop(NULL, &in);				// flags?
-						fifo_in->pop(NULL, &x);					// X coord?
-						fifo_in->pop(NULL, &y);					// Y coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// always 0?
-						vert[i].x = x;
-						vert[i].y = y;
-					}
-				}
-				else if (w2 == 0x78c003c0)
-				{
-					for (int i=0; i < units; i++)
+					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
+					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
+					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
+					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
+
+					if (w2 & 0x00000001)		// unknown float (0.0f ... 1.0f)
 					{
-						UINT64 in;
-						fifo_in->pop(NULL, &in);				// flags?
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].x);			// X coord?
-						fifo_in->pop(NULL, &vert[i].y);			// Y coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].p[0]);		// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].p[1]);		// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);
 					}
-				}
-				else if (w2 == 0x18f803c1 || w2 == 0x38f803c0 || w2 == 0x58f803c0)
-				{
-					for (int i=0; i < units; i++)				// in screen coords!
-					{
-						UINT64 in;
-						fifo_in->pop(NULL, &vert[i].x);			// X coord
-						fifo_in->pop(NULL, &vert[i].y);			// Y coord
-						fifo_in->pop(NULL, &in);
-                        fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &vert[i].p[0]);		// texture U coord
-						fifo_in->pop(NULL, &vert[i].p[1]);		// texture V coord
-                        fifo_in->pop(NULL, &in);
-                        fifo_in->pop(NULL, &in);
-                        fifo_in->pop(NULL, &in);
-						fifo_in->pop(NULL, &in);
-                        fifo_in->pop(NULL, &in);
-                    }
-				}
-				else if (w2 == 0x78f803c1)
-				{
-					for (int i=0; i < units; i++)				// 3d coords?
-					{
-						UINT64 in;
-						fifo_in->pop(NULL, &in);				// flags?
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].x);			// X coord?
-						fifo_in->pop(NULL, &vert[i].y);			// Y coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// coord?
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].p[0]);		// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &vert[i].p[1]);		// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
-					}
-				}
-				else
-				{
-					fatalerror("gfxfifo_exec: E0 unhandled %08X %08X\n", w1, w2);
 				}
 
 
 				// render
-				switch ((w1 >> 24) & 0xff)
+				switch ((w1 >> 24) & 0xf)
 				{
-					case 0xe0:			// triangles
+					case 0x0:			// triangles
 					{
-						if (unit_size == 12)
+						if (w2 & 0x00200000)
 						{
 							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
 							for (int i=2; i < units; i++)
@@ -1851,7 +1731,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 								render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
-						else if (unit_size == 8)
+						else
 						{
 							//render_delegate rd = render_delegate(FUNC(cobra_renderer::render_color_scan), this);
 							for (int i=2; i < units; i++)
@@ -1865,40 +1745,27 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 						break;
 					}
 
-					case 0xe2:			// points
+					case 0x2:			// points
 					{
-						if (unit_size == 8)
+						for (int i=0; i < units; i++)
 						{
-							for (int i=0; i < units; i++)
-							{
-								draw_point(visarea, vert[i], 0xffffffff);
-							}
-						}
-						else if (unit_size == 12)
-						{
-							for (int i=0; i < units; i++)
-							{
-								draw_point(visarea, vert[i], 0xffffffff);
-							}
+							draw_point(visarea, vert[i], 0xffffffff);
 						}
 						break;
 					}
 
-					case 0xe3:			// lines
+					case 0x3:			// lines
 					{
-						if (unit_size == 10)
+						if ((units & 1) == 0)		// batches of lines
 						{
-							if ((units & 1) == 0)		// batches of lines
+							for (i=0; i < units; i+=2)
 							{
-								for (i=0; i < units; i+=2)
-								{
-									draw_line(visarea, vert[i], vert[i+1]);
-								}
+								draw_line(visarea, vert[i], vert[i+1]);
 							}
-							else						// line strip
-							{
-								printf("GFX: linestrip %08X, %08X\n", w1, w2);
-							}
+						}
+						else						// line strip
+						{
+							printf("GFX: linestrip %08X, %08X\n", w1, w2);
 						}
 						break;
 					}
