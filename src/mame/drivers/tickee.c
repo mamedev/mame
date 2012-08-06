@@ -15,7 +15,6 @@
 
     Known bugs:
         * (Tickee) gun sometimes misfires
-        * Mouse Attack dips and inputs need fixing
         * Mallet Madness ticket dispenser isn't working
 
 ***************************************************************************/
@@ -587,27 +586,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mouseatk )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x01, "Game Time/Diff" )
-	PORT_DIPSETTING(    0x03, "Very Fast/Very Easy" )
-	PORT_DIPSETTING(    0x02, "Fast/Easy" )
-	PORT_DIPSETTING(    0x01, "Average/Hard" )
-	PORT_DIPSETTING(    0x00, "Slow/Very Hard" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ))
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x00, "Last Box Tickets" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x08, "25" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Unknown ))
-	PORT_DIPSETTING(    0x30, "0" )
-	PORT_DIPSETTING(    0x20, "1" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ))
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ))
+	PORT_DIPNAME( 0x03, 0x03, "Number of Extra Cheese" )	PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x01, "1 Extra Cheese" )
+	PORT_DIPSETTING(    0x02, "2 Extra Cheese" )
+	PORT_DIPSETTING(    0x03, "3 Extra Cheese" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Number of Mice & Cheese" )	PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "4 Mice - 5 Cheese" )
+	PORT_DIPSETTING(    0x04, "5 Mice - 6 Cheese" )
+	PORT_DIPSETTING(    0x08, "6 Mice - 7 Cheese" )
+	PORT_DIPSETTING(    0x0c, "7 Mice - 8 Cheese" )
+	PORT_DIPNAME( 0x10, 0x10, "Bonus Ticket Game" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Ticket Payout" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
