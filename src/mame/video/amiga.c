@@ -999,6 +999,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int s
  *
  *************************************/
 
+/* TODO: alg.c requires that this uses RGB32 */
 SCREEN_UPDATE_IND16( amiga )
 {
 	int y;

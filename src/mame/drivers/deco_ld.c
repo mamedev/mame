@@ -203,7 +203,7 @@ static SCREEN_UPDATE_RGB32( rblaster )
 	draw_sprites(screen.machine(), bitmap,cliprect,state->m_vram1,0x000);
 	draw_sprites(screen.machine(), bitmap,cliprect,state->m_vram0,0x100);
 
-	for (y=1;y<31;y++)
+	for (y=0;y<32;y++)
 	{
 		for (x=0;x<32;x++)
 		{
@@ -215,7 +215,7 @@ static SCREEN_UPDATE_RGB32( rblaster )
 		}
 	}
 
-	for (y=1;y<31;y++)
+	for (y=0;y<32;y++)
 	{
 		for (x=0;x<32;x++)
 		{
@@ -468,6 +468,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, rblaster)
+	MCFG_LASERDISC_OVERLAY_CLIP(0, 256-1, 8, 240-1)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
