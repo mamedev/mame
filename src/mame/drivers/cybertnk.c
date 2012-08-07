@@ -7,17 +7,6 @@ preliminary driver by Angelo Salese & David Haywood
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
-- improve sprite emulation
-  How are unused sprites marked? None of the bits alone seem to be used for this purpose
-   and while in many cases the first value gets cleared to 0x0000 (palette 0, upper tile offset 0)
-   that doesn't really seem like a valid marker, and leaves us with some lingering sprites anyway.
-
-  Attempting to clear the spriteram every frame doesn't help either, the list is copied, complete
-   with 'unwanted' sprites every frame, ruling out some kind of auto clear after drawing operation.
-
-  The last entry in spriteram has 0x0008 in the first word as the only value set, maybe these bits
-  are used as some kind of jump list like several other systems, but I can't see the logic right now
-
 - improve sprite zooming
   Currently many sprites have an ugly 'bad' line at the top, the chances of this being caused by
   bad roms is very low because a single 8 pixel block of a sprite covers 4 roms, and it's only
@@ -26,7 +15,9 @@ TODO:
 
 - sprite shadows
   looks like sprites should have a shadow colour rather than the shadows being solid black, how
-  is this marked?
+  is this marked? pen 0xe might be alpha blending related?
+
+- verify on real hw that animation is 15fps
 
 
 ============================================================================================
@@ -290,9 +281,6 @@ static VIDEO_START( cybertnk )
 	state->m_tilemap2_tilemap->set_transparent_pen(0);
 }
 
-#define CYBERTNK_DRAWPIXEL \
-	if ((xx>=minx) && (xx<=maxx)) \
-		dest[xx] = paldata[dot]; \
 
 
 static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri)
@@ -356,10 +344,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 	for(int offs=0;offs<0x1000/2;offs+=8)
 	{
-		// todo, how are sprites really disabled? our gunshots etc. still leave trails with this logic
-
-
-		if ((state->m_spr_ram[offs+0x0]) == 0x0000)
+		if ((state->m_spr_ram[offs+0x0] & 8) == 0)
 			continue;
 
 		int x = (state->m_spr_ram[offs+0x5] & 0x3ff);
@@ -436,10 +421,16 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 						if (dot != 0)
 						{
-							dot|= col_bank<<4;
+							//dot|= col_bank<<4;
 
 							int xx = (x+xz)+screen_shift;
-							CYBERTNK_DRAWPIXEL
+							if ((xx>=minx) && (xx<=maxx))
+							{
+								//if (dot != 0xe)
+									dest[xx] = paldata[col_bank << 4 | dot];
+							}
+
+							//CYBERTNK_DRAWPIXEL
 						}
 						xf+=zoom;
 						if(xf >= 0x100)
@@ -840,15 +831,15 @@ static const y8950_interface y8950_config = {
 };
 
 static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
-	MCFG_CPU_ADD("maincpu", M68000,20000000/2)
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
 	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_assert)
 
-	MCFG_CPU_ADD("slave", M68000,20000000/2)
+	MCFG_CPU_ADD("slave", M68000,XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(slave_mem)
 	MCFG_CPU_VBLANK_INT("lscreen", irq3_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579500)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
@@ -878,12 +869,12 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", Y8950, 3579500)
+	MCFG_SOUND_ADD("ym1", Y8950, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(y8950_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, 3579500)
+	MCFG_SOUND_ADD("ym2", Y8950, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(y8950_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
