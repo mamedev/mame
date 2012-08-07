@@ -3079,6 +3079,11 @@ ROM_START( sc1scunk )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( sc1wud )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "car2-9n.p1", 0x008000, 0x008000, CRC(be523840) SHA1(a6b5b36cf8ee495c2271a879b28e4f388b9deba1) )
+	ROM_LOAD( "car2-9n.p2", 0x000000, 0x008000, CRC(865c23f3) SHA1(e4e874cc003cb62012cdc741e163becfb29caa12) )
+ROM_END
 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -3319,6 +3324,7 @@ GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse
 
 GAME( 199?, sc1scunk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
 
+GAME( 199?, sc1wud			,0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "What's Up Dr (Scorpion 1?)", GAME_FLAGS) // was in maygayep.c whats up doc set
 
 //Adder 2
 GAME( 1996, m_tppokr		, 0			,  scorpion1_adder2	, toppoker	, bfm_sc1_state, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_FLAGS )

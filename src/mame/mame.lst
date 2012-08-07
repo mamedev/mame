@@ -12250,6 +12250,7 @@ sc1chaina
 sc1potp		// Pick Of The Pack (Bellfruit)
 sc1potpa	// Double Dealer (Bellfruit)?
 sc1scunk	//
+sc1wud		// What's Up Dr
 
 // Scorpion 1 + Adder Video board
 
@@ -18401,53 +18402,174 @@ ep_grncl	// Grid Runner Club (Global)
 ep_grncla	//
 ep_grnclb	//
 ep_grnclc	//
-ep_grncld	//
-ep_grncle	//
 ep_heybg	// Hey Big Spender (Global)
+ep_heybga	//
+ep_heybgb	//
+ep_heybgc	//
 ep_heybc	// Hey Big Spender Club (Global)
+ep_heybca	//
 ep_hispr	// Hi Spirits (Global)
+ep_hispra	//
+ep_hisprb	//
+ep_hisprc	//
+ep_hisprd	//
+ep_hispre	//
 ep_hiscl	// Hi Spirits Club (Global)
+ep_hiscla	//
 ep_spirt	// High Spirits (Global)
+ep_spirta	//
+ep_spirtb	//
 ep_smoke	// Holy Smoke! (Impulse)
+ep_smokea	//
+ep_smokeb	//
+ep_smokec	//
+ep_smoked	//
+ep_smokee	//
+ep_smokef	//
+ep_smokeg	//
+ep_smokeh	//
+ep_smokei	//
+ep_smokej	//
 ep_hur		// Hurricane (Global)
+ep_hura		//
+ep_hurb		//
 ep_ifern	// Inferno (Impulse)
+ep_iferna	//
 ep_kopcl	// Knockout Punch Club (Global)
+ep_kopcla	//
+ep_kopclb	//
 ep_ltt		// Licence To Thrill (Global)
+ep_ltta		//
 ep_ll		// Lucky Ladders (Unk)
+ep_lla		//
 ep_monrt	// Money Returns Club, The (Global)
+ep_monrta	//
+ep_monrtb	//
+ep_monrtc	//
+ep_monrtd	//
+ep_monrte	//
+ep_monrtf	//
 ep_monsh	// Moonshine Club, The (Unk)
+ep_monsha	//
+ep_monshb	//
+ep_monshc	//
+ep_monshd	//
+ep_monshe	//
+ep_monshf	//
 ep_mummy	// Mummy Talks (Impulse)
+ep_mummya	//
+ep_mummyb	//
+ep_mummyc	//
+ep_mummyd	//
+ep_mummye	//
+ep_mummyf	//
 ep_pkni		// The Phoenix Knights (Global)
+ep_pknia	//
+ep_pknib	//
+ep_pknic	//
+ep_pknid	//
+ep_pknie	//
+ep_pknif	//
 ep_redl		// Red Line (Unk)
+ep_redla	//
 ep_rchik	// Rich Chics Club (Unk)
+ep_rchika	//
 ep_royrc	// Royal Roulette Club (Unk)
 ep_snbev	// Saturday Night Beaver (Global)
+ep_snbeva	//
+ep_snbevb	//
+ep_snbevc	//
+ep_snbevd	//
+ep_snbeve	//
 ep_spook	// Spooky Hollow (Global)
+ep_spooka	//
+ep_spookb	//
 ep_sdcla	// Spotted Dick Classic (Global)
+ep_sdclaa	//
+ep_sdclab	//
+ep_sdclac	//
+ep_sdclad	//
+ep_sdclae	//
+ep_sdclaf	//
+ep_sdclag	//
 ep_sdclb	// Spotted Dick Club (Global)
+ep_sdclba	//
 ep_stm		// Storm Force (Global)
+ep_stma		//
+ep_stmb		//
+ep_stmc		//
 ep_stmcl	// Storm Force Club (Global)
+ep_stmcla	//
 ep_snset	// Sunset Strip (Unk)
+ep_snseta	//
 ep_twarp	// Time Warp (Unk)
+ep_twarpa	//
+ep_twarpb	//
+ep_twarpc	//
 ep_tod		// Truth Or Dare (Global)
+ep_toda		//
 ep_utnut	// Utter Nutter (Global)
+ep_utnuta	//
+ep_utnutb	//
+ep_utnutc	//
 ep_utncl	// Utter Nutter Club (Global)
+ep_utncla	//
 ep_wleek	// Weakest Leek Club (Global)
+ep_wleeka	//
 ep_wud		// What's Up Doc (Global)
+ep_wuda		//
+ep_wudb		//
+ep_wudc		//
+ep_wudd		//
+ep_wude		//
 ep_milhr	// Who Wants To Be A Millionhare? (Global)
+ep_milhra	//
+ep_milhrb	//
+ep_milhrc	//
+ep_milhrd	//
+ep_milhre	//
+ep_milhrf	//
+ep_milhrg	//
 ep_mlhrc	// Who Whats To Be A Millionhare Club (Global)
+ep_mlhrca	//
+ep_mlhrcb	//
+ep_mlhrcc	//
+ep_mlhrcd	//
+ep_mlhrce	//
 ep_wf		// Wildfire (Global)
+ep_wfa		//
+ep_wfb		//
+ep_wfc		//
+ep_wfd		//
+ep_wfe		//
+ep_wff		//
+ep_wfg		//
 ep_bbars	// Balloon Bars (Maygay)
+ep_bbarsa	//
+ep_bbarsb	//
+ep_bbarsc	//
 ep_cslay	// Cash Slayer (Global)
+ep_cslaya	//
 ep_monky	// Monkey Business (Global)
+ep_monkya	//
 ep_makmv	// Make Your Move (Global)
+ep_makmva	//
 ep_lug		// London Underground (Maygay)
+ep_luga		//
+ep_lugb		//
+ep_lugc		//
 ep_crzbn	// Crazy Bingo (Maygay)
+ep_crzbna	//
+ep_crzbnb	//
+ep_crzbnc	//
 ep_cascz	// Casino Crazy (Global)
+ep_cascza	//
 ep_wside	// Wildside (Global)
+ep_wsidea	//
 ep_goldf	// Gold Fever (Impulse)
 ep_imj		// I'm A Jackpot (Global)
 ep_party
+
 
 // MPU2
 
@@ -21432,6 +21554,10 @@ hg_frd		// Fruit Deuce
 
 /* Global Games 'Stealth' */
 
+gl_snbev
+gl_snbeva
+gl_grncl
+gl_grncla
 gl_dow		// Deals On Wheels (Global)
 gl_dowp
 gl_dowcl	// Deals On Wheels Club (Global)
