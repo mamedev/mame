@@ -27,6 +27,14 @@
     INLINE MATH FUNCTIONS
 ***************************************************************************/
 
+typedef union
+{
+	UINT64 u64;
+	struct {
+	    UINT32 l, h;
+	} u32;
+} _x86_union;
+
 /*-------------------------------------------------
     mul_32x32 - perform a signed 32 bit x 32 bit
     multiply and return the full 64 bit result
@@ -289,6 +297,29 @@ _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
 		: [result]    "=a" (quotient)	/* Quotient ends up in eax */
 		, [remainder] "=d" (*remainder)	/* Remainder ends up in edx */
 		: [dividend]  "A"  (dividend)	/* 'dividend' in edx:eax */
+		, [divisor]   "rm" (divisor)	/* 'divisor' in register or memory */
+		: "cc"							/* Clobbers condition codes */
+	);
+
+	return quotient;
+}
+#else
+#define divu_64x32_rem _divu_64x32_rem
+INLINE UINT32 ATTR_FORCE_INLINE
+_divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
+{
+	register UINT32 quotient;
+	register _x86_union r;
+
+	r.u64 = dividend;
+
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
+	__asm__ (
+		" divl  %[divisor] ;"
+		: [result]    "=a" (quotient)	/* Quotient ends up in eax */
+		, [remainder] "=d" (*remainder)	/* Remainder ends up in edx */
+		: [divl]  "a"  (r.u32.l)		/* 'dividend' in edx:eax */
+		, [divh]  "d"  (r.u32.h)
 		, [divisor]   "rm" (divisor)	/* 'divisor' in register or memory */
 		: "cc"							/* Clobbers condition codes */
 	);
@@ -673,19 +704,13 @@ INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 #else
 INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 {
-	union
-	{
-		UINT64 r;
-		struct {
-		    UINT32 r1, r2;
-		} p;
-	} r;
+	_x86_union r;
     __asm__ __volatile__ (
             "rdtsc"
-            : "=a" (r.p.r1), "=d" (r.p.r2)
+            : "=a" (r.u32.l), "=d" (r.u32.h)
     );
 
-    return (INT64) (r.r & U64(0x7fffffffffffffff));
+    return (INT64) (r.u64 & U64(0x7fffffffffffffff));
 }
 #endif
 
