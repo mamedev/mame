@@ -387,11 +387,11 @@ static UINT32 h8disasm_0(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			size = 4;
 			if ((data16&0xff00) == 0x5000)
 			{
-				sprintf(buffer, "mulxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+				sprintf(buffer, "mulxs.b %s, %s", reg_names8[(data16>>4)&0xf], reg_names16[data16&0xf]);
 			}
 			else if ((data16&0xff00) == 0x5200)
 			{
-				sprintf(buffer, "mulxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+				sprintf(buffer, "mulxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names32[data16&0xf]);
 			}
 			else
 			{
