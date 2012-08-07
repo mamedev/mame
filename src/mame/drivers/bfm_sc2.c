@@ -4528,12 +4528,6 @@ ROM_START( sc2catms3 )
 	sc2_catms_sound
 ROM_END
 
-ROM_START( sc2catms4 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cm20std", 0x0000, 0x010000, CRC(74ca0fd5) SHA1(2345bf3810820a12c613013fedad936ab9134b22) )
-
-	sc2_catms_sound
-ROM_END
 
 ROM_START( sc2ctms2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5026,6 +5020,8 @@ ROM_START( sc2luvv1 )
 	sc2_luvv_sound
 ROM_END
 
+
+
 ROM_START( sc2luvv1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "luvvley-jubbley_dat_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(9dee74fc) SHA1(d29756d743b781ab9ce7baf990f4a2cc0e9d7972) )
@@ -5056,15 +5052,6 @@ ROM_START( sc2luvv2p )
 	sc2_luvv_sound
 ROM_END
 
-ROM_START( sc2luvv3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "luvvley-jubbley_std_ac_10pnd-20p_a.bin", 0x0000, 0x010000, CRC(e4440803) SHA1(be9b49cbe2cfcaa0e640365e190da9c3fcf82bea) )
-
-	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "95000575.p1", 0x0000, 0x010000, CRC(e4e06767) SHA1(bee2385c2a9c7ca39ff6a599f827ddba4324b903) )//luvvley-jubbley_mat_ass.bin
-
-	sc2_luvv_sound
-ROM_END
 
 ROM_START( sc2luvv4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5393,13 +5380,15 @@ ROM_END
 //It'll probably becom clear when the casino hardware is working
 ROM_START( sc2cops )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cops & robbers 10 p1 (27512)", 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
+	ROM_LOAD( "cops-and-robbers_std_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
 	ROM_LOAD( "95000578.p1", 0x0000, 0x010000, CRC(bdd56a09) SHA1(92d0416578c55075a127f1c2af8d6de5216dd189) )//official part number for cops-and-robbers-mtx-ass.bin, cops & robbers 10 p2 (27512
 
 	sc2_cops_sound
 ROM_END
+
+
 
 ROM_START( sc2copsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5411,15 +5400,7 @@ ROM_START( sc2copsp )
 	sc2_cops_sound
 ROM_END
 
-ROM_START( sc2cops1 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cops-and-robbers_std_ac_10pnd_ass.bin", 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
 
-	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "95000578.p1", 0x0000, 0x010000, CRC(bdd56a09) SHA1(92d0416578c55075a127f1c2af8d6de5216dd189) )//official part number for cops-and-robbers-mtx-ass.bin, cops & robbers 10 p2 (27512
-
-	sc2_cops_sound
-ROM_END
 
 ROM_START( sc2cops1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7550,7 +7531,6 @@ GAME( 199?, sc2catms1p	, sc2catms	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkf
 GAME( 199?, sc2catms2	, sc2catms	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2catms2p	, sc2catms	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (set 3, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2catms3	, sc2catms	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2catms4	, sc2catms	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2ctms2	, 0			,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "Cat & Mouse (Mark 2) (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2ctms21	, sc2ctms2	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "Cat & Mouse (Mark 2) (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
@@ -7938,11 +7918,10 @@ GAME( 1996, sc2luvv1	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvju
 GAME( 1996, sc2luvv1p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 2, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 GAME( 1996, sc2luvv2	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 GAME( 1996, sc2luvv2p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv3	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 4, UK, Arcade) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv4	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 5, UK, Arcade) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv5p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 6, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv6p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 7, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv7p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 8, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, sc2luvv4	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 4, UK, Arcade) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, sc2luvv5p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 5, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, sc2luvv6p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 6, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, sc2luvv7p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 7, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 
 GAME( 1996, sc2cpe		, 0			,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (UK, Game Card 95-750-846) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
@@ -7978,7 +7957,6 @@ GAME( 199?, sc2ptytm1p	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, of
 
 GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops1	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cops3	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4)  (Scorpion 2/3)", GAME_FLAGS)

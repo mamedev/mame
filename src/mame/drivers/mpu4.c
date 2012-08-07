@@ -516,16 +516,6 @@ ROM_START( m4blkwhd )
 	ROM_LOAD( "bwsnd.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
-ROM_START( m4blkwht )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "b&wrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == oldtimer
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "b&wchrt.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "b&wsound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
 
 
 ROM_START( m4blkbul )
@@ -1054,17 +1044,40 @@ ROM_START( m4casmul )
 	ROM_LOAD( "casinomultiplaysnd.bin", 0x0000, 0x080000, CRC(be293e95) SHA1(bf0d419c898920a7546b542d8b205e25004ef04f) )
 ROM_END
 
-ROM_START( m4casot )
+ROM_START( m4oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "casrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
+	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
 
 	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "caschar.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
+	ROM_LOAD( "m470.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cassound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+	ROM_LOAD( "sdot01.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
+ROM_START( m4casot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "casrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer   (aka b&wrom.bin)
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "caschar.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) ) // ( aka b&wchrt.chr )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "cassound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) ) // ( aka b&wsound.bin )
+ROM_END
+
+
+
+ROM_START( m4jpmcla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jcv2.epr",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "jcchr.chr", 0x0000, 0x000048, CRC(e370e271) SHA1(2b712dd3590c31356e8b0b62ffc64ff8ce444f73) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "sjcv2.snd", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+ROM_END
 
 
 ROM_START( m4ceptr )
@@ -1797,13 +1810,6 @@ ROM_START( m4gldjok )
 	ROM_LOAD( "sdgj.snd", 0x0000, 0x080000, CRC(b6cd118b) SHA1(51c5d694ed0dfde8d3fd682f2471d83eec236736) )
 ROM_END
 
-ROM_START( m4gldnud )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gdjb", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "gn.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) )
-ROM_END
 
 
 
@@ -2403,17 +2409,7 @@ ROM_START( m4joltav )
 	ROM_LOAD( "jto20d_1.1", 0x0000, 0x010000, CRC(dff09dfc) SHA1(c13f31f7d96075f7c94ae5e79fc1f9b8ce7e4c80) )
 ROM_END
 
-ROM_START( m4jpmcla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jcv2.epr",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
 
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "jcchr.chr", 0x0000, 0x000048, CRC(e370e271) SHA1(2b712dd3590c31356e8b0b62ffc64ff8ce444f73) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sjcv2.snd", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-	ROM_LOAD( "sjcv22.snd", 0x080000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
 
 ROM_START( m4lastrp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -2849,16 +2845,6 @@ ROM_START( m4magrep )
 	ROM_LOAD( "mrdsound.bin", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) )
 ROM_END
 
-ROM_START( m4magtbo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "ctp.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
 
 ROM_START( m4mag7s )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -3249,16 +3235,7 @@ ROM_START( m4num1 )
 	ROM_LOAD( "dno17.bin", 0x0000, 0x010000, CRC(3b302160) SHA1(ff52803472e119aa46fe1cff134b5503858dfee1) )
 ROM_END
 
-ROM_START( m4oldtmr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
 
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "m470.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdot01.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-ROM_END
 
 ROM_START( m4omega )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3730,25 +3707,6 @@ ROM_START( m4przve )
 ROM_END
 
 
-ROM_START( m4przwo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pwo206ac", 0x0000, 0x010000, CRC(b9dd88e7) SHA1(4c60e7a28b538ff2483839fc66600037ccd99440) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "pwob.p1", 0x0000, 0x010000, CRC(9e9f65d7) SHA1(69d28a1e08d2bde1a9c4d55555478808546ad4f0) )
-	ROM_LOAD( "pwod.p1", 0x0000, 0x010000, CRC(ae97b585) SHA1(d6b90d8b696a21f9fa6b06c63a329b1370edd224) )
-	ROM_LOAD( "pwody.p1", 0x0000, 0x010000, CRC(3abfd1c9) SHA1(131811807396103641d73cd7cef1797a6cecb35b) )
-	ROM_LOAD( "pwok.p1", 0x0000, 0x010000, CRC(b8631e11) SHA1(c01aff60dad14945c2b45992f0112c6fc0ae7c5a) )
-	ROM_LOAD( "pwos.p1", 0x0000, 0x010000, CRC(6a87aa68) SHA1(3dc8c006de3adcada43c3581be0ff921081ecff0) )
-	ROM_LOAD( "pwoy.p1", 0x0000, 0x010000, CRC(1ada4987) SHA1(05a0480f5a92faaedc8183d948c7e2d657bda2a4) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "pwos.chr", 0x0000, 0x000048, CRC(352b86c4) SHA1(59c26a1948ffd6ecea08d8ca8e62735ec9732c0f) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "pwo.s1", 0x000000, 0x080000, CRC(1dbd8a33) SHA1(37bd71688475591232422eb0841e23aff58e3800) )
-	ROM_LOAD( "pwo.s2", 0x080000, 0x080000, CRC(6c7badef) SHA1(416c36fe2b4253bf7944b3ba412561bd0d21cbe5) )
-ROM_END
 
 
 ROM_START( m4przwta )
@@ -3874,11 +3832,13 @@ ROM_END
 
 ROM_START( m4rdht )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "drh12", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) )
+	ROM_LOAD( "drh12", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) ) // aka gdjb
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "drh_1.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) )
+	ROM_LOAD( "drh_1.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) ) // aka gn.snd
 ROM_END
+
+
 
 
 ROM_START( m4rhr )
@@ -4050,7 +4010,7 @@ ROM_END
 
 ROM_START( m4rmtp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
+	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) ) // aka starplay.epr
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "r4iha202.bin", 0x0000, 0x010000, CRC(b1588632) SHA1(ad21bbc5e99fd6b511e6881e8b20dcad177b937f) )
@@ -4063,12 +4023,25 @@ ROM_START( m4rmtp )
 	ROM_LOAD( "r4iua205.bin", 0x0000, 0x010000, CRC(46df24f3) SHA1(31000815a90e47e744091bbf0fe9e96baac8d7e3) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "ctp.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) )
+	ROM_LOAD( "ctp.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) ) // aka starpl.chr
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "rm.s3", 0x0000, 0x080000, CRC(250e64f2) SHA1(627c4dc5cdc7d0a7cb6f74991ae91b71a2f4dbc6) )
-	ROM_LOAD( "scrmtb.snd", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+	ROM_LOAD( "scrmtb.snd", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) ) // aka starplay.snd
 ROM_END
+
+ROM_START( m4magtbo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "ctp.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+ROM_END
+
+
 
 
 ROM_START( m4rmtpd )
@@ -4502,16 +4475,6 @@ ROM_END
 
 
 
-ROM_START( m4str300 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "starplay.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "starpl.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "starplay.snd", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
 
 
 ROM_START( m4stards )
@@ -5102,12 +5065,12 @@ ROM_END
 ROM_START( m4tbreel )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dtr12.bin", 0x0000, 0x010000, CRC(cdb63ef5) SHA1(748cc06e6a274b125d189dd66f2adad8bd2fb166) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "dtr31.dat", 0x0000, 0x010000, CRC(cdb63ef5) SHA1(748cc06e6a274b125d189dd66f2adad8bd2fb166) )
-	ROM_LOAD( "dtv30.dat", 0x0000, 0x010000, CRC(c314846c) SHA1(bfa6539b204477a04a5bbc8d13c3a666c52b597b) )
 ROM_END
 
+ROM_START( m4tbreela )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dtr31.dat", 0x0000, 0x010000, CRC(cdb63ef5) SHA1(748cc06e6a274b125d189dd66f2adad8bd2fb166) )
+ROM_END
 
 ROM_START( m4tbrldx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5588,9 +5551,18 @@ ROM_END
 
 
 
-ROM_START( m4whaton )
+
+ROM_START( m4przwo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pwo206ac", 0x0000, 0x010000, CRC(b9dd88e7) SHA1(4c60e7a28b538ff2483839fc66600037ccd99440) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "pwob.p1", 0x0000, 0x010000, CRC(9e9f65d7) SHA1(69d28a1e08d2bde1a9c4d55555478808546ad4f0) )
+	ROM_LOAD( "pwod.p1", 0x0000, 0x010000, CRC(ae97b585) SHA1(d6b90d8b696a21f9fa6b06c63a329b1370edd224) )
+	ROM_LOAD( "pwody.p1", 0x0000, 0x010000, CRC(3abfd1c9) SHA1(131811807396103641d73cd7cef1797a6cecb35b) )
+	ROM_LOAD( "pwok.p1", 0x0000, 0x010000, CRC(b8631e11) SHA1(c01aff60dad14945c2b45992f0112c6fc0ae7c5a) )
 	ROM_LOAD( "pwos.p1", 0x0000, 0x010000, CRC(6a87aa68) SHA1(3dc8c006de3adcada43c3581be0ff921081ecff0) )
+	ROM_LOAD( "pwoy.p1", 0x0000, 0x010000, CRC(1ada4987) SHA1(05a0480f5a92faaedc8183d948c7e2d657bda2a4) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "pwos.chr", 0x0000, 0x000048, CRC(352b86c4) SHA1(59c26a1948ffd6ecea08d8ca8e62735ec9732c0f) )
@@ -5599,6 +5571,7 @@ ROM_START( m4whaton )
 	ROM_LOAD( "pwo.s1", 0x000000, 0x080000, CRC(1dbd8a33) SHA1(37bd71688475591232422eb0841e23aff58e3800) )
 	ROM_LOAD( "pwo.s2", 0x080000, 0x080000, CRC(6c7badef) SHA1(416c36fe2b4253bf7944b3ba412561bd0d21cbe5) )
 ROM_END
+
 
 
 ROM_START( m4wildms )
@@ -7473,7 +7446,7 @@ ROM_END
 
 ROM_START( m4bigbena )
 	ROM_REGION( 0x010000, "maincpu", 0 )
-	ROM_LOAD( "b_bv2_9.bin", 0x0000, 0x010000, CRC(86a745ee) SHA1(2347e8e38c743ea4d00faee6a56bb77e05c9c94d) )
+	ROM_LOAD( "b_bv2_9.bin", 0x0000, 0x010000, CRC(86a745ee) SHA1(2347e8e38c743ea4d00faee6a56bb77e05c9c94d) ) // aka bb2_9.bin
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "big-bensnd1.bin", 0x000000, 0x080000, CRC(e41c3ec1) SHA1(a0c09f51229afcd14f09bb9080d4f3bb198b2050) )
@@ -7489,14 +7462,7 @@ ROM_START( m4bigbenb )
 	ROM_LOAD( "big-bensnd2.bin", 0x080000, 0x080000, CRC(ed71dbe1) SHA1(e67ca3c178caacb99118bacfcd7612e699f40455) )
 ROM_END
 
-ROM_START( m4bigbenc )
-	ROM_REGION( 0x010000, "maincpu", 0 )
-	ROM_LOAD( "bb2_9.bin", 0x0000, 0x010000, CRC(86a745ee) SHA1(2347e8e38c743ea4d00faee6a56bb77e05c9c94d) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "big-bensnd1.bin", 0x000000, 0x080000, CRC(e41c3ec1) SHA1(a0c09f51229afcd14f09bb9080d4f3bb198b2050) )
-	ROM_LOAD( "big-bensnd2.bin", 0x080000, 0x080000, CRC(ed71dbe1) SHA1(e67ca3c178caacb99118bacfcd7612e699f40455) )
-ROM_END
 
 ROM_START( m4bigbend )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -10874,8 +10840,9 @@ GAME(199?, m4omega	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 GAME(199?, m4randr	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Random Roulette (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4samu	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4stards	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Stardust (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tbreel	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tbrldx	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel Deluxe (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4tbreel	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 1)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4tbreela,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 2)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4tbrldx	,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4taj	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4topdk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4tricol	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -10970,7 +10937,6 @@ GAME(199?, m4gb006	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 GAME(199?, m4gbust	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ghost Buster (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4gclue	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Give Us A Clue (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4gldjok	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Golden Joker (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // dutch?
-GAME(199?, m4gldnud	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Golden Nudger (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hpyjok	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Happy Joker (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hijinx	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Barcrest","Hi Jinx (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hittop	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -11004,7 +10970,6 @@ GAME(199?, m4madhse	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4magdrg	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4maglin	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4magrep	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Magic Replay DeLuxe (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4magtbo	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Magic Turbo  (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4mag7s	,0			,mod4oki	,mpu4jackpot8per	, mpu4_state,m4default_bigbank	,ROT0,   "Barcrest","Magnificent 7's (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4makmnt	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Barcrest","Make A Mint (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4nhtt	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","New Hit the Top (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -11014,8 +10979,7 @@ GAME(199?, m4nnww	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barc
 GAME(199?, m4nnwwc	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4nudshf	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4oldtmr	,0			,mod4oki	,mpu4				, mpu4_state,m_oldtmr			,ROT0,   "Barcrest","Old Timer (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4casot	,m4oldtmr	,mod4oki	,mpu4				, mpu4_state,m_oldtmr			,ROT0,   "Barcrest","Casino Old Timer (Old Timer Sound hack?) (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // uses the same program???
-GAME(199?, m4blkwht	,m4oldtmr	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Black & White (Old Timer Sound hack?) (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // uses the same program???
+GAME(199?, m4casot	,m4oldtmr	,mod4oki	,mpu4				, mpu4_state,m_oldtmr			,ROT0,   "Barcrest","Casino Old Timer (Black & White?) (Old Timer Sound hack?) (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // uses the same program???
 GAME(199?, m4jpmcla	,m4oldtmr	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","JPM Classic (Old Timer Sound hack?) (Barcrest) (MPU4)",							GAME_FLAGS|GAME_NO_SOUND ) // uses the same program???
 GAME(199?, m4ordmnd	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Barcrest","Oriental Diamonds (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4overmn	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Over The Moon (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -11035,12 +10999,12 @@ GAME(199?, m4przwo	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 GAME(199?, m4przwta	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Barcrest","Prize Winner Takes All (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4reeltm	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4rgsa	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4rdht	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Heat (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4rdht	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Heat (Golden Nugget?) (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4rhr	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Hot Roll (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4rhrc	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4rhrcl	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Hot Roll Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4rwb	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red White & Blue (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4rmtp	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Reel Magic Turbo Play (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4rmtp	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Reel Magic Turbo Play / Star Play 300? (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4rmtpd	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Reel Magic Turbo Play Deluxe (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4richfm	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Rich & Famous (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4ringfr	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Barcrest","Ring Of Fire (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -11054,7 +11018,6 @@ GAME(199?, m4salsa	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 GAME(199?, m4showtm	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Show Timer (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4shodf	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Showcase Duty Free (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(1999, m4squid	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Bwb","Squids In (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4str300	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Star Play 300 (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4steptm	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Step Timer (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4supbj	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Blackjack (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4supbjc	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -11083,7 +11046,6 @@ GAME(199?, m4vivess	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4vivalvd,m4vivalv	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas (Barcrest) [Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4vivalv	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4viz	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viz (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4whaton	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","What's On (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4wildtm	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Wild Timer (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4wta	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Winner Takes All (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4ch30	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -11364,9 +11326,8 @@ GAME(199?, m4vfm,	  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","
 GAME(199?, m4bigben,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4bigbena, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4bigbenb, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bigbenc, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bigbend, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 5)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bigbene, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 6)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bigbend, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bigbene, m4bigben,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 5)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4kqclub,  0,		mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Newby","Kings & Queens Club (Newby) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4snookr,  0,		mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Eurocoin","Snooker (Eurocoin) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND ) // works?
 GAME(199?, m4stakex,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND ) // can't coin, no sound

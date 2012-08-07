@@ -193,12 +193,6 @@ ROM_END
 
 
 
-ROM_START( j80r66 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "route66p1seta.bin", 0x0000, 0x1000, CRC(86f50997) SHA1(8bb266274d3ebeee942e5f878f7faae012712382) )
-	ROM_LOAD( "route66p2seta.bin", 0x1000, 0x1000, CRC(aea12b9e) SHA1(6f6eb286c43a9bc04bfcab71713ce59da61cc063) )
-	ROM_LOAD( "route66p3seta.bin", 0x2000, 0x1000, CRC(9b0b6fb9) SHA1(0282189e2945e4aa3a338930666d1eb34022894c) )
-ROM_END
 
 
 
@@ -292,9 +286,8 @@ GAME(198?, j80golds	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Gold
 GAME(198?, j80hotln	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Hot Lines (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80myspn	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Mystery Spin (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80nudg2	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Nudge Double Up MkII (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j80rr	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 1)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80rr	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 1)",						GAME_IS_SKELETON_MECHANICAL ) // was also in a set named 'Route 66' with identical roms, but text in ROM indicates name is Road Runner, maybe a reskin?
 GAME(198?, j80rra	,j80rr		,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Road Runner (Jpm) (SYSTEM80, set 2)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j80r66	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Route 66 (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80supst	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Supa Steppa (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80supbk	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Superbank (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80topsp	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "Jpm","Top Sprint (Jpm) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )

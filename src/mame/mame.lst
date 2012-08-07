@@ -9353,7 +9353,6 @@ j80myspn	// Mystery Spin (Jpm)
 j80nudg2	// Nudge Double Up MkII (Jpm)
 j80rr		// Road Runner (Jpm)
 j80rra		//
-j80r66		// Route 66 (Jpm)
 j80supst	// Supa Steppa (Jpm)
 j80supbk	// Superbank (Jpm)
 j80topsp	// Top Sprint (Jpm)
@@ -12319,7 +12318,6 @@ sc2catms1p
 sc2catms2
 sc2catms2p
 sc2catms3
-sc2catms4
 sc2ctms2	// Cat & Mouse (Mark 2 - Bellfruit)
 sc2ctms21
 sc2ctms21p
@@ -12629,7 +12627,6 @@ sc2luvv1
 sc2luvv1p
 sc2luvv2
 sc2luvv2p
-sc2luvv3
 sc2luvv4
 sc2luvv5p
 sc2luvv6p
@@ -12662,7 +12659,6 @@ sc2ptytm1
 sc2ptytm1p
 sc2cops		// Cops 'n' Robbers (Bellfruit)
 sc2copsp
-sc2cops1
 sc2cops1p
 sc2cops2
 sc2cops3
@@ -19130,7 +19126,6 @@ m4gclue		// Give Us A Clue (Barcrest)
 m4gldstr	// Gold Strike (Barcrest)
 m4gldgat	// Golden Gate (Barcrest)
 m4gldjok	// Golden Joker (Barcrest)
-m4gldnud	// Golden Nudger (Barcrest)
 m4grbbnk	// Grab The Bank (Barcrest)
 m4grbbnka	//
 m4grbbnkb	//
@@ -19185,7 +19180,6 @@ m4madhse	// Mad House (Barcrest)
 m4magdrg	// Magic Dragon (Barcrest)
 m4maglin	// Magic Liner (Barcrest)
 m4magrep	// Magic Replay DeLuxe (Barcrest)
-m4magtbo	// Magic Turbo  (Barcrest)
 m4mag7s		// Magnificent 7's (Barcrest)
 m4makmnt	// Make A Mint (Barcrest)
 m4megbks	// Mega Bucks (Barcrest)
@@ -19216,7 +19210,6 @@ m4nudup		// Nudge Up (Barcrest)
 m4num1		// Number One (Barcrest)
 m4oldtmr	// Old Timer (Barcrest)
 m4casot		// Casino Old Timer (Barcrest)
-m4blkwht	// Black & White (Barcrest)
 m4jpmcla	// JPM Classic (Barcrest)
 m4omega		// Omega (Barcrest)
 m4ordmnd	// Oriental Diamonds (Barcrest)
@@ -19328,7 +19321,6 @@ m4sss		// Spend Spend Spend (Barcrest)
 m4squid		// Squids In (Barcrest)
 m4stakeu	// Stake Up Club (Barcrest)
 m4stakeua	//
-m4str300	// Star Play 300 (Barcrest)
 m4stards	// Stardust (Barcrest)
 m4starbr	// Stars And Bars (Barcrest)
 m4steptm	// Step Timer (Barcrest)
@@ -19394,6 +19386,7 @@ m4tropcl	// Tropicana Club (Barcrest)
 m4tupen		// Tuppenny Cracker (Barcrest - Bootleg)
 m4tbplay	// Turbo Play (Barcrest)
 m4tbreel	// Turbo Reel (Barcrest)
+m4tbreela	//
 m4tbrldx	// Turbo Reel Deluxe (Barcrest)
 m4tutfrt	// Tutti Fruity (Barcrest)
 m4tutcl		// Tutti Fruity Classic (Barcrest)
@@ -19414,7 +19407,6 @@ m4viz		// Viz (Barcrest)
 m4voodoo	// Voodoo 1000 (Barcrest)
 m4wayin		// Way In (Barcrest)
 m4wayina	//
-m4whaton	// What's On (Barcrest)
 m4wildms	// Wild Mystery (Barcrest)
 m4wildtm	// Wild Timer (Barcrest)
 m4wta		// Winner Takes All (Barcrest)
@@ -19712,7 +19704,6 @@ m4screwb
 m4bigben	// Big Ben (Coinworld)
 m4bigbena	//
 m4bigbenb	//
-m4bigbenc	//
 m4bigbend	//
 m4bigbene	//
 m4kqclub	// Kings & Queens Club (Newby)
