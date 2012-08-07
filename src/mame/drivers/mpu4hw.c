@@ -2552,6 +2552,24 @@ DRIVER_INIT (m4default)
 	state->m_bwb_bank=0;
 }
 
+DRIVER_INIT (m4default_alt)
+{
+	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reel_mux=STANDARD_REEL;
+	state->m_reels = 8;
+	stepper_config(machine, 0, &barcrest_opto2_interface);
+	stepper_config(machine, 1, &barcrest_opto2_interface);
+	stepper_config(machine, 2, &barcrest_opto2_interface);
+	stepper_config(machine, 3, &barcrest_opto2_interface);
+	stepper_config(machine, 4, &barcrest_opto2_interface);
+	stepper_config(machine, 5, &barcrest_opto2_interface);
+	stepper_config(machine, 6, &barcrest_opto2_interface);
+	stepper_config(machine, 7, &barcrest_opto2_interface);
+
+	state->m_bwb_bank=0;
+}
+
+
 DRIVER_INIT( m4default_bigbank )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);

@@ -1235,6 +1235,32 @@ ROM_START( m4centpta )
 	ROM_LOAD( "centrepoint v1.3.bin", 0x0000, 0x010000, CRC(24d117a5) SHA1(bd48a1687d11e32ea8cda19318e8936d1ffd9fd7) )
 ROM_END
 
+ROM_START( m4clbcls )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cl11s.bin", 0x0000, 0x010000, CRC(d0064e6e) SHA1(17235d69ef56989a3f05458423a6b101bd635095) )
+ROM_END
+
+
+ROM_START( m4c999 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c999 2p unprotected.bin", 0x0000, 0x010000, CRC(7637e074) SHA1(3b9e724cc1e657ab2a6cf6fe237f0ca43990aa53) )
+ROM_END
+
+ROM_START( m4c999a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c99910p6", 0x0000, 0x010000, CRC(e3f6710a) SHA1(d527541ec6e799c8bc12e1e31519415eaf11fbe5) )
+ROM_END
+
+ROM_START( m4c999b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c99920p2", 0x0000, 0x010000, CRC(94f8f03e) SHA1(a99c3c60f2e9c15d5dd6265cfa73fad1058ce7fa) )
+ROM_END
+
+ROM_START( m4c999c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c99920p6", 0x0000, 0x010000, CRC(f88f3bfc) SHA1(8dd1bd13645b8c3e38d45a8a6941e56d6268c21d) )
+ROM_END
+
 
 GAME(199?, m4rsg		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.2)",GAME_FLAGS )
 GAME(199?, m4rsga		,m4rsg		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.0)",GAME_FLAGS )
@@ -1482,21 +1508,30 @@ GAME(199?, m4actbnkb,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,
 GAME(199?, m4actclb		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",						GAME_FLAGS ) // set stake to boot
 GAME(199?, m4actclba	,m4actclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",						GAME_FLAGS ) //  ^^
 
-GAME(199?, m4bluemn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bluemna	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bluemnb	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",						GAME_FLAGS|GAME_NO_SOUND ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4bluemn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",						GAME_FLAGS )
+GAME(199?, m4bluemna	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",						GAME_FLAGS )
+GAME(199?, m4bluemnb	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",						GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
-GAME(199?, m4take2		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4take2a		,m4take2			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.1)",						GAME_FLAGS|GAME_NO_SOUND ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4take2		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",						GAME_FLAGS )
+GAME(199?, m4take2a		,m4take2			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.1)",						GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
-GAME(199?, m4pont		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake to boot
-GAME(199?, m4ponta		,m4pont				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",						GAME_FLAGS|GAME_NO_SOUND )//  ^^
+GAME(199?, m4pont		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",						GAME_FLAGS ) // set stake to boot
+GAME(199?, m4ponta		,m4pont				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",						GAME_FLAGS )//  ^^
 
-GAME(199?, m4loadmn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 1)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4loadmna	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 2)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4loadmnb	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 3)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4loadmn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 1)",						GAME_FLAGS )
+GAME(199?, m4loadmna	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 2)",						GAME_FLAGS )
+GAME(199?, m4loadmnb	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 3)",						GAME_FLAGS )
 
-GAME(199?, m4celclb	,0						,mod2   	,mpu4				, mpu4_state,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake
+GAME(199?, m4celclb	,0						,mod2   	,mpu4				, mpu4_state,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_FLAGS ) // set stake
 
-GAME(199?, m4centpt, 0						,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4centpta,m4centpt				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4centpt, 0						,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4centpta,m4centpt				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",						GAME_FLAGS )
+
+GAME(199?, m4clbcls	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",						GAME_FLAGS ) // set stake (still moans tho)
+
+// OC9 (on cloud 9?)
+GAME(199?, m4c999	,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 1)",						GAME_FLAGS )
+GAME(199?, m4c999a	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 2)",						GAME_FLAGS )
+// make sure these are the same
+GAME(199?, m4c999b	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.6)",						GAME_FLAGS ) // bad chr
+GAME(199?, m4c999c	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.0)",						GAME_FLAGS ) // bad chr
