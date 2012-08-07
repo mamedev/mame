@@ -52,6 +52,7 @@
 
 // MAME headers
 #include "osdcore.h"
+#include "eminline.h"
 
 
 //============================================================
@@ -76,7 +77,7 @@
 //============================================================
 
 #if KEEP_STATISTICS
-#define add_to_stat(v,x)		do { interlocked_add((v), (x)); } while (0)
+#define add_to_stat(v,x)		do { atomic_add32((v), (x)); } while (0)
 #define begin_timing(v)			do { (v) -= get_profile_ticks(); } while (0)
 #define end_timing(v)			do { (v) += get_profile_ticks(); } while (0)
 #else
@@ -192,47 +193,6 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 
 //============================================================
-//  INLINE FUNCTIONS
-//============================================================
-
-INLINE void *compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
-{
-#ifdef PTR64
-	INT64 result = InterlockedCompareExchange64((LONGLONG *)ptr, (LONGLONG)exchange, (LONGLONG)compare);
-	return (void *)result;
-#else
-	INT32 result = InterlockedCompareExchange((LPLONG)ptr, (LONG)exchange, (LONG)compare);
-	return (void *)result;
-#endif
-}
-
-
-INLINE INT32 interlocked_exchange32(INT32 volatile *ptr, INT32 value)
-{
-	return InterlockedExchange((LPLONG)ptr, value);
-}
-
-
-INLINE INT32 interlocked_increment(INT32 volatile *ptr)
-{
-	return InterlockedIncrement((LPLONG)ptr);
-}
-
-
-INLINE INT32 interlocked_decrement(INT32 volatile *ptr)
-{
-	return InterlockedDecrement((LPLONG)ptr);
-}
-
-
-INLINE INT32 interlocked_add(INT32 volatile *ptr, INT32 add)
-{
-	return InterlockedExchangeAdd((LPLONG)ptr, add) + add;
-}
-
-
-
-//============================================================
 //  Scalable Locks
 //============================================================
 
@@ -250,7 +210,7 @@ INLINE void scalable_lock_init(scalable_lock *lock)
 INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 {
 #if USE_SCALABLE_LOCKS
-	INT32 myslot = (interlocked_increment(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
+	INT32 myslot = (atomic_increment32(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
 	INT32 backoff = 1;
 
 	while (!lock->slot[myslot].haslock)
@@ -272,7 +232,7 @@ INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 {
 #if USE_SCALABLE_LOCKS
-	interlocked_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
+	atomic_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
 #else
 	LeaveCriticalSection(&lock->section);
 #endif
@@ -430,10 +390,10 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 
 	// reset our done event and double-check the items before waiting
 	ResetEvent(queue->doneevent);
-	interlocked_exchange32(&queue->waiting, TRUE);
+	atomic_exchange32(&queue->waiting, TRUE);
 	if (queue->items != 0)
 		WaitForSingleObject(queue->doneevent, timeout * 1000 / osd_ticks_per_second());
-	interlocked_exchange32(&queue->waiting, FALSE);
+	atomic_exchange32(&queue->waiting, FALSE);
 
 	// return TRUE if we actually hit 0
 	return (queue->items == 0);
@@ -593,7 +553,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	scalable_lock_release(&queue->lock, lockslot);
 
 	// increment the number of items in the queue
-	interlocked_add(&queue->items, numitems);
+	atomic_add32(&queue->items, numitems);
 	add_to_stat(&queue->itemsqueued, numitems);
 
 	// look for free threads to do the work
@@ -744,8 +704,8 @@ static unsigned __stdcall worker_thread_entry(void *param)
 			break;
 
 		// indicate that we are live
-		interlocked_exchange32(&thread->active, TRUE);
-		interlocked_increment(&queue->livethreads);
+		atomic_exchange32(&thread->active, TRUE);
+		atomic_increment32(&queue->livethreads);
 
 		// process work items
 		for ( ;; )
@@ -773,8 +733,8 @@ static unsigned __stdcall worker_thread_entry(void *param)
 		}
 
 		// decrement the live thread count
-		interlocked_exchange32(&thread->active, FALSE);
-		interlocked_decrement(&queue->livethreads);
+		atomic_exchange32(&thread->active, FALSE);
+		atomic_decrement32(&queue->livethreads);
 	}
 	return 0;
 }
@@ -819,8 +779,8 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			end_timing(thread->actruntime);
 
 			// decrement the item count after we are done
-			interlocked_decrement(&queue->items);
-			interlocked_exchange32(&item->done, TRUE);
+			atomic_decrement32(&queue->items);
+			atomic_exchange32(&item->done, TRUE);
 			add_to_stat(&thread->itemsdone, 1);
 
 			// if it's an auto-release item, release it

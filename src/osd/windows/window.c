@@ -184,7 +184,7 @@ static volatile LONG mtlogindex;
 
 void mtlog_add(const char *event)
 {
-	int index = InterlockedIncrement((LONG *) &mtlogindex) - 1;
+	int index = atomic_increment32((LONG *) &mtlogindex) - 1;
 	if (index < ARRAY_LENGTH(mtlog))
 	{
 		mtlog[index].timestamp = osd_ticks();
