@@ -1,3 +1,22 @@
+/*
+ 
+H8/3xx: Unknown opcode (PC=1c966) 10f - not a valid H8 or H8S opcode, either bad dump or banked ROM
+maygayep.c  ep_cfallc
+
+H8/3xx: Unknown opcode (PC=6bfffefe) 230 - STMAC
+coinmvga.c  cmkenosp
+
+H8/3xx: Unknown opcode (PC=67fffefe) 230 - STMAC
+coinmvga.c  cmkenospa
+
+H8/3xx: Unknown opcode (PC=8f91) aeb - ADD.L ERs, ERd
+maygayep.c  ep_hogmnc
+
+H8/3xx: Unknown opcode (PC=20000) 6b6e - MOV.B @ERs, Rd
+maygayep.c  ep_wordf 
+ 
+*/
+
 static UINT32 udata32, address24;
 static INT32 sdata32;
 static UINT16 udata16, ext16;
@@ -637,7 +656,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			h8->pc+=2;
 			if(((ext16>>8) & 0xf) == 0)	// .b (8x8 = 16)
 			{
-				sdata16 = h8_getreg8(h8, ext16 & 0xf);	// Rd
+				sdata16 = h8_getreg8(h8, (ext16 & 0xf)+8);	// Rd - always the low 8 bits of Rd
 				sdata8 = h8_getreg8(h8, (ext16>>4) & 0xf);	// Rs
 				sdata16 = h8_mulxs8(h8, sdata8, sdata16);
 				h8_setreg16(h8, ext16 & 0xf, sdata16);
