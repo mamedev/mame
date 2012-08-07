@@ -18357,10 +18357,11 @@ m4clr		// MPU4 Meter Clear ROM
 m4tenten	// 10 X 10 (Barcrest)
 m421club	// 21 Club (Barcrest)
 m4actbnk	// Action Bank (Barcrest)
-m4actbnka
+m4actbnka	//
+m4actbnkb	//
 m4actclb	// Action Club (Barcrest)
+m4actclba	//
 m4actnot	// Action Note (Barcrest)
-m4actnota	//
 m4actpak	// Action Pack (Barcrest)
 m4actpaka	//
 m4addr		// Adders & Ladders (Barcrest)
@@ -18611,6 +18612,8 @@ m4bjsma		//
 m4blstbk	// Blast A Bank (Barcrest)
 m4bluedm	// Blue Diamond (Barcrest)
 m4bluemn	// Blue Moon (Barcrest)
+m4bluemna	//
+m4bluemnb	//
 m4bdash		// Boulder Dash (Barcrest)
 m4brktak	// Break & Take (Barcrest)
 m4brdway	// Broadway (Barcrest) [Dutch]
@@ -18840,6 +18843,8 @@ m4goodtm	// Let The Good Times Roll (Barcrest)
 m4libty		// Liberty (Barcrest)
 m4lineup	// Line Up (Bwb - Barcrest)
 m4loadmn	// Loads A Money (Barcrest)
+m4loadmna	//
+m4loadmnb	//
 m4luck7		// Lucky 7 (Barcrest)
 m4luckdv	// Lucky Devil (Barcrest) [Czech]
 m4luckdvd	//
@@ -18890,6 +18895,7 @@ m4ordmnd	// Oriental Diamonds (Barcrest)
 m4overmn	// Over The Moon (Barcrest)
 m4placbt	// Place Your Bets (Barcrest)
 m4pont		// Pontoon Club (Barcrest)
+m4ponta		//
 m4potblk	// Pot Black (Barcrest)
 m4ptblkc	// Pot Black Casino (Bwb - Barcrest)
 m4potlck	// Pot Luck Club (Barcrest)
@@ -19313,8 +19319,6 @@ m4supjstb
 m4supjstc
 m4supjstd
 m4supjste
-m4supjstf
-m4supjstg
 
 /* Nova - German licensed Barcrest / Bwb sets? */
 
@@ -19799,6 +19803,7 @@ m5mega		// Mega Zone (Barcrest)
 m5martns	// Money Mad Martians (Barcrest)
 m5martns07	//
 m5mmak		// Money Maker (Barcrest)
+m5mmak06	//
 m5monjok	// Monedin Joker (Spanish) (Barcrest)
 m5monjoka	//
 m5monty		// Monty Python (Barcrest)

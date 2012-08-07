@@ -324,6 +324,18 @@ ROM_START( m4ra )
 	ROM_LOAD( "redx_20_.8", 0x0000, 0x010000, CRC(b5e8dec5) SHA1(74777ed7f78ef7cc615beadf097380569832a75a) )
 ROM_END
 
+ROM_START( m4sayno )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "snms.p1", 0x0000, 0x010000, CRC(be1f2222) SHA1(7d8319796e1d45a3d0246bf13b6d818f20796db3) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "snm 5p.bin", 0x0000, 0x010000, CRC(4fba5c0a) SHA1(85438c531d4122bc31f59127a577dc6d71a4ba9d) )
+	ROM_LOAD( "say no more 425b.bin", 0x0000, 0x010000, CRC(2cf27394) SHA1(fb7688b7d9d2e68f0c84a57b66dd02dbbc6accc7) )
+	ROM_LOAD( "snm 6.bin", 0x0000, 0x010000, CRC(0d14730b) SHA1(2a35d72bdcc9402b00153621ec852f902720c104) )
+	ROM_LOAD( "snmx.p1", 0x0000, 0x010000, CRC(61a78035) SHA1(1d6c553c60fee0b80e06f8421b8a3806d1f3a587) )
+ROM_END
+
+
 
 GAME(199?, m4cojok	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",						GAME_FLAGS )
 GAMEL(198?,m4gambal	,0			,mod4yam	,m4gambal			, mpu4_state,m4gambal			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
@@ -335,3 +347,4 @@ GAME(199?, m4przmc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 GAME(199?, m4przsss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4)",						GAME_FLAGS )
 GAME(199?, m4sss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Spend Spend Spend (Barcrest) (MPU4)",						GAME_FLAGS )
 GAME(199?, m4ra		,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Alert (Barcrest) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4sayno	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )

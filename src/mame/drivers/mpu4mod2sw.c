@@ -20,7 +20,11 @@
 
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 extern DRIVER_INIT( m4default );
+extern DRIVER_INIT( m_ccelbr );
+
+
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
@@ -395,10 +399,6 @@ ROM_START( m4actnot )
 	ROM_LOAD( "an12.bin", 0x0000, 0x010000, CRC(54c6a33b) SHA1(91870c46b538abf56c356c96290cfedcf41db21f) )
 ROM_END
 
-ROM_START( m4actnota )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "an22c.bin", 0x0000, 0x010000, CRC(54c6a33b) SHA1(91870c46b538abf56c356c96290cfedcf41db21f) )
-ROM_END
 
 ROM_START( m4cardcs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -987,6 +987,7 @@ ROM_END
 ROM_START( m4supjstb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "super jester 2.1.90 10p 4.80 p1.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) )
+//	ROM_LOAD( "31.1.90cj10p4.80v6.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) ) // marked crown jester?
 ROM_END
 
 ROM_START( m4supjstc )
@@ -1003,17 +1004,6 @@ ROM_START( m4supjste )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "super jester 4.10.89 10p 4 token.bin", 0x8000, 0x008000, CRC(3b4e4444) SHA1(a3cbbd2657be087c346a5ada7c301584125f8fbc) )
 ROM_END
-
-ROM_START( m4supjstf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "superjester", 0x8000, 0x008000, CRC(754d821a) SHA1(9b00d0e028e46f8dfed60f3b49ef7c5cc40ac70c) )
-ROM_END
-
-ROM_START( m4supjstg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "31.1.90cj10p4.80v6.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) ) // marked crown jester?
-ROM_END
-
 
 
 ROM_START( m4spnwin )
@@ -1145,6 +1135,107 @@ ROM_START( m4wayina )
 ROM_END
 
 
+ROM_START( m4actbnka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ac30_prom2.bin", 0x4000, 0x04000, CRC(595615cd) SHA1(42d2028d11e2160c67f0dfde5a1ad805c0dc0fe1) )
+	ROM_LOAD( "ac30_prom1.bin", 0x8000, 0x08000, CRC(6765aef1) SHA1(4158bd2ff65434f040ef6505adc5026710031756) )
+ROM_END
+
+ROM_START( m4actbnkb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "abank.hex", 0x6000, 0x00a000, CRC(2cd1a269) SHA1(5ce22b2736844a2de6cda04abdd0fe435391e033) ) // split me
+ROM_END
+
+
+ROM_START( m4actclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "abcs.p1", 0x0000, 0x010000, CRC(cf730606) SHA1(35b95b924a24b306428c6c81136c14d7732e2356) )
+ROM_END
+
+
+ROM_START( m4actclba )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // this seems to also contain a bunch of extra (unused?) data for another game
+	ROM_LOAD( "a2c1-1mkii.bin", 0x0000, 0x010000, CRC(4c8ee662) SHA1(17e710c2bda21db609b619dfc0c9280a211da151) )
+ROM_END
+
+
+ROM_START( m4bluemn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "blu23.bin", 0x0000, 0x010000, CRC(499d41c7) SHA1(1a741cf2c6ed6910717324ca2b0a2630338479e0) )
+ROM_END
+
+ROM_START( m4bluemna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bmoon.hex", 0x0000, 0x010000, CRC(109aa258) SHA1(88820b1090ce6b6538b4ca0428c02979535895c3) )
+ROM_END
+
+ROM_START( m4bluemnb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "blm20p-6", 0x0000, 0x010000, CRC(4b9f83cf) SHA1(7014da9f7fc20443251dd5b2817f06a4ef862afd) ) // contains inaccessible data before 0x1000
+ROM_END
+
+
+ROM_START( m4take2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ttos.p1", 0x0000, 0x010000, CRC(d7943729) SHA1(76fcaf7dbfa7863a4dfe2804e2d472dcfec13124) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "taketwo.chr", 0x0000, 0x000048, CRC(61c0b52b) SHA1(9defb30a186dc237625fc2476dd8650e7fe289af) )
+ROM_END
+
+ROM_START( m4take2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "take220p", 0x0000, 0x010000, CRC(b536311a) SHA1(234945d2419c8391307db5b5d01d228894441faf) ) // contains inaccessible data before 0x1000
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "taketwo.chr", 0x0000, 0x000048, CRC(61c0b52b) SHA1(9defb30a186dc237625fc2476dd8650e7fe289af) )
+ROM_END
+
+
+ROM_START( m4pont )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pon3.0.bin", 0x0000, 0x010000, CRC(12d83177) SHA1(5b88b9618f53af2b2a4f75e73c3eb334a17791c0) )
+ROM_END
+
+ROM_START( m4ponta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pons.p1", 0x0000, 0x010000, CRC(5186daa7) SHA1(78f853e221307270e1725895201d08f358e34986) )
+ROM_END
+
+
+
+ROM_START( m4loadmn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "la10h.bin", 0x0000, 0x010000, CRC(1f90520e) SHA1(c052c2c751d1ded6077a800be4dedf91ca0bd5ba) )
+ROM_END
+
+ROM_START( m4loadmna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "la11c.bin", 0x0000, 0x010000, CRC(8e6ab8f9) SHA1(cd3367d368c64a74e108fdfda00c4898ca8262c8) )
+ROM_END
+
+ROM_START( m4loadmnb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "la11l.bin", 0x0000, 0x010000, CRC(2d1f8e7a) SHA1(9e5a8b7827925f757784ea4726e3c4897056cdf6) )
+ROM_END
+
+ROM_START( m4celclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "cels.chr", 0x0000, 0x000048, CRC(fe250f3a) SHA1(8b1d569a667921ba1768e7eebba81182466cfabf) )
+ROM_END
+
+ROM_START( m4centpt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "centrepoint v1.6.bin", 0x0000, 0x010000, CRC(adcf0330) SHA1(b68b8c808b2dc1965d37d912adec714547466522) )
+ROM_END
+
+ROM_START( m4centpta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "centrepoint v1.3.bin", 0x0000, 0x010000, CRC(24d117a5) SHA1(bd48a1687d11e32ea8cda19318e8936d1ffd9fd7) )
+ROM_END
+
+
 GAME(199?, m4rsg		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.2)",GAME_FLAGS )
 GAME(199?, m4rsga		,m4rsg		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.0)",GAME_FLAGS )
 
@@ -1200,8 +1291,7 @@ GAME(199?, m4flash		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4swpnot		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Swap-A-Note (Barcrest) (v3.3) (MPU4)",GAME_FLAGS )
 GAME(199?, m4swpnota	,m4swpnot	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Swap-A-Note (Barcrest) (v3.2D) (MPU4)",GAME_FLAGS)
 
-GAME(199?, m4actnot		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) (MPU4) (AN 1.2, set 1))",GAME_FLAGS )
-GAME(199?, m4actnota	,m4actnot	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) (MPU4) (AN 1.2, set 2)",GAME_FLAGS )
+GAME(199?, m4actnot		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) (MPU4) (AN 1.2)",GAME_FLAGS )
 
 GAME(199?, m4cardcs		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Card Cash (Barcrest) (MPU4) (CCS 1.9)",GAME_FLAGS )
 
@@ -1372,8 +1462,6 @@ GAME(199?, m4supjstb	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "
 GAME(199?, m4supjstc	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 4)",						GAME_FLAGS )
 GAME(199?, m4supjstd	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 5)",						GAME_FLAGS )
 GAME(199?, m4supjste	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 6)",						GAME_FLAGS )
-GAME(199?, m4supjstf	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 7)",						GAME_FLAGS )
-GAME(199?, m4supjstg	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 8)",						GAME_FLAGS )
 
 GAME(199?, m4frcrak, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",   GAME_FLAGS )
 
@@ -1387,3 +1475,28 @@ GAME(199?, m4pick, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Jpm","Pic
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4, mpu4_state,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
 GAME(199?, m4ttak	,  0,		mod2	,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",   GAME_FLAGS )
+
+GAME(199?, m4actbnka,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
+GAME(199?, m4actbnkb,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",						GAME_FLAGS ) 
+
+GAME(199?, m4actclb		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",						GAME_FLAGS ) // set stake to boot
+GAME(199?, m4actclba	,m4actclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",						GAME_FLAGS ) //  ^^
+
+GAME(199?, m4bluemn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bluemna	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bluemnb	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",						GAME_FLAGS|GAME_NO_SOUND ) // bad chr, non-blanked out start of rom (hack?)
+
+GAME(199?, m4take2		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4take2a		,m4take2			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.1)",						GAME_FLAGS|GAME_NO_SOUND ) // bad chr, non-blanked out start of rom (hack?)
+
+GAME(199?, m4pont		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake to boot
+GAME(199?, m4ponta		,m4pont				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",						GAME_FLAGS|GAME_NO_SOUND )//  ^^
+
+GAME(199?, m4loadmn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 1)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4loadmna	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 2)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4loadmnb	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 3)",						GAME_FLAGS|GAME_NO_SOUND )
+
+GAME(199?, m4celclb	,0						,mod2   	,mpu4				, mpu4_state,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake
+
+GAME(199?, m4centpt, 0						,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4centpta,m4centpt				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
