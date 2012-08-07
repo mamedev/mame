@@ -7,7 +7,6 @@ Ernesto Corvi
 
 TODO:
 - Dip switches mapping is not complete. ( Anyone has the manual handy? )
-- Missing drums, they might be internal to the YM2608. (outdated note?)
 - Hook up trackball controls in wc90t.
 
 CPU #1 : Handles background & foreground tiles, controllers, dipswitches.
