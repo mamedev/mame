@@ -55,8 +55,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, exedexes_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489n_device, write)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("sn2", sn76489n_device, write)
 ADDRESS_MAP_END
 
 
@@ -195,6 +195,15 @@ static GFXDECODE_START( exedexes )
 GFXDECODE_END
 
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_START( exedexes )
 {
@@ -253,11 +262,13 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("sn1", SN76489, 3000000)
+	MCFG_SOUND_ADD("sn1", SN76489N, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 3000000)
+	MCFG_SOUND_ADD("sn2", SN76489N, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

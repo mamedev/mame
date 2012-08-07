@@ -64,8 +64,8 @@ static ADDRESS_MAP_START( ikki_cpu2, AS_PROGRAM, 8, ikki_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496n_device, write)
+	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496n_device, write)
 ADDRESS_MAP_END
 
 
@@ -204,6 +204,23 @@ GFXDECODE_END
 
 /*************************************
  *
+ *  Sound definitions
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
+/*************************************
+ *
  *  Machine driver
  *
  *************************************/
@@ -274,11 +291,13 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 8000000/4)
+	MCFG_SOUND_ADD("sn1", SN76496N, 8000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 8000000/2)
+	MCFG_SOUND_ADD("sn2", SN76496N, 8000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

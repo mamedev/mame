@@ -220,9 +220,9 @@ static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496n_device, write)
+	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76496n_device, write)
+	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE("sn3", sn76496n_device, write)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
@@ -325,7 +325,14 @@ static const pokey_interface pokey_interface_2 =
 	DEVCB_INPUT_PORT("IN1")
 };
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
 
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
 
 /*************************************
  *
@@ -393,14 +400,17 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_SOUND_ADD("sn1", SN76496N, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn2", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn2", SN76496N, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn3", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn3", SN76496N, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

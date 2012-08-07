@@ -84,9 +84,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, drmicro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496n_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496n_device, write)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496n_device, write)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(pcm_set_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x05, 0x05) AM_NOP // unused? / watchdog?
@@ -222,6 +222,16 @@ static const msm5205_interface msm5205_config =
 };
 
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 /*************************************
  *
  *  Machine driver
@@ -279,15 +289,18 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, MCLK/4)
+	MCFG_SOUND_ADD("sn1", SN76496N, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496, MCLK/4)
+	MCFG_SOUND_ADD("sn2", SN76496N, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn3", SN76496, MCLK/4)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn3", SN76496N, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SOUND_CONFIG(psg_intf)
+	
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

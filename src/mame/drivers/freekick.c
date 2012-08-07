@@ -169,10 +169,10 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITE(pbillrd_bankswitch_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76496n_device, write)
+	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76496n_device, write)
+	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76496n_device, write)
+	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496n_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( freekickb_map, AS_PROGRAM, 8, freekick_state )
@@ -189,10 +189,10 @@ static ADDRESS_MAP_START( freekickb_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(coin_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xf806, 0xf806) AM_WRITE(spinner_select_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76496n_device, write)
+	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76496n_device, write)
+	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76496n_device, write)
+	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496n_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
@@ -208,10 +208,10 @@ static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITENOP //bankswitch ?
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76496n_device, write)
+	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76496n_device, write)
+	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76496n_device, write)
+	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496n_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_io_map, AS_IO, 8, freekick_state )
@@ -530,6 +530,16 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 };
 
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 /*************************************
  *
  *  Graphics definitions
@@ -646,17 +656,21 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 12000000/4)
+	MCFG_SOUND_ADD("sn1", SN76496N, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn2", SN76496, 12000000/4)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn2", SN76496N, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn3", SN76496, 12000000/4)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn3", SN76496N, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn4", SN76496, 12000000/4)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn4", SN76496N, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pbillrd, base )

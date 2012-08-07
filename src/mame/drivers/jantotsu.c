@@ -330,8 +330,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8, jantotsu_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76489an_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76489an_device, write)
 	AM_RANGE(0x02, 0x03) AM_WRITE(jan_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r, jantotsu_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
@@ -468,6 +468,17 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S64_4B	/* 6 KHz */
 };
 
+
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 /*************************************
  *
  *  Machine driver
@@ -528,12 +539,14 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/4)
+	MCFG_SOUND_ADD("sn1", SN76489AN, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/4)
+	MCFG_SOUND_CONFIG(psg_intf)
+	
+	MCFG_SOUND_ADD("sn2", SN76489AN, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SOUND_CONFIG(psg_intf)
+	
 	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
