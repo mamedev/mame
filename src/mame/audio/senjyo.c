@@ -33,7 +33,6 @@ Z80PIO_INTERFACE( senjyo_pio_intf )
 /* z80 ctc */
 Z80CTC_INTERFACE( senjyo_ctc_intf )
 {
-	0,       /* timer disables */
 	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0), /* interrupt handler */
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),	/* ZC/TO0 callback */
 	DEVCB_NULL,													/* ZC/TO1 callback */

@@ -31,17 +31,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-const int NOTIMER_0 = (1<<0);
-const int NOTIMER_1 = (1<<1);
-const int NOTIMER_2 = (1<<2);
-const int NOTIMER_3 = (1<<3);
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -64,7 +53,6 @@ const int NOTIMER_3 = (1<<3);
 
 struct z80ctc_interface
 {
-	UINT8				m_notimer;	// timer disabler mask
 	devcb_write_line	m_intr_cb;	// callback when change interrupt status
 	devcb_write_line	m_zc0_cb;	// ZC/TO0 callback
 	devcb_write_line	m_zc1_cb;	// ZC/TO1 callback
@@ -120,7 +108,7 @@ private:
 	public:
 		ctc_channel();
 
-		void start(z80ctc_device *device, int index, bool notimer, const devcb_write_line &write_line);
+		void start(z80ctc_device *device, int index, const devcb_write_line &write_line);
 		void reset();
 
 		UINT8 read();
@@ -133,7 +121,6 @@ private:
 		z80ctc_device *	m_device;				// pointer back to our device
 		int				m_index;				// our channel index
 		devcb_resolved_write_line m_zc;			// zero crossing callbacks
-		bool			m_notimer;				// timer disabled?
 		UINT16			m_mode;					// current mode
 		UINT16			m_tconst;				// time constant
 		UINT16			m_down;					// down counter (clock mode only)

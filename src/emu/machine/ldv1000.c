@@ -128,7 +128,6 @@ static I8255_INTERFACE(ppi1intf)
 
 static Z80CTC_INTERFACE( ctcintf )
 {
-	0,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ctc_interrupt),
 	DEVCB_NULL,
 	DEVCB_NULL,

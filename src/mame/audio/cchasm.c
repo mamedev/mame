@@ -120,7 +120,6 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_timer_2_w )
 
 Z80CTC_INTERFACE( cchasm_ctc_intf )
 {
-	0,               /* timer disables */
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
 	DEVCB_NULL,					/* ZC/TO0 callback */
 	DEVCB_LINE(ctc_timer_1_w),	/* ZC/TO1 callback */

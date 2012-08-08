@@ -1397,7 +1397,6 @@ static const ay8910_interface demon_ay8910_interface_3 =
 
 static Z80CTC_INTERFACE( demon_z80ctc_interface )
 {
-	0,               /* timer disables */
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
 	DEVCB_NULL,     /* ZC/TO0 callback */
 	DEVCB_NULL,		/* ZC/TO1 callback */

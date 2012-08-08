@@ -620,7 +620,6 @@ static INTERRUPT_GEN( ctc0_trg1 )
 
 static Z80CTC_INTERFACE( ctc_intf_main )
 {
-	0,							/* timer disables */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),/* interrupt handler */
 	DEVCB_NULL,					/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
 	DEVCB_NULL,					/* ZC/TO1 callback */
@@ -629,7 +628,6 @@ static Z80CTC_INTERFACE( ctc_intf_main )
 
 static Z80CTC_INTERFACE( ctc_intf_audio )
 {
-	0,							/* timer disables */
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
 	DEVCB_DEVICE_LINE_MEMBER("audio_ctc", z80ctc_device, trg3),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
 	DEVCB_NULL,					/* ZC/TO1 callback */

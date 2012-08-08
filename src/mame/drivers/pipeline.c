@@ -314,7 +314,6 @@ GFXDECODE_END
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,							// timer disables
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),		// interrupt handler
 	DEVCB_NULL,					// ZC/TO0 callback
 	DEVCB_NULL,					// ZC/TO1 callback

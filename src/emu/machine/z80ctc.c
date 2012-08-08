@@ -133,7 +133,6 @@ void z80ctc_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		m_notimer = 0;
 		memset(&m_intr_cb, 0, sizeof(m_intr_cb));
 		memset(&m_zc0_cb, 0, sizeof(m_zc0_cb));
 		memset(&m_zc1_cb, 0, sizeof(m_zc1_cb));
@@ -156,10 +155,10 @@ void z80ctc_device::device_start()
 
 	// start each channel
 	devcb_write_line nullcb = DEVCB_NULL;
-	m_channel[0].start(this, 0, (m_notimer & NOTIMER_0) != 0, m_zc0_cb);
-	m_channel[1].start(this, 1, (m_notimer & NOTIMER_1) != 0, m_zc1_cb);
-	m_channel[2].start(this, 2, (m_notimer & NOTIMER_2) != 0, m_zc2_cb);
-	m_channel[3].start(this, 3, (m_notimer & NOTIMER_3) != 0, nullcb);
+	m_channel[0].start(this, 0, m_zc0_cb);
+	m_channel[1].start(this, 1, m_zc1_cb);
+	m_channel[2].start(this, 2, m_zc2_cb);
+	m_channel[3].start(this, 3, nullcb);
 
 	// register for save states
     save_item(NAME(m_vector));
@@ -301,8 +300,7 @@ void z80ctc_device::interrupt_check()
 //-------------------------------------------------
 
 z80ctc_device::ctc_channel::ctc_channel()
-	: m_notimer(false),
-	  m_mode(0),
+	: m_mode(0),
 	  m_tconst(0),
 	  m_down(0),
 	  m_extclk(0),
@@ -317,13 +315,12 @@ z80ctc_device::ctc_channel::ctc_channel()
 //  start - set up at device start time
 //-------------------------------------------------
 
-void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool notimer, const devcb_write_line &write_line)
+void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, const devcb_write_line &write_line)
 {
 	// initialize state
 	m_device = device;
 	m_index = index;
 	m_zc.resolve(write_line, *m_device);
-	m_notimer = notimer;
 	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_callback), this);
 
 	// register for save states
@@ -422,13 +419,8 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 			// if we're triggering on the time constant, reset the down counter now
 			if ((m_mode & TRIGGER) == TRIGGER_AUTO)
 			{
-				if (!m_notimer)
-				{
-					attotime curperiod = period();
-					m_timer->adjust(curperiod, m_index, curperiod);
-				}
-				else
-					m_timer->adjust(attotime::never);
+				attotime curperiod = period();
+				m_timer->adjust(curperiod, m_index, curperiod);
 			}
 
 			// else set the bit indicating that we're waiting for the appropriate trigger
@@ -491,17 +483,9 @@ void z80ctc_device::ctc_channel::trigger(UINT8 data)
 			// if we're waiting for a trigger, start the timer
 			if ((m_mode & WAITING_FOR_TRIG) && (m_mode & MODE) == MODE_TIMER)
 			{
-				if (!m_notimer)
-				{
-					attotime curperiod = period();
-					VPRINTF(("CTC period %s\n", curperiod.as_string()));
-					m_timer->adjust(curperiod, m_index, curperiod);
-				}
-				else
-				{
-					VPRINTF(("CTC disabled\n"));
-					m_timer->adjust(attotime::never);
-				}
+				attotime curperiod = period();
+				VPRINTF(("CTC period %s\n", curperiod.as_string()));
+				m_timer->adjust(curperiod, m_index, curperiod);
 			}
 
 			// we're no longer waiting
