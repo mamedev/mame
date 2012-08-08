@@ -536,7 +536,8 @@ inline void v30mz_cpu_device::PutImmRMWord()
 	}
 	else
 	{
-		write_word( get_ea(), fetch_word() );
+		UINT32 addr = get_ea();
+		write_word( addr, fetch_word() );
 	}
 }
 
@@ -574,7 +575,8 @@ inline void v30mz_cpu_device::PutImmRMByte()
 	}
 	else
 	{
-		write_byte( get_ea(), fetch() );
+		UINT32 addr = get_ea();
+		write_byte( addr, fetch() );
 	}
 }
 
