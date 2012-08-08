@@ -914,7 +914,7 @@ static int snes_bank_0x00_0x3f_cycles(running_machine &machine,UINT32 offset)
 	if(((offset & 0xff00) == 0x4200) || ((offset & 0xff00) == 0x4300))
 		return 0; //TODO: 6
 
-	if(((offset & 0xff00) >= 0x0000) && ((offset & 0xff00) <= 0x1f00))
+	if((offset & 0xff00) <= 0x1f00)
 		return 0; //TODO: 8
 
 	if((offset & 0xff00) >= 0x6000)
@@ -944,7 +944,7 @@ static int snes_bank_0x80_0xbf_cycles(running_machine &machine,UINT32 offset)
 	if(((offset & 0xff00) == 0x4200) || ((offset & 0xff00) == 0x4300))
 		return 0; //TODO: 6
 
-	if(((offset & 0xff00) >= 0x0000) && ((offset & 0xff00) <= 0x1f00))
+	if((offset & 0xff00) <= 0x1f00)
 		return 0; //TODO: 8
 
 	if(((offset & 0xff00) >= 0x6000) && ((offset & 0xff00) <= 0x7f00))
