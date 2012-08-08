@@ -89,24 +89,24 @@ static READ8_DEVICE_HANDLER( adc_status_r );
  *
  *************************************/
 
-static const ppi8255_interface hangon_ppi_intf[2] =
+static I8255_INTERFACE(hangon_ppi_intf_0)
 {
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(sound_latch_w),
-		DEVCB_HANDLER(video_lamps_w),
-		DEVCB_HANDLER(tilemap_sound_w)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(adc_status_r),
-		DEVCB_HANDLER(sub_control_adc_w),
-		DEVCB_NULL,
-		DEVCB_NULL
-	}
+	DEVCB_NULL,
+	DEVCB_HANDLER(sound_latch_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(video_lamps_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(tilemap_sound_w)
+};
+
+static I8255_INTERFACE(hangon_ppi_intf_1)
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(sub_control_adc_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(adc_status_r),
+	DEVCB_NULL
 };
 
 
@@ -179,10 +179,10 @@ static TIMER_DEVICE_CALLBACK( hangon_irq )
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_ppi8255_w )
+static TIMER_CALLBACK( delayed_i8255_w )
 {
 	segahang_state *state = machine.driver_data<segahang_state>();
-	state->m_ppi8255_1->write(*state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	state->m_i8255_1->write(*state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 }
 
 
@@ -193,7 +193,7 @@ static READ16_HANDLER( hangon_io_r )
 	switch (offset & 0x3020/2)
 	{
 		case 0x0000/2: /* PPI @ 4B */
-			return state->m_ppi8255_1->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
+			return state->m_i8255_1->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
 
 		case 0x1000/2: /* Input ports and DIP switches */
 		{
@@ -202,7 +202,7 @@ static READ16_HANDLER( hangon_io_r )
 		}
 
 		case 0x3000/2: /* PPI @ 4C */
-			return state->m_ppi8255_2->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
+			return state->m_i8255_2->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
 
 		case 0x3020/2: /* ADC0804 data output */
 		{
@@ -226,11 +226,11 @@ static WRITE16_HANDLER( hangon_io_w )
 			case 0x0000/2: /* PPI @ 4B */
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				space->machine().scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
+				space->machine().scheduler().synchronize(FUNC(delayed_i8255_w), ((offset & 3) << 8) | (data & 0xff));
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
-				state->m_ppi8255_2->write(*state->m_maincpu->space(AS_PROGRAM), offset & 3, data & 0xff);
+				state->m_i8255_2->write(*state->m_maincpu->space(AS_PROGRAM), offset & 3, data & 0xff);
 				return;
 
 			case 0x3020/2: /* ADC0804 */
@@ -248,7 +248,7 @@ static READ16_HANDLER( sharrier_io_r )
 	switch (offset & 0x0030/2)
 	{
 		case 0x0000/2:
-			return state->m_ppi8255_1->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
+			return state->m_i8255_1->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
 
 		case 0x0010/2: /* Input ports and DIP switches */
 		{
@@ -258,7 +258,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 		case 0x0020/2: /* PPI @ 4C */
 			if (offset == 2) return 0;
-			return state->m_ppi8255_2->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
+			return state->m_i8255_2->read(*state->m_maincpu->space(AS_PROGRAM), offset & 3);
 
 		case 0x0030/2: /* ADC0804 data output */
 		{
@@ -282,11 +282,11 @@ static WRITE16_HANDLER( sharrier_io_w )
 			case 0x0000/2:
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				space->machine().scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
+				space->machine().scheduler().synchronize(FUNC(delayed_i8255_w), ((offset & 3) << 8) | (data & 0xff));
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
-				state->m_ppi8255_2->write(*state->m_maincpu->space(AS_PROGRAM), offset & 3, data & 0xff);
+				state->m_i8255_2->write(*state->m_maincpu->space(AS_PROGRAM), offset & 3, data & 0xff);
 				return;
 
 			case 0x0030/2: /* ADC0804 */
@@ -428,7 +428,7 @@ static READ8_HANDLER( sound_data_r )
 	segahang_state *state = space->machine().driver_data<segahang_state>();
 
 	/* assert ACK */
-	state->m_ppi8255_1->set_port_c(0x00);
+	state->m_i8255_1->pc6_w(CLEAR_LINE);
 	return state->soundlatch_byte_r(*space, offset);
 }
 
@@ -844,8 +844,8 @@ static MACHINE_CONFIG_START( hangon_base, segahang_state )
 	MCFG_MACHINE_RESET(hangon)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_PPI8255_ADD( "ppi8255_1", hangon_ppi_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_2", hangon_ppi_intf[1] )
+	MCFG_I8255_ADD( "i8255_1", hangon_ppi_intf_0 )
+	MCFG_I8255_ADD( "i8255_2", hangon_ppi_intf_1 )
 
 	/* video hardware */
 	MCFG_GFXDECODE(segahang)

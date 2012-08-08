@@ -38,7 +38,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
 
@@ -55,8 +55,8 @@ public:
 		  m_subcpu(*this, "subcpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_mcu(*this, "mcu"),
-		  m_ppi8255_1(*this, "ppi8255_1"),
-		  m_ppi8255_2(*this, "ppi8255_2"),
+		  m_i8255_1(*this, "i8255_1"),
+		  m_i8255_2(*this, "i8255_2"),
 		  m_i8751_vblank_hook(NULL),
 		  m_adc_select(0)
 	{ }
@@ -67,8 +67,8 @@ public:
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
-	required_device<ppi8255_device> m_ppi8255_1;
-	required_device<ppi8255_device> m_ppi8255_2;
+	required_device<i8255_device> m_i8255_1;
+	required_device<i8255_device> m_i8255_2;
 	
 	// configuration
 	void (*m_i8751_vblank_hook)(running_machine &machine);
