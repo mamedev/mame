@@ -234,7 +234,7 @@ static WRITE8_DEVICE_HANDLER( ipu_break_changed )
 	{
 		logerror("DTR changed -> %d\n", data);
 		if (data == 1)
-			z80sio_receive_data(device, 1, 0);
+			downcast<z80sio_device *>(device)->receive_data(1, 0);
 	}
 }
 

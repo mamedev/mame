@@ -577,7 +577,7 @@ READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 
 WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 {
-	device_t *sio = machine().device("ipu_sio");
+	z80sio_device *sio = machine().device<z80sio_device>("ipu_sio");
 
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(&space.device()), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
@@ -607,12 +607,12 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 		{
 			logerror(" -- stop bit = %d; final value = %02X\n", (data >> 7) & 1, nflfoot_serial_out_bits);
 			nflfoot_serial_out_active = FALSE;
-			z80sio_receive_data(sio, 0, nflfoot_serial_out_bits);
+			sio->receive_data(0, nflfoot_serial_out_bits);
 		}
 	}
 
 	/* bit 6 = J3-3 on IPU board = CTSA on SIO */
-	z80sio_set_cts(sio, 0, (data >> 6) & 1);
+	sio->set_cts(0, (data >> 6) & 1);
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
@@ -752,7 +752,7 @@ static ADDRESS_MAP_START( ipu_91695_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio0", z80pio_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE_LEGACY("ipu_sio", z80sio_cd_ba_r, z80sio_cd_ba_w)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_sio", z80sio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio1", z80pio_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(mcr_ipu_laserdisk_w)

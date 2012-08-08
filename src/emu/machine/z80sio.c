@@ -804,62 +804,50 @@ void z80sio_device::sio_channel::serial_callback()
 //  GLOBAL STUBS
 //**************************************************************************
 
-WRITE8_DEVICE_HANDLER( z80sio_c_w ) { downcast<z80sio_device *>(device)->control_write(offset & 1, data); }
-WRITE8_DEVICE_HANDLER( z80sio_d_w ) { downcast<z80sio_device *>(device)->data_write(offset & 1, data); }
-READ8_DEVICE_HANDLER( z80sio_c_r ) { return downcast<z80sio_device *>(device)->control_read(offset & 1); }
-READ8_DEVICE_HANDLER( z80sio_d_r ) { return downcast<z80sio_device *>(device)->data_read(offset & 1); }
-
-READ8_DEVICE_HANDLER( z80sio_get_dtr ) { return downcast<z80sio_device *>(device)->dtr(offset & 1); }
-READ8_DEVICE_HANDLER( z80sio_get_rts ) { return downcast<z80sio_device *>(device)->rts(offset & 1); }
-
-WRITE8_DEVICE_HANDLER( z80sio_set_cts ) { downcast<z80sio_device *>(device)->set_cts(offset & 1, data); }
-WRITE8_DEVICE_HANDLER( z80sio_set_dcd ) { downcast<z80sio_device *>(device)->set_dcd(offset & 1, data); }
-WRITE8_DEVICE_HANDLER( z80sio_receive_data ) { downcast<z80sio_device *>(device)->receive_data(offset & 1, data); }
-
-READ8_DEVICE_HANDLER( z80sio_cd_ba_r )
+READ8_MEMBER( z80sio_device::read )
 {
 	switch (offset & 3)
 	{
-		case 0: return z80sio_d_r(device, 0);
-		case 1: return z80sio_d_r(device, 1);
-		case 2: return z80sio_c_r(device, 0);
-		case 3: return z80sio_c_r(device, 1);
+		case 0: return data_read(0);
+		case 1: return data_read(1);
+		case 2: return control_read(0);
+		case 3: return control_read(1);
 	}
 
 	return 0xff;
 }
 
-WRITE8_DEVICE_HANDLER( z80sio_cd_ba_w )
+WRITE8_MEMBER( z80sio_device::write )
 {
 	switch (offset & 3)
 	{
-		case 0: z80sio_d_w(device, 0, data); break;
-		case 1: z80sio_d_w(device, 1, data); break;
-		case 2: z80sio_c_w(device, 0, data); break;
-		case 3: z80sio_c_w(device, 1, data); break;
+		case 0: data_write(0, data); break;
+		case 1: data_write(1, data); break;
+		case 2: control_write(0, data); break;
+		case 3: control_write(1, data); break;
 	}
 }
 
-READ8_DEVICE_HANDLER( z80sio_ba_cd_r )
+READ8_MEMBER( z80sio_device::read_alt )
 {
 	switch (offset & 3)
 	{
-		case 0: return z80sio_d_r(device, 0);
-		case 1: return z80sio_c_r(device, 0);
-		case 2: return z80sio_d_r(device, 1);
-		case 3: return z80sio_c_r(device, 1);
+		case 0: return data_read(0);
+		case 1: return control_read(0);
+		case 2: return data_read(1);
+		case 3: return control_read(1);
 	}
 
 	return 0xff;
 }
 
-WRITE8_DEVICE_HANDLER( z80sio_ba_cd_w )
+WRITE8_MEMBER( z80sio_device::write_alt )
 {
 	switch (offset & 3)
 	{
-		case 0: z80sio_d_w(device, 0, data); break;
-		case 1: z80sio_c_w(device, 0, data); break;
-		case 2: z80sio_d_w(device, 1, data); break;
-		case 3: z80sio_c_w(device, 1, data); break;
+		case 0: data_write(0, data); break;
+		case 1: control_write(0, data); break;
+		case 2: data_write(1, data); break;
+		case 3: control_write(1, data); break;
 	}
 }

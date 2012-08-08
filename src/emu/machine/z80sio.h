@@ -66,6 +66,14 @@ public:
 	void set_cts(int ch, int state) { m_channel[ch].set_cts(state); }
 	void set_dcd(int ch, int state) { m_channel[ch].set_dcd(state); }
 	void receive_data(int ch, int data) { m_channel[ch].receive_data(data); }
+	
+	// standard read/write, with C/D in bit 1, B/A in bit 0
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	// alternate read/write, with C/D in bit 0, B/A in bit 1
+	DECLARE_READ8_MEMBER( read_alt );
+	DECLARE_WRITE8_MEMBER( write_alt );
 
 private:
 	// device-level overrides
@@ -138,37 +146,6 @@ private:
 
 // device type definition
 extern const device_type Z80SIO;
-
-
-
-//**************************************************************************
-//  CONTROL/DATA REGISTER READ/WRITE
-//**************************************************************************
-
-// register access (A1=C/_D A0=B/_A)
-READ8_DEVICE_HANDLER( z80sio_cd_ba_r );
-WRITE8_DEVICE_HANDLER( z80sio_cd_ba_w );
-
-// register access (A1=B/_A A0=C/_D)
-READ8_DEVICE_HANDLER( z80sio_ba_cd_r );
-WRITE8_DEVICE_HANDLER( z80sio_ba_cd_w );
-
-WRITE8_DEVICE_HANDLER( z80sio_c_w );
-READ8_DEVICE_HANDLER( z80sio_c_r );
-
-WRITE8_DEVICE_HANDLER( z80sio_d_w );
-READ8_DEVICE_HANDLER( z80sio_d_r );
-
-
-//**************************************************************************
-//  CONTROL LINE READ/WRITE
-//**************************************************************************
-
-READ8_DEVICE_HANDLER( z80sio_get_dtr );
-READ8_DEVICE_HANDLER( z80sio_get_rts );
-WRITE8_DEVICE_HANDLER( z80sio_set_cts );
-WRITE8_DEVICE_HANDLER( z80sio_set_dcd );
-WRITE8_DEVICE_HANDLER( z80sio_receive_data );
 
 
 #endif
