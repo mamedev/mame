@@ -39,7 +39,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
@@ -58,7 +58,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_mcu(*this, "mcu"),
-		  m_ppi8255(*this, "ppi8255"),
+		  m_i8255(*this, "i8255"),
 		  m_ymsnd(*this, "ymsnd"),
 		  m_n7751(*this, "n7751"),
 		  m_n7751_i8243(*this, "n7751_8243"),
@@ -151,7 +151,7 @@ protected:
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
-	required_device<ppi8255_device> m_ppi8255;
+	required_device<i8255_device> m_i8255;
 	required_device<ym2151_device> m_ymsnd;
 	optional_device<n7751_device> m_n7751;
 	optional_device<i8243_device> m_n7751_i8243;

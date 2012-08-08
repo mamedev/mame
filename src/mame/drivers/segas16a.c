@@ -190,13 +190,13 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 //	PPI INTERFACES
 //**************************************************************************
 
-static const ppi8255_interface single_ppi_intf =
+static I8255_INTERFACE(single_ppi_intf)
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(segas16a_state, misc_control_w),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(segas16a_state, tilemap_sound_w)
 };
 
@@ -216,7 +216,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return m_ppi8255->read(space, offset & 3);
+			return m_i8255->read(space, offset & 3);
 
 		case 0x1000/2:
 		{
@@ -356,7 +356,7 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 READ8_MEMBER( segas16a_state::sound_data_r )
 {
 	// assert ACK
-	m_ppi8255->set_port_c(0x00);
+	m_i8255->pc6_w(CLEAR_LINE);
 	return soundlatch_read();
 }
 
@@ -692,7 +692,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_ppi8255->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -1957,7 +1957,7 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PPI8255_ADD( "ppi8255", single_ppi_intf )
+	MCFG_I8255_ADD( "i8255", single_ppi_intf )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
