@@ -107,17 +107,7 @@ public:
 
 static MACHINE_RESET( sandscrp )
 {
-	sandscrp_state *state = machine.driver_data<sandscrp_state>();
-	state->m_sprite_type  = 0;
-
-	state->m_sprite_xoffs = 0;
-	state->m_sprite_yoffs = 0;
-
-	state->m_priority.sprite[0] = 1;	// above tile[0],   below the others
-	state->m_priority.sprite[1] = 2;	// above tile[0-1], below the others
-	state->m_priority.sprite[2] = 3;	// above tile[0-2], below the others
-	state->m_priority.sprite[3] = 8;	// above all
-	state->m_sprite_type = 3;	// "different" sprites layout
+//	sandscrp_state *state = machine.driver_data<sandscrp_state>();
 }
 
 /* Sand Scorpion */
@@ -174,8 +164,8 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_irq_cause_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_sprite_flipx	=	data & 1;
-		m_sprite_flipy	=	data & 1;
+//		m_sprite_flipx	=	data & 1;
+//		m_sprite_flipy	=	data & 1;
 
 		if (data & 0x08)	m_sprite_irq  = 0;
 		if (data & 0x10)	m_unknown_irq = 0;

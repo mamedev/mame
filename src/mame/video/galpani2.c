@@ -194,6 +194,6 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 							   cliprect,0x4000 + 0);
 	}
 
-	if (layers_ctrl & 0x8)	kaneko16_draw_sprites(screen.machine(), bitmap, cliprect);
+	if (layers_ctrl & 0x8) state->m_kaneko_spr->kaneko16_draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes());
 	return 0;
 }
