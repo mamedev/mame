@@ -323,13 +323,13 @@ Notes:
 //	PPI INTERFACES
 //**************************************************************************
 
-static const ppi8255_interface single_ppi_intf =
+static I8255_INTERFACE(single_ppi_intf)
 {
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_w),
+	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_w),
+	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
 	DEVCB_DRIVER_MEMBER(segaorun_state, video_control_w)
 };
 
@@ -643,7 +643,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return m_ppi8255->read(space, offset & 3);
+			return m_i8255->read(space, offset & 3);
 
 		case 0x10/2:
 		{
@@ -673,7 +673,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				m_ppi8255->write(space, offset & 3, data);
+				m_i8255->write(space, offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -1050,7 +1050,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_PPI8255_ADD( "ppi8255", single_ppi_intf )
+	MCFG_I8255_ADD( "i8255", single_ppi_intf )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware

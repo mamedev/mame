@@ -260,40 +260,44 @@ WRITE8_MEMBER(turbo_state::turbo_ppi3c_w)
 }
 
 
-static const ppi8255_interface turbo_8255_intf[4] =
+static I8255_INTERFACE(turbo_8255_intf_0)
 {
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi0a_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi0b_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi0c_w)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi1a_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi1b_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi1c_w)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(turbo_sound_a_w),
-		DEVCB_HANDLER(turbo_sound_b_w),
-		DEVCB_HANDLER(turbo_sound_c_w)
-	},
-	{
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_analog_r),
-		DEVCB_INPUT_PORT("DSW2"),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi3c_w)
-	}
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi0a_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi0b_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi0c_w)
+};
+
+static I8255_INTERFACE(turbo_8255_intf_1)
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi1a_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi1b_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi1c_w)
+};
+
+static I8255_INTERFACE(turbo_8255_intf_2)
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(turbo_sound_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(turbo_sound_b_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(turbo_sound_c_w)
+};
+
+static I8255_INTERFACE(turbo_8255_intf_3)
+{
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_analog_r),
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_ppi3c_w)
 };
 
 
@@ -339,24 +343,24 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
 }
 
 
-static const ppi8255_interface subroc3d_8255_intf[2] =
+static I8255_INTERFACE(subroc3d_8255_intf_0)
 {
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_ppi0a_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_ppi0b_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_ppi0c_w)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(subroc3d_sound_a_w),
-		DEVCB_HANDLER(subroc3d_sound_b_w),
-		DEVCB_HANDLER(subroc3d_sound_c_w)
-	}
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_ppi0a_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_ppi0b_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_ppi0c_w)
+};
+
+static I8255_INTERFACE(subroc3d_8255_intf_1)
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(subroc3d_sound_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(subroc3d_sound_b_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(subroc3d_sound_c_w)
 };
 
 
@@ -408,24 +412,24 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
 }
 
 
-static const ppi8255_interface buckrog_8255_intf[2] =
+static I8255_INTERFACE(buckrog_8255_intf_0)
 {
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi0a_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi0b_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi0c_w)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(buckrog_sound_a_w),
-		DEVCB_HANDLER(buckrog_sound_b_w),
-		DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi1c_w)
-	}
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi0a_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi0b_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi0c_w)
+};
+
+static I8255_INTERFACE(buckrog_8255_intf_1)
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(buckrog_sound_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(buckrog_sound_b_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi1c_w)
 };
 
 
@@ -524,7 +528,7 @@ WRITE8_MEMBER(turbo_state::turbo_coin_and_lamp_w)
 READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
 {
 	/* assert ACK */
-	m_ppi8255_0->set_port_c(0x00);
+	m_i8255_0->pc6_w(CLEAR_LINE);
 	return m_buckrog_command;
 }
 
@@ -561,18 +565,18 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 }
 
 
-static TIMER_CALLBACK( delayed_ppi8255_w )
+static TIMER_CALLBACK( delayed_i8255_w )
 {
 	turbo_state *state = machine.driver_data<turbo_state>();
-	state->m_ppi8255_0->write(*state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	state->m_i8255_0->write(*state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi8255_0_w)
+WRITE8_MEMBER(turbo_state::buckrog_i8255_0_w)
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
-	machine().scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
+	machine().scheduler().synchronize(FUNC(delayed_i8255_w), ((offset & 3) << 8) | (data & 0xff));
 }
 
 
@@ -592,10 +596,10 @@ static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(turbo_collision_clear_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_device, read, write)
-	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_device, read, write)
-	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
-	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_3", ppi8255_device, read, write)
+	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
+	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE("i8255_1", i8255_device, read, write)
+	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("i8255_2", i8255_device, read, write)
+	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("i8255_3", i8255_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xfc01, 0xfc01) AM_MIRROR(0x00fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0xfd00, 0xfdff) AM_READ_PORT("INPUT")
@@ -621,8 +625,8 @@ static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff)														// HANDLE CL
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")	// FIX PAGE
-	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_device, read, write)
+	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
+	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("i8255_1", i8255_device, read, write)
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 ADDRESS_MAP_END
@@ -639,8 +643,8 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")	// FIX PAGE
-	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREAD("ppi8255_0", ppi8255_device, read) AM_WRITE(buckrog_ppi8255_0_w)	// 8255
-	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_device, read, write)			// 8255
+	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREAD("i8255_0", i8255_device, read) AM_WRITE(buckrog_i8255_0_w)	// 8255
+	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("i8255_1", i8255_device, read, write)			// 8255
 	AM_RANGE(0xd800, 0xd800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xd801, 0xd801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("spritepos")							// CONT RAM
@@ -929,10 +933,10 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_CPU_PROGRAM_MAP(turbo_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", turbo_8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", turbo_8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", turbo_8255_intf[2] )
-	MCFG_PPI8255_ADD( "ppi8255_3", turbo_8255_intf[3] )
+	MCFG_I8255_ADD( "i8255_0", turbo_8255_intf_0 )
+	MCFG_I8255_ADD( "i8255_1", turbo_8255_intf_1 )
+	MCFG_I8255_ADD( "i8255_2", turbo_8255_intf_2 )
+	MCFG_I8255_ADD( "i8255_3", turbo_8255_intf_3 )
 
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)	 // unknown clock
 
@@ -960,8 +964,8 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	MCFG_CPU_PROGRAM_MAP(subroc3d_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", subroc3d_8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", subroc3d_8255_intf[1] )
+	MCFG_I8255_ADD( "i8255_0", subroc3d_8255_intf_0 )
+	MCFG_I8255_ADD( "i8255_1", subroc3d_8255_intf_1 )
 
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)	 // unknown clock
 
@@ -996,8 +1000,8 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 	MCFG_MACHINE_RESET(buckrog)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", buckrog_8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", buckrog_8255_intf[1] )
+	MCFG_I8255_ADD( "i8255_0", buckrog_8255_intf_0 )
+	MCFG_I8255_ADD( "i8255_1", buckrog_8255_intf_1 )
 
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)	 // unknown clock
 

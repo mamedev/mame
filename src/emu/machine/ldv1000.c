@@ -45,7 +45,7 @@
 
 #include "emu.h"
 #include "ldv1000.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -90,8 +90,8 @@ const device_type PIONEER_LDV1000 = &device_creator<pioneer_ldv1000_device>;
 static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8, pioneer_ldv1000_device )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi0", ppi8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi1", ppi8255_device, read, write)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi1", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -104,24 +104,24 @@ static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8, pioneer_ldv1000_device )
 ADDRESS_MAP_END
 
 
-static const ppi8255_interface ppi0intf =
+static I8255_INTERFACE(ppi0intf)
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_porta_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portb_r),
 	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_w)
 };
 
 
-static const ppi8255_interface ppi1intf =
+static I8255_INTERFACE(ppi1intf)
 {
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portb_w),
+	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portc_w)
 };
 
@@ -150,8 +150,8 @@ static MACHINE_CONFIG_FRAGMENT( ldv1000 )
 	MCFG_CPU_IO_MAP(ldv1000_portmap)
 
 	MCFG_Z80CTC_ADD("ldvctc", XTAL_5MHz/2, ctcintf)
-	MCFG_PPI8255_ADD("ldvppi0", ppi0intf)
-	MCFG_PPI8255_ADD("ldvppi1", ppi1intf)
+	MCFG_I8255_ADD("ldvppi0", ppi0intf)
+	MCFG_I8255_ADD("ldvppi1", ppi1intf)
 MACHINE_CONFIG_END
 
 

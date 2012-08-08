@@ -37,7 +37,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
@@ -55,7 +55,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_subcpu(*this, "subcpu"),
 		  m_soundcpu(*this, "soundcpu"),
-		  m_ppi8255(*this, "ppi8255"),
+		  m_i8255(*this, "i8255"),
 		  m_nvram(*this, "nvram"),
 		  m_workram(*this, "workram"),
 		  m_custom_map(NULL),
@@ -130,7 +130,7 @@ protected:
 	required_device<m68000_device> m_maincpu;
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
-	required_device<ppi8255_device> m_ppi8255;
+	required_device<i8255_device> m_i8255;
 	optional_device<nvram_device> m_nvram;
 
 	// memory
