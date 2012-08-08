@@ -145,8 +145,6 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
 #include "includes/turbo.h"
 #include "machine/i8279.h"
 #include "machine/segacrpt.h"
@@ -526,7 +524,7 @@ WRITE8_MEMBER(turbo_state::turbo_coin_and_lamp_w)
 READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
 {
 	/* assert ACK */
-	ppi8255_set_port_c(machine().device("ppi8255_0"), 0x00);
+	m_ppi8255_0->set_port_c(0x00);
 	return m_buckrog_command;
 }
 
@@ -565,7 +563,8 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-    ppi8255_w(machine.device("ppi8255_0"), param >> 8, param & 0xff);
+	turbo_state *state = machine.driver_data<turbo_state>();
+	state->m_ppi8255_0->write(*state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 }
 
 
@@ -593,10 +592,10 @@ static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(turbo_collision_clear_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_device, read, write)
+	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_device, read, write)
+	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
+	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_3", ppi8255_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xfc01, 0xfc01) AM_MIRROR(0x00fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0xfd00, 0xfdff) AM_READ_PORT("INPUT")
@@ -622,8 +621,8 @@ static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff)														// HANDLE CL
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")	// FIX PAGE
-	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_device, read, write)
+	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_device, read, write)
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 ADDRESS_MAP_END
@@ -640,8 +639,8 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")	// FIX PAGE
-	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVWRITE_LEGACY("ppi8255_0", ppi8255_r) AM_WRITE(buckrog_ppi8255_0_w)	// 8255
-	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)			// 8255
+	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREAD("ppi8255_0", ppi8255_device, read) AM_WRITE(buckrog_ppi8255_0_w)	// 8255
+	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_device, read, write)			// 8255
 	AM_RANGE(0xd800, 0xd800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0xd801, 0xd801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("spritepos")							// CONT RAM

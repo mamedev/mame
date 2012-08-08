@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "cpu/z80/z80.h"
+#include "machine/8255ppi.h"
 #include "sound/discrete.h"
 
 /* sprites are scaled in the analog domain; to give a better */
@@ -17,8 +19,12 @@ class turbo_state : public driver_device
 public:
 	turbo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"subcpu"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_ppi8255_0(*this, "ppi8255_0"),
+		m_ppi8255_1(*this, "ppi8255_1"),
+		m_ppi8255_2(*this, "ppi8255_2"),
+		m_ppi8255_3(*this, "ppi8255_3"),
 		m_gfx1(*this, "gfx1"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -26,8 +32,12 @@ public:
 	{ }
 
 	/* device/memory pointers */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
+	required_device<z80_device> m_maincpu;
+	optional_device<z80_device> m_subcpu;
+	required_device<ppi8255_device> m_ppi8255_0;
+	required_device<ppi8255_device> m_ppi8255_1;
+	optional_device<ppi8255_device> m_ppi8255_2;
+	optional_device<ppi8255_device> m_ppi8255_3;
 	required_memory_region m_gfx1;
 
 	required_shared_ptr<UINT8> m_videoram;

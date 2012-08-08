@@ -632,7 +632,7 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 

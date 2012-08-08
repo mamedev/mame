@@ -90,8 +90,8 @@ const device_type PIONEER_LDV1000 = &device_creator<pioneer_ldv1000_device>;
 static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8, pioneer_ldv1000_device )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE_LEGACY("ldvppi0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE_LEGACY("ldvppi1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi0", ppi8255_device, read, write)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi1", ppi8255_device, read, write)
 ADDRESS_MAP_END
 
 

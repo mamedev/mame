@@ -55,22 +55,22 @@ public:
     // construction/destruction
     ppi8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	UINT8 ppi8255_r(UINT32 offset);
-	void ppi8255_w(UINT32 offset, UINT8 data);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-	void ppi8255_set_port_read(int which, const devcb_read8 &config) { m_port_read[which].resolve(config, *this); }
-	void ppi8255_set_port_write(int which, const devcb_write8 &config) { m_port_write[which].resolve(config, *this); }
+	void set_port_read(int which, const devcb_read8 &config) { m_port_read[which].resolve(config, *this); }
+	void set_port_write(int which, const devcb_write8 &config) { m_port_write[which].resolve(config, *this); }
 
-	void ppi8255_set_port(int which, UINT8 data) { ppi8255_input(which, data); }
-	UINT8 ppi8255_get_port(int which) { return m_output[which]; }
+	void set_port(int which, UINT8 data) { input(which, data); }
+	UINT8 get_port(int which) const { return m_output[which]; }
 
-	void ppi8255_set_port_a(UINT8 data);
-	void ppi8255_set_port_b(UINT8 data);
-	void ppi8255_set_port_c(UINT8 data);
+	void set_port_a(UINT8 data) { set_port(0, data); }
+	void set_port_b(UINT8 data) { set_port(1, data); }
+	void set_port_c(UINT8 data) { set_port(2, data); }
 
-	UINT8 ppi8255_get_port_a();
-	UINT8 ppi8255_get_port_b();
-	UINT8 ppi8255_get_port_c();
+	UINT8 get_port_a() const { return get_port(0); }
+	UINT8 get_port_b() const { return get_port(1); }
+	UINT8 get_port_c() const { return get_port(2); }
 
 protected:
     // device-level overrides
@@ -84,11 +84,11 @@ protected:
 
 private:
 
-	void ppi8255_get_handshake_signals(int is_read, UINT8 *result);
-	void ppi8255_input(int port, UINT8 data);
+	void get_handshake_signals(bool is_read, UINT8 &result);
+	void input(int port, UINT8 data);
 
-	UINT8 ppi8255_read_port(int port);
-	void ppi8255_write_port(int port);
+	UINT8 read_port(int port);
+	void write_port(int port);
 
 	void set_mode(int data, int call_handlers);
 
@@ -125,29 +125,5 @@ private:
 // device type definition
 extern const device_type PPI8255;
 
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-READ8_DEVICE_HANDLER( ppi8255_r );
-WRITE8_DEVICE_HANDLER( ppi8255_w );
-
-void ppi8255_set_port_a_read( device_t *device, const devcb_read8 *config );
-void ppi8255_set_port_b_read( device_t *device, const devcb_read8 *config );
-void ppi8255_set_port_c_read( device_t *device, const devcb_read8 *config );
-
-void ppi8255_set_port_a_write( device_t *device, const devcb_write8 *config );
-void ppi8255_set_port_b_write( device_t *device, const devcb_write8 *config );
-void ppi8255_set_port_c_write( device_t *device, const devcb_write8 *config );
-
-void ppi8255_set_port_a( device_t *device, UINT8 data );
-void ppi8255_set_port_b( device_t *device, UINT8 data );
-void ppi8255_set_port_c( device_t *device, UINT8 data );
-
-UINT8 ppi8255_get_port_a( device_t *device );
-UINT8 ppi8255_get_port_b( device_t *device );
-UINT8 ppi8255_get_port_c( device_t *device );
 
 #endif /* __8255PPI_H_ */

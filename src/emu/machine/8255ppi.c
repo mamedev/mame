@@ -203,7 +203,7 @@ void ppi8255_device::device_reset()
 }
 
 
-void ppi8255_device::ppi8255_get_handshake_signals(int is_read, UINT8 *result)
+void ppi8255_device::get_handshake_signals(bool is_read, UINT8 &result)
 {
 	UINT8 handshake = 0x00;
 	UINT8 mask = 0x00;
@@ -249,13 +249,13 @@ void ppi8255_device::ppi8255_get_handshake_signals(int is_read, UINT8 *result)
 		}
 	}
 
-	*result &= ~mask;
-	*result |= handshake & mask;
+	result &= ~mask;
+	result |= handshake & mask;
 }
 
 
 
-void ppi8255_device::ppi8255_input(int port, UINT8 data)
+void ppi8255_device::input(int port, UINT8 data)
 {
 	int changed = 0;
 
@@ -306,20 +306,20 @@ void ppi8255_device::ppi8255_input(int port, UINT8 data)
 
 		if (changed)
 		{
-			ppi8255_write_port(2);
+			write_port(2);
 		}
 	}
 }
 
 
 
-UINT8 ppi8255_device::ppi8255_read_port(int port)
+UINT8 ppi8255_device::read_port(int port)
 {
 	UINT8 result = 0x00;
 
 	if (m_in_mask[port])
 	{
-		ppi8255_input(port, m_port_read[port](0));
+		input(port, m_port_read[port](0));
 		result |= m_read[port] & m_in_mask[port];
 	}
 	result |= m_latch[port] & m_out_mask[port];
@@ -338,7 +338,7 @@ UINT8 ppi8255_device::ppi8255_read_port(int port)
 
 	case 2:
 		/* read special port 2 signals */
-		ppi8255_get_handshake_signals(1, &result);
+		get_handshake_signals(true, result);
 		break;
 	}
 
@@ -346,8 +346,7 @@ UINT8 ppi8255_device::ppi8255_read_port(int port)
 }
 
 
-
-READ8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_r)
+READ8_MEMBER( ppi8255_device::read )
 {
 	UINT8 result = 0;
 
@@ -358,7 +357,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_r)
 		case 0: /* Port A read */
 		case 1: /* Port B read */
 		case 2: /* Port C read */
-			result = ppi8255_read_port(offset);
+			result = read_port(offset);
 			break;
 
 		case 3: /* Control word */
@@ -371,7 +370,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_r)
 
 
 
-void ppi8255_device::ppi8255_write_port(int port)
+void ppi8255_device::write_port(int port)
 {
 	UINT8 write_data = m_latch[port] & m_out_mask[port];
 	write_data |= 0xFF & ~m_out_mask[port];
@@ -379,7 +378,7 @@ void ppi8255_device::ppi8255_write_port(int port)
 	/* write out special port 2 signals */
 	if (port == 2)
 	{
-		ppi8255_get_handshake_signals(0, &write_data);
+		get_handshake_signals(false, write_data);
 	}
 
 	m_output[port] = write_data;
@@ -388,7 +387,7 @@ void ppi8255_device::ppi8255_write_port(int port)
 
 
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_w)
+WRITE8_MEMBER( ppi8255_device::write )
 {
 	offset %= 4;
 
@@ -398,7 +397,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_w)
 		case 1: /* Port B write */
 		case 2: /* Port C write */
 			m_latch[offset] = data;
-			ppi8255_write_port(offset);
+			write_port(offset);
 
 			switch(offset)
 			{
@@ -406,7 +405,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_w)
 					if (!m_port_a_dir && (m_group_a_mode != 0))
 					{
 						m_obf_a = 1;
-						ppi8255_write_port(2);
+						write_port(2);
 					}
 					break;
 
@@ -414,7 +413,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_w)
 					if (!m_port_b_dir && (m_group_b_mode != 0))
 					{
 						m_obf_b = 1;
-						ppi8255_write_port(2);
+						write_port(2);
 					}
 					break;
 			}
@@ -471,7 +470,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_w)
 					}
 				}
 
-				ppi8255_write_port(2);
+				write_port(2);
 			}
 			break;
 	}
@@ -589,7 +588,7 @@ void ppi8255_device::set_mode(int data, int call_handlers)
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			ppi8255_write_port(i);
+			write_port(i);
 		}
 	}
 
@@ -600,67 +599,4 @@ void ppi8255_device::set_mode(int data, int call_handlers)
 
 	/* store control word */
 	m_control = data;
-}
-
-void ppi8255_set_port_a_read(device_t *device, const devcb_read8 *config)
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(0, *config);
-}
-
-void ppi8255_set_port_b_read(device_t *device, const devcb_read8 *config)
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(1, *config);
-}
-
-void ppi8255_set_port_c_read(device_t *device, const devcb_read8 *config)
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(2, *config);
-}
-
-
-void ppi8255_set_port_a_write(device_t *device, const devcb_write8 *config)
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(0, *config);
-}
-
-void ppi8255_set_port_b_write(device_t *device, const devcb_write8 *config)
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(1, *config);
-}
-
-void ppi8255_set_port_c_write(device_t *device, const devcb_write8 *config)
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(2, *config);
-}
-
-
-void ppi8255_set_port_a( device_t *device, UINT8 data )
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port(0, data);
-}
-
-void ppi8255_set_port_b( device_t *device, UINT8 data )
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port(1, data);
-}
-
-void ppi8255_set_port_c( device_t *device, UINT8 data )
-{
-	downcast<ppi8255_device*>(device)->ppi8255_set_port(2, data);
-}
-
-
-UINT8 ppi8255_get_port_a( device_t *device )
-{
-	return downcast<ppi8255_device*>(device)->ppi8255_get_port(0);
-}
-
-UINT8 ppi8255_get_port_b( device_t *device )
-{
-	return downcast<ppi8255_device*>(device)->ppi8255_get_port(1);
-}
-
-UINT8 ppi8255_get_port_c( device_t *device )
-{
-	return downcast<ppi8255_device*>(device)->ppi8255_get_port(2);
 }

@@ -643,7 +643,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return ppi8255_r(m_ppi8255, offset & 3);
+			return m_ppi8255->read(space, offset & 3);
 
 		case 0x10/2:
 		{
@@ -673,7 +673,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				ppi8255_w(m_ppi8255, offset & 3, data);
+				m_ppi8255->write(space, offset & 3, data);
 			return;
 
 		case 0x20/2:

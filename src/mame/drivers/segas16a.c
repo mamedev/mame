@@ -216,7 +216,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return ppi8255_r(m_ppi8255, offset & 3);
+			return m_ppi8255->read(space, offset & 3);
 
 		case 0x1000/2:
 		{
@@ -356,7 +356,7 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 READ8_MEMBER( segas16a_state::sound_data_r )
 {
 	// assert ACK
-	ppi8255_set_port_c(m_ppi8255, 0x00);
+	m_ppi8255->set_port_c(0x00);
 	return soundlatch_read();
 }
 
@@ -692,7 +692,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			ppi8255_w(m_ppi8255, param >> 8, param & 0xff);
+			m_ppi8255->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 			break;
 	}
 }
