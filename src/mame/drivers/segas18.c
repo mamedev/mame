@@ -63,7 +63,7 @@
 #include "emu.h"
 #include "machine/segaic16.h"
 #include "machine/nvram.h"
-#include "includes/segas16.h"
+#include "includes/segas18.h"
 #include "includes/genesis.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"

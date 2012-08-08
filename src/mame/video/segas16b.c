@@ -36,7 +36,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segas16.h"
+#include "includes/segas16b.h"
 
 
 

@@ -45,7 +45,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segas16.h"
+#include "includes/segahang.h"
 #include "machine/segaic16.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"

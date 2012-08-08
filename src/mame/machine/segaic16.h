@@ -50,10 +50,28 @@
 //**************************************************************************
 
 #define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper, _read, _write) \
-	MCFG_DEVICE_ADD(_tag, SEGA_MEM_MAPPER, 0) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
 	sega_315_5195_mapper_device::static_set_cputag(*device, _cputag); \
 	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, NULL, (_class *)0)); \
 	sega_315_5195_mapper_device::static_set_sound_readwrite(*device, sega_315_5195_mapper_device::sound_read_delegate(&_class::_read, #_class "::" #_read, NULL, (_class *)0), sega_315_5195_mapper_device::sound_write_delegate(&_class::_write, #_class "::" #_write, NULL, (_class *)0)); \
+
+
+#define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0) \
+
+
+#define MCFG_SEGA_315_5249_DIVIDER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5249_DIVIDER, 0) \
+
+
+#define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0) \
+
+#define MCFG_SEGA_315_5250_TIMER_ACK(_class, _func) \
+	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, NULL, (_class *)0)); \
+
+#define MCFG_SEGA_315_5250_SOUND_WRITE(_class, _func) \
+	sega_315_5250_compare_timer_device::static_set_sound_write(*device, sega_315_5250_compare_timer_device::sound_write_delegate(&_class::_func, #_class "::" #_func, NULL, (_class *)0)); \
 
 
 
@@ -74,7 +92,7 @@ public:
 	// construction/destruction
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
+	// static configuration helpers
 	static void static_set_cputag(device_t &device, const char *cpu);
 	static void static_set_mapper(device_t &device, mapper_delegate callback);
 	static void static_set_sound_readwrite(device_t &device, sound_read_delegate read, sound_write_delegate write);
@@ -157,71 +175,106 @@ private:
 };
 
 
-// device type definition
-extern const device_type SEGA_MEM_MAPPER;
+// ======================> sega_315_5248_multiplier_device
 
-
-
-
-#include "devlegcy.h"
-
-/* open bus read helpers */
-READ16_HANDLER( segaic16_open_bus_r );
-
-/*** Sega 16-bit Devices ***/
-
-#include "devcb.h"
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef void (*_315_5250_sound_callback)(running_machine &, UINT8);
-typedef void (*_315_5250_timer_ack_callback)(running_machine &);
-
-typedef struct _ic_315_5250_interface ic_315_5250_interface;
-struct _ic_315_5250_interface
+class sega_315_5248_multiplier_device : public device_t
 {
-	_315_5250_sound_callback          sound_write_callback;
-	_315_5250_timer_ack_callback      timer_ack_callback;
+public:
+	// construction/destruction
+	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// public interface
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	// internal state
+	UINT16						m_regs[4];
 };
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+// ======================> sega_315_5249_divider_device
 
-DECLARE_LEGACY_DEVICE(_315_5248, ic_315_5248);
-DECLARE_LEGACY_DEVICE(_315_5249, ic_315_5249);
-DECLARE_LEGACY_DEVICE(_315_5250, ic_315_5250);
+class sega_315_5249_divider_device : public device_t
+{
+public:
+	// construction/destruction
+	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-#define MCFG_315_5248_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, _315_5248, 0)
+	// public interface
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 
-#define MCFG_315_5249_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, _315_5249, 0)
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
-#define MCFG_315_5250_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, _315_5250, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+private:
+	// internal helpers
+	void execute(int mode);
+
+	// internal state
+	UINT16						m_regs[8];
+};
 
 
-/***************************************************************************
-    DEVICE I/O FUNCTIONS
-***************************************************************************/
+// ======================> sega_315_5250_compare_timer_device
 
-/* multiply chip */
-READ16_DEVICE_HANDLER( segaic16_multiply_r );
-WRITE16_DEVICE_HANDLER( segaic16_multiply_w );
+class sega_315_5250_compare_timer_device : public device_t
+{
+public:
+	typedef device_delegate<void (UINT8)> sound_write_delegate;
+	typedef device_delegate<void ()> timer_ack_delegate;
 
-/* divide chip */
-READ16_DEVICE_HANDLER( segaic16_divide_r );
-WRITE16_DEVICE_HANDLER( segaic16_divide_w );
+	// construction/destruction
+	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-/* compare/timer chip */
-int segaic16_compare_timer_clock( device_t *device );
-READ16_DEVICE_HANDLER( segaic16_compare_timer_r );
-WRITE16_DEVICE_HANDLER( segaic16_compare_timer_w );
+	// static configuration helpers
+	static void static_set_timer_ack(device_t &device, timer_ack_delegate callback);
+	static void static_set_sound_write(device_t &device, sound_write_delegate write);
+
+	// public interface
+	bool clock();
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	// internal helpers
+	void execute(bool update_history = false);
+	void interrupt_ack() { if (!m_timer_ack.isnull()) m_timer_ack(); }
+	
+	// configuration
+	timer_ack_delegate			m_timer_ack;
+	sound_write_delegate		m_sound_write;
+
+	// internal state
+	UINT16						m_regs[16];
+	UINT16						m_counter;
+	UINT8						m_bit;
+};
+
+
+// device type definition
+extern const device_type SEGA_315_5195_MEM_MAPPER;
+extern const device_type SEGA_315_5248_MULTIPLIER;
+extern const device_type SEGA_315_5249_DIVIDER;
+extern const device_type SEGA_315_5250_COMPARE_TIMER;
+
+
+
+/* open bus read helpers */
+READ16_HANDLER( segaic16_open_bus_r );
 
 
 #endif

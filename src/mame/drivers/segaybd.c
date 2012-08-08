@@ -57,7 +57,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/segas16.h"
+#include "includes/segaybd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
 #include "machine/nvram.h"
@@ -449,9 +449,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE_LEGACY("5248_main", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
 	AM_RANGE(0x082000, 0x083fff) AM_WRITE_LEGACY(sound_data_w)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE_LEGACY("5249_main", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x10001f) AM_READWRITE_LEGACY(io_chip_r, io_chip_w)
@@ -471,8 +471,8 @@ static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE_LEGACY("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE_LEGACY("5249_subx", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_subx", sega_315_5248_multiplier_device, read, write)
+	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_1)
 	AM_RANGE(0x1f8000, 0x1fbfff) AM_RAM
@@ -484,8 +484,8 @@ static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE_LEGACY("5248_suby", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE_LEGACY("5249_suby", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_suby", sega_315_5248_multiplier_device, read, write)
+	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_suby", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_BASE_LEGACY(&segaic16_rotateram_0)
 	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
@@ -984,12 +984,12 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_315_5248_ADD("5248_main")
-	MCFG_315_5248_ADD("5248_subx")
-	MCFG_315_5248_ADD("5248_suby")
-	MCFG_315_5249_ADD("5249_main")
-	MCFG_315_5249_ADD("5249_subx")
-	MCFG_315_5249_ADD("5249_suby")
+	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
+	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
+	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_suby")
+	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
+	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
+	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_suby")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

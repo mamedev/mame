@@ -38,14 +38,13 @@
 #include "emu.h"
 #include "segaic16.h"
 #include "video/resnet.h"
-#include "includes/segas16.h"		// needed for fd1094 calls
 
 
 //**************************************************************************
 //	DEBUGGING
 //**************************************************************************
 
-#define LOG_MEMORY_MAP	(1)
+#define LOG_MEMORY_MAP	(0)
 #define LOG_MULTIPLY	(0)
 #define LOG_DIVIDE		(0)
 #define LOG_COMPARE		(0)
@@ -57,7 +56,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type SEGA_MEM_MAPPER = &device_creator<sega_315_5195_mapper_device>;
+const device_type SEGA_315_5195_MEM_MAPPER = &device_creator<sega_315_5195_mapper_device>;
+const device_type SEGA_315_5248_MULTIPLIER = &device_creator<sega_315_5248_multiplier_device>;
+const device_type SEGA_315_5249_DIVIDER = &device_creator<sega_315_5249_divider_device>;
+const device_type SEGA_315_5250_COMPARE_TIMER = &device_creator<sega_315_5250_compare_timer_device>;
 
 
 
@@ -100,7 +102,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 //-------------------------------------------------
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_MEM_MAPPER, "Sega Memory Mapper", tag, owner, clock),
+	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock),
 	  m_cputag(NULL),
 	  m_cpu(NULL),
 	  m_space(NULL),
@@ -505,6 +507,11 @@ void sega_315_5195_mapper_device::update_mapping()
 }
 
 
+
+//**************************************************************************
+//	DECRYPT BANK HELPER CLASS
+//**************************************************************************
+
 //-------------------------------------------------
 //  decrypt_bank - constructor
 //-------------------------------------------------
@@ -620,477 +627,391 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 
 
 
-/*************************************
- *
- *  Multiply chip - 315-5248
- *
- *************************************/
+//**************************************************************************
+//	315-5248 MULTIPLIER
+//**************************************************************************
 
-typedef struct _ic_315_5248_state ic_315_5248_state ;
-struct _ic_315_5248_state
+//-------------------------------------------------
+//  sega_315_5248_multiplier_device - constructor
+//-------------------------------------------------
+
+sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5248 Multiplier", tag, owner, clock)
 {
-	UINT16	regs[4];
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE ic_315_5248_state *_315_5248_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == _315_5248);
-
-	return (ic_315_5248_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-/*****************************************************************************
-    IMPLEMENTATION
-*****************************************************************************/
 
-READ16_DEVICE_HANDLER ( segaic16_multiply_r )
+//-------------------------------------------------
+//  read - read the registers
+//-------------------------------------------------
+
+READ16_MEMBER( sega_315_5248_multiplier_device::read )
 {
-	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
-
-	offset &= 3;
-	switch (offset)
+	switch (offset & 3)
 	{
-		case 0:	return ic_315_5248->regs[0];
-		case 1:	return ic_315_5248->regs[1];
-		case 2:	return ((INT16)ic_315_5248->regs[0] * (INT16)ic_315_5248->regs[1]) >> 16;
-		case 3:	return ((INT16)ic_315_5248->regs[0] * (INT16)ic_315_5248->regs[1]) & 0xffff;
+		// if bit 1 is 0, just return register values
+		case 0:	return m_regs[0];
+		case 1:	return m_regs[1];
+		
+		// if bit 1 is 1, return ther results
+		case 2:	return (INT16(m_regs[0]) * INT16(m_regs[1])) >> 16;
+		case 3:	return (INT16(m_regs[0]) * INT16(m_regs[1])) & 0xffff;
+	}
+	
+	// should never get here
+	return 0xffff;
+}
+
+
+//-------------------------------------------------
+//  write - write to the registers
+//-------------------------------------------------
+
+WRITE16_MEMBER( sega_315_5248_multiplier_device::write )
+{
+	// only low bit matters
+	COMBINE_DATA(&m_regs[offset & 1]);
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sega_315_5248_multiplier_device::device_start()
+{
+	save_item(NAME(m_regs));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sega_315_5248_multiplier_device::device_reset()
+{
+	memset(m_regs, 0, sizeof(m_regs));
+}
+
+
+
+//**************************************************************************
+//	315-5249 DIVIDER
+//**************************************************************************
+
+//-------------------------------------------------
+//  sega_315_5249_divider_device - constructor
+//-------------------------------------------------
+
+sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5249 Divider", tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  read - read the registers
+//-------------------------------------------------
+
+READ16_MEMBER( sega_315_5249_divider_device::read )
+{
+	// 8 effective read registers
+	switch (offset & 7)
+	{
+		case 0:	return m_regs[0];	// dividend high
+		case 1:	return m_regs[1];	// dividend low
+		case 2:	return m_regs[2];	// divisor
+		case 4: return m_regs[4];	// quotient (mode 0) or quotient high (mode 1)
+		case 5:	return m_regs[5];	// remainder (mode 0) or quotient low (mode 1)
+		case 6: return m_regs[6];	// flags
 	}
 	return 0xffff;
 }
 
 
-WRITE16_DEVICE_HANDLER( segaic16_multiply_w )
-{
-	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
+//-------------------------------------------------
+//  write - write to the registers
+//-------------------------------------------------
 
-	offset &= 3;
-	switch (offset)
+WRITE16_MEMBER( sega_315_5249_divider_device::write )
+{
+	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
+
+	// only 4 effective write registers
+	switch (offset & 3)
 	{
-		case 0:	COMBINE_DATA(&ic_315_5248->regs[0]);	break;
-		case 1:	COMBINE_DATA(&ic_315_5248->regs[1]);	break;
-		case 2:	COMBINE_DATA(&ic_315_5248->regs[0]);	break;
-		case 3:	COMBINE_DATA(&ic_315_5248->regs[1]);	break;
+		case 0:	COMBINE_DATA(&m_regs[0]); break;	// dividend high
+		case 1:	COMBINE_DATA(&m_regs[1]); break;	// dividend low
+		case 2:	COMBINE_DATA(&m_regs[2]); break;	// divisor/trigger
+		case 3:	break;
 	}
+
+	// if A4 line is high, divide, using A3 as the mode
+	if (offset & 8)
+		execute(offset & 4);
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
 
-static DEVICE_START( ic_315_5248 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sega_315_5249_divider_device::device_start()
 {
-	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
-
-	device->save_item(NAME(ic_315_5248->regs));
+	save_item(NAME(m_regs));
 }
 
-static DEVICE_RESET( ic_315_5248 )
-{
-	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
-	int i;
 
-	for (i = 0; i < 4; i++)
-		ic_315_5248->regs[i] = 0;
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sega_315_5249_divider_device::device_reset()
+{
+	memset(m_regs, 0, sizeof(m_regs));
 }
 
-/*************************************
- *
- *  Divide chip - 315-5249
- *
- *************************************/
 
-typedef struct _ic_315_5249_state ic_315_5249_state ;
-struct _ic_315_5249_state
+//-------------------------------------------------
+//  execute - execute the divide
+//-------------------------------------------------
+
+void sega_315_5249_divider_device::execute(int mode)
 {
-	UINT16	regs[8];
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE ic_315_5249_state *_315_5249_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == _315_5249);
-
-	return (ic_315_5249_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-/*****************************************************************************
-    IMPLEMENTATION
-*****************************************************************************/
-
-static void update_divide( device_t *device, int mode )
-{
-	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
-
 	// clear the flags by default
-	ic_315_5249->regs[6] = 0;
+	m_regs[6] = 0;
 
-	// if mode 0, store quotient/remainder
+	// mode 0: signed divide, return 16-bit quotient/remainder
 	if (mode == 0)
 	{
-		INT32 dividend = (INT32)((ic_315_5249->regs[0] << 16) | ic_315_5249->regs[1]);
-		INT32 divisor = (INT16)ic_315_5249->regs[2];
-		INT32 quotient, remainder;
-
 		// perform signed divide
+		INT32 dividend = INT32((m_regs[0] << 16) | m_regs[1]);
+		INT32 divisor = INT16(m_regs[2]);
+		INT32 quotient;
+		
+		// check for divide by 0, signal if we did
 		if (divisor == 0)
 		{
 			quotient = dividend;//((INT32)(dividend ^ divisor) < 0) ? 0x8000 : 0x7fff;
-			ic_315_5249->regs[6] |= 0x4000;
+			m_regs[6] |= 0x4000;
 		}
 		else
 			quotient = dividend / divisor;
 
-		remainder = dividend - quotient * divisor;
-
-		// clamp to 16-bit signed
+		// clamp to 16-bit signed, signal overflow if we did
 		if (quotient < -32768)
 		{
 			quotient = -32768;
-			ic_315_5249->regs[6] |= 0x8000;
+			m_regs[6] |= 0x8000;
 		}
 		else if (quotient > 32767)
 		{
 			quotient = 32767;
-			ic_315_5249->regs[6] |= 0x8000;
+			m_regs[6] |= 0x8000;
 		}
 
 		// store quotient and remainder
-		ic_315_5249->regs[4] = quotient;
-		ic_315_5249->regs[5] = remainder;
+		m_regs[4] = INT16(quotient);
+		m_regs[5] = INT16(dividend - quotient * divisor);
 	}
 
-	// if mode 1, store 32-bit quotient
+	// mode 1: unsigned divide, 32-bit quotient only
 	else
 	{
-		UINT32 dividend = (UINT32)((ic_315_5249->regs[0] << 16) | ic_315_5249->regs[1]);
-		UINT32 divisor = (UINT16)ic_315_5249->regs[2];
+		// perform unsigned divide
+		UINT32 dividend = UINT32((m_regs[0] << 16) | m_regs[1]);
+		UINT32 divisor = UINT16(m_regs[2]);
 		UINT32 quotient;
 
-		// perform unsigned divide
+		// check for divide by 0, signal if we did
 		if (divisor == 0)
 		{
 			quotient = dividend;//0x7fffffff;
-			ic_315_5249->regs[6] |= 0x4000;
+			m_regs[6] |= 0x4000;
 		}
 		else
 			quotient = dividend / divisor;
 
 		// store 32-bit quotient
-		ic_315_5249->regs[4] = quotient >> 16;
-		ic_315_5249->regs[5] = quotient & 0xffff;
+		m_regs[4] = quotient >> 16;
+		m_regs[5] = quotient & 0xffff;
 	}
 }
 
-READ16_DEVICE_HANDLER ( segaic16_divide_r )
+
+//**************************************************************************
+//	315-5250 COMPARE/TIMER
+//**************************************************************************
+
+//-------------------------------------------------
+//  sega_315_5250_compare_timer_device - 
+//	constructor
+//-------------------------------------------------
+
+sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, "Sega 315-5250 Compare/Timer", tag, owner, clock)
 {
-	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
-
-	// 8 effective read registers
-	offset &= 7;
-	switch (offset)
-	{
-		case 0:	return ic_315_5249->regs[0];	// dividend high
-		case 1:	return ic_315_5249->regs[1];	// dividend low
-		case 2:	return ic_315_5249->regs[2];	// divisor
-		case 4: 	return ic_315_5249->regs[4];	// quotient (mode 0) or quotient high (mode 1)
-		case 5:	return ic_315_5249->regs[5];	// remainder (mode 0) or quotient low (mode 1)
-		case 6: 	return ic_315_5249->regs[6];	// flags
-	}
-
-	return 0xffff;
 }
 
 
-WRITE16_DEVICE_HANDLER( segaic16_divide_w )
+//-------------------------------------------------
+//  static_set_timer_ack - configuration helper
+//  to set the timer acknowledge function
+//-------------------------------------------------
+
+void sega_315_5250_compare_timer_device::static_set_timer_ack(device_t &device, timer_ack_delegate callback)
 {
-	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
-	int a4 = offset & 8;
-	int a3 = offset & 4;
-
-	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
-
-	// only 4 effective write registers
-	offset &= 3;
-	switch (offset)
-	{
-		case 0:	COMBINE_DATA(&ic_315_5249->regs[0]); break;	// dividend high
-		case 1:	COMBINE_DATA(&ic_315_5249->regs[1]); break;	// dividend low
-		case 2:	COMBINE_DATA(&ic_315_5249->regs[2]); break;	// divisor/trigger
-		case 3:	break;
-	}
-
-	// if a4 line is high, divide, using a3 as the mode
-	if (a4) update_divide(device, a3);
+	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
+	timer.m_timer_ack = callback;
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
 
-static DEVICE_START( ic_315_5249 )
+//-------------------------------------------------
+//  static_set_sound_readwrite - configuration 
+//	helper to set the sound read/write callbacks
+//-------------------------------------------------
+
+void sega_315_5250_compare_timer_device::static_set_sound_write(device_t &device, sound_write_delegate write)
 {
-	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
-
-	device->save_item(NAME(ic_315_5249->regs));
+	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
+	timer.m_sound_write = write;
 }
 
-static DEVICE_RESET( ic_315_5249 )
+
+//-------------------------------------------------
+//  clock - clock the timer
+//-------------------------------------------------
+
+bool sega_315_5250_compare_timer_device::clock()
 {
-	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
-	int i;
-
-	for (i = 0; i < 8; i++)
-		ic_315_5249->regs[i] = 0;
-}
-
-/*************************************
- *
- *  Compare/timer chip - 315-5250
- *
- *************************************/
-
-typedef struct _ic_315_5250_state ic_315_5250_state ;
-struct _ic_315_5250_state
-{
-	UINT16	regs[16];
-	UINT16	counter;
-	UINT8	      bit;
-	_315_5250_sound_callback       sound_w;
-	_315_5250_timer_ack_callback   timer_ack;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE ic_315_5250_state *_315_5250_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == _315_5250);
-
-	return (ic_315_5250_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-INLINE const ic_315_5250_interface *_315_5250_get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == _315_5250));
-	return (const ic_315_5250_interface *) device->static_config();
-}
-
-/*****************************************************************************
-    IMPLEMENTATION
-*****************************************************************************/
-
-int segaic16_compare_timer_clock( device_t *device )
-{
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
-	int old_counter = ic_315_5250->counter;
-	int result = 0;
-
 	// if we're enabled, clock the upcounter
-	if (ic_315_5250->regs[10] & 1)
-		ic_315_5250->counter++;
+	int old_counter = m_counter;
+	if (m_regs[10] & 1)
+		m_counter++;
 
 	// regardless of the enable, a value of 0xfff will generate the IRQ
+	bool result = false;
 	if (old_counter == 0xfff)
 	{
-		result = 1;
-		ic_315_5250->counter = ic_315_5250->regs[8] & 0xfff;
+		result = true;
+		m_counter = m_regs[8] & 0xfff;
 	}
 	return result;
 }
 
 
-static void update_compare( device_t *device, int update_history )
+//-------------------------------------------------
+//  read - read the registers
+//-------------------------------------------------
+
+READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 {
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
-	int bound1 = (INT16)ic_315_5250->regs[0];
-	int bound2 = (INT16)ic_315_5250->regs[1];
-	int value = (INT16)ic_315_5250->regs[2];
-	int min = (bound1 < bound2) ? bound1 : bound2;
-	int max = (bound1 > bound2) ? bound1 : bound2;
-
-	if (value < min)
+	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
+	switch (offset & 15)
 	{
-		ic_315_5250->regs[7] = min;
-		ic_315_5250->regs[3] = 0x8000;
-	}
-	else if (value > max)
-	{
-		ic_315_5250->regs[7] = max;
-		ic_315_5250->regs[3] = 0x4000;
-	}
-	else
-	{
-		ic_315_5250->regs[7] = value;
-		ic_315_5250->regs[3] = 0x0000;
-	}
-
-	if (update_history)
-		ic_315_5250->regs[4] |= (ic_315_5250->regs[3] == 0) << ic_315_5250->bit++;
-}
-
-
-static void timer_interrupt_ack( device_t *device )
-{
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
-
-	if (ic_315_5250->timer_ack)
-		(*ic_315_5250->timer_ack)(device->machine());
-}
-
-
-READ16_DEVICE_HANDLER ( segaic16_compare_timer_r )
-{
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
-
-	offset &= 0xf;
-	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, ic_315_5250->regs[offset]);
-	switch (offset)
-	{
-		case 0x0:	return ic_315_5250->regs[0];
-		case 0x1:	return ic_315_5250->regs[1];
-		case 0x2:	return ic_315_5250->regs[2];
-		case 0x3:	return ic_315_5250->regs[3];
-		case 0x4:	return ic_315_5250->regs[4];
-		case 0x5:	return ic_315_5250->regs[1];
-		case 0x6:	return ic_315_5250->regs[2];
-		case 0x7:	return ic_315_5250->regs[7];
+		case 0x0:	return m_regs[0];
+		case 0x1:	return m_regs[1];
+		case 0x2:	return m_regs[2];
+		case 0x3:	return m_regs[3];
+		case 0x4:	return m_regs[4];
+		case 0x5:	return m_regs[1];
+		case 0x6:	return m_regs[2];
+		case 0x7:	return m_regs[7];
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(device); break;
+		case 0xd:	interrupt_ack(); break;
 	}
 	return 0xffff;
 }
 
 
-WRITE16_DEVICE_HANDLER ( segaic16_compare_timer_w )
-{
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
+//-------------------------------------------------
+//  write - write to the registers
+//-------------------------------------------------
 
-	offset &= 0xf;
+WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
+{
 	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
-	switch (offset)
+	switch (offset & 15)
 	{
-		case 0x0:	COMBINE_DATA(&ic_315_5250->regs[0]); update_compare(device, 0); break;
-		case 0x1:	COMBINE_DATA(&ic_315_5250->regs[1]); update_compare(device, 0); break;
-		case 0x2:	COMBINE_DATA(&ic_315_5250->regs[2]); update_compare(device, 1); break;
-		case 0x4:	ic_315_5250->regs[4] = 0; ic_315_5250->bit = 0; break;
-		case 0x6:	COMBINE_DATA(&ic_315_5250->regs[2]); update_compare(device, 0); break;
+		case 0x0:	COMBINE_DATA(&m_regs[0]); execute(); break;
+		case 0x1:	COMBINE_DATA(&m_regs[1]); execute(); break;
+		case 0x2:	COMBINE_DATA(&m_regs[2]); execute(true); break;
+		case 0x4:	m_regs[4] = 0; m_bit = 0; break;
+		case 0x6:	COMBINE_DATA(&m_regs[2]); execute(); break;
 		case 0x8:
-		case 0xc:	COMBINE_DATA(&ic_315_5250->regs[8]); break;
+		case 0xc:	COMBINE_DATA(&m_regs[8]); break;
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(device); break;
+		case 0xd:	interrupt_ack(); break;
 		case 0xa:
-		case 0xe:	COMBINE_DATA(&ic_315_5250->regs[10]); break;
+		case 0xe:	COMBINE_DATA(&m_regs[10]); break;
 		case 0xb:
 		case 0xf:
-			COMBINE_DATA(&ic_315_5250->regs[11]);
-			if (ic_315_5250->sound_w)
-				(*ic_315_5250->sound_w)(device->machine(), ic_315_5250->regs[11]);
+			COMBINE_DATA(&m_regs[11]);
+			if (!m_sound_write.isnull())
+				m_sound_write(m_regs[11]);
 			break;
 	}
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
 
-static DEVICE_START( ic_315_5250 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sega_315_5250_compare_timer_device::device_start()
 {
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
-	const ic_315_5250_interface *intf = _315_5250_get_interface(device);
+	// bind our handlers
+	m_timer_ack.bind_relative_to(*owner());
+	m_sound_write.bind_relative_to(*owner());
 
-	ic_315_5250->sound_w = intf->sound_write_callback;
-	ic_315_5250->timer_ack = intf->timer_ack_callback;
-
-	device->save_item(NAME(ic_315_5250->counter));
-	device->save_item(NAME(ic_315_5250->bit));
-	device->save_item(NAME(ic_315_5250->regs));
-}
-
-static DEVICE_RESET( ic_315_5250 )
-{
-	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
-
-	memset(&ic_315_5250, 0, sizeof(ic_315_5250));
+	// save states
+	save_item(NAME(m_regs));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_bit));
 }
 
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-DEVICE_GET_INFO( ic_315_5248 )
+void sega_315_5250_compare_timer_device::device_reset()
 {
-	switch (state)
+	memset(m_regs, 0, sizeof(m_regs));
+	m_counter = 0;
+	m_bit = 0;
+}
+
+
+//-------------------------------------------------
+//  execute - execute the compare
+//-------------------------------------------------
+
+void sega_315_5250_compare_timer_device::execute(bool update_history)
+{
+	INT16 bound1 = INT16(m_regs[0]);
+	INT16 bound2 = INT16(m_regs[1]);
+	INT16 value = INT16(m_regs[2]);
+
+	INT16 min = (bound1 < bound2) ? bound1 : bound2;
+	INT16 max = (bound1 > bound2) ? bound1 : bound2;
+
+	if (value < min)
 	{
-		// --- the following bits of info are returned as 64-bit signed integers ---
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5248_state);					break;
-
-		// --- the following bits of info are returned as pointers to data or functions ---
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5248);		break;
-		case DEVINFO_FCT_STOP:					// Nothing									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ic_315_5248);		break;
-
-		// --- the following bits of info are returned as NULL-terminated strings ---
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega 315-5248");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega Custom IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+		m_regs[7] = min;
+		m_regs[3] = 0x8000;
 	}
-}
-
-DEVICE_GET_INFO( ic_315_5249 )
-{
-	switch (state)
+	else if (value > max)
 	{
-		// --- the following bits of info are returned as 64-bit signed integers ---
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5249_state);					break;
-
-		// --- the following bits of info are returned as pointers to data or functions ---
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5249);		break;
-		case DEVINFO_FCT_STOP:					// Nothing									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ic_315_5249);		break;
-
-		// --- the following bits of info are returned as NULL-terminated strings ---
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega 315-5249");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega Custom IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+		m_regs[7] = max;
+		m_regs[3] = 0x4000;
 	}
-}
-
-DEVICE_GET_INFO( ic_315_5250 )
-{
-	switch (state)
+	else
 	{
-		// --- the following bits of info are returned as 64-bit signed integers ---
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5250_state);					break;
-
-		// --- the following bits of info are returned as pointers to data or functions ---
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5250);		break;
-		case DEVINFO_FCT_STOP:					// Nothing									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ic_315_5250);		break;
-
-		// --- the following bits of info are returned as NULL-terminated strings ---
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega 315-5250");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Sega Custom IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+		m_regs[7] = value;
+		m_regs[3] = 0x0000;
 	}
+
+	if (update_history)
+		m_regs[4] |= (m_regs[3] == 0) << m_bit++;
 }
-
-
-DEFINE_LEGACY_DEVICE(_315_5248, ic_315_5248);
-DEFINE_LEGACY_DEVICE(_315_5249, ic_315_5249);
-DEFINE_LEGACY_DEVICE(_315_5250, ic_315_5250);

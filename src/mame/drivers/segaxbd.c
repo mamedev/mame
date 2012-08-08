@@ -292,7 +292,7 @@ ROMs:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/segas16.h"
+#include "includes/segaxbd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
 #include "machine/nvram.h"
@@ -350,7 +350,7 @@ static TIMER_CALLBACK( scanline_callback )
 	int update = 0;
 
 	/* clock the timer and set the IRQ if something happened */
-	if ((scanline % 2) != 0 && segaic16_compare_timer_clock(state->m_315_5250_1))
+	if ((scanline % 2) != 0 && state->m_cmptimer_1->clock())
 		state->m_timer_irq_state = update = 1;
 
 	/* set VBLANK on scanline 223 */
@@ -379,13 +379,11 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-static void timer_ack_callback(running_machine &machine)
+void segaxbd_state::timer_ack_callback()
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
-
 	/* clear the timer IRQ */
-	state->m_timer_irq_state = 0;
-	update_main_irqs(machine);
+	m_timer_irq_state = 0;
+	update_main_irqs(machine());
 }
 
 
@@ -410,9 +408,9 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 }
 
 
-static void sound_data_w(running_machine &machine, UINT8 data)
+void segaxbd_state::sound_data_w(UINT8 data)
 {
-	machine.scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
@@ -741,9 +739,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_BASE_LEGACY(&segaic16_tileram_0)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_BASE_LEGACY(&segaic16_textram_0)
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE_LEGACY("5248_main", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5249_main", segaic16_divide_r, segaic16_divide_w)
-	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5250_main", segaic16_compare_timer_r, segaic16_compare_timer_w)
+	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
+	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
+	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("cmptimer_main", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0x110000, 0x11ffff) AM_WRITE_LEGACY(segaic16_sprites_draw_0_w)
 	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
@@ -754,9 +752,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("subcpu", 0x00000)
 	AM_RANGE(0x280000, 0x283fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x2a0000, 0x2a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE_LEGACY("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5249_subx", segaic16_divide_r, segaic16_divide_w)
-	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE_LEGACY("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
+	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_subx", sega_315_5248_multiplier_device, read, write)
+	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
+	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE_LEGACY(&segaic16_roadram_0)
 	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE_LEGACY(excs_r, excs_w)
@@ -778,9 +776,9 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE_LEGACY("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5249_subx", segaic16_divide_r, segaic16_divide_w)
-	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE_LEGACY("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
+	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_subx", sega_315_5248_multiplier_device, read, write)
+	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
+	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x0ec000, 0x0ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5")
 	AM_RANGE(0x0ee000, 0x0effff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE_LEGACY(excs_r, excs_w)
@@ -1466,16 +1464,6 @@ static MACHINE_RESET( xboard )
 }
 
 
-static const ic_315_5250_interface segaxb_5250_1_intf =
-{
-	sound_data_w, timer_ack_callback
-};
-
-static const ic_315_5250_interface segaxb_5250_2_intf =
-{
-	NULL, NULL
-};
-
 static MACHINE_CONFIG_START( xboard, segaxbd_state )
 
 	/* basic machine hardware */
@@ -1495,12 +1483,16 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 	MCFG_NVRAM_ADD_0FILL("backup2")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_315_5248_ADD("5248_main")
-	MCFG_315_5248_ADD("5248_subx")
-	MCFG_315_5249_ADD("5249_main")
-	MCFG_315_5249_ADD("5249_subx")
-	MCFG_315_5250_ADD("5250_main", segaxb_5250_1_intf)
-	MCFG_315_5250_ADD("5250_subx", segaxb_5250_2_intf)
+	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
+	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
+	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
+	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
+	
+	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
+	MCFG_SEGA_315_5250_TIMER_ACK(segaxbd_state, timer_ack_callback)
+	MCFG_SEGA_315_5250_SOUND_WRITE(segaxbd_state, sound_data_w)
+
+	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
 	/* video hardware */
 	MCFG_GFXDECODE(segaxbd)

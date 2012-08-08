@@ -901,7 +901,7 @@ CPU  - 317-0092  |--------------------------------------------------------------
 #define MODERN_DRIVER_INIT
 
 #include "emu.h"
-#include "includes/segas16.h"
+#include "includes/segas16b.h"
 #include "machine/segaic16.h"
 #include "machine/mc8123.h"
 #include "includes/segaipt.h"
@@ -1046,11 +1046,11 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			// multiply registers
-			return segaic16_multiply_r(m_315_5248_1, offset & 3, mem_mask);
+			return m_multiplier->read(space, offset, mem_mask);
 
 		case 0x1000/2:
 			// compare registers
-			return segaic16_compare_timer_r(m_315_5250_1, offset & 7, mem_mask);
+			return m_cmptimer_1->read(space, offset, mem_mask);
 	}
 	return segaic16_open_bus_r(&space, 0, mem_mask);
 }
@@ -1068,12 +1068,12 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			// multiply registers
-			segaic16_multiply_w(m_315_5248_1, offset & 3, data, mem_mask);
+			m_multiplier->write(space, offset, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			// compare registers
-			segaic16_compare_timer_w(m_315_5250_1, offset & 7, data, mem_mask);
+			m_cmptimer_1->write(space, offset, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1092,7 +1092,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return segaic16_compare_timer_r(m_315_5250_2, offset & 7, mem_mask);
+	return m_cmptimer_2->read(space, offset, mem_mask);
 }
 
 
@@ -1104,7 +1104,7 @@ READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	segaic16_compare_timer_w(m_315_5250_2, offset & 7, data, mem_mask);
+	m_cmptimer_2->write(space, offset, data, mem_mask);
 }
 
 
@@ -1338,9 +1338,9 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
 		case TID_INIT_I8751:
 			if (!m_i8751_vblank_hook.isnull())
-				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
-			else if (m_mcu != NULL)
 				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
+			else if (m_mcu != NULL)
+				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 
 		// generate a periodic IRQ to the sound CPU		
@@ -3350,27 +3350,22 @@ MACHINE_CONFIG_END
 
 // same as the above, but with custom Sega ICs
 
-static const ic_315_5250_interface sys16b_5250_intf =
-{
-	NULL, NULL
-};
-
-static MACHINE_CONFIG_DERIVED( system16b_5248, system16b )
-	MCFG_315_5248_ADD("315_5248")
-	MCFG_315_5250_ADD("315_5250_1", sys16b_5250_intf)
-	MCFG_315_5250_ADD("315_5250_2", sys16b_5250_intf)
+static MACHINE_CONFIG_FRAGMENT( rom_5797_fragment )
+	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier")
+	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_1")
+	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16b_i8751_5248, system16b_i8751 )
-	MCFG_315_5248_ADD("315_5248")
-	MCFG_315_5250_ADD("315_5250_1", sys16b_5250_intf)
-	MCFG_315_5250_ADD("315_5250_2", sys16b_5250_intf)
+static MACHINE_CONFIG_DERIVED( system16b_5797, system16b )
+	MCFG_FRAGMENT_ADD(rom_5797_fragment)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16b_fd1094_5248, system16b_fd1094 )
-	MCFG_315_5248_ADD("315_5248")
-	MCFG_315_5250_ADD("315_5250_1", sys16b_5250_intf)
-	MCFG_315_5250_ADD("315_5250_2", sys16b_5250_intf)
+static MACHINE_CONFIG_DERIVED( system16b_i8751_5797, system16b_i8751 )
+	MCFG_FRAGMENT_ADD(rom_5797_fragment)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( system16b_fd1094_5797, system16b_fd1094 )
+	MCFG_FRAGMENT_ADD(rom_5797_fragment)
 MACHINE_CONFIG_END
 
 
@@ -6618,26 +6613,26 @@ GAME( 1988, ddux1,      ddux,     system16b_i8751,     ddux,     segas16b_state,
 
 GAME( 1986, dunkshot,   0,        system16b_fd1089a,   dunkshot, segas16b_state,init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b_fd1094_5248,eswat,   segas16b_state,init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b_fd1094_5248,eswat,   segas16b_state,init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b_fd1094_5248,eswat,   segas16b_state,init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
+GAME( 1989, eswat,      0,        system16b_fd1094_5797,eswat,   segas16b_state,init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
 
 GAME( 1988, exctleag,   0,        system16b_fd1094,    exctleag, segas16b_state,init_exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
 
 GAME( 1989, fpoint,     0,        system16b_fd1094,    fpoint,   segas16b_state,init_generic_5358,       ROT0,   "Sega", "Flash Point (set 2, Japan, FD1094 317-0127A)", 0 )
 GAME( 1989, fpoint1,    fpoint,   system16b_fd1094,    fpoint,   segas16b_state,init_generic_5704,       ROT0,   "Sega", "Flash Point (set 1, Japan, FD1094 317-0127A)", 0 )
 
-GAME( 1989, goldnaxe,   0,        system16b_i8751_5248,goldnaxe, segas16b_state,init_goldnaxe_5797,      ROT0,   "Sega", "Golden Axe (set 6, US, 8751 317-123A)", 0 )
-GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5248,goldnaxe,segas16b_state,init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
+GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,goldnaxe, segas16b_state,init_goldnaxe_5797,      ROT0,   "Sega", "Golden Axe (set 6, US, 8751 317-123A)", 0 )
+GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
 GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan, FD1094 317-0121)", 0 )
 GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World, FD1094 317-0120)", 0)
 GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,     goldnaxe, segas16b_state,init_goldnaxe_5704,      ROT0,   "Sega", "Golden Axe (set 2, US, 8751 317-0112)", 0 )
-GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5248,goldnaxe,segas16b_state,init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
+GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
 
 GAME( 1987, hwchamp,    0,        system16b,           hwchamp,  segas16b_state,init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
 GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,    hwchamp,  segas16b_state,init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan, FD1094 317-0046)", 0 )
 
-GAME( 1989, mvp,        0,        system16b_fd1094_5248,mvp,     segas16b_state,init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US, FD1094 317-0143)", 0 )
+GAME( 1989, mvp,        0,        system16b_fd1094_5797,mvp,     segas16b_state,init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US, FD1094 317-0143)", 0 )
 GAME( 1989, mvpj,       mvp,      system16b_fd1094,    mvp,      segas16b_state,init_generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan, FD1094 317-0142)", 0 )
 
 GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,init_generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
@@ -6668,7 +6663,7 @@ GAME( 1988, tetris1,    tetris,   system16b_fd1094,    tetris,   segas16b_state,
 
 GAME( 1987, timescan,   0,        system16b,           timescan, segas16b_state,init_timescan_5358_small, ROT270, "Sega", "Time Scanner (set 2, System 16B)", 0 )
 
-GAME( 1994, toryumon,   0,        system16b_5248,      toryumon, segas16b_state,init_generic_5797,       ROT0,   "Sega", "Toryumon", 0 )
+GAME( 1994, toryumon,   0,        system16b_5797,      toryumon, segas16b_state,init_generic_5797,       ROT0,   "Sega", "Toryumon", 0 )
 
 GAME( 1989, tturf,      0,        system16b_i8751,     tturf,    segas16b_state,init_tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", GAME_NO_SOUND ) // due to missing ROM only
 GAME( 1989, tturfu,     tturf,    system16b_i8751,     tturf,    segas16b_state,init_generic_5358,       ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)

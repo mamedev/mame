@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Sega Y-board hardware
+    Sega System Hang On hardware
 
 ****************************************************************************
 
@@ -35,60 +35,51 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "includes/segaybd.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/z80/z80.h"
+#include "machine/8255ppi.h"
+#include "machine/segaic16.h"
+#include "video/segaic16.h"
 
 
-/*************************************
- *
- *  Video startup
- *
- *************************************/
+// ======================> segahang_state
 
-VIDEO_START( yboard )
+class segahang_state : public driver_device
 {
-	segaybd_state *state = machine.driver_data<segaybd_state>();
+public:
+	// construction/destruction
+	segahang_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_subcpu(*this, "subcpu"),
+		  m_soundcpu(*this, "soundcpu"),
+		  m_mcu(*this, "mcu"),
+		  m_ppi8255_1(*this, "ppi8255_1"),
+		  m_ppi8255_2(*this, "ppi8255_2"),
+		  m_i8751_vblank_hook(NULL),
+		  m_adc_select(0)
+	{ }
 
-	/* compute palette info */
-	segaic16_palette_init(0x2000);
+//protected:
+	// devices
+	required_device<m68000_device> m_maincpu;
+	required_device<m68000_device> m_subcpu;
+	required_device<z80_device> m_soundcpu;
+	optional_device<i8751_device> m_mcu;
+	required_device<ppi8255_device> m_ppi8255_1;
+	required_device<ppi8255_device> m_ppi8255_2;
+	
+	// configuration
+	void (*m_i8751_vblank_hook)(running_machine &machine);
 
-	/* allocate a bitmap for the yboard layer */
-	state->m_tmp_bitmap = auto_bitmap_ind16_alloc(machine, 512, 512);
-
-	/* initialize the rotation layer */
-	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
-
-	state->save_item(NAME(*state->m_tmp_bitmap));
-}
+	// internal state
+	UINT8 		m_adc_select;
+};
 
 
+/*----------- defined in video/segahang.c -----------*/
 
-/*************************************
- *
- *  Video update
- *
- *************************************/
-
-SCREEN_UPDATE_IND16( yboard )
-{
-	segaybd_state *state = screen.machine().driver_data<segaybd_state>();
-	rectangle yboard_clip;
-
-	/* if no drawing is happening, fill with black and get out */
-	if (!segaic16_display_enable)
-	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
-		return 0;
-	}
-
-	/* draw the yboard sprites */
-	yboard_clip.set(0, 511, 0, 511);
-	segaic16_sprites_draw(screen, *state->m_tmp_bitmap, yboard_clip, 1);
-
-	/* apply rotation */
-	segaic16_rotate_draw(screen.machine(), 0, bitmap, cliprect, state->m_tmp_bitmap);
-
-	/* draw the 16B sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
-	return 0;
-}
+VIDEO_START( hangon );
+VIDEO_START( sharrier );
+SCREEN_UPDATE_IND16( hangon );

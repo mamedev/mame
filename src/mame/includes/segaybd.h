@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Sega Y-board hardware
+    Sega Y-Board hardware
 
 ****************************************************************************
 
@@ -35,60 +35,48 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "includes/segaybd.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/segaic16.h"
+#include "video/segaic16.h"
 
 
-/*************************************
- *
- *  Video startup
- *
- *************************************/
+// ======================> segaybd_state
 
-VIDEO_START( yboard )
+class segaybd_state : public driver_device
 {
-	segaybd_state *state = machine.driver_data<segaybd_state>();
-
-	/* compute palette info */
-	segaic16_palette_init(0x2000);
-
-	/* allocate a bitmap for the yboard layer */
-	state->m_tmp_bitmap = auto_bitmap_ind16_alloc(machine, 512, 512);
-
-	/* initialize the rotation layer */
-	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
-
-	state->save_item(NAME(*state->m_tmp_bitmap));
-}
-
-
-
-/*************************************
- *
- *  Video update
- *
- *************************************/
-
-SCREEN_UPDATE_IND16( yboard )
-{
-	segaybd_state *state = screen.machine().driver_data<segaybd_state>();
-	rectangle yboard_clip;
-
-	/* if no drawing is happening, fill with black and get out */
-	if (!segaic16_display_enable)
+public:
+	// construction/destruction
+	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_subx(*this, "subx"),
+		  m_suby(*this, "suby"),
+		  m_soundcpu(*this, "soundcpu")
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
-		return 0;
+		memset(m_analog_data, 0, sizeof(m_analog_data));
+		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 	}
 
-	/* draw the yboard sprites */
-	yboard_clip.set(0, 511, 0, 511);
-	segaic16_sprites_draw(screen, *state->m_tmp_bitmap, yboard_clip, 1);
+//protected:
+	// devices
+	required_device<m68000_device> m_maincpu;
+	required_device<m68000_device> m_subx;
+	required_device<m68000_device> m_suby;
+	required_device<z80_device> m_soundcpu;
 
-	/* apply rotation */
-	segaic16_rotate_draw(screen.machine(), 0, bitmap, cliprect, state->m_tmp_bitmap);
+	// internal state
+	emu_timer *		m_scanline_timer;
+	UINT8 			m_analog_data[4];
+	int 			m_irq2_scanline;
+	UINT8 			m_timer_irq_state;
+	UINT8 			m_vblank_irq_state;
+	UINT8 			m_misc_io_data[0x10];
+	bitmap_ind16 *	m_tmp_bitmap;
+};
 
-	/* draw the 16B sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
-	return 0;
-}
+
+/*----------- defined in video/segaybd.c -----------*/
+
+VIDEO_START( yboard );
+SCREEN_UPDATE_IND16( yboard );
