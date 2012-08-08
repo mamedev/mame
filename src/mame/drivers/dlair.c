@@ -443,7 +443,7 @@ ADDRESS_MAP_END
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8, dlair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE_LEGACY("sio", z80sio_ba_cd_r, z80sio_ba_cd_w)
 ADDRESS_MAP_END
 

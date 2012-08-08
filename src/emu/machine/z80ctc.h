@@ -90,6 +90,14 @@ public:
 	UINT8 read(int ch) { return m_channel[ch].read(); }
 	void write(int ch, UINT8 data) { m_channel[ch].write(data); }
 	void trigger(int ch, UINT8 data) { m_channel[ch].trigger(data); }
+	
+	// read/write handlers
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( trg0 );
+	DECLARE_WRITE_LINE_MEMBER( trg1 );
+	DECLARE_WRITE_LINE_MEMBER( trg2 );
+	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
 private:
 	// device-level overrides
@@ -149,20 +157,6 @@ private:
 
 // device type definition
 extern const device_type Z80CTC;
-
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-WRITE8_DEVICE_HANDLER( z80ctc_w );
-READ8_DEVICE_HANDLER( z80ctc_r );
-
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg0_w );
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg1_w );
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg2_w );
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w );
 
 
 #endif

@@ -87,6 +87,37 @@ z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
+//  read - standard handler for reading
+//-------------------------------------------------
+
+READ8_MEMBER( z80ctc_device::read )
+{
+	return read(offset & 3);
+}
+
+
+//-------------------------------------------------
+//  write - standard handler for writing
+//-------------------------------------------------
+
+WRITE8_MEMBER( z80ctc_device::write )
+{
+	write(offset & 3, data);
+}
+
+
+//-------------------------------------------------
+//  trg0-3 - standard write line handlers for each
+//	trigger
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { trigger(0, state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg1 ) { trigger(1, state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg2 ) { trigger(2, state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { trigger(3, state); }
+
+
+//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -510,17 +541,3 @@ void z80ctc_device::ctc_channel::timer_callback()
 	// reset the down counter
 	m_down = m_tconst;
 }
-
-
-
-//**************************************************************************
-//  GLOBAL STUBS
-//**************************************************************************
-
-WRITE8_DEVICE_HANDLER( z80ctc_w ) { downcast<z80ctc_device *>(device)->write(offset & 3, data); }
-READ8_DEVICE_HANDLER( z80ctc_r ) { return downcast<z80ctc_device *>(device)->read(offset & 3); }
-
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg0_w ) { downcast<z80ctc_device *>(device)->trigger(0, state); }
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg1_w ) { downcast<z80ctc_device *>(device)->trigger(1, state); }
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg2_w ) { downcast<z80ctc_device *>(device)->trigger(2, state); }
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w ) { downcast<z80ctc_device *>(device)->trigger(3, state); }

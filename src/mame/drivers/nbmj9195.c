@@ -613,9 +613,9 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_1_dir_pe_w)
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
-	device_t *ctc = device->machine().device("main_ctc");
-	z80ctc_trg1_w(ctc, 1);
-	z80ctc_trg1_w(ctc, 0);
+	z80ctc_device *ctc = device->machine().device<z80ctc_device>("main_ctc");
+	ctc->trg1(1);
+	ctc->trg1(0);
 }
 
 static Z80CTC_INTERFACE( ctc_intf_main )
@@ -631,7 +631,7 @@ static Z80CTC_INTERFACE( ctc_intf_audio )
 {
 	0,							/* timer disables */
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_LINE(z80ctc_trg3_w),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_DEVICE_LINE_MEMBER("audio_ctc", z80ctc_device, trg3),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
 	DEVCB_NULL,					/* ZC/TO1 callback */
 	DEVCB_NULL					/* ZC/TO2 callback */
 };
@@ -665,7 +665,7 @@ static DRIVER_INIT( nbmj9195 )
 }
 
 static ADDRESS_MAP_START( tmpz84c011_regs, AS_IO, 8, nbmj9195_state )
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("main_ctc", z80ctc_r,z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("main_ctc", z80ctc_device, read, write)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r,tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r,tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r,tmpz84c011_0_pc_w)
@@ -1157,7 +1157,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("audio_ctc", z80ctc_r,z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("audio_ctc", z80ctc_device, read, write)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_1_pa_r,tmpz84c011_1_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_1_pb_r,tmpz84c011_1_pb_w)
 	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_1_pc_r,tmpz84c011_1_pc_w)

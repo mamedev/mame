@@ -38,10 +38,10 @@ public:
 	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, 0, data); }
 	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, 1, data); }
 
-	DECLARE_WRITE8_MEMBER( ctc_w0 ) { z80ctc_w(m_z80ctc, 0, data); }
-	DECLARE_WRITE8_MEMBER( ctc_w1 ) { z80ctc_w(m_z80ctc, 1, data); }
-	DECLARE_WRITE8_MEMBER( ctc_w2 ) { z80ctc_w(m_z80ctc, 2, data); }
-	DECLARE_WRITE8_MEMBER( ctc_w3 ) { z80ctc_w(m_z80ctc, 3, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w0 ) { m_z80ctc->write(0, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w1 ) { m_z80ctc->write(1, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w2 ) { m_z80ctc->write(2, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w3 ) { m_z80ctc->write(3, data); }
 
 	DECLARE_WRITE8_MEMBER( sio_w0 ) { z80sio_cd_ba_w(m_z80sio, 0, data); }
 	DECLARE_WRITE8_MEMBER( sio_w1 ) { z80sio_cd_ba_w(m_z80sio, 1, data); }
@@ -75,10 +75,10 @@ public:
 
 	DECLARE_READ8_MEMBER( ay_r0 ) { return ay8910_r(m_ay, 0); }
 
-	DECLARE_READ8_MEMBER( ctc_r0 ) { return z80ctc_r(m_z80ctc, 0); }
-	DECLARE_READ8_MEMBER( ctc_r1 ) { return z80ctc_r(m_z80ctc, 1); }
-	DECLARE_READ8_MEMBER( ctc_r2 ) { return z80ctc_r(m_z80ctc, 2); }
-	DECLARE_READ8_MEMBER( ctc_r3 ) { return z80ctc_r(m_z80ctc, 3); }
+	DECLARE_READ8_MEMBER( ctc_r0 ) { return m_z80ctc->read(0); }
+	DECLARE_READ8_MEMBER( ctc_r1 ) { return m_z80ctc->read(1); }
+	DECLARE_READ8_MEMBER( ctc_r2 ) { return m_z80ctc->read(2); }
+	DECLARE_READ8_MEMBER( ctc_r3 ) { return m_z80ctc->read(3); }
 
 	DECLARE_READ8_MEMBER( sio_r0 ) { return z80sio_cd_ba_r(m_z80sio, 0); }
 	DECLARE_READ8_MEMBER( sio_r1 ) { return z80sio_cd_ba_r(m_z80sio, 1); }

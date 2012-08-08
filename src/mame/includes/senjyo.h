@@ -1,4 +1,4 @@
-#include "sound/samples.h"
+#include "sound/dac.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
@@ -7,7 +7,8 @@ class senjyo_state : public driver_device
 {
 public:
 	senjyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_dac(*this, "dac"),
 		m_spriteram(*this, "spriteram"),
 		m_fgscroll(*this, "fgscroll"),
 		m_scrollx1(*this, "scrollx1"),
@@ -29,6 +30,9 @@ public:
 	INT16 *m_single_data;
 	int m_single_rate;
 	int m_single_volume;
+	int m_sound_state;
+	
+	required_device<dac_device> m_dac;
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_fgscroll;
@@ -64,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(senjyo_bg3videoram_w);
 	DECLARE_WRITE8_MEMBER(senjyo_bgstripes_w);
 	DECLARE_WRITE8_MEMBER(senjyo_volume_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 };
 
@@ -73,8 +78,6 @@ public:
 extern const z80_daisy_config senjyo_daisy_chain[];
 extern const z80pio_interface senjyo_pio_intf;
 extern const z80ctc_interface senjyo_ctc_intf;
-
-SAMPLES_START( senjyo_sh_start );
 
 
 /*----------- defined in video/senjyo.c -----------*/

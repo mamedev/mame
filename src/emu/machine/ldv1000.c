@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8, pioneer_ldv1000_device )
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(z80_decoder_display_port_r, z80_decoder_display_port_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(z80_controller_r)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(z80_controller_w)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE_LEGACY("ldvctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ldvctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 

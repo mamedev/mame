@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( senjyo_sound_io_map, AS_IO, 8, senjyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 /* For the bootleg */
@@ -552,14 +552,6 @@ GFXDECODE_END
 
 
 
-static const samples_interface senjyo_samples_interface =
-{
-	1,
-	NULL,
-	senjyo_sh_start
-};
-
-
 static MACHINE_CONFIG_START( senjyo, senjyo_state )
 
 	/* basic machine hardware */
@@ -602,8 +594,8 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SAMPLES_ADD("samples", senjyo_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
 

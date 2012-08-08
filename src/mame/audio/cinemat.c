@@ -1435,8 +1435,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_device, write)
+	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_device, write)
 ADDRESS_MAP_END
 
 

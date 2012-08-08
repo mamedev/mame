@@ -106,7 +106,7 @@ Z80CTC_INTERFACE( mcr_ctc_intf )
 {
 	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(z80ctc_trg1_w),	/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),	/* ZC/TO0 callback */
 	DEVCB_NULL,             	/* ZC/TO1 callback */
 	DEVCB_NULL              	/* ZC/TO2 callback */
 };
@@ -187,38 +187,38 @@ MACHINE_RESET( mcr )
 TIMER_DEVICE_CALLBACK( mcr_interrupt )
 {
 	//mcr_state *state = timer.machine().driver_data<mcr_state>();
-	device_t *ctc = timer.machine().device("ctc");
+	z80ctc_device *ctc = timer.machine().device<z80ctc_device>("ctc");
 	int scanline = param;
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
 	if(scanline == 0 || scanline == 240)
 	{
-		z80ctc_trg2_w(ctc, 1);
-		z80ctc_trg2_w(ctc, 0);
+		ctc->trg2(1);
+		ctc->trg2(0);
 	}
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (scanline == 0)
 	{
-		z80ctc_trg3_w(ctc, 1);
-		z80ctc_trg3_w(ctc, 0);
+		ctc->trg3(1);
+		ctc->trg3(0);
 	}
 }
 
 TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt )
 {
 	//mcr_state *state = timer.machine().driver_data<mcr_state>();
-	device_t *ctc = timer.machine().device("ctc");
+	z80ctc_device *ctc = timer.machine().device<z80ctc_device>("ctc");
 	int scanline = param;
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (scanline == 0)
 	{
-		z80ctc_trg3_w(ctc, 1);
-		z80ctc_trg3_w(ctc, 0);
+		ctc->trg3(1);
+		ctc->trg3(0);
 	}
 }
 

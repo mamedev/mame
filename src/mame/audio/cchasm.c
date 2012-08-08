@@ -17,7 +17,7 @@ WRITE8_MEMBER(cchasm_state::cchasm_reset_coin_flag_w)
 	if (m_coin_flag)
 	{
 		m_coin_flag = 0;
-		z80ctc_trg0_w(m_ctc, m_coin_flag);
+		m_ctc->trg0(m_coin_flag);
 	}
 }
 
@@ -26,7 +26,7 @@ INPUT_CHANGED_MEMBER(cchasm_state::cchasm_set_coin_flag )
 	if (!newval && !m_coin_flag)
 	{
 		m_coin_flag = 1;
-		z80ctc_trg0_w(m_ctc, m_coin_flag);
+		m_ctc->trg0(m_coin_flag);
 	}
 }
 
@@ -39,7 +39,7 @@ READ8_MEMBER(cchasm_state::cchasm_coin_sound_r)
 READ8_MEMBER(cchasm_state::cchasm_soundlatch2_r)
 {
 	m_sound_flags &= ~0x80;
-	z80ctc_trg2_w(m_ctc, 0);
+	m_ctc->trg2(0);
 	return soundlatch2_byte_r(space, offset);
 }
 
@@ -65,7 +65,7 @@ WRITE16_MEMBER(cchasm_state::cchasm_io_w)
 		case 1:
 			m_sound_flags |= 0x80;
 			soundlatch2_byte_w(space, offset, data);
-			z80ctc_trg2_w(m_ctc, 1);
+			m_ctc->trg2(1);
 			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
@@ -134,5 +134,5 @@ SOUND_START( cchasm )
 	state->m_sound_flags = 0;
 	state->m_output[0] = 0; state->m_output[1] = 0;
 
-	state->m_ctc = machine.device("ctc");
+	state->m_ctc = machine.device<z80ctc_device>("ctc");
 }

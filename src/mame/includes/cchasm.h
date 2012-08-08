@@ -15,7 +15,7 @@ public:
 
 	int m_sound_flags;
 	int m_coin_flag;
-	device_t *m_ctc;
+	z80ctc_device *m_ctc;
 	int m_channel_active[2];
 	int m_output[2];
 	required_shared_ptr<UINT16> m_ram;
