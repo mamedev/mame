@@ -48,30 +48,30 @@ public:
 	DECLARE_WRITE8_MEMBER( sio_w2 ) { z80sio_cd_ba_w(m_z80sio, 2, data); }
 	DECLARE_WRITE8_MEMBER( sio_w3 ) { z80sio_cd_ba_w(m_z80sio, 3, data); }
 
-	DECLARE_WRITE8_MEMBER( pio1_w0 ) { z80pio_cd_ba_w(m_z80pio_1, 0, data); }
-	DECLARE_WRITE8_MEMBER( pio1_w1 ) { z80pio_cd_ba_w(m_z80pio_1, 1, data); }
-	DECLARE_WRITE8_MEMBER( pio1_w2 ) { z80pio_cd_ba_w(m_z80pio_1, 2, data); }
-	DECLARE_WRITE8_MEMBER( pio1_w3 ) { z80pio_cd_ba_w(m_z80pio_1, 3, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w0 ) { m_z80pio_1->write(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w1 ) { m_z80pio_1->write(space, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w2 ) { m_z80pio_1->write(space, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w3 ) { m_z80pio_1->write(space, 3, data); }
 
-	DECLARE_WRITE8_MEMBER( pio2_w0 ) { z80pio_cd_ba_w(m_z80pio_2, 0, data); }
-	DECLARE_WRITE8_MEMBER( pio2_w1 ) { z80pio_cd_ba_w(m_z80pio_2, 1, data); }
-	DECLARE_WRITE8_MEMBER( pio2_w2 ) { z80pio_cd_ba_w(m_z80pio_2, 2, data); }
-	DECLARE_WRITE8_MEMBER( pio2_w3 ) { z80pio_cd_ba_w(m_z80pio_2, 3, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w0 ) { m_z80pio_2->write(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w1 ) { m_z80pio_2->write(space, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w2 ) { m_z80pio_2->write(space, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w3 ) { m_z80pio_2->write(space, 3, data); }
 
-	DECLARE_WRITE8_MEMBER( pio3_w0 ) { z80pio_cd_ba_w(m_z80pio_3, 0, data); }
-	DECLARE_WRITE8_MEMBER( pio3_w1 ) { z80pio_cd_ba_w(m_z80pio_3, 1, data); }
-	DECLARE_WRITE8_MEMBER( pio3_w2 ) { z80pio_cd_ba_w(m_z80pio_3, 2, data); }
-	DECLARE_WRITE8_MEMBER( pio3_w3 ) { z80pio_cd_ba_w(m_z80pio_3, 3, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w0 ) { m_z80pio_3->write(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w1 ) { m_z80pio_3->write(space, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w2 ) { m_z80pio_3->write(space, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w3 ) { m_z80pio_3->write(space, 3, data); }
 
-	DECLARE_WRITE8_MEMBER( pio4_w0 ) { z80pio_cd_ba_w(m_z80pio_4, 0, data); }
-	DECLARE_WRITE8_MEMBER( pio4_w1 ) { z80pio_cd_ba_w(m_z80pio_4, 1, data); }
-	DECLARE_WRITE8_MEMBER( pio4_w2 ) { z80pio_cd_ba_w(m_z80pio_4, 2, data); }
-	DECLARE_WRITE8_MEMBER( pio4_w3 ) { z80pio_cd_ba_w(m_z80pio_4, 3, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w0 ) { m_z80pio_4->write(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w1 ) { m_z80pio_4->write(space, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w2 ) { m_z80pio_4->write(space, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w3 ) { m_z80pio_4->write(space, 3, data); }
 
-	DECLARE_WRITE8_MEMBER( pio5_w0 ) { z80pio_cd_ba_w(m_z80pio_5, 0, data); }
-	DECLARE_WRITE8_MEMBER( pio5_w1 ) { z80pio_cd_ba_w(m_z80pio_5, 1, data); }
-	DECLARE_WRITE8_MEMBER( pio5_w2 ) { z80pio_cd_ba_w(m_z80pio_5, 2, data); }
-	DECLARE_WRITE8_MEMBER( pio5_w3 ) { z80pio_cd_ba_w(m_z80pio_5, 3, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w0 ) { m_z80pio_5->write(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w1 ) { m_z80pio_5->write(space, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w2 ) { m_z80pio_5->write(space, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w3 ) { m_z80pio_5->write(space, 3, data); }
 
 	DECLARE_READ8_MEMBER( ay_r0 ) { return ay8910_r(m_ay, 0); }
 
@@ -85,30 +85,30 @@ public:
 	DECLARE_READ8_MEMBER( sio_r2 ) { return z80sio_cd_ba_r(m_z80sio, 2); }
 	DECLARE_READ8_MEMBER( sio_r3 ) { return z80sio_cd_ba_r(m_z80sio, 3); }
 
-	DECLARE_READ8_MEMBER( pio1_r0 ) { return z80pio_cd_ba_r(m_z80pio_1, 0); }
-	DECLARE_READ8_MEMBER( pio1_r1 ) { return z80pio_cd_ba_r(m_z80pio_1, 1); }
-	DECLARE_READ8_MEMBER( pio1_r2 ) { return z80pio_cd_ba_r(m_z80pio_1, 2); }
-	DECLARE_READ8_MEMBER( pio1_r3 ) { return z80pio_cd_ba_r(m_z80pio_1, 3); }
+	DECLARE_READ8_MEMBER( pio1_r0 ) { return m_z80pio_1->read(space, 0); }
+	DECLARE_READ8_MEMBER( pio1_r1 ) { return m_z80pio_1->read(space, 1); }
+	DECLARE_READ8_MEMBER( pio1_r2 ) { return m_z80pio_1->read(space, 2); }
+	DECLARE_READ8_MEMBER( pio1_r3 ) { return m_z80pio_1->read(space, 3); }
 
-	DECLARE_READ8_MEMBER( pio2_r0 ) { return z80pio_cd_ba_r(m_z80pio_2, 0); }
-	DECLARE_READ8_MEMBER( pio2_r1 ) { return z80pio_cd_ba_r(m_z80pio_2, 1); }
-	DECLARE_READ8_MEMBER( pio2_r2 ) { return z80pio_cd_ba_r(m_z80pio_2, 2); }
-	DECLARE_READ8_MEMBER( pio2_r3 ) { return z80pio_cd_ba_r(m_z80pio_2, 3); }
+	DECLARE_READ8_MEMBER( pio2_r0 ) { return m_z80pio_2->read(space, 0); }
+	DECLARE_READ8_MEMBER( pio2_r1 ) { return m_z80pio_2->read(space, 1); }
+	DECLARE_READ8_MEMBER( pio2_r2 ) { return m_z80pio_2->read(space, 2); }
+	DECLARE_READ8_MEMBER( pio2_r3 ) { return m_z80pio_2->read(space, 3); }
 
-	DECLARE_READ8_MEMBER( pio3_r0 ) { return z80pio_cd_ba_r(m_z80pio_3, 0); }
-	DECLARE_READ8_MEMBER( pio3_r1 ) { return z80pio_cd_ba_r(m_z80pio_3, 1); }
-	DECLARE_READ8_MEMBER( pio3_r2 ) { return z80pio_cd_ba_r(m_z80pio_3, 2); }
-	DECLARE_READ8_MEMBER( pio3_r3 ) { return z80pio_cd_ba_r(m_z80pio_3, 3); }
+	DECLARE_READ8_MEMBER( pio3_r0 ) { return m_z80pio_3->read(space, 0); }
+	DECLARE_READ8_MEMBER( pio3_r1 ) { return m_z80pio_3->read(space, 1); }
+	DECLARE_READ8_MEMBER( pio3_r2 ) { return m_z80pio_3->read(space, 2); }
+	DECLARE_READ8_MEMBER( pio3_r3 ) { return m_z80pio_3->read(space, 3); }
 
-	DECLARE_READ8_MEMBER( pio4_r0 ) { return z80pio_cd_ba_r(m_z80pio_4, 0); }
-	DECLARE_READ8_MEMBER( pio4_r1 ) { return z80pio_cd_ba_r(m_z80pio_4, 1); }
-	DECLARE_READ8_MEMBER( pio4_r2 ) { return z80pio_cd_ba_r(m_z80pio_4, 2); }
-	DECLARE_READ8_MEMBER( pio4_r3 ) { return z80pio_cd_ba_r(m_z80pio_4, 3); }
+	DECLARE_READ8_MEMBER( pio4_r0 ) { return m_z80pio_4->read(space, 0); }
+	DECLARE_READ8_MEMBER( pio4_r1 ) { return m_z80pio_4->read(space, 1); }
+	DECLARE_READ8_MEMBER( pio4_r2 ) { return m_z80pio_4->read(space, 2); }
+	DECLARE_READ8_MEMBER( pio4_r3 ) { return m_z80pio_4->read(space, 3); }
 
-	DECLARE_READ8_MEMBER( pio5_r0 ) { return z80pio_cd_ba_r(m_z80pio_5, 0); }
-	DECLARE_READ8_MEMBER( pio5_r1 ) { return z80pio_cd_ba_r(m_z80pio_5, 1); }
-	DECLARE_READ8_MEMBER( pio5_r2 ) { return z80pio_cd_ba_r(m_z80pio_5, 2); }
-	DECLARE_READ8_MEMBER( pio5_r3 ) { return z80pio_cd_ba_r(m_z80pio_5, 3); }
+	DECLARE_READ8_MEMBER( pio5_r0 ) { return m_z80pio_5->read(space, 0); }
+	DECLARE_READ8_MEMBER( pio5_r1 ) { return m_z80pio_5->read(space, 1); }
+	DECLARE_READ8_MEMBER( pio5_r2 ) { return m_z80pio_5->read(space, 2); }
+	DECLARE_READ8_MEMBER( pio5_r3 ) { return m_z80pio_5->read(space, 3); }
 
 protected:
 

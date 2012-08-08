@@ -751,10 +751,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipu_91695_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE_LEGACY("ipu_pio0", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio0", z80pio_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE_LEGACY("ipu_sio", z80sio_cd_ba_r, z80sio_cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_ctc", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE_LEGACY("ipu_pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio1", z80pio_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(mcr_ipu_laserdisk_w)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xe0) AM_READWRITE(mcr_ipu_watchdog_r, mcr_ipu_watchdog_w)
 ADDRESS_MAP_END

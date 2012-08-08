@@ -130,13 +130,16 @@ class meritm_state : public driver_device
 public:
 	meritm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_z80pio_0(*this, "z80pio_0"),
+		  m_z80pio_1(*this, "z80pio_1"),
 		  m_v9938_0(*this, "v9938_0"),
 		  m_v9938_1(*this, "v9938_1"),
 		  m_microtouch(*this, "microtouch") { }
 
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT8* m_ram;
-	device_t *m_z80pio[2];
+	required_device<z80pio_device> m_z80pio_0;
+	required_device<z80pio_device> m_z80pio_1;
 	int m_vint;
 	int m_interrupt_vdp0_state;
 	int m_interrupt_vdp1_state;
@@ -603,8 +606,8 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
@@ -615,8 +618,8 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
@@ -636,8 +639,8 @@ static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
@@ -984,13 +987,11 @@ static const z80_daisy_config meritm_daisy_chain[] =
 static MACHINE_START(merit_common)
 {
 	meritm_state *state = machine.driver_data<meritm_state>();
-	state->m_z80pio[0] = machine.device( "z80pio_0" );
-	state->m_z80pio[1] = machine.device( "z80pio_1" );
 
-	z80pio_astb_w(state->m_z80pio[0], 1);
-	z80pio_bstb_w(state->m_z80pio[0], 1);
-	z80pio_astb_w(state->m_z80pio[1], 1);
-	z80pio_bstb_w(state->m_z80pio[1], 1);
+	state->m_z80pio_0->strobe_a(1);
+	state->m_z80pio_0->strobe_b(1);
+	state->m_z80pio_1->strobe_a(1);
+	state->m_z80pio_1->strobe_b(1);
 };
 
 static MACHINE_START(meritm_crt250)
@@ -1049,7 +1050,7 @@ static TIMER_DEVICE_CALLBACK( vblank_start_tick )
 	meritm_state *state = timer.machine().driver_data<meritm_state>();
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
 	state->m_vint = 0x08;
-	z80pio_pa_w(state->m_z80pio[0], 0, state->m_vint);
+	state->m_z80pio_0->port_a_write(state->m_vint);
 }
 
 static TIMER_DEVICE_CALLBACK( vblank_end_tick )
@@ -1057,7 +1058,7 @@ static TIMER_DEVICE_CALLBACK( vblank_end_tick )
 	meritm_state *state = timer.machine().driver_data<meritm_state>();
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
 	state->m_vint = 0x18;
-	z80pio_pa_w(state->m_z80pio[0], 0, state->m_vint);
+	state->m_z80pio_0->port_a_write(state->m_vint);
 }
 
 static MACHINE_CONFIG_START( meritm_crt250, meritm_state )

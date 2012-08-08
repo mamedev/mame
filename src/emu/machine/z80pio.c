@@ -211,6 +211,52 @@ void z80pio_device::z80daisy_irq_reti()
 
 
 //**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read - register read
+//-------------------------------------------------
+
+READ8_MEMBER( z80pio_device::read )
+{
+	int index = BIT(offset, 0);
+	return BIT(offset, 1) ? control_read() : data_read(index);
+}
+
+//-------------------------------------------------
+//  write - register write
+//-------------------------------------------------
+
+WRITE8_MEMBER( z80pio_device::write )
+{
+	int index = BIT(offset, 0);
+	BIT(offset, 1) ? control_write(index, data) : data_write(index, data);
+}
+
+//-------------------------------------------------
+//  read_alt - register read
+//-------------------------------------------------
+
+READ8_MEMBER( z80pio_device::read_alt )
+{
+	int index = BIT(offset, 1);
+	return BIT(offset, 0) ? control_read() : data_read(index);
+}
+
+//-------------------------------------------------
+//  write_alt - register write
+//-------------------------------------------------
+
+WRITE8_MEMBER( z80pio_device::write_alt )
+{
+	int index = BIT(offset, 1);
+	BIT(offset, 0) ? control_write(index, data) : data_write(index, data);
+}
+
+
+
+//**************************************************************************
 //  DEVICE-LEVEL IMPLEMENTATION
 //**************************************************************************
 
@@ -773,72 +819,4 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		m_out_p_func(0, m_ior | (m_output & (m_ior ^ 0xff)));
 		break;
 	}
-}
-
-
-
-//**************************************************************************
-//  GLOBAL STUBS
-//**************************************************************************
-
-READ8_DEVICE_HANDLER( z80pio_c_r ) { return downcast<z80pio_device *>(device)->control_read(); }
-WRITE8_DEVICE_HANDLER( z80pio_c_w ) { downcast<z80pio_device *>(device)->control_write(offset & 1, data); }
-
-READ8_DEVICE_HANDLER( z80pio_d_r ) { return downcast<z80pio_device *>(device)->data_read(offset & 1); }
-WRITE8_DEVICE_HANDLER( z80pio_d_w ) { downcast<z80pio_device *>(device)->data_write(offset & 1, data); }
-
-READ_LINE_DEVICE_HANDLER( z80pio_ardy_r ) { return downcast<z80pio_device *>(device)->rdy(z80pio_device::PORT_A); }
-READ_LINE_DEVICE_HANDLER( z80pio_brdy_r ) { return downcast<z80pio_device *>(device)->rdy(z80pio_device::PORT_B); }
-
-WRITE_LINE_DEVICE_HANDLER( z80pio_astb_w ) { downcast<z80pio_device *>(device)->strobe(z80pio_device::PORT_A, state ? true : false); }
-WRITE_LINE_DEVICE_HANDLER( z80pio_bstb_w ) { downcast<z80pio_device *>(device)->strobe(z80pio_device::PORT_B, state ? true : false); }
-
-READ8_DEVICE_HANDLER( z80pio_pa_r ) { return downcast<z80pio_device *>(device)->port_read(z80pio_device::PORT_A); }
-READ8_DEVICE_HANDLER( z80pio_pb_r ) { return downcast<z80pio_device *>(device)->port_read(z80pio_device::PORT_B); }
-
-WRITE8_DEVICE_HANDLER( z80pio_pa_w ) { downcast<z80pio_device *>(device)->port_write(z80pio_device::PORT_A, data); }
-WRITE8_DEVICE_HANDLER( z80pio_pb_w ) { downcast<z80pio_device *>(device)->port_write(z80pio_device::PORT_B, data); }
-
-//-------------------------------------------------
-//  z80pio_cd_ba_r - register read
-//-------------------------------------------------
-
-READ8_DEVICE_HANDLER( z80pio_cd_ba_r )
-{
-	int index = BIT(offset, 0);
-
-	return BIT(offset, 1) ? z80pio_c_r(device, index) : z80pio_d_r(device, index);
-}
-
-//-------------------------------------------------
-//  z80pio_cd_ba_w - register write
-//-------------------------------------------------
-
-WRITE8_DEVICE_HANDLER( z80pio_cd_ba_w )
-{
-	int index = BIT(offset, 0);
-
-	BIT(offset, 1) ? z80pio_c_w(device, index, data) : z80pio_d_w(device, index, data);
-}
-
-//-------------------------------------------------
-//  z80pio_ba_cd_r - register read
-//-------------------------------------------------
-
-READ8_DEVICE_HANDLER( z80pio_ba_cd_r )
-{
-	int index = BIT(offset, 1);
-
-	return BIT(offset, 0) ? z80pio_c_r(device, index) : z80pio_d_r(device, index);
-}
-
-//-------------------------------------------------
-//  z80pio_ba_cd_w - register write
-//-------------------------------------------------
-
-WRITE8_DEVICE_HANDLER( z80pio_ba_cd_w )
-{
-	int index = BIT(offset, 1);
-
-	BIT(offset, 0) ? z80pio_c_w(device, index, data) : z80pio_d_w(device, index, data);
 }

@@ -104,12 +104,12 @@ WRITE8_MEMBER(senjyo_state::flip_screen_w)
 
 WRITE8_MEMBER(senjyo_state::sound_cmd_w)
 {
-	device_t *device = machine().device("z80pio");
+	z80pio_device *device = machine().device<z80pio_device>("z80pio");
 
 	m_sound_cmd = data;
 
-	z80pio_astb_w(device, 0);
-	z80pio_astb_w(device, 1);
+	device->strobe_a(0);
+	device->strobe_a(1);
 }
 
 WRITE8_MEMBER(senjyo_state::senjyo_paletteram_w)
@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( senjyo_sound_io_map, AS_IO, 8, senjyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 

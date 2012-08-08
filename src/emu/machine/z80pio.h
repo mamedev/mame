@@ -91,18 +91,40 @@ public:
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
 	void strobe(int which, bool state) { m_port[which].strobe(state); }
+	DECLARE_READ_LINE_MEMBER( rdy_a ) { return rdy(PORT_A); }
+	DECLARE_READ_LINE_MEMBER( rdy_b ) { return rdy(PORT_B); }
+	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { strobe(PORT_A, state); }
+	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { strobe(PORT_B, state); }
 
 	// control register I/O
 	UINT8 control_read();
 	void control_write(int offset, UINT8 data) { m_port[offset & 1].control_write(data); }
+	void control_a_write(UINT8 data) { control_write(PORT_A, data); }
+	void control_b_write(UINT8 data) { control_write(PORT_B, data); }
 
 	// data register I/O
 	UINT8 data_read(int offset) { return m_port[offset & 1].data_read(); }
 	void data_write(int offset, UINT8 data) { m_port[offset & 1].data_write(data); }
+	UINT8 data_a_read() { return data_read(PORT_A); }
+	UINT8 data_b_read() { return data_read(PORT_B); }
+	void data_a_write(UINT8 data) { data_write(PORT_A, data); }
+	void data_b_write(UINT8 data) { data_write(PORT_B, data); }
 
 	// port I/O
 	UINT8 port_read(int offset) { return m_port[offset & 1].read(); }
 	void port_write(int offset, UINT8 data) { m_port[offset & 1].write(data); }
+	UINT8 port_a_read() { return port_read(PORT_A); }
+	UINT8 port_b_read() { return port_read(PORT_B); }
+	void port_a_write(UINT8 data) { port_write(PORT_A, data); }
+	void port_b_write(UINT8 data) { port_write(PORT_B, data); }
+	
+	// standard read/write, with C/D in bit 1, B/A in bit 0
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	// alternate read/write, with C/D in bit 0, B/A in bit 1
+	DECLARE_READ8_MEMBER( read_alt );
+	DECLARE_WRITE8_MEMBER( write_alt );
 
 private:
 	// device-level overrides
@@ -182,40 +204,5 @@ private:
 // device type definition
 extern const device_type Z80PIO;
 
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-// control register access
-READ8_DEVICE_HANDLER( z80pio_c_r );
-WRITE8_DEVICE_HANDLER( z80pio_c_w );
-
-// data register access
-READ8_DEVICE_HANDLER( z80pio_d_r );
-WRITE8_DEVICE_HANDLER( z80pio_d_w );
-
-// register access
-READ8_DEVICE_HANDLER( z80pio_cd_ba_r );
-WRITE8_DEVICE_HANDLER( z80pio_cd_ba_w );
-
-READ8_DEVICE_HANDLER( z80pio_ba_cd_r );
-WRITE8_DEVICE_HANDLER( z80pio_ba_cd_w );
-
-// port access
-READ8_DEVICE_HANDLER( z80pio_pa_r );
-WRITE8_DEVICE_HANDLER( z80pio_pa_w );
-
-READ8_DEVICE_HANDLER( z80pio_pb_r );
-WRITE8_DEVICE_HANDLER( z80pio_pb_w );
-
-// ready
-READ_LINE_DEVICE_HANDLER( z80pio_ardy_r );
-READ_LINE_DEVICE_HANDLER( z80pio_brdy_r );
-
-// strobe
-WRITE_LINE_DEVICE_HANDLER( z80pio_astb_w );
-WRITE_LINE_DEVICE_HANDLER( z80pio_bstb_w );
 
 #endif

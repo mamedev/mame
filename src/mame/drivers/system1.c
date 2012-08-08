@@ -760,7 +760,7 @@ static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8, system1_state )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")	/* DIP1 some games read it from here... */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")	/* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_device, read, write)
 ADDRESS_MAP_END
 
 
