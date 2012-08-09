@@ -63,10 +63,13 @@ The other has the secondary label 351100210 with a serial number labeled:
  S/N: SIURxxxx (xxxx=number of PCB)
  SPACE INVADERS U/R
 
+Both boards have the same program code and either can be set to Coin or Free Play
+as well as Up Right, Cocktail or Flip Screen from the service menu.
+
     Memory map:
     000000-1fffff: program ROM
     200000-20ffff: Work RAM
-    400000-400003: OKIM9810
+    400000-400003: OKI M9810
     600000-61ffff: VRAM
     620000-620005: video registers
  
@@ -74,7 +77,7 @@ The other has the secondary label 351100210 with a serial number labeled:
     port 1: player 2 inputs
  
     port 2 bit 3: must be "1" to avoid SERVICE ERROR
-	port 2 bit 6: FPGA chip select
+    port 2 bit 6: FPGA chip select
     port 2 bit 7: FPGA clock in
 
     port 3 bit 0: FPGA status (1 for ready)
@@ -128,7 +131,7 @@ public:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portg_r);
 
-    DECLARE_WRITE16_MEMBER(vctl_w);
+	DECLARE_WRITE16_MEMBER(vctl_w);
 
 protected:
 	// devices
@@ -140,7 +143,7 @@ protected:
 	virtual void video_start();
 
 private:
-    UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
+	UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
 
@@ -152,60 +155,60 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	int x,y;
 
-    // this means freeze or blank or something
-    if (m_vctl == 0x100)
-    {
-        return 0;
-    }
+	// this means freeze or blank or something
+	if (m_vctl == 0x100)
+	{
+		return 0;
+	}
 
-    if (m_vctl == 0x0000)
-    {
-        for(y=0;y<256;y++)
-        {
-            for(x=0;x<256;x++)
-            {
-                UINT8 r,g,b;
-                int pen_data;
+	if (m_vctl == 0x0000)
+	{
+		for(y=0;y<256;y++)
+		{
+			for(x=0;x<256;x++)
+			{
+				UINT8 r,g,b;
+				int pen_data;
 
-                pen_data = (m_vram[(x+y*256)]);
-                b = (pen_data & 0x001f);
-                g = (pen_data & 0x03e0) >> 5;
-                r = (pen_data & 0x7c00) >> 10;
-                r = (r << 3) | (r & 0x7);
-                g = (g << 3) | (g & 0x7);
-                b = (b << 3) | (b & 0x7);
+				pen_data = (m_vram[(x+y*256)]);
+				b = (pen_data & 0x001f);
+				g = (pen_data & 0x03e0) >> 5;
+				r = (pen_data & 0x7c00) >> 10;
+				r = (r << 3) | (r & 0x7);
+				g = (g << 3) | (g & 0x7);
+				b = (b << 3) | (b & 0x7);
 
-                if(cliprect.contains(x, y))
-                    bitmap.pix32(y, x) = r << 16 | g << 8 | b;
-            }
-        }
-    }
-    else if (m_vctl == 0x0001)  // flip
-    {
-        for(y=0;y<256;y++)
-        {
-            for(x=0;x<256;x++)
-            {
-                UINT8 r,g,b;
-                int pen_data;
+				if(cliprect.contains(x, y))
+					bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+			}
+		}
+	}
+	else if (m_vctl == 0x0001)  // flip
+	{
+		for(y=0;y<256;y++)
+		{
+			for(x=0;x<256;x++)
+			{
+				UINT8 r,g,b;
+				int pen_data;
 
-                pen_data = (m_vram[(256-x)+((256-y)*256)]);
-                b = (pen_data & 0x001f);
-                g = (pen_data & 0x03e0) >> 5;
-                r = (pen_data & 0x7c00) >> 10;
-                r = (r << 3) | (r & 0x7);
-                g = (g << 3) | (g & 0x7);
-                b = (b << 3) | (b & 0x7);
+				pen_data = (m_vram[(256-x)+((256-y)*256)]);
+				b = (pen_data & 0x001f);
+				g = (pen_data & 0x03e0) >> 5;
+				r = (pen_data & 0x7c00) >> 10;
+				r = (r << 3) | (r & 0x7);
+				g = (g << 3) | (g & 0x7);
+				b = (b << 3) | (b & 0x7);
 
-                if(cliprect.contains(x, y))
-                    bitmap.pix32(y, x) = r << 16 | g << 8 | b;
-            }
-        }
-    }
-    else
-    {
-        logerror("invqix: Unhandled vctl %04x\n", m_vctl);
-    }
+				if(cliprect.contains(x, y))
+					bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+			}
+		}
+	}
+	else
+	{
+		logerror("invqix: Unhandled vctl %04x\n", m_vctl);
+	}
 
 	return 0;
 }
@@ -252,7 +255,7 @@ READ8_MEMBER(invqix_state::portg_r)
 
 WRITE16_MEMBER(invqix_state::vctl_w)
 {
-    m_vctl = data;
+	m_vctl = data;
 }
 
 static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
@@ -262,7 +265,7 @@ static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREAD8("oki", okim9810_device, read, 0xff00)
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
-    AM_RANGE(0x620004, 0x620005) AM_WRITE(vctl_w)
+	AM_RANGE(0x620004, 0x620005) AM_WRITE(vctl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(invqix_io_map, AS_IO, 8, invqix_state)
