@@ -994,7 +994,6 @@ M4EAW_SET( 199?, m4eaw__bu,	m4eaw,	"eun01k.p1",				0x0000, 0x010000, CRC(9fca43f
 M4EAW_SET( 199?, m4eaw__bv,	m4eaw,	"eun01r.p1",				0x0000, 0x010000, CRC(15b8eb9e) SHA1(e4babaf526e6dd45bb4b7f7441a08cfbec12c661), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 95)" )
 M4EAW_SET( 199?, m4eaw__bw,	m4eaw,	"eun01s.p1",				0x0000, 0x010000, CRC(d0b49fc6) SHA1(4062d9763010d42666660e383e52818d572b61b9), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 96)" )
 M4EAW_SET( 199?, m4eaw__bx,	m4eaw,	"eun01y.p1",				0x0000, 0x010000, CRC(88d3c370) SHA1(6c3839a9c89ae67f80ab932ec70ebaf1240de9bb), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 97)" )
-M4EAW_SET( 199?, m4eaw__by,	m4eaw,	"every1.hex",				0x0000, 0x010000, CRC(406843a2) SHA1(7d4bf6cd3c5be0f6df687b0ba97b3b88fd377170), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 98)" )
 M4EAW_SET( 199?, m4eaw__bz,	m4eaw,	"everyones a winner v2-5p",	0x0000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 99)" )
 
 
@@ -1017,7 +1016,6 @@ M4EAW_SET( 199?, m4eaw__bz,	m4eaw,	"everyones a winner v2-5p",	0x0000, 0x008000,
 M4WTA_SET( 199?, m4wta,		0,		"wta55",									0x0000, 0x010000, CRC(df3e66cd) SHA1(68e769816cb1a71dea8a3ccf4636414c45c01646), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 1)" )
 M4WTA_SET( 199?, m4wta__a,	m4wta,	"pwnk.p1",									0x0000, 0x020000, CRC(7c6e21e3) SHA1(d6aeb5948e0800050193575a3b5c06c11f46eed8), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 2)" )
 M4WTA_SET( 199?, m4wta__b,	m4wta,	"windy.p1",									0x0000, 0x010000, CRC(d8b78c2d) SHA1(d8c2a2ac30a9b876acfbe99e3c540ba0e82cde33), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 3)" )
-M4WTA_SET( 199?, m4wta__c,	m4wta,	"winner takes all wn80.1c 20p 8 idm.bin",	0x0000, 0x010000, CRC(471ba65a) SHA1(6ede860bcf323ee75dd7f75a51e5d1166ee72abc), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 4)" )
 M4WTA_SET( 199?, m4wta__d,	m4wta,	"wins.p1",									0x0000, 0x010000, CRC(d79d1e5b) SHA1(722657423a605d6d272d61e4e00b4055ed05f98d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 5)" )
 M4WTA_SET( 199?, m4wta__e,	m4wta,	"winy.p1",									0x0000, 0x010000, CRC(5ff8ed08) SHA1(9567db64e8ebf25ecb22236598cc88a3106f0e36), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 6)" )
 M4WTA_SET( 199?, m4wta__f,	m4wta,	"wn5ad.p1",									0x0000, 0x010000, CRC(0eb0845d) SHA1(57a2ca27672119e71af3b990cedcf52dd89e24cc), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 7)" )
@@ -2221,7 +2219,6 @@ M4TUTFRT_SET( 199?, m4tutfrt__ad,	m4tutfrt,	"tf4dy.p1",				0x0000, 0x010000, CRC
 M4TUTFRT_SET( 199?, m4tutfrt__ae,	m4tutfrt,	"tf4k.p1",				0x0000, 0x010000, CRC(1a4eb247) SHA1(f6b4c85dd8b155b672bd96ea7ee6630df773c6ca), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 42)" )
 M4TUTFRT_SET( 199?, m4tutfrt__af,	m4tutfrt,	"tf4s.p1",				0x0000, 0x010000, CRC(2d298c58) SHA1(568c2babdb002da871df7a36d16e4f7810cac265), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 43)" )
 M4TUTFRT_SET( 199?, m4tutfrt__ag,	m4tutfrt,	"tf4y.p1",				0x0000, 0x010000, CRC(06cd8b06) SHA1(92205e9edd42f80de67d5d6652de8ea80bc60af7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 44)" )
-M4TUTFRT_SET( 199?, m4tutfrt__ah,	m4tutfrt,	"tfruity.hex",			0x0000, 0x010000, CRC(dce2e5be) SHA1(3c218cdb939d5b7cc650c820737ae3ac653435ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 45)" )
 M4TUTFRT_SET( 199?, m4tutfrt__ai,	m4tutfrt,	"tft04ad.p1",			0x0000, 0x010000, CRC(2994aa14) SHA1(af0e618f24cdedd14e3a347701313360d9fc73d1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 46)" )
 M4TUTFRT_SET( 199?, m4tutfrt__aj,	m4tutfrt,	"tft04b.p1",			0x0000, 0x010000, CRC(e95eab06) SHA1(70e85e38493ac1fd30a79582bab45af5227d835a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 47)" )
 M4TUTFRT_SET( 199?, m4tutfrt__ak,	m4tutfrt,	"tft04bd.p1",			0x0000, 0x010000, CRC(060d3572) SHA1(e78b6248d3aef6cd08f4b30e0b00bd4cf254e630), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 48)" )

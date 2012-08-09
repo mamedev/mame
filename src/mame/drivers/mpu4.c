@@ -3727,13 +3727,10 @@ ROM_END
 
 ROM_START( m4tbreel )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtr12.bin", 0x0000, 0x010000, CRC(cdb63ef5) SHA1(748cc06e6a274b125d189dd66f2adad8bd2fb166) )
+	ROM_LOAD( "dtr12.bin", 0x0000, 0x010000, CRC(cdb63ef5) SHA1(748cc06e6a274b125d189dd66f2adad8bd2fb166) ) // aka dtr31.dat
 ROM_END
 
-ROM_START( m4tbreela )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtr31.dat", 0x0000, 0x010000, CRC(cdb63ef5) SHA1(748cc06e6a274b125d189dd66f2adad8bd2fb166) )
-ROM_END
+
 
 ROM_START( m4tbrldx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -9258,7 +9255,6 @@ GAME(199?, m4randr	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 GAME(199?, m4samu	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4stards	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Stardust (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4tbreel	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 1)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tbreela,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 2)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4tbrldx	,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4taj	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4topdk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )

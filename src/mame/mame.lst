@@ -7848,8 +7848,9 @@ tokia			// (c) 1989 Tad (World)
 tokiu			// (c) 1989 Tad + Fabtek license (US)
 tokiua			// (c) 1989 Tad + Fabtek license (US)
 tokib			// bootleg
+jujub			// bootleg
 juju			// (c) 1989 Tad (Japan)
-jujub			// (c) 1989 Tad (Japan)
+jujuba			// bootleg
 bloodbro		// (c) 1990 Tad
 bloodbroa		// (c) 1990 Tad
 bloodbrob		// (c) 1990 Tad
@@ -19335,7 +19336,6 @@ m4eaw__bu	//
 m4eaw__bv	//
 m4eaw__bw	//
 m4eaw__bx	//
-m4eaw__by	//
 m4eaw__bz	//
 m4exprs		// Express (Barcrest)
 m4exgam		// Extra Game (Fairplay - Barcrest)
@@ -19609,6 +19609,9 @@ m4jolgem__aj	//
 m4jolgem__ak	//
 m4jolgem__al	//
 m4jolgem__am	//
+m4jolgem__an	//
+m4jolgem__ao	//
+m4jolgem__ap	//
 m4joljokd	//
 m4joljokh	//
 m4joljok	// Jolly Joker (Barcrest)
@@ -20440,7 +20443,6 @@ m4tropcl	// Tropicana Club (Barcrest)
 m4tupen		// Tuppenny Cracker (Barcrest - Bootleg)
 m4tbplay	// Turbo Play (Barcrest)
 m4tbreel	// Turbo Reel (Barcrest)
-m4tbreela	//
 m4tbrldx	// Turbo Reel Deluxe (Barcrest)
 m4tutfrt	// Tutti Fruity (Barcrest)
 m4tutfrt__a		//
@@ -20486,7 +20488,6 @@ m4tutfrt__ad	//
 m4tutfrt__ae	//
 m4tutfrt__af	//
 m4tutfrt__ag	//
-m4tutfrt__ah	//
 m4tutfrt__ai	//
 m4tutfrt__aj	//
 m4tutfrt__ak	//
@@ -20586,7 +20587,6 @@ m4wildtm	// Wild Timer (Barcrest)
 m4wta		// Winner Takes All (Barcrest)
 m4wta__a	//
 m4wta__b	//
-m4wta__c	//
 m4wta__d	//
 m4wta__e	//
 m4wta__f	//
