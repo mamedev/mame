@@ -22,7 +22,6 @@ TODO:
 - There is a vector for IRQ4. The function does nothing in galpanic but is
   more complicated in the Comad ones. However I'm not triggering it, and
   they seems to work anyway...
-- Four unknown ROMs in fantasia. The game seems to work fine without them.
 - There was a ROM in the newfant set, obj2_14.rom, which was identical to
   Terminator 2's t2.107. I can only assume this was a mistake of the dumper.
 - lots of unknown reads and writes, also in galpanic but particularly in
@@ -51,7 +50,6 @@ For this version of Gals Panic see the expro02.c driver
 
 Stephh's additional notes :
 
-  - The games might not work correctly if sound is disabled.
   - There seems to exist 3 versions of 'galpanic' (Japan, US and World),
     and we seem to have a World version according to the coinage.
     Version is stored at 0x03ffff.b :
@@ -80,7 +78,7 @@ Stephh's additional notes :
       * In this version, there is a "Coin Mode" Dip Switch, but no
         "Character Test" Dip Switch.
       * Area 0xe00000-0xe00014 is a "calculator" area. I've tried to
-        simulate it (see 'galpanib_calc*' handlers) by comparing the code
+        simulate it (see machine/kaneko_hit.c) by comparing the code
         with the other set. I don't know if there are some other unmapped
         reads, but the game seems to run fine with what I've done.
       * When you press the "Tilt" button, the game enters in an endless
@@ -122,6 +120,7 @@ The current set of Super Model is an example of type C
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
+#include "machine/kaneko_hit.h"
 #include "includes/galpanic.h"
 #include "includes/galpnipt.h"
 
@@ -189,19 +188,6 @@ WRITE16_MEMBER(galpanic_state::galpanica_6295_bankswitch_w)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(galpanic_state::galpanica_misc_w)
-{
-	device_t *pandora = machine.device("pandora");
-
-	if (ACCESSING_BITS_0_7)
-	{
-		pandora_set_clear_bitmap(pandora, data & 0x0004);
-	}
-
-	// other bits unknown !
-}
-#endif
 
 WRITE16_MEMBER(galpanic_state::galpanic_coin_w)
 {
@@ -241,7 +227,7 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
+	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 ADDRESS_MAP_END
 
 READ16_MEMBER(galpanic_state::comad_timer_r)
@@ -588,6 +574,12 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_PALETTE_LENGTH(1024 + 32768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
+	
+	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 0);
+
+
+	
 
 	MCFG_PALETTE_INIT(galpanic)
 	MCFG_VIDEO_START(galpanic)

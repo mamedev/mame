@@ -151,7 +151,7 @@ the layer is misplaced however, different scroll regs?
 #include "cpu/m68000/m68000.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
-
+#include "machine/kaneko_hit.h"
 
 class expro02_state : public kaneko16_state
 {
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 
 	AM_RANGE(0xd80000, 0xd80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_1_tilebank_w)	/* ??? */
 
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
+	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 
 	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_0_tilebank_w)	/* ??? */
 ADDRESS_MAP_END
@@ -469,7 +469,6 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_1_tilebank_w)	/* ??? */
-	//AM_RANGE(0xe00000, 0xe00015) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_0_tilebank_w)	/* ??? */
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 ADDRESS_MAP_END
@@ -555,6 +554,8 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	kaneko16_sprite_device::set_priorities(*device, 8,8,8,8); // above all (not verified)
 	kaneko16_sprite_device::set_offsets(*device, 0, -0x40);
 
+	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 0);
 
 
 	MCFG_VIDEO_START(galsnew)

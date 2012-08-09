@@ -92,6 +92,7 @@ Dip locations verified from manual for:
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "machine/kaneko_hit.h"
 
 
 /***************************************************************************
@@ -451,7 +452,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x900039) AM_READWRITE(bloodwar_calc_r, bloodwar_calc_w)
+	AM_RANGE(0x900000, 0x900039) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
@@ -509,7 +510,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x900015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)
+	AM_RANGE(0x900000, 0x900015) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
@@ -754,7 +755,7 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x900000, 0x90001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xa00000, 0xa0007f) AM_READWRITE(bloodwar_calc_r, bloodwar_calc_w)
+	AM_RANGE(0xa00000, 0xa0007f) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 	AM_RANGE(0xa80000, 0xa80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb80000, 0xb80001) AM_READ_PORT("P1")
 	AM_RANGE(0xb80002, 0xb80003) AM_READ_PORT("P2")
@@ -1955,6 +1956,10 @@ static MACHINE_CONFIG_DERIVED( bloodwar, gtmr )
 	MCFG_DEVICE_MODIFY("kan_spr")
 	kaneko16_sprite_device::set_priorities(*device, 2 /* never used? */ ,3 /* character selection / vs. portraits */ ,5 /* winning portrait*/ ,7 /* ? */);
 
+	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 1);
+
+
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1982,6 +1987,10 @@ static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	kaneko16_sprite_device::set_priorities(*device, 2 /* never used? */ ,3 /* volcano lava on level 2 */ ,5 /* in-game player */ ,7 /* demostration text */);
+
+	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 0);
+
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2148,6 +2157,10 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_state )
 	kaneko16_sprite_device::set_offsets(*device, 0xa00, -0x40);
 	kaneko16_sprite_device::set_fliptype(*device, 1);
 
+	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 1);
+
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -2180,6 +2193,9 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_DERIVED( brapboys, shogwarr )
 	MCFG_SOUND_MODIFY("oki2")
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, brapboys_oki2_map)
+
+	MCFG_DEVICE_MODIFY("kan_hit")
+	kaneko_hit_device::set_type(*device, 2);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")

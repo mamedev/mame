@@ -15,36 +15,6 @@
 
 typedef struct
 {
-	UINT16 x1p, y1p, x1s, y1s;
-	UINT16 x2p, y2p, x2s, y2s;
-
-	INT16 x12, y12, x21, y21;
-
-	UINT16 mult_a, mult_b;
-} calc1_hit_t;
-
-typedef struct
-{
-	int x1p, y1p, z1p, x1s, y1s, z1s;
-	int x2p, y2p, z2p, x2s, y2s, z2s;
-
-	int x1po, y1po, z1po, x1so, y1so, z1so;
-	int x2po, y2po, z2po, x2so, y2so, z2so;
-
-	int x12, y12, z12, x21, y21, z21;
-
-	int x_coll, y_coll, z_coll;
-
-	int x1tox2, y1toy2, z1toz2;
-
-	UINT16 mult_a, mult_b;
-
-	UINT16 flags;
-	UINT16 mode;
-} calc3_hit_t;
-
-typedef struct
-{
 	int mcu_status;
 	int mcu_command_offset;
 	UINT16 mcu_crc;
@@ -90,8 +60,6 @@ public:
 
 	UINT8 m_nvram_save[128];
 
-	calc1_hit_t m_hit;
-	calc3_hit_t m_hit3;
 	calc3_t m_calc3;
 	void (*m_toybox_mcu_run)(running_machine &machine);
 	UINT16 m_toybox_mcu_com[4];
