@@ -548,10 +548,10 @@ static void equites_update_dac( running_machine &machine )
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
 	if (state->m_eq8155_port_b & 1)
-		dac_signed_data_w(state->m_dac_1, state->m_dac_latch);
+		state->m_dac_1->write_signed8(state->m_dac_latch);
 
 	if (state->m_eq8155_port_b & 2)
-		dac_signed_data_w(state->m_dac_2, state->m_dac_latch);
+		state->m_dac_2->write_signed8(state->m_dac_latch);
 }
 
 WRITE8_MEMBER(equites_state::equites_dac_latch_w)
@@ -1176,10 +1176,10 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_SOUND_CONFIG(equites_8910intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SAMPLES_ADD("samples", alphamc07_samples_interface)
@@ -1195,8 +1195,8 @@ static MACHINE_START( equites )
 	state->m_mcu = machine.device("mcu");
 	state->m_audio_cpu = machine.device("audiocpu");
 	state->m_msm = machine.device<msm5232_device>("msm");
-	state->m_dac_1 = machine.device("dac1");
-	state->m_dac_2 = machine.device("dac2");
+	state->m_dac_1 = machine.device<dac_device>("dac1");
+	state->m_dac_2 = machine.device<dac_device>("dac2");
 
 	state->save_item(NAME(state->m_fg_char_bank));
 	state->save_item(NAME(state->m_bgcolor));

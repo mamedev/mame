@@ -446,7 +446,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)			/* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE_LEGACY("dac", dac_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_device, write_unsigned8)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1191,7 +1191,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1249,7 +1249,7 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1314,7 +1314,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 

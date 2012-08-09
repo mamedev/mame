@@ -51,7 +51,7 @@ static TIMER_CALLBACK( dac_irq )
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	UINT8 *rom = memregion("maincpu")->base();
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
@@ -74,7 +74,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	dac_address += 0x10000;
 
-	dac_data_w( device, rom[dac_address+m_cur_dac_address_index] );
+	device->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
 
 	machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

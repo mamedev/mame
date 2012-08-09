@@ -790,7 +790,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("dac", dac_w )
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
 ADDRESS_MAP_END
 
 
@@ -3210,7 +3210,7 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 	MCFG_CPU_IO_MAP(jansou_sub_iomap)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4000000/512)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

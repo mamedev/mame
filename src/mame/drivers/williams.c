@@ -1458,7 +1458,7 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wmsdac", DAC, 0)
+	MCFG_DAC_ADD("wmsdac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* pia */
@@ -1613,9 +1613,9 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 	MCFG_DEVICE_REMOVE("mono")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("wmsdac", DAC, 0)
+	MCFG_DAC_ADD("wmsdac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ADD("wmsdac_b", DAC, 0)
+	MCFG_DAC_ADD("wmsdac_b")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -1650,7 +1650,7 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wmsdac", DAC, 0)
+	MCFG_DAC_ADD("wmsdac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* pia */

@@ -98,14 +98,14 @@ const pia6821_interface williams_pia_1_intf =
 const pia6821_interface williams_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 /* Same as above, but for second sound board */
 const pia6821_interface williams_snd_pia_b_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("wmsdac_b", dac_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac_b", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq_b), DEVCB_LINE(williams_snd_irq_b)
 };
 
@@ -129,7 +129,7 @@ const pia6821_interface lottofun_pia_0_intf =
 const pia6821_interface sinistar_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_NULL, DEVCB_DEVICE_LINE("cvsd", hc55516_digit_w), DEVCB_DEVICE_LINE("cvsd", hc55516_clock_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_DEVICE_LINE("cvsd", hc55516_digit_w), DEVCB_DEVICE_LINE("cvsd", hc55516_clock_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -185,7 +185,7 @@ const pia6821_interface williams2_pia_1_intf =
 const pia6821_interface williams2_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -233,7 +233,7 @@ const pia6821_interface tshoot_pia_1_intf =
 const pia6821_interface tshoot_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 

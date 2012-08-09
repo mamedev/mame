@@ -271,29 +271,29 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_1_w)
 {
-	device_t *device = machine().device("dac");
-	dac_data_w(device, 0x00);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_unsigned8(0x00);
 }
 
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_2_w)
 {
-	device_t *device = machine().device("dac");
-	dac_data_w(device, 0x55);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_unsigned8(0x55);
 }
 
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_3_w)
 {
-	device_t *device = machine().device("dac");
-	dac_data_w(device, 0xaa);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_unsigned8(0xaa);
 }
 
 
 WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
 {
-	device_t *device = machine().device("dac");
-	dac_data_w(device, 0xff);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_unsigned8(0xff);
 }
 
 
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( meyc8080, meyc8080_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

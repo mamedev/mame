@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 #define HORZ_RES		32
 #define VERT_RES		24
 #define HORZ_CHR        8
@@ -27,7 +29,7 @@ public:
 
 	/* device */
 	required_device<cpu_device> m_maincpu;
-	device_t *m_dac;
+	dac_device *m_dac;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 

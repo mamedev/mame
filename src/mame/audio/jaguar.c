@@ -404,12 +404,12 @@ WRITE32_HANDLER( jaguar_serial_w )
 	{
 		/* right DAC */
 		case 2:
-			dac_signed_data_16_w(space->machine().device("dac2"), (data & 0xffff) ^ 0x8000);
+			space->machine().device<dac_device>("dac2")->write_signed16((data & 0xffff) ^ 0x8000);
 			break;
 
 		/* left DAC */
 		case 3:
-			dac_signed_data_16_w(space->machine().device("dac1"), (data & 0xffff) ^ 0x8000);
+			space->machine().device<dac_device>("dac1")->write_signed16((data & 0xffff) ^ 0x8000);
 			break;
 
 		/* frequency register */

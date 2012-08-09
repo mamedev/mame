@@ -92,8 +92,8 @@ WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 
 WRITE8_MEMBER(tceptor_state::voice_w)
 {
-	device_t *device = machine().device("dac");
-	dac_signed_data_16_w(device, data ? (data + 1) * 0x100 : 0x8000);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_signed16(data ? (data + 1) * 0x100 : 0x8000);
 }
 
 
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END

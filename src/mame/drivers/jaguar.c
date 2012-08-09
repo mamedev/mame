@@ -1753,10 +1753,10 @@ static MACHINE_CONFIG_START( cojagr3k, cojag_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1800,9 +1800,9 @@ static MACHINE_CONFIG_START( jaguar, cojag_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */

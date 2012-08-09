@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SAMPLES_ADD("samples", meadows_samples_interface)
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SAMPLES_ADD("samples", meadows_samples_interface)

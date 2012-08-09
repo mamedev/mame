@@ -475,7 +475,7 @@ static const ay8910_interface ay8910_37_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(nyny_state,nyny_ay8910_37_port_a_w),
-	DEVCB_DEVICE_HANDLER("dac", dac_w)
+	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8)
 };
 
 
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_SOUND_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.03)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

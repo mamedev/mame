@@ -44,7 +44,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_dac;
+	dac_device *m_dac;
 
 	/* memory */
 	UINT8 m_videoram0[0x8000];
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( dac_callback )
 	mjsister_state *state = machine.driver_data<mjsister_state>();
 	UINT8 *DACROM = state->memregion("samples")->base();
 
-	dac_data_w(state->m_dac, DACROM[(state->m_dac_bank * 0x10000 + state->m_dac_adr++) & 0x1ffff]);
+	state->m_dac->write_unsigned8(DACROM[(state->m_dac_bank * 0x10000 + state->m_dac_adr++) & 0x1ffff]);
 
 	if (((state->m_dac_adr & 0xff00 ) >> 8) !=  state->m_dac_adr_e)
 		machine.scheduler().timer_set(attotime::from_hz(MCLK) * 1024, FUNC(dac_callback));
@@ -454,7 +454,7 @@ static MACHINE_START( mjsister )
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_dac = machine.device("dac");
+	state->m_dac = machine.device<dac_device>("dac");
 
 	state->save_item(NAME(state->m_dac_busy));
 	state->save_item(NAME(state->m_flip_screen));
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

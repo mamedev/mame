@@ -112,7 +112,7 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1500000)
 	MCFG_SOUND_CONFIG(vectrex_ay8910_interface)

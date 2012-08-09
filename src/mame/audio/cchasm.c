@@ -103,7 +103,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_timer_1_w )
 	{
 		drvstate->m_output[0] ^= 0x7f;
 		drvstate->m_channel_active[0] = 1;
-		dac_data_w(device->machine().device("dac1"), drvstate->m_output[0]);
+		device->machine().device<dac_device>("dac1")->write_unsigned8(drvstate->m_output[0]);
 	}
 }
 
@@ -114,7 +114,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_timer_2_w )
 	{
 		drvstate->m_output[1] ^= 0x7f;
 		drvstate->m_channel_active[1] = 1;
-		dac_data_w(device->machine().device("dac2"), drvstate->m_output[0]);
+		device->machine().device<dac_device>("dac2")->write_unsigned8(drvstate->m_output[0]);
 	}
 }
 

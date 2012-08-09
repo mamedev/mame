@@ -1,166 +1,121 @@
+/***************************************************************************
+
+    dac.c
+
+    DAC device emulator.
+
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
+
 #include "emu.h"
 #include "dac.h"
 
 
-/* default to 4x oversampling */
-#define DEFAULT_SAMPLE_RATE (48000 * 4)
+// device type definition
+const device_type DAC = &device_creator<dac_device>;
 
 
-typedef struct _dac_state dac_state;
-struct _dac_state
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  dac_device - constructor
+//-------------------------------------------------
+
+dac_device::dac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DAC, "DAC", "dac", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_stream(NULL),
+	  m_output(0)
 {
-	sound_stream	*channel;
-	INT16			output;
-	INT16			UnsignedVolTable[256];
-	INT16			SignedVolTable[256];
-};
-
-
-INLINE dac_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == DAC);
-	return (dac_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
-static STREAM_UPDATE( DAC_update )
-{
-	dac_state *info = (dac_state *)param;
-	stream_sample_t *buffer = outputs[0];
-	INT16 out = info->output;
+//-------------------------------------------------
+//  write_unsigned8 - write an 8-bit value, 
+//	keeping the scaled result unsigned
+//-------------------------------------------------
 
-	while (samples--) *(buffer++) = out;
+WRITE8_MEMBER( dac_device::write_unsigned8 )
+{
+	write_unsigned8(data);
 }
 
 
-void dac_data_w(device_t *device, UINT8 data)
-{
-	dac_state *info = get_safe_token(device);
-	INT16 out = info->UnsignedVolTable[data];
+//-------------------------------------------------
+//  write_signed8 - write an 8-bit value, 
+//	keeping the scaled result signed
+//-------------------------------------------------
 
-	if (info->output != out)
-	{
-		/* update the output buffer before changing the registers */
-		info->channel->update();
-		info->output = out;
-	}
+WRITE8_MEMBER( dac_device::write_signed8 )
+{
+	write_signed8(data);
 }
 
 
-void dac_signed_data_w(device_t *device, UINT8 data)
-{
-	dac_state *info = get_safe_token(device);
-	INT16 out = info->SignedVolTable[data];
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-	if (info->output != out)
-	{
-		/* update the output buffer before changing the registers */
-		info->channel->update();
-		info->output = out;
-	}
+void dac_device::device_start()
+{
+	// create the stream
+	m_stream = stream_alloc(0, 1, DEFAULT_SAMPLE_RATE);
+
+	// register for save states
+	save_item(NAME(m_output));
 }
 
 
-void dac_data_16_w(device_t *device, UINT16 data)
-{
-	dac_state *info = get_safe_token(device);
-	INT16 out = data >> 1;		/* range      0..32767 */
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-	if (info->output != out)
-	{
-		/* update the output buffer before changing the registers */
-		info->channel->update();
-		info->output = out;
-	}
+void dac_device::device_reset()
+{
+	m_output = 0;
 }
 
 
-void dac_signed_data_16_w(device_t *device, UINT16 data)
+//-------------------------------------------------
+//  sound_stream_update - handle update requests
+//  for our sound stream
+//-------------------------------------------------
+
+void dac_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	dac_state *info = get_safe_token(device);
-	INT16 out = (INT32)data - (INT32)0x08000;	/* range -32768..32767 */
-						/* casts avoid potential overflow on some ABIs */
-
-	if (info->output != out)
-	{
-		/* update the output buffer before changing the registers */
-		info->channel->update();
-		info->output = out;
-	}
+	// just fill with current value
+	for (int samp = 0; samp < samples; samp++)
+		outputs[0][samp] = m_output;
 }
-
-
-INT16 dac_output(device_t *device)
-{
-	dac_state *info = get_safe_token(device);
-	return info->output;
-}
-
-
-static void DAC_build_voltable(dac_state *info)
-{
-	int i;
-
-	/* build volume table (linear) */
-	for (i = 0;i < 256;i++)
-	{
-		info->UnsignedVolTable[i] = i * 0x101 / 2;	/* range      0..32767 */
-		info->SignedVolTable[i] = i * 0x101 - 0x8000;	/* range -32768..32767 */
-	}
-}
-
-
-static DEVICE_START( dac )
-{
-	dac_state *info = get_safe_token(device);
-
-	DAC_build_voltable(info);
-
-	info->channel = device->machine().sound().stream_alloc(*device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
-	info->output = 0;
-
-	device->save_item(NAME(info->output));
-}
-
-
-
-WRITE8_DEVICE_HANDLER( dac_w )
-{
-	dac_data_w(device, data);
-}
-
-WRITE8_DEVICE_HANDLER( dac_signed_w )
-{
-	dac_signed_data_w(device, data);
-}
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( dac )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dac_state);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( dac );		break;
-		case DEVINFO_FCT_STOP:							/* nothing */								break;
-		case DEVINFO_FCT_RESET:							/* nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "DAC");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "DAC");						break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
-DEFINE_LEGACY_SOUND_DEVICE(DAC, dac);

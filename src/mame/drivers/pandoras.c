@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

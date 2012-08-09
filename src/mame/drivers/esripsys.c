@@ -560,7 +560,7 @@ WRITE8_MEMBER(esripsys_state::control_w)
 /* 10-bit MC3410CL DAC */
 WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	if (offset == 0)
 	{
 		m_dac_msb = data & 3;
@@ -573,7 +573,7 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
             The 8-bit DAC modulates the 10-bit DAC.
             Shift down to prevent clipping.
         */
-		dac_signed_data_16_w(device, (m_dac_vol * dac_data) >> 1);
+		device->write_signed16((m_dac_vol * dac_data) >> 1);
 	}
 }
 
@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("tms5220nl", TMS5220, 640000)

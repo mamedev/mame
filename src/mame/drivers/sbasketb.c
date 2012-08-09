@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( sbasketb_sound_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("vlm", hyperspt_sound_w)     /* speech and output controll */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE_LEGACY(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w)      /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("snsnd", SN76489, XTAL_14_31818MHz / 8)

@@ -506,9 +506,9 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 		UINT8 *sample_rom = state->memregion("samples")->base();
 
 		res = sample_rom[state->m_sound_pointer_l|(state->m_sound_index_l<<10)|0x40000];
-		dac_signed_w(state->m_dacl, 0, res);
+		state->m_dacl->write_signed8(res);
 		res = sample_rom[state->m_sound_pointer_r|(state->m_sound_index_r<<10)|0x00000];
-		dac_signed_w(state->m_dacr, 0, res);
+		state->m_dacr->write_signed8(res);
 		state->m_sound_pointer_l++;
 		state->m_sound_pointer_l&=0x3ff;
 		state->m_sound_pointer_r++;
@@ -542,10 +542,10 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 //  MCFG_PALETTE_INIT(littlerb)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
-	MCFG_SOUND_ADD("dacl", DAC, 0)
+	MCFG_DAC_ADD("dacl")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dacr", DAC, 0)
+	MCFG_DAC_ADD("dacr")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 

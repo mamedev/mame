@@ -781,7 +781,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x04) m_ppi8255_2->write(space, offset & 3, data);
-	if (offset & 0x10) dac_signed_data_w(machine().device("dac"), data);
+	if (offset & 0x10) machine().device<dac_device>("dac")->write_signed8(data);
 }
 
 
@@ -1187,8 +1187,8 @@ WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 
 WRITE8_MEMBER(galaxian_state::kingball_dac_w)
 {
-	device_t *device = machine().device("dac");
-	dac_w(device, offset, data ^ 0xff);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_unsigned8(data ^ 0xff);
 }
 
 
@@ -2314,7 +2314,7 @@ static MACHINE_CONFIG_DERIVED( kingball, mooncrst )
 	MCFG_CPU_IO_MAP(kingball_sound_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2450,7 +2450,7 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	MCFG_SOUND_CONFIG(sfx_ay8910_interface)
 
 	/* DAC for the sample player */
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

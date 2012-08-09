@@ -686,8 +686,8 @@ static ADDRESS_MAP_START( wheelfir_sub, AS_PROGRAM, 16, wheelfir_state )
 
 	AM_RANGE(0x780000, 0x780001) AM_READ(wheelfir_snd_r)
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8_LEGACY("dac1", dac_w, 0xff00) //guess for now
-	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE8_LEGACY("dac2", dac_w, 0xff00)
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8("dac1", dac_device, write_unsigned8, 0xff00) //guess for now
+	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE8("dac2", dac_device, write_unsigned8, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -841,8 +841,8 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac1")
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

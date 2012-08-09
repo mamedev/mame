@@ -598,7 +598,7 @@ void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		dac_signed_data_w(machine().device("dac"), data);
+		machine().device<dac_device>("dac")->write_signed8(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -612,7 +612,7 @@ void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		dac_signed_data_w(machine().device("dac"), data);
+		machine().device<dac_device>("dac")->write_signed8(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -1982,7 +1982,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

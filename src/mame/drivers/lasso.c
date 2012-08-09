@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -581,7 +581,7 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_VIDEO_START(wwjgtin)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

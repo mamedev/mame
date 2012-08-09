@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8, chsuper_state )
 	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 	AM_RANGE( 0x8300, 0x8300 ) AM_READ( ff_r ) //probably data for the dac
-	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE_LEGACY("dac", dac_w) // unk writes
+	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_device, write_unsigned8) // unk writes
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chsuper )
@@ -219,7 +219,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

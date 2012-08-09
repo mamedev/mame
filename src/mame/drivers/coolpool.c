@@ -558,8 +558,8 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 
 WRITE16_MEMBER(coolpool_state::dsp_dac_w)
 {
-	device_t *device = machine().device("dac");
-	dac_signed_data_16_w(device, (INT16)(data << 4) + 0x8000);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_signed16((INT16)(data << 4) + 0x8000);
 }
 
 
@@ -876,7 +876,7 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

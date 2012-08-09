@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12) /* verified on pcb */

@@ -333,10 +333,10 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				dac_w(machine().device("dac2"), 0, data);
+				machine().device<dac_device>("dac2")->write_unsigned8(data);
 				break;
 			case 7:			/* PC_1 */
-				dac_w(machine().device("dac1"), 0, data);
+				machine().device<dac_device>("dac1")->write_unsigned8(data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -371,10 +371,10 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				dac_w(machine().device("dac1"), 0, data);
+				machine().device<dac_device>("dac1")->write_unsigned8(data);
 				break;
 			case 7:			/* PC_1 */
-				dac_w(machine().device("dac2"), 0, data);
+				machine().device<dac_device>("dac2")->write_unsigned8(data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -3174,10 +3174,10 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

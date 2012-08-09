@@ -302,9 +302,9 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 		case 0: /* audio channels */
 			m_dac_data = (data & 0x80) ^ ((data & 0x40) << 1) ^ ((data & 0x20) << 2) ^ ((data & 0x10) << 3);
 			if (m_dac_data)
-				dac_data_w(m_dac, 0xff);
+				m_dac->write_unsigned8(0xff);
 			else
-				dac_data_w(m_dac, 0);
+				m_dac->write_unsigned8(0);
 			break;
 		case 1: /* marker Y position */
 			m_marker_y = data;
@@ -328,9 +328,9 @@ WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 			/* at the moment they are routed through the dac */
 			m_dac_data = ((data & 0x20) << 2) ^ ((data & 0x10) << 3);
 			if (m_dac_data)
-				dac_data_w(m_dac, 0xff);
+				m_dac->write_unsigned8(0xff);
 			else
-				dac_data_w(m_dac, 0);
+				m_dac->write_unsigned8(0);
 			break;
 		case 1: /* marker Y position */
 			m_marker_y = data;
@@ -354,9 +354,9 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 			/* at the moment they are routed through the dac */
 			m_dac_data = ((data & 0x20) << 2) ^ ((data & 0x10) << 3);
 			if (m_dac_data)
-				dac_data_w(m_dac, 0xff);
+				m_dac->write_unsigned8(0xff);
 			else
-				dac_data_w(m_dac, 0);
+				m_dac->write_unsigned8(0);
 			break;
 		case 3: /* D4 clears coin detected and D0 toggles on attract mode */
 			break;
@@ -606,7 +606,7 @@ static MACHINE_START( lazercmd )
 {
 	lazercmd_state *state = machine.driver_data<lazercmd_state>();
 
-	state->m_dac = machine.device("dac");
+	state->m_dac = machine.device<dac_device>("dac");
 
 	state->save_item(NAME(state->m_marker_x));
 	state->save_item(NAME(state->m_marker_y));
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

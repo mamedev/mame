@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -572,7 +572,7 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

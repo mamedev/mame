@@ -277,7 +277,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stratvox_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
@@ -650,7 +650,7 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 	MCFG_SOUND_CONFIG(sn76477_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

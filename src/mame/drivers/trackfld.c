@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ_LEGACY(trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE_LEGACY(konami_SN76496_latch_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_DEVWRITE_LEGACY("snsnd",konami_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD_LEGACY("vlm", trackfld_speech_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_MASK(0x0380) AM_DEVWRITE_LEGACY("vlm", trackfld_sound_w)
@@ -424,7 +424,7 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ_LEGACY(trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE_LEGACY(konami_SN76496_latch_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_DEVWRITE_LEGACY("snsnd",konami_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_busy_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITENOP
@@ -936,7 +936,7 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("snsnd", SN76496, SOUND_CLOCK/8)
@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/6/2)

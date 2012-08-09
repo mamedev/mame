@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "sound/samples.h"
+#include "sound/dac.h"
 
 #define COSMICG_MASTER_CLOCK     XTAL_9_828MHz
 #define Z80_MASTER_CLOCK         XTAL_10_816MHz
@@ -39,7 +40,7 @@ public:
 
 	/* devices */
 	samples_device *m_samples;
-	device_t *m_dac;
+	dac_device *m_dac;
 	DECLARE_WRITE8_MEMBER(panic_sound_output_w);
 	DECLARE_WRITE8_MEMBER(panic_sound_output2_w);
 	DECLARE_WRITE8_MEMBER(cosmicg_output_w);

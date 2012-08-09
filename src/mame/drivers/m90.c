@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_device, write_signed8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( m90, m90_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 

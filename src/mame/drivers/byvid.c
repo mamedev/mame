@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
@@ -185,7 +185,7 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

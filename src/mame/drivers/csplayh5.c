@@ -161,9 +161,9 @@ sound HW is identical to Niyanpai
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
+#define DAC_WRITE	write_signed8
 #else
-#define DAC_WRITE	dac_w
+#define DAC_WRITE	write_unsigned8
 #endif
 
 static void csplayh5_soundbank_w(running_machine &machine, int data)
@@ -222,10 +222,10 @@ WRITE8_MEMBER(csplayh5_state::tmpz84c011_pio_w)
 			csplayh5_soundbank_w(machine(), data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(machine().device("dac2"), 0, data);
+			machine().device<dac_device>("dac2")->DAC_WRITE(data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(machine().device("dac1"), 0, data);
+			machine().device<dac_device>("dac1")->DAC_WRITE(data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -655,10 +655,10 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

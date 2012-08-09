@@ -1,3 +1,4 @@
+#include "sound/dac.h"
 
 class homedata_state : public driver_device
 {
@@ -36,7 +37,7 @@ public:
 	/* device */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
-	device_t *m_dac;
+	dac_device *m_dac;
 	device_t *m_ym;
 	device_t *m_sn;
 	UINT8 m_prot_data;

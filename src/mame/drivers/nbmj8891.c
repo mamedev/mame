@@ -443,7 +443,7 @@ static ADDRESS_MAP_START( gionbana_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) //AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( mgion_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) //AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( omotesnd_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) AM_WRITENOP
 	AM_RANGE(0xd0, 0xdf) AM_READ(nbmj8891_clut_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
@@ -503,7 +503,7 @@ static ADDRESS_MAP_START( hanamomo_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) //AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r) //AM_WRITENOP
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( msjiken_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) //AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r) //AM_WRITENOP
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -541,7 +541,7 @@ static ADDRESS_MAP_START( scandal_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r) //AM_WRITENOP
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( scandalm_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -581,7 +581,7 @@ static ADDRESS_MAP_START( bananadr_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -600,7 +600,7 @@ static ADDRESS_MAP_START( lovehous_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("PORT0-2")
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -619,7 +619,7 @@ static ADDRESS_MAP_START( maiko_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("PORT0-2") //AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -635,7 +635,7 @@ static ADDRESS_MAP_START( taiwanmb_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 //  AM_RANGE(0xc0, 0xc0) AM_WRITENOP                    // ?
 //  AM_RANGE(0xd0, 0xd0) AM_READ_LEGACY(ff_r)  // irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_READ_LEGACY(nb1413m3_dipsw3_h_r) AM_WRITE(nbmj8891_taiwanmb_gfxdraw_w)	// blitter draw start
 	AM_RANGE(0xe1, 0xe1) AM_READ_LEGACY(nb1413m3_dipsw3_l_r)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw2_r,nb1413m3_outcoin_w)
@@ -2624,7 +2624,7 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 	MCFG_SOUND_ADD("fmsnd", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

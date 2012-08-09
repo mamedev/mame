@@ -84,7 +84,7 @@ static const samples_interface spacefb_samples_interface =
 MACHINE_CONFIG_FRAGMENT( spacefb_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SAMPLES_ADD("samples", spacefb_samples_interface)

@@ -396,13 +396,13 @@ READ8_MEMBER(n8080_state::helifire_8035_p2_r)
 
 WRITE8_MEMBER(n8080_state::n8080_dac_w)
 {
-	dac_data_w(machine().device("dac"), data & 0x80);
+	machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);
 }
 
 
 WRITE8_MEMBER(n8080_state::helifire_dac_w)
 {
-	dac_data_w(machine().device("dac"), data * m_helifire_dac_volume);
+	machine().device<dac_device>("dac")->write_unsigned8(data * m_helifire_dac_volume);
 }
 
 
@@ -588,7 +588,7 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
@@ -607,7 +607,7 @@ MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
@@ -628,6 +628,6 @@ MACHINE_CONFIG_FRAGMENT( helifire_sound )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

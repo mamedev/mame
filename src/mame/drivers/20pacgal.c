@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")	/* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
-	AM_RANGE(0x89, 0x89) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_SHARE("stars_ctrl")	/* stars: bits 3-4 = active set; bit 5 = enable */
 	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_SHARE("flip")
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

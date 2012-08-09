@@ -44,7 +44,7 @@ WRITE8_MEMBER(cheekyms_state::cheekyms_port_40_w)
 {
 
 	/* the lower bits probably trigger sound samples */
-	dac_data_w(m_dac, data ? 0x80 : 0);
+	m_dac->write_unsigned8(data ? 0x80 : 0);
 }
 
 

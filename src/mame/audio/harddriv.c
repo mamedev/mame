@@ -301,7 +301,7 @@ WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w )
 
 	/* DAC L */
 	if (!state->m_dacmute)
-		dac_signed_data_16_w(device, data ^ 0x8000);
+		downcast<dac_device *>(device)->write_signed16(data ^ 0x8000);
 }
 
 

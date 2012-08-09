@@ -1031,7 +1031,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna8_state::brickzn_pcm_w)
 {
 	static const char *const dacs[] = { "dac1", "dac2", "dac3", "dac4" };
-	dac_signed_data_w( machine().device(dacs[offset & 3]), (data & 0xf) * 0x11 );
+	machine().device<dac_device>(dacs[offset & 3])->write_signed8( (data & 0xf) * 0x11 );
 }
 
 
@@ -1645,16 +1645,16 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
 
-	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
 
-	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_DAC_ADD("dac4")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
 MACHINE_CONFIG_END
 

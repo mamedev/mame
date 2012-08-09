@@ -65,7 +65,7 @@ WRITE8_HANDLER( targ_audio_1_w )
 
 	/* CPU music */
 	if ((data & 0x01) != (port_1_last & 0x01))
-		dac_data_w(space->machine().device("dac"),(data & 0x01) * 0xff);
+		space->machine().device<dac_device>("dac")->write_unsigned8((data & 0x01) * 0xff);
 
 	/* shot */
 	if (FALLING_EDGE(0x02) && !samples->playing(0))  samples->start(0,1);
@@ -203,7 +203,7 @@ MACHINE_CONFIG_FRAGMENT( spectar_audio )
 	MCFG_SAMPLES_ADD("samples", spectar_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -215,6 +215,6 @@ MACHINE_CONFIG_FRAGMENT( targ_audio )
 	MCFG_SAMPLES_ADD("samples", targ_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -94,9 +94,9 @@ void meadows_sh_update(running_machine &machine)
 		state->m_dac_enable = state->m_0c03 & ENABLE_DAC;
 
 		if (state->m_dac_enable)
-			dac_data_w(machine.device("dac"), state->m_dac);
+			machine.device<dac_device>("dac")->write_unsigned8(state->m_dac);
 		else
-			dac_data_w(machine.device("dac"), 0);
+			machine.device<dac_device>("dac")->write_unsigned8(0);
 	}
 
 	state->m_latched_0c01 = state->m_0c01;
@@ -112,9 +112,9 @@ void meadows_sh_dac_w(running_machine &machine, int data)
 	meadows_state *state = machine.driver_data<meadows_state>();
 	state->m_dac = data;
 	if (state->m_dac_enable)
-		dac_data_w(machine.device("dac"), state->m_dac);
+		machine.device<dac_device>("dac")->write_unsigned8(state->m_dac);
 	else
-		dac_data_w(machine.device("dac"), 0);
+		machine.device<dac_device>("dac")->write_unsigned8(0);
 }
 
 

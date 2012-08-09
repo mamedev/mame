@@ -1192,10 +1192,10 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_SOUND_ADD("lch_pwm", DAC, 0)
+	MCFG_DAC_ADD("lch_pwm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MCFG_SOUND_ADD("rch_pwm", DAC, 0)
+	MCFG_DAC_ADD("rch_pwm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
@@ -1240,10 +1240,10 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_SOUND_ADD("lch_pwm", DAC, 0)
+	MCFG_DAC_ADD("lch_pwm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MCFG_SOUND_ADD("rch_pwm", DAC, 0)
+	MCFG_DAC_ADD("rch_pwm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 

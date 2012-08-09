@@ -1694,7 +1694,7 @@ static MACHINE_CONFIG_DERIVED( grobda, superpac )
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_CONFIG_END
 
@@ -2254,8 +2254,8 @@ ROM_END
 
 WRITE8_MEMBER(mappy_state::grobda_DAC_w)
 {
-	device_t *device = machine().device("dac");
-	dac_data_w(device, (data << 4) | data);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_unsigned8((data << 4) | data);
 }
 
 static DRIVER_INIT( grobda )

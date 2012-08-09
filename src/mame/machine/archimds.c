@@ -182,7 +182,7 @@ static TIMER_CALLBACK( vidc_audio_tick )
 
 		res = mulawTable[ulaw_comp];
 
-		dac_signed_data_16_w(space->machine().device(dac_port[ch & 7]), res^0x8000);
+		space->machine().device<dac_device>(dac_port[ch & 7])->write_signed16(res^0x8000);
 	}
 
 	vidc_sndcur+=8;
@@ -196,7 +196,7 @@ static TIMER_CALLBACK( vidc_audio_tick )
 		{
 			snd_timer->adjust(attotime::never);
 			for(ch=0;ch<8;ch++)
-				dac_signed_data_16_w(space->machine().device(dac_port[ch & 7]), 0x8000);
+				space->machine().device<dac_device>(dac_port[ch & 7])->write_signed16(0x8000);
 		}
 	}
 }

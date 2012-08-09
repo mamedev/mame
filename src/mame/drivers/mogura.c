@@ -22,8 +22,8 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_dac1;
-	device_t *m_dac2;
+	dac_device *m_dac1;
+	dac_device *m_dac2;
 	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
 	DECLARE_WRITE8_MEMBER(mogura_dac_w);
 	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
@@ -111,8 +111,8 @@ WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 
 WRITE8_MEMBER(mogura_state::mogura_dac_w)
 {
-	dac_data_w(m_dac1, data & 0xf0);	/* left */
-	dac_data_w(m_dac2, (data & 0x0f) << 4);	/* right */
+	m_dac1->write_unsigned8(data & 0xf0);	/* left */
+	m_dac2->write_unsigned8((data & 0x0f) << 4);	/* right */
 }
 
 
@@ -193,8 +193,8 @@ static MACHINE_START( mogura )
 	mogura_state *state = machine.driver_data<mogura_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_dac1 = machine.device("dac1");
-	state->m_dac2 = machine.device("dac2");
+	state->m_dac1 = machine.device<dac_device>("dac1");
+	state->m_dac2 = machine.device<dac_device>("dac2");
 }
 
 static MACHINE_CONFIG_START( mogura, mogura_state )
@@ -225,10 +225,10 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 

@@ -1731,16 +1731,16 @@ static const UINT8 voltable[256] =
 
 WRITE8_MEMBER(taitosj_state::dac_out_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	m_dac_out = data - 0x80;
-	dac_signed_data_16_w(device,m_dac_out * m_dac_vol + 0x8000);
+	device->write_signed16(m_dac_out * m_dac_vol + 0x8000);
 }
 
 WRITE8_MEMBER(taitosj_state::dac_vol_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	m_dac_vol = voltable[data];
-	dac_signed_data_16_w(device,m_dac_out * m_dac_vol + 0x8000);
+	device->write_signed16(m_dac_out * m_dac_vol + 0x8000);
 }
 
 
@@ -1836,7 +1836,7 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	MCFG_SOUND_CONFIG(ay8910_interface_4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 

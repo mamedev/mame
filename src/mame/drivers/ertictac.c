@@ -197,7 +197,7 @@ static MACHINE_START( ertictac )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	//dac_signed_data_w(machine.device("dac"), 0x80);
+	//machine.device<dac_device>("dac")->write_signed8(0x80);
 }
 
 static MACHINE_RESET( ertictac )
@@ -242,28 +242,28 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 	MCFG_VIDEO_START(archimds_vidc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac0", DAC, 0)
+	MCFG_DAC_ADD("dac0")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_DAC_ADD("dac4")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac5", DAC, 0)
+	MCFG_DAC_ADD("dac5")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac6", DAC, 0)
+	MCFG_DAC_ADD("dac6")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
-	MCFG_SOUND_ADD("dac7", DAC, 0)
+	MCFG_DAC_ADD("dac7")
 	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 MACHINE_CONFIG_END
 

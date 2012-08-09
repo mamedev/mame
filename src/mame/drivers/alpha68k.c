@@ -746,7 +746,7 @@ static ADDRESS_MAP_START( kyros_sound_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0xe006, 0xe00e) AM_WRITENOP // soundboard I/O's, ignored
 /* reference only
     AM_RANGE(0xe006, 0xe006) AM_WRITENOP // NMI: diminishing saw-tooth
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( sstingry_sound_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc100, 0xc100) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc102, 0xc102) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xc104, 0xc104) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0xc104, 0xc104) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0xc106, 0xc10e) AM_WRITENOP // soundboard I/O's, ignored
 ADDRESS_MAP_END
 
@@ -790,7 +790,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE_LEGACY("ym2", ym2413_w)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
@@ -2002,7 +2002,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_SOUND_ADD("ym3", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -2048,7 +2048,7 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -2169,7 +2169,7 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -2218,7 +2218,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 //ZT
@@ -2261,7 +2261,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -2303,7 +2303,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

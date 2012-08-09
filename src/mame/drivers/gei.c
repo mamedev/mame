@@ -221,7 +221,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_nmi_mask = data & 0x40;
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(machine().device("dac"), ((data & 0x80) >> 7) * 255);
+	machine().device<dac_device>("dac")->write_unsigned8(((data & 0x80) >> 7) * 255);
 }
 
 WRITE8_MEMBER(gei_state::sound2_w)
@@ -238,7 +238,7 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	set_led_status(machine(), 12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(machine().device("dac"), ((data & 0x80) >> 7) * 255);
+	machine().device<dac_device>("dac")->write(((data & 0x80) >> 7) * 255);
 }
 
 WRITE8_MEMBER(gei_state::lamps2_w)
@@ -1135,7 +1135,7 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

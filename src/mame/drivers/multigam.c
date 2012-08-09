@@ -1216,7 +1216,7 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 	MCFG_SOUND_CONFIG(multigam_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

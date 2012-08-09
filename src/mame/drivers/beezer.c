@@ -109,7 +109,7 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	//MCFG_SOUND_ADD("dac", DAC, 0)
+	//MCFG_DAC_ADD("dac")
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_ADD("custom", BEEZER, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

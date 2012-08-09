@@ -874,8 +874,8 @@ TIMER_CALLBACK( _32x_pwm_callback )
 		switch(pwm_ctrl & 3)
 		{
 			case 0: lch_index_r++; /*Speaker OFF*/ break;
-			case 1: dac_signed_data_16_w(machine.device("lch_pwm"), cur_lch[lch_index_r++]); break;
-			case 2: dac_signed_data_16_w(machine.device("rch_pwm"), cur_lch[lch_index_r++]); break;
+			case 1: machine.device<dac_device>("lch_pwm")->write_signed16(cur_lch[lch_index_r++]); break;
+			case 2: machine.device<dac_device>("rch_pwm")->write_signed16(cur_lch[lch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Lch value 3, contact MESSdev"); break;
 		}
 
@@ -889,8 +889,8 @@ TIMER_CALLBACK( _32x_pwm_callback )
 		switch((pwm_ctrl & 0xc) >> 2)
 		{
 			case 0: rch_index_r++; /*Speaker OFF*/ break;
-			case 1: dac_signed_data_16_w(machine.device("rch_pwm"), cur_rch[rch_index_r++]); break;
-			case 2: dac_signed_data_16_w(machine.device("lch_pwm"), cur_rch[rch_index_r++]); break;
+			case 1: machine.device<dac_device>("rch_pwm")->write_signed16(cur_rch[rch_index_r++]); break;
+			case 2: machine.device<dac_device>("lch_pwm")->write_signed16(cur_rch[rch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Rch value 3, contact MESSdev"); break;
 		}
 

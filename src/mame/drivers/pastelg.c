@@ -31,9 +31,9 @@ Memo:
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
+#define DAC_WRITE	write_signed8
 #else
-#define DAC_WRITE	dac_w
+#define DAC_WRITE	write_unsigned8
 #endif
 
 
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(nb1413m3_inputport2_r) AM_WRITE(pastelg_romsel_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
 
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pastelg )
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( pastelg, pastelg_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( threeds, pastelg_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -327,9 +327,9 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 
 WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	INT16 newval = ((INT16)data - 0x6000) << 2;
-	dac_signed_data_16_w(device, newval + 0x8000);
+	device->write_signed16(newval + 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
@@ -620,7 +620,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -651,7 +651,7 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

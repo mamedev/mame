@@ -243,7 +243,7 @@ static const pia6821_interface cvsd_pia_intf =
 	DEVCB_NULL,		// line CB1 in
 	DEVCB_NULL,		// line CA2 in
 	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_HANDLER("dac", dac_w),		// port A out
+	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),		// port A out
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, talkback_w),		// port B out
 	DEVCB_NULL,		// line CA2 out
 	DEVCB_NULL,		// port CB2 out
@@ -276,7 +276,7 @@ static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
 	MCFG_SOUND_CONFIG(cvsd_ym2151_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
@@ -569,7 +569,7 @@ static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8, williams_narc
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(master_talkback_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_WRITE(command2_w)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(command_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(master_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(master_sync_w)
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8, williams_narc_
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(cvsd_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_WRITE(cvsd_digit_clock_clear_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(slave_talkback_w)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(command2_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(slave_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(slave_sync_w)
@@ -621,10 +621,10 @@ static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
 	MCFG_SOUND_CONFIG(narc_ym2151_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
@@ -860,7 +860,7 @@ static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8, williams_adpcm_soun
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(bank_select_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_READ(command_r)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(oki6295_bank_select_w)
@@ -902,7 +902,7 @@ static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
 	MCFG_SOUND_CONFIG(adpcm_ym2151_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 
 	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

@@ -325,7 +325,7 @@ static I8255_INTERFACE (ppi8255_intf_1)
 {
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("dac", dac_w),
+	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(jankenmn_state,jankenmn_lamps1_w),
 	DEVCB_NULL,
@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

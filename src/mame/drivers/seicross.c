@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( mcu_no_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("DSW3")		/* DSW3 */
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -471,7 +471,7 @@ public:
 
 	void sound_cb(net_sig_t newval)
 	{
-		dac_w(m_dac, 0, 128*(!newval));
+		m_dac->write_unsigned8(128*(!newval));
 	}
 
 	void video_cb(net_sig_t newval)

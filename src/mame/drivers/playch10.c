@@ -397,7 +397,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)  /* PSG status / first control register */
@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_SOUND_CONFIG(nes_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_RP5H01_ADD("rp5h01")

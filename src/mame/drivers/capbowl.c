@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP				/* Not hooked up according to the schematics */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -393,7 +393,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.07)
 	MCFG_SOUND_ROUTE(3, "mono", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

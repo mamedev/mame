@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -501,7 +501,7 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15) /* guess: using volume 0.50 makes the sound to clip a lot */
 MACHINE_CONFIG_END
 

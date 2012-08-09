@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_byte_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( megazone, megazone_state )
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("filter.0.0", FILTER_RC, 0)

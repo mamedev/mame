@@ -192,8 +192,8 @@ WRITE8_MEMBER(zaccaria_state::sound1_command_w)
 
 WRITE8_MEMBER(zaccaria_state::mc1408_data_w)
 {
-	device_t *device = machine().device("dac2");
-	dac_data_w(device, data);
+	dac_device *device = machine().device<dac_device>("dac2");
+	device->write_unsigned8(data);
 }
 
 
@@ -624,7 +624,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */

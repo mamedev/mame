@@ -131,7 +131,7 @@ WRITE8_MEMBER(murogem_state::outport_w)
     7654 3210
     ---- x---   Sound DAC.
 */
-	dac_data_w(machine().device("dac"), data & 0x08);
+	machine().device<dac_device>("dac")->write_unsigned8(data & 0x08);
 }
 
 
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 12.00)
 MACHINE_CONFIG_END
 

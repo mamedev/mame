@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( sound1_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command1_r)
 	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x7f00, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( sound2_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command2_r)
 	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x7f00, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( sound1_m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command1_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( sound2_m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command2_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM /* work RAM */
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 ADDRESS_MAP_END
 
 /*******************************************************************************/
@@ -710,10 +710,10 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -794,10 +794,10 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 

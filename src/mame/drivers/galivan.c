@@ -115,8 +115,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -470,10 +470,10 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -512,10 +512,10 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

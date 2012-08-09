@@ -236,8 +236,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_signed8)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_signed8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -245,8 +245,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_signed8)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_signed8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -556,10 +556,10 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -591,10 +591,10 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -635,10 +635,10 @@ static MACHINE_CONFIG_START( ym2203, terracre_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -145,8 +145,8 @@ WRITE16_MEMBER(cyberbal_state::cyberbal_sound_68k_w)
 
 WRITE16_MEMBER(cyberbal_state::cyberbal_sound_68k_dac_w)
 {
-	device_t *dac = machine().device((offset & 8) ? "dac2" : "dac1");
-	dac_data_16_w(dac, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
+	dac_device *dac = machine().device<dac_device>((offset & 8) ? "dac2" : "dac1");
+	dac->write_unsigned16((((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
 
 	if (m_fast_68k_int)
 	{

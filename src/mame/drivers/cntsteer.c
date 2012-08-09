@@ -872,7 +872,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("dac", dac_w),
+	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),
 	DEVCB_NULL
 };
 
@@ -919,7 +919,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

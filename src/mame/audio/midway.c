@@ -590,7 +590,7 @@ WRITE_LINE_MEMBER(midway_chip_squeak_deluxe_device::reset_write)
 WRITE8_MEMBER(midway_chip_squeak_deluxe_device::porta_w)
 {
 	m_dacval = (m_dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(m_dac, m_dacval << 6);
+	m_dac->write_signed16(m_dacval << 6);
 }
 
 
@@ -601,7 +601,7 @@ WRITE8_MEMBER(midway_chip_squeak_deluxe_device::porta_w)
 WRITE8_MEMBER(midway_chip_squeak_deluxe_device::portb_w)
 {
 	m_dacval = (m_dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(m_dac, m_dacval << 6);
+	m_dac->write_signed16(m_dacval << 6);
 
 	UINT8 z_mask = m_pia->port_b_z_mask();
 	if (~z_mask & 0x10)  m_status = (m_status & ~1) | ((data >> 4) & 1);
@@ -695,7 +695,7 @@ static MACHINE_CONFIG_FRAGMENT(midway_chip_squeak_deluxe)
 
 	MCFG_PIA6821_ADD("pia", csdeluxe_pia_intf)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
 MACHINE_CONFIG_END
 
@@ -806,7 +806,7 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
 WRITE8_MEMBER(midway_sounds_good_device::porta_w)
 {
 	m_dacval = (m_dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(m_dac, m_dacval << 6);
+	m_dac->write_signed16(m_dacval << 6);
 }
 
 
@@ -819,7 +819,7 @@ WRITE8_MEMBER(midway_sounds_good_device::portb_w)
 	UINT8 z_mask = m_pia->port_b_z_mask();
 
 	m_dacval = (m_dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(m_dac, m_dacval << 6);
+	m_dac->write_signed16(m_dacval << 6);
 
 	if (~z_mask & 0x10)  m_status = (m_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  m_status = (m_status & ~2) | ((data >> 4) & 2);
@@ -882,7 +882,7 @@ static MACHINE_CONFIG_FRAGMENT(midway_sounds_good)
 
 	MCFG_PIA6821_ADD("pia", soundsgood_pia_intf)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
 MACHINE_CONFIG_END
 
@@ -992,7 +992,7 @@ WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::reset_write)
 WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
 {
 	m_dacval = (m_dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(m_dac, m_dacval << 6);
+	m_dac->write_signed16(m_dacval << 6);
 }
 
 
@@ -1003,7 +1003,7 @@ WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
 WRITE8_MEMBER(midway_turbo_chip_squeak_device::portb_w)
 {
 	m_dacval = (m_dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(m_dac, m_dacval << 6);
+	m_dac->write_signed16(m_dacval << 6);
 	m_status = (data >> 4) & 3;
 }
 
@@ -1063,7 +1063,7 @@ static MACHINE_CONFIG_FRAGMENT(midway_turbo_chip_squeak)
 
 	MCFG_PIA6821_ADD("pia", turbocs_pia_intf)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
 MACHINE_CONFIG_END
 

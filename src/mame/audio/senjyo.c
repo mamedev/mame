@@ -43,7 +43,7 @@ WRITE_LINE_MEMBER(senjyo_state::sound_line_clock)
 {
 	if (state != 0)
 	{
-		dac_signed_data_16_w(m_dac, 2184 * 2 * ((m_sound_state & 8) ? m_single_volume : 0));
+		m_dac->write_signed16(2184 * 2 * ((m_sound_state & 8) ? m_single_volume : 0));
 		m_sound_state++;
 	}
 }

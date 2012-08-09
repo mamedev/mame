@@ -144,20 +144,20 @@ static TIMER_CALLBACK( exctsccr_fm_callback )
 // Champion Baseball has only one DAC
 WRITE8_MEMBER(champbas_state::champbas_dac_w)
 {
-	device_t *device = machine().device("dac");
-	dac_signed_data_w(device, data << 2);
+	dac_device *device = machine().device<dac_device>("dac");
+	device->write_signed8(data << 2);
 }
 
 WRITE8_MEMBER(champbas_state::champbas_dac1_w)
 {
-	device_t *device = machine().device("dac1");
-	dac_signed_data_w(device, data << 2);
+	dac_device *device = machine().device<dac_device>("dac1");
+	device->write_signed8(data << 2);
 }
 
 WRITE8_MEMBER(champbas_state::champbas_dac2_w)
 {
-	device_t *device = machine().device("dac2");
-	dac_signed_data_w(device, data << 2);
+	dac_device *device = machine().device<dac_device>("dac2");
+	device->write_signed8(data << 2);
 }
 
 /*************************************
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -753,10 +753,10 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_SOUND_ADD("ay4", AY8910, XTAL_14_31818MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -794,7 +794,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

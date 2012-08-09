@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( galkoku_io_map, AS_IO, 8, nbmj8991_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( hyouban_io_map, AS_IO, 8, nbmj8991_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -310,8 +310,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(nbmj8991_sound_r) AM_DEVWRITE_LEGACY("dac1", dac_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0x00, 0x00) AM_READ(nbmj8991_sound_r) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x04, 0x04) AM_WRITE(nbmj8991_soundbank_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
@@ -1494,7 +1494,7 @@ static MACHINE_CONFIG_START( nbmjdrv1, nbmj8991_state )	// galkoku
 	MCFG_SOUND_ADD("fmsnd", YM3812, 25000000/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1532,10 +1532,10 @@ static MACHINE_CONFIG_START( nbmjdrv2, nbmj8991_state )	// pstadium
 	MCFG_SOUND_ADD("fmsnd", YM3812, 25000000/6.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

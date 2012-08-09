@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 
 #define RLT_NUM_BLITTER_REGS	8
 #define RLT_NUM_BITMAPS			8
@@ -26,8 +28,8 @@ public:
 
 	bitmap_ind16 *m_tmp_bitmap[RLT_NUM_BITMAPS];
 
-	device_t *m_dac_1;
-	device_t *m_dac_2;
+	dac_device *m_dac_1;
+	dac_device *m_dac_2;
 
 	UINT8 *m_samples_1;
 	UINT8 *m_samples_2;

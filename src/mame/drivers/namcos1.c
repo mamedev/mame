@@ -384,7 +384,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
 static void namcos1_update_DACs(running_machine &machine)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
-	dac_signed_data_16_w(machine.device("dac"),0x8000 + (state->m_dac0_value * state->m_dac0_gain) + (state->m_dac1_value * state->m_dac1_gain));
+	machine.device<dac_device>("dac")->write_signed16(0x8000 + (state->m_dac0_value * state->m_dac0_gain) + (state->m_dac1_value * state->m_dac1_gain));
 }
 
 void namcos1_init_DACs(running_machine &machine)
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

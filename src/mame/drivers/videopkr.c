@@ -883,9 +883,9 @@ READ8_MEMBER(videopkr_state::baby_sound_p2_r)
 
 WRITE8_MEMBER(videopkr_state::baby_sound_p2_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	m_sbp2 = data;
-	dac_data_w(device, data);
+	device->write_unsigned8(data);
 }
 
 READ8_MEMBER(videopkr_state::baby_sound_p3_r)
@@ -962,7 +962,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
 ADDRESS_MAP_END
 
@@ -1261,7 +1261,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_CONFIG_END
 

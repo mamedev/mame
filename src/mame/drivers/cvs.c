@@ -302,7 +302,7 @@ static TIMER_CALLBACK( cvs_393hz_timer_cb )
 	if (state->m_dac3 != NULL)
 	{
 		if (state->m_dac3_state[2])
-			dac_w(state->m_dac3, 0, state->m_cvs_393hz_clock * 0xff);
+			state->m_dac3->write_unsigned8(state->m_cvs_393hz_clock * 0xff);
 	}
 }
 
@@ -324,7 +324,7 @@ static void start_393hz_timer(running_machine &machine)
 
 WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 {
-	device_t *device = machine().device("dac2");
+	dac_device *device = machine().device<dac_device>("dac2");
 	UINT8 dac_value;
 	static int old_data[4] = {0,0,0,0};
 
@@ -342,7 +342,7 @@ WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 			    (m_cvs_4_bit_dac_data[3] << 3);
 
 	/* scale up to a full byte and output */
-	dac_data_w(device, (dac_value << 4) | dac_value);
+	device->write_unsigned8((dac_value << 4) | dac_value);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_unknown_w)
@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x1880, 0x1883) AM_WRITE(cvs_4_bit_dac_data_w) AM_SHARE("4bit_dac")
 	AM_RANGE(0x1884, 0x1887) AM_WRITE(cvs_unknown_w)	AM_SHARE("dac3_state")	/* ???? not connected to anything */
 ADDRESS_MAP_END
@@ -1002,7 +1002,7 @@ MACHINE_START( cvs )
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_speech = machine.device("speech");
-	state->m_dac3 = machine.device("dac3");
+	state->m_dac3 = machine.device<dac_device>("dac3");
 	state->m_tms = machine.device("tms");
 	state->m_s2636_0 = machine.device("s2636_0");
 	state->m_s2636_1 = machine.device("s2636_1");
@@ -1079,16 +1079,16 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	//MCFG_SOUND_ADD("dac1a", DAC, 0)
+	//MCFG_DAC_ADD("dac1a")
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("tms", TMS5100, 640000)

@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x03040160, 0x0304016f) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x03040170, 0x0304017f) AM_READ_PORT("SERVICE1")
 	AM_RANGE(0x03040180, 0x0304018f) AM_READ(analogy_watchdog_r)
-	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8_LEGACY("dac", dac_w, 0xff00)
+	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8("dac", dac_device, write_unsigned8, 0xff00)
 	AM_RANGE(0x04000000, 0x057fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -307,7 +307,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
 	switch (offset & 0xff)
 	{
 		case 0x40:
-			dac_signed_data_w(m_dac, data);
+			m_dac->write_signed8(data);
 			break;
 		default:
 			logerror("%04x: I/O write to port %04x\n", cpu_get_pc(&space.device()), offset);
@@ -582,7 +582,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_io_map, AS_IO, 8, homedata_state )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
 	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
 ADDRESS_MAP_END
@@ -617,7 +617,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_io_map, AS_IO, 8, homedata_state )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
 	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
 ADDRESS_MAP_END
@@ -1149,7 +1149,7 @@ static MACHINE_START( homedata )
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_ym = machine.device("ymsnd");
 	state->m_sn = machine.device("snsnd");
-	state->m_dac = machine.device("dac");
+	state->m_dac = machine.device<dac_device>("dac");
 
 	state->save_item(NAME(state->m_visible_page));
 	state->save_item(NAME(state->m_flipscreen));
@@ -1285,7 +1285,7 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 	
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1357,7 +1357,7 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -1405,7 +1405,7 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 	
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

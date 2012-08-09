@@ -314,12 +314,12 @@ VIDEO_START(vectrex)
 static void vectrex_multiplexer(running_machine &machine, int mux)
 {
 	vectrex_state *state = machine.driver_data<vectrex_state>();
-	device_t *dac_device = machine.device("dac");
+	dac_device *dac = machine.device<dac_device>("dac");
 
 	machine.scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), state->m_via_out[PORTA], &state->m_analog[mux]);
 
 	if (mux == A_AUDIO)
-		dac_data_w(dac_device, state->m_via_out[PORTA]);
+		dac->write_unsigned8(state->m_via_out[PORTA]);
 }
 
 

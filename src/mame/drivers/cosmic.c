@@ -96,7 +96,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 					m_samples->stop(4);
 				break;
 
-		case 10:	dac_data_w(m_dac, data); break;/* Bonus */
+		case 10:	m_dac->write_unsigned8(data); break;/* Bonus */
 		case 15:	if (data) m_samples->start(0, 6); break;	/* Player Die */
 		case 16:	if (data) m_samples->start(5, 7); break;	/* Enemy Laugh */
 		case 17:	if (data) m_samples->start(0, 10); break;	/* Coin - Not triggered by software */
@@ -135,7 +135,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 		/* as other cosmic series games, but it never seems to */
 		/* be used for anything. It is implemented for sake of */
 		/* completness. Maybe it plays a tune if you win ?     */
-		case 1:	dac_data_w(m_dac, -data); break;
+		case 1:	m_dac->write_unsigned8(-data); break;
 		case 2:	if (data) m_samples->start(0, m_march_select); break;	/* March Sound */
 		case 3:	m_march_select = (m_march_select & 0xfe) | data; break;
 		case 4:	m_march_select = (m_march_select & 0xfd) | (data << 1); break;
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
@@ -963,7 +963,7 @@ static MACHINE_START( cosmic )
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 
 	state->m_samples = machine.device<samples_device>("samples");
-	state->m_dac = machine.device("dac");
+	state->m_dac = machine.device<dac_device>("dac");
 
 	state->save_item(NAME(state->m_sound_enabled));
 	state->save_item(NAME(state->m_march_select));
@@ -1035,7 +1035,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	MCFG_SAMPLES_ADD("samples", panic_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1060,7 +1060,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_SAMPLES_ADD("samples", cosmica_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	MCFG_SAMPLES_ADD("samples", cosmicg_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1119,7 +1119,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1151,7 +1151,7 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1550,11 +1550,11 @@ static DRIVER_INIT( devzone )
 static DRIVER_INIT( nomnlnd )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
-	device_t *dac = machine.device("dac");
+	dac_device *dac = machine.device<dac_device>("dac");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x480a, 0x480a, FUNC(dac_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),dac));
 }
 
 static DRIVER_INIT( panic )

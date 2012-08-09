@@ -113,7 +113,7 @@ static MACHINE_START( cheekyms )
 	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_dac = machine.device("dac");
+	state->m_dac = machine.device<dac_device>("dac");
 }
 
 static INTERRUPT_GEN( vblank_irq )
@@ -152,7 +152,7 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

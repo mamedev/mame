@@ -527,14 +527,14 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 
 WRITE16_MEMBER(calchase_state::calchase_dac_l_w)
 {
-	device_t *device = machine().device("dac_l");
-	dac_data_16_w(device, ((data & 0xfff) << 4));
+	dac_device *device = machine().device<dac_device>("dac_l");
+	device->write_unsigned16((data & 0xfff) << 4);
 }
 
 WRITE16_MEMBER(calchase_state::calchase_dac_r_w)
 {
-	device_t *device = machine().device("dac_r");
-	dac_data_16_w(device, ((data & 0xfff) << 4));
+	dac_device *device = machine().device<dac_device>("dac_r");
+	device->write_unsigned16((data & 0xfff) << 4);
 }
 
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
@@ -941,10 +941,10 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("dac_l", DAC, 0)
+	MCFG_DAC_ADD("dac_l")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 
-	MCFG_SOUND_ADD("dac_r", DAC, 0)
+	MCFG_DAC_ADD("dac_r")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
 MACHINE_CONFIG_END

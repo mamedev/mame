@@ -75,7 +75,7 @@ struct _m72_audio_state
 	UINT8 *samples;
 	UINT32 samples_size;
 	address_space *space;
-	device_t *dac;
+	dac_device *dac;
 };
 
 INLINE m72_audio_state *get_safe_token(device_t *device)
@@ -127,7 +127,7 @@ static DEVICE_START( m72_audio )
 	state->samples = device->machine().root_device().memregion("samples")->base();
 	state->samples_size = device->machine().root_device().memregion("samples")->bytes();
 	state->space = device->machine().device("soundcpu")->memory().space(AS_IO);
-	state->dac = device->machine().device("dac");
+	state->dac = device->machine().device<dac_device>("dac");
 
 	device->save_item(NAME(state->irqvector));
 	device->save_item(NAME(state->sample_addr));
@@ -250,7 +250,7 @@ WRITE8_DEVICE_HANDLER( m72_sample_w )
 {
 	m72_audio_state *state = get_safe_token(device);
 
-	dac_signed_data_w(state->dac, data);
+	state->dac->write_signed8(data);
 	state->sample_addr = (state->sample_addr + 1) & (state->samples_size - 1);
 }
 

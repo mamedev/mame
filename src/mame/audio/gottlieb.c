@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( gottlieb_sound_r1_map, AS_PROGRAM, 8, gottlieb_sound_r
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(votrax_data_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(speech_clock_dac_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -477,7 +477,7 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1 )
 	MCFG_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
 
 	// sound devices
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 MACHINE_CONFIG_END
 
@@ -743,7 +743,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::dac_w )
 	// dual DAC; the first DAC serves as the reference voltage for the
     // second, effectively scaling the output
 	m_dac_data[offset] = data;
-	dac_data_16_w(m_dac, m_dac_data[0] * m_dac_data[1]);
+	m_dac->write_unsigned16(m_dac_data[0] * m_dac_data[1]);
 }
 
 
@@ -867,7 +867,7 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r2 )
 	MCFG_CPU_PROGRAM_MAP(gottlieb_speech_r2_map)
 
 	// sound hardware
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15)
 
 	MCFG_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)

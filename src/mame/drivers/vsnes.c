@@ -231,7 +231,7 @@ WRITE8_MEMBER(vsnes_state::psg2_4017_w)
 static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes1", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w)	/* PSG status / first control register */
@@ -245,7 +245,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram_1")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_device, read, write)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes2", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg2_4015_r, psg2_4015_w)	/* PSG status / first control register */
@@ -1715,7 +1715,7 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	MCFG_SOUND_CONFIG(nes_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1788,10 +1788,10 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_SOUND_CONFIG(nes_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

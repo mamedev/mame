@@ -1,5 +1,6 @@
 
 #include "sound/msm5232.h"
+#include "sound/dac.h"
 
 #define POPDRUMKIT 0
 
@@ -56,8 +57,8 @@ public:
 	device_t *m_mcu;
 	device_t *m_audio_cpu;
 	msm5232_device *m_msm;
-	device_t *m_dac_1;
-	device_t *m_dac_2;
+	dac_device *m_dac_1;
+	dac_device *m_dac_2;
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);

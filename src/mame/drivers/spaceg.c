@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 //  MCFG_SOUND_ADD("sn3", SN76496, 15468480/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-//  MCFG_SOUND_ADD("dac", DAC, 0)
+//  MCFG_DAC_ADD("dac")
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

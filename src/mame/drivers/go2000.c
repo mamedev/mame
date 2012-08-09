@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

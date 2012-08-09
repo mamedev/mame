@@ -25,7 +25,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_dac;
+	dac_device *m_dac;
 
 	UINT8          m_irq_mask;
 	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);

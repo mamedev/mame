@@ -51,7 +51,7 @@ static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

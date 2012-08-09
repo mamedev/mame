@@ -283,11 +283,11 @@ static UINT8 console_read(address_space *space)
 
 static void console_write(address_space *space, UINT8 data)
 {
-	device_t *dac = space->machine().device("dac");
+	dac_device *dac = space->machine().device<dac_device>("dac");
 	if (data & 0x08)
-		dac_data_w(dac, (UINT8)-120);
+		dac->write_unsigned8((UINT8)-120);
 	else
-		dac_data_w(dac, +120);
+		dac->write_unsigned8(+120);
 }
 
 
@@ -305,7 +305,7 @@ void atari_machine_start(running_machine &machine)
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
 	if (machine.root_device().ioport("console") != NULL)
 		gtia_intf.console_read = console_read;
-	if (machine.device("dac") != NULL)
+	if (machine.device<dac_device>("dac") != NULL)
 		gtia_intf.console_write = console_write;
 	gtia_init(machine, &gtia_intf);
 

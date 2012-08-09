@@ -294,23 +294,23 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(suna16_state::bssoccer_DAC1_w)
 {
-	device_t *device = machine().device("dac1");
-	dac_data_w( device, (data & 0xf) * 0x11 );
+	dac_device *device = machine().device<dac_device>("dac1");
+	device->write_unsigned8( (data & 0xf) * 0x11 );
 }
 WRITE8_MEMBER(suna16_state::bssoccer_DAC2_w)
 {
-	device_t *device = machine().device("dac2");
-	dac_data_w( device, (data & 0xf) * 0x11 );
+	dac_device *device = machine().device<dac_device>("dac2");
+	device->write_unsigned8( (data & 0xf) * 0x11 );
 }
 WRITE8_MEMBER(suna16_state::bssoccer_DAC3_w)
 {
-	device_t *device = machine().device("dac3");
-	dac_data_w( device, (data & 0xf) * 0x11 );
+	dac_device *device = machine().device<dac_device>("dac3");
+	device->write_unsigned8( (data & 0xf) * 0x11 );
 }
 WRITE8_MEMBER(suna16_state::bssoccer_DAC4_w)
 {
-	device_t *device = machine().device("dac4");
-	dac_data_w( device, (data & 0xf) * 0x11 );
+	dac_device *device = machine().device<dac_device>("dac4");
+	device->write_unsigned8( (data & 0xf) * 0x11 );
 }
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
@@ -806,16 +806,16 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_DAC_ADD("dac4")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
@@ -865,10 +865,10 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -914,10 +914,10 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -987,16 +987,16 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_DAC_ADD("dac4")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 

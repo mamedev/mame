@@ -82,6 +82,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
 #include "sound/2151intf.h"
+#include "sound/dac.h"
 
 
 #define OUTPUT_RATE			50000

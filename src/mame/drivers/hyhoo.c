@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r, nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE_LEGACY("dac", dac_w)		// unknown read
+	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", dac_device, write_unsigned8)		// unknown read
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
 	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nb1413m3_gfxrom_r)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

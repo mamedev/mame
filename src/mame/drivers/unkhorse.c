@@ -117,7 +117,7 @@ WRITE8_MEMBER(horse_state::horse_output_w)
 
 WRITE_LINE_MEMBER(horse_state::horse_timer_out)
 {
-	dac_signed_w(machine().device("dac"), 0, state ? 0x7f : 0);
+	machine().device<dac_device>("dac")->write_signed8(state ? 0x7f : 0);
 }
 
 static I8155_INTERFACE(i8155_intf)
@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -742,10 +742,10 @@ WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
 
 WRITE8_MEMBER(tnzs_state::kabukiz_sample_w)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		dac_data_w(device, data);
+		device->write_unsigned8(data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_state )
@@ -1881,7 +1881,7 @@ static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_SOUND_CONFIG(kabukiz_ym2203_interface)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

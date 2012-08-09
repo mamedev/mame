@@ -162,7 +162,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
 	// d1: audio out
-	dac_signed_w(machine().device("dac"), 0, (data & 2) ? 0x7f : 0);
+	machine().device<dac_device>("dac")->write_signed8((data & 2) ? 0x7f : 0);
 
 	// d0, d2-d7: N/C
 }
@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	/* sound hardware (discrete) */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

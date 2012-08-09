@@ -380,7 +380,7 @@ WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 
 WRITE8_MEMBER(looping_state::looping_sound_sw)
 {
-	device_t *device = machine().device("dac");
+	dac_device *device = machine().device<dac_device>("dac");
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
         0001 = ASOV
@@ -393,7 +393,7 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
     */
 
 	m_sound[offset + 1] = data ^ 1;
-	dac_data_w(device, ((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
+	device->write_unsigned8(((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
 }
 
 
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_SOUND_CONFIG(tms5220_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
