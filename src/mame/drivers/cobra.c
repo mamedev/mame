@@ -171,28 +171,104 @@
 		0xb0 0xb4 0xb8 0xbc
 
 		0x00114:		High word: framebuffer pitch?   Low word: framebuffer pixel size?
-		0x00118:		High word: FB pixel read X pos,   Low word: FB pixel read Y pos
+		
+		0x00118:		xxxxxxxx xxxxxxxx -------- --------				Framebuffer pixel read X pos
+						-------- -------- xxxxxxxx xxxxxxxx				Framebuffer pixel read Y pos
+		
 		0x0011c:		Same as above?
+		
 		0x00458:		Set to 0x02100000 (0xff) by texselect()
 
-		0x40018:		Set to 0x0001040a (0xc0) by mode_stipple()
+		0x02904:		-------- ------xx xx------ --------				Tex mag filter?
+						-------- -------- --xxxx-- --------				Tex min filter?
+
+		0x02908:		-------- ----xxx- -------- --------				Tex wrap S (0 = repeat, 1 = mirror, 2 = clamp)
+						-------- -------x xx------ --------				Tex wrap T
+
+		0x02910:		xxxx---- -------- -------- --------				Texture width shift (size = 1 << X)
+						----xxxx -------- -------- --------				Texture height shift (size = 1 << X)
+						-------- ----x--- -------- --------				?
+						-------- -------- -x------ --------				?
+						-------- -------- -------- xxx-----				Texture format (texel size, 2 = 4-bit, 3 = 8-bit, 4 = 16-bit)
+						-------- -------- -------- ---xxx--				Texture format param
+
+		0x02914:		--xxxxxx xxxxxxxx xx------ --------				? (texture param, set to 0x1243)
+
+		0x40018:		Set to 0x0001040a (0xc0) by mode_stipple()		(bits 24..27 = stipple pattern?)
 		0x400d0:		Set to 0x80000000 (0x80) by mode_stipple()
 		0x400f4:		Set to 0x40000000 (0x80) by texselect()
 		0x40114:		Set to 0x00080000 (0x10) by mode_scissor()
 		0x40138:		Set to 0x88800000 (0xe0) by mode_viewclip()
-		0x40160:		Some viewport register? (high word: 192, low word: 150)
-		0x40164:		Some viewport register? (high word: 352, low word: 275)
-		0x40170:		Some viewport register? (high word: 160, low word: 125)
-		0x40174:		Some viewport register? (high word: 320, low word: 250)
-		0x40198:		Set to 0x80800000 (0xa0) by mode_alphatest()
-		0x4019c:		Set to 0x88000000 (0xc0) by mode_fog()
-		0x8001c:		Set to 0xc1d60060 (0xfe) by mode_stenciltest()
-		0x80020:		Set to 0x00020000 (0x10) by mode_depthtest()
-		0x80050:		Set to 0x04445500 (0x7c) by mode_blend()
+		
+		0x40160:		xxxxxxxx xxxxxxxx -------- --------				Scissor Left
+						-------- -------- xxxxxxxx xxxxxxxx				Scissor Top
+
+		0x40164:		xxxxxxxx xxxxxxxx -------- --------				Scissor Right
+						-------- -------- xxxxxxxx xxxxxxxx				Scissor Bottom
+
+		0x40170:		xxxxxxxx xxxxxxxx -------- --------				Viewport Left
+						-------- -------- xxxxxxxx xxxxxxxx				Viewport Top
+
+		0x40174:		xxxxxxxx xxxxxxxx -------- --------				Viewport Right
+						-------- -------- xxxxxxxx xxxxxxxx				Viewport Bottom
+
+		0x40198:		x------- -------- -------- --------				Alpha test enable?
+						-------- xxx----- -------- --------				Alpha test function (0 = never, 1 = less, 2 = lequal, 3 = greater,
+																							 4 = gequal, 5 = equal, 6 = notequal, 7 = always)
+		
+		0x4019c:		Set to 0x88000000 (0xc0) by mode_fog()			(bit 31: 0 = linear fog, 1 = table fog)
+
+		0x401bc:														Texture env mode
+						xxx----- -------- -------- --------				?
+						---xxx-- -------- -------- --------				?
+
+		0x8001c:		(mask 0xfe) 0xc1d60060 = (not equal, 6)			Stencil register
+									0xca9b0010 = (not equal, 1)
+									0x037dfff0 = (never)
+									0x2616fff0 = (greater)
+									0x459cfff0 = (greater/equal)
+									0x6672fff0 = (less)
+									0x8827fff0 = (less/equal)
+									0xa92b0100 = (equal, 16)
+
+						-------- -------- xxxxxxxx xxxx----				Stencil reference value?
+						xxx----- -------- -------- --------				Stencil function?
+
+		
+		0x80020:		-------- ----xxx- -------- --------				Depth test function (7 = always?)
+
+		0x80050:		(mask 0x7c) 0x04445500 = (As, 1-As)				Blend register
+									0x04111100 = (1, 1)
+									0x04441100 = (As, 1)
+									0x04114400 = (1, As)
+									0x04681100 = (Cd, 1)
+									0x04680000 = (Cd, 0)
+									0x04002400 = (0, Cs)
+									0x04e11100 = (Ad, 1-Ad)
+									0x04889900 = (pseudo-fog)
+
+						-----x-- -------- -------- --------				Blend enable?
+						-------- xxxx---- -------- --------				source factor?
+						-------- ----xxxx -------- --------				source?
+						-------- -------- xxxx---- --------				dest factor?
+						-------- -------- ----xxxx --------				dest?
+						
+
 		0x80054:		Set to 0x02400000 (0xe0) by mode_stencilmod()
+
+		0x800a4:		x------- -------- -------- --------				Logic op enable?
+						-----xxx x------- -------- --------				Logic op (0 = clear, 1 = and, 2 = and reverse, 3 = copy,
+																				  4 = and inverted, 5 = noop, 6 = xor, 7 = or inverted,
+																				  8 = nor, 9 = equiv, 10 = invert, 11 = or reverse,
+																				  12 = copy inverted, 13 = or inverted, 14 = nand, 15 = set)
+
 		0x80114:		(0xcc) by mode_colormask()
 		0x80118:		(0xcc) by mode_colormask()
-		0x8011c:		(0xe0) by mode_stencilmask()
+
+		0x8011c:		xxxxxxxx xxxx---- -------- --------				Stencil mask
+
+		0x80120:		-------- -------- xxxxxxxx xxxxxxxx				Depth mask register
+
 		0xc0c00..fff:	Texture RAM readback
 		0xc3020:		Start address for texram writes?
 		0xc3028:		Reads address from texram?
@@ -233,10 +309,6 @@ public:
 		m_zbuffer = auto_bitmap_ind32_alloc(machine, 1024, 1024);
 		m_stencil = auto_bitmap_ind32_alloc(machine, 1024, 1024);
 
-		// TODO: these are probably set by some 3D registers
-		m_texture_width = 128;
-		m_texture_height = 8;
-
 		m_gfx_regmask = auto_alloc_array(machine, UINT32, 0x100);
 		for (int i=0; i < 0x100; i++)
 		{
@@ -275,8 +347,6 @@ private:
 	bitmap_ind32 *m_stencil;
 
 	UINT32 *m_texture_ram;
-	int m_texture_width;
-	int m_texture_height;
 
 	UINT32 *m_gfx_gram;
 	UINT32 *m_gfx_regmask;
@@ -435,15 +505,18 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 	float dv = extent.param[1].dpdx;
 	UINT32 *fb = &m_framebuffer->pix32(scanline);
 
+	int texture_width = 1 << ((m_gfx_gram[0x2910/4] >> 28) & 0xf);
+	int texture_height = 1 << ((m_gfx_gram[0x2910/4] >> 24) & 0xf);
+
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
 		UINT32 texel;
 
-		iu = (int)(u * m_texture_width);
-		iv = (int)(v * m_texture_height);
+		iu = (int)(u * texture_width);
+		iv = (int)(v * texture_height);
 
-		texel = m_texture_ram[((iv * m_texture_width) + iu) / 2];
+		texel = m_texture_ram[((iv * texture_width) + iu) / 2];
 
 		if (iu & 1)
 		{
@@ -1377,6 +1450,7 @@ static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM											// Main RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)			// Double buffered shared RAM between Main and Sub
+//  AM_RANGE(0x78000000, 0x780000ff) AM_MIRROR(0x80000000) AM_NOP											// SCSI controller (unused)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16_LEGACY("rfsnd", rf5c400_r, rf5c400_w, 0xffffffff)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
@@ -1533,6 +1607,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			w2 = cobra->m_gfx_re_command_word2;
 		}
 
+	
 
 		switch ((w1 >> 24) & 0xff)
 		{
@@ -1650,7 +1725,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				// 0x00: -------- -------- -------- xxxxxxxx	Number of units (amount of bits is uncertain)
 				//
 				// 0x01: -x------ -------- -------- --------    Has extra flags word (used by lines only)
-				// 0x01: --x----- -------- -------- --------    Has extra unknown float
+				// 0x01: --x----- -------- -------- --------    Has extra unknown float (seems to be fog-related?)
 				// 0x01: ---x---- -------- -------- --------    Always 1?
 				// 0x01: -------- xx------ -------- --------    ?
 				// 0x01: -------- --x----- -------- --------    Has texture coords
@@ -1697,11 +1772,11 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					fifo_in->pop(NULL, &vert[i].x);				// X coord
 					fifo_in->pop(NULL, &vert[i].y);				// Y coord
 					fifo_in->pop(NULL, &in);					// coord?
-					fifo_in->pop(NULL, &in);					// coord?
+					fifo_in->pop(NULL, &in);					// Z coord
 
 					if (w2 & 0x00200000)		// texture coords
 					{
-						fifo_in->pop(NULL, &in);				// ? (float 0.0f ... 1.0f)
+						fifo_in->pop(NULL, &in);				// W coord (1 / Z)
 						fifo_in->pop(NULL, &vert[i].p[0]);		// U coord
 						fifo_in->pop(NULL, &vert[i].p[1]);		// V coord
 					}
@@ -1861,6 +1936,9 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 						fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);
 					}
 				}
+
+				// flush fifo_out so we have fresh data at top
+				fifo_out->flush();
 
 				fifo_out->push(NULL, buffer[x+0]);
 				fifo_out->push(NULL, buffer[x+1]);
