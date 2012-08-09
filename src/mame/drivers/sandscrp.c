@@ -105,6 +105,32 @@ public:
 };
 
 
+
+SCREEN_UPDATE_IND16( sandscrp )
+{
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+	device_t *pandora = screen.machine().device("pandora");
+	bitmap.fill(0, cliprect);
+
+	int i;
+
+	screen.machine().priority_bitmap.fill(0, cliprect);
+
+	state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+
+	for ( i = 0; i < 8; i++ )
+	{
+		state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+	}
+
+	// copy sprite bitmap to screen
+	pandora_update(pandora, bitmap, cliprect);
+	return 0;
+}
+
+
+
+
 static MACHINE_RESET( sandscrp )
 {
 //	sandscrp_state *state = machine.driver_data<sandscrp_state>();
@@ -496,8 +522,6 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
-
-	MCFG_VIDEO_START(sandscrp_1xVIEW2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

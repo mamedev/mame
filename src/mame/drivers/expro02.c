@@ -157,7 +157,13 @@ class expro02_state : public kaneko16_state
 {
 public:
 	expro02_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag) { }
+		: kaneko16_state(mconfig, type, tag),
+		m_galsnew_bg_pixram(*this, "galsnew_bgram"),
+		m_galsnew_fg_pixram(*this, "galsnew_fgram")
+	{ }
+
+	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
+	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
 
 	UINT16 m_vram_0_bank_num;
 	UINT16 m_vram_1_bank_num;
@@ -166,6 +172,71 @@ public:
 	DECLARE_WRITE16_MEMBER(galsnew_vram_0_bank_w);
 	DECLARE_WRITE16_MEMBER(galsnew_vram_1_bank_w);
 };
+
+
+
+SCREEN_UPDATE_IND16( galsnew )
+{
+	expro02_state *state = screen.machine().driver_data<expro02_state>();
+//  kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
+	int y,x;
+	int count;
+
+
+	count = 0;
+	for (y=0;y<256;y++)
+	{
+		UINT16 *dest = &bitmap.pix16(y);
+
+		for (x=0;x<256;x++)
+		{
+			UINT16 dat = (state->m_galsnew_fg_pixram[count] & 0xfffe)>>1;
+			dat+=2048;
+			dest[x] = dat;
+			count++;
+		}
+	}
+
+	count = 0;
+	for (y=0;y<256;y++)
+	{
+		UINT16 *dest = &bitmap.pix16(y);
+
+		for (x=0;x<256;x++)
+		{
+			UINT16 dat = (state->m_galsnew_bg_pixram[count]);
+			//dat &=0x3ff;
+			if (dat)
+				dest[x] = dat;
+
+			count++;
+		}
+	}
+
+
+	// if the display is disabled, do nothing?
+	if (!state->m_disp_enable) return 0;
+
+	int i;
+
+	screen.machine().priority_bitmap.fill(0, cliprect);
+
+	state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+
+	for ( i = 0; i < 8; i++ )
+	{
+		state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+	}
+
+	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
+	return 0;
+}
+
+VIDEO_START( galsnew )
+{
+	kaneko16_state *state = machine.driver_data<kaneko16_state>();
+	state->m_disp_enable = 1;	// default enabled for games not using it
+}
 
 
 /*************************************

@@ -17,34 +17,72 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
 	COMBINE_DATA(&m_disp_enable);
 }
 
-VIDEO_START( kaneko16_sprites )
+VIDEO_START( kaneko16 )
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	state->m_disp_enable = 1;	// default enabled for games not using it
 }
 
-VIDEO_START( kaneko16_1xVIEW2_tilemaps )
+
+
+static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	state->m_disp_enable = 1; // default enabled for games not using it
+	if (state->m_kaneko_spr)
+		if(state->m_kaneko_spr->get_sprite_type()== 1)
+		{
+			bitmap.fill(0x7f00, cliprect);
+			return;
+		}
+
+
+	
+	/* Fill the bitmap with pen 0. This is wrong, but will work most of
+       the times. To do it right, each pixel should be drawn with pen 0
+       of the bottomost tile that covers it (which is pretty tricky to do) */
+	bitmap.fill(0, cliprect);
+
 }
 
-
-VIDEO_START( kaneko16_1xVIEW2 )
+static SCREEN_UPDATE_IND16( common )
 {
-	VIDEO_START_CALL(kaneko16_sprites);
-	VIDEO_START_CALL(kaneko16_1xVIEW2_tilemaps);
+	int i;
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+
+	screen.machine().priority_bitmap.fill(0, cliprect);
+
+	if (state->m_view2_0) state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+	if (state->m_view2_1) state->m_view2_1->kaneko16_prepare(bitmap, cliprect);
+
+	for ( i = 0; i < 8; i++ )
+	{
+		if (state->m_view2_0) state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		if (state->m_view2_1) state->m_view2_1->render_tilemap_chip_alt(bitmap,cliprect,i, state->VIEW2_2_pri);
+	}
+
+	return 0;
 }
 
-VIDEO_START( kaneko16_2xVIEW2 )
+
+
+
+
+SCREEN_UPDATE_IND16( kaneko16 )
 {
-	VIDEO_START_CALL(kaneko16_1xVIEW2);
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
+
+	// if the display is disabled, do nothing?
+	if (!state->m_disp_enable) return 0;
+
+	SCREEN_UPDATE16_CALL(common);
+	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
+	return 0;
 }
 
-VIDEO_START( sandscrp_1xVIEW2 )
-{
-	VIDEO_START_CALL(kaneko16_1xVIEW2);
-}
+
+
 
 
 
@@ -63,7 +101,7 @@ PALETTE_INIT( berlwall )
 
 VIDEO_START( berlwall )
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
+	kaneko16_berlwall_state *state = machine.driver_data<kaneko16_berlwall_state>();
 	int sx, x,y;
 	UINT8 *RAM	=	state->memregion("gfx3")->base();
 
@@ -105,13 +143,9 @@ VIDEO_START( berlwall )
 			state->m_bg15_bitmap.pix16(y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
 	  }
 
-	VIDEO_START_CALL(kaneko16_1xVIEW2);
+	VIDEO_START_CALL(kaneko16);
 }
 
-VIDEO_START( galsnew )
-{
-	VIDEO_START_CALL(kaneko16_sprites);
-}
 
 
 
@@ -119,31 +153,29 @@ VIDEO_START( galsnew )
 
 
 /* Select the high color background image (out of 32 in the ROMs) */
-READ16_MEMBER(kaneko16_state::kaneko16_bg15_select_r)
+READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_r)
 {
 	return m_bg15_select[0];
 }
-WRITE16_MEMBER(kaneko16_state::kaneko16_bg15_select_w)
+WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_w)
 {
 	COMBINE_DATA(&m_bg15_select[0]);
 }
 
 /* ? */
-READ16_MEMBER(kaneko16_state::kaneko16_bg15_reg_r)
+READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_r)
 {
 	return m_bg15_reg[0];
 }
-WRITE16_MEMBER(kaneko16_state::kaneko16_bg15_reg_w)
+WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_w)
 {
 	COMBINE_DATA(&m_bg15_reg[0]);
 }
 
 
-
-
 static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
+	kaneko16_berlwall_state *state = machine.driver_data<kaneko16_berlwall_state>();
 	if (state->m_bg15_bitmap.valid())
 	{
 		int select	=	state->m_bg15_select[ 0 ];
@@ -161,46 +193,6 @@ static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_ind16 
 //      flag = 0;
 	}
 }
-
-static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	if (state->m_kaneko_spr)
-		if(state->m_kaneko_spr->get_sprite_type()== 1)
-		{
-			bitmap.fill(0x7f00, cliprect);
-			return;
-		}
-
-
-	
-	/* Fill the bitmap with pen 0. This is wrong, but will work most of
-       the times. To do it right, each pixel should be drawn with pen 0
-       of the bottomost tile that covers it (which is pretty tricky to do) */
-	bitmap.fill(0, cliprect);
-
-}
-
-static SCREEN_UPDATE_IND16( common )
-{
-	int i;
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
-
-	screen.machine().priority_bitmap.fill(0, cliprect);
-
-	if (state->m_view2_0) state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
-	if (state->m_view2_1) state->m_view2_1->kaneko16_prepare(bitmap, cliprect);
-
-	for ( i = 0; i < 8; i++ )
-	{
-		if (state->m_view2_0) state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
-		if (state->m_view2_1) state->m_view2_1->render_tilemap_chip_alt(bitmap,cliprect,i, state->VIEW2_2_pri);
-	}
-
-	return 0;
-}
-
 SCREEN_UPDATE_IND16(berlwall)
 {
 	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
@@ -214,91 +206,3 @@ SCREEN_UPDATE_IND16(berlwall)
 	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
 	return 0;
 }
-
-
-SCREEN_UPDATE_IND16( jchan_view2 )
-{
-	SCREEN_UPDATE16_CALL(common);
-	return 0;
-}
-
-
-SCREEN_UPDATE_IND16( kaneko16 )
-{
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
-	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
-
-	// if the display is disabled, do nothing?
-	if (!state->m_disp_enable) return 0;
-
-	SCREEN_UPDATE16_CALL(common);
-	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
-	return 0;
-}
-
-SCREEN_UPDATE_IND16( galsnew )
-{
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
-//  kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
-	int y,x;
-	int count;
-
-
-	count = 0;
-	for (y=0;y<256;y++)
-	{
-		UINT16 *dest = &bitmap.pix16(y);
-
-		for (x=0;x<256;x++)
-		{
-			UINT16 dat = (state->m_galsnew_fg_pixram[count] & 0xfffe)>>1;
-			dat+=2048;
-			dest[x] = dat;
-			count++;
-		}
-	}
-
-	count = 0;
-	for (y=0;y<256;y++)
-	{
-		UINT16 *dest = &bitmap.pix16(y);
-
-		for (x=0;x<256;x++)
-		{
-			UINT16 dat = (state->m_galsnew_bg_pixram[count]);
-			//dat &=0x3ff;
-			if (dat)
-				dest[x] = dat;
-
-			count++;
-		}
-	}
-
-
-	// if the display is disabled, do nothing?
-	if (!state->m_disp_enable) return 0;
-
-	SCREEN_UPDATE16_CALL(common);
-
-	state->m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, state->m_spriteram, state->m_spriteram.bytes());
-	return 0;
-}
-
-
-SCREEN_UPDATE_IND16( sandscrp )
-{
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
-	device_t *pandora = screen.machine().device("pandora");
-	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
-
-	// if the display is disabled, do nothing?
-	if (!state->m_disp_enable) return 0;
-
-	SCREEN_UPDATE16_CALL(common);
-
-	// copy sprite bitmap to screen
-	pandora_update(pandora, bitmap, cliprect);
-	return 0;
-}
-
-

@@ -2,13 +2,11 @@
 
 /* berlwall, blazeon etc. */
 #define MCFG_DEVICE_ADD_VU002_SPRITES \
-	MCFG_DEVICE_ADD("kan_spr", KANEKO16_SPRITE, 0) \
-	kaneko16_sprite_device::set_type(*device, 0); \
+	MCFG_DEVICE_ADD("kan_spr", KANEKO_VU002_SPRITE, 0) \
 
 /* gtmr, gtmr2, bloodwar etc. */
 #define MCFG_DEVICE_ADD_KC002_SPRITES \
-	MCFG_DEVICE_ADD("kan_spr", KANEKO16_SPRITE, 0) \
-	kaneko16_sprite_device::set_type(*device, 1); \
+	MCFG_DEVICE_ADD("kan_spr", KANEKO_KC002_SPRITE, 0) \
 
 
 
@@ -31,19 +29,25 @@ struct tempsprite
 class kaneko16_sprite_device : public device_t
 {
 public:
-	kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock,  device_type type);
 	
-	static void set_type(device_t &device, int type);
 	static void set_altspacing(device_t &device, int spacing);
 	static void set_fliptype(device_t &device, int fliptype);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
-
 	static void set_priorities(device_t &device, int pri0, int pri1, int pri2, int pri3);
 
+	// (legacy) used in the bitmap clear functions
+	virtual int get_sprite_type(void) =0;
+
+	void kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes);
 
 
-	// sprite type: todo, different class instead (set when declaring device in MCFG)
-	int m_sprite_type;
+	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
 
 	// alt ram addressing (set when declaring device in MCFG)
 	//  used on Berlin Wall.. it's the same sprite chip, so probably just a different RAM hookup on the PCB, maybe also
@@ -60,16 +64,12 @@ public:
 	// priority for mixing (set when declaring device in MCFG )
 	kaneko16_priority_t m_priority;
 
+	// pure virtual function for getting the attributes on sprites, the two different chip types have
+	// them in a different order
+	virtual void get_sprite_attributes(struct tempsprite *s, UINT16 attr) =0;
 
 
-	// used in the bitmap clear functions
-	int get_sprite_type(void)
-	{
-		return m_sprite_type;
-	}
-
-
-
+private:
 	// registers
 	UINT16 m_sprite_flipx;
 	UINT16 m_sprite_flipy;
@@ -79,8 +79,6 @@ public:
 	int m_keep_sprites;
 	bitmap_ind16 m_sprites_bitmap;
 
-
-	void kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes);
 	void kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes);
 
 	void kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
@@ -90,17 +88,29 @@ public:
 	int kaneko16_parse_sprite_type012(running_machine &machine, int i, struct tempsprite *s, UINT16* spriteram16, int spriteram16_bytes);
 
 
-	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
 
-
-protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-private:
 
 };
 
-extern const device_type KANEKO16_SPRITE;
+//extern const device_type KANEKO16_SPRITE;
 
+
+class kaneko_vu002_sprite_device : public kaneko16_sprite_device
+{
+public:
+	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void get_sprite_attributes(struct tempsprite *s, UINT16 attr);
+	int get_sprite_type(void){ return 0; }; 
+};
+
+extern const device_type KANEKO_VU002_SPRITE;
+
+class kaneko_kc002_sprite_device : public kaneko16_sprite_device
+{
+public:
+	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void get_sprite_attributes(struct tempsprite *s, UINT16 attr);
+	int get_sprite_type(void){ return 1; }; 
+};
+
+extern const device_type KANEKO_KC002_SPRITE;

@@ -72,12 +72,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_spriteram(*this, "spriteram"),
-		m_bg15_reg(*this, "bg15_reg"),
-		m_bg15_select(*this, "bg15_select"),
 		m_mcu_ram(*this, "mcu_ram"),
 		m_mainram(*this, "mainram"),
-		m_galsnew_bg_pixram(*this, "galsnew_bgram"),
-		m_galsnew_fg_pixram(*this, "galsnew_fgram"),
 		m_view2_0(*this, "view2_0"),
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr")
@@ -86,12 +82,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_bg15_reg;
-	optional_shared_ptr<UINT16> m_bg15_select;
 	optional_shared_ptr<UINT16> m_mcu_ram;
 	optional_shared_ptr<UINT16> m_mainram;
-	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
-	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 	optional_device<kaneko_view2_tilemap_device> m_view2_1;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
@@ -107,7 +99,6 @@ public:
 
 	int VIEW2_2_pri;
 
-	bitmap_ind16 m_bg15_bitmap;
 
 	DECLARE_READ16_MEMBER(kaneko16_rnd_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
@@ -139,10 +130,6 @@ public:
 	DECLARE_READ16_MEMBER(shogwarr_calc_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
 
-	DECLARE_READ16_MEMBER(kaneko16_bg15_select_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
-	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
 	DECLARE_READ16_MEMBER(kaneko16_ay1_YM2149_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_ay1_YM2149_w);
 	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
@@ -157,6 +144,27 @@ public:
 	DECLARE_WRITE8_MEMBER(kaneko16_eeprom_reset_w);
 };
 
+class kaneko16_berlwall_state : public kaneko16_state
+{
+public:
+	kaneko16_berlwall_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag),
+		m_bg15_reg(*this, "bg15_reg"),
+		m_bg15_select(*this, "bg15_select")
+	{
+	}
+
+	optional_shared_ptr<UINT16> m_bg15_reg;
+	optional_shared_ptr<UINT16> m_bg15_select;
+
+	bitmap_ind16 m_bg15_bitmap;
+
+	DECLARE_READ16_MEMBER(kaneko16_bg15_select_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
+	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
+
+};
 
 /*----------- defined in machine/kaneko16.c -----------*/
 
@@ -195,20 +203,11 @@ void kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const
 
 PALETTE_INIT( berlwall );
 
-VIDEO_START( kaneko16_sprites );
-VIDEO_START( kaneko16_1xVIEW2_tilemaps );
-VIDEO_START( kaneko16_1xVIEW2 );
-VIDEO_START( kaneko16_2xVIEW2 );
+VIDEO_START( kaneko16 );
 VIDEO_START( berlwall );
-VIDEO_START( sandscrp_1xVIEW2 );
-
 
 SCREEN_UPDATE_IND16( kaneko16 );
-SCREEN_UPDATE_IND16( sandscrp );
 SCREEN_UPDATE_IND16( berlwall );
-SCREEN_UPDATE_IND16( jchan_view2 );
 
-VIDEO_START( galsnew );
-SCREEN_UPDATE_IND16( galsnew );
 
 #endif

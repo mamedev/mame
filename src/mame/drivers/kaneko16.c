@@ -306,7 +306,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
                                 The Berlin Wall
 ***************************************************************************/
 
-static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_state )
+static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x30e000, 0x30ffff) AM_RAM AM_SHARE("spriteram")		// Sprites
@@ -1712,7 +1712,7 @@ static const ay8910_interface ay8910_intf_eeprom =
     6-7]    rte
 */
 
-static MACHINE_CONFIG_START( berlwall, kaneko16_state )
+static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12 */
@@ -1802,7 +1802,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 
 
 
-	MCFG_VIDEO_START(kaneko16_2xVIEW2)
+	MCFG_VIDEO_START(kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
-	MCFG_VIDEO_START(kaneko16_1xVIEW2)
+	MCFG_VIDEO_START(kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1928,7 +1928,7 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_state )
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
 
-	MCFG_VIDEO_START(kaneko16_2xVIEW2)
+	MCFG_VIDEO_START(kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2025,7 +2025,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 
 
 
-	MCFG_VIDEO_START(kaneko16_2xVIEW2)
+	MCFG_VIDEO_START(kaneko16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2141,7 +2141,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_state )
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, -0x8, 320, 240);
 
-	MCFG_VIDEO_START(kaneko16_1xVIEW2)
+	MCFG_VIDEO_START(kaneko16)
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_priorities(*device, 1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */);

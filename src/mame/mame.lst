@@ -18956,6 +18956,8 @@ m4cashcoc	//
 m4cashcod	//
 m4cashln	// Cash Lines (Barcrest)
 m4cashmn	// Cash Machine (Barcrest)
+m4cashmn__za	//
+m4cashmn__zb	//
 m4cashmx	// Cash Matrix (Barcrest)
 m4cashmxa	//
 m4cashzn	// Cash Zone (Barcrest)
@@ -18994,6 +18996,23 @@ m4crjwl		// Crown Jewels Club (Barcrest)
 m4crjwl2	// Crown Jewels Mk II Club (Barcrest)
 m4crdome	// Crystal Dome (Barcrest)
 m4crmaze	// Crystal Maze (Barcrest)
+m4crmaze__c	//
+m4crmaze__d	//
+m4crmaze__e	//
+m4crmaze__f	//
+m4crmaze__g	//
+m4crmaze__h	//
+m4crmaze__i	//
+m4crmaze__j	//
+m4crmaze__k	//
+m4crmaze__l	//
+m4crmaze__m	//
+m4crmaze__n	//
+m4crmaze__o	//
+m4crmaze__p	//
+m4crmaze__q	//
+m4crmaze__r	//
+m4crmaze__s	//
 m4denmen	// Dennis The Menace (Barcrest)
 m4denmen_h2	//
 m4denmendnc	//
@@ -19367,6 +19386,8 @@ m4takepk	// Take Your Pick (Barcrest)
 m4tpcl		// Take Your Pick Club (Barcrest)
 m4techno	// Techno Reel (Barcrest)
 m4toot		// Ten Out Of Ten (Barcrest)
+m4toot__za	//
+m4toot__zb	//
 m4ttdia		// Ten Ten Do It Again (Barcrest)
 m4tiktak	// Tic Tak Cash (Barcrest)
 m4toma		// Tomahawk (Barcrest)
@@ -19378,6 +19399,64 @@ m4toprn		// Top Run (Barcrest)
 m4topst		// Top Stop (Barcrest)
 m4toptak	// Top Take (Barcrest)
 m4topten	// Top Tenner (Barcrest)
+m4topten__a	//
+m4topten__b	//
+m4topten__e	//
+m4topten__f	//
+m4topten__g	//
+m4topten__h	//
+m4topten__i	//
+m4topten__j	//
+m4topten__k	//
+m4topten__l	//
+m4topten__m	//
+m4topten__n	//
+m4topten__o	//
+m4topten__p	//
+m4topten__q	//
+m4topten__r	//
+m4topten__s	//
+m4topten__t	//
+m4topten__u	//
+m4topten__v	//
+m4topten__w	//
+m4topten__x	//
+m4topten__y	//
+m4topten__z	//
+m4topten__0	//
+m4topten__1	//
+m4topten__2	//
+m4topten__3	//
+m4topten__4	//
+m4topten__5	//
+m4topten__6	//
+m4topten__7	//
+m4topten__8	//
+m4topten__9	//
+m4topten__aa	//
+m4topten__ab	//
+m4topten__ac	//
+m4topten__ad	//
+m4topten__ae	//
+m4topten__af	//
+m4topten__ag	//
+m4topten__ah	//
+m4topten__ai	//
+m4topten__aj	//
+m4topten__ak	//
+m4topten__al	//
+m4topten__am	//
+m4topten__an	//
+m4topten__ao	//
+m4topten__ap	//
+m4topten__aq	//
+m4topten__ar	//
+m4topten__as	//
+m4topten__at	//
+m4topten__au	//
+m4topten__av	//
+m4topten__aw	//
+m4topten__ax	//
 m4toptena	//
 m4toplot	// Top The Lot (Barcrest)
 m4toptim	// Top Timer (Barcrest)

@@ -10,7 +10,7 @@
 
         Sprites are 16 x 16 x 4 in the older games, 16 x 16 x 8 in
         gtmr & gtmr2.
-        Sprites types 0 and 2 can also have a simple effect keeping
+        Sprite type 0 also has a simple effect for keeping
         sprites on the screen
 
 
@@ -25,10 +25,12 @@
 #include "emu.h"
 #include "kaneko_spr.h"
 
-const device_type KANEKO16_SPRITE = &device_creator<kaneko16_sprite_device>;
+//const device_type KANEKO16_SPRITE = &device_creator<kaneko16_sprite_device>; // we have pure virtual functions
+const device_type KANEKO_VU002_SPRITE = &device_creator<kaneko_vu002_sprite_device>;
+const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_device>;
 
-kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO16_SPRITE, "kaneko16_sprite_device", tag, owner, clock)
+kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
+	: device_t(mconfig, type, "kaneko16_sprite_device", tag, owner, clock)
 {
 	m_keep_sprites = 0;	// default disabled for games not using it
 
@@ -37,7 +39,6 @@ kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, co
 	m_sprite_yoffs = 0;
 
 	m_sprite_fliptype = 0;
-	m_sprite_type  = 0;
 
 	m_altspacing = 0;
 /*
@@ -81,11 +82,6 @@ void kaneko16_sprite_device::set_priorities(device_t &device, int pri0, int pri1
 	dev.m_priority.sprite[3] = pri3;
 }
 
-void kaneko16_sprite_device::set_type(device_t &device, int type)
-{
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-	dev.m_sprite_type = type;
-}
 
 void kaneko16_sprite_device::set_altspacing(device_t &device, int spacing)
 {
@@ -119,16 +115,16 @@ void kaneko16_sprite_device::set_offsets(device_t &device, int xoffs, int yoffs)
                                 Sprites Drawing
 
     Sprite data is layed out in RAM in different ways for different games
-    (type 0,1,2,etc.). This basically involves the bits in the attribute
+    (type 0,1). This basically involves the bits in the attribute
     word to be shuffled around and/or the words being in different order.
 
     Each sprite is always stuffed in 4 words. There may be some extra
-    padding words though (e.g. type 2 sprites are like type 0 but the
-    data is held in the last 8 bytes of every 16). Examples are:
+    padding words though
+	
+	Examples are:
 
     Type 0: shogwarr, blazeon, bakubrkr.
     Type 1: gtmr.
-    Type 2: berlwall
 
 Offset:         Format:                     Value:
 
@@ -166,6 +162,24 @@ Offset:         Format:                     Value:
 #define USE_LATCHED_CODE	2
 #define USE_LATCHED_COLOR	4
 
+void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
+{
+	s->color		=		(attr & 0x003f);
+	s->priority		=		(attr & 0x00c0) >> 6;
+	s->flipy		=		(attr & 0x0100);
+	s->flipx		=		(attr & 0x0200);
+	s->code			+=		(s->y & 1) << 16;	// bloodwar
+}
+	
+void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
+{
+	s->flipy		=		(attr & 0x0001);
+	s->flipx		=		(attr & 0x0002);
+	s->color		=		(attr & 0x00fc) >> 2;
+	s->priority		=		(attr & 0x0300) >> 8;
+}
+
+
 int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machine, int i, struct tempsprite *s, UINT16* spriteram16, int spriteram16_bytes)
 {
 	int attr, xoffs, offs;
@@ -180,21 +194,8 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machi
 	s->x			=		spriteram16[offs + 2];
 	s->y			=		spriteram16[offs + 3];
 
-	if (m_sprite_type == 1)
-	{
-		s->color		=		(attr & 0x003f);
-		s->priority		=		(attr & 0x00c0) >> 6;
-		s->flipy		=		(attr & 0x0100);
-		s->flipx		=		(attr & 0x0200);
-		s->code			+=		(s->y & 1) << 16;	// bloodwar
-	}
-	else
-	{
-		s->flipy		=		(attr & 0x0001);
-		s->flipx		=		(attr & 0x0002);
-		s->color		=		(attr & 0x00fc) >> 2;
-		s->priority		=		(attr & 0x0300) >> 8;
-	}
+	// this differs between each chip type
+	get_sprite_attributes(s, attr);
 
 	xoffs			=		(attr & 0x1800) >> 11;
 	s->yoffs		=		m_sprites_regs[0x10/2 + xoffs*2 + 1];
@@ -345,12 +346,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 	{
 		int flags;
 
-		switch( m_sprite_type )
-		{
-			case 0:
-			case 1:		flags = kaneko16_parse_sprite_type012(machine, i,s, spriteram16, spriteram16_bytes);	break;			
-			default:	flags = -1;
-		}
+		flags = kaneko16_parse_sprite_type012(machine, i,s, spriteram16, spriteram16_bytes);			
 
 		if (flags == -1)	// End of Sprites
 			break;
@@ -453,7 +449,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 
     0000.w          f--- ---- ---- ----         Sprites Disable?? (see blazeon)
                     -edc ba98 7654 3---
-                    ---- ---- ---- -2--         Keep sprites on screen (only sprites types 0 and 2)
+                    ---- ---- ---- -2--         Keep sprites on screen (only sprites type 0?)
                     ---- ---- ---- --1-         Flip X
                     ---- ---- ---- ---0         Flip Y
 
@@ -532,7 +528,7 @@ WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
 				m_sprite_flipx = new_data & 2;
 				m_sprite_flipy = new_data & 1;
 
-				if(m_sprite_type == 0)
+				if(get_sprite_type() == 0)
 					m_keep_sprites = ~new_data & 4;
 			}
 
@@ -560,4 +556,14 @@ void kaneko16_sprite_device::kaneko16_render_sprites(running_machine &machine, b
 		m_sprites_bitmap.fill(0, cliprect);
 		kaneko16_draw_sprites(machine,bitmap,cliprect, spriteram16, spriteram16_bytes);
 	}
+}
+
+kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: kaneko16_sprite_device(mconfig, tag, owner, clock, KANEKO_VU002_SPRITE)
+{
+}
+
+kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: kaneko16_sprite_device(mconfig, tag, owner, clock, KANEKO_KC002_SPRITE)
+{
 }

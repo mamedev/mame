@@ -227,6 +227,7 @@ public:
 };
 
 
+
 /***************************************************************************
 
                             MCU Code Simulation
@@ -368,7 +369,7 @@ static VIDEO_START(jchan)
 	state->m_spritegen1->skns_sprite_kludge(0,0);
 	state->m_spritegen2->skns_sprite_kludge(0,0);
 
-	VIDEO_START_CALL( kaneko16_1xVIEW2_tilemaps );
+	state->m_disp_enable = 1;	// default enabled for games not using it
 }
 
 
@@ -389,7 +390,14 @@ static SCREEN_UPDATE_IND16(jchan)
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	SCREEN_UPDATE16_CALL(jchan_view2);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+
+	state->m_view2_0->kaneko16_prepare(bitmap, cliprect);
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		state->m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+	}
 
 	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 	state->m_sprite_bitmap_2->fill(0x0000, cliprect);
