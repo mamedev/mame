@@ -215,6 +215,11 @@ public:
 	UINT64 m_last_coin_out;
 	UINT8 m_coin_out_state;
 	int m_sda_dir;
+	UINT8 m_bv_state;
+	UINT8 m_bv_busy;
+	UINT8 m_bv_pulse;
+	UINT8 m_bv_denomination;
+	UINT64 m_bv_cycles;
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
 	DECLARE_WRITE8_MEMBER(peplus_io_w);
@@ -246,6 +251,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
+	DECLARE_READ8_MEMBER(peplus_input0_r);
 };
 
 
@@ -556,6 +562,111 @@ READ8_MEMBER(peplus_state::peplus_watchdog_r)
 	return 0x00; // Watchdog
 }
 
+READ8_MEMBER(peplus_state::peplus_input0_r)
+{
+/*
+        Emulating IGT IDO22 Pulse Protocol (IGT Smoke 2.2)
+
+        TODO: Will need to include IGT IDO23 (IGT 2.5) for Superboard games.
+        PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
+
+        IDO23 Denomination Codes
+        ------------------------
+        0x00 = $1
+        0x02 = $5
+        0x03 = $10
+        0x04 = $20
+        0x06 = $50
+        0x07 = $100
+
+        IDO23 Country Codes
+        ------------------------
+        0x25(37) = USA
+
+        Direction Data
+        --------------
+        A (FA) <-- [FRONT OF BILL] --> (FB) B
+        D (BB) <-- [BACK OF BILL ] --> (BA) C
+
+        Pulses are currently time via cpu cycles.
+        833.3 cycles per millisecond
+        10 ms = 8333 cycles
+*/
+	UINT64 curr_cycles = machine().firstcpu->total_cycles();
+
+	if ((ioport("DBV")->read_safe(0xff) & 0x01) == 0x00) {
+		// If not busy
+		if (m_bv_busy == 0) {
+			m_bv_busy = 1;
+
+			// Fetch Current Denomination
+			m_bv_denomination = ioport("BC")->read();
+
+			m_bv_cycles = curr_cycles;			
+			m_bv_pulse = 1;
+
+			if (m_bv_denomination == 0)
+				m_bv_state = 3; // $1 So Skip Credit Pulse
+			else
+				m_bv_state = 1; // Greater than $1 Needs Credit Pulse
+		}
+	}
+	
+	switch (m_bv_state)
+	{
+		case 0x00: // Not Active
+			m_bv_busy = 0;
+			break;
+		case 0x01: // Credit Pulse 20ms ON
+			if (curr_cycles - m_bv_cycles >= 833.3 * 20) {
+				m_bv_cycles = curr_cycles;
+				m_bv_pulse = 0;
+				m_bv_state++;
+			}
+			break;
+		case 0x02: // Credit Pulse 20ms OFF
+			if (curr_cycles - m_bv_cycles >= 833.3 * 20) {
+				m_bv_cycles = curr_cycles;
+				m_bv_pulse = 1;
+
+				m_bv_denomination--;
+				
+				if (m_bv_denomination == 0)
+					m_bv_state++; // Done with Credit Pulse
+				else
+					m_bv_state = 1; // Continue Pulsing Denomination
+			}
+			break;
+		case 0x03: // Stop Pulse 50ms ON
+			if (curr_cycles - m_bv_cycles >= 833.3 * 50) {
+				m_bv_cycles = curr_cycles;
+				m_bv_pulse = 0;
+				m_bv_state++;
+			}
+			break;
+		case 0x04: // Stop Pulse 50ms OFF
+			if (curr_cycles - m_bv_cycles >= 833.3 * 50) {
+				m_bv_cycles = curr_cycles;
+				m_bv_pulse = 1;
+				m_bv_state++;
+			}
+			break;
+		case 0x05: // Stacked Pulse 10ms ON
+			if (curr_cycles - m_bv_cycles >= 833.3 * 10) {
+				m_bv_cycles = curr_cycles;
+				m_bv_pulse = 0;
+				m_bv_state = 0;
+			}
+			break;
+	}
+
+	if (m_bv_pulse == 1) {
+		return (0x70 || ioport("IN0")->read()); // Add Bill Validator Credit Pulse
+	} else {
+		return ioport("IN0")->read();
+	}
+}
+
 READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 {
 	device_t *device = machine().device("i2cmem");
@@ -794,7 +905,7 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_WRITE(i2c_nvram_w)
 
 	// Input Banks B & C, Output Bank B
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(peplus_input0_r) AM_WRITE(peplus_output_bank_b_w)
 
     // Superboard Data
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_SHARE("sb000_ram")
@@ -844,6 +955,19 @@ static INPUT_PORTS_START( peplus )
 
 	PORT_START("SENSOR")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin In") PORT_IMPULSE(1)
+
+	PORT_START("DBV")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Bill In") PORT_IMPULSE(1)
+
+	PORT_START("BC")
+	PORT_DIPNAME( 0x1f, 0x00, "Bill Choices" )
+	PORT_DIPSETTING( 0x00, "$1" )
+	PORT_DIPSETTING( 0x01, "$2" )
+	PORT_DIPSETTING( 0x04, "$5" )
+	PORT_DIPSETTING( 0x09, "$10" )
+	PORT_DIPSETTING( 0x13, "$20" )
+	PORT_DIPSETTING( 0x16, "$50" )
+	PORT_DIPSETTING( 0x18, "$100" )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x01, 0x01, "Line Frequency" )
@@ -904,7 +1028,7 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
@@ -932,7 +1056,7 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
@@ -960,7 +1084,7 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("TOUCH_X")
 	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
@@ -993,7 +1117,7 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
