@@ -33,8 +33,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6529_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS6529, _clock)	\
+#define MCFG_MOS6529_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS6529, 0)	\
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6529_INTERFACE(name) \
