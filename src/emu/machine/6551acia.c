@@ -218,7 +218,7 @@ READ8_MEMBER(acia6551_device::read)
 			break;
 	}
 
-	logerror("6551 R %04x %02x\n",offset & 0x03,data);
+	//logerror("6551 R %04x %02x\n",offset & 0x03,data);
 
 	return data;
 }
@@ -254,7 +254,7 @@ void acia6551_device::update_data_form()
 
 WRITE8_MEMBER(acia6551_device::write)
 {
-	logerror("6551 W %04x %02x\n",offset & 0x03, data);
+	//logerror("6551 W %04x %02x\n",offset & 0x03, data);
 
 	switch (offset & 0x03)
 	{
