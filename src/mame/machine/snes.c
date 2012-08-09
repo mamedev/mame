@@ -731,7 +731,6 @@ WRITE8_HANDLER( snes_w_io )
 //          state->m_div_timer->adjust(state->m_maincpu->cycles_to_attotime(16));
 			{
 				UINT16 value, dividend, remainder;
-				dividend = remainder = 0;
 				value = (snes_ram[WRDIVH] << 8) + snes_ram[WRDIVL];
 				if (snes_ram[WRDVDD] > 0)
 				{

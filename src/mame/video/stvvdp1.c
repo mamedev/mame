@@ -1728,10 +1728,6 @@ static void stv_vpd1_draw_normal_sprite(running_machine &machine, const rectangl
 	int su, u, dux, duy;
 	int maxdrawypos, maxdrawxpos;
 
-
-
-	shading = stv_read_gouraud_table(machine);
-
 	x = x2s(machine, stv2_current_sprite.CMDXA);
 	y = y2s(machine, stv2_current_sprite.CMDYA);
 

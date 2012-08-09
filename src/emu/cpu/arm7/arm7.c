@@ -1191,9 +1191,6 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
             break;
     }
 
-    op2 = 0;
-//    op3 = 0;
-
     return data;
 }
 
@@ -1299,8 +1296,6 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
             LOG( ( "arm7_rt_w_callback Test / Clock / Idle = %08x (%d) (%d)\n", data, op2, op3 ) );
             break;
     }
-    op2 = 0;
-    op3 = 0;
 }
 
 void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr))

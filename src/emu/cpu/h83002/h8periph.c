@@ -272,7 +272,6 @@ void h8_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val)
 		}
 		break;
 	default:
-		val = 0;
 		break;
 	}
 }
@@ -597,7 +596,6 @@ void h8_3007_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val)
 		h8->h8TSTR = val;
 		break;
 	default:
-		val = 0;
 		break;
 	}
 }

@@ -347,7 +347,6 @@ double compute_resistor_net_outputs(
 	}
 
 	/* calculate minimum outputs for all given networks */
-	j = 0;
 	min = maxval;
 	max = minval;
 	for( i = 0; i < networks_no; i++ )

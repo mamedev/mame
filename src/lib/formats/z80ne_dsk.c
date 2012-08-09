@@ -181,8 +181,6 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	int sector_position;
 	int i;
 
-	err = FLOPPY_ERROR_SUCCESS;
-
 	sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
 	sector_length	= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 	interleave		= option_resolution_lookup_int(params, PARAM_INTERLEAVE);
@@ -398,9 +396,6 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int
 	int local_idam_size;
 	UINT8 *sec_data;
 
-
-	err = FLOPPY_ERROR_SUCCESS;
-
 	err = floppy_load_track(floppy, head, track, dirtify, &track_data_v, &track_length);
 	if (err)
 		goto done;
@@ -591,8 +586,6 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 	int local_sector_size;
 	int i;
 
-	err = FLOPPY_ERROR_SUCCESS;
-
 	/* get sector length and data pointer */
 	err = z80ne_dmk_seek_sector_in_track(floppy, head, track, sector, sector_is_index, FALSE, &sector_data, &sector_length);
 	if (err)
@@ -645,8 +638,6 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, in
 	UINT8 *local_sector = NULL;
 	int local_sector_size;
 	int i;
-
-	err = FLOPPY_ERROR_SUCCESS;
 
 	/* get sector length */
 	err = z80ne_dmk_seek_sector_in_track(floppy, head, track, sector, sector_is_index, TRUE, &sector_data, &sector_length);

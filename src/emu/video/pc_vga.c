@@ -447,7 +447,6 @@ static void vga_vh_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	pen_t pen;
 	int width;
 
-	addr = 0;
 	width = (vga.crtc.horz_disp_end + 1) * 8;
 
 	for(y=0;y<LINES;y++)
@@ -483,7 +482,6 @@ static void vga_vh_mono(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	pen_t pen;
 	int width;
 
-	addr = 0;
 	width = (vga.crtc.horz_disp_end + 1) * 8;
 
 	for(y=0;y<LINES;y++)
@@ -2010,7 +2008,6 @@ static UINT8 tseng_crtc_reg_read(running_machine &machine, UINT8 index)
 {
 	UINT8 res;
 
-	res = 0;
 	if(index <= 0x18)
 		res = crtc_reg_read(index);
 	else
@@ -2471,7 +2468,6 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 {
 	UINT8 res;
 
-	res = 0;
 	if(index <= 0x18)
 		res = crtc_reg_read(index);
 	else

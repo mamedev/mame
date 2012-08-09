@@ -850,7 +850,7 @@ static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int 
 static STREAM_UPDATE( es5506_update )
 {
 	es5506_state *chip = (es5506_state *)param;
-	INT32 *lsrc = chip->scratch, *rsrc = chip->scratch;
+	INT32 *lsrc = NULL, *rsrc = NULL;
 	stream_sample_t *ldest = outputs[0];
 	stream_sample_t *rdest = outputs[1];
 
