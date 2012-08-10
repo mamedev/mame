@@ -718,5 +718,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 2008, ldv1000, 0, ldv1000, ldplayer, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
-GAMEL(2008, pr8210,  0, pr8210,  ldplayer, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )
+GAME( 2008, ldv1000, 0, ldv1000, ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
+GAMEL(2008, pr8210,  0, pr8210,  ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )
