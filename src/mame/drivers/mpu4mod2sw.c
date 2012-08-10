@@ -1391,6 +1391,113 @@ ROM_START( m4wildms )
 ROM_END
 
 
+
+ROM_START( m4suptrn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dsu21", 0x0000, 0x010000, CRC(b09f63e3) SHA1(8dba0731e1ed5e7056ec6ad1fa269b5b77629745) )
+ROM_END
+
+ROM_START( m4bjac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bjak1.8", 0x0000, 0x010000, CRC(e6a3c263) SHA1(fb28657cb43a0f24354382518d5d5be9cfdfa1d1) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "c2js.hex", 0x0000, 0x010000, CRC(3e6dd1f3) SHA1(dbd87368124244931b8868eb740b02a1775ed734) )
+	ROM_LOAD( "c2js.p1", 0x0000, 0x010000, CRC(3e6dd1f3) SHA1(dbd87368124244931b8868eb740b02a1775ed734) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "bj.chr", 0x0000, 0x000048, CRC(b7851f82) SHA1(a6b2ae283b8e251169508ab6a2cba2fb70f706bf) )
+ROM_END
+
+
+ROM_START( m421club )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dtw27.bin", 0x0000, 0x010000, CRC(8e37977e) SHA1(8e996e50b2a87b97f999bfd00166c32240b74690) )
+ROM_END
+
+ROM_START( m4clbcnt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "con12.bin", 0x0000, 0x010000, CRC(e577d7bc) SHA1(be4d6d75f33782c503f91659b5f69d1fb4c220da) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "con1_0.bin", 0x0000, 0x010000, CRC(2a758619) SHA1(77f993090b7d01901635c56fd9256f57d2371c6d) )
+	ROM_LOAD( "con1-1.bin", 0x0000, 0x010000, CRC(9fc1fefc) SHA1(5638c978687526858cbcb105bdb499dce2d234d3) )
+	ROM_LOAD( "conf.p1", 0x0000, 0x010000, CRC(7900cee0) SHA1(afcd77e5bc05a21b5eb7b26c66d94ce21f2ce501) )
+	ROM_LOAD( "cons.p1", 0x0000, 0x010000, CRC(afe71a40) SHA1(b0065e131eb8fcf7a2fd420f60e2174d927db450) )
+ROM_END
+
+ROM_START( m4class )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dfc20.bin", 0x0000, 0x010000, CRC(1fa0c771) SHA1(b374d2cdc1bfc35a2e6fe35b9d21f2784b8c52e8) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "dfc20dsl.bin", 0x0000, 0x010000, CRC(dc1c8b87) SHA1(52235f9d393c574fdd26aa2ec60e6db70538fb9d) )
+ROM_END
+
+ROM_START( m4frtfl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "frtfull", 0x0000, 0x010000, CRC(4f5389e2) SHA1(bb6d43d428c1e8db07fe58d1b83c05ce5fcdcc7d) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "fruitfull.hex", 0x0000, 0x010000, CRC(c264d497) SHA1(93843efbf1b4207a4722f49dd5dddf2c52bb1b8f) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
+ROM_END
+
+ROM_START( m4frtflc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ffcs.p1", 0x0000, 0x010000, CRC(db917142) SHA1(0f32f0c1ed6733b4557fd19f24f2b1dda26ccc44) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
+ROM_END
+
+
+ROM_START( m4frtlnk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "flcs.p1", 0x0000, 0x010000, CRC(f66a6810) SHA1(e91cdba6b52df6e633d6ce5036a82f5c2dbb1d19) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "flinkv6", 0x0000, 0x010000, CRC(ca9c1034) SHA1(f7e02372a1c7cd41097db63d4a921387d22e02b4) )
+ROM_END
+
+ROM_START( m4thehit )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dth17.bin", 0x0000, 0x010000, CRC(93947de4) SHA1(e04c34edf39d264e3fa91bf6dfd757088e1c08e4) )
+ROM_END
+
+ROM_START( m4jpjmp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "vjcs.p1", 0x0000, 0x010000, CRC(90280752) SHA1(bc2fcefc00adbae9ca2e116108b53ab932ab57b2) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "jackjump-vjc1-3.bin", 0x0000, 0x010000, CRC(fa713c10) SHA1(766912ea891166d7d7f0360e81bdad58b6064eb1) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
+ROM_END
+
+
+ROM_START( m4milclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mi2d.p1", 0x0000, 0x010000, CRC(ce697bbd) SHA1(86c1729014eff9925a5f62189236a9c5bd11534b) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "mi2f.p1", 0x0000, 0x010000, CRC(224922a4) SHA1(59bc1fbfe20c533eb6462f01196a5f2d35ceb92d) )
+	ROM_LOAD( "mi2s.p1", 0x0000, 0x010000, CRC(f69b69c7) SHA1(4f881f5307db2c100535fa75a8eb42d0f7382c93) )
+	ROM_LOAD( "mild.p1", 0x0000, 0x010000, CRC(16da3df9) SHA1(0f1838f99c14763132c2a3b79363496c6baa5e88) )
+	ROM_LOAD( "mils.p1", 0x0000, 0x010000, CRC(0742defd) SHA1(ac25d8adb40bc5b4124241cc5d970d4c10c6f5fd) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
+ROM_END
+
+ROM_START( m4bigchd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bch15.bin", 0x0000, 0x010000, CRC(b745b19f) SHA1(b654af35200c69604a3c30e3df1252f8bedc2000) )
+ROM_END
+
+
 GAME(199?, m4rsg		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.2)",GAME_FLAGS )
 GAME(199?, m4rsga		,m4rsg		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.0)",GAME_FLAGS )
 
@@ -1692,4 +1799,16 @@ GAME(199?, m4tricol	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4tridic	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4twilgt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4wildms	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-
+// these all have reel issues, but test mode produces ay sounds
+GAME(199?, m4suptrn	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Supatron (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bjac	,0			,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m421club	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4clbcnt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4class	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","First Class (Barcrest) [DFC, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4frtfl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4frtflc	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4frtlnk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4thehit	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4jpjmp	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4milclb	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4bigchd,0	        ,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // why code BCH on a dutch?

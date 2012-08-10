@@ -1,4 +1,10 @@
-/* mpu4 sets which have been split, and appear to do something useful */
+/* mpu4 sets which have been split, and appear to do something useful
+ 
+  I'm trying to keep this file to official Barcrest / BwB games on mod4 hw, or licensed
+  versions of them (and their bootlegs)
+
+ */
+
 
 /* many sets have the BARCREST or BWG string at FFE0 replaced with other things
   such at 'FATHER CHRISTMAS' are these hacked / bootlegs requiring special hw?
@@ -1010,7 +1016,6 @@ M4EAW_SET( 199?, m4eaw__bz,	m4eaw,	"everyones a winner v2-5p",	0x0000, 0x008000,
 
 
 M4WTA_SET( 199?, m4wta,		0,		"wta55",									0x0000, 0x010000, CRC(df3e66cd) SHA1(68e769816cb1a71dea8a3ccf4636414c45c01646), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 1)" )
-M4WTA_SET( 199?, m4wta__a,	m4wta,	"pwnk.p1",									0x0000, 0x020000, CRC(7c6e21e3) SHA1(d6aeb5948e0800050193575a3b5c06c11f46eed8), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 2)" )
 M4WTA_SET( 199?, m4wta__b,	m4wta,	"windy.p1",									0x0000, 0x010000, CRC(d8b78c2d) SHA1(d8c2a2ac30a9b876acfbe99e3c540ba0e82cde33), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 3)" )
 M4WTA_SET( 199?, m4wta__d,	m4wta,	"wins.p1",									0x0000, 0x010000, CRC(d79d1e5b) SHA1(722657423a605d6d272d61e4e00b4055ed05f98d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 5)" )
 M4WTA_SET( 199?, m4wta__e,	m4wta,	"winy.p1",									0x0000, 0x010000, CRC(5ff8ed08) SHA1(9567db64e8ebf25ecb22236598cc88a3106f0e36), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 6)" )
@@ -3888,4 +3893,208 @@ M4BAGTEL_SET( 199?, m4bagtel__ad,	m4bagtel,	"el310k.p1",	0x0000, 0x010000, CRC(8
 M4BAGTEL_SET( 199?, m4bagtel__ae,	m4bagtel,	"el310r.p1",	0x0000, 0x010000, CRC(0ea8a744) SHA1(2839dd86b54ed073765d97a82b056e20eb05f32f), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 42)" )
 M4BAGTEL_SET( 199?, m4bagtel__af,	m4bagtel,	"el310s.p1",	0x0000, 0x010000, CRC(5e1cace4) SHA1(b78d8021ef91127f8a60cdcb458723de8925fba5), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 43)" )
 M4BAGTEL_SET( 199?, m4bagtel__ag,	m4bagtel,	"el310y.p1",	0x0000, 0x010000, CRC(9653f0c6) SHA1(188056b8b704f9b06f93144ce358ec47cc026902), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 45)" )
+
+
+
+#define M4PRZWTA_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "pwnsnd.p1", 0x000000, 0x080000, CRC(c0f5e160) SHA1(eff218a36912fe599e9d73a96b49e75335bba272) ) \
+	ROM_LOAD( "pwnsnd.p2", 0x080000, 0x080000, CRC(d81dfc8f) SHA1(5fcfcba836080b5752911d69dfe650614acbf845) ) \
+
+
+#define M4PRZWTA_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4PRZWTA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4PRZWTA_SET( 199?, m4przwta,		0,			"pwnr.p1",	0x0000, 0x020000, CRC(cf619ad2) SHA1(3eeccccb304afd5faf2563e0e65f8123e463d363), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 1)" )
+M4PRZWTA_SET( 199?, m4przwta__a,	m4przwta,	"pw8ad.p1", 0x0000, 0x020000, CRC(71257e43) SHA1(1db17aa1fc684873511a46e5e7421b459040d0cc), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 2)" )
+M4PRZWTA_SET( 199?, m4przwta__b,	m4przwta,	"pw8b.p1",	0x0000, 0x020000, CRC(52b2af18) SHA1(1ce00b94a2d16b5140a110e604b97af6860fd577), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 3)" )
+M4PRZWTA_SET( 199?, m4przwta__c,	m4przwta,	"pw8bd.p1", 0x0000, 0x020000, CRC(fc3fd086) SHA1(8fa8b75faf2196e87acbafc3a48a2ba628f6cc66), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 4)" )
+M4PRZWTA_SET( 199?, m4przwta__d,	m4przwta,	"pw8d.p1",	0x0000, 0x020000, CRC(2fa9a46e) SHA1(4f351fc4e5e0ea9316893981420041d0d5613aec), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 5)" )
+M4PRZWTA_SET( 199?, m4przwta__e,	m4przwta,	"pw8dj.p1", 0x0000, 0x020000, CRC(d8ea4655) SHA1(f3c02638d20eaef95e09e51301445c9a4c215514), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 6)" )
+M4PRZWTA_SET( 199?, m4przwta__f,	m4przwta,	"pw8dk.p1", 0x0000, 0x020000, CRC(b6f878d0) SHA1(51bbeb36cc5c086442ec3951d2679fbf0a5ceebd), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 7)" )
+M4PRZWTA_SET( 199?, m4przwta__g,	m4przwta,	"pw8dy.p1", 0x0000, 0x020000, CRC(311b582e) SHA1(f53254b8c6f65087f67d60f0d0441228e1024cc8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 8)" )
+M4PRZWTA_SET( 199?, m4przwta__h,	m4przwta,	"pw8j.p1",	0x0000, 0x020000, CRC(766739cb) SHA1(8b7cd7f02fb25f5e50febdb90c8f39f3a6840a35), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 9)" )
+M4PRZWTA_SET( 199?, m4przwta__i,	m4przwta,	"pw8k.p1",	0x0000, 0x020000, CRC(1875074e) SHA1(fb25c4ed4ba9d6aa5fb45a8ba9c73b18062173f0), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 10)" )
+M4PRZWTA_SET( 199?, m4przwta__j,	m4przwta,	"pw8s.p1",	0x0000, 0x020000, CRC(3d77c91d) SHA1(3ab79073f5d9c13f751892aa33c2668521887bf8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 11)" )
+M4PRZWTA_SET( 199?, m4przwta__k,	m4przwta,	"pw8y.p1",	0x0000, 0x020000, CRC(9f9627b0) SHA1(19c9dc7033b1e85676222a8b3a866392a4afdd1e), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 12)" )
+M4PRZWTA_SET( 199?, m4przwta__l,	m4przwta,	"pwna.p1",	0x0000, 0x020000, CRC(bbb32770) SHA1(36815dca6550a1a417b3e809b041a7b4670f5b75), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 13)" )
+M4PRZWTA_SET( 199?, m4przwta__m,	m4przwta,	"pwnb.p1",	0x0000, 0x020000, CRC(36a989b5) SHA1(631399c65b697417ed9a95961463b8349a97b142), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 14)" )
+M4PRZWTA_SET( 199?, m4przwta__n,	m4przwta,	"pwndy.p1", 0x0000, 0x020000, CRC(6b739a41) SHA1(64f4b380c725f6159c6201147ab4062d6375d98b), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 15)" )
+M4PRZWTA_SET( 199?, m4przwta__o,	m4przwta,	"pwnk.p1",	0x0000, 0x020000, CRC(7c6e21e3) SHA1(d6aeb5948e0800050193575a3b5c06c11f46eed8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 16)" )
+M4PRZWTA_SET( 199?, m4przwta__p,	m4przwta,	"pwns.p1",	0x0000, 0x020000, CRC(b3b87954) SHA1(f998ebf8047930f006213040ed5e6a9f90844143), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 17)" )
+
+
+#define M4BERSER_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "bessnd.p1", 0x0000, 0x080000, CRC(4eb15200) SHA1(1997a304df5219153418369bd8cc4fd169fb4bd4) ) \
+
+#define M4BERSER_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BERSER_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4BERSER_SET( 199?, m4berser,		0,			"bess.p1",		0x0000, 0x010000, CRC(b95bafbe) SHA1(034c80ef5fd0a12fad918c9b01bafb9a99c2e991), "Barcrest","Berserk (Barcrest) (MPU4) (set 1)" )
+M4BERSER_SET( 199?, m4berser__a,	m4berser,	"be3ad.p1",		0x0000, 0x010000, CRC(db4d77e9) SHA1(80e9ecf0a5d213e23fe8d328fbe8af52d49e2897), "Barcrest","Berserk (Barcrest) (MPU4) (set 2)" )
+M4BERSER_SET( 199?, m4berser__b,	m4berser,	"be3b.p1",		0x0000, 0x010000, CRC(b25e9adb) SHA1(cc72c7a02868d56371f6d1bbaf78a017147b1a5a), "Barcrest","Berserk (Barcrest) (MPU4) (set 3)" )
+M4BERSER_SET( 199?, m4berser__c,	m4berser,	"be3bd.p1",		0x0000, 0x010000, CRC(ed511aa3) SHA1(e6efe14490fa62ec9e5565e92216e371ab98b78a), "Barcrest","Berserk (Barcrest) (MPU4) (set 4)" )
+M4BERSER_SET( 199?, m4berser__d,	m4berser,	"be3d.p1",		0x0000, 0x010000, CRC(9bd3b8a5) SHA1(9432e985d6fc0158a325b75cfdec38ab10d0e991), "Barcrest","Berserk (Barcrest) (MPU4) (set 5)" )
+M4BERSER_SET( 199?, m4berser__e,	m4berser,	"be3dk.p1",		0x0000, 0x010000, CRC(82b4513e) SHA1(a36eebef35dbc2fbc25d39fde811e180a3682b67), "Barcrest","Berserk (Barcrest) (MPU4) (set 6)" )
+M4BERSER_SET( 199?, m4berser__f,	m4berser,	"be3dy.p1",		0x0000, 0x010000, CRC(6f2869f2) SHA1(b006f467463038b5987764f9eedec1d7357ade65), "Barcrest","Berserk (Barcrest) (MPU4) (set 7)" )
+M4BERSER_SET( 199?, m4berser__g,	m4berser,	"be3k.p1",		0x0000, 0x010000, CRC(12b3954a) SHA1(cce68a720a0bb1ce64cbf6ab2902a712403516cd), "Barcrest","Berserk (Barcrest) (MPU4) (set 8)" )
+M4BERSER_SET( 199?, m4berser__h,	m4berser,	"be3s.p1",		0x0000, 0x010000, CRC(1a66772e) SHA1(e604315cea3db5f3859f1756e84b37b805f1f995), "Barcrest","Berserk (Barcrest) (MPU4) (set 9)" )
+M4BERSER_SET( 199?, m4berser__i,	m4berser,	"be3y.p1",		0x0000, 0x010000, CRC(5c6451ca) SHA1(b63b9289fdef3be6add1e1ee22f9e316f296cc97), "Barcrest","Berserk (Barcrest) (MPU4) (set 10)" )
+M4BERSER_SET( 199?, m4berser__j,	m4berser,	"be8ad.p1",		0x0000, 0x010000, CRC(0c196fd2) SHA1(830917f4c9bb7df35ac7d1e4fdcbb3eaac65ec5f), "Barcrest","Berserk (Barcrest) (MPU4) (set 11)" )
+M4BERSER_SET( 199?, m4berser__k,	m4berser,	"be8b.p1",		0x0000, 0x010000, CRC(8f25875d) SHA1(e53ca0322838891274e0c5c61882a6690df3f1a0), "Barcrest","Berserk (Barcrest) (MPU4) (set 12)" )
+M4BERSER_SET( 199?, m4berser__l,	m4berser,	"be8bcd.p1",	0x0000, 0x010000, CRC(40d40ecd) SHA1(a728a2ea63dc7d520e2f189e18b4884fb5f292bc), "Barcrest","Berserk (Barcrest) (MPU4) (set 13)" )
+M4BERSER_SET( 199?, m4berser__m,	m4berser,	"be8bd.p1",		0x0000, 0x010000, CRC(81af1323) SHA1(49c2c086079080f3ac5f44c9a3a051b7170ad777), "Barcrest","Berserk (Barcrest) (MPU4) (set 14)" )
+M4BERSER_SET( 199?, m4berser__n,	m4berser,	"be8c.p1",		0x0000, 0x010000, CRC(8ff5ddc0) SHA1(2a9a1d6f74981c14a6b6c3077c8ba3b3437fbb42), "Barcrest","Berserk (Barcrest) (MPU4) (set 15)" )
+M4BERSER_SET( 199?, m4berser__o,	m4berser,	"be8d.p1",		0x0000, 0x010000, CRC(480e0983) SHA1(bfce722e5371b30c119a11149f02d139b699903a), "Barcrest","Berserk (Barcrest) (MPU4) (set 16)" )
+M4BERSER_SET( 199?, m4berser__p,	m4berser,	"be8dk.p1",		0x0000, 0x010000, CRC(39a3f145) SHA1(00242636e7519e37ed4f5e65ecf41c315c2607ad), "Barcrest","Berserk (Barcrest) (MPU4) (set 17)" )
+M4BERSER_SET( 199?, m4berser__q,	m4berser,	"be8dy.p1",		0x0000, 0x010000, CRC(5f885b13) SHA1(c398bb40fbac39530ba7b96bf4a4fde575c9fa87), "Barcrest","Berserk (Barcrest) (MPU4) (set 18)" )
+M4BERSER_SET( 199?, m4berser__r,	m4berser,	"be8k.p1",		0x0000, 0x010000, CRC(b66051b6) SHA1(910bd0a4112a81df0160efd86bed1a8a59b2acb8), "Barcrest","Berserk (Barcrest) (MPU4) (set 19)" )
+M4BERSER_SET( 199?, m4berser__s,	m4berser,	"be8s.p1",		0x0000, 0x010000, CRC(12d0fb4f) SHA1(103a468a0712dfc44b140cad01cd49b6f159b621), "Barcrest","Berserk (Barcrest) (MPU4) (set 20)" )
+M4BERSER_SET( 199?, m4berser__t,	m4berser,	"be8y.p1",		0x0000, 0x010000, CRC(80d73997) SHA1(99e76616e9a73f111bdd560f2691b99905e4e454), "Barcrest","Berserk (Barcrest) (MPU4) (set 21)" )
+M4BERSER_SET( 199?, m4berser__u,	m4berser,	"besb.p1",		0x0000, 0x010000, CRC(a0aa05f9) SHA1(3831c07e9e33c83b2f7148a34037023433b49cd0), "Barcrest","Berserk (Barcrest) (MPU4) (set 22)" )
+M4BERSER_SET( 199?, m4berser__v,	m4berser,	"besc.p1",		0x0000, 0x010000, CRC(3a7ea673) SHA1(469e104ca1008c274f2a58c3ec6e96b40e1b4fb6), "Barcrest","Berserk (Barcrest) (MPU4) (set 23)" )
+M4BERSER_SET( 199?, m4berser__w,	m4berser,	"besd.p1",		0x0000, 0x010000, CRC(ac7daf9c) SHA1(9951cf3194bc5acc17044dfb4b854edb0cc2c090), "Barcrest","Berserk (Barcrest) (MPU4) (set 24)" )
+M4BERSER_SET( 199?, m4berser__x,	m4berser,	"besdk.p1",		0x0000, 0x010000, CRC(f9d20012) SHA1(d3942406af0573a58e49a24f98b4e3c0a9ff508e), "Barcrest","Berserk (Barcrest) (MPU4) (set 25)" )
+M4BERSER_SET( 199?, m4berser__y,	m4berser,	"besdy.p1",		0x0000, 0x010000, CRC(461ac51f) SHA1(217f169bd2bc4108145231e9b974d2f890a4f25e), "Barcrest","Berserk (Barcrest) (MPU4) (set 26)" )
+M4BERSER_SET( 199?, m4berser__z,	m4berser,	"besk.p1",		0x0000, 0x010000, CRC(03eb2a05) SHA1(375f47bd1d0f21fde5ea0fcf7b79c02db9f8c9c6), "Barcrest","Berserk (Barcrest) (MPU4) (set 27)" )
+M4BERSER_SET( 199?, m4berser__0,	m4berser,	"besy.p1",		0x0000, 0x010000, CRC(64a49f88) SHA1(6bd1275e9172e311ead36566432729530c1b6c21), "Barcrest","Berserk (Barcrest) (MPU4) (set 28)" )
+M4BERSER_SET( 199?, m4berser__1,	m4berser,	"be_05a_4.1_1",	0x0000, 0x010000, CRC(e4ec1624) SHA1(e6241edb729796dd248abca6bf67281379c39af2), "Barcrest","Berserk (Barcrest) (MPU4) (set 29)" )
+
+
+
+#define M4VIVESS_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing */ \
+
+#define M4VIVESS_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4VIVESS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4VIVESS_SET( 199?, m4vivess,		0,			"se8s.p1",	0x0000, 0x010000, CRC(d5c261de) SHA1(5f70944ffe03109ad16f162370fd3653d131034d), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 1)" )
+M4VIVESS_SET( 199?, m4vivess__a,	m4vivess,	"se8ad.p1", 0x0000, 0x010000, CRC(4f799dfe) SHA1(e85108ab0aad92a64eabf5c7562068caf22f8d5b), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 2)" )
+M4VIVESS_SET( 199?, m4vivess__b,	m4vivess,	"se8b.p1",	0x0000, 0x010000, CRC(876efabb) SHA1(6ca1d37416b5401ba10977dad6a5881bdc7246ed), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 3)" )
+M4VIVESS_SET( 199?, m4vivess__c,	m4vivess,	"se8bd.p1", 0x0000, 0x010000, CRC(39fe1c08) SHA1(99a04561555c819fc2954897e7831cf2c38db702), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 4)" )
+M4VIVESS_SET( 199?, m4vivess__d,	m4vivess,	"se8d.p1",	0x0000, 0x010000, CRC(86cfec8e) SHA1(22e66ab075148c084db703358554b5496837d936), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 5)" )
+M4VIVESS_SET( 199?, m4vivess__e,	m4vivess,	"se8dj.p1", 0x0000, 0x010000, CRC(86cfec8e) SHA1(22e66ab075148c084db703358554b5496837d936), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 6)" )
+M4VIVESS_SET( 199?, m4vivess__f,	m4vivess,	"se8dk.p1", 0x0000, 0x010000, CRC(006b907e) SHA1(368915ec502bff70c1bdb0724ba6e32a9892aa5e), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 7)" )
+M4VIVESS_SET( 199?, m4vivess__g,	m4vivess,	"se8dy.p1", 0x0000, 0x010000, CRC(36dcf85f) SHA1(e635501e6ba7dc4e56f1e00b472b32c030aa6592), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 8)" )
+M4VIVESS_SET( 199?, m4vivess__h,	m4vivess,	"se8j.p1",	0x0000, 0x010000, CRC(d5c261de) SHA1(5f70944ffe03109ad16f162370fd3653d131034d), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 9)" )
+M4VIVESS_SET( 199?, m4vivess__i,	m4vivess,	"se8k.p1",	0x0000, 0x010000, CRC(befb76cd) SHA1(f60e17538acd6f5b20e786f8a51a0471ee3246c8), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 10)" )
+M4VIVESS_SET( 199?, m4vivess__j,	m4vivess,	"se8y.p1",	0x0000, 0x010000, CRC(8be03e81) SHA1(f51024036f56b2009905e9c08bb292f2a280c0f6), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 11)" )
+M4VIVESS_SET( 199?, m4vivess__k,	m4vivess,	"sesb.p1",	0x0000, 0x010000, CRC(0e3dc285) SHA1(53cf28228192b6e83d0ff95c8de2fb978720d363), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 12)" )
+M4VIVESS_SET( 199?, m4vivess__l,	m4vivess,	"sesd.p1",	0x0000, 0x010000, CRC(549aaf0b) SHA1(084aca4429e27ce2642991aae8738d85c0157e54), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 13)" )
+M4VIVESS_SET( 199?, m4vivess__m,	m4vivess,	"sesdy.p1", 0x0000, 0x010000, CRC(1869edd8) SHA1(b76dfa439eef641817a9bdf9c737cb06ac54efea), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 14)" )
+M4VIVESS_SET( 199?, m4vivess__n,	m4vivess,	"sesk.p1",	0x0000, 0x010000, CRC(ebdb5ec4) SHA1(f7ec6e8c0142a0885fda066f379e7bd22f5844e5), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 15)" )
+M4VIVESS_SET( 199?, m4vivess__o,	m4vivess,	"sess.p1",	0x0000, 0x010000, CRC(0e8d5c05) SHA1(bf05e4e83d6d4fb7c471e8ca22df21b357d8ed9b), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 16)" )
+M4VIVESS_SET( 199?, m4vivess__p,	m4vivess,	"sesy.p1",	0x0000, 0x010000, CRC(126472e9) SHA1(3bebd273debbc9b71fce83cdc1031927698f7775), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 17)" )
+
+
+#define M4TTDIA_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "tdasnd.p1", 0x000000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) ) \
+	ROM_LOAD( "tdasnd.p2", 0x080000, 0x080000, CRC(66cc2f87) SHA1(6d8af6090b2ab29039aa89a125512190e7e34a03) ) \
+
+#define M4TTDIA_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TTDIA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4TTDIA_SET( 199?, m4ttdia,		0,			"tda04s.p1",	0x0000, 0x020000, CRC(1240642e) SHA1(7eaf02d5c00707a0a6d98d247c293cad1ca87108), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 1)" )
+M4TTDIA_SET( 199?, m4ttdia__a,	m4ttdia,	"tda04ad.p1",	0x0000, 0x020000, CRC(79d804ba) SHA1(0616a2718aea85692ce5c5086f18e54a531efb19), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 2)" )
+M4TTDIA_SET( 199?, m4ttdia__b,	m4ttdia,	"tda04b.p1",	0x0000, 0x020000, CRC(dc755e6a) SHA1(386a1baf7d86d73dff1d6034f60094a55255d6bc), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 3)" )
+M4TTDIA_SET( 199?, m4ttdia__c,	m4ttdia,	"tda04bd.p1",	0x0000, 0x020000, CRC(f4c2aa7f) SHA1(aae114e9ab813809a8f8e2e12773a9f6379f535d), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 4)" )
+M4TTDIA_SET( 199?, m4ttdia__d,	m4ttdia,	"tda04c.p1",	0x0000, 0x020000, CRC(eb3fe378) SHA1(d805cc596dc5c4dd9d0ee5d7c741736698f7db36), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 5)" )
+M4TTDIA_SET( 199?, m4ttdia__e,	m4ttdia,	"tda04d.p1",	0x0000, 0x020000, CRC(a16e551c) SHA1(7aaf5355e3f454523363f78d32b7ff80bac45268), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 6)" )
+M4TTDIA_SET( 199?, m4ttdia__f,	m4ttdia,	"tda04dh.p1",	0x0000, 0x020000, CRC(3a2efa3c) SHA1(e7826f2cc7e7b853cbb9a216212e60be29a89a90), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 7)" )
+M4TTDIA_SET( 199?, m4ttdia__g,	m4ttdia,	"tda04dk.p1",	0x0000, 0x020000, CRC(be050229) SHA1(a4a66f87430a03b1f3b1638d3e45786a64f8db0f), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 8)" )
+M4TTDIA_SET( 199?, m4ttdia__h,	m4ttdia,	"tda04dr.p1",	0x0000, 0x020000, CRC(0d0ab918) SHA1(41f8ac5a59b2600f71f2d5498a20d2ac0f6c7ffa), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 9)" )
+M4TTDIA_SET( 199?, m4ttdia__i,	m4ttdia,	"tda04dy.p1",	0x0000, 0x020000, CRC(39e622d7) SHA1(b8525ffa91b29fe71c452e5642a5eb9432c0fa63), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 10)" )
+M4TTDIA_SET( 199?, m4ttdia__j,	m4ttdia,	"tda04h.p1",	0x0000, 0x020000, CRC(12990e29) SHA1(b61a5efa34e3d3bff80272f2b3008d15ada24179), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 11)" )
+M4TTDIA_SET( 199?, m4ttdia__k,	m4ttdia,	"tda04k.p1",	0x0000, 0x020000, CRC(96b2f63c) SHA1(7cb76b7dfc34d5967ba82c01d8d0b0f8a62a2c93), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 12)" )
+M4TTDIA_SET( 199?, m4ttdia__l,	m4ttdia,	"tda04r.p1",	0x0000, 0x020000, CRC(25bd4d0d) SHA1(967949e7ce73ba7064f3d75333091140236629c7), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 13)" )
+M4TTDIA_SET( 199?, m4ttdia__m,	m4ttdia,	"tda04y.p1",	0x0000, 0x020000, CRC(1151d6c2) SHA1(0048447537061d15c4173366ac1b431e4eef4d57), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 14)" )
+
+
+
+#define M4PRZVE_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "pessnd.p1", 0x000000, 0x080000, CRC(e7975c75) SHA1(407c3bcff29f4b6599de2c35d96f62c72a897bd1) ) \
+	ROM_LOAD( "pessnd.p2", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) ) \
+
+#define M4PRZVE_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4PRZVE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4PRZVE_SET( 199?, m4przve,		0,			"pess.p1",	0x0000, 0x010000, CRC(d8e79833) SHA1(f68fd1bd057a353832c7de3e2818906ab2b844b7), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 1)" )
+M4PRZVE_SET( 199?, m4przve__a,	m4przve,	"pe8ad.p1", 0x0000, 0x010000, CRC(3a81422e) SHA1(bb77365ed7bc7c2cd9e1cfe6e266c6edfd3562a3), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 2)" )
+M4PRZVE_SET( 199?, m4przve__b,	m4przve,	"pe8b.p1",	0x0000, 0x010000, CRC(9f36b112) SHA1(265451557afcfdc1aa8e77616f4b871698b20c5f), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 3)" )
+M4PRZVE_SET( 199?, m4przve__c,	m4przve,	"pe8bd.p1", 0x0000, 0x010000, CRC(af0689b5) SHA1(0e3cf464c855b0dcfeac403bda80818287707abe), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 4)" )
+M4PRZVE_SET( 199?, m4przve__d,	m4przve,	"pe8d.p1",	0x0000, 0x010000, CRC(d21ee810) SHA1(bb95e217a383332a6617644bf17239c1ebd7c7e7), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 5)" )
+M4PRZVE_SET( 199?, m4przve__e,	m4przve,	"pe8dj.p1", 0x0000, 0x010000, CRC(2bdf3b80) SHA1(2d27373e01c4308c9b0818c8193b459b1b335634), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 6)" )
+M4PRZVE_SET( 199?, m4przve__f,	m4przve,	"pe8dk.p1", 0x0000, 0x010000, CRC(fcece282) SHA1(95e5bfeef8618f422501bcb9b703887587b3067a), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 7)" )
+M4PRZVE_SET( 199?, m4przve__g,	m4przve,	"pe8dy.p1", 0x0000, 0x010000, CRC(6abc5682) SHA1(ae8754f0e214738adae4bc856cd72b0920aaa67a), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 8)" )
+M4PRZVE_SET( 199?, m4przve__h,	m4przve,	"pe8j.p1",	0x0000, 0x010000, CRC(d3bf07f1) SHA1(3e539f24ef25c8d6fbfbdcd469fa8a2908dd2ec2), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 9)" )
+M4PRZVE_SET( 199?, m4przve__i,	m4przve,	"pe8k.p1",	0x0000, 0x010000, CRC(efba0d3f) SHA1(2205b94f5a6ed23e834cfeb0d3ebe5ed66d942a1), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 10)" )
+M4PRZVE_SET( 199?, m4przve__j,	m4przve,	"pe8s.p1",	0x0000, 0x010000, CRC(e8463e69) SHA1(923d6c79470a65cf66b089ef09898acea928aa9b), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 11)" )
+M4PRZVE_SET( 199?, m4przve__k,	m4przve,	"pe8y.p1",	0x0000, 0x010000, CRC(c324b75f) SHA1(bf3409a193539e1e032c856a5316bec674043d57), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 12)" )
+M4PRZVE_SET( 199?, m4przve__l,	m4przve,	"pesb.p1",	0x0000, 0x010000, CRC(bf0ffed9) SHA1(ab8cd98ae7dfb3582aad7ae8c669a6d97f144f88), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 13)" )
+M4PRZVE_SET( 199?, m4przve__m,	m4przve,	"pesd.p1",	0x0000, 0x010000, CRC(6f7b1e16) SHA1(412a22ebb61b77541da067ba74621c8e54364471), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 14)" )
+M4PRZVE_SET( 199?, m4przve__n,	m4przve,	"pesdy.p1", 0x0000, 0x010000, CRC(94db27b4) SHA1(fe745a991a5e78fc9054480d3ce5bf6b7f5f9fe4), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 15)" )
+M4PRZVE_SET( 199?, m4przve__o,	m4przve,	"pesk.p1",	0x0000, 0x010000, CRC(9e7b9f58) SHA1(86c2a83964f925448dda189546d9909b10e52673), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 16)" )
+M4PRZVE_SET( 199?, m4przve__p,	m4przve,	"pesy.p1",	0x0000, 0x010000, CRC(fbfc1563) SHA1(870239cab39eff33303fe06dfd1dd3db708f0f2d), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 17)" )
+
+
+#define M4SHOCM_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing */ \
+
+#define M4SHOCM_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SHOCM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SHOCM_SET( 199?, m4shocm,		0,			"scms.p1",	0x0000, 0x020000, CRC(8cb17f49) SHA1(6c67d5d65567ba3677f51f9c636e1f8e253111de), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 1)" )
+M4SHOCM_SET( 199?, m4shocm__a,	m4shocm,	"scmad.p1", 0x0000, 0x020000, CRC(0960b887) SHA1(02b029760d141664a7c5860a29b158d8c2dec4e7), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 2)" )
+M4SHOCM_SET( 199?, m4shocm__b,	m4shocm,	"scmb.p1",	0x0000, 0x020000, CRC(c96e88cd) SHA1(61abff544c979efabf5e53d2c53d7cbe90c1f265), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 3)" )
+M4SHOCM_SET( 199?, m4shocm__c,	m4shocm,	"scmbd.p1", 0x0000, 0x020000, CRC(847a1642) SHA1(0bb6d2494888c5e45bf4bfd0f6ba123283346361), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 4)" )
+M4SHOCM_SET( 199?, m4shocm__d,	m4shocm,	"scmd.p1",	0x0000, 0x020000, CRC(b47583bb) SHA1(ed7449764c03d1bd1a45a8891a7a4f9e73c1a9e6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 5)" )
+M4SHOCM_SET( 199?, m4shocm__e,	m4shocm,	"scmdj.p1", 0x0000, 0x020000, CRC(a0af8091) SHA1(3b6a5e8825cdff40051630d26ca5654173482692), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 6)" )
+M4SHOCM_SET( 199?, m4shocm__f,	m4shocm,	"scmdk.p1", 0x0000, 0x020000, CRC(cebdbe14) SHA1(4da55b365d5eaf558c44eaee33b3ebdc6b6882fa), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 7)" )
+M4SHOCM_SET( 199?, m4shocm__g,	m4shocm,	"scmdy.p1", 0x0000, 0x020000, CRC(495e9eea) SHA1(f10ff85e37538083919af1eec9dabfacd1ac524b), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 8)" )
+M4SHOCM_SET( 199?, m4shocm__h,	m4shocm,	"scmj.p1",	0x0000, 0x020000, CRC(edbb1e1e) SHA1(9a6f4f17d138d7df76bc30a2b16e0bc6ee6149e6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 9)" )
+M4SHOCM_SET( 199?, m4shocm__i,	m4shocm,	"scmy.p1",	0x0000, 0x020000, CRC(044a0065) SHA1(e5deb75e7d05787f1e820352aec99abebd3530b6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 10)" )
+M4SHOCM_SET( 199?, m4shocm__j,	m4shocm,	"scmk.p1",	0x0000, 0x020000, CRC(83a9209b) SHA1(011ecd85c435c02b4868ed74012e16c73beb6e99), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 11)" )
 

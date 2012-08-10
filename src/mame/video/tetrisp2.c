@@ -412,6 +412,12 @@ static void tetrisp2_draw_sprites(	running_machine &machine, _BitmapClass &bitma
 		xzoom	=	1 << 16;
 		yzoom	=	1 << 16;
 
+		if (xsize > 0x100 - tx)
+			xsize = 0x100 - tx;
+
+		if (ysize > 0x100 - ty)
+			ysize = 0x100 - ty;
+
 		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
 
 		{

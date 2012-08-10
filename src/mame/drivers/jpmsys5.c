@@ -1143,6 +1143,12 @@ ROM_START( j5cird )
 	J5CIR_SOUND
 ROM_END
 
+ROM_START( j5cire )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "circ-71a.p1", 0x000000, 0x010000, CRC(a4b3b276) SHA1(fe88345ce04a8e60dae92cd112e11a822775a2ac) )
+	ROM_LOAD16_BYTE( "circ-71a.p2", 0x000001, 0x010000, NO_DUMP )
+	J5CIR_SOUND
+ROM_END
 
 
 
@@ -2376,6 +2382,7 @@ GAME( 199?, j5cira		, j5cir		, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "
 GAME( 199?, j5cirb		, j5cir		, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Circus (Jpm) (SYSTEM5, set 3)", GAME_FLAGS )
 GAME( 199?, j5circ		, j5cir		, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Circus (Jpm) (SYSTEM5, set 4)", GAME_FLAGS )
 GAME( 199?, j5cird		, j5cir		, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Circus (Jpm) (SYSTEM5, set 5)", GAME_FLAGS )
+GAME( 199?, j5cire		, j5cir		, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Circus (Jpm) (SYSTEM5, set 6)", GAME_FLAGS )
 GAME( 199?, j5clbnud	, 0			, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Club Nudger (Jpm) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5clbnuda	, j5clbnud	, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Club Nudger (Jpm) (SYSTEM5, set 2)", GAME_FLAGS )
 GAME( 199?, j5daytn		, 0			, jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Daytona (Jpm) (SYSTEM5, set 1)", GAME_FLAGS )

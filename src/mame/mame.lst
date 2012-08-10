@@ -7915,6 +7915,7 @@ tetrisp2		// (c) 1997 Jaleco
 tetrisp2j		// (c) 1997 Jaleco
 tetrisp2ja		// (c) 1997 Jaleco
 nndmseal		// (c) 1997 I'Max/Jaleco
+nndmseala		// (c) 1997 I'Max/Jaleco
 stepstag		// (c) 1999 Jaleco
 step3			// (c) 1999 Jaleco
 rockn			// (c) 1999 Jaleco
@@ -9602,6 +9603,7 @@ j5cira		//
 j5cirb		//
 j5circ		//
 j5cird		//
+j5cire		//
 j5clbnud	// Club Nudger (Jpm)
 j5clbnuda	//
 j5daytn		// Daytona (Jpm)
@@ -19090,6 +19092,34 @@ m4bnknot	// Bank A Note (Barcrest)
 m4bnkrol	// Bank Roller Club (Barcrest)
 m4btclok	// Beat The Clock (Barcrest)
 m4berser	// Berserk (Barcrest)
+m4berser__a	//
+m4berser__b	//
+m4berser__c	//
+m4berser__d	//
+m4berser__e	//
+m4berser__f	//
+m4berser__g	//
+m4berser__h	//
+m4berser__i	//
+m4berser__j	//
+m4berser__k	//
+m4berser__l	//
+m4berser__m	//
+m4berser__n	//
+m4berser__o	//
+m4berser__p	//
+m4berser__q	//
+m4berser__r	//
+m4berser__s	//
+m4berser__t	//
+m4berser__u	//
+m4berser__v	//
+m4berser__w	//
+m4berser__x	//
+m4berser__y	//
+m4berser__z	//
+m4berser__0	//
+m4berser__1	//
 m4bigbn		// Big Ben (Barcrest)
 m4bigchf	// Big Chief (Barcrest)
 m4bigchfa	//
@@ -20887,8 +20917,40 @@ m4przrf		// Prize Rich And Famous (Barcrest)
 m4przrfm	// Prize Run For Your Money (Barcrest)
 m4przsss	// Prize Spend Spend Spend (Barcrest)
 m4przve		// Prize Viva Esapana (Barcrest)
+m4przve__a	//
+m4przve__b	//
+m4przve__c	//
+m4przve__d	//
+m4przve__e	//
+m4przve__f	//
+m4przve__g	//
+m4przve__h	//
+m4przve__i	//
+m4przve__j	//
+m4przve__k	//
+m4przve__l	//
+m4przve__m	//
+m4przve__n	//
+m4przve__o	//
+m4przve__p	//
 m4przwo		// Prize What's On (Barcrest)
 m4przwta	// Prize Winner Takes All (Barcrest)
+m4przwta__a	//
+m4przwta__b	//
+m4przwta__c	//
+m4przwta__d	//
+m4przwta__e	//
+m4przwta__f	//
+m4przwta__g	//
+m4przwta__h	//
+m4przwta__i	//
+m4przwta__j	//
+m4przwta__k	//
+m4przwta__l	//
+m4przwta__m	//
+m4przwta__n	//
+m4przwta__o	//
+m4przwta__p	//
 m4randr		// Random Roulette (Barcrest)
 m4rsg		// Ready Steady Go (Barcrest) (type 1)
 m4rsga		//
@@ -21227,6 +21289,16 @@ m4samu		// Samurai (Barcrest)
 m4sayno		// Say No More (Barcrest)
 m4showtm	// Show Timer (Barcrest)
 m4shocm		// Showcase Crystal Maze (Barcrest)
+m4shocm__a	//
+m4shocm__b	//
+m4shocm__c	//
+m4shocm__d	//
+m4shocm__e	//
+m4shocm__f	//
+m4shocm__g	//
+m4shocm__h	//
+m4shocm__i	//
+m4shocm__j	//
 m4shodf		// Showcase Duty Free (Barcrest)
 m4silnud	// Silver Nudger (Mdm?)
 m4nud2p		// 2p Nudger (Mdm?)
@@ -21471,6 +21543,19 @@ m4toot__al	//
 m4toot__za	//
 m4toot__zb	//
 m4ttdia		// Ten Ten Do It Again (Barcrest)
+m4ttdia__a	//
+m4ttdia__b	//
+m4ttdia__c	//
+m4ttdia__d	//
+m4ttdia__e	//
+m4ttdia__f	//
+m4ttdia__g	//
+m4ttdia__h	//
+m4ttdia__i	//
+m4ttdia__j	//
+m4ttdia__k	//
+m4ttdia__l	//
+m4ttdia__m	//
 m4tiktak	// Tic Tak Cash (Barcrest)
 m4toma		// Tomahawk (Barcrest)
 m4topact	// Top Action (Barcrest)
@@ -21755,6 +21840,22 @@ m4vivaes__an	//
 m4vivaes__ao	//
 m4vivaes__ap	//
 m4vivess	// Viva Espana Showcase (Barcrest)
+m4vivess__a	//
+m4vivess__b	//
+m4vivess__c	//
+m4vivess__d	//
+m4vivess__e	//
+m4vivess__f	//
+m4vivess__g	//
+m4vivess__h	//
+m4vivess__i	//
+m4vivess__j	//
+m4vivess__k	//
+m4vivess__l	//
+m4vivess__m	//
+m4vivess__n	//
+m4vivess__o	//
+m4vivess__p	//
 m4vivalvd	//
 m4vivalv	// Viva Las Vegas (Barcrest)
 m4vivalv__a	//
@@ -21822,7 +21923,6 @@ m4wayina	//
 m4wildms	// Wild Mystery (Barcrest)
 m4wildtm	// Wild Timer (Barcrest)
 m4wta		// Winner Takes All (Barcrest)
-m4wta__a	//
 m4wta__b	//
 m4wta__d	//
 m4wta__e	//
