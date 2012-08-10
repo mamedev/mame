@@ -8,10 +8,10 @@
    sandscrp   - CALC1	- type 0 ( only uses Random Number? )
    bonkadv    - TOYBOX	- type 0 ( only uses Random Number, XY Overlap Collision bit and register '0x02' )
    bloodwar   -	TOYBOX  - type 1
-   type2   - CALC3   - type 1
+   shogwarr   - CALC3   - type 1
    brapboys   - CALC3   - type 2
 
-   note: type2 won't work with our brapboys implementation despite them being the same PCB and same MCU, this
+   note: shogwarr won't work with our brapboys implementation despite them being the same PCB and same MCU, this
          suggests that at least one of the implementations is wrong
 
    suprnova.c also has a similar device, the implementation hasn't been fully compared

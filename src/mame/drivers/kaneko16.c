@@ -178,12 +178,7 @@ static MACHINE_RESET( shogwarr )
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	MACHINE_RESET_CALL(kaneko16);
-
-
-	
 	state->VIEW2_2_pri = 0;
-
-	calc3_mcu_init(machine);
 }
 
 
@@ -592,7 +587,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)					// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)													// Random Number ?
+	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)													// Random Number ? (toyboy mcu)
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)						// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
@@ -659,7 +654,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)	// Random Number ?
+	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)	// Random Number ?  (toyboy mcu)
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
@@ -720,7 +715,7 @@ static void kaneko16_common_oki_bank_w( running_machine& machine, const char *ba
 	}
 }
 
-WRITE16_MEMBER(kaneko16_state::shogwarr_oki_bank_w)
+WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -729,7 +724,7 @@ WRITE16_MEMBER(kaneko16_state::shogwarr_oki_bank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_state::brapboys_oki_bank_w)
+WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -739,15 +734,15 @@ WRITE16_MEMBER(kaneko16_state::brapboys_oki_bank_w)
 }
 
 
-static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_state )
+static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("mainram")		// Work RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(calc3_mcu_ram_w) AM_SHARE("mcu_ram")	// Shared With MCU
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(calc3_mcu_com0_w)
-	AM_RANGE(0x290000, 0x290001) AM_WRITE(calc3_mcu_com1_w)
-	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(calc3_mcu_com2_w)
-	//AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(calc3_run) // guess, might be irqack
-	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(calc3_mcu_com3_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_ram_r, calc3_mcu_ram_w) // Shared With MCU
+	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com0_w)
+	AM_RANGE(0x290000, 0x290001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com1_w)
+	AM_RANGE(0x2b0000, 0x2b0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com2_w)
+	//AM_RANGE(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
+	AM_RANGE(0x2d0000, 0x2d0001) AM_DEVWRITE("calc3_prot", kaneko_calc3_device, calc3_mcu_com3_w)
 	AM_RANGE(0x380000, 0x380fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// Samples
 	AM_RANGE(0x480000, 0x480001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
@@ -2071,14 +2066,16 @@ MACHINE_CONFIG_END
 
 static TIMER_DEVICE_CALLBACK( shogwarr_interrupt )
 {
-	kaneko16_state *state = timer.machine().driver_data<kaneko16_state>();
+	kaneko16_shogwarr_state *state = timer.machine().driver_data<kaneko16_shogwarr_state>();
 	int scanline = param;
 
 	if(scanline == 224)
 	{
 		// the code for this interrupt is provided by the MCU..
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
-		calc3_mcu_run(timer.machine());
+		
+		
+		state->m_calc3_prot->calc3_mcu_run(timer.machine());
 	}
 
 	if(scanline == 64)
@@ -2113,16 +2110,16 @@ static const UINT16 shogwarr_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0010, 0x0000, 0x0000, 0xFFFF
 };
 
-static ADDRESS_MAP_START( shogwarr_oki1_map, AS_0, 8, kaneko16_state )
+static ADDRESS_MAP_START( shogwarr_oki1_map, AS_0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank10")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shogwarr_oki2_map, AS_0, 8, kaneko16_state )
+static ADDRESS_MAP_START( shogwarr_oki2_map, AS_0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shogwarr, kaneko16_state )
+static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -2160,6 +2157,8 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_state )
 	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 1);
 
+	MCFG_DEVICE_ADD("calc3_prot", KANEKO_CALC3, 0)
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2185,7 +2184,7 @@ static const UINT16 brapboys_default_eeprom[64] = {
 	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x0035, 0xFFFF, 0xFFFF, 0xFFFF
 };
 
-static ADDRESS_MAP_START( brapboys_oki2_map, AS_0, 8, kaneko16_state )
+static ADDRESS_MAP_START( brapboys_oki2_map, AS_0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
@@ -3412,7 +3411,7 @@ ROM_START( shogwarr )
 	ROM_LOAD16_BYTE( "fb030e.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
 	ROM_LOAD16_BYTE( "fb031e.u62", 0x000001, 0x020000, CRC(228aeaf5) SHA1(5e080d7975bc5dcf6fccfbc286eafe939496d9bf) )
 
-	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb040e.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )	/* Sprites */
@@ -3487,7 +3486,7 @@ ROM_START( shogwarru )
 	ROM_LOAD16_BYTE( "fb030a.u61", 0x000000, 0x020000, CRC(a04106c6) SHA1(95ab084f2e709be7cec2964cb09bcf5a8d3aacdf) )
 	ROM_LOAD16_BYTE( "fb031a.u62", 0x000001, 0x020000, CRC(d1def5e2) SHA1(f442de4433547e52b483549aca5786e4597a7122) )
 
-	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb040a.u33",  0x000000, 0x020000, CRC(4b62c4d9) SHA1(35c943dde70438a411714070e42a84366db5ef83) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )	/* Sprites */
@@ -3555,7 +3554,7 @@ ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_LOAD16_BYTE( "fb030j.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
 	ROM_LOAD16_BYTE( "fb031j.u62", 0x000001, 0x020000, CRC(000c8c08) SHA1(439daac1541c34557b5a4308ed69dfebb93abe13) )
 
-	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "fb040j.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )	/* Sprites */
@@ -3701,7 +3700,7 @@ ROM_START( brapboys ) /* World 'normal version', no rom sub board, serial RB92E0
 	ROM_LOAD16_BYTE( "rb-030.01.u61", 0x000000, 0x020000, CRC(ccbe9a53) SHA1(b96baf0ecbf6550bfaf8e512d9275c53a3928bee) ) /* eprom labeled RB-030/U61-01 (green label) */
 	ROM_LOAD16_BYTE( "rb-031.01.u62", 0x000001, 0x020000, CRC(c72b8dda) SHA1(450e1fb8acb140fa0ab23630daad82924f7ce72b) ) /* eprom labeled RB-031/U62-01 (green label) */
 
-	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-040.00.u33",  0x000000, 0x020000, CRC(757c6e19) SHA1(0f1c37b1b1eb6b230c593e4648c4302f413a61f5) ) /* eprom labeled RB-040/U33-00 (green label) */
 
 	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
@@ -3735,7 +3734,7 @@ ROM_START( brapboysj ) /* Japanese 'special version' with EXROM sub board; seria
 	ROM_LOAD16_BYTE( "rb-004.u61", 0x000000, 0x020000, CRC(5432442c) SHA1(f0f7328ece96ef25e6d4fd1958d734f64a9ef371) ) // fill in suffix!
 	ROM_LOAD16_BYTE( "rb-005.u62", 0x000001, 0x020000, CRC(118b3cfb) SHA1(1690ecf5c629879bd97131ff77029e152919e45d) ) // fill in suffix!
 
-	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-006.u33",  0x000000, 0x020000, CRC(f1d76b20) SHA1(c571b5f28e529589ee2d7697ef5d4b60ccb66e7a) ) // fill in suffix!
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )	/* Sprites */
@@ -3768,7 +3767,7 @@ ROM_START( brapboysu ) /* US 'special version' with EXROM sub board; Serial RB92
 	ROM_LOAD16_BYTE( "rb-030.10.u61", 0x000000, 0x020000, CRC(527EB92A) SHA1(64727675E58A4A71BEA1D88D7F76F60929196505) ) /* eprom labeled RB-030/U61-10 (red label) */
 	ROM_LOAD16_BYTE( "rb-031.10.u62", 0x000001, 0x020000, CRC(D5962BDD) SHA1(9BADAB4CC2A9064BD29C582D82EC0B003B9FB091) ) /* eprom labeled RB-031/U62-10 (red label) */
 
-	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
 	ROM_LOAD( "rb-040.10.u33",  0x000000, 0x020000, CRC(0C90D758) SHA1(9B1A9856AB00F80F15BFFC01276F636F92F0BD12) ) /* eprom labeled RB-040/U33-10 (red label)*/
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )	/* Sprites */
@@ -3892,13 +3891,6 @@ static DRIVER_INIT( gtmr2 )
 	DRIVER_INIT_CALL(decrypt_toybox_rom_alt);
 }
 
-static DRIVER_INIT( calc3 )
-{
-	DRIVER_INIT_CALL(calc3_scantables);
-
-	DRIVER_INIT_CALL(kaneko16);
-    //  MCU is a 78K series III type CPU
-}
 
 
 static DRIVER_INIT( shogwarr )
@@ -3906,22 +3898,20 @@ static DRIVER_INIT( shogwarr )
 	// default sample banks
 	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_w(machine, "bank11", "oki2", 0, 0x00000, 0x40000);
-
-	DRIVER_INIT_CALL(calc3);
+	DRIVER_INIT_CALL(kaneko16);
 }
 
 
 static DRIVER_INIT( brapboys )
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
+	kaneko16_shogwarr_state *state = machine.driver_data<kaneko16_shogwarr_state>();
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_state::brapboys_oki_bank_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),state));
 
 	// default sample banks
 	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_w(machine, "bank11", "oki2", 0, 0x20000, 0x20000);
-
-	DRIVER_INIT_CALL(calc3);
+	DRIVER_INIT_CALL(kaneko16);
 }
 
 
@@ -3934,8 +3924,9 @@ static DRIVER_INIT( brapboys )
 ***************************************************************************/
 
 /* Working games */
-GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_state, berlwall,   ROT0,  "Kaneko", "The Berlin Wall", 0 )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_state, berlwall,   ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
+GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall,   ROT0,  "Kaneko", "The Berlin Wall", 0 )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall,   ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
+
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state, kaneko16,   ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", 0 )
 GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state, kaneko16,   ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", 0 )
 GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state, kaneko16,   ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", 0 )
@@ -3952,11 +3943,12 @@ GAME( 1994, gtmrusa,  gtmr,     gtmr,     gtmr, kaneko16_state,     gtmr2, ROT0,
 GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2, kaneko16_state,    gtmr2, ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", 0 )
 GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2, kaneko16_state,    gtmr2, ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", 0 )
 GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2, kaneko16_state,    gtmr2, ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", 0 )
+
 // some functionality of the protection chip still needs investigating on these, but they seem to be playable
-GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
-GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
-GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (US)", 0 )
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_state, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL )
-GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_state, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL )
-GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_state, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL )
+GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
+GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
+GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (US)", 0 )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL )
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL )
+GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL )
 

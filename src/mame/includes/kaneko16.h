@@ -10,30 +10,11 @@
 #include "machine/nvram.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
+#include "machine/kaneko_calc3.h"
 
 
+#define MCU_RESPONSE(d) memcpy(&state->m_mcu_ram[mcu_offset], d, sizeof(d))
 
-typedef struct
-{
-	int mcu_status;
-	int mcu_command_offset;
-	UINT16 mcu_crc;
-	UINT8 decryption_key_byte;
-	UINT8 alternateswaps;
-	UINT8 shift;
-	UINT8 subtracttype;
-	UINT8 mode;
-	UINT8 blocksize_offset;
-	UINT16 dataend;
-	UINT16 database;
-	int data_header[2];
-	UINT32 writeaddress;
-	UINT32 writeaddress_current;
-	UINT16 dsw_addr;
-	UINT16 eeprom_addr;
-	UINT16 poll_addr;
-	UINT16 checksumaddress;
-} calc3_t;
 
 class kaneko16_state : public driver_device
 {
@@ -49,7 +30,6 @@ public:
 		m_kaneko_spr(*this, "kan_spr")
 	{ }
 
-
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_mcu_ram;
@@ -60,7 +40,6 @@ public:
 
 	UINT8 m_nvram_save[128];
 
-	calc3_t m_calc3;
 	void (*m_toybox_mcu_run)(running_machine &machine);
 	UINT16 m_toybox_mcu_com[4];
 	UINT16 m_disp_enable;
@@ -76,26 +55,15 @@ public:
 	DECLARE_READ16_MEMBER(gtmr_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
-	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
-	DECLARE_READ16_MEMBER(galpanib_calc_r);
-	DECLARE_WRITE16_MEMBER(galpanib_calc_w);
-	DECLARE_WRITE16_MEMBER(bloodwar_calc_w);
-	DECLARE_READ16_MEMBER(bloodwar_calc_r);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_ram_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(calc3_mcu_com3_w);
+
 	DECLARE_WRITE16_MEMBER(toybox_mcu_com0_w);
 	DECLARE_WRITE16_MEMBER(toybox_mcu_com1_w);
 	DECLARE_WRITE16_MEMBER(toybox_mcu_com2_w);
 	DECLARE_WRITE16_MEMBER(toybox_mcu_com3_w);
 	DECLARE_READ16_MEMBER(toybox_mcu_status_r);
-	void calc3_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+
 	void toybox_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
-	DECLARE_WRITE16_MEMBER(shogwarr_calc_w);
-	DECLARE_READ16_MEMBER(shogwarr_calc_r);
+
 	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
 
 	DECLARE_READ16_MEMBER(kaneko16_ay1_YM2149_r);
@@ -134,11 +102,25 @@ public:
 
 };
 
+class kaneko16_shogwarr_state : public kaneko16_state
+{
+public:
+	kaneko16_shogwarr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag),
+		m_calc3_prot(*this, "calc3_prot")
+	{
+	}
+
+	optional_device<kaneko_calc3_device> m_calc3_prot;
+
+	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
+	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
+};
+
+
 /*----------- defined in machine/kaneko16.c -----------*/
 
 
-
-void calc3_mcu_init(running_machine &machine);
 
 void toybox_mcu_init(running_machine &machine);
 
@@ -151,8 +133,6 @@ void toxboy_handle_04_subcommand(running_machine& machine, UINT8 mcu_subcmd, UIN
 
 DRIVER_INIT( decrypt_toybox_rom );
 DRIVER_INIT( decrypt_toybox_rom_alt );
-DRIVER_INIT( calc3_scantables );
-
 
 
 /*----------- defined in drivers/kaneko16.c -----------*/
@@ -160,14 +140,6 @@ DRIVER_INIT( calc3_scantables );
 MACHINE_RESET( kaneko16 );
 
 /*----------- defined in video/kaneko16.c -----------*/
-
-
-
-
-
-void kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-
 
 PALETTE_INIT( berlwall );
 

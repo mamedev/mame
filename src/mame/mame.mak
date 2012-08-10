@@ -849,6 +849,7 @@ $(MAMEOBJ)/kaneko.a: \
 	$(VIDEO)/kaneko_tmap.o \
 	$(VIDEO)/kaneko_spr.o \
 	$(MACHINE)/kaneko_hit.o \
+	$(MACHINE)/kaneko_calc3.o \
 	$(DRIVERS)/sandscrp.o \
 	$(DRIVERS)/suprnova.o $(VIDEO)/suprnova.o \
 	$(VIDEO)/sknsspr.o \
