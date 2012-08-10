@@ -70,6 +70,10 @@ public:
 	DECLARE_WRITE8_MEMBER(senjyo_volume_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_DRIVER_INIT(starfora);
+	DECLARE_DRIVER_INIT(senjyo);
+	DECLARE_DRIVER_INIT(starfore);
+	DECLARE_DRIVER_INIT(starforc);
 };
 
 

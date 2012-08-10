@@ -105,6 +105,8 @@ public:
 	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
 	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(bogus_w);
+	DECLARE_DRIVER_INIT(calorie);
+	DECLARE_DRIVER_INIT(calorieb);
 };
 
 
@@ -548,15 +550,15 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( calorie )
+DRIVER_INIT_MEMBER(calorie_state,calorie)
 {
-	sega_317_0004_decode(machine, "maincpu");
+	sega_317_0004_decode(machine(), "maincpu");
 }
 
-static DRIVER_INIT( calorieb )
+DRIVER_INIT_MEMBER(calorie_state,calorieb)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x10000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x10000);
 }
 
 

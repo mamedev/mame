@@ -735,12 +735,13 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	machine.device<nvram_device>("eeprom")->set_base(state->m_eeprom, 0x400);
 }
 
-static DRIVER_INIT( redearth ){ init_common(machine, 0x9e300ab1, 0xa175b82c, 0); }
-static DRIVER_INIT( sfiii )   { init_common(machine, 0xb5fe053e, 0xfc03925a, 0); }
-static DRIVER_INIT( sfiii2 )  { init_common(machine, 0x00000000, 0x00000000, 1); }
-static DRIVER_INIT( jojo )    { init_common(machine, 0x02203ee3, 0x01301972, 0); }
-static DRIVER_INIT( sfiii3 )  { init_common(machine, 0xa55432b4, 0x0c129981, 0); }
-static DRIVER_INIT( jojoba )  { init_common(machine, 0x23323ee3, 0x03021972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_common(machine(), 0x9e300ab1, 0xa175b82c, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_common(machine(), 0xb5fe053e, 0xfc03925a, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_common(machine(), 0x00000000, 0x00000000, 1); }
+DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_common(machine(), 0x02203ee3, 0x01301972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_common(machine(), 0xa55432b4, 0x0c129981, 0); }
+DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_common(machine(), 0x23323ee3, 0x03021972, 0); }
+
 
 
 /* GFX decodes */

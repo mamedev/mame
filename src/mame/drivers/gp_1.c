@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(gp_1);
 };
 
 
@@ -35,7 +37,7 @@ void gp_1_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( gp_1 )
+DRIVER_INIT_MEMBER(gp_1_state,gp_1)
 {
 }
 

@@ -870,28 +870,27 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
 }
 
 
-static DRIVER_INIT(megaplay)
+DRIVER_INIT_MEMBER(mplay_state,megaplay)
 {
-	mplay_state *state = machine.driver_data<mplay_state>();
 	/* to support the old code.. */
-	state->m_ic36_ram = auto_alloc_array(machine, UINT16, 0x10000 / 2);
-	state->m_ic37_ram = auto_alloc_array(machine, UINT8, 0x10000);
-	state->m_genesis_io_ram = auto_alloc_array(machine, UINT16, 0x20 / 2);
+	m_ic36_ram = auto_alloc_array(machine(), UINT16, 0x10000 / 2);
+	m_ic37_ram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_genesis_io_ram = auto_alloc_array(machine(), UINT16, 0x20 / 2);
 
 	DRIVER_INIT_CALL(mpnew);
 
-	mplay_start(machine);
+	mplay_start(machine());
 
 	/* for now ... */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa10000, 0xa1001f, FUNC(megaplay_io_read), FUNC(megaplay_io_write));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa10000, 0xa1001f, FUNC(megaplay_io_read), FUNC(megaplay_io_write));
 
 	/* megaplay has ram shared with the bios cpu here */
-	machine.device("genesis_snd_z80")->memory().space(AS_PROGRAM)->install_ram(0x2000, 0x3fff, &state->m_ic36_ram[0]);
+	machine().device("genesis_snd_z80")->memory().space(AS_PROGRAM)->install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa02000, 0xa03fff, FUNC(megadriv_68k_read_z80_extra_ram), FUNC(megadriv_68k_write_z80_extra_ram));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa02000, 0xa03fff, FUNC(megadriv_68k_read_z80_extra_ram), FUNC(megadriv_68k_write_z80_extra_ram));
 
-	DRIVER_INIT_CALL(megatech_bios); // create the SMS vdp etc.
+	init_megatech_bios(machine());
 
 }
 

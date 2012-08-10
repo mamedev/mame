@@ -5945,56 +5945,52 @@ static void metro_common( running_machine &machine )
 }
 
 
-static DRIVER_INIT( metro )
+DRIVER_INIT_MEMBER(metro_state,metro)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	metro_common(machine);
+	metro_common(machine());
 
-	state->m_porta = 0x00;
-	state->m_portb = 0x00;
-	state->m_busy_sndcpu = 0;
-	state->metro_sound_rombank_w(*space, 0, 0x00);
+	m_porta = 0x00;
+	m_portb = 0x00;
+	m_busy_sndcpu = 0;
+	metro_sound_rombank_w(*space, 0, 0x00);
 }
 
-static DRIVER_INIT( karatour )
+DRIVER_INIT_MEMBER(metro_state,karatour)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	state->m_vram_0.allocate(0x20000/2);
-	state->m_vram_1.allocate(0x20000/2);
-	state->m_vram_2.allocate(0x20000/2);
+	m_vram_0.allocate(0x20000/2);
+	m_vram_1.allocate(0x20000/2);
+	m_vram_2.allocate(0x20000/2);
 	for (int i = 0; i < 0x20000 / 2; i++)
 	{
-		state->m_vram_0[i] = machine.rand();
-		state->m_vram_1[i] = machine.rand();
-		state->m_vram_2[i] = machine.rand();
+		m_vram_0[i] = machine().rand();
+		m_vram_1[i] = machine().rand();
+		m_vram_2[i] = machine().rand();
 	}
 
 	DRIVER_INIT_CALL(metro);
 }
 
-static DRIVER_INIT( daitorid )
+DRIVER_INIT_MEMBER(metro_state,daitorid)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	metro_common(machine);
+	metro_common(machine());
 
-	state->m_porta = 0x00;
-	state->m_portb = 0x00;
-	state->m_busy_sndcpu = 0;
-	state->daitorid_sound_rombank_w(*space, 0, 0x00);
+	m_porta = 0x00;
+	m_portb = 0x00;
+	m_busy_sndcpu = 0;
+	daitorid_sound_rombank_w(*space, 0, 0x00);
 }
 
 
 /* Unscramble the GFX ROMs */
-static DRIVER_INIT( balcube )
+DRIVER_INIT_MEMBER(metro_state,balcube)
 {
-	metro_state *state = machine.driver_data<metro_state>();
 
-	const size_t len = state->memregion("gfx1")->bytes();
-	UINT8 *src       = state->memregion("gfx1")->base();
+	const size_t len = memregion("gfx1")->bytes();
+	UINT8 *src       = memregion("gfx1")->base();
 	UINT8 *end       = src + len;
 
 	while (src < end)
@@ -6007,14 +6003,14 @@ static DRIVER_INIT( balcube )
 		src   +=  2;
 	}
 
-	metro_common(machine);
-	state->m_irq_line = 1;
+	metro_common(machine());
+	m_irq_line = 1;
 }
 
 
-static DRIVER_INIT( dharmak )
+DRIVER_INIT_MEMBER(metro_state,dharmak)
 {
-	UINT8 *src = machine.root_device().memregion( "gfx1" )->base();
+	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
 	int i;
 
 	for (i = 0; i < 0x200000; i += 4)
@@ -6032,38 +6028,34 @@ static DRIVER_INIT( dharmak )
 	DRIVER_INIT_CALL(metro);
 }
 
-static DRIVER_INIT( blzntrnd )
+DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	metro_common(machine);
-	state->m_irq_line = 1;
+	metro_common(machine());
+	m_irq_line = 1;
 }
 
-static DRIVER_INIT( mouja )
+DRIVER_INIT_MEMBER(metro_state,mouja)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	metro_common(machine);
-	state->m_irq_line = -1;	/* split interrupt handlers */
-	state->m_vblank_bit = 1;
-	state->m_mouja_irq_timer = machine.scheduler().timer_alloc(FUNC(mouja_irq_callback));
+	metro_common(machine());
+	m_irq_line = -1;	/* split interrupt handlers */
+	m_vblank_bit = 1;
+	m_mouja_irq_timer = machine().scheduler().timer_alloc(FUNC(mouja_irq_callback));
 }
 
-static DRIVER_INIT( gakusai )
+DRIVER_INIT_MEMBER(metro_state,gakusai)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	metro_common(machine);
-	state->m_irq_line = -1;
-	state->m_vblank_bit = 1;
-	state->m_blitter_bit = 3;
+	metro_common(machine());
+	m_irq_line = -1;
+	m_vblank_bit = 1;
+	m_blitter_bit = 3;
 }
 
-static DRIVER_INIT( puzzlet )
+DRIVER_INIT_MEMBER(metro_state,puzzlet)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	metro_common(machine);
-	state->m_irq_line = 0;
-	state->m_vblank_bit = 1;
-	state->m_blitter_bit = 0;
+	metro_common(machine());
+	m_irq_line = 0;
+	m_vblank_bit = 1;
+	m_blitter_bit = 0;
 }
 
 /***************************************************************************

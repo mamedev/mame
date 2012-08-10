@@ -192,5 +192,5 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, 0, ROT0, "RamTek", "Star Cruiser", GAME_IMPERFECT_SOUND )
+GAME( 1977, starcrus, 0, starcrus, starcrus, driver_device, 0, ROT0, "RamTek", "Star Cruiser", GAME_IMPERFECT_SOUND )
 

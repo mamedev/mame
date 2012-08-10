@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(drgnmst_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_md_videoram_w);
+	DECLARE_DRIVER_INIT(drgnmst);
 };
 
 

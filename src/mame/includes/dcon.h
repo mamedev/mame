@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dcon_foreground_w);
 	DECLARE_WRITE16_MEMBER(dcon_midground_w);
 	DECLARE_WRITE16_MEMBER(dcon_text_w);
+	DECLARE_DRIVER_INIT(sdgndmps);
 };
 
 

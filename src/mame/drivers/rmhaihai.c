@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(themj_rombank_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_DRIVER_INIT(rmhaihai);
 };
 
 
@@ -665,10 +666,10 @@ ROM_START( themj )
 ROM_END
 
 
-static DRIVER_INIT( rmhaihai )
+DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 {
-	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
-	int size = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
+	int size = machine().root_device().memregion("gfx1")->bytes();
 	int a,b;
 
 	size /= 2;

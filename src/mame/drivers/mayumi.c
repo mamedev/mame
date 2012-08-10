@@ -436,4 +436,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, mayumi, 0, mayumi, mayumi, mayumi_state, 0, ROT0, "Sanritsu / Victory L.L.C.",  "Kikiippatsu Mayumi-chan (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mayumi, 0, mayumi, mayumi, driver_device, 0, ROT0, "Sanritsu / Victory L.L.C.",  "Kikiippatsu Mayumi-chan (Japan)", GAME_SUPPORTS_SAVE )

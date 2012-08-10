@@ -105,6 +105,15 @@ public:
 	DECLARE_READ8_MEMBER(exp_rom_r);
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_DRIVER_INIT(igs_ncs);
+	DECLARE_DRIVER_INIT(number10);
+	DECLARE_DRIVER_INIT(pktet346);
+	DECLARE_DRIVER_INIT(cpokert);
+	DECLARE_DRIVER_INIT(chleague);
+	DECLARE_DRIVER_INIT(cska);
+	DECLARE_DRIVER_INIT(cpoker);
+	DECLARE_DRIVER_INIT(igs_ncs2);
+	DECLARE_DRIVER_INIT(cpokerpk);
 };
 
 
@@ -1916,10 +1925,10 @@ ROM_END
 /*  Decode a simple PAL encryption
  */
 
-static DRIVER_INIT( cpoker )
+DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 {
 	int A;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1931,9 +1940,9 @@ static DRIVER_INIT( cpoker )
 	}
 }
 
-static DRIVER_INIT( cpokert )
+DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -1960,10 +1969,10 @@ static DRIVER_INIT( cpokert )
 	}
 }
 
-static DRIVER_INIT( cska )
+DRIVER_INIT_MEMBER(igspoker_state,cska)
 {
 	int A;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1977,10 +1986,10 @@ static DRIVER_INIT( cska )
 }
 
 
-static DRIVER_INIT( igs_ncs )
+DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
 {
 	int A;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -2139,9 +2148,9 @@ Clocks
 
 */
 
-static DRIVER_INIT( igs_ncs2 )
+DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
 {
-	UINT8 *src = (UINT8 *) (machine.root_device().memregion("maincpu")->base());
+	UINT8 *src = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -2212,14 +2221,14 @@ ROM_START( igs_ncs2 )
 ROM_END
 
 
-static DRIVER_INIT( chleague )
+DRIVER_INIT_MEMBER(igspoker_state,chleague)
 {
 	int A;
 	int length;
 	UINT8 *rom;
 
-	rom = machine.root_device().memregion("maincpu")->base();
-	length = machine.root_device().memregion("maincpu")->bytes();
+	rom = machine().root_device().memregion("maincpu")->base();
+	length = machine().root_device().memregion("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2275,15 +2284,15 @@ ROM_START( chleagul )
 ROM_END
 
 
-static DRIVER_INIT( number10 )
+DRIVER_INIT_MEMBER(igspoker_state,number10)
 {
 	int A;
 	int length;
 	UINT8 *tmp;
 	UINT8 *rom;
 
-	rom = machine.root_device().memregion("maincpu")->base();
-	length = machine.root_device().memregion("maincpu")->bytes();
+	rom = machine().root_device().memregion("maincpu")->base();
+	length = machine().root_device().memregion("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2312,9 +2321,9 @@ static DRIVER_INIT( number10 )
 	rom[0xeed] = 0xc3;
 
 	/* Descramble graphic */
-	rom = machine.root_device().memregion("gfx1")->base();
-	length = machine.root_device().memregion("gfx1")->bytes();
-	tmp = auto_alloc_array(machine, UINT8, length);
+	rom = machine().root_device().memregion("gfx1")->base();
+	length = machine().root_device().memregion("gfx1")->bytes();
+	tmp = auto_alloc_array(machine(), UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
 	{
@@ -2322,7 +2331,7 @@ static DRIVER_INIT( number10 )
 		rom[A] = tmp[addr];
 	}
 
-	auto_free(machine, tmp);
+	auto_free(machine(), tmp);
 }
 
 
@@ -2358,10 +2367,10 @@ ROM_START( numbr10l )
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
-static DRIVER_INIT( cpokerpk )
+DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
 {
 	int A;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	for (A=0x0714; A < 0xF000; A+=0x1000)
 		rom[A] ^= 0x20;
@@ -2412,10 +2421,10 @@ ROM_START( citalcup )
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
-static DRIVER_INIT( pktet346 )
+DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 {
 	int A;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -2463,6 +2472,6 @@ GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, 
 
 GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igspoker_state,  igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",            GAME_IMPERFECT_GRAPHICS, layout_igspoker )
 
-GAMEL( 1998, stellecu,  0,        number10, number10, igspoker_state, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                      GAME_NOT_WORKING, layout_igspoker )
+GAMEL( 1998, stellecu,  0,        number10, number10, driver_device, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                      GAME_NOT_WORKING, layout_igspoker )
 
 GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                          0, layout_igspoker )

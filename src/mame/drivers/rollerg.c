@@ -377,5 +377,5 @@ static KONAMI_SETLINES_CALLBACK( rollerg_banking )
 }
 
 
-GAME( 1991, rollerg,  0,       rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (US)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rollergj, rollerg, rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rollerg,  0,       rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (US)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rollergj, rollerg, rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (Japan)", GAME_SUPPORTS_SAVE )

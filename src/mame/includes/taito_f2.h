@@ -99,6 +99,10 @@ public:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
+	DECLARE_DRIVER_INIT(driveout);
+	DECLARE_DRIVER_INIT(cameltry);
+	DECLARE_DRIVER_INIT(mjnquest);
+	DECLARE_DRIVER_INIT(finalb);
 };
 
 /*----------- defined in video/taito_f2.c -----------*/

@@ -494,53 +494,51 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( starwars )
+DRIVER_INIT_MEMBER(starwars_state,starwars)
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
 	/* prepare the mathbox */
-	state->m_is_esb = 0;
-	starwars_mproc_init(machine);
+	m_is_esb = 0;
+	starwars_mproc_init(machine());
 
 	/* initialize banking */
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
+	membank("bank1")->set_entry(0);
 }
 
 
-static DRIVER_INIT( esb )
+DRIVER_INIT_MEMBER(starwars_state,esb)
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
-	slapstic_init(machine, 101);
-	state->m_slapstic_source = &rom[0x14000];
-	state->m_slapstic_base = &rom[0x08000];
+	slapstic_init(machine(), 101);
+	m_slapstic_source = &rom[0x14000];
+	m_slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	address_space *space = machine.device<m6809_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), state));
+	address_space *space = machine().device<m6809_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), this));
 
 	/* install read/write handlers for it */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),state), write8_delegate(FUNC(starwars_state::esb_slapstic_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),this), write8_delegate(FUNC(starwars_state::esb_slapstic_w),this));
 
 	/* install additional banking */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");
 
 	/* prepare the matrix processor */
-	state->m_is_esb = 1;
-	starwars_mproc_init(machine);
+	m_is_esb = 1;
+	starwars_mproc_init(machine());
 
 	/* initialize banking */
-	state->membank("bank1")->configure_entries(0, 2, rom + 0x6000, 0x10000 - 0x6000);
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->configure_entries(0, 2, rom + 0xa000, 0x1c000 - 0xa000);
-	state->membank("bank2")->set_entry(0);
+	membank("bank1")->configure_entries(0, 2, rom + 0x6000, 0x10000 - 0x6000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->configure_entries(0, 2, rom + 0xa000, 0x1c000 - 0xa000);
+	membank("bank2")->set_entry(0);
 
 	/* additional globals for state saving */
-	state->save_item(NAME(state->m_slapstic_current_bank));
-	state->save_item(NAME(state->m_slapstic_last_pc));
-	state->save_item(NAME(state->m_slapstic_last_address));
+	save_item(NAME(m_slapstic_current_bank));
+	save_item(NAME(m_slapstic_last_pc));
+	save_item(NAME(m_slapstic_last_address));
 }
 
 

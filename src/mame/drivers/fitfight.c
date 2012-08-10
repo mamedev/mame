@@ -1000,34 +1000,30 @@ ROM_END
 
 /* INIT */
 
-static DRIVER_INIT( fitfight )
+DRIVER_INIT_MEMBER(fitfight_state,fitfight)
 {
-//  UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+//  UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),state));
-	state->m_bbprot_kludge = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),this));
+	m_bbprot_kludge = 0;
 }
 
-static DRIVER_INIT( histryma )
+DRIVER_INIT_MEMBER(fitfight_state,histryma)
 {
-//  UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+//  UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),state));
-	state->m_bbprot_kludge = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),this));
+	m_bbprot_kludge = 0;
 }
 
-static DRIVER_INIT( bbprot )
+DRIVER_INIT_MEMBER(fitfight_state,bbprot)
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	state->m_bbprot_kludge = 1;
+	m_bbprot_kludge = 1;
 }
 
-DRIVER_INIT( hotmindff )
+DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, 0, 0, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, 0, 0, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
 	DRIVER_INIT_CALL(fitfight);
 }
 

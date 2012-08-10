@@ -1462,24 +1462,24 @@ static void gfx_unscramble(running_machine &machine)
  *
  *************************************/
 
-static DRIVER_INIT( ninjakd2 )
+DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 {
-	mc8123_decrypt_rom(machine, "soundcpu", "user1", NULL, 0);
+	mc8123_decrypt_rom(machine(), "soundcpu", "user1", NULL, 0);
 
-	gfx_unscramble(machine);
+	gfx_unscramble(machine());
 }
 
-static DRIVER_INIT( bootleg )
+DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
 {
-	address_space *space = machine.device("soundcpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("soundcpu")->base() + 0x10000);
+	address_space *space = machine().device("soundcpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("soundcpu")->base() + 0x10000);
 
-	gfx_unscramble(machine);
+	gfx_unscramble(machine());
 }
 
-static DRIVER_INIT(mnight)
+DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
 {
-	gfx_unscramble(machine);
+	gfx_unscramble(machine());
 }
 
 
@@ -1497,8 +1497,8 @@ GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  R
 GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,    0,        mnight,   mnight, ninjakd2_state,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", 0 )
 GAME( 1988, arkarea,   0,        arkarea,  arkarea, ninjakd2_state,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
-GAME( 1988, robokid,   0,        robokid,  robokid, ninjakd2_state,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
-GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
-GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
-GAME( 1989, omegaf,    0,        omegaf,   omegaf, ninjakd2_state,   0,        ROT270, "UPL", "Omega Fighter", 0 )
-GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf, ninjakd2_state,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )
+GAME( 1988, robokid,   0,        robokid,  robokid, driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
+GAME( 1988, robokidj,  robokid,  robokid,  robokidj, driver_device, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
+GAME( 1988, robokidj2, robokid,  robokid,  robokidj, driver_device, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
+GAME( 1989, omegaf,    0,        omegaf,   omegaf, driver_device,   0,        ROT270, "UPL", "Omega Fighter", 0 )
+GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf, driver_device,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )

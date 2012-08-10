@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(yard_videoram_w);
 	DECLARE_WRITE8_MEMBER(yard_scroll_panel_w);
 	DECLARE_WRITE8_MEMBER(yard_flipscreen_w);
+	DECLARE_DRIVER_INIT(yard85);
 };
 
 /*----------- defined in video/m58.c -----------*/

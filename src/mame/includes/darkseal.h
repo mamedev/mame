@@ -28,6 +28,7 @@ public:
 	DECLARE_READ16_MEMBER(darkseal_control_r);
 	DECLARE_WRITE16_MEMBER(darkseal_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(darkseal_palette_24bit_b_w);
+	DECLARE_DRIVER_INIT(darkseal);
 };
 
 

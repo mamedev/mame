@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
 	DECLARE_WRITE8_MEMBER(popeye_portB_w);
 	DECLARE_READ8_MEMBER(popeye_portA_r);
+	DECLARE_DRIVER_INIT(skyskipr);
+	DECLARE_DRIVER_INIT(popeye);
 };
 
 

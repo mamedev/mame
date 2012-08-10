@@ -112,6 +112,11 @@ public:
 	DECLARE_READ16_MEMBER(hotslot_copro_r);
 	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
 	DECLARE_WRITE16_MEMBER(magic10_out_w);
+	DECLARE_DRIVER_INIT(sgsafari);
+	DECLARE_DRIVER_INIT(suprpool);
+	DECLARE_DRIVER_INIT(magic102);
+	DECLARE_DRIVER_INIT(magic10);
+	DECLARE_DRIVER_INIT(hotslot);
 };
 
 
@@ -1209,42 +1214,37 @@ ROM_END
 *       Driver Init         *
 ****************************/
 
-static DRIVER_INIT( magic10 )
+DRIVER_INIT_MEMBER(magic10_state,magic10)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer2_offset[0] = 32;
-	state->m_layer2_offset[1] = 2;
+	m_layer2_offset[0] = 32;
+	m_layer2_offset[1] = 2;
 }
 
-static DRIVER_INIT( magic102 )
+DRIVER_INIT_MEMBER(magic10_state,magic102)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer2_offset[0] = 8;
-	state->m_layer2_offset[1] = 20;
+	m_layer2_offset[0] = 8;
+	m_layer2_offset[1] = 20;
 }
 
-static DRIVER_INIT( suprpool )
+DRIVER_INIT_MEMBER(magic10_state,suprpool)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer2_offset[0] = 8;
-	state->m_layer2_offset[1] = 16;
+	m_layer2_offset[0] = 8;
+	m_layer2_offset[1] = 16;
 }
 
-static DRIVER_INIT( hotslot )
+DRIVER_INIT_MEMBER(magic10_state,hotslot)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
 */
-	state->m_layer2_offset[0] = -56;	// X offset.
-	state->m_layer2_offset[1] = 0;	// Y offset.
+	m_layer2_offset[0] = -56;	// X offset.
+	m_layer2_offset[1] = 0;	// Y offset.
 }
 
-static DRIVER_INIT( sgsafari )
+DRIVER_INIT_MEMBER(magic10_state,sgsafari)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer2_offset[0] = 16;
-	state->m_layer2_offset[1] = 20;
+	m_layer2_offset[0] = 16;
+	m_layer2_offset[1] = 20;
 }
 
 

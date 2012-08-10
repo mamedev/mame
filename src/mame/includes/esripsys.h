@@ -90,6 +90,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
+	DECLARE_DRIVER_INIT(esripsys);
 };
 
 

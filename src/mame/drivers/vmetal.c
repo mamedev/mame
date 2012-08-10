@@ -551,5 +551,5 @@ ROM_START( vmetaln )
 ROM_END
 
 
-GAME( 1995, vmetal,  0,      varia, varia, vmetal_state, 0, ROT270, "Excellent System",                                "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, vmetaln, vmetal, varia, varia, vmetal_state, 0, ROT270, "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, vmetal,  0,      varia, varia, driver_device, 0, ROT270, "Excellent System",                                "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, vmetaln, vmetal, varia, varia, driver_device, 0, ROT270, "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

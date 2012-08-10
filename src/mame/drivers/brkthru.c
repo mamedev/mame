@@ -657,10 +657,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( brkthru )
+DRIVER_INIT_MEMBER(brkthru_state,brkthru)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 }
 
 /*************************************

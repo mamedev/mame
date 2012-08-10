@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
 	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(brkthru);
 };
 
 

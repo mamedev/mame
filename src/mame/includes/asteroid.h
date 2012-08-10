@@ -26,6 +26,8 @@ public:
 	DECLARE_WRITE8_MEMBER(astdelux_bank_switch_w);
 	DECLARE_WRITE8_MEMBER(astdelux_led_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_DRIVER_INIT(asterock);
+	DECLARE_DRIVER_INIT(asteroidb);
 };
 
 

@@ -36,6 +36,7 @@ public:
 	DECLARE_READ8_MEMBER(capbowl_tms34061_r);
 	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
+	DECLARE_DRIVER_INIT(capbowl);
 };
 
 /*----------- defined in video/capbowl.c -----------*/

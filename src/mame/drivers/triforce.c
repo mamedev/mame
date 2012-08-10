@@ -692,20 +692,20 @@ ROM_START( mkartagp )
 ROM_END
 
 
-GAME( 2002, triforce, 0,        triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
+GAME( 2002, triforce, 0,        triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Triforce Bios", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT )
 
 // GD-ROM games
-GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
-GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
-GAME( 2003, avalons,  triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "The Key Of Avalon - The Wizard Master - Server (GDT-0005C) (V4.001)", GAME_IS_SKELETON )
-GAME( 2003, gekpurya, triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_IS_SKELETON )
-GAME( 2004, avalon13, triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "The Key Of Avalon 1.3 - Chaotic Sabbat - Client (GDT-0010C) (V4.000)", GAME_IS_SKELETON )
-GAME( 2004, tfupdate, triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_IS_SKELETON )
-GAME( 2004, vs4j,     triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_IS_SKELETON )
-GAME( 2004, vs4,      triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_IS_SKELETON )
-GAME( 2004, avalon20, triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_IS_SKELETON )
-GAME( 2006, vs42006,  triforce, triforcegd,    triforce, triforce_state,    0, ROT0, "Sega",           "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
+GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
+GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
+GAME( 2003, avalons,  triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "The Key Of Avalon - The Wizard Master - Server (GDT-0005C) (V4.001)", GAME_IS_SKELETON )
+GAME( 2003, gekpurya, triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_IS_SKELETON )
+GAME( 2004, avalon13, triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "The Key Of Avalon 1.3 - Chaotic Sabbat - Client (GDT-0010C) (V4.000)", GAME_IS_SKELETON )
+GAME( 2004, tfupdate, triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_IS_SKELETON )
+GAME( 2004, vs4j,     triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_IS_SKELETON )
+GAME( 2004, vs4,      triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_IS_SKELETON )
+GAME( 2004, avalon20, triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_IS_SKELETON )
+GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device,    0, ROT0, "Sega",           "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
 
 // ROM games
-GAME( 2005, mkartagp, triforce, triforce_base, triforce, triforce_state,    0, ROT0, "Namco",          "Mario Kart Arcade GP", GAME_IS_SKELETON )
+GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device,    0, ROT0, "Namco",          "Mario Kart Arcade GP", GAME_IS_SKELETON )
 

@@ -97,6 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_videoram_w);
 	DECLARE_READ8_MEMBER(wardner_sprite_r);
 	DECLARE_WRITE8_MEMBER(wardner_sprite_w);
+	DECLARE_DRIVER_INIT(twincobr);
 };
 
 

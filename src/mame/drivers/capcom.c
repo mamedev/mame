@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(capcom);
 };
 
 
@@ -35,7 +37,7 @@ void capcom_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( capcom )
+DRIVER_INIT_MEMBER(capcom_state,capcom)
 {
 }
 

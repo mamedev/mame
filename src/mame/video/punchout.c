@@ -10,32 +10,28 @@
 #include "includes/punchout.h"
 
 
-DRIVER_INIT( punchout )
+DRIVER_INIT_MEMBER(punchout_state,punchout)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_palette_reverse_top = 0x00;
-	state->m_palette_reverse_bot = 0xff;
+	m_palette_reverse_top = 0x00;
+	m_palette_reverse_bot = 0xff;
 }
 
-DRIVER_INIT( spnchout )
+DRIVER_INIT_MEMBER(punchout_state,spnchout)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_palette_reverse_top = 0x00;
-	state->m_palette_reverse_bot = 0xff;
+	m_palette_reverse_top = 0x00;
+	m_palette_reverse_bot = 0xff;
 }
 
-DRIVER_INIT( spnchotj )
+DRIVER_INIT_MEMBER(punchout_state,spnchotj)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_palette_reverse_top = 0xff;
-	state->m_palette_reverse_bot = 0xff;
+	m_palette_reverse_top = 0xff;
+	m_palette_reverse_bot = 0xff;
 }
 
-DRIVER_INIT( armwrest )
+DRIVER_INIT_MEMBER(punchout_state,armwrest)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_palette_reverse_top = 0x00;
-	state->m_palette_reverse_bot = 0x00;
+	m_palette_reverse_top = 0x00;
+	m_palette_reverse_bot = 0x00;
 }
 
 

@@ -458,11 +458,11 @@ ROM_START( asterixj )
 ROM_END
 
 
-static DRIVER_INIT( asterix )
+DRIVER_INIT_MEMBER(asterix_state,asterix)
 {
 #if 0
-	*(UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x07f34) = 0x602a;
-	*(UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x00008) = 0x0400;
+	*(UINT16 *)(machine().root_device().memregion("maincpu")->base() + 0x07f34) = 0x602a;
+	*(UINT16 *)(machine().root_device().memregion("maincpu")->base() + 0x00008) = 0x0400;
 #endif
 }
 

@@ -44,6 +44,8 @@ public:
 	void roadriot_sloop_tweak(int offset);
 	void guardians_sloop_tweak(int offset);
 	DECLARE_DIRECT_UPDATE_MEMBER(atarig42_sloop_direct_handler);
+	DECLARE_DRIVER_INIT(roadriot);
+	DECLARE_DRIVER_INIT(guardian);
 };
 
 

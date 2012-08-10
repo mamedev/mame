@@ -78,6 +78,13 @@ public:
 	DECLARE_WRITE16_MEMBER(gtmr_oki_0_bank_w);
 	DECLARE_WRITE16_MEMBER(gtmr_oki_1_bank_w);
 	DECLARE_WRITE8_MEMBER(kaneko16_eeprom_reset_w);
+	
+	DECLARE_DRIVER_INIT(bloodwar);
+	DECLARE_DRIVER_INIT(gtmr2);
+	DECLARE_DRIVER_INIT(kaneko16);
+	DECLARE_DRIVER_INIT(decrypt_toybox_rom);
+	DECLARE_DRIVER_INIT(decrypt_toybox_rom_alt);
+	DECLARE_DRIVER_INIT(samplebank);
 };
 
 class kaneko16_berlwall_state : public kaneko16_state
@@ -100,6 +107,7 @@ public:
 	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
 
+	DECLARE_DRIVER_INIT(berlwall);
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state
@@ -115,6 +123,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
+
+	DECLARE_DRIVER_INIT(shogwarr);
+	DECLARE_DRIVER_INIT(brapboys);
 };
 
 
@@ -130,9 +141,6 @@ void gtmr_mcu_run(running_machine &machine);
 void calc3_mcu_run(running_machine &machine);
 
 void toxboy_handle_04_subcommand(running_machine& machine, UINT8 mcu_subcmd, UINT16*mcu_ram);
-
-DRIVER_INIT( decrypt_toybox_rom );
-DRIVER_INIT( decrypt_toybox_rom_alt );
 
 
 /*----------- defined in drivers/kaneko16.c -----------*/

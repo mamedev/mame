@@ -158,6 +158,8 @@ public:
 	DECLARE_WRITE32_MEMBER(kinst_ide_w);
 	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
 	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
+	DECLARE_DRIVER_INIT(kinst);
+	DECLARE_DRIVER_INIT(kinst2);
 };
 
 
@@ -896,21 +898,19 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( kinst )
+DRIVER_INIT_MEMBER(kinst_state,kinst)
 {
-	kinst_state *state = machine.driver_data<kinst_state>();
 	static const UINT8 kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
-	dcs_init(machine);
+	dcs_init(machine());
 
 	/* set up the control register mapping */
-	state->m_control_map = kinst_control_map;
+	m_control_map = kinst_control_map;
 }
 
 
-static DRIVER_INIT( kinst2 )
+DRIVER_INIT_MEMBER(kinst_state,kinst2)
 {
-	kinst_state *state = machine.driver_data<kinst_state>();
 	static const UINT8 kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 
 	// read: $80 on ki2 = $90 on ki
@@ -920,10 +920,10 @@ static DRIVER_INIT( kinst2 )
 	// write: $98 on ki2 = $80 on ki
 	// write: $a0 on ki2 = $98 on ki
 
-	dcs_init(machine);
+	dcs_init(machine());
 
 	/* set up the control register mapping */
-	state->m_control_map = kinst2_control_map;
+	m_control_map = kinst2_control_map;
 }
 
 

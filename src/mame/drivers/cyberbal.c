@@ -1002,21 +1002,21 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( cyberbal )
+DRIVER_INIT_MEMBER(cyberbal_state,cyberbal)
 {
-	atarigen_slapstic_init(machine.device("maincpu"), 0x018000, 0, 0);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x018000, 0, 0);
 }
 
 
-static DRIVER_INIT( cyberbalt )
+DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
 {
-	atarigen_slapstic_init(machine.device("maincpu"), 0x018000, 0, 116);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x018000, 0, 116);
 }
 
 
-static DRIVER_INIT( cyberbal2p )
+DRIVER_INIT_MEMBER(cyberbal_state,cyberbal2p)
 {
-	atarijsa_init(machine, "IN2", 0x8000);
+	atarijsa_init(machine(), "IN2", 0x8000);
 }
 
 

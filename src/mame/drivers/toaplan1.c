@@ -2513,21 +2513,21 @@ ROM_START( vimana1 )
 ROM_END
 
 
-static DRIVER_INIT( toaplan1 )
+DRIVER_INIT_MEMBER(toaplan1_state,toaplan1)
 {
-	toaplan1_driver_savestate(machine);
+	toaplan1_driver_savestate(machine());
 }
 
-static DRIVER_INIT( demonwld )
+DRIVER_INIT_MEMBER(toaplan1_state,demonwld)
 {
-	toaplan1_driver_savestate(machine);
-	demonwld_driver_savestate(machine);
+	toaplan1_driver_savestate(machine());
+	demonwld_driver_savestate(machine());
 }
 
-static DRIVER_INIT( vimana )
+DRIVER_INIT_MEMBER(toaplan1_state,vimana)
 {
-	toaplan1_driver_savestate(machine);
-	vimana_driver_savestate(machine);
+	toaplan1_driver_savestate(machine());
+	vimana_driver_savestate(machine());
 }
 
 

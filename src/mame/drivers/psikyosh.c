@@ -1207,63 +1207,62 @@ ROM_START( tgm2p )
 ROM_END
 
 
-static DRIVER_INIT( soldivid )
+DRIVER_INIT_MEMBER(psikyosh_state,soldivid)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( s1945ii )
+DRIVER_INIT_MEMBER(psikyosh_state,s1945ii)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( daraku )
+DRIVER_INIT_MEMBER(psikyosh_state,daraku)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( sbomberb )
+DRIVER_INIT_MEMBER(psikyosh_state,sbomberb)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( gunbird2 )
+DRIVER_INIT_MEMBER(psikyosh_state,gunbird2)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( s1945iii )
+DRIVER_INIT_MEMBER(psikyosh_state,s1945iii)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( dragnblz )
+DRIVER_INIT_MEMBER(psikyosh_state,dragnblz)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( gnbarich )
+DRIVER_INIT_MEMBER(psikyosh_state,gnbarich)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( tgm2 )
+DRIVER_INIT_MEMBER(psikyosh_state,tgm2)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
-static DRIVER_INIT( mjgtaste )
+DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 {
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	psikyosh_state *state = machine.driver_data<psikyosh_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
 }
 
 

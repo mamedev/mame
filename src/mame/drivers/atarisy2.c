@@ -3191,13 +3191,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( paperboy )
+DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 {
 	int i;
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	UINT8 *cpu1 = state->memregion("maincpu")->base();
+	UINT8 *cpu1 = memregion("maincpu")->base();
 
-	slapstic_init(machine, 105);
+	slapstic_init(machine(), 105);
 
 	/* expand the 16k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3207,69 +3206,65 @@ static DRIVER_INIT( paperboy )
 		memcpy(&cpu1[i + 0x18000], &cpu1[i], 0x8000);
 	}
 
-	state->m_pedal_count = 0;
-	state->m_has_tms5220 = 1;
-	tms5220_rsq_w(machine.device("tms"),  1); // /RS is tied high on sys2 hw
+	m_pedal_count = 0;
+	m_has_tms5220 = 1;
+	tms5220_rsq_w(machine().device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
 
-static DRIVER_INIT( 720 )
+DRIVER_INIT_MEMBER(atarisy2_state,720)
 {
 	/* without the default EEPROM, 720 hangs at startup due to communication
        issues with the sound CPU; temporarily increasing the sound CPU frequency
        to ~2.2MHz "fixes" the problem */
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	slapstic_init(machine, 107);
+	slapstic_init(machine(), 107);
 
-	state->m_pedal_count = -1;
-	state->m_has_tms5220 = 1;
-	tms5220_rsq_w(machine.device("tms"),  1); // /RS is tied high on sys2 hw
+	m_pedal_count = -1;
+	m_has_tms5220 = 1;
+	tms5220_rsq_w(machine().device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
 
-static DRIVER_INIT( ssprint )
+DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 	int i;
-	UINT8 *cpu1 = state->memregion("maincpu")->base();
+	UINT8 *cpu1 = memregion("maincpu")->base();
 
-	slapstic_init(machine, 108);
+	slapstic_init(machine(), 108);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
-	state->m_pedal_count = 3;
-	state->m_has_tms5220 = 0;
+	m_pedal_count = 3;
+	m_has_tms5220 = 0;
 }
 
 
-static DRIVER_INIT( csprint )
+DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 {
 	int i;
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	UINT8 *cpu1 = state->memregion("maincpu")->base();
+	UINT8 *cpu1 = memregion("maincpu")->base();
 
-	slapstic_init(machine, 109);
+	slapstic_init(machine(), 109);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
-	state->m_pedal_count = 2;
-	state->m_has_tms5220 = 0;
+	m_pedal_count = 2;
+	m_has_tms5220 = 0;
 }
 
 
-static DRIVER_INIT( apb )
+DRIVER_INIT_MEMBER(atarisy2_state,apb)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
-	slapstic_init(machine, 110);
+	slapstic_init(machine(), 110);
 
-	state->m_pedal_count = 2;
-	state->m_has_tms5220 = 1;
-	tms5220_rsq_w(machine.device("tms"),  1); // /RS is tied high on sys2 hw
+	m_pedal_count = 2;
+	m_has_tms5220 = 1;
+	tms5220_rsq_w(machine().device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
 

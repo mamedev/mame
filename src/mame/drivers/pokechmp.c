@@ -240,16 +240,16 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, pokechmp_oki_map)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( pokechmp )
+DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)
 {
 	// default sound rom bank
-	machine.root_device().membank("bank3")->configure_entries(0, 2, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank3")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	// default fixed area for main CPU
-	machine.root_device().membank("fixed")->set_base( machine.root_device().memregion("maincpu")->base() + 0x18000 );
+	machine().root_device().membank("fixed")->set_base( machine().root_device().memregion("maincpu")->base() + 0x18000 );
 
 	// default OKI sample bank
-	machine.root_device().membank("okibank")->set_base( machine.root_device().memregion("oki")->base() + 0x40000 );
+	machine().root_device().membank("okibank")->set_base( machine().root_device().memregion("oki")->base() + 0x40000 );
 }
 
 

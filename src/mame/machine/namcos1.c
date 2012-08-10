@@ -1008,117 +1008,117 @@ static void namcos1_driver_init( running_machine &machine, const struct namcos1_
 /*******************************************************************************
 *   Shadowland / Youkai Douchuuki specific                                     *
 *******************************************************************************/
-DRIVER_INIT( shadowld )
+DRIVER_INIT_MEMBER(namcos1_state,shadowld)
 {
-	namcos1_driver_init(machine, NULL);
+	namcos1_driver_init(machine(), NULL);
 }
 
 /*******************************************************************************
 *   Dragon Spirit specific (CUS136)                                            *
 *******************************************************************************/
-DRIVER_INIT( dspirit )
+DRIVER_INIT_MEMBER(namcos1_state,dspirit)
 {
 	static const struct namcos1_specific dspirit_specific=
 	{
 		key_type1_r,key_type1_w, 0x36
 	};
-	namcos1_driver_init(machine, &dspirit_specific);
+	namcos1_driver_init(machine(), &dspirit_specific);
 }
 
 /*******************************************************************************
 *   World Court specific (CUS143)                                              *
 *******************************************************************************/
-DRIVER_INIT( wldcourt )
+DRIVER_INIT_MEMBER(namcos1_state,wldcourt)
 {
 	static const struct namcos1_specific worldcourt_specific=
 	{
 		key_type1_r,key_type1_w, 0x35
 	};
-	namcos1_driver_init(machine, &worldcourt_specific);
+	namcos1_driver_init(machine(), &worldcourt_specific);
 }
 
 /*******************************************************************************
 *   Blazer specific (CUS144)                                                   *
 *******************************************************************************/
-DRIVER_INIT( blazer )
+DRIVER_INIT_MEMBER(namcos1_state,blazer)
 {
 	static const struct namcos1_specific blazer_specific=
 	{
 		key_type1_r,key_type1_w, 0x13
 	};
-	namcos1_driver_init(machine, &blazer_specific);
+	namcos1_driver_init(machine(), &blazer_specific);
 }
 
 /*******************************************************************************
 *   Puzzle Club specific                                                       *
 *******************************************************************************/
-DRIVER_INIT( puzlclub )
+DRIVER_INIT_MEMBER(namcos1_state,puzlclub)
 {
 	static const struct namcos1_specific puzlclub_specific=
 	{
 		key_type1_r,key_type1_w, 0x35
 	};
-	namcos1_driver_init(machine, &puzlclub_specific);
+	namcos1_driver_init(machine(), &puzlclub_specific);
 }
 
 /*******************************************************************************
 *   Pac-Mania specific (CUS151)                                                *
 *******************************************************************************/
-DRIVER_INIT( pacmania )
+DRIVER_INIT_MEMBER(namcos1_state,pacmania)
 {
 	static const struct namcos1_specific pacmania_specific=
 	{
 		key_type2_r,key_type2_w, 0x12
 	};
-	namcos1_driver_init(machine, &pacmania_specific);
+	namcos1_driver_init(machine(), &pacmania_specific);
 }
 
 /*******************************************************************************
 *   Alice in Wonderland / Marchen Maze specific (CUS152)                       *
 *******************************************************************************/
-DRIVER_INIT( alice )
+DRIVER_INIT_MEMBER(namcos1_state,alice)
 {
 	static const struct namcos1_specific alice_specific=
 	{
 		key_type2_r,key_type2_w, 0x25
 	};
-	namcos1_driver_init(machine, &alice_specific);
+	namcos1_driver_init(machine(), &alice_specific);
 }
 
 /*******************************************************************************
 *   Galaga '88 specific (CUS153)                                               *
 *******************************************************************************/
-DRIVER_INIT( galaga88 )
+DRIVER_INIT_MEMBER(namcos1_state,galaga88)
 {
 	static const struct namcos1_specific galaga88_specific=
 	{
 		key_type2_r,key_type2_w, 0x31
 	};
-	namcos1_driver_init(machine, &galaga88_specific);
+	namcos1_driver_init(machine(), &galaga88_specific);
 }
 
 /*******************************************************************************
 *   World Stadium specific (CUS154)                                            *
 *******************************************************************************/
-DRIVER_INIT( ws )
+DRIVER_INIT_MEMBER(namcos1_state,ws)
 {
 	static const struct namcos1_specific ws_specific=
 	{
 		key_type2_r,key_type2_w, 0x07
 	};
-	namcos1_driver_init(machine, &ws_specific);
+	namcos1_driver_init(machine(), &ws_specific);
 }
 
 /*******************************************************************************
 *   Bakutotsu Kijuutei specific (CUS155)                                       *
 *******************************************************************************/
-DRIVER_INIT( bakutotu )
+DRIVER_INIT_MEMBER(namcos1_state,bakutotu)
 {
 	static const struct namcos1_specific bakutotu_specific=
 	{
 		key_type2_r,key_type2_w, 0x22
 	};
-	namcos1_driver_init(machine, &bakutotu_specific);
+	namcos1_driver_init(machine(), &bakutotu_specific);
 
 #if 0
 	// resolves CPU deadlocks caused by sloppy coding(see driver\namcos1.c)
@@ -1126,7 +1126,7 @@ DRIVER_INIT( bakutotu )
 		static const UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
 		UINT8 *rombase, *srcptr, *endptr, *scanptr;
 
-		rombase = machine.root_device().memregion("user1")->base();
+		rombase = machine().root_device().memregion("user1")->base();
 		srcptr = rombase + 0x1e000;
 		endptr = srcptr + 0xa000;
 
@@ -1149,123 +1149,123 @@ DRIVER_INIT( bakutotu )
 /*******************************************************************************
 *   Splatter House specific (CUS181)                                           *
 *******************************************************************************/
-DRIVER_INIT( splatter )
+DRIVER_INIT_MEMBER(namcos1_state,splatter)
 {
 	static const struct namcos1_specific splatter_specific=
 	{
 		key_type3_r,key_type3_w, 181, 3, 4,-1,-1,-1,-1
 	};
 
-	namcos1_driver_init(machine, &splatter_specific);
+	namcos1_driver_init(machine(), &splatter_specific);
 }
 
 /*******************************************************************************
 *   Rompers specific (CUS182)                                                  *
 *******************************************************************************/
-DRIVER_INIT( rompers )
+DRIVER_INIT_MEMBER(namcos1_state,rompers)
 {
 	static const struct namcos1_specific rompers_specific=
 	{
 		key_type3_r,key_type3_w, 182, 7,-1,-1,-1,-1,-1
 	};
-	namcos1_driver_init(machine, &rompers_specific);
+	namcos1_driver_init(machine(), &rompers_specific);
 }
 
 /*******************************************************************************
 *   Blast Off specific (CUS183)                                                *
 *******************************************************************************/
-DRIVER_INIT( blastoff )
+DRIVER_INIT_MEMBER(namcos1_state,blastoff)
 {
 	static const struct namcos1_specific blastoff_specific=
 	{
 		key_type3_r,key_type3_w, 183, 0, 7, 3, 5,-1,-1
 	};
-	namcos1_driver_init(machine, &blastoff_specific);
+	namcos1_driver_init(machine(), &blastoff_specific);
 }
 
 /*******************************************************************************
 *   World Stadium '89 specific (CUS184)                                        *
 *******************************************************************************/
-DRIVER_INIT( ws89 )
+DRIVER_INIT_MEMBER(namcos1_state,ws89)
 {
 	static const struct namcos1_specific ws89_specific=
 	{
 		key_type3_r,key_type3_w, 184, 2,-1,-1,-1,-1,-1
 	};
-	namcos1_driver_init(machine, &ws89_specific);
+	namcos1_driver_init(machine(), &ws89_specific);
 }
 
 /*******************************************************************************
 *   Tank Force specific (CUS185)                                               *
 *******************************************************************************/
-DRIVER_INIT( tankfrce )
+DRIVER_INIT_MEMBER(namcos1_state,tankfrce)
 {
 	static const struct namcos1_specific tankfrce_specific=
 	{
 		key_type3_r,key_type3_w, 185, 5,-1, 1,-1, 2,-1
 	};
-	namcos1_driver_init(machine, &tankfrce_specific);
+	namcos1_driver_init(machine(), &tankfrce_specific);
 }
 
 
 
-DRIVER_INIT( tankfrc4 )
+DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
 {
 	static const struct namcos1_specific tankfrce_specific=
 	{
 		key_type3_r,key_type3_w, 185, 5,-1, 1,-1, 2,-1
 	};
-	namcos1_driver_init(machine, &tankfrce_specific);
+	namcos1_driver_init(machine(), &tankfrce_specific);
 
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }
 
 /*******************************************************************************
 *   Dangerous Seed specific (CUS308)                                           *
 *******************************************************************************/
-DRIVER_INIT( dangseed )
+DRIVER_INIT_MEMBER(namcos1_state,dangseed)
 {
 	static const struct namcos1_specific dangseed_specific=
 	{
 		key_type3_r,key_type3_w, 308, 6,-1, 5,-1, 0, 4
 	};
-	namcos1_driver_init(machine, &dangseed_specific);
+	namcos1_driver_init(machine(), &dangseed_specific);
 }
 
 /*******************************************************************************
 *   Pistol Daimyo no Bouken specific (CUS309)                                  *
 *******************************************************************************/
-DRIVER_INIT( pistoldm )
+DRIVER_INIT_MEMBER(namcos1_state,pistoldm)
 {
 	static const struct namcos1_specific pistoldm_specific=
 	{
 		key_type3_r,key_type3_w, 309, 1, 2, 0,-1, 4,-1
 	};
-	namcos1_driver_init(machine, &pistoldm_specific);
+	namcos1_driver_init(machine(), &pistoldm_specific);
 }
 
 /*******************************************************************************
 *   World Stadium '90 specific (CUS310)                                        *
 *******************************************************************************/
-DRIVER_INIT( ws90 )
+DRIVER_INIT_MEMBER(namcos1_state,ws90)
 {
 	static const struct namcos1_specific ws90_specific=
 	{
 		key_type3_r,key_type3_w, 310, 4,-1, 7,-1, 3,-1
 	};
-	namcos1_driver_init(machine, &ws90_specific);
+	namcos1_driver_init(machine(), &ws90_specific);
 }
 
 /*******************************************************************************
 *   Souko Ban DX specific (CUS311)                                             *
 *******************************************************************************/
-DRIVER_INIT( soukobdx )
+DRIVER_INIT_MEMBER(namcos1_state,soukobdx)
 {
 	static const struct namcos1_specific soukobdx_specific=
 	{
 		key_type3_r,key_type3_w, 311, 2, 3/*?*/, 0,-1, 4,-1
 	};
-	namcos1_driver_init(machine, &soukobdx_specific);
+	namcos1_driver_init(machine(), &soukobdx_specific);
 }
 
 
@@ -1305,10 +1305,10 @@ static READ8_HANDLER( quester_paddle_r )
 	}
 }
 
-DRIVER_INIT( quester )
+DRIVER_INIT_MEMBER(namcos1_state,quester)
 {
-	namcos1_driver_init(machine, NULL);
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
+	namcos1_driver_init(machine(), NULL);
+	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
 }
 
 
@@ -1394,10 +1394,10 @@ static READ8_HANDLER( berabohm_buttons_r )
 	}
 }
 
-DRIVER_INIT( berabohm )
+DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 {
-	namcos1_driver_init(machine, NULL);
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
+	namcos1_driver_init(machine(), NULL);
+	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
 }
 
 
@@ -1464,8 +1464,8 @@ static READ8_HANDLER( faceoff_inputs_r )
 	}
 }
 
-DRIVER_INIT( faceoff )
+DRIVER_INIT_MEMBER(namcos1_state,faceoff)
 {
-	namcos1_driver_init(machine, NULL);
-	machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	namcos1_driver_init(machine(), NULL);
+	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }

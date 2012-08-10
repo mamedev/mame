@@ -25,6 +25,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(astropc);
 };
 
 static ADDRESS_MAP_START( astropc_map, AS_PROGRAM, 32, astropc_state )
@@ -154,7 +156,7 @@ ROM_START( rasce )
 ROM_END
 
 
-static DRIVER_INIT(astropc)
+DRIVER_INIT_MEMBER(astropc_state,astropc)
 {
 
 }

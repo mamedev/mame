@@ -167,6 +167,13 @@ public:
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
 
+	DECLARE_DRIVER_INIT(toppoker);
+	DECLARE_DRIVER_INIT(lotse_bank0);
+	DECLARE_DRIVER_INIT(nocrypt_bank0);
+	DECLARE_DRIVER_INIT(lotse);
+	DECLARE_DRIVER_INIT(clatt);
+	DECLARE_DRIVER_INIT(rou029);
+	DECLARE_DRIVER_INIT(nocrypt);
 };
 
 #define VFD_RESET  0x20
@@ -1161,59 +1168,58 @@ static void sc1_common_init(running_machine &machine, int reels, int decrypt, in
 
 }
 
-static DRIVER_INIT(toppoker)
+DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 {
-	sc1_common_init(machine,3,1, 3);
-	adder2_decode_char_roms(machine);	// decode GFX roms
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),3,1, 3);
+	adder2_decode_char_roms(machine());	// decode GFX roms
+	MechMtr_config(machine(),8);
 }
 
-static DRIVER_INIT(lotse)
+DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
 {
-	sc1_common_init(machine,6,1, 3);
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),6,1, 3);
+	MechMtr_config(machine(),8);
 }
 
-static DRIVER_INIT(lotse_bank0)
+DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 {
-	sc1_common_init(machine,6,1, 0);
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),6,1, 0);
+	MechMtr_config(machine(),8);
 }
 
 
-static DRIVER_INIT(nocrypt)
+DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
 {
-	sc1_common_init(machine,6,0, 3);
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),6,0, 3);
+	MechMtr_config(machine(),8);
 }
 
-static DRIVER_INIT(nocrypt_bank0)
+DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 {
-	sc1_common_init(machine,6,0, 0);
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),6,0, 0);
+	MechMtr_config(machine(),8);
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-static DRIVER_INIT(rou029)
+DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 {
-	sc1_common_init(machine,6,0, 3);
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),6,0, 3);
+	MechMtr_config(machine(),8);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-static DRIVER_INIT(clatt)
+DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 {
-	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
-	sc1_common_init(machine,6,1, 3);
-	MechMtr_config(machine,8);
+	sc1_common_init(machine(),6,1, 3);
+	MechMtr_config(machine(),8);
 
-	Scorpion1_SetSwitchState(state,3,2,1);
-	Scorpion1_SetSwitchState(state,3,3,1);
-	Scorpion1_SetSwitchState(state,3,6,1);
-	Scorpion1_SetSwitchState(state,4,1,1);
+	Scorpion1_SetSwitchState(this,3,2,1);
+	Scorpion1_SetSwitchState(this,3,3,1);
+	Scorpion1_SetSwitchState(this,3,6,1);
+	Scorpion1_SetSwitchState(this,4,1,1);
 }
 
 

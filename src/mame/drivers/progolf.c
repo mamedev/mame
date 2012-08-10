@@ -82,6 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(progolf_videoram_r);
 	DECLARE_WRITE8_MEMBER(progolf_videoram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(progolfa);
+	DECLARE_DRIVER_INIT(progolf);
 };
 
 
@@ -498,12 +500,12 @@ ROM_START( progolfa )
 ROM_END
 
 
-static DRIVER_INIT( progolf )
+DRIVER_INIT_MEMBER(progolf_state,progolf)
 {
 	int A;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8* decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);
 
@@ -512,12 +514,12 @@ static DRIVER_INIT( progolf )
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
 }
 
-static DRIVER_INIT( progolfa )
+DRIVER_INIT_MEMBER(progolf_state,progolfa)
 {
 	int A;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8* decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);
 

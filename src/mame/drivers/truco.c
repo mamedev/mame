@@ -499,4 +499,4 @@ ROM_START( truco )
 ROM_END
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT    INIT  ROT    COMPANY           FULLNAME     FLAGS  */
-GAME( 198?, truco,   0,      truco,   truco, truco_state,   0,    ROT0, "Playtronic SRL", "Truco-Tron", 0 )
+GAME( 198?, truco,   0,      truco,   truco, driver_device,   0,    ROT0, "Playtronic SRL", "Truco-Tron", 0 )

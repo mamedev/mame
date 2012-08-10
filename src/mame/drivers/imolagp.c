@@ -609,4 +609,4 @@ ROM_END
 
 
 /*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,     FULLNAME */
-GAME( 1981, imolagp, 0,        imolagp, imolagp, imolagp_state, 0,       ROT90,   "Alberici", "Imola Grand Prix", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, imolagp, 0,        imolagp, imolagp, driver_device, 0,       ROT90,   "Alberici", "Imola Grand Prix", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

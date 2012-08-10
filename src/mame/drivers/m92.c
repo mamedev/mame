@@ -2153,76 +2153,70 @@ ROM_END
 
 /***************************************************************************/
 
-static DRIVER_INIT( m92 )
+DRIVER_INIT_MEMBER(m92_state,m92)
 {
-	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->set_base(&ROM[0xa0000]);
+	membank("bank1")->set_base(&ROM[0xa0000]);
 
-	state->m_game_kludge = 0;
-	state->m_irq_vectorbase = 0x80;
+	m_game_kludge = 0;
+	m_irq_vectorbase = 0x80;
 }
 
 /* different vector base */
-static DRIVER_INIT( m92_alt )
+DRIVER_INIT_MEMBER(m92_state,m92_alt)
 {
-	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->set_base(&ROM[0xa0000]);
+	membank("bank1")->set_base(&ROM[0xa0000]);
 
-	state->m_game_kludge = 0;
-	state->m_irq_vectorbase = 0x20;
+	m_game_kludge = 0;
+	m_irq_vectorbase = 0x20;
 }
 
 /* different vector base, different address map (no bank1) */
-static DRIVER_INIT( lethalth )
+DRIVER_INIT_MEMBER(m92_state,lethalth)
 {
-	m92_state *state = machine.driver_data<m92_state>();
 
-	state->m_game_kludge = 0;
-	state->m_irq_vectorbase = 0x20;
+	m_game_kludge = 0;
+	m_irq_vectorbase = 0x20;
 }
 
 /* has bankswitching */
-static DRIVER_INIT( m92_bank )
+DRIVER_INIT_MEMBER(m92_state,m92_bank)
 {
-	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),state));
+	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
 
-	state->m_game_kludge = 0;
-	state->m_irq_vectorbase = 0x80;
+	m_game_kludge = 0;
+	m_irq_vectorbase = 0x80;
 }
 
 /* has bankswitching, has eeprom, needs sprite kludge */
-static DRIVER_INIT( majtitl2 )
+DRIVER_INIT_MEMBER(m92_state,majtitl2)
 {
-	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),state));
+	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
 
 	/* This game has an eeprom on the game board */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),state), write16_delegate(FUNC(m92_state::m92_eeprom_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),this), write16_delegate(FUNC(m92_state::m92_eeprom_w),this));
 
-	state->m_game_kludge = 2;
-	state->m_irq_vectorbase = 0x80;
+	m_game_kludge = 2;
+	m_irq_vectorbase = 0x80;
 }
 
 /* TODO: figure out actual address map and other differences from real Irem h/w */
-static DRIVER_INIT( ppan )
+DRIVER_INIT_MEMBER(m92_state,ppan)
 {
-	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	state->membank("bank1")->set_base(&ROM[0xa0000]);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&ROM[0xa0000]);
 
-	state->m_game_kludge = 0;
-	state->m_irq_vectorbase = 0x80;
+	m_game_kludge = 0;
+	m_irq_vectorbase = 0x80;
 }
 
 /***************************************************************************/

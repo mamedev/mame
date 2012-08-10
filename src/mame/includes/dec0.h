@@ -62,6 +62,13 @@ public:
 	DECLARE_WRITE16_MEMBER(dec0_paletteram_rg_w);
 	DECLARE_WRITE16_MEMBER(dec0_paletteram_b_w);
 	DECLARE_WRITE16_MEMBER(dec0_priority_w);
+	DECLARE_DRIVER_INIT(robocop);
+	DECLARE_DRIVER_INIT(hippodrm);
+	DECLARE_DRIVER_INIT(hbarrel);
+	DECLARE_DRIVER_INIT(slyspy);
+	DECLARE_DRIVER_INIT(birdtry);
+	DECLARE_DRIVER_INIT(baddudes);
+	DECLARE_DRIVER_INIT(midresb);
 };
 
 
@@ -111,12 +118,6 @@ SCREEN_UPDATE_IND16( secretab );
 
 READ16_HANDLER( slyspy_controls_r );
 
-DRIVER_INIT( slyspy );
-DRIVER_INIT( hippodrm );
-DRIVER_INIT( robocop );
-DRIVER_INIT( baddudes );
-DRIVER_INIT( hbarrel );
-DRIVER_INIT( birdtry );
 
 extern void dec0_i8751_write(running_machine &machine, int data);
 extern void dec0_i8751_reset(running_machine &machine);

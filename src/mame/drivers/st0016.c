@@ -660,26 +660,26 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT(renju)
+DRIVER_INIT_MEMBER(st0016_state,renju)
 {
 	st0016_game=0;
 }
 
-static DRIVER_INIT(nratechu)
+DRIVER_INIT_MEMBER(st0016_state,nratechu)
 {
 	st0016_game=1;
 }
 
-static DRIVER_INIT(mayjinsn)
+DRIVER_INIT_MEMBER(st0016_state,mayjinsn)
 {
 	st0016_game=4;//|0x80;
-	machine.root_device().membank("bank2")->set_base(machine.root_device().memregion("user1")->base());
+	machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("user1")->base());
 }
 
-static DRIVER_INIT(mayjisn2)
+DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
 {
 	st0016_game=4;
-	machine.root_device().membank("bank2")->set_base(machine.root_device().memregion("user1")->base());
+	machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("user1")->base());
 }
 
 /*************************************

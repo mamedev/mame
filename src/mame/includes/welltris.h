@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE16_MEMBER(welltris_charvideoram_w);
 	void setbank(int num, int bank);
 	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
+	DECLARE_DRIVER_INIT(quiz18k);
+	DECLARE_DRIVER_INIT(welltris);
 };
 
 

@@ -104,6 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_DRIVER_INIT(re900);
 };
 
 
@@ -452,12 +453,11 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-static DRIVER_INIT( re900 )
+DRIVER_INIT_MEMBER(re900_state,re900)
 {
-	re900_state *state = machine.driver_data<re900_state>();
-	state->m_player = 1;
-	state->m_stat_a = 1;
-	state->m_psg_pa = state->m_psg_pb = state->m_mux_data = state->m_ledant = 0;
+	m_player = 1;
+	m_stat_a = 1;
+	m_psg_pa = m_psg_pb = m_mux_data = m_ledant = 0;
 }
 
 

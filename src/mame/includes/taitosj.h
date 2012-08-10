@@ -80,6 +80,11 @@ public:
 	DECLARE_WRITE8_MEMBER(input_port_4_f0_w);
 	DECLARE_WRITE8_MEMBER(dac_out_w);
 	DECLARE_WRITE8_MEMBER(dac_vol_w);
+	DECLARE_DRIVER_INIT(alpinea);
+	DECLARE_DRIVER_INIT(alpine);
+	DECLARE_DRIVER_INIT(taitosj);
+	DECLARE_DRIVER_INIT(junglhbr);
+	DECLARE_DRIVER_INIT(spacecr);
 };
 
 

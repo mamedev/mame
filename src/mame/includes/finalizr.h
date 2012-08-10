@@ -46,6 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(i8039_T1_r);
 	DECLARE_WRITE8_MEMBER(i8039_T0_w);
 	DECLARE_WRITE8_MEMBER(finalizr_videoctrl_w);
+	DECLARE_DRIVER_INIT(finalizr);
 };
 
 

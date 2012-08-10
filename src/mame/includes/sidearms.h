@@ -42,6 +42,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sidearms_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(sidearms_star_scrollx_w);
 	DECLARE_WRITE8_MEMBER(sidearms_star_scrolly_w);
+	DECLARE_DRIVER_INIT(dyger);
+	DECLARE_DRIVER_INIT(sidearms);
+	DECLARE_DRIVER_INIT(whizz);
+	DECLARE_DRIVER_INIT(turtship);
 };
 
 /*----------- defined in video/sidearms.c -----------*/

@@ -490,6 +490,8 @@ public:
 
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_spc_direct);
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);
+	DECLARE_DRIVER_INIT(snes);
+	DECLARE_DRIVER_INIT(snes_hirom);	
 };
 
 /* Special chips, checked at init and used in memory handlers */
@@ -537,8 +539,6 @@ enum
 
 /*----------- defined in machine/snes.c -----------*/
 
-extern DRIVER_INIT( snes );
-extern DRIVER_INIT( snes_hirom );
 
 extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );

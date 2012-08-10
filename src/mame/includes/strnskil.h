@@ -25,6 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_WRITE8_MEMBER(strnskil_videoram_w);
 	DECLARE_WRITE8_MEMBER(strnskil_scrl_ctrl_w);
+	DECLARE_DRIVER_INIT(banbam);
+	DECLARE_DRIVER_INIT(pettanp);
 };
 
 

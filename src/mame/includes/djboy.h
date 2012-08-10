@@ -65,6 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(djboy_scrolly_w);
 	DECLARE_WRITE8_MEMBER(djboy_videoram_w);
 	DECLARE_WRITE8_MEMBER(djboy_paletteram_w);
+	DECLARE_DRIVER_INIT(djboy);
+	DECLARE_DRIVER_INIT(djboyj);
 };
 
 

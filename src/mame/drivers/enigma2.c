@@ -86,6 +86,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(protection_data_w);
+	DECLARE_DRIVER_INIT(enigma2);
 };
 
 
@@ -704,10 +705,10 @@ ROM_START( enigma2b )
 ROM_END
 
 
-static DRIVER_INIT(enigma2)
+DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 {
 	offs_t i;
-	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
 
 	for(i = 0; i < 0x2000; i++)
 	{

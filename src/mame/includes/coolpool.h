@@ -53,4 +53,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_romaddr_w);
 	DECLARE_READ16_MEMBER(coolpool_input_r);
 	DECLARE_WRITE16_MEMBER(dsp_dac_w);
+	DECLARE_DRIVER_INIT(coolpool);
+	DECLARE_DRIVER_INIT(amerdart);
+	DECLARE_DRIVER_INIT(9ballsht);
 };

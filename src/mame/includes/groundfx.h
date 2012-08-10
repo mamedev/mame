@@ -35,6 +35,7 @@ public:
 	DECLARE_READ32_MEMBER(irq_speedup_r_groundfx);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	DECLARE_DRIVER_INIT(groundfx);
 };
 
 

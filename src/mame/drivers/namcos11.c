@@ -330,6 +330,17 @@ public:
 	DECLARE_READ8_MEMBER(pocketrc_steer_r);
 	DECLARE_READ16_MEMBER(c76_speedup_r);
 	DECLARE_WRITE16_MEMBER(c76_speedup_w);
+	DECLARE_DRIVER_INIT(primglex);
+	DECLARE_DRIVER_INIT(danceyes);
+	DECLARE_DRIVER_INIT(myangel3);
+	DECLARE_DRIVER_INIT(ptblank2ua);
+	DECLARE_DRIVER_INIT(pocketrc);
+	DECLARE_DRIVER_INIT(starswep);
+	DECLARE_DRIVER_INIT(souledge);
+	DECLARE_DRIVER_INIT(dunkmnia);
+	DECLARE_DRIVER_INIT(tekken);
+	DECLARE_DRIVER_INIT(xevi3dg);
+	DECLARE_DRIVER_INIT(tekken2);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -910,85 +921,75 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 	}
 }
 
-static DRIVER_INIT( tekken )
+DRIVER_INIT_MEMBER(namcos11_state,tekken)
 {
-	namcos11_init_common(machine, 32);
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( tekken2 )
+DRIVER_INIT_MEMBER(namcos11_state,tekken2)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c406_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c406_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( souledge )
+DRIVER_INIT_MEMBER(namcos11_state,souledge)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c409_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c409_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( dunkmnia )
+DRIVER_INIT_MEMBER(namcos11_state,dunkmnia)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c410_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c410_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( primglex )
+DRIVER_INIT_MEMBER(namcos11_state,primglex)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c411_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c411_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( xevi3dg )
+DRIVER_INIT_MEMBER(namcos11_state,xevi3dg)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c430_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c430_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( danceyes )
+DRIVER_INIT_MEMBER(namcos11_state,danceyes)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c431_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c431_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( pocketrc )
+DRIVER_INIT_MEMBER(namcos11_state,pocketrc)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("c76")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC0_L, read8_delegate(FUNC(namcos11_state::pocketrc_steer_r),state));
-	machine.device("c76")->memory().space(AS_IO)->install_read_handler(M37710_ADC1_L, M37710_ADC1_L, read8_delegate(FUNC(namcos11_state::pocketrc_gas_r),state));
+	machine().device("c76")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC0_L, read8_delegate(FUNC(namcos11_state::pocketrc_steer_r),this));
+	machine().device("c76")->memory().space(AS_IO)->install_read_handler(M37710_ADC1_L, M37710_ADC1_L, read8_delegate(FUNC(namcos11_state::pocketrc_gas_r),this));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c432_r),state));
-	namcos11_init_common(machine, 32);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c432_r),this));
+	namcos11_init_common(machine(), 32);
 }
 
-static DRIVER_INIT( starswep )
+DRIVER_INIT_MEMBER(namcos11_state,starswep)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c442_r),state));
-	namcos11_init_common(machine, 0);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c442_r),this));
+	namcos11_init_common(machine(), 0);
 }
 
-static DRIVER_INIT( myangel3 )
+DRIVER_INIT_MEMBER(namcos11_state,myangel3)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),state));
-	namcos11_init_common(machine, 64);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),this));
+	namcos11_init_common(machine(), 64);
 }
 
-static DRIVER_INIT( ptblank2ua )
+DRIVER_INIT_MEMBER(namcos11_state,ptblank2ua)
 {
-	namcos11_state *state = machine.driver_data<namcos11_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),state));
-	namcos11_init_common(machine, 64);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),this));
+	namcos11_init_common(machine(), 64);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos11_state::lightgun_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos11_state::lightgun_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos11_state::lightgun_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos11_state::lightgun_r),this));
 }
 
 static MACHINE_RESET( namcos11 )

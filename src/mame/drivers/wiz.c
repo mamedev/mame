@@ -1054,7 +1054,7 @@ ROM_END
 
 
 
-static DRIVER_INIT( stinger )
+DRIVER_INIT_MEMBER(wiz_state,stinger)
 {
 	static const UINT8 swap_xor_table[4][4] =
 	{
@@ -1063,10 +1063,10 @@ static DRIVER_INIT( stinger )
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	int size = machine.root_device().memregion("maincpu")->bytes();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	int size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
 	int A;
 	const UINT8 *tbl;
 
@@ -1098,16 +1098,15 @@ static DRIVER_INIT( stinger )
 }
 
 
-static DRIVER_INIT( scion )
+DRIVER_INIT_MEMBER(wiz_state,scion)
 {
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->nop_write(0x4000, 0x4001);
+	machine().device("audiocpu")->memory().space(AS_PROGRAM)->nop_write(0x4000, 0x4001);
 }
 
 
-static DRIVER_INIT( wiz )
+DRIVER_INIT_MEMBER(wiz_state,wiz)
 {
-	wiz_state *state = machine.driver_data<wiz_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd400, 0xd400, read8_delegate(FUNC(wiz_state::wiz_protection_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd400, 0xd400, read8_delegate(FUNC(wiz_state::wiz_protection_r),this));
 }
 
 
@@ -1115,8 +1114,8 @@ GAME( 1983, stinger,  0,       stinger, stinger, wiz_state,  stinger, ROT90,  "S
 GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", GAME_IMPERFECT_SOUND )
 GAME( 1984, scion,    0,       scion,   scion, wiz_state,    scion,   ROT0,   "Seibu Denshi", "Scion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1984, scionc,   scion,   scion,   scion, wiz_state,    scion,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1984, kungfut,  0,       kungfut, kungfut, wiz_state,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", 0 )
-GAME( 1984, kungfuta, kungfut, kungfut, kungfut, wiz_state,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)" , 0) /* board was a bootleg but set might still be original */
+GAME( 1984, kungfut,  0,       kungfut, kungfut, driver_device,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", 0 )
+GAME( 1984, kungfuta, kungfut, kungfut, kungfut, driver_device,  0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)" , 0) /* board was a bootleg but set might still be original */
 GAME( 1985, wiz,      0,       wiz,     wiz, wiz_state,      wiz,     ROT270, "Seibu Kaihatsu", "Wiz", 0 )
 GAME( 1985, wizt,     wiz,     wiz,     wiz, wiz_state,      wiz,     ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", 0 )
 GAME( 1985, wizta,    wiz,     wiz,     wiz, wiz_state,      wiz,     ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", 0 )

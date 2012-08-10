@@ -183,6 +183,8 @@ public:
 		(machine.driver_data<_DriverClass>()->*_Function)();
 	}
 
+	void init_0() {};
+
 	// generic interrupt generators
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
 	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);

@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC3_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC4_w);
 	DECLARE_WRITE8_MEMBER(bestbest_ay8910_port_a_w);
+	DECLARE_DRIVER_INIT(uballoon);
 };
 
 

@@ -46,6 +46,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 	DECLARE_WRITE32_MEMBER(ps4_eeprom_w);
 	DECLARE_READ32_MEMBER(ps4_eeprom_r);
+	DECLARE_DRIVER_INIT(hotgmck);
 };
 
 

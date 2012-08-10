@@ -605,22 +605,22 @@ ROM_END
 *************************/
 
 // BIOS / System
-CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      cdi_state, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_IS_BIOS_ROOT )
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_IS_BIOS_ROOT )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
 // Working
-GAME( 1995, quizrd12, cdimono1,      quizrd12,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd17, cdimono1,      quizrd17,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd22, cdimono1,      quizrd22,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd12, cdimono1,      quizrd12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd17, cdimono1,      quizrd17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd22, cdimono1,      quizrd22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizrd18, cdimono1,      quizrd18,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 1.8", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd23, cdimono1,      quizrd23,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 2.3", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd34, cdimono1,      quizrd34,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 3.4", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd18, cdimono1,      quizrd18,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.8", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd23, cdimono1,      quizrd23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.3", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd34, cdimono1,      quizrd34,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.4", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
 // Partially working
-GAME( 1996, quizard,  cdimono1,      quizrd32,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1997, quizrr40, cdimono1,      quizrr40,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdimono1,      quizrr41,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr42, cdimono1,      quizrr42,      quizard, cdi_state,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, quizard,  cdimono1,      quizrd32,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1997, quizrr40, cdimono1,      quizrr40,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr41, cdimono1,      quizrr41,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr42, cdimono1,      quizrr42,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 

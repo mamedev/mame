@@ -121,6 +121,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_DRIVER_INIT(tetriskr);
+	DECLARE_DRIVER_INIT(filetto);
 };
 
 static SCREEN_UPDATE_RGB32( tetriskr )
@@ -814,12 +816,12 @@ ROM_START( tetriskr )
 	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
 ROM_END
 
-static DRIVER_INIT( filetto )
+DRIVER_INIT_MEMBER(pcxt_state,filetto)
 {
 	//...
 }
 
-static DRIVER_INIT( tetriskr )
+DRIVER_INIT_MEMBER(pcxt_state,tetriskr)
 {
 	//...
 }

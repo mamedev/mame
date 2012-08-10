@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(hammer_led_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
+	DECLARE_DRIVER_INIT(livequiz);
 };
 
 
@@ -870,9 +871,9 @@ ROM_START( livequiz )
 	ROM_LOAD( "flash.u5", 0x000000, 0x200000, CRC(dc062792) SHA1(ec415c918c47ce9d181f014cde317af5717600e4) )
 ROM_END
 
-static DRIVER_INIT( livequiz )
+DRIVER_INIT_MEMBER(midas_state,livequiz)
 {
-	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2]	=	0x4e75;
@@ -963,4 +964,4 @@ ROM_START( hammer )
 ROM_END
 
 GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, hammer,   0, hammer,   hammer, midas_state,   0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 2000, hammer,   0, hammer,   hammer, driver_device,   0,        ROT0, "Andamiro", "Hammer",         0 )

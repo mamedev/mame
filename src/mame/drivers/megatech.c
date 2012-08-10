@@ -421,25 +421,23 @@ ADDRESS_MAP_END
 
 
 
-static DRIVER_INIT(mt_slot)
+DRIVER_INIT_MEMBER(mtech_state,mt_slot)
 {
-	mtech_state *state = machine.driver_data<mtech_state>();
-	state->m_megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
+	m_megatech_banked_ram = auto_alloc_array(machine(), UINT8, 0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(megatech_bios);
+	init_megatech_bios(machine());
 
 	// this gets set in DEVICE_IMAGE_LOAD
-	memset(state->m_cart_is_genesis, 0, sizeof(state->m_cart_is_genesis));
+	memset(m_cart_is_genesis, 0, sizeof(m_cart_is_genesis));
 }
 
-static DRIVER_INIT(mt_crt)
+DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 {
-	mtech_state *state = machine.driver_data<mtech_state>();
-	UINT8* pin = state->memregion("sms_pin")->base();
+	UINT8* pin = memregion("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
 
-	state->m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
+	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
 static VIDEO_START(mtnew)

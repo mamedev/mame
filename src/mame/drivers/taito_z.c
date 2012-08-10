@@ -5050,21 +5050,19 @@ ROM_START( racingb )
 ROM_END
 
 
-static DRIVER_INIT( taitoz )
+DRIVER_INIT_MEMBER(taitoz_state,taitoz)
 {
-	//taitoz_state *state = machine.driver_data<taitoz_state>();
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(parse_cpu_control), &machine));
+	machine().save().register_postload(save_prepost_delegate(FUNC(parse_cpu_control), &machine()));
 }
 
-static DRIVER_INIT( bshark )
+DRIVER_INIT_MEMBER(taitoz_state,bshark)
 {
-	taitoz_state *state = machine.driver_data<taitoz_state>();
 	DRIVER_INIT_CALL(taitoz);
 
-	state->m_eep_latch = 0;
+	m_eep_latch = 0;
 
-	state->save_item(NAME(state->m_eep_latch));
+	save_item(NAME(m_eep_latch));
 }
 
 

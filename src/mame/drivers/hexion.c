@@ -280,4 +280,4 @@ ROM_START( hexion )
 ROM_END
 
 
-GAME( 1992, hexion, 0, hexion, hexion, hexion_state, 0, ROT0, "Konami", "Hexion (Japan ver JAB)", 0 )
+GAME( 1992, hexion, 0, hexion, hexion, driver_device, 0, ROT0, "Konami", "Hexion (Japan ver JAB)", 0 )

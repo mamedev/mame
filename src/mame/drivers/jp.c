@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(jp);
 };
 
 
@@ -31,7 +33,7 @@ void jp_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( jp )
+DRIVER_INIT_MEMBER(jp_state,jp)
 {
 }
 

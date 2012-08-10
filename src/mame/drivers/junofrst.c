@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(junofrst_irq_enable_w);
 	DECLARE_READ8_MEMBER(junofrst_portA_r);
 	DECLARE_WRITE8_MEMBER(junofrst_portB_w);
+	DECLARE_DRIVER_INIT(junofrst);
 };
 
 
@@ -525,12 +526,12 @@ ROM_END
 
 
 
-static DRIVER_INIT( junofrst )
+DRIVER_INIT_MEMBER(junofrst_state,junofrst)
 {
-	UINT8 *decrypted = konami1_decode(machine, "maincpu");
+	UINT8 *decrypted = konami1_decode(machine(), "maincpu");
 
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
-	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
+	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
+	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
 }
 
 

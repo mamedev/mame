@@ -389,16 +389,14 @@ ROM_END
 
 
 
-static DRIVER_INIT( ohmygod )
+DRIVER_INIT_MEMBER(ohmygod_state,ohmygod)
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	state->m_adpcm_bank_shift = 4;
+	m_adpcm_bank_shift = 4;
 }
 
-static DRIVER_INIT( naname )
+DRIVER_INIT_MEMBER(ohmygod_state,naname)
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	state->m_adpcm_bank_shift = 0;
+	m_adpcm_bank_shift = 0;
 }
 
 

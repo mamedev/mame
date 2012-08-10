@@ -59,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(starwars_main_wr_w);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
+	DECLARE_DRIVER_INIT(esb);
+	DECLARE_DRIVER_INIT(starwars);
 };
 
 

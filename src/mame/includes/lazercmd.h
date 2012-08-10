@@ -50,6 +50,9 @@ public:
 	DECLARE_WRITE8_MEMBER(medlanes_hardware_w);
 	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
 	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
+	DECLARE_DRIVER_INIT(lazercmd);
+	DECLARE_DRIVER_INIT(bbonk);
+	DECLARE_DRIVER_INIT(medlanes);
 };
 
 

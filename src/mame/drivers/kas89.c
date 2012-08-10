@@ -225,6 +225,7 @@ public:
 	DECLARE_WRITE8_MEMBER(int_ack_w);
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
+	DECLARE_DRIVER_INIT(kas89);
 };
 
 #define VDP_MEM             0x40000
@@ -862,11 +863,11 @@ ROM_END
    A13-> A06
    A14-> A14
 */
-static DRIVER_INIT(kas89)
+DRIVER_INIT_MEMBER(kas89_state,kas89)
 {
 	int i;
-	UINT8 *mem = machine.root_device().memregion("maincpu")->base();
-	int memsize = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *mem = machine().root_device().memregion("maincpu")->base();
+	int memsize = machine().root_device().memregion("maincpu")->bytes();
 	UINT8 *buf;
 
 	/* Unscrambling data lines */
@@ -876,14 +877,14 @@ static DRIVER_INIT(kas89)
 	}
 
 	/* Unscrambling address lines */
-	buf = auto_alloc_array(machine, UINT8, memsize);
+	buf = auto_alloc_array(machine(), UINT8, memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,15,14,5,6,3,0,12,1,9,13,4,7,10,8,2,11)] = buf[i];
 	}
 
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
 

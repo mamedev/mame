@@ -1934,10 +1934,10 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) )	// 000xxxxxxxxxxxxx
 ROM_END
 
-static DRIVER_INIT( bigrun )
+DRIVER_INIT_MEMBER(cischeat_state,bigrun)
 {
-	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
-	phantasm_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
+	cischeat_untangle_sprites(machine(), "gfx4");	// Untangle sprites
+	phantasm_rom_decode(machine(), "soundcpu");					// Decrypt sound cpu code
 }
 
 
@@ -2053,10 +2053,10 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-static DRIVER_INIT( cischeat )
+DRIVER_INIT_MEMBER(cischeat_state,cischeat)
 {
-	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
-	astyanax_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
+	cischeat_untangle_sprites(machine(), "gfx4");	// Untangle sprites
+	astyanax_rom_decode(machine(), "soundcpu");					// Decrypt sound cpu code
 }
 
 
@@ -2267,9 +2267,9 @@ ROM_START( f1gpstar )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )	// FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-static DRIVER_INIT( f1gpstar )
+DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
 {
-	cischeat_untangle_sprites(machine, "gfx4");
+	cischeat_untangle_sprites(machine(), "gfx4");
 }
 
 
@@ -2479,10 +2479,9 @@ ROM_START( wildplt )
 	ROM_LOAD( "pr90015b.bin", 0x000000, 0x0100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )
 ROM_END
 
-static DRIVER_INIT( wildplt )
+DRIVER_INIT_MEMBER(cischeat_state,wildplt)
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
-	machine.device("cpu1")->memory().space(AS_PROGRAM)->install_read_handler(0x080000, 0x087fff, read16_delegate(FUNC(cischeat_state::wildplt_vregs_r),state));
+	machine().device("cpu1")->memory().space(AS_PROGRAM)->install_read_handler(0x080000, 0x087fff, read16_delegate(FUNC(cischeat_state::wildplt_vregs_r),this));
 
 	DRIVER_INIT_CALL(f1gpstar);
 }
@@ -3004,8 +3003,8 @@ ROM_END
 GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS, layout_cischeat )	// there's a 13th Rallye version (1991)
 GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS, layout_cischeat )
 GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               GAME_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            GAME_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            GAME_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
 GAME ( 1992, wildplt,  0,        f1gpstr2, wildplt, cischeat_state,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS )
 GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS )
+GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS )

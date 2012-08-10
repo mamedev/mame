@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
+	DECLARE_DRIVER_INIT(quizo);
 };
 
 
@@ -257,10 +258,9 @@ ROM_START( quizoa )
 ROM_END
 
 
-static DRIVER_INIT(quizo)
+DRIVER_INIT_MEMBER(quizo_state,quizo)
 {
-	quizo_state *state = machine.driver_data<quizo_state>();
-	state->m_videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
+	m_videoram=auto_alloc_array(machine(), UINT8, 0x4000*2);
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )

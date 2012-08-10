@@ -529,9 +529,9 @@ ROM_START( megazonec )
 ROM_END
 
 
-static DRIVER_INIT( megazone )
+DRIVER_INIT_MEMBER(megazone_state,megazone)
 {
-	konami1_decode(machine, "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
 /* these just display a Konami copyright, no logo */

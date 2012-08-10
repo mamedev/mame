@@ -14,6 +14,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_videoram_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
+	DECLARE_DRIVER_INIT(pokechmp);
 };
 
 

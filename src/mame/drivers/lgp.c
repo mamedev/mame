@@ -84,6 +84,7 @@ public:
 	emu_timer *m_irq_timer;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
+	DECLARE_DRIVER_INIT(lgp);
 };
 
 
@@ -473,7 +474,7 @@ ROM_START( lgp )
 ROM_END
 
 
-static DRIVER_INIT( lgp )
+DRIVER_INIT_MEMBER(lgp_state,lgp)
 {
 }
 

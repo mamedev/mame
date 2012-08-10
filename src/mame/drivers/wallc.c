@@ -64,6 +64,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
+	DECLARE_DRIVER_INIT(wallc);
+	DECLARE_DRIVER_INIT(wallca);
 };
 
 
@@ -254,12 +256,12 @@ static GFXDECODE_START( wallc )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout, 0, 4 )
 GFXDECODE_END
 
-static DRIVER_INIT( wallc )
+DRIVER_INIT_MEMBER(wallc_state,wallc)
 {
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -269,12 +271,12 @@ static DRIVER_INIT( wallc )
 	}
 }
 
-static DRIVER_INIT( wallca )
+DRIVER_INIT_MEMBER(wallc_state,wallca)
 {
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{

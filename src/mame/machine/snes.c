@@ -1990,23 +1990,22 @@ MACHINE_RESET( snes )
 
 
 /* for mame we use an init, maybe we will need more for the different games */
-DRIVER_INIT( snes )
-{
-	snes_state *state = machine.driver_data<snes_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+DRIVER_INIT_MEMBER(snes_state,snes)
+{	
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
-	rom = state->memregion("user3")->base();
-	snes_ram = auto_alloc_array_clear(machine, UINT8, 0x1400000);
+	rom = memregion("user3")->base();
+	snes_ram = auto_alloc_array_clear(machine(), UINT8, 0x1400000);
 
 	/* all NSS games seem to use MODE 20 */
-	state->m_cart[0].mode = SNES_MODE_20;
-	state->m_cart[0].sram_max = 0x40000;
-	state->m_has_addon_chip = HAS_NONE;
+	m_cart[0].mode = SNES_MODE_20;
+	m_cart[0].sram_max = 0x40000;
+	m_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (state->memregion("user3")->bytes() / 0x8000);
+	total_blocks = (memregion("user3")->bytes() / 0x8000);
 	read_blocks = 0;
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
@@ -2047,32 +2046,31 @@ DRIVER_INIT( snes )
 	}
 
 	/* Find the amount of sram */
-	state->m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
-	if (state->m_cart[0].sram > 0)
+	m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
+	if (m_cart[0].sram > 0)
 	{
-		state->m_cart[0].sram = (1024 << state->m_cart[0].sram);
-		if (state->m_cart[0].sram > state->m_cart[0].sram_max)
-			state->m_cart[0].sram = state->m_cart[0].sram_max;
+		m_cart[0].sram = (1024 << m_cart[0].sram);
+		if (m_cart[0].sram > m_cart[0].sram_max)
+			m_cart[0].sram = m_cart[0].sram_max;
 	}
 }
 
-DRIVER_INIT( snes_hirom )
+DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
-	rom = state->memregion("user3")->base();
-	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
+	rom = memregion("user3")->base();
+	snes_ram = auto_alloc_array(machine(), UINT8, 0x1400000);
 	memset(snes_ram, 0, 0x1400000);
 
-	state->m_cart[0].mode = SNES_MODE_21;
-	state->m_cart[0].sram_max = 0x40000;
-	state->m_has_addon_chip = HAS_NONE;
+	m_cart[0].mode = SNES_MODE_21;
+	m_cart[0].sram_max = 0x40000;
+	m_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (state->memregion("user3")->bytes() / 0x10000);
+	total_blocks = (memregion("user3")->bytes() / 0x10000);
 	read_blocks = 0;
 
 	/* See above for details about the way we fill banks 0x00 to 0x7f */
@@ -2107,12 +2105,12 @@ DRIVER_INIT( snes_hirom )
 	}
 
 	/* Find the amount of sram */
-	state->m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
-	if (state->m_cart[0].sram > 0)
+	m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
+	if (m_cart[0].sram > 0)
 	{
-		state->m_cart[0].sram = (1024 << state->m_cart[0].sram);
-		if (state->m_cart[0].sram > state->m_cart[0].sram_max)
-			state->m_cart[0].sram = state->m_cart[0].sram_max;
+		m_cart[0].sram = (1024 << m_cart[0].sram);
+		if (m_cart[0].sram > m_cart[0].sram_max)
+			m_cart[0].sram = m_cart[0].sram_max;
 	}
 }
 

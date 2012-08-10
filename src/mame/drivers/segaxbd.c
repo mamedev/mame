@@ -3171,46 +3171,43 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( generic_xboard )
+DRIVER_INIT_MEMBER(segaxbd_state,generic_xboard)
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
 	/* set the default road priority */
-	state->m_road_priority = 1;
+	m_road_priority = 1;
 
 	/* reset the custom handlers and other pointers */
-	memset(state->m_adc_reverse, 0, sizeof(state->m_adc_reverse));
-	memset(state->m_iochip_custom_io_r, 0, sizeof(state->m_iochip_custom_io_r));
-	memset(state->m_iochip_custom_io_w, 0, sizeof(state->m_iochip_custom_io_w));
-	state->m_iochip_custom_io_w[0][3] = generic_iochip0_lamps_w;
+	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
+	memset(m_iochip_custom_io_r, 0, sizeof(m_iochip_custom_io_r));
+	memset(m_iochip_custom_io_w, 0, sizeof(m_iochip_custom_io_w));
+	m_iochip_custom_io_w[0][3] = generic_iochip0_lamps_w;
 
-	state->m_gprider_hack = 0;
+	m_gprider_hack = 0;
 
-	state->save_item(NAME(state->m_vblank_irq_state));
-	state->save_item(NAME(state->m_timer_irq_state));
-	state->save_item(NAME(state->m_iochip_regs[0]));
-	state->save_item(NAME(state->m_iochip_regs[1]));
+	save_item(NAME(m_vblank_irq_state));
+	save_item(NAME(m_timer_irq_state));
+	save_item(NAME(m_iochip_regs[0]));
+	save_item(NAME(m_iochip_regs[1]));
 }
 
 
-static DRIVER_INIT( aburner2 )
+DRIVER_INIT_MEMBER(segaxbd_state,aburner2)
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
-	DRIVER_INIT_CALL( generic_xboard );
-	state->m_road_priority = 0;
-	state->m_iochip_custom_io_r[0][0] = aburner2_iochip0_motor_r;
-	state->m_iochip_custom_io_w[0][1] = aburner2_iochip0_motor_w;
+	DRIVER_INIT_CALL(generic_xboard);
+	m_road_priority = 0;
+	m_iochip_custom_io_r[0][0] = aburner2_iochip0_motor_r;
+	m_iochip_custom_io_w[0][1] = aburner2_iochip0_motor_w;
 }
 
 
-static DRIVER_INIT( lastsurv )
+DRIVER_INIT_MEMBER(segaxbd_state,lastsurv)
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
-	DRIVER_INIT_CALL( generic_xboard );
-	state->m_iochip_custom_io_r[1][1] = lastsurv_iochip1_port_r;
-	state->m_iochip_custom_io_w[0][3] = lastsurv_iochip0_muxer_w;
+	DRIVER_INIT_CALL(generic_xboard);
+	m_iochip_custom_io_r[1][1] = lastsurv_iochip1_port_r;
+	m_iochip_custom_io_w[0][3] = lastsurv_iochip0_muxer_w;
 }
 
 
@@ -3222,51 +3219,48 @@ static WRITE16_HANDLER( loffire_sync0_w )
 	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
-static DRIVER_INIT( loffire )
+DRIVER_INIT_MEMBER(segaxbd_state,loffire)
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
-	DRIVER_INIT_CALL( generic_xboard );
-	state->m_adc_reverse[1] = state->m_adc_reverse[3] = 1;
+	DRIVER_INIT_CALL(generic_xboard);
+	m_adc_reverse[1] = m_adc_reverse[3] = 1;
 
 	/* install sync hack on core shared memory */
-	state->m_loffire_sync = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x29c000, 0x29c011, FUNC(loffire_sync0_w));
+	m_loffire_sync = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x29c000, 0x29c011, FUNC(loffire_sync0_w));
 }
 
 
-static DRIVER_INIT( smgp )
+DRIVER_INIT_MEMBER(segaxbd_state,smgp)
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
-	DRIVER_INIT_CALL( generic_xboard );
-	state->m_iochip_custom_io_r[0][0] = smgp_iochip0_motor_r;
-	state->m_iochip_custom_io_w[0][1] = smgp_iochip0_motor_w;
+	DRIVER_INIT_CALL(generic_xboard);
+	m_iochip_custom_io_r[0][0] = smgp_iochip0_motor_r;
+	m_iochip_custom_io_w[0][1] = smgp_iochip0_motor_w;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
 }
 
 
-static DRIVER_INIT( rascot )
+DRIVER_INIT_MEMBER(segaxbd_state,rascot)
 {
 	// patch out bootup link test
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("subcpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("subcpu")->base();
 	rom[0xb78/2] = 0x601e; // subrom checksum test
 	rom[0x57e/2] = 0x4e71;
 	rom[0x5d0/2] = 0x6008;
 	rom[0x606/2] = 0x4e71;
 
-	DRIVER_INIT_CALL( generic_xboard );
+	DRIVER_INIT_CALL(generic_xboard);
 
-	machine.device("subcpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0f0000, 0x0f3fff, FUNC(rascot_excs_r), FUNC(rascot_excs_w));
+	machine().device("subcpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0f0000, 0x0f3fff, FUNC(rascot_excs_r), FUNC(rascot_excs_w));
 }
 
 
-static DRIVER_INIT( gprider )
+DRIVER_INIT_MEMBER(segaxbd_state,gprider)
 {
-	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
-	DRIVER_INIT_CALL( generic_xboard );
-	state->m_gprider_hack = 1;
+	DRIVER_INIT_CALL(generic_xboard);
+	m_gprider_hack = 1;
 }
 
 

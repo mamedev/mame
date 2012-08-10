@@ -87,6 +87,20 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
 	DECLARE_WRITE8_MEMBER(yawdim_oki_bank_w);
+	DECLARE_DRIVER_INIT(smashtv);
+	DECLARE_DRIVER_INIT(strkforc);
+	DECLARE_DRIVER_INIT(narc);
+	DECLARE_DRIVER_INIT(term2);
+	DECLARE_DRIVER_INIT(term2la1);
+	DECLARE_DRIVER_INIT(term2la3);
+	DECLARE_DRIVER_INIT(mkyunit);
+	DECLARE_DRIVER_INIT(trog);
+	DECLARE_DRIVER_INIT(totcarn);
+	DECLARE_DRIVER_INIT(mkyawdim);
+	DECLARE_DRIVER_INIT(shimpact);
+	DECLARE_DRIVER_INIT(hiimpact);
+	DECLARE_DRIVER_INIT(mkyturbo);
+	DECLARE_DRIVER_INIT(term2la2);
 };
 
 
@@ -95,20 +109,6 @@ public:
 
 
 
-DRIVER_INIT( narc );
-DRIVER_INIT( trog );
-DRIVER_INIT( smashtv );
-DRIVER_INIT( hiimpact );
-DRIVER_INIT( shimpact );
-DRIVER_INIT( strkforc );
-DRIVER_INIT( mkyunit );
-DRIVER_INIT( mkyturbo );
-DRIVER_INIT( mkyawdim );
-DRIVER_INIT( term2 );
-DRIVER_INIT( term2la3 );
-DRIVER_INIT( term2la2 );
-DRIVER_INIT( term2la1 );
-DRIVER_INIT( totcarn );
 
 MACHINE_RESET( midyunit );
 

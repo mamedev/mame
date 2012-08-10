@@ -30,6 +30,9 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:	
+	DECLARE_DRIVER_INIT(ace_sp);
+	DECLARE_DRIVER_INIT(ace_cr);
 };
 
 
@@ -3892,12 +3895,12 @@ ROM_END
 // mpu4.c
 extern void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor);
 
-DRIVER_INIT( ace_cr )
+DRIVER_INIT_MEMBER(ace_sp_state,ace_cr)
 {
-	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(machine().root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
-DRIVER_INIT( ace_sp )
+DRIVER_INIT_MEMBER(ace_sp_state,ace_sp)
 {
 
 }

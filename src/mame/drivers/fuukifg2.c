@@ -680,6 +680,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, gogomile, 0,        fuuki16, gogomile, fuuki16_state, 0, ROT0, "Fuuki", "Go Go! Mile Smile", GAME_IMPERFECT_SOUND )
-GAME( 1995, gogomilej,gogomile, fuuki16, gogomilej, fuuki16_state,0, ROT0, "Fuuki", "Susume! Mile Smile (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1996, pbancho,  0,        fuuki16, pbancho, fuuki16_state,  0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", 0)
+GAME( 1995, gogomile, 0,        fuuki16, gogomile, driver_device, 0, ROT0, "Fuuki", "Go Go! Mile Smile", GAME_IMPERFECT_SOUND )
+GAME( 1995, gogomilej,gogomile, fuuki16, gogomilej, driver_device,0, ROT0, "Fuuki", "Susume! Mile Smile (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1996, pbancho,  0,        fuuki16, pbancho, driver_device,  0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", 0)

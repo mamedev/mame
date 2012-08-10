@@ -567,6 +567,21 @@ public:
 	DECLARE_WRITE32_MEMBER(mamboagg_io_w);
 	DECLARE_WRITE32_MEMBER(gunmania_w);
 	DECLARE_READ32_MEMBER(gunmania_r);
+	DECLARE_DRIVER_INIT(gtrfrkdigital);
+	DECLARE_DRIVER_INIT(salarymc);
+	DECLARE_DRIVER_INIT(dmx);
+	DECLARE_DRIVER_INIT(gtrfrks);
+	DECLARE_DRIVER_INIT(drmndigital);
+	DECLARE_DRIVER_INIT(punchmania);
+	DECLARE_DRIVER_INIT(ddr);
+	DECLARE_DRIVER_INIT(mamboagg);
+	DECLARE_DRIVER_INIT(ge765pwbba);
+	DECLARE_DRIVER_INIT(gunmania);
+	DECLARE_DRIVER_INIT(hyperbbc);
+	DECLARE_DRIVER_INIT(drmn);
+	DECLARE_DRIVER_INIT(ddrsolo);
+	DECLARE_DRIVER_INIT(ddrdigital);
+	DECLARE_DRIVER_INIT(konami573);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -1376,16 +1391,15 @@ static void update_mode( running_machine &machine )
 	}
 }
 
-static DRIVER_INIT( konami573 )
+DRIVER_INIT_MEMBER(ksys573_state,konami573)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
 
-	psx_driver_init(machine);
-	atapi_init(machine);
+	psx_driver_init(machine());
+	atapi_init(machine());
 
-	state->save_item( NAME(state->m_n_security_control) );
+	save_item( NAME(m_n_security_control) );
 
-	flash_init(machine);
+	flash_init(machine());
 }
 
 static MACHINE_RESET( konami573 )
@@ -1538,11 +1552,10 @@ WRITE32_MEMBER(ksys573_state::ge765pwbba_w)
 	verboselog(machine(), 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data);
 }
 
-static DRIVER_INIT( ge765pwbba )
+DRIVER_INIT_MEMBER(ksys573_state,ge765pwbba)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
 	DRIVER_INIT_CALL(konami573);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::ge765pwbba_r),state), write32_delegate(FUNC(ksys573_state::ge765pwbba_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::ge765pwbba_r),this), write32_delegate(FUNC(ksys573_state::ge765pwbba_w),this));
 }
 
 /*
@@ -1829,16 +1842,15 @@ static void gn845pwbb_output_callback( running_machine &machine, int offset, int
 	}
 }
 
-static DRIVER_INIT( ddr )
+DRIVER_INIT_MEMBER(ksys573_state,ddr)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
 
 	DRIVER_INIT_CALL(konami573);
 
-	state->m_stage_mask = 0xffffffff;
-	gx700pwfbf_init( machine, gn845pwbb_output_callback );
+	m_stage_mask = 0xffffffff;
+	gx700pwfbf_init( machine(), gn845pwbb_output_callback );
 
-	state->save_item( NAME(state->m_stage_mask) );
+	save_item( NAME(m_stage_mask) );
 }
 
 /*
@@ -1890,11 +1902,10 @@ WRITE32_MEMBER(ksys573_state::gtrfrks_io_w)
 	}
 }
 
-static DRIVER_INIT( gtrfrks )
+DRIVER_INIT_MEMBER(ksys573_state,gtrfrks)
 {
 	DRIVER_INIT_CALL(konami573);
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),state), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),this), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),this));
 }
 
 /* GX894 digital i/o */
@@ -2219,22 +2230,21 @@ static void gx894pwbba_init( running_machine &machine, void (*output_callback_fu
 
 /* ddr digital */
 
-static DRIVER_INIT( ddrdigital )
+DRIVER_INIT_MEMBER(ksys573_state,ddrdigital)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx894pwbba_init( machine, gn845pwbb_output_callback );
+	gx894pwbba_init( machine(), gn845pwbb_output_callback );
 }
 
 /* guitar freaks digital */
 
-static DRIVER_INIT( gtrfrkdigital )
+DRIVER_INIT_MEMBER(ksys573_state,gtrfrkdigital)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx894pwbba_init( machine, NULL );
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),state), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),state) );
+	gx894pwbba_init( machine(), NULL );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),this), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),this) );
 }
 
 /* ddr solo */
@@ -2292,11 +2302,11 @@ static void ddrsolo_output_callback( running_machine &machine, int offset, int d
 	}
 }
 
-static DRIVER_INIT( ddrsolo )
+DRIVER_INIT_MEMBER(ksys573_state,ddrsolo)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx894pwbba_init( machine, ddrsolo_output_callback );
+	gx894pwbba_init( machine(), ddrsolo_output_callback );
 }
 
 /* drummania */
@@ -2365,18 +2375,18 @@ static void drmn_output_callback( running_machine &machine, int offset, int data
 	}
 }
 
-static DRIVER_INIT( drmn )
+DRIVER_INIT_MEMBER(ksys573_state,drmn)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx700pwfbf_init( machine, drmn_output_callback );
+	gx700pwfbf_init( machine(), drmn_output_callback );
 }
 
-static DRIVER_INIT( drmndigital )
+DRIVER_INIT_MEMBER(ksys573_state,drmndigital)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx894pwbba_init( machine, drmn_output_callback );
+	gx894pwbba_init( machine(), drmn_output_callback );
 }
 
 /* dance maniax */
@@ -2521,13 +2531,12 @@ WRITE32_MEMBER(ksys573_state::dmx_io_w)
 	}
 }
 
-static DRIVER_INIT( dmx )
+DRIVER_INIT_MEMBER(ksys573_state,dmx)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx894pwbba_init( machine, dmx_output_callback );
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::dmx_io_w),state) );
+	gx894pwbba_init( machine(), dmx_output_callback );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::dmx_io_w),this) );
 }
 
 /* salary man champ */
@@ -2578,17 +2587,16 @@ static void salarymc_lamp_callback( running_machine &machine, int data )
 	}
 }
 
-static DRIVER_INIT( salarymc )
+DRIVER_INIT_MEMBER(ksys573_state,salarymc)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
 
 	DRIVER_INIT_CALL(konami573);
 
-	state->m_security_callback = salarymc_lamp_callback;
+	m_security_callback = salarymc_lamp_callback;
 
-	state->save_item( NAME(state->m_salarymc_lamp_bits) );
-	state->save_item( NAME(state->m_salarymc_lamp_shift) );
-	state->save_item( NAME(state->m_salarymc_lamp_clk) );
+	save_item( NAME(m_salarymc_lamp_bits) );
+	save_item( NAME(m_salarymc_lamp_shift) );
+	save_item( NAME(m_salarymc_lamp_clk) );
 }
 
 /* Hyper Bishi Bashi Champ */
@@ -2621,16 +2629,15 @@ static void hyperbbc_lamp_callback( running_machine &machine, int data )
 	state->m_hyperbbc_lamp_strobe2 = strobe2;
 }
 
-static DRIVER_INIT( hyperbbc )
+DRIVER_INIT_MEMBER(ksys573_state,hyperbbc)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
 
 	DRIVER_INIT_CALL(konami573);
 
-	state->m_security_callback = hyperbbc_lamp_callback;
+	m_security_callback = hyperbbc_lamp_callback;
 
-	state->save_item( NAME(state->m_hyperbbc_lamp_strobe1) );
-	state->save_item( NAME(state->m_hyperbbc_lamp_strobe2) );
+	save_item( NAME(m_hyperbbc_lamp_strobe1) );
+	save_item( NAME(m_hyperbbc_lamp_strobe2) );
 }
 
 /* Mambo A Go Go */
@@ -2681,13 +2688,12 @@ WRITE32_MEMBER(ksys573_state::mamboagg_io_w)
 	}
 }
 
-static DRIVER_INIT( mamboagg )
+DRIVER_INIT_MEMBER(ksys573_state,mamboagg)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx894pwbba_init( machine, mamboagg_output_callback );
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::mamboagg_io_w),state));
+	gx894pwbba_init( machine(), mamboagg_output_callback );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::mamboagg_io_w),this));
 }
 
 
@@ -2860,11 +2866,11 @@ static const adc083x_interface punchmania_adc_interface = {
 	punchmania_inputs_callback
 };
 
-static DRIVER_INIT( punchmania )
+DRIVER_INIT_MEMBER(ksys573_state,punchmania)
 {
 	DRIVER_INIT_CALL(konami573);
 
-	gx700pwfbf_init( machine, punchmania_output_callback );
+	gx700pwfbf_init( machine(), punchmania_output_callback );
 }
 
 /* GunMania */
@@ -3002,11 +3008,10 @@ READ32_MEMBER(ksys573_state::gunmania_r)
 	return data;
 }
 
-static DRIVER_INIT( gunmania )
+DRIVER_INIT_MEMBER(ksys573_state,gunmania)
 {
 	DRIVER_INIT_CALL(konami573);
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gunmania_r),state), write32_delegate(FUNC(ksys573_state::gunmania_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gunmania_r),this), write32_delegate(FUNC(ksys573_state::gunmania_w),this));
 }
 
 /* ADC0834 Interface */

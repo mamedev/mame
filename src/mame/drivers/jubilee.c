@@ -460,4 +460,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME          PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                  FLAGS */
-GAME( 198?, jubileep,     0,      jubileep, jubileep, jubilee_state, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 198?, jubileep,     0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND | GAME_NOT_WORKING )

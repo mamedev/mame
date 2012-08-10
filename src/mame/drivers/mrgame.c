@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(mrgame);
 };
 
 
@@ -35,7 +37,7 @@ void mrgame_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( mrgame )
+DRIVER_INIT_MEMBER(mrgame_state,mrgame)
 {
 }
 

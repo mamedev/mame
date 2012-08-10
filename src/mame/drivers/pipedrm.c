@@ -874,21 +874,19 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( pipedrm )
+DRIVER_INIT_MEMBER(fromance_state,pipedrm)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* sprite RAM lives at the end of palette RAM */
-	state->m_spriteram.set_target(&state->m_generic_paletteram_8[0xc00], 0x400);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, state->m_spriteram);
+	m_spriteram.set_target(&m_generic_paletteram_8[0xc00], 0x400);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 
 
-static DRIVER_INIT( hatris )
+DRIVER_INIT_MEMBER(fromance_state,hatris)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x21, 0x21, write8_delegate(FUNC(fromance_state::fromance_gfxreg_w),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x21, 0x21, write8_delegate(FUNC(fromance_state::fromance_gfxreg_w),this));
 }
 
 

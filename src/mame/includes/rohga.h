@@ -50,6 +50,10 @@ public:
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_DRIVER_INIT(wizdfire);
+	DECLARE_DRIVER_INIT(nitrobal);
+	DECLARE_DRIVER_INIT(schmeisr);
+	DECLARE_DRIVER_INIT(rohga);
 };
 
 

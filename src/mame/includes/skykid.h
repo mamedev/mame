@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(skykid_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(skykid_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(skykid_flipscreen_priority_w);
+	DECLARE_DRIVER_INIT(skykid);
 };
 
 

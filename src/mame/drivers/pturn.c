@@ -112,6 +112,7 @@ public:
 	DECLARE_READ8_MEMBER(pturn_custom_r);
 	DECLARE_READ8_MEMBER(pturn_protection_r);
 	DECLARE_READ8_MEMBER(pturn_protection2_r);
+	DECLARE_DRIVER_INIT(pturn);
 };
 
 
@@ -553,11 +554,11 @@ ROM_START( pturn )
 ROM_END
 
 
-static DRIVER_INIT(pturn)
+DRIVER_INIT_MEMBER(pturn_state,pturn)
 {
 	/*
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0dd, 0xc0dd, FUNC(pturn_protection_r));
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0db, 0xc0db, FUNC(pturn_protection2_r));
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0dd, 0xc0dd, FUNC(pturn_protection_r));
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0db, 0xc0db, FUNC(pturn_protection2_r));
     */
 }
 

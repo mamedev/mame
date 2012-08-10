@@ -36,6 +36,7 @@ public:
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_DRIVER_INIT(pesadelo);
 };
 
 
@@ -142,11 +143,11 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT(pesadelo)
+DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 {
 	int i;
-	UINT8 *mem = machine.root_device().memregion("maincpu")->base();
-	int memsize = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *mem = machine().root_device().memregion("maincpu")->base();
+	int memsize = machine().root_device().memregion("maincpu")->bytes();
 	UINT8 *buf;
 
 	// data swap
@@ -156,13 +157,13 @@ static DRIVER_INIT(pesadelo)
 	}
 
 	// address line swap
-	buf = auto_alloc_array(machine, UINT8, memsize);
+	buf = auto_alloc_array(machine(), UINT8, memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
 	}
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 
 }
 

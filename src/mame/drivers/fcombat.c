@@ -329,18 +329,18 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static DRIVER_INIT( fcombat )
+DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 {
 	UINT32 oldaddr, newaddr, length;
 	UINT8 *src, *dst, *temp;
 
 	/* allocate some temporary space */
-	temp = auto_alloc_array(machine, UINT8, 0x10000);
+	temp = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.root_device().memregion("gfx1")->base();
-	length = machine.root_device().memregion("gfx1")->bytes();
+	dst = machine().root_device().memregion("gfx1")->base();
+	length = machine().root_device().memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -357,8 +357,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine.root_device().memregion("gfx2")->base();
-	length = machine.root_device().memregion("gfx2")->bytes();
+	dst = machine().root_device().memregion("gfx2")->base();
+	length = machine().root_device().memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -378,8 +378,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.root_device().memregion("gfx3")->base();
-	length = machine.root_device().memregion("gfx3")->bytes();
+	dst = machine().root_device().memregion("gfx3")->base();
+	length = machine().root_device().memregion("gfx3")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -397,8 +397,8 @@ static DRIVER_INIT( fcombat )
 	}
 
 	src = temp;
-	dst = machine.root_device().memregion("user1")->base();
-	length = machine.root_device().memregion("user1")->bytes();
+	dst = machine().root_device().memregion("user1")->base();
+	length = machine().root_device().memregion("user1")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -409,8 +409,8 @@ static DRIVER_INIT( fcombat )
 
 
 	src = temp;
-	dst = machine.root_device().memregion("user2")->base();
-	length = machine.root_device().memregion("user2")->bytes();
+	dst = machine().root_device().memregion("user2")->base();
+	length = machine().root_device().memregion("user2")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -419,7 +419,7 @@ static DRIVER_INIT( fcombat )
 		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
 	}
 
-	auto_free(machine, temp);
+	auto_free(machine(), temp);
 }
 
 ROM_START( fcombat )

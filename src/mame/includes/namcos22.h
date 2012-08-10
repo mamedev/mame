@@ -233,6 +233,22 @@ public:
 	UINT32 ReadFromCommRAM(offs_t offs );
 	void WriteToCommRAM(offs_t offs, UINT32 data );
 	void WriteToPointRAM(offs_t offs, UINT32 data );
+	DECLARE_DRIVER_INIT(acedrvr);
+	DECLARE_DRIVER_INIT(aquajet);
+	DECLARE_DRIVER_INIT(cybrcyc);
+	DECLARE_DRIVER_INIT(raveracw);
+	DECLARE_DRIVER_INIT(ridger2j);
+	DECLARE_DRIVER_INIT(victlap);
+	DECLARE_DRIVER_INIT(cybrcomm);
+	DECLARE_DRIVER_INIT(timecris);
+	DECLARE_DRIVER_INIT(tokyowar);
+	DECLARE_DRIVER_INIT(propcycl);
+	DECLARE_DRIVER_INIT(alpiner2);
+	DECLARE_DRIVER_INIT(dirtdash);
+	DECLARE_DRIVER_INIT(airco22);
+	DECLARE_DRIVER_INIT(alpiner);
+	DECLARE_DRIVER_INIT(ridgeraj);
+	DECLARE_DRIVER_INIT(alpinesa);
 };
 
 

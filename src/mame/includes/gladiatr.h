@@ -56,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gladiator_int_control_w);
 	DECLARE_WRITE8_MEMBER(glad_adpcm_w);
 	DECLARE_READ8_MEMBER(f1_r);
+	DECLARE_DRIVER_INIT(gladiatr);
+	DECLARE_DRIVER_INIT(ppking);
 };
 
 /*----------- defined in video/gladiatr.c -----------*/

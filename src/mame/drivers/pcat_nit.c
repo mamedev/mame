@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
+	DECLARE_DRIVER_INIT(pcat_nit);
 };
 
 WRITE_LINE_MEMBER(pcat_nit_state::microtouch_out)
@@ -420,14 +421,13 @@ ROM_START(streetg2r5)
 	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
 ROM_END
 
-static DRIVER_INIT(pcat_nit)
+DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 {
-	pcat_nit_state *state = machine.driver_data<pcat_nit_state>();
-	state->m_banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
-	machine.device<nvram_device>("nvram")->set_base(state->m_banked_nvram, 0x2000);
+	m_banked_nvram = auto_alloc_array(machine(), UINT8, 0x2000);
+	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
 
-	pc_vga_init(machine, vga_setting, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )

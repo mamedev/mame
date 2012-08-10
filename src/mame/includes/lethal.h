@@ -35,6 +35,7 @@ public:
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);
 	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
+	DECLARE_DRIVER_INIT(lethalen);
 };
 
 /*----------- defined in video/lethal.c -----------*/

@@ -258,6 +258,9 @@ public:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
+	DECLARE_DRIVER_INIT(halley87);
+	DECLARE_DRIVER_INIT(benberob);
+	DECLARE_DRIVER_INIT(halleys);
 };
 
 
@@ -2232,33 +2235,30 @@ static void init_common(running_machine &machine)
 }
 
 
-static DRIVER_INIT( benberob )
+DRIVER_INIT_MEMBER(halleys_state,benberob)
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
-	state->m_game_id = GAME_BENBEROB;
+	m_game_id = GAME_BENBEROB;
 
-	init_common(machine);
+	init_common(machine());
 
-	state->m_blitter_reset_timer = machine.scheduler().timer_alloc(FUNC(blitter_reset));
+	m_blitter_reset_timer = machine().scheduler().timer_alloc(FUNC(blitter_reset));
 }
 
 
-static DRIVER_INIT( halleys )
+DRIVER_INIT_MEMBER(halleys_state,halleys)
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
-	state->m_game_id = GAME_HALLEYS;
-	state->m_collision_detection = 0xb114;
+	m_game_id = GAME_HALLEYS;
+	m_collision_detection = 0xb114;
 
-	init_common(machine);
+	init_common(machine());
 }
 
-static DRIVER_INIT( halley87 )
+DRIVER_INIT_MEMBER(halleys_state,halley87)
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
-	state->m_game_id = GAME_HALLEYS;
-	state->m_collision_detection = 0xb10d;
+	m_game_id = GAME_HALLEYS;
+	m_collision_detection = 0xb10d;
 
-	init_common(machine);
+	init_common(machine());
 }
 
 

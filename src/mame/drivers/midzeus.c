@@ -1422,39 +1422,37 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( mk4 )
+DRIVER_INIT_MEMBER(midzeus_state,mk4)
 {
-	dcs2_init(machine, 0, 0);
-	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 94, NULL);
+	dcs2_init(machine(), 0, 0);
+	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 94, NULL);
 	midway_ioasic_set_shuffle_state(1);
 }
 
 
-static DRIVER_INIT( invasn )
+DRIVER_INIT_MEMBER(midzeus_state,invasn)
 {
-	dcs2_init(machine, 0, 0);
-	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	midzeus_state *state = machine.driver_data<midzeus_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),state), write32_delegate(FUNC(midzeus_state::invasn_gun_w),state));
+	dcs2_init(machine(), 0, 0);
+	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
 }
 
 
-static DRIVER_INIT( crusnexo )
+DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
 {
-	dcs2_init(machine, 0, 0);
-	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user2")->base(), 0x400000*4);
-	midzeus_state *state = machine.driver_data<midzeus_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),state), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),state));
+	dcs2_init(machine(), 0, 0);
+	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
+	machine().root_device().membank("bank1")->configure_entries(0, 3, machine().root_device().memregion("user2")->base(), 0x400000*4);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
 }
 
 
-static DRIVER_INIT( thegrid )
+DRIVER_INIT_MEMBER(midzeus_state,thegrid)
 {
-	dcs2_init(machine, 0, 0);
-	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user2")->base(), 0x400000*4);
+	dcs2_init(machine(), 0, 0);
+	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
+	machine().root_device().membank("bank1")->configure_entries(0, 3, machine().root_device().memregion("user2")->base(), 0x400000*4);
 }
 
 

@@ -787,10 +787,10 @@ ROM_END
 
 
 
-static DRIVER_INIT( toki )
+DRIVER_INIT_MEMBER(toki_state,toki)
 {
-	UINT8 *ROM = machine.root_device().memregion("oki")->base();
-	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
+	UINT8 *ROM = machine().root_device().memregion("oki")->base();
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x20000);
 	int i;
 
 	memcpy(buffer,ROM,0x20000);
@@ -799,21 +799,21 @@ static DRIVER_INIT( toki )
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 
-	seibu_sound_decrypt(machine,"audiocpu",0x2000);
+	seibu_sound_decrypt(machine(),"audiocpu",0x2000);
 }
 
 
-static DRIVER_INIT( tokib )
+DRIVER_INIT_MEMBER(toki_state,tokib)
 {
-	UINT8 *temp = auto_alloc_array(machine, UINT8, 65536 * 2);
+	UINT8 *temp = auto_alloc_array(machine(), UINT8, 65536 * 2);
 	int i, offs, len;
 	UINT8 *rom;
 
 	/* merge background tile graphics together */
-	len = machine.root_device().memregion("gfx3")->bytes();
-	rom = machine.root_device().memregion("gfx3")->base();
+	len = machine().root_device().memregion("gfx3")->bytes();
+	rom = machine().root_device().memregion("gfx3")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -826,8 +826,8 @@ static DRIVER_INIT( tokib )
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-	len = machine.root_device().memregion("gfx4")->bytes();
-	rom = machine.root_device().memregion("gfx4")->base();
+	len = machine().root_device().memregion("gfx4")->bytes();
+	rom = machine().root_device().memregion("gfx4")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -841,15 +841,15 @@ static DRIVER_INIT( tokib )
 		}
 	}
 
-	auto_free (machine, temp);
+	auto_free (machine(), temp);
 }
 
-static DRIVER_INIT(jujuba)
+DRIVER_INIT_MEMBER(toki_state,jujuba)
 {
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+		UINT16 *prgrom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -862,9 +862,9 @@ static DRIVER_INIT(jujuba)
 
 	/* Decrypt data for z80 program */
 	{
-		address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
-		UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x20000);
-		UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
+		address_space *space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+		UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x20000);
+		UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
@@ -879,8 +879,8 @@ static DRIVER_INIT(jujuba)
 	}
 
 	{
-		UINT8 *ROM = machine.root_device().memregion("oki")->base();
-		UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
+		UINT8 *ROM = machine().root_device().memregion("oki")->base();
+		UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x20000);
 		int i;
 
 		memcpy(buffer,ROM,0x20000);
@@ -889,7 +889,7 @@ static DRIVER_INIT(jujuba)
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
 
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 }
 

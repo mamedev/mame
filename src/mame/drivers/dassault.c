@@ -827,11 +827,11 @@ ROM_END
 /**********************************************************************************/
 
 
-static DRIVER_INIT( dassault )
+DRIVER_INIT_MEMBER(dassault_state,dassault)
 {
-	const UINT8 *src = machine.root_device().memregion("gfx1")->base();
-	UINT8 *dst = machine.root_device().memregion("gfx2")->base();
-	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
+	const UINT8 *src = machine().root_device().memregion("gfx1")->base();
+	UINT8 *dst = machine().root_device().memregion("gfx2")->base();
+	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
@@ -841,14 +841,14 @@ static DRIVER_INIT( dassault )
 	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 
-	auto_free(machine, tmp);
+	auto_free(machine(), tmp);
 }
 
-static DRIVER_INIT( thndzone )
+DRIVER_INIT_MEMBER(dassault_state,thndzone)
 {
-	const UINT8 *src = machine.root_device().memregion("gfx1")->base();
-	UINT8 *dst = machine.root_device().memregion("gfx2")->base();
-	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
+	const UINT8 *src = machine().root_device().memregion("gfx1")->base();
+	UINT8 *dst = machine().root_device().memregion("gfx2")->base();
+	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
@@ -858,7 +858,7 @@ static DRIVER_INIT( thndzone )
 	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 
-	auto_free(machine, tmp);
+	auto_free(machine(), tmp);
 }
 
 /**********************************************************************************/

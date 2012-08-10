@@ -917,5 +917,5 @@ ROM_END
 *********************************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
-GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )

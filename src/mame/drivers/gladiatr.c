@@ -952,12 +952,12 @@ static void swap_block(UINT8 *src1,UINT8 *src2,int len)
 	}
 }
 
-static DRIVER_INIT( gladiatr )
+DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 {
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine.root_device().memregion("gfx2")->base();
+	rom = machine().root_device().memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -971,7 +971,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = machine.root_device().memregion("gfx3")->base();
+	rom = machine().root_device().memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -988,8 +988,8 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
 	/* make sure bank is valid in cpu-reset */
-	rom = machine.root_device().memregion("audiocpu")->base() + 0x10000;
-	machine.root_device().membank("bank2")->set_base(rom);
+	rom = machine().root_device().memregion("audiocpu")->base() + 0x10000;
+	machine().root_device().membank("bank2")->set_base(rom);
 }
 
 
@@ -1001,19 +1001,19 @@ READ8_MEMBER(gladiatr_state::f6a3_r)
 	return m_nvram[0x6a3];
 }
 
-static DRIVER_INIT(ppking)
+DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 {
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine.root_device().memregion("gfx2")->base();
+	rom = machine().root_device().memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = machine.root_device().memregion("gfx3")->base();
+	rom = machine().root_device().memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{
@@ -1023,8 +1023,7 @@ static DRIVER_INIT(ppking)
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
 		}
 	}
-	gladiatr_state *state = machine.driver_data<gladiatr_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::f6a3_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::f6a3_r),this));
 }
 
 

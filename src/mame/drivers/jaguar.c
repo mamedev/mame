@@ -437,6 +437,20 @@ public:
 	DECLARE_WRITE16_MEMBER(jaguar_gpu_clut_w16);
 	DECLARE_READ16_MEMBER(jaguar_gpu_ram_r16);
 	DECLARE_WRITE16_MEMBER(jaguar_gpu_ram_w16);
+	DECLARE_DRIVER_INIT(jaguar);
+	DECLARE_DRIVER_INIT(area51mx);
+	DECLARE_DRIVER_INIT(maxforce);
+	DECLARE_DRIVER_INIT(freezeat);
+	DECLARE_DRIVER_INIT(fishfren);
+	DECLARE_DRIVER_INIT(a51mxr3k);
+	DECLARE_DRIVER_INIT(area51);
+	DECLARE_DRIVER_INIT(freezeat4);
+	DECLARE_DRIVER_INIT(freezeat5);
+	DECLARE_DRIVER_INIT(freezeat6);
+	DECLARE_DRIVER_INIT(vcircle);
+	DECLARE_DRIVER_INIT(freezeat3);
+	DECLARE_DRIVER_INIT(freezeat2);
+	DECLARE_DRIVER_INIT(area51a);
 };
 
 
@@ -1848,10 +1862,10 @@ static void jaguar_fix_endian( running_machine &machine, UINT32 addr, UINT32 siz
 	}
 }
 
-static DRIVER_INIT( jaguar )
+DRIVER_INIT_MEMBER(cojag_state,jaguar)
 {
 	jaguar_hacks_enabled = false;
-	state_save_register_global(machine, joystick_data);
+	state_save_register_global(machine(), joystick_data);
 	using_cart = 0;
 
 	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
@@ -2368,100 +2382,94 @@ static void cojag_common_init(running_machine &machine, UINT16 gpu_jump_offs, UI
 }
 
 
-static DRIVER_INIT( area51a )
+DRIVER_INIT_MEMBER(cojag_state,area51a)
 {
 	jaguar_hacks_enabled = true;
-	cojag_common_init(machine, 0x5c4, 0x5a0);
+	cojag_common_init(machine(), 0x5c4, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
 	{
-		cojag_state *state = machine.driver_data<cojag_state>();
 
 		/* install speedup for main CPU */
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(cojag_state::area51_main_speedup_w),state));
+		m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(cojag_state::area51_main_speedup_w),this));
 	}
 #endif
 }
 
 
-static DRIVER_INIT( area51 )
+DRIVER_INIT_MEMBER(cojag_state,area51)
 {
 	jaguar_hacks_enabled = true;
-	cojag_common_init(machine, 0x0c0, 0x09e);
+	cojag_common_init(machine(), 0x0c0, 0x09e);
 
 #if ENABLE_SPEEDUP_HACKS
 	{
-		cojag_state *state = machine.driver_data<cojag_state>();
 
 		/* install speedup for main CPU */
-		state->m_main_speedup_max_cycles = 120;
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
+		m_main_speedup_max_cycles = 120;
+		m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),this));
 	}
 #endif
 }
 
-static DRIVER_INIT( maxforce )
+DRIVER_INIT_MEMBER(cojag_state,maxforce)
 {
 	jaguar_hacks_enabled = true;
-	cojag_state *state = machine.driver_data<cojag_state>();
-	cojag_common_init(machine, 0x0c0, 0x09e);
+	cojag_common_init(machine(), 0x0c0, 0x09e);
 
 	/* patch the protection */
-	state->m_rom_base[0x220/4] = 0x03e00008;
+	m_rom_base[0x220/4] = 0x03e00008;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	state->m_main_speedup_max_cycles = 120;
-	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
+	m_main_speedup_max_cycles = 120;
+	m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 
 
-static DRIVER_INIT( area51mx )
+DRIVER_INIT_MEMBER(cojag_state,area51mx)
 {
 	jaguar_hacks_enabled = true;
-	cojag_state *state = machine.driver_data<cojag_state>();
-	cojag_common_init(machine, 0x0c0, 0x09e);
+	cojag_common_init(machine(), 0x0c0, 0x09e);
 
 	/* patch the protection */
-	state->m_rom_base[0x418/4] = 0x4e754e75;
+	m_rom_base[0x418/4] = 0x4e754e75;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(cojag_state::area51mx_main_speedup_w),state));
+	m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(cojag_state::area51mx_main_speedup_w),this));
 #endif
 }
 
 
-static DRIVER_INIT( a51mxr3k )
+DRIVER_INIT_MEMBER(cojag_state,a51mxr3k)
 {
 	jaguar_hacks_enabled = true;
-	cojag_state *state = machine.driver_data<cojag_state>();
-	cojag_common_init(machine, 0x0c0, 0x09e);
+	cojag_common_init(machine(), 0x0c0, 0x09e);
 
 	/* patch the protection */
-	state->m_rom_base[0x220/4] = 0x03e00008;
+	m_rom_base[0x220/4] = 0x03e00008;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	state->m_main_speedup_max_cycles = 120;
-	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
+	m_main_speedup_max_cycles = 120;
+	m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 
 
-static DRIVER_INIT( fishfren )
+DRIVER_INIT_MEMBER(cojag_state,fishfren)
 {
 	jaguar_hacks_enabled = true;
-	cojag_common_init(machine, 0x578, 0x554);
+	cojag_common_init(machine(), 0x578, 0x554);
 
 #if ENABLE_SPEEDUP_HACKS
 	{
-		cojag_state *state = machine.driver_data<cojag_state>();
 
 		/* install speedup for main CPU */
-		state->m_main_speedup_max_cycles = 200;
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
+		m_main_speedup_max_cycles = 200;
+		m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),this));
 	}
 #endif
 }
@@ -2484,26 +2492,24 @@ static void init_freeze_common(running_machine &machine, offs_t main_speedup_add
 #endif
 }
 
-static DRIVER_INIT( freezeat ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a9f4); }
-static DRIVER_INIT( freezeat2 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a8c4); }
-static DRIVER_INIT( freezeat3 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a134); }
-static DRIVER_INIT( freezeat4 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x1001a134); }
-static DRIVER_INIT( freezeat5 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x10019b34); }
-static DRIVER_INIT( freezeat6 ) { jaguar_hacks_enabled = true; init_freeze_common(machine, 0x10019684); }
+DRIVER_INIT_MEMBER(cojag_state,freezeat) { jaguar_hacks_enabled = true; init_freeze_common(machine(), 0x1001a9f4); }
+DRIVER_INIT_MEMBER(cojag_state,freezeat2) { jaguar_hacks_enabled = true; init_freeze_common(machine(), 0x1001a8c4); }
+DRIVER_INIT_MEMBER(cojag_state,freezeat3) { jaguar_hacks_enabled = true; init_freeze_common(machine(), 0x1001a134); }
+DRIVER_INIT_MEMBER(cojag_state,freezeat4) { jaguar_hacks_enabled = true; init_freeze_common(machine(), 0x1001a134); }
+DRIVER_INIT_MEMBER(cojag_state,freezeat5) { jaguar_hacks_enabled = true; init_freeze_common(machine(), 0x10019b34); }
+DRIVER_INIT_MEMBER(cojag_state,freezeat6) { jaguar_hacks_enabled = true; init_freeze_common(machine(), 0x10019684); }
 
-
-static DRIVER_INIT( vcircle )
+DRIVER_INIT_MEMBER(cojag_state,vcircle)
 {
 	jaguar_hacks_enabled = true;
-	cojag_common_init(machine, 0x5c0, 0x5a0);
+	cojag_common_init(machine(), 0x5c0, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
 	{
-		cojag_state *state = machine.driver_data<cojag_state>();
 
 		/* install speedup for main CPU */
-		state->m_main_speedup_max_cycles = 50;
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
+		m_main_speedup_max_cycles = 50;
+		m_main_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),this));
 	}
 #endif
 }

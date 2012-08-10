@@ -76,6 +76,7 @@ public:
 	DECLARE_WRITE32_MEMBER(fs_paletteram_w);
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
+	DECLARE_DRIVER_INIT(feversoc);
 };
 
 
@@ -295,9 +296,9 @@ ROM_START( feversoc )
 	ROM_LOAD( "pcm.u0743", 0x00000, 0x80000, CRC(20b0c0e3) SHA1(dcf2f620a8fe695688057dbaf5c431a32a832440) )
 ROM_END
 
-static DRIVER_INIT( feversoc )
+DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 {
-	seibuspi_rise11_sprite_decrypt_feversoc(machine.root_device().memregion("gfx1")->base(), 0x200000);
+	seibuspi_rise11_sprite_decrypt_feversoc(machine().root_device().memregion("gfx1")->base(), 0x200000);
 }
 
 GAME( 2004, feversoc,  0,       feversoc,  feversoc, feversoc_state,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

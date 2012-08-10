@@ -5,8 +5,6 @@
 
 MACHINE_CONFIG_EXTERN( mod4yam );
 INPUT_PORTS_EXTERN( mpu4 );
-extern DRIVER_INIT( m4default );
-extern DRIVER_INIT( m4gambal );
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 

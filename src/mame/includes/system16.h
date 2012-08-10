@@ -151,6 +151,22 @@ public:
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrollx_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_tilemapselect_w);
 	DECLARE_WRITE8_MEMBER(upd7759_bank_w);
+	DECLARE_DRIVER_INIT(passsht);
+	DECLARE_DRIVER_INIT(wb3bbl);
+	DECLARE_DRIVER_INIT(fpointbl);
+	DECLARE_DRIVER_INIT(eswatbl);
+	DECLARE_DRIVER_INIT(astormbl);
+	DECLARE_DRIVER_INIT(shdancbl);
+	DECLARE_DRIVER_INIT(dduxbl);
+	DECLARE_DRIVER_INIT(goldnaxeb2);
+	DECLARE_DRIVER_INIT(bayrouteb1);
+	DECLARE_DRIVER_INIT(beautyb);
+	DECLARE_DRIVER_INIT(mwalkbl);
+	DECLARE_DRIVER_INIT(bayrouteb2);
+	DECLARE_DRIVER_INIT(shinobl);
+	DECLARE_DRIVER_INIT(tturfbl);
+	DECLARE_DRIVER_INIT(goldnaxeb1);
+	DECLARE_DRIVER_INIT(common);
 };
 
 /*----------- defined in video/system16.c -----------*/

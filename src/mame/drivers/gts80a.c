@@ -24,6 +24,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(gts80a);
 };
 
 class caveman_state : public gts80a_state
@@ -64,7 +66,7 @@ void gts80a_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( gts80a )
+DRIVER_INIT_MEMBER(gts80a_state,gts80a)
 {
 }
 
@@ -671,5 +673,5 @@ ROM_END
 /* disp3 */GAME(1984,	touchdn,	0,		gts80a_s,	gts80a, gts80a_state,	gts80a,	ROT0,	"Gottlieb",		"Touchdown",			GAME_IS_SKELETON_MECHANICAL)
 
 /* custom (+video) */
-GAME(1981,	caveman,	0,			caveman,	caveman, caveman_state,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 1)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(1981,	cavemana,	caveman,	caveman,	caveman, caveman_state,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 2)",	GAME_IS_SKELETON_MECHANICAL)
+GAME(1981,	caveman,	0,			caveman,	caveman, gts80a_state,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 1)",	GAME_IS_SKELETON_MECHANICAL)
+GAME(1981,	cavemana,	caveman,	caveman,	caveman, gts80a_state,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 2)",	GAME_IS_SKELETON_MECHANICAL)

@@ -64,10 +64,10 @@ static void drgwld2_common_init(running_machine &machine)
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_r));
 }
 
-DRIVER_INIT( drgw2 )
+DRIVER_INIT_MEMBER(pgm_state,drgw2)
 {	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	drgwld2_common_init(machine);
+	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	drgwld2_common_init(machine());
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
        although some addresses may be missing */
@@ -76,20 +76,20 @@ DRIVER_INIT( drgw2 )
 	mem16[0x1311ce / 2] = 0x4e93;
 }
 
-DRIVER_INIT( dw2v100x )
+DRIVER_INIT_MEMBER(pgm_state,dw2v100x)
 {
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	drgwld2_common_init(machine);
+	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	drgwld2_common_init(machine());
 
 	mem16[0x131084 / 2] = 0x4e93;
 	mem16[(0x131084+0xa6) / 2] = 0x4e93;
 	mem16[(0x131084+0x136) / 2] = 0x4e93;
 }
 
-DRIVER_INIT( drgw2c )
+DRIVER_INIT_MEMBER(pgm_state,drgw2c)
 {
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	drgwld2_common_init(machine);
+	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	drgwld2_common_init(machine());
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
        although some addresses may be missing */
@@ -98,10 +98,10 @@ DRIVER_INIT( drgw2c )
 	mem16[0x1304f2 / 2] = 0x4e93;
 }
 
-DRIVER_INIT( drgw2j )
+DRIVER_INIT_MEMBER(pgm_state,drgw2j)
 {
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	drgwld2_common_init(machine);
+	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	drgwld2_common_init(machine());
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
        although some addresses may be missing */

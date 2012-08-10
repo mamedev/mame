@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp7_w);
 	DECLARE_WRITE8_MEMBER(sol_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	DECLARE_DRIVER_INIT(peyper);
 };
 
 
@@ -545,7 +546,7 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 MACHINE_CONFIG_END
 
 
-static DRIVER_INIT( peyper )
+DRIVER_INIT_MEMBER(peyper_state,peyper)
 {
 }
 

@@ -679,20 +679,18 @@ ROM_START( hotminda )
 	ROM_LOAD( "rom10.rom",       0x00000, 0x40000,  CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 ROM_END
 
-static DRIVER_INIT( powerbal )
+DRIVER_INIT_MEMBER(playmark_state,powerbal)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_bg_yoffset = 16;
-	state->m_yoffset = -8;
+	m_bg_yoffset = 16;
+	m_yoffset = -8;
 }
 
-static DRIVER_INIT( magicstk )
+DRIVER_INIT_MEMBER(playmark_state,magicstk)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_bg_yoffset = 0;
-	state->m_yoffset = -5;
+	m_bg_yoffset = 0;
+	m_yoffset = -5;
 }
 
 /*************************

@@ -353,9 +353,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( cbasebal )
+DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
 {
-	pang_decode(machine);
+	pang_decode(machine());
 }
 
 

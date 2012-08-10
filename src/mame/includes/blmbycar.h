@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(blmbycar_palette_w);
 	DECLARE_WRITE16_MEMBER(blmbycar_vram_0_w);
 	DECLARE_WRITE16_MEMBER(blmbycar_vram_1_w);
+	DECLARE_DRIVER_INIT(blmbycar);
 };
 
 

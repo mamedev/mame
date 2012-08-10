@@ -109,6 +109,14 @@ public:
 	DECLARE_WRITE8_MEMBER(slapfight_fixcol_w);
 	DECLARE_WRITE8_MEMBER(slapfight_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(slapfight_palette_bank_w);
+	DECLARE_DRIVER_INIT(getstarj);
+	DECLARE_DRIVER_INIT(getstar);
+	DECLARE_DRIVER_INIT(gtstarb1);
+	DECLARE_DRIVER_INIT(tigerhb);
+	DECLARE_DRIVER_INIT(slapfigh);
+	DECLARE_DRIVER_INIT(perfrman);
+	DECLARE_DRIVER_INIT(gtstarb2);
+	DECLARE_DRIVER_INIT(tigerh);
 };
 
 

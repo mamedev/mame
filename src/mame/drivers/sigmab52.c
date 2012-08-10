@@ -145,6 +145,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_WRITE8_MEMBER(unk_f710_w);
 	DECLARE_READ8_MEMBER(unk_f721_r);
+	DECLARE_DRIVER_INIT(jwildb52);
 };
 
 
@@ -676,9 +677,9 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT(jwildb52)
+DRIVER_INIT_MEMBER(sigmab52_state,jwildb52)
 {
-	//HD63484_start(machine);
+	//HD63484_start(machine());
 }
 
 

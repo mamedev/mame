@@ -168,6 +168,12 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(sammymdl_eeprom_r);
 	DECLARE_WRITE8_MEMBER(sammymdl_eeprom_w);
+	DECLARE_DRIVER_INIT(gegege);
+	DECLARE_DRIVER_INIT(pepsiman);
+	DECLARE_DRIVER_INIT(itazuram);
+	DECLARE_DRIVER_INIT(animalc);
+	DECLARE_DRIVER_INIT(ucytokyu);
+	DECLARE_DRIVER_INIT(haekaka);
 };
 
 
@@ -1900,9 +1906,9 @@ ROM_START( gegege )
 	ROM_LOAD( "b9804-5.ic16", 0x00000, 0x80000, CRC(ddd7984c) SHA1(3558c495776671ffd3cd5c665b87827b3959b360) )
 ROM_END
 
-static DRIVER_INIT( gegege )
+DRIVER_INIT_MEMBER(sigmab98_state,gegege)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x0bdd] = 0xc9;
@@ -1920,14 +1926,14 @@ static DRIVER_INIT( gegege )
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine.root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine.root_device().membank("rombank")->set_entry(0);
+	machine().root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	machine().root_device().membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
+	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
-	machine.root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine.root_device().membank("rambank")->set_entry(0);
+	machine().root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	machine().root_device().membank("rambank")->set_entry(0);
 }
 
 
@@ -1949,9 +1955,9 @@ ROM_START( pepsiman )
 	ROM_LOAD( "b9806-5.ic16", 0x00000, 0x80000, CRC(6d405dfb) SHA1(e65ffe1279680097894754e379d7ad638657eb49) )
 ROM_END
 
-static DRIVER_INIT( pepsiman )
+DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x058a] = 0xc9;
@@ -1969,14 +1975,14 @@ static DRIVER_INIT( pepsiman )
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine.root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine.root_device().membank("rombank")->set_entry(0);
+	machine().root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	machine().root_device().membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
+	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
-	machine.root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine.root_device().membank("rambank")->set_entry(0);
+	machine().root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	machine().root_device().membank("rambank")->set_entry(0);
 }
 
 
@@ -2000,9 +2006,9 @@ ROM_START( ucytokyu )
 	ROM_LOAD( "b9809-6.ic26", 0x80000, 0x80000, CRC(4e2d5fdf) SHA1(af1357b0f6a407890ecad26a18d2b4e223802693) )
 ROM_END
 
-static DRIVER_INIT( ucytokyu )
+DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x0bfa] = 0xc9;
@@ -2020,14 +2026,14 @@ static DRIVER_INIT( ucytokyu )
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine.root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine.root_device().membank("rombank")->set_entry(0);
+	machine().root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	machine().root_device().membank("rombank")->set_entry(0);
 
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
+	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
-	machine.root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine.root_device().membank("rambank")->set_entry(0);
+	machine().root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	machine().root_device().membank("rambank")->set_entry(0);
 }
 
 
@@ -2110,23 +2116,22 @@ ROM_START( animalc )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )	// 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
-static DRIVER_INIT( animalc )
+DRIVER_INIT_MEMBER(sigmab98_state,animalc)
 {
-	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// RAM banks
-	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	state->membank("rambank")->configure_entry(0, state->m_nvram);
-	state->membank("rambank")->configure_entries(1, 4, bankedram, 0x1000);
-	state->membank("rambank")->set_entry(0);
+	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x1000 * 5);
+	membank("rambank")->configure_entry(0, m_nvram);
+	membank("rambank")->configure_entries(1, 4, bankedram, 0x1000);
+	membank("rambank")->set_entry(0);
 
-	state->m_spriteram.allocate(0x1000 * 5);
-	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->membank("sprbank")->configure_entries(0, 5, state->m_spriteram, 0x1000);
-	state->membank("sprbank")->set_entry(0);
+	m_spriteram.allocate(0x1000 * 5);
+	memset(m_spriteram, 0, 0x1000 * 5);
+	membank("sprbank")->configure_entries(0, 5, m_spriteram, 0x1000);
+	membank("sprbank")->set_entry(0);
 
-	state->m_vblank_vector = 0x00; // increment counter
-	state->m_timer0_vector = 0x1c; // read hopper state
-	state->m_timer1_vector = 0x1e; // drive hopper motor
+	m_vblank_vector = 0x00; // increment counter
+	m_timer0_vector = 0x1c; // read hopper state
+	m_timer1_vector = 0x1e; // drive hopper motor
 }
 
 /***************************************************************************
@@ -2151,29 +2156,28 @@ ROM_START( itazuram )
 	ROM_LOAD( "vx2001l01.u016", 0x00000, 0x200000, CRC(9ee95222) SHA1(7154d43ef312a48a882207ca37e1c61e8b215a9b) )
 ROM_END
 
-static DRIVER_INIT( itazuram )
+DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 {
-	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// ROM banks
-	UINT8 *rom = state->memregion("maincpu")->base();
-	state->membank("rombank0")->set_base(rom + 0x3400);
-	state->membank("rombank1")->set_base(rom + 0x4400);
-	state->m_rombank = 0x0f;
+	UINT8 *rom = memregion("maincpu")->base();
+	membank("rombank0")->set_base(rom + 0x3400);
+	membank("rombank1")->set_base(rom + 0x4400);
+	m_rombank = 0x0f;
 
 	// RAM banks
-	state->m_generic_paletteram_8.allocate(0x3000);
-	memset(state->m_generic_paletteram_8, 0, 0x3000);
-	state->membank("palbank")->set_base(state->m_generic_paletteram_8);
-	state->m_rambank = 0x64;
+	m_generic_paletteram_8.allocate(0x3000);
+	memset(m_generic_paletteram_8, 0, 0x3000);
+	membank("palbank")->set_base(m_generic_paletteram_8);
+	m_rambank = 0x64;
 
-	state->m_spriteram.allocate(0x1000 * 5);
-	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->membank("sprbank0")->set_base(state->m_spriteram + 0x1000*4);	// scratch
-	state->membank("sprbank1")->set_base(state->m_spriteram + 0x1000*4);	// scratch
+	m_spriteram.allocate(0x1000 * 5);
+	memset(m_spriteram, 0, 0x1000 * 5);
+	membank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
+	membank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
 
-	state->m_vblank_vector = 0x00;
-	state->m_timer0_vector = 0x02;
-	state->m_timer1_vector = 0x16;
+	m_vblank_vector = 0x00;
+	m_timer0_vector = 0x02;
+	m_timer1_vector = 0x16;
 }
 
 /***************************************************************************
@@ -2270,22 +2274,21 @@ ROM_START( haekaka )
 	ROM_LOAD( "em4207l01.u016.bin", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
 ROM_END
 
-static DRIVER_INIT( haekaka )
+DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 {
-	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// RAM banks
-	state->m_generic_paletteram_8.allocate(0x200);
-	memset(state->m_generic_paletteram_8, 0, 0x200);
+	m_generic_paletteram_8.allocate(0x200);
+	memset(m_generic_paletteram_8, 0, 0x200);
 
-	state->m_spriteram.allocate(0x1000);
-	memset(state->m_spriteram, 0, 0x1000);
+	m_spriteram.allocate(0x1000);
+	memset(m_spriteram, 0, 0x1000);
 
-	state->m_rombank = 0x65;
-	state->m_rambank = 0x53;
+	m_rombank = 0x65;
+	m_rambank = 0x53;
 
-	state->m_vblank_vector = 0x04;
-	state->m_timer0_vector = 0x1a;
-	state->m_timer1_vector = 0x1c;
+	m_vblank_vector = 0x04;
+	m_timer0_vector = 0x1a;
+	m_timer1_vector = 0x1c;
 }
 
 
@@ -2299,7 +2302,7 @@ GAME( 1997, gegege,   0,        gegege,   gegege, sigmab98_state,   gegege,   RO
 GAME( 1997, pepsiman, 0,        gegege,   pepsiman, sigmab98_state, pepsiman, ROT0, "Sigma",             "PEPSI Man",                     0 )
 GAME( 1997, ucytokyu, 0,        gegege,   ucytokyu, sigmab98_state, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",        0 )	// Banpresto + others in the ROM
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sigmab98_state, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, driver_device, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Animal Catch",                  0 )
 GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, ROT0, "Sammy",             "Itazura Monkey",                0 )
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",               0 )

@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(williams_s11a);
 };
 
 
@@ -35,7 +37,7 @@ void williams_s11a_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( williams_s11a )
+DRIVER_INIT_MEMBER(williams_s11a_state,williams_s11a)
 {
 }
 

@@ -892,41 +892,37 @@ ROM_START( baluba )
 ROM_END
 
 
-static DRIVER_INIT( starforc )
+DRIVER_INIT_MEMBER(senjyo_state,starforc)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 
-	state->m_is_senjyo = 0;
-	state->m_scrollhack = 1;
+	m_is_senjyo = 0;
+	m_scrollhack = 1;
 }
-static DRIVER_INIT( starfore )
+DRIVER_INIT_MEMBER(senjyo_state,starfore)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* encrypted CPU */
-	suprloco_decode(machine, "maincpu");
+	suprloco_decode(machine(), "maincpu");
 
-	state->m_is_senjyo = 0;
-	state->m_scrollhack = 0;
+	m_is_senjyo = 0;
+	m_scrollhack = 0;
 }
 
-static DRIVER_INIT( starfora )
+DRIVER_INIT_MEMBER(senjyo_state,starfora)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 
 	/* encrypted CPU */
-	yamato_decode(machine, "maincpu");
+	yamato_decode(machine(), "maincpu");
 
-	state->m_is_senjyo = 0;
-	state->m_scrollhack = 1;
+	m_is_senjyo = 0;
+	m_scrollhack = 1;
 }
 
-static DRIVER_INIT( senjyo )
+DRIVER_INIT_MEMBER(senjyo_state,senjyo)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 
-	state->m_is_senjyo = 1;
-	state->m_scrollhack = 0;
+	m_is_senjyo = 1;
+	m_scrollhack = 0;
 }
 
 

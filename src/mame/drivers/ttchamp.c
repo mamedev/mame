@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paldat_w);
 	DECLARE_READ16_MEMBER(peno_rand);
 	DECLARE_READ16_MEMBER(peno_rand2);
+	DECLARE_DRIVER_INIT(ttchamp);
 };
 
 
@@ -335,11 +336,11 @@ ROM_START( ttchampa )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
-static DRIVER_INIT (ttchamp)
+DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 {
-	UINT8 *ROM1 = machine.root_device().memregion("user1")->base();
-	machine.root_device().membank("bank1")->set_base(&ROM1[0x120000]);
-	machine.root_device().membank("bank2")->set_base(&ROM1[0x180000]);
+	UINT8 *ROM1 = machine().root_device().memregion("user1")->base();
+	machine().root_device().membank("bank1")->set_base(&ROM1[0x120000]);
+	machine().root_device().membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

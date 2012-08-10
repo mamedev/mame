@@ -358,14 +358,13 @@ static void h6280_decrypt(running_machine &machine, const char *cputag)
 		RAM[i] = (RAM[i] & 0x7e) | ((RAM[i] & 0x1) << 7) | ((RAM[i] & 0x80) >> 7);
 }
 
-DRIVER_INIT( hippodrm )
+DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 {
-	UINT8 *RAM = machine.root_device().memregion("sub")->base();
-	dec0_state *state = machine.driver_data<dec0_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),state), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),state));
+	UINT8 *RAM = machine().root_device().memregion("sub")->base();
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
-	h6280_decrypt(machine, "sub");
+	h6280_decrypt(machine(), "sub");
 
 	/* The protection cpu has additional memory mapped protection! */
 	RAM[0x189] = 0x60; /* RTS prot area */
@@ -374,37 +373,33 @@ DRIVER_INIT( hippodrm )
 	RAM[0x21a] = 0x60; /* RTS prot area */
 }
 
-DRIVER_INIT( slyspy )
+DRIVER_INIT_MEMBER(dec0_state,slyspy)
 {
-	UINT8 *RAM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("audiocpu")->base();
 
-	h6280_decrypt(machine, "audiocpu");
+	h6280_decrypt(machine(), "audiocpu");
 
 	/* Slyspy sound cpu has some protection */
 	RAM[0xf2d] = 0xea;
 	RAM[0xf2e] = 0xea;
 }
 
-DRIVER_INIT( robocop )
+DRIVER_INIT_MEMBER(dec0_state,robocop)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),state), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
 }
 
-DRIVER_INIT( baddudes )
+DRIVER_INIT_MEMBER(dec0_state,baddudes)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_GAME = 2;
+	m_GAME = 2;
 }
 
-DRIVER_INIT( hbarrel )
+DRIVER_INIT_MEMBER(dec0_state,hbarrel)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_GAME = 1;
+	m_GAME = 1;
 }
 
-DRIVER_INIT( birdtry )
+DRIVER_INIT_MEMBER(dec0_state,birdtry)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_GAME=3;
+	m_GAME=3;
 }

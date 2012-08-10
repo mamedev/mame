@@ -61,6 +61,8 @@ public:
 	DECLARE_WRITE8_MEMBER(centiped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(milliped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
+	DECLARE_DRIVER_INIT(multiped);
+	DECLARE_DRIVER_INIT(bullsdrt);
 };
 
 

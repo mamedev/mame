@@ -61,6 +61,8 @@ public:
 	DECLARE_WRITE16_MEMBER(astrocorp_palette_w);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
+	DECLARE_DRIVER_INIT(showhanc);
+	DECLARE_DRIVER_INIT(showhand);
 };
 
 /***************************************************************************
@@ -1009,10 +1011,10 @@ ROM_END
 
 
 
-static DRIVER_INIT( showhand )
+DRIVER_INIT_MEMBER(astrocorp_state,showhand)
 {
 #if 0
-	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
 	rom[0x0a1a/2] = 0x6000;	// hopper jam
 
@@ -1025,10 +1027,10 @@ static DRIVER_INIT( showhand )
 #endif
 }
 
-static DRIVER_INIT( showhanc )
+DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 {
 #if 0
-	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
 	rom[0x14d4/2] = 0x4e71;	// enable full test mode
 	rom[0x14d6/2] = 0x4e71;	// ""
@@ -1040,9 +1042,9 @@ static DRIVER_INIT( showhanc )
 
 GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",               GAME_SUPPORTS_SAVE )
 GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue (China)",        GAME_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S)", GAME_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06)",          GAME_SUPPORTS_SAVE )
-GAME( 2005?, winbingo,  0,        showhand, showhand, astrocorp_state, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)",           GAME_NOT_WORKING )
-GAME( 2005?, winbingoa, winbingo, showhand, showhand, astrocorp_state, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)",           GAME_NOT_WORKING )
-GAME( 2005?, zoo,       0,        showhand, showhand, astrocorp_state, 0,        ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D)",              GAME_NOT_WORKING )
-GAME( 2007?, westvent,  0,        showhand, showhand, astrocorp_state, 0,        ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",  GAME_NOT_WORKING )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, driver_device, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S)", GAME_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, driver_device, 0,        ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06)",          GAME_SUPPORTS_SAVE )
+GAME( 2005?, winbingo,  0,        showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)",           GAME_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)",           GAME_NOT_WORKING )
+GAME( 2005?, zoo,       0,        showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D)",              GAME_NOT_WORKING )
+GAME( 2007?, westvent,  0,        showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",  GAME_NOT_WORKING )

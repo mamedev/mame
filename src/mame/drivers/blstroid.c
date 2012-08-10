@@ -428,9 +428,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( blstroid )
+DRIVER_INIT_MEMBER(blstroid_state,blstroid)
 {
-	atarijsa_init(machine, "IN0", 0x80);
+	atarijsa_init(machine(), "IN0", 0x80);
 }
 
 

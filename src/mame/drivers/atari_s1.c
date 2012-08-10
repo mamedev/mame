@@ -22,6 +22,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(atari_s1);
 };
 
 static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
@@ -39,7 +41,7 @@ void atari_s1_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( atari_s1 )
+DRIVER_INIT_MEMBER(atari_s1_state,atari_s1)
 {
 }
 

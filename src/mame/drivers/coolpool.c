@@ -1175,33 +1175,31 @@ static void register_state_save(running_machine &machine)
 
 
 
-static DRIVER_INIT( amerdart )
+DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 {
-	coolpool_state *state = machine.driver_data<coolpool_state>();
 
-	state->m_lastresult = 0xffff;
+	m_lastresult = 0xffff;
 
-	register_state_save(machine);
+	register_state_save(machine());
 }
 
-static DRIVER_INIT( coolpool )
+DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 {
-	coolpool_state *state = machine.driver_data<coolpool_state>();
 
-	machine.device("dsp")->memory().space(AS_IO)->install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),state));
+	machine().device("dsp")->memory().space(AS_IO)->install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
-	register_state_save(machine);
+	register_state_save(machine());
 }
 
 
-static DRIVER_INIT( 9ballsht )
+DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 {
 	int a, len;
 	UINT16 *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (UINT16 *)machine.root_device().memregion("user1")->base();
-	len = machine.root_device().memregion("user1")->bytes();
+	rom = (UINT16 *)machine().root_device().memregion("user1")->base();
+	len = machine().root_device().memregion("user1")->bytes();
 	for (a = 0;a < len/2;a++)
 	{
 		int hi,lo,nhi,nlo;
@@ -1224,8 +1222,8 @@ static DRIVER_INIT( 9ballsht )
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (UINT16 *)machine.root_device().memregion("user2")->base();
-	len = machine.root_device().memregion("user2")->bytes();
+	rom = (UINT16 *)machine().root_device().memregion("user2")->base();
+	len = machine().root_device().memregion("user2")->bytes();
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */
@@ -1234,7 +1232,7 @@ static DRIVER_INIT( 9ballsht )
 		rom[a+1] = tmp;
 	}
 
-	register_state_save(machine);
+	register_state_save(machine());
 }
 
 

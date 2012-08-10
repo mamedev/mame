@@ -68,6 +68,11 @@ public:
 	DECLARE_WRITE8_MEMBER(tms5220_strobe_w);
 	DECLARE_WRITE8_MEMBER(coincount_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(atarisy2_direct_handler);
+	DECLARE_DRIVER_INIT(ssprint);
+	DECLARE_DRIVER_INIT(apb);
+	DECLARE_DRIVER_INIT(csprint);
+	DECLARE_DRIVER_INIT(paperboy);
+	DECLARE_DRIVER_INIT(720);
 };
 
 

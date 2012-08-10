@@ -2206,69 +2206,68 @@ static void configure_banks(running_machine &machine)
 	state->membank("bank5")->configure_entries(0, 16, state->memregion("audiocpu")->base() + 0x14000, 0x4000);
 }
 
-static DRIVER_INIT( ms32_common )
+DRIVER_INIT_MEMBER(ms32_state,ms32_common)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
-	state->m_nvram_8 = auto_alloc_array(machine, UINT8, 0x2000);
-	configure_banks(machine);
+	m_nvram_8 = auto_alloc_array(machine(), UINT8, 0x2000);
+	configure_banks(machine());
 }
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
-static DRIVER_INIT (ss91022_10)
+DRIVER_INIT_MEMBER(ms32_state,ss91022_10)
 {
 	DRIVER_INIT_CALL(ms32_common);
-	ms32_rearrange_sprites(machine, "gfx1");
-	decrypt_ms32_tx(machine, 0x00000,0x35, "gfx4");
-	decrypt_ms32_bg(machine, 0x00000,0xa3, "gfx3");
+	ms32_rearrange_sprites(machine(), "gfx1");
+	decrypt_ms32_tx(machine(), 0x00000,0x35, "gfx4");
+	decrypt_ms32_bg(machine(), 0x00000,0xa3, "gfx3");
 }
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
-static DRIVER_INIT (ss92046_01)
+DRIVER_INIT_MEMBER(ms32_state,ss92046_01)
 {
 	DRIVER_INIT_CALL(ms32_common);
-	ms32_rearrange_sprites(machine, "gfx1");
-	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx4");
-	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx3");
+	ms32_rearrange_sprites(machine(), "gfx1");
+	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx4");
+	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx3");
 }
 
 /* SS92047-01: gratia, kirarast */
-static DRIVER_INIT (ss92047_01)
+DRIVER_INIT_MEMBER(ms32_state,ss92047_01)
 {
 	DRIVER_INIT_CALL(ms32_common);
-	ms32_rearrange_sprites(machine, "gfx1");
-	decrypt_ms32_tx(machine, 0x24000,0x18, "gfx4");
-	decrypt_ms32_bg(machine, 0x24000,0x55, "gfx3");
+	ms32_rearrange_sprites(machine(), "gfx1");
+	decrypt_ms32_tx(machine(), 0x24000,0x18, "gfx4");
+	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
 
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
-static DRIVER_INIT (ss92048_01)
+DRIVER_INIT_MEMBER(ms32_state,ss92048_01)
 {
 	DRIVER_INIT_CALL(ms32_common);
-	ms32_rearrange_sprites(machine, "gfx1");
-	decrypt_ms32_tx(machine, 0x20400,0xd6, "gfx4");
-	decrypt_ms32_bg(machine, 0x20400,0xd4, "gfx3");
+	ms32_rearrange_sprites(machine(), "gfx1");
+	decrypt_ms32_tx(machine(), 0x20400,0xd6, "gfx4");
+	decrypt_ms32_bg(machine(), 0x20400,0xd4, "gfx3");
 }
 
-static DRIVER_INIT (kirarast)
+DRIVER_INIT_MEMBER(ms32_state,kirarast)
 {
 	DRIVER_INIT_CALL(ss92047_01);
 }
 
-static DRIVER_INIT (47pie2)
+DRIVER_INIT_MEMBER(ms32_state,47pie2)
 {
 	DRIVER_INIT_CALL(ss92048_01);
 }
 
-static DRIVER_INIT (f1superb)
+DRIVER_INIT_MEMBER(ms32_state,f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
+	UINT32 *pROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);
 }
 
-static DRIVER_INIT (bnstars)
+DRIVER_INIT_MEMBER(ms32_state,bnstars)
 {
 	DRIVER_INIT_CALL(ss92046_01);
 }

@@ -726,9 +726,9 @@ ROM_START( venus )
 ROM_END
 
 
-static DRIVER_INIT( gyruss )
+DRIVER_INIT_MEMBER(gyruss_state,gyruss)
 {
-	konami1_decode(machine, "sub");
+	konami1_decode(machine(), "sub");
 }
 
 

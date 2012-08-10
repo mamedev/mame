@@ -79,6 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(hitpoker_pic_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
 	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_DRIVER_INIT(hitpoker);
 };
 
 
@@ -520,13 +521,12 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT(hitpoker)
+DRIVER_INIT_MEMBER(hitpoker_state,hitpoker)
 {
-	hitpoker_state *state = machine.driver_data<hitpoker_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	// init nvram
-	machine.device<nvram_device>("nvram")->set_base(state->m_eeprom_data, sizeof(state->m_eeprom_data));
+	machine().device<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;

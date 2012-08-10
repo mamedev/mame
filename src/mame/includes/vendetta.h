@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_irq_w);
 	DECLARE_READ8_MEMBER(vendetta_sound_interrupt_r);
 	DECLARE_READ8_MEMBER(vendetta_sound_r);
+	DECLARE_DRIVER_INIT(vendetta);
+	DECLARE_DRIVER_INIT(esckids);
 };
 
 /*----------- defined in video/vendetta.c -----------*/

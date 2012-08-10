@@ -21,6 +21,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(cupidon);
 };
 
 
@@ -86,7 +88,7 @@ ROM_END
 
 
 
-DRIVER_INIT( cupidon )
+DRIVER_INIT_MEMBER(cupidon_state,cupidon)
 {
 
 }

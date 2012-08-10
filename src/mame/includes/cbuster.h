@@ -38,6 +38,7 @@ public:
 	DECLARE_READ16_MEMBER(twocrude_control_r);
 	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_b_w);
+	DECLARE_DRIVER_INIT(twocrude);
 };
 
 

@@ -29,6 +29,13 @@ public:
 	DECLARE_WRITE8_MEMBER(warpwarp_videoram_w);
 	DECLARE_READ8_MEMBER(warpwarp_dsw1_r);
 	DECLARE_READ8_MEMBER(warpwarp_vol_r);
+	DECLARE_DRIVER_INIT(navarone);
+	DECLARE_DRIVER_INIT(geebee);
+	DECLARE_DRIVER_INIT(kaitein);
+	DECLARE_DRIVER_INIT(warpwarp);
+	DECLARE_DRIVER_INIT(sos);
+	DECLARE_DRIVER_INIT(kaitei);
+	DECLARE_DRIVER_INIT(bombbee);
 };
 
 

@@ -75,6 +75,8 @@ public:
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_DRIVER_INIT(penta);
+	DECLARE_DRIVER_INIT(pengo);
 };
 
 
@@ -642,13 +644,13 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( pengo )
+DRIVER_INIT_MEMBER(pengo_state,pengo)
 {
-	pengo_decode(machine, "maincpu");
+	pengo_decode(machine(), "maincpu");
 }
 
 
-static DRIVER_INIT( penta )
+DRIVER_INIT_MEMBER(pengo_state,penta)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -690,9 +692,9 @@ static DRIVER_INIT( penta )
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },	/* ...1...1...0.... */
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }		/* ...1...1...1.... */
 	};
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -732,9 +734,9 @@ static DRIVER_INIT( penta )
 
 GAME( 1982, pengo,    0,     pengo, pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 1 rev c)", GAME_SUPPORTS_SAVE )
 GAME( 1982, pengo2,   pengo, pengo, pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, pengo2u,  pengo, pengo, pengo, pengo_state, 0,        ROT90, "Sega", "Pengo (set 2 not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1982, pengo3u,  pengo, pengo, pengo, pengo_state, 0,        ROT90, "Sega", "Pengo (set 3 not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pengo2u,  pengo, pengo, pengo, driver_device, 0,        ROT90, "Sega", "Pengo (set 2 not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pengo3u,  pengo, pengo, pengo, driver_device, 0,        ROT90, "Sega", "Pengo (set 3 not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1982, pengo4,   pengo, pengo, pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 4)", GAME_SUPPORTS_SAVE )
 GAME( 1982, pengob,   pengo, pengo, pengo, pengo_state, penta,    ROT90, "bootleg", "Pengo (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, penta,    pengo, pengo, pengo, pengo_state, penta,    ROT90, "bootleg", "Penta", GAME_SUPPORTS_SAVE )
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, 0, ROT90, "bootleg", "Jr. Pac-Man (Pengo hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, driver_device, 0, ROT90, "bootleg", "Jr. Pac-Man (Pengo hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

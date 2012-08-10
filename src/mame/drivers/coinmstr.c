@@ -52,6 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(question_r);
 	DECLARE_WRITE8_MEMBER(question_w);
 	DECLARE_READ8_MEMBER(ff_r);
+	DECLARE_DRIVER_INIT(coinmstr);
 };
 
 
@@ -1223,11 +1224,11 @@ ROM_START( jpcoin )
 	ROM_LOAD( "4.bin", 0x4000, 0x004000, CRC(2bac1c0b) SHA1(3e45fc38ed6d332e1d49b2b66bf8001610f914c5) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
-static DRIVER_INIT( coinmstr )
+DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 {
-	UINT8 *rom = machine.root_device().memregion("user1")->base();
-	int length = machine.root_device().memregion("user1")->bytes();
-	UINT8 *buf = auto_alloc_array(machine, UINT8, length);
+	UINT8 *rom = machine().root_device().memregion("user1")->base();
+	int length = machine().root_device().memregion("user1")->bytes();
+	UINT8 *buf = auto_alloc_array(machine(), UINT8, length);
 	int i;
 
 	memcpy(buf,rom,length);
@@ -1238,7 +1239,7 @@ static DRIVER_INIT( coinmstr )
 		rom[i] = BITSWAP8(buf[adr],3,2,4,1,5,0,6,7);
 	}
 
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
 
@@ -1247,5 +1248,5 @@ static DRIVER_INIT( coinmstr )
 GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_UNEMULATED_PROTECTION )
 GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
 GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1990, pokeroul, 0, pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
-GAME( 1990, jpcoin,   0, pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster)",  GAME_NOT_WORKING ) // io stuff is different at least
+GAME( 1990, pokeroul, 0, pokeroul, pokeroul, driver_device, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
+GAME( 1990, jpcoin,   0, pokeroul, pokeroul, driver_device, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster)",  GAME_NOT_WORKING ) // io stuff is different at least

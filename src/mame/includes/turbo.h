@@ -119,6 +119,8 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_ppi1c_w);
 	DECLARE_READ8_MEMBER(turbo_analog_r);
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
+	DECLARE_DRIVER_INIT(buckrog_enc);
+	DECLARE_DRIVER_INIT(turbo_enc);
 };
 
 

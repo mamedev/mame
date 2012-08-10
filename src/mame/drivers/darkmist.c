@@ -400,17 +400,17 @@ static void decrypt_snd(running_machine &machine)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
 }
 
-static DRIVER_INIT(darkmist)
+DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, len;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	decrypt_gfx(machine);
+	decrypt_gfx(machine());
 
-	decrypt_snd(machine);
+	decrypt_snd(machine());
 
 	for(i=0;i<0x8000;i++)
 	{
@@ -440,8 +440,8 @@ static DRIVER_INIT(darkmist)
 	space->machine().root_device().membank("bank1")->set_base(&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = machine.root_device().memregion("user1")->base();
-	len = machine.root_device().memregion("user1")->bytes();
+	ROM = machine().root_device().memregion("user1")->base();
+	len = machine().root_device().memregion("user1")->bytes();
 	memcpy( buffer, ROM, len );
 
 	for(i=0;i<len;i++)
@@ -449,31 +449,31 @@ static DRIVER_INIT(darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = machine.root_device().memregion("user2")->base();
-	len = machine.root_device().memregion("user2")->bytes();
+	ROM = machine().root_device().memregion("user2")->base();
+	len = machine().root_device().memregion("user2")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = machine.root_device().memregion("user3")->base();
-	len = machine.root_device().memregion("user3")->bytes();
+	ROM = machine().root_device().memregion("user3")->base();
+	len = machine().root_device().memregion("user3")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	ROM = machine.root_device().memregion("user4")->base();
-	len = machine.root_device().memregion("user4")->bytes();
+	ROM = machine().root_device().memregion("user4")->base();
+	len = machine().root_device().memregion("user4")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
 GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Taito Corporation", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS|GAME_NO_COCKTAIL )

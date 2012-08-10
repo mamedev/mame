@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE16_MEMBER(stlforce_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	DECLARE_DRIVER_INIT(twinbrat);
+	DECLARE_DRIVER_INIT(stlforce);
 };
 
 

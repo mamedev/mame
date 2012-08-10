@@ -18,6 +18,7 @@ class ecoinf1_state : public driver_device
 public:
 	ecoinf1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	DECLARE_DRIVER_INIT(ecoinf1);
 };
 
 
@@ -329,7 +330,7 @@ ROM_START( ec_casbxo )
 	ROM_LOAD( "bx5c10p.a2", 0x2000, 0x001000, CRC(0bd21303) SHA1(eb60749d3097ce77f0955586fc8ed1d16993286a) )
 ROM_END
 
-DRIVER_INIT( ecoinf1 )
+DRIVER_INIT_MEMBER(ecoinf1_state,ecoinf1)
 {
 
 }

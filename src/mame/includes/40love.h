@@ -84,6 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_1_w);
 	DECLARE_WRITE8_MEMBER(sound_control_2_w);
 	DECLARE_WRITE8_MEMBER(sound_control_3_w);
+	DECLARE_DRIVER_INIT(undoukai);
+	DECLARE_DRIVER_INIT(40love);
 };
 
 

@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
 	DECLARE_WRITE16_MEMBER(moo_prot_w);
 	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
+	DECLARE_DRIVER_INIT(moo);
 };
 
 

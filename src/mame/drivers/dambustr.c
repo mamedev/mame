@@ -62,6 +62,7 @@ public:
 
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
+	DECLARE_DRIVER_INIT(dambustr);
 };
 
 
@@ -202,13 +203,13 @@ static GFXDECODE_START( dambustr )
 GFXDECODE_END
 
 
-static DRIVER_INIT(dambustr)
+DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *usr = machine.root_device().memregion("user1")->base();
-	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *usr = machine().root_device().memregion("user1")->base();
+	UINT8 *gfx = machine().root_device().memregion("gfx1")->base();
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {

@@ -45,4 +45,5 @@ public:
 	DECLARE_READ32_MEMBER(host_vram_r);
 	DECLARE_WRITE32_MEMBER(host_vram_w);
 	DECLARE_WRITE32_MEMBER(timer_w);
+	DECLARE_DRIVER_INIT(metalmx);
 };

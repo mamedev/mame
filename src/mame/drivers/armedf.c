@@ -2036,95 +2036,86 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( terraf )
+DRIVER_INIT_MEMBER(armedf_state,terraf)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 0;
+	m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c006, 0x07c007, write16_delegate(FUNC(armedf_state::terraf_fg_scrolly_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c008, 0x07c009, write16_delegate(FUNC(armedf_state::terraf_fg_scrollx_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c006, 0x07c007, write16_delegate(FUNC(armedf_state::terraf_fg_scrolly_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c008, 0x07c009, write16_delegate(FUNC(armedf_state::terraf_fg_scrollx_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
 }
 
-static DRIVER_INIT( terrafu )
+DRIVER_INIT_MEMBER(armedf_state,terrafu)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 0;
+	m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 }
 
-static DRIVER_INIT( terrafb )
+DRIVER_INIT_MEMBER(armedf_state,terrafb)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 0;
+	m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafb_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafb_io_w),this));
 }
 
-static DRIVER_INIT( armedf )
+DRIVER_INIT_MEMBER(armedf_state,armedf)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 1;
+	m_scroll_type = 1;
 }
 
 
-static DRIVER_INIT( kozure )
+DRIVER_INIT_MEMBER(armedf_state,kozure)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 0;
+	m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 }
 
-static DRIVER_INIT( legion )
+DRIVER_INIT_MEMBER(armedf_state,legion)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)state->memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	RAM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
 	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
-	state->m_scroll_type = 2;
+	m_scroll_type = 2;
 }
 
-static DRIVER_INIT( legiono )
+DRIVER_INIT_MEMBER(armedf_state,legiono)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)state->memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	RAM[0x0001d6/2] = 0x0001;
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
 
-	state->m_scroll_type = 2;
+	m_scroll_type = 2;
 }
 
-static DRIVER_INIT( cclimbr2 )
+DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
-	state->m_scroll_type = 3;
+	m_scroll_type = 3;
 }
 
-static DRIVER_INIT( bigfghtr )
+DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 1;
+	m_scroll_type = 1;
 }
 
 /*************************************

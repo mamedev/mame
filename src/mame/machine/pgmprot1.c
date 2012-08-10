@@ -281,22 +281,22 @@ static READ16_HANDLER( kovsh_fake_region_r )
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
-DRIVER_INIT( photoy2k )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,photoy2k)
 {
-	pgm_basic_init(machine);
-	pgm_photoy2k_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
+	pgm_basic_init(machine());
+	pgm_photoy2k_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
 
-DRIVER_INIT( kovsh )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovsh)
 {
-	pgm_basic_init(machine);
-	pgm_kovsh_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
+	pgm_basic_init(machine());
+	pgm_kovsh_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
 
 /* Fake remapping of ASIC commands to the ones used by KOVSH due to the lack of the real ARM rom for this set */
@@ -361,26 +361,26 @@ WRITE16_HANDLER( kovshp_asic27a_write_word )
 }
 
 
-DRIVER_INIT( kovshp )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovshp)
 {
-	pgm_basic_init(machine);
-	pgm_kovshp_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
+	pgm_basic_init(machine());
+	pgm_kovshp_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
 }
 
 
 
 /* bootleg inits */
 
-DRIVER_INIT( kovshxas )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovshxas)
 {
-	pgm_basic_init(machine);
-//  pgm_kovshp_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
+	pgm_basic_init(machine());
+//  pgm_kovshp_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
 }
 
 static void pgm_decode_kovlsqh2_tiles( running_machine &machine )
@@ -467,46 +467,46 @@ static void pgm_decode_kovqhsgs2_program( running_machine &machine )
 }
 
 
-DRIVER_INIT( kovlsqh2 )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovlsqh2)
 {
-	pgm_decode_kovqhsgs2_program(machine);
-	pgm_decode_kovlsqh2_tiles(machine);
+	pgm_decode_kovqhsgs2_program(machine());
+	pgm_decode_kovlsqh2_tiles(machine());
 
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprmask")->base() + 0x0800000);
 
-	pgm_decode_kovlsqh2_samples(machine);
-	pgm_basic_init(machine);
-	pgm_arm7_type1_latch_init(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
+	pgm_decode_kovlsqh2_samples(machine());
+	pgm_basic_init(machine());
+	pgm_arm7_type1_latch_init(machine());
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
 }
 
-DRIVER_INIT( kovqhsgs )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovqhsgs)
 {
-	pgm_decode_kovqhsgs_program(machine);
-	pgm_decode_kovlsqh2_tiles(machine);
+	pgm_decode_kovqhsgs_program(machine());
+	pgm_decode_kovlsqh2_tiles(machine());
 
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine(), machine().root_device().memregion("sprmask")->base() + 0x0800000);
 
-	pgm_decode_kovlsqh2_samples(machine);
-	pgm_basic_init(machine);
-	pgm_arm7_type1_latch_init(machine);
+	pgm_decode_kovlsqh2_samples(machine());
+	pgm_basic_init(machine());
+	pgm_arm7_type1_latch_init(machine());
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
 
 /*
@@ -1408,124 +1408,114 @@ static READ16_HANDLER( pstars_arm7_type1_sim_protram_r )
 }
 
 
-DRIVER_INIT( ddp3 )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,ddp3)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine, false);
-	pgm_py2k2_decrypt(machine); // yes, it's the same as photo y2k2
-	state->arm_sim_handler = command_handler_ddp3;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	pgm_basic_init(machine(), false);
+	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
+	arm_sim_handler = command_handler_ddp3;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 }
 
-DRIVER_INIT( ket )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,ket)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine, false);
-	pgm_ket_decrypt(machine);
-	state->arm_sim_handler = command_handler_ddp3;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	pgm_basic_init(machine(), false);
+	pgm_ket_decrypt(machine());
+	arm_sim_handler = command_handler_ddp3;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 }
 
-DRIVER_INIT( espgal )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,espgal)
 {
-	pgm_basic_init(machine, false);
-	pgm_espgal_decrypt(machine);
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	state->arm_sim_handler = command_handler_ddp3;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	pgm_basic_init(machine(), false);
+	pgm_espgal_decrypt(machine());
+	arm_sim_handler = command_handler_ddp3;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 }
 
-DRIVER_INIT( puzzli2 )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine);
-	pgm_puzzli2_decrypt(machine);
-	state->arm_sim_handler = command_handler_puzzli2;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
-	state->m_irq4_disabled = 1; // // doesn't like this irq??
+	pgm_basic_init(machine());
+	pgm_puzzli2_decrypt(machine());
+	arm_sim_handler = command_handler_puzzli2;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
+	m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
-DRIVER_INIT( py2k2 )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,py2k2)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine);
-	pgm_py2k2_decrypt(machine);
-	state->arm_sim_handler = command_handler_py2k2;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
+	pgm_basic_init(machine());
+	pgm_py2k2_decrypt(machine());
+	arm_sim_handler = command_handler_py2k2;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 }
 
-DRIVER_INIT( pstar )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,pstar)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
+	pgm_basic_init(machine());
+	pgm_pstar_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
 
-	pgm_basic_init(machine);
-	pgm_pstar_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
+	m_pstar_e7_value = 0;
+	m_pstar_b1_value = 0;
+	m_pstar_ce_value = 0;
+	m_extra_ram[0] = 0;
+	m_extra_ram[1] = 0;
+	m_extra_ram[2] = 0;
+	memset(m_slots, 0, 16 * sizeof(UINT32));
 
-	state->m_pstar_e7_value = 0;
-	state->m_pstar_b1_value = 0;
-	state->m_pstar_ce_value = 0;
-	state->m_extra_ram[0] = 0;
-	state->m_extra_ram[1] = 0;
-	state->m_extra_ram[2] = 0;
-	memset(state->m_slots, 0, 16 * sizeof(UINT32));
+	arm_sim_handler = command_handler_pstars;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pstars_arm7_type1_sim_protram_r));
 
-	state->arm_sim_handler = command_handler_pstars;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pstars_arm7_type1_sim_protram_r));
-
-	state->save_item(NAME(state->m_pstar_e7_value));
-	state->save_item(NAME(state->m_pstar_b1_value));
-	state->save_item(NAME(state->m_pstar_ce_value));
-	state->save_item(NAME(state->m_extra_ram));
+	save_item(NAME(m_pstar_e7_value));
+	save_item(NAME(m_pstar_b1_value));
+	save_item(NAME(m_pstar_ce_value));
+	save_item(NAME(m_extra_ram));
 }
 
-DRIVER_INIT( kov )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kov)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine);
-	pgm_kov_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
-	state->m_curslots = 0;
-	state->m_kov_c0_value = 0;
-	state->m_kov_cb_value = 0;
-	state->m_kov_fe_value = 0;
-	state->arm_sim_handler = command_handler_kov;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
+	pgm_basic_init(machine());
+	pgm_kov_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
+	m_curslots = 0;
+	m_kov_c0_value = 0;
+	m_kov_cb_value = 0;
+	m_kov_fe_value = 0;
+	arm_sim_handler = command_handler_kov;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 }
 
-DRIVER_INIT( kovboot )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,kovboot)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine);
-//  pgm_kov_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
-	state->m_curslots = 0;
-	state->m_kov_c0_value = 0;
-	state->m_kov_cb_value = 0;
-	state->m_kov_fe_value = 0;
-	state->arm_sim_handler = command_handler_kov;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
+	pgm_basic_init(machine());
+//  pgm_kov_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
+	m_curslots = 0;
+	m_kov_c0_value = 0;
+	m_kov_cb_value = 0;
+	m_kov_fe_value = 0;
+	arm_sim_handler = command_handler_kov;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 
 }
 
-DRIVER_INIT( oldsplus )
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,oldsplus)
 {
-	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
-	pgm_basic_init(machine);
-	pgm_oldsplus_decrypt(machine);
-	pgm_arm7_type1_latch_init(machine);
-	memset(state->m_extra_ram, 0, 0x100 * sizeof(UINT16));
-	memset(state->m_slots, 0, 0x100 * sizeof(UINT32));
-	state->arm_sim_handler = command_handler_oldsplus;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
-	state_save_register_global_array(machine, state->m_extra_ram);
-	state_save_register_global_array(machine, state->m_slots);
+	pgm_basic_init(machine());
+	pgm_oldsplus_decrypt(machine());
+	pgm_arm7_type1_latch_init(machine());
+	memset(m_extra_ram, 0, 0x100 * sizeof(UINT16));
+	memset(m_slots, 0, 0x100 * sizeof(UINT32));
+	arm_sim_handler = command_handler_oldsplus;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
+	state_save_register_global_array(machine(), m_extra_ram);
+	state_save_register_global_array(machine(), m_slots);
 }
 
 INPUT_PORTS_START( photoy2k )

@@ -20,6 +20,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(zac_proto);
 };
 
 
@@ -34,7 +36,7 @@ void zac_proto_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( zac_proto )
+DRIVER_INIT_MEMBER(zac_proto_state,zac_proto)
 {
 }
 

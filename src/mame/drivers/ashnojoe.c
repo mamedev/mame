@@ -461,12 +461,12 @@ ROM_START( ashnojoe )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-static DRIVER_INIT( ashnojoe )
+DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 {
-	UINT8 *ROM = machine.root_device().memregion("adpcm")->base();
-	machine.root_device().membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
+	UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
+	machine().root_device().membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
-	machine.root_device().membank("bank4")->set_entry(0);
+	machine().root_device().membank("bank4")->set_entry(0);
 }
 
 GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Wave / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )

@@ -73,6 +73,11 @@ public:
 	UINT8 			m_vblank_irq_state;
 	UINT8 			m_misc_io_data[0x10];
 	bitmap_ind16 *	m_tmp_bitmap;
+	DECLARE_DRIVER_INIT(pdrift);
+	DECLARE_DRIVER_INIT(r360);
+	DECLARE_DRIVER_INIT(gforce2);
+	DECLARE_DRIVER_INIT(rchase);
+	DECLARE_DRIVER_INIT(gloc);
 };
 
 

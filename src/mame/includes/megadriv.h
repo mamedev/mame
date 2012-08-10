@@ -22,13 +22,6 @@
 
 /*----------- defined in machine/megadriv.c -----------*/
 
-extern DRIVER_INIT( megadriv_c2 );
-extern DRIVER_INIT( megadrie );
-extern DRIVER_INIT( megadriv );
-extern DRIVER_INIT( megadrij );
-extern DRIVER_INIT( _32x );
-extern DRIVER_INIT( mpnew );
-
 INPUT_PORTS_EXTERN( md_common );
 INPUT_PORTS_EXTERN( megadriv );
 INPUT_PORTS_EXTERN( megadri6 );
@@ -125,6 +118,13 @@ class md_base_state : public driver_device
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag) { }
+	
+	DECLARE_DRIVER_INIT(megadriv_c2);
+	DECLARE_DRIVER_INIT(megadrie);
+	DECLARE_DRIVER_INIT(megadriv);
+	DECLARE_DRIVER_INIT(megadrij);
+	DECLARE_DRIVER_INIT(mpnew);
+	
 };
 
 class md_boot_state : public md_base_state
@@ -208,6 +208,13 @@ public:
 		m_protcount = 0;
 		return ret;
 	}
+	
+	DECLARE_DRIVER_INIT(aladmdb);
+	DECLARE_DRIVER_INIT(mk3mdb);
+	DECLARE_DRIVER_INIT(ssf2mdb);
+	DECLARE_DRIVER_INIT(srmdb);
+	DECLARE_DRIVER_INIT(topshoot);	
+	DECLARE_DRIVER_INIT(puckpkmn);
 };
 
 class segac2_state : public md_base_state
@@ -240,6 +247,33 @@ public:
 
 	/* sound-related variables */
 	UINT8		m_sound_banks;		/* number of sound banks */
+	
+	DECLARE_DRIVER_INIT(c2boot);
+	DECLARE_DRIVER_INIT(bloxeedc);
+	DECLARE_DRIVER_INIT(columns);
+	DECLARE_DRIVER_INIT(columns2);
+	DECLARE_DRIVER_INIT(tfrceac);
+	DECLARE_DRIVER_INIT(tfrceacb);
+	DECLARE_DRIVER_INIT(borench);
+	DECLARE_DRIVER_INIT(twinsqua);
+	DECLARE_DRIVER_INIT(ribbit);
+	DECLARE_DRIVER_INIT(puyo);
+	DECLARE_DRIVER_INIT(tantr);
+	DECLARE_DRIVER_INIT(tantrkor);
+	DECLARE_DRIVER_INIT(potopoto);
+	DECLARE_DRIVER_INIT(stkclmns);
+	DECLARE_DRIVER_INIT(stkclmnj);
+	DECLARE_DRIVER_INIT(ichir);
+	DECLARE_DRIVER_INIT(ichirk);
+	DECLARE_DRIVER_INIT(ichirj);
+	DECLARE_DRIVER_INIT(ichirjbl);
+	DECLARE_DRIVER_INIT(puyopuy2);
+	DECLARE_DRIVER_INIT(zunkyou);
+	DECLARE_DRIVER_INIT(pclub);
+	DECLARE_DRIVER_INIT(pclubjv2);
+	DECLARE_DRIVER_INIT(pclubjv4);
+	DECLARE_DRIVER_INIT(pclubjv5);
+	void segac2_common_init(running_machine& machine, int (*func)(int in));
 };
 
 class mplay_state : public md_base_state
@@ -267,6 +301,8 @@ public:
 	required_shared_ptr<UINT8> m_ic3_ram;
 	UINT8* m_ic37_ram;
 	UINT16 *m_ic36_ram;
+	
+	DECLARE_DRIVER_INIT(megaplay);
 };
 
 class mtech_state : public md_base_state
@@ -287,6 +323,8 @@ public:
 
 	/* Megatech BIOS specific */
 	UINT8* m_megatech_banked_ram;
+	DECLARE_DRIVER_INIT(mt_crt);
+	DECLARE_DRIVER_INIT(mt_slot);
 };
 
 typedef struct _megadriv_cart  megadriv_cart;
@@ -327,6 +365,9 @@ public:
 	UINT8 m_jcart_io_data[2];
 
 	megadriv_cart m_md_cart;
+	
+	DECLARE_DRIVER_INIT(hshavoc);
+	DECLARE_DRIVER_INIT(topshoot);
 };
 
 class pico_state : public md_cons_state
@@ -368,6 +409,8 @@ class _32x_state : public md_base_state
 public:
 	_32x_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag) { }
+
+	DECLARE_DRIVER_INIT(_32x);	
 };
 
 // Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions

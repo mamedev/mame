@@ -3287,72 +3287,67 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( common )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
-	state->m_bg1_trans = 0;
-	state->m_splittab_bg_x = 0;
-	state->m_splittab_bg_y = 0;
-	state->m_splittab_fg_x = 0;
-	state->m_splittab_fg_y = 0;
+	m_bg1_trans = 0;
+	m_splittab_bg_x = 0;
+	m_splittab_bg_y = 0;
+	m_splittab_fg_x = 0;
+	m_splittab_fg_y = 0;
 
-	state->m_spritebank_type = 0;
-	state->m_back_yscroll = 0;
-	state->m_fore_yscroll = 0;
-	state->m_text_yscroll = 0;
+	m_spritebank_type = 0;
+	m_back_yscroll = 0;
+	m_fore_yscroll = 0;
+	m_text_yscroll = 0;
 
-	state->m_sample_buffer = 0;
-	state->m_sample_select = 0;
+	m_sample_buffer = 0;
+	m_sample_select = 0;
 
-	state->m_soundbank_ptr = NULL;
+	m_soundbank_ptr = NULL;
 
-	state->m_beautyb_unkx = 0;
+	m_beautyb_unkx = 0;
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
+	m_maincpu = machine().device("maincpu");
+	m_soundcpu = machine().device("soundcpu");
 }
 
 /* Sys16A */
-static DRIVER_INIT( shinobl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,shinobl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
+	m_spritebank_type = 1;
 }
 
-static DRIVER_INIT( passsht )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,passsht)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
-	state->m_back_yscroll = 3;
+	m_spritebank_type = 1;
+	m_back_yscroll = 3;
 }
 
-static DRIVER_INIT( wb3bbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,wb3bbl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
-	state->m_back_yscroll = 2;
-	state->m_fore_yscroll = 2;
+	m_spritebank_type = 1;
+	m_back_yscroll = 2;
+	m_fore_yscroll = 2;
 }
 
 
 /* Sys16B */
-static DRIVER_INIT( goldnaxeb1 )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int i;
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	UINT8 *KEY = state->memregion("decryption")->base();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *KEY = memregion("decryption")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 data[0x1000];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
@@ -3363,23 +3358,23 @@ static DRIVER_INIT( goldnaxeb1 )
 		data[(i * 2) + 1] = ((KEY[i] & 0x08) << 3) | ((KEY[i] & 0x04) << 2) | ((KEY[i] & 0x02) << 1) | ((KEY[i] & 0x01) << 0);
 	}
 
-	state->m_decrypted_region = auto_alloc_array(machine, UINT8, 0xc0000);
-	memcpy(state->m_decrypted_region, ROM, 0xc0000);
+	m_decrypted_region = auto_alloc_array(machine(), UINT8, 0xc0000);
+	memcpy(m_decrypted_region, ROM, 0xc0000);
 
 	for (i = 0; i < 0x40000; i++)
 	{
-		state->m_decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
+		m_decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
 	}
 
-	space->set_decrypted_region(0x00000, 0xbffff, state->m_decrypted_region);
+	space->set_decrypted_region(0x00000, 0xbffff, m_decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
+	m_spritebank_type = 1;
 }
 
 
-static DRIVER_INIT( bayrouteb1 )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 {
 	// it has the same encryption as the golden axe bootleg!
 	//
@@ -3387,15 +3382,14 @@ static DRIVER_INIT( bayrouteb1 )
 	//
 	// for now we use the code which is present in the unprotected bootleg set
 	// and modify the rom to use it
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	UINT16 *ROM2;
 	UINT16 *decrypted_region2;
 
 	// decrypt
-	DRIVER_INIT_CALL( goldnaxeb1 );
+	DRIVER_INIT_CALL(goldnaxeb1);
 
-	ROM2 = (UINT16*)state->memregion("maincpu")->base();
-	decrypted_region2 = (UINT16*)state->m_decrypted_region;
+	ROM2 = (UINT16*)memregion("maincpu")->base();
+	decrypted_region2 = (UINT16*)m_decrypted_region;
 
 	// patch interrupt vector
 	ROM2[0x0070/2] = 0x000b;
@@ -3407,63 +3401,60 @@ static DRIVER_INIT( bayrouteb1 )
 	decrypted_region2[0x1082/2] = 0xf000;
 }
 
-static DRIVER_INIT( bayrouteb2 )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)
 {
-	UINT8 *mem = machine.root_device().memregion("soundcpu")->base();
+	UINT8 *mem = machine().root_device().memregion("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
 	DRIVER_INIT_CALL(common);
 }
 
-static DRIVER_INIT( goldnaxeb2 )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb2)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
+	m_spritebank_type = 1;
 }
 
-static DRIVER_INIT( tturfbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,tturfbl)
 {
-	UINT8 *mem = machine.root_device().memregion("soundcpu")->base();
+	UINT8 *mem = machine().root_device().memregion("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
 	DRIVER_INIT_CALL(common);
 }
 
-static DRIVER_INIT( dduxbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,dduxbl)
 {
 	DRIVER_INIT_CALL(common);
 }
 
-static DRIVER_INIT( eswatbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,eswatbl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
-	//state->m_splittab_fg_x = &sys16_textram[0x0f80];
+	//m_splittab_fg_x = &sys16_textram[0x0f80];
 
-	state->m_spritebank_type = 1;
+	m_spritebank_type = 1;
 }
 
-static DRIVER_INIT( fpointbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
 	//sys16_video_config(fpoint_update_proc, -0xb8, NULL);
 
-	state->m_back_yscroll = 2;
-	state->m_fore_yscroll = 2;
+	m_back_yscroll = 2;
+	m_fore_yscroll = 2;
 }
 
 /* Tetris-based */
-static DRIVER_INIT( beautyb )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 {
-	UINT16*rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
+	UINT16*rom = (UINT16*)machine().root_device().memregion( "maincpu" )->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)
@@ -3479,25 +3470,23 @@ static DRIVER_INIT( beautyb )
 
 
 /* Sys18 */
-static DRIVER_INIT( shdancbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,shdancbl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	UINT8 *mem = state->memregion("soundcpu")->base();;
+	UINT8 *mem = memregion("soundcpu")->base();;
 
 	/* Copy first 32K of IC45 to Z80 address space */
 	memcpy(mem, mem + 0x10000, 0x8000);
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
-	state->m_splittab_fg_x = &state->m_textram[0x0f80/2];
-	state->m_splittab_bg_x = &state->m_textram[0x0fc0/2];
+	m_spritebank_type = 1;
+	m_splittab_fg_x = &m_textram[0x0f80/2];
+	m_splittab_bg_x = &m_textram[0x0fc0/2];
 }
 
-static DRIVER_INIT( mwalkbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,mwalkbl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	UINT8 *RAM =  state->memregion("soundcpu")->base();
+	UINT8 *RAM =  memregion("soundcpu")->base();
 	static const int mwalk_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -3506,20 +3495,19 @@ static DRIVER_INIT( mwalkbl )
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	memcpy(state->m_sound_info, mwalk_sound_info, sizeof(state->m_sound_info));
+	memcpy(m_sound_info, mwalk_sound_info, sizeof(m_sound_info));
 	memcpy(RAM, &RAM[0x10000], 0xa000);
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
-	state->m_splittab_fg_x = &state->m_textram[0x0f80/2];
-	state->m_splittab_bg_x = &state->m_textram[0x0fc0/2];
+	m_spritebank_type = 1;
+	m_splittab_fg_x = &m_textram[0x0f80/2];
+	m_splittab_bg_x = &m_textram[0x0fc0/2];
 }
 
-static DRIVER_INIT( astormbl )
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	UINT8 *RAM =  state->memregion("soundcpu")->base();
+	UINT8 *RAM =  memregion("soundcpu")->base();
 	static const int astormbl_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -3528,14 +3516,14 @@ static DRIVER_INIT( astormbl )
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	memcpy(state->m_sound_info, astormbl_sound_info, sizeof(state->m_sound_info));
+	memcpy(m_sound_info, astormbl_sound_info, sizeof(m_sound_info));
 	memcpy(RAM, &RAM[0x10000], 0xa000);
 
 	DRIVER_INIT_CALL(common);
 
-	state->m_spritebank_type = 1;
-	state->m_splittab_fg_x = &state->m_textram[0x0f80/2];
-	state->m_splittab_bg_x = &state->m_textram[0x0fc0/2];
+	m_spritebank_type = 1;
+	m_splittab_fg_x = &m_textram[0x0f80/2];
+	m_splittab_bg_x = &m_textram[0x0fc0/2];
 }
 
 /*************************************

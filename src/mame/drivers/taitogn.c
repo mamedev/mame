@@ -385,6 +385,8 @@ public:
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(coin_r);
 	DECLARE_READ32_MEMBER(gnet_mahjong_panel_r);
+	DECLARE_DRIVER_INIT(coh3002t_mp);
+	DECLARE_DRIVER_INIT(coh3002t);
 };
 
 
@@ -878,33 +880,31 @@ READ32_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 
 // Init and reset
 
-static DRIVER_INIT( coh3002t )
+DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 {
-	taitogn_state *state = machine.driver_data<taitogn_state>();
 
-	state->m_biosflash = machine.device<intel_te28f160_device>("biosflash");
-	state->m_pgmflash = machine.device<intel_e28f400_device>("pgmflash");
-	state->m_sndflash[0] = machine.device<intel_te28f160_device>("sndflash0");
-	state->m_sndflash[1] = machine.device<intel_te28f160_device>("sndflash1");
-	state->m_sndflash[2] = machine.device<intel_te28f160_device>("sndflash2");
+	m_biosflash = machine().device<intel_te28f160_device>("biosflash");
+	m_pgmflash = machine().device<intel_e28f400_device>("pgmflash");
+	m_sndflash[0] = machine().device<intel_te28f160_device>("sndflash0");
+	m_sndflash[1] = machine().device<intel_te28f160_device>("sndflash1");
+	m_sndflash[2] = machine().device<intel_te28f160_device>("sndflash2");
 
-	psx_driver_init(machine);
+	psx_driver_init(machine());
 	znsec_init(0, tt10);
 	znsec_init(1, tt16);
-	psx_sio_install_handler(machine, 0, sio_pad_handler);
-	state->m_dip_timer = machine.scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
+	psx_sio_install_handler(machine(), 0, sio_pad_handler);
+	m_dip_timer = machine().scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
 
 	UINT32 metalength;
-	memset(state->m_cis, 0xff, 512);
-	if (get_disk_handle(machine, ":drive_0") != NULL)
-		get_disk_handle(machine, ":drive_0")->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, state->m_cis, 512, metalength);
+	memset(m_cis, 0xff, 512);
+	if (get_disk_handle(machine(), ":drive_0") != NULL)
+		get_disk_handle(machine(), ":drive_0")->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, m_cis, 512, metalength);
 }
 
-static DRIVER_INIT( coh3002t_mp )
+DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 {
 	DRIVER_INIT_CALL(coh3002t);
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),this));
 }
 
 static MACHINE_RESET( coh3002t )

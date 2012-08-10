@@ -29,6 +29,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(jpmsru);
 };
 
 // blind guess
@@ -70,7 +72,7 @@ static MACHINE_CONFIG_START( jpmsru_4, jpmsru_state )
 	MCFG_CPU_IO_MAP(jpmsru_io)
 MACHINE_CONFIG_END
 
-DRIVER_INIT( jpmsru )
+DRIVER_INIT_MEMBER(jpmsru_state,jpmsru)
 {
 }
 

@@ -715,11 +715,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, timeplt,  0,       timeplt, timeplt, timeplt_state, 0, ROT90,  "Konami", "Time Pilot", GAME_SUPPORTS_SAVE )
-GAME( 1982, timepltc, timeplt, timeplt, timeplt, timeplt_state, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", GAME_SUPPORTS_SAVE )
-GAME( 1982, timeplta, timeplt, timeplt, timeplt, timeplt_state, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", GAME_SUPPORTS_SAVE )
-GAME( 1982, spaceplt, timeplt, timeplt, timeplt, timeplt_state, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
-GAME( 1988, psurge,   0,       psurge,  psurge, timeplt_state,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
+GAME( 1982, timeplt,  0,       timeplt, timeplt, driver_device, 0, ROT90,  "Konami", "Time Pilot", GAME_SUPPORTS_SAVE )
+GAME( 1982, timepltc, timeplt, timeplt, timeplt, driver_device, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", GAME_SUPPORTS_SAVE )
+GAME( 1982, timeplta, timeplt, timeplt, timeplt, driver_device, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", GAME_SUPPORTS_SAVE )
+GAME( 1982, spaceplt, timeplt, timeplt, timeplt, driver_device, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
+GAME( 1988, psurge,   0,       psurge,  psurge, driver_device,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
 // ROM says manufactured by Peni Soft for these two ... no, I'm not going to add THAT -.-"
-GAME( 1988, chkun,    0,       chkun,   chkun, timeplt_state,   0, ROT90,  "<unknown>", "Chance Kun (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1987, bikkuric, 0,       bikkuric,bikkuric, timeplt_state,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, chkun,    0,       chkun,   chkun, driver_device,   0, ROT90,  "<unknown>", "Chance Kun (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1987, bikkuric, 0,       bikkuric,bikkuric, driver_device,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE )

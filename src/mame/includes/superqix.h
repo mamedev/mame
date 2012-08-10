@@ -67,6 +67,9 @@ public:
 	DECLARE_READ8_MEMBER(bootleg_in0_r);
 	DECLARE_READ8_MEMBER(hotsmash_ay_port_a_r);
 	DECLARE_READ8_MEMBER(pbillian_ay_port_a_r);
+	DECLARE_DRIVER_INIT(sqix);
+	DECLARE_DRIVER_INIT(perestro);
+	DECLARE_DRIVER_INIT(sqixa);
 };
 
 

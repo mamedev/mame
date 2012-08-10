@@ -39,15 +39,15 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
+	DECLARE_DRIVER_INIT(touchgo);
+	DECLARE_DRIVER_INIT(snowboar);
+	DECLARE_DRIVER_INIT(alighunt);
+	DECLARE_DRIVER_INIT(bang);
 };
 
 
 /*----------- defined in machine/gaelco2.c -----------*/
 
-DRIVER_INIT( alighunt );
-DRIVER_INIT( touchgo );
-DRIVER_INIT( snowboar );
-DRIVER_INIT( bang );
 TIMER_DEVICE_CALLBACK( bang_irq );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );

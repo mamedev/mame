@@ -60,6 +60,7 @@ public:
 	DECLARE_READ16_MEMBER(tc0180vcu_framebuffer_word_r);
 	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
+	DECLARE_DRIVER_INIT(taito_b);
 };
 
 

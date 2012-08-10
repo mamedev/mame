@@ -2019,58 +2019,54 @@ ROM_END
 
 
 
-static DRIVER_INIT( jogakuen )
+DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	homedata_state *state = machine.driver_data<homedata_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8007, 0x8007, write8_delegate(FUNC(homedata_state::pteacher_blitter_bank_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8007, 0x8007, write8_delegate(FUNC(homedata_state::pteacher_blitter_bank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
-static DRIVER_INIT( mjikaga )
+DRIVER_INIT_MEMBER(homedata_state,mjikaga)
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	homedata_state *state = machine.driver_data<homedata_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),state));
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
+	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
-static DRIVER_INIT( reikaids )
+DRIVER_INIT_MEMBER(homedata_state,reikaids)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_priority = 0;
+	m_priority = 0;
 }
 
-static DRIVER_INIT( battlcry )
+DRIVER_INIT_MEMBER(homedata_state,battlcry)
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_priority = 1; /* priority and initial value for bank write */
+	m_priority = 1; /* priority and initial value for bank write */
 }
 
-static DRIVER_INIT( mirderby )
+DRIVER_INIT_MEMBER(homedata_state,mirderby)
 {
 
 }
 
 
-GAME( 1987, hourouki, 0, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data", "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1987, mhgaiden, 0, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data", "Mahjong Hourouki Gaiden (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mjhokite, 0, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data", "Mahjong Hourouki Okite (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mjclinic, 0, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data", "Mahjong Clinic (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, mrokumei, 0, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data", "Mahjong Rokumeikan (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1987, hourouki, 0, mrokumei, mjhokite, driver_device, 0,          ROT0, "Home Data", "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1987, mhgaiden, 0, mrokumei, mjhokite, driver_device, 0,          ROT0, "Home Data", "Mahjong Hourouki Gaiden (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mjhokite, 0, mrokumei, mjhokite, driver_device, 0,          ROT0, "Home Data", "Mahjong Hourouki Okite (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mjclinic, 0, mrokumei, mjhokite, driver_device, 0,          ROT0, "Home Data", "Mahjong Clinic (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mrokumei, 0, mrokumei, mjhokite, driver_device, 0,          ROT0, "Home Data", "Mahjong Rokumeikan (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 GAME( 1988, reikaids, 0, reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data", "Reikai Doushi (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1991, battlcry, 0, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data", "Battlecry", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1989, mjkojink, 0, pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data", "Mahjong Kojinkyouju (Private Teacher) (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, vitaminc, 0, pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data", "Mahjong Vitamin C (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mjyougo,  0, pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data", "Mahjong-yougo no Kisotairyoku (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, homedata_state, 0,          ROT0, "Home Data", "Mahjong Kinjirareta Asobi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mjkojink, 0, pteacher, pteacher, driver_device, 0,          ROT0, "Home Data", "Mahjong Kojinkyouju (Private Teacher) (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, vitaminc, 0, pteacher, pteacher, driver_device, 0,          ROT0, "Home Data", "Mahjong Vitamin C (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mjyougo,  0, pteacher, pteacher, driver_device, 0,          ROT0, "Home Data", "Mahjong-yougo no Kisotairyoku (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, driver_device, 0,          ROT0, "Home Data", "Mahjong Kinjirareta Asobi (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1992?,jogakuen, 0, pteacher, jogakuen, homedata_state, jogakuen,   ROT0, "Windom",    "Mahjong Jogakuen (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, lemnangl, 0, lemnangl, pteacher, homedata_state, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, mjprivat, 0, lemnangl, pteacher, homedata_state, 0,          ROT0, "Matoba",    "Mahjong Private (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lemnangl, 0, lemnangl, pteacher, driver_device, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mjprivat, 0, lemnangl, pteacher, driver_device, 0,          ROT0, "Matoba",    "Mahjong Private (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1991?,mjikaga,  0, lemnangl, mjikaga, homedata_state,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 

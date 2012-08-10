@@ -1675,17 +1675,16 @@ static UINT8 playmark_asciitohex(UINT8 data)
 }
 
 
-static DRIVER_INIT( bigtwin )
+DRIVER_INIT_MEMBER(playmark_state,bigtwin)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT8 *playmark_PICROM_HEX = state->memregion("user1")->base();
-	UINT16 *playmark_PICROM = (UINT16 *)state->memregion("audiocpu")->base();
+	UINT8 *playmark_PICROM_HEX = memregion("user1")->base();
+	UINT16 *playmark_PICROM = (UINT16 *)memregion("audiocpu")->base();
 	INT32 offs, data;
 	UINT16 src_pos = 0;
 	UINT16 dst_pos = 0;
 	UINT8 data_hi, data_lo;
 
-	state->m_snd_flag = 0;
+	m_snd_flag = 0;
 
 	/**** Convert the PIC16C57 ASCII HEX dumps to pure HEX ****/
 	do
@@ -1733,7 +1732,7 @@ static DRIVER_INIT( bigtwin )
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(machine.device("audiocpu"), data);
+			pic16c5x_set_config(machine().device("audiocpu"), data);
 
 			src_pos = 0x7fff;		/* Force Exit */
 		}
@@ -1743,10 +1742,10 @@ static DRIVER_INIT( bigtwin )
 
 GAME( 1995, bigtwin,   0,        bigtwin,  bigtwin, playmark_state,  bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, bigtwinb,  bigtwin,  bigtwinb, bigtwinb, playmark_state, bigtwin, ROT0, "Playmark", "Big Twin (No Girls Conversion)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, playmark_state, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, playmark_state, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl, wbeachvl, playmark_state, 0,       ROT0, "Playmark", "World Beach Volley (set 3)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, driver_device, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, driver_device, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl, wbeachvl, driver_device, 0,       ROT0, "Playmark", "World Beach Volley (set 3)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1996, excelsr,   0,        excelsr,  excelsr, playmark_state,  bigtwin, ROT0, "Playmark", "Excelsior", GAME_SUPPORTS_SAVE )
 GAME( 1995, hotmind,   0,        hotmind,  hotmind, playmark_state,  bigtwin, ROT0, "Playmark", "Hot Mind", GAME_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes, hrdtimes, playmark_state, 0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes, hrdtimes, playmark_state, 0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1994, hrdtimes,  0,        hrdtimes, hrdtimes, driver_device, 0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes, hrdtimes, driver_device, 0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

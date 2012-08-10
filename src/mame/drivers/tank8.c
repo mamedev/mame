@@ -468,12 +468,12 @@ ROM_START( tank8 )
 ROM_END
 
 
-static DRIVER_INIT( decode )
+DRIVER_INIT_MEMBER(tank8_state,decode)
 {
-	const UINT8* DECODE = machine.root_device().memregion("user1")->base();
+	const UINT8* DECODE = machine().root_device().memregion("user1")->base();
 
-	UINT8* p1 = machine.root_device().memregion("maincpu")->base() + 0x00000;
-	UINT8* p2 = machine.root_device().memregion("maincpu")->base() + 0x10000;
+	UINT8* p1 = machine().root_device().memregion("maincpu")->base() + 0x00000;
+	UINT8* p2 = machine().root_device().memregion("maincpu")->base() + 0x10000;
 
 	int i;
 
@@ -488,8 +488,8 @@ static DRIVER_INIT( decode )
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8, tank8_state,    0,	      ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", 0)
+GAME( 1976, tank8,    0,        tank8,    tank8, driver_device,    0,	      ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", 0)
 GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  GAME_NOT_WORKING )
 GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  GAME_NOT_WORKING )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING )

@@ -104,6 +104,7 @@ public:
 	}
 
 
+	DECLARE_DRIVER_INIT(silvmil);
 };
 
 
@@ -428,9 +429,9 @@ static void tumblepb_gfx1_rearrange(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( silvmil )
+DRIVER_INIT_MEMBER(silvmil_state,silvmil)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 }
 
 GAME( 1995, silvmil, 0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", 0 )

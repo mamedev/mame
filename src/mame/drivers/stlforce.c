@@ -362,18 +362,16 @@ ROM_START( twinbrata )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END
 
-static DRIVER_INIT(stlforce)
+DRIVER_INIT_MEMBER(stlforce_state,stlforce)
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 
-	state->m_sprxoffs = 0;
+	m_sprxoffs = 0;
 }
 
-static DRIVER_INIT(twinbrat)
+DRIVER_INIT_MEMBER(stlforce_state,twinbrat)
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 
-	state->m_sprxoffs = 9;
+	m_sprxoffs = 9;
 }
 
 

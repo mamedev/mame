@@ -519,4 +519,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, 0, ROT90, "Wing", "Super Wing", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, superwng,   0,      superwng, superwng, driver_device, 0, ROT90, "Wing", "Super Wing", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

@@ -1548,30 +1548,29 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
  *
  *************************************/
 
-static DRIVER_INIT( zaxxonj )
+DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 {
-	zaxxonj_decode(machine, "maincpu");
+	zaxxonj_decode(machine(), "maincpu");
 }
 
 
-static DRIVER_INIT( szaxxon )
+DRIVER_INIT_MEMBER(zaxxon_state,szaxxon)
 {
-	szaxxon_decode(machine, "maincpu");
+	szaxxon_decode(machine(), "maincpu");
 }
 
 
-static DRIVER_INIT( futspy )
+DRIVER_INIT_MEMBER(zaxxon_state,futspy)
 {
-	futspy_decode(machine, "maincpu");
+	futspy_decode(machine(), "maincpu");
 }
 
 
-static DRIVER_INIT( razmataz )
+DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	nprinces_decode(machine, "maincpu");
+	nprinces_decode(machine(), "maincpu");
 
 	/* additional input ports are wired */
 	pgmspace->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
@@ -1579,11 +1578,11 @@ static DRIVER_INIT( razmataz )
 	pgmspace->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace->install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),state));
+	pgmspace->install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));
 
 	/* additional state saving */
-	state->save_item(NAME(state->m_razmataz_dial_pos));
-	state->save_item(NAME(state->m_razmataz_counter));
+	save_item(NAME(m_razmataz_dial_pos));
+	save_item(NAME(m_razmataz_counter));
 }
 
 
@@ -1595,9 +1594,9 @@ static DRIVER_INIT( razmataz )
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 1)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 1)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxonj,  zaxxon, zaxxon,   zaxxon, zaxxon_state,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon, zaxxon_state,   zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
@@ -1614,6 +1613,6 @@ GAME( 1983, ixion,    0,      razmataz, ixion, zaxxon_state,    szaxxon,  ROT270
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,    congo, zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, congoa,   congo,  congo,    congo, zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,    congo, zaxxon_state,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,    congo, driver_device,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,    congo, driver_device,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,    congo, driver_device,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

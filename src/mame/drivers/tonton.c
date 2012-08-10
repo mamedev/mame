@@ -298,4 +298,4 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   INIT  ROT    COMPANY                   FULLNAME                                 FLAGS  */
-GAME( 199?, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+GAME( 199?, tonton,  0,      tonton,  tonton, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

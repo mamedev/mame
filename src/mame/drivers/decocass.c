@@ -1601,60 +1601,58 @@ ROM_START( cflyball )
 ROM_END
 
 
-static DRIVER_INIT( decocass )
+DRIVER_INIT_MEMBER(decocass_state,decocass)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = state->memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
-	state->m_decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	space->set_decrypted_region(0x0000, 0xc7ff, &state->m_decrypted[0x0000]);
-	space->set_decrypted_region(0xd000, 0xdbff, &state->m_decrypted[0xd000]);
-	space->set_decrypted_region(0xf000, 0xffff, &state->m_decrypted[0xf000]);
+	m_decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
+	space->set_decrypted_region(0x0000, 0xc7ff, &m_decrypted[0x0000]);
+	space->set_decrypted_region(0xd000, 0xdbff, &m_decrypted[0xd000]);
+	space->set_decrypted_region(0xf000, 0xffff, &m_decrypted[0xf000]);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xf000; A < 0x10000; A++)
-		state->m_decrypted[A] = swap_bits_5_6(rom[A]);
+		m_decrypted[A] = swap_bits_5_6(rom[A]);
 
-	state->save_pointer(NAME(state->m_decrypted), 0x10000);
+	save_pointer(NAME(m_decrypted), 0x10000);
 
 	/* Call the state save setup code in machine/decocass.c */
-	decocass_machine_state_save_init(machine);
+	decocass_machine_state_save_init(machine());
 	/* and in video/decocass.c, too */
-	decocass_video_state_save_init(machine);
+	decocass_video_state_save_init(machine());
 }
 
-static DRIVER_INIT( decocrom )
+DRIVER_INIT_MEMBER(decocass_state,decocrom)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	int romlength = state->memregion("user3")->bytes();
-	UINT8 *rom = state->memregion("user3")->base();
+	int romlength = memregion("user3")->bytes();
+	UINT8 *rom = memregion("user3")->base();
 	int i;
 
-	state->m_decrypted2 = auto_alloc_array(machine, UINT8, romlength);
+	m_decrypted2 = auto_alloc_array(machine(), UINT8, romlength);
 
 	/* standard init */
 	DRIVER_INIT_CALL(decocass);
 
 	/* decrypt the ROMs */
 	for (i = 0; i < romlength; i++)
-		state->m_decrypted2[i] = swap_bits_5_6(rom[i]);
+		m_decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
-	state->membank("bank1")->configure_entry(0, state->m_charram);
-	state->membank("bank1")->configure_entry(1, state->memregion("user3")->base());
-	state->membank("bank1")->configure_decrypted_entry(0, &state->m_decrypted[0x6000]);
-	state->membank("bank1")->configure_decrypted_entry(1, state->m_decrypted2);
-	state->membank("bank1")->set_entry(0);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
+	membank("bank1")->configure_entry(0, m_charram);
+	membank("bank1")->configure_entry(1, memregion("user3")->base());
+	membank("bank1")->configure_decrypted_entry(0, &m_decrypted[0x6000]);
+	membank("bank1")->configure_decrypted_entry(1, m_decrypted2);
+	membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));
 
-	state->save_pointer(NAME(state->m_decrypted2), romlength);
+	save_pointer(NAME(m_decrypted2), romlength);
 }
 
 static READ8_HANDLER( cdsteljn_input_r )
@@ -1684,14 +1682,14 @@ static WRITE8_HANDLER( cdsteljn_mux_w )
 		printf("%02x\n",data);
 }
 
-static DRIVER_INIT( cdsteljn )
+DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 {
 	/* standard init */
 	DRIVER_INIT_CALL(decocass);
 
 	/* install custom mahjong panel */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe413, 0xe413, FUNC(cdsteljn_mux_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe600, 0xe6ff, FUNC(cdsteljn_input_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe413, 0xe413, FUNC(cdsteljn_mux_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe600, 0xe6ff, FUNC(cdsteljn_input_r));
 }
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )

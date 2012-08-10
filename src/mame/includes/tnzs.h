@@ -81,6 +81,16 @@ public:
 	DECLARE_READ8_MEMBER(tnzs_ramrom_bank_r);
 	DECLARE_WRITE8_MEMBER(tnzs_ramrom_bank_w);
 
+	DECLARE_DRIVER_INIT(arknoid2);
+	DECLARE_DRIVER_INIT(extrmatn);
+	DECLARE_DRIVER_INIT(drtoppel);
+	DECLARE_DRIVER_INIT(kabukiz);
+	DECLARE_DRIVER_INIT(plumpop);
+	DECLARE_DRIVER_INIT(insectx);
+	DECLARE_DRIVER_INIT(tnzs);
+	DECLARE_DRIVER_INIT(kageki);
+	DECLARE_DRIVER_INIT(chukatai);
+	DECLARE_DRIVER_INIT(tnzsb);
 };
 
 
@@ -88,16 +98,6 @@ public:
 
 INTERRUPT_GEN( arknoid2_interrupt );
 
-DRIVER_INIT( plumpop );
-DRIVER_INIT( extrmatn );
-DRIVER_INIT( arknoid2 );
-DRIVER_INIT( drtoppel );
-DRIVER_INIT( chukatai );
-DRIVER_INIT( tnzs );
-DRIVER_INIT( tnzsb );
-DRIVER_INIT( kabukiz );
-DRIVER_INIT( insectx );
-DRIVER_INIT( kageki );
 
 MACHINE_START( tnzs );
 MACHINE_RESET( tnzs );

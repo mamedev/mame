@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE16_MEMBER(batman_atarivc_w);
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
+	DECLARE_DRIVER_INIT(batman);
 };
 
 

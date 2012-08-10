@@ -381,9 +381,9 @@ ROM_END
 
 
 
-static DRIVER_INIT( goindol )
+DRIVER_INIT_MEMBER(goindol_state,goindol)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 
 	/* I hope that's all patches to avoid protection */
@@ -415,4 +415,4 @@ static DRIVER_INIT( goindol )
 GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (World)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (US)",    GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (Korea)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1987, homo,     goindol, goindol, homo, goindol_state,    0,       ROT90, "bootleg", "Homo", GAME_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo, driver_device,    0,       ROT90, "bootleg", "Homo", GAME_SUPPORTS_SAVE )

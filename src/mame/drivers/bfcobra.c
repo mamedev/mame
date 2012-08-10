@@ -296,6 +296,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
 	DECLARE_READ_LINE_MEMBER(data_acia_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
+	DECLARE_DRIVER_INIT(bfcobra);
 };
 
 
@@ -1696,9 +1697,8 @@ static ACIA6850_INTERFACE( data_acia_if )
 
 
 /* TODO: Driver vs Machine Init */
-static DRIVER_INIT( bfcobra )
+DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 {
-	bfcobra_state *state = machine.driver_data<bfcobra_state>();
 	/*
         6809 ROM address and data lines are scrambled.
         This is the same scrambling as Scorpion 2.
@@ -1710,8 +1710,8 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *rom;
 	UINT8 *tmp;
 
-	tmp = auto_alloc_array(machine, UINT8, 0x8000);
-	rom = machine.root_device().memregion("audiocpu")->base() + 0x8000;
+	tmp = auto_alloc_array(machine(), UINT8, 0x8000);
+	rom = machine().root_device().memregion("audiocpu")->base() + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1730,35 +1730,35 @@ static DRIVER_INIT( bfcobra )
 		rom[addr] = data;
 	}
 
-	auto_free(machine, tmp);
+	auto_free(machine(), tmp);
 
-	init_ram(machine);
+	init_ram(machine());
 
-	state->m_bank_data[0] = 1;
-	state->m_bank_data[1] = 0;
-	state->m_bank_data[2] = 0;
-	state->m_bank_data[3] = 0;
+	m_bank_data[0] = 1;
+	m_bank_data[1] = 0;
+	m_bank_data[2] = 0;
+	m_bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());
+	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
-	state->m_data_r = 1;
+	m_data_r = 1;
 
 	/* Finish this */
-	state_save_register_global(machine, state->m_z80_m6809_line);
-	state_save_register_global(machine, state->m_m6809_z80_line);
-	state_save_register_global(machine, state->m_data_r);
-	state_save_register_global(machine, state->m_data_t);
-	state_save_register_global(machine, state->m_h_scroll);
-	state_save_register_global(machine, state->m_v_scroll);
-	state_save_register_global(machine, state->m_flip_8);
-	state_save_register_global(machine, state->m_flip_22);
-	state_save_register_global(machine, state->m_z80_int);
-	state_save_register_global(machine, state->m_z80_inten);
-	state_save_register_global_array(machine, state->m_bank_data);
-	state_save_register_global_pointer(machine, state->m_work_ram, 0xc0000);
-	state_save_register_global_pointer(machine, state->m_video_ram, 0x20000);
+	state_save_register_global(machine(), m_z80_m6809_line);
+	state_save_register_global(machine(), m_m6809_z80_line);
+	state_save_register_global(machine(), m_data_r);
+	state_save_register_global(machine(), m_data_t);
+	state_save_register_global(machine(), m_h_scroll);
+	state_save_register_global(machine(), m_v_scroll);
+	state_save_register_global(machine(), m_flip_8);
+	state_save_register_global(machine(), m_flip_22);
+	state_save_register_global(machine(), m_z80_int);
+	state_save_register_global(machine(), m_z80_inten);
+	state_save_register_global_array(machine(), m_bank_data);
+	state_save_register_global_pointer(machine(), m_work_ram, 0xc0000);
+	state_save_register_global_pointer(machine(), m_video_ram, 0x20000);
 }
 
 /* TODO */

@@ -1782,35 +1782,33 @@ static void cps2_gfx_decode( running_machine &machine )
 }
 
 
-DRIVER_INIT( cps1 )
+DRIVER_INIT_MEMBER(cps_state,cps1)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	cps1_gfx_decode(machine);
+	cps1_gfx_decode(machine());
 
-	state->m_scanline1 = 0;
-	state->m_scanline2 = 0;
-	state->m_scancalls = 0;
-	state->m_last_sprite_offset = 0;
-	state->m_pri_ctrl = 0;
-	state->m_objram_bank = 0;
+	m_scanline1 = 0;
+	m_scanline2 = 0;
+	m_scancalls = 0;
+	m_last_sprite_offset = 0;
+	m_pri_ctrl = 0;
+	m_objram_bank = 0;
 }
 
 
 
-DRIVER_INIT( cps2_video )
+DRIVER_INIT_MEMBER(cps_state,cps2_video)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
-	cps2_gfx_decode(machine);
+	cps2_gfx_decode(machine());
 
-	state->m_scanline1 = 262;
-	state->m_scanline2 = 262;
-	state->m_scancalls = 0;
-	state->m_last_sprite_offset = 0;
-	state->m_cps2_last_sprite_offset = 0;
-	state->m_pri_ctrl = 0;
-	state->m_objram_bank = 0;
+	m_scanline1 = 262;
+	m_scanline2 = 262;
+	m_scancalls = 0;
+	m_last_sprite_offset = 0;
+	m_cps2_last_sprite_offset = 0;
+	m_pri_ctrl = 0;
+	m_objram_bank = 0;
 }
 
 

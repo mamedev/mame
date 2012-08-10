@@ -530,13 +530,13 @@ ROM_START( metrocrsa )
 ROM_END
 
 
-static DRIVER_INIT( baraduke )
+DRIVER_INIT_MEMBER(baraduke_state,baraduke)
 {
 	UINT8 *rom;
 	int i;
 
 	/* unpack the third tile ROM */
-	rom = machine.root_device().memregion("gfx2")->base() + 0x8000;
+	rom = machine().root_device().memregion("gfx2")->base() + 0x8000;
 	for (i = 0x2000;i < 0x4000;i++)
 	{
 		rom[i + 0x2000] = rom[i];

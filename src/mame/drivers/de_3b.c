@@ -25,6 +25,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(de_3b);
 };
 
 
@@ -39,7 +41,7 @@ void de_3b_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( de_3b )
+DRIVER_INIT_MEMBER(de_3b_state,de_3b)
 {
 }
 

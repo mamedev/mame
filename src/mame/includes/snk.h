@@ -140,6 +140,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
 	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+	DECLARE_DRIVER_INIT(countryc);
 };
 
 

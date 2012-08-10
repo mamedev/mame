@@ -697,8 +697,8 @@ ROM_START( bounty )
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
-GAME( 1983, zodiack,  0, zodiack, zodiack, zodiack_state,  0, ROT270, "Orca (Esco Trading Co)",                           "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
-GAME( 1983, dogfight, 0, zodiack, dogfight, zodiack_state, 0, ROT270, "Orca / Thunderbolt",                               "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
-GAME( 1982, moguchan, 0, percuss, moguchan, percuss_state, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  "Moguchan", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0, percuss, percuss, percuss_state,  0, ROT270, "Orca (bootleg?)",                                  "The Percussor", GAME_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0, percuss, bounty, percuss_state,   0, ROT180, "Orca",                                             "The Bounty", GAME_SUPPORTS_SAVE )
+GAME( 1983, zodiack,  0, zodiack, zodiack, driver_device,  0, ROT270, "Orca (Esco Trading Co)",                           "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
+GAME( 1983, dogfight, 0, zodiack, dogfight, driver_device, 0, ROT270, "Orca / Thunderbolt",                               "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
+GAME( 1982, moguchan, 0, percuss, moguchan, driver_device, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  "Moguchan", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0, percuss, percuss, driver_device,  0, ROT270, "Orca (bootleg?)",                                  "The Percussor", GAME_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0, percuss, bounty, driver_device,   0, ROT180, "Orca",                                             "The Bounty", GAME_SUPPORTS_SAVE )

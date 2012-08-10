@@ -14,6 +14,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mustache_videoram_w);
 	DECLARE_WRITE8_MEMBER(mustache_video_control_w);
 	DECLARE_WRITE8_MEMBER(mustache_scroll_w);
+	DECLARE_DRIVER_INIT(mustache);
 };
 
 

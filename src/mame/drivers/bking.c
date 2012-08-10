@@ -818,6 +818,6 @@ ROM_START( bking3 )
 ROM_END
 
 
-GAME( 1982, bking,  0, bking,  bking, bking_state,  0, ROT270, "Taito Corporation", "Birdie King", GAME_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 2", GAME_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 3", GAME_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking, driver_device,  0, ROT270, "Taito Corporation", "Birdie King", GAME_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 2", GAME_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 3", GAME_SUPPORTS_SAVE )

@@ -3041,13 +3041,12 @@ ROM_START( bouldashj )
 ROM_END
 
 
-static DRIVER_INIT( midresb )
+DRIVER_INIT_MEMBER(dec0_state,midresb)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
 }
 
 /******************************************************************************/
@@ -3069,9 +3068,9 @@ GAME( 1989, ffantasya,  hippodrm, hippodrm, ffantasy, dec0_state, hippodrm, ROT0
 GAME( 1989, slyspy,     0,        slyspy,   slyspy, dec0_state,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
 GAME( 1989, slyspy2,    slyspy,   slyspy,   slyspy, dec0_state,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
 GAME( 1989, secretag,   slyspy,   slyspy,   slyspy, dec0_state,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )
-GAME( 1989, midres,     0,        midres,   midres, dec0_state,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
-GAME( 1989, midresu,    midres,   midres,   midresu, dec0_state,  0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
-GAME( 1989, midresj,    midres,   midres,   midresu, dec0_state,  0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
+GAME( 1989, midres,     0,        midres,   midres, driver_device,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
+GAME( 1989, midresu,    midres,   midres,   midresu, driver_device,  0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
+GAME( 1989, midresj,    midres,   midres,   midresu, driver_device,  0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
 GAME( 1990, bouldash,   0,        slyspy,   bouldash, dec0_state, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
 GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )
 
@@ -3083,9 +3082,9 @@ GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0
 
 // this is a common bootleg board
 GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
-GAME( 1989, ffantasybl, hippodrm, midres,   midres, dec0_state,   0,        ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
+GAME( 1989, ffantasybl, hippodrm, midres,   midres, driver_device,   0,        ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
 /* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,  robocop, dec0_automat_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", GAME_NOT_WORKING ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   slyspy,   secretab, slyspy, dec0_automat_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", GAME_NOT_WORKING )
+GAME( 1988, automat,    robocop,  automat,  robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", GAME_NOT_WORKING ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   slyspy,   secretab, slyspy, dec0_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", GAME_NOT_WORKING )

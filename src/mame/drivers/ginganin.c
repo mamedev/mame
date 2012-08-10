@@ -375,12 +375,12 @@ ROM_END
 
 
 
-static DRIVER_INIT( ginganin )
+DRIVER_INIT_MEMBER(ginganin_state,ginganin)
 {
 	UINT16 *rom;
 
 	/* main cpu patches */
-	rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;
@@ -388,7 +388,7 @@ static DRIVER_INIT( ginganin )
 
 	/* sound cpu patches */
 	/* let's clear the RAM: ROM starts at 0x4000 */
-	memset(machine.root_device().memregion("audiocpu")->base(), 0, 0x800);
+	memset(machine().root_device().memregion("audiocpu")->base(), 0, 0x800);
 }
 
 

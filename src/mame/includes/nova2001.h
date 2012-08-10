@@ -25,6 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+	DECLARE_DRIVER_INIT(raiders5);
+	DECLARE_DRIVER_INIT(pkunwar);
 };
 
 

@@ -71,6 +71,9 @@ public:
 	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
 	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
 	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
+	DECLARE_DRIVER_INIT(slither);
+	DECLARE_DRIVER_INIT(zookeep);
+	DECLARE_DRIVER_INIT(kram3);
 };
 
 

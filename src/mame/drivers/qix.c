@@ -1255,10 +1255,10 @@ static int kram3_decrypt(int address, int value)
 	return ((bits2 & 0xe) << 4) | ((bits1 & 0x8) << 1) | ((bits2 & 0x1) << 3) | ((bits1 & 0x7) << 0);
 }
 
-static DRIVER_INIT( kram3 )
+DRIVER_INIT_MEMBER(qix_state,kram3)
 {
-	address_space *mainspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *videospace = machine.device("videocpu")->memory().space(AS_PROGRAM);
+	address_space *mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *videospace = machine().device("videocpu")->memory().space(AS_PROGRAM);
 	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;
@@ -1278,9 +1278,9 @@ static DRIVER_INIT( kram3 )
      ********************************/
 
 	i = 0;
-	//patch = machine.root_device().memregion("user1")->base();
-	rom = machine.root_device().memregion("maincpu")->base();
-	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
+	//patch = machine().root_device().memregion("user1")->base();
+	rom = machine().root_device().memregion("maincpu")->base();
+	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 
 	mainspace->set_decrypted_region(0xa000, 0xffff, decrypted);
 
@@ -1291,9 +1291,9 @@ static DRIVER_INIT( kram3 )
 	}
 
 	i = 0;
-	//patch = machine.root_device().memregion("user2")->base();
-	rom = machine.root_device().memregion("videocpu")->base();
-	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
+	//patch = machine().root_device().memregion("user2")->base();
+	rom = machine().root_device().memregion("videocpu")->base();
+	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 
 	videospace->set_decrypted_region(0xa000, 0xffff, decrypted);
 
@@ -1305,16 +1305,16 @@ static DRIVER_INIT( kram3 )
 }
 
 
-static DRIVER_INIT( zookeep )
+DRIVER_INIT_MEMBER(qix_state,zookeep)
 {
 	/* configure the banking */
-	machine.root_device().membank("bank1")->configure_entry(0, machine.root_device().memregion("videocpu")->base() + 0xa000);
-	machine.root_device().membank("bank1")->configure_entry(1, machine.root_device().memregion("videocpu")->base() + 0x10000);
-	machine.root_device().membank("bank1")->set_entry(0);
+	machine().root_device().membank("bank1")->configure_entry(0, machine().root_device().memregion("videocpu")->base() + 0xa000);
+	machine().root_device().membank("bank1")->configure_entry(1, machine().root_device().memregion("videocpu")->base() + 0x10000);
+	machine().root_device().membank("bank1")->set_entry(0);
 }
 
 
-static DRIVER_INIT( slither )
+DRIVER_INIT_MEMBER(qix_state,slither)
 {
 }
 
@@ -1326,20 +1326,20 @@ static DRIVER_INIT( slither )
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix, qix_state,      0,       ROT270, "Taito America Corporation", "Qix (Rev 2)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
-GAME( 1981, qixa,     qix,      qix,      qix, qix_state,      0,       ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", GAME_SUPPORTS_SAVE )
-GAME( 1981, qixb,     qix,      qix,      qix, qix_state,      0,       ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", GAME_SUPPORTS_SAVE )
-GAME( 1981, qixo,     qix,      qix,      qix, qix_state,      0,       ROT270, "Taito America Corporation", "Qix (set 3, earlier)", GAME_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
-GAME( 1981, qix2,     qix,      qix,      qix, qix_state,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, qix_state, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
-GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, qix_state, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, qix_state, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
-GAME( 1982, kram,     0,        mcu,      kram, qix_state,     0,       ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram2,    kram,     mcu,      kram, qix_state,     0,       ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qix,      0,        qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (Rev 2)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qixa,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qixb,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qixo,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (set 3, earlier)", GAME_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
+GAME( 1981, qix2,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
+GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
+GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAME( 1982, kram,     0,        mcu,      kram, driver_device,     0,       ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kram2,    kram,     mcu,      kram, driver_device,     0,       ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram3,    kram,     qix,      kram, qix_state,     kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep,  0,        zookeep,  zookeep, qix_state,  zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep, qix_state,  zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep, qix_state,  zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1982, slither,  0,        slither,  slither, qix_state,  slither, ROT270, "Century II",                "Slither (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, slithera, slither,  slither,  slither, qix_state,  slither, ROT270, "Century II",                "Slither (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, complexx, 0,        qix,      complexx, qix_state, 0,       ROT270, "Taito America Corporation", "Complex X", GAME_SUPPORTS_SAVE )
+GAME( 1984, complexx, 0,        qix,      complexx, driver_device, 0,       ROT270, "Taito America Corporation", "Complex X", GAME_SUPPORTS_SAVE )

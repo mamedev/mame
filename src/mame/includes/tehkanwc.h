@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tehkanwc_portA_w);
 	DECLARE_WRITE8_MEMBER(tehkanwc_portB_w);
 	DECLARE_WRITE8_MEMBER(msm_reset_w);
+	DECLARE_DRIVER_INIT(teedoff);
 };
 
 

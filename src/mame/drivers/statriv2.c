@@ -98,6 +98,12 @@ public:
 	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
+	DECLARE_DRIVER_INIT(addr_xlh);
+	DECLARE_DRIVER_INIT(addr_lhx);
+	DECLARE_DRIVER_INIT(addr_lmh);
+	DECLARE_DRIVER_INIT(addr_lmhe);
+	DECLARE_DRIVER_INIT(addr_xhl);
+	DECLARE_DRIVER_INIT(laserdisc);
 };
 
 
@@ -1001,42 +1007,38 @@ ROM_END
  *************************************/
 
 /* question address is stored as L/H/X (low/high/don't care) */
-static DRIVER_INIT( addr_lhx )
+DRIVER_INIT_MEMBER(statriv2_state,addr_lhx)
 {
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_question_offset_low = 0;
-	state->m_question_offset_mid = 1;
-	state->m_question_offset_high = 0xff;
+	m_question_offset_low = 0;
+	m_question_offset_mid = 1;
+	m_question_offset_high = 0xff;
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
-static DRIVER_INIT( addr_xlh )
+DRIVER_INIT_MEMBER(statriv2_state,addr_xlh)
 {
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_question_offset_low = 1;
-	state->m_question_offset_mid = 2;
-	state->m_question_offset_high = 0xff;
+	m_question_offset_low = 1;
+	m_question_offset_mid = 2;
+	m_question_offset_high = 0xff;
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
-static DRIVER_INIT( addr_xhl )
+DRIVER_INIT_MEMBER(statriv2_state,addr_xhl)
 {
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_question_offset_low = 2;
-	state->m_question_offset_mid = 1;
-	state->m_question_offset_high = 0xff;
+	m_question_offset_low = 2;
+	m_question_offset_mid = 1;
+	m_question_offset_high = 0xff;
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
-static DRIVER_INIT( addr_lmh )
+DRIVER_INIT_MEMBER(statriv2_state,addr_lmh)
 {
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_question_offset_low = 0;
-	state->m_question_offset_mid = 1;
-	state->m_question_offset_high = 2;
+	m_question_offset_low = 0;
+	m_question_offset_mid = 1;
+	m_question_offset_high = 2;
 }
 
-static DRIVER_INIT( addr_lmhe )
+DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 {
 	/***************************************************\
     *                                                   *
@@ -1100,8 +1102,8 @@ static DRIVER_INIT( addr_lmhe )
     *                                                   *
     \***************************************************/
 
-	UINT8 *qrom = machine.root_device().memregion("questions")->base();
-	UINT32 length = machine.root_device().memregion("questions")->bytes();
+	UINT8 *qrom = machine().root_device().memregion("questions")->base();
+	UINT32 length = machine().root_device().memregion("questions")->bytes();
 	UINT32 address;
 
 	for (address = 0; address < length; address++)
@@ -1125,11 +1127,10 @@ WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
 	mame_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 }
 
-static DRIVER_INIT( laserdisc )
+DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 {
-	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	iospace->install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), state), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), state));
+	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
+	iospace->install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), this), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), this));
 }
 
 
@@ -1140,9 +1141,9 @@ static DRIVER_INIT( laserdisc )
  *
  *************************************/
 
-GAME( 1981, statusbj, 0,        statriv2,  statusbj, statriv2_state, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        funcsino,  funcsino, statriv2_state, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", GAME_SUPPORTS_SAVE )
-GAME( 1981, tripdraw, 0,        statriv2,  funcsino, statriv2_state, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", GAME_SUPPORTS_SAVE )
+GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
 GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )

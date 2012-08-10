@@ -233,6 +233,7 @@ public:
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
+	DECLARE_DRIVER_INIT(omegrace);
 };
 
 
@@ -587,10 +588,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( omegrace )
+DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 {
-	int i, len = machine.root_device().memregion("user1")->bytes();
-	UINT8 *prom = machine.root_device().memregion("user1")->base();
+	int i, len = machine().root_device().memregion("user1")->bytes();
+	UINT8 *prom = machine().root_device().memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
      * lines swapped before going into the decoder.

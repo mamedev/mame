@@ -969,11 +969,11 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 	machine.save().register_postload(save_prepost_delegate(FUNC(hotgmck_pcm_bank_postload), &machine));
 }
 
-static DRIVER_INIT( hotgmck )
+DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
-	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	install_hotgmck_pcm_bank(machine());	// Banked PCM ROM
 }
 
 
@@ -983,6 +983,6 @@ GAME( 1998, hgkairak, 0,        ps4big,    hotgmck, psikyo4_state,  hotgmck,  RO
 GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck, psikyo4_state,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", 0 )
 GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck, psikyo4_state,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", 0 )
 GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck, psikyo4_state,  hotgmck,  ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", 0 )
-GAME( 2000, loderndf, 0,        ps4small,  loderndf, psikyo4_state, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
-GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, psikyo4_state, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, psikyo4_state, 0,        ROT0,   "Psikyo / Moss", "Quiz de Idol! Hot Debut (Japan)", 0 )
+GAME( 2000, loderndf, 0,        ps4small,  loderndf, driver_device, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
+GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, driver_device, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, driver_device, 0,        ROT0,   "Psikyo / Moss", "Quiz de Idol! Hot Debut (Japan)", 0 )

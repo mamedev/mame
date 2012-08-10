@@ -137,6 +137,7 @@ public:
 	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
 	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
+	DECLARE_DRIVER_INIT(darkhors);
 };
 
 
@@ -989,7 +990,7 @@ ROM_END
 
 ***************************************************************************/
 
-static DRIVER_INIT( darkhors )
+DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )
@@ -999,20 +1000,20 @@ static DRIVER_INIT( darkhors )
 	// the eeprom contains the game ID, which must be valid for it to boot
 	// is there a way (key sequence) to reprogram it??
 	// I bet the original sets need similar get further in their boot sequence
-	UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
+	UINT8  *eeprom = (UINT8 *)  machine().root_device().memregion("eeprom")->base();
 	if (eeprom != NULL)	
 	{
-		size_t len = machine.root_device().memregion("eeprom")->bytes();
-		UINT8* temp = (UINT8*)auto_alloc_array(machine, UINT8, len);
+		size_t len = machine().root_device().memregion("eeprom")->bytes();
+		UINT8* temp = (UINT8*)auto_alloc_array(machine(), UINT8, len);
 		int i;
 		for (i = 0; i < len; i++)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
 		
 		memcpy(eeprom, temp, len);
-		auto_free(machine, temp);
+		auto_free(machine(), temp);
 	}
 }
 
-GAME( 199?, jclub2,   0,      jclub2,  darkhors, darkhors_state, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, jclub2o,  jclub2, jclub2o, darkhors, darkhors_state, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, jclub2,   0,      jclub2,  darkhors, driver_device, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, jclub2o,  jclub2, jclub2o, darkhors, driver_device, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, darkhors, jclub2, darkhors,darkhors, darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )

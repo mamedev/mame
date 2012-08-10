@@ -765,7 +765,7 @@ ROM_END
 
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_IS_SKELETON)
-GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_IS_SKELETON)
-GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_IS_SKELETON)
-GAME(2001, arctthndult, arctthnd, midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", GAME_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_IS_SKELETON)
+GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_IS_SKELETON)
+GAME(2001, arctthndult, arctthnd, midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", GAME_IS_SKELETON)

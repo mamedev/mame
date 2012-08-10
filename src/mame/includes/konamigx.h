@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
+	DECLARE_DRIVER_INIT(konamigx);
 };
 
 

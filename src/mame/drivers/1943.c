@@ -641,21 +641,20 @@ ROM_START( 1943b )
 ROM_END
 
 
-static DRIVER_INIT( 1943 )
+DRIVER_INIT_MEMBER(_1943_state,1943)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 READ8_MEMBER(_1943_state::_1943b_c007_r){ return 0; }
 
-static DRIVER_INIT( 1943b )
+DRIVER_INIT_MEMBER(_1943_state,1943b)
 {
-	_1943_state *state = machine.driver_data<_1943_state>();
-	DRIVER_INIT_CALL( 1943 );
+	DRIVER_INIT_CALL(1943);
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
 	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 
 }
 

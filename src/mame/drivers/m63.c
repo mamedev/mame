@@ -175,6 +175,8 @@ public:
 	DECLARE_READ8_MEMBER(snddata_r);
 	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_DRIVER_INIT(wilytowr);
+	DECLARE_DRIVER_INIT(fghtbskt);
 };
 
 
@@ -1017,16 +1019,14 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb_b.11e",     0x0200, 0x0100, CRC(fca5bf0e) SHA1(5846f43aa2906cac58e300fdab197b99f896e3ef) )
 ROM_END
 
-static DRIVER_INIT( wilytowr )
+DRIVER_INIT_MEMBER(m63_state,wilytowr)
 {
-	m63_state *state = machine.driver_data<m63_state>();
-	state->m_sy_offset = 238;
+	m_sy_offset = 238;
 }
 
-static DRIVER_INIT( fghtbskt )
+DRIVER_INIT_MEMBER(m63_state,fghtbskt)
 {
-	m63_state *state = machine.driver_data<m63_state>();
-	state->m_sy_offset = 240;
+	m_sy_offset = 240;
 }
 
 GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, wilytowr, ROT180, "Irem",                    "Wily Tower", GAME_SUPPORTS_SAVE )

@@ -107,6 +107,14 @@ public:
 	DECLARE_READ32_MEMBER(midvplus_misc_r);
 	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
 	DECLARE_READ32_MEMBER(generic_speedup_r);
+	DECLARE_DRIVER_INIT(crusnu40);
+	DECLARE_DRIVER_INIT(crusnu21);
+	DECLARE_DRIVER_INIT(crusnwld);
+	DECLARE_DRIVER_INIT(wargods);
+	DECLARE_DRIVER_INIT(offroadc);
+	DECLARE_DRIVER_INIT(crusnusa);
+	void init_crusnwld_common(offs_t speedup);
+	void init_crusnusa_common(offs_t speedup);
 };
 
 

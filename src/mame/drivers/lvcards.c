@@ -575,6 +575,6 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,		0, lvcards,  lvcards, lvcards_state,  0, ROT0, "Tehkan", "Lovely Cards", 0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker, lvcards_state,  0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk,		0, ponttehk, ponttehk, lvcards_state, 0, ROT0, "Tehkan", "Pontoon (Tehkan)", 0 )
+GAME( 1985, lvcards,		0, lvcards,  lvcards, driver_device,  0, ROT0, "Tehkan", "Lovely Cards", 0 )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker, driver_device,  0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
+GAME( 1985, ponttehk,		0, ponttehk, ponttehk, driver_device, 0, ROT0, "Tehkan", "Pontoon (Tehkan)", 0 )

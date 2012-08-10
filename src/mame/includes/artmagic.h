@@ -42,6 +42,10 @@ public:
 	DECLARE_READ16_MEMBER(artmagic_blitter_r);
 	DECLARE_WRITE16_MEMBER(artmagic_blitter_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	DECLARE_DRIVER_INIT(shtstar);
+	DECLARE_DRIVER_INIT(cheesech);
+	DECLARE_DRIVER_INIT(ultennis);
+	DECLARE_DRIVER_INIT(stonebal);
 };
 
 

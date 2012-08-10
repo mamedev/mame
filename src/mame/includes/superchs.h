@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE32_MEMBER(superchs_stick_w);
 	DECLARE_READ32_MEMBER(main_cycle_r);
 	DECLARE_READ16_MEMBER(sub_cycle_r);
+	DECLARE_DRIVER_INIT(superchs);
 };
 
 

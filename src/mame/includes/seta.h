@@ -158,6 +158,19 @@ public:
 	DECLARE_WRITE16_MEMBER(magspeed_lights_w);
 	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_READ8_MEMBER(dsw2_r);
+	DECLARE_DRIVER_INIT(downtown);
+	DECLARE_DRIVER_INIT(rezon);
+	DECLARE_DRIVER_INIT(twineagl);
+	DECLARE_DRIVER_INIT(zombraid);
+	DECLARE_DRIVER_INIT(crazyfgt);
+	DECLARE_DRIVER_INIT(inttoote);
+	DECLARE_DRIVER_INIT(metafox);
+	DECLARE_DRIVER_INIT(arbalest);
+	DECLARE_DRIVER_INIT(inttootea);
+	DECLARE_DRIVER_INIT(wiggie);
+	DECLARE_DRIVER_INIT(blandia);
+	DECLARE_DRIVER_INIT(kiwame);
+	DECLARE_DRIVER_INIT(eightfrc);
 };
 
 /*----------- defined in video/seta.c -----------*/

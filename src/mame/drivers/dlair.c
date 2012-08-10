@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE8_MEMBER(laserdisc_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
+	DECLARE_DRIVER_INIT(fixed);
+	DECLARE_DRIVER_INIT(variable);
 };
 
 
@@ -968,17 +970,15 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( fixed )
+DRIVER_INIT_MEMBER(dlair_state,fixed)
 {
-//  dlair_state *state = machine.driver_data<dlair_state>();
-//  state->m_laserdisc_type = LASERDISC_TYPE_FIXED;
+//  m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
-static DRIVER_INIT( variable )
+DRIVER_INIT_MEMBER(dlair_state,variable)
 {
-//  dlair_state *state = machine.driver_data<dlair_state>();
-//  state->m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
+//  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
 

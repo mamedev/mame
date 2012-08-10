@@ -137,6 +137,7 @@ public:
 	DECLARE_WRITE8_MEMBER(looping_sound_sw);
 	DECLARE_WRITE8_MEMBER(ay_enable_w);
 	DECLARE_WRITE8_MEMBER(speech_enable_w);
+	DECLARE_DRIVER_INIT(looping);
 };
 
 
@@ -903,21 +904,20 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( looping )
+DRIVER_INIT_MEMBER(looping_state,looping)
 {
-	looping_state *state = machine.driver_data<looping_state>();
-	int length = state->memregion("maincpu")->bytes();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
-	state->m_cop_io = auto_alloc_array(machine, UINT8, 0x08);
+	m_cop_io = auto_alloc_array(machine(), UINT8, 0x08);
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));
 }
 
 

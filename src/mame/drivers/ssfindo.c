@@ -241,6 +241,10 @@ public:
 	DECLARE_READ32_MEMBER(randomized_r);
 	DECLARE_READ32_MEMBER(tetfight_unk_r);
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
+	DECLARE_DRIVER_INIT(common);
+	DECLARE_DRIVER_INIT(ssfindo);
+	DECLARE_DRIVER_INIT(ppcar);
+	DECLARE_DRIVER_INIT(tetfight);
 };
 
 
@@ -850,39 +854,35 @@ ROM_START( tetfight )
 	ROM_LOAD( "u15",		0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) )
 ROM_END
 
-static DRIVER_INIT(common)
+DRIVER_INIT_MEMBER(ssfindo_state,common)
 {
-	ssfindo_state *state = machine.driver_data<ssfindo_state>();
 	ssfindo_speedup = 0;
-	state->m_PS7500timer0 = machine.scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
-	state->m_PS7500timer1 = machine.scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
+	m_PS7500timer0 = machine().scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
+	m_PS7500timer1 = machine().scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
 
 }
 
-static DRIVER_INIT(ssfindo)
+DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
 {
-	ssfindo_state *state = machine.driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	state->m_flashType=0;
+	m_flashType=0;
 	ssfindo_speedup = ssfindo_speedups;
-	state->m_iocr_hack=0;
+	m_iocr_hack=0;
 }
 
-static DRIVER_INIT(ppcar)
+DRIVER_INIT_MEMBER(ssfindo_state,ppcar)
 {
-	ssfindo_state *state = machine.driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	state->m_flashType=1;
+	m_flashType=1;
 	ssfindo_speedup = ppcar_speedups;
-	state->m_iocr_hack=0;
+	m_iocr_hack=0;
 }
 
-static DRIVER_INIT(tetfight)
+DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
 {
-	ssfindo_state *state = machine.driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	state->m_flashType=0;
-	state->m_iocr_hack=1;
+	m_flashType=0;
+	m_iocr_hack=1;
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo, ssfindo_state,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )

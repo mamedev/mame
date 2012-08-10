@@ -330,6 +330,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ambush,  0,      ambush,   ambusht, ambush_state,  0, ROT0, "Tecfri",                            "Ambush", GAME_SUPPORTS_SAVE )
-GAME( 1983, ambushj, ambush, ambush,   ambush, ambush_state,   0, ROT0, "Tecfri (Nippon Amuse license)",     "Ambush (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ambushv, ambush, ambush,   ambush, ambush_state,   0, ROT0, "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambush,  0,      ambush,   ambusht, driver_device,  0, ROT0, "Tecfri",                            "Ambush", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambushj, ambush, ambush,   ambush, driver_device,   0, ROT0, "Tecfri (Nippon Amuse license)",     "Ambush (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambushv, ambush, ambush,   ambush, driver_device,   0, ROT0, "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)", GAME_SUPPORTS_SAVE )

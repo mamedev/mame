@@ -40,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(starfire_colorram_r);
 	DECLARE_WRITE8_MEMBER(starfire_videoram_w);
 	DECLARE_READ8_MEMBER(starfire_videoram_r);
+	DECLARE_DRIVER_INIT(starfire);
+	DECLARE_DRIVER_INIT(fireone);
 };
 
 /*----------- defined in video/starfire.c -----------*/

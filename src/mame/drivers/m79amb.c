@@ -77,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
 	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
 	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
+	DECLARE_DRIVER_INIT(m79amb);
 };
 
 
@@ -287,10 +288,9 @@ static const UINT8 lut_pos[0x20] = {
 };
 
 
-static DRIVER_INIT( m79amb )
+DRIVER_INIT_MEMBER(m79amb_state,m79amb)
 {
-	m79amb_state *state = machine.driver_data<m79amb_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i, j;
 
 	/* PROM data is active low */
@@ -305,7 +305,7 @@ static DRIVER_INIT( m79amb )
 		{
 			if (i <= lut_cross[j])
 			{
-				state->m_lut_gun1[i] = lut_pos[j];
+				m_lut_gun1[i] = lut_pos[j];
 				break;
 			}
 		}
@@ -315,7 +315,7 @@ static DRIVER_INIT( m79amb )
 		{
 			if (i >= (253 - lut_cross[j]))
 			{
-				state->m_lut_gun2[i] = lut_pos[j];
+				m_lut_gun2[i] = lut_pos[j];
 				break;
 			}
 		}

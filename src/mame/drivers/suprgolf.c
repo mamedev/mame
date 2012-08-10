@@ -64,6 +64,7 @@ public:
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(suprgolf_writeA);
 	DECLARE_WRITE8_MEMBER(suprgolf_writeB);
+	DECLARE_DRIVER_INIT(suprgolf);
 };
 
 static TILE_GET_INFO( get_tile_info )
@@ -641,9 +642,9 @@ ROM_END
 
 
 
-static DRIVER_INIT( suprgolf )
+DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
 {
-	UINT8 *ROM = machine.root_device().memregion("user2")->base();
+	UINT8 *ROM = machine().root_device().memregion("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
@@ -651,4 +652,4 @@ static DRIVER_INIT( suprgolf )
 }
 
 GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state,  suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state,  0,        ROT0, "Nasco", "Albatross (US Prototype?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, driver_device,  0,        ROT0, "Nasco", "Albatross (US Prototype?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

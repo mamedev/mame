@@ -56,6 +56,8 @@ public:
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_DRIVER_INIT(thndzone);
+	DECLARE_DRIVER_INIT(dassault);
 };
 
 

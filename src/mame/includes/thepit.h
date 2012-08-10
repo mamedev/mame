@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(thepit_flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(intrepid_graphics_bank_w);
 	DECLARE_READ8_MEMBER(thepit_input_port_0_r);
+	DECLARE_DRIVER_INIT(rtriv);
 };
 
 

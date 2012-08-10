@@ -30,6 +30,7 @@ public:
 	DECLARE_READ16_MEMBER(eolith16_custom_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(vram_r);
+	DECLARE_DRIVER_INIT(eolith16);
 };
 
 
@@ -260,9 +261,9 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-static DRIVER_INIT( eolith16 )
+DRIVER_INIT_MEMBER(eolith16_state,eolith16)
 {
-	init_eolith_speedup(machine);
+	init_eolith_speedup(machine());
 }
 
 GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, eolith16, ROT0, "Eolith", "KlonDike+", 0 )

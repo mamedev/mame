@@ -80,6 +80,14 @@ public:
 	DECLARE_READ8_MEMBER(suna8_banked_spriteram_r);
 	DECLARE_WRITE8_MEMBER(suna8_spriteram_w);
 	DECLARE_WRITE8_MEMBER(suna8_banked_spriteram_w);
+	DECLARE_DRIVER_INIT(brickzn3);
+	DECLARE_DRIVER_INIT(starfigh);
+	DECLARE_DRIVER_INIT(hardhea2);
+	DECLARE_DRIVER_INIT(hardhedb);
+	DECLARE_DRIVER_INIT(sparkman);
+	DECLARE_DRIVER_INIT(brickzn);
+	DECLARE_DRIVER_INIT(hardhead);
+	DECLARE_DRIVER_INIT(suna8);
 };
 
 

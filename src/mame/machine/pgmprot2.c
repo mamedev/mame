@@ -182,27 +182,27 @@ static WRITE32_HANDLER( kov2_arm_region_w )
 	COMBINE_DATA(&state->m_arm7_shareram[0x138/4]);
 }
 
-DRIVER_INIT( kov2 )
+DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
 {
-	pgm_basic_init(machine);
-	pgm_kov2_decrypt(machine);
-	kov2_latch_init(machine);
+	pgm_basic_init(machine());
+	pgm_kov2_decrypt(machine());
+	kov2_latch_init(machine());
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
 }
 
 
-DRIVER_INIT( kov2p )
+DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2p)
 {
 	// this hacks the identification of the kov2 rom to return the string required for kov2p
 	// this isn't guaranteed to work properly (and definitely wouldn't on real hardware due to the internal
 	// ROM uploading the encryption table)  The internal ROM should be dumped properly.
-	pgm_basic_init(machine);
-	pgm_kov2p_decrypt(machine);
-	kov2_latch_init(machine);
+	pgm_basic_init(machine());
+	pgm_kov2p_decrypt(machine());
+	kov2_latch_init(machine());
 
-	UINT8 *mem8 = (UINT8 *)machine.root_device().memregion("user1")->base();
+	UINT8 *mem8 = (UINT8 *)machine().root_device().memregion("user1")->base();
 	mem8[0xDE] = 0xC0;
 	mem8[0xDF] = 0x46;
 	mem8[0x4ED8] = 0xA8;// B0
@@ -223,7 +223,7 @@ DRIVER_INIT( kov2p )
 	mem8[0x1FFFFD] = 0x99;
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
 }
 
 static WRITE32_HANDLER( martmast_arm_region_w )
@@ -236,14 +236,14 @@ static WRITE32_HANDLER( martmast_arm_region_w )
 }
 
 
-DRIVER_INIT( martmast )
+DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
 {
-	pgm_basic_init(machine);
-	pgm_mm_decrypt(machine);
-	kov2_latch_init(machine);
+	pgm_basic_init(machine());
+	pgm_mm_decrypt(machine());
+	kov2_latch_init(machine());
 
 	// we only have a USA / CHINA internal ROMs dumped for now, allow us to override that for debugging purposes.
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(martmast_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(martmast_arm_region_w));
 }
 
 
@@ -291,32 +291,32 @@ static READ16_HANDLER( ddp2_main_speedup_r )
 
 }
 
-DRIVER_INIT( ddp2 )
+DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
 {
-	pgm_basic_init(machine);
-	pgm_ddp2_decrypt(machine);
-	kov2_latch_init(machine);
+	pgm_basic_init(machine());
+	pgm_ddp2_decrypt(machine());
+	kov2_latch_init(machine());
 
 	// we only have a Japan internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
 
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1800300c, 0x1800300f, FUNC(ddp2_speedup_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80ee54, 0x80ee55, FUNC(ddp2_main_speedup_r));
+	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1800300c, 0x1800300f, FUNC(ddp2_speedup_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80ee54, 0x80ee55, FUNC(ddp2_main_speedup_r));
 }
 
 
-DRIVER_INIT( dw2001 )
+DRIVER_INIT_MEMBER(pgm_arm_type2_state,dw2001)
 {
-	pgm_basic_init(machine);
-	kov2_latch_init(machine);
-	pgm_mm_decrypt(machine); // encryption is the same as martial masters
+	pgm_basic_init(machine());
+	kov2_latch_init(machine());
+	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 
-DRIVER_INIT( dwpc )
+DRIVER_INIT_MEMBER(pgm_arm_type2_state,dwpc)
 {
-	pgm_basic_init(machine);
-	kov2_latch_init(machine);
-	pgm_mm_decrypt(machine); // encryption is the same as martial masters
+	pgm_basic_init(machine());
+	kov2_latch_init(machine());
+	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 
 INPUT_PORTS_START( ddp2 )

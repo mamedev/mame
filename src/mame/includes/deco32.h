@@ -97,6 +97,10 @@ public:
 	DECLARE_READ32_MEMBER(dragngun_eeprom_r);
 	DECLARE_WRITE32_MEMBER(dragngun_eeprom_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_DRIVER_INIT(tattass);
+	DECLARE_DRIVER_INIT(nslasher);
+	DECLARE_DRIVER_INIT(captaven);
+	DECLARE_DRIVER_INIT(fghthist);
 };
 
 class dragngun_state : public deco32_state
@@ -119,6 +123,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dragngun_lightgun_w);
 	DECLARE_WRITE32_MEMBER(dragngun_sprite_control_w);
 	DECLARE_WRITE32_MEMBER(dragngun_spriteram_dma_w);
+	DECLARE_DRIVER_INIT(dragngun);
+	DECLARE_DRIVER_INIT(lockload);
 };
 
 

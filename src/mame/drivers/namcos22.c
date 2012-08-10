@@ -5495,50 +5495,46 @@ static void alpine_init_common( running_machine &machine, int game_type )
 	state->m_motor_status = 2;
 }
 
-static DRIVER_INIT( alpiner )
+DRIVER_INIT_MEMBER(namcos22_state,alpiner)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	alpine_init_common(machine, NAMCOS22_ALPINE_RACER);
+	alpine_init_common(machine(), NAMCOS22_ALPINE_RACER);
 
-	install_130_speedup(machine);
+	install_130_speedup(machine());
 
-	state->m_keycus_id = 0x0187;
+	m_keycus_id = 0x0187;
 }
 
-static DRIVER_INIT( alpiner2 )
+DRIVER_INIT_MEMBER(namcos22_state,alpiner2)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	alpine_init_common(machine, NAMCOS22_ALPINE_RACER_2);
+	alpine_init_common(machine(), NAMCOS22_ALPINE_RACER_2);
 
-	install_130_speedup(machine);
+	install_130_speedup(machine());
 
-	state->m_keycus_id = 0x0187;
+	m_keycus_id = 0x0187;
 }
 
-static DRIVER_INIT( alpinesa )
+DRIVER_INIT_MEMBER(namcos22_state,alpinesa)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	alpine_init_common(machine, NAMCOS22_ALPINE_SURFER);
+	alpine_init_common(machine(), NAMCOS22_ALPINE_SURFER);
 
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler (0x200000, 0x200003, read32_delegate(FUNC(namcos22_state::alpinesa_prot_r),state));
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(namcos22_state::alpinesa_prot_w),state));
-	install_141_speedup(machine);
+	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler (0x200000, 0x200003, read32_delegate(FUNC(namcos22_state::alpinesa_prot_r),this));
+	m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(namcos22_state::alpinesa_prot_w),this));
+	install_141_speedup(machine());
 
-	state->m_keycus_id = 0x01a9;
+	m_keycus_id = 0x01a9;
 }
 
-static DRIVER_INIT( airco22 )
+DRIVER_INIT_MEMBER(namcos22_state,airco22)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_AIR_COMBAT22);
+	namcos22_init(machine(), NAMCOS22_AIR_COMBAT22);
 
 	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
-	state->m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::airco22_mcu_adc_r),state));
+	m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::airco22_mcu_adc_r),this));
 }
 
-static DRIVER_INIT( propcycl )
+DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 {
-   UINT32 *pROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
+   UINT32 *pROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;
@@ -5555,116 +5551,106 @@ static DRIVER_INIT( propcycl )
 //   pROM[0x22296/4] &= 0xffff0000;
 //   pROM[0x22296/4] |= 0x00004e75;
 
-	namcos22_init(machine, NAMCOS22_PROP_CYCLE);
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::propcycle_mcu_adc_r),state));
-	state->m_mcu->memory().space(AS_IO)->install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::propcycle_mcu_port5_w),state));
-	install_141_speedup(machine);
+	namcos22_init(machine(), NAMCOS22_PROP_CYCLE);
+	m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::propcycle_mcu_adc_r),this));
+	m_mcu->memory().space(AS_IO)->install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::propcycle_mcu_port5_w),this));
+	install_141_speedup(machine());
 }
 
-static DRIVER_INIT( ridgeraj )
+DRIVER_INIT_MEMBER(namcos22_state,ridgeraj)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_RIDGE_RACER);
+	namcos22_init(machine(), NAMCOS22_RIDGE_RACER);
 
-	install_c74_speedup(machine);
+	install_c74_speedup(machine());
 
-	state->m_keycus_id = 0x0172;
+	m_keycus_id = 0x0172;
 }
 
-static DRIVER_INIT( ridger2j )
+DRIVER_INIT_MEMBER(namcos22_state,ridger2j)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_RIDGE_RACER2);
+	namcos22_init(machine(), NAMCOS22_RIDGE_RACER2);
 
-	install_c74_speedup(machine);
+	install_c74_speedup(machine());
 
-	state->m_keycus_id = 0x0172;
+	m_keycus_id = 0x0172;
 }
 
-static DRIVER_INIT( acedrvr )
+DRIVER_INIT_MEMBER(namcos22_state,acedrvr)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_ACE_DRIVER);
+	namcos22_init(machine(), NAMCOS22_ACE_DRIVER);
 
-	install_c74_speedup(machine);
+	install_c74_speedup(machine());
 
-	state->m_keycus_id = 0x0173;
+	m_keycus_id = 0x0173;
 }
 
-static DRIVER_INIT( victlap )
+DRIVER_INIT_MEMBER(namcos22_state,victlap)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_VICTORY_LAP);
+	namcos22_init(machine(), NAMCOS22_VICTORY_LAP);
 
-	install_c74_speedup(machine);
+	install_c74_speedup(machine());
 
-	state->m_keycus_id = 0x0188;
+	m_keycus_id = 0x0188;
 }
 
-static DRIVER_INIT( raveracw )
+DRIVER_INIT_MEMBER(namcos22_state,raveracw)
 {
-	namcos22_init(machine, NAMCOS22_RAVE_RACER);
+	namcos22_init(machine(), NAMCOS22_RAVE_RACER);
 
-	install_c74_speedup(machine);
+	install_c74_speedup(machine());
 }
 
-static DRIVER_INIT( cybrcomm )
+DRIVER_INIT_MEMBER(namcos22_state,cybrcomm)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_CYBER_COMMANDO);
+	namcos22_init(machine(), NAMCOS22_CYBER_COMMANDO);
 
-	install_c74_speedup(machine);
+	install_c74_speedup(machine());
 
-	state->m_keycus_id = 0x0185;
+	m_keycus_id = 0x0185;
 }
 
-static DRIVER_INIT( cybrcyc )
+DRIVER_INIT_MEMBER(namcos22_state,cybrcyc)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_CYBER_CYCLES);
+	namcos22_init(machine(), NAMCOS22_CYBER_CYCLES);
 
-	state->m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),state));
-	install_130_speedup(machine);
+	m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
+	install_130_speedup(machine());
 
-	state->m_keycus_id = 0x0387;
+	m_keycus_id = 0x0387;
 }
 
-static DRIVER_INIT( timecris )
+DRIVER_INIT_MEMBER(namcos22_state,timecris)
 {
-	namcos22_init(machine, NAMCOS22_TIME_CRISIS);
+	namcos22_init(machine(), NAMCOS22_TIME_CRISIS);
 
-	install_130_speedup(machine);
+	install_130_speedup(machine());
 }
 
-static DRIVER_INIT( tokyowar )
+DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_TOKYO_WARS);
+	namcos22_init(machine(), NAMCOS22_TOKYO_WARS);
 
-	state->m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::tokyowar_mcu_adc_r),state));
-	install_141_speedup(machine);
+	m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::tokyowar_mcu_adc_r),this));
+	install_141_speedup(machine());
 
-	state->m_keycus_id = 0x01a8;
+	m_keycus_id = 0x01a8;
 }
 
-static DRIVER_INIT( aquajet )
+DRIVER_INIT_MEMBER(namcos22_state,aquajet)
 {
-	namcos22_init(machine, NAMCOS22_AQUA_JET);
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),state));
-	install_141_speedup(machine);
+	namcos22_init(machine(), NAMCOS22_AQUA_JET);
+	m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),this));
+	install_141_speedup(machine());
 }
 
-static DRIVER_INIT( dirtdash )
+DRIVER_INIT_MEMBER(namcos22_state,dirtdash)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22_init(machine, NAMCOS22_DIRT_DASH);
+	namcos22_init(machine(), NAMCOS22_DIRT_DASH);
 
-	state->m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),state));
-	install_141_speedup(machine);
+	m_mcu->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
+	install_141_speedup(machine());
 
-	state->m_keycus_id = 0x01a2;
+	m_keycus_id = 0x01a2;
 }
 
 /************************************************************************************/

@@ -67,10 +67,10 @@ public:
 	{ }
 
 	// driver init
-	void init_outrun();
-	void init_outrunb();
-	void init_shangon();
-	void init_shangon3();
+	DECLARE_DRIVER_INIT(outrunb);
+	DECLARE_DRIVER_INIT(shangon);
+	DECLARE_DRIVER_INIT(outrun);
+	DECLARE_DRIVER_INIT(shangon3);
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);

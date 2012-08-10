@@ -21,6 +21,8 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(pingpong_videoram_w);
 	DECLARE_WRITE8_MEMBER(pingpong_colorram_w);
+	DECLARE_DRIVER_INIT(cashquiz);
+	DECLARE_DRIVER_INIT(merlinmm);
 };
 
 

@@ -898,10 +898,10 @@ ROM_START( josvolly )
 	ROM_LOAD( "005.3h",       0x0440, 0x0020, CRC(e8d6dec0) SHA1(d15cba9a4b24255d41046b15c2409391ab13ce95) )	/* address decoder? not used */
 ROM_END
 
-static DRIVER_INIT( gsword )
+DRIVER_INIT_MEMBER(gsword_state,gsword)
 {
 #if 0
-	UINT8 *ROM2 = machine.root_device().memregion("sub")->base();
+	UINT8 *ROM2 = machine().root_device().memregion("sub")->base();
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 
 	ROM2[0x71e] = 0;    /* patch for sound protection or time out function */
@@ -909,15 +909,14 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	gsword_state *state = machine.driver_data<gsword_state>();
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),state));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),this));
 #endif
 }
 
-static DRIVER_INIT( gsword2 )
+DRIVER_INIT_MEMBER(gsword_state,gsword2)
 {
 #if 0
-	UINT8 *ROM2 = machine.root_device().memregion("sub")->base();
+	UINT8 *ROM2 = machine().root_device().memregion("sub")->base();
 
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 	ROM2[0x726] = 0;    /* patch for sound protection or time out function */
@@ -925,12 +924,11 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	gsword_state *state = machine.driver_data<gsword_state>();
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),state));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),this));
 #endif
 }
 
 
-GAME( 1983, josvolly, 0,      josvolly, josvolly, gsword_state, 0,       ROT90, "Taito Corporation", "Joshi Volleyball", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1983, josvolly, 0,      josvolly, josvolly, driver_device, 0,       ROT90, "Taito Corporation", "Joshi Volleyball", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gsword,   0,      gsword,   gsword, gsword_state,   gsword,  ROT0,  "Taito Corporation", "Great Swordsman (World?)", 0 )
 GAME( 1984, gsword2,  gsword, gsword,   gsword, gsword_state,   gsword2, ROT0,  "Taito Corporation", "Great Swordsman (Japan?)", 0 )

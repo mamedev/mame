@@ -80,6 +80,7 @@ public:
 	DECLARE_READ8_MEMBER(cntsteer_adx_r);
 	DECLARE_WRITE8_MEMBER(nmimask_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(zerotrgt);
 };
 
 
@@ -1162,22 +1163,22 @@ static void zerotrgt_rearrange_gfx( running_machine &machine, int romsize, int r
 }
 
 #if 0
-static DRIVER_INIT( cntsteer )
+DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
 {
-	UINT8 *RAM = machine.root_device().memregion("subcpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("subcpu")->base();
 
 	RAM[0xc2cf] = 0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0] = 0x43;
 	RAM[0xc2f1] = 0x43;
 	RAM[0xc2f2] = 0x43;
 
-	zerotrgt_rearrange_gfx(machine, 0x02000, 0x10000);
+	zerotrgt_rearrange_gfx(machine(), 0x02000, 0x10000);
 }
 #endif
 
-static DRIVER_INIT( zerotrgt )
+DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
 {
-	zerotrgt_rearrange_gfx(machine, 0x02000, 0x10000);
+	zerotrgt_rearrange_gfx(machine(), 0x02000, 0x10000);
 }
 
 

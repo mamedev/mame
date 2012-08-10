@@ -17,6 +17,8 @@ public:
 	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_low_w);
 	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_high_w);
 	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
+	DECLARE_DRIVER_INIT(shtridra);
+	DECLARE_DRIVER_INIT(motorace);
 };
 
 /*----------- defined in video/travrusa.c -----------*/

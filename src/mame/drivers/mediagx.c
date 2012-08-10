@@ -182,6 +182,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(mediagx_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_DRIVER_INIT(a51site4);
 };
 
 // Display controller registers
@@ -1331,12 +1332,12 @@ static const speedup_entry a51site4_speedups[] =
 
 #endif
 
-static DRIVER_INIT( a51site4 )
+DRIVER_INIT_MEMBER(mediagx_state,a51site4)
 {
-	init_mediagx(machine);
+	init_mediagx(machine());
 
 #if SPEEDUP_HACKS
-	install_speedups(machine, a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
+	install_speedups(machine(), a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
 #endif
 }
 

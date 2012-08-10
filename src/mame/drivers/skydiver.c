@@ -435,4 +435,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, skydiver, 0, skydiver, skydiver, skydiver_state, 0, ROT0, "Atari", "Sky Diver", 0 )
+GAME( 1978, skydiver, 0, skydiver, skydiver, driver_device, 0, ROT0, "Atari", "Sky Diver", 0 )

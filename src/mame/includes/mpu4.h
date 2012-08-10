@@ -227,6 +227,25 @@ public:
 	DECLARE_WRITE8_MEMBER(ic3ss_o1_callback);
 	DECLARE_WRITE8_MEMBER(ic3ss_o2_callback);
 	DECLARE_WRITE8_MEMBER(ic3ss_o3_callback);
+	DECLARE_DRIVER_INIT(m4default_alt);
+	DECLARE_DRIVER_INIT(crystali);
+	DECLARE_DRIVER_INIT(m4tst2);
+	DECLARE_DRIVER_INIT(crystal);
+	DECLARE_DRIVER_INIT(m_frkstn);
+	DECLARE_DRIVER_INIT(m4default_bigbank);
+	DECLARE_DRIVER_INIT(m4default);
+	DECLARE_DRIVER_INIT(m_blsbys);
+	DECLARE_DRIVER_INIT(m_oldtmr);
+	DECLARE_DRIVER_INIT(m4tst);
+	DECLARE_DRIVER_INIT(m_ccelbr);
+	DECLARE_DRIVER_INIT(m4gambal);
+	DECLARE_DRIVER_INIT(m_grtecp);
+	DECLARE_DRIVER_INIT(m4debug);
+	DECLARE_DRIVER_INIT(m4_showstring);
+	DECLARE_DRIVER_INIT(m4_showstring_mod2);
+	DECLARE_DRIVER_INIT(m4_showstring_big);
+	DECLARE_DRIVER_INIT(m_grtecpss);
+	DECLARE_DRIVER_INIT(connect4);
 };
 
 /* mpu4.c, used by mpu4vid.c */

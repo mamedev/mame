@@ -131,6 +131,7 @@ public:
 	DECLARE_WRITE32_MEMBER(rabbit_rombank_w);
 	DECLARE_WRITE32_MEMBER(rabbit_blitter_w);
 	DECLARE_WRITE32_MEMBER(rabbit_eeprom_write);
+	DECLARE_DRIVER_INIT(rabbit);
 };
 
 
@@ -905,12 +906,11 @@ MACHINE_CONFIG_END
 
 
 
-static DRIVER_INIT(rabbit)
+DRIVER_INIT_MEMBER(rabbit_state,rabbit)
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
-	state->m_banking = 1;
-	state->m_vblirqlevel = 6;
-	state->m_bltirqlevel = 4;
+	m_banking = 1;
+	m_vblirqlevel = 6;
+	m_bltirqlevel = 4;
 	/* 5 and 1 are also valid and might be raster related */
 }
 

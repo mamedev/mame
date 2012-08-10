@@ -484,11 +484,11 @@ static UINT8 drgnmst_asciitohex( UINT8 data )
 }
 
 
-static DRIVER_INIT( drgnmst )
+DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 {
-	UINT8 *drgnmst_PICROM_HEX = machine.root_device().memregion("user1")->base();
-	UINT16 *drgnmst_PICROM = (UINT16 *)machine.root_device().memregion("audiocpu")->base();
-	UINT8 *drgnmst_PCM = machine.root_device().memregion("oki1")->base();
+	UINT8 *drgnmst_PICROM_HEX = machine().root_device().memregion("user1")->base();
+	UINT16 *drgnmst_PICROM = (UINT16 *)machine().root_device().memregion("audiocpu")->base();
+	UINT8 *drgnmst_PCM = machine().root_device().memregion("oki1")->base();
 	INT32   offs, data;
 	UINT16  src_pos = 0;
 	UINT16  dst_pos = 0;
@@ -554,7 +554,7 @@ static DRIVER_INIT( drgnmst )
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(machine.device("audiocpu"), data);
+			pic16c5x_set_config(machine().device("audiocpu"), data);
 
 			src_pos = 0x7fff;		/* Force Exit */
 		}

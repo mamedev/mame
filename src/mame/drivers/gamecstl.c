@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(gamecstl_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_DRIVER_INIT(gamecstl);
 };
 
 
@@ -761,16 +762,15 @@ static void gamecstl_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-static DRIVER_INIT( gamecstl )
+DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
 {
-	gamecstl_state *state = machine.driver_data<gamecstl_state>();
-	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
+	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
 
-	intel82439tx_init(machine);
+	intel82439tx_init(machine());
 
-	kbdc8042_init(machine, &at8042);
+	kbdc8042_init(machine(), &at8042);
 }
 
 /*****************************************************************************/

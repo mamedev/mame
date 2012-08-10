@@ -3105,44 +3105,43 @@ static void tumblepb_gfx1_rearrange(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( tumblepb )
+DRIVER_INIT_MEMBER(tumbleb_state,tumblepb)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(machine, 0x000132);
+	tumblepb_patch_code(machine(), 0x000132);
 	#endif
 }
 
-static DRIVER_INIT( tumbleb2 )
+DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(machine, 0x000132);
+	tumblepb_patch_code(machine(), 0x000132);
 	#endif
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(tumbleb_state::tumbleb2_soundmcu_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(tumbleb_state::tumbleb2_soundmcu_w),this));
 
 }
 
-static DRIVER_INIT( jumpkids )
+DRIVER_INIT_MEMBER(tumbleb_state,jumpkids)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(machine, 0x00013a);
+	tumblepb_patch_code(machine(), 0x00013a);
 	#endif
 }
 
-static DRIVER_INIT( fncywld )
+DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
        of the 2 first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
 	#endif
@@ -3157,21 +3156,19 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 	else return ioport("SYSTEM")->read();
 }
 
-static DRIVER_INIT ( bcstory )
+DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	tumblepb_gfx1_rearrange(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),state)); // io should be here??
+	tumblepb_gfx1_rearrange(machine());
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),this)); // io should be here??
 }
 
 
-static DRIVER_INIT( htchctch )
+DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 {
 
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-//  UINT16 *HCROM = (UINT16*)state->memregion("maincpu")->base();
-	UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
-	int i, len = state->memregion("user1")->bytes();
+//  UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
+	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
+	int i, len = memregion("user1")->bytes();
 	/* simulate RAM initialization done by the protection MCU */
 	/* verified on real hardware */
 //  static const UINT16 htchctch_mcu68k[] =
@@ -3181,14 +3178,14 @@ static DRIVER_INIT( htchctch )
 
 
 //  for (i = 0; i < sizeof(htchctch_mcu68k) / sizeof(htchctch_mcu68k[0]); i++)
-//      state->m_mainram[0x000/2 + i] = htchctch_mcu68k[i];
+//      m_mainram[0x000/2 + i] = htchctch_mcu68k[i];
 
 	for (i = 0; i < len / 2; i++)
-		state->m_mainram[0x000/2 + i] = PROTDATA[i];
+		m_mainram[0x000/2 + i] = PROTDATA[i];
 
 
 
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 
 /* trojan.. */
 #if 0
@@ -3403,7 +3400,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x140000, 0x1407ff); // kill palette writes as the interrupt code we don't have controls them
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x140000, 0x1407ff); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{
@@ -3456,45 +3453,42 @@ static void suprtrio_decrypt_gfx(running_machine &machine)
 	auto_free(machine, buf);
 }
 
-static DRIVER_INIT( suprtrio )
+DRIVER_INIT_MEMBER(tumbleb_state,suprtrio)
 {
-	suprtrio_decrypt_code(machine);
-	suprtrio_decrypt_gfx(machine);
+	suprtrio_decrypt_code(machine());
+	suprtrio_decrypt_gfx(machine());
 }
 
-static DRIVER_INIT( chokchok )
+DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 {
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(tumbleb_state::paletteram_xxxxBBBBGGGGRRRR_word_w), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(tumbleb_state::paletteram_xxxxBBBBGGGGRRRR_word_w), this));
 
 	/* slightly different banking */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
-static DRIVER_INIT( wlstar )
+DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 
 	/* slightly different banking */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::wlstar_tilebank_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::wlstar_tilebank_w),this));
 
-	state->m_protbase = 0x0000;
+	m_protbase = 0x0000;
 }
 
-static DRIVER_INIT( wondl96 )
+DRIVER_INIT_MEMBER(tumbleb_state,wondl96)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	DRIVER_INIT_CALL( wlstar );
-	state->m_protbase = 0x0200;
+	DRIVER_INIT_CALL(wlstar);
+	m_protbase = 0x0200;
 }
 
-static DRIVER_INIT ( dquizgo )
+DRIVER_INIT_MEMBER(tumbleb_state,dquizgo)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 }
 
 

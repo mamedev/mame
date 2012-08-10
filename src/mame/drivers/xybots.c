@@ -389,12 +389,11 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( xybots )
+DRIVER_INIT_MEMBER(xybots_state,xybots)
 {
-	xybots_state *state = machine.driver_data<xybots_state>();
-	state->m_h256 = 0x0400;
-	atarigen_slapstic_init(machine.device("maincpu"), 0x008000, 0, 107);
-	atarijsa_init(machine, "FFE200", 0x0100);
+	m_h256 = 0x0400;
+	atarigen_slapstic_init(machine().device("maincpu"), 0x008000, 0, 107);
+	atarijsa_init(machine(), "FFE200", 0x0100);
 }
 
 

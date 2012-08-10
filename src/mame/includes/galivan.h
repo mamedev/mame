@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
+	DECLARE_DRIVER_INIT(youmab);
 };
 
 

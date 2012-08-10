@@ -82,12 +82,11 @@ public:
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 
 	// game-specific driver init
-	void init_generic();
-	void init_sharrier();
-	void init_enduror();
-	void init_endurobl();
-	void init_endurob2();
-
+	DECLARE_DRIVER_INIT(generic);
+	DECLARE_DRIVER_INIT(sharrier);
+	DECLARE_DRIVER_INIT(enduror);
+	DECLARE_DRIVER_INIT(endurobl);
+	DECLARE_DRIVER_INIT(endurob2);
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

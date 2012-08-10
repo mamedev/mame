@@ -36,22 +36,21 @@ Encryption PAL 16R4 on CPU board
 */
 
 
-DRIVER_INIT( empcity )
+DRIVER_INIT_MEMBER(stfight_state,empcity)
 {
-	stfight_state *state = machine.driver_data<stfight_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = state->memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
-	state->m_decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	space->set_decrypted_region(0x0000, 0x7fff, state->m_decrypt);
+	m_decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
+	space->set_decrypted_region(0x0000, 0x7fff, m_decrypt);
 
 	for (A = 0;A < 0x8000;A++)
 	{
 		UINT8 src = rom[A];
 
 		// decode opcode
-		state->m_decrypt[A] =
+		m_decrypt[A] =
 				( src & 0xA6 ) |
 				( ( ( ( src << 2 ) ^ src ) << 3 ) & 0x40 ) |
 				( ~( ( src ^ ( A >> 1 ) ) >> 2 ) & 0x10 ) |
@@ -68,18 +67,17 @@ DRIVER_INIT( empcity )
 	}
 }
 
-DRIVER_INIT( stfight )
+DRIVER_INIT_MEMBER(stfight_state,stfight)
 {
-	stfight_state *state = machine.driver_data<stfight_state>();
 	DRIVER_INIT_CALL(empcity);
 
 	/* patch out a tight loop during startup - is the code waiting */
 	/* for NMI to wake it up? */
-	state->m_decrypt[0xb1] = 0x00;
-	state->m_decrypt[0xb2] = 0x00;
-	state->m_decrypt[0xb3] = 0x00;
-	state->m_decrypt[0xb4] = 0x00;
-	state->m_decrypt[0xb5] = 0x00;
+	m_decrypt[0xb1] = 0x00;
+	m_decrypt[0xb2] = 0x00;
+	m_decrypt[0xb3] = 0x00;
+	m_decrypt[0xb4] = 0x00;
+	m_decrypt[0xb5] = 0x00;
 }
 
 MACHINE_RESET( stfight )

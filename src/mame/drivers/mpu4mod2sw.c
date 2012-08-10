@@ -21,20 +21,18 @@
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
-extern DRIVER_INIT( m4default );
-extern DRIVER_INIT( m_ccelbr );
 
 
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
-static DRIVER_INIT( m4_showstring )
+DRIVER_INIT_MEMBER(mpu4_state,m4_showstring_mod2)
 {
-	DRIVER_INIT_CALL( m4default );
+	DRIVER_INIT_CALL(m4default);
 
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
 	printf("\ncopyright string:\n");
 	for (int i = 0xffe0; i<0xfff0; i++)
 	{
@@ -47,11 +45,10 @@ static DRIVER_INIT( m4_showstring )
 	}
 }
 
-static DRIVER_INIT (connect4)
+DRIVER_INIT_MEMBER(mpu4_state,connect4)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0; //reel-free game
-	state->m_led_lamp=1;
+	m_reels = 0; //reel-free game
+	m_led_lamp=1;
 }
 
 
@@ -1392,25 +1389,25 @@ GAME(199?, m4solsila	,m4solsil	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,
 
 GAME(199?, m4starbr		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Stars And Bars (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4sunset		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
+GAME(199?, m4sunset		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
 GAME(199?, m4sb5		,m4sunset	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.3)",	GAME_FLAGS )
-GAME(199?, m4sunsetd	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SBU 2.0)",GAME_FLAGS )
-GAME(199?, m4sunsete	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
-GAME(199?, m4sunsetf	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetg	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunseth	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 3, bad)",GAME_FLAGS )
-GAME(199?, m4sunseti	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4sunsetj	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 5)",GAME_FLAGS )
-GAME(199?, m4sunsetk	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.1)",GAME_FLAGS )
-GAME(199?, m4sunsetl	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetm	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunsetn	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 3)",GAME_FLAGS )
-GAME(199?, m4sunseto	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4sunsetp	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 5)",GAME_FLAGS )
-GAME(199?, m4sunsetq	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 6)",GAME_FLAGS )
-GAME(199?, m4sunsetr	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 7)",GAME_FLAGS )
-GAME(199?, m4sunsets	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
-GAME(199?, m4sunsett	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
+GAME(199?, m4sunsetd	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SBU 2.0)",GAME_FLAGS )
+GAME(199?, m4sunsete	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
+GAME(199?, m4sunsetf	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetg	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunseth	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 3, bad)",GAME_FLAGS )
+GAME(199?, m4sunseti	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4sunsetj	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4sunsetk	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.1)",GAME_FLAGS )
+GAME(199?, m4sunsetl	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetm	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunsetn	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4sunseto	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4sunsetp	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4sunsetq	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 6)",GAME_FLAGS )
+GAME(199?, m4sunsetr	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 7)",GAME_FLAGS )
+GAME(199?, m4sunsets	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
+GAME(199?, m4sunsett	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
 
 GAME(199?, m4supslt		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4)",						GAME_FLAGS )
 
@@ -1454,21 +1451,21 @@ GAME(199?, m4wayina		,m4wayin	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0, 
 
 /* Bwb */
 
-GAME(199?, m4flshlt		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 1)",   GAME_FLAGS )
-GAME(199?, m4flshlta	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",   GAME_FLAGS )
-GAME(199?, m4flshltb	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 3)",   GAME_FLAGS )
-GAME(199?, m4flshltc	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 4)",   GAME_FLAGS )
-GAME(199?, m4flshltd	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 5)",   GAME_FLAGS )
-GAME(199?, m4flshlte	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 6)",   GAME_FLAGS )
-GAME(199?, m4flshltf	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 7)",   GAME_FLAGS )
-GAME(199?, m4flshltg	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 8)",   GAME_FLAGS )
+GAME(199?, m4flshlt		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 1)",   GAME_FLAGS )
+GAME(199?, m4flshlta	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",   GAME_FLAGS )
+GAME(199?, m4flshltb	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 3)",   GAME_FLAGS )
+GAME(199?, m4flshltc	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 4)",   GAME_FLAGS )
+GAME(199?, m4flshltd	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 5)",   GAME_FLAGS )
+GAME(199?, m4flshlte	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 6)",   GAME_FLAGS )
+GAME(199?, m4flshltf	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 7)",   GAME_FLAGS )
+GAME(199?, m4flshltg	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 8)",   GAME_FLAGS )
 
-GAME(199?, m4blflsh		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",   GAME_FLAGS )
-GAME(199?, m4blflsha	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 2)",   GAME_FLAGS )
-GAME(199?, m4blflshb	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 3)",   GAME_FLAGS )
-GAME(199?, m4blflshc	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 4)",   GAME_FLAGS )
-GAME(199?, m4blflshd	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 5)",   GAME_FLAGS )
-GAME(199?, m4blflshe	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 6)",   GAME_FLAGS )
+GAME(199?, m4blflsh		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",   GAME_FLAGS )
+GAME(199?, m4blflsha	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 2)",   GAME_FLAGS )
+GAME(199?, m4blflshb	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 3)",   GAME_FLAGS )
+GAME(199?, m4blflshc	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 4)",   GAME_FLAGS )
+GAME(199?, m4blflshd	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 5)",   GAME_FLAGS )
+GAME(199?, m4blflshe	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 6)",   GAME_FLAGS )
 
 /* Pcp */
 
@@ -1530,8 +1527,8 @@ GAME(199?, m4centpta,m4centpt				,mod2   	,mpu4				, mpu4_state,m4default			,ROT
 GAME(199?, m4clbcls	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",						GAME_FLAGS ) // set stake (still moans tho)
 
 // OC9 (on cloud 9?)
-GAME(199?, m4c999	,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 1)",						GAME_FLAGS )
-GAME(199?, m4c999a	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 2)",						GAME_FLAGS )
+GAME(199?, m4c999	,0			,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 1)",						GAME_FLAGS )
+GAME(199?, m4c999a	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 2)",						GAME_FLAGS )
 // make sure these are the same
-GAME(199?, m4c999b	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.6)",						GAME_FLAGS ) // bad chr
-GAME(199?, m4c999c	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.0)",						GAME_FLAGS ) // bad chr
+GAME(199?, m4c999b	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.6)",						GAME_FLAGS ) // bad chr
+GAME(199?, m4c999c	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring_mod2			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.0)",						GAME_FLAGS ) // bad chr

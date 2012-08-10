@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER(appoooh_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(appoooh_bg_colorram_w);
 	DECLARE_WRITE8_MEMBER(appoooh_out_w);
+	DECLARE_DRIVER_INIT(robowres);
+	DECLARE_DRIVER_INIT(robowresb);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

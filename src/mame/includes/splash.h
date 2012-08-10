@@ -52,6 +52,11 @@ public:
 	DECLARE_WRITE8_MEMBER(msm2_interrupt_w);
 	DECLARE_WRITE8_MEMBER(msm2_data_w);
 	DECLARE_WRITE16_MEMBER(splash_vram_w);
+	DECLARE_DRIVER_INIT(splash10);
+	DECLARE_DRIVER_INIT(roldfrog);
+	DECLARE_DRIVER_INIT(funystrp);
+	DECLARE_DRIVER_INIT(splash);
+	DECLARE_DRIVER_INIT(rebus);
 };
 
 

@@ -178,6 +178,23 @@ public:
 	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
 	DECLARE_READ16_MEMBER(ics2115_word_r);
 	DECLARE_WRITE16_MEMBER(ics2115_word_w);
+	DECLARE_DRIVER_INIT(lhbv33c);
+	DECLARE_DRIVER_INIT(drgnwrldv21j);
+	DECLARE_DRIVER_INIT(wlcc);
+	DECLARE_DRIVER_INIT(nkishusp);
+	DECLARE_DRIVER_INIT(drgnwrldv21);
+	DECLARE_DRIVER_INIT(dbc);
+	DECLARE_DRIVER_INIT(lhb);
+	DECLARE_DRIVER_INIT(drgnwrld);
+	DECLARE_DRIVER_INIT(drgnwrldv30);
+	DECLARE_DRIVER_INIT(drgnwrldv11h);
+	DECLARE_DRIVER_INIT(lhb2);
+	DECLARE_DRIVER_INIT(xymg);
+	DECLARE_DRIVER_INIT(drgnwrldv10c);
+	DECLARE_DRIVER_INIT(drgnwrldv20j);
+	DECLARE_DRIVER_INIT(vbowl);
+	DECLARE_DRIVER_INIT(vbowlj);
+	DECLARE_DRIVER_INIT(ryukobou);
 };
 
 
@@ -1759,12 +1776,12 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 ***************************************************************************/
 
 // V0400O
-static DRIVER_INIT( drgnwrld )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
 /*
     // PROTECTION CHECKS
     rom[0x032ee/2]  =   0x606c;     // 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
@@ -1785,12 +1802,12 @@ static DRIVER_INIT( drgnwrld )
 */
 }
 
-static DRIVER_INIT( drgnwrldv30 )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
 /*
     // PROTECTION CHECKS
     rom[0x032ee/2]  =   0x606c;     // 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
@@ -1810,14 +1827,13 @@ static DRIVER_INIT( drgnwrldv30 )
 */
 }
 
-static DRIVER_INIT( drgnwrldv21 )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	drgnwrld_type2_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-	igs011_state *state = machine.driver_data<igs011_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), state));
+	drgnwrld_type2_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1840,12 +1856,12 @@ static DRIVER_INIT( drgnwrldv21 )
 */
 }
 
-static DRIVER_INIT( drgnwrldv21j )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	drgnwrld_type3_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
+	drgnwrld_type3_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
 /*
     // PROTECTION CHECKS
     rom[0x033d2/2]  =   0x606c;     // 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
@@ -1867,12 +1883,12 @@ static DRIVER_INIT( drgnwrldv21j )
 */
 }
 
-static DRIVER_INIT( drgnwrldv20j )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	drgnwrld_type3_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
+	drgnwrld_type3_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
 /*
     // PROTECTION CHECKS
     // bp 33d2; bp 11c74; bp 23d2a; bp 23f68; bp 240d4; bp 242ac; bp 244b2; bp 24630; bp 24886; bp 24aca; bp 24d46; bp 24f8e; bp 254ba; bp 26a52; bp 276a0; bp 2a86e
@@ -1896,21 +1912,21 @@ static DRIVER_INIT( drgnwrldv20j )
 */
 }
 
-static DRIVER_INIT( drgnwrldv11h )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
 {
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
 
 	// PROTECTION CHECKS
 	// the protection checks are already patched out like we do!
 }
 
-static DRIVER_INIT( drgnwrldv10c )
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
+	drgnwrld_type1_decrypt(machine());
+	drgnwrld_gfx_decrypt(machine());
 /*
     // PROTECTION CHECKS
     // bp 33d2; bp 23d0e; bp 23f58; bp 240d0; bp 242a8; bp 244ae; bp 2462c; bp 24882; bp 24ac6; bp 24d42; bp 24f8a; bp 254b6; bp 2a23a
@@ -1931,34 +1947,33 @@ static DRIVER_INIT( drgnwrldv10c )
 }
 
 
-static DRIVER_INIT( lhb )
+DRIVER_INIT_MEMBER(igs011_state,lhb)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	lhb_decrypt(machine);
+	lhb_decrypt(machine());
 
 	// PROTECTION CHECKS
 //  rom[0x2eef6/2]  =   0x4e75;     // 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-static DRIVER_INIT( lhbv33c )
+DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	lhb_decrypt(machine);
+	lhb_decrypt(machine());
 
 	// PROTECTION CHECKS
 //  rom[0x2e988/2]  =   0x4e75;     // 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-static DRIVER_INIT( dbc )
+DRIVER_INIT_MEMBER(igs011_state,dbc)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	dbc_decrypt(machine);
+	dbc_decrypt(machine());
 
-	igs011_state *state = machine.driver_data<igs011_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), this));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -1982,25 +1997,24 @@ static DRIVER_INIT( dbc )
 //  rom[0x19E90/2]  =   0x00ff;
 }
 
-static DRIVER_INIT( ryukobou )
+DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	ryukobou_decrypt(machine);
+	ryukobou_decrypt(machine());
 
-	igs011_state *state = machine.driver_data<igs011_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), this));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
 
-static DRIVER_INIT( xymg )
+DRIVER_INIT_MEMBER(igs011_state,xymg)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	lhb_decrypt(machine);
+	lhb_decrypt(machine());
 /*
     // PROTECTION CHECKS
     rom[0x00502/2]  =   0x6006;     // 000502: 6050         bra 554
@@ -2030,11 +2044,11 @@ static DRIVER_INIT( xymg )
 */
 }
 
-static DRIVER_INIT( wlcc )
+DRIVER_INIT_MEMBER(igs011_state,wlcc)
 {
-//  UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	wlcc_decrypt(machine);
+	wlcc_decrypt(machine());
 /*
     // PROTECTION CHECKS
     rom[0x16b96/2]  =   0x6000;     // 016B96: 6700 02FE    beq 16e96  (fills palette with red otherwise)
@@ -2054,12 +2068,12 @@ static DRIVER_INIT( wlcc )
 }
 
 
-static DRIVER_INIT( lhb2 )
+DRIVER_INIT_MEMBER(igs011_state,lhb2)
 {
-	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	lhb2_decrypt(machine);
-	lhb2_decrypt_gfx(machine);
+	lhb2_decrypt(machine());
+	lhb2_decrypt_gfx(machine());
 
 	// PROTECTION CHECKS
 	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
@@ -2077,13 +2091,13 @@ static DRIVER_INIT( lhb2 )
 	rom[0x44834/2]	=	0x6034;		// 044834: 6734    beq 4486a  (fills palette with black otherwise)
 }
 
-static DRIVER_INIT( vbowl )
+DRIVER_INIT_MEMBER(igs011_state,vbowl)
 {
-	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
-	UINT8  *gfx = (UINT8 *)  machine.root_device().memregion("blitter")->base();
+	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	UINT8  *gfx = (UINT8 *)  machine().root_device().memregion("blitter")->base();
 	int i;
 
-	vbowlj_decrypt(machine);
+	vbowlj_decrypt(machine());
 
 	for (i = 0x400000-1; i >= 0; i--)
 	{
@@ -2102,13 +2116,13 @@ static DRIVER_INIT( vbowl )
 }
 
 
-static DRIVER_INIT( vbowlj )
+DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 {
-	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
-	UINT8  *gfx = (UINT8 *)  machine.root_device().memregion("blitter")->base();
+	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	UINT8  *gfx = (UINT8 *)  machine().root_device().memregion("blitter")->base();
 	int i;
 
-	vbowlj_decrypt(machine);
+	vbowlj_decrypt(machine());
 
 	for (i = 0x400000-1; i >= 0; i--)
 	{
@@ -2124,12 +2138,12 @@ static DRIVER_INIT( vbowlj )
 }
 
 
-static DRIVER_INIT( nkishusp )
+DRIVER_INIT_MEMBER(igs011_state,nkishusp)
 {
-	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	nkishusp_decrypt(machine);
-	lhb2_decrypt_gfx(machine);
+	nkishusp_decrypt(machine());
+	lhb2_decrypt_gfx(machine());
 
 	// PROTECTION CHECKS (similar to lhb2)
 

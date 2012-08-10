@@ -114,6 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
+	DECLARE_DRIVER_INIT(spool99);
 };
 
 static TILE_GET_INFO( get_spool99_tile_info )
@@ -421,13 +422,12 @@ ROM_START( vcarn )
 ROM_END
 
 
-static DRIVER_INIT( spool99 )
+DRIVER_INIT_MEMBER(spool99_state,spool99)
 {
-	spool99_state *state = machine.driver_data<spool99_state>();
 
-	UINT8 *ROM = state->memregion("maincpu")->base();
-//  vram = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(state->m_main, ROM, 0x100);
+	UINT8 *ROM = memregion("maincpu")->base();
+//  vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	memcpy(m_main, ROM, 0x100);
 }
 
 

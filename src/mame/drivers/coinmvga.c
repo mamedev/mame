@@ -232,6 +232,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ramdac_bg_w);
 	DECLARE_WRITE16_MEMBER(ramdac_fg_w);
 	DECLARE_READ16_MEMBER(test_r);
+	DECLARE_DRIVER_INIT(colorama);
+	DECLARE_DRIVER_INIT(cmrltv75);
 };
 
 
@@ -869,10 +871,10 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT( colorama )
+DRIVER_INIT_MEMBER(coinmvga_state,colorama)
 {
 	UINT16 *ROM;
-	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// rte in non-irq routines? wtf? patch them to rts...
 	ROM[0x02B476/2] = 0x5470;
@@ -886,10 +888,10 @@ static DRIVER_INIT( colorama )
 	ROM[0x02a94e/2] = 0x5470;
 }
 
-static DRIVER_INIT( cmrltv75 )
+DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 {
 	UINT16 *ROM;
-	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// rte in non-irq routines? wtf? patch them to rts...
 	ROM[0x056fd6/2] = 0x5470;
@@ -908,5 +910,5 @@ static DRIVER_INIT( cmrltv75 )
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT     COMPANY                    FULLNAME                                     FLAGS */
 GAME( 2001, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (English)",                         GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette V75 (Y2K, Spanish)",     GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, driver_device, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, driver_device, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )

@@ -280,6 +280,7 @@ public:
 	DECLARE_WRITE16_MEMBER(wheelfir_snd_w);
 	DECLARE_READ16_MEMBER(wheelfir_snd_r);
 	DECLARE_WRITE16_MEMBER(coin_cnt_w);
+	DECLARE_DRIVER_INIT(wheelfir);
 };
 
 
@@ -868,9 +869,9 @@ ROM_START( wheelfir )
 	ROM_LOAD( "tch12.u59",0x380000, 0x80000, CRC(cce2e675) SHA1(f3d8916077b2e057169d0f254005cd959789a3b3) )
 ROM_END
 
-static DRIVER_INIT(wheelfir)
+DRIVER_INIT_MEMBER(wheelfir_state,wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	RAM[0xdd3da/2] = 0x4e71; //hack
 }
 

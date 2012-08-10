@@ -46,6 +46,13 @@ public:
 	DECLARE_READ8_MEMBER(imago_sprites_offset_r);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	DECLARE_DRIVER_INIT(fastfred);
+	DECLARE_DRIVER_INIT(flyboy);
+	DECLARE_DRIVER_INIT(flyboyb);
+	DECLARE_DRIVER_INIT(imago);
+	DECLARE_DRIVER_INIT(boggy84);
+	DECLARE_DRIVER_INIT(jumpcoas);
+	DECLARE_DRIVER_INIT(boggy84b);
 };
 
 

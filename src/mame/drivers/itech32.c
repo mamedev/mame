@@ -4007,67 +4007,62 @@ static void init_program_rom(running_machine &machine)
 }
 
 
-static DRIVER_INIT( timekill )
+DRIVER_INIT_MEMBER(itech32_state,timekill)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	init_program_rom(machine);
-	state->m_vram_height = 512;
-	state->m_planes = 2;
-	state->m_is_drivedge = 0;
+	init_program_rom(machine());
+	m_vram_height = 512;
+	m_planes = 2;
+	m_is_drivedge = 0;
 }
 
 
-static DRIVER_INIT( hardyard )
+DRIVER_INIT_MEMBER(itech32_state,hardyard)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 1;
-	state->m_is_drivedge = 0;
+	init_program_rom(machine());
+	m_vram_height = 1024;
+	m_planes = 1;
+	m_is_drivedge = 0;
 }
 
 
-static DRIVER_INIT( bloodstm )
+DRIVER_INIT_MEMBER(itech32_state,bloodstm)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 1;
-	state->m_is_drivedge = 0;
+	init_program_rom(machine());
+	m_vram_height = 1024;
+	m_planes = 1;
+	m_is_drivedge = 0;
 }
 
 
-static DRIVER_INIT( drivedge )
+DRIVER_INIT_MEMBER(itech32_state,drivedge)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 1;
-	state->m_is_drivedge = 1;
+	init_program_rom(machine());
+	m_vram_height = 1024;
+	m_planes = 1;
+	m_is_drivedge = 1;
 
-	machine.device("dsp1")->memory().space(AS_PROGRAM)->install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms1_speedup_r),state));
-	machine.device("dsp2")->memory().space(AS_PROGRAM)->install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms2_speedup_r),state));
+	machine().device("dsp1")->memory().space(AS_PROGRAM)->install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms1_speedup_r),this));
+	machine().device("dsp2")->memory().space(AS_PROGRAM)->install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms2_speedup_r),this));
 }
 
 
-static DRIVER_INIT( wcbowl )
+DRIVER_INIT_MEMBER(itech32_state,wcbowl)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
 	/*
         This is the 3 tier PCB set:
           Main  P/N 1059 Rev 3 (see Hot Memory PCB layout above)
           ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
           Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
     */
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 1;
+	init_program_rom(machine());
+	m_vram_height = 1024;
+	m_planes = 1;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680001, read16_delegate(FUNC(itech32_state::trackball_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680001, read16_delegate(FUNC(itech32_state::trackball_r),this));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x578000, 0x57ffff);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680080, 0x680081, read16_delegate(FUNC(itech32_state::wcbowl_prot_result_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x680080, 0x680081);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x578000, 0x57ffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680080, 0x680081, read16_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x680080, 0x680081);
 }
 
 
@@ -4086,15 +4081,15 @@ static void init_sftm_common(running_machine &machine, int prot_addr)
 }
 
 
-static DRIVER_INIT( sftm )
+DRIVER_INIT_MEMBER(itech32_state,sftm)
 {
-	init_sftm_common(machine, 0x7a6a);
+	init_sftm_common(machine(), 0x7a6a);
 }
 
 
-static DRIVER_INIT( sftm110 )
+DRIVER_INIT_MEMBER(itech32_state,sftm110)
 {
-	init_sftm_common(machine, 0x7a66);
+	init_sftm_common(machine(), 0x7a66);
 }
 
 
@@ -4120,16 +4115,16 @@ static void init_shuffle_bowl_common(running_machine &machine, int prot_addr)
 }
 
 
-static DRIVER_INIT( shufshot )	/* PIC 16C54 labeled as ITSHF-1 (ITBWL-4 for WCB Deluxe) */
+DRIVER_INIT_MEMBER(itech32_state,shufshot)
 {
-	init_shuffle_bowl_common(machine, 0x111a);
+	init_shuffle_bowl_common(machine(), 0x111a);
 }
 
 
-static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
+DRIVER_INIT_MEMBER(itech32_state,wcbowln)
 {
 	/* The security PROM is NOT interchangeable between the Deluxe and "normal" versions. */
-	init_shuffle_bowl_common(machine, 0x1116);
+	init_shuffle_bowl_common(machine(), 0x1116);
 }
 
 static void install_timekeeper(running_machine &machine)
@@ -4138,12 +4133,12 @@ static void install_timekeeper(running_machine &machine)
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x681000, 0x6817ff, FUNC(timekeeper_r), FUNC(timekeeper_w), 0xffffffff);
 }
 
-static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
+DRIVER_INIT_MEMBER(itech32_state,wcbowlt)
 {
 	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
-	init_shuffle_bowl_common(machine, 0x111a);
+	init_shuffle_bowl_common(machine(), 0x111a);
 
-	install_timekeeper(machine);
+	install_timekeeper(machine());
 }
 
 static void init_gt_common(running_machine &machine)
@@ -4158,7 +4153,7 @@ static void init_gt_common(running_machine &machine)
 }
 
 
-static DRIVER_INIT( gt3d )
+DRIVER_INIT_MEMBER(itech32_state,gt3d)
 {
 	/*
         This is the 3 tier PCB with the short ROM board:
@@ -4167,13 +4162,12 @@ static DRIVER_INIT( gt3d )
         Hacked versions of this PCB have been found with GT97
         through GTClassic. This is _NOT_ a factory modification
     */
-	itech32_state *state = machine.driver_data<itech32_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_8bit_r),state));
-	init_gt_common(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_8bit_r),this));
+	init_gt_common(machine());
 }
 
 
-static DRIVER_INIT( aama )
+DRIVER_INIT_MEMBER(itech32_state,aama)
 {
 	/*
         This is the single PCB style board commonly referred to as:
@@ -4181,25 +4175,24 @@ static DRIVER_INIT( aama )
         board share the same sound CPU code and sample ROMs.
         This board has all versions of GT for it, GT3D through GTClassic
     */
-	itech32_state *state = machine.driver_data<itech32_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),state));
-	init_gt_common(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	init_gt_common(machine());
 }
 
 
-static DRIVER_INIT( aamat )
+DRIVER_INIT_MEMBER(itech32_state,aamat)
 {
 	/*
         Tournament Version - So install needed handler for the TimeKeeper ram
     */
 	DRIVER_INIT_CALL(aama);
 
-	install_timekeeper(machine);
+	install_timekeeper(machine());
 }
 
 
-static DRIVER_INIT( s_ver )
+DRIVER_INIT_MEMBER(itech32_state,s_ver)
 {
 	/*
         This is a special 3 tier PCB with a short ROM board and 1 trackball
@@ -4207,13 +4200,12 @@ static DRIVER_INIT( s_ver )
         board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
         Trackball info is read through 200202 (actually 200203).
     */
-	itech32_state *state = machine.driver_data<itech32_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200200, 0x200203, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
-	init_gt_common(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200200, 0x200203, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	init_gt_common(machine());
 }
 
 
-static DRIVER_INIT( gt3dl )
+DRIVER_INIT_MEMBER(itech32_state,gt3dl)
 {
 	/*
         This is the 3 tier PCB with the long ROM board:
@@ -4222,17 +4214,15 @@ static DRIVER_INIT( gt3dl )
         Player 1 trackball read through 200003
         Player 2 trackball read through 200002
     */
-	itech32_state *state = machine.driver_data<itech32_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),state));
-	init_gt_common(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
+	init_gt_common(machine());
 }
 
 
-static DRIVER_INIT( gt2kp )
+DRIVER_INIT_MEMBER(itech32_state,gt2kp)
 {
 	/* a little extra protection */
-	itech32_state *state = machine.driver_data<itech32_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gt2kp_prot_result_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gt2kp_prot_result_r),this));
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:
@@ -4250,11 +4240,10 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 }
 
 
-static DRIVER_INIT( gtclasscp )
+DRIVER_INIT_MEMBER(itech32_state,gtclasscp)
 {
 	/* a little extra protection */
-	itech32_state *state = machine.driver_data<itech32_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gtclass_prot_result_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gtclass_prot_result_r),this));
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:

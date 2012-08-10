@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
 	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
 	DECLARE_WRITE8_MEMBER(angelkds_paletteram_w);
+	DECLARE_DRIVER_INIT(angelkds);
+	DECLARE_DRIVER_INIT(spcpostn);
 };
 
 

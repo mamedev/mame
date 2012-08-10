@@ -103,10 +103,10 @@ UINT8 ascii_to_bin( UINT8 ascii )
 	return 0;
 }
 
-DRIVER_INIT(vegaa)
+DRIVER_INIT_MEMBER(vega_state,vegaa)
 {
 	UINT8* buf = (UINT8*)malloc(0x10000);
-	UINT8* rom = machine.root_device().memregion("maincpu")->base();
+	UINT8* rom = machine().root_device().memregion("maincpu")->base();
 	int i;
 	int count = 0;
 	// last 0xc bytes of file are just some settings, ignore
@@ -134,7 +134,7 @@ DRIVER_INIT(vegaa)
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"vega_%s", machine.system().name);
+		sprintf(filename,"vega_%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -145,4 +145,4 @@ DRIVER_INIT(vegaa)
 }
 #endif
 
-GAME( 1982, vega,   0, vega, vega, vega_state, 0, ROT270, "Olympia", "Vega", GAME_IS_SKELETON )
+GAME( 1982, vega,   0, vega, vega, driver_device, 0, ROT270, "Olympia", "Vega", GAME_IS_SKELETON )

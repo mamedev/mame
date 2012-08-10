@@ -493,14 +493,13 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( atetris )
+DRIVER_INIT_MEMBER(atetris_state,atetris)
 {
-	atetris_state *state = machine.driver_data<atetris_state>();
-	UINT8 *rgn = state->memregion("maincpu")->base();
+	UINT8 *rgn = memregion("maincpu")->base();
 
-	slapstic_init(machine, 101);
-	state->m_slapstic_source = &rgn[0x10000];
-	state->m_slapstic_base = &rgn[0x04000];
+	slapstic_init(machine(), 101);
+	m_slapstic_source = &rgn[0x10000];
+	m_slapstic_base = &rgn[0x04000];
 }
 
 

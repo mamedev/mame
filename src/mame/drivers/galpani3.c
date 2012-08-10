@@ -169,6 +169,7 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_bgcol_w);
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_bgcol_w);
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_bgcol_w);
+	DECLARE_DRIVER_INIT(galpani3);
 };
 
 
@@ -1076,12 +1077,11 @@ ROM_START( galpani3j ) /* Some game text in Japanese, but no "For use in Japan" 
 ROM_END
 
 
-static DRIVER_INIT( galpani3 )
+DRIVER_INIT_MEMBER(galpani3_state,galpani3)
 {
-	galpani3_state *state = machine.driver_data<galpani3_state>();
-	DRIVER_INIT_CALL( decrypt_toybox_rom );
+	DRIVER_INIT_CALL(decrypt_toybox_rom);
 
-	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16) );
+	memset(m_mcu_com, 0, 4 * sizeof( UINT16) );
 }
 
 GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

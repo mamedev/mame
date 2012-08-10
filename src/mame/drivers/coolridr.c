@@ -316,6 +316,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_char_w);
 	DECLARE_READ32_MEMBER(coolridr_hack1_r);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
+	DECLARE_DRIVER_INIT(coolridr);
 };
 
 
@@ -1249,11 +1250,10 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 	return m_sysh1_workram_h[0xd8894/4];
 }
 
-static DRIVER_INIT( coolridr )
+DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 {
-	coolridr_state *state = machine.driver_data<coolridr_state>();
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), state));
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )

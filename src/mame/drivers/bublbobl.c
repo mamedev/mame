@@ -1556,39 +1556,36 @@ static void configure_banks( running_machine& machine )
 	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-static DRIVER_INIT( bublbobl )
+DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	configure_banks(machine);
+	configure_banks(machine());
 
 	/* we init this here, so that it does not conflict with tokio init, below */
-	state->m_video_enable = 0;
+	m_video_enable = 0;
 }
 
-static DRIVER_INIT( tokio )
+DRIVER_INIT_MEMBER(bublbobl_state,tokio)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
-	configure_banks(machine);
+	configure_banks(machine());
 
 	/* preemptively enable video, the bit is not mapped for this game and */
 	/* I don't know if it even has it. */
-	state->m_video_enable = 1;
+	m_video_enable = 1;
 }
 
-static DRIVER_INIT( tokiob )
+DRIVER_INIT_MEMBER(bublbobl_state,tokiob)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 	DRIVER_INIT_CALL(tokio);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),state) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),this) );
 }
 
-static DRIVER_INIT( dland )
+DRIVER_INIT_MEMBER(bublbobl_state,dland)
 {
 	// rearrange gfx to original format
 	int i;
-	UINT8* src = machine.root_device().memregion("gfx1")->base();
+	UINT8* src = machine().root_device().memregion("gfx1")->base();
 	for (i = 0; i < 0x40000; i++)
 		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
 

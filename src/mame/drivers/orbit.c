@@ -372,4 +372,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, orbit_state, 0, 0, "Atari", "Orbit", GAME_SUPPORTS_SAVE )
+GAME( 1978, orbit, 0, orbit, orbit, driver_device, 0, 0, "Atari", "Orbit", GAME_SUPPORTS_SAVE )

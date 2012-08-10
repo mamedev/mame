@@ -539,9 +539,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( vindictr )
+DRIVER_INIT_MEMBER(vindictr_state,vindictr)
 {
-	atarijsa_init(machine, "260010", 0x0002);
+	atarijsa_init(machine(), "260010", 0x0002);
 }
 
 

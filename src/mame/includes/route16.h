@@ -26,6 +26,8 @@ public:
 	DECLARE_WRITE8_MEMBER(route16_out0_w);
 	DECLARE_WRITE8_MEMBER(route16_out1_w);
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
+	DECLARE_DRIVER_INIT(route16);
+	DECLARE_DRIVER_INIT(route16a);
 };
 
 

@@ -915,28 +915,26 @@ ROM_START( powerbals )
 	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
 ROM_END
 
-static DRIVER_INIT( sslam )
+DRIVER_INIT_MEMBER(sslam_state,sslam)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
-	state->m_track = 0;
-	state->m_melody = 0;
-	state->m_bar = 0;
+	m_track = 0;
+	m_melody = 0;
+	m_bar = 0;
 
-	state->save_item(NAME(state->m_track));
-	state->save_item(NAME(state->m_melody));
-	state->save_item(NAME(state->m_bar));
-	state->save_item(NAME(state->m_snd_bank));
+	save_item(NAME(m_track));
+	save_item(NAME(m_melody));
+	save_item(NAME(m_bar));
+	save_item(NAME(m_snd_bank));
 
-	state->m_music_timer = machine.scheduler().timer_alloc(FUNC(music_playback));
+	m_music_timer = machine().scheduler().timer_alloc(FUNC(music_playback));
 }
 
-static DRIVER_INIT( powerbls )
+DRIVER_INIT_MEMBER(sslam_state,powerbls)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->save_item(NAME(state->m_oki_control));
-	state->save_item(NAME(state->m_oki_command));
-	state->save_item(NAME(state->m_oki_bank));
+	save_item(NAME(m_oki_control));
+	save_item(NAME(m_oki_command));
+	save_item(NAME(m_oki_bank));
 }
 
 

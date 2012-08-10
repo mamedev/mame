@@ -41,6 +41,10 @@ public:
 	DECLARE_WRITE32_MEMBER(policetr_palette_offset_w);
 	DECLARE_WRITE32_MEMBER(policetr_palette_data_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
+	DECLARE_DRIVER_INIT(sshoot12);
+	DECLARE_DRIVER_INIT(policetr);
+	DECLARE_DRIVER_INIT(sshooter);
+	DECLARE_DRIVER_INIT(plctr13b);
 };
 
 

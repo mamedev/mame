@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(circusc_videoram_w);
 	DECLARE_WRITE8_MEMBER(circusc_colorram_w);
 	DECLARE_WRITE8_MEMBER(circusc_flipscreen_w);
+	DECLARE_DRIVER_INIT(circusc);
 };
 
 

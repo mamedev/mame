@@ -51,6 +51,10 @@ public:
 	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);
 
 	DECLARE_READ16_MEMBER( hotmindff_unk_r );
+	DECLARE_DRIVER_INIT(hotmindff);
+	DECLARE_DRIVER_INIT(fitfight);
+	DECLARE_DRIVER_INIT(histryma);
+	DECLARE_DRIVER_INIT(bbprot);
 };
 
 

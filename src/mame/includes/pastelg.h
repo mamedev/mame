@@ -31,6 +31,7 @@ public:
 	DECLARE_READ8_MEMBER(threeds_rom_readback_r);
 	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
+	DECLARE_DRIVER_INIT(pastelg);
 };
 
 

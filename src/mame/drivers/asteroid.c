@@ -933,17 +933,16 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( asteroidb )
+DRIVER_INIT_MEMBER(asteroid_state,asteroidb)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2000, 0x2000, "IN0");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2003, 0x2003, "HS");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2000, 0x2000, "IN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2003, 0x2003, "HS");
 }
 
 
-static DRIVER_INIT( asterock )
+DRIVER_INIT_MEMBER(asteroid_state,asterock)
 {
-	asteroid_state *state = machine.driver_data<asteroid_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
 
 
@@ -954,16 +953,16 @@ static DRIVER_INIT( asterock )
  *
  *************************************/
 
-GAME( 1979, asteroid, 0,        asteroid, asteroid, asteroid_state, 0,        ROT0, "Atari",   "Asteroids (rev 4)",        GAME_SUPPORTS_SAVE )
-GAME( 1979, asteroid2,asteroid, asteroid, asteroid, asteroid_state, 0,        ROT0, "Atari",   "Asteroids (rev 2)",        GAME_SUPPORTS_SAVE )
-GAME( 1979, asteroid1,asteroid, asteroid, asteroid, asteroid_state, 0,        ROT0, "Atari",   "Asteroids (rev 1)",        GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroid, 0,        asteroid, asteroid, driver_device, 0,        ROT0, "Atari",   "Asteroids (rev 4)",        GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroid2,asteroid, asteroid, asteroid, driver_device, 0,        ROT0, "Atari",   "Asteroids (rev 2)",        GAME_SUPPORTS_SAVE )
+GAME( 1979, asteroid1,asteroid, asteroid, asteroid, driver_device, 0,        ROT0, "Atari",   "Asteroids (rev 1)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroidb,asteroid, asteroid, asteroidb, asteroid_state,asteroidb,ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1979, asterock, asteroid, asterock, asterock, asteroid_state, asterock, ROT0, "bootleg (Sidam)",   "Asterock (bootleg of Asteroids)",    GAME_SUPPORTS_SAVE )
-GAME( 1979, meteorts, asteroid, asteroid, asteroid, asteroid_state, 0,        ROT0, "bootleg (VGG)",     "Meteorites (bootleg of Asteroids)",  GAME_SUPPORTS_SAVE )
-GAME( 1979, meteorho, asteroid, asteroid, asteroid, asteroid_state, 0,        ROT0, "bootleg (Hoei)",    "Meteor (bootleg of Asteroids)",      GAME_SUPPORTS_SAVE )
-GAME( 1979, hyperspc, asteroid, asteroid, asteroid, asteroid_state, 0,        ROT0, "bootleg (Rumiano)", "Hyperspace (bootleg of Asteroids)",  GAME_SUPPORTS_SAVE )
-GAMEL(1980, astdelux, 0,        astdelux, astdelux, asteroid_state, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, astdelux2,astdelux, astdelux, astdelux, asteroid_state, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, astdelux1,astdelux, astdelux, astdelux, asteroid_state, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAME( 1979, llander,  0,        llander,  llander, asteroid_state,  0,        ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
-GAME( 1979, llander1, llander,  llander,  llander1, asteroid_state, 0,        ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorts, asteroid, asteroid, asteroid, driver_device, 0,        ROT0, "bootleg (VGG)",     "Meteorites (bootleg of Asteroids)",  GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorho, asteroid, asteroid, asteroid, driver_device, 0,        ROT0, "bootleg (Hoei)",    "Meteor (bootleg of Asteroids)",      GAME_SUPPORTS_SAVE )
+GAME( 1979, hyperspc, asteroid, asteroid, asteroid, driver_device, 0,        ROT0, "bootleg (Rumiano)", "Hyperspace (bootleg of Asteroids)",  GAME_SUPPORTS_SAVE )
+GAMEL(1980, astdelux, 0,        astdelux, astdelux, driver_device, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, astdelux2,astdelux, astdelux, astdelux, driver_device, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, astdelux1,astdelux, astdelux, astdelux, driver_device, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAME( 1979, llander,  0,        llander,  llander, driver_device,  0,        ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
+GAME( 1979, llander1, llander,  llander,  llander1, driver_device, 0,        ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )

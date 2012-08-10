@@ -21,6 +21,10 @@ public:
 	DECLARE_READ8_MEMBER(switch_6502_r);
 	DECLARE_WRITE8_MEMBER(sound_ctl_w);
 	DECLARE_WRITE8_MEMBER(mixer_w);
+	DECLARE_DRIVER_INIT(gauntlet2);
+	DECLARE_DRIVER_INIT(gaunt2p);
+	DECLARE_DRIVER_INIT(gauntlet);
+	DECLARE_DRIVER_INIT(vindctr2);
 };
 
 

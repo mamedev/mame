@@ -198,6 +198,9 @@ public:
 	DECLARE_WRITE32_MEMBER(jetwave_palette_w);
 	DECLARE_READ32_MEMBER(dsp_dataram_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
+	DECLARE_DRIVER_INIT(common);
+	DECLARE_DRIVER_INIT(zr107);
+	DECLARE_DRIVER_INIT(jetwave);
 };
 
 
@@ -831,26 +834,25 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static void init_zr107(running_machine &machine)
+DRIVER_INIT_MEMBER(zr107_state,common)
 {
-	zr107_state *state = machine.driver_data<zr107_state>();
-	state->m_sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
-	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
-	state->m_ccu_vcth = state->m_ccu_vctl = 0;
+	m_sharc_dataram = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_led_reg0 = m_led_reg1 = 0x7f;
+	m_ccu_vcth = m_ccu_vctl = 0;
 
-	K001005_preprocess_texture_data(state->memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 0);
+	K001005_preprocess_texture_data(memregion("gfx1")->base(), memregion("gfx1")->bytes(), 0);
 }
 
-static DRIVER_INIT(zr107)
+DRIVER_INIT_MEMBER(zr107_state,zr107)
 {
-	init_konami_cgboard(machine, 1, CGBOARD_TYPE_ZR107);
-	init_zr107(machine);
+	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_ZR107);
+	init_common();
 }
 
-static DRIVER_INIT(jetwave)
+DRIVER_INIT_MEMBER(zr107_state,jetwave)
 {
-	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
-	init_zr107(machine);
+	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_GTICLUB);
+	init_common();
 }
 
 /*****************************************************************************/

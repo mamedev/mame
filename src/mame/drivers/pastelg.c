@@ -38,7 +38,7 @@ Memo:
 
 
 
-static DRIVER_INIT( pastelg )
+DRIVER_INIT_MEMBER(pastelg_state,pastelg)
 {
 	nb1413m3_type = NB1413M3_PASTELG;
 }

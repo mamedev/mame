@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);
 	DECLARE_WRITE16_MEMBER(yunsun16_vram_0_w);
 	DECLARE_WRITE16_MEMBER(yunsun16_vram_1_w);
+	DECLARE_DRIVER_INIT(magicbub);
 };
 
 

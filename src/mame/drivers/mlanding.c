@@ -74,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(ml_msm_start_lsb_w);
+	DECLARE_DRIVER_INIT(mlanding);
 };
 
 
@@ -846,9 +847,9 @@ ROM_START( mlanding )
 	ROM_LOAD( "ml_b0934.epr", 0x00000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
 ROM_END
 
-static DRIVER_INIT(mlanding)
+DRIVER_INIT_MEMBER(mlanding_state,mlanding)
 {
-//  UINT8 *rom = machine.root_device().memregion("sub")->base();
+//  UINT8 *rom = machine().root_device().memregion("sub")->base();
 //  rom[0x88b]=0x4e;
 //  rom[0x88a]=0x71;
 }

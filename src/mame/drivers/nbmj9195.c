@@ -648,17 +648,16 @@ static MACHINE_RESET( sailorws )
 	}
 }
 
-static DRIVER_INIT( nbmj9195 )
+DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ROM = state->memregion("audiocpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = memregion("audiocpu")->base();
 
 	// sound program patch
 	ROM[0x0213] = 0x00;			// DI -> NOP
 
 	// initialize sound rom bank
-	state->nbmj9195_soundbank_w(*space, 0, 0);
+	nbmj9195_soundbank_w(*space, 0, 0);
 	logerror("DRIVER_INIT( nbmj9195 )\n");
 }
 

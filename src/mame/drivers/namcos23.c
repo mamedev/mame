@@ -1429,6 +1429,7 @@ public:
 	DECLARE_WRITE8_MEMBER(s23_iob_p4_w);
 	DECLARE_READ8_MEMBER(s23_gun_r);
 	DECLARE_READ8_MEMBER(iob_r);
+	DECLARE_DRIVER_INIT(ss23);
 };
 
 
@@ -3066,54 +3067,53 @@ static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_NOP
 ADDRESS_MAP_END
 
-static DRIVER_INIT(ss23)
+DRIVER_INIT_MEMBER(namcos23_state,ss23)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->m_render;
-	state->m_ptrom  = (const UINT32 *)state->memregion("pointrom")->base();
-	state->m_tmlrom = (const UINT16 *)state->memregion("textilemapl")->base();
-	state->m_tmhrom = state->memregion("textilemaph")->base();
-	state->m_texrom = state->memregion("textile")->base();
+	render_t &render = m_render;
+	m_ptrom  = (const UINT32 *)memregion("pointrom")->base();
+	m_tmlrom = (const UINT16 *)memregion("textilemapl")->base();
+	m_tmhrom = memregion("textilemaph")->base();
+	m_texrom = memregion("textile")->base();
 
-	state->m_tileid_mask = (state->memregion("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
-	state->m_tile_mask = state->memregion("textile")->bytes()/256 - 1;
-	state->m_ptrom_limit = state->memregion("pointrom")->bytes()/4;
+	m_tileid_mask = (memregion("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
+	m_tile_mask = memregion("textile")->bytes()/256 - 1;
+	m_ptrom_limit = memregion("pointrom")->bytes()/4;
 
-	state->m_mi_rd = state->m_mi_wr = state->m_im_rd = state->m_im_wr = 0;
-	state->m_jvssense = 1;
-	state->m_ctl_vbl_active = false;
-	state->m_s23_lastpB = 0x50;
-	state->m_s23_setstate = 0;
-	state->m_s23_setnum = 0;
-	memset(state->m_s23_settings, 0, sizeof(state->m_s23_settings));
-	state->m_s23_tssio_port_4 = 0;
-	state->m_s23_porta = 0, state->m_s23_rtcstate = 0;
-	state->m_s23_subcpu_running = 1;
+	m_mi_rd = m_mi_wr = m_im_rd = m_im_wr = 0;
+	m_jvssense = 1;
+	m_ctl_vbl_active = false;
+	m_s23_lastpB = 0x50;
+	m_s23_setstate = 0;
+	m_s23_setnum = 0;
+	memset(m_s23_settings, 0, sizeof(m_s23_settings));
+	m_s23_tssio_port_4 = 0;
+	m_s23_porta = 0, m_s23_rtcstate = 0;
+	m_s23_subcpu_running = 1;
 	render.count[0] = render.count[1] = 0;
 	render.cur = 0;
 
-	if ((!strcmp(machine.system().name, "motoxgo")) ||
-	    (!strcmp(machine.system().name, "panicprk")) ||
-	    (!strcmp(machine.system().name, "rapidrvr")) ||
-	    (!strcmp(machine.system().name, "rapidrvr2")) ||
-	    (!strcmp(machine.system().name, "finlflng")) ||
-	    (!strcmp(machine.system().name, "gunwars")) ||
-	    (!strcmp(machine.system().name, "downhill")) ||
-	    (!strcmp(machine.system().name, "finfurl2")) ||
-	    (!strcmp(machine.system().name, "finfurl2j")) ||
-	    (!strcmp(machine.system().name, "raceon")) ||
-	    (!strcmp(machine.system().name, "crszone")) ||
-	    (!strcmp(machine.system().name, "crszonea")) ||
-	    (!strcmp(machine.system().name, "crszoneb")) ||
-	    (!strcmp(machine.system().name, "crszonec")) ||
-	    (!strcmp(machine.system().name, "timecrs2b")) ||
-	    (!strcmp(machine.system().name, "timecrs2")))
+	if ((!strcmp(machine().system().name, "motoxgo")) ||
+	    (!strcmp(machine().system().name, "panicprk")) ||
+	    (!strcmp(machine().system().name, "rapidrvr")) ||
+	    (!strcmp(machine().system().name, "rapidrvr2")) ||
+	    (!strcmp(machine().system().name, "finlflng")) ||
+	    (!strcmp(machine().system().name, "gunwars")) ||
+	    (!strcmp(machine().system().name, "downhill")) ||
+	    (!strcmp(machine().system().name, "finfurl2")) ||
+	    (!strcmp(machine().system().name, "finfurl2j")) ||
+	    (!strcmp(machine().system().name, "raceon")) ||
+	    (!strcmp(machine().system().name, "crszone")) ||
+	    (!strcmp(machine().system().name, "crszonea")) ||
+	    (!strcmp(machine().system().name, "crszoneb")) ||
+	    (!strcmp(machine().system().name, "crszonec")) ||
+	    (!strcmp(machine().system().name, "timecrs2b")) ||
+	    (!strcmp(machine().system().name, "timecrs2")))
 	{
-		state->m_has_jvsio = 1;
+		m_has_jvsio = 1;
 	}
 	else
 	{
-		state->m_has_jvsio = 0;
+		m_has_jvsio = 0;
 	}
 }
 

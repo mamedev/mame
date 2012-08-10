@@ -201,6 +201,19 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
+	DECLARE_DRIVER_INIT(strtdriv);
+	DECLARE_DRIVER_INIT(harddrivc);
+	DECLARE_DRIVER_INIT(hdrivairp);
+	DECLARE_DRIVER_INIT(racedriv);
+	DECLARE_DRIVER_INIT(hdrivair);
+	DECLARE_DRIVER_INIT(steeltal1);
+	DECLARE_DRIVER_INIT(racedrivc);
+	DECLARE_DRIVER_INIT(steeltal);
+	DECLARE_DRIVER_INIT(racedrivc1);
+	DECLARE_DRIVER_INIT(racedrivb1);
+	DECLARE_DRIVER_INIT(harddriv);
+	DECLARE_DRIVER_INIT(steeltalp);
+	DECLARE_DRIVER_INIT(stunrun);
 };
 
 

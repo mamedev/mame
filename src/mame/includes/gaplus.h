@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gaplus_starfield_control_w);
 	DECLARE_WRITE8_MEMBER(out_lamps0);
 	DECLARE_WRITE8_MEMBER(out_lamps1);
+	DECLARE_DRIVER_INIT(gaplus);
 };
 
 

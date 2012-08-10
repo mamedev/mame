@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
+	DECLARE_DRIVER_INIT(dynadice);
 };
 
 
@@ -292,13 +293,13 @@ ROM_START( dynadice )
 	ROM_LOAD( "dy_5.bin",     0x0000, 0x0800, CRC(e4799462) SHA1(5cd0f003572540522d72706bc5a8fa6588553031) )
 ROM_END
 
-static DRIVER_INIT( dynadice )
+DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 {
 	int i, j;
-	UINT8 *usr1 = machine.root_device().memregion("user1")->base();
-	UINT8 *cpu2 = machine.root_device().memregion("audiocpu")->base();
-	UINT8 *gfx1 = machine.root_device().memregion("gfx1")->base();
-	UINT8 *gfx2 = machine.root_device().memregion("gfx2")->base();
+	UINT8 *usr1 = machine().root_device().memregion("user1")->base();
+	UINT8 *cpu2 = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *gfx1 = machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfx2 = machine().root_device().memregion("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;	/* bug in game code  Dec HL -> Inc HL*/
 

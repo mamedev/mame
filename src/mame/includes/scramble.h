@@ -28,7 +28,30 @@ public:
 	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
-};
+	DECLARE_DRIVER_INIT(cavelon);
+	DECLARE_DRIVER_INIT(mariner);
+	DECLARE_DRIVER_INIT(mrkougb);
+	DECLARE_DRIVER_INIT(scramble_ppi);
+	DECLARE_DRIVER_INIT(mars);
+	DECLARE_DRIVER_INIT(ckongs);
+	DECLARE_DRIVER_INIT(mimonscr);
+	DECLARE_DRIVER_INIT(hotshock);
+	DECLARE_DRIVER_INIT(ad2083);
+	DECLARE_DRIVER_INIT(devilfsh);
+	DECLARE_DRIVER_INIT(mrkougar);
+	
+	DECLARE_DRIVER_INIT(scobra);
+	DECLARE_DRIVER_INIT(stratgyx);
+	DECLARE_DRIVER_INIT(tazmani2);
+	DECLARE_DRIVER_INIT(darkplnt);
+	DECLARE_DRIVER_INIT(mimonkey);
+	DECLARE_DRIVER_INIT(mimonsco);
+	DECLARE_DRIVER_INIT(rescue);
+	DECLARE_DRIVER_INIT(minefld);
+	DECLARE_DRIVER_INIT(hustler);
+	DECLARE_DRIVER_INIT(hustlerd);
+	DECLARE_DRIVER_INIT(billiard);
+};                      
 
 
 /*----------- defined in machine/scramble.c -----------*/
@@ -37,27 +60,6 @@ extern const i8255_interface(scramble_ppi_0_intf);
 extern const i8255_interface(scramble_ppi_1_intf);
 extern const i8255_interface(stratgyx_ppi_1_intf);
 
-DRIVER_INIT( scramble_ppi );
-DRIVER_INIT( stratgyx );
-DRIVER_INIT( tazmani2 );
-DRIVER_INIT( ckongs );
-DRIVER_INIT( mariner );
-DRIVER_INIT( devilfsh );
-DRIVER_INIT( mars );
-DRIVER_INIT( hotshock );
-DRIVER_INIT( cavelon );
-DRIVER_INIT( darkplnt );
-DRIVER_INIT( mimonkey );
-DRIVER_INIT( mimonsco );
-DRIVER_INIT( mimonscr );
-DRIVER_INIT( rescue );
-DRIVER_INIT( minefld );
-DRIVER_INIT( hustler );
-DRIVER_INIT( hustlerd );
-DRIVER_INIT( billiard );
-DRIVER_INIT( mrkougar );
-DRIVER_INIT( mrkougb );
-DRIVER_INIT( ad2083 );
 
 MACHINE_RESET( scramble );
 MACHINE_RESET( explorer );

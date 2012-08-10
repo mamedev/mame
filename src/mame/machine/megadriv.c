@@ -1451,13 +1451,13 @@ static void megadriv_init_common(running_machine &machine)
 
 }
 
-DRIVER_INIT( megadriv_c2 )
+DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 {
 	genvdp_use_cram = 0;
 	genesis_always_irq6 = 1;
 	genesis_other_hacks = 0;
 
-	megadriv_init_common(machine);
+	megadriv_init_common(machine());
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 0;
 	hazemdchoice_megadriv_framerate = 60;
@@ -1465,43 +1465,43 @@ DRIVER_INIT( megadriv_c2 )
 
 
 
-DRIVER_INIT( megadriv )
+DRIVER_INIT_MEMBER(md_base_state,megadriv)
 {
 	genvdp_use_cram = 1;
 	genesis_always_irq6 = 0;
 	genesis_other_hacks = 1;
 
-	megadriv_init_common(machine);
+	megadriv_init_common(machine());
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 0;
 	hazemdchoice_megadriv_framerate = 60;
 }
 
-DRIVER_INIT( megadrij )
+DRIVER_INIT_MEMBER(md_base_state,megadrij)
 {
 	genvdp_use_cram = 1;
 	genesis_always_irq6 = 0;
 	genesis_other_hacks = 1;
 
-	megadriv_init_common(machine);
+	megadriv_init_common(machine());
 	hazemdchoice_megadrive_region_export = 0;
 	hazemdchoice_megadrive_region_pal = 0;
 	hazemdchoice_megadriv_framerate = 60;
 }
 
-DRIVER_INIT( megadrie )
+DRIVER_INIT_MEMBER(md_base_state,megadrie)
 {
 	genvdp_use_cram = 1;
 	genesis_always_irq6 = 0;
 	genesis_other_hacks = 1;
 
-	megadriv_init_common(machine);
+	megadriv_init_common(machine());
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 1;
 	hazemdchoice_megadriv_framerate = 50;
 }
 
-DRIVER_INIT( mpnew )
+DRIVER_INIT_MEMBER(md_base_state,mpnew)
 {
 	DRIVER_INIT_CALL(megadrij);
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_3button;

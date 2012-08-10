@@ -47,6 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
 	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
 	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
+	DECLARE_DRIVER_INIT(upscope);
 };
 
 
@@ -387,9 +388,8 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( upscope )
+DRIVER_INIT_MEMBER(upscope_state,upscope)
 {
-	upscope_state *state = machine.driver_data<upscope_state>();
 	static const amiga_machine_interface upscope_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -399,14 +399,14 @@ static DRIVER_INIT( upscope )
 		NULL,
 		0
 	};
-	amiga_machine_config(machine, &upscope_intf);
+	amiga_machine_config(machine(), &upscope_intf);
 
 	/* allocate NVRAM */
-	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, sizeof(state->m_nvram));
+	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 

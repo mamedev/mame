@@ -1256,26 +1256,23 @@ ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity co
 	ROM_LOAD( "s.u28", 0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
 ROM_END
 
-static DRIVER_INIT (paradise)
+DRIVER_INIT_MEMBER(paradise_state,paradise)
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
-	state->m_sprite_inc = 0x20;
+	m_sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
-static DRIVER_INIT (tgtball)
+DRIVER_INIT_MEMBER(paradise_state,tgtball)
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
-	state->m_sprite_inc = 4;
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),state));
+	m_sprite_inc = 4;
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),this));
 
 }
 
-static DRIVER_INIT (torus)
+DRIVER_INIT_MEMBER(paradise_state,torus)
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
-	state->m_sprite_inc = 4;
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),state));
+	m_sprite_inc = 4;
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),this));
 }
 
 

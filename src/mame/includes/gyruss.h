@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gyruss_dac_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
+	DECLARE_DRIVER_INIT(gyruss);
 };
 
 

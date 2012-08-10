@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
+	DECLARE_DRIVER_INIT(jongkyo);
 };
 
 
@@ -547,10 +548,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( jongkyo )
+DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
 {
 	int i;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0x6000; i < 0x9000; ++i)
@@ -559,7 +560,7 @@ static DRIVER_INIT( jongkyo )
 	}
 
 	/* then do the standard Sega decryption */
-	jongkyo_decode(machine, "maincpu");
+	jongkyo_decode(machine(), "maincpu");
 }
 
 

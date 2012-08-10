@@ -2461,123 +2461,113 @@ static mpu4_chr_table blsbys_data[8] = {
 //request 36 42 27 42 09 42 27 42 42 09
 //verify  00 04 04 0C 0C 1C 14 2C 5C 2C
 
-DRIVER_INIT (m_oldtmr)
+DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=SIX_REEL_1TO8;
-	state->m_reels = 6;
+	m_reel_mux=SIX_REEL_1TO8;
+	m_reels = 6;
 
-	stepper_config(machine, 0, &barcrest_opto1_interface);
-	stepper_config(machine, 1, &barcrest_opto1_interface);
-	stepper_config(machine, 2, &barcrest_opto1_interface);
-	stepper_config(machine, 3, &barcrest_opto1_interface);
-	stepper_config(machine, 4, &barcrest_opto1_interface);
-	stepper_config(machine, 5, &barcrest_opto1_interface);
+	stepper_config(machine(), 0, &barcrest_opto1_interface);
+	stepper_config(machine(), 1, &barcrest_opto1_interface);
+	stepper_config(machine(), 2, &barcrest_opto1_interface);
+	stepper_config(machine(), 3, &barcrest_opto1_interface);
+	stepper_config(machine(), 4, &barcrest_opto1_interface);
+	stepper_config(machine(), 5, &barcrest_opto1_interface);
 
-	state->m_current_chr_table = oldtmr_data;
+	m_current_chr_table = oldtmr_data;
 }
 
-DRIVER_INIT (m_ccelbr)
+DRIVER_INIT_MEMBER(mpu4_state,m_ccelbr)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 4;
+	m_reel_mux=STANDARD_REEL;
+	m_reels = 4;
 	// setup 4 default 96 half step reels ///////////////////////////////////
-	mpu4_config_common_reels(machine,4);
+	mpu4_config_common_reels(machine(),4);
 
-	state->m_current_chr_table = ccelbr_data;
+	m_current_chr_table = ccelbr_data;
 }
 
-DRIVER_INIT (m4gambal)
+DRIVER_INIT_MEMBER(mpu4_state,m4gambal)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 4;
+	m_reel_mux=STANDARD_REEL;
+	m_reels = 4;
 	// setup 4 default 96 half step reels ///////////////////////////////////
-	mpu4_config_common_reels(machine,4);
+	mpu4_config_common_reels(machine(),4);
 
-	state->m_current_chr_table = gmball_data;
+	m_current_chr_table = gmball_data;
 }
 
-DRIVER_INIT (m_grtecp)
+DRIVER_INIT_MEMBER(mpu4_state,m_grtecp)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=FIVE_REEL_5TO8;
-	state->m_reels = 5;
-	state->m_lamp_extender=SMALL_CARD;
+	m_reel_mux=FIVE_REEL_5TO8;
+	m_reels = 5;
+	m_lamp_extender=SMALL_CARD;
 	// setup 4 default 96 half step reels with the mux board
-	mpu4_config_common_reels(machine,5);
-	state->m_current_chr_table = grtecp_data;
+	mpu4_config_common_reels(machine(),5);
+	m_current_chr_table = grtecp_data;
 }
 
-DRIVER_INIT (m_blsbys)
+DRIVER_INIT_MEMBER(mpu4_state,m_blsbys)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_bwb_bank=1;
-	state->m_reel_mux=FIVE_REEL_5TO8;
-	state->m_reels = 5;
-	stepper_config(machine, 0, &bwb_opto1_interface);
-	stepper_config(machine, 1, &bwb_opto1_interface);
-	stepper_config(machine, 2, &bwb_opto1_interface);
-	stepper_config(machine, 3, &bwb_opto1_interface);
-	stepper_config(machine, 4, &bwb_opto1_interface);
-	state->m_bwb_chr_table1 = blsbys_data1;
-	state->m_current_chr_table = blsbys_data;
+	m_bwb_bank=1;
+	m_reel_mux=FIVE_REEL_5TO8;
+	m_reels = 5;
+	stepper_config(machine(), 0, &bwb_opto1_interface);
+	stepper_config(machine(), 1, &bwb_opto1_interface);
+	stepper_config(machine(), 2, &bwb_opto1_interface);
+	stepper_config(machine(), 3, &bwb_opto1_interface);
+	stepper_config(machine(), 4, &bwb_opto1_interface);
+	m_bwb_chr_table1 = blsbys_data1;
+	m_current_chr_table = blsbys_data;
 }
 
-DRIVER_INIT (m4tst2)
+DRIVER_INIT_MEMBER(mpu4_state,m4tst2)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 4;
-	mpu4_config_common_reels(machine,4);
+	m_reel_mux=STANDARD_REEL;
+	m_reels = 4;
+	mpu4_config_common_reels(machine(),4);
 }
 
-DRIVER_INIT (m4tst)
+DRIVER_INIT_MEMBER(mpu4_state,m4tst)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 4;
-	mpu4_config_common_reels(machine,4);
+	m_reel_mux=STANDARD_REEL;
+	m_reels = 4;
+	mpu4_config_common_reels(machine(),4);
 }
 
 
 
-DRIVER_INIT (m4default)
+DRIVER_INIT_MEMBER(mpu4_state,m4default)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 4;
-	mpu4_config_common_reels(machine,4);
-	state->m_bwb_bank=0;
+	m_reel_mux=STANDARD_REEL;
+	m_reels = 4;
+	mpu4_config_common_reels(machine(),4);
+	m_bwb_bank=0;
 }
 
-DRIVER_INIT (m4default_alt)
+DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 8;
-	stepper_config(machine, 0, &barcrest_opto2_interface);
-	stepper_config(machine, 1, &barcrest_opto2_interface);
-	stepper_config(machine, 2, &barcrest_opto2_interface);
-	stepper_config(machine, 3, &barcrest_opto2_interface);
-	stepper_config(machine, 4, &barcrest_opto2_interface);
-	stepper_config(machine, 5, &barcrest_opto2_interface);
-	stepper_config(machine, 6, &barcrest_opto2_interface);
-	stepper_config(machine, 7, &barcrest_opto2_interface);
+	m_reel_mux=STANDARD_REEL;
+	m_reels = 8;
+	stepper_config(machine(), 0, &barcrest_opto2_interface);
+	stepper_config(machine(), 1, &barcrest_opto2_interface);
+	stepper_config(machine(), 2, &barcrest_opto2_interface);
+	stepper_config(machine(), 3, &barcrest_opto2_interface);
+	stepper_config(machine(), 4, &barcrest_opto2_interface);
+	stepper_config(machine(), 5, &barcrest_opto2_interface);
+	stepper_config(machine(), 6, &barcrest_opto2_interface);
+	stepper_config(machine(), 7, &barcrest_opto2_interface);
 
-	state->m_bwb_bank=0;
+	m_bwb_bank=0;
 }
 
 
-DRIVER_INIT( m4default_bigbank )
+DRIVER_INIT_MEMBER(mpu4_state,m4default_bigbank)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	mpu4_state *state = machine.driver_data<mpu4_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default);
-	state->m_bwb_bank=1;
-	space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),state));
-	space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),state));
+	m_bwb_bank=1;
+	space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
+	space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
 }
 
 
@@ -2594,13 +2584,12 @@ WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 	printf("crystal_sound_w %02x\n",data);
 }
 
-DRIVER_INIT (m_frkstn)
+DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	mpu4_state *state = machine.driver_data<mpu4_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default_bigbank);
-	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),state));
-	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),state));
+	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),this));
+	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),this));
 }
 
 // thanks to Project Amber for descramble information
@@ -2625,16 +2614,16 @@ void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
 }
 
 
-DRIVER_INIT( crystal )
+DRIVER_INIT_MEMBER(mpu4_state,crystal)
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(machine().root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
-DRIVER_INIT( crystali )
+DRIVER_INIT_MEMBER(mpu4_state,crystali)
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
+	descramble_crystal(machine().root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
 }
 
 /* generate a 50 Hz signal (based on an RC time) */

@@ -427,5 +427,5 @@ ROM_START( quasara )
 ROM_END
 
 
-GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, quasar,   0,      quasar,   quasar, driver_device,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, quasara,  quasar, quasar,   quasar, driver_device,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

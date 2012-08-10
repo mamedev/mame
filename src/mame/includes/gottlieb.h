@@ -290,6 +290,11 @@ public:
 	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+	DECLARE_DRIVER_INIT(romtiles);
+	DECLARE_DRIVER_INIT(screwloo);
+	DECLARE_DRIVER_INIT(vidvince);
+	DECLARE_DRIVER_INIT(ramtiles);
+	DECLARE_DRIVER_INIT(stooges);
 };
 
 

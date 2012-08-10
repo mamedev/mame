@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(chinhero_ay8910_porta_w);
 	DECLARE_WRITE8_MEMBER(shangkid_ay8910_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	DECLARE_DRIVER_INIT(shangkid);
+	DECLARE_DRIVER_INIT(chinhero);
 };
 
 

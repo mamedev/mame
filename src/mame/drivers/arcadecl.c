@@ -396,9 +396,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( sparkz )
+DRIVER_INIT_MEMBER(arcadecl_state,sparkz)
 {
-	memset(machine.root_device().memregion("gfx1")->base(), 0, machine.root_device().memregion("gfx1")->bytes());
+	memset(machine().root_device().memregion("gfx1")->base(), 0, machine().root_device().memregion("gfx1")->bytes());
 }
 
 
@@ -409,5 +409,5 @@ static DRIVER_INIT( sparkz )
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0,      ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, driver_device, 0,      ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1992, sparkz,   0, arcadecl, sparkz, arcadecl_state,   sparkz, ROT0, "Atari Games", "Sparkz (prototype)", GAME_SUPPORTS_SAVE )

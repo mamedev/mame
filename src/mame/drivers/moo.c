@@ -917,10 +917,9 @@ ROM_START( moomesabl )
 	ROM_LOAD( "moo.nv", 0x0000, 0x080, CRC(7bd904a8) SHA1(8747c5c62d1832e290be8ace73c61b1f228c0bec) )
 ROM_END
 
-static DRIVER_INIT( moo )
+DRIVER_INIT_MEMBER(moo_state,moo)
 {
-	moo_state *state = machine.driver_data<moo_state>();
-	state->m_game_type = (!strcmp(machine.system().name, "bucky") || !strcmp(machine.system().name, "buckyua"));
+	m_game_type = (!strcmp(machine().system().name, "bucky") || !strcmp(machine().system().name, "buckyua"));
 }
 
 

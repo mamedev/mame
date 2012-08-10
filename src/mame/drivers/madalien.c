@@ -417,5 +417,5 @@ ROM_END
 
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_SUPPORTS_SAVE )
-GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, driver_device, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_SUPPORTS_SAVE )
+GAME( 1980, madaliena,madalien, madalien, madalien, driver_device, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

@@ -1637,31 +1637,31 @@ static void gauntlet_common_init(running_machine &machine, int slapstic, int vin
 }
 
 
-static DRIVER_INIT( gauntlet )
+DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
 {
-	gauntlet_common_init(machine, 104, 0);
+	gauntlet_common_init(machine(), 104, 0);
 }
 
 
-static DRIVER_INIT( gaunt2p )
+DRIVER_INIT_MEMBER(gauntlet_state,gaunt2p)
 {
-	gauntlet_common_init(machine, 107, 0);
+	gauntlet_common_init(machine(), 107, 0);
 }
 
 
-static DRIVER_INIT( gauntlet2 )
+DRIVER_INIT_MEMBER(gauntlet_state,gauntlet2)
 {
-	gauntlet_common_init(machine, 106, 0);
+	gauntlet_common_init(machine(), 106, 0);
 }
 
 
-static DRIVER_INIT( vindctr2 )
+DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
-	UINT8 *gfx2_base = machine.root_device().memregion("gfx2")->base();
-	UINT8 *data = auto_alloc_array(machine, UINT8, 0x8000);
+	UINT8 *gfx2_base = machine().root_device().memregion("gfx2")->base();
+	UINT8 *data = auto_alloc_array(machine(), UINT8, 0x8000);
 	int i;
 
-	gauntlet_common_init(machine, 118, 1);
+	gauntlet_common_init(machine(), 118, 1);
 
 	/* highly strange -- the address bits on the chip at 2J (and only that
        chip) are scrambled -- this is verified on the schematics! */
@@ -1672,7 +1672,7 @@ static DRIVER_INIT( vindctr2 )
 		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
 		gfx2_base[0x88000 + i] = data[srcoffs];
 	}
-	auto_free(machine, data);
+	auto_free(machine(), data);
 }
 
 

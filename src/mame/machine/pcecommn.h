@@ -27,7 +27,7 @@ struct pce_struct
 	UINT8 io_port_options; /*driver-specific options for the PCE*/
 };
 extern struct pce_struct pce;
-DRIVER_INIT( pce );
+void init_pce();
 MACHINE_RESET( pce );
 
 void pce_set_joystick_readinputport_callback( UINT8 (*joy_read)(running_machine &));

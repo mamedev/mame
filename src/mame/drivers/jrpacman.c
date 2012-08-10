@@ -111,6 +111,7 @@ public:
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_DRIVER_INIT(jrpacman);
 };
 
 
@@ -355,10 +356,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( jrpacman )
+DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
 {
 	/* The encryption PALs garble bits 0, 2 and 7 of the ROMs. The encryption */
-	/* scheme is complex (basically it's a state machine) and can only be */
+	/* scheme is complex (basically it's a state machine()) and can only be */
 	/* faithfully emulated at run time. To avoid the performance hit that would */
 	/* cause, here we have a table of the values which must be XORed with */
 	/* each memory region to obtain the decrypted bytes. */
@@ -392,7 +393,7 @@ static DRIVER_INIT( jrpacman )
 	    { 0,0 }
 	};
 
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 	int i, j, A;
 
 	for (i = A = 0; table[i].count; i++)

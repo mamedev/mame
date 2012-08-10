@@ -24,6 +24,7 @@ public:
 	DECLARE_READ8_MEMBER(audio_io_r);
 	DECLARE_WRITE8_MEMBER(audio_io_w);
 	DECLARE_READ16_MEMBER(badlandsb_unk_r);
+	DECLARE_DRIVER_INIT(badlands);
 };
 
 

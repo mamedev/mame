@@ -55,6 +55,13 @@ public:
 	DECLARE_WRITE8_MEMBER(spelunkr_palbank_w);
 	DECLARE_WRITE8_MEMBER(spelunk2_gfxport_w);
 	DECLARE_WRITE8_MEMBER(horizon_scrollram_w);
+	DECLARE_DRIVER_INIT(youjyudn);
+	DECLARE_DRIVER_INIT(spelunkr);
+	DECLARE_DRIVER_INIT(ldrun2);
+	DECLARE_DRIVER_INIT(ldrun4);
+	DECLARE_DRIVER_INIT(spelunk2);
+	DECLARE_DRIVER_INIT(kidniki);
+	DECLARE_DRIVER_INIT(battroad);
 };
 
 

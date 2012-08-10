@@ -405,9 +405,9 @@ ROM_START( sotsugyo )
 	ROM_LOAD( "sb030.15h",    0x00000, 0x20000, CRC(1ea43f48) SHA1(74cc8c740f1c7fa94c2cb460ea4ee7aa0c490ed7) )
 ROM_END
 
-static DRIVER_INIT( funkyjet )
+DRIVER_INIT_MEMBER(funkyjet_state,funkyjet)
 {
-	deco74_decrypt_gfx(machine, "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx1");
 }
 
 /******************************************************************************/

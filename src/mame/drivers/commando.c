@@ -514,11 +514,11 @@ ROM_END
 
 /* Driver Initialization */
 
-static DRIVER_INIT( commando )
+DRIVER_INIT_MEMBER(commando_state,commando)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0xc000);
 	int A;
 
 	space->set_decrypted_region(0x0000, 0xbfff, decrypt);
@@ -534,11 +534,11 @@ static DRIVER_INIT( commando )
 	}
 }
 
-static DRIVER_INIT( spaceinv )
+DRIVER_INIT_MEMBER(commando_state,spaceinv)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0xc000);
 	int A;
 
 	space->set_decrypted_region(0x0000, 0xbfff, decrypt);

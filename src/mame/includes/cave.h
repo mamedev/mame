@@ -164,6 +164,23 @@ public:
 	DECLARE_WRITE16_MEMBER(korokoro_eeprom_msb_w);
 	DECLARE_READ16_MEMBER(pwrinst2_eeprom_r);
 	DECLARE_WRITE16_MEMBER(tjumpman_eeprom_lsb_w);
+	DECLARE_DRIVER_INIT(uopoko);
+	DECLARE_DRIVER_INIT(donpachi);
+	DECLARE_DRIVER_INIT(mazinger);
+	DECLARE_DRIVER_INIT(gaia);
+	DECLARE_DRIVER_INIT(pwrinst2);
+	DECLARE_DRIVER_INIT(ddonpach);
+	DECLARE_DRIVER_INIT(agallet);
+	DECLARE_DRIVER_INIT(hotdogst);
+	DECLARE_DRIVER_INIT(tjumpman);
+	DECLARE_DRIVER_INIT(korokoro);
+	DECLARE_DRIVER_INIT(esprade);
+	DECLARE_DRIVER_INIT(pwrinst2j);
+	DECLARE_DRIVER_INIT(guwange);
+	DECLARE_DRIVER_INIT(feversos);
+	DECLARE_DRIVER_INIT(sailormn);
+	DECLARE_DRIVER_INIT(dfeveron);
+	DECLARE_DRIVER_INIT(metmqstr);
 };
 
 /*----------- defined in video/cave.c -----------*/

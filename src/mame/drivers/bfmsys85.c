@@ -109,6 +109,7 @@ public:
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_READ_LINE_MEMBER(sys85_data_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
+	DECLARE_DRIVER_INIT(decode);
 };
 
 
@@ -653,13 +654,12 @@ ROM_START( b85koca )
 ROM_END
 
 
-DRIVER_INIT( decode )
+DRIVER_INIT_MEMBER(bfmsys85_state,decode)
 {
-	bfmsys85_state *state = machine.driver_data<bfmsys85_state>();
-	bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);
+	bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 }
 
-GAME( 1989, b85scard	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		0		,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1989, b85scard	, 0			, bfmsys85, bfmsys85, driver_device,		0		,	  0,       "BFM/ELAM",   "Supercards (Dutch, Game Card 39-340-271?) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1989, b85cexpl	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "Cash Explosion (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1988, b85royal	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "The Royal (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK ) // 'The Royal' ?? hack of the Ritz or Big Deal Club?
 GAME( 1987, b85bdclb	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "Big Deal Club (System 85, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
@@ -682,10 +682,10 @@ GAME( 1987, b85jpclb	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0, 
 GAME( 1987, b85jpclba	, b85jpclb	, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1988, b85jpclbb	, b85jpclb	, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1988, b85jpclbc	, b85jpclb	, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "Jackpot Club (System 85, set 4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		0		,	  0,       "BFM/ELAM",   "Jokers Wild (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1992, b85jkwld	, 0			, bfmsys85, bfmsys85, driver_device,		0		,	  0,       "BFM/ELAM",   "Jokers Wild (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1986, b85lucky	, 0			, bfmsys85, bfmsys85, driver_device,		0		,	  0,       "BFM/ELAM",   "Lucky Cards (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1992, b85luckd	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM/ELAM",   "Lucky Dice (Dutch) (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,       "BFM",   "Super Nudge Gambler (System 85)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85, bfmsys85_state,       0		,	  0,	   "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85, driver_device,       0		,	  0,	   "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, b85koc		, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,	   "BFM",   "King of Clubs (Bellfruit) (System 85, set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 GAME( 199?, b85koca		, b85koc	, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,	   "BFM",   "King of Clubs (Bellfruit) (System 85, set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?

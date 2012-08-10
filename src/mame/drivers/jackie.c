@@ -103,6 +103,7 @@ public:
 	void jackie_unk_reg_hi_w( int offset, UINT8 data, int reg );
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_DRIVER_INIT(jackie);
 };
 
 
@@ -536,11 +537,11 @@ static GFXDECODE_START( jackie )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-static DRIVER_INIT( jackie )
+DRIVER_INIT_MEMBER(jackie_state,jackie)
 {
 
 	int A;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	for (A = 0;A < 0xf000;A++)
 	{

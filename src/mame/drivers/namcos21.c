@@ -2228,63 +2228,61 @@ static void namcos21_init( running_machine &machine, int game_type )
 	}
 } /* namcos21_init */
 
-static DRIVER_INIT( winrun )
+DRIVER_INIT_MEMBER(namcos21_state,winrun)
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)state->memregion("dsp")->base();
+	UINT16 *pMem = (UINT16 *)memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 
-	state->m_winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
+	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
 
 	namcos2_gametype = NAMCOS21_WINRUN91;
-	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
-	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
-	state->m_pointram_idx = 0;
-	state->m_mbNeedsKickstart = 0;
+	m_mpDataROM = (UINT16 *)memregion( "user1" )->base();
+	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram_idx = 0;
+	m_mbNeedsKickstart = 0;
 }
 
-static DRIVER_INIT( aircomb )
+DRIVER_INIT_MEMBER(namcos21_state,aircomb)
 {
-	namcos21_init( machine, NAMCOS21_AIRCOMBAT );
+	namcos21_init( machine(), NAMCOS21_AIRCOMBAT );
 }
 
-static DRIVER_INIT( starblad )
+DRIVER_INIT_MEMBER(namcos21_state,starblad)
 {
-	namcos21_init( machine, NAMCOS21_STARBLADE );
+	namcos21_init( machine(), NAMCOS21_STARBLADE );
 }
 
 
-static DRIVER_INIT( cybsled )
+DRIVER_INIT_MEMBER(namcos21_state,cybsled)
 {
-	namcos21_init( machine, NAMCOS21_CYBERSLED );
+	namcos21_init( machine(), NAMCOS21_CYBERSLED );
 }
 
-static DRIVER_INIT( solvalou )
+DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 {
-	UINT16 *mem = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *mem = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;
 	mem[0x20cf4/2+2] = 0x4e71;
 
-	namcos21_init( machine, NAMCOS21_SOLVALOU );
+	namcos21_init( machine(), NAMCOS21_SOLVALOU );
 }
 
-static DRIVER_INIT( driveyes )
+DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 {
-	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)state->memregion("dsp")->base();
+	UINT16 *pMem = (UINT16 *)memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
-	state->m_winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
+	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
 	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
-	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
-	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
-	state->m_pointram_idx = 0;
-	state->m_mbNeedsKickstart = 0;
+	m_mpDataROM = (UINT16 *)memregion( "user1" )->base();
+	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
+	m_pointram_idx = 0;
+	m_mbNeedsKickstart = 0;
 }
 
 /*************************************************************/

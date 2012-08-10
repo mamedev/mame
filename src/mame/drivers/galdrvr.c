@@ -6672,13 +6672,13 @@ GAME( 1985, superbon,  0,        scobra,   superbon, galaxian_state,  superbon, 
 //GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, XXX_CLASS, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 1)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, XXX_CLASS, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, hotshock, 0,        theend  /*hotshock*/, hotshock, XXX_CLASS, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
-//GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, XXX_CLASS, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
+//GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, driver_device, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 //GAME( 1983, hunchbks, hunchbak, theend  /*hunchbks*/, hunchbks, XXX_CLASS, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1984, hncholms, huncholy, theend  /*hncholms*/, hncholms, XXX_CLASS, scramble_ppi, ROT90, "Century Electronics", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, cavelon,  0,        theend  /*cavelon*/,  cavelon, XXX_CLASS,  cavelon,      ROT90, "Jetsoft", "Cavelon", GAME_SUPPORTS_SAVE )
 //GAME( 1982, mimonscr, mimonkey, theend  /*mimonscr*/, mimonscr, XXX_CLASS, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, ad2083,   0,        theend  /*ad2083*/,   ad2083, XXX_CLASS,   ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-//GAME( 1981, turpins,  turtles,  turtles,  turpins, galaxian_state,  0,              ROT90, "bootleg", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
+//GAME( 1981, turpins,  turtles,  turtles,  turpins, driver_device,  0,              ROT90, "bootleg", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
 
 /* currently in scobra.c and should be moved here */
 //GAME( 1981, stratgyx, 0,        scobra/*stratgyx*/, stratgyx, XXX_CLASS, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
@@ -6700,4 +6700,4 @@ GAME( 1985, superbon,  0,        scobra,   superbon, galaxian_state,  superbon, 
 
 /* misc stuff that should eventually be moved here */
 //GAME( 1981, scramblb, scramble, scramblb, scramblb, galaxian_state, galaxian, ROT90,  "bootleg", "Scramble (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1981, scramb2,  scramble, scramb2,  scramb2, galaxian_state,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, scramb2,  scramble, scramb2,  scramb2, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_SUPPORTS_SAVE )

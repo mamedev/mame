@@ -113,6 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
+	DECLARE_DRIVER_INIT(jokrwild);
 };
 
 
@@ -537,7 +538,7 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-static DRIVER_INIT( jokrwild )
+DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 /*****************************************************************************
 
     Encryption was made by pages of 256 bytes.
@@ -555,7 +556,7 @@ static DRIVER_INIT( jokrwild )
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *srcp = machine().root_device().memregion( "maincpu" )->base();
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{

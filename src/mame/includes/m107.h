@@ -44,6 +44,9 @@ public:
 	DECLARE_WRITE16_MEMBER(m107_vram_w);
 	DECLARE_WRITE16_MEMBER(m107_control_w);
 	DECLARE_WRITE16_MEMBER(m107_spritebuffer_w);
+	DECLARE_DRIVER_INIT(firebarr);
+	DECLARE_DRIVER_INIT(dsoccr94);
+	DECLARE_DRIVER_INIT(wpksoc);
 };
 
 

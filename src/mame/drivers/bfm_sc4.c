@@ -207,9 +207,9 @@ INPUT_PORTS_END
 
 
 
-DRIVER_INIT( sc4 )
+DRIVER_INIT_MEMBER(sc4_state,sc4)
 {
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
 	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
 	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
 	{
@@ -223,33 +223,31 @@ DRIVER_INIT( sc4 )
 	// there is usually a string in the rom with identification info, often also saying which sound rom should be used!
 	// find it.
 
-	int found = find_project_string(machine, 1, 0);
+	int found = find_project_string(machine(), 1, 0);
 	if (!found)
 		printf("Normal rom pair string not found, checking mismatched / missing rom string\n");
 
 	// help identify roms where one of the pair is missing too
 	if (!found)
 	{
-		 found = find_project_string(machine, 1, 1);
-		 found = find_project_string(machine, 1, 2);
+		 found = find_project_string(machine(), 1, 1);
+		 found = find_project_string(machine(), 1, 2);
 	}
 
 	if (!found)
 		printf("No suitable string found\n");
 
 
-	sc4_state *state = machine.driver_data<sc4_state>();
 
-	state->m_reel_setup = default_reel_configs;
+	m_reel_setup = default_reel_configs;
 
 }
 
-DRIVER_INIT( sc4mbus )
+DRIVER_INIT_MEMBER(sc4_state,sc4mbus)
 {
-	DRIVER_INIT_CALL( sc4 );
-	sc4_state *state = machine.driver_data<sc4_state>();
-	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
-	find_mbus(state, rom);
+	DRIVER_INIT_CALL(sc4);
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	find_mbus(this, rom);
 }
 
 
@@ -23339,11 +23337,10 @@ const stepper_interface* sc4cvani_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4cvani )
+DRIVER_INIT_MEMBER(sc4_state,sc4cvani)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4cvani_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cvani_reel_configs;
 }
 
 // PR2052 CASHLVANIA         VANIASND           CASH'!'VANIA
@@ -23368,11 +23365,10 @@ const stepper_interface* sc4cvclb_reel_configs[6] =
 	&starpoint_interface_200step_reel,
 };
 
-static DRIVER_INIT( sc4cvclb )
+DRIVER_INIT_MEMBER(sc4_state,sc4cvclb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4cvclb_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cvclb_reel_configs;
 }
 
 // PRXXXX CLUBCASHLVANIA V1.0         CLUBVANIASND         CLUB  CASH!VANIA
@@ -23480,18 +23476,16 @@ const stepper_interface* sc4bonbx_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4bonbxm )
+DRIVER_INIT_MEMBER(sc4_state,sc4bonbxm)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4bonbx_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4bonbx_reel_configs;
 }
 
-static DRIVER_INIT( sc4bonbx )
+DRIVER_INIT_MEMBER(sc4_state,sc4bonbx)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4bonbx_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bonbx_reel_configs;
 }
 
 INPUT_PORTS_START( sc4bonbx4 )
@@ -23772,12 +23766,11 @@ const stepper_interface* sc4crcc_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4crcc )
+DRIVER_INIT_MEMBER(sc4_state,sc4crcc)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	BFM_dm01_config(machine, &dm01_interface);
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4crcc_reel_configs;
+	BFM_dm01_config(machine(), &dm01_interface);
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4crcc_reel_configs;
 }
 
 
@@ -24097,12 +24090,11 @@ const stepper_interface* sc4fcc_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4fcc )
+DRIVER_INIT_MEMBER(sc4_state,sc4fcc)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	BFM_dm01_config(machine, &dm01_interface);
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4fcc_reel_configs;
+	BFM_dm01_config(machine(), &dm01_interface);
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4fcc_reel_configs;
 }
 
 // PR6835 FIRE CRACKER         PR6835 FIRE SOUNDS11
@@ -24741,11 +24733,10 @@ const stepper_interface* sc4luckb_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4luckb )
+DRIVER_INIT_MEMBER(sc4_state,sc4luckb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4luckb_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4luckb_reel_configs;
 }
 
 
@@ -24864,18 +24855,16 @@ const stepper_interface* sc4mgr_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4mgr )
+DRIVER_INIT_MEMBER(sc4_state,sc4mgr)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4mgr_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4mgr_reel_configs;
 }
 
-static DRIVER_INIT( sc4mgrm )
+DRIVER_INIT_MEMBER(sc4_state,sc4mgrm)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4mgr_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4mgr_reel_configs;
 }
 
 // PR1132 CASINO MONEY GO ROUND         PR1132 MONEY GO ROUND SOUNDS11
@@ -25113,11 +25102,10 @@ const stepper_interface* sc4pgold_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4pgold )
+DRIVER_INIT_MEMBER(sc4_state,sc4pgold)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4pgold_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4pgold_reel_configs;
 }
 
 // PR1012 PHARAOH'S GOLD         PR1012 PHARAOHS GOLD SOUNDS11
@@ -25424,11 +25412,10 @@ const stepper_interface* sc4royle_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4royle )
+DRIVER_INIT_MEMBER(sc4_state,sc4royle)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4royle_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4royle_reel_configs;
 }
 
 // PR1102 ROYLEFAMILY         PR1102 ROYLEFAMILY SOUNDS11
@@ -25792,12 +25779,11 @@ const stepper_interface* sc4ticlb_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4ticlb )
+DRIVER_INIT_MEMBER(sc4_state,sc4ticlb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	BFM_dm01_config(machine, &dm01_interface);
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4ticlb_reel_configs;
+	BFM_dm01_config(machine(), &dm01_interface);
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ticlb_reel_configs;
 }
 
 // PR6832 TREASURE ISLAND FIXED 65%         PR6832 TRES SOUNDS11
@@ -26120,12 +26106,11 @@ const stepper_interface* sc4clbtm_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4clbtm )
+DRIVER_INIT_MEMBER(sc4_state,sc4clbtm)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	BFM_dm01_config(machine, &dm01_interface);
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4clbtm_reel_configs;
+	BFM_dm01_config(machine(), &dm01_interface);
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4clbtm_reel_configs;
 }
 
 
@@ -26290,11 +26275,10 @@ const stepper_interface* sc4bull_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4bull )
+DRIVER_INIT_MEMBER(sc4_state,sc4bull)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4bull_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4bull_reel_configs;
 }
 
 // PR1722 AWP BULLSEYE SCORP4         PR1702 BULLSEYE SOUNDS11         BULLSEYE  S.SITE
@@ -26475,11 +26459,10 @@ const stepper_interface* sc4dnd_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dnd )
+DRIVER_INIT_MEMBER(sc4_state,sc4dnd)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dnd_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dnd_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dnd25 )
@@ -26524,11 +26507,10 @@ const stepper_interface* sc4dndcs_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndcs )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndcs)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndcs_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndcs_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndcs5 )
@@ -26556,11 +26538,10 @@ const stepper_interface* sc4dndbb_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndbb )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndbb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndbb_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndbb_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndbb35 )
@@ -26600,11 +26581,10 @@ const stepper_interface* sc4dndcl_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndcl )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndcl)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndcl_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndcl_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndcl250 )
@@ -26641,11 +26621,10 @@ const stepper_interface* sc4dnddd_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dnddd )
+DRIVER_INIT_MEMBER(sc4_state,sc4dnddd)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dnddd_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dnddd_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dnddd35 )
@@ -26683,11 +26662,10 @@ const stepper_interface* sc4dndhf_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndhf )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndhf)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndhf_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndhf_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndhf35 )
@@ -26729,11 +26707,10 @@ const stepper_interface* sc4dndys_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndys )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndys)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndys_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndys_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndys35 )
@@ -26768,11 +26745,10 @@ const stepper_interface* sc4dndlp_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4dndlp )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndlp)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndlp_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndlp_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndlp70 )
@@ -26802,11 +26778,10 @@ const stepper_interface* sc4dndra_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndra )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndra)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndra_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndra_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndra35 )
@@ -26841,11 +26816,10 @@ const stepper_interface* sc4dndbd_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4dndbd )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndbd)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndbd_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndbd_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndbd35 )
@@ -26881,11 +26855,10 @@ const stepper_interface* sc4dndbr_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndbr )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndbr)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndbr_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndbr_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndbr35 )
@@ -26923,11 +26896,10 @@ const stepper_interface* sc4dndcc_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4dndcc )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndcc)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndcc_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndcc_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndcc35 )
@@ -26964,11 +26936,10 @@ const stepper_interface* sc4dnddw_reel_configs[6] =
 	&starpoint_interface_200step_reel,
 };
 
-static DRIVER_INIT( sc4dnddw )
+DRIVER_INIT_MEMBER(sc4_state,sc4dnddw)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dnddw_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dnddw_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dnddw35 )
@@ -27005,11 +26976,10 @@ const stepper_interface* sc4dnddf_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dnddf )
+DRIVER_INIT_MEMBER(sc4_state,sc4dnddf)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dnddf_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dnddf_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dnddf35 )
@@ -27044,11 +27014,10 @@ const stepper_interface* sc4dndpg_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4dndpg )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndpg)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndpg_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndpg_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndpg35 )
@@ -27084,11 +27053,10 @@ const stepper_interface* sc4dndtp_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4dndtp )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndtp)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndtp_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndtp_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndtp35 )
@@ -27125,11 +27093,10 @@ const stepper_interface* sc4dndww_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndww )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndww)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndww_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndww_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndww35 )
@@ -27158,11 +27125,10 @@ const stepper_interface* sc4dndcw_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndcw )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndcw)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndcw_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndcw_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndcw5 )
@@ -27189,11 +27155,10 @@ const stepper_interface* sc4dndtr_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndtr )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndtr)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndtr_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndtr_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndtr70 )
@@ -27218,11 +27183,10 @@ const stepper_interface* sc4dndwb_reel_configs[6] =
 	&starpoint_interface_200step_reel,
 };
 
-static DRIVER_INIT( sc4dndwb )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndwb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndwb_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndwb_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndwb35 )
@@ -27252,11 +27216,10 @@ const stepper_interface* sc4dndbe_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4dndbe )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndbe)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndbe_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndbe_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndbe25 )
@@ -27299,11 +27262,10 @@ const stepper_interface* sc4dndbc_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4dndbc )
+DRIVER_INIT_MEMBER(sc4_state,sc4dndbc)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4dndbc_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4dndbc_reel_configs;
 }
 
 INPUT_PORTS_START( sc4dndbc70 )
@@ -27393,11 +27355,10 @@ const stepper_interface* sc4fguy_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4fguy )
+DRIVER_INIT_MEMBER(sc4_state,sc4fguy)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4fguy_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4fguy_reel_configs;
 }
 
 INPUT_PORTS_START( sc4fguy35 )
@@ -27454,11 +27415,10 @@ const stepper_interface* sc4gd_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4gd )
+DRIVER_INIT_MEMBER(sc4_state,sc4gd)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4gd_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gd_reel_configs;
 }
 
 // PR1016 GOLD DIGGER         PR1016 GOLD DIGGER SOUNDS11
@@ -27485,11 +27445,10 @@ const stepper_interface* sc4gdclb_reel_configs[6] =
 	&starpoint_interface_200step_reel,
 };
 
-static DRIVER_INIT( sc4gdclb )
+DRIVER_INIT_MEMBER(sc4_state,sc4gdclb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4gdclb_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gdclb_reel_configs;
 }
 
 
@@ -27517,11 +27476,10 @@ const stepper_interface* sc4gbcas_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4gbcas )
+DRIVER_INIT_MEMBER(sc4_state,sc4gbcas)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4gbcas_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gbcas_reel_configs;
 }
 
 // this one is a variation of lucky balls
@@ -27542,11 +27500,10 @@ const stepper_interface* sc4gball_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4gball )
+DRIVER_INIT_MEMBER(sc4_state,sc4gball)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4gball_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gball_reel_configs;
 }
 
 // this is a football themed game...
@@ -27566,11 +27523,10 @@ const stepper_interface* sc4gunp_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4gunp )
+DRIVER_INIT_MEMBER(sc4_state,sc4gunp)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4gunp_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4gunp_reel_configs;
 }
 
 // PR3046 AWP THE GUNPOWDER SLOT S4         PR3016 GUNPOWDER SLOT SOUNDS11    GUNPOWDER SLOT  S.SITE
@@ -27593,11 +27549,10 @@ const stepper_interface* sc4hapnt_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4hapnt )
+DRIVER_INIT_MEMBER(sc4_state,sc4hapnt)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4hapnt_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4hapnt_reel_configs;
 }
 
 // PR1306 AWP HAPPY NOTES         PR1306 HAPPY NOTES SOUNDS11
@@ -27618,19 +27573,17 @@ const stepper_interface* sc4hntcs_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4hntcsm )
+DRIVER_INIT_MEMBER(sc4_state,sc4hntcsm)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4hntcs_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4hntcs_reel_configs;
 }
 
 
-static DRIVER_INIT( sc4hntcs )
+DRIVER_INIT_MEMBER(sc4_state,sc4hntcs)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4hntcs_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4hntcs_reel_configs;
 }
 
 // PR1327 CASINO HAPPY NOTES         HAPPY NOTES S.SITE  PR1327 CAS_HAPPY_NOTES SOUNDS11
@@ -27684,11 +27637,10 @@ const stepper_interface* sc4hill_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4hill )
+DRIVER_INIT_MEMBER(sc4_state,sc4hill)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4hill_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4hill_reel_configs;
 }
 
 // PR1643 AWP HILLBILLIONAIRE SCORP4         PR1613 HILLBILLIONAIRE SOUNDS11   HILLBILLIONAIRE S.SITE
@@ -28325,11 +28277,10 @@ const stepper_interface* sc4bwow_reel_configs[6] =
 	&starpoint_interface_200step_reel,
 };
 
-static DRIVER_INIT( sc4bwow )
+DRIVER_INIT_MEMBER(sc4_state,sc4bwow)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4bwow_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4bwow_reel_configs;
 }
 
 GAME( 200?, sc4bwow	  ,0,	    sc4, sc4, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR1726 AWP WHEEL OF WEALTH         PR1706 WHEEL OF WEALTH SOUNDS11   WHEEL OF WEALTH S.SITE
@@ -28381,18 +28332,16 @@ const stepper_interface* sc4ggame_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4ggamem )
+DRIVER_INIT_MEMBER(sc4_state,sc4ggamem)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4mbus );
-	state->m_reel_setup = sc4ggame_reel_configs;
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4ggame_reel_configs;
 }
 
-static DRIVER_INIT( sc4ggame )
+DRIVER_INIT_MEMBER(sc4_state,sc4ggame)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4ggame_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ggame_reel_configs;
 }
 
 // 25GBP sets
@@ -28467,11 +28416,10 @@ const stepper_interface* sc4gggtb_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-static DRIVER_INIT( sc4gggtb )
+DRIVER_INIT_MEMBER(sc4_state,sc4gggtb)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4gggtb_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gggtb_reel_configs;
 }
 
 // most of these look similar
@@ -28489,11 +28437,10 @@ const stepper_interface* sc4ggg_reel_configs[6] =
 	0,
 };
 
-static DRIVER_INIT( sc4ggg )
+DRIVER_INIT_MEMBER(sc4_state,sc4ggg)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
-	DRIVER_INIT_CALL( sc4 );
-	state->m_reel_setup = sc4ggg_reel_configs;
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ggg_reel_configs;
 }
 
 // do these sets have the wrong project name / ID strings? they boot at GGGB (Grand Golden Game) but their product ID in the header suggests standard Golden Game
@@ -28830,11 +28777,11 @@ GAME( 200?, sc4boomba	,sc4boomb,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Mono
 
 /* Scorpion 4 + Adder 4 */
 
-GAME( 200?, ad4skill	,0,			sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, ad4film		,0,			sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
-GAME( 200?, ad4filma	,ad4film,	sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, ad4ctl		,0,			sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, ad4ctla		,ad4ctl,	sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, ad4skill	,0,			sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, ad4film		,0,			sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
+GAME( 200?, ad4filma	,ad4film,	sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, ad4ctl		,0,			sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, ad4ctla		,ad4ctl,	sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 
 

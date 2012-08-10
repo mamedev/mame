@@ -976,35 +976,33 @@ ROM_START( opwolfb )
 ROM_END
 
 
-static DRIVER_INIT( opwolf )
+DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 {
-	opwolf_state *state = machine.driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)state->memregion("maincpu")->base();
+	UINT16* rom = (UINT16*)memregion("maincpu")->base();
 
-	state->m_opwolf_region = rom[0x03fffe / 2] & 0xff;
+	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
-	opwolf_cchip_init(machine);
+	opwolf_cchip_init(machine());
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
-	state->m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
-	state->m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
+	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
+	m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
-static DRIVER_INIT( opwolfb )
+DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 {
-	opwolf_state *state = machine.driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)state->memregion("maincpu")->base();
+	UINT16* rom = (UINT16*)memregion("maincpu")->base();
 
-	state->m_opwolf_region = rom[0x03fffe / 2] & 0xff;
+	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
 	/* bootleg needs different range of raw gun coords */
-	state->m_opwolf_gun_xoffs = -2;
-	state->m_opwolf_gun_yoffs = 17;
+	m_opwolf_gun_xoffs = -2;
+	m_opwolf_gun_yoffs = 17;
 
-	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

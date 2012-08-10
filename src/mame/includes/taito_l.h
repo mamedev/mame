@@ -103,6 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER(champwr_msm5205_stop_w);
 	DECLARE_WRITE8_MEMBER(champwr_msm5205_volume_w);
 	DECLARE_WRITE8_MEMBER(portA_w);
+	DECLARE_DRIVER_INIT(plottinga);
 };
 
 /*----------- defined in video/taito_l.c -----------*/

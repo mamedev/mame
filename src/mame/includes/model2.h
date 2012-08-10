@@ -145,6 +145,15 @@ public:
 	void push_geo_data(UINT32 data);
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
+	DECLARE_DRIVER_INIT(overrev);
+	DECLARE_DRIVER_INIT(pltkids);
+	DECLARE_DRIVER_INIT(rchase2);
+	DECLARE_DRIVER_INIT(genprot);
+	DECLARE_DRIVER_INIT(daytonam);
+	DECLARE_DRIVER_INIT(srallyc);
+	DECLARE_DRIVER_INIT(doa);
+	DECLARE_DRIVER_INIT(zerogun);
+	DECLARE_DRIVER_INIT(sgt24h);
 };
 
 

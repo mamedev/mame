@@ -546,9 +546,9 @@ ROM_START( circusce ) /* Version P */
 ROM_END
 
 
-static DRIVER_INIT( circusc )
+DRIVER_INIT_MEMBER(circusc_state,circusc)
 {
-	konami1_decode(machine, "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
 

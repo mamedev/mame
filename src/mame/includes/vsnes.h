@@ -77,6 +77,20 @@ public:
 	DECLARE_READ8_MEMBER(psg2_4015_r);
 	DECLARE_WRITE8_MEMBER(psg2_4015_w);
 	DECLARE_WRITE8_MEMBER(psg2_4017_w);
+	DECLARE_DRIVER_INIT(vskonami);
+	DECLARE_DRIVER_INIT(vsvram);
+	DECLARE_DRIVER_INIT(bnglngby);
+	DECLARE_DRIVER_INIT(drmario);
+	DECLARE_DRIVER_INIT(MMC3);
+	DECLARE_DRIVER_INIT(vsfdf);
+	DECLARE_DRIVER_INIT(tkoboxng);
+	DECLARE_DRIVER_INIT(vsgun);
+	DECLARE_DRIVER_INIT(supxevs);
+	DECLARE_DRIVER_INIT(vsgshoe);
+	DECLARE_DRIVER_INIT(vsnormal);
+	DECLARE_DRIVER_INIT(platoon);
+	DECLARE_DRIVER_INIT(rbibb);
+	DECLARE_DRIVER_INIT(vsdual);
 };
 
 
@@ -100,18 +114,4 @@ MACHINE_RESET( vsdual );
 MACHINE_START( vsnes );
 MACHINE_START( vsdual );
 
-DRIVER_INIT( vsnormal );
-DRIVER_INIT( vsgun );
-DRIVER_INIT( vskonami );
-DRIVER_INIT( vsvram );
-DRIVER_INIT( drmario );
-DRIVER_INIT( rbibb );
-DRIVER_INIT( tkoboxng );
-DRIVER_INIT( MMC3 );
-DRIVER_INIT( platoon );
-DRIVER_INIT( supxevs );
-DRIVER_INIT( bnglngby );
-DRIVER_INIT( vsgshoe );
-DRIVER_INIT( vsfdf );
-DRIVER_INIT( vsdual );
 

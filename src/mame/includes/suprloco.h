@@ -18,6 +18,7 @@ public:
 	DECLARE_WRITE8_MEMBER(suprloco_scrollram_w);
 	DECLARE_WRITE8_MEMBER(suprloco_control_w);
 	DECLARE_READ8_MEMBER(suprloco_control_r);
+	DECLARE_DRIVER_INIT(suprloco);
 };
 
 

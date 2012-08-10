@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_COLOR_write);
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
+	DECLARE_DRIVER_INIT(astron);
 };
 
 /* VIDEO GOODS */
@@ -595,10 +596,10 @@ ROM_START( cobraseg )
 ROM_END
 
 
-static DRIVER_INIT( astron )
+DRIVER_INIT_MEMBER(segald_state,astron)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 }
 
 

@@ -43,6 +43,7 @@ public:
 	pcat_dyn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_DRIVER_INIT(pcat_dyn);
 };
 
 
@@ -193,10 +194,10 @@ ROM_START(toursol1)
 	ROM_LOAD("prom.7", 0xe0000, 0x02000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
 ROM_END
 
-static DRIVER_INIT(pcat_dyn)
+DRIVER_INIT_MEMBER(pcat_dyn_state,pcat_dyn)
 {
-	pc_vga_init(machine, vga_setting, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, pcat_dyn, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", GAME_NOT_WORKING|GAME_NO_SOUND )

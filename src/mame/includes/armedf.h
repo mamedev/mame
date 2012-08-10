@@ -60,6 +60,14 @@ public:
 	DECLARE_WRITE16_MEMBER(armedf_fg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrolly_w);
+	DECLARE_DRIVER_INIT(cclimbr2);
+	DECLARE_DRIVER_INIT(armedf);
+	DECLARE_DRIVER_INIT(legion);
+	DECLARE_DRIVER_INIT(terrafu);
+	DECLARE_DRIVER_INIT(legiono);
+	DECLARE_DRIVER_INIT(kozure);
+	DECLARE_DRIVER_INIT(terraf);
+	DECLARE_DRIVER_INIT(terrafb);
 };
 
 class bigfghtr_state : public armedf_state
@@ -79,6 +87,7 @@ public:
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
+	DECLARE_DRIVER_INIT(bigfghtr);
 };
 
 /*----------- defined in video/armedf.c -----------*/

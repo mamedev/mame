@@ -18,6 +18,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(mephisto);
 };
 
 
@@ -35,7 +37,7 @@ void mephisto_pinball_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( mephisto )
+DRIVER_INIT_MEMBER(mephisto_pinball_state,mephisto)
 {
 }
 

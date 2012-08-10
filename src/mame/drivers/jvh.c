@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(jvh);
 };
 
 
@@ -32,7 +34,7 @@ void jvh_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( jvh )
+DRIVER_INIT_MEMBER(jvh_state,jvh)
 {
 }
 

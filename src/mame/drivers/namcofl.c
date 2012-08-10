@@ -815,15 +815,15 @@ static void namcofl_common_init(running_machine &machine)
 	state->membank("bank2")->set_base(state->m_workram );
 }
 
-static DRIVER_INIT(speedrcr)
+DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
 {
-	namcofl_common_init(machine);
+	namcofl_common_init(machine());
 	namcos2_gametype = NAMCOFL_SPEED_RACER;
 }
 
-static DRIVER_INIT(finalapr)
+DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 {
-	namcofl_common_init(machine);
+	namcofl_common_init(machine());
 	namcos2_gametype = NAMCOFL_FINAL_LAP_R;
 }
 

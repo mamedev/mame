@@ -78,6 +78,11 @@ public:
     DECLARE_WRITE8_MEMBER(qs1000_p1_w);
     DECLARE_WRITE8_MEMBER(qs1000_p2_w);
     DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	DECLARE_DRIVER_INIT(common);
+	DECLARE_DRIVER_INIT(sb2003);
+	DECLARE_DRIVER_INIT(dynabomb);
+	DECLARE_DRIVER_INIT(legendoh);
+	DECLARE_DRIVER_INIT(spotty);
 };
 
 
@@ -1112,47 +1117,42 @@ READ32_MEMBER(limenko_state::spotty_speedup_r)
 	return m_mainram[0x6626c/4];
 }
 
-static DRIVER_INIT( common )
+DRIVER_INIT_MEMBER(limenko_state,common)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
 
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine.device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
-	state->membank("qs1000:bank")->configure_entries(0, 8, state->memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	machine().device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
+	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
-	state->m_spriteram_bit = 1;
+	m_spriteram_bit = 1;
 }
 
-static DRIVER_INIT( dynabomb )
+DRIVER_INIT_MEMBER(limenko_state,dynabomb)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
-static DRIVER_INIT( legendoh )
+DRIVER_INIT_MEMBER(limenko_state,legendoh)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
-static DRIVER_INIT( sb2003 )
+DRIVER_INIT_MEMBER(limenko_state,sb2003)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
 
-static DRIVER_INIT( spotty )
+DRIVER_INIT_MEMBER(limenko_state,spotty)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	UINT8 *dst    = state->memregion("gfx1")->base();
-	UINT8 *src    = state->memregion("user2")->base();
+	UINT8 *dst    = memregion("gfx1")->base();
+	UINT8 *src    = memregion("user2")->base();
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */
@@ -1164,9 +1164,9 @@ static DRIVER_INIT( spotty )
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
 
-	state->m_spriteram_bit = 1;
+	m_spriteram_bit = 1;
 }
 
 GAME( 2000, dynabomb, 0,      limenko, sb2003, limenko_state,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_IMPERFECT_SOUND )

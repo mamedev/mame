@@ -289,35 +289,34 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 
 /********************** Revolution X **********************/
 
-DRIVER_INIT( revx )
+DRIVER_INIT_MEMBER(midxunit_state,revx)
 {
-	midxunit_state *state = machine.driver_data<midxunit_state>();
 	UINT8 *base;
 	int i, j, len;
 
 	/* register for state saving */
-	register_state_saving(machine);
+	register_state_saving(machine());
 
 	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = state->memregion("gfx1")->base();
-	len = state->memregion("gfx1")->bytes();
+	midtunit_gfx_rom = base = memregion("gfx1")->base();
+	len = memregion("gfx1")->bytes();
 	for (i = 0; i < len / 0x200000; i++)
 	{
-		memcpy(state->m_decode_memory, base, 0x200000);
+		memcpy(m_decode_memory, base, 0x200000);
 		for (j = 0; j < 0x80000; j++)
 		{
-			*base++ = state->m_decode_memory[0x000000 + j];
-			*base++ = state->m_decode_memory[0x080000 + j];
-			*base++ = state->m_decode_memory[0x100000 + j];
-			*base++ = state->m_decode_memory[0x180000 + j];
+			*base++ = m_decode_memory[0x000000 + j];
+			*base++ = m_decode_memory[0x080000 + j];
+			*base++ = m_decode_memory[0x100000 + j];
+			*base++ = m_decode_memory[0x180000 + j];
 		}
 	}
 
 	/* init sound */
-	dcs_init(machine);
+	dcs_init(machine());
 
 	/* serial prefixes 419, 420 */
-	midway_serial_pic_init(machine, 419);
+	midway_serial_pic_init(machine(), 419);
 }
 
 

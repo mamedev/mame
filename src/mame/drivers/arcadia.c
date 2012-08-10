@@ -68,6 +68,17 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 	DECLARE_WRITE8_MEMBER(arcadia_cia_0_porta_w);
 	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
+	DECLARE_DRIVER_INIT(xeon);
+	DECLARE_DRIVER_INIT(sdwr);
+	DECLARE_DRIVER_INIT(dart);
+	DECLARE_DRIVER_INIT(bowl);
+	DECLARE_DRIVER_INIT(none);
+	DECLARE_DRIVER_INIT(sprg);
+	DECLARE_DRIVER_INIT(rdwr);
+	DECLARE_DRIVER_INIT(ninj);
+	DECLARE_DRIVER_INIT(airh);
+	DECLARE_DRIVER_INIT(ldrba);
+	DECLARE_DRIVER_INIT(socc);
 };
 
 
@@ -826,19 +837,17 @@ static void arcadia_init(running_machine &machine)
  *
  *************************************/
 
-static DRIVER_INIT( none )  { arcadia_init(machine); }
-static DRIVER_INIT( airh )  { arcadia_init(machine); generic_decode(machine, "user3", 5, 0, 2, 4, 7, 6, 1, 3); }
-static DRIVER_INIT( bowl )  { arcadia_init(machine); generic_decode(machine, "user3", 7, 6, 0, 1, 2, 3, 4, 5); }
-static DRIVER_INIT( dart )  { arcadia_init(machine); generic_decode(machine, "user3", 4, 0, 7, 6, 3, 1, 2, 5); }
-static DRIVER_INIT( ldrba ) { arcadia_init(machine); generic_decode(machine, "user3", 2, 3, 4, 1, 0, 7, 5, 6); }
-static DRIVER_INIT( ninj )  { arcadia_init(machine); generic_decode(machine, "user3", 1, 6, 5, 7, 4, 2, 0, 3); }
-static DRIVER_INIT( rdwr )  { arcadia_init(machine); generic_decode(machine, "user3", 3, 1, 6, 4, 0, 5, 2, 7); }
-static DRIVER_INIT( sdwr )  { arcadia_init(machine); generic_decode(machine, "user3", 6, 3, 4, 5, 2, 1, 0, 7); }
-static DRIVER_INIT( socc )  { arcadia_init(machine); generic_decode(machine, "user3", 0, 7, 1, 6, 5, 4, 3, 2); }
-static DRIVER_INIT( sprg )  { arcadia_init(machine); generic_decode(machine, "user3", 4, 7, 3, 0, 6, 5, 2, 1); }
-static DRIVER_INIT( xeon )  { arcadia_init(machine); generic_decode(machine, "user3", 3, 1, 2, 4, 0, 5, 6, 7); }
-
-
+DRIVER_INIT_MEMBER(arcadia_amiga_state,none)   { arcadia_init(machine()); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,airh)   { arcadia_init(machine()); generic_decode(machine(), "user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl)   { arcadia_init(machine()); generic_decode(machine(), "user3", 7, 6, 0, 1, 2, 3, 4, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,dart)   { arcadia_init(machine()); generic_decode(machine(), "user3", 4, 0, 7, 6, 3, 1, 2, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrba)  { arcadia_init(machine()); generic_decode(machine(), "user3", 2, 3, 4, 1, 0, 7, 5, 6); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj)   { arcadia_init(machine()); generic_decode(machine(), "user3", 1, 6, 5, 7, 4, 2, 0, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,rdwr)   { arcadia_init(machine()); generic_decode(machine(), "user3", 3, 1, 6, 4, 0, 5, 2, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr)   { arcadia_init(machine()); generic_decode(machine(), "user3", 6, 3, 4, 5, 2, 1, 0, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,socc)   { arcadia_init(machine()); generic_decode(machine(), "user3", 0, 7, 1, 6, 5, 4, 3, 2); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg)   { arcadia_init(machine()); generic_decode(machine(), "user3", 4, 7, 3, 0, 6, 5, 2, 1); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon)   { arcadia_init(machine()); generic_decode(machine(), "user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 
 /*************************************
  *

@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
 	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);
 	DECLARE_WRITE8_MEMBER(ptm_irq);
+	DECLARE_DRIVER_INIT(ginganin);
 };
 
 

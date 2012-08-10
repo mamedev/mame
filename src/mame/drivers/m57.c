@@ -326,5 +326,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, troangel, 0,        m57,   troangel, m57_state, 0, ROT0, "Irem", "Tropical Angel", GAME_SUPPORTS_SAVE )
-GAME( 1983, newtangl, troangel, m57,   troangel, m57_state, 0, ROT0, "Irem", "New Tropical Angel", GAME_SUPPORTS_SAVE )
+GAME( 1983, troangel, 0,        m57,   troangel, driver_device, 0, ROT0, "Irem", "Tropical Angel", GAME_SUPPORTS_SAVE )
+GAME( 1983, newtangl, troangel, m57,   troangel, driver_device, 0, ROT0, "Irem", "New Tropical Angel", GAME_SUPPORTS_SAVE )

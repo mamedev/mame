@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_vclk_w);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_inv_w);
+	DECLARE_DRIVER_INIT(hnfubuki);
 };
 
 

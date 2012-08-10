@@ -233,4 +233,4 @@ ROM_START( attckufo )
 	ROM_COPY( "maincpu", 0x02000, 0x00000, 0x400)
 ROM_END
 
-GAME( 1980, attckufo, 0,      attckufo, attckufo, attckufo_state, 0, ROT270, "Ryoto Electric Co.", "Attack Ufo", GAME_SUPPORTS_SAVE )
+GAME( 1980, attckufo, 0,      attckufo, attckufo, driver_device, 0, ROT270, "Ryoto Electric Co.", "Attack Ufo", GAME_SUPPORTS_SAVE )

@@ -370,21 +370,19 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( starfire )
+DRIVER_INIT_MEMBER(starfire_state,starfire)
 {
-	starfire_state *state = machine.driver_data<starfire_state>();
 
-	state->m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),state);
+	m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),this);
 }
 
-static DRIVER_INIT( fireone )
+DRIVER_INIT_MEMBER(starfire_state,fireone)
 {
-	starfire_state *state = machine.driver_data<starfire_state>();
 
-	state->m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),state);
+	m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),this);
 
 	/* register for state saving */
-	state->save_item(NAME(state->m_fireone_select));
+	save_item(NAME(m_fireone_select));
 }
 
 

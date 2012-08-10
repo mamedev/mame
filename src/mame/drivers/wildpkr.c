@@ -172,6 +172,7 @@ public:
 	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_DRIVER_INIT(wildpkr);
 };
 
 
@@ -315,9 +316,9 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT(wildpkr)
+DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 {
-	//HD63484_start(machine);
+	//HD63484_start(machine());
 }
 
 

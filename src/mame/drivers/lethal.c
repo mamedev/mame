@@ -917,10 +917,10 @@ ROM_START( lethalenua )	// *might* be UAA (writes UA to Eeprom)
 ROM_END
 
 
-static DRIVER_INIT( lethalen )
+DRIVER_INIT_MEMBER(lethal_state,lethalen)
 {
-	konamid_rom_deinterleave_2_half(machine, "gfx2");
-	konamid_rom_deinterleave_2(machine, "gfx4");
+	konamid_rom_deinterleave_2_half(machine(), "gfx2");
+	konamid_rom_deinterleave_2(machine(), "gfx4");
 }
 
 GAME( 1992, lethalen,   0,        lethalen, lethalen, lethal_state, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // writes UE to eeprom

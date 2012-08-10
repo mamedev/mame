@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(play_5);
 };
 
 
@@ -35,7 +37,7 @@ void play_5_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( play_5 )
+DRIVER_INIT_MEMBER(play_5_state,play_5)
 {
 }
 

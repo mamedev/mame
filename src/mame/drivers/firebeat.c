@@ -177,6 +177,9 @@ public:
 	int m_ibutton_read_subkey_ptr;
 	UINT8 m_ibutton_subkey_data[0x40];
 	DECLARE_READ8_MEMBER(soundram_r);
+	DECLARE_DRIVER_INIT(ppd);
+	DECLARE_DRIVER_INIT(kbm);
+	DECLARE_DRIVER_INIT(ppp);
 };
 
 
@@ -2241,19 +2244,18 @@ static void init_firebeat(running_machine &machine)
 	init_lights(machine, FUNC_NULL, FUNC_NULL, FUNC_NULL);
 }
 
-static DRIVER_INIT(ppp)
+DRIVER_INIT_MEMBER(firebeat_state,ppp)
 {
-	init_firebeat(machine);
-	init_lights(machine, FUNC(lamp_output_ppp_w), FUNC(lamp_output2_ppp_w), FUNC(lamp_output3_ppp_w));
+	init_firebeat(machine());
+	init_lights(machine(), FUNC(lamp_output_ppp_w), FUNC(lamp_output2_ppp_w), FUNC(lamp_output3_ppp_w));
 }
 
-static DRIVER_INIT(ppd)
+DRIVER_INIT_MEMBER(firebeat_state,ppd)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
-	init_firebeat(machine);
-	init_lights(machine, FUNC(lamp_output_ppp_w), FUNC(lamp_output2_ppp_w), FUNC(lamp_output3_ppp_w));
+	init_firebeat(machine());
+	init_lights(machine(), FUNC(lamp_output_ppp_w), FUNC(lamp_output2_ppp_w), FUNC(lamp_output3_ppp_w));
 
-	state->m_cur_cab_data = ppd_cab_data;
+	m_cur_cab_data = ppd_cab_data;
 }
 
 static void init_keyboard(running_machine &machine)
@@ -2264,15 +2266,14 @@ static void init_keyboard(running_machine &machine)
 	state->m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
-static DRIVER_INIT(kbm)
+DRIVER_INIT_MEMBER(firebeat_state,kbm)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
-	init_firebeat(machine);
-	init_lights(machine, FUNC(lamp_output_kbm_w), FUNC_NULL, FUNC_NULL);
+	init_firebeat(machine());
+	init_lights(machine(), FUNC(lamp_output_kbm_w), FUNC_NULL, FUNC_NULL);
 
-	init_keyboard(machine);
+	init_keyboard(machine());
 
-	state->m_cur_cab_data = kbm_cab_data;
+	m_cur_cab_data = kbm_cab_data;
 }
 
 

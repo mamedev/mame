@@ -669,5 +669,5 @@ ROM_START( toypop )
 ROM_END
 
 //    YEAR, NAME,     PARENT,MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, toypop_state, 0,   ROT0,   "Namco", "Libble Rabble", 0 )
-GAME( 1986, toypop,   0,     toypop,   toypop, toypop_state,   0,   ROT0,   "Namco", "Toypop", 0 )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, driver_device, 0,   ROT0,   "Namco", "Libble Rabble", 0 )
+GAME( 1986, toypop,   0,     toypop,   toypop, driver_device,   0,   ROT0,   "Namco", "Toypop", 0 )

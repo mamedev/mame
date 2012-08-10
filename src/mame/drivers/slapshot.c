@@ -727,11 +727,11 @@ ROM_START( opwolf3u )
 ROM_END
 
 
-static DRIVER_INIT( slapshot )
+DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
-	int size = machine.root_device().memregion("gfx2")->bytes();
+	UINT8 *gfx = machine().root_device().memregion("gfx2")->base();
+	int size = machine().root_device().memregion("gfx2")->bytes();
 	int data;
 
 	offset = size / 2;

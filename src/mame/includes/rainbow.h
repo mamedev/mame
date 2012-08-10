@@ -42,6 +42,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_DRIVER_INIT(jumping);
+	DECLARE_DRIVER_INIT(rbislande);
+	DECLARE_DRIVER_INIT(rbisland);
 };
 
 

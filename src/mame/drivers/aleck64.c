@@ -835,9 +835,9 @@ static MACHINE_CONFIG_START( aleck64, n64_state )
 	MCFG_N64_PERIPHS_ADD("rcp");
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( aleck64 )
+DRIVER_INIT_MEMBER(n64_state,aleck64)
 {
-	UINT8 *rom = machine.root_device().memregion("user2")->base();
+	UINT8 *rom = machine().root_device().memregion("user2")->base();
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

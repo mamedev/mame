@@ -438,17 +438,15 @@ ROM_START( 20pacgalr0 ) /* Version 1.00 */
 ROM_END
 
 
-static DRIVER_INIT(20pacgal)
+DRIVER_INIT_MEMBER(_20pacgal_state,20pacgal)
 {
-	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
-	state->m_sprite_pal_base = 0x00<<2;
+	m_sprite_pal_base = 0x00<<2;
 }
 
-static DRIVER_INIT(25pacman)
+DRIVER_INIT_MEMBER(_20pacgal_state,25pacman)
 
 {
-	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
-	state->m_sprite_pal_base = 0x20<<2;
+	m_sprite_pal_base = 0x20<<2;
 }
 
 

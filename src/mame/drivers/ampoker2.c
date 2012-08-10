@@ -1402,11 +1402,11 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT( rabbitpk )
+DRIVER_INIT_MEMBER(ampoker2_state,rabbitpk)
 {
 
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	int size = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	int size = machine().root_device().memregion("maincpu")->bytes();
 	int start = 0;
 	int i;
 
@@ -1424,7 +1424,7 @@ static DRIVER_INIT( rabbitpk )
 	}
 }
 
-static DRIVER_INIT( piccolop )
+DRIVER_INIT_MEMBER(ampoker2_state,piccolop)
 {
 /*
   The protection is based on a stuck bit at RAM offset $C416.
@@ -1457,7 +1457,7 @@ static DRIVER_INIT( piccolop )
 
 */
 
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* NOP'ing the mortal jump... */
 	rom[0x154b] = 0x00;
@@ -1472,16 +1472,16 @@ static DRIVER_INIT( piccolop )
 *************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY              FULLNAME                             FLAGS  LAYOUT      */
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "Novomatic",         "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg?",          "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95, ampoker2_state,  0,        ROT0, "bootleg",           "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, driver_device, 0,        ROT0, "Novomatic",         "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg?",          "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95, driver_device,  0,        ROT0, "bootleg",           "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
-GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k, ampoker2_state,  0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, driver_device, 0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k, driver_device,  0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
 GAME(  1990, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  GAME_SUPPORTS_SAVE )

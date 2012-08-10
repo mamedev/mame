@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(baraduke_scroll1_w);
 	DECLARE_READ8_MEMBER(baraduke_spriteram_r);
 	DECLARE_WRITE8_MEMBER(baraduke_spriteram_w);
+	DECLARE_DRIVER_INIT(baraduke);
 };
 
 

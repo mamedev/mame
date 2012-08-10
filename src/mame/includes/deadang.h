@@ -24,6 +24,8 @@ public:
 	DECLARE_WRITE16_MEMBER(deadang_foreground_w);
 	DECLARE_WRITE16_MEMBER(deadang_text_w);
 	DECLARE_WRITE16_MEMBER(deadang_bank_w);
+	DECLARE_DRIVER_INIT(deadang);
+	DECLARE_DRIVER_INIT(ghunter);
 };
 
 

@@ -567,26 +567,22 @@ ROM_START( ripcord )
 ROM_END
 
 
-static DRIVER_INIT( circus )
+DRIVER_INIT_MEMBER(circus_state,circus)
 {
-	circus_state *state = machine.driver_data<circus_state>();
-	state->m_game_id = 1;
+	m_game_id = 1;
 }
 
-static DRIVER_INIT( robotbwl )
+DRIVER_INIT_MEMBER(circus_state,robotbwl)
 {
-	circus_state *state = machine.driver_data<circus_state>();
-	state->m_game_id = 2;
+	m_game_id = 2;
 }
-static DRIVER_INIT( crash )
+DRIVER_INIT_MEMBER(circus_state,crash)
 {
-	circus_state *state = machine.driver_data<circus_state>();
-	state->m_game_id = 3;
+	m_game_id = 3;
 }
-static DRIVER_INIT( ripcord )
+DRIVER_INIT_MEMBER(circus_state,ripcord)
 {
-	circus_state *state = machine.driver_data<circus_state>();
-	state->m_game_id = 4;
+	m_game_id = 4;
 }
 
 

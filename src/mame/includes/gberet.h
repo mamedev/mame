@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gberet_scroll_w);
 	DECLARE_WRITE8_MEMBER(gberet_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(gberetb_scroll_w);
+	DECLARE_DRIVER_INIT(mrgoemon);
 };
 
 

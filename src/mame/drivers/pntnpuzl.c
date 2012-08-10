@@ -152,6 +152,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
 	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
+	DECLARE_DRIVER_INIT(pip);
 };
 
 
@@ -378,13 +379,13 @@ ROM_START( pntnpuzl )
 ROM_END
 
 
-static DRIVER_INIT(pip)
+DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 {
-//  UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
-	pc_vga_init(machine, vga_setting, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3c0000);
+	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x3c0000);
 
 }
 

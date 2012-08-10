@@ -408,9 +408,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( thunderj )
+DRIVER_INIT_MEMBER(thunderj_state,thunderj)
 {
-	atarijsa_init(machine, "260012", 0x0002);
+	atarijsa_init(machine(), "260012", 0x0002);
 }
 
 

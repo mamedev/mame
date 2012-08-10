@@ -28,6 +28,7 @@ public:
 	DECLARE_WRITE16_MEMBER(jumppop_sound_w);
 	DECLARE_READ16_MEMBER(tumblepop_controls_r);
 	DECLARE_WRITE16_MEMBER(tumblep_oki_w);
+	DECLARE_DRIVER_INIT(tumblep);
 };
 
 

@@ -313,5 +313,5 @@ ROM_START( funybublc )
 ROM_END
 
 
-GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", GAME_SUPPORTS_SAVE )
-GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, 0, ROT0, "Comad", "Funny Bubble (Comad version)", GAME_SUPPORTS_SAVE )
+GAME( 1999, funybubl, 0,        funybubl, funybubl, driver_device, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", GAME_SUPPORTS_SAVE )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, driver_device, 0, ROT0, "Comad", "Funny Bubble (Comad version)", GAME_SUPPORTS_SAVE )

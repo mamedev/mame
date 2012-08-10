@@ -80,6 +80,17 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
 	DECLARE_WRITE8_MEMBER(ay_audio_nmi_enable_w);
+	DECLARE_DRIVER_INIT(btime);
+	DECLARE_DRIVER_INIT(tisland);
+	DECLARE_DRIVER_INIT(cookrace);
+	DECLARE_DRIVER_INIT(zoar);
+	DECLARE_DRIVER_INIT(sdtennis);
+	DECLARE_DRIVER_INIT(wtennis);
+	DECLARE_DRIVER_INIT(bnj);
+	DECLARE_DRIVER_INIT(protennb);
+	DECLARE_DRIVER_INIT(disco);
+	DECLARE_DRIVER_INIT(lnc);
+	DECLARE_DRIVER_INIT(rockduck);
 };
 
 

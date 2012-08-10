@@ -77,6 +77,8 @@ public:
 	DECLARE_WRITE8_MEMBER(m10_chargen_w);
 	DECLARE_WRITE8_MEMBER(m15_chargen_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(andromed);
+	DECLARE_DRIVER_INIT(ipminva1);
 };
 
 

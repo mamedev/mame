@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_io_write);
 	DECLARE_WRITE8_MEMBER(brake_gas_write);
 	DECLARE_WRITE8_MEMBER(palette_write);
+	DECLARE_DRIVER_INIT(gpworld);
 };
 
 
@@ -522,13 +523,12 @@ ROM_START( gpworld )
 ROM_END
 
 
-static DRIVER_INIT( gpworld )
+DRIVER_INIT_MEMBER(gpworld_state,gpworld)
 {
-	gpworld_state *state = machine.driver_data<gpworld_state>();
-	state->m_nmi_enable = 0;
-	state->m_start_lamp = 0;
-	state->m_brake_gas = 0;
-	state->m_ldp_write_latch = state->m_ldp_read_latch = 0;
+	m_nmi_enable = 0;
+	m_start_lamp = 0;
+	m_brake_gas = 0;
+	m_ldp_write_latch = m_ldp_read_latch = 0;
 }
 
 

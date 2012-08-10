@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(commando_scrollx_w);
 	DECLARE_WRITE8_MEMBER(commando_scrolly_w);
 	DECLARE_WRITE8_MEMBER(commando_c804_w);
+	DECLARE_DRIVER_INIT(spaceinv);
+	DECLARE_DRIVER_INIT(commando);
 };
 
 

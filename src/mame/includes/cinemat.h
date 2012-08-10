@@ -52,6 +52,11 @@ public:
 	DECLARE_WRITE8_MEMBER(cinemat_sound_control_w);
 	DECLARE_WRITE8_MEMBER(qb3_sound_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(speedfrk);
+	DECLARE_DRIVER_INIT(boxingb);
+	DECLARE_DRIVER_INIT(tailg);
+	DECLARE_DRIVER_INIT(sundance);
+	DECLARE_DRIVER_INIT(qb3);
 };
 
 

@@ -2186,41 +2186,41 @@ static void rchase_output_cb2( UINT16 data )
  *
  *************************************/
 
-static DRIVER_INIT( gforce2 )
+DRIVER_INIT_MEMBER(segaybd_state,gforce2)
 {
-	yboard_generic_init(machine);
+	yboard_generic_init(machine());
 	ybd_output_cb2 = gforce2_output_cb2;
 }
 
-static DRIVER_INIT( pdrift )
+DRIVER_INIT_MEMBER(segaybd_state,pdrift)
 {
 	/* because some of the output data isn't fully understood we need to "center" the motor */
-	yboard_generic_init(machine);
+	yboard_generic_init(machine());
 
 	ybd_output_cb1 = pdrift_output_cb1;
 	ybd_output_cb2 = pdrift_output_cb2;
 }
 
-static DRIVER_INIT( gloc )
+DRIVER_INIT_MEMBER(segaybd_state,gloc)
 {
 	/* because some of the output data isn't fully understood we need to "center" the rams */
 	output_set_value("left_motor_position_nor", 16);
 	output_set_value("right_motor_position_nor", 16);
-	yboard_generic_init(machine);
+	yboard_generic_init(machine());
 
 	ybd_output_cb1 = gloc_output_cb1;
 	ybd_output_cb2 = gloc_output_cb2;
 }
 
-static DRIVER_INIT( r360 )
+DRIVER_INIT_MEMBER(segaybd_state,r360)
 {
-	yboard_generic_init(machine);
+	yboard_generic_init(machine());
 	ybd_output_cb2 = r360_output_cb2;
 }
 
-static DRIVER_INIT( rchase )
+DRIVER_INIT_MEMBER(segaybd_state,rchase)
 {
-	yboard_generic_init(machine);
+	yboard_generic_init(machine());
 	ybd_output_cb2 = rchase_output_cb2;
 }
 

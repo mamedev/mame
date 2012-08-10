@@ -88,7 +88,7 @@ ROM_START( bg_maxa )
 ROM_END
 
 
-GAME( 199?, bg_ddb,    0,       bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Ding Dong Bells (BGT)",          GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, bg_barmy,  0,       bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Barmy Army (BGT)",               GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, bg_max,    0,       bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 1)",    GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, bg_maxa,   bg_max,  bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 2)",    GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_ddb,    0,       bgt,  bgt, driver_device,  0,  ROT0,  "BGT",    "Ding Dong Bells (BGT)",          GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_barmy,  0,       bgt,  bgt, driver_device,  0,  ROT0,  "BGT",    "Barmy Army (BGT)",               GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_max,    0,       bgt,  bgt, driver_device,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 1)",    GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_maxa,   bg_max,  bgt,  bgt, driver_device,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 2)",    GAME_IS_SKELETON_MECHANICAL )

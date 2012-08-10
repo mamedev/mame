@@ -538,12 +538,12 @@ ROM_START( redclashk )
 	ROM_LOAD( "3.11e",        0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* 6331.6w */
 ROM_END
 
-static DRIVER_INIT( redclash )
+DRIVER_INIT_MEMBER(ladybug_state,redclash)
 {
 	int i,j;
-	const UINT8 *src = machine.root_device().memregion("gfx2")->base();
-	UINT8 *dst = machine.root_device().memregion("gfx3")->base();
-	int len = machine.root_device().memregion("gfx3")->bytes();
+	const UINT8 *src = machine().root_device().memregion("gfx2")->base();
+	UINT8 *dst = machine().root_device().memregion("gfx3")->base();
+	int len = machine().root_device().memregion("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */
 	for (i = 0;i < len;i++)

@@ -427,4 +427,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi,   0,      koikoi, koikoi, koikoi_state, 0, ROT270, "Kiwako", "Koi Koi Part 2", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, koikoi,   0,      koikoi, koikoi, driver_device, 0, ROT270, "Kiwako", "Koi Koi Part 2", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

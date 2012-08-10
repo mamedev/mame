@@ -69,6 +69,10 @@ public:
 	void cischeat_set_vreg_flag(int which, int data);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
+	DECLARE_DRIVER_INIT(wildplt);
+	DECLARE_DRIVER_INIT(cischeat);
+	DECLARE_DRIVER_INIT(bigrun);
+	DECLARE_DRIVER_INIT(f1gpstar);
 };
 
 

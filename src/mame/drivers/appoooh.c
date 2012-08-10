@@ -610,15 +610,15 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT(robowres)
+DRIVER_INIT_MEMBER(appoooh_state,robowres)
 {
-	sega_315_5179_decode(machine, "maincpu");
+	sega_315_5179_decode(machine(), "maincpu");
 }
 
-static DRIVER_INIT(robowresb)
+DRIVER_INIT_MEMBER(appoooh_state,robowresb)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x1c000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x1c000);
 }
 
 
@@ -628,6 +628,6 @@ static DRIVER_INIT(robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh, appoooh_state,  0,        ROT0, "Sanritsu / Sega", "Appoooh", GAME_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,  appoooh, driver_device,  0,        ROT0, "Sanritsu / Sega", "Appoooh", GAME_SUPPORTS_SAVE )
 GAME( 1986, robowres,  0,        robowres, robowres, appoooh_state, robowres, ROT0, "Sanritsu / Sega", "Robo Wres 2001", GAME_SUPPORTS_SAVE )
 GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb,ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )

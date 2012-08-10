@@ -282,6 +282,17 @@ public:
 	DECLARE_WRITE8_MEMBER(stisub_out_c_w);
 	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
 	DECLARE_READ8_MEMBER(reel_scrollattr_r);
+	DECLARE_DRIVER_INIT(stisub);
+	DECLARE_DRIVER_INIT(smoto20);
+	DECLARE_DRIVER_INIT(sharkpy);
+	DECLARE_DRIVER_INIT(smoto16);
+	DECLARE_DRIVER_INIT(crsbingo);
+	DECLARE_DRIVER_INIT(victor21);
+	DECLARE_DRIVER_INIT(victor5);
+	DECLARE_DRIVER_INIT(tisuba);
+	DECLARE_DRIVER_INIT(sharkpye);
+	DECLARE_DRIVER_INIT(tisub);
+	DECLARE_DRIVER_INIT(mtrainnv);
 };
 
 
@@ -3360,9 +3371,9 @@ ROM_START( smoto16 )
 	ROM_LOAD( "prom-n82s129an.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
 ROM_END
 
-static DRIVER_INIT( smoto16 )
+DRIVER_INIT_MEMBER(subsino_state,smoto16)
 {
-	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 
@@ -3485,40 +3496,40 @@ ROM_END
 *                        Driver Init / Decryption                          *
 ***************************************************************************/
 
-static DRIVER_INIT( victor5 )
+DRIVER_INIT_MEMBER(subsino_state,victor5)
 {
-	subsino_decrypt(machine, victor5_bitswaps, victor5_xors, 0xc000);
+	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
 }
 
-static DRIVER_INIT( victor21 )
+DRIVER_INIT_MEMBER(subsino_state,victor21)
 {
-	subsino_decrypt(machine, victor21_bitswaps, victor21_xors, 0xc000);
+	subsino_decrypt(machine(), victor21_bitswaps, victor21_xors, 0xc000);
 }
 
-static DRIVER_INIT( crsbingo )
+DRIVER_INIT_MEMBER(subsino_state,crsbingo)
 {
-	subsino_decrypt(machine, crsbingo_bitswaps, crsbingo_xors, 0xc000);
+	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
 }
 
-static DRIVER_INIT( sharkpy )
+DRIVER_INIT_MEMBER(subsino_state,sharkpy)
 {
-	subsino_decrypt(machine, sharkpy_bitswaps, sharkpy_xors, 0xa000);
+	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0xa000);
 }
 
-static DRIVER_INIT( sharkpye )
+DRIVER_INIT_MEMBER(subsino_state,sharkpye)
 {
-	subsino_decrypt(machine, victor5_bitswaps, victor5_xors, 0xa000);
+	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xa000);
 }
 
-static DRIVER_INIT( smoto20 )
+DRIVER_INIT_MEMBER(subsino_state,smoto20)
 {
-	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 
-static DRIVER_INIT( tisub )
+DRIVER_INIT_MEMBER(subsino_state,tisub)
 {
-	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3531,9 +3542,9 @@ static DRIVER_INIT( tisub )
 	rom[0x64cf] = 0x00;
 }
 
-static DRIVER_INIT( tisuba )
+DRIVER_INIT_MEMBER(subsino_state,tisuba)
 {
-	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3546,36 +3557,34 @@ static DRIVER_INIT( tisuba )
 	rom[0x6498] = 0x00;
 }
 
-static DRIVER_INIT( stisub )
+DRIVER_INIT_MEMBER(subsino_state,stisub)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	UINT8 *rom = state->memregion( "maincpu" )->base();
+	UINT8 *rom = memregion( "maincpu" )->base();
 	rom[0x1005] = 0x1d; //patch protection check
 	rom[0x7ab] = 0x18; //patch "winning protection" check
 	rom[0x957] = 0x18; //patch "losing protection" check
-	state->m_stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
+	m_stisub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
 
-	state->m_reel1_scroll.allocate(0x40);
-	state->m_reel2_scroll.allocate(0x40);
-	state->m_reel3_scroll.allocate(0x40);
+	m_reel1_scroll.allocate(0x40);
+	m_reel2_scroll.allocate(0x40);
+	m_reel3_scroll.allocate(0x40);
 
-	state->m_reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_reel3_attr = auto_alloc_array(machine, UINT8, 0x200);
+	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
 }
 
-static DRIVER_INIT( mtrainnv )
+DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
+	m_stisub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
 
-	state->m_reel1_scroll.allocate(0x40);
-	state->m_reel2_scroll.allocate(0x40);
-	state->m_reel3_scroll.allocate(0x40);
+	m_reel1_scroll.allocate(0x40);
+	m_reel2_scroll.allocate(0x40);
+	m_reel3_scroll.allocate(0x40);
 
-	state->m_reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
-	state->m_reel3_attr = auto_alloc_array(machine, UINT8, 0x200);
+	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
 }
 
 

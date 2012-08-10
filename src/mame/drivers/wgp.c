@@ -1257,20 +1257,20 @@ ROM_START( wgp2 )
 ROM_END
 
 
-static DRIVER_INIT( wgp )
+DRIVER_INIT_MEMBER(wgp_state,wgp)
 {
 #if 0
 	/* Patch for coding error that causes corrupt data in
        sprite tilemapping area from $4083c0-847f */
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	ROM[0x25dc / 2] = 0x0602;	// faulty value is 0x0206
 #endif
 }
 
-static DRIVER_INIT( wgp2 )
+DRIVER_INIT_MEMBER(wgp_state,wgp2)
 {
 	/* Code patches to prevent failure in memory checks */
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("sub")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("sub")->base();
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 }

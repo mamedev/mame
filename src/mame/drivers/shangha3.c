@@ -651,18 +651,16 @@ ROM_END
 
 
 
-static DRIVER_INIT( shangha3 )
+DRIVER_INIT_MEMBER(shangha3_state,shangha3)
 {
-	shangha3_state *state = machine.driver_data<shangha3_state>();
 
-	state->m_do_shadows = 1;
+	m_do_shadows = 1;
 }
 
-static DRIVER_INIT( heberpop )
+DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 {
-	shangha3_state *state = machine.driver_data<shangha3_state>();
 
-	state->m_do_shadows = 0;
+	m_do_shadows = 0;
 }
 
 GAME( 1993, shangha3, 0, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )

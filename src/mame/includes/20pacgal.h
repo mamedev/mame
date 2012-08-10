@@ -50,6 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
 	DECLARE_WRITE8_MEMBER(sprite_ram_w);
 	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
+	DECLARE_DRIVER_INIT(25pacman);
+	DECLARE_DRIVER_INIT(20pacgal);
 };
 
 

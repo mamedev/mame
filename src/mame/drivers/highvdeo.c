@@ -122,6 +122,8 @@ public:
 	DECLARE_READ16_MEMBER(tv_oki6376_r);
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_w);
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
+	DECLARE_DRIVER_INIT(fashion);
+	DECLARE_DRIVER_INIT(ciclone);
 };
 
 
@@ -1195,10 +1197,9 @@ READ16_MEMBER(highvdeo_state::ciclone_status_r)
 	return 0;
 }
 
-static DRIVER_INIT( ciclone )
+DRIVER_INIT_MEMBER(highvdeo_state,ciclone)
 {
-	highvdeo_state *state = machine.driver_data<highvdeo_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0030, 0x0033, read16_delegate(FUNC(highvdeo_state::ciclone_status_r), state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0030, 0x0033, read16_delegate(FUNC(highvdeo_state::ciclone_status_r), this));
 }
 
 /*
@@ -1266,21 +1267,20 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 	}
 }
 
-static DRIVER_INIT( fashion )
+DRIVER_INIT_MEMBER(highvdeo_state,fashion)
 {
-	highvdeo_state *state = machine.driver_data<highvdeo_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x0002, 0x0003, write16_delegate(FUNC(highvdeo_state::fashion_output_w), state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x0002, 0x0003, write16_delegate(FUNC(highvdeo_state::fashion_output_w), this));
 }
 
-GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf, highvdeo_state,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )
-GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf, highvdeo_state,   0,       ROT0,  "High Video", "Casino Fever 4.0",  0, layout_fashion )
-GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf, highvdeo_state,   0,       ROT0,  "High Video", "Casino Fever 5.0",  0, layout_fashion )
-GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf, highvdeo_state,   0,       ROT0,  "High Video", "Tour 4010",         0, layout_fashion )
-GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf, highvdeo_state,   0,       ROT0,  "High Video", "Casino Fever 5.1",  0, layout_fashion )
-GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf, highvdeo_state,   0,       ROT0,  "High Video", "Casino Fever 6.1",  0, layout_fashion )
-GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf, highvdeo_state,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
-GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf, highvdeo_state,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
+GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf, driver_device,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )
+GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 4.0",  0, layout_fashion )
+GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.0",  0, layout_fashion )
+GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Tour 4010",         0, layout_fashion )
+GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.1",  0, layout_fashion )
+GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 6.1",  0, layout_fashion )
+GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
+GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf, driver_device,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
 GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf, highvdeo_state,   ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
-GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf, highvdeo_state,   0,       ROT0,  "High Video", "New Magic Card",    0, layout_fashion )
-GAMEL( 2000, brasil,    0,      brasil,   brasil, highvdeo_state,   0,       ROT0,  "High Video", "Bra$il (Version 3)",     0, layout_fashion )
+GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf, driver_device,   0,       ROT0,  "High Video", "New Magic Card",    0, layout_fashion )
+GAMEL( 2000, brasil,    0,      brasil,   brasil, driver_device,   0,       ROT0,  "High Video", "Bra$il (Version 3)",     0, layout_fashion )
 GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state,  fashion, ROT0,  "High Video", "Fashion (Version 2.14)", 0, layout_fashion )

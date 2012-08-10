@@ -961,25 +961,22 @@ READ8_MEMBER(lkage_state::fake_status_r)
 	return m_mcu_ready;
 }
 
-static DRIVER_INIT( lkage )
+DRIVER_INIT_MEMBER(lkage_state,lkage)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	state->m_sprite_dx=0;
+	m_sprite_dx=0;
 }
 
-static DRIVER_INIT( lkageb )
+DRIVER_INIT_MEMBER(lkage_state,lkageb)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf062, 0xf062, read8_delegate(FUNC(lkage_state::fake_mcu_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf087, 0xf087, read8_delegate(FUNC(lkage_state::fake_status_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf062, 0xf062, write8_delegate(FUNC(lkage_state::fake_mcu_w),state));
-	state->m_sprite_dx=0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf062, 0xf062, read8_delegate(FUNC(lkage_state::fake_mcu_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf087, 0xf087, read8_delegate(FUNC(lkage_state::fake_status_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf062, 0xf062, write8_delegate(FUNC(lkage_state::fake_mcu_w),this));
+	m_sprite_dx=0;
 }
 
-static DRIVER_INIT( bygone )
+DRIVER_INIT_MEMBER(lkage_state,bygone)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	state->m_sprite_dx=1;
+	m_sprite_dx=1;
 }
 
 GAME( 1984, lkage,    0,        lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

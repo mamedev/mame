@@ -109,6 +109,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
 	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
+	DECLARE_DRIVER_INIT(skydest);
+	DECLARE_DRIVER_INIT(cyclemb);
 };
 
 
@@ -1004,18 +1006,16 @@ ROM_START( skydest )
 	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) )
 ROM_END
 
-static DRIVER_INIT( cyclemb )
+DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 {
-	cyclemb_state *state = machine.driver_data<cyclemb_state>();
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
-	state->m_dsw_pc_hack = 0x760;
+	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
+	m_dsw_pc_hack = 0x760;
 }
 
-static DRIVER_INIT( skydest )
+DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 {
-	cyclemb_state *state = machine.driver_data<cyclemb_state>();
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
-	state->m_dsw_pc_hack = 0x554;
+	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
+	m_dsw_pc_hack = 0x554;
 }
 
 GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND )

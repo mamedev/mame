@@ -257,19 +257,18 @@ static MACHINE_RESET( niyanpai )
 	}
 }
 
-static DRIVER_INIT( niyanpai )
+DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 {
-	niyanpai_state *state = machine.driver_data<niyanpai_state>();
-	UINT8 *SNDROM = state->memregion("audiocpu")->base();
+	UINT8 *SNDROM = memregion("audiocpu")->base();
 
 	// sound program patch
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
 
 	// initialize sound rom bank
-	niyanpai_soundbank_w(machine, 0);
+	niyanpai_soundbank_w(machine(), 0);
 
 	// initialize out coin flag (musobana)
-	state->m_musobana_outcoin_flag = 1;
+	m_musobana_outcoin_flag = 1;
 }
 
 

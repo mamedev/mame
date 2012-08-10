@@ -581,13 +581,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( badlands )
+DRIVER_INIT_MEMBER(badlands_state,badlands)
 {
-	badlands_state *state = machine.driver_data<badlands_state>();
 
 	/* initialize the audio system */
-	state->m_bank_base = &state->memregion("audiocpu")->base()[0x03000];
-	state->m_bank_source_data = &state->memregion("audiocpu")->base()[0x10000];
+	m_bank_base = &memregion("audiocpu")->base()[0x03000];
+	m_bank_source_data = &memregion("audiocpu")->base()[0x10000];
 }
 
 
@@ -810,5 +809,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlands, badlands_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlands, badlands_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandsb, badlands, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb2,badlands, badlandsb, badlands, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )

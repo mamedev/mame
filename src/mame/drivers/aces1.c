@@ -143,9 +143,7 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
-
-protected:
-
+	DECLARE_DRIVER_INIT(aces1);
 };
 
 
@@ -693,7 +691,7 @@ ROM_END
 
 
 
-DRIVER_INIT( aces1 )
+DRIVER_INIT_MEMBER(aces1_state,aces1)
 {
 }
 

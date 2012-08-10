@@ -454,12 +454,12 @@ ROM_END
 
 
 
-static DRIVER_INIT( pktgaldx )
+DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco102_decrypt_cpu(machine, "maincpu", 0x42ba, 0x00, 0x00);
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco102_decrypt_cpu(machine(), "maincpu", 0x42ba, 0x00, 0x00);
 }
 
 GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", GAME_SUPPORTS_SAVE )
 GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", GAME_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, driver_device, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

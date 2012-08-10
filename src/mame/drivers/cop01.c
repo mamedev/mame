@@ -649,12 +649,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( mightguy )
+DRIVER_INIT_MEMBER(cop01_state,mightguy)
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
        "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = (UINT8 *)machine().root_device().memregion("maincpu")->base();
 	RAM[0x00e4] = 0x07;	// rlca
 	RAM[0x00e5] = 0x07;	// rlca
 	RAM[0x00e6] = 0x07;	// rlca
@@ -671,6 +671,6 @@ static DRIVER_INIT( mightguy )
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01, cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01, cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

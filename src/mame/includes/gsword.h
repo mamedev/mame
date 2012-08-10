@@ -37,6 +37,8 @@ public:
 	DECLARE_READ8_MEMBER(gsword_fake_0_r);
 	DECLARE_READ8_MEMBER(gsword_fake_1_r);
 	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
+	DECLARE_DRIVER_INIT(gsword);
+	DECLARE_DRIVER_INIT(gsword2);
 };
 
 

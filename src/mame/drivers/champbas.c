@@ -1186,12 +1186,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT(champbas)
+DRIVER_INIT_MEMBER(champbas_state,champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = machine.root_device().memregion("gfx1")->base();
-	UINT8 *rom2 = machine.root_device().memregion("gfx2")->base();
-	int len = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rom1 = machine().root_device().memregion("gfx1")->base();
+	UINT8 *rom2 = machine().root_device().memregion("gfx2")->base();
+	int len = machine().root_device().memregion("gfx1")->bytes();
 	int i;
 
 	for (i = 0; i < len/2; ++i)
@@ -1203,11 +1203,11 @@ static DRIVER_INIT(champbas)
 }
 
 
-static DRIVER_INIT( exctsccr )
+DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = machine.root_device().memregion("gfx1")->base();
-	UINT8 *rom2 = machine.root_device().memregion("gfx2")->base();
+	UINT8 *rom1 = machine().root_device().memregion("gfx1")->base();
+	UINT8 *rom2 = machine().root_device().memregion("gfx2")->base();
 	int i;
 
 	// planes 0,1
@@ -1238,7 +1238,7 @@ static DRIVER_INIT( exctsccr )
  *
  *************************************/
 
-GAME( 1982, talbot,     0,        talbot,   talbot, champbas_state,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", GAME_SUPPORTS_SAVE )
+GAME( 1982, talbot,     0,        talbot,   talbot, driver_device,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", GAME_SUPPORTS_SAVE )
 
 GAME( 1983, champbas,   0,        champbas, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", GAME_SUPPORTS_SAVE )

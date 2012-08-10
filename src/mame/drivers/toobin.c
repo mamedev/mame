@@ -600,9 +600,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( toobin )
+DRIVER_INIT_MEMBER(toobin_state,toobin)
 {
-	atarijsa_init(machine, "FF9000", 0x1000);
+	atarijsa_init(machine(), "FF9000", 0x1000);
 }
 
 

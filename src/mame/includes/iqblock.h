@@ -24,6 +24,8 @@ public:
 	DECLARE_READ8_MEMBER(iqblock_bgvideoram_r);
 	DECLARE_WRITE8_MEMBER(iqblock_fgscroll_w);
 	DECLARE_WRITE8_MEMBER(port_C_w);
+	DECLARE_DRIVER_INIT(grndtour);
+	DECLARE_DRIVER_INIT(iqblock);
 };
 
 

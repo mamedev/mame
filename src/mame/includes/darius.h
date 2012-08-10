@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(darius_write_portB0);
 	DECLARE_WRITE8_MEMBER(darius_write_portB1);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	DECLARE_DRIVER_INIT(darius);
 };
 
 

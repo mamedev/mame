@@ -768,14 +768,13 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 MACHINE_CONFIG_END
 
 
-static DRIVER_INIT( metalmx )
+DRIVER_INIT_MEMBER(metalmx_state,metalmx)
 {
-	UINT8 *adsp_boot = (UINT8*)machine.root_device().memregion("adsp")->base();
-	metalmx_state *state = machine.driver_data<metalmx_state>();
+	UINT8 *adsp_boot = (UINT8*)machine().root_device().memregion("adsp")->base();
 
-	state->m_adsp->load_boot_data(adsp_boot, state->m_adsp_internal_program_ram);
+	m_adsp->load_boot_data(adsp_boot, m_adsp_internal_program_ram);
 
-	cage_init(machine, 0); // TODO: speedup address
+	cage_init(machine(), 0); // TODO: speedup address
 	cage_set_irq_handler(cage_irq_callback);
 }
 

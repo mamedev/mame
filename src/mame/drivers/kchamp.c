@@ -736,11 +736,10 @@ static UINT8 *decrypt_code(running_machine &machine)
 }
 
 
-static DRIVER_INIT( kchampvs )
+DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 {
-	kchamp_state *state = machine.driver_data<kchamp_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
-	UINT8 *decrypted = decrypt_code(machine);
+	UINT8 *rom = memregion("maincpu")->base();
+	UINT8 *decrypted = decrypt_code(machine());
 	int A;
 
 	/*
@@ -762,26 +761,25 @@ static DRIVER_INIT( kchampvs )
 	decrypted[A] = rom[A];	/* fix fourth opcode (ld ($xxxx),a */
 	/* and from here on, opcodes are encrypted */
 
-	state->m_counter = 0;
-	state->m_msm_data = 0;
-	state->m_msm_play_lo_nibble = 0;
+	m_counter = 0;
+	m_msm_data = 0;
+	m_msm_play_lo_nibble = 0;
 }
 
 
-static DRIVER_INIT( kchampvs2 )
+DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 {
-	kchamp_state *state = machine.driver_data<kchamp_state>();
 
-	decrypt_code(machine);
-	state->m_counter = 0;
-	state->m_msm_data = 0;
-	state->m_msm_play_lo_nibble = 1;
+	decrypt_code(machine());
+	m_counter = 0;
+	m_msm_data = 0;
+	m_msm_play_lo_nibble = 1;
 }
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp, kchamp_state,   0,         ROT90, "Data East USA",         "Karate Champ (US)", GAME_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp, kchamp_state,   0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp, driver_device,   0,         ROT90, "Data East USA",         "Karate Champ (US)", GAME_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp, driver_device,   0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state, kchampvs,  ROT90, "Data East USA",         "Karate Champ (US, VS version set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state, kchampvs2, ROT90, "Data East USA",         "Karate Champ (US, VS version set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state, kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", GAME_SUPPORTS_SAVE )

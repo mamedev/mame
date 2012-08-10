@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
+	DECLARE_DRIVER_INIT(chanbara);
 };
 
 
@@ -469,11 +470,11 @@ ROM_START( chanbara )
 ROM_END
 
 
-static DRIVER_INIT(chanbara )
+DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 {
-	UINT8	*src = machine.root_device().memregion("gfx4")->base();
-	UINT8	*dst = machine.root_device().memregion("gfx3")->base() + 0x4000;
-	UINT8	*bg = machine.root_device().memregion("user1")->base();
+	UINT8	*src = machine().root_device().memregion("gfx4")->base();
+	UINT8	*dst = machine().root_device().memregion("gfx3")->base() + 0x4000;
+	UINT8	*bg = machine().root_device().memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)
@@ -484,7 +485,7 @@ static DRIVER_INIT(chanbara )
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	machine.root_device().membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
 GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara_state, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

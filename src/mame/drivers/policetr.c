@@ -696,33 +696,29 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( policetr )
+DRIVER_INIT_MEMBER(policetr_state,policetr)
 {
-	policetr_state *state = machine.driver_data<policetr_state>();
-	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),state));
-	state->m_speedup_pc = 0x1fc028ac;
+	m_speedup_data = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
+	m_speedup_pc = 0x1fc028ac;
 }
 
-static DRIVER_INIT( plctr13b )
+DRIVER_INIT_MEMBER(policetr_state,plctr13b)
 {
-	policetr_state *state = machine.driver_data<policetr_state>();
-	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),state));
-	state->m_speedup_pc = 0x1fc028bc;
+	m_speedup_data = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
+	m_speedup_pc = 0x1fc028bc;
 }
 
 
-static DRIVER_INIT( sshooter )
+DRIVER_INIT_MEMBER(policetr_state,sshooter)
 {
-	policetr_state *state = machine.driver_data<policetr_state>();
-	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),state));
-	state->m_speedup_pc = 0x1fc03470;
+	m_speedup_data = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
+	m_speedup_pc = 0x1fc03470;
 }
 
-static DRIVER_INIT( sshoot12 )
+DRIVER_INIT_MEMBER(policetr_state,sshoot12)
 {
-	policetr_state *state = machine.driver_data<policetr_state>();
-	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),state));
-	state->m_speedup_pc = 0x1fc033e0;
+	m_speedup_data = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
+	m_speedup_pc = 0x1fc033e0;
 }
 
 

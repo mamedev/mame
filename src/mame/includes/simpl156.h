@@ -51,6 +51,12 @@ public:
 	DECLARE_READ32_MEMBER(prtytime_speedup_r);
 	DECLARE_READ32_MEMBER(charlien_speedup_r);
 	DECLARE_READ32_MEMBER(osman_speedup_r);
+	DECLARE_DRIVER_INIT(simpl156);
+	DECLARE_DRIVER_INIT(joemacr);
+	DECLARE_DRIVER_INIT(charlien);
+	DECLARE_DRIVER_INIT(prtytime);
+	DECLARE_DRIVER_INIT(osman);
+	DECLARE_DRIVER_INIT(chainrec);
 };
 
 

@@ -2706,4 +2706,4 @@ GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz, tnzs_state,  kabukiz,  ROT0,
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, tnzs_state, kabukiz,  ROT0,   "Kaneko / Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,   0,        insectx,  insectx, tnzs_state,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
 GAME( 1989, insectxj,  insectx,  insectx,  insectxj, tnzs_state, insectx,  ROT0,   "Taito Corporation", "Insector X (Japan)", 0 )
-GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, tnzs_state, 0,        ROT0,   "bootleg (Nics)", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, driver_device, 0,        ROT0,   "bootleg (Nics)", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )

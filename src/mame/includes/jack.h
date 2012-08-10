@@ -42,6 +42,11 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_check_r);
 	DECLARE_READ8_MEMBER(timer_r);
+	DECLARE_DRIVER_INIT(zzyzzyxx);
+	DECLARE_DRIVER_INIT(striv);
+	DECLARE_DRIVER_INIT(treahunt);
+	DECLARE_DRIVER_INIT(loverboy);
+	DECLARE_DRIVER_INIT(jack);
 };
 
 

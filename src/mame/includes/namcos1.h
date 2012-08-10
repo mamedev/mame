@@ -62,6 +62,29 @@ public:
 	DECLARE_WRITE8_MEMBER(namcos1_subcpu_bank_w);
 	DECLARE_WRITE8_MEMBER(namcos1_mcu_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(namcos1_mcu_patch_w);
+	DECLARE_DRIVER_INIT(pacmania);
+	DECLARE_DRIVER_INIT(ws);
+	DECLARE_DRIVER_INIT(wldcourt);
+	DECLARE_DRIVER_INIT(tankfrc4);
+	DECLARE_DRIVER_INIT(blazer);
+	DECLARE_DRIVER_INIT(dangseed);
+	DECLARE_DRIVER_INIT(splatter);
+	DECLARE_DRIVER_INIT(alice);
+	DECLARE_DRIVER_INIT(faceoff);
+	DECLARE_DRIVER_INIT(puzlclub);
+	DECLARE_DRIVER_INIT(bakutotu);
+	DECLARE_DRIVER_INIT(rompers);
+	DECLARE_DRIVER_INIT(ws90);
+	DECLARE_DRIVER_INIT(tankfrce);
+	DECLARE_DRIVER_INIT(soukobdx);
+	DECLARE_DRIVER_INIT(shadowld);
+	DECLARE_DRIVER_INIT(berabohm);
+	DECLARE_DRIVER_INIT(galaga88);
+	DECLARE_DRIVER_INIT(blastoff);
+	DECLARE_DRIVER_INIT(quester);
+	DECLARE_DRIVER_INIT(ws89);
+	DECLARE_DRIVER_INIT(dspirit);
+	DECLARE_DRIVER_INIT(pistoldm);
 };
 
 
@@ -77,29 +100,6 @@ void namcos1_init_DACs(running_machine &machine);
 
 MACHINE_RESET( namcos1 );
 
-DRIVER_INIT( shadowld );
-DRIVER_INIT( dspirit );
-DRIVER_INIT( quester );
-DRIVER_INIT( blazer );
-DRIVER_INIT( pacmania );
-DRIVER_INIT( galaga88 );
-DRIVER_INIT( ws );
-DRIVER_INIT( berabohm );
-DRIVER_INIT( alice );
-DRIVER_INIT( bakutotu );
-DRIVER_INIT( wldcourt );
-DRIVER_INIT( splatter );
-DRIVER_INIT( faceoff );
-DRIVER_INIT( rompers );
-DRIVER_INIT( blastoff );
-DRIVER_INIT( ws89 );
-DRIVER_INIT( dangseed );
-DRIVER_INIT( ws90 );
-DRIVER_INIT( pistoldm );
-DRIVER_INIT( soukobdx );
-DRIVER_INIT( puzlclub );
-DRIVER_INIT( tankfrce );
-DRIVER_INIT( tankfrc4 );
 
 /*----------- defined in video/namcos1.c -----------*/
 

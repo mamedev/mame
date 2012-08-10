@@ -24,6 +24,7 @@ public:
 
 	required_shared_ptr<UINT8> m_vram;
 //	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_DRIVER_INIT(intrscti);
 };
 
 static VIDEO_START(intrscti)
@@ -193,10 +194,9 @@ ROM_START( intrscti )
 	ROM_LOAD( "b.5a", 0x2000, 0x1000, CRC(8951fb7e) SHA1(c423bf0536e3a09453814172e31b47f9c3c3324c) )
 ROM_END
 
-static DRIVER_INIT( intrscti )
+DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 {
-	intrscti_state *state = machine.driver_data<intrscti_state>();
-	UINT8 *cpu = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *cpu = machine().root_device().memregion( "maincpu" )->base();
 	int i;
 	for (i=0;i<0x1000;i++)
 		cpu[i+0x8000]=0xc9; // ret
@@ -208,8 +208,8 @@ static DRIVER_INIT( intrscti )
 	/* one of the protection sub-routines does this */
 	for (i=0;i<0x400;i++)
 	{
-		state->m_vram[i+0x000] = 0x0e;
-		state->m_vram[i+0x400] = 0xff;
+		m_vram[i+0x000] = 0x0e;
+		m_vram[i+0x400] = 0xff;
 	}
 }
 

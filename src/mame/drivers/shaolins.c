@@ -337,6 +337,6 @@ ROM_END
 
 
 /*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    INIT, MONITOR, COMPANY,  FULLNAME,                  FLAGS */
-GAME( 1985, kicker,   0,      shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Kicker",                  0 )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", 0 )
-GAME( 1985, shaolinb, kicker, shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", 0 )
+GAME( 1985, kicker,   0,      shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Kicker",                  0 )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", 0 )
+GAME( 1985, shaolinb, kicker, shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", 0 )

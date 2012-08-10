@@ -802,25 +802,23 @@ ROM_START( magerror )
 ROM_END
 
 
-static DRIVER_INIT( hyprduel )
+DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->m_int_num = 0x02;
+	m_int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),state));
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),state));
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
-static DRIVER_INIT( magerror )
+DRIVER_INIT_MEMBER(hyprduel_state,magerror)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->m_int_num = 0x01;
-	state->m_magerror_irq_timer = machine.scheduler().timer_alloc(FUNC(magerror_irq_callback));
+	m_int_num = 0x01;
+	m_magerror_irq_timer = machine().scheduler().timer_alloc(FUNC(magerror_irq_callback));
 }
 
 

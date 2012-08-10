@@ -176,6 +176,7 @@ public:
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	DECLARE_DRIVER_INIT(gstream);
 };
 
 
@@ -645,10 +646,9 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 	return m_workram[0xd1ee0 / 4];
 }
 
-static DRIVER_INIT( gstream )
+DRIVER_INIT_MEMBER(gstream_state,gstream)
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 }
 
 

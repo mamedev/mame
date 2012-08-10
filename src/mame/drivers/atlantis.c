@@ -45,6 +45,7 @@ class atlantis_state : public driver_device
 public:
 	atlantis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) {}
+	DECLARE_DRIVER_INIT(mwskins);
 };
 
 
@@ -207,9 +208,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( mwskins )
+DRIVER_INIT_MEMBER(atlantis_state,mwskins)
 {
-	dcs2_init(machine, 8, 0);
+	dcs2_init(machine(), 8, 0);
 }
 
 /*************************************

@@ -1999,11 +1999,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( beatmania )
+DRIVER_INIT_MEMBER(djmain_state,beatmania)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
-	state->m_ide_master_password = NULL;
-	state->m_ide_user_password = NULL;
+	m_ide_master_password = NULL;
+	m_ide_user_password = NULL;
 }
 
 static const UINT8 beatmania_master_password[2 + 32] =
@@ -2015,9 +2014,8 @@ static const UINT8 beatmania_master_password[2 + 32] =
 	0x53, 0x45, 0x52, 0x45, 0x45, 0x56, 0x2e, 0x44
 };
 
-static DRIVER_INIT( hmcompmx )
+DRIVER_INIT_MEMBER(djmain_state,hmcompmx)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 hmcompmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2029,13 +2027,12 @@ static DRIVER_INIT( hmcompmx )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = hmcompmx_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = hmcompmx_user_password;
 }
 
-static DRIVER_INIT( bm4thmix )
+DRIVER_INIT_MEMBER(djmain_state,bm4thmix)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm4thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2047,12 +2044,11 @@ static DRIVER_INIT( bm4thmix )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_user_password = bm4thmix_user_password;
+	m_ide_user_password = bm4thmix_user_password;
 }
 
-static DRIVER_INIT( bm5thmix )
+DRIVER_INIT_MEMBER(djmain_state,bm5thmix)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm5thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2064,13 +2060,12 @@ static DRIVER_INIT( bm5thmix )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bm5thmix_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bm5thmix_user_password;
 }
 
-static DRIVER_INIT( bmclubmx )
+DRIVER_INIT_MEMBER(djmain_state,bmclubmx)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmclubmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2082,14 +2077,13 @@ static DRIVER_INIT( bmclubmx )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bmclubmx_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bmclubmx_user_password;
 }
 
 
-static DRIVER_INIT( bmcompm2 )
+DRIVER_INIT_MEMBER(djmain_state,bmcompm2)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2101,13 +2095,12 @@ static DRIVER_INIT( bmcompm2 )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bmcompm2_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bmcompm2_user_password;
 }
 
-static DRIVER_INIT( hmcompm2 )
+DRIVER_INIT_MEMBER(djmain_state,hmcompm2)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 hmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2119,13 +2112,12 @@ static DRIVER_INIT( hmcompm2 )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = hmcompm2_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = hmcompm2_user_password;
 }
 
-static DRIVER_INIT( bmdct )
+DRIVER_INIT_MEMBER(djmain_state,bmdct)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmdct_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2137,13 +2129,12 @@ static DRIVER_INIT( bmdct )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bmdct_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bmdct_user_password;
 }
 
-static DRIVER_INIT( bmcorerm )
+DRIVER_INIT_MEMBER(djmain_state,bmcorerm)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmcorerm_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2155,13 +2146,12 @@ static DRIVER_INIT( bmcorerm )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bmcorerm_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bmcorerm_user_password;
 }
 
-static DRIVER_INIT( bm6thmix )
+DRIVER_INIT_MEMBER(djmain_state,bm6thmix)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm6thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2173,13 +2163,12 @@ static DRIVER_INIT( bm6thmix )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bm6thmix_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bm6thmix_user_password;
 }
 
-static DRIVER_INIT( bm7thmix )
+DRIVER_INIT_MEMBER(djmain_state,bm7thmix)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bm7thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2191,13 +2180,12 @@ static DRIVER_INIT( bm7thmix )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bm7thmix_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bm7thmix_user_password;
 }
 
-static DRIVER_INIT( bmfinal )
+DRIVER_INIT_MEMBER(djmain_state,bmfinal)
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
 	static const UINT8 bmfinal_user_password[2 + 32] =
 	{
 		0x00, 0x00,
@@ -2209,8 +2197,8 @@ static DRIVER_INIT( bmfinal )
 
 	DRIVER_INIT_CALL(beatmania);
 
-	state->m_ide_master_password = beatmania_master_password;
-	state->m_ide_user_password = bmfinal_user_password;
+	m_ide_master_password = beatmania_master_password;
+	m_ide_user_password = bmfinal_user_password;
 }
 
 

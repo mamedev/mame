@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ee00_w);
 	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(fcombat);
 };
 
 

@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tank8_bug_w);
 	DECLARE_WRITE8_MEMBER(tank8_attract_w);
 	DECLARE_WRITE8_MEMBER(tank8_motor_w);
+	DECLARE_DRIVER_INIT(decode);
 };
 
 

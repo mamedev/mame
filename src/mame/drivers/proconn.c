@@ -168,7 +168,8 @@ protected:
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80sio_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
-
+public:
+	DECLARE_DRIVER_INIT(proconn);
 };
 
 static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
@@ -1267,7 +1268,7 @@ ROM_START( pr_trktp )
 	ROM_LOAD( "305a30pn.990", 0x00000, 0x010000, CRC(5448e7d5) SHA1(81414083341364c011ab814a3f57d0831edb3036) )
 ROM_END
 
-DRIVER_INIT( proconn )
+DRIVER_INIT_MEMBER(proconn_state,proconn)
 {
 }
 

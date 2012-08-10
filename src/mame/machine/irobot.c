@@ -402,17 +402,16 @@ static void load_oproms(running_machine &machine)
 
 
 /* Init mathbox (only called once) */
-DRIVER_INIT( irobot )
+DRIVER_INIT_MEMBER(irobot_state,irobot)
 {
-	irobot_state *state = machine.driver_data<irobot_state>();
 	int i;
 	for (i = 0; i < 16; i++)
 	{
-		state->m_irmb_stack[i] = &state->m_mbops[0];
-		state->m_irmb_regs[i] = 0;
+		m_irmb_stack[i] = &m_mbops[0];
+		m_irmb_regs[i] = 0;
 	}
-	state->m_irmb_latch=0;
-	load_oproms(machine);
+	m_irmb_latch=0;
+	load_oproms(machine());
 }
 
 TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback )

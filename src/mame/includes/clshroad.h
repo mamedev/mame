@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE8_MEMBER(clshroad_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(clshroad_vram_0_w);
 	DECLARE_WRITE8_MEMBER(clshroad_vram_1_w);
+	DECLARE_DRIVER_INIT(firebatl);
 };
 
 

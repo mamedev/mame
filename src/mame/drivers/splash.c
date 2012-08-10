@@ -997,39 +997,35 @@ ROM_END
 
 /* DRIVER INITs */
 
-static DRIVER_INIT( splash )
+DRIVER_INIT_MEMBER(splash_state,splash)
 {
-	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_bitmap_type = 0;
-	state->m_sprite_attr2_shift = 8;
+	m_bitmap_type = 0;
+	m_sprite_attr2_shift = 8;
 }
 
-static DRIVER_INIT( splash10 )
+DRIVER_INIT_MEMBER(splash_state,splash10)
 {
-	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_bitmap_type = 0;
-	state->m_sprite_attr2_shift = 0;
+	m_bitmap_type = 0;
+	m_sprite_attr2_shift = 0;
 }
 
-static DRIVER_INIT( roldfrog )
+DRIVER_INIT_MEMBER(splash_state,roldfrog)
 {
-	splash_state *state = machine.driver_data<splash_state>();
-	UINT8 * ROM = (UINT8 *)state->memregion("audiocpu")->base();
-	state->membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
+	UINT8 * ROM = (UINT8 *)memregion("audiocpu")->base();
+	membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
-	state->m_bitmap_type = 1;
-	state->m_sprite_attr2_shift = 8;
+	m_bitmap_type = 1;
+	m_sprite_attr2_shift = 8;
 }
 
-static DRIVER_INIT( rebus )
+DRIVER_INIT_MEMBER(splash_state,rebus)
 {
-	splash_state *state = machine.driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)state->memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 
-	state->m_bitmap_type = 1;
-	state->m_sprite_attr2_shift = 0;
+	m_bitmap_type = 1;
+	m_sprite_attr2_shift = 0;
 
 	//d1 clear , regs restore and rte - end of trap $b
 	ROM[0x196c0/2] = 0x7200;
@@ -1053,13 +1049,12 @@ static DRIVER_INIT( rebus )
 
 
 
-static DRIVER_INIT( funystrp )
+DRIVER_INIT_MEMBER(splash_state,funystrp)
 {
-	splash_state *state = machine.driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)state->memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 
-	state->m_bitmap_type = 0;
-	state->m_sprite_attr2_shift = 0;
+	m_bitmap_type = 0;
+	m_sprite_attr2_shift = 0;
 
 	// initial protection checks, just after boot
 
@@ -1095,9 +1090,9 @@ static DRIVER_INIT( funystrp )
 	ROM[0x11730/2] = 0x7001;
 	ROM[0x11f80/2] = 0x7001;
 
-	ROM = (UINT16 *)state->memregion("audiocpu")->base();
+	ROM = (UINT16 *)memregion("audiocpu")->base();
 
-	state->membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
+	membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
 }
 

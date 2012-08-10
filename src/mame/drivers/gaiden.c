@@ -1482,38 +1482,35 @@ ROM_START( drgnbowl )
 ROM_END
 
 
-static DRIVER_INIT( shadoww )
+DRIVER_INIT_MEMBER(gaiden_state,shadoww)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 	/* sprite size Y = sprite size X */
-	state->m_sprite_sizey = 0;
-	state->m_raiga_jumppoints = jumppoints_00;
+	m_sprite_sizey = 0;
+	m_raiga_jumppoints = jumppoints_00;
 }
 
-static DRIVER_INIT( wildfang )
+DRIVER_INIT_MEMBER(gaiden_state,wildfang)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 	/* sprite size Y = sprite size X */
-	state->m_sprite_sizey = 0;
-	state->m_raiga_jumppoints = jumppoints_00;
+	m_sprite_sizey = 0;
+	m_raiga_jumppoints = jumppoints_00;
 
-	state->m_prot = 0;
-	state->m_jumpcode = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::wildfang_protection_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),state));
+	m_prot = 0;
+	m_jumpcode = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::wildfang_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),this));
 }
 
-static DRIVER_INIT( raiga )
+DRIVER_INIT_MEMBER(gaiden_state,raiga)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
 	/* sprite size Y independent from sprite size X */
-	state->m_sprite_sizey = 2;
-	state->m_raiga_jumppoints = jumppoints_00;
+	m_sprite_sizey = 2;
+	m_raiga_jumppoints = jumppoints_00;
 
-	state->m_prot = 0;
-	state->m_jumpcode = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::raiga_protection_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),state));
+	m_prot = 0;
+	m_jumpcode = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::raiga_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),this));
 }
 
 static void descramble_drgnbowl_gfx(running_machine &machine)
@@ -1555,12 +1552,11 @@ static void descramble_drgnbowl_gfx(running_machine &machine)
 	auto_free(machine, buffer);
 }
 
-static DRIVER_INIT( drgnbowl )
+DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
-	state->m_raiga_jumppoints = jumppoints_00;
+	m_raiga_jumppoints = jumppoints_00;
 
-	descramble_drgnbowl_gfx(machine);
+	descramble_drgnbowl_gfx(machine());
 }
 
 static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
@@ -1604,11 +1600,11 @@ static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
 	}
 }
 
-static DRIVER_INIT(mastninj)
+DRIVER_INIT_MEMBER(gaiden_state,mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
-	descramble_mastninj_gfx(machine, machine.root_device().memregion("gfx2")->base());
-	descramble_mastninj_gfx(machine, machine.root_device().memregion("gfx3")->base());
+	descramble_mastninj_gfx(machine(), machine().root_device().memregion("gfx2")->base());
+	descramble_mastninj_gfx(machine(), machine().root_device().memregion("gfx3")->base());
 	DRIVER_INIT_CALL(shadoww);
 }
 

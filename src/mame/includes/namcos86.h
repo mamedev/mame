@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rthunder_backcolor_w);
 	DECLARE_READ8_MEMBER(rthunder_spriteram_r);
 	DECLARE_WRITE8_MEMBER(rthunder_spriteram_w);
+	DECLARE_DRIVER_INIT(namco86);
 };
 
 

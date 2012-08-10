@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
 	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
 	DECLARE_WRITE8_MEMBER(gng_flipscreen_w);
+	DECLARE_DRIVER_INIT(diamond);
 };
 
 

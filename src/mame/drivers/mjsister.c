@@ -558,4 +558,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, mjsister, 0, mjsister, mjsister, driver_device, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", GAME_SUPPORTS_SAVE )

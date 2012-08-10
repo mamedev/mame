@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kyugo_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(kyugo_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(kyugo_flipscreen_w);
+	DECLARE_DRIVER_INIT(srdmissn);
+	DECLARE_DRIVER_INIT(gyrodine);
 };
 
 

@@ -339,6 +339,7 @@ public:
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
+	DECLARE_DRIVER_INIT(fortecar);
 };
 
 
@@ -764,7 +765,7 @@ ROM_START( fortecrd )
 ROM_END
 
 
-static DRIVER_INIT( fortecar )
+DRIVER_INIT_MEMBER(fortecar_state,fortecar)
 {
 	// ...
 }

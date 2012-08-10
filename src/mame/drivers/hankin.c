@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(hankin);
 };
 
 
@@ -31,7 +33,7 @@ void hankin_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( hankin )
+DRIVER_INIT_MEMBER(hankin_state,hankin)
 {
 }
 

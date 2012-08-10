@@ -52,6 +52,7 @@ public:
 	tcl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_DRIVER_INIT(tcl);
 };
 
 
@@ -184,14 +185,14 @@ ROM_END
 		dest[idx+0x10000]=(n)^0xff;	\
 		idx++;
 
-static DRIVER_INIT(tcl)
+DRIVER_INIT_MEMBER(tcl_state,tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
-	int len = machine.root_device().memregion("maincpu")->bytes();
-	UINT8 *src = auto_alloc_array(machine, UINT8, len);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
+	int len = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *src = auto_alloc_array(machine(), UINT8, len);
 
 	int i,idx=0;
 	memcpy(src, dest, len);
@@ -212,7 +213,7 @@ static DRIVER_INIT(tcl)
 			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
 		}
 	}
-	auto_free(machine, src);
+	auto_free(machine(), src);
 
 	space->set_decrypted_region(0x0000, 0x7fff, dest+0x10000);
 }

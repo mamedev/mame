@@ -343,6 +343,8 @@ public:
 	DECLARE_WRITE8_MEMBER(output2_w);
 	DECLARE_READ8_MEMBER(qc_b8_r);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
+	DECLARE_DRIVER_INIT(qc);
+	DECLARE_DRIVER_INIT(dwarfd);
 };
 
 
@@ -1283,15 +1285,14 @@ ROM_START( qc )
 
 ROM_END
 
-static DRIVER_INIT(dwarfd)
+DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 {
-	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 	int i;
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src = state->memregion("gfx1")->base();
-	dst = state->memregion("gfx2")->base();
+	src = memregion("gfx1")->base();
+	dst = memregion("gfx2")->base();
 
 	for (i = 0; i < 0x4000; i++)
 	{
@@ -1304,7 +1305,7 @@ static DRIVER_INIT(dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src = machine.root_device().memregion("gfx2")->base();
+	src = machine().root_device().memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		if (src[i] & 0x10)
@@ -1322,25 +1323,25 @@ static DRIVER_INIT(dwarfd)
 	//      src[i] = src[i] & 0xe0;
 	}
 
-	state->save_item(NAME(state->m_videobuf));
-	state->save_item(NAME(state->m_dw_ram));
+	save_item(NAME(m_videobuf));
+	save_item(NAME(m_dw_ram));
 
-	memset(state->m_videobuf, 0, sizeof(state->m_videobuf));
-	memset(state->m_dw_ram, 0, sizeof(state->m_dw_ram));
+	memset(m_videobuf, 0, sizeof(m_videobuf));
+	memset(m_dw_ram, 0, sizeof(m_dw_ram));
 
 }
 
-static DRIVER_INIT(qc)
+DRIVER_INIT_MEMBER(dwarfd_state,qc)
 {
 	DRIVER_INIT_CALL(dwarfd);
 
 	// hacks for program to proceed
-	machine.root_device().memregion("maincpu")->base()[0x6564] = 0x00;
-	machine.root_device().memregion("maincpu")->base()[0x6565] = 0x00;
+	machine().root_device().memregion("maincpu")->base()[0x6564] = 0x00;
+	machine().root_device().memregion("maincpu")->base()[0x6565] = 0x00;
 
-	machine.root_device().memregion("maincpu")->base()[0x59b2] = 0x00;
-	machine.root_device().memregion("maincpu")->base()[0x59b3] = 0x00;
-	machine.root_device().memregion("maincpu")->base()[0x59b4] = 0x00;
+	machine().root_device().memregion("maincpu")->base()[0x59b2] = 0x00;
+	machine().root_device().memregion("maincpu")->base()[0x59b3] = 0x00;
+	machine().root_device().memregion("maincpu")->base()[0x59b4] = 0x00;
 
 }
 

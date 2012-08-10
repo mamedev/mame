@@ -356,16 +356,15 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 	}
 }
 
-DRIVER_INIT(vectrex)
+DRIVER_INIT_MEMBER(vectrex_state,vectrex)
 {
-	vectrex_state *state = machine.driver_data<vectrex_state>();
 	int i;
 
-	state->m_64k_cart = 0;
-	state->m_imager_angles = unknown_game_angles;
-	state->m_beam_color = RGB_WHITE;
-	for (i=0; i<ARRAY_LENGTH(state->m_imager_colors); i++)
-		state->m_imager_colors[i] = RGB_WHITE;
+	m_64k_cart = 0;
+	m_imager_angles = unknown_game_angles;
+	m_beam_color = RGB_WHITE;
+	for (i=0; i<ARRAY_LENGTH(m_imager_colors); i++)
+		m_imager_colors[i] = RGB_WHITE;
 
 	/*
      * Minestorm's PRNG doesn't work with a 0 seed (mines in the first
@@ -373,6 +372,6 @@ DRIVER_INIT(vectrex)
      * location since initializing all RAM randomly causes problems
      * with Berzerk.
      */
-	state->m_gce_vectorram[0x7e] = machine.rand() | 1;
-	state->m_gce_vectorram[0x7f] = machine.rand() | 1;
+	m_gce_vectorram[0x7e] = machine().rand() | 1;
+	m_gce_vectorram[0x7f] = machine().rand() | 1;
 }

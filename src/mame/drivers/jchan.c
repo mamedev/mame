@@ -224,6 +224,7 @@ public:
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_1_w);
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32_2_w);
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_2_w);
+	DECLARE_DRIVER_INIT(jchan);
 };
 
 
@@ -801,18 +802,17 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-static DRIVER_INIT( jchan )
+DRIVER_INIT_MEMBER(jchan_state,jchan)
 {
-	jchan_state *state = machine.driver_data<jchan_state>();
-	DRIVER_INIT_CALL( decrypt_toybox_rom );
+	DRIVER_INIT_CALL(decrypt_toybox_rom);
 	// install these here, putting them in the memory map causes issues
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),state));
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
 
 
-	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) );
+	memset(m_mcu_com, 0, 4 * sizeof( UINT16 ) );
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_nvram_data, sizeof(state->m_nvram_data));
+	machine().device<nvram_device>("nvram")->set_base(m_nvram_data, sizeof(m_nvram_data));
 }
 
 

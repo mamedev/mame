@@ -101,6 +101,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
 	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(oki1_bankswitch_w);
+	DECLARE_DRIVER_INIT(bbakraid);
+	DECLARE_DRIVER_INIT(pipibibsbl);
+	DECLARE_DRIVER_INIT(dogyuun);
+	DECLARE_DRIVER_INIT(fixeight);
+	DECLARE_DRIVER_INIT(bgaregga);
+	DECLARE_DRIVER_INIT(fixeightbl);
+	DECLARE_DRIVER_INIT(vfive);
+	DECLARE_DRIVER_INIT(batrider);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/

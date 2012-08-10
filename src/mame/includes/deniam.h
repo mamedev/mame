@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
 	DECLARE_WRITE8_MEMBER(deniam16b_oki_rom_bank_w);
 	DECLARE_WRITE16_MEMBER(deniam16c_oki_rom_bank_w);
+	DECLARE_DRIVER_INIT(karianx);
+	DECLARE_DRIVER_INIT(logicpro);
 };
 
 
@@ -60,5 +62,3 @@ public:
 VIDEO_START( deniam );
 SCREEN_UPDATE_IND16( deniam );
 
-DRIVER_INIT( logicpro );
-DRIVER_INIT( karianx );

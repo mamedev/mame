@@ -608,9 +608,9 @@ ROM_START( revenger )
 	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, NO_DUMP )	/* missing */
 ROM_END
 
-static DRIVER_INIT( dealer )
+DRIVER_INIT_MEMBER(epos_state,dealer)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int A;
 
 	/* Key 0 */
@@ -655,12 +655,12 @@ static DRIVER_INIT( dealer )
  *
  *************************************/
 
-GAME( 1982, megadon,  0,        epos,   megadon, epos_state,  0,	      ROT270, "Epos Corporation (Photar Industries license)", "Megadon", GAME_SUPPORTS_SAVE )
-GAME( 1982, catapult, 0,        epos,   catapult, epos_state, 0,	      ROT270, "Epos Corporation", "Catapult", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
-GAME( 1983, suprglob, 0,        epos,   suprglob, epos_state, 0,	      ROT270, "Epos Corporation", "Super Glob", GAME_SUPPORTS_SAVE )
-GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, 0,	      ROT270, "Epos Corporation", "The Glob", GAME_SUPPORTS_SAVE )
-GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, 0,	      ROT270, "Epos Corporation", "The Glob (earlier)", GAME_SUPPORTS_SAVE )
-GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, 0,	      ROT270, "Epos Corporation", "The Glob (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo, epos_state,     0,	      ROT270, "Epos Corporation", "IGMO", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, megadon,  0,        epos,   megadon, driver_device,  0,	      ROT270, "Epos Corporation (Photar Industries license)", "Megadon", GAME_SUPPORTS_SAVE )
+GAME( 1982, catapult, 0,        epos,   catapult, driver_device, 0,	      ROT270, "Epos Corporation", "Catapult", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
+GAME( 1983, suprglob, 0,        epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "Super Glob", GAME_SUPPORTS_SAVE )
+GAME( 1983, theglob,  suprglob, epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "The Glob", GAME_SUPPORTS_SAVE )
+GAME( 1983, theglob2, suprglob, epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "The Glob (earlier)", GAME_SUPPORTS_SAVE )
+GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "The Glob (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,	      ROT270, "Epos Corporation", "IGMO", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

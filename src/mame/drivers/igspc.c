@@ -56,6 +56,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(speeddrv);
 };
 
 static ADDRESS_MAP_START( speeddrv_map, AS_PROGRAM, 32, speeddrv_state )
@@ -105,7 +107,7 @@ ROM_START( eztouch )
 ROM_END
 
 
-static DRIVER_INIT(speeddrv)
+DRIVER_INIT_MEMBER(speeddrv_state,speeddrv)
 {
 
 }

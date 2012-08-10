@@ -101,6 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(cmd1_r);
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
+	DECLARE_DRIVER_INIT(srmp5);
 };
 
 
@@ -613,16 +614,15 @@ ROM_START( srmp5 )
 #endif
 ROM_END
 
-static DRIVER_INIT(srmp5)
+DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 {
-	srmp5_state *state = machine.driver_data<srmp5_state>();
 	st0016_game = 9;
 
-	state->m_tileram = auto_alloc_array(machine, UINT16, 0x100000/2);
-	state->m_sprram  = auto_alloc_array(machine, UINT16, 0x080000/2);
-	state->m_palram  = auto_alloc_array(machine, UINT16, 0x040000/2);
+	m_tileram = auto_alloc_array(machine(), UINT16, 0x100000/2);
+	m_sprram  = auto_alloc_array(machine(), UINT16, 0x080000/2);
+	m_palram  = auto_alloc_array(machine(), UINT16, 0x040000/2);
 #ifdef DEBUG_CHAR
-	memset(state->m_tileduty, 1, 0x2000);
+	memset(m_tileduty, 1, 0x2000);
 #endif
 }
 

@@ -71,6 +71,22 @@ class dc_state : public driver_device
 	optional_shared_ptr<UINT64> pvr2_texture_ram;
 	optional_shared_ptr<UINT64> pvr2_framebuffer_ram;
 	optional_shared_ptr<UINT64> elan_ram;
+	DECLARE_DRIVER_INIT(atomiswave);
+	DECLARE_DRIVER_INIT(naomigd);
+	DECLARE_DRIVER_INIT(ggxx);
+	DECLARE_DRIVER_INIT(ggxxrl);
+	DECLARE_DRIVER_INIT(ggxxsla);
+	DECLARE_DRIVER_INIT(naomi2);
+	DECLARE_DRIVER_INIT(naomi);
+	DECLARE_DRIVER_INIT(naomigd_mp);
+	DECLARE_DRIVER_INIT(sfz3ugd);
+	DECLARE_DRIVER_INIT(hotd2);
+	DECLARE_DRIVER_INIT(qmegamis);
+	DECLARE_DRIVER_INIT(gram2000);
+	DECLARE_DRIVER_INIT(kick4csh);
+	DECLARE_DRIVER_INIT(vf4evoct);
+	DECLARE_DRIVER_INIT(naomi_mp);
+	DECLARE_DRIVER_INIT(mvsc2);
 };
 
 /*----------- defined in machine/dc.c -----------*/

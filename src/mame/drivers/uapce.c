@@ -109,6 +109,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
+	DECLARE_DRIVER_INIT(uapce);
 };
 
 #define UAPCE_SOUND_EN	NODE_10
@@ -374,9 +375,9 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-static DRIVER_INIT(uapce)
+DRIVER_INIT_MEMBER(uapce_state,uapce)
 {
-	DRIVER_INIT_CALL(pce);
+	init_pce();
 }
 
 GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )

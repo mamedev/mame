@@ -606,56 +606,56 @@ static MACHINE_START(namconb)
 	memset(state->m_namconb_cpureg, 0, sizeof(state->m_namconb_cpureg));
 }
 
-static DRIVER_INIT( nebulray )
+DRIVER_INIT_MEMBER(namconb1_state,nebulray)
 {
-	UINT8 *pMem = (UINT8 *)machine.root_device().memregion(NAMCONB1_TILEMASKREGION)->base();
+	UINT8 *pMem = (UINT8 *)machine().root_device().memregion(NAMCONB1_TILEMASKREGION)->base();
 	size_t numBytes = (0xfe7-0xe6f)*8;
 	memset( &pMem[0xe6f*8], 0, numBytes );
 
 	namcos2_gametype = NAMCONB1_NEBULRAY;
 } /* nebulray */
 
-static DRIVER_INIT( gslgr94u )
+DRIVER_INIT_MEMBER(namconb1_state,gslgr94u)
 {
 	namcos2_gametype = NAMCONB1_GSLGR94U;
 } /* gslgr94u */
 
-static DRIVER_INIT( gslgr94j )
+DRIVER_INIT_MEMBER(namconb1_state,gslgr94j)
 {
 	namcos2_gametype = NAMCONB1_GSLGR94J;
 } /* gslgr94j */
 
-static DRIVER_INIT( sws95 )
+DRIVER_INIT_MEMBER(namconb1_state,sws95)
 {
 	namcos2_gametype = NAMCONB1_SWS95;
 } /* sws95 */
 
-static DRIVER_INIT( sws96 )
+DRIVER_INIT_MEMBER(namconb1_state,sws96)
 {
 	namcos2_gametype = NAMCONB1_SWS96;
 } /* sws96 */
 
-static DRIVER_INIT( sws97 )
+DRIVER_INIT_MEMBER(namconb1_state,sws97)
 {
 	namcos2_gametype = NAMCONB1_SWS97;
 } /* sws97 */
 
-static DRIVER_INIT( gunbulet )
+DRIVER_INIT_MEMBER(namconb1_state,gunbulet)
 {
 	namcos2_gametype = NAMCONB1_GUNBULET;
 } /* gunbulet */
 
-static DRIVER_INIT( vshoot )
+DRIVER_INIT_MEMBER(namconb1_state,vshoot)
 {
 	namcos2_gametype = NAMCONB1_VSHOOT;
 } /* vshoot */
 
-static DRIVER_INIT( machbrkr )
+DRIVER_INIT_MEMBER(namconb1_state,machbrkr)
 {
 	namcos2_gametype = NAMCONB2_MACH_BREAKERS;
 }
 
-static DRIVER_INIT( outfxies )
+DRIVER_INIT_MEMBER(namconb1_state,outfxies)
 {
 	namcos2_gametype = NAMCONB2_OUTFOXIES;
 }

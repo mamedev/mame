@@ -115,9 +115,9 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpub_reset_w)
 #if 0
 // without exzisus_cpub_reset_w, the following patch would be needed for
 // the RAM check to work
-static DRIVER_INIT( exzisus )
+DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 {
-	UINT8 *RAM = machine.root_device().memregion("cpua")->base();
+	UINT8 *RAM = machine().root_device().memregion("cpua")->base();
 
 	/* Fix WORK RAM error */
 	RAM[0x67fd] = 0x18;
@@ -439,6 +439,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  0 )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", 0 )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", 0 )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  0 )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", 0 )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", 0 )

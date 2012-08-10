@@ -109,6 +109,9 @@ public:
 	DECLARE_WRITE16_MEMBER(cyclwarr_videoram0_w);
 	DECLARE_WRITE16_MEMBER(cyclwarr_videoram1_w);
 	DECLARE_WRITE16_MEMBER(roundup5_crt_w);
+	DECLARE_DRIVER_INIT(roundup5);
+	DECLARE_DRIVER_INIT(apache3);
+	DECLARE_DRIVER_INIT(cyclwarr);
 };
 
 

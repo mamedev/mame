@@ -1230,14 +1230,14 @@ static void init_g1_common(running_machine &machine, offs_t slapstic_base, int s
 	state->m_is_pitfight = is_pitfight;
 }
 
-static DRIVER_INIT( hydra )    { init_g1_common(machine, 0x078000, 116, 0); }
-static DRIVER_INIT( hydrap )   { init_g1_common(machine, 0x000000,   0, 0); }
-
-static DRIVER_INIT( pitfight9 ) { init_g1_common(machine, 0x038000, 114, 1); }
-static DRIVER_INIT( pitfight7 ) { init_g1_common(machine, 0x038000, 112, 1); }
-static DRIVER_INIT( pitfight )  { init_g1_common(machine, 0x038000, 111, 1); }
-static DRIVER_INIT( pitfightj ) { init_g1_common(machine, 0x038000, 113, 1); }
-static DRIVER_INIT( pitfightb ) { init_g1_common(machine, 0x038000,  -1, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,hydra)     { init_g1_common(machine(), 0x078000, 116, 0); }
+DRIVER_INIT_MEMBER(atarig1_state,hydrap)    { init_g1_common(machine(), 0x000000,   0, 0); }
+                                     
+DRIVER_INIT_MEMBER(atarig1_state,pitfight9)  { init_g1_common(machine(), 0x038000, 114, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfight7)  { init_g1_common(machine(), 0x038000, 112, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfight)   { init_g1_common(machine(), 0x038000, 111, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfightj)  { init_g1_common(machine(), 0x038000, 113, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfightb)  { init_g1_common(machine(), 0x038000,  -1, 1); }
 
 
 /*************************************

@@ -31,6 +31,7 @@ public:
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
+	DECLARE_DRIVER_INIT(mv4in1);
 };
 
 
@@ -709,16 +710,16 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "a.ic19",   0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
-static DRIVER_INIT(mv4in1)
+DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
 {
 	int i;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	for(i=0;i<0x10000;i++)
 		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
 }
 
 
 
-GAME( 1982, ltcasino, 0, ltcasino, ltcasino, ltcasino_state, 0, ROT0, "Digital Controls Inc.", "Little Casino (older)", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS  )
+GAME( 1982, ltcasino, 0, ltcasino, ltcasino, driver_device, 0, ROT0, "Digital Controls Inc.", "Little Casino (older)", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS  )
 GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, ltcasinn, 0, ltcasino, ltcasinn, ltcasino_state, 0, ROT0, "Digital Controls Inc.", "Little Casino (newer)", GAME_NOT_WORKING )
+GAME( 1984, ltcasinn, 0, ltcasino, ltcasinn, driver_device, 0, ROT0, "Digital Controls Inc.", "Little Casino (newer)", GAME_NOT_WORKING )

@@ -18,6 +18,13 @@ public:
 	DECLARE_WRITE8_MEMBER(pia1_ca2_w);
 	DECLARE_READ8_MEMBER(funquiz_ay8910_a_r);
 	DECLARE_READ8_MEMBER(funquiz_ay8910_b_r);
+	DECLARE_DRIVER_INIT(magicd2b);
+	DECLARE_DRIVER_INIT(saloon);
+	DECLARE_DRIVER_INIT(royalcdc);
+	DECLARE_DRIVER_INIT(multiwin);
+	DECLARE_DRIVER_INIT(soccernw);
+	DECLARE_DRIVER_INIT(tabblue);
+	DECLARE_DRIVER_INIT(magicd2a);
 };
 
 

@@ -101,6 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(splus_registers_r);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
+	DECLARE_DRIVER_INIT(splus);
 };
 
 /* Static Variables */
@@ -576,14 +577,13 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 * Driver Init *
 ***************/
 
-static DRIVER_INIT( splus )
+DRIVER_INIT_MEMBER(splus_state,splus)
 {
-	splus_state *state = machine.driver_data<splus_state>();
 
-	UINT8 *reel_data = state->memregion( "reeldata" )->base();
+	UINT8 *reel_data = memregion( "reeldata" )->base();
 
     // Load Reel Data
-    memcpy(state->m_reel_ram, &reel_data[0x0000], 0x2000);
+    memcpy(m_reel_ram, &reel_data[0x0000], 0x2000);
 }
 
 

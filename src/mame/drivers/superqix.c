@@ -1314,19 +1314,17 @@ ROM_END
 
 
 
-static DRIVER_INIT( sqix )
+DRIVER_INIT_MEMBER(superqix_state,sqix)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_invert_coin_lockout = 1;
+	m_invert_coin_lockout = 1;
 }
 
-static DRIVER_INIT( sqixa )
+DRIVER_INIT_MEMBER(superqix_state,sqixa)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_invert_coin_lockout = 0;
+	m_invert_coin_lockout = 0;
 }
 
-static DRIVER_INIT( perestro )
+DRIVER_INIT_MEMBER(superqix_state,perestro)
 {
 	UINT8 *src;
 	int len;
@@ -1334,8 +1332,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = machine.root_device().memregion("maincpu")->base();
-	len = machine.root_device().memregion("maincpu")->bytes();
+	src = machine().root_device().memregion("maincpu")->base();
+	len = machine().root_device().memregion("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1354,8 +1352,8 @@ static DRIVER_INIT( perestro )
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = machine.root_device().memregion("gfx1")->base();
-	len = machine.root_device().memregion("gfx1")->bytes();
+	src = machine().root_device().memregion("gfx1")->base();
+	len = machine().root_device().memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1365,8 +1363,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = machine.root_device().memregion("gfx2")->base();
-	len = machine.root_device().memregion("gfx2")->bytes();
+	src = machine().root_device().memregion("gfx2")->base();
+	len = machine().root_device().memregion("gfx2")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1376,8 +1374,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = machine.root_device().memregion("gfx3")->base();
-	len = machine.root_device().memregion("gfx3")->bytes();
+	src = machine().root_device().memregion("gfx3")->base();
+	len = machine().root_device().memregion("gfx3")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1390,12 +1388,12 @@ static DRIVER_INIT( perestro )
 
 
 
-GAME( 1986, pbillian, 0,        pbillian, pbillian, superqix_state, 0,        ROT0,  "Kaneko / Taito", "Prebillian", GAME_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, superqix_state, 0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian, pbillian, driver_device, 0,        ROT0,  "Kaneko / Taito", "Prebillian", GAME_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, driver_device, 0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqix,     0,        sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixr1,   sqix,     sqix,     superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqixu,    superqix, superqix_state, 0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqixu,    superqix, driver_device, 0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixb1,   sqix,     sqix,     superqix, superqix_state, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, superqix_state, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, driver_device, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1994, perestro, 0,        sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", GAME_SUPPORTS_SAVE )
 GAME( 1993, perestrof,perestro, sqixbl,   superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", GAME_SUPPORTS_SAVE )

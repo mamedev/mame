@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(naughtyb_videoreg_w);
 	DECLARE_WRITE8_MEMBER(popflame_videoreg_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(trvmstr);
+	DECLARE_DRIVER_INIT(popflame);
 };
 
 

@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(flicker);
 };
 
 
@@ -41,7 +43,7 @@ void flicker_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( flicker )
+DRIVER_INIT_MEMBER(flicker_state,flicker)
 {
 }
 

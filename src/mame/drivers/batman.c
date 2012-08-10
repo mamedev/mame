@@ -330,9 +330,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( batman )
+DRIVER_INIT_MEMBER(batman_state,batman)
 {
-	atarijsa_init(machine, "260010", 0x0040);
+	atarijsa_init(machine(), "260010", 0x0040);
 }
 
 

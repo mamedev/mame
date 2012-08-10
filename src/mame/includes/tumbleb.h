@@ -61,6 +61,17 @@ public:
 	DECLARE_WRITE16_MEMBER(pangpang_pf1_data_w);
 	DECLARE_WRITE16_MEMBER(pangpang_pf2_data_w);
 	DECLARE_WRITE16_MEMBER(tumbleb2_soundmcu_w);
+	DECLARE_DRIVER_INIT(dquizgo);
+	DECLARE_DRIVER_INIT(jumpkids);
+	DECLARE_DRIVER_INIT(htchctch);
+	DECLARE_DRIVER_INIT(wlstar);
+	DECLARE_DRIVER_INIT(suprtrio);
+	DECLARE_DRIVER_INIT(tumblepb);
+	DECLARE_DRIVER_INIT(bcstory);
+	DECLARE_DRIVER_INIT(wondl96);
+	DECLARE_DRIVER_INIT(tumbleb2);
+	DECLARE_DRIVER_INIT(chokchok);
+	DECLARE_DRIVER_INIT(fncywld);
 };
 
 /*----------- defined in video/tumbleb.c -----------*/

@@ -1008,30 +1008,27 @@ ROM_START( boobhack )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, BAD_DUMP CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 ROM_END
 
-static DRIVER_INIT( amazon )
+DRIVER_INIT_MEMBER(terracre_state,amazon)
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
-	state->m_mpProtData = mAmazonProtData;
+	m_mpProtData = mAmazonProtData;
 }
 
-static DRIVER_INIT( amatelas )
+DRIVER_INIT_MEMBER(terracre_state,amatelas)
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
-	state->m_mpProtData = mAmatelasProtData;
+	m_mpProtData = mAmatelasProtData;
 }
 
-static DRIVER_INIT( horekid )
+DRIVER_INIT_MEMBER(terracre_state,horekid)
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
-	state->m_mpProtData = mHoreKidProtData;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x44004, 0x44005, read16_delegate(FUNC(terracre_state::horekid_IN2_r),state));
+	m_mpProtData = mHoreKidProtData;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x44004, 0x44005, read16_delegate(FUNC(terracre_state::horekid_IN2_r),this));
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */
-GAME( 1985, terracre, 0,        ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, terracreo,terracre, ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", GAME_SUPPORTS_SAVE )
+GAME( 1985, terracre, 0,        ym3526,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, terracreo,terracre, ym3526,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, terracrea,terracre, ym3526,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1985, terracren,terracre, ym2203,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", GAME_SUPPORTS_SAVE )
 GAME( 1986, amazon,   0,        amazon,  amazon, terracre_state,   amazon,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", GAME_SUPPORTS_SAVE )
 GAME( 1986, amatelas, amazon,   amazon,  amazon, terracre_state,   amatelas, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", GAME_SUPPORTS_SAVE )
 GAME( 1987, horekid,  0,        amazon,  horekid, terracre_state,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", GAME_SUPPORTS_SAVE )

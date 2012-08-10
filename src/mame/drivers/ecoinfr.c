@@ -83,6 +83,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
+	DECLARE_DRIVER_INIT(ecoinfr);
+	DECLARE_DRIVER_INIT(ecoinfrmab);
 };
 
 
@@ -1502,12 +1504,12 @@ ROM_START( ec_unkt )
 	ROM_LOAD( "t2.bin", 0x0000, 0x000989, CRC(0992ffa6) SHA1(cffb6e0a9a72bb2bf9a6e262074062bd06cfa1fb) )
 ROM_END
 
-DRIVER_INIT( ecoinfr )
+DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfr)
 {
 
 }
 
-DRIVER_INIT( ecoinfrmab )
+DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
 {
 	// descramble here
 }

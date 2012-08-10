@@ -30,6 +30,10 @@ public:
 	DECLARE_WRITE16_MEMBER(raiden_text_w);
 	DECLARE_WRITE16_MEMBER(raiden_control_w);
 	DECLARE_WRITE16_MEMBER(raidena_control_w);
+	DECLARE_DRIVER_INIT(raidenu);
+	DECLARE_DRIVER_INIT(raidenk);
+	DECLARE_DRIVER_INIT(raiden);
+	DECLARE_DRIVER_INIT(raidena);
 };
 
 

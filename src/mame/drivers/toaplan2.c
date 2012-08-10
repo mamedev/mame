@@ -414,41 +414,38 @@ static MACHINE_RESET( ghox )
 }
 
 
-static DRIVER_INIT( dogyuun )
+DRIVER_INIT_MEMBER(toaplan2_state,dogyuun)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_v25_reset_line = 0x20;
+	m_v25_reset_line = 0x20;
 }
 
 
-static DRIVER_INIT( fixeight )
+DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_v25_reset_line = 0x08;
+	m_v25_reset_line = 0x08;
 }
 
 
-static DRIVER_INIT( fixeightbl )
+DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 {
-	UINT8 *ROM = machine.root_device().memregion("oki")->base();
+	UINT8 *ROM = machine().root_device().memregion("oki")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
+	machine().root_device().membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
 
 
-static DRIVER_INIT( vfive )
+DRIVER_INIT_MEMBER(toaplan2_state,vfive)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_v25_reset_line = 0x10;
+	m_v25_reset_line = 0x10;
 }
 
 
-static DRIVER_INIT( pipibibsbl )
+DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 {
-	UINT16 *ROM = (UINT16 *)(machine.root_device().memregion("maincpu")->base());
+	UINT16 *ROM = (UINT16 *)(machine().root_device().memregion("maincpu")->base());
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
@@ -460,30 +457,28 @@ static DRIVER_INIT( pipibibsbl )
 }
 
 
-static DRIVER_INIT( bgaregga )
+DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 {
-	UINT8 *Z80 = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *Z80 = machine().root_device().memregion("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
-	machine.root_device().membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
 }
 
 
-static DRIVER_INIT( batrider )
+DRIVER_INIT_MEMBER(toaplan2_state,batrider)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
-	UINT8 *Z80 = state->memregion("audiocpu")->base();
+	UINT8 *Z80 = memregion("audiocpu")->base();
 
-	state->membank("bank1")->configure_entries(0, 16, Z80, 0x4000);
-	state->m_sndirq_line = 4;
+	membank("bank1")->configure_entries(0, 16, Z80, 0x4000);
+	m_sndirq_line = 4;
 }
 
 
-static DRIVER_INIT( bbakraid )
+DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_sndirq_line = 2;
+	m_sndirq_line = 2;
 }
 
 
@@ -5112,25 +5107,25 @@ ROM_END
 // See list at top of file
 
 //  ( YEAR  NAME        PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS )
-GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, toaplan2_state, 0,        ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, driver_device, 0,        ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, ghox,       0,        ghox,     ghox, toaplan2_state,     0,        ROT270, "Toaplan", "Ghox (spinner)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1991, ghoxj,      ghox,     ghox,     ghox, toaplan2_state,     0,        ROT270, "Toaplan", "Ghox (joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghox,       0,        ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (spinner)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghoxj,      ghox,     ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun, toaplan2_state,  dogyuun,  ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", GAME_SUPPORTS_SAVE )
 GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, toaplan2_state, dogyuun,  ROT270, "Toaplan", "Dogyuun (location test)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, kbash,      0,        kbash,    kbash, toaplan2_state,    0,        ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
+GAME( 1993, kbash,      0,        kbash,    kbash, driver_device,    0,        ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
 
-GAME( 1999, kbash2,     0,        kbash2,   kbash2, toaplan2_state,   0,        ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1999, kbash2,     0,        kbash2,   kbash2, driver_device,   0,        ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, truxton2,   0,        truxton2, truxton2, toaplan2_state, 0,        ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
+GAME( 1992, truxton2,   0,        truxton2, truxton2, driver_device, 0,        ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, pipibibs,   0,        pipibibs, pipibibs, toaplan2_state, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibsa,  pipibibs, pipibibs, pipibibs, toaplan2_state, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibsp,  pipibibs, pipibibs, pipibibsp, toaplan2_state,0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee, toaplan2_state,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
+GAME( 1991, pipibibs,   0,        pipibibs, pipibibs, driver_device, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibsa,  pipibibs, pipibibs, pipibibs, driver_device, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibsp,  pipibibs, pipibibs, pipibibsp, driver_device,0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee, driver_device,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 
 GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, toaplan2_state, pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
 
@@ -5161,14 +5156,14 @@ GAME( 1993, batsugun,   0,        batsugun, batsugun, toaplan2_state,   dogyuun,
 GAME( 1993, batsuguna,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsugunsp, batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, toaplan2_state,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
+GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, driver_device,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, sstriker,   0,        mahoudai, sstriker, toaplan2_state,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
-GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera, toaplan2_state,  0,       ROT270, "Raizing", "Sorcer Striker (set 2)" , GAME_SUPPORTS_SAVE ) // from Korean board
-GAME( 1993, mahoudai,   sstriker, mahoudai, mahoudai, toaplan2_state,   0,       ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sstriker,   0,        mahoudai, sstriker, driver_device,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera, driver_device,  0,       ROT270, "Raizing", "Sorcer Striker (set 2)" , GAME_SUPPORTS_SAVE ) // from Korean board
+GAME( 1993, mahoudai,   sstriker, mahoudai, mahoudai, driver_device,   0,       ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp, toaplan2_state,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", GAME_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
-GAME( 1994, shippumd,   kingdmgp, shippumd, shippumd, toaplan2_state,   0,       ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp, driver_device,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", GAME_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
+GAME( 1994, shippumd,   kingdmgp, shippumd, shippumd, driver_device,   0,       ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,   0,        bgaregga, bgaregga, toaplan2_state,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
 GAME( 1996, bgareggahk, bgaregga, bgaregga, bgareggahk, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )

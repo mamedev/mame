@@ -61,6 +61,8 @@ public:
 	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
+	DECLARE_DRIVER_INIT(invmulti);
+	DECLARE_DRIVER_INIT(vortex);
 };
 
 

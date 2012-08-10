@@ -81,6 +81,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
+	DECLARE_DRIVER_INIT(fromanc4);
+	DECLARE_DRIVER_INIT(fromanc2);
 };
 
 

@@ -251,16 +251,16 @@ ROM_START( suprlocoa )
 	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) )	/* unknown */
 ROM_END
 
-static DRIVER_INIT( suprloco )
+DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 {
 	/* convert graphics to 4bpp from 3bpp */
 
 	int i, j, k, color_source, color_dest;
 	UINT8 *source, *dest, *lookup;
 
-	source = machine.root_device().memregion("gfx1")->base();
+	source = machine().root_device().memregion("gfx1")->base();
 	dest   = source + 0x6000;
-	lookup = machine.root_device().memregion("proms")->base() + 0x0200;
+	lookup = machine().root_device().memregion("proms")->base() + 0x0200;
 
 	for (i = 0; i < 0x80; i++, lookup += 8)
 	{
@@ -286,7 +286,7 @@ static DRIVER_INIT( suprloco )
 
 
 	/* decrypt program ROMs */
-	suprloco_decode(machine, "maincpu");
+	suprloco_decode(machine(), "maincpu");
 }
 
 

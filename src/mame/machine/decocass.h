@@ -116,6 +116,9 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_mcu;
 	device_t *m_cassette;
+	DECLARE_DRIVER_INIT(decocass);
+	DECLARE_DRIVER_INIT(decocrom);
+	DECLARE_DRIVER_INIT(cdsteljn);
 };
 
 

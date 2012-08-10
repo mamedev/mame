@@ -15,6 +15,7 @@ public:
 	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(beezer_map_w);
 	DECLARE_READ8_MEMBER(beezer_line_r);
+	DECLARE_DRIVER_INIT(beezer);
 };
 
 
@@ -23,7 +24,6 @@ public:
 extern const via6522_interface b_via_0_interface;
 extern const via6522_interface b_via_1_interface;
 
-DRIVER_INIT( beezer );
 
 /*----------- defined in audio/beezer.c -----------*/
 

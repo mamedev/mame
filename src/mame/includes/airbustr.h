@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(airbustr_videoram2_w);
 	DECLARE_WRITE8_MEMBER(airbustr_colorram2_w);
 	DECLARE_WRITE8_MEMBER(airbustr_scrollregs_w);
+	DECLARE_DRIVER_INIT(airbustr);
 };
 
 

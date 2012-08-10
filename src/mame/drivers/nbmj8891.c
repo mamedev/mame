@@ -51,9 +51,9 @@ TODO:
 #include "machine/nvram.h"
 
 
-static DRIVER_INIT( gionbana )
+DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 {
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -69,15 +69,15 @@ static DRIVER_INIT( gionbana )
 	nb1413m3_type = NB1413M3_GIONBANA;
 }
 
-static DRIVER_INIT( mgion )
+DRIVER_INIT_MEMBER(nbmj8891_state,mgion)
 {
 	nb1413m3_type = NB1413M3_MGION;
 }
 
-static DRIVER_INIT( omotesnd )
+DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 {
 #if 0
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -92,7 +92,7 @@ static DRIVER_INIT( omotesnd )
 #endif
 
 #if 1
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x0106] = 0x00;
@@ -110,24 +110,24 @@ static DRIVER_INIT( omotesnd )
 	nb1413m3_type = NB1413M3_OMOTESND;
 }
 
-static DRIVER_INIT( abunai )
+DRIVER_INIT_MEMBER(nbmj8891_state,abunai)
 {
 	nb1413m3_type = NB1413M3_ABUNAI;
 }
 
-static DRIVER_INIT( hanamomo )
+DRIVER_INIT_MEMBER(nbmj8891_state,hanamomo)
 {
 	nb1413m3_type = NB1413M3_HANAMOMO;
 }
 
-static DRIVER_INIT( msjiken )
+DRIVER_INIT_MEMBER(nbmj8891_state,msjiken)
 {
 	nb1413m3_type = NB1413M3_MSJIKEN;
 }
 
-static DRIVER_INIT( telmahjn )
+DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 {
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -143,9 +143,9 @@ static DRIVER_INIT( telmahjn )
 	nb1413m3_type = NB1413M3_TELMAHJN;
 }
 
-static DRIVER_INIT( mgmen89 )
+DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 {
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -161,10 +161,10 @@ static DRIVER_INIT( mgmen89 )
 	nb1413m3_type = NB1413M3_MGMEN89;
 }
 
-static DRIVER_INIT( mjfocus )
+DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 {
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
-	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0xf800;
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *ram = machine().root_device().memregion("maincpu")->base() + 0xf800;
 	int i;
 
 	/* need to clear RAM otherwise it doesn't boot... */
@@ -183,10 +183,10 @@ static DRIVER_INIT( mjfocus )
 	nb1413m3_type = NB1413M3_MJFOCUS;	// mjfocus & peepshow
 }
 
-static DRIVER_INIT( mjfocusm )
+DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
 {
 #if 1
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x014e] = 0x00;
@@ -196,9 +196,9 @@ static DRIVER_INIT( mjfocusm )
 	nb1413m3_type = NB1413M3_MJFOCUSM;
 }
 
-static DRIVER_INIT( scandal )
+DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -206,19 +206,19 @@ static DRIVER_INIT( scandal )
 	nb1413m3_type = NB1413M3_SCANDAL;
 }
 
-static DRIVER_INIT( scandalm )
+DRIVER_INIT_MEMBER(nbmj8891_state,scandalm)
 {
 	nb1413m3_type = NB1413M3_SCANDALM;
 }
 
-static DRIVER_INIT( mjnanpas )
+DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
-	machine.root_device().memregion("maincpu")->base()[0x003d] = 0x01;	// force the protection check to be executed
+	machine().root_device().memregion("maincpu")->base()[0x003d] = 0x01;	// force the protection check to be executed
 
 	/* this is one possible way to rearrange the protection ROM data to get the
        expected 0xfe1a checksum. It's probably completely wrong! But since the
@@ -234,49 +234,49 @@ static DRIVER_INIT( mjnanpas )
 	nb1413m3_type = NB1413M3_MJNANPAS;
 }
 
-static DRIVER_INIT( bananadr )
+DRIVER_INIT_MEMBER(nbmj8891_state,bananadr)
 {
 	nb1413m3_type = NB1413M3_BANANADR;
 }
 
-static DRIVER_INIT( club90s )
+DRIVER_INIT_MEMBER(nbmj8891_state,club90s)
 {
 	nb1413m3_type = NB1413M3_CLUB90S;
 }
 
-static DRIVER_INIT( lovehous )
+DRIVER_INIT_MEMBER(nbmj8891_state,lovehous)
 {
 	nb1413m3_type = NB1413M3_LOVEHOUS;
 }
 
-static DRIVER_INIT( mladyhtr )
+DRIVER_INIT_MEMBER(nbmj8891_state,mladyhtr)
 {
 	nb1413m3_type = NB1413M3_MLADYHTR;
 }
 
-static DRIVER_INIT( chinmoku )
+DRIVER_INIT_MEMBER(nbmj8891_state,chinmoku)
 {
 	nb1413m3_type = NB1413M3_CHINMOKU;
 }
 
-static DRIVER_INIT( maiko )
+DRIVER_INIT_MEMBER(nbmj8891_state,maiko)
 {
 	nb1413m3_type = NB1413M3_MAIKO;
 }
 
-static DRIVER_INIT( mmaiko )
+DRIVER_INIT_MEMBER(nbmj8891_state,mmaiko)
 {
 	nb1413m3_type = NB1413M3_MMAIKO;
 }
 
-static DRIVER_INIT( hanaoji )
+DRIVER_INIT_MEMBER(nbmj8891_state,hanaoji)
 {
 	nb1413m3_type = NB1413M3_HANAOJI;
 }
 
-static DRIVER_INIT( pairsnb )
+DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 {
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -292,9 +292,9 @@ static DRIVER_INIT( pairsnb )
 	nb1413m3_type = NB1413M3_PAIRSNB;
 }
 
-static DRIVER_INIT( pairsten )
+DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
 {
-	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *prot = machine().root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -310,12 +310,12 @@ static DRIVER_INIT( pairsten )
 	nb1413m3_type = NB1413M3_PAIRSTEN;
 }
 
-static DRIVER_INIT( mmcamera )
+DRIVER_INIT_MEMBER(nbmj8891_state,mmcamera)
 {
 	nb1413m3_type = NB1413M3_MMCAMERA;
 }
 
-static DRIVER_INIT( taiwanmb )
+DRIVER_INIT_MEMBER(nbmj8891_state,taiwanmb)
 {
 	nb1413m3_type = NB1413M3_TAIWANMB;
 }

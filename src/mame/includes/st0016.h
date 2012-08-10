@@ -32,6 +32,10 @@ public:
 	DECLARE_READ8_MEMBER(st0016_dma_r);
 	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	DECLARE_DRIVER_INIT(nratechu);
+	DECLARE_DRIVER_INIT(mayjinsn);
+	DECLARE_DRIVER_INIT(mayjisn2);
+	DECLARE_DRIVER_INIT(renju);
 };
 
 #define ISMACS  (st0016_game&0x80)

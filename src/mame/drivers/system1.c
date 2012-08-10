@@ -4583,67 +4583,63 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( bank00 )
+DRIVER_INIT_MEMBER(system1_state,bank00)
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	state->m_videomode_custom = NULL;
+	m_videomode_custom = NULL;
 }
-static DRIVER_INIT( bank44 )
+DRIVER_INIT_MEMBER(system1_state,bank44)
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	state->m_videomode_custom = bank44_custom_w;
+	m_videomode_custom = bank44_custom_w;
 }
 
-static DRIVER_INIT( bank0c )
+DRIVER_INIT_MEMBER(system1_state,bank0c)
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	state->m_videomode_custom = bank0c_custom_w;
+	m_videomode_custom = bank0c_custom_w;
 }
 
-static DRIVER_INIT( regulus )	{ DRIVER_INIT_CALL(bank00); regulus_decode(machine, "maincpu"); }
-static DRIVER_INIT( mrviking )	{ DRIVER_INIT_CALL(bank00); mrviking_decode(machine, "maincpu"); }
-static DRIVER_INIT( swat )		{ DRIVER_INIT_CALL(bank00); swat_decode(machine, "maincpu"); }
-static DRIVER_INIT( flicky )	{ DRIVER_INIT_CALL(bank00); flicky_decode(machine, "maincpu"); }
-static DRIVER_INIT( wmatch )	{ DRIVER_INIT_CALL(bank00); wmatch_decode(machine, "maincpu"); }
-static DRIVER_INIT( bullfgtj )	{ DRIVER_INIT_CALL(bank00); bullfgtj_decode(machine, "maincpu"); }
-static DRIVER_INIT( spatter )	{ DRIVER_INIT_CALL(bank00); spatter_decode(machine, "maincpu"); }
-static DRIVER_INIT( pitfall2 )	{ DRIVER_INIT_CALL(bank00); pitfall2_decode(machine, "maincpu"); }
-static DRIVER_INIT( nprinces )	{ DRIVER_INIT_CALL(bank00); nprinces_decode(machine, "maincpu"); }
-static DRIVER_INIT( seganinj )	{ DRIVER_INIT_CALL(bank00); seganinj_decode(machine, "maincpu"); }
-static DRIVER_INIT( imsorry )	{ DRIVER_INIT_CALL(bank00); imsorry_decode(machine, "maincpu"); }
-static DRIVER_INIT( teddybb )	{ DRIVER_INIT_CALL(bank00); teddybb_decode(machine, "maincpu"); }
-static DRIVER_INIT( myheroj )	{ DRIVER_INIT_CALL(bank00); myheroj_decode(machine, "maincpu"); }
-static DRIVER_INIT( 4dwarrio )	{ DRIVER_INIT_CALL(bank00); sega_315_5162_decode(machine, "maincpu"); }
-static DRIVER_INIT( wboy )		{ DRIVER_INIT_CALL(bank00); sega_315_5177_decode(machine, "maincpu"); }
-static DRIVER_INIT( wboy2 )		{ DRIVER_INIT_CALL(bank00); sega_315_5178_decode(machine, "maincpu"); }
-static DRIVER_INIT( wboyo )		{ DRIVER_INIT_CALL(bank00); hvymetal_decode(machine, "maincpu"); }
-static DRIVER_INIT( blockgal )	{ DRIVER_INIT_CALL(bank00); mc8123_decrypt_rom(machine, "maincpu", "key", NULL, 0); }
+DRIVER_INIT_MEMBER(system1_state,regulus)	{ DRIVER_INIT_CALL(bank00); regulus_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,mrviking)	{ DRIVER_INIT_CALL(bank00); mrviking_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,swat)		{ DRIVER_INIT_CALL(bank00); swat_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,flicky)	{ DRIVER_INIT_CALL(bank00); flicky_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,wmatch)	{ DRIVER_INIT_CALL(bank00); wmatch_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,bullfgtj)	{ DRIVER_INIT_CALL(bank00); bullfgtj_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,spatter)	{ DRIVER_INIT_CALL(bank00); spatter_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,pitfall2)	{ DRIVER_INIT_CALL(bank00); pitfall2_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,nprinces)	{ DRIVER_INIT_CALL(bank00); nprinces_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,seganinj)	{ DRIVER_INIT_CALL(bank00); seganinj_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,imsorry)	{ DRIVER_INIT_CALL(bank00); imsorry_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,teddybb)	{ DRIVER_INIT_CALL(bank00); teddybb_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,myheroj)	{ DRIVER_INIT_CALL(bank00); myheroj_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,4dwarrio)	{ DRIVER_INIT_CALL(bank00); sega_315_5162_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,wboy)		{ DRIVER_INIT_CALL(bank00); sega_315_5177_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,wboy2)		{ DRIVER_INIT_CALL(bank00); sega_315_5178_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,wboyo)		{ DRIVER_INIT_CALL(bank00); hvymetal_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,blockgal)	{ DRIVER_INIT_CALL(bank00); mc8123_decrypt_rom(machine(), "maincpu", "key", NULL, 0); }
 
-static DRIVER_INIT( hvymetal )	{ DRIVER_INIT_CALL(bank44); hvymetal_decode(machine, "maincpu"); }
-static DRIVER_INIT( gardia )	{ DRIVER_INIT_CALL(bank44); sega_317_0006_decode(machine, "maincpu"); }
-static DRIVER_INIT( gardiab )	{ DRIVER_INIT_CALL(bank44); sega_317_0007_decode(machine, "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,hvymetal)	{ DRIVER_INIT_CALL(bank44); hvymetal_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,gardia)	{ DRIVER_INIT_CALL(bank44); sega_317_0006_decode(machine(), "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,gardiab)	{ DRIVER_INIT_CALL(bank44); sega_317_0007_decode(machine(), "maincpu"); }
 
-static DRIVER_INIT( wbml )		{ DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4); }
-static DRIVER_INIT( ufosensi )  { DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4); }
-static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); sega_315_5177_decode(machine, "maincpu"); }
+DRIVER_INIT_MEMBER(system1_state,wbml)		{ DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine(), "maincpu", "key", "bank1", 4); }
+DRIVER_INIT_MEMBER(system1_state,ufosensi)  { DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine(), "maincpu", "key", "bank1", 4); }
+DRIVER_INIT_MEMBER(system1_state,wboysys2)	{ DRIVER_INIT_CALL(bank0c); sega_315_5177_decode(machine(), "maincpu"); }
 
 
-static DRIVER_INIT( dakkochn )
+DRIVER_INIT_MEMBER(system1_state,dakkochn)
 {
-	system1_state *state = machine.driver_data<system1_state>();
-	state->m_videomode_custom = dakkochn_custom_w;
+	m_videomode_custom = dakkochn_custom_w;
 
-	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
+	mc8123_decrypt_rom(machine(), "maincpu", "key", "bank1", 4);
 
-//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
-//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
-//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
+//  machine().device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
+//  machine().device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
+//  machine().device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
 
-//  machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
+//  machine().device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
 }
 
 
-static DRIVER_INIT( myherok )
+DRIVER_INIT_MEMBER(system1_state,myherok)
 {
 	int A;
 	UINT8 *rom;
@@ -4652,12 +4648,12 @@ static DRIVER_INIT( myherok )
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
-	rom = machine.root_device().memregion("maincpu")->base();
+	rom = machine().root_device().memregion("maincpu")->base();
 	for (A = 0;A < 0xc000;A++)
 		rom[A] = (rom[A] & 0xfc) | ((rom[A] & 1) << 1) | ((rom[A] & 2) >> 1);
 
 	/* the tile gfx ROMs are mangled as well: */
-	rom = machine.root_device().memregion("tiles")->base();
+	rom = machine().root_device().memregion("tiles")->base();
 
 	/* the first ROM has data lines D0 and D6 swapped. */
 	for (A = 0x0000;A < 0x4000;A++)
@@ -4686,7 +4682,7 @@ static DRIVER_INIT( myherok )
 		}
 	}
 
-	myheroj_decode(machine, "maincpu");
+	myheroj_decode(machine(), "maincpu");
 }
 
 READ8_MEMBER(system1_state::nob_start_r)
@@ -4695,30 +4691,29 @@ READ8_MEMBER(system1_state::nob_start_r)
 	return (cpu_get_pc(&space.device()) <= 0x0003) ? 0x80 : memregion("maincpu")->base()[1];
 }
 
-static DRIVER_INIT( nob )
+DRIVER_INIT_MEMBER(system1_state,nob)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
-	system1_state *state = machine.driver_data<system1_state>();
-	space->install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),state));
+	space->install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
 
 	/* install MCU communications */
-	iospace->install_readwrite_handler(0x18, 0x18, 0x00, 0x00, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),state), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),state));
-	iospace->install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),state));
+	iospace->install_readwrite_handler(0x18, 0x18, 0x00, 0x00, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
+	iospace->install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
 }
 
-static DRIVER_INIT( nobb )
+DRIVER_INIT_MEMBER(system1_state,nobb)
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
 
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 //  ROM[0x3296] = 0x18;     // 'jr' instead of 'jr z' - 'T' (PRG Main ROM)
 //  ROM[0x32be] = 0x18;     // 'jr' instead of 'jr z' - 'R' (Banked ROM 1)
@@ -4730,40 +4725,39 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
-	UINT8 *ROM2 = machine.root_device().memregion("soundcpu")->base();
+	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
+	UINT8 *ROM2 = machine().root_device().memregion("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
 	DRIVER_INIT_CALL(bank44);
 
-	system1_state *state = machine.driver_data<system1_state>();
-	iospace->install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),state));
-	iospace->install_read_handler(0x22, 0x22, read8_delegate(FUNC(system1_state::nobb_inport22_r),state));
-	iospace->install_read_handler(0x23, 0x23, read8_delegate(FUNC(system1_state::nobb_inport23_r),state));
-	iospace->install_write_handler(0x24, 0x24, write8_delegate(FUNC(system1_state::nobb_outport24_w),state));
+	iospace->install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
+	iospace->install_read_handler(0x22, 0x22, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
+	iospace->install_read_handler(0x23, 0x23, read8_delegate(FUNC(system1_state::nobb_inport23_r),this));
+	iospace->install_write_handler(0x24, 0x24, write8_delegate(FUNC(system1_state::nobb_outport24_w),this));
 }
 
 
-static DRIVER_INIT( bootleg )
+DRIVER_INIT_MEMBER(system1_state,bootleg)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x10000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
 
 
-static DRIVER_INIT( bootsys2 )
+DRIVER_INIT_MEMBER(system1_state,bootsys2)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x20000);
-	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x30000, 0x4000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x20000);
+	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }
 
-static DRIVER_INIT( choplift )
+DRIVER_INIT_MEMBER(system1_state,choplift)
 {
-	UINT8 *mcurom = machine.root_device().memregion("mcu")->base();
+	UINT8 *mcurom = machine().root_device().memregion("mcu")->base();
 
 	/* the ROM dump we have is bad; the following patches make it work */
 	mcurom[0x100] = 0x55;		/* D5 in current dump */
@@ -4773,9 +4767,9 @@ static DRIVER_INIT( choplift )
 	DRIVER_INIT_CALL(bank0c);
 }
 
-static DRIVER_INIT( shtngmst )
+DRIVER_INIT_MEMBER(system1_state,shtngmst)
 {
-	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
 	iospace->install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	iospace->install_read_port(0x18, 0x18, 0x00, 0x03, "18");
 	iospace->install_read_port(0x1c, 0x1c, 0x00, 0x02, "GUNX");

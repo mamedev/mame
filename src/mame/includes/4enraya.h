@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fenraya_custom_map_w);
 	DECLARE_WRITE8_MEMBER(fenraya_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
+	DECLARE_DRIVER_INIT(unkpacg);
 };
 
 

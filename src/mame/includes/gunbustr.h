@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
 	DECLARE_READ32_MEMBER(main_cycle_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	DECLARE_DRIVER_INIT(gunbustrj);
+	DECLARE_DRIVER_INIT(gunbustr);
 };
 
 

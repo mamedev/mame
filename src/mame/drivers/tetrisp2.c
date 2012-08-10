@@ -1282,51 +1282,45 @@ static void init_rockn_timer(running_machine &machine)
 	state_save_register_global(machine, state->m_rockn_soundvolume);
 }
 
-static DRIVER_INIT( rockn )
+DRIVER_INIT_MEMBER(tetrisp2_state,rockn)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	init_rockn_timer(machine);
-	state->m_rockn_protectdata = 1;
+	init_rockn_timer(machine());
+	m_rockn_protectdata = 1;
 }
 
-static DRIVER_INIT( rockn1 )
+DRIVER_INIT_MEMBER(tetrisp2_state,rockn1)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	init_rockn_timer(machine);
-	state->m_rockn_protectdata = 1;
+	init_rockn_timer(machine());
+	m_rockn_protectdata = 1;
 }
 
-static DRIVER_INIT( rockn2 )
+DRIVER_INIT_MEMBER(tetrisp2_state,rockn2)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	init_rockn_timer(machine);
-	state->m_rockn_protectdata = 2;
+	init_rockn_timer(machine());
+	m_rockn_protectdata = 2;
 }
 
-static DRIVER_INIT( rocknms )
+DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	init_rockn_timer(machine);
+	init_rockn_timer(machine());
 
-	machine.scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_sub_level1_callback));
-	state->m_rockn_timer_sub_l4 = machine.scheduler().timer_alloc(FUNC(rockn_timer_sub_level4_callback));
+	machine().scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_sub_level1_callback));
+	m_rockn_timer_sub_l4 = machine().scheduler().timer_alloc(FUNC(rockn_timer_sub_level4_callback));
 
-	state->m_rockn_protectdata = 3;
+	m_rockn_protectdata = 3;
 
 }
 
-static DRIVER_INIT( rockn3 )
+DRIVER_INIT_MEMBER(tetrisp2_state,rockn3)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	init_rockn_timer(machine);
-	state->m_rockn_protectdata = 4;
+	init_rockn_timer(machine());
+	m_rockn_protectdata = 4;
 }
 
-static DRIVER_INIT( stepstag )
+DRIVER_INIT_MEMBER(stepstag_state,stepstag)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	init_rockn_timer(machine);		// used
-	state->m_rockn_protectdata = 1;	// unused?
+	init_rockn_timer(machine());		// used
+	m_rockn_protectdata = 1;	// unused?
 }
 
 
@@ -2210,9 +2204,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2, tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",     GAME_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",     GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2, driver_device, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, driver_device,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",     GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, driver_device,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",     GAME_SUPPORTS_SAVE )
 
 GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, tetrisp2_state, rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",       GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 

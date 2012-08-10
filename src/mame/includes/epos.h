@@ -22,6 +22,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(epos_port_1_w);
 	DECLARE_WRITE8_MEMBER(write_prtc);
+	DECLARE_DRIVER_INIT(dealer);
 };
 
 

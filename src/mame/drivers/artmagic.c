@@ -1162,42 +1162,38 @@ static void decrypt_cheesech(running_machine &machine)
 }
 
 
-static DRIVER_INIT( ultennis )
+DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	decrypt_ultennis(machine);
-	state->m_is_stoneball = 0;
-	state->m_protection_handler = ultennis_protection;
+	decrypt_ultennis(machine());
+	m_is_stoneball = 0;
+	m_protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),this));
 }
 
 
-static DRIVER_INIT( cheesech )
+DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	decrypt_cheesech(machine);
-	state->m_is_stoneball = 0;
-	state->m_protection_handler = cheesech_protection;
+	decrypt_cheesech(machine());
+	m_is_stoneball = 0;
+	m_protection_handler = cheesech_protection;
 }
 
 
-static DRIVER_INIT( stonebal )
+DRIVER_INIT_MEMBER(artmagic_state,stonebal)
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	decrypt_ultennis(machine);
-	state->m_is_stoneball = 1;	/* blits 1 line high are NOT encrypted, also different first pixel decrypt */
-	state->m_protection_handler = stonebal_protection;
+	decrypt_ultennis(machine());
+	m_is_stoneball = 1;	/* blits 1 line high are NOT encrypted, also different first pixel decrypt */
+	m_protection_handler = stonebal_protection;
 }
 
-static DRIVER_INIT( shtstar )
+DRIVER_INIT_MEMBER(artmagic_state,shtstar)
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
 	/* wrong */
-	decrypt_ultennis(machine);
-	state->m_is_stoneball =0;
-	state->m_protection_handler = stonebal_protection;
+	decrypt_ultennis(machine());
+	m_is_stoneball =0;
+	m_protection_handler = stonebal_protection;
 }
 
 

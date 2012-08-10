@@ -144,6 +144,55 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
+	DECLARE_DRIVER_INIT(astrass);
+	DECLARE_DRIVER_INIT(batmanfr);
+	DECLARE_DRIVER_INIT(finlarch);
+	DECLARE_DRIVER_INIT(decathlt);
+	DECLARE_DRIVER_INIT(sanjeon);
+	DECLARE_DRIVER_INIT(puyosun);
+	DECLARE_DRIVER_INIT(winterht);
+	DECLARE_DRIVER_INIT(gaxeduel);
+	DECLARE_DRIVER_INIT(rsgun);
+	DECLARE_DRIVER_INIT(groovef);
+	DECLARE_DRIVER_INIT(sandor);
+	DECLARE_DRIVER_INIT(cottonbm);
+	DECLARE_DRIVER_INIT(smleague);
+	DECLARE_DRIVER_INIT(nameclv3);
+	DECLARE_DRIVER_INIT(danchiq);
+	DECLARE_DRIVER_INIT(hanagumi);
+	DECLARE_DRIVER_INIT(cotton2);
+	DECLARE_DRIVER_INIT(seabass);
+	DECLARE_DRIVER_INIT(stv);
+	DECLARE_DRIVER_INIT(thunt);
+	DECLARE_DRIVER_INIT(critcrsh);
+	DECLARE_DRIVER_INIT(stvmp);
+	DECLARE_DRIVER_INIT(sasissu);
+	DECLARE_DRIVER_INIT(dnmtdeka);
+	DECLARE_DRIVER_INIT(ffreveng);
+	DECLARE_DRIVER_INIT(fhboxers);
+	DECLARE_DRIVER_INIT(pblbeach);
+	DECLARE_DRIVER_INIT(sss);
+	DECLARE_DRIVER_INIT(diehard);
+	DECLARE_DRIVER_INIT(danchih);
+	DECLARE_DRIVER_INIT(shienryu);
+	DECLARE_DRIVER_INIT(elandore);
+	DECLARE_DRIVER_INIT(prikura);
+	DECLARE_DRIVER_INIT(maruchan);
+	DECLARE_DRIVER_INIT(colmns97);
+	DECLARE_DRIVER_INIT(grdforce);
+	DECLARE_DRIVER_INIT(suikoenb);
+	DECLARE_DRIVER_INIT(magzun);
+	DECLARE_DRIVER_INIT(shanhigw);
+	DECLARE_DRIVER_INIT(sokyugrt);
+	DECLARE_DRIVER_INIT(vfremix);
+	DECLARE_DRIVER_INIT(twcup98);
+	DECLARE_DRIVER_INIT(znpwfv);
+	DECLARE_DRIVER_INIT(othellos);
+	DECLARE_DRIVER_INIT(mausuke);
+	
+	DECLARE_DRIVER_INIT(saturnus);
+	DECLARE_DRIVER_INIT(saturneu);
+	DECLARE_DRIVER_INIT(saturnjp);
 };
 
 #define MASTER_CLOCK_352 57272720
@@ -172,51 +221,11 @@ public:
 #define IRQ_VDP1_END   1 << 13
 #define IRQ_ABUS       1 << 15
 
-DRIVER_INIT ( stv );
 
 
 /*----------- defined in drivers/stv.c -----------*/
 
 void install_stvbios_speedups(running_machine &machine);
-DRIVER_INIT(mausuke);
-DRIVER_INIT(puyosun);
-DRIVER_INIT(shienryu);
-DRIVER_INIT(prikura);
-DRIVER_INIT(hanagumi);
-DRIVER_INIT(cottonbm);
-DRIVER_INIT(cotton2);
-DRIVER_INIT(fhboxers);
-DRIVER_INIT(dnmtdeka);
-DRIVER_INIT(groovef);
-DRIVER_INIT(danchih);
-DRIVER_INIT(astrass);
-DRIVER_INIT(thunt);
-DRIVER_INIT(grdforce);
-DRIVER_INIT(batmanfr);
-DRIVER_INIT(winterht);
-DRIVER_INIT(seabass);
-DRIVER_INIT(vfremix);
-DRIVER_INIT(diehard);
-DRIVER_INIT(sss);
-DRIVER_INIT(othellos);
-DRIVER_INIT(sasissu);
-DRIVER_INIT(gaxeduel);
-DRIVER_INIT(suikoenb);
-DRIVER_INIT(sokyugrt);
-DRIVER_INIT(znpwfv);
-DRIVER_INIT(twcup98);
-DRIVER_INIT(smleague);
-DRIVER_INIT(maruchan);
-DRIVER_INIT(sandor);
-DRIVER_INIT(colmns97);
-DRIVER_INIT(pblbeach);
-DRIVER_INIT(shanhigw);
-DRIVER_INIT(finlarch);
-DRIVER_INIT(elandore);
-DRIVER_INIT(rsgun);
-DRIVER_INIT(ffreveng);
-DRIVER_INIT(decathlt);
-DRIVER_INIT(nameclv3);
 
 /*----------- defined in video/stvvdp1.c -----------*/
 

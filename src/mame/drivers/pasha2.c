@@ -105,6 +105,7 @@ public:
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 	DECLARE_WRITE16_MEMBER(oki1_bank_w);
 	DECLARE_WRITE16_MEMBER(oki2_bank_w);
+	DECLARE_DRIVER_INIT(pasha2);
 };
 
 
@@ -481,12 +482,11 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 	return m_wram[(0x95744 / 2) + offset];
 }
 
-static DRIVER_INIT( pasha2 )
+DRIVER_INIT_MEMBER(pasha2_state,pasha2)
 {
-	pasha2_state *state = machine.driver_data<pasha2_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
 
-	state->membank("bank1")->set_base(state->memregion("user2")->base());
+	membank("bank1")->set_base(memregion("user2")->base());
 }
 
 GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

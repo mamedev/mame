@@ -322,11 +322,10 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
  *
  *************************************/
 
-DRIVER_INIT( mhavocrv )
+DRIVER_INIT_MEMBER(mhavoc_state,mhavocrv)
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	mhavoc_state *state = machine.driver_data<mhavoc_state>();
-	machine.device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),state));
-	machine.device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),state));
+	machine().device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
+	machine().device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
 }

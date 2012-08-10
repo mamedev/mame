@@ -567,29 +567,27 @@ READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
 
 /***************************************************************************/
 
-static DRIVER_INIT( undoukai )
+DRIVER_INIT_MEMBER(fortyl_state,undoukai)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
-	state->m_pix_color[0] = 0x000;
-	state->m_pix_color[1] = 0x1e3;
-	state->m_pix_color[2] = 0x16c;
-	state->m_pix_color[3] = 0x1ec;
+	m_pix_color[0] = 0x000;
+	m_pix_color[1] = 0x1e3;
+	m_pix_color[2] = 0x16c;
+	m_pix_color[3] = 0x1ec;
 }
 
-static DRIVER_INIT( 40love )
+DRIVER_INIT_MEMBER(fortyl_state,40love)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack
             to show a white line on the opponent side */
 
-		UINT8 *ROM = state->memregion("gfx2")->base();
+		UINT8 *ROM = memregion("gfx2")->base();
 		int adr = 0x10 * 0x022b;
 		ROM[adr + 0x000a] = 0x00;
 		ROM[adr + 0x000b] = 0x00;
@@ -597,10 +595,10 @@ static DRIVER_INIT( 40love )
 		ROM[adr + 0x400b] = 0x00;
 	#endif
 
-	state->m_pix_color[0] = 0x000;
-	state->m_pix_color[1] = 0x1e3;
-	state->m_pix_color[2] = 0x16c;
-	state->m_pix_color[3] = 0x1ec;
+	m_pix_color[0] = 0x000;
+	m_pix_color[1] = 0x1e3;
+	m_pix_color[2] = 0x16c;
+	m_pix_color[3] = 0x1ec;
 }
 
 /***************************************************************************/

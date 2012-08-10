@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_addr_w);
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_w);
 	DECLARE_READ8_MEMBER(bigevglf_vidram_r);
+	DECLARE_DRIVER_INIT(bigevglf);
 };
 
 

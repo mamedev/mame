@@ -59,6 +59,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tomahawk_audio_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
+	DECLARE_DRIVER_INIT(afire);
+	DECLARE_DRIVER_INIT(abattle);
+	DECLARE_DRIVER_INIT(sstarbtl);
 };
 
 /*----------- defined in audio/astrof.c -----------*/

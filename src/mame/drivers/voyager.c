@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_WRITE_LINE_MEMBER(voyager_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_DRIVER_INIT(voyager);
 };
 
 
@@ -789,18 +790,17 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( voyager )
+DRIVER_INIT_MEMBER(voyager_state,voyager)
 {
-	voyager_state *state = machine.driver_data<voyager_state>();
-	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x20000/4);
+	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
 
-	pc_vga_init(machine, vga_setting, NULL);
-	pc_svga_trident_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, voyager_set_keyb_int);
+	pc_vga_init(machine(), vga_setting, NULL);
+	pc_svga_trident_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, voyager_set_keyb_int);
 
-	intel82439tx_init(machine);
+	intel82439tx_init(machine());
 
-	kbdc8042_init(machine, &at8042);
+	kbdc8042_init(machine(), &at8042);
 }
 
 ROM_START( voyager )

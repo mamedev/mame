@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(battlnts_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(battlnts_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(battlnts_spritebank_w);
+	DECLARE_DRIVER_INIT(rackemup);
 };
 
 /*----------- defined in video/battlnts.c -----------*/

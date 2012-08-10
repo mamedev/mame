@@ -72,6 +72,9 @@ public:
 	DECLARE_WRITE32_MEMBER(vbuffer_w);
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
+	DECLARE_DRIVER_INIT(fmaniac3);
+	DECLARE_DRIVER_INIT(xfiles);
+	DECLARE_DRIVER_INIT(kdynastg);
 };
 
 
@@ -571,10 +574,9 @@ ROM_START( fmaniac3 )
 	// not present
 ROM_END
 
-static DRIVER_INIT( xfiles )
+DRIVER_INIT_MEMBER(dgpix_state,xfiles)
 {
-	dgpix_state *state = machine.driver_data<dgpix_state>();
-	UINT8 *rom = (UINT8 *)state->memregion("user1")->base() + 0x1c00000;
+	UINT8 *rom = (UINT8 *)memregion("user1")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -584,15 +586,14 @@ static DRIVER_INIT( xfiles )
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0xf0c8b440, 0xf0c8b447);
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0xf0c8b440, 0xf0c8b447);
 
-	state->m_flash_roms = 2;
+	m_flash_roms = 2;
 }
 
-static DRIVER_INIT( kdynastg )
+DRIVER_INIT_MEMBER(dgpix_state,kdynastg)
 {
-	dgpix_state *state = machine.driver_data<dgpix_state>();
-	UINT8 *rom = (UINT8 *)state->memregion("user1")->base() + 0x1c00000;
+	UINT8 *rom = (UINT8 *)memregion("user1")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;
@@ -605,15 +606,14 @@ static DRIVER_INIT( kdynastg )
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x12341234, 0x12341243);
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x12341234, 0x12341243);
 
-	state->m_flash_roms = 4;
+	m_flash_roms = 4;
 }
 
-static DRIVER_INIT( fmaniac3 )
+DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
 {
-	dgpix_state *state = machine.driver_data<dgpix_state>();
-	state->m_flash_roms = 2;
+	m_flash_roms = 2;
 }
 
 GAME( 1999, xfiles,   0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )

@@ -83,6 +83,7 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+	DECLARE_DRIVER_INIT(cham24);
 };
 
 
@@ -331,7 +332,7 @@ static MACHINE_START( cham24 )
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), state), write8_delegate(FUNC(cham24_state::nt_w), state));
 }
 
-static DRIVER_INIT( cham24 )
+DRIVER_INIT_MEMBER(cham24_state,cham24)
 {
 }
 

@@ -77,6 +77,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 	DECLARE_WRITE8_MEMBER(pia_porta_out);
 	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
+	DECLARE_DRIVER_INIT(rimrockn);
+	DECLARE_DRIVER_INIT(grmatch);
+	DECLARE_DRIVER_INIT(peggle);
+	DECLARE_DRIVER_INIT(slikshot);
+	DECLARE_DRIVER_INIT(neckneck);
+	DECLARE_DRIVER_INIT(arligntn);
+	DECLARE_DRIVER_INIT(hstennis);
+	DECLARE_DRIVER_INIT(sstrike);
 };
 
 

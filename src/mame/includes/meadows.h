@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(meadows_videoram_w);
 	DECLARE_WRITE8_MEMBER(meadows_spriteram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(minferno);
+	DECLARE_DRIVER_INIT(gypsyjug);
 };
 
 

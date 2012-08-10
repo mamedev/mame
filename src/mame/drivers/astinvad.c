@@ -74,6 +74,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
 	DECLARE_WRITE8_MEMBER(astinvad_sound1_w);
 	DECLARE_WRITE8_MEMBER(astinvad_sound2_w);
+	DECLARE_DRIVER_INIT(kamikaze);
+	DECLARE_DRIVER_INIT(spcking2);
 };
 
 
@@ -736,21 +738,19 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( kamikaze )
+DRIVER_INIT_MEMBER(astinvad_state,kamikaze)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	/* the flip screen logic adds 32 to the Y after flipping */
-	state->m_flip_yoffs = 32;
+	m_flip_yoffs = 32;
 }
 
 
-static DRIVER_INIT( spcking2 )
+DRIVER_INIT_MEMBER(astinvad_state,spcking2)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	/* don't have the schematics, but the blanking must center the screen here */
-	state->m_flip_yoffs = 0;
+	m_flip_yoffs = 0;
 }
 
 
@@ -765,5 +765,5 @@ GAME( 1979, kamikaze, 0,        kamikaze, kamikaze, astinvad_state, kamikaze, RO
 GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, astinvad_state, kamikaze, ROT270, "bootleg",            "Kosmo Killer",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
 GAME( 1979, spcking2, 0,        spcking2, spcking2, astinvad_state, spcking2, ROT270, "Konami",             "Space King 2",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceint, 0,        spaceint, spaceint, astinvad_state, 0,        ROT90,  "Shoei",              "Space Intruder", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, astinvad_state,0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, spaceint, 0,        spaceint, spaceint, driver_device, 0,        ROT90,  "Shoei",              "Space Intruder", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, driver_device,0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

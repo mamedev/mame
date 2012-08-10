@@ -188,4 +188,4 @@ ROM_END
 
 
 
-GAME( 1980, cheekyms, 0, cheekyms, cheekyms, cheekyms_state, 0, ROT270, "Universal", "Cheeky Mouse", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, cheekyms, 0, cheekyms, cheekyms, driver_device, 0, ROT270, "Universal", "Cheeky Mouse", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

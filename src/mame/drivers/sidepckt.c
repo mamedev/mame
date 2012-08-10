@@ -502,21 +502,19 @@ ROM_START( sidepcktb )
 ROM_END
 
 
-static DRIVER_INIT( sidepckt )
+DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 {
-	sidepckt_state *state = machine.driver_data<sidepckt_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),this));
 }
 
-static DRIVER_INIT( sidepctj )
+DRIVER_INIT_MEMBER(sidepckt_state,sidepctj)
 {
-	sidepckt_state *state = machine.driver_data<sidepckt_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),this));
 }
 
 
 GAME( 1986, sidepckt,  0,        sidepckt, sidepckt, sidepckt_state,  sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
 GAME( 1986, sidepcktj, sidepckt, sidepckt, sidepcktj, sidepckt_state, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktb, sidepckt, sidepckt, sidepcktb, sidepckt_state, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktb, sidepckt, sidepckt, sidepcktb, driver_device, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )

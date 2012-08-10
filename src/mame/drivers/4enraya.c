@@ -389,12 +389,11 @@ ROM_START(unkpacg)
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
 ROM_END
 
-static DRIVER_INIT( unkpacg )
+DRIVER_INIT_MEMBER(_4enraya_state,unkpacg)
 {
-	_4enraya_state *state = machine.driver_data<_4enraya_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
-	state->m_snd_latch_bit = 2;
+	m_snd_latch_bit = 2;
 
 	{
 		for(int i=0x8000;i<0xa000;++i)
@@ -404,5 +403,5 @@ static DRIVER_INIT( unkpacg )
 	}
 }
 
-GAME( 1990, 4enraya,  0,   4enraya,  4enraya, _4enraya_state,  0,       ROT0, "IDSA",      "4 En Raya", GAME_SUPPORTS_SAVE )
+GAME( 1990, 4enraya,  0,   4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya", GAME_SUPPORTS_SAVE )
 GAME( 199?, unkpacg,  0,   unkpacg,  unkpacg, _4enraya_state,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )

@@ -782,18 +782,17 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( roadriot )
+DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 {
-	atarig42_state *state = machine.driver_data<atarig42_state>();
-	atarijsa_init(machine, "IN2", 0x0040);
+	atarijsa_init(machine(), "IN2", 0x0040);
 
-	state->m_playfield_base = 0x400;
+	m_playfield_base = 0x400;
 
-	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
-	state->m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),state), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),state));
-	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), state));
+	address_space *main = machine().device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
-	asic65_config(machine, ASIC65_ROMBASED);
+	asic65_config(machine(), ASIC65_ROMBASED);
 /*
     Road Riot color MUX
 
@@ -817,22 +816,21 @@ static DRIVER_INIT( roadriot )
 }
 
 
-static DRIVER_INIT( guardian )
+DRIVER_INIT_MEMBER(atarig42_state,guardian)
 {
-	atarig42_state *state = machine.driver_data<atarig42_state>();
-	atarijsa_init(machine, "IN2", 0x0040);
+	atarijsa_init(machine(), "IN2", 0x0040);
 
-	state->m_playfield_base = 0x000;
+	m_playfield_base = 0x000;
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&state->memregion("maincpu")->base()[0x80000] = 0x4E75;
+	*(UINT16 *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
-	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
-	state->m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),state), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),state));
-	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), state));
+	address_space *main = machine().device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
-	asic65_config(machine, ASIC65_GUARDIANS);
+	asic65_config(machine(), ASIC65_GUARDIANS);
 /*
     Guardians color MUX
 

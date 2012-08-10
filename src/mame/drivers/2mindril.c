@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
+	DECLARE_DRIVER_INIT(drill);
 };
 
 
@@ -551,11 +552,10 @@ static void tile_decode(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( drill )
+DRIVER_INIT_MEMBER(_2mindril_state,drill)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	state->m_f3_game=TMDRILL;
-	tile_decode(machine);
+	m_f3_game=TMDRILL;
+	tile_decode(machine());
 }
 
 GAME( 1993, 2mindril,    0,        drill,    drill, _2mindril_state,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_MECHANICAL)

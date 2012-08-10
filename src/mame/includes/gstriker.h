@@ -95,6 +95,9 @@ public:
 	DECLARE_WRITE16_MEMBER(MB60553_1_vram_w);
 	DECLARE_WRITE16_MEMBER(gsx_videoram3_w);
 	void MB60553_reg_written(int numchip, int num_reg);
+	DECLARE_DRIVER_INIT(twrldc94a);
+	DECLARE_DRIVER_INIT(vgoalsoc);
+	DECLARE_DRIVER_INIT(twrldc94);
 };
 
 

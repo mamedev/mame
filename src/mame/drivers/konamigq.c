@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
+	DECLARE_DRIVER_INIT(konamigq);
 };
 
 /* Sound */
@@ -315,13 +316,12 @@ static const struct AM53CF96interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static DRIVER_INIT( konamigq )
+DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 {
-	konamigq_state *state = machine.driver_data<konamigq_state>();
 
-	psx_driver_init(machine);
+	psx_driver_init(machine());
 
-	state->m_p_n_pcmram = state->memregion( "shared" )->base() + 0x80000;
+	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }
 
 static MACHINE_START( konamigq )

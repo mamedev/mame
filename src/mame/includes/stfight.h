@@ -35,13 +35,13 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_text_attr_w);
 	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
+	DECLARE_DRIVER_INIT(stfight);
+	DECLARE_DRIVER_INIT(empcity);
 };
 
 
 /*----------- defined in machine/stfight.c -----------*/
 
-DRIVER_INIT( empcity );
-DRIVER_INIT( stfight );
 MACHINE_RESET( stfight );
 INTERRUPT_GEN( stfight_vb_interrupt );
 void stfight_adpcm_int(device_t *device);

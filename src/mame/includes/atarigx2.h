@@ -37,6 +37,9 @@ public:
 	DECLARE_WRITE32_MEMBER(atarigx2_protection_w);
 	DECLARE_READ32_MEMBER(atarigx2_protection_r);
 	DECLARE_READ32_MEMBER(rrreveng_prot_r);
+	DECLARE_DRIVER_INIT(spclords);
+	DECLARE_DRIVER_INIT(rrreveng);
+	DECLARE_DRIVER_INIT(motofren);
 };
 
 

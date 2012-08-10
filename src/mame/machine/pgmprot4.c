@@ -369,26 +369,24 @@ static MACHINE_RESET( killbld )
 
 
 
-DRIVER_INIT( killbld )
+DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 {
-	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
+	pgm_basic_init(machine());
+	pgm_killbld_decrypt(machine());
 
-	pgm_basic_init(machine);
-	pgm_killbld_decrypt(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
+	m_kb_cmd = 0;
+	m_kb_reg = 0;
+	m_kb_ptr = 0;
+	m_kb_region_sequence_position = 0;
+	memset(m_kb_regs, 0, 0x10 * sizeof(UINT32));
 
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10 * sizeof(UINT32));
-
-	state->save_item(NAME(state->m_kb_region_sequence_position));
-	state->save_item(NAME(state->m_kb_cmd));
-	state->save_item(NAME(state->m_kb_reg));
-	state->save_item(NAME(state->m_kb_ptr));
-	state->save_item(NAME(state->m_kb_regs));
+	save_item(NAME(m_kb_region_sequence_position));
+	save_item(NAME(m_kb_cmd));
+	save_item(NAME(m_kb_reg));
+	save_item(NAME(m_kb_ptr));
+	save_item(NAME(m_kb_regs));
 }
 
 static MACHINE_RESET( dw3 )
@@ -525,26 +523,24 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 }
 
 
-DRIVER_INIT( drgw3 )
+DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
 {
-	pgm_basic_init(machine);
+	pgm_basic_init(machine());
 
 /*
-    pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
-
     {
         int x;
-        UINT16 *RAMDUMP = (UINT16*)state->memregion("user2")->base();
+        UINT16 *RAMDUMP = (UINT16*)memregion("user2")->base();
         for (x=0;x<(0x4000/2);x++)
         {
-            state->m_sharedprotram[x] = RAMDUMP[x];
-            if((x>=0x100)&&(x<0x110)) printf("data 0x%4x, offset:%x\n",state->m_sharedprotram[x],x);
+            m_sharedprotram[x] = RAMDUMP[x];
+            if((x>=0x100)&&(x<0x110)) printf("data 0x%4x, offset:%x\n",m_sharedprotram[x],x);
         }
     }
 */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
 
-	pgm_dw3_decrypt(machine);
+	pgm_dw3_decrypt(machine());
 }
 
 

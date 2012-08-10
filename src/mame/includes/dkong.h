@@ -232,6 +232,11 @@ public:
 	DECLARE_WRITE8_MEMBER(dkong_z80dma_rdy_w);
 	DECLARE_READ8_MEMBER(braze_eeprom_r);
 	DECLARE_WRITE8_MEMBER(braze_eeprom_w);
+	DECLARE_DRIVER_INIT(strtheat);
+	DECLARE_DRIVER_INIT(herodk);
+	DECLARE_DRIVER_INIT(dkingjr);
+	DECLARE_DRIVER_INIT(drakton);
+	DECLARE_DRIVER_INIT(dkongx);
 };
 
 /*----------- defined in video/dkong.c -----------*/

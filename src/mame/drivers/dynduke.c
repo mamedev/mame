@@ -605,9 +605,9 @@ ROM_END
 
 /* Driver Initialization */
 
-static DRIVER_INIT( dynduke )
+DRIVER_INIT_MEMBER(dynduke_state,dynduke)
 {
-	seibu_sound_decrypt(machine,"audiocpu",0x20000);
+	seibu_sound_decrypt(machine(),"audiocpu",0x20000);
 }
 
 /* Game Drivers */

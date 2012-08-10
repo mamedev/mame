@@ -91,6 +91,22 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+	DECLARE_DRIVER_INIT(playch10);
+	DECLARE_DRIVER_INIT(pcfboard_2);
+	DECLARE_DRIVER_INIT(pc_gun);
+	DECLARE_DRIVER_INIT(pchboard);
+	DECLARE_DRIVER_INIT(pcdboard);
+	DECLARE_DRIVER_INIT(pccboard);
+	DECLARE_DRIVER_INIT(pcbboard);
+	DECLARE_DRIVER_INIT(pcgboard);
+	DECLARE_DRIVER_INIT(pcfboard);
+	DECLARE_DRIVER_INIT(pcgboard_type2);
+	DECLARE_DRIVER_INIT(pc_hrz);
+	DECLARE_DRIVER_INIT(pckboard);
+	DECLARE_DRIVER_INIT(pcdboard_2);
+	DECLARE_DRIVER_INIT(pceboard);
+	DECLARE_DRIVER_INIT(pciboard);
+	DECLARE_DRIVER_INIT(pcaboard);
 };
 
 
@@ -99,22 +115,6 @@ public:
 MACHINE_RESET( pc10 );
 MACHINE_START( pc10 );
 MACHINE_START( playch10_hboard );
-DRIVER_INIT( playch10 );	/* standard games */
-DRIVER_INIT( pc_gun );	/* gun games */
-DRIVER_INIT( pc_hrz );	/* horizontal games */
-DRIVER_INIT( pcaboard );	/* a-board games */
-DRIVER_INIT( pcbboard );	/* b-board games */
-DRIVER_INIT( pccboard );	/* c-board games */
-DRIVER_INIT( pcdboard );	/* d-board games */
-DRIVER_INIT( pcdboard_2 );	/* d-board games with extra ram */
-DRIVER_INIT( pceboard );	/* e-board games */
-DRIVER_INIT( pcfboard );	/* f-board games */
-DRIVER_INIT( pcfboard_2 );	/* f-board games with extra ram */
-DRIVER_INIT( pcgboard );	/* g-board games */
-DRIVER_INIT( pcgboard_type2 ); /* g-board games with 4 screen mirror */
-DRIVER_INIT( pchboard );	/* h-board games */
-DRIVER_INIT( pciboard );	/* i-board games */
-DRIVER_INIT( pckboard );	/* k-board games */
 
 
 

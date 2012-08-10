@@ -421,9 +421,9 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-static DRIVER_INIT( jailbrek )
+DRIVER_INIT_MEMBER(jailbrek_state,jailbrek)
 {
-	UINT8 *SPEECH_ROM = machine.root_device().memregion("vlm")->base();
+	UINT8 *SPEECH_ROM = machine().root_device().memregion("vlm")->base();
 	int ind;
 
     /*
@@ -435,7 +435,7 @@ static DRIVER_INIT( jailbrek )
        represents address line A13.)
     */
 
-    if (machine.root_device().memregion("vlm")->bytes() == 0x4000)
+    if (machine().root_device().memregion("vlm")->bytes() == 0x4000)
     {
         for (ind = 0; ind < 0x2000; ++ind)
         {
@@ -443,7 +443,7 @@ static DRIVER_INIT( jailbrek )
         }
     }
 
-    konami1_decode(machine, "maincpu");
+    konami1_decode(machine(), "maincpu");
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek_state, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

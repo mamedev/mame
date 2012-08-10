@@ -1343,7 +1343,8 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
 		image.device().machine().root_device().membank("cart_rom")->set_base(&image.device().machine().root_device().memregion("maincpu")->base()[0x80]);
 
 		// handle possible protection
-		mvs_install_protection(image);
+		neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
+		state->mvs_install_protection(image);
 
 		return IMAGE_INIT_PASS;
 	}
@@ -1415,10 +1416,9 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static DRIVER_INIT( neogeo )
+DRIVER_INIT_MEMBER(neogeo_state,neogeo)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_fixed_layer_bank_type = 0;
+	m_fixed_layer_bank_type = 0;
 }
 
 

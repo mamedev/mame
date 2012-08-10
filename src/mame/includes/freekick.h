@@ -38,6 +38,9 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_l_w);
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_h_w);
 	DECLARE_READ8_MEMBER(snd_rom_r);
+	DECLARE_DRIVER_INIT(gigas);
+	DECLARE_DRIVER_INIT(gigasb);
+	DECLARE_DRIVER_INIT(pbillrds);
 };
 
 

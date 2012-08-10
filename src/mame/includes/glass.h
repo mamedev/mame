@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(glass_coin_w);
 	DECLARE_WRITE16_MEMBER(glass_blitter_w);
 	DECLARE_WRITE16_MEMBER(glass_vram_w);
+	DECLARE_DRIVER_INIT(glass);
 };
 
 

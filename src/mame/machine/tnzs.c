@@ -508,80 +508,70 @@ WRITE8_MEMBER(tnzs_state::tnzs_sync_kludge_w)
 
 
 
-DRIVER_INIT( plumpop )
+DRIVER_INIT_MEMBER(tnzs_state,plumpop)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_PLUMPOP;
+	m_mcu_type = MCU_PLUMPOP;
 }
 
-DRIVER_INIT( extrmatn )
+DRIVER_INIT_MEMBER(tnzs_state,extrmatn)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_EXTRMATN;
+	m_mcu_type = MCU_EXTRMATN;
 }
 
-DRIVER_INIT( arknoid2 )
+DRIVER_INIT_MEMBER(tnzs_state,arknoid2)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_ARKANOID;
+	m_mcu_type = MCU_ARKANOID;
 }
 
-DRIVER_INIT( drtoppel )
+DRIVER_INIT_MEMBER(tnzs_state,drtoppel)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_DRTOPPEL;
+	m_mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xf800, 0xfbff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xf800, 0xfbff);
 }
 
-DRIVER_INIT( chukatai )
+DRIVER_INIT_MEMBER(tnzs_state,chukatai)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_CHUKATAI;
+	m_mcu_type = MCU_CHUKATAI;
 }
 
-DRIVER_INIT( tnzs )
+DRIVER_INIT_MEMBER(tnzs_state,tnzs)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_TNZS;
+	m_mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
 }
 
-DRIVER_INIT( tnzsb )
+DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_NONE_TNZSB;
+	m_mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
 }
 
-DRIVER_INIT( kabukiz )
+DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *SOUND = state->memregion("audiocpu")->base();
-	state->m_mcu_type = MCU_NONE_KABUKIZ;
+	UINT8 *SOUND = memregion("audiocpu")->base();
+	m_mcu_type = MCU_NONE_KABUKIZ;
 
-	state->membank("audiobank")->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
+	membank("audiobank")->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
 }
 
-DRIVER_INIT( insectx )
+DRIVER_INIT_MEMBER(tnzs_state,insectx)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_NONE_INSECTX;
+	m_mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc000, 0xc000, "IN0" );
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc001, 0xc001, "IN1" );
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc002, 0xc002, "IN2" );
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc000, 0xc000, "IN0" );
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc001, 0xc001, "IN1" );
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc002, 0xc002, "IN2" );
 }
 
-DRIVER_INIT( kageki )
+DRIVER_INIT_MEMBER(tnzs_state,kageki)
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->m_mcu_type = MCU_NONE_KAGEKI;
+	m_mcu_type = MCU_NONE_KAGEKI;
 }
 
 

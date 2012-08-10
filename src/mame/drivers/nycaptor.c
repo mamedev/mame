@@ -1338,40 +1338,36 @@ ROM_START( colt )
 	ROM_LOAD( "a50_14",   0x1c000, 0x4000, CRC(24b2f1bf) SHA1(4757aec2e4b99ce33d993ce1e19ee46a4eb76e86) )
 ROM_END
 
-static DRIVER_INIT( nycaptor )
+DRIVER_INIT_MEMBER(nycaptor_state,nycaptor)
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
-	state->m_gametype = 0;
+	m_gametype = 0;
 }
 
-static DRIVER_INIT( cyclshtg )
+DRIVER_INIT_MEMBER(nycaptor_state,cyclshtg)
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
-	state->m_gametype = 1;
+	m_gametype = 1;
 }
 
-static DRIVER_INIT( bronx )
+DRIVER_INIT_MEMBER(nycaptor_state,bronx)
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int i;
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
-	state->m_gametype = 1;
+	m_gametype = 1;
 }
 
-static DRIVER_INIT( colt )
+DRIVER_INIT_MEMBER(nycaptor_state,colt)
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int i;
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
-	state->m_gametype = 2;
+	m_gametype = 2;
 }
 
 GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, nycaptor, ROT0,  "Taito",   "N.Y. Captor", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

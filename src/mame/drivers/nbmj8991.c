@@ -68,39 +68,39 @@ static MACHINE_RESET( nbmj8991 )
 	MACHINE_RESET_CALL(nb1413m3);
 }
 
-static DRIVER_INIT( pstadium )
+DRIVER_INIT_MEMBER(nbmj8991_state,pstadium)
 {
 	nb1413m3_type = NB1413M3_PSTADIUM;
 }
 
-static DRIVER_INIT( triplew1 )
+DRIVER_INIT_MEMBER(nbmj8991_state,triplew1)
 {
 	nb1413m3_type = NB1413M3_TRIPLEW1;
 }
 
-static DRIVER_INIT( triplew2 )
+DRIVER_INIT_MEMBER(nbmj8991_state,triplew2)
 {
 	nb1413m3_type = NB1413M3_TRIPLEW2;
 }
 
-static DRIVER_INIT( ntopstar )
+DRIVER_INIT_MEMBER(nbmj8991_state,ntopstar)
 {
 	nb1413m3_type = NB1413M3_NTOPSTAR;
 }
 
-static DRIVER_INIT( mjlstory )
+DRIVER_INIT_MEMBER(nbmj8991_state,mjlstory)
 {
 	nb1413m3_type = NB1413M3_MJLSTORY;
 }
 
-static DRIVER_INIT( vanilla )
+DRIVER_INIT_MEMBER(nbmj8991_state,vanilla)
 {
 	nb1413m3_type = NB1413M3_VANILLA;
 }
 
-static DRIVER_INIT( finalbny )
+DRIVER_INIT_MEMBER(nbmj8991_state,finalbny)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -108,25 +108,25 @@ static DRIVER_INIT( finalbny )
 	nb1413m3_type = NB1413M3_FINALBNY;
 }
 
-static DRIVER_INIT( qmhayaku )
+DRIVER_INIT_MEMBER(nbmj8991_state,qmhayaku)
 {
 	nb1413m3_type = NB1413M3_QMHAYAKU;
 }
 
-static DRIVER_INIT( galkoku )
+DRIVER_INIT_MEMBER(nbmj8991_state,galkoku)
 {
 	nb1413m3_type = NB1413M3_GALKOKU;
 }
 
-static DRIVER_INIT( hyouban )
+DRIVER_INIT_MEMBER(nbmj8991_state,hyouban)
 {
 	nb1413m3_type = NB1413M3_HYOUBAN;
 }
 
-static DRIVER_INIT( galkaika )
+DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
 {
 #if 1
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -134,10 +134,10 @@ static DRIVER_INIT( galkaika )
 	nb1413m3_type = NB1413M3_GALKAIKA;
 }
 
-static DRIVER_INIT( tokyogal )
+DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
 {
 #if 1
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -145,10 +145,10 @@ static DRIVER_INIT( tokyogal )
 	nb1413m3_type = NB1413M3_TOKYOGAL;
 }
 
-static DRIVER_INIT( tokimbsj )
+DRIVER_INIT_MEMBER(nbmj8991_state,tokimbsj)
 {
 #if 1
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -156,27 +156,27 @@ static DRIVER_INIT( tokimbsj )
 	nb1413m3_type = NB1413M3_TOKIMBSJ;
 }
 
-static DRIVER_INIT( mcontest )
+DRIVER_INIT_MEMBER(nbmj8991_state,mcontest)
 {
 	nb1413m3_type = NB1413M3_MCONTEST;
 }
 
-static DRIVER_INIT( uchuuai )
+DRIVER_INIT_MEMBER(nbmj8991_state,uchuuai)
 {
 	nb1413m3_type = NB1413M3_UCHUUAI;
 }
 
-static DRIVER_INIT( mjgottub )
+DRIVER_INIT_MEMBER(nbmj8991_state,mjgottub)
 {
 	nb1413m3_type = NB1413M3_MJGOTTUB;
 }
 
-static DRIVER_INIT( av2mj1bb )
+DRIVER_INIT_MEMBER(nbmj8991_state,av2mj1bb)
 {
 	nb1413m3_type = NB1413M3_AV2MJ1BB;
 }
 
-static DRIVER_INIT( av2mj2rg )
+DRIVER_INIT_MEMBER(nbmj8991_state,av2mj2rg)
 {
 	nb1413m3_type = NB1413M3_AV2MJ2RG;
 }

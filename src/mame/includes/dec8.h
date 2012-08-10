@@ -88,6 +88,18 @@ public:
 	DECLARE_WRITE8_MEMBER(lastmisn_scrolly_w);
 	DECLARE_WRITE8_MEMBER(gondo_scroll_w);
 	DECLARE_READ8_MEMBER(csilver_adpcm_reset_r);
+	DECLARE_DRIVER_INIT(dec8);
+	DECLARE_DRIVER_INIT(deco222);
+	DECLARE_DRIVER_INIT(meikyuh);
+	DECLARE_DRIVER_INIT(garyoret);
+	DECLARE_DRIVER_INIT(shackled);
+	DECLARE_DRIVER_INIT(cobracom);
+	DECLARE_DRIVER_INIT(csilver);
+	DECLARE_DRIVER_INIT(ghostb);
+	DECLARE_DRIVER_INIT(srdarwin);
+	DECLARE_DRIVER_INIT(lastmisn);
+	DECLARE_DRIVER_INIT(gondo);
+	DECLARE_DRIVER_INIT(oscar);
 };
 
 /*----------- defined in video/dec8.c -----------*/

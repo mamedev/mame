@@ -485,4 +485,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0, safarir, safarir, safarir_state, 0, ROT90, "SNK", "Safari Rally (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1979, safarir, 0, safarir, safarir, driver_device, 0, ROT90, "SNK", "Safari Rally (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

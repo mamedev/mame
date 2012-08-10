@@ -429,6 +429,7 @@ public:
 	int m_aga_sprite_dma_used_words[8];
 
 	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
+	DECLARE_DRIVER_INIT(mquake);
 };
 
 

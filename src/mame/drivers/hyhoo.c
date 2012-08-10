@@ -30,12 +30,12 @@ Memo:
 #include "machine/nvram.h"
 
 
-static DRIVER_INIT( hyhoo )
+DRIVER_INIT_MEMBER(hyhoo_state,hyhoo)
 {
 	nb1413m3_type = NB1413M3_HYHOO;
 }
 
-static DRIVER_INIT( hyhoo2 )
+DRIVER_INIT_MEMBER(hyhoo_state,hyhoo2)
 {
 	nb1413m3_type = NB1413M3_HYHOO2;
 }

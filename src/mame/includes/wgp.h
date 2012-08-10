@@ -59,6 +59,8 @@ public:
 	DECLARE_WRITE16_MEMBER(wgp_pivram_word_w);
 	DECLARE_READ16_MEMBER(wgp_piv_ctrl_word_r);
 	DECLARE_WRITE16_MEMBER(wgp_piv_ctrl_word_w);
+	DECLARE_DRIVER_INIT(wgp);
+	DECLARE_DRIVER_INIT(wgp2);
 };
 
 

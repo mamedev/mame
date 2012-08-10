@@ -127,6 +127,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mirax_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
+	DECLARE_DRIVER_INIT(mirax);
 };
 
 
@@ -540,11 +541,10 @@ ROM_START( miraxa )
 ROM_END
 
 
-static DRIVER_INIT( mirax )
+DRIVER_INIT_MEMBER(mirax_state,mirax)
 {
-	mirax_state *state = machine.driver_data<mirax_state>();
-	UINT8 *DATA = state->memregion("data_code")->base();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *DATA = memregion("data_code")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)
@@ -557,8 +557,8 @@ static DRIVER_INIT( mirax )
 		ROM[BITSWAP16(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (BITSWAP8(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 
 	/* These values need to be initialised only once, not on every soft reset */
-	state->m_flipscreen_x = 0;
-	state->m_flipscreen_y = 0;
+	m_flipscreen_x = 0;
+	m_flipscreen_y = 0;
 }
 
 GAME( 1985, mirax,    0,        mirax,    mirax, mirax_state,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", 0 )

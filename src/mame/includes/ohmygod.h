@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_scrollx_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
+	DECLARE_DRIVER_INIT(ohmygod);
+	DECLARE_DRIVER_INIT(naname);
 };
 
 

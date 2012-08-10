@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(wpc_dot);
 };
 
 
@@ -31,7 +33,7 @@ void wpc_dot_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( wpc_dot )
+DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
 {
 }
 

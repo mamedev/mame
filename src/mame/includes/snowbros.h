@@ -34,5 +34,12 @@ public:
 	DECLARE_READ16_MEMBER(cookbib3_read);
 	DECLARE_WRITE8_MEMBER(twinadv_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
+	DECLARE_DRIVER_INIT(pzlbreak);
+	DECLARE_DRIVER_INIT(moremorp);
+	DECLARE_DRIVER_INIT(snowbro3);
+	DECLARE_DRIVER_INIT(cookbib3);
+	DECLARE_DRIVER_INIT(4in1boot);
+	DECLARE_DRIVER_INIT(3in1semi);
+	DECLARE_DRIVER_INIT(cookbib2);
 };
 

@@ -264,4 +264,4 @@ ROM_END
 
 
 
-GAME( 1999, bmcpokr,    0, bmcpokr,    bmcpokr, bmcpokr_state,    0, ROT0,  "BMC", "unknown BMC poker game", GAME_NOT_WORKING | GAME_IS_SKELETON )
+GAME( 1999, bmcpokr,    0, bmcpokr,    bmcpokr, driver_device,    0, ROT0,  "BMC", "unknown BMC poker game", GAME_NOT_WORKING | GAME_IS_SKELETON )

@@ -346,4 +346,4 @@ ROM_START( ultratnk )
 ROM_END
 
 
-GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, 0, 0, "Atari (Kee Games)", "Ultra Tank", 0 )
+GAME( 1978, ultratnk, 0, ultratnk, ultratnk, driver_device, 0, 0, "Atari (Kee Games)", "Ultra Tank", 0 )

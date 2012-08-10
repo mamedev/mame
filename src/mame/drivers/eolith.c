@@ -1438,64 +1438,60 @@ static MACHINE_RESET( eolith )
 	cputag_set_input_line(machine, "soundcpu", MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-static DRIVER_INIT( eolith )
+DRIVER_INIT_MEMBER(eolith_state,eolith)
 {
-	eolith_state *state = machine.driver_data<eolith_state>();
 
-	init_eolith_speedup(machine);
+	init_eolith_speedup(machine());
 
 	// Sound CPU -> QS1000 CPU serial link
-	i8051_set_serial_tx_callback(machine.device("soundcpu"), soundcpu_to_qs1000);
+	i8051_set_serial_tx_callback(machine().device("soundcpu"), soundcpu_to_qs1000);
 
 	// Configure the sound ROM banking
-	machine.root_device().membank("sound_bank")->configure_entries(0, 16, state->memregion("sounddata")->base(), 0x8000);
+	machine().root_device().membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
 }
 
-static DRIVER_INIT( landbrk )
+DRIVER_INIT_MEMBER(eolith_state,landbrk)
 {
-	eolith_state *state = machine.driver_data<eolith_state>();
-	state->m_coin_counter_bit = 0x1000;
+	m_coin_counter_bit = 0x1000;
 
-    DRIVER_INIT_CALL(eolith);
+	DRIVER_INIT_CALL(eolith);
 }
 
-static DRIVER_INIT( landbrka )
+DRIVER_INIT_MEMBER(eolith_state,landbrka)
 {
-	eolith_state *state = machine.driver_data<eolith_state>();
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)state->memregion("maincpu")->base();
+	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
-	state->m_coin_counter_bit = 0x2000;
+	m_coin_counter_bit = 0x2000;
 
-    DRIVER_INIT_CALL(eolith);
+	DRIVER_INIT_CALL(eolith);
 }
 
-static DRIVER_INIT( hidctch2 )
+DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)machine.root_device().memregion("maincpu")->base();
+	UINT32 *rombase = (UINT32*)machine().root_device().memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
-    DRIVER_INIT_CALL(eolith);
+	DRIVER_INIT_CALL(eolith);
 }
 
-static DRIVER_INIT( hidctch3 )
+DRIVER_INIT_MEMBER(eolith_state,hidctch3)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	eolith_state *state = machine.driver_data<eolith_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce00000, 0xfce00003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce80000, 0xfce80003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce00000, 0xfce00003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce80000, 0xfce80003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
 
-    DRIVER_INIT_CALL(eolith);
+	DRIVER_INIT_CALL(eolith);
 }
 
 

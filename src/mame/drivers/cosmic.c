@@ -1506,14 +1506,13 @@ ROM_START( nomnlndg )
 ROM_END
 
 
-static DRIVER_INIT( cosmicg )
+DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
 {
 	/* Program ROMs have data pins connected different from normal */
-	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs, len;
 	UINT8 *rom;
-	len = state->memregion("maincpu")->bytes();
-	rom = state->memregion("maincpu")->base();
+	len = memregion("maincpu")->bytes();
+	rom = memregion("maincpu")->base();
 	for (offs = 0; offs < len; offs++)
 	{
 		UINT8 scrambled = rom[offs];
@@ -1526,41 +1525,37 @@ static DRIVER_INIT( cosmicg )
 		rom[offs] = normal;
 	}
 
-	state->m_sound_enabled = 0;
-	state->m_march_select = 0;
-	state->m_gun_die_select = 0;
+	m_sound_enabled = 0;
+	m_march_select = 0;
+	m_gun_die_select = 0;
 }
 
 
-static DRIVER_INIT( cosmica )
+DRIVER_INIT_MEMBER(cosmic_state,cosmica)
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	state->m_sound_enabled = 1;
-	state->m_dive_bomb_b_select = 0;
+	m_sound_enabled = 1;
+	m_dive_bomb_b_select = 0;
 }
 
 
-static DRIVER_INIT( devzone )
+DRIVER_INIT_MEMBER(cosmic_state,devzone)
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
 }
 
 
-static DRIVER_INIT( nomnlnd )
+DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	dac_device *dac = machine.device<dac_device>("dac");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),dac));
+	dac_device *dac = machine().device<dac_device>("dac");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),dac));
 }
 
-static DRIVER_INIT( panic )
+DRIVER_INIT_MEMBER(cosmic_state,panic)
 {
-	cosmic_state *state = machine.driver_data<cosmic_state>();
-	state->m_sound_enabled = 1;
+	m_sound_enabled = 1;
 }
 
 
@@ -1570,8 +1565,8 @@ GAME( 1979, cosmica1, cosmica, cosmica,  cosmica, cosmic_state,  cosmica, ROT270
 GAME( 1979, cosmica2, cosmica, cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd, cosmic_state,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, cosmic_state, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, magspot,  0,       magspot,  magspot, cosmic_state,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, magspot2, 0,       magspot,  magspot, cosmic_state,  0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, magspot,  0,       magspot,  magspot, driver_device,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, magspot2, 0,       magspot,  magspot, driver_device,  0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, panic,    0,       panic,    panic, cosmic_state,    panic,   ROT270, "Universal", "Space Panic (version E)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, panic2,   panic,   panic,    panic, cosmic_state,    panic,   ROT270, "Universal", "Space Panic (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, panic3,   panic,   panic,    panic, cosmic_state,    panic,   ROT270, "Universal", "Space Panic (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

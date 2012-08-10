@@ -226,6 +226,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_DRIVER_INIT(bus);
 };
 
 
@@ -611,12 +612,12 @@ ROM_END
 *       Driver Init        *
 ***************************/
 
-static DRIVER_INIT( bus )
+DRIVER_INIT_MEMBER(tmspoker_state,bus)
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	const size_t len = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	const size_t len = machine().root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

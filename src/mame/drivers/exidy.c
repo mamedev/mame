@@ -1412,101 +1412,95 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( sidetrac )
+DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
-	exidy_video_config(machine, 0x00, 0x00, FALSE);
+	exidy_video_config(machine(), 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	state->m_color_latch[2] = 0xf8;
-	state->m_color_latch[1] = 0xdc;
-	state->m_color_latch[0] = 0xb8;
+	m_color_latch[2] = 0xf8;
+	m_color_latch[1] = 0xdc;
+	m_color_latch[0] = 0xb8;
 }
 
 
-static DRIVER_INIT( targ )
+DRIVER_INIT_MEMBER(exidy_state,targ)
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
-	exidy_video_config(machine, 0x00, 0x00, FALSE);
+	exidy_video_config(machine(), 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	state->m_color_latch[2] = 0x5c;
-	state->m_color_latch[1] = 0xee;
-	state->m_color_latch[0] = 0x6b;
+	m_color_latch[2] = 0x5c;
+	m_color_latch[1] = 0xee;
+	m_color_latch[0] = 0x6b;
 }
 
 
-static DRIVER_INIT( spectar )
+DRIVER_INIT_MEMBER(exidy_state,spectar)
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
-	exidy_video_config(machine, 0x00, 0x00, FALSE);
+	exidy_video_config(machine(), 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	state->m_color_latch[2] = 0x58;
-	state->m_color_latch[1] = 0xee;
-	state->m_color_latch[0] = 0x09;
+	m_color_latch[2] = 0x58;
+	m_color_latch[1] = 0xee;
+	m_color_latch[0] = 0x09;
 }
 
-static DRIVER_INIT( rallys )
+DRIVER_INIT_MEMBER(exidy_state,rallys)
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
-	exidy_video_config(machine, 0x00, 0x00, FALSE);
+	exidy_video_config(machine(), 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	state->m_color_latch[2] = 0x58;
-	state->m_color_latch[1] = 0xee;
-	state->m_color_latch[0] = 0x09;
+	m_color_latch[2] = 0x58;
+	m_color_latch[1] = 0xee;
+	m_color_latch[0] = 0x09;
 }
 
-static DRIVER_INIT( phantoma )
+DRIVER_INIT_MEMBER(exidy_state,phantoma)
 {
-	exidy_state *state = machine.driver_data<exidy_state>();
-	exidy_video_config(machine, 0x00, 0x00, FALSE);
+	exidy_video_config(machine(), 0x00, 0x00, FALSE);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	state->m_color_latch[2] = 0x58;
-	state->m_color_latch[1] = 0xee;
-	state->m_color_latch[0] = 0x09;
+	m_color_latch[2] = 0x58;
+	m_color_latch[1] = 0xee;
+	m_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xf800, 0xffff, "bank1");
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0xf800);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xf800, 0xffff, "bank1");
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0xf800);
 }
 
 
-static DRIVER_INIT( mtrap )
+DRIVER_INIT_MEMBER(exidy_state,mtrap)
 {
-	exidy_video_config(machine, 0x14, 0x00, FALSE);
+	exidy_video_config(machine(), 0x14, 0x00, FALSE);
 }
 
 
-static DRIVER_INIT( venture )
+DRIVER_INIT_MEMBER(exidy_state,venture)
 {
-	exidy_video_config(machine, 0x04, 0x04, FALSE);
+	exidy_video_config(machine(), 0x04, 0x04, FALSE);
 }
 
 
-static DRIVER_INIT( teetert )
+DRIVER_INIT_MEMBER(exidy_state,teetert)
 {
-	exidy_video_config(machine, 0x0c, 0x0c, FALSE);
+	exidy_video_config(machine(), 0x0c, 0x0c, FALSE);
 }
 
 
-static DRIVER_INIT( pepper2 )
+DRIVER_INIT_MEMBER(exidy_state,pepper2)
 {
-	exidy_video_config(machine, 0x14, 0x04, TRUE);
+	exidy_video_config(machine(), 0x14, 0x04, TRUE);
 }
 
 
-static DRIVER_INIT( fax )
+DRIVER_INIT_MEMBER(exidy_state,fax)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	exidy_state *state = machine.driver_data<exidy_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	exidy_video_config(machine, 0x04, 0x04, TRUE);
+	exidy_video_config(machine(), 0x04, 0x04, TRUE);
 
 	/* reset the ROM bank */
-	state->fax_bank_select_w(*space,0,0);
+	fax_bank_select_w(*space,0,0);
 }
 
 

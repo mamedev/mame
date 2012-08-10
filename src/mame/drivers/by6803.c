@@ -22,6 +22,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(by6803);
 };
 
 
@@ -39,7 +41,7 @@ void by6803_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( by6803 )
+DRIVER_INIT_MEMBER(by6803_state,by6803)
 {
 }
 

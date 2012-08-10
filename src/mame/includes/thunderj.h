@@ -17,6 +17,7 @@ public:
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_READ16_MEMBER(thunderj_atarivc_r);
 	DECLARE_WRITE16_MEMBER(thunderj_atarivc_w);
+	DECLARE_DRIVER_INIT(thunderj);
 };
 
 

@@ -20,6 +20,7 @@ public:
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(audio_control_w);
 	DECLARE_WRITE16_MEMBER(audio_volume_w);
+	DECLARE_DRIVER_INIT(relief);
 };
 
 

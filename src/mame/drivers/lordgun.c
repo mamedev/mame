@@ -54,10 +54,10 @@ Notes:
 
 ***************************************************************************/
 
-static DRIVER_INIT( lordgun )
+DRIVER_INIT_MEMBER(lordgun_state,lordgun)
 {
 	int i;
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// Decryption
 
@@ -80,9 +80,9 @@ static DRIVER_INIT( lordgun )
 
 
 // From XingXing:
-static DRIVER_INIT( aliencha )
+DRIVER_INIT_MEMBER(lordgun_state,aliencha)
 {
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// Protection
 
@@ -104,9 +104,9 @@ static DRIVER_INIT( aliencha )
 }
 
 
-static DRIVER_INIT( alienchac )
+DRIVER_INIT_MEMBER(lordgun_state,alienchac)
 {
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// Protection
 

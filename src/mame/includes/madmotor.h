@@ -22,6 +22,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(madmotor_sound_w);
+	DECLARE_DRIVER_INIT(madmotor);
 };
 
 

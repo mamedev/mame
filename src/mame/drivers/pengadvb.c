@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_a_w);
 	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_DRIVER_INIT(pengadvb);
 };
 
 
@@ -312,13 +313,12 @@ static void pengadvb_decrypt(running_machine &machine, const char* region)
 	auto_free(machine, buf);
 }
 
-static DRIVER_INIT(pengadvb)
+DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
 {
-	pengadvb_state *state = machine.driver_data<pengadvb_state>();
-	pengadvb_decrypt(machine, "maincpu");
-	pengadvb_decrypt(machine, "game");
+	pengadvb_decrypt(machine(), "maincpu");
+	pengadvb_decrypt(machine(), "game");
 
-	state->m_main_mem = auto_alloc_array(machine, UINT8, 0x4000);
+	m_main_mem = auto_alloc_array(machine(), UINT8, 0x4000);
 }
 
 ROM_START( pengadvb )

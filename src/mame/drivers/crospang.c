@@ -581,9 +581,9 @@ static void tumblepb_gfx1_rearrange(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( crospang )
+DRIVER_INIT_MEMBER(crospang_state,crospang)
 {
-	tumblepb_gfx1_rearrange(machine);
+	tumblepb_gfx1_rearrange(machine());
 }
 
 GAME( 1998, crospang, 0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System", "Cross Pang", GAME_SUPPORTS_SAVE )

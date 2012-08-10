@@ -348,5 +348,5 @@ ROM_START( sformula )
 ROM_END
 
 
-GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -48,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
 	DECLARE_READ8_MEMBER(namco_52xx_si_r);
 	DECLARE_READ8_MEMBER(custom_mod_r);
+	DECLARE_DRIVER_INIT(galaga);
+	DECLARE_DRIVER_INIT(gatsbee);
 };
 
 class xevious_state : public galaga_state
@@ -72,6 +74,9 @@ public:
 	required_shared_ptr<UINT8> m_xevious_bg_videoram;
 
 	INT32 m_xevious_bs[2];
+	DECLARE_DRIVER_INIT(xevious);
+	DECLARE_DRIVER_INIT(xevios);
+	DECLARE_DRIVER_INIT(battles);	
 };
 
 

@@ -53,6 +53,16 @@ public:
 	DECLARE_READ32_MEMBER(mjgtaste_input_r);
 	DECLARE_WRITE32_MEMBER(psh_eeprom_w);
 	DECLARE_READ32_MEMBER(psh_eeprom_r);
+	DECLARE_DRIVER_INIT(gnbarich);
+	DECLARE_DRIVER_INIT(daraku);
+	DECLARE_DRIVER_INIT(soldivid);
+	DECLARE_DRIVER_INIT(s1945iii);
+	DECLARE_DRIVER_INIT(mjgtaste);
+	DECLARE_DRIVER_INIT(tgm2);
+	DECLARE_DRIVER_INIT(sbomberb);
+	DECLARE_DRIVER_INIT(dragnblz);
+	DECLARE_DRIVER_INIT(gunbird2);
+	DECLARE_DRIVER_INIT(s1945ii);
 };
 
 /*----------- defined in video/psikyosh.c -----------*/

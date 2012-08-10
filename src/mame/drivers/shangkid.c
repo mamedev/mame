@@ -119,20 +119,18 @@ READ8_MEMBER(shangkid_state::shangkid_soundlatch_r)
 
 /***************************************************************************************/
 
-static DRIVER_INIT( chinhero )
+DRIVER_INIT_MEMBER(shangkid_state,chinhero)
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
-	state->m_gfx_type = 0;
+	m_gfx_type = 0;
 }
 
-static DRIVER_INIT( shangkid )
+DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
-	state->m_gfx_type = 1;
+	m_gfx_type = 1;
 
 	/* set up banking */
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x8000, 0x8000);
-	state->membank("bank2")->configure_entries(0, 2, state->memregion("audiocpu")->base() + 0x0000, 0x10000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
+	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/
@@ -970,7 +968,7 @@ ROM_START( dynamski )
 ROM_END
 
 
-GAME( 1984, dynamski, 0,        dynamski, dynamski, shangkid_state, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
+GAME( 1984, dynamski, 0,        dynamski, dynamski, driver_device, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
 GAME( 1984, chinhero, 0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 ) // by Nihon Game?
 GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
 GAME( 1984, chinherot,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", 0 )

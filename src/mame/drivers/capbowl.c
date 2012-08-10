@@ -497,12 +497,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( capbowl )
+DRIVER_INIT_MEMBER(capbowl_state,capbowl)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
-	machine.root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
 
@@ -517,4 +517,4 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT27
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", 0 )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", 0 )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling", 0 )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, 0,        ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, driver_device, 0,        ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )

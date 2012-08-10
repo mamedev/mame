@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(poolshrk_watchdog_w);
 	DECLARE_READ8_MEMBER(poolshrk_input_r);
 	DECLARE_READ8_MEMBER(poolshrk_irq_reset_r);
+	DECLARE_DRIVER_INIT(poolshrk);
 };
 
 

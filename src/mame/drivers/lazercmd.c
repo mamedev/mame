@@ -786,10 +786,10 @@ ROM_START( bbonk )
 ROM_END
 
 
-static DRIVER_INIT( lazercmd )
+DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
 {
 	int i, y;
-	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfx = machine().root_device().memregion("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -815,10 +815,10 @@ static DRIVER_INIT( lazercmd )
 	}
 }
 
-static DRIVER_INIT( medlanes )
+DRIVER_INIT_MEMBER(lazercmd_state,medlanes)
 {
 	int i, y;
-	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfx = machine().root_device().memregion("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -844,10 +844,10 @@ static DRIVER_INIT( medlanes )
 	}
 }
 
-static DRIVER_INIT( bbonk )
+DRIVER_INIT_MEMBER(lazercmd_state,bbonk)
 {
 	int i, y;
-	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfx = machine().root_device().memregion("gfx1")->base();
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.

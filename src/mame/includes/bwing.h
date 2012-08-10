@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bwing_paletteram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
+	DECLARE_DRIVER_INIT(bwing);
 };
 
 

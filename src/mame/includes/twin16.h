@@ -54,6 +54,9 @@ public:
 	DECLARE_READ8_MEMBER(twin16_upd_busy_r);
 	DECLARE_WRITE8_MEMBER(twin16_upd_reset_w);
 	DECLARE_WRITE8_MEMBER(twin16_upd_start_w);
+	DECLARE_DRIVER_INIT(fround);
+	DECLARE_DRIVER_INIT(twin16);
+	DECLARE_DRIVER_INIT(cuebrickj);
 };
 
 

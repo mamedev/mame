@@ -46,6 +46,15 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhunt_op4_w);
 	DECLARE_READ8_MEMBER(turbotag_ip2_r);
 	DECLARE_READ8_MEMBER(turbotag_kludge_r);
+	DECLARE_DRIVER_INIT(crater);
+	DECLARE_DRIVER_INIT(demoderm);
+	DECLARE_DRIVER_INIT(turbotag);
+	DECLARE_DRIVER_INIT(powerdrv);
+	DECLARE_DRIVER_INIT(stargrds);
+	DECLARE_DRIVER_INIT(maxrpm);
+	DECLARE_DRIVER_INIT(rampage);
+	DECLARE_DRIVER_INIT(spyhunt);
+	DECLARE_DRIVER_INIT(sarge);
 };
 
 

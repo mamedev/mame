@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
 	DECLARE_READ32_MEMBER(Ns5r50);
 	DECLARE_WRITE32_MEMBER(sram_banksel_w);
+	DECLARE_DRIVER_INIT(aristmk5);
 };
 
 
@@ -357,15 +358,15 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_CONFSETTING(    0x03, "Game Mode" )
 INPUT_PORTS_END
 
-static DRIVER_INIT( aristmk5 )
+DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 {
-	UINT8 *SRAM    = machine.root_device().memregion("sram")->base();
-	UINT8 *SRAM_NZ = machine.root_device().memregion("sram")->base();
+	UINT8 *SRAM    = machine().root_device().memregion("sram")->base();
+	UINT8 *SRAM_NZ = machine().root_device().memregion("sram")->base();
 
-	archimedes_driver_init(machine);
+	archimedes_driver_init(machine());
 
-	machine.root_device().membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
-	machine.root_device().membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
+	machine().root_device().membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
+	machine().root_device().membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
 }
 
 

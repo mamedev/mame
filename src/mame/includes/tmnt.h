@@ -116,6 +116,9 @@ public:
 	DECLARE_WRITE8_MEMBER(glfgreat_sound_w);
 	DECLARE_WRITE8_MEMBER(tmnt_upd_start_w);
 	DECLARE_READ8_MEMBER(tmnt_upd_busy_r);
+	DECLARE_DRIVER_INIT(mia);
+	DECLARE_DRIVER_INIT(tmnt);
+	DECLARE_DRIVER_INIT(cuebrick);
 };
 
 

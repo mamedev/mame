@@ -453,24 +453,22 @@ static void init_tunit_generic(running_machine &machine, int sound)
  *
  *************************************/
 
-DRIVER_INIT( mktunit )
+DRIVER_INIT_MEMBER(midtunit_state,mktunit)
 {
 	/* common init */
-	init_tunit_generic(machine, SOUND_ADPCM);
+	init_tunit_generic(machine(), SOUND_ADPCM);
 
 	/* protection */
-	midtunit_state *state = machine.driver_data<midtunit_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),state), write16_delegate(FUNC(midtunit_state::mk_prot_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),this), write16_delegate(FUNC(midtunit_state::mk_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
+	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
 }
 
-DRIVER_INIT( mkturbo )
+DRIVER_INIT_MEMBER(midtunit_state,mkturbo)
 {
 	/* protection */
-	midtunit_state *state = machine.driver_data<midtunit_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midtunit_state::mkturbo_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midtunit_state::mkturbo_prot_r),this));
 
 	DRIVER_INIT_CALL(mktunit);
 }
@@ -501,36 +499,35 @@ static void init_nbajam_common(running_machine &machine, int te_protection)
 		machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(0xfbec, 0xfc16);
 }
 
-DRIVER_INIT( nbajam )
+DRIVER_INIT_MEMBER(midtunit_state,nbajam)
 {
-	init_nbajam_common(machine, 0);
+	init_nbajam_common(machine(), 0);
 }
 
-DRIVER_INIT( nbajamte )
+DRIVER_INIT_MEMBER(midtunit_state,nbajamte)
 {
-	init_nbajam_common(machine, 1);
+	init_nbajam_common(machine(), 1);
 }
 
-DRIVER_INIT( jdreddp )
+DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 {
 	/* common init */
-	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
+	init_tunit_generic(machine(), SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x01d81060, 0x01d8107f);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x01d81060, 0x01d8107f);
 
 	/* protection */
-	midtunit_state *state = machine.driver_data<midtunit_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),state), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),this), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
-	state->membank("adpcm:bank9")->set_base(auto_alloc_array(machine, UINT8, 0x80));
+	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), UINT8, 0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */
-	jdredd_hack = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFBA7FF0, 0xFFBA7FFf, FUNC(jdredd_hack_r));
+	jdredd_hack = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFBA7FF0, 0xFFBA7FFf, FUNC(jdredd_hack_r));
 #endif
 }
 
@@ -544,21 +541,20 @@ DRIVER_INIT( jdreddp )
  *
  *************************************/
 
-DRIVER_INIT( mk2 )
+DRIVER_INIT_MEMBER(midtunit_state,mk2)
 {
 	/* common init */
-	init_tunit_generic(machine, SOUND_DCS);
+	init_tunit_generic(machine(), SOUND_DCS);
 	midtunit_gfx_rom_large = 1;
 
 	/* protection */
-	midtunit_state *state = machine.driver_data<midtunit_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00f42820, 0x00f4283f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01a190e0, 0x01a190ff, read16_delegate(FUNC(midtunit_state::mk2_prot_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01a191c0, 0x01a191df, read16_delegate(FUNC(midtunit_state::mk2_prot_shift_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01a3d0c0, 0x01a3d0ff, read16_delegate(FUNC(midtunit_state::mk2_prot_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01d9d1e0, 0x01d9d1ff, read16_delegate(FUNC(midtunit_state::mk2_prot_const_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01def920, 0x01def93f, read16_delegate(FUNC(midtunit_state::mk2_prot_const_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00f42820, 0x00f4283f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01a190e0, 0x01a190ff, read16_delegate(FUNC(midtunit_state::mk2_prot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01a191c0, 0x01a191df, read16_delegate(FUNC(midtunit_state::mk2_prot_shift_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01a3d0c0, 0x01a3d0ff, read16_delegate(FUNC(midtunit_state::mk2_prot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01d9d1e0, 0x01d9d1ff, read16_delegate(FUNC(midtunit_state::mk2_prot_const_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01def920, 0x01def93f, read16_delegate(FUNC(midtunit_state::mk2_prot_const_r),this));
 }
 
 

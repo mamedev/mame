@@ -356,10 +356,10 @@ static void compgolf_expand_bg(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( compgolf )
+DRIVER_INIT_MEMBER(compgolf_state,compgolf)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("user1")->base(), 0x4000);
-	compgolf_expand_bg(machine);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("user1")->base(), 0x4000);
+	compgolf_expand_bg(machine());
 }
 
 

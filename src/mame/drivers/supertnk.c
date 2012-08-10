@@ -122,6 +122,7 @@ public:
 	DECLARE_READ8_MEMBER(supertnk_videoram_r);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
+	DECLARE_DRIVER_INIT(supertnk);
 };
 
 
@@ -486,12 +487,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( supertnk )
+DRIVER_INIT_MEMBER(supertnk_state,supertnk)
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	size_t len = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	size_t len = machine().root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

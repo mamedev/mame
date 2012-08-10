@@ -442,6 +442,6 @@ ROM_START( tp84b )
 ROM_END
 
 
-GAME( 1984, tp84,  0,    tp84,  tp84, tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, tp84a, tp84, tp84,  tp84a, tp84_state,0, ROT90, "Konami", "Time Pilot '84 (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, tp84b, tp84, tp84b, tp84, tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1984, tp84,  0,    tp84,  tp84, driver_device, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, tp84a, tp84, tp84,  tp84a, driver_device,0, ROT90, "Konami", "Time Pilot '84 (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, tp84b, tp84, tp84b, tp84, driver_device, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", GAME_SUPPORTS_SAVE )

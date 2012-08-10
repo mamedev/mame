@@ -196,7 +196,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-
+public:
+	DECLARE_DRIVER_INIT(hb);
 };
 
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
@@ -576,20 +577,20 @@ extern void astra_addresslines( UINT16* src, size_t srcsize, int small );
 
 
 
-static DRIVER_INIT( hb )
+DRIVER_INIT_MEMBER(pluto5_state,hb)
 {
-	astra_addresslines( (UINT16*)machine.root_device().memregion( "maincpu" )->base(), machine.root_device().memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (UINT16*)machine().root_device().memregion( "maincpu" )->base(), machine().root_device().memregion( "maincpu" )->bytes(), 0 );
 
 	#if 0
 	{
-		UINT8* ROM = machine.root_device().memregion( "maincpu" )->base();
+		UINT8* ROM = machine().root_device().memregion( "maincpu" )->base();
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s", machine.system().name);
+		sprintf(filename,"%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(ROM,  machine.root_device().memregion( "maincpu" )->bytes(), 1, fp);
+			fwrite(ROM,  machine().root_device().memregion( "maincpu" )->bytes(), 1, fp);
 			fclose(fp);
 		}
 	}

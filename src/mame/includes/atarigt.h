@@ -62,6 +62,9 @@ public:
 	DECLARE_WRITE32_MEMBER(tmek_pf_w);
 	void atarigt_colorram_w(offs_t address, UINT16 data, UINT16 mem_mask);
 	UINT16 atarigt_colorram_r(offs_t address);
+	DECLARE_DRIVER_INIT(primrage20);
+	DECLARE_DRIVER_INIT(primrage);
+	DECLARE_DRIVER_INIT(tmek);
 };
 
 

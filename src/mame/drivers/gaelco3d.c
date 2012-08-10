@@ -1208,7 +1208,7 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( gaelco3d )
+DRIVER_INIT_MEMBER(gaelco3d_state,gaelco3d)
 {
 }
 

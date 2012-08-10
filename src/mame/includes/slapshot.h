@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(slapshot_msb_sound_w);
 	DECLARE_READ16_MEMBER(slapshot_msb_sound_r);
+	DECLARE_DRIVER_INIT(slapshot);
 };
 
 

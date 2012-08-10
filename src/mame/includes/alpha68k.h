@@ -71,6 +71,23 @@ public:
 	DECLARE_WRITE16_MEMBER(alpha68k_videoram_w);
 	DECLARE_WRITE16_MEMBER(alpha68k_II_video_bank_w);
 	DECLARE_WRITE16_MEMBER(alpha68k_V_video_control_w);
+	DECLARE_DRIVER_INIT(paddlema);
+	DECLARE_DRIVER_INIT(btlfield);
+	DECLARE_DRIVER_INIT(jongbou);
+	DECLARE_DRIVER_INIT(goldmedl);
+	DECLARE_DRIVER_INIT(skyadvnt);
+	DECLARE_DRIVER_INIT(goldmedla);
+	DECLARE_DRIVER_INIT(gangwarsu);
+	DECLARE_DRIVER_INIT(gangwars);
+	DECLARE_DRIVER_INIT(tnextspc);
+	DECLARE_DRIVER_INIT(timesold1);
+	DECLARE_DRIVER_INIT(sbasebal);
+	DECLARE_DRIVER_INIT(skysoldr);
+	DECLARE_DRIVER_INIT(skyadvntu);
+	DECLARE_DRIVER_INIT(btlfieldb);
+	DECLARE_DRIVER_INIT(timesold);
+	DECLARE_DRIVER_INIT(kyros);
+	DECLARE_DRIVER_INIT(sstingry);
 };
 
 /* game_id - used to deal with a few game specific situations */

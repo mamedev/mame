@@ -128,10 +128,10 @@ static const UINT8 toybox_mcu_decryption_table_alt[0x100] = {
 
 // I use a byteswapped MCU data rom to make the transfers to the 68k side easier
 //  not sure if it's all 100% endian safe
-DRIVER_INIT( decrypt_toybox_rom )
+DRIVER_INIT_MEMBER(kaneko16_state,decrypt_toybox_rom)
 {
 
-	UINT8 *src = (UINT8 *)machine.root_device().memregion("mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine().root_device().memregion("mcudata" )->base();
 
 	int i;
 
@@ -144,7 +144,7 @@ DRIVER_INIT( decrypt_toybox_rom )
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s.mcudata", machine.system().name);
+		sprintf(filename,"%s.mcudata", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -155,10 +155,10 @@ DRIVER_INIT( decrypt_toybox_rom )
 	#endif
 }
 
-DRIVER_INIT( decrypt_toybox_rom_alt )
+DRIVER_INIT_MEMBER(kaneko16_state,decrypt_toybox_rom_alt)
 {
 
-	UINT8 *src = (UINT8 *)machine.root_device().memregion("mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine().root_device().memregion("mcudata" )->base();
 
 	int i;
 

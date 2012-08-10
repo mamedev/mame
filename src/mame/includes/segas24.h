@@ -94,6 +94,22 @@ public:
 	void irq_timer_sync();
 	void irq_timer_start(int old_tmode);
 	void reset_control_w(UINT8 data);
+	DECLARE_DRIVER_INIT(crkdown);
+	DECLARE_DRIVER_INIT(quizmeku);
+	DECLARE_DRIVER_INIT(qrouka);
+	DECLARE_DRIVER_INIT(roughrac);
+	DECLARE_DRIVER_INIT(qgh);
+	DECLARE_DRIVER_INIT(gground);
+	DECLARE_DRIVER_INIT(mahmajn2);
+	DECLARE_DRIVER_INIT(sspiritj);
+	DECLARE_DRIVER_INIT(mahmajn);
+	DECLARE_DRIVER_INIT(hotrod);
+	DECLARE_DRIVER_INIT(sspirits);
+	DECLARE_DRIVER_INIT(dcclub);
+	DECLARE_DRIVER_INIT(bnzabros);
+	DECLARE_DRIVER_INIT(dcclubfd);
+	DECLARE_DRIVER_INIT(qsww);
+	DECLARE_DRIVER_INIT(sgmast);
 };
 
 /*----------- defined in video/segas24.c -----------*/

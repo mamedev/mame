@@ -91,6 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(gunpey_status_r);
 	DECLARE_READ8_MEMBER(gunpey_inputs_r);
 	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
+	DECLARE_DRIVER_INIT(gunpey);
 };
 
 
@@ -410,9 +411,9 @@ ROM_START( gunpey )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-static DRIVER_INIT( gunpey )
+DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* patch SLOOOOW cycle checks ... */
 	rom[0x848b5] = 0x7e;

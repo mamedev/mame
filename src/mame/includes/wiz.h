@@ -42,6 +42,9 @@ public:
 	DECLARE_WRITE8_MEMBER(wiz_char_bank_select_w);
 	DECLARE_WRITE8_MEMBER(wiz_flipx_w);
 	DECLARE_WRITE8_MEMBER(wiz_flipy_w);
+	DECLARE_DRIVER_INIT(wiz);
+	DECLARE_DRIVER_INIT(scion);
+	DECLARE_DRIVER_INIT(stinger);
 };
 
 

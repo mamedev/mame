@@ -481,6 +481,9 @@ public:
 	int m_gfx_fifo_loopback;
 	int m_gfx_unknown_v1;
 	int m_gfx_status_byte;
+	DECLARE_DRIVER_INIT(racjamdx);
+	DECLARE_DRIVER_INIT(bujutsu);
+	DECLARE_DRIVER_INIT(cobra);
 };
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -2519,42 +2522,41 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static DRIVER_INIT(cobra)
+DRIVER_INIT_MEMBER(cobra_state,cobra)
 {
-	cobra_state *cobra = machine.driver_data<cobra_state>();
 
-	cobra->m_gfxfifo_in	 = auto_alloc(machine, cobra_fifo(machine, 8192, "GFXFIFO_IN", GFXFIFO_IN_VERBOSE != 0));
-	cobra->m_gfxfifo_out = auto_alloc(machine, cobra_fifo(machine, 8192, "GFXFIFO_IN", GFXFIFO_OUT_VERBOSE != 0));
-	cobra->m_m2sfifo     = auto_alloc(machine, cobra_fifo(machine, 2048, "M2SFIFO", M2SFIFO_VERBOSE != 0));
-	cobra->m_s2mfifo     = auto_alloc(machine, cobra_fifo(machine, 2048, "S2MFIFO", S2MFIFO_VERBOSE != 0));
-
-
-	ppc_set_dcstore_callback(cobra->m_gfxcpu, gfx_cpu_dc_store);
+	m_gfxfifo_in	 = auto_alloc(machine(), cobra_fifo(machine(), 8192, "GFXFIFO_IN", GFXFIFO_IN_VERBOSE != 0));
+	m_gfxfifo_out = auto_alloc(machine(), cobra_fifo(machine(), 8192, "GFXFIFO_IN", GFXFIFO_OUT_VERBOSE != 0));
+	m_m2sfifo     = auto_alloc(machine(), cobra_fifo(machine(), 2048, "M2SFIFO", M2SFIFO_VERBOSE != 0));
+	m_s2mfifo     = auto_alloc(machine(), cobra_fifo(machine(), 2048, "S2MFIFO", S2MFIFO_VERBOSE != 0));
 
 
-	ppc4xx_set_dma_read_handler(cobra->m_subcpu, 0, sub_unknown_dma_r);
-	ppc4xx_set_dma_write_handler(cobra->m_subcpu, 0, sub_unknown_dma_w);
+	ppc_set_dcstore_callback(m_gfxcpu, gfx_cpu_dc_store);
+
+
+	ppc4xx_set_dma_read_handler(m_subcpu, 0, sub_unknown_dma_r);
+	ppc4xx_set_dma_write_handler(m_subcpu, 0, sub_unknown_dma_w);
 
 
 
-	cobra->m_comram[0] = auto_alloc_array(machine, UINT32, 0x40000/4);
-	cobra->m_comram[1] = auto_alloc_array(machine, UINT32, 0x40000/4);
+	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);
+	m_comram[1] = auto_alloc_array(machine(), UINT32, 0x40000/4);
 
-	cobra->m_comram_page = 0;
+	m_comram_page = 0;
 
 
 	// setup fake pagetable until we figure out what really maps there...
-	//cobra->m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);
-	cobra->m_gfx_pagetable[0x80 / 8] = U64(0x80000100200001a8);		// should this map to 0x1e000000?
+	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);
+	m_gfx_pagetable[0x80 / 8] = U64(0x80000100200001a8);		// should this map to 0x1e000000?
 }
 
-static DRIVER_INIT(bujutsu)
+DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 {
 	DRIVER_INIT_CALL(cobra);
 
 	// rom hacks for sub board...
 	{
-		UINT32 *rom = (UINT32*)machine.root_device().memregion("user2")->base();
+		UINT32 *rom = (UINT32*)machine().root_device().memregion("user2")->base();
 
 		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 	}
@@ -2565,7 +2567,7 @@ static DRIVER_INIT(bujutsu)
 		int i;
 		UINT32 sum = 0;
 
-		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
+		UINT32 *rom = (UINT32*)machine().root_device().memregion("user3")->base();
 
 		rom[(0x022d4^4) / 4] = 0x60000000;		// skip init_raster() for now ...
 
@@ -2586,7 +2588,7 @@ static DRIVER_INIT(bujutsu)
 
 	// fill in M48T58 data for now...
 	{
-		UINT8 *rom = (UINT8*)machine.root_device().memregion("m48t58")->base();
+		UINT8 *rom = (UINT8*)machine().root_device().memregion("m48t58")->base();
 		rom[0x00] = 0x47;		// G
 		rom[0x02] = 0x36;		// 6
 		rom[0x03] = 0x34;		// 4
@@ -2608,13 +2610,13 @@ static DRIVER_INIT(bujutsu)
 	}
 }
 
-static DRIVER_INIT(racjamdx)
+DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 {
 	DRIVER_INIT_CALL(cobra);
 
 	// rom hacks for sub board...
 	{
-		UINT32 *rom = (UINT32*)machine.root_device().memregion("user2")->base();
+		UINT32 *rom = (UINT32*)machine().root_device().memregion("user2")->base();
 
 		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 		rom[0x62ddc / 4] = 0x60000000;			// skip lanc_hardcheck()
@@ -2640,7 +2642,7 @@ static DRIVER_INIT(racjamdx)
 		int i;
 		UINT32 sum = 0;
 
-		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
+		UINT32 *rom = (UINT32*)machine().root_device().memregion("user3")->base();
 
 		rom[(0x02448^4) / 4] = 0x60000000;		// skip init_raster() for now ...
 
@@ -2662,7 +2664,7 @@ static DRIVER_INIT(racjamdx)
 
 	// fill in M48T58 data for now...
 	{
-		UINT8 *rom = (UINT8*)machine.root_device().memregion("m48t58")->base();
+		UINT8 *rom = (UINT8*)machine().root_device().memregion("m48t58")->base();
 		rom[0x00] = 0x47;		// G
 		rom[0x01] = 0x59;		// Y
 		rom[0x02] = 0x36;		// 6

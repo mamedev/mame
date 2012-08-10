@@ -30,6 +30,15 @@ public:
 	DECLARE_WRITE8_MEMBER(cd32_cia_0_porta_w);
 	DECLARE_READ8_MEMBER(cd32_cia_0_portb_r);
 	DECLARE_WRITE8_MEMBER(cd32_cia_0_portb_w);
+	DECLARE_DRIVER_INIT(cd32);
+	DECLARE_DRIVER_INIT(mgprem11);
+	DECLARE_DRIVER_INIT(odeontw2);
+	DECLARE_DRIVER_INIT(cndypuzl);
+	DECLARE_DRIVER_INIT(haremchl);
+	DECLARE_DRIVER_INIT(mgnumber);
+	DECLARE_DRIVER_INIT(lsrquiz2);
+	DECLARE_DRIVER_INIT(lasstixx);
+	DECLARE_DRIVER_INIT(lsrquiz);
 };
 
 /*----------- defined in machine/cd32.c -----------*/

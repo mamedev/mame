@@ -183,11 +183,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( trucocl )
+DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 {
-	trucocl_state *state = machine.driver_data<trucocl_state>();
-	state->m_cur_dac_address = -1;
-	state->m_cur_dac_address_index = 0;
+	m_cur_dac_address = -1;
+	m_cur_dac_address_index = 0;
 }
 
 

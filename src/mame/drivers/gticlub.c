@@ -258,6 +258,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	DECLARE_DRIVER_INIT(hangplt);
+	DECLARE_DRIVER_INIT(gticlub);
 };
 
 
@@ -1157,27 +1159,25 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_LOAD( "hangplt.nv", 0x0000, 0x0200, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )
 ROM_END
 
-static DRIVER_INIT(gticlub)
+DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 {
-	gticlub_state *state = machine.driver_data<gticlub_state>();
 
-	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
+	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_GTICLUB);
 
-	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
+	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
 
-	K001005_preprocess_texture_data(state->memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 1);
+	K001005_preprocess_texture_data(memregion("gfx1")->base(), memregion("gfx1")->bytes(), 1);
 }
 
-static DRIVER_INIT(hangplt)
+DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 {
-	gticlub_state *state = machine.driver_data<gticlub_state>();
 
-	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
-	set_cgboard_texture_bank(machine, 1, "bank6", state->memregion("user5")->base());
+	init_konami_cgboard(machine(), 2, CGBOARD_TYPE_HANGPLT);
+	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
+	set_cgboard_texture_bank(machine(), 1, "bank6", memregion("user5")->base());
 
-	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
-	state->m_sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);
+	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram_1 = auto_alloc_array(machine(), UINT32, 0x100000/4);
 }
 
 /*************************************************************************/

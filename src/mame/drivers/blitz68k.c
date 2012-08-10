@@ -161,6 +161,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
+	DECLARE_DRIVER_INIT(bankrob);
+	DECLARE_DRIVER_INIT(cjffruit);
+	DECLARE_DRIVER_INIT(deucesw2);
+	DECLARE_DRIVER_INIT(megadble);
+	DECLARE_DRIVER_INIT(bankroba);
+	DECLARE_DRIVER_INIT(maxidbl);
+	DECLARE_DRIVER_INIT(cj3play);
+	DECLARE_DRIVER_INIT(megadblj);
+	DECLARE_DRIVER_INIT(hermit);
+	DECLARE_DRIVER_INIT(dualgame);
 };
 
 /*************************************************************************************************************
@@ -2767,9 +2777,9 @@ ROM_END
     ROM patches
 *************************************************************************************************************/
 
-static DRIVER_INIT( bankrob )
+DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb5e0/2] = 0x6028;
@@ -2782,9 +2792,9 @@ static DRIVER_INIT( bankrob )
 	ROM[0x1d4d4/2] = 0x4e71;
 }
 
-static DRIVER_INIT( bankroba )
+DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x11e4e/2] = 0x6028;
@@ -2797,9 +2807,9 @@ static DRIVER_INIT( bankroba )
 	ROM[0x178ec/2] = 0x4e71;
 }
 
-static DRIVER_INIT( cj3play )
+DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x7064/2] = 0x6028;
@@ -2813,9 +2823,9 @@ static DRIVER_INIT( cj3play )
 	ROM[0x20ab0/2] = 0x6050;
 }
 
-static DRIVER_INIT( cjffruit )
+DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xf564/2] = 0x6028;
@@ -2824,9 +2834,9 @@ static DRIVER_INIT( cjffruit )
 	ROM[0x1e7b8/2] = 0x6050;
 }
 
-static DRIVER_INIT( deucesw2 )
+DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x8fe4/2] = 0x6020;
@@ -2835,9 +2845,9 @@ static DRIVER_INIT( deucesw2 )
 	ROM[0x12f70/2] = 0x6054;
 }
 
-static DRIVER_INIT( dualgame )
+DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xa518/2] = 0x6024;
@@ -2846,9 +2856,9 @@ static DRIVER_INIT( dualgame )
 	ROM[0x1739c/2] = 0x4e71;
 }
 
-static DRIVER_INIT( hermit )
+DRIVER_INIT_MEMBER(blitz68k_state,hermit)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xdeba/2] = 0x602e;
@@ -2863,9 +2873,9 @@ static DRIVER_INIT( hermit )
 	ROM[0x3238/2] = 0x4e75;
 }
 
-static DRIVER_INIT( maxidbl )
+DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb384/2] = 0x6036;
@@ -2874,9 +2884,9 @@ static DRIVER_INIT( maxidbl )
 	ROM[0x17ca/2] = 0x4e71;
 }
 
-static DRIVER_INIT( megadblj )
+DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xe21c/2] = 0x6040;
@@ -2885,9 +2895,9 @@ static DRIVER_INIT( megadblj )
 	ROM[0x19d4/2] = 0x4e71;
 }
 
-static DRIVER_INIT( megadble )
+DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xcfc2/2] = 0x4e71;
@@ -2901,13 +2911,13 @@ static DRIVER_INIT( megadble )
 GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl, blitz68k_state,  maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS )
 GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl, blitz68k_state,  megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // JUNE 28TH, 1993
 GAME( 1990,  megadble, 0,       maxidbl,  maxidbl, blitz68k_state,  megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1993,  steaser,  0,       steaser,  steaser, blitz68k_state,  0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  steaser,  0,       steaser,  steaser, driver_device,  0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
 GAME( 1993,  bankrob,  0,       bankrob,  bankrob, blitz68k_state,  bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // BLITZ SYSTEM INC APRIL 1995
 GAME( 1993,  bankroba, bankrob, bankroba, bankrob, blitz68k_state,  bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl, blitz68k_state,  0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // MARCH 10TH, 1994
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl, driver_device,  0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // MARCH 10TH, 1994
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // SEPTEMBER 5TH, 1995
 GAME( 1995,  hermit,   0,       hermit,   hermit, blitz68k_state,   hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // APRIL 10TH, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // APRIL 21ST, 1999
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag, blitz68k_state,    0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 199?,  ilpag,    0,       ilpag,    ilpag, driver_device,    0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )

@@ -51,6 +51,11 @@ public:
 	DECLARE_WRITE8_MEMBER(alg_cia_0_portb_w);
 	DECLARE_READ8_MEMBER(alg_cia_1_porta_r);
 	DECLARE_WRITE8_MEMBER(alg_cia_1_porta_w);
+	DECLARE_DRIVER_INIT(aplatoon);
+	DECLARE_DRIVER_INIT(palr3);
+	DECLARE_DRIVER_INIT(palr1);
+	DECLARE_DRIVER_INIT(none);
+	DECLARE_DRIVER_INIT(palr6);
 };
 
 static TIMER_CALLBACK( response_timer );
@@ -715,11 +720,11 @@ static void alg_init(running_machine &machine)
  *
  *************************************/
 
-static DRIVER_INIT( palr1 )
+DRIVER_INIT_MEMBER(alg_state,palr1)
 {
-	UINT32 length = machine.root_device().memregion("user2")->bytes();
-	UINT8 *rom = machine.root_device().memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine, UINT8, length);
+	UINT32 length = machine().root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -730,16 +735,16 @@ static DRIVER_INIT( palr1 )
 		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine, original);
+	auto_free(machine(), original);
 
-	alg_init(machine);
+	alg_init(machine());
 }
 
-static DRIVER_INIT( palr3 )
+DRIVER_INIT_MEMBER(alg_state,palr3)
 {
-	UINT32 length = machine.root_device().memregion("user2")->bytes();
-	UINT8 *rom = machine.root_device().memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine, UINT8, length);
+	UINT32 length = machine().root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -749,16 +754,16 @@ static DRIVER_INIT( palr3 )
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine, original);
+	auto_free(machine(), original);
 
-	alg_init(machine);
+	alg_init(machine());
 }
 
-static DRIVER_INIT( palr6 )
+DRIVER_INIT_MEMBER(alg_state,palr6)
 {
-	UINT32 length = machine.root_device().memregion("user2")->bytes();
-	UINT8 *rom = machine.root_device().memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine, UINT8, length);
+	UINT32 length = machine().root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -770,16 +775,16 @@ static DRIVER_INIT( palr6 )
 		dstaddr ^= 0x20000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine, original);
+	auto_free(machine(), original);
 
-	alg_init(machine);
+	alg_init(machine());
 }
 
-static DRIVER_INIT( aplatoon )
+DRIVER_INIT_MEMBER(alg_state,aplatoon)
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = machine.root_device().memregion("user2")->base();
-	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
+	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x40000);
 	int i;
 
 	static const int shuffle[] =
@@ -792,12 +797,12 @@ static DRIVER_INIT( aplatoon )
 		memcpy(decrypted + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
 	memcpy(rom, decrypted, 0x40000);
 	logerror("decrypt done\n ");
-	alg_init(machine);
+	alg_init(machine());
 }
 
-static DRIVER_INIT( none )
+DRIVER_INIT_MEMBER(alg_state,none)
 {
-	alg_init(machine);
+	alg_init(machine());
 }
 
 

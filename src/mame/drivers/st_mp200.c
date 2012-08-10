@@ -22,6 +22,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(st_mp200);
 };
 
 
@@ -36,7 +38,7 @@ void st_mp200_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( st_mp200 )
+DRIVER_INIT_MEMBER(st_mp200_state,st_mp200)
 {
 }
 

@@ -56,6 +56,9 @@ public:
 	DECLARE_READ8_MEMBER(aliencha_dip_r);
 	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
 	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
+	DECLARE_DRIVER_INIT(lordgun);
+	DECLARE_DRIVER_INIT(aliencha);
+	DECLARE_DRIVER_INIT(alienchac);
 };
 
 

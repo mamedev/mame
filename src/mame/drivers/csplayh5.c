@@ -69,6 +69,16 @@ public:
 	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pc_w);
 	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pd_w);
 	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pe_w);
+	DECLARE_DRIVER_INIT(mjmania);
+	DECLARE_DRIVER_INIT(csplayh5);
+	DECLARE_DRIVER_INIT(fuudol);
+	DECLARE_DRIVER_INIT(bikiniko);
+	DECLARE_DRIVER_INIT(thenanpa);
+	DECLARE_DRIVER_INIT(junai);
+	DECLARE_DRIVER_INIT(csplayh1);
+	DECLARE_DRIVER_INIT(renaimj);
+	DECLARE_DRIVER_INIT(csplayh7);
+	DECLARE_DRIVER_INIT(junai2);
 };
 
 
@@ -684,16 +694,16 @@ void general_init(running_machine &machine, int patchaddress, int patchvalue)
 
 }
 
-static DRIVER_INIT( csplayh1 ) { general_init(machine, 0x6880/2,0x6020); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(machine(), 0x6880/2,0x6020); }
 
-static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2,0x6018); }
-static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2,0x6018); }
-static DRIVER_INIT( junai2 )   { general_init(machine, 0x6588/2,0x6018); }
-static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2,0x6018); }
-static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2,0x6018); }
-static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2,0x6018); }
-static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2,0x6018); }
-static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(machine(), 0x679c/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(machine(), 0x6b96/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(machine(), 0x6588/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(machine(), 0x4cb4/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(machine(), 0x585c/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(machine(), 0x69ec/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(machine(), 0x7a20/2,0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(machine(), 0x9166/2,0x6018); }
 
 /* TODO: correct rom labels*/
 ROM_START( csplayh1 )
@@ -908,7 +918,7 @@ GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5, csplayh5_state,  csplayh1,    
 /* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5, csplayh5_state,  bikiniko,		ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
 /* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5, csplayh5_state,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", GAME_NOT_WORKING )
-// 12 GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5, csplayh5_state,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", GAME_NOT_WORKING )
+// 12 GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5, driver_device,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", GAME_NOT_WORKING )
 /* 13 */ GAME( 1999, csplayh7,  0,   csplayh5,  csplayh5, csplayh5_state,  csplayh7,        ROT0, "Nichibutsu/eic", "Cosplay Tengoku 7 - Super Kogal Grandprix (Japan)", GAME_NOT_WORKING )
 // 14 : Ai-mode - Pet Shiiku : Nichibutsu/eic
 

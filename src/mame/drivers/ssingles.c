@@ -171,6 +171,7 @@ public:
 	DECLARE_READ8_MEMBER(atamanot_prot_r);
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
+	DECLARE_DRIVER_INIT(ssingles);
 };
 
 //fake palette
@@ -683,12 +684,11 @@ ROM_START( atamanot )
 	ROM_LOAD( "3.54",   0x00200, 0x0100, CRC(88acb21e) SHA1(18fe5280dad6687daf6bf42d37dde45157fab5e3) )
 ROM_END
 
-static DRIVER_INIT(ssingles)
+DRIVER_INIT_MEMBER(ssingles_state,ssingles)
 {
-	ssingles_state *state = machine.driver_data<ssingles_state>();
 
-	state->save_item(NAME(state->m_videoram));
-	state->save_item(NAME(state->m_colorram));
+	save_item(NAME(m_videoram));
+	save_item(NAME(m_colorram));
 }
 
 GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, ssingles, ROT90, "Entertainment Enterprises, Ltd.", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )

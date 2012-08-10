@@ -31,6 +31,7 @@ public:
 	DECLARE_READ8_MEMBER(thief_coprocessor_r);
 	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
 	DECLARE_WRITE8_MEMBER(tape_control_w);
+	DECLARE_DRIVER_INIT(thief);
 };
 
 

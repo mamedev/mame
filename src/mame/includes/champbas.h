@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(champbas_dac_w);
 	DECLARE_WRITE8_MEMBER(champbas_dac1_w);
 	DECLARE_WRITE8_MEMBER(champbas_dac2_w);
+	DECLARE_DRIVER_INIT(exctsccr);
+	DECLARE_DRIVER_INIT(champbas);
 };
 
 

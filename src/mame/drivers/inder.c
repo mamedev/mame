@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(inder);
 };
 
 static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
@@ -31,7 +33,7 @@ void inder_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( inder )
+DRIVER_INIT_MEMBER(inder_state,inder)
 {
 }
 

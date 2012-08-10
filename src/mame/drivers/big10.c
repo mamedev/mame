@@ -291,4 +291,4 @@ ROM_END
 **************************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY    FULLNAME   FLAGS  */
-GAME( 198?, big10,    0,      big10,    big10, big10_state,    0,     ROT0, "<unknown>", "Big 10",   0 )
+GAME( 198?, big10,    0,      big10,    big10, driver_device,    0,     ROT0, "<unknown>", "Big 10",   0 )

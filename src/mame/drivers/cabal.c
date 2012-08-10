@@ -865,24 +865,24 @@ static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int len
 
 
 
-static DRIVER_INIT( cabal )
+DRIVER_INIT_MEMBER(cabal_state,cabal)
 {
-	seibu_sound_decrypt(machine,"audiocpu",0x2000);
-	seibu_adpcm_decrypt(machine,"adpcm1");
-	seibu_adpcm_decrypt(machine,"adpcm2");
+	seibu_sound_decrypt(machine(),"audiocpu",0x2000);
+	seibu_adpcm_decrypt(machine(),"adpcm1");
+	seibu_adpcm_decrypt(machine(),"adpcm2");
 }
 
-static DRIVER_INIT( cabalbl2 )
+DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 {
-	seibu_sound_bootleg(machine,"audiocpu",0x2000);
-	seibu_adpcm_decrypt(machine,"adpcm1");
-	seibu_adpcm_decrypt(machine,"adpcm2");
+	seibu_sound_bootleg(machine(),"audiocpu",0x2000);
+	seibu_adpcm_decrypt(machine(),"adpcm1");
+	seibu_adpcm_decrypt(machine(),"adpcm2");
 }
 
 
 GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", 0 )
 GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, cabal_state,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND )
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, driver_device,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND )
 GAME( 1988, cabalbl2,cabal, cabal,   cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", 0 )
 
 GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", 0 )

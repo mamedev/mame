@@ -171,6 +171,7 @@ public:
 	DECLARE_WRITE16_MEMBER(galsnew_paletteram_w);
 	DECLARE_WRITE16_MEMBER(galsnew_vram_0_bank_w);
 	DECLARE_WRITE16_MEMBER(galsnew_vram_1_bank_w);
+	DECLARE_DRIVER_INIT(galsnew);
 };
 
 
@@ -789,10 +790,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT(galsnew)
+DRIVER_INIT_MEMBER(expro02_state,galsnew)
 {
-	UINT32 *src = (UINT32 *)machine.root_device().memregion("gfx3" )->base();
-	UINT32 *dst = (UINT32 *)machine.root_device().memregion("gfx2" )->base();
+	UINT32 *src = (UINT32 *)machine().root_device().memregion("gfx3" )->base();
+	UINT32 *dst = (UINT32 *)machine().root_device().memregion("gfx2" )->base();
 	int x, offset;
 
 

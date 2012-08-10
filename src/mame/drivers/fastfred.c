@@ -1001,57 +1001,50 @@ ROM_START( imagoa )
 ROM_END
 
 
-static DRIVER_INIT( flyboy )
+DRIVER_INIT_MEMBER(fastfred_state,flyboy)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),state));
-	state->m_hardware_type = 1;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
+	m_hardware_type = 1;
 }
 
-static DRIVER_INIT( flyboyb )
+DRIVER_INIT_MEMBER(fastfred_state,flyboyb)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->m_hardware_type = 1;
+	m_hardware_type = 1;
 }
 
-static DRIVER_INIT( fastfred )
+DRIVER_INIT_MEMBER(fastfred_state,fastfred)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->m_hardware_type = 1;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	m_hardware_type = 1;
 }
 
-static DRIVER_INIT( jumpcoas )
+DRIVER_INIT_MEMBER(fastfred_state,jumpcoas)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->m_hardware_type = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	m_hardware_type = 0;
 }
 
-static DRIVER_INIT( boggy84b )
+DRIVER_INIT_MEMBER(fastfred_state,boggy84b)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->m_hardware_type = 2;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	m_hardware_type = 2;
 }
 
-static DRIVER_INIT( boggy84 )
+DRIVER_INIT_MEMBER(fastfred_state,boggy84)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->m_hardware_type = 2;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
+	m_hardware_type = 2;
 }
 
 
-static DRIVER_INIT( imago )
+DRIVER_INIT_MEMBER(fastfred_state,imago)
 {
-	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->m_hardware_type = 3;
+	m_hardware_type = 3;
 }
 
 GAME( 1982, flyboy,   0,        fastfred, flyboy, fastfred_state,   flyboy,   ROT90, "Kaneko", "Fly-Boy", 0 )

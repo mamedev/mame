@@ -1093,6 +1093,9 @@ public:
 	DECLARE_WRITE8_MEMBER(s12_mcu_settings_w);
 	DECLARE_READ8_MEMBER(s12_mcu_gun_h_r);
 	DECLARE_READ8_MEMBER(s12_mcu_gun_v_r);
+	DECLARE_DRIVER_INIT(namcos12);
+	DECLARE_DRIVER_INIT(ghlpanic);
+	DECLARE_DRIVER_INIT(ptblank2);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -1621,47 +1624,46 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8, namcos12_state )
 	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
 ADDRESS_MAP_END
 
-static DRIVER_INIT( namcos12 )
+DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 {
-	namcos12_state *state = machine.driver_data<namcos12_state>();
 
-	psx_driver_init(machine);
+	psx_driver_init(machine());
 
-	state->membank("bank1")->configure_entries(0, state->memregion( "user2" )->bytes() / 0x200000, state->memregion( "user2" )->base(), 0x200000 );
+	membank("bank1")->configure_entries(0, memregion( "user2" )->bytes() / 0x200000, memregion( "user2" )->base(), 0x200000 );
 
-	state->m_s12_porta = 0;
-	state->m_s12_rtcstate = 0;
-	state->m_s12_lastpB = 0x50;
-	state->m_s12_setstate = 0;
-	state->m_s12_setnum = 0;
-	memset(state->m_s12_settings, 0, sizeof(state->m_s12_settings));
+	m_s12_porta = 0;
+	m_s12_rtcstate = 0;
+	m_s12_lastpB = 0x50;
+	m_s12_setstate = 0;
+	m_s12_setnum = 0;
+	memset(m_s12_settings, 0, sizeof(m_s12_settings));
 
-	state->m_n_tektagdmaoffset = 0;
-	state->m_n_dmaoffset = 0;
-	state->m_n_dmabias = 0;
-	state->m_n_bankoffset = 0;
-	state->membank( "bank1" )->set_entry( 0 );
+	m_n_tektagdmaoffset = 0;
+	m_n_dmaoffset = 0;
+	m_n_dmabias = 0;
+	m_n_bankoffset = 0;
+	membank( "bank1" )->set_entry( 0 );
 
-	state->save_item( NAME(state->m_n_dmaoffset) );
-	state->save_item( NAME(state->m_n_dmabias) );
-	state->save_item( NAME(state->m_n_bankoffset) );
+	save_item( NAME(m_n_dmaoffset) );
+	save_item( NAME(m_n_dmabias) );
+	save_item( NAME(m_n_bankoffset) );
 }
 
-static DRIVER_INIT( ptblank2 )
+DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
 {
 	DRIVER_INIT_CALL(namcos12);
 
 	/* patch out wait for dma 5 to complete */
-	*( (UINT32 *)( machine.root_device().memregion( "user1" )->base() + 0x331c4 ) ) = 0;
+	*( (UINT32 *)( machine().root_device().memregion( "user1" )->base() + 0x331c4 ) ) = 0;
 
-	system11gun_install(machine);
+	system11gun_install(machine());
 }
 
-static DRIVER_INIT( ghlpanic )
+DRIVER_INIT_MEMBER(namcos12_state,ghlpanic)
 {
 	DRIVER_INIT_CALL(namcos12);
 
-	system11gun_install(machine);
+	system11gun_install(machine());
 }
 
 static MACHINE_CONFIG_START( coh700, namcos12_state )

@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_voice_reset_w);
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
 	DECLARE_WRITE8_MEMBER(combatscb_dac_w);
+	DECLARE_DRIVER_INIT(combatsc);
 };
 
 

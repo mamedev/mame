@@ -278,6 +278,6 @@ ROM_START( phklad )
 	ROM_LOAD( "klad.bin", 0x10000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
 ROM_END
 
-GAME( 19??,  phtetris, 0,      photon, photon, photon_state, 0, ROT0, "<unknown>", "Tetris (Photon System)", 0 )
-GAME( 1989?, phpython,  0,     photon, photon, photon_state, 0, ROT0, "<unknown>", "Python (Photon System)", 0 )
-GAME( 19??,  phklad,   0,      photon, photon, photon_state, 0, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )
+GAME( 19??,  phtetris, 0,      photon, photon, driver_device, 0, ROT0, "<unknown>", "Tetris (Photon System)", 0 )
+GAME( 1989?, phpython,  0,     photon, photon, driver_device, 0, ROT0, "<unknown>", "Python (Photon System)", 0 )
+GAME( 19??,  phklad,   0,      photon, photon, driver_device, 0, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )

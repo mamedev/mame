@@ -15,6 +15,7 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_chip_select_w);
 	DECLARE_WRITE16_MEMBER(eeprom_serial_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_data_w);
+	DECLARE_DRIVER_INIT(xorworld);
 };
 
 

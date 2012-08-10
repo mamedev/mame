@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(berzerk_audio_r);
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
+	DECLARE_DRIVER_INIT(moonwarp);
 };
 
 
@@ -1233,12 +1234,11 @@ ROM_START( moonwarp )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-static DRIVER_INIT( moonwarp )
+DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
 {
-	address_space *io = machine.device("maincpu")->memory().space(AS_IO);
-	berzerk_state *state = machine.driver_data<berzerk_state>();
-	io->install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), state));
-	io->install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), state));
+	address_space *io = machine().device("maincpu")->memory().space(AS_IO);
+	io->install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
+	io->install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
 }
 
 /*************************************
@@ -1247,8 +1247,8 @@ static DRIVER_INIT( moonwarp )
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk, berzerk_state, 0, ROT0, "Stern Electronics", "Berzerk (set 1)", 0 )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk, berzerk_state, 0, ROT0, "Stern Electronics", "Berzerk (set 2)", 0 )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state,0, ROT0, "Stern Electronics", "Berzerk (German Speech)", 0 )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy, berzerk_state,  0, ROT0, "Stern Electronics", "Frenzy", 0 )
+GAME( 1980, berzerk,  0,       berzerk, berzerk, driver_device, 0, ROT0, "Stern Electronics", "Berzerk (set 1)", 0 )
+GAME( 1980, berzerk1, berzerk, berzerk, berzerk, driver_device, 0, ROT0, "Stern Electronics", "Berzerk (set 2)", 0 )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, driver_device,0, ROT0, "Stern Electronics", "Berzerk (German Speech)", 0 )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy, driver_device,  0, ROT0, "Stern Electronics", "Frenzy", 0 )
 GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state,moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", 0)

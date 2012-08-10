@@ -729,31 +729,29 @@ READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 	return a;
 }
 
-static DRIVER_INIT( avengrgs )
+DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 {
-	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	// init options
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x3234);
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x32dc);
+	sh2drc_add_pcflush(machine().device("maincpu"), 0x3234);
+	sh2drc_add_pcflush(machine().device("maincpu"), 0x32dc);
 
-	state->m_mainCpuIsArm = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),state));
-	descramble_sound(machine);
+	m_mainCpuIsArm = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
+	descramble_sound(machine());
 }
 
-static DRIVER_INIT( mlc )
+DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 {
-	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	machine.device("maincpu")->set_clock_scale(2.0f);
-	state->m_mainCpuIsArm = 1;
-	deco156_decrypt(machine);
-	descramble_sound(machine);
+	machine().device("maincpu")->set_clock_scale(2.0f);
+	m_mainCpuIsArm = 1;
+	deco156_decrypt(machine());
+	descramble_sound(machine());
 }
 
 /***************************************************************************/

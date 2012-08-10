@@ -485,29 +485,27 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( offtwall )
+DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 {
-	offtwall_state *state = machine.driver_data<offtwall_state>();
 
-	atarijsa_init(machine, "260010", 0x0040);
+	atarijsa_init(machine(), "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->m_spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),state));
-	state->m_bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),state));
-	state->m_unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),state));
+	m_spritecache_count = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
+	m_bankswitch_base = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
+	m_unknown_verify_base = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
 }
 
 
-static DRIVER_INIT( offtwalc )
+DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
 {
-	offtwall_state *state = machine.driver_data<offtwall_state>();
 
-	atarijsa_init(machine, "260010", 0x0040);
+	atarijsa_init(machine(), "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->m_spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),state));
-	state->m_bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),state));
-	state->m_unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),state));
+	m_spritecache_count = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
+	m_bankswitch_base = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
+	m_unknown_verify_base = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
 }
 
 

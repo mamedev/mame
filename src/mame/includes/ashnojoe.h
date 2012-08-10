@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE16_MEMBER(joe_tilemaps_yscroll_w);
 	DECLARE_WRITE8_MEMBER(ym2203_write_a);
 	DECLARE_WRITE8_MEMBER(ym2203_write_b);
+	DECLARE_DRIVER_INIT(ashnojoe);
 };
 
 

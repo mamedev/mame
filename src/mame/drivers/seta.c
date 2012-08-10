@@ -10721,14 +10721,13 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 	}
 }
 
-static DRIVER_INIT( twineagl )
+DRIVER_INIT_MEMBER(seta_state,twineagl)
 {
-	seta_state *state = machine.driver_data<seta_state>();
 	/* debug? */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x200100, 0x20010f, read16_delegate(FUNC(seta_state::twineagl_200100_r),state), write16_delegate(FUNC(seta_state::twineagl_200100_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x200100, 0x20010f, read16_delegate(FUNC(seta_state::twineagl_200100_r),this), write16_delegate(FUNC(seta_state::twineagl_200100_w),this));
 }
 
 
@@ -10755,10 +10754,9 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 
-static DRIVER_INIT( downtown )
+DRIVER_INIT_MEMBER(seta_state,downtown)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),state), write16_delegate(FUNC(seta_state::downtown_protection_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
 
 
@@ -10776,19 +10774,18 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 	return 0;
 }
 
-static DRIVER_INIT( arbalest )
+DRIVER_INIT_MEMBER(seta_state,arbalest)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
 
-static DRIVER_INIT( metafox )
+DRIVER_INIT_MEMBER(seta_state,metafox)
 {
-	UINT16 *RAM = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x21c000, 0x21ffff);
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x21c000, 0x21ffff);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -10796,7 +10793,7 @@ static DRIVER_INIT( metafox )
 }
 
 
-static DRIVER_INIT ( blandia )
+DRIVER_INIT_MEMBER(seta_state,blandia)
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
@@ -10806,18 +10803,9 @@ static DRIVER_INIT ( blandia )
 	int rpos;
 
 	rom_size = 0x80000;
-	buf = auto_alloc_array(machine, UINT8, rom_size);
+	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine.root_device().memregion("gfx2")->base() + 0x40000;
-
-	for (rpos = 0; rpos < rom_size/2; rpos++) {
-		buf[rpos+0x40000] = rom[rpos*2];
-		buf[rpos] = rom[rpos*2+1];
-	}
-
-	memcpy( rom, buf, rom_size );
-
-	rom = machine.root_device().memregion("gfx3")->base() + 0x40000;
+	rom = machine().root_device().memregion("gfx2")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -10826,27 +10814,35 @@ static DRIVER_INIT ( blandia )
 
 	memcpy( rom, buf, rom_size );
 
-	auto_free(machine, buf);
+	rom = machine().root_device().memregion("gfx3")->base() + 0x40000;
+
+	for (rpos = 0; rpos < rom_size/2; rpos++) {
+		buf[rpos+0x40000] = rom[rpos*2];
+		buf[rpos] = rom[rpos*2+1];
+	}
+
+	memcpy( rom, buf, rom_size );
+
+	auto_free(machine(), buf);
 }
 
 
-static DRIVER_INIT( eightfrc )
+DRIVER_INIT_MEMBER(seta_state,eightfrc)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500004, 0x500005);	// watchdog??
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500004, 0x500005);	// watchdog??
 }
 
 
-static DRIVER_INIT( zombraid )
+DRIVER_INIT_MEMBER(seta_state,zombraid)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),this));
 }
 
 
-static DRIVER_INIT( kiwame )
+DRIVER_INIT_MEMBER(seta_state,kiwame)
 {
-	UINT16 *RAM = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
 	/* WARNING: This game writes to the interrupt vector
        table. Lev 1 routine address is stored at $100 */
@@ -10856,20 +10852,20 @@ static DRIVER_INIT( kiwame )
 }
 
 
-static DRIVER_INIT( rezon )
+DRIVER_INIT_MEMBER(seta_state,rezon)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500006, 0x500007);	// irq ack?
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500006, 0x500007);	// irq ack?
 }
 
-static DRIVER_INIT( wiggie )
+DRIVER_INIT_MEMBER(seta_state,wiggie)
 {
 	UINT8 *src;
 	int len;
 	UINT8 temp[16];
 	int i,j;
 
-	src = machine.root_device().memregion("maincpu")->base();
-	len = machine.root_device().memregion("maincpu")->bytes();
+	src = machine().root_device().memregion("maincpu")->base();
+	len = machine().root_device().memregion("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -10890,22 +10886,20 @@ static DRIVER_INIT( wiggie )
 	}
 
 	/* X1_010 is not used. */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x100000, 0x103fff);
-	seta_state *state = machine.driver_data<seta_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xB00008, 0xB00009, write16_delegate(FUNC(seta_state::wiggie_soundlatch_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x100000, 0x103fff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xB00008, 0xB00009, write16_delegate(FUNC(seta_state::wiggie_soundlatch_w),this));
 
 }
 
-static DRIVER_INIT( crazyfgt )
+DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	UINT16 *RAM = (UINT16 *) state->memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
-	state->m_vregs.allocate(3);
+	m_vregs.allocate(3);
 
 	DRIVER_INIT_CALL(blandia);
 }
@@ -10914,13 +10908,12 @@ static DRIVER_INIT( crazyfgt )
                              International Toote
 ***************************************************************************/
 
-static DRIVER_INIT( inttoote )
+DRIVER_INIT_MEMBER(seta_state,inttoote)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	UINT16 *ROM = (UINT16 *)state->memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// missing / unused video regs
-	state->m_vregs.allocate(3);
+	m_vregs.allocate(3);
 
 	// code patches (to be removed...)
 	ROM[0x4de0/2] = 0x4e71;	// hardware test errors
@@ -10929,14 +10922,12 @@ static DRIVER_INIT( inttoote )
 	ROM[0x368a/2] = 0x50f9;	// betting count down
 }
 
-static DRIVER_INIT( inttootea )
+DRIVER_INIT_MEMBER(seta_state,inttootea)
 {
-	//seta_state *state = machine.driver_data<seta_state>();
-	//UINT16 *ROM = (UINT16 *)state->memregion( "maincpu" )->base();
+	//UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// missing / unused video regs
-	seta_state *state = machine.driver_data<seta_state>();
-	state->m_vregs.allocate(3);
+	m_vregs.allocate(3);
 
 	// code patches (to be removed...)
 	//ROM[0x4de0/2] = 0x4e71;   // hardware test errors
@@ -10954,64 +10945,64 @@ static DRIVER_INIT( inttootea )
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, seta_state, 0,        ROT270, "Seta (Taito license)",   "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, seta_state, 0,        ROT270, "Seta (Taito license)",   "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, driver_device, 0,        ROT270, "Seta (Taito license)",   "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, driver_device, 0,        ROT270, "Seta (Taito license)",   "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 GAME( 1988, twineagl, 0,        twineagl, twineagl, seta_state, twineagl, ROT270, "Seta (Taito license)",   "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 GAME( 1989, downtown, 0,        downtown, downtown, seta_state, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
 GAME( 1989, downtown2,downtown, downtown, downtown, seta_state, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
 GAME( 1989, downtownj,downtown, downtown, downtown, seta_state, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp,downtown, downtown, downtown, seta_state, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
-GAME( 1989, usclssic, 0,        usclssic, usclssic, seta_state, 0,        ROT270, "Seta",                   "U.S. Classic" , 0) // Country/License: DSW
-GAME( 1989, calibr50, 0,        calibr50, calibr50, seta_state, 0,        ROT270, "Athena / Seta",          "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, usclssic, 0,        usclssic, usclssic, driver_device, 0,        ROT270, "Seta",                   "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, calibr50, 0,        calibr50, calibr50, driver_device, 0,        ROT270, "Athena / Seta",          "Caliber 50" , 0) // Country/License: DSW
 GAME( 1989, arbalest, 0,        metafox,  arbalest, seta_state, arbalest, ROT270, "Seta",                   "Arbalester" , 0) // Country/License: DSW
 GAME( 1989, metafox,  0,        metafox,  metafox, seta_state,  metafox,  ROT270, "Seta",                   "Meta Fox" , 0) // Country/License: DSW
 
 /* 68000 */
-GAME( 198?, setaroul, 0,        setaroul, setaroul, seta_state, 0,        ROT270, "Visco",                  "Visco Roulette", GAME_NOT_WORKING ) // I can't see a title in the GFX roms.  Press F2 twice to boot..
-GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, seta_state, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
-GAME( 1989, wits,     0,        wits,     wits, seta_state,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
-GAME( 1990, thunderl, 0,        thunderl, thunderl, seta_state, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderl, seta_state,0,        ROT270, "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)" , GAME_NO_SOUND) // Country/License: DSW
+GAME( 198?, setaroul, 0,        setaroul, setaroul, driver_device, 0,        ROT270, "Visco",                  "Visco Roulette", GAME_NOT_WORKING ) // I can't see a title in the GFX roms.  Press F2 twice to boot..
+GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, driver_device, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
+GAME( 1989, wits,     0,        wits,     wits, driver_device,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
+GAME( 1990, thunderl, 0,        thunderl, thunderl, driver_device, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderl, driver_device,0,        ROT270, "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)" , GAME_NO_SOUND) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, seta_state, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar, wiggie,   superbar, thunderl, seta_state, wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
-GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc, seta_state,  0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )
+GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc, driver_device,  0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )
 GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, seta_state, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, seta_state, inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1991, rezon,    0,        rezon,    rezon, seta_state,    rezon,    ROT0,   "Allumer",                "Rezon", 0 )
 GAME( 1992, rezont,   rezon,    rezon,    rezont, seta_state,   rezon,    ROT0,   "Allumer (Taito license)","Rezon (Taito)", 0 )
-GAME( 1991, stg,      0,        drgnunit, stg, seta_state,      0,        ROT270, "Athena / Tecmo",         "Strike Gunner S.T.G", 0 )
-GAME( 1991, pairlove, 0,        pairlove, pairlove, seta_state, 0,        ROT270, "Athena",                 "Pairs Love", 0 )
+GAME( 1991, stg,      0,        drgnunit, stg, driver_device,      0,        ROT270, "Athena / Tecmo",         "Strike Gunner S.T.G", 0 )
+GAME( 1991, pairlove, 0,        pairlove, pairlove, driver_device, 0,        ROT270, "Athena",                 "Pairs Love", 0 )
 GAME( 1992, blandia,  0,        blandia,  blandia, seta_state,  blandia,  ROT0,   "Allumer",                "Blandia", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, blandiap, blandia,  blandiap, blandia, seta_state,  0,        ROT0,   "Allumer",                "Blandia (prototype)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, blockcar, 0,        blockcar, blockcar, seta_state, 0,        ROT90,  "Visco",                  "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
-GAME( 1992, qzkklogy, 0,        drgnunit, qzkklogy, seta_state, 0,        ROT0,   "Tecmo",                  "Quiz Kokology", 0 )
-GAME( 1992, neobattl, 0,        umanclub, neobattl, seta_state, 0,        ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
-GAME( 1992, umanclub, 0,        umanclub, umanclub, seta_state, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
-GAME( 1992, zingzip,  0,        zingzip,  zingzip, seta_state,  0,        ROT270, "Allumer / Tecmo",        "Zing Zing Zip", 0 )
-GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, seta_state,  0,        ROT270, "bootleg",                "Zing Zing Zip (bootleg)", GAME_NOT_WORKING )
-GAME( 1993, atehate,  0,        atehate,  atehate, seta_state,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
-GAME( 1993, daioh,    0,        daioh,    daioh, seta_state,    0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
-GAME( 1993, daioha,   daioh,    daioh,    daioh, seta_state,    0,        ROT270, "Athena",                 "Daioh (set 2)", 0 )
-GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, seta_state, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, seta_state, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, seta_state, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg, Blandia Conversion)", GAME_IMPERFECT_SOUND )
-GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, seta_state, 0,        ROT0,   "Banpresto / Toei",       "Masked Riders Club Battle Race", 0 )
-GAME( 1993, madshark, 0,        madshark, madshark, seta_state, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
-GAME( 1993, msgundam, 0,        msgundam, msgundam, seta_state, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
-GAME( 1993, msgundam1,msgundam, msgundam, msgunda1, seta_state, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam (Japan)", 0 )
-GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, seta_state, 0,        ROT0,   "Sunsoft / Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
-GAME( 1993, triplfun, oisipuzl, triplfun, oisipuzl, seta_state, 0,        ROT0,   "bootleg",                "Triple Fun", 0 )
-GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, seta_state, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
-GAME( 1993, utoukond, 0,        utoukond, utoukond, seta_state, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
-GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, seta_state, 0,        ROT270, "Yang Cheng",             "War of Aero - Project MEIOU", 0 )
+GAME( 1992, blandiap, blandia,  blandiap, blandia, driver_device,  0,        ROT0,   "Allumer",                "Blandia (prototype)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, blockcar, 0,        blockcar, blockcar, driver_device, 0,        ROT90,  "Visco",                  "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
+GAME( 1992, qzkklogy, 0,        drgnunit, qzkklogy, driver_device, 0,        ROT0,   "Tecmo",                  "Quiz Kokology", 0 )
+GAME( 1992, neobattl, 0,        umanclub, neobattl, driver_device, 0,        ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
+GAME( 1992, umanclub, 0,        umanclub, umanclub, driver_device, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
+GAME( 1992, zingzip,  0,        zingzip,  zingzip, driver_device,  0,        ROT270, "Allumer / Tecmo",        "Zing Zing Zip", 0 )
+GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, driver_device,  0,        ROT270, "bootleg",                "Zing Zing Zip (bootleg)", GAME_NOT_WORKING )
+GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
+GAME( 1993, daioh,    0,        daioh,    daioh, driver_device,    0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
+GAME( 1993, daioha,   daioh,    daioh,    daioh, driver_device,    0,        ROT270, "Athena",                 "Daioh (set 2)", 0 )
+GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg, Blandia Conversion)", GAME_IMPERFECT_SOUND )
+GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, driver_device, 0,        ROT0,   "Banpresto / Toei",       "Masked Riders Club Battle Race", 0 )
+GAME( 1993, madshark, 0,        madshark, madshark, driver_device, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
+GAME( 1993, msgundam, 0,        msgundam, msgundam, driver_device, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
+GAME( 1993, msgundam1,msgundam, msgundam, msgunda1, driver_device, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam (Japan)", 0 )
+GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, driver_device, 0,        ROT0,   "Sunsoft / Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
+GAME( 1993, triplfun, oisipuzl, triplfun, oisipuzl, driver_device, 0,        ROT0,   "bootleg",                "Triple Fun", 0 )
+GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, driver_device, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
+GAME( 1993, utoukond, 0,        utoukond, utoukond, driver_device, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
+GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, driver_device, 0,        ROT270, "Yang Cheng",             "War of Aero - Project MEIOU", 0 )
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, seta_state, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )
 GAME( 1994, kiwame,   0,        kiwame,   kiwame, seta_state,   kiwame,   ROT0,   "Athena",                 "Pro Mahjong Kiwame", 0 )
-GAME( 1994, krzybowl, 0,        krzybowl, krzybowl, seta_state, 0,        ROT270, "American Sammy",         "Krazy Bowl", 0 )
-GAME( 1994, magspeed, 0,        magspeed, magspeed, seta_state, 0,        ROT0,   "Allumer",                "Magical Speed", 0 )
-GAME( 1994, orbs,     0,        orbs,     orbs, seta_state,     0,        ROT0,   "American Sammy",         "Orbs (10/7/94 prototype?)", 0 )
-GAME( 1993, keroppi,  0,        keroppi,  keroppi, seta_state,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
-GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, seta_state, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, gundhara, 0,        gundhara, gundhara, seta_state, 0,        ROT270, "Banpresto",              "Gundhara", 0 )
-GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, seta_state, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1994, krzybowl, 0,        krzybowl, krzybowl, driver_device, 0,        ROT270, "American Sammy",         "Krazy Bowl", 0 )
+GAME( 1994, magspeed, 0,        magspeed, magspeed, driver_device, 0,        ROT0,   "Allumer",                "Magical Speed", 0 )
+GAME( 1994, orbs,     0,        orbs,     orbs, driver_device,     0,        ROT0,   "American Sammy",         "Orbs (10/7/94 prototype?)", 0 )
+GAME( 1993, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, driver_device, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, gundhara, 0,        gundhara, gundhara, driver_device, 0,        ROT270, "Banpresto",              "Gundhara", 0 )
+GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, driver_device, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",         "Zombie Raid (US)", GAME_NO_COCKTAIL )
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

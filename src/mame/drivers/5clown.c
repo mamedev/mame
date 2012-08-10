@@ -482,6 +482,7 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
+	DECLARE_DRIVER_INIT(fclown);
 };
 
 
@@ -1204,13 +1205,12 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT( fclown )
+DRIVER_INIT_MEMBER(_5clown_state,fclown)
 {
-	_5clown_state *state = machine.driver_data<_5clown_state>();
     /* Decrypting main program */
 
 	int x;
-	UINT8 *src = state->memregion( "maincpu" )->base();
+	UINT8 *src = memregion( "maincpu" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1220,8 +1220,8 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = machine.root_device().memregion( "gfx1" )->base();
-	UINT8 *gfx2_src = machine.root_device().memregion( "gfx2" )->base();
+	UINT8 *gfx1_src = machine().root_device().memregion( "gfx1" )->base();
+	UINT8 *gfx2_src = machine().root_device().memregion( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1241,7 +1241,7 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting sound samples */
 
-	UINT8 *samples_src = machine.root_device().memregion( "oki6295" )->base();
+	UINT8 *samples_src = machine().root_device().memregion( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1259,7 +1259,7 @@ static DRIVER_INIT( fclown )
 
 	/* Assigning AY-3-8910 sound device */
 
-	state->m_ay8910 = machine.device("ay8910");
+	m_ay8910 = machine().device("ay8910");
 }
 
 

@@ -2759,15 +2759,15 @@ static void unmap_galaxian_sound(running_machine &machine, offs_t base)
  *
  *************************************/
 
-static DRIVER_INIT( galaxian )
+DRIVER_INIT_MEMBER(galaxian_state,galaxian)
 {
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 }
 
 
-static DRIVER_INIT( nolock )
+DRIVER_INIT_MEMBER(galaxian_state,nolock)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2777,68 +2777,65 @@ static DRIVER_INIT( nolock )
 }
 
 
-static DRIVER_INIT( azurian )
+DRIVER_INIT_MEMBER(galaxian_state,azurian)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* yellow bullets instead of white ones */
-	common_init(machine, scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin lockout disabled */
 	space->unmap_write(0x6002, 0x6002, 0, 0x7f8);
 }
 
 
-static DRIVER_INIT( gmgalax )
+DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
 
 	/* ROM is banked */
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	state->gmgalax_game_changed(*machine.ioport().first_port()->first_field(), NULL, 0, 0);
-	state_save_register_global(machine, state->m_gmgalax_selected_game);
+	gmgalax_game_changed(*machine().ioport().first_port()->first_field(), NULL, 0, 0);
+	state_save_register_global(machine(), m_gmgalax_selected_game);
 }
 
 
-static DRIVER_INIT( pisces )
+DRIVER_INIT_MEMBER(galaxian_state,pisces)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),state));
+	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),this));
 }
 
 
-static DRIVER_INIT( batman2 )
+DRIVER_INIT_MEMBER(galaxian_state,batman2)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),state));
+	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),this));
 }
 
 
-static DRIVER_INIT( frogg )
+DRIVER_INIT_MEMBER(galaxian_state,frogg)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* same as galaxian... */
-	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* ...but needs a full 2k of RAM */
 	space->install_ram(0x4000, 0x47ff);
@@ -2852,46 +2849,45 @@ static DRIVER_INIT( frogg )
  *
  *************************************/
 
-static DRIVER_INIT( mooncrst )
+DRIVER_INIT_MEMBER(galaxian_state,mooncrst)
 {
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(machine, 0x8000, machine.root_device().memregion("maincpu")->base());
+	decode_mooncrst(machine(), 0x8000, machine().root_device().memregion("maincpu")->base());
 }
 
 
-static DRIVER_INIT( mooncrsu )
+DRIVER_INIT_MEMBER(galaxian_state,mooncrsu)
 {
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 }
 
 
-static DRIVER_INIT( mooncrgx )
+DRIVER_INIT_MEMBER(galaxian_state,mooncrgx)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* LEDs and coin lockout replaced by graphics banking */
-	space->install_write_handler(0x6000, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),state));
+	space->install_write_handler(0x6000, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),this));
 }
 
 
-static DRIVER_INIT( moonqsr )
+DRIVER_INIT_MEMBER(galaxian_state,moonqsr)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, moonqsr_extend_tile_info, moonqsr_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, moonqsr_extend_tile_info, moonqsr_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(machine, 0x8000, decrypt);
+	decode_mooncrst(machine(), 0x8000, decrypt);
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 }
 
@@ -2900,16 +2896,15 @@ WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
 //  printf("artic_gfxbank_w %02x\n",data);
 }
 
-static DRIVER_INIT( pacmanbl )
+DRIVER_INIT_MEMBER(galaxian_state,pacmanbl)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),state));
+	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),this));
 }
 
 READ8_MEMBER(galaxian_state::tenspot_dsw_read)
@@ -2961,16 +2956,15 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 	PALETTE_INIT_CALL(galaxian);
 }
 
-static DRIVER_INIT( tenspot )
+DRIVER_INIT_MEMBER(galaxian_state,tenspot)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
        which tenspot appears to have copied */
 
 	/* video extensions */
-	//common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
+	//common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
 	//space->install_legacy_write_handler(0x6002, 0x6002, 0, 0x7f8, FUNC(galaxian_gfxbank_w));
@@ -2978,180 +2972,173 @@ static DRIVER_INIT( tenspot )
 
 	DRIVER_INIT_CALL(galaxian);
 
-	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),state));
+	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),this));
 
-	state->m_tenspot_current_game = 0;
+	m_tenspot_current_game = 0;
 
-	tenspot_set_game_bank(machine, state->m_tenspot_current_game, 0);
+	tenspot_set_game_bank(machine(), m_tenspot_current_game, 0);
 
-	space->install_read_handler(0x7000, 0x7000, read8_delegate(FUNC(galaxian_state::tenspot_dsw_read),state));
+	space->install_read_handler(0x7000, 0x7000, read8_delegate(FUNC(galaxian_state::tenspot_dsw_read),this));
 }
 
 
 
-static DRIVER_INIT( devilfsg )
+DRIVER_INIT_MEMBER(galaxian_state,devilfsg)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* IRQ line is INT, not NMI */
-	state->m_irq_line = 0;
+	m_irq_line = 0;
 }
 
 
-static DRIVER_INIT( zigzag )
+DRIVER_INIT_MEMBER(galaxian_state,zigzag)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
-	state->m_draw_bullet_ptr = NULL;
+	common_init(machine(), NULL, galaxian_draw_background, NULL, NULL);
+	m_draw_bullet_ptr = NULL;
 
 	/* two sprite generators */
-	state->m_numspritegens = 2;
+	m_numspritegens = 2;
 
 	/* make ROMs 2 & 3 swappable */
 	space->install_read_bank(0x2000, 0x2fff, "bank1");
 	space->install_read_bank(0x3000, 0x3fff, "bank2");
-	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x2000, 0x1000);
-	state->membank("bank2")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x2000, 0x1000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
+	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
 	space->install_read_bank(0x0000, 0x1fff, "bank3");
-	state->membank("bank3")->set_base(state->memregion("maincpu")->base() + 0x0000);
+	membank("bank3")->set_base(memregion("maincpu")->base() + 0x0000);
 
 	/* handler for doing the swaps */
-	space->install_write_handler(0x7002, 0x7002, 0, 0x07f8, write8_delegate(FUNC(galaxian_state::zigzag_bankswap_w),state));
-	state->zigzag_bankswap_w(*space, 0, 0);
+	space->install_write_handler(0x7002, 0x7002, 0, 0x07f8, write8_delegate(FUNC(galaxian_state::zigzag_bankswap_w),this));
+	zigzag_bankswap_w(*space, 0, 0);
 
 	/* coin lockout disabled */
 	space->unmap_write(0x6002, 0x6002, 0, 0x7f8);
 
 	/* remove the galaxian sound hardware */
-	unmap_galaxian_sound(machine, 0x6000);
+	unmap_galaxian_sound(machine(), 0x6000);
 
 	/* install our AY-8910 handler */
-	space->install_write_handler(0x4800, 0x4fff, write8_delegate(FUNC(galaxian_state::zigzag_ay8910_w),state));
+	space->install_write_handler(0x4800, 0x4fff, write8_delegate(FUNC(galaxian_state::zigzag_ay8910_w),this));
 }
 
 
-static DRIVER_INIT( jumpbug )
+DRIVER_INIT_MEMBER(galaxian_state,jumpbug)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, jumpbug_draw_background, jumpbug_extend_tile_info, jumpbug_extend_sprite_info);
+	common_init(machine(), scramble_draw_bullet, jumpbug_draw_background, jumpbug_extend_tile_info, jumpbug_extend_sprite_info);
 }
 
 
-static DRIVER_INIT( checkman )
+DRIVER_INIT_MEMBER(galaxian_state,checkman)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
-	galaxian_state *state = machine.driver_data<galaxian_state>();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
 
 	/* attach the sound command handler */
-	iospace->install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
+	iospace->install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),this));
 
 	/* decrypt program code */
-	decode_checkman(machine);
+	decode_checkman(machine());
 }
 
 
-static DRIVER_INIT( checkmaj )
+DRIVER_INIT_MEMBER(galaxian_state,checkmaj)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* attach the sound command handler */
-	space->install_write_handler(0x7800, 0x7800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
+	space->install_write_handler(0x7800, 0x7800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),this));
 
 	/* for the title screen */
-	space->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(galaxian_state::checkmaj_protection_r),state));
+	space->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(galaxian_state::checkmaj_protection_r),this));
 }
 
 
-static DRIVER_INIT( dingo )
+DRIVER_INIT_MEMBER(galaxian_state,dingo)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* attach the sound command handler */
-	space->install_write_handler(0x7800, 0x7800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
+	space->install_write_handler(0x7800, 0x7800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),this));
 
-	space->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::dingo_3000_r),state));
-	space->install_read_handler(0x3035, 0x3035, read8_delegate(FUNC(galaxian_state::dingo_3035_r),state));
+	space->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::dingo_3000_r),this));
+	space->install_read_handler(0x3035, 0x3035, read8_delegate(FUNC(galaxian_state::dingo_3035_r),this));
 }
 
 
-static DRIVER_INIT( dingoe )
+DRIVER_INIT_MEMBER(galaxian_state,dingoe)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
 
 	/* attach the sound command handler */
-	iospace->install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
+	iospace->install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),this));
 
-	space->install_read_handler(0x3001, 0x3001, read8_delegate(FUNC(galaxian_state::dingoe_3001_r),state));	/* Protection check */
+	space->install_read_handler(0x3001, 0x3001, read8_delegate(FUNC(galaxian_state::dingoe_3001_r),this));	/* Protection check */
 
 	/* decrypt program code */
-	decode_dingoe(machine);
+	decode_dingoe(machine());
 }
 
 
-static DRIVER_INIT( skybase )
+DRIVER_INIT_MEMBER(galaxian_state,skybase)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space->install_write_handler(0xa002, 0xa002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),state));
+	space->install_write_handler(0xa002, 0xa002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),this));
 
 	/* needs a full 2k of RAM */
 	space->install_ram(0x8000, 0x87ff);
 
 	/* extend ROM */
-	space->install_rom(0x0000, 0x5fff, state->memregion("maincpu")->base());
+	space->install_rom(0x0000, 0x5fff, memregion("maincpu")->base());
 }
 
 
-static DRIVER_INIT( kong )
+DRIVER_INIT_MEMBER(galaxian_state,kong)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
 
 	/* needs a full 2k of RAM */
 	space->install_ram(0x8000, 0x87ff);
 
 	/* extend ROM */
-	space->install_rom(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base());
+	space->install_rom(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base());
 }
 
 
@@ -3182,9 +3169,8 @@ static void mshuttle_decode(running_machine &machine, const UINT8 convtable[8][1
 }
 
 
-static DRIVER_INIT( mshuttle )
+DRIVER_INIT_MEMBER(galaxian_state,mshuttle)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 	static const UINT8 convtable[8][16] =
 	{
 		/* -1 marks spots which are unused and therefore unknown */
@@ -3199,19 +3185,18 @@ static DRIVER_INIT( mshuttle )
 	};
 
 	/* video extensions */
-	common_init(machine, mshuttle_draw_bullet, galaxian_draw_background, mshuttle_extend_tile_info, mshuttle_extend_sprite_info);
+	common_init(machine(), mshuttle_draw_bullet, galaxian_draw_background, mshuttle_extend_tile_info, mshuttle_extend_sprite_info);
 
 	/* IRQ line is INT, not NMI */
-	state->m_irq_line = 0;
+	m_irq_line = 0;
 
 	/* decrypt the code */
-	mshuttle_decode(machine, convtable);
+	mshuttle_decode(machine(), convtable);
 }
 
 
-static DRIVER_INIT( mshuttlj )
+DRIVER_INIT_MEMBER(galaxian_state,mshuttlj)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 	static const UINT8 convtable[8][16] =
 	{
 		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
@@ -3225,28 +3210,27 @@ static DRIVER_INIT( mshuttlj )
 	};
 
 	/* video extensions */
-	common_init(machine, mshuttle_draw_bullet, galaxian_draw_background, mshuttle_extend_tile_info, mshuttle_extend_sprite_info);
+	common_init(machine(), mshuttle_draw_bullet, galaxian_draw_background, mshuttle_extend_tile_info, mshuttle_extend_sprite_info);
 
 	/* IRQ line is INT, not NMI */
-	state->m_irq_line = 0;
+	m_irq_line = 0;
 
 	/* decrypt the code */
-	mshuttle_decode(machine, convtable);
+	mshuttle_decode(machine(), convtable);
 }
 
 
-static DRIVER_INIT( fantastc )
+DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
 
 	/* two sprite generators */
-	state->m_numspritegens = 2;
+	m_numspritegens = 2;
 
 	/* bullets moved from $60 to $c0 */
-	state->m_bullets_base = 0xc0;
+	m_bullets_base = 0xc0;
 
 	/* decode code */
 	static const UINT16 lut_am_unscramble[32] = {
@@ -3260,8 +3244,8 @@ static DRIVER_INIT( fantastc )
 		3, 7, 7, 7	// ok!
 	};
 
-	UINT8* romdata = machine.root_device().memregion("maincpu")->base();
-	assert(machine.root_device().memregion("maincpu")->bytes() == 0x8000);
+	UINT8* romdata = machine().root_device().memregion("maincpu")->base();
+	assert(machine().root_device().memregion("maincpu")->bytes() == 0x8000);
 	UINT8 buf[0x8000];
 	memcpy(buf, romdata, 0x8000);
 
@@ -3270,38 +3254,36 @@ static DRIVER_INIT( fantastc )
 }
 
 
-static DRIVER_INIT( kingball )
+DRIVER_INIT_MEMBER(galaxian_state,kingball)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
-	space->install_write_handler(0xb000, 0xb000, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound1_w),state));
-	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
-	space->install_write_handler(0xb002, 0xb002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound2_w),state));
-	space->install_write_handler(0xb003, 0xb003, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_speech_dip_w),state));
+	space->install_write_handler(0xb000, 0xb000, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound1_w),this));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
+	space->install_write_handler(0xb002, 0xb002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound2_w),this));
+	space->install_write_handler(0xb003, 0xb003, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_speech_dip_w),this));
 
-	state_save_register_global(machine, state->m_kingball_speech_dip);
-	state_save_register_global(machine, state->m_kingball_sound);
+	state_save_register_global(machine(), m_kingball_speech_dip);
+	state_save_register_global(machine(), m_kingball_sound);
 }
 
 
-static DRIVER_INIT( scorpnmc )
+DRIVER_INIT_MEMBER(galaxian_state,scorpnmc)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
 
 	/* extra ROM */
-	space->install_rom(0x5000, 0x67ff, state->memregion("maincpu")->base() + 0x5000);
+	space->install_rom(0x5000, 0x67ff, memregion("maincpu")->base() + 0x5000);
 
 	/* install RAM at $4000-$4800 */
 	space->install_ram(0x4000, 0x47ff);
@@ -3310,23 +3292,22 @@ static DRIVER_INIT( scorpnmc )
 	space->unmap_readwrite(0x8000, 0x87ff);
 }
 
-static DRIVER_INIT( thepitm )
+DRIVER_INIT_MEMBER(galaxian_state,thepitm)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
+	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
 
 	/* disable the stars */
 	space->unmap_write(0xb004, 0xb004, 0, 0x07f8);
 
 	/* extend ROM */
-	space->install_rom(0x0000, 0x47ff, state->memregion("maincpu")->base());
+	space->install_rom(0x0000, 0x47ff, memregion("maincpu")->base());
 }
 
 /*************************************
@@ -3335,35 +3316,34 @@ static DRIVER_INIT( thepitm )
  *
  *************************************/
 
-static DRIVER_INIT( theend )
+DRIVER_INIT_MEMBER(galaxian_state,theend)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine(), theend_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin counter on the upper bit of port C */
 	space->unmap_write(0x6802, 0x6802, 0, 0x7f8);
 }
 
 
-static DRIVER_INIT( scramble )
+DRIVER_INIT_MEMBER(galaxian_state,scramble)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 }
 
 
-static DRIVER_INIT( explorer )
+DRIVER_INIT_MEMBER(galaxian_state,explorer)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog works for writes as well? (or is it just disabled?) */
-	space->install_write_handler(0x7000, 0x7000, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::watchdog_reset_w),state));
+	space->install_write_handler(0x7000, 0x7000, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::watchdog_reset_w),this));
 
 	/* I/O appears to be direct, not via PPIs */
 	space->unmap_readwrite(0x8000, 0xffff);
@@ -3371,135 +3351,130 @@ static DRIVER_INIT( explorer )
 	space->install_read_port(0x8001, 0x8001, 0, 0xffc, "IN1");
 	space->install_read_port(0x8002, 0x8002, 0, 0xffc, "IN2");
 	space->install_read_port(0x8003, 0x8003, 0, 0xffc, "IN3");
-	space->install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),state));
-	space->install_write_handler(0x9000, 0x9000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::explorer_sound_control_w),state));
+	space->install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),this));
+	space->install_write_handler(0x9000, 0x9000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::explorer_sound_control_w),this));
 }
 
 
-static DRIVER_INIT( sfx )
+DRIVER_INIT_MEMBER(galaxian_state,sfx)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* basic configuration */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, upper_extend_tile_info, NULL);
-	state->m_sfx_tilemap = TRUE;
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, upper_extend_tile_info, NULL);
+	m_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
-	state->membank("bank1")->set_base(state->memregion("audiocpu")->base());
+	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
+	membank("bank1")->set_base(memregion("audiocpu")->base());
 }
 
 
-static DRIVER_INIT( atlantis )
+DRIVER_INIT_MEMBER(galaxian_state,atlantis)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog is at $7800? (or is it just disabled?) */
 	space->unmap_read(0x7000, 0x7000, 0, 0x7ff);
-	space->install_read_handler(0x7800, 0x7800, 0, 0x7ff, read8_delegate(FUNC(galaxian_state::watchdog_reset_r),state));
+	space->install_read_handler(0x7800, 0x7800, 0, 0x7ff, read8_delegate(FUNC(galaxian_state::watchdog_reset_r),this));
 }
 
 
-static DRIVER_INIT( scobra )
+DRIVER_INIT_MEMBER(galaxian_state,scobra)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 }
 
 
-static DRIVER_INIT( losttomb )
+DRIVER_INIT_MEMBER(galaxian_state,losttomb)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decrypt */
-	decode_losttomb_gfx(machine);
+	decode_losttomb_gfx(machine());
 }
 
 
-static DRIVER_INIT( frogger )
+DRIVER_INIT_MEMBER(galaxian_state,frogger)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* video extensions */
-	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
-	state->m_frogger_adjust = TRUE;
+	common_init(machine(), NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+	m_frogger_adjust = TRUE;
 
 	/* decrypt */
-	decode_frogger_sound(machine);
-	decode_frogger_gfx(machine);
+	decode_frogger_sound(machine());
+	decode_frogger_gfx(machine());
 }
 
 
-static DRIVER_INIT( froggrmc )
+DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+	common_init(machine(), NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
-	space->install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),state));
-	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggrmc_sound_control_w),state));
+	space->install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),this));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggrmc_sound_control_w),this));
 
 	/* actually needs 2k of RAM */
 	space->install_ram(0x8000, 0x87ff);
 
 	/* decrypt */
-	decode_frogger_sound(machine);
+	decode_frogger_sound(machine());
 }
 
 
-static DRIVER_INIT( froggers )
+DRIVER_INIT_MEMBER(galaxian_state,froggers)
 {
 	/* video extensions */
-	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+	common_init(machine(), NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* decrypt */
-	decode_frogger_sound(machine);
+	decode_frogger_sound(machine());
 }
 
 
-static DRIVER_INIT( turtles )
+DRIVER_INIT_MEMBER(galaxian_state,turtles)
 {
 	/* video extensions */
-	common_init(machine, NULL, turtles_draw_background, NULL, NULL);
+	common_init(machine(), NULL, turtles_draw_background, NULL, NULL);
 }
 
 
 #ifdef UNUSED_FUNCTION
-static DRIVER_INIT( amidar )
+DRIVER_INIT_MEMBER(galaxian_state,amidar)
 {
 	/* no existing amidar sets run on Amidar hardware as described by Amidar schematics! */
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, amidar_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, amidar_draw_background, NULL, NULL);
 }
 #endif
 
 
-static DRIVER_INIT( scorpion )
+DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* hook up AY8910 */
-	machine.device("audiocpu")->memory().space(AS_IO)->install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),state), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),state));
+	machine().device("audiocpu")->memory().space(AS_IO)->install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),this), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),this));
 
 	/* extra ROM */
 	space->install_read_bank(0x5800, 0x67ff, "bank1");
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x5800);
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x5800);
 
 	/* no background related */
 //  space->nop_write(0x6803, 0x6803);
 
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),state));
+	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
 /*
 {
-    const UINT8 *rom = state->memregion("speech")->base();
+    const UINT8 *rom = memregion("speech")->base();
     int i;
 
     for (i = 0; i < 0x2c; i++)
@@ -3517,47 +3492,46 @@ static DRIVER_INIT( scorpion )
 }
 
 
-static DRIVER_INIT( anteater )
+DRIVER_INIT_MEMBER(galaxian_state,anteater)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, anteater_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, anteater_draw_background, NULL, NULL);
 
 	/* decode graphics */
-	decode_anteater_gfx(machine);
+	decode_anteater_gfx(machine());
 }
 
 
-static DRIVER_INIT( anteateruk )
+DRIVER_INIT_MEMBER(galaxian_state,anteateruk)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, anteater_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, anteater_draw_background, NULL, NULL);
 }
 
 
-static DRIVER_INIT( superbon )
+DRIVER_INIT_MEMBER(galaxian_state,superbon)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decode code */
-	decode_superbon(machine);
+	decode_superbon(machine());
 }
 
 
-static DRIVER_INIT( calipso )
+DRIVER_INIT_MEMBER(galaxian_state,calipso)
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, calipso_extend_sprite_info);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, calipso_extend_sprite_info);
 }
 
 
-static DRIVER_INIT( moonwar )
+DRIVER_INIT_MEMBER(galaxian_state,moonwar)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine(), scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
-	state_save_register_global(machine, state->m_moonwar_port_select);
+	state_save_register_global(machine(), m_moonwar_port_select);
 }
 
 

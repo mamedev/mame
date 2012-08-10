@@ -213,6 +213,7 @@ public:
 	DECLARE_READ8_MEMBER(cybertnk_mux_r);
 	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
+	DECLARE_DRIVER_INIT(cybertnk);
 };
 
 /* tile format
@@ -971,9 +972,9 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-DRIVER_INIT( cybertnk )
+DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
 {
-	UINT32 *spr = (UINT32*)machine.root_device().memregion("spr_gfx")->base();
+	UINT32 *spr = (UINT32*)machine().root_device().memregion("spr_gfx")->base();
 
 	for (int x = 0; x< 0x200000/4;x++)
 	{

@@ -2155,68 +2155,68 @@ ROM_START( horizon )
 ROM_END
 
 
-static DRIVER_INIT( battroad )
+DRIVER_INIT_MEMBER(m62_state,battroad)
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
+	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-static DRIVER_INIT( ldrun2 )
+DRIVER_INIT_MEMBER(m62_state,ldrun2)
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-static DRIVER_INIT( ldrun4 )
+DRIVER_INIT_MEMBER(m62_state,ldrun4)
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-static DRIVER_INIT( kidniki )
+DRIVER_INIT_MEMBER(m62_state,kidniki)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	/* in Kid Niki, bank 0 has code falling from 7fff to 8000, */
 	/* so I have to copy it there because bank switching wouldn't catch it */
 	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
 
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
+	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-static DRIVER_INIT( spelunkr )
+DRIVER_INIT_MEMBER(m62_state,spelunkr)
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
+	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-static DRIVER_INIT( spelunk2 )
+DRIVER_INIT_MEMBER(m62_state,spelunk2)
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0,  4, machine.root_device().memregion("maincpu")->base() + 0x20000, 0x1000);
-	machine.root_device().membank("bank2")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
+	machine().root_device().membank("bank1")->configure_entries(0,  4, machine().root_device().memregion("maincpu")->base() + 0x20000, 0x1000);
+	machine().root_device().membank("bank2")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
-static DRIVER_INIT( youjyudn )
+DRIVER_INIT_MEMBER(m62_state,youjyudn)
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1984, kungfum,  0,        kungfum,  kungfum, m62_state,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum, m62_state,  0,        ROT0,   "Irem (Data East license)", "Kung-Fu Master (Data East)", GAME_SUPPORTS_SAVE )
-GAME( 1984, spartanx, kungfum,  kungfum,  kungfum, m62_state,  0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum, m62_state,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum, m62_state,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfum,  0,        kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem (Data East license)", "Kung-Fu Master (Data East)", GAME_SUPPORTS_SAVE )
+GAME( 1984, spartanx, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, battroad, 0,        battroad, battroad, m62_state, battroad, ROT90,  "Irem", "The Battle-Road", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1984, ldrun,    0,        ldrun,    ldrun, m62_state,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun, m62_state,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, ldrun,    0,        ldrun,    ldrun, driver_device,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun, driver_device,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2, m62_state,   ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", GAME_SUPPORTS_SAVE )	/* Japanese version is called Bangeringu Teikoku No Gyakushuu */
-GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3, m62_state,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", GAME_SUPPORTS_SAVE )
-GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3, m62_state,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu", GAME_SUPPORTS_SAVE )
+GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3, driver_device,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", GAME_SUPPORTS_SAVE )
+GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3, driver_device,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu", GAME_SUPPORTS_SAVE )
 GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4, m62_state,   ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu", GAME_SUPPORTS_SAVE )
-GAME( 1985, lotlot,   0,        lotlot,   lotlot, m62_state,   0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", GAME_SUPPORTS_SAVE )
+GAME( 1985, lotlot,   0,        lotlot,   lotlot, driver_device,   0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", GAME_SUPPORTS_SAVE )
 GAME( 1986, kidniki,  0,        kidniki,  kidniki, m62_state,  kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki, m62_state,  kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki, m62_state,  kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
@@ -2225,4 +2225,4 @@ GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state, spelunkr, ROT0,  
 GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, horizon,  0,        horizon,  horizon, m62_state,  0,        ROT0,   "Irem", "Horizon", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, horizon,  0,        horizon,  horizon, driver_device,  0,        ROT0,   "Irem", "Horizon", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -247,6 +247,7 @@ public:
 	DECLARE_WRITE64_MEMBER(cde_w);
 	DECLARE_READ64_MEMBER(device2_r);
 	DECLARE_READ64_MEMBER(cpu_r);
+	DECLARE_DRIVER_INIT(m2);
 };
 
 
@@ -1296,12 +1297,11 @@ ROM_START(3do_m2)
 	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(1) )
 ROM_END
 
-static DRIVER_INIT( m2 )
+DRIVER_INIT_MEMBER(konamim2_state,m2)
 {
-	konamim2_state *state = machine.driver_data<konamim2_state>();
-	state->m_unk3 = U64(0xffffffffffffffff);
-	state->m_unk20004 = 0;
-	cde_init(machine);
+	m_unk3 = U64(0xffffffffffffffff);
+	m_unk20004 = 0;
+	cde_init(machine());
 }
 
 GAME( 1997, polystar, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -1314,4 +1314,4 @@ GAME( 1998, evilngt, 0,         m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte,  evilngt,       m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    m2,    m2,	konamim2_state, 0,      "3DO",  "3DO M2",   	GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    m2,    m2,	driver_device, 0,      "3DO",  "3DO M2",   	GAME_NOT_WORKING | GAME_NO_SOUND )

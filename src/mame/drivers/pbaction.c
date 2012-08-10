@@ -478,10 +478,10 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-static DRIVER_INIT( pbactio3 )
+DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 {
 	int i;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0; i < 0xc000; i++)
@@ -490,23 +490,22 @@ static DRIVER_INIT( pbactio3 )
 	}
 
 	/* then do the standard Sega decryption */
-	pbaction_decode(machine, "maincpu");
+	pbaction_decode(machine(), "maincpu");
 
 	/* install a protection (?) workaround */
-	pbaction_state *state = machine.driver_data<pbaction_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),state) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
 }
 
-static DRIVER_INIT( pbactio4 )
+DRIVER_INIT_MEMBER(pbaction_state,pbactio4)
 {
 	/* this one only has the Sega decryption */
-	pbaction_decode(machine, "maincpu");
+	pbaction_decode(machine(), "maincpu");
 }
 
 
 
-GAME( 1985, pbaction,  0,        pbaction, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction, pbaction, driver_device, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction, pbaction, driver_device, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pbaction3, pbaction, pbaction, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pbaction4, pbaction, pbaction, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pbaction5, pbaction, pbaction, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )

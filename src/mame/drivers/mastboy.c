@@ -475,6 +475,7 @@ public:
 	DECLARE_READ8_MEMBER(mastboy_port_38_read);
 	DECLARE_READ8_MEMBER(mastboy_nmi_read);
 	DECLARE_WRITE8_MEMBER(mastboy_msm5205_reset_w);
+	DECLARE_DRIVER_INIT(mastboy);
 };
 
 
@@ -995,10 +996,9 @@ ROM_START( mastboyi )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-static DRIVER_INIT( mastboy )
+DRIVER_INIT_MEMBER(mastboy_state,mastboy)
 {
-	mastboy_state *state = machine.driver_data<mastboy_state>();
-	state->m_vram = state->memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
+	m_vram = memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
 }
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )

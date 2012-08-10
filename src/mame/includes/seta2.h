@@ -62,6 +62,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 	DECLARE_READ32_MEMBER(oki_read);
 	DECLARE_WRITE32_MEMBER(oki_write);
+	DECLARE_DRIVER_INIT(funcube3);
+	DECLARE_DRIVER_INIT(funcube);
+	DECLARE_DRIVER_INIT(funcube2);
 };
 
 /*----------- defined in video/seta2.c -----------*/

@@ -72,6 +72,7 @@ public:
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
+	DECLARE_DRIVER_INIT(39in1);
 };
 
 
@@ -1455,16 +1456,15 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 	return 0x37;
 }
 
-static DRIVER_INIT( 39in1 )
+DRIVER_INIT_MEMBER(_39in1_state,39in1)
 {
-	_39in1_state *state = machine.driver_data<_39in1_state>();
 
-	state->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
-	state->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
-	state->m_eeprom = machine.device<eeprom_device>("eeprom");
+	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
+	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
+	m_eeprom = machine().device<eeprom_device>("eeprom");
 
-	address_space *space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
-	space->install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), state));
+	address_space *space = machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	space->install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
 }
 
 static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32, _39in1_state )

@@ -90,6 +90,11 @@ public:
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_rot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
+	DECLARE_DRIVER_INIT(rockn2);
+	DECLARE_DRIVER_INIT(rockn1);
+	DECLARE_DRIVER_INIT(rockn);
+	DECLARE_DRIVER_INIT(rockn3);
+	DECLARE_DRIVER_INIT(rocknms);
 };
 
 class stepstag_state : public tetrisp2_state
@@ -107,6 +112,7 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_soundlatch_word_w);
 	DECLARE_WRITE16_MEMBER(stepstag_leds_w);
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
+	DECLARE_DRIVER_INIT(stepstag);
 };
 
 /*----------- defined in video/tetrisp2.c -----------*/

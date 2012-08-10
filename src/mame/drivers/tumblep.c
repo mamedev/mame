@@ -395,9 +395,9 @@ void tumblep_patch_code(UINT16 offset)
 }
 #endif
 
-static DRIVER_INIT( tumblep )
+DRIVER_INIT_MEMBER(tumblep_state,tumblep)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
+	deco56_decrypt_gfx(machine(), "gfx1");
 
 	#if TUMBLEP_HACK
 	tumblep_patch_code(0x000132);

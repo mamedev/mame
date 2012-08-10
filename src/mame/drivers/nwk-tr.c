@@ -250,6 +250,7 @@ public:
 	DECLARE_WRITE32_MEMBER(lanc2_w);
 	DECLARE_READ32_MEMBER(dsp_dataram_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
+	DECLARE_DRIVER_INIT(nwktr);
 };
 
 
@@ -735,16 +736,15 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static DRIVER_INIT(nwktr)
+DRIVER_INIT_MEMBER(nwktr_state,nwktr)
 {
-	nwktr_state *state = machine.driver_data<nwktr_state>();
-	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
+	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_NWKTR);
+	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
 
-	state->m_sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
-	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
+	m_sharc_dataram = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	lanc2_init(machine);
+	lanc2_init(machine());
 }
 
 

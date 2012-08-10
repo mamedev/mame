@@ -1078,18 +1078,18 @@ static void init_namcona1( running_machine &machine, int gametype )
 	state->m_mEnableInterrupts = 0;
 }
 
-static DRIVER_INIT( bkrtmaq ){		init_namcona1(machine, NAMCO_BKRTMAQ); }
-static DRIVER_INIT( cgangpzl ){	init_namcona1(machine, NAMCO_CGANGPZL); }
-static DRIVER_INIT( emeralda ){	init_namcona1(machine, NAMCO_EMERALDA); } /* NA-2 Hardware */
-static DRIVER_INIT( emeraldj ){	init_namcona1(machine, NAMCO_EMERALDA); } /* NA-1 Hardware */
-static DRIVER_INIT( exbania ){		init_namcona1(machine, NAMCO_EXBANIA); }
-static DRIVER_INIT( fa ){	        init_namcona1(machine, NAMCO_FA); }
-static DRIVER_INIT( knckhead ){	init_namcona1(machine, NAMCO_KNCKHEAD); }
-static DRIVER_INIT( numanath ){	init_namcona1(machine, NAMCO_NUMANATH); }
-static DRIVER_INIT( quiztou ){		init_namcona1(machine, NAMCO_QUIZTOU); }
-static DRIVER_INIT( swcourt ){		init_namcona1(machine, NAMCO_SWCOURT); }
-static DRIVER_INIT( tinklpit ){	init_namcona1(machine, NAMCO_TINKLPIT); }
-static DRIVER_INIT( xday2 ){		init_namcona1(machine, NAMCO_XDAY2); }
+DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)   { init_namcona1(machine(), NAMCO_BKRTMAQ); }
+DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)  { init_namcona1(machine(), NAMCO_CGANGPZL); }
+DRIVER_INIT_MEMBER(namcona1_state,emeralda)  { init_namcona1(machine(), NAMCO_EMERALDA); } /* NA-2 Hardware */
+DRIVER_INIT_MEMBER(namcona1_state,emeraldj)  { init_namcona1(machine(), NAMCO_EMERALDA); } /* NA-1 Hardware */
+DRIVER_INIT_MEMBER(namcona1_state,exbania)   { init_namcona1(machine(), NAMCO_EXBANIA); }
+DRIVER_INIT_MEMBER(namcona1_state,fa)        { init_namcona1(machine(), NAMCO_FA); }
+DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { init_namcona1(machine(), NAMCO_KNCKHEAD); }
+DRIVER_INIT_MEMBER(namcona1_state,numanath)  { init_namcona1(machine(), NAMCO_NUMANATH); }
+DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { init_namcona1(machine(), NAMCO_QUIZTOU); }
+DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { init_namcona1(machine(), NAMCO_SWCOURT); }
+DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { init_namcona1(machine(), NAMCO_TINKLPIT); }
+DRIVER_INIT_MEMBER(namcona1_state,xday2)     { init_namcona1(machine(), NAMCO_XDAY2); }
 
 ROM_START( bkrtmaq )
 	ROM_REGION( 0xa80000, "maincpu", 0 )

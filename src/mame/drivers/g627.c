@@ -25,6 +25,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(g627);
 };
 
 
@@ -39,7 +41,7 @@ void g627_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( g627 )
+DRIVER_INIT_MEMBER(g627_state,g627)
 {
 }
 

@@ -106,6 +106,15 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
+	DECLARE_DRIVER_INIT(profpac);
+	DECLARE_DRIVER_INIT(spacezap);
+	DECLARE_DRIVER_INIT(robby);
+	DECLARE_DRIVER_INIT(wow);
+	DECLARE_DRIVER_INIT(tenpindx);
+	DECLARE_DRIVER_INIT(seawolf2);
+	DECLARE_DRIVER_INIT(demndrgn);
+	DECLARE_DRIVER_INIT(ebases);
+	DECLARE_DRIVER_INIT(gorf);
 };
 
 

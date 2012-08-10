@@ -120,6 +120,7 @@ public:
 	DECLARE_WRITE16_MEMBER(lastfght_c00006_w);
 	DECLARE_READ16_MEMBER(lastfght_sound_r);
 	DECLARE_WRITE16_MEMBER(lastfght_sound_w);
+	DECLARE_DRIVER_INIT(lastfght);
 };
 
 
@@ -619,9 +620,9 @@ ROM_START( lastfght )
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 ROM_END
 
-static DRIVER_INIT(lastfght)
+DRIVER_INIT_MEMBER(lastfght_state,lastfght)
 {
-	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354 / 2] = 0x403e;

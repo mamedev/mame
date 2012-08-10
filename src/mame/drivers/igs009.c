@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(jingbell_magic_r);
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_DRIVER_INIT(jingbell);
 };
 
 
@@ -842,11 +843,11 @@ ROM_START( jingbell )
 	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
 
-static DRIVER_INIT( jingbell )
+DRIVER_INIT_MEMBER(igs009_state,jingbell)
 {
 	int i;
-	UINT8 *rom  = (UINT8 *)machine.root_device().memregion("maincpu")->base();
-	size_t size = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom  = (UINT8 *)machine().root_device().memregion("maincpu")->base();
+	size_t size = machine().root_device().memregion("maincpu")->bytes();
 
 	for (i=0; i<size; i++)
 	{
@@ -931,4 +932,4 @@ ROM_START( gp98 )
 ROM_END
 
 GAME( 1995?, jingbell, 0, jingbell, jingbell, igs009_state, jingbell, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", 0 )
-GAME( 1998,  gp98,     0, gp98,     jingbell, igs009_state, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998,  gp98,     0, gp98,     jingbell, driver_device, 0,        ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )

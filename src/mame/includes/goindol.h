@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
 	DECLARE_WRITE8_MEMBER(goindol_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(goindol_bg_videoram_w);
+	DECLARE_DRIVER_INIT(goindol);
 };
 
 

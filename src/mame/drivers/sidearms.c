@@ -1144,32 +1144,28 @@ ROM_START( whizz )	/* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Seri
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-static DRIVER_INIT( sidearms )
+DRIVER_INIT_MEMBER(sidearms_state,sidearms)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 
-	state->m_gameid = 0;
+	m_gameid = 0;
 }
 
-static DRIVER_INIT( turtship )
+DRIVER_INIT_MEMBER(sidearms_state,turtship)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 
-	state->m_gameid = 1;
+	m_gameid = 1;
 }
 
-static DRIVER_INIT( dyger )
+DRIVER_INIT_MEMBER(sidearms_state,dyger)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 
-	state->m_gameid = 2;
+	m_gameid = 2;
 }
 
-static DRIVER_INIT( whizz )
+DRIVER_INIT_MEMBER(sidearms_state,whizz)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 
-	state->m_gameid = 3;
+	m_gameid = 3;
 }
 
 GAME( 1986, sidearms, 0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (World)", GAME_IMPERFECT_GRAPHICS )

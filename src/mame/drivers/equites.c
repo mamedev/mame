@@ -1874,46 +1874,45 @@ static void unpack_region( running_machine &machine, const char *region )
 }
 
 
-static DRIVER_INIT( equites )
+DRIVER_INIT_MEMBER(equites_state,equites)
 {
-	unpack_region(machine, "gfx2");
-	unpack_region(machine, "gfx3");
+	unpack_region(machine(), "gfx2");
+	unpack_region(machine(), "gfx3");
 }
 
-static DRIVER_INIT( bullfgtr )
+DRIVER_INIT_MEMBER(equites_state,bullfgtr)
 {
-	unpack_region(machine, "gfx2");
-	unpack_region(machine, "gfx3");
+	unpack_region(machine(), "gfx2");
+	unpack_region(machine(), "gfx3");
 }
 
-static DRIVER_INIT( kouyakyu )
+DRIVER_INIT_MEMBER(equites_state,kouyakyu)
 {
-	unpack_region(machine, "gfx2");
-	unpack_region(machine, "gfx3");
+	unpack_region(machine(), "gfx2");
+	unpack_region(machine(), "gfx3");
 }
 
-static DRIVER_INIT( gekisou )
+DRIVER_INIT_MEMBER(equites_state,gekisou)
 {
-	unpack_region(machine, "gfx2");
-	unpack_region(machine, "gfx3");
+	unpack_region(machine(), "gfx2");
+	unpack_region(machine(), "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	equites_state *state = machine.driver_data<equites_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x5a0000, 0x5a0001, write16_delegate(FUNC(equites_state::gekisou_unknown_1_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x5a0000, 0x5a0001, write16_delegate(FUNC(equites_state::gekisou_unknown_1_w),this));
 }
 
-static DRIVER_INIT( splndrbt )
+DRIVER_INIT_MEMBER(equites_state,splndrbt)
 {
-	unpack_region(machine, "gfx3");
+	unpack_region(machine(), "gfx3");
 }
 
-static DRIVER_INIT( hvoltage )
+DRIVER_INIT_MEMBER(equites_state,hvoltage)
 {
-	unpack_region(machine, "gfx3");
+	unpack_region(machine(), "gfx3");
 
 #if HVOLTAGE_DEBUG
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
 #endif
 }
 

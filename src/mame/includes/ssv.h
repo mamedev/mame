@@ -98,6 +98,28 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram16_xrgb_swap_word_w);
 	DECLARE_READ16_MEMBER(gdfs_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gdfs_eeprom_w);
+	DECLARE_DRIVER_INIT(gdfs);
+	DECLARE_DRIVER_INIT(sxyreac2);
+	DECLARE_DRIVER_INIT(hypreac2);
+	DECLARE_DRIVER_INIT(hypreact);
+	DECLARE_DRIVER_INIT(dynagear);
+	DECLARE_DRIVER_INIT(eaglshot);
+	DECLARE_DRIVER_INIT(srmp4);
+	DECLARE_DRIVER_INIT(srmp7);
+	DECLARE_DRIVER_INIT(keithlcy);
+	DECLARE_DRIVER_INIT(meosism);
+	DECLARE_DRIVER_INIT(vasara);
+	DECLARE_DRIVER_INIT(cairblad);
+	DECLARE_DRIVER_INIT(sxyreact);
+	DECLARE_DRIVER_INIT(janjans1);
+	DECLARE_DRIVER_INIT(ryorioh);
+	DECLARE_DRIVER_INIT(drifto94);
+	DECLARE_DRIVER_INIT(survarts);
+	DECLARE_DRIVER_INIT(ultrax);
+	DECLARE_DRIVER_INIT(stmblade);
+	DECLARE_DRIVER_INIT(jsk);
+	DECLARE_DRIVER_INIT(twineag2);
+	DECLARE_DRIVER_INIT(mslider);
 };
 
 /*----------- defined in video/ssv.c -----------*/

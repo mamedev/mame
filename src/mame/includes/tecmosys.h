@@ -70,6 +70,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bg2_tilemap_lineram_w);
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_DRIVER_INIT(tkdensha);
+	DECLARE_DRIVER_INIT(deroon);
+	DECLARE_DRIVER_INIT(tkdensho);
 };
 
 

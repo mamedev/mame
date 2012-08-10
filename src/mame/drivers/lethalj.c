@@ -894,24 +894,21 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( ripribit )
+DRIVER_INIT_MEMBER(lethalj_state,ripribit)
 {
-	lethalj_state *state = machine.driver_data<lethalj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
 }
 
 
-static DRIVER_INIT( cfarm )
+DRIVER_INIT_MEMBER(lethalj_state,cfarm)
 {
-	lethalj_state *state = machine.driver_data<lethalj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
 }
 
 
-static DRIVER_INIT( cclownz )
+DRIVER_INIT_MEMBER(lethalj_state,cclownz)
 {
-	lethalj_state *state = machine.driver_data<lethalj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
 }
 
 
@@ -922,12 +919,12 @@ static DRIVER_INIT( cclownz )
  *
  *************************************/
 
-GAME( 1996, lethalj,  0,        lethalj,  lethalj, lethalj_state,  0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
-GAME( 1997, eggventr, 0,        gameroom, eggventr, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggventr8,eggventr, gameroom, eggventr, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggventr7,eggventr, gameroom, eggventr, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventra,eggventr, gameroom, eggventr, lethalj_state, 0,        ROT0,  "The Game Room (Allied Leisure license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggventrd,eggventr, gameroom, eggvntdx, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1996, lethalj,  0,        lethalj,  lethalj, driver_device,  0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
+GAME( 1997, eggventr, 0,        gameroom, eggventr, driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggventr8,eggventr, gameroom, eggventr, driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
+GAME( 1997, eggventr7,eggventr, gameroom, eggventr, driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventra,eggventr, gameroom, eggventr, driver_device, 0,        ROT0,  "The Game Room (Allied Leisure license)", "Egg Venture (A.L. Release)", 0 )
+GAME( 1997, eggventrd,eggventr, gameroom, eggvntdx, driver_device, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
 GAME( 1997, ripribit, 0,        gameroom, ripribit, lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
 GAME( 1999, cfarm,    0,        gameroom, cfarm, lethalj_state,    cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
 GAME( 1999, cclownz,  0,        gameroom, cclownz, lethalj_state,  cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )

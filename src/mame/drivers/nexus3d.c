@@ -47,6 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(n3d_flash_r);
 	DECLARE_WRITE8_MEMBER(n3d_flash_cmd_w);
 	DECLARE_WRITE8_MEMBER(n3d_flash_addr_w);
+	DECLARE_DRIVER_INIT(nexus3d);
 };
 
 
@@ -259,12 +260,11 @@ ROM_START( acheartf )
 //  ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
 ROM_END
 
-static DRIVER_INIT( nexus3d )
+DRIVER_INIT_MEMBER(nexus3d_state,nexus3d)
 {
-	nexus3d_state *state = machine.driver_data<nexus3d_state>();
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy( state->m_mainram, state->memregion("user1")->base(), 4 * 1024);
-	state->m_flash_region = state->memregion("user1")->base();
+	memcpy( m_mainram, memregion("user1")->base(), 4 * 1024);
+	m_flash_region = memregion("user1")->base();
 }
 
 GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )

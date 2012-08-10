@@ -50,6 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(z80_2_unknown_read);
 	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
+	DECLARE_DRIVER_INIT(istellar);
 };
 
 
@@ -398,14 +399,13 @@ ROM_START( istellar )
 ROM_END
 
 
-static DRIVER_INIT( istellar )
+DRIVER_INIT_MEMBER(istellar_state,istellar)
 {
-	istellar_state *state = machine.driver_data<istellar_state>();
-	state->m_z80_2_nmi_enable = 0;
+	m_z80_2_nmi_enable = 0;
 
 	#if 0
 	{
-		UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+		UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 		ROM[0x4465] = 0x00;
 		ROM[0x4466] = 0x00;

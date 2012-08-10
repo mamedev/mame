@@ -114,4 +114,5 @@ public:
 	DECLARE_WRITE32_MEMBER( palette_w );
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
+	DECLARE_DRIVER_INIT(beathead);
 };

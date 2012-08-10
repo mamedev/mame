@@ -184,6 +184,10 @@ public:
 	DECLARE_WRITE32_MEMBER(DMA0_w);
 	DECLARE_READ32_MEMBER(DMA1_r);
 	DECLARE_WRITE32_MEMBER(DMA1_w);
+	DECLARE_DRIVER_INIT(topbladv);
+	DECLARE_DRIVER_INIT(officeye);
+	DECLARE_DRIVER_INIT(crysking);
+	DECLARE_DRIVER_INIT(evosocc);
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -956,9 +960,9 @@ ROM_START( donghaer )
 	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
-static DRIVER_INIT(crysking)
+DRIVER_INIT_MEMBER(crystal_state,crysking)
 {
-	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -975,9 +979,9 @@ static DRIVER_INIT(crysking)
 	Rom[WORD_XOR_LE(0x8a54/2)] = 0x403c;	//NOP
 }
 
-static DRIVER_INIT(evosocc)
+DRIVER_INIT_MEMBER(crystal_state,evosocc)
 {
-	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;	//PUSH R2..R7
@@ -993,9 +997,9 @@ static DRIVER_INIT(evosocc)
 	Rom[WORD_XOR_LE(0x974ED2/2)] = 0x9001;	//PUSH R0
 }
 
-static DRIVER_INIT(topbladv)
+DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
-	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;	//PUSH R0
@@ -1011,9 +1015,9 @@ static DRIVER_INIT(topbladv)
 
 }
 
-static DRIVER_INIT(officeye)
+DRIVER_INIT_MEMBER(crystal_state,officeye)
 {
-	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;	//PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;	//PUSH R0
@@ -1032,7 +1036,7 @@ static DRIVER_INIT(officeye)
 
 
 
-GAME( 2001, crysbios,        0, crystal,  crystal, crystal_state,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft", "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga", "Evolution Soccer", 0 )
 GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", GAME_NOT_WORKING ) // protection

@@ -79,6 +79,14 @@ public:
 	DECLARE_WRITE16_MEMBER(zwackery_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_spriteram_w);
 	DECLARE_READ8_MEMBER(zwackery_port_2_r);
+	DECLARE_DRIVER_INIT(intlaser);
+	DECLARE_DRIVER_INIT(pigskin);
+	DECLARE_DRIVER_INIT(zwackery);
+	DECLARE_DRIVER_INIT(blasted);
+	DECLARE_DRIVER_INIT(trisport);
+	DECLARE_DRIVER_INIT(xenophob);
+	DECLARE_DRIVER_INIT(archrivl);
+	DECLARE_DRIVER_INIT(spyhunt2);
 };
 
 /*----------- defined in machine/mcr68.c -----------*/

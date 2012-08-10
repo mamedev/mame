@@ -440,20 +440,18 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 	return m_ram[0x3acc/4];
 }
 
-static DRIVER_INIT( gunbustr )
+DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 {
 	/* Speedup handler */
-	gunbustr_state *state = machine.driver_data<gunbustr_state>();
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),state));
+	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
 }
 
-static DRIVER_INIT( gunbustrj )
+DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
 {
 	DRIVER_INIT_CALL(gunbustr);
 
 	// no coin lockout, perhaps this was a prototype version without proper coin handling?
-	gunbustr_state *state = machine.driver_data<gunbustr_state>();
-	state->m_coin_lockout = false;
+	m_coin_lockout = false;
 }
 
 GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )

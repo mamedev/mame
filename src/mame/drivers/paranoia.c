@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(paranoia_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(paranoia_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(paranoia_i8155_timer_out);
+	DECLARE_DRIVER_INIT(paranoia);
 };
 
 
@@ -227,9 +228,9 @@ ROM_START(paranoia)
 	ROM_LOAD( "4.352", 0x18000, 0x8000, CRC(11297fed) SHA1(17a294e65ba1c4806307602dee4c7c627ad1fcfd) )
 ROM_END
 
-static DRIVER_INIT(paranoia)
+DRIVER_INIT_MEMBER(paranoia_state,paranoia)
 {
-	DRIVER_INIT_CALL(pce);
+	init_pce();
 }
 
 GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, paranoia, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

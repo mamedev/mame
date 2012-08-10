@@ -38,6 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(prot_r);
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_READ8_MEMBER(sound_r);
+	DECLARE_DRIVER_INIT(wink);
 };
 
 
@@ -408,11 +409,11 @@ ROM_START( winka )
 	ROM_LOAD( "wink4.bin",    0x4000, 0x2000, CRC(06dd229b) SHA1(9057cf10e9ec4119297c2d40b26f0ce0c1d7b86a) )
 ROM_END
 
-static DRIVER_INIT( wink )
+DRIVER_INIT_MEMBER(wink_state,wink)
 {
 	UINT32 i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x8000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN
 
@@ -430,7 +431,7 @@ static DRIVER_INIT( wink )
 	for (i = 0x6000; i <= 0x7fff; i++)
 		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 
 	for (i = 0; i < 0x8000; i++)
 		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);

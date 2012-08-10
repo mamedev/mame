@@ -87,4 +87,4 @@ ROM_START(tokyocop)
 ROM_END
 
 
-GAME( 2003, tokyocop,  0,   tokyocop, tokyocop, tokyocop_state, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", GAME_IS_SKELETON )
+GAME( 2003, tokyocop,  0,   tokyocop, tokyocop, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", GAME_IS_SKELETON )

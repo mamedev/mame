@@ -366,9 +366,9 @@ ROM_START( finalizrb )
 ROM_END
 
 
-static DRIVER_INIT( finalizr )
+DRIVER_INIT_MEMBER(finalizr_state,finalizr)
 {
-	konami1_decode(machine, "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
 

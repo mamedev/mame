@@ -109,6 +109,8 @@ public:
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
 	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
 	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
+	DECLARE_DRIVER_INIT(micro3d);
+	DECLARE_DRIVER_INIT(botss);
 };
 
 typedef struct _micro3d_vtx_
@@ -125,8 +127,6 @@ void micro3d_duart_output_w(device_t *device, UINT8 data);
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
 MACHINE_RESET( micro3d );
-DRIVER_INIT( micro3d );
-DRIVER_INIT( botss );
 
 
 /*----------- defined in audio/micro3d.c -----------*/

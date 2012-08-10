@@ -349,6 +349,8 @@ public:
 	DECLARE_WRITE64_MEMBER(cf_card_w);
 	DECLARE_READ64_MEMBER(ata_r);
 	DECLARE_WRITE64_MEMBER(ata_w);
+	DECLARE_DRIVER_INIT(viper);
+	DECLARE_DRIVER_INIT(vipercf);
 };
 
 UINT32 m_mpc8240_regs[256/4];
@@ -2005,18 +2007,17 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static DRIVER_INIT(viper)
+DRIVER_INIT_MEMBER(viper_state,viper)
 {
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( *ide, 0xff200000, 0xff207fff, FUNC(hdd_r), FUNC(hdd_w) ); //TODO
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( *ide, 0xff200000, 0xff207fff, FUNC(hdd_r), FUNC(hdd_w) ); //TODO
 }
 
-static DRIVER_INIT(vipercf)
+DRIVER_INIT_MEMBER(viper_state,vipercf)
 {
-	viper_state *state = machine.driver_data<viper_state>();
 	DRIVER_INIT_CALL(viper);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), state), write64_delegate(FUNC(viper_state::cf_card_data_w), state) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), state), write64_delegate(FUNC(viper_state::cf_card_w), state) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), this), write64_delegate(FUNC(viper_state::cf_card_data_w), this) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), this), write64_delegate(FUNC(viper_state::cf_card_w), this) );
 }
 
 

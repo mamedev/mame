@@ -1008,12 +1008,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j,ddragon3, ddragon3, ddragon3, ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p,ddragon3, ddragon3, ddragon3, ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b,ddragon3, ddragon3b,ddragon3b, ddragon3_state,0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribe,   0,        ctribe,   ctribe, ddragon3_state,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe, ddragon3_state,   0, ROT0, "Technos Japan", "The Combatribes (US set 1?)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe, ddragon3_state,   0, ROT0, "Technos Japan", "The Combatribes (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb, ddragon3_state,  0, ROT0, "bootleg", "The Combatribes (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribeb2, ctribe,   ctribe,   ctribeb, ddragon3_state,  0, ROT0, "bootleg", "The Combatribes (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, driver_device, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j,ddragon3, ddragon3, ddragon3, driver_device, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p,ddragon3, ddragon3, ddragon3, driver_device, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b,ddragon3, ddragon3b,ddragon3b, driver_device,0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe,   0,        ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (US set 1?)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb, driver_device,  0, ROT0, "bootleg", "The Combatribes (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2, ctribe,   ctribe,   ctribeb, driver_device,  0, ROT0, "bootleg", "The Combatribes (bootleg set 2)", GAME_SUPPORTS_SAVE )

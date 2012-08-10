@@ -235,35 +235,35 @@ static void svg_latch_init( running_machine &machine )
 }
 
 
-DRIVER_INIT( theglad )
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 {
-	svg_basic_init(machine);
-	pgm_theglad_decrypt(machine);
-	svg_latch_init(machine);
-	pgm_create_dummy_internal_arm_region(machine);
+	svg_basic_init(machine());
+	pgm_theglad_decrypt(machine());
+	svg_latch_init(machine());
+	pgm_create_dummy_internal_arm_region(machine());
 }
 
-DRIVER_INIT( svg )
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 {
-	svg_basic_init(machine);
-	pgm_svg_decrypt(machine);
-	svg_latch_init(machine);
-	pgm_create_dummy_internal_arm_region(machine);
+	svg_basic_init(machine());
+	pgm_svg_decrypt(machine());
+	svg_latch_init(machine());
+	pgm_create_dummy_internal_arm_region(machine());
 }
 
-DRIVER_INIT( svgpcb )
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 {
-	svg_basic_init(machine);
-	pgm_svgpcb_decrypt(machine);
-	svg_latch_init(machine);
-	pgm_create_dummy_internal_arm_region(machine);
+	svg_basic_init(machine());
+	pgm_svgpcb_decrypt(machine());
+	svg_latch_init(machine());
+	pgm_create_dummy_internal_arm_region(machine());
 }
 
-DRIVER_INIT( killbldp )
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 {
-	svg_basic_init(machine);
-	pgm_killbldp_decrypt(machine);
-	svg_latch_init(machine);
+	svg_basic_init(machine());
+	pgm_killbldp_decrypt(machine());
+	svg_latch_init(machine());
 }
 
 static READ32_HANDLER( dmnfrnt_speedup_r )
@@ -284,38 +284,36 @@ static READ16_HANDLER( dmnfrnt_main_speedup_r )
 	return data;
 }
 
-DRIVER_INIT( dmnfrnt )
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 {
-	pgm_arm_type3_state *state = machine.driver_data<pgm_arm_type3_state>();
-
-	svg_basic_init(machine);
-	pgm_dfront_decrypt(machine);
-	svg_latch_init(machine);
+	svg_basic_init(machine());
+	pgm_dfront_decrypt(machine());
+	svg_latch_init(machine());
 
 	/* put some fake code for the ARM here ... */
-	pgm_create_dummy_internal_arm_region(machine);
+	pgm_create_dummy_internal_arm_region(machine());
 
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x18000444, 0x18000447, FUNC(dmnfrnt_speedup_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80a03c, 0x80a03d, FUNC(dmnfrnt_main_speedup_r));
+	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x18000444, 0x18000447, FUNC(dmnfrnt_speedup_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80a03c, 0x80a03d, FUNC(dmnfrnt_main_speedup_r));
 
-	state->m_svg_ram_sel = 1;
+	m_svg_ram_sel = 1;
 
 	// the internal rom probably also supplies the region here
 	// we have to copy it to both shared ram regions because it reads from a different one before the attract story?
 	// could be a timing error? or shared ram behavior isn't how we think it is?
 	UINT16 *share16;
-	share16 = (UINT16 *)(state->m_svg_shareram[1]);
+	share16 = (UINT16 *)(m_svg_shareram[1]);
 	share16[0x158/2] = 0x0005;
-	share16 = (UINT16 *)(state->m_svg_shareram[0]);
+	share16 = (UINT16 *)(m_svg_shareram[0]);
 	share16[0x158/2] = 0x0005;
 }
 
-DRIVER_INIT( happy6 )
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 {
-	svg_basic_init(machine);
-	pgm_happy6_decrypt(machine);
-	svg_latch_init(machine);
-	pgm_create_dummy_internal_arm_region(machine);
+	svg_basic_init(machine());
+	pgm_happy6_decrypt(machine());
+	svg_latch_init(machine());
+	pgm_create_dummy_internal_arm_region(machine());
 }
 
 

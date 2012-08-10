@@ -53,6 +53,9 @@ public:
 	DECLARE_WRITE8_MEMBER(robokid_bg1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(robokid_bg2_ctrl_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_sprite_overdraw_w);
+	DECLARE_DRIVER_INIT(mnight);
+	DECLARE_DRIVER_INIT(ninjakd2);
+	DECLARE_DRIVER_INIT(bootleg);
 };
 
 

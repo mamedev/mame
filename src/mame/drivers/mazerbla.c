@@ -137,6 +137,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_nmi_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
 	DECLARE_READ8_MEMBER(soundcommand_r);
+	DECLARE_DRIVER_INIT(mazerbla);
+	DECLARE_DRIVER_INIT(greatgun);
 };
 
 
@@ -1705,18 +1707,16 @@ ROM_START( greatgun )
 	ROM_LOAD( "psb19",0x36000,0x2000, CRC(68752e0d) SHA1(58a4921e4f774af5e1ef7af67f06e9b43643ffab) )
 ROM_END
 
-static DRIVER_INIT( mazerbla )
+DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
-	state->m_game_id = MAZERBLA;
+	m_game_id = MAZERBLA;
 }
 
-static DRIVER_INIT( greatgun )
+DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
-	UINT8 *rom = state->memregion("sub2")->base();
+	UINT8 *rom = memregion("sub2")->base();
 
-	state->m_game_id = GREATGUN;
+	m_game_id = GREATGUN;
 
 	//  patch VCU test
 	//  VCU test starts at PC=0x56f

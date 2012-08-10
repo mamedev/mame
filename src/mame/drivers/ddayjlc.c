@@ -99,6 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	DECLARE_DRIVER_INIT(ddayjlc);
 };
 
 
@@ -634,7 +635,7 @@ ROM_START( ddayjlca )
 ROM_END
 
 
-static DRIVER_INIT( ddayjlc )
+DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 {
 #define repack(n)\
 		dst[newadr+0+n] = src[oldaddr+0+n];\
@@ -673,10 +674,10 @@ static DRIVER_INIT( ddayjlc )
 	{
 		UINT32 oldaddr, newadr, length,j;
 		UINT8 *src, *dst, *temp;
-		temp = auto_alloc_array(machine, UINT8, 0x10000);
+		temp = auto_alloc_array(machine(), UINT8, 0x10000);
 		src = temp;
-		dst = machine.root_device().memregion("gfx1")->base();
-		length = machine.root_device().memregion("gfx1")->bytes();
+		dst = machine().root_device().memregion("gfx1")->base();
+		length = machine().root_device().memregion("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -687,11 +688,11 @@ static DRIVER_INIT( ddayjlc )
 			newadr += 32;
 			oldaddr += 16;
 		}
-		auto_free(machine, temp);
+		auto_free(machine(), temp);
 	}
 
-	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user1")->base(), 0x4000);
-	machine.root_device().membank("bank1")->set_entry(0);
+	machine().root_device().membank("bank1")->configure_entries(0, 3, machine().root_device().memregion("user1")->base(), 0x4000);
+	machine().root_device().membank("bank1")->set_entry(0);
 }
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

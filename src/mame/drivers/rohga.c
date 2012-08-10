@@ -1531,42 +1531,42 @@ ROM_END
 
 /**********************************************************************************/
 
-static DRIVER_INIT( rohga )
+DRIVER_INIT_MEMBER(rohga_state,rohga)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco56_decrypt_gfx(machine, "gfx2");
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco56_decrypt_gfx(machine(), "gfx2");
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
-static DRIVER_INIT( wizdfire )
+DRIVER_INIT_MEMBER(rohga_state,wizdfire)
 {
-	deco74_decrypt_gfx(machine, "gfx1");
-	deco74_decrypt_gfx(machine, "gfx2");
-	deco74_decrypt_gfx(machine, "gfx3");
+	deco74_decrypt_gfx(machine(), "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx2");
+	deco74_decrypt_gfx(machine(), "gfx3");
 }
 
-static DRIVER_INIT( nitrobal )
+DRIVER_INIT_MEMBER(rohga_state,nitrobal)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco56_decrypt_gfx(machine, "gfx2");
-	deco74_decrypt_gfx(machine, "gfx3");
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco56_decrypt_gfx(machine(), "gfx2");
+	deco74_decrypt_gfx(machine(), "gfx3");
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
-static DRIVER_INIT( schmeisr )
+DRIVER_INIT_MEMBER(rohga_state,schmeisr)
 {
-	const UINT8 *src = machine.root_device().memregion("gfx2")->base();
-	UINT8 *dst = machine.root_device().memregion("gfx1")->base();
+	const UINT8 *src = machine().root_device().memregion("gfx2")->base();
+	UINT8 *dst = machine().root_device().memregion("gfx1")->base();
 
 	memcpy(dst, src, 0x20000);
 	memcpy(dst + 0x20000, src + 0x80000, 0x20000);
 
-	deco74_decrypt_gfx(machine, "gfx1");
-	deco74_decrypt_gfx(machine, "gfx2");
+	deco74_decrypt_gfx(machine(), "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx2");
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
 GAME( 1991, rohga,     0,        rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", GAME_SUPPORTS_SAVE )

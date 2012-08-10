@@ -2758,47 +2758,43 @@ static void init_common(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(reset_common), &machine));
 }
 
-static DRIVER_INIT( taitosj )
+DRIVER_INIT_MEMBER(taitosj_state,taitosj)
 {
-	init_common(machine);
+	init_common(machine());
 }
 
-static DRIVER_INIT( spacecr )
+DRIVER_INIT_MEMBER(taitosj_state,spacecr)
 {
-	init_common(machine);
+	init_common(machine());
 
 	/* install protection handler */
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),this));
 }
 
-static DRIVER_INIT( alpine )
+DRIVER_INIT_MEMBER(taitosj_state,alpine)
 {
-	init_common(machine);
+	init_common(machine());
 
 	/* install protection handlers */
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd50f, 0xd50f, write8_delegate(FUNC(taitosj_state::alpine_protection_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd50f, 0xd50f, write8_delegate(FUNC(taitosj_state::alpine_protection_w),this));
 }
 
-static DRIVER_INIT( alpinea )
+DRIVER_INIT_MEMBER(taitosj_state,alpinea)
 {
-	init_common(machine);
+	init_common(machine());
 
 	/* install protection handlers */
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd50e, 0xd50e, write8_delegate(FUNC(taitosj_state::alpinea_bankswitch_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd50e, 0xd50e, write8_delegate(FUNC(taitosj_state::alpinea_bankswitch_w),this));
 }
 
-static DRIVER_INIT( junglhbr )
+DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
 {
-	init_common(machine);
+	init_common(machine());
 
 	/* inverter on bits 0 and 1 */
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(taitosj_state::junglhbr_characterram_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(taitosj_state::junglhbr_characterram_w),this));
 }
 
 GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", GAME_SUPPORTS_SAVE )

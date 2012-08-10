@@ -35,6 +35,7 @@ public:
 	UINT8 *m_code_base;
 	DECLARE_READ8_MEMBER(io_read_missing_dips);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_DRIVER_INIT(kingpin);
 };
 
 
@@ -174,13 +175,12 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 */
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( kingpin )
+DRIVER_INIT_MEMBER(kingpin_state,kingpin)
 {
-	kingpin_state *state = machine.driver_data<kingpin_state>();
 
 	/* Hacks to keep the emu a'runnin */
-	state->m_code_base = state->memregion("maincpu")->base();
-	state->m_code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
+	m_code_base = memregion("maincpu")->base();
+	m_code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 
 ROM_START( kingpin )

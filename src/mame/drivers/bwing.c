@@ -582,15 +582,14 @@ static void fix_bwp3( running_machine &machine )
 }
 
 
-static DRIVER_INIT( bwing )
+DRIVER_INIT_MEMBER(bwing_state,bwing)
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->m_bwp123_membase[0] = state->memregion("maincpu")->base();
-	state->m_bwp123_membase[1] = state->memregion("sub")->base();
-	state->m_bwp123_membase[2] = state->memregion("audiocpu")->base();
+	m_bwp123_membase[0] = memregion("maincpu")->base();
+	m_bwp123_membase[1] = memregion("sub")->base();
+	m_bwp123_membase[2] = memregion("audiocpu")->base();
 
-	fix_bwp3(machine);
+	fix_bwp3(machine());
 }
 
 //****************************************************************************

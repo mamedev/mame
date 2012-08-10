@@ -8107,9 +8107,8 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( cps2 )
+DRIVER_INIT_MEMBER(cps_state,cps2)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
 	/* Decrypt the game - see machine/cps2crpt.c */
 	DRIVER_INIT_CALL(cps2crpt);
@@ -8117,36 +8116,34 @@ static DRIVER_INIT( cps2 )
 	/* Initialize some video elements */
 	DRIVER_INIT_CALL(cps2_video);
 
-	state->m_cps2networkpresent = 0;
+	m_cps2networkpresent = 0;
 
-	machine.device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	machine().device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
-static DRIVER_INIT( ssf2tb )
+DRIVER_INIT_MEMBER(cps_state,ssf2tb)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->m_cps2networkpresent = 0;
+	m_cps2networkpresent = 0;
 
 	/* we don't emulate the network board, so don't say it's present for now, otherwise the game will
        attempt to boot in tournament mode and fail */
-	//state->m_cps2networkpresent = 1;
+	//m_cps2networkpresent = 1;
 
 }
 
-static DRIVER_INIT ( pzloop2 )
+DRIVER_INIT_MEMBER(cps_state,pzloop2)
 {
-	cps_state *state = machine.driver_data<cps_state>();
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->m_readpaddle = 0;
+	m_readpaddle = 0;
 
-	state->save_item(NAME(state->m_readpaddle));
+	save_item(NAME(m_readpaddle));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
 }
 
 static READ16_HANDLER( gigaman2_dummyqsound_r )
@@ -8178,23 +8175,22 @@ static void gigaman2_gfx_reorder(running_machine &machine)
 	auto_free( machine, buf );
 }
 
-static DRIVER_INIT( gigaman2 )
+DRIVER_INIT_MEMBER(cps_state,gigaman2)
 {
-	cps_state *state = machine.driver_data<cps_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
-	int length = state->memregion("maincpu")->bytes();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
 
-	gigaman2_gfx_reorder(machine);
+	gigaman2_gfx_reorder(machine());
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->m_gigaman2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
-	state->save_pointer(NAME(state->m_gigaman2_dummyqsound_ram), 0x20000 / 2);
+	m_gigaman2_dummyqsound_ram = auto_alloc_array(machine(), UINT16, 0x20000 / 2);
+	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
-	m68k_set_encrypted_opcode_range(machine.device("maincpu"), 0, length);
+	m68k_set_encrypted_opcode_range(machine().device("maincpu"), 0, length);
 }
 
 

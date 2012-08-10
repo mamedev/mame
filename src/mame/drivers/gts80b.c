@@ -23,6 +23,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(gts80b);
 };
 
 static ADDRESS_MAP_START( gts80b_map, AS_PROGRAM, 8, gts80b_state )
@@ -40,7 +42,7 @@ void gts80b_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( gts80b )
+DRIVER_INIT_MEMBER(gts80b_state,gts80b)
 {
 }
 

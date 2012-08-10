@@ -2335,29 +2335,26 @@ READ16_MEMBER(snowbros_state::moremorp_0a_read)
 	return 0x000a;
 }
 
-static DRIVER_INIT( moremorp )
+DRIVER_INIT_MEMBER(snowbros_state,moremorp)
 {
-	//snowbros_state *state = machine.driver_data<snowbros_state>();
-//  UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
+//  UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
 //  int i;
 
 //  for (i = 0;i < 0x200/2;i++)
-//      state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+//      m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::moremorp_0a_read),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::moremorp_0a_read),this));
 }
 
 
-static DRIVER_INIT( cookbib2 )
+DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
 {
-	//snowbros_state *state = machine.driver_data<snowbros_state>();
-//  UINT16 *HCROM = (UINT16*)state->memregion("maincpu")->base();
-//  UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
+//  UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
+//  UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
 //  int i;
-//  state->m_hyperpac_ram[0xf000/2] = 0x46fc;
-//  state->m_hyperpac_ram[0xf002/2] = 0x2700;
+//  m_hyperpac_ram[0xf000/2] = 0x46fc;
+//  m_hyperpac_ram[0xf002/2] = 0x2700;
 
 // verified on real hardware, need to move this to a file really
 
@@ -2370,18 +2367,18 @@ static DRIVER_INIT( cookbib2 )
 
 
 //for (i = 0;i < sizeof(cookbib2_mcu68k)/sizeof(cookbib2_mcu68k[0]);i++)
-//      state->m_hyperpac_ram[0xf000/2 + i] = cookbib2_mcu68k[i];
+//      m_hyperpac_ram[0xf000/2 + i] = cookbib2_mcu68k[i];
 
 //  for (i = 0;i < 0x200/2;i++)
-//      state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+//      m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 
 	// trojan is actually buggy and gfx flicker like crazy
 	// but we can pause the system after bootup with HALT line of 68k to get the table before
 	// it goes nuts
 
-	//  state->m_hyperpac_ram[0xf07a/2] = 0x4e73;
-	//  state->m_hyperpac_ram[0xf000/2] = 0x4e73;
+	//  m_hyperpac_ram[0xf07a/2] = 0x4e73;
+	//  m_hyperpac_ram[0xf000/2] = 0x4e73;
 
 #if 0
 
@@ -2695,10 +2692,9 @@ static DRIVER_INIT( cookbib2 )
 
 // protection simulation no longer used
 #if 0
-static DRIVER_INIT( hyperpac )
+DRIVER_INIT_MEMBER(snowbros_state,hyperpac)
 {
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	UINT16 *hyperpac_ram = state->m_hyperpac_ram;
+	UINT16 *hyperpac_ram = m_hyperpac_ram;
 	/* simulate RAM initialization done by the protection MCU */
 	/* not verified on real hardware */
 	hyperpac_ram[0xe000/2] = 0x4ef9;
@@ -2717,14 +2713,14 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 	return 0x0202;
 }
 
-static DRIVER_INIT(4in1boot)
+DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine.root_device().memregion("maincpu")->base();
-	int len = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *src = machine().root_device().memregion("maincpu")->base();
+	int len = machine().root_device().memregion("maincpu")->bytes();
 
 	/* strange order */
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -2732,39 +2728,38 @@ static DRIVER_INIT(4in1boot)
 			else buffer[i] = src[i];
 
 		memcpy(src,buffer,len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 
-	src = machine.root_device().memregion("soundcpu")->base();
-	len = machine.root_device().memregion("soundcpu")->bytes();
+	src = machine().root_device().memregion("soundcpu")->base();
+	len = machine().root_device().memregion("soundcpu")->bytes();
 
 	/* strange order */
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
 		memcpy(src,buffer,len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
 
-static DRIVER_INIT(snowbro3)
+DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine.root_device().memregion("maincpu")->base();
-	int len = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *src = machine().root_device().memregion("maincpu")->base();
+	int len = machine().root_device().memregion("maincpu")->bytes();
 
 	/* strange order */
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,buffer,len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 }
 
@@ -2773,10 +2768,9 @@ READ16_MEMBER(snowbros_state::_3in1_read)
 	return 0x0a0a;
 }
 
-static DRIVER_INIT( 3in1semi )
+DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
 {
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
 
 READ16_MEMBER(snowbros_state::cookbib3_read)
@@ -2784,37 +2778,36 @@ READ16_MEMBER(snowbros_state::cookbib3_read)
 	return 0x2a2a;
 }
 
-static DRIVER_INIT( cookbib3 )
+DRIVER_INIT_MEMBER(snowbros_state,cookbib3)
 {
-	snowbros_state *state = machine.driver_data<snowbros_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
 }
 
-static DRIVER_INIT( pzlbreak )
+DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 {
-	pandora_set_bg_pen(machine.device("pandora"), 0xc0);
+	pandora_set_bg_pen(machine().device("pandora"), 0xc0);
 }
 
-GAME( 1990, snowbros,  0,        snowbros, snowbros, snowbros_state, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 )
-GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, snowbros_state, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 2)", 0 )
-GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, snowbros_state, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 3)", 0 )
-GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, snowbros_state, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 4)", 0 )
-GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, snowbros_state, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 )
-GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, snowbros_state, 0, ROT0, "Toaplan (Dooyong license)", "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
-GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, snowbros_state, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
+GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 )
+GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 2)", 0 )
+GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 3)", 0 )
+GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 4)", 0 )
+GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 )
+GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan (Dooyong license)", "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
+GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
 
 // none of the games below are on genuine SnowBros hardware, but they clone the functionality of it.
-GAME( 1993, finalttr, 0,        finalttr, finalttr, snowbros_state, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )
-GAME( 1995, honeydol, 0,        honeydol, honeydol, snowbros_state, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
-GAME( 1995, twinadv,  0,        twinadv,  twinadv, snowbros_state,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )
-GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv, snowbros_state,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", 0 )
-GAME( 1995, hyperpac, 0,        semicom_mcu,  hyperpac, snowbros_state, 0, ROT0, "SemiCom", "Hyper Pacman", 0 )
-GAME( 1995, hyperpacb,hyperpac, semicom,  hyperpac, snowbros_state, 0,        ROT0, "bootleg", "Hyper Pacman (bootleg)", 0 )
+GAME( 1993, finalttr, 0,        finalttr, finalttr, driver_device, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )
+GAME( 1995, honeydol, 0,        honeydol, honeydol, driver_device, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
+GAME( 1995, twinadv,  0,        twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )
+GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", 0 )
+GAME( 1995, hyperpac, 0,        semicom_mcu,  hyperpac, driver_device, 0, ROT0, "SemiCom", "Hyper Pacman", 0 )
+GAME( 1995, hyperpacb,hyperpac, semicom,  hyperpac, driver_device, 0,        ROT0, "bootleg", "Hyper Pacman (bootleg)", 0 )
 GAME( 1996, cookbib2, 0,        semiprot, cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom", "Cookie & Bibi 2", 0 )
-GAME( 1996, toppyrap, 0,        semiprot, toppyrap, snowbros_state, 0,        ROT0, "SemiCom", "Toppy & Rappy", 0 )
+GAME( 1996, toppyrap, 0,        semiprot, toppyrap, driver_device, 0,        ROT0, "SemiCom", "Toppy & Rappy", 0 )
 GAME( 1997, cookbib3, 0,        semiprot, cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom", "Cookie & Bibi 3", 0 )
 GAME( 1997, 3in1semi, 0,        semiprot, moremore, snowbros_state, 3in1semi, ROT0, "SemiCom", "XESS - The New Revolution (SemiCom 3-in-1)", 0 )
-GAME( 1997, twinkle,  0,        semiprot, twinkle, snowbros_state,  0,        ROT0, "SemiCom", "Twinkle", 0 )
+GAME( 1997, twinkle,  0,        semiprot, twinkle, driver_device,  0,        ROT0, "SemiCom", "Twinkle", 0 )
 GAME( 1997, pzlbreak, 0,        semiprot, pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom", "Puzzle Break", 0 )
 GAME( 1999, moremore, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More", 0 )
 GAME( 1999, moremorp, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 )

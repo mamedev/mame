@@ -68,6 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
+	DECLARE_DRIVER_INIT(opwolf);
+	DECLARE_DRIVER_INIT(opwolfb);
 };
 
 

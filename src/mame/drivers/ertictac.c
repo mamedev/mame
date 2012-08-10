@@ -35,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER(ertictac_podule_r);
+	DECLARE_DRIVER_INIT(ertictac);
 };
 
 
@@ -187,9 +188,9 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END
 
-static DRIVER_INIT( ertictac )
+DRIVER_INIT_MEMBER(ertictac_state,ertictac)
 {
-	archimedes_driver_init(machine);
+	archimedes_driver_init(machine());
 }
 
 static MACHINE_START( ertictac )

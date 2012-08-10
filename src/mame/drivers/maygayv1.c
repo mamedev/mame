@@ -237,6 +237,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_w);
 	DECLARE_READ8_MEMBER(b_read);
 	DECLARE_WRITE8_MEMBER(b_writ);
+	DECLARE_DRIVER_INIT(screenpl);
 };
 
 
@@ -1407,10 +1408,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( screenpl )
+DRIVER_INIT_MEMBER(maygayv1_state,screenpl)
 {
-	maygayv1_state *state = machine.driver_data<maygayv1_state>();
-	state->m_p1 = state->m_p3 = 0xff;
+	m_p1 = m_p3 = 0xff;
 }
 
 #define GAME_FLAGS GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK

@@ -283,6 +283,21 @@ public:
 	int recdata(int changed, int data);
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
+	DECLARE_DRIVER_INIT(sltsbelg);
+	DECLARE_DRIVER_INIT(pyramid);
+	DECLARE_DRIVER_INIT(gldncrwn);
+	DECLARE_DRIVER_INIT(bbrkfst);
+	DECLARE_DRIVER_INIT(ofah);
+	DECLARE_DRIVER_INIT(quintoon);
+	DECLARE_DRIVER_INIT(drwhon);
+	DECLARE_DRIVER_INIT(adder_dutch);
+	DECLARE_DRIVER_INIT(bfmcgslm);
+	DECLARE_DRIVER_INIT(luvjub);
+	DECLARE_DRIVER_INIT(prom);
+	DECLARE_DRIVER_INIT(cpeno1);
+	DECLARE_DRIVER_INIT(focus);
+	DECLARE_DRIVER_INIT(drwho);
+	DECLARE_DRIVER_INIT(drwho_common);
 };
 
 
@@ -2197,95 +2212,90 @@ static void adder2_common_init(running_machine &machine)
 
 // UK quintoon initialisation ////////////////////////////////////////////////
 
-static DRIVER_INIT (quintoon)
+DRIVER_INIT_MEMBER(bfm_sc2_state,quintoon)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2_common_init(machine, 1);
-	adder2_decode_char_roms(machine);
-	MechMtr_config(machine,8);					// setup mech meters
+	sc2_common_init(machine(), 1);
+	adder2_decode_char_roms(machine());
+	MechMtr_config(machine(),8);					// setup mech meters
 
-	state->m_has_hopper = 0;
+	m_has_hopper = 0;
 
-	Scorpion2_SetSwitchState(machine,3,0,1);	// tube1 level switch
-	Scorpion2_SetSwitchState(machine,3,1,1);	// tube2 level switch
-	Scorpion2_SetSwitchState(machine,3,2,1);	// tube3 level switch
+	Scorpion2_SetSwitchState(machine(),3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(machine(),3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(machine(),3,2,1);	// tube3 level switch
 
-	Scorpion2_SetSwitchState(machine,5,2,1);
-	Scorpion2_SetSwitchState(machine,6,4,1);
+	Scorpion2_SetSwitchState(machine(),5,2,1);
+	Scorpion2_SetSwitchState(machine(),6,4,1);
 
-	state->m_sc2_show_door   = 1;
-	state->m_sc2_door_state  = 0x41;
+	m_sc2_show_door   = 1;
+	m_sc2_door_state  = 0x41;
 }
 
 // dutch pyramid intialisation //////////////////////////////////////////////
 
-static DRIVER_INIT( pyramid )
+DRIVER_INIT_MEMBER(bfm_sc2_state,pyramid)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2_common_init(machine, 1);
-	adder2_decode_char_roms(machine);			// decode GFX roms
-	adder2_common_init(machine);
+	sc2_common_init(machine(), 1);
+	adder2_decode_char_roms(machine());			// decode GFX roms
+	adder2_common_init(machine());
 
-	state->m_has_hopper = 1;
+	m_has_hopper = 1;
 
-	Scorpion2_SetSwitchState(machine,3,0,1);	// tube1 level switch
-	Scorpion2_SetSwitchState(machine,3,1,1);	// tube2 level switch
-	Scorpion2_SetSwitchState(machine,3,2,1);	// tube3 level switch
+	Scorpion2_SetSwitchState(machine(),3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(machine(),3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(machine(),3,2,1);	// tube3 level switch
 
-	state->m_sc2_show_door   = 1;
-	state->m_sc2_door_state  = 0x41;
+	m_sc2_show_door   = 1;
+	m_sc2_door_state  = 0x41;
 }
 // belgian slots initialisation /////////////////////////////////////////////
 
-static DRIVER_INIT( sltsbelg )
+DRIVER_INIT_MEMBER(bfm_sc2_state,sltsbelg)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2_common_init(machine, 1);
-	adder2_decode_char_roms(machine);			// decode GFX roms
-	adder2_common_init(machine);
+	sc2_common_init(machine(), 1);
+	adder2_decode_char_roms(machine());			// decode GFX roms
+	adder2_common_init(machine());
 
-	state->m_has_hopper = 1;
+	m_has_hopper = 1;
 
-	state->m_sc2_show_door   = 1;
-	state->m_sc2_door_state  = 0x41;
+	m_sc2_show_door   = 1;
+	m_sc2_door_state  = 0x41;
 }
 
 // other dutch adder games ////////////////////////////////////////////////
 
-static DRIVER_INIT( adder_dutch )
+DRIVER_INIT_MEMBER(bfm_sc2_state,adder_dutch)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2_common_init(machine, 1);
-	adder2_decode_char_roms(machine);			// decode GFX roms
-	adder2_common_init(machine);
+	sc2_common_init(machine(), 1);
+	adder2_decode_char_roms(machine());			// decode GFX roms
+	adder2_common_init(machine());
 
-	state->m_has_hopper = 0;
+	m_has_hopper = 0;
 
-	Scorpion2_SetSwitchState(machine,3,0,1);	// tube1 level switch
-	Scorpion2_SetSwitchState(machine,3,1,1);	// tube2 level switch
-	Scorpion2_SetSwitchState(machine,3,2,1);	// tube3 level switch
+	Scorpion2_SetSwitchState(machine(),3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(machine(),3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(machine(),3,2,1);	// tube3 level switch
 
-	state->m_sc2_show_door   = 1;
-	state->m_sc2_door_state  = 0x41;
+	m_sc2_show_door   = 1;
+	m_sc2_door_state  = 0x41;
 }
 
 // golden crown //////////////////////////////////////////////////////////
 
-static DRIVER_INIT( gldncrwn )
+DRIVER_INIT_MEMBER(bfm_sc2_state,gldncrwn)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2_common_init(machine, 1);
-	adder2_decode_char_roms(machine);			// decode GFX roms
-	adder2_common_init(machine);
+	sc2_common_init(machine(), 1);
+	adder2_decode_char_roms(machine());			// decode GFX roms
+	adder2_common_init(machine());
 
-	state->m_has_hopper = 0;
+	m_has_hopper = 0;
 
-	Scorpion2_SetSwitchState(machine,3,0,1);	// tube1 level switch
-	Scorpion2_SetSwitchState(machine,3,1,1);	// tube2 level switch
-	Scorpion2_SetSwitchState(machine,3,2,1);	// tube3 level switch
+	Scorpion2_SetSwitchState(machine(),3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(machine(),3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(machine(),3,2,1);	// tube3 level switch
 
-	state->m_sc2_show_door   = 0;
-	state->m_sc2_door_state  = 0x41;
+	m_sc2_show_door   = 0;
+	m_sc2_door_state  = 0x41;
 }
 
 // ROM definition UK Quintoon ////////////////////////////////////////////
@@ -3784,177 +3794,172 @@ static void sc2awpdmd_common_init(running_machine &machine,int reels, int decryp
 
 
 
-static DRIVER_INIT (bbrkfst)
+DRIVER_INIT_MEMBER(bfm_sc2_state,bbrkfst)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2awp_common_init(machine,5, 1);
-	MechMtr_config(machine,8);
+	sc2awp_common_init(machine(),5, 1);
+	MechMtr_config(machine(),8);
 
-	state->m_has_hopper = 0;
+	m_has_hopper = 0;
 
-	Scorpion2_SetSwitchState(machine,4,0, 1);	  /* GBP1 Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,1, 1);	  /* 20p Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,2, 1);	  /* Token Front Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,3, 1);	  /* Token Rear  Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,4, 1);
-	Scorpion2_SetSwitchState(machine,6,0, 0);
-	Scorpion2_SetSwitchState(machine,6,1, 1);
-	Scorpion2_SetSwitchState(machine,6,2, 0);
-	Scorpion2_SetSwitchState(machine,6,3, 1);
+	Scorpion2_SetSwitchState(machine(),4,0, 1);	  /* GBP1 Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,1, 1);	  /* 20p Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,2, 1);	  /* Token Front Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,3, 1);	  /* Token Rear  Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,4, 1);
+	Scorpion2_SetSwitchState(machine(),6,0, 0);
+	Scorpion2_SetSwitchState(machine(),6,1, 1);
+	Scorpion2_SetSwitchState(machine(),6,2, 0);
+	Scorpion2_SetSwitchState(machine(),6,3, 1);
 
 }
 
-static DRIVER_INIT (drwho_common)
+DRIVER_INIT_MEMBER(bfm_sc2_state,drwho_common)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 
-	MechMtr_config(machine,8);
+	MechMtr_config(machine(),8);
 
-	state->m_has_hopper = 0;
+	m_has_hopper = 0;
 
-	Scorpion2_SetSwitchState(machine,4,0, 0);	  /* GBP1 Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,1, 0);	  /* 20p Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,2, 0);	  /* Token Front Low Level Switch */
-	Scorpion2_SetSwitchState(machine,4,3, 0);	  /* Token Rear  Low Level Switch */
-	Scorpion2_SetSwitchState(machine,7,0, 0);	  /* GBP1 High Level Switch */
-	Scorpion2_SetSwitchState(machine,7,1, 0);	  /* 20P High Level Switch */
-	Scorpion2_SetSwitchState(machine,7,2, 0);	  /* Token Front High Level Switch */
-	Scorpion2_SetSwitchState(machine,7,3, 0);	  /* Token Rear High Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,0, 0);	  /* GBP1 Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,1, 0);	  /* 20p Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,2, 0);	  /* Token Front Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),4,3, 0);	  /* Token Rear  Low Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,0, 0);	  /* GBP1 High Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,1, 0);	  /* 20P High Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,2, 0);	  /* Token Front High Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,3, 0);	  /* Token Rear High Level Switch */
 }
 
-static DRIVER_INIT (drwho)
+DRIVER_INIT_MEMBER(bfm_sc2_state,drwho)
 {
-	sc2awp_common_init(machine,6, 1);
+	sc2awp_common_init(machine(),6, 1);
 	DRIVER_INIT_CALL(drwho_common);
 }
 
-static DRIVER_INIT (drwhon)
+DRIVER_INIT_MEMBER(bfm_sc2_state,drwhon)
 {
-	sc2awp_common_init(machine,4, 0);
+	sc2awp_common_init(machine(),4, 0);
 	DRIVER_INIT_CALL(drwho_common);
 }
 
 
-static DRIVER_INIT (focus)
+DRIVER_INIT_MEMBER(bfm_sc2_state,focus)
 {
-	sc2awp_common_init(machine,6, 1);
-	MechMtr_config(machine,5);
+	sc2awp_common_init(machine(),6, 1);
+	MechMtr_config(machine(),5);
 }
 
-static DRIVER_INIT (cpeno1)
+DRIVER_INIT_MEMBER(bfm_sc2_state,cpeno1)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2awpdmd_common_init(machine,6, 1);
+	sc2awpdmd_common_init(machine(),6, 1);
 
-	MechMtr_config(machine,5);
+	MechMtr_config(machine(),5);
 
-	Scorpion2_SetSwitchState(machine,3,3,1);	/*  5p play */
-	Scorpion2_SetSwitchState(machine,3,4,1);	/* 20p play */
+	Scorpion2_SetSwitchState(machine(),3,3,1);	/*  5p play */
+	Scorpion2_SetSwitchState(machine(),3,4,1);	/* 20p play */
 
-	Scorpion2_SetSwitchState(machine,4,0,1);	/* pay tube low (1 pound front) */
-	Scorpion2_SetSwitchState(machine,4,1,1);	/* pay tube low (20p) */
-	Scorpion2_SetSwitchState(machine,4,2,1);	/* pay tube low (?1 right) */
-	Scorpion2_SetSwitchState(machine,4,3,1);	/* pay tube low (?1 left) */
+	Scorpion2_SetSwitchState(machine(),4,0,1);	/* pay tube low (1 pound front) */
+	Scorpion2_SetSwitchState(machine(),4,1,1);	/* pay tube low (20p) */
+	Scorpion2_SetSwitchState(machine(),4,2,1);	/* pay tube low (?1 right) */
+	Scorpion2_SetSwitchState(machine(),4,3,1);	/* pay tube low (?1 left) */
 
-	Scorpion2_SetSwitchState(machine,5,0,1);	/* pay sensor (GBP1 front) */
-	Scorpion2_SetSwitchState(machine,5,1,1);	/* pay sensor (20 p) */
-	Scorpion2_SetSwitchState(machine,5,2,1);	/* pay sensor (1 right) */
-	Scorpion2_SetSwitchState(machine,5,3,1);	/* pay sensor (?1 left) */
-	Scorpion2_SetSwitchState(machine,5,4,1);	/* payout unit present */
+	Scorpion2_SetSwitchState(machine(),5,0,1);	/* pay sensor (GBP1 front) */
+	Scorpion2_SetSwitchState(machine(),5,1,1);	/* pay sensor (20 p) */
+	Scorpion2_SetSwitchState(machine(),5,2,1);	/* pay sensor (1 right) */
+	Scorpion2_SetSwitchState(machine(),5,3,1);	/* pay sensor (?1 left) */
+	Scorpion2_SetSwitchState(machine(),5,4,1);	/* payout unit present */
 
-	state->m_slide_pay_sensor[0] = 0x50;
-	state->m_slide_pay_sensor[1] = 0x51;
-	state->m_slide_pay_sensor[2] = 0x52;
-	state->m_slide_pay_sensor[3] = 0x53;
-	state->m_slide_pay_sensor[4] = 0;
-	state->m_slide_pay_sensor[5] = 0;
+	m_slide_pay_sensor[0] = 0x50;
+	m_slide_pay_sensor[1] = 0x51;
+	m_slide_pay_sensor[2] = 0x52;
+	m_slide_pay_sensor[3] = 0x53;
+	m_slide_pay_sensor[4] = 0;
+	m_slide_pay_sensor[5] = 0;
 
-	Scorpion2_SetSwitchState(machine,6,0,1);	/* ? percentage key */
-	Scorpion2_SetSwitchState(machine,6,1,1);
-	Scorpion2_SetSwitchState(machine,6,2,1);
-	Scorpion2_SetSwitchState(machine,6,3,1);
-	Scorpion2_SetSwitchState(machine,6,4,1);
+	Scorpion2_SetSwitchState(machine(),6,0,1);	/* ? percentage key */
+	Scorpion2_SetSwitchState(machine(),6,1,1);
+	Scorpion2_SetSwitchState(machine(),6,2,1);
+	Scorpion2_SetSwitchState(machine(),6,3,1);
+	Scorpion2_SetSwitchState(machine(),6,4,1);
 
-	Scorpion2_SetSwitchState(machine,7,0,0);	/* GBP1 High Level Switch  */
-	Scorpion2_SetSwitchState(machine,7,1,0);	/* 20P High Level Switch */
-	Scorpion2_SetSwitchState(machine,7,2,0);	/* Token Front High Level Switch */
-	Scorpion2_SetSwitchState(machine,7,3,0);	/* Token Rear High Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,0,0);	/* GBP1 High Level Switch  */
+	Scorpion2_SetSwitchState(machine(),7,1,0);	/* 20P High Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,2,0);	/* Token Front High Level Switch */
+	Scorpion2_SetSwitchState(machine(),7,3,0);	/* Token Rear High Level Switch */
 
-	state->m_sc2_show_door   = 1;
-	state->m_sc2_door_state  = 0x31;
+	m_sc2_show_door   = 1;
+	m_sc2_door_state  = 0x31;
 
-	state->m_has_hopper = 0;
+	m_has_hopper = 0;
 }
 
-static DRIVER_INIT (ofah)
+DRIVER_INIT_MEMBER(bfm_sc2_state,ofah)
 {
-	sc2awpdmd_common_init(machine,4, 1);
+	sc2awpdmd_common_init(machine(),4, 1);
 
-	Scorpion2_SetSwitchState(machine,4,0,1);	/* pay tube low (1 pound front) */
-	Scorpion2_SetSwitchState(machine,4,1,1);	/* pay tube low (20p) */
-	Scorpion2_SetSwitchState(machine,4,2,1);	/* pay tube low (?1 right) */
-	Scorpion2_SetSwitchState(machine,4,3,1);	/* pay tube low (?1 left) */
+	Scorpion2_SetSwitchState(machine(),4,0,1);	/* pay tube low (1 pound front) */
+	Scorpion2_SetSwitchState(machine(),4,1,1);	/* pay tube low (20p) */
+	Scorpion2_SetSwitchState(machine(),4,2,1);	/* pay tube low (?1 right) */
+	Scorpion2_SetSwitchState(machine(),4,3,1);	/* pay tube low (?1 left) */
 
-	Scorpion2_SetSwitchState(machine,6,0,0);	/* ? percentage key */
-	Scorpion2_SetSwitchState(machine,6,1,1);
-	Scorpion2_SetSwitchState(machine,6,2,0);
-	Scorpion2_SetSwitchState(machine,6,3,1);
+	Scorpion2_SetSwitchState(machine(),6,0,0);	/* ? percentage key */
+	Scorpion2_SetSwitchState(machine(),6,1,1);
+	Scorpion2_SetSwitchState(machine(),6,2,0);
+	Scorpion2_SetSwitchState(machine(),6,3,1);
 
-	MechMtr_config(machine,3);
-
-}
-
-static DRIVER_INIT (prom)
-{
-	sc2awpdmd_common_init(machine,6, 1);
-
-	Scorpion2_SetSwitchState(machine,4,0,1);	/* pay tube low (1 pound front) */
-	Scorpion2_SetSwitchState(machine,4,1,1);	/* pay tube low (20p) */
-	Scorpion2_SetSwitchState(machine,4,2,1);	/* pay tube low (?1 right) */
-	Scorpion2_SetSwitchState(machine,4,3,1);	/* pay tube low (?1 left) */
-
-	Scorpion2_SetSwitchState(machine,6,0,0);	/* ? percentage key */
-	Scorpion2_SetSwitchState(machine,6,1,1);
-	Scorpion2_SetSwitchState(machine,6,2,0);
-	Scorpion2_SetSwitchState(machine,6,3,1);
-
-	MechMtr_config(machine,3);
+	MechMtr_config(machine(),3);
 
 }
 
-static DRIVER_INIT (bfmcgslm)
+DRIVER_INIT_MEMBER(bfm_sc2_state,prom)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2awp_common_init(machine,6, 1);
-	MechMtr_config(machine,8);
-	state->m_has_hopper = 0;
+	sc2awpdmd_common_init(machine(),6, 1);
+
+	Scorpion2_SetSwitchState(machine(),4,0,1);	/* pay tube low (1 pound front) */
+	Scorpion2_SetSwitchState(machine(),4,1,1);	/* pay tube low (20p) */
+	Scorpion2_SetSwitchState(machine(),4,2,1);	/* pay tube low (?1 right) */
+	Scorpion2_SetSwitchState(machine(),4,3,1);	/* pay tube low (?1 left) */
+
+	Scorpion2_SetSwitchState(machine(),6,0,0);	/* ? percentage key */
+	Scorpion2_SetSwitchState(machine(),6,1,1);
+	Scorpion2_SetSwitchState(machine(),6,2,0);
+	Scorpion2_SetSwitchState(machine(),6,3,1);
+
+	MechMtr_config(machine(),3);
+
 }
 
-static DRIVER_INIT (luvjub)
+DRIVER_INIT_MEMBER(bfm_sc2_state,bfmcgslm)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2awpdmd_common_init(machine,6, 1);
+	sc2awp_common_init(machine(),6, 1);
+	MechMtr_config(machine(),8);
+	m_has_hopper = 0;
+}
 
-	MechMtr_config(machine,8);
-	state->m_has_hopper = 0;
+DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
+{
+	sc2awpdmd_common_init(machine(),6, 1);
 
-	Scorpion2_SetSwitchState(machine,3,0,1);
-	Scorpion2_SetSwitchState(machine,3,1,1);
+	MechMtr_config(machine(),8);
+	m_has_hopper = 0;
 
-	Scorpion2_SetSwitchState(machine,4,0,1);
-	Scorpion2_SetSwitchState(machine,4,1,1);
-	Scorpion2_SetSwitchState(machine,4,2,1);
-	Scorpion2_SetSwitchState(machine,4,3,1);
+	Scorpion2_SetSwitchState(machine(),3,0,1);
+	Scorpion2_SetSwitchState(machine(),3,1,1);
 
-	Scorpion2_SetSwitchState(machine,6,0,1);
-	Scorpion2_SetSwitchState(machine,6,1,1);
-	Scorpion2_SetSwitchState(machine,6,2,1);
-	Scorpion2_SetSwitchState(machine,6,3,0);
+	Scorpion2_SetSwitchState(machine(),4,0,1);
+	Scorpion2_SetSwitchState(machine(),4,1,1);
+	Scorpion2_SetSwitchState(machine(),4,2,1);
+	Scorpion2_SetSwitchState(machine(),4,3,1);
 
-	Scorpion2_SetSwitchState(machine,7,0,0);
-	Scorpion2_SetSwitchState(machine,7,1,0);
-	Scorpion2_SetSwitchState(machine,7,2,0);
-	Scorpion2_SetSwitchState(machine,7,3,0);
+	Scorpion2_SetSwitchState(machine(),6,0,1);
+	Scorpion2_SetSwitchState(machine(),6,1,1);
+	Scorpion2_SetSwitchState(machine(),6,2,1);
+	Scorpion2_SetSwitchState(machine(),6,3,0);
+
+	Scorpion2_SetSwitchState(machine(),7,0,0);
+	Scorpion2_SetSwitchState(machine(),7,1,0);
+	Scorpion2_SetSwitchState(machine(),7,2,0);
+	Scorpion2_SetSwitchState(machine(),7,3,0);
 }
 
 

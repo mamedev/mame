@@ -27,6 +27,7 @@ public:
 	DECLARE_READ8_MEMBER(skyfox_vregs_r);
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(skyfox);
 };
 
 /*----------- defined in video/skyfox.c -----------*/

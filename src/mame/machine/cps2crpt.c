@@ -990,9 +990,9 @@ static const struct game_keys keys_table[] =
 
 
 
-DRIVER_INIT( cps2crpt )
+DRIVER_INIT_MEMBER(cps_state,cps2crpt)
 {
-	const char *gamename = machine.system().name;
+	const char *gamename = machine().system().name;
 	const struct game_keys *k = &keys_table[0];
 
 	while (k->name)
@@ -1000,7 +1000,7 @@ DRIVER_INIT( cps2crpt )
 		if (strcmp(k->name, gamename) == 0)
 		{
 			// we have a proper key so use it to decrypt
-			cps2_decrypt(machine, k->keys, k->upper_limit ? k->upper_limit : 0x400000);
+			cps2_decrypt(machine(), k->keys, k->upper_limit ? k->upper_limit : 0x400000);
 
 			break;
 		}

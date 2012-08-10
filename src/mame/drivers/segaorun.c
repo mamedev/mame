@@ -300,8 +300,6 @@ Notes:
 
 ***************************************************************************/
 
-#define MODERN_DRIVER_INIT
-
 #include "emu.h"
 #include "includes/segaorun.h"
 #include "machine/fd1089.h"
@@ -423,7 +421,7 @@ READ8_MEMBER( segaorun_state::sound_data_r )
 //  init_generic - common initialization
 //-------------------------------------------------
 
-void segaorun_state::init_generic()
+DRIVER_INIT_MEMBER(segaorun_state,generic)
 {
 	// configure the NVRAM to point to our workram
 	if (m_nvram != NULL)
@@ -2073,7 +2071,7 @@ ROM_END
 //	GENERIC DRIVER INITIALIZATION
 //**************************************************************************
 
-void segaorun_state::init_outrun()
+DRIVER_INIT_MEMBER(segaorun_state,outrun)
 {
 	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segaorun_state::outrun_custom_io_r), this);
@@ -2081,7 +2079,7 @@ void segaorun_state::init_outrun()
 }
 
 
-void segaorun_state::init_outrunb()
+DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 {
 	static const UINT8 memory_map[] = { 0x02,0x00,0x0d,0x10,0x00,0x12,0x0c,0x13,0x08,0x14,0x0f,0x20,0x00,0x00,0x00,0x00 };
 	UINT16 *word;
@@ -2124,7 +2122,7 @@ void segaorun_state::init_outrunb()
 }
 
 
-void segaorun_state::init_shangon()
+DRIVER_INIT_MEMBER(segaorun_state,shangon)
 {
 	init_generic();
 	m_is_shangon = true;
@@ -2133,7 +2131,7 @@ void segaorun_state::init_shangon()
 }
 
 
-void segaorun_state::init_shangon3()
+DRIVER_INIT_MEMBER(segaorun_state,shangon3)
 {
 	init_generic();
 	m_is_shangon = true;
@@ -2148,17 +2146,17 @@ void segaorun_state::init_shangon3()
 //**************************************************************************
 
 //    YEAR, NAME,     PARENT,  MACHINE,         INPUT,    INIT,                         MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT
-GAMEL(1986, outrun,   0,       outrun,          outrun,   segaorun_state,init_outrun,   ROT0,   "Sega", "Out Run (sitdown/upright, Rev B)", 0,                           layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outrunra, outrun,  outrun,          outrun,   segaorun_state,init_outrun,   ROT0,   "Sega", "Out Run (sitdown/upright, Rev A)", 0,                           layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outruno,  outrun,  outrun,          outrun,   segaorun_state,init_outrun,   ROT0,   "Sega", "Out Run (sitdown/upright)", 0,                                  layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outrundx, outrun,  outrundx,        outrundx, segaorun_state,init_outrun,   ROT0,   "Sega", "Out Run (deluxe sitdown)", 0,                                   layout_outrun )
-GAMEL(1986, outrunb,  outrun,  outrun,          outrun,   segaorun_state,init_outrunb,  ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
-GAME( 1987, shangon,  0,       shangon,         shangon,  segaorun_state,init_shangon,  ROT0,   "Sega", "Super Hang-On (sitdown/upright, unprotected)", 0 )
-GAME( 1987, shangon3, shangon, shangon_fd1089b, shangon,  segaorun_state,init_shangon3, ROT0,   "Sega", "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon2, shangon, shangon_fd1089b, shangon,  segaorun_state,init_shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon1, shangon, shangon_fd1089b, shangon,  segaorun_state,init_shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) // bad program rom
-GAME( 1991, shangonle,shangon, shangon,         shangon,  segaorun_state,init_shangon,  ROT0,   "Sega", "Limited Edition Hang-On", 0 )
-GAMEL(1989, toutrun,  0,       outrun_fd1094,   toutrun,  segaorun_state,init_outrun,   ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrun3, toutrun, outrun_fd1094,   toutrunc, segaorun_state,init_outrun,   ROT0,   "Sega", "Turbo Out Run (upright, FD1094 317-0107)", 0,                   layout_outrun )
-GAMEL(1989, toutrun2, toutrun, outrun_fd1094,   toutrun,  segaorun_state,init_outrun,   ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) // FD1094 CPU not decrypted
-GAMEL(1989, toutrun1, toutrun, outrun_fd1094,   toutrunm, segaorun_state,init_outrun,   ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )
+GAMEL(1986, outrun,   0,       outrun,          outrun,   segaorun_state,outrun,   ROT0,   "Sega", "Out Run (sitdown/upright, Rev B)", 0,                           layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outrunra, outrun,  outrun,          outrun,   segaorun_state,outrun,   ROT0,   "Sega", "Out Run (sitdown/upright, Rev A)", 0,                           layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outruno,  outrun,  outrun,          outrun,   segaorun_state,outrun,   ROT0,   "Sega", "Out Run (sitdown/upright)", 0,                                  layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outrundx, outrun,  outrundx,        outrundx, segaorun_state,outrun,   ROT0,   "Sega", "Out Run (deluxe sitdown)", 0,                                   layout_outrun )
+GAMEL(1986, outrunb,  outrun,  outrun,          outrun,   segaorun_state,outrunb,  ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
+GAME( 1987, shangon,  0,       shangon,         shangon,  segaorun_state,shangon,  ROT0,   "Sega", "Super Hang-On (sitdown/upright, unprotected)", 0 )
+GAME( 1987, shangon3, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon3, ROT0,   "Sega", "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
+GAME( 1987, shangon2, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
+GAME( 1987, shangon1, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) // bad program rom
+GAME( 1991, shangonle,shangon, shangon,         shangon,  segaorun_state,shangon,  ROT0,   "Sega", "Limited Edition Hang-On", 0 )
+GAMEL(1989, toutrun,  0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,   ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrun3, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,   ROT0,   "Sega", "Turbo Out Run (upright, FD1094 317-0107)", 0,                   layout_outrun )
+GAMEL(1989, toutrun2, toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,   ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) // FD1094 CPU not decrypted
+GAMEL(1989, toutrun1, toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,   ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )

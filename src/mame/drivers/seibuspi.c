@@ -2080,66 +2080,59 @@ static void init_spi(running_machine &machine)
 	seibuspi_sprite_decrypt(state->memregion("gfx3")->base(), 0x400000);
 }
 
-static DRIVER_INIT( rdft )
+DRIVER_INIT_MEMBER(seibuspi_state,rdft)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
-static DRIVER_INIT( senkyu )
+DRIVER_INIT_MEMBER(seibuspi_state,senkyu)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
-static DRIVER_INIT( senkyua )
+DRIVER_INIT_MEMBER(seibuspi_state,senkyua)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
-static DRIVER_INIT( batlball )
+DRIVER_INIT_MEMBER(seibuspi_state,batlball)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
-static DRIVER_INIT( ejanhs )
+DRIVER_INIT_MEMBER(seibuspi_state,ejanhs)
 {
 //  idle skip doesn't work properly?
-//  seibuspi_state *state = machine.driver_data<seibuspi_state>();
-//  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),state));
+//  machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
-static DRIVER_INIT( viprp1 )
+DRIVER_INIT_MEMBER(seibuspi_state,viprp1)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
-static DRIVER_INIT( viprp1o )
+DRIVER_INIT_MEMBER(seibuspi_state,viprp1o)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),this));
 
-	init_spi(machine);
+	init_spi(machine());
 }
 
 
 
-static void init_rf2(running_machine &machine)
+static void init_rf2_common(running_machine &machine)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
@@ -2153,18 +2146,18 @@ static void init_rf2(running_machine &machine)
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
 }
 
-static DRIVER_INIT( rdft2 )
+DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
 {
-	init_rf2(machine);
+	init_rf2_common(machine());
 }
 
-static DRIVER_INIT( rdft2us )
+DRIVER_INIT_MEMBER(seibuspi_state,rdft2us)
 {
-	init_rf2(machine);
+	init_rf2_common(machine());
 }
 
 
-static void init_rfjet(running_machine &machine)
+static void init_rfjet_common(running_machine &machine)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
@@ -2178,21 +2171,21 @@ static void init_rfjet(running_machine &machine)
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
 }
 
-static DRIVER_INIT( rfjet )
+DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 {
-	init_rfjet(machine);
+	init_rfjet_common(machine());
 }
 
 /* SYS386 */
 
-static DRIVER_INIT( rdft22kc )
+DRIVER_INIT_MEMBER(seibuspi_state,rdft22kc)
 {
-	init_rf2(machine);
+	init_rf2_common(machine());
 }
 
-static DRIVER_INIT( rfjet2k )
+DRIVER_INIT_MEMBER(seibuspi_state,rfjet2k)
 {
-	init_rfjet(machine);
+	init_rfjet_common(machine());
 }
 
 static MACHINE_RESET( seibu386 )
@@ -2234,14 +2227,14 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 MACHINE_CONFIG_END
 
 /* SYS386-F V2.0 */
-static DRIVER_INIT( sys386f2 )
+DRIVER_INIT_MEMBER(seibuspi_state,sys386f2)
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)machine.root_device().memregion("gfx3")->base();
+	UINT16 *src = (UINT16 *)machine().root_device().memregion("gfx3")->base();
 	UINT16 tmp[0x40 / 2], Offset;
 
 	// sprite_reorder() only
-	for(i = 0; i < machine.root_device().memregion("gfx3")->bytes() / 0x40; i++)
+	for(i = 0; i < machine().root_device().memregion("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 

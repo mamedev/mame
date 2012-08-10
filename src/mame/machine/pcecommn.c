@@ -19,7 +19,7 @@ static int joystick_data_select;        /* which nibble of joystick data we want
 
 static UINT8 (*pce_joystick_readinputport_callback)(running_machine &) = NULL;
 
-DRIVER_INIT( pce ) {
+void init_pce() {
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 

@@ -28,6 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sbasketb_videoram_w);
 	DECLARE_WRITE8_MEMBER(sbasketb_colorram_w);
 	DECLARE_WRITE8_MEMBER(sbasketb_flipscreen_w);
+	DECLARE_DRIVER_INIT(sbasketb);
 };
 
 /*----------- defined in video/sbasketb.c -----------*/

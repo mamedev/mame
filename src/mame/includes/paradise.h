@@ -42,6 +42,9 @@ public:
 	DECLARE_WRITE8_MEMBER(paradise_pixmap_w);
 	DECLARE_WRITE8_MEMBER(paradise_priority_w);
 	DECLARE_WRITE8_MEMBER(paradise_okibank_w);
+	DECLARE_DRIVER_INIT(torus);
+	DECLARE_DRIVER_INIT(paradise);
+	DECLARE_DRIVER_INIT(tgtball);
 };
 
 /*----------- defined in video/paradise.c -----------*/

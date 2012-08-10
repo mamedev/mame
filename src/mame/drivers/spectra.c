@@ -23,6 +23,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(spectra);
 };
 
 
@@ -37,7 +39,7 @@ void spectra_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( spectra )
+DRIVER_INIT_MEMBER(spectra_state,spectra)
 {
 }
 

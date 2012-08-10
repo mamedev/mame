@@ -75,6 +75,9 @@ public:
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
 	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
+	DECLARE_DRIVER_INIT(bigtwin);
+	DECLARE_DRIVER_INIT(powerbal);
+	DECLARE_DRIVER_INIT(magicstk);
 };
 
 /*----------- defined in video/playmark.c -----------*/

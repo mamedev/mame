@@ -922,74 +922,67 @@ ROM_END
 
 
 
-static DRIVER_INIT( geebee )
+DRIVER_INIT_MEMBER(warpwarp_state,geebee)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 0;
+	m_handle_joystick = 0;
 
-	state->m_ball_pen = 1;
-	state->m_ball_sizex = 4;
-	state->m_ball_sizey = 4;
+	m_ball_pen = 1;
+	m_ball_sizex = 4;
+	m_ball_sizey = 4;
 }
 
-static DRIVER_INIT( navarone )
+DRIVER_INIT_MEMBER(warpwarp_state,navarone)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 1;
+	m_handle_joystick = 1;
 
-	state->m_ball_pen = 1;
-	state->m_ball_sizex = 4;
-	state->m_ball_sizey = 4;
+	m_ball_pen = 1;
+	m_ball_sizex = 4;
+	m_ball_sizey = 4;
 }
 
-static DRIVER_INIT( kaitein )
+DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 1;
+	m_handle_joystick = 1;
 
-	state->m_ball_pen = 1;
-	state->m_ball_sizex = 1;
-	state->m_ball_sizey = 16;
+	m_ball_pen = 1;
+	m_ball_sizex = 1;
+	m_ball_sizey = 16;
 }
 
-static DRIVER_INIT( kaitei )
+DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 0;
+	m_handle_joystick = 0;
 
-	state->m_ball_pen = 1;
-	state->m_ball_sizex = 1;
-	state->m_ball_sizey = 16;
+	m_ball_pen = 1;
+	m_ball_sizex = 1;
+	m_ball_sizey = 16;
 }
 
-static DRIVER_INIT( sos )
+DRIVER_INIT_MEMBER(warpwarp_state,sos)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 1;
+	m_handle_joystick = 1;
 
-	state->m_ball_pen = 0;
-	state->m_ball_sizex = 4;
-	state->m_ball_sizey = 2;
+	m_ball_pen = 0;
+	m_ball_sizex = 4;
+	m_ball_sizey = 2;
 }
 
-static DRIVER_INIT( bombbee )
+DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 0;
+	m_handle_joystick = 0;
 
-	state->m_ball_pen = 0x200;
-	state->m_ball_sizex = 4;
-	state->m_ball_sizey = 4;
+	m_ball_pen = 0x200;
+	m_ball_sizex = 4;
+	m_ball_sizey = 4;
 }
 
-static DRIVER_INIT( warpwarp )
+DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_handle_joystick = 1;
+	m_handle_joystick = 1;
 
-	state->m_ball_pen = 0x200;
-	state->m_ball_sizex = 4;
-	state->m_ball_sizey = 4;
+	m_ball_pen = 0x200;
+	m_ball_sizex = 4;
+	m_ball_sizey = 4;
 }
 
 

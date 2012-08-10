@@ -1041,7 +1041,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state, 0, ROT0, "Unico", "Burglar X" , 0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt, unico_state,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt, unico_state,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
-GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, unico_state, 0, ROT0, "Unico", "Zero Point 2", 0 )
+GAME( 1997, burglarx, 0,       burglarx, burglarx, driver_device, 0, ROT0, "Unico", "Burglar X" , 0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt, driver_device,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt, driver_device,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, driver_device, 0, ROT0, "Unico", "Zero Point 2", 0 )

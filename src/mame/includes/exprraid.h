@@ -44,6 +44,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_DRIVER_INIT(exprraid);
+	DECLARE_DRIVER_INIT(wexpressb);
+	DECLARE_DRIVER_INIT(wexpressb2);
+	DECLARE_DRIVER_INIT(wexpressb3);
 };
 
 

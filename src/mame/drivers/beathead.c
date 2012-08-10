@@ -525,16 +525,15 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
  *
  *************************************/
 
-static DRIVER_INIT( beathead )
+DRIVER_INIT_MEMBER(beathead_state,beathead)
 {
-	beathead_state *state = machine.driver_data<beathead_state>();
 
 	/* initialize the common systems */
-	atarijsa_init(machine, "IN2", 0x0040);
+	atarijsa_init(machine(), "IN2", 0x0040);
 
 	/* prepare the speedups */
-	state->m_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate(FUNC(beathead_state::speedup_r), state));
-	state->m_movie_speedup_data = state->m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000804, 0x00000807, 0, 0, read32_delegate(FUNC(beathead_state::movie_speedup_r), state));
+	m_speedup_data = m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate(FUNC(beathead_state::speedup_r), this));
+	m_movie_speedup_data = m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000804, 0x00000807, 0, 0, read32_delegate(FUNC(beathead_state::movie_speedup_r), this));
 }
 
 

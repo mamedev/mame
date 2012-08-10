@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(williams_s9);
 };
 
 
@@ -35,7 +37,7 @@ void williams_s9_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( williams_s9 )
+DRIVER_INIT_MEMBER(williams_s9_state,williams_s9)
 {
 }
 

@@ -343,16 +343,16 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( rocnrope )
+DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
 {
-	UINT8 *decrypted = konami1_decode(machine, "maincpu");
+	UINT8 *decrypted = konami1_decode(machine(), "maincpu");
 
 	decrypted[0x703d] = 0x98;	/* fix one instruction */
 }
 
-static DRIVER_INIT( rocnropk )
+DRIVER_INIT_MEMBER(rocnrope_state,rocnropk)
 {
-	konami1_decode(machine, "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
 

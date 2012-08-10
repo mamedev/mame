@@ -1286,50 +1286,47 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( abattle )
+DRIVER_INIT_MEMBER(astrof_state,abattle)
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *prom = machine.root_device().memregion("user1")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *prom = machine().root_device().memregion("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	astrof_state *state = machine.driver_data<astrof_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
 }
 
 
-static DRIVER_INIT( afire )
+DRIVER_INIT_MEMBER(astrof_state,afire)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	astrof_state *state = machine.driver_data<astrof_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::afire_coin_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::afire_coin_prot_r),this));
 }
 
 
-static DRIVER_INIT( sstarbtl )
+DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	astrof_state *state = machine.driver_data<astrof_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
 }
 
 
@@ -1340,16 +1337,16 @@ static DRIVER_INIT( sstarbtl )
  *
  *************************************/
 
-GAME( 1979, astrof,   0,        astrof,   astrof, astrof_state,   0,       ROT90, "Data East",   "Astro Fighter (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, astrof2,  astrof,   astrof,   astrof, astrof_state,   0,       ROT90, "Data East",   "Astro Fighter (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, astrof3,  astrof,   astrof,   astrof, astrof_state,   0,       ROT90, "Data East",   "Astro Fighter (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, astrof,   0,        astrof,   astrof, driver_device,   0,       ROT90, "Data East",   "Astro Fighter (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, astrof2,  astrof,   astrof,   astrof, driver_device,   0,       ROT90, "Data East",   "Astro Fighter (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, astrof3,  astrof,   astrof,   astrof, driver_device,   0,       ROT90, "Data East",   "Astro Fighter (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, abattle,  astrof,   abattle,  abattle, astrof_state,  abattle, ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, abattle2, astrof,   abattle,  abattle, astrof_state,  abattle, ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, afire,    astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg (Rene Pierre)", "Astro Fire", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, acombat,  astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg",     "Astro Combat (newer, CB)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, acombato, astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg",     "Astro Combat (older, PZ)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, sstarbtl, astrof,   abattle,  abattle, astrof_state,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, astrof_state, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfghmk22, astrof_state,0,       ROT90, "Data East",   "Space Fighter Mark II (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, astrof_state, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 5)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahawk1, astrof_state,0,       ROT90, "Data East",   "Tomahawk 777 (rev 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, driver_device, 0,       ROT90, "Data East",   "Space Fighter Mark II (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfghmk22, driver_device,0,       ROT90, "Data East",   "Space Fighter Mark II (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, driver_device, 0,       ROT90, "Data East",   "Tomahawk 777 (rev 5)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahawk1, driver_device,0,       ROT90, "Data East",   "Tomahawk 777 (rev 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

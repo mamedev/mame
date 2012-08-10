@@ -34,6 +34,7 @@ public:
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
+	DECLARE_DRIVER_INIT(kingtut);
 };
 
 
@@ -749,10 +750,9 @@ ROM_START( vikingt )
 ROM_END
 
 
-static DRIVER_INIT( kingtut )
+DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 {
-	kongambl_state *state = machine.driver_data<kongambl_state>();
-	UINT32 *rom = (UINT32*)state->memregion("maincpu")->base();
+	UINT32 *rom = (UINT32*)memregion("maincpu")->base();
 
 //  rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
 //  rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
@@ -761,7 +761,7 @@ static DRIVER_INIT( kingtut )
 }
 
 GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,    0, ROT0,  "Konami", "Viking Treasure", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Dragon Sphere", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Ivory Tusk", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Viking Treasure", GAME_NOT_WORKING | GAME_NO_SOUND )

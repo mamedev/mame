@@ -21,6 +21,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a);
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b);
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c);
+	DECLARE_DRIVER_INIT(ecoinf3);
 };
 
 
@@ -469,7 +470,7 @@ ROM_START( ec_secrt )
 	// no strange rom in this set
 ROM_END
 
-DRIVER_INIT( ecoinf3 )
+DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3)
 {
 
 }

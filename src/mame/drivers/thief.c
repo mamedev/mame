@@ -635,17 +635,17 @@ ROM_START( natodefa )
 ROM_END
 
 
-static DRIVER_INIT( thief )
+DRIVER_INIT_MEMBER(thief_state,thief)
 {
-	UINT8 *dest = machine.root_device().memregion( "maincpu" )->base();
-	const UINT8 *source = machine.root_device().memregion( "cpu1" )->base();
+	UINT8 *dest = machine().root_device().memregion( "maincpu" )->base();
+	const UINT8 *source = machine().root_device().memregion( "cpu1" )->base();
 
 	/* C8 is mapped (banked) in CPU1's address space; it contains Z80 code */
 	memcpy( &dest[0xe010], &source[0x290], 0x20 );
 }
 
 
-GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, thief_state, 0,     ROT0, "Pacific Novelty", "Shark Attack", 0 )
+GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, driver_device, 0,     ROT0, "Pacific Novelty", "Shark Attack", 0 )
 GAME( 1981, thief,    0,       thief,    thief, thief_state,    thief, ROT0, "Pacific Novelty", "Thief", 0 )
 GAME( 1982, natodef,  0,       natodef,  natodef, thief_state,  thief, ROT0, "Pacific Novelty", "NATO Defense" , 0 )
 GAME( 1982, natodefa, natodef, natodef,  natodef, thief_state,  thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 )

@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
 	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
+	DECLARE_DRIVER_INIT(sangho);
 };
 
 
@@ -515,10 +516,9 @@ ROM_START( sexyboom )
 	/* 15 empty */
 ROM_END
 
-static DRIVER_INIT(sangho)
+DRIVER_INIT_MEMBER(sangho_state,sangho)
 {
-	sangho_state *state = machine.driver_data<sangho_state>();
-	state->m_ram = auto_alloc_array(machine, UINT8, 0x20000);
+	m_ram = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
 GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )

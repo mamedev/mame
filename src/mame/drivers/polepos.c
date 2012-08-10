@@ -1975,19 +1975,18 @@ ROM_END
  * Initialization routines
  *********************************************************************/
 
-static DRIVER_INIT( topracern )
+DRIVER_INIT_MEMBER(polepos_state,topracern)
 {
 	/* extra direct mapped inputs read */
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x02, 0x02, "STEER");
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "IN0");
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSWA");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x02, 0x02, "STEER");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "IN0");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSWA");
 }
 
-static DRIVER_INIT( polepos2 )
+DRIVER_INIT_MEMBER(polepos_state,polepos2)
 {
-	polepos_state *state = machine.driver_data<polepos_state>();
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),state));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
 }
 
 
@@ -1995,14 +1994,14 @@ static DRIVER_INIT( polepos2 )
  * Game drivers
  *********************************************************************/
 
-GAME( 1982, polepos,    0,        polepos,    polepos, polepos_state,  0,        ROT0, "Namco", "Pole Position", 0 )
-GAME( 1982, poleposa,   polepos,  polepos,    poleposa, polepos_state, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
-GAME( 1982, polepos1,   polepos,  polepos,    poleposa, polepos_state, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 1)", 0 )
-GAME( 1984, topracer,   polepos,  polepos,    polepos, polepos_state,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1984)", 0 ) // the NAMCO customs have been cloned on these bootlegs
-GAME( 1983, topracera,  polepos,  polepos,    polepos, polepos_state,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1983)", 0 ) // the only difference between them is the year displayed on the title screen
+GAME( 1982, polepos,    0,        polepos,    polepos, driver_device,  0,        ROT0, "Namco", "Pole Position", 0 )
+GAME( 1982, poleposa,   polepos,  polepos,    poleposa, driver_device, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
+GAME( 1982, polepos1,   polepos,  polepos,    poleposa, driver_device, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 1)", 0 )
+GAME( 1984, topracer,   polepos,  polepos,    polepos, driver_device,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1984)", 0 ) // the NAMCO customs have been cloned on these bootlegs
+GAME( 1983, topracera,  polepos,  polepos,    polepos, driver_device,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1983)", 0 ) // the only difference between them is the year displayed on the title screen
 GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state,topracern,ROT0, "bootleg", "Top Racer (no MB8841 + MB8842)", 0 )
 
 GAME( 1983, polepos2,   0,        polepos,    polepos2, polepos_state, polepos2, ROT0, "Namco", "Pole Position II", 0 )
 GAME( 1983, polepos2a,  polepos2, polepos,    polepos2, polepos_state, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
-GAME( 1983, polepos2b,  polepos2, polepos,    polepos2, polepos_state, 0,        ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
+GAME( 1983, polepos2b,  polepos2, polepos,    polepos2, driver_device, 0,        ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
 GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern, polepos_state,topracern,ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices

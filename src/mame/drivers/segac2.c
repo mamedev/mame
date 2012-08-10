@@ -1751,12 +1751,12 @@ it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
 
-static void segac2_common_init(running_machine& machine, int (*func)(int in))
+void segac2_state::segac2_common_init(running_machine& machine, int (*func)(int in))
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
 	device_t *upd = machine.device("upd");
 
-	DRIVER_INIT_CALL( megadriv_c2 );
+	DRIVER_INIT_CALL(megadriv_c2);
 
 	state->m_prot_func = func;
 
@@ -1993,152 +1993,152 @@ static int prot_func_pclubjv5(int in)
 
 
 
-static DRIVER_INIT( c2boot )
+DRIVER_INIT_MEMBER(segac2_state,c2boot)
 {
-	segac2_common_init(machine, NULL);
+	segac2_common_init(machine(), NULL);
 }
 
-static DRIVER_INIT( bloxeedc )
+DRIVER_INIT_MEMBER(segac2_state,bloxeedc)
 {
-	segac2_common_init(machine, NULL);
+	segac2_common_init(machine(), NULL);
 }
 
-static DRIVER_INIT( columns )
+DRIVER_INIT_MEMBER(segac2_state,columns)
 {
-	segac2_common_init(machine, prot_func_columns);
+	segac2_common_init(machine(), prot_func_columns);
 }
 
-static DRIVER_INIT( columns2 )
+DRIVER_INIT_MEMBER(segac2_state,columns2)
 {
-	segac2_common_init(machine, prot_func_columns2);
+	segac2_common_init(machine(), prot_func_columns2);
 }
 
-static DRIVER_INIT( tfrceac )
+DRIVER_INIT_MEMBER(segac2_state,tfrceac)
 {
-	segac2_common_init(machine, prot_func_tfrceac);
+	segac2_common_init(machine(), prot_func_tfrceac);
 }
 
-static DRIVER_INIT( tfrceacb )
+DRIVER_INIT_MEMBER(segac2_state,tfrceacb)
 {
 	/* disable the palette bank switching from the protection chip */
-	segac2_common_init(machine, NULL);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x800000, 0x800001);
+	segac2_common_init(machine(), NULL);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x800000, 0x800001);
 }
 
-static DRIVER_INIT( borench )
+DRIVER_INIT_MEMBER(segac2_state,borench)
 {
-	segac2_common_init(machine, prot_func_borench);
+	segac2_common_init(machine(), prot_func_borench);
 }
 
-static DRIVER_INIT( twinsqua )
+DRIVER_INIT_MEMBER(segac2_state,twinsqua)
 {
-	segac2_common_init(machine, prot_func_twinsqua);
+	segac2_common_init(machine(), prot_func_twinsqua);
 }
 
-static DRIVER_INIT( ribbit )
+DRIVER_INIT_MEMBER(segac2_state,ribbit)
 {
-	segac2_common_init(machine, prot_func_ribbit);
+	segac2_common_init(machine(), prot_func_ribbit);
 }
 
-static DRIVER_INIT( puyo )
+DRIVER_INIT_MEMBER(segac2_state,puyo)
 {
-	segac2_common_init(machine, prot_func_puyo);
+	segac2_common_init(machine(), prot_func_puyo);
 }
 
-static DRIVER_INIT( tantr )
+DRIVER_INIT_MEMBER(segac2_state,tantr)
 {
-	segac2_common_init(machine, prot_func_tantr);
+	segac2_common_init(machine(), prot_func_tantr);
 }
 
-static DRIVER_INIT( tantrkor )
+DRIVER_INIT_MEMBER(segac2_state,tantrkor)
 {
-	segac2_common_init(machine, prot_func_tantrkor);
+	segac2_common_init(machine(), prot_func_tantrkor);
 }
 
-static DRIVER_INIT( potopoto )
+DRIVER_INIT_MEMBER(segac2_state,potopoto)
 {
-	segac2_common_init(machine, prot_func_potopoto);
+	segac2_common_init(machine(), prot_func_potopoto);
 }
 
-static DRIVER_INIT( stkclmns )
+DRIVER_INIT_MEMBER(segac2_state,stkclmns)
 {
-	segac2_common_init(machine, prot_func_stkclmns);
+	segac2_common_init(machine(), prot_func_stkclmns);
 }
 
-static DRIVER_INIT( stkclmnj )
+DRIVER_INIT_MEMBER(segac2_state,stkclmnj)
 {
-	segac2_common_init(machine, prot_func_stkclmnj);
+	segac2_common_init(machine(), prot_func_stkclmnj);
 }
 
-static DRIVER_INIT( ichir )
+DRIVER_INIT_MEMBER(segac2_state,ichir)
 {
-	segac2_common_init(machine, prot_func_ichir);
+	segac2_common_init(machine(), prot_func_ichir);
 }
 
-static DRIVER_INIT( ichirk )
+DRIVER_INIT_MEMBER(segac2_state,ichirk)
 {
-	segac2_common_init(machine, prot_func_ichirk);
+	segac2_common_init(machine(), prot_func_ichirk);
 }
 
-static DRIVER_INIT( ichirj )
+DRIVER_INIT_MEMBER(segac2_state,ichirj)
 {
-	segac2_common_init(machine, prot_func_ichirj);
+	segac2_common_init(machine(), prot_func_ichirj);
 }
 
-static DRIVER_INIT( ichirjbl )
+DRIVER_INIT_MEMBER(segac2_state,ichirjbl)
 {
 	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	rom[0x390/2] = 0x6600;
 
-	segac2_common_init(machine, NULL);
+	segac2_common_init(machine(), NULL);
 }
 
-static DRIVER_INIT( puyopuy2 )
+DRIVER_INIT_MEMBER(segac2_state,puyopuy2)
 {
-	segac2_common_init(machine, prot_func_puyopuy2);
+	segac2_common_init(machine(), prot_func_puyopuy2);
 }
 
-static DRIVER_INIT( zunkyou )
+DRIVER_INIT_MEMBER(segac2_state,zunkyou)
 {
-	segac2_common_init(machine, prot_func_zunkyou);
+	segac2_common_init(machine(), prot_func_zunkyou);
 }
 
 
-static DRIVER_INIT( pclub )
+DRIVER_INIT_MEMBER(segac2_state,pclub)
 {
-	segac2_common_init(machine, prot_func_pclub);
+	segac2_common_init(machine(), prot_func_pclub);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
-static DRIVER_INIT( pclubjv2 )
+DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 {
-	segac2_common_init(machine, prot_func_pclubjv2);
+	segac2_common_init(machine(), prot_func_pclubjv2);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
-static DRIVER_INIT( pclubjv4 )
+DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 {
-	segac2_common_init(machine, prot_func_pclubjv4);
+	segac2_common_init(machine(), prot_func_pclubjv4);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
-static DRIVER_INIT( pclubjv5 )
+DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
 {
-	segac2_common_init(machine, prot_func_pclubjv5);
+	segac2_common_init(machine(), prot_func_pclubjv5);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 

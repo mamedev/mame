@@ -266,6 +266,10 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
+	DECLARE_DRIVER_INIT(prot_val_00);
+	DECLARE_DRIVER_INIT(prot_val_10);
+	DECLARE_DRIVER_INIT(prot_val_20);
+	DECLARE_DRIVER_INIT(prot_val_40);
 };
 
 
@@ -1503,28 +1507,24 @@ ROM_START( 7ordi )
 	ROM_RELOAD(0x60000,0x20000)
 ROM_END
 
-static DRIVER_INIT( prot_val_00 )
+DRIVER_INIT_MEMBER(nmg5_state,prot_val_00)
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
-	state->m_prot_val = 0x00;
+	m_prot_val = 0x00;
 }
 
-static DRIVER_INIT( prot_val_10 )
+DRIVER_INIT_MEMBER(nmg5_state,prot_val_10)
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
-	state->m_prot_val = 0x10;
+	m_prot_val = 0x10;
 }
 
-static DRIVER_INIT( prot_val_20 )
+DRIVER_INIT_MEMBER(nmg5_state,prot_val_20)
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
-	state->m_prot_val = 0x20;
+	m_prot_val = 0x20;
 }
 
-static DRIVER_INIT( prot_val_40 )
+DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
-	state->m_prot_val = 0x40;
+	m_prot_val = 0x40;
 }
 
 GAME( 1998, nmg5,     0,       nmg5,     nmg5, nmg5_state,     prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5", GAME_SUPPORTS_SAVE )

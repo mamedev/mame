@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	DECLARE_DRIVER_INIT(vegaeo);
 };
 
 READ8_MEMBER( vegaeo_state::qs1000_p1_r )
@@ -351,15 +352,14 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-static DRIVER_INIT( vegaeo )
+DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
 {
-	vegaeo_state *state = machine.driver_data<vegaeo_state>();
 
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine.device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
-	state->membank("qs1000:bank")->configure_entries(0, 8, state->memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	machine().device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
+	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
-	init_eolith_speedup(machine);
+	init_eolith_speedup(machine());
 }
 
 GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND )

@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pbaction_colorram2_w);
 	DECLARE_WRITE8_MEMBER(pbaction_scroll_w);
 	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
+	DECLARE_DRIVER_INIT(pbactio3);
+	DECLARE_DRIVER_INIT(pbactio4);
 };
 
 

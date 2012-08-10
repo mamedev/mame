@@ -66,6 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(vectrex_via_r);
 	DECLARE_WRITE8_MEMBER(vectrex_via_w);
 	DECLARE_WRITE8_MEMBER(raaspec_led_w);
+	DECLARE_DRIVER_INIT(vectrex);
 };
 
 
@@ -80,7 +81,6 @@ READ8_DEVICE_HANDLER (vectrex_via_pa_r);
 READ8_DEVICE_HANDLER(vectrex_via_pb_r );
 void vectrex_via_irq (device_t *device, int level);
 
-DRIVER_INIT( vectrex );
 
 /* for spectrum 1+ */
 READ8_DEVICE_HANDLER( vectrex_s1_via_pb_r );

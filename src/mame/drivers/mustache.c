@@ -248,15 +248,15 @@ ROM_START( mustache )
 	ROM_LOAD( "mustache.b6",0x0300, 0x1000, CRC(5f83fa35) SHA1(cb13e63577762d818e5dcbb52b8a53f66e284e8f) ) /* 63S281N near SEI0070BU */
 ROM_END
 
-static DRIVER_INIT( mustache )
+DRIVER_INIT_MEMBER(mustache_state,mustache)
 {
 	int i;
 
-	int G1 = machine.root_device().memregion("gfx1")->bytes()/3;
-	int G2 = machine.root_device().memregion("gfx2")->bytes()/2;
-	UINT8 *gfx1 = machine.root_device().memregion("gfx1")->base();
-	UINT8 *gfx2 = machine.root_device().memregion("gfx2")->base();
-	UINT8 *buf=auto_alloc_array(machine, UINT8, G2*2);
+	int G1 = machine().root_device().memregion("gfx1")->bytes()/3;
+	int G2 = machine().root_device().memregion("gfx2")->bytes()/2;
+	UINT8 *gfx1 = machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfx2 = machine().root_device().memregion("gfx2")->base();
+	UINT8 *buf=auto_alloc_array(machine(), UINT8, G2*2);
 
 	/* BG data lines */
 	for (i=0;i<G1; i++)
@@ -292,8 +292,8 @@ static DRIVER_INIT( mustache )
 	for (i = 0; i < 2*G2; i++)
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
-	auto_free(machine, buf);
-	seibu_sound_decrypt(machine,"maincpu",0x8000);
+	auto_free(machine(), buf);
+	seibu_sound_decrypt(machine(),"maincpu",0x8000);
 }
 
 

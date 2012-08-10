@@ -364,6 +364,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	DECLARE_DRIVER_INIT(hornet);
+	DECLARE_DRIVER_INIT(hornet_2board);
 };
 
 
@@ -1263,27 +1265,25 @@ static void jamma_jvs_cmd_exec(running_machine &machine)
 /*****************************************************************************/
 
 
-static DRIVER_INIT(hornet)
+DRIVER_INIT_MEMBER(hornet_state,hornet)
 {
-	hornet_state *state = machine.driver_data<hornet_state>();
-	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
+	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_HORNET);
+	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
 
-	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
+	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(machine.device("maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(machine().device("maincpu"), jamma_jvs_w);
 }
 
-static DRIVER_INIT(hornet_2board)
+DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
 {
-	hornet_state *state = machine.driver_data<hornet_state>();
-	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
-	set_cgboard_texture_bank(machine, 1, "bank6", state->memregion("user5")->base());
+	init_konami_cgboard(machine(), 2, CGBOARD_TYPE_HORNET);
+	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
+	set_cgboard_texture_bank(machine(), 1, "bank6", memregion("user5")->base());
 
-	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
+	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(machine.device("maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(machine().device("maincpu"), jamma_jvs_w);
 }
 
 /*****************************************************************************/

@@ -109,4 +109,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, 0, ROT0, "Taito Corporation", "Mini Vaders", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, driver_device, 0, ROT0, "Taito Corporation", "Mini Vaders", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

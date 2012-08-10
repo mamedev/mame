@@ -439,6 +439,10 @@ public:
 	UINT8 m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
+	DECLARE_DRIVER_INIT(ama8000_3_o);
+	DECLARE_DRIVER_INIT(ama8000_2_i);
+	DECLARE_DRIVER_INIT(ama8000_2_v);
+	DECLARE_DRIVER_INIT(ama8000_1_x);
 };
 
 
@@ -1077,24 +1081,24 @@ static void decrypt(running_machine &machine, int key1, int key2)
 	}
 }
 
-static DRIVER_INIT( ama8000_1_x )
+DRIVER_INIT_MEMBER(amaticmg_state,ama8000_1_x)
 {
-	decrypt(machine, 0x4d1, 0xf5);
+	decrypt(machine(), 0x4d1, 0xf5);
 }
 
-static DRIVER_INIT( ama8000_2_i )
+DRIVER_INIT_MEMBER(amaticmg_state,ama8000_2_i)
 {
-	decrypt(machine, 0x436, 0x55);
+	decrypt(machine(), 0x436, 0x55);
 }
 
-static DRIVER_INIT( ama8000_2_v )
+DRIVER_INIT_MEMBER(amaticmg_state,ama8000_2_v)
 {
-	decrypt(machine, 0x703, 0xaf);
+	decrypt(machine(), 0x703, 0xaf);
 }
 
-static DRIVER_INIT( ama8000_3_o )
+DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 {
-	decrypt(machine, 0x56e, 0xa7);
+	decrypt(machine(), 0x56e, 0xa7);
 }
 
 

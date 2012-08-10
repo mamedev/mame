@@ -27,6 +27,7 @@ public:
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
+	DECLARE_DRIVER_INIT(condor);
 };
 
 

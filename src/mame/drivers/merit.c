@@ -87,6 +87,13 @@ public:
 	DECLARE_WRITE8_MEMBER(led2_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(misc_couple_w);
+	DECLARE_DRIVER_INIT(couple);
+	DECLARE_DRIVER_INIT(key_5);
+	DECLARE_DRIVER_INIT(key_4);
+	DECLARE_DRIVER_INIT(key_7);
+	DECLARE_DRIVER_INIT(key_0);
+	DECLARE_DRIVER_INIT(key_2);
+	DECLARE_DRIVER_INIT(dtrvwz5);
 };
 
 
@@ -1982,39 +1989,34 @@ ROM_START( couplei )
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )	/*video timing?*/
 ROM_END
 
-static DRIVER_INIT( key_0 )
+DRIVER_INIT_MEMBER(merit_state,key_0)
 {
-	merit_state *state = machine.driver_data<merit_state>();
-	state->m_decryption_key = 0;
+	m_decryption_key = 0;
 }
 
-static DRIVER_INIT( key_2 )
+DRIVER_INIT_MEMBER(merit_state,key_2)
 {
-	merit_state *state = machine.driver_data<merit_state>();
-	state->m_decryption_key = 2;
+	m_decryption_key = 2;
 }
 
-static DRIVER_INIT( key_4 )
+DRIVER_INIT_MEMBER(merit_state,key_4)
 {
-	merit_state *state = machine.driver_data<merit_state>();
-	state->m_decryption_key = 4;
+	m_decryption_key = 4;
 }
 
-static DRIVER_INIT( key_5 )
+DRIVER_INIT_MEMBER(merit_state,key_5)
 {
-	merit_state *state = machine.driver_data<merit_state>();
-	state->m_decryption_key = 5;
+	m_decryption_key = 5;
 }
 
-static DRIVER_INIT( key_7 )
+DRIVER_INIT_MEMBER(merit_state,key_7)
 {
-	merit_state *state = machine.driver_data<merit_state>();
-	state->m_decryption_key = 7;
+	m_decryption_key = 7;
 }
 
-static DRIVER_INIT( couple )
+DRIVER_INIT_MEMBER(merit_state,couple)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2034,14 +2036,13 @@ static DRIVER_INIT( couple )
       dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
       update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
       all behave the same...*/
-	machine.root_device().membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
+	machine().root_device().membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
-static DRIVER_INIT( dtrvwz5 )
+DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
 {
-	merit_state *state = machine.driver_data<merit_state>();
 	int i;
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;
@@ -2063,15 +2064,15 @@ static DRIVER_INIT( dtrvwz5 )
 	ROM[0xb00c] = 0x5f; /* ld   e,a */
 	ROM[0xb00a] = 0xc9; /* ret */
 
-	state->m_decryption_key = 6;
+	m_decryption_key = 6;
 }
 
-GAME( 1983, pitboss,  0,       pitboss,  pitboss, merit_state,  0,      ROT0,  "Merit", "The Pit Boss (set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossa, pitboss, pitboss,  pitboss, merit_state,  0,      ROT0,  "Merit", "The Pit Boss (set 2)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossb, pitboss, pitboss,  pitboss, merit_state,  0,      ROT0,  "Merit", "The Pit Boss (set 3)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossc, pitboss, casino5,  pitboss, merit_state,  0,      ROT0,  "Merit", "The Pit Boss (set 4)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss,  0,       pitboss,  pitboss, driver_device,  0,      ROT0,  "Merit", "The Pit Boss (set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossa, pitboss, pitboss,  pitboss, driver_device,  0,      ROT0,  "Merit", "The Pit Boss (set 2)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossb, pitboss, pitboss,  pitboss, driver_device,  0,      ROT0,  "Merit", "The Pit Boss (set 3)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossc, pitboss, casino5,  pitboss, driver_device,  0,      ROT0,  "Merit", "The Pit Boss (set 4)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1984, casino5,  0,       casino5,  casino5, merit_state,  0,      ROT0,  "Merit", "Casino Five",                                 GAME_SUPPORTS_SAVE )
+GAME( 1984, casino5,  0,       casino5,  casino5, driver_device,  0,      ROT0,  "Merit", "Casino Five",                                 GAME_SUPPORTS_SAVE )
 
 GAME( 1985, trvwzh,   0,       trvwhiz,  trivia, merit_state,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Horizontal) (question set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, trvwzha,  trvwzh,  trvwhiz,  trivia, merit_state,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Horizontal) (question set 2)", GAME_SUPPORTS_SAVE )
@@ -2098,9 +2099,9 @@ GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "
 GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (Expanded Questions, set 2)",    GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit, Vertical)",            GAME_SUPPORTS_SAVE )
 
-GAME( 1986, bigappg,  0,       bigappg,  bigappg, merit_state,  0,      ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )
+GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,      ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )
 
-GAME( 1986, dodge,    0,       dodge,    couple, merit_state,   0,      ROT0,  "Merit", "Dodge City",                                  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodge,    0,       dodge,    couple, driver_device,   0,      ROT0,  "Merit", "Dodge City",                                  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5, merit_state,  dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (Edition 5)",  GAME_SUPPORTS_SAVE )
 

@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sidepckt_videoram_w);
 	DECLARE_WRITE8_MEMBER(sidepckt_colorram_w);
 	DECLARE_WRITE8_MEMBER(sidepckt_flipscreen_w);
+	DECLARE_DRIVER_INIT(sidepckt);
+	DECLARE_DRIVER_INIT(sidepctj);
 };
 
 

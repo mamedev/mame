@@ -36,6 +36,7 @@ public:
 	DECLARE_READ16_MEMBER(midxunit_sound_r);
 	DECLARE_READ16_MEMBER(midxunit_sound_state_r);
 	DECLARE_WRITE16_MEMBER(midxunit_sound_w);
+	DECLARE_DRIVER_INIT(revx);
 };
 
 
@@ -45,7 +46,6 @@ public:
 
 
 
-DRIVER_INIT( revx );
 
 MACHINE_RESET( midxunit );
 

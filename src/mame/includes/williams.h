@@ -72,6 +72,24 @@ public:
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
 	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(williams_mux_r);
+	DECLARE_DRIVER_INIT(sinistar);
+	DECLARE_DRIVER_INIT(blaster);
+	DECLARE_DRIVER_INIT(stargate);
+	DECLARE_DRIVER_INIT(playball);
+	DECLARE_DRIVER_INIT(defender);
+	DECLARE_DRIVER_INIT(mayday);
+	DECLARE_DRIVER_INIT(mysticm);
+	DECLARE_DRIVER_INIT(lottofun);
+	DECLARE_DRIVER_INIT(alienaru);
+	DECLARE_DRIVER_INIT(defndjeu);
+	DECLARE_DRIVER_INIT(spdball);
+	DECLARE_DRIVER_INIT(inferno);
+	DECLARE_DRIVER_INIT(splat);
+	DECLARE_DRIVER_INIT(joust);
+	DECLARE_DRIVER_INIT(alienar);
+	DECLARE_DRIVER_INIT(tshoot);
+	DECLARE_DRIVER_INIT(robotron);
+	DECLARE_DRIVER_INIT(bubbles);
 };
 
 
@@ -83,6 +101,7 @@ public:
 		m_cvsd_sound(*this, "cvsd") { }
 
 	required_device<williams_cvsd_sound_device> m_cvsd_sound;
+	DECLARE_DRIVER_INIT(joust2);
 };
 
 /*----------- defined in drivers/williams.c -----------*/

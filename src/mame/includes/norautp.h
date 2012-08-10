@@ -22,6 +22,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mainlamps_w);
 	DECLARE_WRITE8_MEMBER(soundlamps_w);
 	DECLARE_WRITE8_MEMBER(counterlamps_w);
+	DECLARE_DRIVER_INIT(ssa);
+	DECLARE_DRIVER_INIT(enc);
+	DECLARE_DRIVER_INIT(deb);
 };
 
 

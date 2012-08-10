@@ -2093,50 +2093,48 @@ static void cninja_patch( running_machine &machine )
 
 /**********************************************************************************/
 
-static DRIVER_INIT( cninja )
+DRIVER_INIT_MEMBER(cninja_state,cninja)
 {
-	cninja_state *state = machine.driver_data<cninja_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),state));
-	cninja_patch(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),this));
+	cninja_patch(machine());
 }
 
-static DRIVER_INIT( stoneage )
+DRIVER_INIT_MEMBER(cninja_state,stoneage)
 {
-	cninja_state *state = machine.driver_data<cninja_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),this));
 }
 
-static DRIVER_INIT( mutantf )
+DRIVER_INIT_MEMBER(cninja_state,mutantf)
 {
-	const UINT8 *src = machine.root_device().memregion("gfx2")->base();
-	UINT8 *dst = machine.root_device().memregion("gfx1")->base();
+	const UINT8 *src = machine().root_device().memregion("gfx2")->base();
+	UINT8 *dst = machine().root_device().memregion("gfx1")->base();
 
 	/* The 16x16 graphic has some 8x8 chars in it - decode them in GFX1 */
 	memcpy(dst + 0x50000, dst + 0x10000, 0x10000);
 	memcpy(dst + 0x10000, src, 0x40000);
 	memcpy(dst + 0x60000, src + 0x40000, 0x40000);
 
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco56_decrypt_gfx(machine, "gfx2");
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco56_decrypt_gfx(machine(), "gfx2");
 }
 
 /**********************************************************************************/
 
-GAME( 1990, edrandy,  0,       edrandy,  edrandy, cninja_state, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, edrandy2, edrandy, edrandy,  edrandc, cninja_state, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, edrandy1, edrandy, edrandy,  edrandc, cninja_state, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, edrandyj, edrandy, edrandy,  edrandc, cninja_state, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, edrandy,  0,       edrandy,  edrandy, driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, edrandy2, edrandy, edrandy,  edrandc, driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, edrandy1, edrandy, edrandy,  edrandc, driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, edrandyj, edrandy, edrandy,  edrandc, driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninja,   0,       cninja,   cninja, cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninja1,  cninja,  cninja,   cninja, cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjaa,  cninja,  cninja,   cninja, cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjau,  cninja,  cninja,   cninjau, cninja_state, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", GAME_SUPPORTS_SAVE )
 GAME( 1991, joemac,   cninja,  cninja,   cninja, cninja_state,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, stoneage, cninja,  stoneage, cninja, cninja_state,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninjabl, cninja,  cninjabl, cninja, cninja_state,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1991, cninjabl2,cninja,  cninjabl, cninja, cninja_state,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", GAME_NOT_WORKING )
-GAME( 1991, robocop2, 0,       robocop2, robocop2, cninja_state,0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", GAME_SUPPORTS_SAVE )
-GAME( 1991, robocop2u,robocop2,robocop2, robocop2, cninja_state,0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
-GAME( 1991, robocop2j,robocop2,robocop2, robocop2, cninja_state,0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", GAME_SUPPORTS_SAVE )
+GAME( 1991, cninjabl, cninja,  cninjabl, cninja, driver_device,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, cninjabl2,cninja,  cninjabl, cninja, driver_device,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", GAME_NOT_WORKING )
+GAME( 1991, robocop2, 0,       robocop2, robocop2, driver_device,0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", GAME_SUPPORTS_SAVE )
+GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device,0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
+GAME( 1991, robocop2j,robocop2,robocop2, robocop2, driver_device,0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mutantf,  0,       mutantf,  mutantf, cninja_state, mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mutantf4, mutantf, mutantf,  mutantf, cninja_state, mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mutantf3, mutantf, mutantf,  mutantf, cninja_state, mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", GAME_SUPPORTS_SAVE )

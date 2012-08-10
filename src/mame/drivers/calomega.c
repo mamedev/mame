@@ -3905,11 +3905,11 @@ ROM_END
 *                  Driver Init                   *
 *************************************************/
 
-static DRIVER_INIT( standard )
+DRIVER_INIT_MEMBER(calomega_state,standard)
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
+	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3918,10 +3918,10 @@ static DRIVER_INIT( standard )
 	}
 }
 
-static DRIVER_INIT( elgrande )
+DRIVER_INIT_MEMBER(calomega_state,elgrande)
 {
 	int x;
-	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
+	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
 
 	/* background color is adjusted through RGB pots */
 	for (x = 0x0000; x < 0x0400; x++)
@@ -3931,11 +3931,11 @@ static DRIVER_INIT( elgrande )
 	}
 }
 
-static DRIVER_INIT( jjpoker )
+DRIVER_INIT_MEMBER(calomega_state,jjpoker)
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
+	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3944,11 +3944,11 @@ static DRIVER_INIT( jjpoker )
 	}
 }
 
-static DRIVER_INIT( comg080 )
+DRIVER_INIT_MEMBER(calomega_state,comg080)
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
+	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3960,7 +3960,7 @@ static DRIVER_INIT( comg080 )
        Start = $2042;  NMI = $26f8;
        Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
     */
-	UINT8 *PRGROM = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *PRGROM = machine().root_device().memregion( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */

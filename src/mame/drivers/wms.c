@@ -22,6 +22,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(wms);
 };
 
 
@@ -370,7 +372,7 @@ ROM_END
 
 
 
-static DRIVER_INIT(wms)
+DRIVER_INIT_MEMBER(wms_state,wms)
 {
 
 }

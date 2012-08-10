@@ -37,6 +37,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tecmo_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(tecmo_adpcm_start_w);
 	DECLARE_WRITE8_MEMBER(tecmo_adpcm_vol_w);
+	DECLARE_DRIVER_INIT(silkworm);
+	DECLARE_DRIVER_INIT(rygar);
+	DECLARE_DRIVER_INIT(backfirt);
+	DECLARE_DRIVER_INIT(gemini);
 };
 
 

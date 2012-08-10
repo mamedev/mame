@@ -352,4 +352,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2002, cmmb162,  0,       cmmb,  cmmb, cmmb_state,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Multipede (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, cmmb162,  0,       cmmb,  cmmb, driver_device,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Multipede (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )

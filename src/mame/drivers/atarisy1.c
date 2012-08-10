@@ -2340,69 +2340,63 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( marble )
+DRIVER_INIT_MEMBER(atarisy1_state,marble)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
-	atarigen_slapstic_init(machine.device("maincpu"), 0x080000, 0, 103);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 103);
 
-	state->m_joystick_type = 0;	/* none */
-	state->m_trackball_type = 1;	/* rotated */
+	m_joystick_type = 0;	/* none */
+	m_trackball_type = 1;	/* rotated */
 }
 
 
-static DRIVER_INIT( peterpak )
+DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
-	atarigen_slapstic_init(machine.device("maincpu"), 0x080000, 0, 107);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 107);
 
-	state->m_joystick_type = 1;	/* digital */
-	state->m_trackball_type = 0;	/* none */
+	m_joystick_type = 1;	/* digital */
+	m_trackball_type = 0;	/* none */
 }
 
 
-static DRIVER_INIT( indytemp )
+DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
-	atarigen_slapstic_init(machine.device("maincpu"), 0x080000, 0, 105);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 105);
 
-	state->m_joystick_type = 1;	/* digital */
-	state->m_trackball_type = 0;	/* none */
+	m_joystick_type = 1;	/* digital */
+	m_trackball_type = 0;	/* none */
 }
 
 
-static DRIVER_INIT( roadrunn )
+DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
-	atarigen_slapstic_init(machine.device("maincpu"), 0x080000, 0, 108);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 108);
 
-	state->m_joystick_type = 2;	/* analog */
-	state->m_trackball_type = 0;	/* none */
+	m_joystick_type = 2;	/* analog */
+	m_trackball_type = 0;	/* none */
 }
 
 
-static DRIVER_INIT( roadb109 )
+DRIVER_INIT_MEMBER(atarisy1_state,roadb109)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
-	atarigen_slapstic_init(machine.device("maincpu"), 0x080000, 0, 109);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 109);
 
-	state->m_joystick_type = 3;	/* pedal */
-	state->m_trackball_type = 2;	/* steering wheel */
+	m_joystick_type = 3;	/* pedal */
+	m_trackball_type = 2;	/* steering wheel */
 }
 
 
-static DRIVER_INIT( roadb110 )
+DRIVER_INIT_MEMBER(atarisy1_state,roadb110)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 
-	atarigen_slapstic_init(machine.device("maincpu"), 0x080000, 0, 110);
+	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 110);
 
-	state->m_joystick_type = 3;	/* pedal */
-	state->m_trackball_type = 2;	/* steering wheel */
+	m_joystick_type = 3;	/* pedal */
+	m_trackball_type = 2;	/* steering wheel */
 }
 
 

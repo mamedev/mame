@@ -410,16 +410,15 @@ static void set_videoram_bank( running_machine &machine, int first, int count, i
  *
  *************************************/
 
-DRIVER_INIT( playch10 )
+DRIVER_INIT_MEMBER(playch10_state,playch10)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	state->m_vram = NULL;
+	m_vram = NULL;
 
 	/* set the controller to default */
-	state->m_pc10_gun_controller = 0;
+	m_pc10_gun_controller = 0;
 
 	/* default mirroring */
-	state->m_mirroring = PPU_MIRROR_NONE;
+	m_mirroring = PPU_MIRROR_NONE;
 }
 
 /**********************************************************************************
@@ -430,30 +429,28 @@ DRIVER_INIT( playch10 )
 
 /* Gun games */
 
-DRIVER_INIT( pc_gun )
+DRIVER_INIT_MEMBER(playch10_state,pc_gun)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	state->m_vram = NULL;
+	m_vram = NULL;
 
 	/* set the control type */
-	state->m_pc10_gun_controller = 1;
+	m_pc10_gun_controller = 1;
 }
 
 
 /* Horizontal mirroring */
 
-DRIVER_INIT( pc_hrz )
+DRIVER_INIT_MEMBER(playch10_state,pc_hrz)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
 	/* setup mirroring */
-	state->m_mirroring = PPU_MIRROR_HORZ;
+	m_mirroring = PPU_MIRROR_HORZ;
 }
 
 /* MMC1 mapper, used by D and F boards */
@@ -583,20 +580,19 @@ WRITE8_MEMBER(playch10_state::aboard_vrom_switch_w)
 	pc10_set_videorom_bank(machine(), 0, 8, (data & 3), 8);
 }
 
-DRIVER_INIT( pcaboard )
+DRIVER_INIT_MEMBER(playch10_state,pcaboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
 	/* switches vrom with writes to the $803e-$8041 area */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0x8fff, write8_delegate(FUNC(playch10_state::aboard_vrom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0x8fff, write8_delegate(FUNC(playch10_state::aboard_vrom_switch_w),this));
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
 	/* set the mirroring here */
-	state->m_mirroring = PPU_MIRROR_VERT;
+	m_mirroring = PPU_MIRROR_VERT;
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	state->m_vram = NULL;
+	m_vram = NULL;
 }
 
 /**********************************************************************************/
@@ -610,28 +606,27 @@ WRITE8_MEMBER(playch10_state::bboard_rom_switch_w)
 	memcpy(&prg[0x08000], &prg[bankoffset], 0x4000);
 }
 
-DRIVER_INIT( pcbboard )
+DRIVER_INIT_MEMBER(playch10_state,pcbboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *prg = state->memregion("cart")->base();
+	UINT8 *prg = memregion("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::bboard_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::bboard_rom_switch_w),this));
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
 	/* allocate vram */
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
 
 	/* set the mirroring here */
-	state->m_mirroring = PPU_MIRROR_VERT;
+	m_mirroring = PPU_MIRROR_VERT;
 	/* special init */
-	set_videoram_bank(machine, 0, 8, 0, 8);
+	set_videoram_bank(machine(), 0, 8, 0, 8);
 }
 
 /**********************************************************************************/
@@ -642,14 +637,13 @@ WRITE8_MEMBER(playch10_state::cboard_vrom_switch_w)
 	pc10_set_videorom_bank(machine(), 0, 8, ((data >> 1) & 1), 8);
 }
 
-DRIVER_INIT( pccboard )
+DRIVER_INIT_MEMBER(playch10_state,pccboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
 	/* switches vrom with writes to $6000 */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(playch10_state::cboard_vrom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(playch10_state::cboard_vrom_switch_w),this));
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	state->m_vram = NULL;
+	m_vram = NULL;
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -658,44 +652,42 @@ DRIVER_INIT( pccboard )
 /**********************************************************************************/
 /* D Board games (Rad Racer) */
 
-DRIVER_INIT( pcdboard )
+DRIVER_INIT_MEMBER(playch10_state,pcdboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *prg = state->memregion("cart")->base();
+	UINT8 *prg = memregion("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
-	state->m_mmc1_rom_mask = 0x07;
+	m_mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
 
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 	/* allocate vram */
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
 	/* special init */
-	set_videoram_bank(machine, 0, 8, 0, 8);
+	set_videoram_bank(machine(), 0, 8, 0, 8);
 }
 
 /* D Board games with extra ram (Metroid) */
 
-DRIVER_INIT( pcdboard_2 )
+DRIVER_INIT_MEMBER(playch10_state,pcdboard_2)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
 	/* extra ram at $6000-$7fff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	/* common init */
 	DRIVER_INIT_CALL(pcdboard);
 
 	/* allocate vram */
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
 	/* special init */
-	set_videoram_bank(machine, 0, 8, 0, 8);
+	set_videoram_bank(machine(), 0, 8, 0, 8);
 }
 
 /**********************************************************************************/
@@ -772,27 +764,26 @@ WRITE8_MEMBER(playch10_state::eboard_rom_switch_w)
 	}
 }
 
-DRIVER_INIT( pceboard )
+DRIVER_INIT_MEMBER(playch10_state,pceboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
-	UINT8 *prg = state->memregion("cart")->base();
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	UINT8 *prg = memregion("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	state->m_vram = NULL;
+	m_vram = NULL;
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* basically a mapper 9 on a nes */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::eboard_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::eboard_rom_switch_w),this));
 
 	/* ppu_latch callback */
 	ppu->set_latch(mapper9_latch);
 
 	/* nvram at $6000-$6fff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -801,22 +792,21 @@ DRIVER_INIT( pceboard )
 /**********************************************************************************/
 /* F Board games (Ninja Gaiden, Double Dragon) */
 
-DRIVER_INIT( pcfboard )
+DRIVER_INIT_MEMBER(playch10_state,pcfboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *prg = state->memregion("cart")->base();
+	UINT8 *prg = memregion("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	state->m_vram = NULL;
+	m_vram = NULL;
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
-	state->m_mmc1_rom_mask = 0x07;
+	m_mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -824,13 +814,12 @@ DRIVER_INIT( pcfboard )
 
 /* F Board games with extra ram (Baseball Stars) */
 
-DRIVER_INIT( pcfboard_2 )
+DRIVER_INIT_MEMBER(playch10_state,pcfboard_2)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
 	/* extra ram at $6000-$6fff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
 
-	state->m_vram = NULL;
+	m_vram = NULL;
 
 	/* common init */
 	DRIVER_INIT_CALL(pcfboard);
@@ -992,12 +981,11 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 	}
 }
 
-DRIVER_INIT( pcgboard )
+DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
-	UINT8 *prg = state->memregion("cart")->base();
-	state->m_vram = NULL;
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	UINT8 *prg = memregion("cart")->base();
+	m_vram = NULL;
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -1005,18 +993,18 @@ DRIVER_INIT( pcgboard )
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* MMC3 mapper at writes to $8000-$ffff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::gboard_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::gboard_rom_switch_w),this));
 
 	/* extra ram at $6000-$7fff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
-	state->m_gboard_banks[0] = 0x1e;
-	state->m_gboard_banks[1] = 0x1f;
-	state->m_gboard_scanline_counter = 0;
-	state->m_gboard_scanline_latch = 0;
-	state->m_gboard_4screen = 0;
-	state->m_IRQ_enable = 0;
-	state->m_IRQ_count = state->m_IRQ_count_latch = 0;
+	m_gboard_banks[0] = 0x1e;
+	m_gboard_banks[1] = 0x1f;
+	m_gboard_scanline_counter = 0;
+	m_gboard_scanline_latch = 0;
+	m_gboard_4screen = 0;
+	m_IRQ_enable = 0;
+	m_IRQ_count = m_IRQ_count_latch = 0;
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -1024,15 +1012,14 @@ DRIVER_INIT( pcgboard )
 	ppu->set_scanline_callback(gboard_scanline_cb);
 }
 
-DRIVER_INIT( pcgboard_type2 )
+DRIVER_INIT_MEMBER(playch10_state,pcgboard_type2)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	state->m_vram = NULL;
+	m_vram = NULL;
 	/* common init */
 	DRIVER_INIT_CALL(pcgboard);
 
 	/* enable 4 screen mirror */
-	state->m_gboard_4screen = 1;
+	m_gboard_4screen = 1;
 }
 
 /**********************************************************************************/
@@ -1051,25 +1038,24 @@ WRITE8_MEMBER(playch10_state::iboard_rom_switch_w)
 	memcpy(&prg[0x08000], &prg[bank * 0x8000 + 0x10000], 0x8000);
 }
 
-DRIVER_INIT( pciboard )
+DRIVER_INIT_MEMBER(playch10_state,pciboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *prg = state->memregion("cart")->base();
+	UINT8 *prg = memregion("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x10000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::iboard_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::iboard_rom_switch_w),this));
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
 	/* allocate vram */
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
 	/* special init */
-	set_videoram_bank(machine, 0, 8, 0, 8);
+	set_videoram_bank(machine(), 0, 8, 0, 8);
 }
 
 /**********************************************************************************/
@@ -1121,25 +1107,24 @@ WRITE8_MEMBER(playch10_state::hboard_rom_switch_w)
 };
 
 
-DRIVER_INIT( pchboard )
+DRIVER_INIT_MEMBER(playch10_state,pchboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *prg = state->memregion("cart")->base();
+	UINT8 *prg = memregion("cart")->base();
 	memcpy(&prg[0x08000], &prg[0x4c000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::hboard_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::hboard_rom_switch_w),this));
 
 	/* extra ram at $6000-$7fff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
-	state->m_gboard_banks[0] = 0x1e;
-	state->m_gboard_banks[1] = 0x1f;
-	state->m_gboard_scanline_counter = 0;
-	state->m_gboard_scanline_latch = 0;
-	state->m_gboard_last_bank = 0xff;
-	state->m_gboard_command = 0;
+	m_gboard_banks[0] = 0x1e;
+	m_gboard_banks[1] = 0x1f;
+	m_gboard_scanline_counter = 0;
+	m_gboard_scanline_latch = 0;
+	m_gboard_last_bank = 0xff;
+	m_gboard_command = 0;
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -1148,28 +1133,27 @@ DRIVER_INIT( pchboard )
 /**********************************************************************************/
 /* K Board games (Mario Open Golf) */
 
-DRIVER_INIT( pckboard )
+DRIVER_INIT_MEMBER(playch10_state,pckboard)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *prg = state->memregion("cart")->base();
+	UINT8 *prg = memregion("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x48000], 0x8000);
 
-	state->m_mmc1_rom_mask = 0x0f;
+	m_mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	/* Roms are banked at $8000 to $bfff */
-	machine.device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),state));
+	machine().device("cart")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
 	/* allocate vram */
-	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
 	/* special init */
-	set_videoram_bank(machine, 0, 8, 0, 8);
+	set_videoram_bank(machine(), 0, 8, 0, 8);
 }

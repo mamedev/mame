@@ -125,6 +125,9 @@ public:
 	DECLARE_WRITE16_MEMBER(toaplan1_tileram16_w);
 	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
+	DECLARE_DRIVER_INIT(toaplan1);
+	DECLARE_DRIVER_INIT(demonwld);
+	DECLARE_DRIVER_INIT(vimana);
 };
 
 

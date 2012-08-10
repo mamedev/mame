@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
 	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
 	DECLARE_WRITE8_MEMBER(prosport_paletteram_w);
+	DECLARE_DRIVER_INIT(yellowcb);
+	DECLARE_DRIVER_INIT(liberate);
+	DECLARE_DRIVER_INIT(prosport);
 };
 
 

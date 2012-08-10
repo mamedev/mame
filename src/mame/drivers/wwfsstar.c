@@ -679,7 +679,7 @@ ROM_END
 
 
 
-GAME( 1989, wwfsstar,  0,        wwfsstar, wwfsstar, wwfsstar_state,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 )
-GAME( 1989, wwfsstaru, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 )
-GAME( 1989, wwfsstara, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 )
-GAME( 1989, wwfsstarj, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ) // missing a program rom
+GAME( 1989, wwfsstar,  0,        wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 )
+GAME( 1989, wwfsstaru, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 )
+GAME( 1989, wwfsstara, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 )
+GAME( 1989, wwfsstarj, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ) // missing a program rom

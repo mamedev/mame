@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nbmj8900_scrolly_w);
 	DECLARE_WRITE8_MEMBER(nbmj8900_vramsel_w);
 	DECLARE_WRITE8_MEMBER(nbmj8900_romsel_w);
+	DECLARE_DRIVER_INIT(togenkyo);
+	DECLARE_DRIVER_INIT(ohpaipee);
 };
 
 

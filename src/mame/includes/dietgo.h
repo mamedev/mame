@@ -23,6 +23,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_deco_tilegen1;
+	DECLARE_DRIVER_INIT(dietgo);
 };
 
 

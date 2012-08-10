@@ -58,6 +58,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_DRIVER_INIT(showdown);
+	DECLARE_DRIVER_INIT(topsecex);
+	DECLARE_DRIVER_INIT(yukon);
+	DECLARE_DRIVER_INIT(exidy440);
+	DECLARE_DRIVER_INIT(claypign);
 };
 
 

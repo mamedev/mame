@@ -425,6 +425,6 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	state->membank("bank2")->set_entry(lines & 0x0f);
 }
 
-GAME( 1989, crimfght,  0,        crimfght, crimfght, crimfght_state, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimfght2, crimfght, crimfght, crimfghtj, crimfght_state,0, ROT0, "Konami", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfghtj, crimfght_state,0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfght,  0,        crimfght, crimfght, driver_device, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfght2, crimfght, crimfght, crimfghtj, driver_device,0, ROT0, "Konami", "Crime Fighters (World 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfghtj, driver_device,0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", GAME_SUPPORTS_SAVE )

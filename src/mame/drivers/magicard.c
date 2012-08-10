@@ -214,6 +214,7 @@ public:
 	DECLARE_WRITE16_MEMBER(scc68070_dma_ch2_w);
 	DECLARE_READ16_MEMBER(scc68070_mmu_r);
 	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
+	DECLARE_DRIVER_INIT(magicard);
 };
 
 
@@ -833,7 +834,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT( magicard )
+DRIVER_INIT_MEMBER(magicard_state,magicard)
 {
 	//...
 }

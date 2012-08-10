@@ -653,22 +653,22 @@ static void tecmosys_descramble(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( deroon )
+DRIVER_INIT_MEMBER(tecmosys_state,deroon)
 {
-	tecmosys_descramble(machine);
-	tecmosys_prot_init(machine, 0); // machine/tecmosys.c
+	tecmosys_descramble(machine());
+	tecmosys_prot_init(machine(), 0); // machine/tecmosys.c
 }
 
-static DRIVER_INIT( tkdensho )
+DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
 {
-	tecmosys_descramble(machine);
-	tecmosys_prot_init(machine, 1);
+	tecmosys_descramble(machine());
+	tecmosys_prot_init(machine(), 1);
 }
 
-static DRIVER_INIT( tkdensha )
+DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
 {
-	tecmosys_descramble(machine);
-	tecmosys_prot_init(machine, 2);
+	tecmosys_descramble(machine());
+	tecmosys_prot_init(machine(), 2);
 }
 
 GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )

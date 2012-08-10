@@ -75,6 +75,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mrokumei_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(reikaids_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(pteacher_blitter_start_w);
+	DECLARE_DRIVER_INIT(reikaids);
+	DECLARE_DRIVER_INIT(mjikaga);
+	DECLARE_DRIVER_INIT(jogakuen);
+	DECLARE_DRIVER_INIT(battlcry);
+	DECLARE_DRIVER_INIT(mirderby);
 };
 
 

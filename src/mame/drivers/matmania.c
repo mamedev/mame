@@ -672,7 +672,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", GAME_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach, matmania_state,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", GAME_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach, matmania_state,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach, matmania_state,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE )	/* earlier version? */
+GAME( 1985, matmania, 0,        matmania, matmania, driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", GAME_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach, driver_device,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", GAME_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE )	/* earlier version? */

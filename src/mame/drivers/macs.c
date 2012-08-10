@@ -76,6 +76,10 @@ public:
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
 	DECLARE_WRITE8_MEMBER(macs_output_w);
+	DECLARE_DRIVER_INIT(macs);
+	DECLARE_DRIVER_INIT(kisekaeh);
+	DECLARE_DRIVER_INIT(kisekaem);
+	DECLARE_DRIVER_INIT(macs2);
 };
 
 
@@ -714,36 +718,32 @@ static MACHINE_RESET(macs)
 		state->membank("bank4")->set_base(machine.root_device().memregion("maincpu")->base() );
 }
 
-static DRIVER_INIT(macs)
+DRIVER_INIT_MEMBER(macs_state,macs)
 {
-	macs_state *state = machine.driver_data<macs_state>();
-	state->m_ram1=auto_alloc_array(machine, UINT8, 0x20000);
+	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
 	st0016_game=10|0x80;
-	state->m_rev = 1;
+	m_rev = 1;
 }
 
-static DRIVER_INIT(macs2)
+DRIVER_INIT_MEMBER(macs_state,macs2)
 {
-	macs_state *state = machine.driver_data<macs_state>();
-	state->m_ram1=auto_alloc_array(machine, UINT8, 0x20000);
+	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
 	st0016_game=10|0x80;
-	state->m_rev = 2;
+	m_rev = 2;
 }
 
-static DRIVER_INIT(kisekaeh)
+DRIVER_INIT_MEMBER(macs_state,kisekaeh)
 {
-	macs_state *state = machine.driver_data<macs_state>();
-	state->m_ram1=auto_alloc_array(machine, UINT8, 0x20000);
+	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
 	st0016_game=11|0x180;
-	state->m_rev = 1;
+	m_rev = 1;
 }
 
-static DRIVER_INIT(kisekaem)
+DRIVER_INIT_MEMBER(macs_state,kisekaem)
 {
-	macs_state *state = machine.driver_data<macs_state>();
-	state->m_ram1=auto_alloc_array(machine, UINT8, 0x20000);
+	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
 	st0016_game=10|0x180;
-	state->m_rev = 1;
+	m_rev = 1;
 }
 
 

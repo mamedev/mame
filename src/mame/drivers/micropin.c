@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(micropin);
 };
 
 
@@ -31,7 +33,7 @@ void micropin_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( micropin )
+DRIVER_INIT_MEMBER(micropin_state,micropin)
 {
 }
 

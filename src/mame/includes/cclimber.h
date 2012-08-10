@@ -45,16 +45,18 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
 	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
+	DECLARE_DRIVER_INIT(cclimber);
+	DECLARE_DRIVER_INIT(yamato);
+	DECLARE_DRIVER_INIT(ckongb);
+	DECLARE_DRIVER_INIT(toprollr);
+	DECLARE_DRIVER_INIT(cclimberj);
+	DECLARE_DRIVER_INIT(cannonb2);
+	DECLARE_DRIVER_INIT(cannonb);
 };
 
 
 /*----------- defined in machine/cclimber.c -----------*/
 
-DRIVER_INIT( cclimber );
-DRIVER_INIT( cclimberj );
-DRIVER_INIT( cannonb );
-DRIVER_INIT( cannonb2 );
-DRIVER_INIT( ckongb );
 
 /*----------- defined in video/cclimber.c -----------*/
 

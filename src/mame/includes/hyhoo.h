@@ -20,6 +20,8 @@ public:
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
+	DECLARE_DRIVER_INIT(hyhoo2);
+	DECLARE_DRIVER_INIT(hyhoo);
 };
 
 

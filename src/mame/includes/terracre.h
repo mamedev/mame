@@ -28,6 +28,9 @@ public:
 	DECLARE_WRITE16_MEMBER(amazon_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(amazon_scrolly_w);
 	DECLARE_WRITE16_MEMBER(amazon_scrollx_w);
+	DECLARE_DRIVER_INIT(amazon);
+	DECLARE_DRIVER_INIT(amatelas);
+	DECLARE_DRIVER_INIT(horekid);
 };
 
 

@@ -2538,121 +2538,112 @@ static void mcr_init(running_machine &machine, int cpuboard, int vidboard, int s
 }
 
 
-static DRIVER_INIT( solarfox )
+DRIVER_INIT_MEMBER(mcr_state,solarfox)
 {
-	mcr_init(machine, 90009, 91399, 90908);
+	mcr_init(machine(), 90009, 91399, 90908);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),this));
 
 	mcr12_sprite_xoffs = 16;
 }
 
 
-static DRIVER_INIT( kick )
+DRIVER_INIT_MEMBER(mcr_state,kick)
 {
-	mcr_init(machine, 90009, 91399, 90908);
+	mcr_init(machine(), 90009, 91399, 90908);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),this));
 
 	mcr12_sprite_xoffs_flip = 16;
 }
 
 
-static DRIVER_INIT( mcr_90010 )
+DRIVER_INIT_MEMBER(mcr_state,mcr_90010)
 {
-	mcr_init(machine, 90010, 91399, 90913);
+	mcr_init(machine(), 90010, 91399, 90913);
 }
 
 
-static DRIVER_INIT( wacko )
+DRIVER_INIT_MEMBER(mcr_state,wacko)
 {
-	mcr_init(machine, 90010, 91399, 90913);
+	mcr_init(machine(), 90010, 91399, 90913);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),this));
 }
 
 
-static DRIVER_INIT( twotiger )
+DRIVER_INIT_MEMBER(mcr_state,twotiger)
 {
-	mcr_init(machine, 90010, 91399, 90913);
+	mcr_init(machine(), 90010, 91399, 90913);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),state), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
 }
 
 
-static DRIVER_INIT( kroozr )
+DRIVER_INIT_MEMBER(mcr_state,kroozr)
 {
-	mcr_init(machine, 90010, 91399, 91483);
+	mcr_init(machine(), 90010, 91399, 91483);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),this));
 }
 
 
-static DRIVER_INIT( journey )
+DRIVER_INIT_MEMBER(mcr_state,journey)
 {
-	mcr_init(machine, 91475, 91464, 90913);
+	mcr_init(machine(), 91475, 91464, 90913);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),this));
 }
 
 
-static DRIVER_INIT( mcr_91490 )
+DRIVER_INIT_MEMBER(mcr_state,mcr_91490)
 {
-	mcr_init(machine, 91490, 91464, 90913);
+	mcr_init(machine(), 91490, 91464, 90913);
 }
 
 
-static DRIVER_INIT( dotrone )
+DRIVER_INIT_MEMBER(mcr_state,dotrone)
 {
-	mcr_init(machine, 91490, 91464, 91657);
+	mcr_init(machine(), 91490, 91464, 91657);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),this));
 }
 
 
-static DRIVER_INIT( nflfoot )
+DRIVER_INIT_MEMBER(mcr_state,nflfoot)
 {
-	mcr_init(machine, 91490, 91464, 91657);
+	mcr_init(machine(), 91490, 91464, 91657);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),this));
 
 	nflfoot_serial_out_active = FALSE;
 	nflfoot_serial_in_active = FALSE;
 
-	state_save_register_global(machine, nflfoot_serial_out_active);
-	state_save_register_global(machine, nflfoot_serial_out_bits);
-	state_save_register_global(machine, nflfoot_serial_out_numbits);
-	state_save_register_global(machine, nflfoot_serial_in_active);
-	state_save_register_global(machine, nflfoot_serial_in_bits);
-	state_save_register_global(machine, nflfoot_serial_in_numbits);
+	state_save_register_global(machine(), nflfoot_serial_out_active);
+	state_save_register_global(machine(), nflfoot_serial_out_bits);
+	state_save_register_global(machine(), nflfoot_serial_out_numbits);
+	state_save_register_global(machine(), nflfoot_serial_in_active);
+	state_save_register_global(machine(), nflfoot_serial_in_bits);
+	state_save_register_global(machine(), nflfoot_serial_in_numbits);
 }
 
 
-static DRIVER_INIT( demoderb )
+DRIVER_INIT_MEMBER(mcr_state,demoderb)
 {
-	mcr_init(machine, 91490, 91464, 90913);
+	mcr_init(machine(), 91490, 91464, 90913);
 
-	mcr_state *state = machine.driver_data<mcr_state>();
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),state));
-	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),state));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),this));
+	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine.device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	machine().device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 

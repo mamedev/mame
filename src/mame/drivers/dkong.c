@@ -3077,10 +3077,10 @@ static void drakton_decrypt_rom(running_machine &machine, UINT8 mod, int offs, i
  *
  *************************************/
 
-static DRIVER_INIT( herodk )
+DRIVER_INIT_MEMBER(dkong_state,herodk)
 {
     int A;
-    UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+    UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
     /* swap data lines D3 and D4 */
     for (A = 0;A < 0x8000;A++)
@@ -3096,7 +3096,7 @@ static DRIVER_INIT( herodk )
 }
 
 
-static DRIVER_INIT( drakton )
+DRIVER_INIT_MEMBER(dkong_state,drakton)
 {
     int bs[4][8] = {
             {7,6,1,3,0,4,2,5},
@@ -3105,20 +3105,20 @@ static DRIVER_INIT( drakton )
             {7,1,4,0,3,6,2,5},
     };
 
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
         memory overhead and decrypt the ROMs using each method in advance. */
 
-    drakton_decrypt_rom(machine, 0x02, 0x10000, bs[0]);
-    drakton_decrypt_rom(machine, 0x40, 0x14000, bs[1]);
-    drakton_decrypt_rom(machine, 0x8a, 0x18000, bs[2]);
-    drakton_decrypt_rom(machine, 0xc8, 0x1c000, bs[3]);
+    drakton_decrypt_rom(machine(), 0x02, 0x10000, bs[0]);
+    drakton_decrypt_rom(machine(), 0x40, 0x14000, bs[1]);
+    drakton_decrypt_rom(machine(), 0x8a, 0x18000, bs[2]);
+    drakton_decrypt_rom(machine(), 0xc8, 0x1c000, bs[3]);
 }
 
 
-static DRIVER_INIT( strtheat )
+DRIVER_INIT_MEMBER(dkong_state,strtheat)
 {
     int bs[4][8] = {
             {0,6,1,7,3,4,2,5},
@@ -3127,50 +3127,48 @@ static DRIVER_INIT( strtheat )
             {6,3,4,1,0,7,2,5},
     };
 
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
         memory overhead and decrypt the ROMs using each method in advance. */
-    drakton_decrypt_rom(machine, 0x03, 0x10000, bs[0]);
-    drakton_decrypt_rom(machine, 0x81, 0x14000, bs[1]);
-    drakton_decrypt_rom(machine, 0x0a, 0x18000, bs[2]);
-    drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
+    drakton_decrypt_rom(machine(), 0x03, 0x10000, bs[0]);
+    drakton_decrypt_rom(machine(), 0x81, 0x14000, bs[1]);
+    drakton_decrypt_rom(machine(), 0x0a, 0x18000, bs[2]);
+    drakton_decrypt_rom(machine(), 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-	dkong_state *state = machine.driver_data<dkong_state>();
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),state));
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),state));
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
 }
 
 
-static DRIVER_INIT( dkongx )
+DRIVER_INIT_MEMBER(dkong_state,dkongx)
 {
 	UINT8 *decrypted;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
+	decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
+    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
 
-	dkong_state *state = machine.driver_data<dkong_state>();
-	space->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),state));
+	space->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),this));
 
-	space->install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),state));
-	space->install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),state));
+	space->install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
+	space->install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
 
-	braze_decrypt_rom(machine, decrypted);
+	braze_decrypt_rom(machine(), decrypted);
 
-	state->membank("bank1")->configure_entries(0, 2, &decrypted[0], 0x8000);
-	state->membank("bank1")->set_entry(0);
-	state->membank("bank2")->configure_entries(0, 2, &decrypted[0], 0x8000);
-	state->membank("bank2")->set_entry(0);
+	membank("bank1")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	membank("bank2")->set_entry(0);
 }
 
-static DRIVER_INIT( dkingjr )
+DRIVER_INIT_MEMBER(dkong_state,dkingjr)
 {
-	UINT8 *prom = machine.root_device().memregion("proms")->base();
+	UINT8 *prom = machine().root_device().memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)
 	{
 		prom[i]^=0xff; // invert color data
@@ -3184,43 +3182,43 @@ static DRIVER_INIT( dkingjr )
  *
  *************************************/
 
-GAME( 1980, radarscp, 0,        radarscp, radarscp, dkong_state,       0, ROT90, "Nintendo", "Radar Scope", GAME_SUPPORTS_SAVE )
-GAME( 1980, radarscp1,radarscp, radarscp1,radarscp, dkong_state,       0, ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
+GAME( 1980, radarscp, 0,        radarscp, radarscp, driver_device,       0, ROT90, "Nintendo", "Radar Scope", GAME_SUPPORTS_SAVE )
+GAME( 1980, radarscp1,radarscp, radarscp1,radarscp, driver_device,       0, ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, dkong,    0,        dkong2b,  dkong, dkong_state,          0,  ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongo,   dkong,    dkong2b,  dkong, dkong_state,          0,  ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongj,   dkong,    dkong2b,  dkong, dkong_state,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongjo,  dkong,    dkong2b,  dkong, dkong_state,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong, dkong_state,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 3)", GAME_SUPPORTS_SAVE )
-GAME( 2004, dkongf,   dkong,    dkong2b,  dkongf, dkong_state,         0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
+GAME( 1981, dkong,    0,        dkong2b,  dkong, driver_device,          0,  ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkongo,   dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkongj,   dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkongjo,  dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 3)", GAME_SUPPORTS_SAVE )
+GAME( 2004, dkongf,   dkong,    dkong2b,  dkongf, driver_device,         0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
 GAME( 2006, dkongx,   dkong,    braze,    dkongx, dkong_state,    dkongx,  ROT90, "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.2) (hack)", GAME_SUPPORTS_SAVE )
 GAME( 2006, dkongx11, dkong,    braze,    dkongx, dkong_state,    dkongx,  ROT90, "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.1) (hack)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr, dkong_state,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr, dkong_state,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjnrj,dkongjr,  dkongjr,  dkongjr, dkong_state,        0,  ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkongjr, dkong_state,        0,  ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr, dkong_state,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (Easy)", GAME_SUPPORTS_SAVE )
-GAME( 1982, jrking,   dkongjr,  dkongjr,  dkongjr, dkong_state,        0,  ROT90, "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjnrj,dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (Easy)", GAME_SUPPORTS_SAVE )
+GAME( 1982, jrking,   dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkingjr,  dkongjr,  dkongjr,  dkongjr, dkong_state,  dkingjr,  ROT90, "bootleg", "Donkey King Jr. (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, dkong3,   0,        dkong3,   dkong3, dkong_state,         0,  ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE )
-GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3, dkong_state,         0,  ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, dkong3b,  dkong3,   dkong3b,  dkong3b, dkong_state,        0,  ROT90, "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1983, dkong3,   0,        dkong3,   dkong3, driver_device,         0,  ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE )
+GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3, driver_device,         0,  ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dkong3b,  dkong3,   dkong3b,  dkong3b, driver_device,        0,  ROT90, "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, pestplce, mario,    pestplce, pestplce, dkong_state,       0,  ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, pestplce, mario,    pestplce, pestplce, driver_device,       0,  ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* 2650 based */
-GAME( 1984, herbiedk, huncholy, s2650,    herbiedk, dkong_state,       0,  ROT90, "Century Electronics / Seatongrove Ltd", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1983, hunchbkd, hunchbak, s2650,    hunchbkd, dkong_state,       0,  ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbdk,     superbik, s2650,    sbdk, dkong_state,           0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, herbiedk, huncholy, s2650,    herbiedk, driver_device,       0,  ROT90, "Century Electronics / Seatongrove Ltd", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1983, hunchbkd, hunchbak, s2650,    hunchbkd, driver_device,       0,  ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbdk,     superbik, s2650,    sbdk, driver_device,           0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, herodk,   hero,     s2650,    herodk, dkong_state,    herodk,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, herodku,  hero,     s2650,    herodk, dkong_state,         0,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 8ballact, 0,        s2650,    8ballact, dkong_state,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA license)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 8ballact2,8ballact, s2650,    8ballact, dkong_state,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA license)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, shootgal, 0,        s2650,    shootgal, dkong_state,       0,  ROT180,"Seatongrove Ltd (Zaccaria license)", "Shooting Gallery", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, spclforc, 0,        spclforc, spclforc, dkong_state,       0,  ROT90, "Senko Industries (Magic Eletronics Inc. license)", "Special Forces", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1985, spcfrcii, 0,        spclforc, spclforc, dkong_state,       0,  ROT90, "Senko Industries (Magic Eletronics Inc. license)", "Special Forces II", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, herodku,  hero,     s2650,    herodk, driver_device,         0,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, 8ballact, 0,        s2650,    8ballact, driver_device,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA license)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, 8ballact2,8ballact, s2650,    8ballact, driver_device,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA license)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, shootgal, 0,        s2650,    shootgal, driver_device,       0,  ROT180,"Seatongrove Ltd (Zaccaria license)", "Shooting Gallery", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, spclforc, 0,        spclforc, spclforc, driver_device,       0,  ROT90, "Senko Industries (Magic Eletronics Inc. license)", "Special Forces", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, spcfrcii, 0,        spclforc, spclforc, driver_device,       0,  ROT90, "Senko Industries (Magic Eletronics Inc. license)", "Special Forces II", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 /* EPOS */
 GAME( 1984, drakton,  0,        drakton,  drakton, dkong_state,  drakton,  ROT90, "Epos Corporation", "Drakton (DK conversion)", GAME_SUPPORTS_SAVE )

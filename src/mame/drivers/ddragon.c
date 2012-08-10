@@ -1980,69 +1980,65 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( ddragon )
+DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	state->m_sprite_irq = INPUT_LINE_NMI;
-	state->m_sound_irq = M6809_IRQ_LINE;
-	state->m_ym_irq = M6809_FIRQ_LINE;
-	state->m_technos_video_hw = 0;
+	m_sprite_irq = INPUT_LINE_NMI;
+	m_sound_irq = M6809_IRQ_LINE;
+	m_ym_irq = M6809_FIRQ_LINE;
+	m_technos_video_hw = 0;
 }
 
 
-static DRIVER_INIT( ddragon2 )
+DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	state->m_sprite_irq = INPUT_LINE_NMI;
-	state->m_sound_irq = INPUT_LINE_NMI;
-	state->m_ym_irq = 0;
-	state->m_technos_video_hw = 2;
+	m_sprite_irq = INPUT_LINE_NMI;
+	m_sound_irq = INPUT_LINE_NMI;
+	m_ym_irq = 0;
+	m_technos_video_hw = 2;
 }
 
 
-static DRIVER_INIT( darktowr )
+DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	state->m_sprite_irq = INPUT_LINE_NMI;
-	state->m_sound_irq = M6809_IRQ_LINE;
-	state->m_ym_irq = M6809_FIRQ_LINE;
-	state->m_technos_video_hw = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::darktowr_bankswitch_w),state));
+	m_sprite_irq = INPUT_LINE_NMI;
+	m_sound_irq = M6809_IRQ_LINE;
+	m_ym_irq = M6809_FIRQ_LINE;
+	m_technos_video_hw = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::darktowr_bankswitch_w),this));
 }
 
 
-static DRIVER_INIT( toffy )
+DRIVER_INIT_MEMBER(ddragon_state,toffy)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
 	int i, length;
 	UINT8 *rom;
 
-	state->m_sound_irq = M6809_IRQ_LINE;
-	state->m_ym_irq = M6809_FIRQ_LINE;
-	state->m_technos_video_hw = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),state));
+	m_sound_irq = M6809_IRQ_LINE;
+	m_ym_irq = M6809_FIRQ_LINE;
+	m_technos_video_hw = 0;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),this));
 
 	/* the program rom has a simple bitswap encryption */
-	rom = state->memregion("maincpu")->base();
-	length = state->memregion("maincpu")->bytes();
+	rom = memregion("maincpu")->base();
+	length = memregion("maincpu")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = state->memregion("gfx1")->base();
-	length = state->memregion("gfx1")->bytes();
+	rom = memregion("gfx1")->base();
+	length = memregion("gfx1")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = state->memregion("gfx2")->base();
-	length = state->memregion("gfx2")->bytes();
+	rom = memregion("gfx2")->base();
+	length = memregion("gfx2")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = state->memregion("gfx3")->base();
-	length = state->memregion("gfx3")->bytes();
+	rom = memregion("gfx3")->base();
+	length = memregion("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
@@ -2052,14 +2048,13 @@ static DRIVER_INIT( toffy )
 	/* should the sound rom be bitswapped too? */
 }
 
-static DRIVER_INIT( ddragon6809 )
+DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
 	int i;
 	UINT8 *dst,*src;
 
-	src = state->memregion("chars")->base();
-	dst = state->memregion("gfx1")->base();
+	src = memregion("chars")->base();
+	dst = memregion("gfx1")->base();
 
 	for (i = 0; i < 0x8000; i++)
 	{
@@ -2072,10 +2067,10 @@ static DRIVER_INIT( ddragon6809 )
 		}
 	}
 
-	state->m_sprite_irq = INPUT_LINE_NMI;
-	state->m_sound_irq = M6809_IRQ_LINE;
-	state->m_ym_irq = M6809_FIRQ_LINE;
-	state->m_technos_video_hw = 0;
+	m_sprite_irq = INPUT_LINE_NMI;
+	m_sound_irq = M6809_IRQ_LINE;
+	m_ym_irq = M6809_FIRQ_LINE;
+	m_technos_video_hw = 0;
 }
 
 /*************************************

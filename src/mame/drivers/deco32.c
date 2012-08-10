@@ -3251,22 +3251,22 @@ ROM_START( nslashers )
 ROM_END
 
 
-static DRIVER_INIT( captaven )
+DRIVER_INIT_MEMBER(deco32_state,captaven)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco56_decrypt_gfx(machine, "gfx2");
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco56_decrypt_gfx(machine(), "gfx2");
 }
 
 extern void process_dvi_data(UINT8* dvi_data, int offset, int regionsize);
-static DRIVER_INIT( dragngun )
+DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 {
-	UINT32 *ROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
-	const UINT8 *SRC_RAM = machine.root_device().memregion("gfx1")->base();
-	UINT8 *DST_RAM = machine.root_device().memregion("gfx2")->base();
+	UINT32 *ROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
+	const UINT8 *SRC_RAM = machine().root_device().memregion("gfx1")->base();
+	UINT8 *DST_RAM = machine().root_device().memregion("gfx2")->base();
 
-	deco74_decrypt_gfx(machine, "gfx1");
-	deco74_decrypt_gfx(machine, "gfx2");
-	deco74_decrypt_gfx(machine, "gfx3");
+	deco74_decrypt_gfx(machine(), "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx2");
+	deco74_decrypt_gfx(machine(), "gfx3");
 
 	memcpy(DST_RAM+0x80000,SRC_RAM,0x10000);
 	memcpy(DST_RAM+0x110000,SRC_RAM+0x10000,0x10000);
@@ -3275,7 +3275,7 @@ static DRIVER_INIT( dragngun )
 
 #if 0
 	{
-		UINT8 *ROM = machine.root_device().memregion("dvi")->base();
+		UINT8 *ROM = machine().root_device().memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -3290,30 +3290,30 @@ static DRIVER_INIT( dragngun )
 #endif
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-	process_dvi_data(machine.root_device().memregion("dvi")->base(),0x000000, 0x1000000);
-	process_dvi_data(machine.root_device().memregion("dvi")->base(),0x580000, 0x1000000);
-	process_dvi_data(machine.root_device().memregion("dvi")->base(),0x800000, 0x1000000);
-	process_dvi_data(machine.root_device().memregion("dvi")->base(),0xB10000, 0x1000000);
-	process_dvi_data(machine.root_device().memregion("dvi")->base(),0xB80000, 0x1000000);
+	process_dvi_data(machine().root_device().memregion("dvi")->base(),0x000000, 0x1000000);
+	process_dvi_data(machine().root_device().memregion("dvi")->base(),0x580000, 0x1000000);
+	process_dvi_data(machine().root_device().memregion("dvi")->base(),0x800000, 0x1000000);
+	process_dvi_data(machine().root_device().memregion("dvi")->base(),0xB10000, 0x1000000);
+	process_dvi_data(machine().root_device().memregion("dvi")->base(),0xB80000, 0x1000000);
 
 }
 
-static DRIVER_INIT( fghthist )
+DRIVER_INIT_MEMBER(deco32_state,fghthist)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco74_decrypt_gfx(machine, "gfx2");
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx2");
 
-	decoprot_reset(machine);
+	decoprot_reset(machine());
 }
 
-static DRIVER_INIT( lockload )
+DRIVER_INIT_MEMBER(dragngun_state,lockload)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
-//  UINT32 *ROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+//  UINT32 *ROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
 
-	deco74_decrypt_gfx(machine, "gfx1");
-	deco74_decrypt_gfx(machine, "gfx2");
-	deco74_decrypt_gfx(machine, "gfx3");
+	deco74_decrypt_gfx(machine(), "gfx1");
+	deco74_decrypt_gfx(machine(), "gfx2");
+	deco74_decrypt_gfx(machine(), "gfx3");
 
 	memcpy(RAM+0x300000,RAM+0x100000,0x100000);
 	memset(RAM+0x100000,0,0x100000);
@@ -3323,51 +3323,50 @@ static DRIVER_INIT( lockload )
 //  ROM[0x3fe40c/4]=0xe1a00000;//  NOP test switch lock
 }
 
-static DRIVER_INIT( tattass )
+DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
-	UINT8 *RAM = machine.root_device().memregion("gfx1")->base();
-	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
+	UINT8 *RAM = machine().root_device().memregion("gfx1")->base();
+	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = machine.root_device().memregion("gfx2")->base();
+	RAM = machine().root_device().memregion("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	auto_free(machine, tmp);
+	auto_free(machine(), tmp);
 
-	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
-	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
+	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
+	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
 }
 
-static DRIVER_INIT( nslasher )
+DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
-	UINT8 *RAM = machine.root_device().memregion("gfx1")->base();
-	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
+	UINT8 *RAM = machine().root_device().memregion("gfx1")->base();
+	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = machine.root_device().memregion("gfx2")->base();
+	RAM = machine().root_device().memregion("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	auto_free(machine, tmp);
+	auto_free(machine(), tmp);
 
-	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
-	deco74_decrypt_gfx(machine, "gfx2");
+	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
+	deco74_decrypt_gfx(machine(), "gfx2");
 
-	deco156_decrypt(machine);
+	deco156_decrypt(machine());
 
-	deco32_state *state = machine.driver_data<deco32_state>();
-	state->soundlatch_setclearedvalue(0xff);
+	soundlatch_setclearedvalue(0xff);
 
 	/* The board for Night Slashers is very close to the Fighter's History and
     Tattoo Assassins boards, but has an encrypted ARM cpu. */

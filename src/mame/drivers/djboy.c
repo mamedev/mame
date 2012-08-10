@@ -731,16 +731,14 @@ ROM_START( djboyj )
 ROM_END
 
 
-static DRIVER_INIT( djboy )
+DRIVER_INIT_MEMBER(djboy_state,djboy)
 {
-	djboy_state *state = machine.driver_data<djboy_state>();
-	state->m_bankxor = 0x00;
+	m_bankxor = 0x00;
 }
 
-static DRIVER_INIT( djboyj )
+DRIVER_INIT_MEMBER(djboy_state,djboyj)
 {
-	djboy_state *state = machine.driver_data<djboy_state>();
-	state->m_bankxor = 0x1f;
+	m_bankxor = 0x1f;
 }
 
 /*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */

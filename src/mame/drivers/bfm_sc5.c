@@ -31,6 +31,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:	
+	DECLARE_DRIVER_INIT(sc5);
 };
 
 
@@ -11831,10 +11833,10 @@ ROM_END
 extern int find_project_string(running_machine &machine, int addrxor, int mode);
 
 
-DRIVER_INIT( sc5 )
+DRIVER_INIT_MEMBER(sc5_state,sc5)
 {
 	// sc5 roms always start with SC5
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
 //  printf("%02x %02x %02x %02x\n", src[0], src[1], src[2], src[3]);
 	if (((src[0] == 0x20) && (src[2] == 0x43)) || ((src[1] == 0x35) && (src[3] == 0x53)))
 	{
@@ -11848,15 +11850,15 @@ DRIVER_INIT( sc5 )
 
 	// there is usually a string in the rom with identification info, often also saying which sound rom should be used!
 	// find it.
-	int found = find_project_string(machine, 3, 0);
+	int found = find_project_string(machine(), 3, 0);
 	if (!found)
 		printf("Normal rom pair string not found, checking mismatched / missing rom string\n");
 
 	// help identify roms where one of the pair is missing too
 	if (!found)
 	{
-		 found = find_project_string(machine, 3, 1);
-		 found = find_project_string(machine, 3, 2);
+		 found = find_project_string(machine(), 3, 1);
+		 found = find_project_string(machine(), 3, 2);
 	}
 
 	if (!found)

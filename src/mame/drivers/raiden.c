@@ -604,30 +604,30 @@ static void common_decrypt(running_machine &machine)
 
 /***************************************************************************/
 
-static DRIVER_INIT( raidena ) /* Decrypt NOTHING! */
+DRIVER_INIT_MEMBER(raiden_state,raidena)
 {
 #ifdef SYNC_HACK
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
 #endif
 }
 
-static DRIVER_INIT( raiden ) /* Decrypt Main / Sub / Sound code */
+DRIVER_INIT_MEMBER(raiden_state,raiden)
 {
 	DRIVER_INIT_CALL(raidena);
-	common_decrypt(machine);
-	seibu_sound_decrypt(machine,"audiocpu",0x20000);
+	common_decrypt(machine());
+	seibu_sound_decrypt(machine(),"audiocpu",0x20000);
 }
 
-static DRIVER_INIT( raidenk ) /* Decrypt Main / Sub code */
+DRIVER_INIT_MEMBER(raiden_state,raidenk)
 {
 	DRIVER_INIT_CALL(raidena);
-	common_decrypt(machine);
+	common_decrypt(machine());
 }
 
-static DRIVER_INIT( raidenu ) /* Decrypt Sound only code */
+DRIVER_INIT_MEMBER(raiden_state,raidenu)
 {
 	DRIVER_INIT_CALL(raidena);
-	seibu_sound_decrypt(machine,"audiocpu",0x20000);
+	seibu_sound_decrypt(machine(),"audiocpu",0x20000);
 }
 
 

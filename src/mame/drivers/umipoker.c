@@ -58,6 +58,8 @@ public:
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(umi_counters_w);
 	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
+	DECLARE_DRIVER_INIT(umipoker);
+	DECLARE_DRIVER_INIT(saiyukip);
 };
 
 static TILE_GET_INFO( get_tile_info_0 )
@@ -746,17 +748,15 @@ ROM_END
 *              Driver Init                *
 ******************************************/
 
-static DRIVER_INIT( umipoker )
+DRIVER_INIT_MEMBER(umipoker_state,umipoker)
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::umi_counters_w), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::umi_counters_w), this));
 }
 
-static DRIVER_INIT( saiyukip )
+DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::saiyu_counters_w), state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe0000c, 0xe0000d, write16_delegate(FUNC(umipoker_state::lamps_w), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::saiyu_counters_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe0000c, 0xe0000d, write16_delegate(FUNC(umipoker_state::lamps_w), this));
 }
 
 

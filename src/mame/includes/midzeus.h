@@ -39,6 +39,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
 	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
 	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
+	DECLARE_DRIVER_INIT(invasn);
+	DECLARE_DRIVER_INIT(mk4);
+	DECLARE_DRIVER_INIT(thegrid);
+	DECLARE_DRIVER_INIT(crusnexo);
 };
 
 

@@ -19,6 +19,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(allied);
 };
 
 
@@ -35,7 +37,7 @@ void allied_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( allied )
+DRIVER_INIT_MEMBER(allied_state,allied)
 {
 }
 

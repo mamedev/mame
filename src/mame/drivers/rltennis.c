@@ -237,4 +237,4 @@ ROM_START( rltennis )
 	ROM_LOAD( "tennis_3.u52", 0x00000, 0x80000, CRC(517dcd0e) SHA1(b2703e185ee8cf7e115ea07151e7bee8be34948b) )
 ROM_END
 
-GAME( 1993, rltennis,    0, rltennis,    rltennis, rltennis_state,    0, ROT0,  "TCH", "Reality Tennis", GAME_IMPERFECT_GRAPHICS)
+GAME( 1993, rltennis,    0, rltennis,    rltennis, driver_device,    0, ROT0,  "TCH", "Reality Tennis", GAME_IMPERFECT_GRAPHICS)

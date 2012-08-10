@@ -120,6 +120,8 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_1_direct_handler);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
+	DECLARE_DRIVER_INIT(shadfgtr);
+	DECLARE_DRIVER_INIT(vcombat);
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -439,29 +441,28 @@ DIRECT_UPDATE_MEMBER(vcombat_state::vcombat_vid_1_direct_handler)
 }
 
 
-static DRIVER_INIT( vcombat )
+DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 {
-	vcombat_state *state = machine.driver_data<vcombat_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* The two i860s execute out of RAM */
-	address_space *space = machine.device<i860_device>("vid_0")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), state));
+	address_space *space = machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 
-	space = machine.device<i860_device>("vid_1")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_1_direct_handler), state));
+	space = machine().device<i860_device>("vid_1")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_1_direct_handler), this));
 
 	/* Allocate the 68000 framebuffers */
-	state->m_m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m_m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
+	m_m68k_framebuffer[0] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_m68k_framebuffer[1] = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	/* First i860 */
-	state->m_i860_framebuffer[0][0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m_i860_framebuffer[0][1] = auto_alloc_array(machine, UINT16, 0x8000);
+	m_i860_framebuffer[0][0] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[0][1] = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	/* Second i860 */
-	state->m_i860_framebuffer[1][0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m_i860_framebuffer[1][1] = auto_alloc_array(machine, UINT16, 0x8000);
+	m_i860_framebuffer[1][0] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[1][1] = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
        I think what is happening here is that M0 snags the first time
@@ -479,22 +480,21 @@ static DRIVER_INIT( vcombat )
 	ROM[0x4017] = 0x66;
 }
 
-static DRIVER_INIT( shadfgtr )
+DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 {
-	vcombat_state *state = machine.driver_data<vcombat_state>();
 	/* Allocate th 68000 frame buffers */
-	state->m_m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m_m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
+	m_m68k_framebuffer[0] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_m68k_framebuffer[1] = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	/* Only one i860 */
-	state->m_i860_framebuffer[0][0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m_i860_framebuffer[0][1] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m_i860_framebuffer[1][0] = NULL;
-	state->m_i860_framebuffer[1][1] = NULL;
+	m_i860_framebuffer[0][0] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[0][1] = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_i860_framebuffer[1][0] = NULL;
+	m_i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
-	address_space *space = machine.device<i860_device>("vid_0")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), state));
+	address_space *space = machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 }
 
 

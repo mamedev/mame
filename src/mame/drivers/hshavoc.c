@@ -115,11 +115,11 @@ ROM_END
 
 #endif
 
-static DRIVER_INIT(hshavoc)
+DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 {
 
 	int x;
-	UINT16 *src = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	static const UINT16 typedat[16] = {
 		1,1,1,1, 1,1,1,1,
@@ -218,7 +218,7 @@ static DRIVER_INIT(hshavoc)
 */
 
 	{
-		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		space->nop_write(0x200000, 0x201fff);
 	}
 

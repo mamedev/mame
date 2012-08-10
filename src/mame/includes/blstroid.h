@@ -16,6 +16,7 @@ public:
 	required_shared_ptr<UINT16>	m_priorityram;
 	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);
 	DECLARE_READ16_MEMBER(inputs_r);
+	DECLARE_DRIVER_INIT(blstroid);
 };
 
 

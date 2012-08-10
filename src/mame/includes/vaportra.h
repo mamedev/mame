@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vaportra_priority_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
+	DECLARE_DRIVER_INIT(vaportra);
 };
 
 

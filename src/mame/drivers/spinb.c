@@ -17,6 +17,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(spinb);
 };
 
 
@@ -31,7 +33,7 @@ void spinb_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( spinb )
+DRIVER_INIT_MEMBER(spinb_state,spinb)
 {
 }
 

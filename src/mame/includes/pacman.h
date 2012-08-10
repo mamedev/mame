@@ -101,6 +101,22 @@ public:
 	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
 	DECLARE_WRITE8_MEMBER(jrpacman_bgpriority_w);
 	DECLARE_WRITE8_MEMBER(superabc_bank_w);
+	DECLARE_DRIVER_INIT(maketrax);
+	DECLARE_DRIVER_INIT(drivfrcp);
+	DECLARE_DRIVER_INIT(mspacmbe);
+	DECLARE_DRIVER_INIT(ponpoko);
+	DECLARE_DRIVER_INIT(eyes);
+	DECLARE_DRIVER_INIT(woodpek);
+	DECLARE_DRIVER_INIT(cannonbp);
+	DECLARE_DRIVER_INIT(jumpshot);
+	DECLARE_DRIVER_INIT(korosuke);
+	DECLARE_DRIVER_INIT(mspacii);
+	DECLARE_DRIVER_INIT(pacplus);
+	DECLARE_DRIVER_INIT(rocktrv2);
+	DECLARE_DRIVER_INIT(superabc);
+	DECLARE_DRIVER_INIT(8bpm);
+	DECLARE_DRIVER_INIT(porky);
+	DECLARE_DRIVER_INIT(mspacman);
 };
 
 

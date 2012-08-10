@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dynduke_text_w);
 	DECLARE_WRITE16_MEMBER(dynduke_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(dynduke_control_w);
+	DECLARE_DRIVER_INIT(dynduke);
 };
 
 

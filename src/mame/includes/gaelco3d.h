@@ -109,6 +109,7 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_data_w);
 	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
+	DECLARE_DRIVER_INIT(gaelco3d);
 };
 
 

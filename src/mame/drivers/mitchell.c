@@ -2118,165 +2118,147 @@ static void configure_banks( running_machine &machine )
 }
 
 
-static DRIVER_INIT( dokaben )
+DRIVER_INIT_MEMBER(mitchell_state,dokaben)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	mgakuen2_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	mgakuen2_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( pang )
+DRIVER_INIT_MEMBER(mitchell_state,pang)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	pang_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	pang_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( pangb )
+DRIVER_INIT_MEMBER(mitchell_state,pangb)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	bootleg_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	bootleg_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( cworld )
+DRIVER_INIT_MEMBER(mitchell_state,cworld)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	cworld_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	cworld_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( hatena )
+DRIVER_INIT_MEMBER(mitchell_state,hatena)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	hatena_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	hatena_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( spang )
+DRIVER_INIT_MEMBER(mitchell_state,spang)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 3;
-	state->m_nvram_size = 0x80;
-	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
-	spang_decode(machine);
-	configure_banks(machine);
+	m_input_type = 3;
+	m_nvram_size = 0x80;
+	m_nvram = &memregion("maincpu")->base()[0xe000];	/* NVRAM */
+	spang_decode(machine());
+	configure_banks(machine());
 }
 
-static DRIVER_INIT( spangbl )
+DRIVER_INIT_MEMBER(mitchell_state,spangbl)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 3;
-	state->m_nvram_size = 0x80;
-	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
-	bootleg_decode(machine);
-	configure_banks(machine);
+	m_input_type = 3;
+	m_nvram_size = 0x80;
+	m_nvram = &memregion("maincpu")->base()[0xe000];	/* NVRAM */
+	bootleg_decode(machine());
+	configure_banks(machine());
 }
 
-static DRIVER_INIT( spangj )
+DRIVER_INIT_MEMBER(mitchell_state,spangj)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 3;
-	state->m_nvram_size = 0x80;
-	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
-	spangj_decode(machine);
-	configure_banks(machine);
+	m_input_type = 3;
+	m_nvram_size = 0x80;
+	m_nvram = &memregion("maincpu")->base()[0xe000];	/* NVRAM */
+	spangj_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( sbbros )
+DRIVER_INIT_MEMBER(mitchell_state,sbbros)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 3;
-	state->m_nvram_size = 0x80;
-	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
-	sbbros_decode(machine);
-	configure_banks(machine);
+	m_input_type = 3;
+	m_nvram_size = 0x80;
+	m_nvram = &memregion("maincpu")->base()[0xe000];	/* NVRAM */
+	sbbros_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( qtono1 )
+DRIVER_INIT_MEMBER(mitchell_state,qtono1)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	qtono1_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	qtono1_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( qsangoku )
+DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 0;
-	state->m_nvram_size = 0;
-	qsangoku_decode(machine);
-	configure_banks(machine);
+	m_input_type = 0;
+	m_nvram_size = 0;
+	qsangoku_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( mgakuen )
+DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 1;
-	configure_banks(machine);
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "DSW0");
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSW1");
+	m_input_type = 1;
+	configure_banks(machine());
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "DSW0");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSW1");
 }
-static DRIVER_INIT( mgakuen2 )
+DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 1;
-	state->m_nvram_size = 0;
-	mgakuen2_decode(machine);
-	configure_banks(machine);
+	m_input_type = 1;
+	m_nvram_size = 0;
+	mgakuen2_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( pkladies )
+DRIVER_INIT_MEMBER(mitchell_state,pkladies)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 1;
-	state->m_nvram_size = 0;
-	mgakuen2_decode(machine);
-	configure_banks(machine);
+	m_input_type = 1;
+	m_nvram_size = 0;
+	mgakuen2_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( pkladiesbl )
+DRIVER_INIT_MEMBER(mitchell_state,pkladiesbl)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 1;
-	state->m_nvram_size = 0;
-	bootleg_decode(machine);
-	configure_banks(machine);
+	m_input_type = 1;
+	m_nvram_size = 0;
+	bootleg_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( marukin )
+DRIVER_INIT_MEMBER(mitchell_state,marukin)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 1;
-	state->m_nvram_size = 0;
-	marukin_decode(machine);
-	configure_banks(machine);
+	m_input_type = 1;
+	m_nvram_size = 0;
+	marukin_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( block )
+DRIVER_INIT_MEMBER(mitchell_state,block)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 2;
-	state->m_nvram_size = 0x80;
-	state->m_nvram = &state->memregion("maincpu")->base()[0xff80];	/* NVRAM */
-	block_decode(machine);
-	configure_banks(machine);
+	m_input_type = 2;
+	m_nvram_size = 0x80;
+	m_nvram = &memregion("maincpu")->base()[0xff80];	/* NVRAM */
+	block_decode(machine());
+	configure_banks(machine());
 }
-static DRIVER_INIT( blockbl )
+DRIVER_INIT_MEMBER(mitchell_state,blockbl)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->m_input_type = 2;
-	state->m_nvram_size = 0x80;
-	state->m_nvram = &state->memregion("maincpu")->base()[0xff80];	/* NVRAM */
-	bootleg_decode(machine);
-	configure_banks(machine);
+	m_input_type = 2;
+	m_nvram_size = 0x80;
+	m_nvram = &memregion("maincpu")->base()[0xff80];	/* NVRAM */
+	bootleg_decode(machine());
+	configure_banks(machine());
 }
 
-static DRIVER_INIT( mstworld )
+DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 {
 	/* descramble the program rom .. */
-	int len = machine.root_device().memregion("maincpu")->bytes();
-	UINT8* source = auto_alloc_array(machine, UINT8, len);
-	UINT8* dst = machine.root_device().memregion("maincpu")->base() ;
+	int len = machine().root_device().memregion("maincpu")->bytes();
+	UINT8* source = auto_alloc_array(machine(), UINT8, len);
+	UINT8* dst = machine().root_device().memregion("maincpu")->base() ;
 	int x;
 
 	static const int tablebank[]=
@@ -2312,10 +2294,10 @@ static DRIVER_INIT( mstworld )
 			memcpy(&dst[((x / 2) * 0x4000) + 0x50000],&source[tablebank[x + 1] * 0x4000], 0x4000);
 		}
 	}
-	auto_free(machine, source);
+	auto_free(machine(), source);
 
-	bootleg_decode(machine);
-	configure_banks(machine);
+	bootleg_decode(machine());
+	configure_banks(machine());
 }
 
 

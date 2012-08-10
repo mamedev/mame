@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(gts1);
 };
 
 
@@ -35,7 +37,7 @@ void gts1_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( gts1 )
+DRIVER_INIT_MEMBER(gts1_state,gts1)
 {
 }
 

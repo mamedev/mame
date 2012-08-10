@@ -44,6 +44,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(maygayep);
 };
 
 // bp 29e58 in ep_simp reads the 'INITIALISE . . .' string
@@ -70,9 +72,9 @@ INPUT_PORTS_END
    dates don't appear to be accurate at least)
 */
 
-DRIVER_INIT( maygayep )
+DRIVER_INIT_MEMBER(maygayep_state,maygayep)
 {
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
 
 	for (int i=0x100;i<0x210;i++)
 	{

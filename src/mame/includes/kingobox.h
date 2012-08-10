@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kingofb_videoram2_w);
 	DECLARE_WRITE8_MEMBER(kingofb_colorram2_w);
 	DECLARE_WRITE8_MEMBER(kingofb_f800_w);
+	DECLARE_DRIVER_INIT(ringkingw);
+	DECLARE_DRIVER_INIT(ringking3);
 };
 
 

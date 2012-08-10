@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
 	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
+	DECLARE_DRIVER_INIT(rdx_v33);
+	DECLARE_DRIVER_INIT(nzerotea);
+	DECLARE_DRIVER_INIT(zerotm2k);
 };
 
 
@@ -732,32 +735,32 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 MACHINE_CONFIG_END
 
 
-static DRIVER_INIT(rdx_v33)
+DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 0x20, machine.root_device().memregion("mainprg")->base(), 0x20000);
+	machine().root_device().membank("bank1")->configure_entries(0, 0x20, machine().root_device().memregion("mainprg")->base(), 0x20000);
 
-	raiden2_decrypt_sprites(machine);
+	raiden2_decrypt_sprites(machine());
 
-	machine.root_device().membank("bank1")->set_entry(1);
+	machine().root_device().membank("bank1")->set_entry(1);
 }
 
-static DRIVER_INIT(nzerotea)
+DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
 
-	zeroteam_decrypt_sprites(machine);
+	zeroteam_decrypt_sprites(machine());
 
-	machine.root_device().membank("bank1")->set_entry(1);
+	machine().root_device().membank("bank1")->set_entry(1);
 }
 
-static DRIVER_INIT(zerotm2k)
+DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
 
 	// sprites are NOT encrypted
-	//zeroteam_decrypt_sprites(machine);
+	//zeroteam_decrypt_sprites(machine());
 
-	machine.root_device().membank("bank1")->set_entry(1);
+	machine().root_device().membank("bank1")->set_entry(1);
 
 }
 

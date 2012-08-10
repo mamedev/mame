@@ -2706,11 +2706,11 @@ ROM_END
  *************************************/
 
 #define CONFIGURE_BLITTER(x,c) \
-	state->m_blitter_config = x; \
-	state->m_blitter_clip_address = c
+	m_blitter_config = x; \
+	m_blitter_clip_address = c
 
 #define CONFIGURE_TILEMAP(x) \
-	state->m_williams2_tilemap_config = x
+	m_williams2_tilemap_config = x
 
 
 
@@ -2720,17 +2720,15 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( defender )
+DRIVER_INIT_MEMBER(williams_state,defender)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
-static DRIVER_INIT( defndjeu )
+DRIVER_INIT_MEMBER(williams_state,defndjeu)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
@@ -2741,13 +2739,12 @@ static DRIVER_INIT( defndjeu )
 }
 
 
-static DRIVER_INIT( mayday )
+DRIVER_INIT_MEMBER(williams_state,mayday)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	state->m_mayday_protection = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),state));
+	m_mayday_protection = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),this));
 }
 
 
@@ -2758,102 +2755,90 @@ static DRIVER_INIT( mayday )
  *
  *************************************/
 
-static DRIVER_INIT( stargate )
+DRIVER_INIT_MEMBER(williams_state,stargate)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
-static DRIVER_INIT( robotron )
+DRIVER_INIT_MEMBER(williams_state,robotron)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
 
-static DRIVER_INIT( joust )
+DRIVER_INIT_MEMBER(williams_state,joust)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
 
-static DRIVER_INIT( bubbles )
+DRIVER_INIT_MEMBER(williams_state,bubbles)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xcc00, 0xcfff, write8_delegate(FUNC(williams_state::bubbles_cmos_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xcc00, 0xcfff, write8_delegate(FUNC(williams_state::bubbles_cmos_w),this));
 }
 
 
-static DRIVER_INIT( splat )
+DRIVER_INIT_MEMBER(williams_state,splat)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0xc000);
 }
 
 
-static DRIVER_INIT( sinistar )
+DRIVER_INIT_MEMBER(williams_state,sinistar)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0x7400);
 }
 
 
-static DRIVER_INIT( playball )
+DRIVER_INIT_MEMBER(williams_state,playball)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
 
-static DRIVER_INIT( blaster )
+DRIVER_INIT_MEMBER(williams_state,blaster)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9700);
 }
 
 
-static DRIVER_INIT( spdball )
+DRIVER_INIT_MEMBER(williams_state,spdball)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	pia6821_device *pia_3 = machine.device<pia6821_device>("pia_3");
+	pia6821_device *pia_3 = machine().device<pia6821_device>("pia_3");
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* add a third PIA */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
 
 	/* install extra input handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc800, 0xc800, "AN0");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc801, 0xc801, "AN1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc802, 0xc802, "AN2");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc803, 0xc803, "AN3");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc800, 0xc800, "AN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc801, 0xc801, "AN1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc802, 0xc802, "AN2");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc803, 0xc803, "AN3");
 }
 
 
-static DRIVER_INIT( alienar )
+DRIVER_INIT_MEMBER(williams_state,alienar)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xcbff, 0xcbff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xcbff, 0xcbff);
 }
 
 
-static DRIVER_INIT( alienaru )
+DRIVER_INIT_MEMBER(williams_state,alienaru)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xcbff, 0xcbff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xcbff, 0xcbff);
 }
 
 
-static DRIVER_INIT( lottofun )
+DRIVER_INIT_MEMBER(williams_state,lottofun)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
@@ -2865,33 +2850,29 @@ static DRIVER_INIT( lottofun )
  *
  *************************************/
 
-static DRIVER_INIT( mysticm )
+DRIVER_INIT_MEMBER(williams_state,mysticm)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_MYSTICM);
 }
 
 
-static DRIVER_INIT( tshoot )
+DRIVER_INIT_MEMBER(williams_state,tshoot)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-static DRIVER_INIT( inferno )
+DRIVER_INIT_MEMBER(williams_state,inferno)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-static DRIVER_INIT( joust2 )
+DRIVER_INIT_MEMBER(joust2_state,joust2)
 {
-	williams_state *state = machine.driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_JOUST2);
 }

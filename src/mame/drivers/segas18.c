@@ -58,8 +58,6 @@
 
 ***************************************************************************/
 
-#define MODERN_DRIVER_INIT
-
 #include "emu.h"
 #include "machine/segaic16.h"
 #include "machine/nvram.h"
@@ -2191,17 +2189,17 @@ ROM_END
  *
  *************************************/
 
-void segas18_state::init_generic_shad()
+DRIVER_INIT_MEMBER(segas18_state,generic_shad)
 {
 	init_generic(ROM_BOARD_171_SHADOW);
 }
 
-void segas18_state::init_generic_5874()
+DRIVER_INIT_MEMBER(segas18_state,generic_5874)
 {
 	init_generic(ROM_BOARD_171_5874);
 }
 
-void segas18_state::init_generic_5987()
+DRIVER_INIT_MEMBER(segas18_state,generic_5987)
 {
 	init_generic(ROM_BOARD_171_5987);
 }
@@ -2214,13 +2212,13 @@ void segas18_state::init_generic_5987()
  *
  *************************************/
 
-void segas18_state::init_ddcrew()
+DRIVER_INIT_MEMBER(segas18_state,ddcrew)
 {
 	init_generic_5987();
 	m_custom_io_r = read16_delegate(FUNC(segas18_state::ddcrew_custom_io_r), this);
 }
 
-void segas18_state::init_lghost()
+DRIVER_INIT_MEMBER(segas18_state,lghost)
 {
 	m_has_guns = true;
 	init_generic_5987();
@@ -2228,7 +2226,7 @@ void segas18_state::init_lghost()
 	m_custom_io_w = write16_delegate(FUNC(segas18_state::lghost_custom_io_w), this);
 }
 
-void segas18_state::init_wwally()
+DRIVER_INIT_MEMBER(segas18_state,wwally)
 {
 	init_generic_5987();
 	m_custom_io_r = read16_delegate(FUNC(segas18_state::wwally_custom_io_r), this);
@@ -2244,28 +2242,28 @@ void segas18_state::init_wwally()
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,              INPUT,    INIT,                             MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1990, astorm,    0,        system18_fd1094,      astorm2p, segas18_state,init_generic_5874, ROT0,   "Sega", "Alien Storm (World, 2 Players, FD1094 317-0154)", 0 )
-GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state,init_generic_5874, ROT0,   "Sega", "Alien Storm (World, 3 Players, FD1094 317-0148)", 0 )
-GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state,init_generic_5874, ROT0,   "Sega", "Alien Storm (US, 3 Players, FD1094 317-0147)", 0 )
-GAME( 1990, astormj,   astorm,   system18_fd1094,      astorm2p, segas18_state,init_generic_5874, ROT0,   "Sega", "Alien Storm (Japan, 2 Players, FD1094 317-0146)", 0 )
-GAME( 1989, bloxeed,   0,        system18_fd1094,      bloxeed,  segas18_state,init_generic_5874, ROT0,   "Sega", "Bloxeed (Japan, FD1094 317-0139)", 0 )
-GAME( 1991, cltchitr,  0,        system18_fd1094,      cltchitr, segas18_state,init_generic_5987, ROT0,   "Sega", "Clutch Hitter (US, FD1094 317-0176)", 0 )
-GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state,init_generic_5987, ROT0,   "Sega", "Clutch Hitter (Japan, FD1094 317-0175)", 0 )
-GAME( 1992, desertbr,  0,        system18_fd1094,      desertbr, segas18_state,init_generic_5987, ROT270, "Sega", "Desert Breaker (World, FD1094 317-0196)", 0 )
-GAME( 1992, desertbrj, desertbr, system18_fd1094,      desertbr, segas18_state,init_generic_5987, ROT270, "Sega", "Desert Breaker (Japan, FD1094 317-0194)", 0 )
-GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew,   segas18_state,init_ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 3 Players, FD1094 317-0190)", 0 )
-GAME( 1991, ddcrewu,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,init_ddcrew,       ROT0,   "Sega", "D. D. Crew (US, 4 Players, FD1094 317-0186)", 0 )
-GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,init_ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 2 Players, FD1094 317-0184)", 0 )
-GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,init_ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 4 Players, FD1094 317-0187)", 0 )
-GAME( 1991, ddcrewj,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,init_ddcrew,       ROT0,   "Sega", "D. D. Crew (Japan, 2 Players, FD1094 317-0182)", 0 )
-GAME( 1990, lghost,    0,        system18_fd1094,      lghost,   segas18_state,init_lghost,       ROT0,   "Sega", "Laser Ghost (World, FD1094 317-0166)", 0 )
-GAME( 1990, lghostu,   lghost,   system18_fd1094,      lghost,   segas18_state,init_lghost,       ROT0,   "Sega", "Laser Ghost (US, FD1094 317-0165)", 0 )
-GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state,init_generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
-GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state,init_generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
-GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state,init_generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
-GAME( 1989, pontoon,   0,        system18,             shdancer, segas18_state,init_generic_5874, ROT0,   "Sega", "Pontoon", GAME_NOT_WORKING )
-GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state,init_generic_shad, ROT0,   "Sega", "Shadow Dancer (World)", 0 )
-GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state,init_generic_shad, ROT0,   "Sega", "Shadow Dancer (Japan)", 0 )
-GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state,init_generic_shad, ROT0,   "Sega", "Shadow Dancer (US)", 0 )
-GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state,init_wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0) // the roms do contain an english logo so maybe there is a world / us set too
-GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state,init_wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev A, Japan, FD1094 317-0197A)", 0 )
+GAME( 1990, astorm,    0,        system18_fd1094,      astorm2p, segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (World, 2 Players, FD1094 317-0154)", 0 )
+GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (World, 3 Players, FD1094 317-0148)", 0 )
+GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (US, 3 Players, FD1094 317-0147)", 0 )
+GAME( 1990, astormj,   astorm,   system18_fd1094,      astorm2p, segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (Japan, 2 Players, FD1094 317-0146)", 0 )
+GAME( 1989, bloxeed,   0,        system18_fd1094,      bloxeed,  segas18_state,generic_5874, ROT0,   "Sega", "Bloxeed (Japan, FD1094 317-0139)", 0 )
+GAME( 1991, cltchitr,  0,        system18_fd1094,      cltchitr, segas18_state,generic_5987, ROT0,   "Sega", "Clutch Hitter (US, FD1094 317-0176)", 0 )
+GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state,generic_5987, ROT0,   "Sega", "Clutch Hitter (Japan, FD1094 317-0175)", 0 )
+GAME( 1992, desertbr,  0,        system18_fd1094,      desertbr, segas18_state,generic_5987, ROT270, "Sega", "Desert Breaker (World, FD1094 317-0196)", 0 )
+GAME( 1992, desertbrj, desertbr, system18_fd1094,      desertbr, segas18_state,generic_5987, ROT270, "Sega", "Desert Breaker (Japan, FD1094 317-0194)", 0 )
+GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 3 Players, FD1094 317-0190)", 0 )
+GAME( 1991, ddcrewu,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (US, 4 Players, FD1094 317-0186)", 0 )
+GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 2 Players, FD1094 317-0184)", 0 )
+GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 4 Players, FD1094 317-0187)", 0 )
+GAME( 1991, ddcrewj,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (Japan, 2 Players, FD1094 317-0182)", 0 )
+GAME( 1990, lghost,    0,        system18_fd1094,      lghost,   segas18_state,lghost,       ROT0,   "Sega", "Laser Ghost (World, FD1094 317-0166)", 0 )
+GAME( 1990, lghostu,   lghost,   system18_fd1094,      lghost,   segas18_state,lghost,       ROT0,   "Sega", "Laser Ghost (US, FD1094 317-0165)", 0 )
+GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
+GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
+GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
+GAME( 1989, pontoon,   0,        system18,             shdancer, segas18_state,generic_5874, ROT0,   "Sega", "Pontoon", GAME_NOT_WORKING )
+GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (World)", 0 )
+GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (Japan)", 0 )
+GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (US)", 0 )
+GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state,wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state,wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev A, Japan, FD1094 317-0197A)", 0 )

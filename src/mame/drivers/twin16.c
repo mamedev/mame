@@ -1319,26 +1319,23 @@ static void gfx_untangle( running_machine &machine )
 	auto_free( machine, temp );
 }
 
-static DRIVER_INIT( twin16 )
+DRIVER_INIT_MEMBER(twin16_state,twin16)
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	gfx_untangle(machine);
-	state->m_custom_video = 0;
+	gfx_untangle(machine());
+	m_custom_video = 0;
 }
 
-static DRIVER_INIT( fround )
+DRIVER_INIT_MEMBER(twin16_state,fround)
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	gfx_untangle(machine);
-	state->m_custom_video = 1;
+	gfx_untangle(machine());
+	m_custom_video = 1;
 }
 
-static DRIVER_INIT( cuebrickj )
+DRIVER_INIT_MEMBER(twin16_state,cuebrickj)
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	gfx_untangle(machine);
+	gfx_untangle(machine());
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_cuebrickj_nvram, 0x400*0x20);
+	machine().device<nvram_device>("nvram")->set_base(m_cuebrickj_nvram, 0x400*0x20);
 }
 
 /* Game Drivers */

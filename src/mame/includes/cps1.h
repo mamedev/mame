@@ -173,6 +173,25 @@ public:
 	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
 	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
 	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
+	DECLARE_DRIVER_INIT(sf2thndr);
+	DECLARE_DRIVER_INIT(dinohunt);
+	DECLARE_DRIVER_INIT(forgottn);
+	DECLARE_DRIVER_INIT(sf2hack);
+	DECLARE_DRIVER_INIT(slammast);
+	DECLARE_DRIVER_INIT(pang3b);
+	DECLARE_DRIVER_INIT(pang3);
+	DECLARE_DRIVER_INIT(sf2ee);
+	DECLARE_DRIVER_INIT(cps1);
+	DECLARE_DRIVER_INIT(sf2mdt);
+	DECLARE_DRIVER_INIT(dino);
+	DECLARE_DRIVER_INIT(punisher);
+	DECLARE_DRIVER_INIT(wof);
+	DECLARE_DRIVER_INIT(cps2_video);
+	DECLARE_DRIVER_INIT(cps2);
+	DECLARE_DRIVER_INIT(cps2crpt);
+	DECLARE_DRIVER_INIT(ssf2tb);
+	DECLARE_DRIVER_INIT(pzloop2);
+	DECLARE_DRIVER_INIT(gigaman2);	
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
@@ -187,8 +206,6 @@ GFXDECODE_EXTERN( cps1 );
 /*----------- defined in video/cps1.c -----------*/
 
 
-DRIVER_INIT( cps1 );
-DRIVER_INIT( cps2_video );
 
 
 VIDEO_START( cps1 );
@@ -207,7 +224,6 @@ void cps2_objram_latch(running_machine &machine);
 
 /*----------- defined in machine/cps2crpt.c -----------*/
 
-DRIVER_INIT( cps2crpt );
 
 
 /*----------- defined in machine/kabuki.c -----------*/

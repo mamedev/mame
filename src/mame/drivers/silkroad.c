@@ -320,14 +320,14 @@ MACHINE_CONFIG_END
   Game driver(s)
 
 ***************************************************************************/
-static DRIVER_INIT( silkroad )
+DRIVER_INIT_MEMBER(silkroad_state,silkroad)
 {
 
 	/* why? rom04.bin looks like a bad dump, but it seems not since it was
        verified as correct... problem with the original which the gfx
        hardware didn't care about? */
 
-	UINT8 *src = machine.root_device().memregion("gfx1")->base()+0x1000000;
+	UINT8 *src = machine().root_device().memregion("gfx1")->base()+0x1000000;
 	int len = 0x0200000;
 	UINT8 *buffer;
 
@@ -335,13 +335,13 @@ static DRIVER_INIT( silkroad )
 
 	src += tileoffset; len -=tileoffset;
 
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i-1];
 		memcpy(src,buffer,len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 }
 

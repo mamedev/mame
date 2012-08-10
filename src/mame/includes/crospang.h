@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crospang_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(crospang_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(crospang_bg_videoram_w);
+	DECLARE_DRIVER_INIT(crospang);
 };
 
 

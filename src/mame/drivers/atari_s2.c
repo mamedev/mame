@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(atari_s2);
 };
 
 
@@ -39,7 +41,7 @@ void atari_s2_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( atari_s2 )
+DRIVER_INIT_MEMBER(atari_s2_state,atari_s2)
 {
 }
 

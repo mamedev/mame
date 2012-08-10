@@ -716,27 +716,26 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( eprom )
+DRIVER_INIT_MEMBER(eprom_state,eprom)
 {
-	eprom_state *state = machine.driver_data<eprom_state>();
 
-	atarijsa_init(machine, "260010", 0x0002);
+	atarijsa_init(machine(), "260010", 0x0002);
 
 	/* install CPU synchronization handlers */
-	state->m_sync_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),state), write16_delegate(FUNC(eprom_state::sync_w),state));
-	state->m_sync_data = machine.device("extra")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),state), write16_delegate(FUNC(eprom_state::sync_w),state));
+	m_sync_data = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),this), write16_delegate(FUNC(eprom_state::sync_w),this));
+	m_sync_data = machine().device("extra")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),this), write16_delegate(FUNC(eprom_state::sync_w),this));
 }
 
 
-static DRIVER_INIT( klaxp )
+DRIVER_INIT_MEMBER(eprom_state,klaxp)
 {
-	atarijsa_init(machine, "260010", 0x0002);
+	atarijsa_init(machine(), "260010", 0x0002);
 }
 
 
-static DRIVER_INIT( guts )
+DRIVER_INIT_MEMBER(eprom_state,guts)
 {
-	atarijsa_init(machine, "260010", 0x0002);
+	atarijsa_init(machine(), "260010", 0x0002);
 }
 
 

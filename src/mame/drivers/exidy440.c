@@ -1926,38 +1926,34 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( exidy440 )
+DRIVER_INIT_MEMBER(exidy440_state,exidy440)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
-	state->m_showdown_bank_data[0] = state->m_showdown_bank_data[1] = NULL;
+	m_showdown_bank_data[0] = m_showdown_bank_data[1] = NULL;
 }
 
 
-static DRIVER_INIT( claypign )
+DRIVER_INIT_MEMBER(exidy440_state,claypign)
 {
 	DRIVER_INIT_CALL(exidy440);
-	exidy440_state *state = machine.driver_data<exidy440_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
 }
 
 
-static DRIVER_INIT( topsecex )
+DRIVER_INIT_MEMBER(exidy440_state,topsecex)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec6, 0x2ec6, "AN0");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec7, 0x2ec7, "IN4");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec6, 0x2ec6, "AN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	state->m_topsecex_yscroll = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),state));
+	m_topsecex_yscroll = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
 }
 
 
-static DRIVER_INIT( showdown )
+DRIVER_INIT_MEMBER(exidy440_state,showdown)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
 	static const UINT8 bankdata0[0x18] =
 	{
 		0x15,0x40,0xc1,0x8d,0x4c,0x84,0x0e,0xce,
@@ -1974,14 +1970,13 @@ static DRIVER_INIT( showdown )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* set up the fake PLD */
-	state->m_showdown_bank_data[0] = bankdata0;
-	state->m_showdown_bank_data[1] = bankdata1;
+	m_showdown_bank_data[0] = bankdata0;
+	m_showdown_bank_data[1] = bankdata1;
 }
 
 
-static DRIVER_INIT( yukon )
+DRIVER_INIT_MEMBER(exidy440_state,yukon)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
 	static const UINT8 bankdata0[0x18] =
 	{
 		0x31,0x40,0xc1,0x95,0x54,0x90,0x16,0xd6,
@@ -1998,8 +1993,8 @@ static DRIVER_INIT( yukon )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* set up the fake PLD */
-	state->m_showdown_bank_data[0] = bankdata0;
-	state->m_showdown_bank_data[1] = bankdata1;
+	m_showdown_bank_data[0] = bankdata0;
+	m_showdown_bank_data[1] = bankdata1;
 }
 
 

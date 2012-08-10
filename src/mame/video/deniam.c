@@ -24,28 +24,26 @@ static void deniam_common_init( running_machine &machine )
 	}
 }
 
-DRIVER_INIT( logicpro )
+DRIVER_INIT_MEMBER(deniam_state,logicpro)
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 
-	deniam_common_init(machine);
+	deniam_common_init(machine());
 
-	state->m_bg_scrollx_offs = 0x00d;
-	state->m_bg_scrolly_offs = 0x000;
-	state->m_fg_scrollx_offs = 0x009;
-	state->m_fg_scrolly_offs = 0x000;
+	m_bg_scrollx_offs = 0x00d;
+	m_bg_scrolly_offs = 0x000;
+	m_fg_scrollx_offs = 0x009;
+	m_fg_scrolly_offs = 0x000;
 }
 
-DRIVER_INIT( karianx )
+DRIVER_INIT_MEMBER(deniam_state,karianx)
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 
-	deniam_common_init(machine);
+	deniam_common_init(machine());
 
-	state->m_bg_scrollx_offs = 0x10d;
-	state->m_bg_scrolly_offs = 0x080;
-	state->m_fg_scrollx_offs = 0x109;
-	state->m_fg_scrolly_offs = 0x080;
+	m_bg_scrollx_offs = 0x10d;
+	m_bg_scrolly_offs = 0x080;
+	m_fg_scrollx_offs = 0x109;
+	m_fg_scrolly_offs = 0x080;
 }
 
 

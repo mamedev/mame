@@ -77,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
+	DECLARE_DRIVER_INIT(sfkick);
 };
 
 
@@ -510,10 +511,9 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 
 MACHINE_CONFIG_END
 
-static DRIVER_INIT(sfkick)
+DRIVER_INIT_MEMBER(sfkick_state,sfkick)
 {
-	sfkick_state *state = machine.driver_data<sfkick_state>();
-	state->m_main_mem=auto_alloc_array(machine, UINT8, 0x4000);
+	m_main_mem=auto_alloc_array(machine(), UINT8, 0x4000);
 }
 
 

@@ -2339,68 +2339,61 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( qgh )
+DRIVER_INIT_MEMBER(segas24_state,qgh)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = segas24_state::qgh_mlt;
-	state->track_size = 0;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = segas24_state::qgh_mlt;
+	track_size = 0;
 }
 
-static DRIVER_INIT( dcclub )
+DRIVER_INIT_MEMBER(segas24_state,dcclub)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::dcclub_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = segas24_state::dcclub_mlt;
-	state->track_size = 0;
+	io_r = &segas24_state::dcclub_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = segas24_state::dcclub_mlt;
+	track_size = 0;
 }
 
-static DRIVER_INIT( qrouka )
+DRIVER_INIT_MEMBER(segas24_state,qrouka)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = segas24_state::qrouka_mlt;
-	state->track_size = 0;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = segas24_state::qrouka_mlt;
+	track_size = 0;
 }
 
-static DRIVER_INIT( quizmeku )
+DRIVER_INIT_MEMBER(segas24_state,quizmeku)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = segas24_state::quizmeku_mlt;
-	state->track_size = 0;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = segas24_state::quizmeku_mlt;
+	track_size = 0;
 }
 
-static DRIVER_INIT( mahmajn )
+DRIVER_INIT_MEMBER(segas24_state,mahmajn)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::mahmajn_io_r;
-	state->io_w = &segas24_state::mahmajn_io_w;
-	state->mlatch_table = segas24_state::mahmajn_mlt;
-	state->track_size = 0;
-	state->cur_input_line = 0;
+	io_r = &segas24_state::mahmajn_io_r;
+	io_w = &segas24_state::mahmajn_io_w;
+	mlatch_table = segas24_state::mahmajn_mlt;
+	track_size = 0;
+	cur_input_line = 0;
 }
 
-static DRIVER_INIT( mahmajn2 )
+DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::mahmajn_io_r;
-	state->io_w = &segas24_state::mahmajn_io_w;
-	state->mlatch_table = segas24_state::mahmajn2_mlt;
-	state->track_size = 0;
-	state->cur_input_line = 0;
+	io_r = &segas24_state::mahmajn_io_r;
+	io_w = &segas24_state::mahmajn_io_w;
+	mlatch_table = segas24_state::mahmajn2_mlt;
+	track_size = 0;
+	cur_input_line = 0;
 }
 
-static DRIVER_INIT( hotrod )
+DRIVER_INIT_MEMBER(segas24_state,hotrod)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
 
 	// Sector  Size
 	// 1       8192
@@ -2410,15 +2403,14 @@ static DRIVER_INIT( hotrod )
 	// 5        512
 	// 6        256
 
-	state->track_size = 0x2f00;
+	track_size = 0x2f00;
 }
 
-static DRIVER_INIT( bnzabros )
+DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = segas24_state::bnzabros_mlt;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = segas24_state::bnzabros_mlt;
 
 	// Sector  Size
 	// 1       2048
@@ -2429,80 +2421,72 @@ static DRIVER_INIT( bnzabros )
 	// 6       1024
 	// 7        256
 
-	state->track_size = 0x2d00;
+	track_size = 0x2d00;
 }
 
-static DRIVER_INIT( sspirits )
+DRIVER_INIT_MEMBER(segas24_state,sspirits)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2d00;
 }
 
-static DRIVER_INIT( sspiritj )
+DRIVER_INIT_MEMBER(segas24_state,sspiritj)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2f00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2f00;
 }
 
-static DRIVER_INIT( dcclubfd )
+DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::dcclub_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = segas24_state::dcclub_mlt;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::dcclub_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = segas24_state::dcclub_mlt;
+	track_size = 0x2d00;
 }
 
 
-static DRIVER_INIT( sgmast )
+DRIVER_INIT_MEMBER(segas24_state,sgmast)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2d00;
 }
 
-static DRIVER_INIT( qsww )
+DRIVER_INIT_MEMBER(segas24_state,qsww)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2d00;
 }
 
-static DRIVER_INIT( gground )
+DRIVER_INIT_MEMBER(segas24_state,gground)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2d00;
 }
 
-static DRIVER_INIT( crkdown )
+DRIVER_INIT_MEMBER(segas24_state,crkdown)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2d00;
 }
 
-static DRIVER_INIT( roughrac )
+DRIVER_INIT_MEMBER(segas24_state,roughrac)
 {
-	segas24_state *state = machine.driver_data<segas24_state>();
-	state->io_r = &segas24_state::hotrod_io_r;
-	state->io_w = &segas24_state::hotrod_io_w;
-	state->mlatch_table = 0;
-	state->track_size = 0x2d00;
+	io_r = &segas24_state::hotrod_io_r;
+	io_w = &segas24_state::hotrod_io_w;
+	mlatch_table = 0;
+	track_size = 0x2d00;
 }
 
 

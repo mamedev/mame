@@ -671,5 +671,5 @@ ROM_START( pongf ) /* dummy to satisfy game entry*/
 ROM_END
 
 
-GAME( 1972, pong,  0, pong, pong, pong_state,  0, ROT0, "Atari", "Pong (Rev E)", 0 )
-GAME( 1972, pongf,  0, pongf, pong, pong_state,  0, ROT0, "Atari", "Pong (Rev E), no subcycles", 0 )
+GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E)", 0 )
+GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E), no subcycles", 0 )

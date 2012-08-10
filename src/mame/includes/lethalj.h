@@ -25,6 +25,9 @@ public:
 	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
 	void do_blit();
 	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
+	DECLARE_DRIVER_INIT(cfarm);
+	DECLARE_DRIVER_INIT(ripribit);
+	DECLARE_DRIVER_INIT(cclownz);
 };
 
 

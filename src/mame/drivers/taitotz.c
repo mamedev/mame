@@ -516,6 +516,11 @@ public:
 	int m_count;
 
 	taitotz_renderer *m_renderer;
+	DECLARE_DRIVER_INIT(batlgr2a);
+	DECLARE_DRIVER_INIT(batlgr2);
+	DECLARE_DRIVER_INIT(pwrshovl);
+	DECLARE_DRIVER_INIT(batlgear);
+	DECLARE_DRIVER_INIT(landhigh);
 };
 
 
@@ -2528,71 +2533,66 @@ static const char BATLGR2_HDD_SERIAL[] =			// "            05412842"
 static const char BATLGR2A_HDD_SERIAL[] =			// "            05411645"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x31, 0x36, 0x34, 0x35 };
 
-static DRIVER_INIT(landhigh)
+DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	init_taitotz_152(machine);
+	init_taitotz_152(machine());
 
-	state->m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
+	m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
 
-	state->m_scr_base = 0x1c0000;
+	m_scr_base = 0x1c0000;
 
-	state->m_displist_addr = 0x5200b8;
+	m_displist_addr = 0x5200b8;
 }
 
-static DRIVER_INIT(batlgear)
+DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	init_taitotz_111a(machine);
+	init_taitotz_111a(machine());
 
 	// unknown, not used by BIOS 1.11a
-	state->m_hdd_serial_number = NULL;
+	m_hdd_serial_number = NULL;
 
-	state->m_scr_base = 0x1c0000;
+	m_scr_base = 0x1c0000;
 
-	state->m_displist_addr = 0x420038;
+	m_displist_addr = 0x420038;
 }
 
-static DRIVER_INIT(batlgr2)
+DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	init_taitotz_152(machine);
+	init_taitotz_152(machine());
 
-	state->m_hdd_serial_number = BATLGR2_HDD_SERIAL;
+	m_hdd_serial_number = BATLGR2_HDD_SERIAL;
 
-	state->m_scr_base = 0x1e0000;
+	m_scr_base = 0x1e0000;
 
-	state->m_displist_addr = 0x3608e4;
+	m_displist_addr = 0x3608e4;
 }
 
-static DRIVER_INIT(batlgr2a)
+DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	init_taitotz_152(machine);
+	init_taitotz_152(machine());
 
-	state->m_hdd_serial_number = BATLGR2A_HDD_SERIAL;
+	m_hdd_serial_number = BATLGR2A_HDD_SERIAL;
 
-	state->m_scr_base = 0x1e0000;
+	m_scr_base = 0x1e0000;
 
-	state->m_displist_addr = 0x3608e4;
+	m_displist_addr = 0x3608e4;
 }
 
-static DRIVER_INIT(pwrshovl)
+DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	init_taitotz_111a(machine);
+	init_taitotz_111a(machine());
 
 	// unknown, not used by BIOS 1.11a
-	state->m_hdd_serial_number = NULL;
+	m_hdd_serial_number = NULL;
 
-	state->m_scr_base = 0x1c0000;
+	m_scr_base = 0x1c0000;
 
-	state->m_displist_addr = 0x4a989c;
+	m_displist_addr = 0x4a989c;
 }
 
 
@@ -2697,7 +2697,7 @@ ROM_START( pwrshovl )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
 ROM_END
 
-GAME( 1999, taitotz,  0, taitotz, taitotz, taitotz_state, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
+GAME( 1999, taitotz,  0, taitotz, taitotz, driver_device, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz,  batlgr2, taitotz_state,  batlgear, ROT0, "Taito", "Battle Gear", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, pwrshovl, taitotz, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator", GAME_NOT_WORKING | GAME_NO_SOUND )

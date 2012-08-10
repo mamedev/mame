@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cbasebal_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(cbasebal_scrollx_w);
 	DECLARE_WRITE8_MEMBER(cbasebal_scrolly_w);
+	DECLARE_DRIVER_INIT(cbasebal);
 };
 
 /*----------- defined in video/cbasebal.c -----------*/

@@ -19,26 +19,11 @@ extern void naomi_game_decrypt(running_machine& machine, UINT64 key, UINT8* regi
 
 /*----------- defined in machine/naomi.c -----------*/
 
-extern DRIVER_INIT( naomi );
-extern DRIVER_INIT( naomi_mp );
-extern DRIVER_INIT( naomi2 );
-extern DRIVER_INIT( naomigd );
-extern DRIVER_INIT( naomigd_mp );
 
-extern DRIVER_INIT( sfz3ugd );
-extern DRIVER_INIT( ggxxsla );
-extern DRIVER_INIT( ggxxrl );
-extern DRIVER_INIT( ggxx );
 
-extern DRIVER_INIT( gram2000 );
-extern DRIVER_INIT( mvsc2 );
-extern DRIVER_INIT( qmegamis );
 
-extern DRIVER_INIT( vf4evoct );
 
-extern DRIVER_INIT( kick4csh );
 
-extern DRIVER_INIT( hotd2 );
 
 extern UINT64 *naomi_ram64;
 

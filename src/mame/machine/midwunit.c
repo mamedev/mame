@@ -222,57 +222,55 @@ static void init_mk3_common(running_machine &machine)
 	midway_serial_pic_init(machine, 528);
 }
 
-DRIVER_INIT( mk3 )
+DRIVER_INIT_MEMBER(midwunit_state,mk3)
 {
-	init_mk3_common(machine);
+	init_mk3_common(machine());
 }
 
-DRIVER_INIT( mk3r20 )
+DRIVER_INIT_MEMBER(midwunit_state,mk3r20)
 {
-	init_mk3_common(machine);
+	init_mk3_common(machine());
 }
 
-DRIVER_INIT( mk3r10 )
+DRIVER_INIT_MEMBER(midwunit_state,mk3r10)
 {
-	init_mk3_common(machine);
+	init_mk3_common(machine());
 }
 
-DRIVER_INIT( umk3 )
+DRIVER_INIT_MEMBER(midwunit_state,umk3)
 {
-	midwunit_state *state = machine.driver_data<midwunit_state>();
-	init_mk3_common(machine);
-	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),state));
+	init_mk3_common(machine());
+	m_umk3_palette = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
 }
 
-DRIVER_INIT( umk3r11 )
+DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
 {
-	midwunit_state *state = machine.driver_data<midwunit_state>();
-	init_mk3_common(machine);
-	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),state));
+	init_mk3_common(machine());
+	m_umk3_palette = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
 }
 
 
 /********************** 2 On 2 Open Ice Challenge **********************/
 
-DRIVER_INIT( openice )
+DRIVER_INIT_MEMBER(midwunit_state,openice)
 {
 	/* common init */
-	init_wunit_generic(machine);
+	init_wunit_generic(machine());
 
 	/* serial prefixes 438, 528 */
-	midway_serial_pic_init(machine, 528);
+	midway_serial_pic_init(machine(), 528);
 }
 
 
 /********************** NBA Hangtime & NBA Maximum Hangtime **********************/
 
-DRIVER_INIT( nbahangt )
+DRIVER_INIT_MEMBER(midwunit_state,nbahangt)
 {
 	/* common init */
-	init_wunit_generic(machine);
+	init_wunit_generic(machine());
 
 	/* serial prefixes 459, 470, 528 */
-	midway_serial_pic_init(machine, 528);
+	midway_serial_pic_init(machine(), 528);
 }
 
 
@@ -327,29 +325,28 @@ WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 	logerror("Changed I/O swiching to %d\n", data);
 }
 
-DRIVER_INIT( wwfmania )
+DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
 {
 	/* common init */
-	init_wunit_generic(machine);
+	init_wunit_generic(machine());
 
 	/* enable I/O shuffling */
-	midwunit_state *state = machine.driver_data<midwunit_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),this));
 
 	/* serial prefixes 430, 528 */
-	midway_serial_pic_init(machine, 528);
+	midway_serial_pic_init(machine(), 528);
 }
 
 
 /********************** Rampage World Tour **********************/
 
-DRIVER_INIT( rmpgwt )
+DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
 {
 	/* common init */
-	init_wunit_generic(machine);
+	init_wunit_generic(machine());
 
 	/* serial prefixes 465, 528 */
-	midway_serial_pic_init(machine, 528);
+	midway_serial_pic_init(machine(), 528);
 }
 
 

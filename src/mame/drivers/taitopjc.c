@@ -479,4 +479,4 @@ ROM_START( optiger )
 	// TODO: There are 6 PALs in total on the main PCB.
 ROM_END
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, 0, ROT0, "Taito", "Operation Tiger", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, driver_device, 0, ROT0, "Taito", "Operation Tiger", GAME_NOT_WORKING | GAME_NO_SOUND )

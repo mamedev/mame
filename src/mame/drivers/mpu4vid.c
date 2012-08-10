@@ -245,6 +245,26 @@ public:
 	INT8 m_cur[2];
 
 
+	DECLARE_DRIVER_INIT(crmazea);
+	DECLARE_DRIVER_INIT(v4barqst2);
+	DECLARE_DRIVER_INIT(quidgrid);
+	DECLARE_DRIVER_INIT(v4barqst);
+	DECLARE_DRIVER_INIT(timemchn);
+	DECLARE_DRIVER_INIT(crmaze2a);
+	DECLARE_DRIVER_INIT(v4opt3);
+	DECLARE_DRIVER_INIT(eyesdown);
+	DECLARE_DRIVER_INIT(v4cmazeb);
+	DECLARE_DRIVER_INIT(crmaze2);
+	DECLARE_DRIVER_INIT(crmaze);
+	DECLARE_DRIVER_INIT(prizeinv);
+	DECLARE_DRIVER_INIT(strikeit);
+	DECLARE_DRIVER_INIT(v4wize);
+	DECLARE_DRIVER_INIT(turnover);
+	DECLARE_DRIVER_INIT(adders);
+	DECLARE_DRIVER_INIT(mating);
+	DECLARE_DRIVER_INIT(crmaze3a);
+	DECLARE_DRIVER_INIT(skiltrek);
+	DECLARE_DRIVER_INIT(crmaze3);
 };
 
 
@@ -1895,111 +1915,96 @@ static mpu4_chr_table prizeinv_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-static DRIVER_INIT (adders)
+DRIVER_INIT_MEMBER(mpu4vid_state,adders)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = adders_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = adders_data;
 }
 
-static DRIVER_INIT (crmaze)
+DRIVER_INIT_MEMBER(mpu4vid_state,crmaze)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = crmaze_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = crmaze_data;
 }
 
-static DRIVER_INIT (crmazea)
+DRIVER_INIT_MEMBER(mpu4vid_state,crmazea)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = crmazea_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = crmazea_data;
 }
 
-static DRIVER_INIT (crmaze2)
+DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = crmaze2_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = crmaze2_data;
 }
 
-static DRIVER_INIT (crmaze2a)
+DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2a)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
+	m_reels = 0;//currently no hybrid games
 }
 
-static DRIVER_INIT (crmaze3)
+DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_reel_mux = FLUTTERBOX;
-	state->m_current_chr_table = crmaze3_data;
+	m_reels = 0;//currently no hybrid games
+	m_reel_mux = FLUTTERBOX;
+	m_current_chr_table = crmaze3_data;
 }
 
-static DRIVER_INIT (crmaze3a)
+DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3a)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_reel_mux = FLUTTERBOX;
-	state->m_current_chr_table = crmaze3a_data;
+	m_reels = 0;//currently no hybrid games
+	m_reel_mux = FLUTTERBOX;
+	m_current_chr_table = crmaze3a_data;
 }
 
-static DRIVER_INIT (mating)
+DRIVER_INIT_MEMBER(mpu4vid_state,mating)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
+	m_reels = 0;//currently no hybrid games
 
-	state->m_current_chr_table = mating_data;
+	m_current_chr_table = mating_data;
 }
 
-static DRIVER_INIT (skiltrek)
+DRIVER_INIT_MEMBER(mpu4vid_state,skiltrek)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = skiltrek_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = skiltrek_data;
 }
 
-static DRIVER_INIT (timemchn)
+DRIVER_INIT_MEMBER(mpu4vid_state,timemchn)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = timemchn_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = timemchn_data;
 }
 
-static DRIVER_INIT (strikeit)
+DRIVER_INIT_MEMBER(mpu4vid_state,strikeit)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = strikeit_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = strikeit_data;
 }
 
-static DRIVER_INIT (turnover)
+DRIVER_INIT_MEMBER(mpu4vid_state,turnover)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = turnover_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = turnover_data;
 }
 
-static DRIVER_INIT (eyesdown)
+DRIVER_INIT_MEMBER(mpu4vid_state,eyesdown)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = eyesdown_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = eyesdown_data;
 }
 
-static DRIVER_INIT (quidgrid)
+DRIVER_INIT_MEMBER(mpu4vid_state,quidgrid)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = quidgrid_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = quidgrid_data;
 }
 
-static DRIVER_INIT (prizeinv)
+DRIVER_INIT_MEMBER(mpu4vid_state,prizeinv)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reels = 0;//currently no hybrid games
-	state->m_current_chr_table = prizeinv_data;
+	m_reels = 0;//currently no hybrid games
+	m_current_chr_table = prizeinv_data;
 }
 
 void mpu4vid_char_cheat(running_machine& machine, int address)
@@ -2014,29 +2019,29 @@ void mpu4vid_char_cheat(running_machine& machine, int address)
 	}
 }
 
-static DRIVER_INIT( v4barqst )
+DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst)
 {
-	mpu4vid_char_cheat(machine,0x154);
+	mpu4vid_char_cheat(machine(),0x154);
 }
 
-static DRIVER_INIT( v4barqst2 )
+DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst2)
 {
-	mpu4vid_char_cheat(machine,0x15c);
+	mpu4vid_char_cheat(machine(),0x15c);
 }
 
-static DRIVER_INIT( v4wize )
+DRIVER_INIT_MEMBER(mpu4vid_state,v4wize)
 {
-	mpu4vid_char_cheat(machine,0x16c);
+	mpu4vid_char_cheat(machine(),0x16c);
 }
 
-static DRIVER_INIT( v4cmazeb )
+DRIVER_INIT_MEMBER(mpu4vid_state,v4cmazeb)
 {
-	mpu4vid_char_cheat(machine,0x4c6);
+	mpu4vid_char_cheat(machine(),0x4c6);
 }
 
-static DRIVER_INIT( v4opt3 )
+DRIVER_INIT_MEMBER(mpu4vid_state,v4opt3)
 {
-	mpu4vid_char_cheat(machine,0x164);
+	mpu4vid_char_cheat(machine(),0x164);
 }
 
 
@@ -3853,7 +3858,7 @@ ROM_END
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME(  199?,v4bios,		0,			mod2,	mpu4, mpu4_state,		0,			ROT0, "Barcrest","MPU4 Video Firmware",GAME_IS_BIOS_ROOT )
+GAME(  199?,v4bios,		0,			mod2,	mpu4, driver_device,		0,			ROT0, "Barcrest","MPU4 Video Firmware",GAME_IS_BIOS_ROOT )
 
 #define GAME_FLAGS GAME_NOT_WORKING
 
@@ -3920,39 +3925,39 @@ GAME(  1991,v4opt3d,	v4opt3, 	mpu4_vid,	mpu4, mpu4vid_state,		v4opt3,		ROT0, "Ba
 
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 
-GAME(  199?,v4vgpok,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4vgpok,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4psi,		0,			bwbvid,		mpu4, mpu4vid_state,		prizeinv,	ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4psia,		0,			bwbvid,		mpu4, mpu4vid_state,		prizeinv,	ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4psib,		0,			bwbvid,		mpu4, mpu4vid_state,		prizeinv,	ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
-GAME(  199?,v4blox,		0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bloxd,	v4blox,		bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4blox,		0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bloxd,	v4blox,		bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996,v4reno,		0,			bwbvid5,	mpu4, mpu4vid_state,		prizeinv,	ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4bigfrt,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bubbnk,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mazbel,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mazbla,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4shpwnd,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bigfrt,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bubbnk,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4mazbel,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4mazbla,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4shpwnd,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4redhtp,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4tetrs,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4redhtp,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4tetrs,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4big40,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bulblx,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
-GAME(  199?,v4cshinf,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4dbltak,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4gldrsh,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mdice,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
-GAME(  199?,v4monte,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4ovrmn3,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4pztet,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
-GAME(  199?,v4pzteta,	v4pztet,	bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
-GAME(  199?,v4rhmaz,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4sunbst,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4timebn,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4sixx,		0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4megbuk,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
-GAME(  199?,v4rencas,	0,			bwbvid,		mpu4, mpu4vid_state,		0,			ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?,v4big40,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bulblx,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
+GAME(  199?,v4cshinf,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4dbltak,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4gldrsh,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4mdice,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
+GAME(  199?,v4monte,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4ovrmn3,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4pztet,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
+GAME(  199?,v4pzteta,	v4pztet,	bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
+GAME(  199?,v4rhmaz,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4sunbst,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4timebn,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4sixx,		0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4megbuk,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?,v4rencas,	0,			bwbvid,		mpu4, driver_device,		0,			ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
 
 /* Uncertain BIOS */
@@ -3961,9 +3966,9 @@ GAME(  199?,v4frfact,	v4bios,		crmaze,		crmaze, mpu4vid_state,		crmaze,		ROT0, "
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
-GAME(  199?,v4cybcas,	0,			bwbvid5,	mpu4, mpu4vid_state,		0,			ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4miami,	0,			bwbvid5,	mpu4, mpu4vid_state,		0,			ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4missis,	0,			bwbvid5,	mpu4, mpu4vid_state,		0,			ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4picdil,	0,			bwbvid5,	mpu4, mpu4vid_state,		0,			ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4cybcas,	0,			bwbvid5,	mpu4, driver_device,		0,			ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4miami,	0,			bwbvid5,	mpu4, driver_device,		0,			ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4missis,	0,			bwbvid5,	mpu4, driver_device,		0,			ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4picdil,	0,			bwbvid5,	mpu4, driver_device,		0,			ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )
 
 

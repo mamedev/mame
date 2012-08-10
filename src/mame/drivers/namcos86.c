@@ -1464,16 +1464,16 @@ ROM_END
 
 
 
-static DRIVER_INIT( namco86 )
+DRIVER_INIT_MEMBER(namcos86_state,namco86)
 {
 	int size;
 	UINT8 *gfx;
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = machine.root_device().memregion("gfx1")->base();
-	size = machine.root_device().memregion("gfx1")->bytes() * 2 / 3;
-	buffer = auto_alloc_array(machine, UINT8,  size );
+	gfx = machine().root_device().memregion("gfx1")->base();
+	size = machine().root_device().memregion("gfx1")->bytes() * 2 / 3;
+	buffer = auto_alloc_array(machine(), UINT8,  size );
 
 	{
 		UINT8 *dest1 = gfx;
@@ -1493,12 +1493,12 @@ static DRIVER_INIT( namco86 )
 			*mono ^= 0xff; mono++;
 		}
 
-		auto_free( machine, buffer );
+		auto_free( machine(), buffer );
 	}
 
-	gfx = machine.root_device().memregion("gfx2")->base();
-	size = machine.root_device().memregion("gfx2")->bytes() * 2 / 3;
-	buffer = auto_alloc_array(machine, UINT8,  size );
+	gfx = machine().root_device().memregion("gfx2")->base();
+	size = machine().root_device().memregion("gfx2")->bytes() * 2 / 3;
+	buffer = auto_alloc_array(machine(), UINT8,  size );
 
 	{
 		UINT8 *dest1 = gfx;
@@ -1518,7 +1518,7 @@ static DRIVER_INIT( namco86 )
 			*mono ^= 0xff; mono++;
 		}
 
-		auto_free( machine, buffer );
+		auto_free( machine(), buffer );
 	}
 }
 

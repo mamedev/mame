@@ -1010,15 +1010,15 @@ static void lineswap_gfx_roms(running_machine &machine, const char *region, cons
  *
  *************************************/
 
-static DRIVER_INIT( pkunwar )
+DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
 {
-	lineswap_gfx_roms(machine, "gfx1", 13);
+	lineswap_gfx_roms(machine(), "gfx1", 13);
 }
 
-static DRIVER_INIT( raiders5 )
+DRIVER_INIT_MEMBER(nova2001_state,raiders5)
 {
-	lineswap_gfx_roms(machine, "gfx1", 13);
-	lineswap_gfx_roms(machine, "gfx2", 13);
+	lineswap_gfx_roms(machine(), "gfx1", 13);
+	lineswap_gfx_roms(machine(), "gfx2", 13);
 }
 
 
@@ -1030,9 +1030,9 @@ static DRIVER_INIT( raiders5 )
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", 0 )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", 0 )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", 0 )
+GAME( 1983, nova2001,  0,        nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", 0 )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", 0 )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, driver_device, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", 0 )
 GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", 0 )
 GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", 0 )
 GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", 0 )

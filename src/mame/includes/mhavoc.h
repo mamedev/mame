@@ -59,6 +59,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_rcvd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_DRIVER_INIT(mhavocrv);
 };
 
 
@@ -69,6 +70,5 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );
 
 MACHINE_START( mhavoc );
 MACHINE_RESET( mhavoc );
-DRIVER_INIT( mhavocrv );
 
 

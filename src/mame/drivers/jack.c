@@ -1337,28 +1337,24 @@ static void treahunt_decode( running_machine &machine )
 	}
 }
 
-static DRIVER_INIT( jack )
+DRIVER_INIT_MEMBER(jack_state,jack)
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	state->m_timer_rate = 128;
+	m_timer_rate = 128;
 }
 
-static DRIVER_INIT( treahunt )
+DRIVER_INIT_MEMBER(jack_state,treahunt)
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	state->m_timer_rate = 128;
-	treahunt_decode(machine);
+	m_timer_rate = 128;
+	treahunt_decode(machine());
 }
 
-static DRIVER_INIT( zzyzzyxx )
+DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	state->m_timer_rate = 16;
+	m_timer_rate = 16;
 }
 
-static DRIVER_INIT( loverboy )
+DRIVER_INIT_MEMBER(jack_state,loverboy)
 {
-	jack_state *state = machine.driver_data<jack_state>();
 
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
        I replace the startup jump with another jump to what appears to be
@@ -1371,18 +1367,17 @@ static DRIVER_INIT( loverboy )
        code, the protection device is disabled or changes behaviour via
        writes at 0xf000 and 0xf008. -AS
        */
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
-	state->m_timer_rate = 16;
+	m_timer_rate = 16;
 }
 
 
-static DRIVER_INIT( striv )
+DRIVER_INIT_MEMBER(jack_state,striv)
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 data;
 	int A;
 
@@ -1409,12 +1404,12 @@ static DRIVER_INIT( striv )
 	}
 
 	// Set-up the weirdest questions read ever done
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(jack_state::striv_question_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(jack_state::striv_question_r),this));
 
 	// Nop out unused sprites writes
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
 
-	state->m_timer_rate = 128;
+	m_timer_rate = 128;
 }
 
 /*************************************

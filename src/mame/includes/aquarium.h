@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
+	DECLARE_DRIVER_INIT(aquarium);
 };
 
 

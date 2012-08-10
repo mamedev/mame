@@ -763,16 +763,14 @@ ROM_END
 
 
 
-static DRIVER_INIT( tigeroad )
+DRIVER_INIT_MEMBER(tigeroad_state,tigeroad)
 {
-	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::tigeroad_soundcmd_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::tigeroad_soundcmd_w),this));
 }
 
-static DRIVER_INIT( f1dream )
+DRIVER_INIT_MEMBER(tigeroad_state,f1dream)
 {
-	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),this));
 }
 
 

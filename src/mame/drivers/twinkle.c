@@ -267,6 +267,7 @@ public:
 	DECLARE_WRITE16_MEMBER(shared_68k_w);
 	DECLARE_READ16_MEMBER(twinkle_ide_r);
 	DECLARE_WRITE16_MEMBER(twinkle_ide_w);
+	DECLARE_DRIVER_INIT(twinkle);
 };
 
 /* RTC */
@@ -861,12 +862,12 @@ static const struct AM53CF96interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static DRIVER_INIT( twinkle )
+DRIVER_INIT_MEMBER(twinkle_state,twinkle)
 {
-	psx_driver_init(machine);
-	am53cf96_init(machine, &scsi_intf);
+	psx_driver_init(machine());
+	am53cf96_init(machine(), &scsi_intf);
 
-	device_t *i2cmem = machine.device("security");
+	device_t *i2cmem = machine().device("security");
 	i2cmem_e0_write( i2cmem, 0 );
 	i2cmem_e1_write( i2cmem, 0 );
 	i2cmem_e2_write( i2cmem, 0 );

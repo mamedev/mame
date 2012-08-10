@@ -315,6 +315,7 @@ public:
 	DECLARE_READ8_MEMBER(pa1_r);
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
+	DECLARE_DRIVER_INIT(aristmk4);
 };
 
 /* Partial Cashcade protocol */
@@ -1622,12 +1623,11 @@ static PALETTE_INIT( aristmk4 )
 	}
 }
 
-static DRIVER_INIT( aristmk4 )
+DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 {
-	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-	state->m_shapeRomPtr = (UINT8 *)state->memregion("tile_gfx")->base();
-	memcpy(state->m_shapeRom,state->m_shapeRomPtr,sizeof(state->m_shapeRom)); // back up
-	state->m_nvram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_shapeRomPtr = (UINT8 *)memregion("tile_gfx")->base();
+	memcpy(m_shapeRom,m_shapeRomPtr,sizeof(m_shapeRom)); // back up
+	m_nvram = auto_alloc_array(machine(), UINT8, 0x1000);
 }
 
 static MACHINE_START( aristmk4 )

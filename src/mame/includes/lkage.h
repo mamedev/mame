@@ -73,6 +73,9 @@ public:
 	DECLARE_READ8_MEMBER(lkage_mcu_r);
 	DECLARE_READ8_MEMBER(lkage_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
+	DECLARE_DRIVER_INIT(bygone);
+	DECLARE_DRIVER_INIT(lkage);
+	DECLARE_DRIVER_INIT(lkageb);
 };
 
 /*----------- defined in machine/lkage.c -----------*/

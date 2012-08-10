@@ -30,20 +30,17 @@
 
 
 
-static DRIVER_INIT( sprint1 )
+DRIVER_INIT_MEMBER(sprint2_state,sprint1)
 {
-	sprint2_state *state = machine.driver_data<sprint2_state>();
-	state->m_game = 1;
+	m_game = 1;
 }
-static DRIVER_INIT( sprint2 )
+DRIVER_INIT_MEMBER(sprint2_state,sprint2)
 {
-	sprint2_state *state = machine.driver_data<sprint2_state>();
-	state->m_game = 2;
+	m_game = 2;
 }
-static DRIVER_INIT( dominos )
+DRIVER_INIT_MEMBER(sprint2_state,dominos)
 {
-	sprint2_state *state = machine.driver_data<sprint2_state>();
-	state->m_game = 3;
+	m_game = 3;
 }
 
 

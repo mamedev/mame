@@ -55,18 +55,18 @@ public:
 	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
 	DECLARE_READ16_MEMBER(midtunit_dma_r);
 	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
+	DECLARE_DRIVER_INIT(mktunit);
+	DECLARE_DRIVER_INIT(mkturbo);
+	DECLARE_DRIVER_INIT(nbajamte);
+	DECLARE_DRIVER_INIT(nbajam);
+	DECLARE_DRIVER_INIT(jdreddp);
+	DECLARE_DRIVER_INIT(mk2);
 };
 
 /*----------- defined in machine/midtunit.c -----------*/
 
 
 
-DRIVER_INIT( mktunit );
-DRIVER_INIT( mkturbo );
-DRIVER_INIT( jdreddp );
-DRIVER_INIT( nbajam );
-DRIVER_INIT( nbajamte );
-DRIVER_INIT( mk2 );
 
 MACHINE_RESET( midtunit );
 

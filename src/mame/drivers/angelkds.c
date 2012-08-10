@@ -742,18 +742,18 @@ ROM_START( spcpostn )
 ROM_END
 
 
-static DRIVER_INIT( angelkds )
+DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 {
-	UINT8 *RAM = machine.root_device().memregion("user1")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8, &RAM[0x0000], 0x4000);
+	UINT8 *RAM = machine().root_device().memregion("user1")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8, &RAM[0x0000], 0x4000);
 }
 
-static DRIVER_INIT( spcpostn )
+DRIVER_INIT_MEMBER(angelkds_state,spcpostn)
 {
-	UINT8 *RAM = machine.root_device().memregion("user1")->base();
+	UINT8 *RAM = machine().root_device().memregion("user1")->base();
 
-	sega_317_0005_decode(machine, "maincpu");
-	machine.root_device().membank("bank1")->configure_entries(0, 10, &RAM[0x0000], 0x4000);
+	sega_317_0005_decode(machine(), "maincpu");
+	machine().root_device().membank("bank1")->configure_entries(0, 10, &RAM[0x0000], 0x4000);
 }
 
 

@@ -519,10 +519,10 @@ ROM_START( watrball )
 ROM_END
 
 
-static DRIVER_INIT( blmbycar )
+DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 {
-	UINT16 *RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
-	size_t size = machine.root_device().memregion("maincpu")->bytes() / 2;
+	UINT16 *RAM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	size_t size = machine().root_device().memregion("maincpu")->bytes() / 2;
 	int i;
 
 	for (i = 0; i < size; i++)
@@ -542,5 +542,5 @@ static DRIVER_INIT( blmbycar )
 ***************************************************************************/
 
 GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", GAME_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru,blmbycar, blmbycar, blmbycar, blmbycar_state, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1996, watrball, 0,        watrball, watrball, blmbycar_state, 0,        ROT0, "ABM", "Water Balls", GAME_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru,blmbycar, blmbycar, blmbycar, driver_device, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1996, watrball, 0,        watrball, watrball, driver_device, 0,        ROT0, "ABM", "Water Balls", GAME_SUPPORTS_SAVE )

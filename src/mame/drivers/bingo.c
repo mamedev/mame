@@ -19,6 +19,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(bingo);
 };
 
 
@@ -35,7 +37,7 @@ void bingo_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( bingo )
+DRIVER_INIT_MEMBER(bingo_state,bingo)
 {
 }
 
@@ -60,6 +62,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(seeben);	
 };
 
 
@@ -73,7 +77,7 @@ void seeben_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( seeben )
+DRIVER_INIT_MEMBER(seeben_state,seeben)
 {
 }
 
@@ -98,6 +102,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(splin);
 };
 
 static ADDRESS_MAP_START( splin_map, AS_PROGRAM, 16, splin_state )
@@ -113,7 +119,7 @@ void splin_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( splin )
+DRIVER_INIT_MEMBER(splin_state,splin)
 {
 }
 

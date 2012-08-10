@@ -1122,33 +1122,29 @@ ROM_END
    video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
    This is needed because there is a difference in the tile and sprite indexing.
 */
-static DRIVER_INIT( rygar )
+DRIVER_INIT_MEMBER(tecmo_state,rygar)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	state->m_video_type = 0;
+	m_video_type = 0;
 }
 
-static DRIVER_INIT( silkworm )
+DRIVER_INIT_MEMBER(tecmo_state,silkworm)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	state->m_video_type = 1;
+	m_video_type = 1;
 }
 
-static DRIVER_INIT( gemini )
+DRIVER_INIT_MEMBER(tecmo_state,gemini)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	state->m_video_type = 2;
+	m_video_type = 2;
 }
 
-static DRIVER_INIT( backfirt )
+DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	state->m_video_type = 2;
+	m_video_type = 2;
 
 	/* no MSM */
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc400, 0xc400);
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xc800);
+	machine().device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
+	machine().device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc400, 0xc400);
+	machine().device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xc800);
 }
 
 

@@ -1360,31 +1360,31 @@ static void sound_cpu_decrypt(running_machine &machine)
 	space->set_decrypted_region(0xc000, 0xffff, decrypted);
 }
 
-static DRIVER_INIT( prosport )
+DRIVER_INIT_MEMBER(liberate_state,prosport)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
 	for (i = 0; i < 0x10000; i++)
 		RAM[i] = ((RAM[i] & 0x0f) << 4) | ((RAM[i] & 0xf0) >> 4);
 
-	sound_cpu_decrypt(machine);
+	sound_cpu_decrypt(machine());
 }
 
-static DRIVER_INIT( yellowcb )
+DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 {
 	DRIVER_INIT_CALL(prosport);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xa000, 0xa000, "IN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xa000, 0xa000, "IN0");
 }
 
-static DRIVER_INIT( liberate )
+DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
 	int A;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 
@@ -1395,9 +1395,9 @@ static DRIVER_INIT( liberate )
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
 
-	machine.root_device().membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
+	machine().root_device().membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
 
-	sound_cpu_decrypt(machine);
+	sound_cpu_decrypt(machine());
 }
 
 /*************************************

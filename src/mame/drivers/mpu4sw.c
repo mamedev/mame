@@ -9,6 +9,7 @@
   */
 
 #include "emu.h"
+#include "includes/mpu4.h"
 
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mod2 );
@@ -16,18 +17,15 @@ INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( grtecp );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
-extern DRIVER_INIT( m4default );
-extern DRIVER_INIT( m4default_bigbank );
-extern DRIVER_INIT( m_grtecp );
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
-static DRIVER_INIT( m4debug )
+DRIVER_INIT_MEMBER(mpu4_state,m4debug)
 {
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
-	int size = machine.root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
+	int size = machine().root_device().memregion( "maincpu" )->bytes();
 	
 	for (int j=0;j<size;j+=0x10000)
 	{
@@ -46,26 +44,25 @@ static DRIVER_INIT( m4debug )
 	}
 }
 
-static DRIVER_INIT( m4_showstring )
+DRIVER_INIT_MEMBER(mpu4_state,m4_showstring)
 {
-	DRIVER_INIT_CALL( m4default );
-	DRIVER_INIT_CALL( m4debug );
+	DRIVER_INIT_CALL(m4default);
+	DRIVER_INIT_CALL(m4debug);
 }
 
-static DRIVER_INIT( m4_showstring_big )
+DRIVER_INIT_MEMBER(mpu4_state,m4_showstring_big)
 {
-	DRIVER_INIT_CALL( m4default_bigbank );
-	DRIVER_INIT_CALL( m4debug );
+	DRIVER_INIT_CALL(m4default_bigbank);
+	DRIVER_INIT_CALL(m4debug);
 }
 
 
 
-static DRIVER_INIT( m_grtecpss )
+DRIVER_INIT_MEMBER(mpu4_state,m_grtecpss)
 {
-	DRIVER_INIT_CALL( m_grtecp );
-	DRIVER_INIT_CALL( m4debug );
+	DRIVER_INIT_CALL(m_grtecp);
+	DRIVER_INIT_CALL(m4debug);
 }
-
 #define M4ANDYCP_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "ac.chr", 0x0000, 0x000048, CRC(87808826) SHA1(df0915a6f89295efcd10e6a06bfa3d3fe8fef160) ) \

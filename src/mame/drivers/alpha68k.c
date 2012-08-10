@@ -3140,149 +3140,133 @@ ROM_END
 
 /******************************************************************************/
 
-static DRIVER_INIT( sstingry )
+DRIVER_INIT_MEMBER(alpha68k_state,sstingry)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x00ff;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x00ff;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( kyros )
+DRIVER_INIT_MEMBER(alpha68k_state,kyros)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x0012;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = ALPHA68K_KYROS;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x0012;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = ALPHA68K_KYROS;
 }
 
-static DRIVER_INIT( jongbou )
+DRIVER_INIT_MEMBER(alpha68k_state,jongbou)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0c0000, 0x0c0001, read16_delegate(FUNC(alpha68k_state::jongbou_inputs_r),state));
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x00ff;
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = ALPHA68K_JONGBOU;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0c0000, 0x0c0001, read16_delegate(FUNC(alpha68k_state::jongbou_inputs_r),this));
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x00ff;
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = ALPHA68K_JONGBOU;
 }
 
-static DRIVER_INIT( paddlema )
+DRIVER_INIT_MEMBER(alpha68k_state,paddlema)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_microcontroller_id = 0;
-	state->m_coin_id = 0;				// Not needed !
-	state->m_game_id = 0;
+	m_microcontroller_id = 0;
+	m_coin_id = 0;				// Not needed !
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( timesold )
+DRIVER_INIT_MEMBER(alpha68k_state,timesold)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( timesold1 )
+DRIVER_INIT_MEMBER(alpha68k_state,timesold1)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 1;
-	state->m_microcontroller_id = 0;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 1;
+	m_microcontroller_id = 0;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( btlfield )
+DRIVER_INIT_MEMBER(alpha68k_state,btlfield)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 1;
-	state->m_microcontroller_id = 0;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 1;
+	m_microcontroller_id = 0;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( btlfieldb )
+DRIVER_INIT_MEMBER(alpha68k_state,btlfieldb)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 1;
-	state->m_microcontroller_id = 0;
-	state->m_coin_id = 0x22 | (0x22 << 8); //not checked
-	state->m_game_id = ALPHA68K_BTLFIELDB;
+	m_invert_controls = 1;
+	m_microcontroller_id = 0;
+	m_coin_id = 0x22 | (0x22 << 8); //not checked
+	m_game_id = ALPHA68K_BTLFIELDB;
 }
 
-static DRIVER_INIT( skysoldr )
+DRIVER_INIT_MEMBER(alpha68k_state,skysoldr)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->membank("bank8")->set_base((state->memregion("user1")->base()) + 0x40000);
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = 0;
+	membank("bank8")->set_base((memregion("user1")->base()) + 0x40000);
+	m_invert_controls = 0;
+	m_microcontroller_id = 0;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( goldmedl )
+DRIVER_INIT_MEMBER(alpha68k_state,goldmedl)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8803; //AT
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8803; //AT
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( goldmedla )
+DRIVER_INIT_MEMBER(alpha68k_state,goldmedla)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->membank("bank8")->set_base(state->memregion("maincpu")->base() + 0x20000);
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = 0;
+	membank("bank8")->set_base(memregion("maincpu")->base() + 0x20000);
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( skyadvnt )
+DRIVER_INIT_MEMBER(alpha68k_state,skyadvnt)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8814;
-	state->m_coin_id = 0x22 | (0x22 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8814;
+	m_coin_id = 0x22 | (0x22 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( skyadvntu )
+DRIVER_INIT_MEMBER(alpha68k_state,skyadvntu)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8814;
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8814;
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( gangwarsu )
+DRIVER_INIT_MEMBER(alpha68k_state,gangwarsu)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->membank("bank8")->set_base(state->memregion("user1")->base());
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8512;
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = 0;
+	membank("bank8")->set_base(memregion("user1")->base());
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8512;
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( gangwars )
+DRIVER_INIT_MEMBER(alpha68k_state,gangwars)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->membank("bank8")->set_base(state->memregion("user1")->base());
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8512;
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = 0;
+	membank("bank8")->set_base(memregion("user1")->base());
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8512;
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( sbasebal )
+DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
        calculate the ball speed when a strike is scored, notice that current emulation
@@ -3303,19 +3287,18 @@ static DRIVER_INIT( sbasebal )
 	rom[0x2b6/2] = 0x4e71;
 #endif
 
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x8512;	// Same as 'gangwars' ?
-	state->m_coin_id = 0x23 | (0x24 << 8);
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x8512;	// Same as 'gangwars' ?
+	m_coin_id = 0x23 | (0x24 << 8);
+	m_game_id = 0;
 }
 
-static DRIVER_INIT( tnextspc )
+DRIVER_INIT_MEMBER(alpha68k_state,tnextspc)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	state->m_invert_controls = 0;
-	state->m_microcontroller_id = 0x890a;
-	state->m_coin_id = 0;				// Not needed !
-	state->m_game_id = 0;
+	m_invert_controls = 0;
+	m_microcontroller_id = 0x890a;
+	m_coin_id = 0;				// Not needed !
+	m_game_id = 0;
 }
 
 /******************************************************************************/

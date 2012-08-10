@@ -429,9 +429,8 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT(mquake)
+DRIVER_INIT_MEMBER(amiga_state,mquake)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 	static const amiga_machine_interface mquake_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -441,11 +440,11 @@ static DRIVER_INIT(mquake)
 		NULL,
 		0
 	};
-	amiga_machine_config(machine, &mquake_intf);
+	amiga_machine_config(machine(), &mquake_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 

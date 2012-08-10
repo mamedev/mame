@@ -392,11 +392,11 @@ ROM_START( rockduck )
 ROM_END
 
 
-static DRIVER_INIT( rockduck )
+DRIVER_INIT_MEMBER(btime_state,rockduck)
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;
-	UINT8 *src = machine.root_device().memregion( "gfx1" )->base();
+	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
 
 	for (x = 0x2000; x < 0x6000; x++)
 	{
@@ -406,7 +406,7 @@ static DRIVER_INIT( rockduck )
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg, btime_state, 0, ROT270, "Technos Japan", "Dommy", GAME_SUPPORTS_SAVE )
-GAME( 1983, scregg,   0,        scregg, scregg, btime_state, 0, ROT270, "Technos Japan", "Scrambled Egg", GAME_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg, btime_state, 0, ROT270, "Technos Japan / Universal USA", "Eggs", GAME_SUPPORTS_SAVE )
+GAME( 1983, dommy,    0,        dommy,  scregg, driver_device, 0, ROT270, "Technos Japan", "Dommy", GAME_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg, driver_device, 0, ROT270, "Technos Japan", "Scrambled Egg", GAME_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg, driver_device, 0, ROT270, "Technos Japan / Universal USA", "Eggs", GAME_SUPPORTS_SAVE )
 GAME( 1983, rockduck, 0,        scregg, rockduck, btime_state, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

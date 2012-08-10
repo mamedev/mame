@@ -99,6 +99,12 @@ public:
 	DECLARE_READ32_MEMBER(cps3_colourram_r);
 	DECLARE_WRITE32_MEMBER(cps3_colourram_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(cps3_direct_handler);
+	DECLARE_DRIVER_INIT(sfiii3);
+	DECLARE_DRIVER_INIT(sfiii);
+	DECLARE_DRIVER_INIT(redearth);
+	DECLARE_DRIVER_INIT(jojo);
+	DECLARE_DRIVER_INIT(jojoba);
+	DECLARE_DRIVER_INIT(sfiii2);
 };
 
 

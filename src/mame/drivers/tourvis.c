@@ -198,6 +198,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
+	DECLARE_DRIVER_INIT(tourvision);
 };
 
 
@@ -513,9 +514,9 @@ ROM_START(tvsvball)
 ROM_END
 
 
-static DRIVER_INIT(tourvision)
+DRIVER_INIT_MEMBER(tourvision_state,tourvision)
 {
-	DRIVER_INIT_CALL(pce);
+	init_pce();
 }
 
 GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )

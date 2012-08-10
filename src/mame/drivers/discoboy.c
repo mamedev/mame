@@ -82,6 +82,7 @@ public:
 	DECLARE_READ8_MEMBER(discoboy_port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
+	DECLARE_DRIVER_INIT(discoboy);
 };
 
 
@@ -559,28 +560,27 @@ ROM_START( discoboy )
 ROM_END
 
 
-static DRIVER_INIT( discoboy )
+DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 {
-	discoboy_state *state = machine.driver_data<discoboy_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	UINT8 *AUDIO = state->memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *AUDIO = memregion("audiocpu")->base();
 
-	memset(state->m_ram_1, 0, sizeof(state->m_ram_1));
-	memset(state->m_ram_2, 0, sizeof(state->m_ram_2));
-	memset(state->m_ram_att,0, sizeof(state->m_ram_att));
-	memset(state->m_ram_3, 0, sizeof(state->m_ram_3));
-	memset(state->m_ram_4, 0, sizeof(state->m_ram_4));
+	memset(m_ram_1, 0, sizeof(m_ram_1));
+	memset(m_ram_2, 0, sizeof(m_ram_2));
+	memset(m_ram_att,0, sizeof(m_ram_att));
+	memset(m_ram_3, 0, sizeof(m_ram_3));
+	memset(m_ram_4, 0, sizeof(m_ram_4));
 
-	state->save_item(NAME(state->m_ram_1));
-	state->save_item(NAME(state->m_ram_2));
-	state->save_item(NAME(state->m_ram_att));
-	state->save_item(NAME(state->m_ram_3));
-	state->save_item(NAME(state->m_ram_4));
+	save_item(NAME(m_ram_1));
+	save_item(NAME(m_ram_2));
+	save_item(NAME(m_ram_att));
+	save_item(NAME(m_ram_3));
+	save_item(NAME(m_ram_4));
 
-	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->membank("bank1")->set_entry(0);
-	state->membank("sndbank")->configure_entries(0, 8, &AUDIO[0x00000], 0x4000);
-	state->membank("sndbank")->set_entry(0);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	membank("bank1")->set_entry(0);
+	membank("sndbank")->configure_entries(0, 8, &AUDIO[0x00000], 0x4000);
+	membank("sndbank")->set_entry(0);
 }
 
 

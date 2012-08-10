@@ -3256,11 +3256,11 @@ ROM_START( digsid )
 	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
-static DRIVER_INIT (galaga)
+DRIVER_INIT_MEMBER(galaga_state,galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
-	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
-	int i, len = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
+	int i, len = machine().root_device().memregion("gfx1")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -3273,41 +3273,40 @@ static DRIVER_INIT (galaga)
 	}
 }
 
-static DRIVER_INIT (gatsbee)
+DRIVER_INIT_MEMBER(galaga_state,gatsbee)
 {
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	galaga_state *state =  machine.driver_data<galaga_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),this));
 }
 
 
-static DRIVER_INIT( xevious )
+DRIVER_INIT_MEMBER(xevious_state,xevious)
 {
 	UINT8 *rom;
 	int i;
 
-	rom = machine.root_device().memregion("gfx3")->base() + 0x5000;
+	rom = machine().root_device().memregion("gfx3")->base() + 0x5000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
 
-static DRIVER_INIT( xevios )
+DRIVER_INIT_MEMBER(xevious_state,xevios)
 {
 	int A;
 	UINT8 *rom;
 
 
 	/* convert one of the sprite ROMs to the format used by Xevious */
-	rom = machine.root_device().memregion("gfx3")->base();
+	rom = machine().root_device().memregion("gfx3")->base();
 	for (A = 0x5000;A < 0x7000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],1,3,5,7,0,2,4,6);
 	}
 
 	/* convert one of tile map ROMs to the format used by Xevious */
-	rom = machine.root_device().memregion("gfx4")->base();
+	rom = machine().root_device().memregion("gfx4")->base();
 	for (A = 0x0000;A < 0x1000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);
@@ -3317,11 +3316,11 @@ static DRIVER_INIT( xevios )
 }
 
 
-static DRIVER_INIT( battles )
+DRIVER_INIT_MEMBER(xevious_state,battles)
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
 
 	DRIVER_INIT_CALL(xevious);
 }
@@ -3330,11 +3329,11 @@ static DRIVER_INIT( battles )
 /* Original Namco hardware, with Namco Customs */
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1981, bosco,     0,       bosco,   bosco, bosco_state,    0,       ROT0,   "Namco", "Bosconian (new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, boscoo,    bosco,   bosco,   bosco, bosco_state,    0,       ROT0,   "Namco", "Bosconian (old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, boscoo2,   bosco,   bosco,   bosco, bosco_state,    0,       ROT0,   "Namco", "Bosconian (older version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomd,   bosco,   bosco,   boscomd, bosco_state,  0,       ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomdo,  bosco,   bosco,   boscomd, bosco_state,  0,       ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, bosco,     0,       bosco,   bosco, driver_device,    0,       ROT0,   "Namco", "Bosconian (new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, boscoo,    bosco,   bosco,   bosco, driver_device,    0,       ROT0,   "Namco", "Bosconian (old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, boscoo2,   bosco,   bosco,   bosco, driver_device,    0,       ROT0,   "Namco", "Bosconian (older version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, boscomd,   bosco,   bosco,   boscomd, driver_device,  0,       ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, boscomdo,  bosco,   bosco,   boscomd, driver_device,  0,       ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1981, galaga,    0,       galaga,  galaga, galaga_state,   galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, galagao,   galaga,  galaga,  galaga, galaga_state,   galaga,  ROT90,  "Namco", "Galaga (Namco)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
@@ -3349,11 +3348,11 @@ GAME( 1982, xeviousc,  xevious, xevious, xeviousa, xevious_state, xevious, ROT90
 GAME( 1984, sxevious,  xevious, xevious, sxevious, xevious_state, xevious, ROT90,  "Namco", "Super Xevious", GAME_SUPPORTS_SAVE )
 GAME( 1984, sxeviousj, xevious, xevious, sxevious, xevious_state, xevious, ROT90,  "Namco", "Super Xevious (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, digdug,    0,       digdug,  digdug, digdug_state,   0,       ROT90,  "Namco", "Dig Dug (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digdug1,   digdug,  digdug,  digdug, digdug_state,   0,       ROT90,  "Namco", "Dig Dug (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digdugat,  digdug,  digdug,  digdug, digdug_state,   0,       ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digdugat1, digdug,  digdug,  digdug, digdug_state,   0,       ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digsid,    digdug,  digdug,  digdug, digdug_state,   0,       ROT90,  "Namco (Sidam license)", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digdug,    0,       digdug,  digdug, driver_device,   0,       ROT90,  "Namco", "Dig Dug (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digdug1,   digdug,  digdug,  digdug, driver_device,   0,       ROT90,  "Namco", "Dig Dug (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digdugat,  digdug,  digdug,  digdug, driver_device,   0,       ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digdugat1, digdug,  digdug,  digdug, driver_device,   0,       ROT90,  "Namco (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digsid,    digdug,  digdug,  digdug, driver_device,   0,       ROT90,  "Namco (Sidam license)", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
 
 /* Bootlegs with replacement I/O chips */
 
@@ -3363,4 +3362,4 @@ GAME( 1984, gatsbee,   galaga,  galagab, gatsbee, galaga_state,  gatsbee, ROT90,
 GAME( 1982, xevios,    xevious, xevious, xevious, xevious_state,  xevios,  ROT90,  "bootleg", "Xevios", GAME_SUPPORTS_SAVE )
 GAME( 1982, battles,   xevious, battles, xevious, xevious_state,  battles, ROT90,  "bootleg", "Battles", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1982, dzigzag,   digdug,  dzigzag, digdug, digdug_state,   0,       ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dzigzag,   digdug,  dzigzag, digdug, driver_device,   0,       ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )

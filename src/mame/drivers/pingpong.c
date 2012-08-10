@@ -557,9 +557,9 @@ ROM_START( cashquiz )
 	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
-static DRIVER_INIT( merlinmm )
+DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -567,48 +567,47 @@ static DRIVER_INIT( merlinmm )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 }
 
-static DRIVER_INIT( cashquiz )
+DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 {
 	UINT8 *ROM;
 	int i;
 
 	/* decrypt program code */
-	ROM = machine.root_device().memregion("maincpu")->base();
+	ROM = machine().root_device().memregion("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = machine.root_device().memregion("user1")->base();
+	ROM = machine().root_device().memregion("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	pingpong_state *state = machine.driver_data<pingpong_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),this));
 
 	// 8 independents banks for questions
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x50ff, "bank1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5100, 0x51ff, "bank2");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5200, 0x52ff, "bank3");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5300, 0x53ff, "bank4");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5400, 0x54ff, "bank5");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5500, 0x55ff, "bank6");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5600, 0x56ff, "bank7");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x50ff, "bank1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5100, 0x51ff, "bank2");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5200, 0x52ff, "bank3");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5300, 0x53ff, "bank4");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5400, 0x54ff, "bank5");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5500, 0x55ff, "bank6");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5600, 0x56ff, "bank7");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
-	state->membank("bank1")->set_base(state->memregion("user1")->base() + 0x100*0 );
-	state->membank("bank2")->set_base(state->memregion("user1")->base() + 0x100*1 );
-	state->membank("bank3")->set_base(state->memregion("user1")->base() + 0x100*2 );
-	state->membank("bank4")->set_base(state->memregion("user1")->base() + 0x100*3 );
-	state->membank("bank5")->set_base(state->memregion("user1")->base() + 0x100*4 );
-	state->membank("bank6")->set_base(state->memregion("user1")->base() + 0x100*5 );
-	state->membank("bank7")->set_base(state->memregion("user1")->base() + 0x100*6 );
-	state->membank("bank8")->set_base(state->memregion("user1")->base() + 0x100*7 );
+	membank("bank1")->set_base(memregion("user1")->base() + 0x100*0 );
+	membank("bank2")->set_base(memregion("user1")->base() + 0x100*1 );
+	membank("bank3")->set_base(memregion("user1")->base() + 0x100*2 );
+	membank("bank4")->set_base(memregion("user1")->base() + 0x100*3 );
+	membank("bank5")->set_base(memregion("user1")->base() + 0x100*4 );
+	membank("bank6")->set_base(memregion("user1")->base() + 0x100*5 );
+	membank("bank7")->set_base(memregion("user1")->base() + 0x100*6 );
+	membank("bank8")->set_base(memregion("user1")->base() + 0x100*7 );
 }
 
 
-GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, 0,		   ROT0, "Konami", "Konami's Ping-Pong", 0 )
+GAME( 1985, pingpong, 0, pingpong, pingpong, driver_device, 0,		   ROT0, "Konami", "Konami's Ping-Pong", 0 )
 GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, merlinmm, ROT90,"Zilec-Zenitone", "Merlins Money Maze", 0 )
 GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, cashquiz, ROT0, "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", GAME_IMPERFECT_GRAPHICS )

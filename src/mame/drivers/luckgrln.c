@@ -144,6 +144,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_DRIVER_INIT(luckgrln);
 };
 
 
@@ -1022,11 +1023,11 @@ static MACHINE_CONFIG_DERIVED( _7smash, luckgrln )
 	MCFG_CPU_IO_MAP(_7smash_io)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( luckgrln )
+DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 {
 	int i;
 	UINT8 x,v;
-	UINT8* rom = machine.root_device().memregion("rom_data")->base();
+	UINT8* rom = machine().root_device().memregion("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{
@@ -1042,7 +1043,7 @@ static DRIVER_INIT( luckgrln )
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine.system().name);
+		sprintf(filename,"decrypted_%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -1053,7 +1054,7 @@ static DRIVER_INIT( luckgrln )
 	#endif
 
 	// ??
-//  machine.root_device().membank("bank1")->set_base(&rom[0x010000]);
+//  machine().root_device().membank("bank1")->set_base(&rom[0x010000]);
 }
 
 
@@ -1101,5 +1102,5 @@ ROM_END
 
        YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                  LAYOUT  */
 GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NO_SOUND, layout_luckgrln )
-GAMEL( 1993, 7smash, 0,        _7smash,  _7smash, luckgrln_state,  0,        ROT0, "Sovic",          "7 Smash", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND, layout_luckgrln )
+GAMEL( 1993, 7smash, 0,        _7smash,  _7smash, driver_device,  0,        ROT0, "Sovic",          "7 Smash", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND, layout_luckgrln )
 

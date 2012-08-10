@@ -192,25 +192,24 @@ static READ16_HANDLER( olds_prot_swap_r )
 
 }
 
-DRIVER_INIT( olds )
+DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 {
-	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
-	pgm_basic_init(machine);
+	pgm_basic_init(machine());
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
 
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_olds_bs = 0;
-	state->m_olds_cmd3 = 0;
+	m_kb_cmd = 0;
+	m_kb_reg = 0;
+	m_kb_ptr = 0;
+	m_olds_bs = 0;
+	m_olds_cmd3 = 0;
 
-	state->save_item(NAME(state->m_kb_cmd));
-	state->save_item(NAME(state->m_kb_reg));
-	state->save_item(NAME(state->m_kb_ptr));
-	state->save_item(NAME(state->m_olds_bs));
-	state->save_item(NAME(state->m_olds_cmd3));
+	save_item(NAME(m_kb_cmd));
+	save_item(NAME(m_kb_reg));
+	save_item(NAME(m_kb_ptr));
+	save_item(NAME(m_olds_bs));
+	save_item(NAME(m_olds_cmd3));
 }
 
 static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16, pgm_028_025_state )

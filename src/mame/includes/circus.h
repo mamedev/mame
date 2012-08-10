@@ -28,6 +28,10 @@ public:
 	DECLARE_WRITE8_MEMBER(circus_clown_x_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_y_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_z_w);
+	DECLARE_DRIVER_INIT(ripcord);
+	DECLARE_DRIVER_INIT(circus);
+	DECLARE_DRIVER_INIT(robotbwl);
+	DECLARE_DRIVER_INIT(crash);
 };
 
 

@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
 	DECLARE_WRITE8_MEMBER(kchamp_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
+	DECLARE_DRIVER_INIT(kchampvs);
+	DECLARE_DRIVER_INIT(kchampvs2);
 };
 
 

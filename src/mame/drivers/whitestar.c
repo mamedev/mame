@@ -46,6 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ8_MEMBER(dedicated_switch_r);
+	DECLARE_DRIVER_INIT(whitestar);
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -174,7 +175,7 @@ static MACHINE_RESET( whitestar )
 	machine.root_device().membank("dmd_bank1")->set_base(machine.root_device().memregion("dmdcpu")->base());
 }
 
-static DRIVER_INIT( whitestar )
+DRIVER_INIT_MEMBER(whitestar_state,whitestar)
 {
 }
 

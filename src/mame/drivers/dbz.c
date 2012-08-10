@@ -538,11 +538,11 @@ ROM_START( dbz2 )
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
 ROM_END
 
-static DRIVER_INIT( dbz )
+DRIVER_INIT_MEMBER(dbz_state,dbz)
 {
 	UINT16 *ROM;
 
-	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
@@ -571,11 +571,11 @@ static DRIVER_INIT( dbz )
 	ROM[0x810/2] = 0x4e71;    /* 0x005e */
 }
 
-static DRIVER_INIT( dbza )
+DRIVER_INIT_MEMBER(dbz_state,dbza)
 {
 	UINT16 *ROM;
 
-	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// nop out dbz1's mask rom test
 	// tile ROM test
@@ -594,11 +594,11 @@ static DRIVER_INIT( dbza )
 	ROM[0x990/2] = 0x4e71;    /* 0x0010 */
 }
 
-static DRIVER_INIT( dbz2 )
+DRIVER_INIT_MEMBER(dbz_state,dbz2)
 {
 	UINT16 *ROM;
 
-	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0xa48/2] = 0x007f;    /* 0x00ff */

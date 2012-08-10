@@ -429,4 +429,4 @@ ROM_START( sothello )
     ROM_LOAD( "6.7f",   0x8000, 0x8000, CRC(ee80fc78) SHA1(9a9d7925847d7a36930f0761c70f67a9affc5e7c) )
 ROM_END
 
-GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state,  0, ROT0, "Success / Fujiwara", "Super Othello", 0 )
+GAME( 1986, sothello,  0,       sothello,  sothello, driver_device,  0, ROT0, "Success / Fujiwara", "Super Othello", 0 )

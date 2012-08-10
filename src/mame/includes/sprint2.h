@@ -58,6 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_noise_reset_w);
 	DECLARE_WRITE8_MEMBER(sprint2_skid1_w);
 	DECLARE_WRITE8_MEMBER(sprint2_skid2_w);
+	DECLARE_DRIVER_INIT(sprint1);
+	DECLARE_DRIVER_INIT(sprint2);
+	DECLARE_DRIVER_INIT(dominos);
 };
 
 

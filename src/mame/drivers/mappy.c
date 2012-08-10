@@ -2258,7 +2258,7 @@ WRITE8_MEMBER(mappy_state::grobda_DAC_w)
 	device->write_unsigned8((data << 4) | data);
 }
 
-static DRIVER_INIT( grobda )
+DRIVER_INIT_MEMBER(mappy_state,grobda)
 {
 	/* I think the speech in Grobda is not a standard Namco sound feature, but rather a hack.
        The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
@@ -2268,36 +2268,35 @@ static DRIVER_INIT( grobda )
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-	mappy_state *state = machine.driver_data<mappy_state>();
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),state));
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
 }
 
-static DRIVER_INIT( digdug2 )
+DRIVER_INIT_MEMBER(mappy_state,digdug2)
 {
 	/* appears to not use the watchdog */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x8000, 0x8000);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x8000, 0x8000);
 }
 
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
-GAME( 1982, superpac, 0,        superpac, superpac, mappy_state, 0,        ROT90, "Namco", "Super Pac-Man", GAME_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac, mappy_state, 0,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", GAME_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal, mappy_state,  0,        ROT90, "Namco", "Pac & Pal", GAME_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal, mappy_state,  0,        ROT90, "Namco", "Pac & Pal (older)", GAME_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal, mappy_state,  0,        ROT90, "Namco", "Pac-Man & Chomp Chomp", GAME_SUPPORTS_SAVE )
+GAME( 1982, superpac, 0,        superpac, superpac, driver_device, 0,        ROT90, "Namco", "Super Pac-Man", GAME_SUPPORTS_SAVE )
+GAME( 1982, superpacm,superpac, superpac, superpac, driver_device, 0,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", GAME_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal, driver_device,  0,        ROT90, "Namco", "Pac & Pal", GAME_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal, driver_device,  0,        ROT90, "Namco", "Pac & Pal (older)", GAME_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal, driver_device,  0,        ROT90, "Namco", "Pac-Man & Chomp Chomp", GAME_SUPPORTS_SAVE )
 GAME( 1984, grobda,   0,        grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1984, grobda2,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, grobda3,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", GAME_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
-GAME( 1983, phozon,   0,        phozon,   phozon, mappy_state,   0,        ROT90, "Namco", "Phozon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, phozon,   0,        phozon,   phozon, driver_device,   0,        ROT90, "Namco", "Phozon (Japan)", GAME_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
-GAME( 1983, mappy,    0,        mappy,    mappy, mappy_state,    0,        ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
-GAME( 1983, mappyj,   mappy,    mappy,    mappy, mappy_state,    0,        ROT90, "Namco", "Mappy (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga, todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga, todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga, todruaga, mappy_state, 0,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mappy,    0,        mappy,    mappy, driver_device,    0,        ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mappyj,   mappy,    mappy,    mappy, driver_device,    0,        ROT90, "Namco", "Mappy (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruaga, 0,        todruaga, todruaga, driver_device, 0,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga, todruaga, driver_device, 0,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga, todruaga, driver_device, 0,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2,  0,        digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, motos,    0,        motos,    motos, mappy_state,    0,        ROT90, "Namco", "Motos", GAME_SUPPORTS_SAVE )
+GAME( 1985, motos,    0,        motos,    motos, driver_device,    0,        ROT90, "Namco", "Motos", GAME_SUPPORTS_SAVE )

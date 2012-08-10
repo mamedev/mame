@@ -488,6 +488,17 @@ public:
 	int m_count;
 	int m_dynamic_count;
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
+	DECLARE_DRIVER_INIT(gauntleg);
+	DECLARE_DRIVER_INIT(cartfury);
+	DECLARE_DRIVER_INIT(tenthdeg);
+	DECLARE_DRIVER_INIT(nbashowt);
+	DECLARE_DRIVER_INIT(warfa);
+	DECLARE_DRIVER_INIT(roadburn);
+	DECLARE_DRIVER_INIT(sf2049te);
+	DECLARE_DRIVER_INIT(gauntdl);
+	DECLARE_DRIVER_INIT(nbanfl);
+	DECLARE_DRIVER_INIT(sf2049);
+	DECLARE_DRIVER_INIT(sf2049se);
 };
 
 
@@ -2469,102 +2480,102 @@ static void init_common(running_machine &machine, int ioasic, int serialnum)
 }
 
 
-static DRIVER_INIT( gauntleg )
+DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 {
-	dcs2_init(machine, 4, 0x0b5d);
-	init_common(machine, MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
+	dcs2_init(machine(), 4, 0x0b5d);
+	init_common(machine(), MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
 }
 
 
-static DRIVER_INIT( gauntdl )
+DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 {
-	dcs2_init(machine, 4, 0x0b5d);
-	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
+	dcs2_init(machine(), 4, 0x0b5d);
+	init_common(machine(), MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
 }
 
 
-static DRIVER_INIT( warfa )
+DRIVER_INIT_MEMBER(vegas_state,warfa)
 {
-	dcs2_init(machine, 4, 0x0b5d);
-	init_common(machine, MIDWAY_IOASIC_MACE, 337/* others? */);
+	dcs2_init(machine(), 4, 0x0b5d);
+	init_common(machine(), MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
 }
 
 
-static DRIVER_INIT( tenthdeg )
+DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 {
-	dcs2_init(machine, 4, 0x0afb);
-	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
+	dcs2_init(machine(), 4, 0x0afb);
+	init_common(machine(), MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine.device("maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
 }
 
 
-static DRIVER_INIT( roadburn )
+DRIVER_INIT_MEMBER(vegas_state,roadburn)
 {
-	dcs2_init(machine, 4, 0);	/* no place to hook :-( */
-	init_common(machine, MIDWAY_IOASIC_STANDARD, 325/* others? */);
+	dcs2_init(machine(), 4, 0);	/* no place to hook :-( */
+	init_common(machine(), MIDWAY_IOASIC_STANDARD, 325/* others? */);
 }
 
 
-static DRIVER_INIT( nbashowt )
+DRIVER_INIT_MEMBER(vegas_state,nbashowt)
 {
-	dcs2_init(machine, 4, 0);
-	init_common(machine, MIDWAY_IOASIC_MACE, 528/* or 478 or 487 */);
+	dcs2_init(machine(), 4, 0);
+	init_common(machine(), MIDWAY_IOASIC_MACE, 528/* or 478 or 487 */);
 }
 
 
-static DRIVER_INIT( nbanfl )
+DRIVER_INIT_MEMBER(vegas_state,nbanfl)
 {
-	dcs2_init(machine, 4, 0);
-	init_common(machine, MIDWAY_IOASIC_BLITZ99, 498/* or 478 or 487 */);
+	dcs2_init(machine(), 4, 0);
+	init_common(machine(), MIDWAY_IOASIC_BLITZ99, 498/* or 478 or 487 */);
 	/* NOT: MACE */
 }
 
 
-static DRIVER_INIT( sf2049 )
+DRIVER_INIT_MEMBER(vegas_state,sf2049)
 {
-	dcs2_init(machine, 8, 0);
-	init_common(machine, MIDWAY_IOASIC_STANDARD, 336/* others? */);
+	dcs2_init(machine(), 8, 0);
+	init_common(machine(), MIDWAY_IOASIC_STANDARD, 336/* others? */);
 }
 
 
-static DRIVER_INIT( sf2049se )
+DRIVER_INIT_MEMBER(vegas_state,sf2049se)
 {
-	dcs2_init(machine, 8, 0);
-	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 336/* others? */);
+	dcs2_init(machine(), 8, 0);
+	init_common(machine(), MIDWAY_IOASIC_SFRUSHRK, 336/* others? */);
 }
 
 
-static DRIVER_INIT( sf2049te )
+DRIVER_INIT_MEMBER(vegas_state,sf2049te)
 {
-	dcs2_init(machine, 8, 0);
-	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 348/* others? */);
+	dcs2_init(machine(), 8, 0);
+	init_common(machine(), MIDWAY_IOASIC_SFRUSHRK, 348/* others? */);
 }
 
 
-static DRIVER_INIT( cartfury )
+DRIVER_INIT_MEMBER(vegas_state,cartfury)
 {
-	dcs2_init(machine, 4, 0);
-	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 495/* others? */);
+	dcs2_init(machine(), 4, 0);
+	init_common(machine(), MIDWAY_IOASIC_CARNEVIL, 495/* others? */);
 }
 
 

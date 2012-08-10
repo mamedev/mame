@@ -73,11 +73,11 @@ public:
 	DECLARE_READ8_MEMBER(irobot_control_r);
 	DECLARE_READ8_MEMBER(irobot_status_r);
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
+	DECLARE_DRIVER_INIT(irobot);
 };
 
 /*----------- defined in machine/irobot.c -----------*/
 
-DRIVER_INIT( irobot );
 MACHINE_RESET( irobot );
 
 TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback );

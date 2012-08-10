@@ -2432,19 +2432,19 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	state->m_cart_backupram = auto_alloc_array(machine, UINT8, 0x400000);
 }
 
-static DRIVER_INIT( saturnus )
+DRIVER_INIT_MEMBER(saturn_state,saturnus)
 {
-	saturn_init_driver(machine, 4);
+	saturn_init_driver(machine(), 4);
 }
 
-static DRIVER_INIT( saturneu )
+DRIVER_INIT_MEMBER(saturn_state,saturneu)
 {
-	saturn_init_driver(machine, 12);
+	saturn_init_driver(machine(), 12);
 }
 
-static DRIVER_INIT( saturnjp )
+DRIVER_INIT_MEMBER(saturn_state,saturnjp)
 {
-	saturn_init_driver(machine, 1);
+	saturn_init_driver(machine(), 1);
 }
 
 

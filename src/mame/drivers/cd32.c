@@ -837,9 +837,8 @@ ROM_END
 
 /***************************************************************************************************/
 
-static DRIVER_INIT( cd32 )
+DRIVER_INIT_MEMBER(cd32_state,cd32)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	static const amiga_machine_interface cd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
@@ -851,14 +850,14 @@ static DRIVER_INIT( cd32 )
 	};
 
 	/* configure our Amiga setup */
-	amiga_machine_config(machine, &cd32_intf);
+	amiga_machine_config(machine(), &cd32_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* input hack */
-	state->m_input_hack = NULL;
+	m_input_hack = NULL;
 }
 
 /* BIOS */
@@ -1248,11 +1247,10 @@ static void cndypuzl_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(cndypuzl)
+DRIVER_INIT_MEMBER(cd32_state,cndypuzl)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = cndypuzl_input_hack;
+	m_input_hack = cndypuzl_input_hack;
 }
 
 static void haremchl_input_hack(running_machine &machine)
@@ -1269,11 +1267,10 @@ static void haremchl_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(haremchl)
+DRIVER_INIT_MEMBER(cd32_state,haremchl)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = haremchl_input_hack;
+	m_input_hack = haremchl_input_hack;
 }
 
 static void lsrquiz_input_hack(running_machine &machine)
@@ -1290,11 +1287,10 @@ static void lsrquiz_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(lsrquiz)
+DRIVER_INIT_MEMBER(cd32_state,lsrquiz)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = lsrquiz_input_hack;
+	m_input_hack = lsrquiz_input_hack;
 }
 
 /* The hack isn't working if you exit the test mode with P1 button 2 ! */
@@ -1312,11 +1308,10 @@ static void lsrquiz2_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(lsrquiz2)
+DRIVER_INIT_MEMBER(cd32_state,lsrquiz2)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = lsrquiz2_input_hack;
+	m_input_hack = lsrquiz2_input_hack;
 }
 
 static void lasstixx_input_hack(running_machine &machine)
@@ -1333,11 +1328,10 @@ static void lasstixx_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(lasstixx)
+DRIVER_INIT_MEMBER(cd32_state,lasstixx)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = lasstixx_input_hack;
+	m_input_hack = lasstixx_input_hack;
 }
 
 static void mgnumber_input_hack(running_machine &machine)
@@ -1353,11 +1347,10 @@ static void mgnumber_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(mgnumber)
+DRIVER_INIT_MEMBER(cd32_state,mgnumber)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = mgnumber_input_hack;
+	m_input_hack = mgnumber_input_hack;
 }
 
 static void mgprem11_input_hack(running_machine &machine)
@@ -1373,11 +1366,10 @@ static void mgprem11_input_hack(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT(mgprem11)
+DRIVER_INIT_MEMBER(cd32_state,mgprem11)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	DRIVER_INIT_CALL(cd32);
-	state->m_input_hack = mgprem11_input_hack;
+	m_input_hack = mgprem11_input_hack;
 }
 
 static INPUT_PORTS_START( odeontw2 )
@@ -1456,9 +1448,8 @@ WRITE8_MEMBER (cd32_state::microtouch_tx)
 	amiga_serial_in_w(machine(), data);
 }
 
-static DRIVER_INIT( odeontw2 )
+DRIVER_INIT_MEMBER(cd32_state,odeontw2)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
 	static const amiga_machine_interface cd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
@@ -1470,14 +1461,14 @@ static DRIVER_INIT( odeontw2 )
 	};
 
 	/* configure our Amiga setup */
-	amiga_machine_config(machine, &cd32_intf);
+	amiga_machine_config(machine(), &cd32_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* input hack */
-	state->m_input_hack = NULL;
+	m_input_hack = NULL;
 }
 
 /***************************************************************************************************/

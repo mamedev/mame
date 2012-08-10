@@ -31,6 +31,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		{ }
 
+	DECLARE_DRIVER_INIT(kov2nl);
+	DECLARE_DRIVER_INIT(orleg2);
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -291,17 +293,17 @@ static void iga_u12_decode(UINT16* rom, int len, int ixor)
 	}
 }
 
-static DRIVER_INIT( orleg2 )
+DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
-	UINT16 *src = (UINT16 *)machine.root_device().memregion("spritesa")->base();
+	UINT16 *src = (UINT16 *)machine().root_device().memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
 }
 
-static DRIVER_INIT( kov2nl )
+DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	UINT16 *src = (UINT16 *)machine.root_device().memregion("spritesa")->base();
+	UINT16 *src = (UINT16 *)machine().root_device().memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);

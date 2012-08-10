@@ -166,6 +166,19 @@ public:
 	DECLARE_WRITE16_MEMBER(galgames_cart_data_w);
 	DECLARE_READ16_MEMBER(dummy_read_01);
 	DECLARE_WRITE16_MEMBER(tmaster_oki_bank_w);
+	DECLARE_DRIVER_INIT(tm4kca);
+	DECLARE_DRIVER_INIT(tm4kb);
+	DECLARE_DRIVER_INIT(tm7ka);
+	DECLARE_DRIVER_INIT(tm4ka);
+	DECLARE_DRIVER_INIT(galgames);
+	DECLARE_DRIVER_INIT(galgame2);
+	DECLARE_DRIVER_INIT(tm7keval);
+	DECLARE_DRIVER_INIT(tm8k);
+	DECLARE_DRIVER_INIT(tm5ka);
+	DECLARE_DRIVER_INIT(tm7k);
+	DECLARE_DRIVER_INIT(tm4k);
+	DECLARE_DRIVER_INIT(tm5kca);
+	DECLARE_DRIVER_INIT(tm5k);
 };
 
 
@@ -1637,9 +1650,9 @@ ROM_START( galgame2 )
 ROM_END
 
 
-static DRIVER_INIT( tm4k )
+DRIVER_INIT_MEMBER(tmaster_state,tm4k)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x834ce/2] = 0x4e75;
@@ -1658,9 +1671,9 @@ Protection resembles that of tm5k rather than tm4ka:
 }
 
 
-static DRIVER_INIT( tm4ka )
+DRIVER_INIT_MEMBER(tmaster_state,tm4ka)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1680,9 +1693,9 @@ Protection starts:
 }
 
 
-static DRIVER_INIT( tm4kca )
+DRIVER_INIT_MEMBER(tmaster_state,tm4kca)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x83470/2] = 0x4e75;
@@ -1702,9 +1715,9 @@ Protection starts:
 }
 
 
-static DRIVER_INIT( tm4kb )
+DRIVER_INIT_MEMBER(tmaster_state,tm4kb)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x82b7a/2] = 0x4e75;
@@ -1723,9 +1736,9 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( tm5k )
+DRIVER_INIT_MEMBER(tmaster_state,tm5k)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1746,9 +1759,9 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( tm5kca )
+DRIVER_INIT_MEMBER(tmaster_state,tm5kca)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x95ffe/2] = 0x4e75;
@@ -1758,9 +1771,9 @@ static DRIVER_INIT( tm5kca )
 
 }
 
-static DRIVER_INIT( tm5ka )
+DRIVER_INIT_MEMBER(tmaster_state,tm5ka)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96b30/2] = 0x4e75;
@@ -1779,9 +1792,9 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( tm7k )
+DRIVER_INIT_MEMBER(tmaster_state,tm7k)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1802,9 +1815,9 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( tm7ka )
+DRIVER_INIT_MEMBER(tmaster_state,tm7ka)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1825,9 +1838,9 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-004, which is a TM5000 key */
+DRIVER_INIT_MEMBER(tmaster_state,tm7keval)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
@@ -1848,9 +1861,9 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( tm8k )
+DRIVER_INIT_MEMBER(tmaster_state,tm8k)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1871,44 +1884,43 @@ Protection starts:
 
 }
 
-static DRIVER_INIT( galgames )
+DRIVER_INIT_MEMBER(tmaster_state,galgames)
 {
-	tmaster_state *state = machine.driver_data<tmaster_state>();
-	UINT8 *ROM	=	state->memregion("maincpu")->base();
+	UINT8 *ROM	=	memregion("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
 	// ROM bank at 0x000000-0x1fffff and 0x200000-0x3fffff (bios)
 
-	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
-	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
+	membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
+	membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	state->membank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	membank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
 
-	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
-	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
+	membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
+	membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	state->membank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	membank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
 
-	state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
+	membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
 
 	// More ROM banks at 0x200000-0x3fffff (carts)
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = state->memregion("maincpu")->base();
+		UINT8 *CART = memregion("maincpu")->base();
 
-		if  (0x200000 * (cart+1) <= state->memregion("maincpu")->bytes())
+		if  (0x200000 * (cart+1) <= memregion("maincpu")->bytes())
 			CART += 0x200000 * cart;
 
-		state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
-		state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
+		membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
+		membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
 	}
 }
 
-static DRIVER_INIT( galgame2 )
+DRIVER_INIT_MEMBER(tmaster_state,galgame2)
 {
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;
@@ -1923,17 +1935,17 @@ static DRIVER_INIT( galgame2 )
 	// Cartdridge check on game selection screen
 	ROM[0x12da0/2] = 0x4e71;
 
-	DRIVER_INIT_CALL( galgames );
+	DRIVER_INIT_CALL(galgames);
 }
 
 
-GAME( 1996, tm,       0,        tm,       tm, tmaster_state,       0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )
-GAME( 1996, tmdo,     tm,       tm,       tm, tmaster_state,       0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v2.2-01 Standard)",         0 )
-GAME( 1996, tm2k,     0,        tm3k,     tmaster, tmaster_state,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)", 0 )
-GAME( 1996, tm2ka,    tm2k,     tm3k,     tmaster, tmaster_state,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",      0 )
-GAME( 1996, tm2kb,    tm2k,     tm3k,     tmaster, tmaster_state,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",      0 )
-GAME( 1997, tm3k,     0,        tm3k,     tmaster, tmaster_state,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",      0 )
-GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster, tmaster_state,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",      0 )
+GAME( 1996, tm,       0,        tm,       tm, driver_device,       0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )
+GAME( 1996, tmdo,     tm,       tm,       tm, driver_device,       0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v2.2-01 Standard)",         0 )
+GAME( 1996, tm2k,     0,        tm3k,     tmaster, driver_device,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)", 0 )
+GAME( 1996, tm2ka,    tm2k,     tm3k,     tmaster, driver_device,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",      0 )
+GAME( 1996, tm2kb,    tm2k,     tm3k,     tmaster, driver_device,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",      0 )
+GAME( 1997, tm3k,     0,        tm3k,     tmaster, driver_device,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",      0 )
+GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster, driver_device,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",      0 )
 GAME( 1998, tm4k,     0,        tm3k,     tmaster, tmaster_state,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",      0 )
 GAME( 1998, tm4ka,    tm4k,     tm3k,     tmaster, tmaster_state,  tm4ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",      0 )
 GAME( 1998, tm4kca,   tm4k,     tm3k,     tmaster, tmaster_state,  tm4kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 California)",    0 )

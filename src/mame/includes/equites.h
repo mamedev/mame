@@ -88,6 +88,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_status);
 	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
+	DECLARE_DRIVER_INIT(bullfgtr);
+	DECLARE_DRIVER_INIT(kouyakyu);
+	DECLARE_DRIVER_INIT(hvoltage);
+	DECLARE_DRIVER_INIT(gekisou);
+	DECLARE_DRIVER_INIT(splndrbt);
+	DECLARE_DRIVER_INIT(equites);
 };
 
 

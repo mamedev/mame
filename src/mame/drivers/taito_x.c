@@ -333,6 +333,7 @@ public:
 	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
 	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_DRIVER_INIT(kyustrkr);
 };
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
@@ -1223,19 +1224,18 @@ ROM_START( ballbros )
 ROM_END
 
 
-static DRIVER_INIT( kyustrkr )
+DRIVER_INIT_MEMBER(taitox_state,kyustrkr)
 {
-	taitox_state *state = machine.driver_data<taitox_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),this));
 }
 
 
-GAME( 1988, superman,  0,        superman, superman, taitox_state,  0,        ROT0,   "Taito Corporation", "Superman", 0 )
-GAME( 1988, supermanj, superman, superman, supermanj, taitox_state, 0,        ROT0,   "Taito Corporation", "Superman (Japan)", 0 )
-GAME( 1989, twinhawk,  0,        daisenpu, twinhawk, taitox_state,  0,        ROT270, "Taito Corporation Japan", "Twin Hawk (World)", 0 )
-GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, taitox_state, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
-GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu, taitox_state,  0,        ROT270, "Taito Corporation", "Daisenpu (Japan)", 0 )
-GAME( 1989, gigandes,  0,        gigandes, gigandes, taitox_state,  0,        ROT0,   "East Technology", "Gigandes", 0 )
-GAME( 1989, gigandesj, gigandes, gigandes, gigandes, taitox_state,  0,        ROT0,   "East Technology", "Gigandes (Japan)", 0 )
+GAME( 1988, superman,  0,        superman, superman, driver_device,  0,        ROT0,   "Taito Corporation", "Superman", 0 )
+GAME( 1988, supermanj, superman, superman, supermanj, driver_device, 0,        ROT0,   "Taito Corporation", "Superman (Japan)", 0 )
+GAME( 1989, twinhawk,  0,        daisenpu, twinhawk, driver_device,  0,        ROT270, "Taito Corporation Japan", "Twin Hawk (World)", 0 )
+GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, driver_device, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
+GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu, driver_device,  0,        ROT270, "Taito Corporation", "Daisenpu (Japan)", 0 )
+GAME( 1989, gigandes,  0,        gigandes, gigandes, driver_device,  0,        ROT0,   "East Technology", "Gigandes", 0 )
+GAME( 1989, gigandesj, gigandes, gigandes, gigandes, driver_device,  0,        ROT0,   "East Technology", "Gigandes (Japan)", 0 )
 GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr, taitox_state,  kyustrkr, ROT180, "East Technology", "Last Striker / Kyuukyoku no Striker", 0 )
-GAME( 1992, ballbros,  0,        ballbros, ballbros, taitox_state,  0,        ROT0,   "East Technology", "Balloon Brothers", 0 )
+GAME( 1992, ballbros,  0,        ballbros, ballbros, driver_device,  0,        ROT0,   "East Technology", "Balloon Brothers", 0 )

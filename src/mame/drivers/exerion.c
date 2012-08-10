@@ -546,18 +546,18 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( exerion )
+DRIVER_INIT_MEMBER(exerion_state,exerion)
 {
 	UINT32 oldaddr, newaddr, length;
 	UINT8 *src, *dst, *temp;
 
 	/* allocate some temporary space */
-	temp = auto_alloc_array(machine, UINT8, 0x10000);
+	temp = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.root_device().memregion("gfx1")->base();
-	length = machine.root_device().memregion("gfx1")->bytes();
+	dst = machine().root_device().memregion("gfx1")->base();
+	length = machine().root_device().memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -574,8 +574,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine.root_device().memregion("gfx2")->base();
-	length = machine.root_device().memregion("gfx2")->bytes();
+	dst = machine().root_device().memregion("gfx2")->base();
+	length = machine().root_device().memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -591,13 +591,13 @@ static DRIVER_INIT( exerion )
 		dst[newaddr] = src[oldaddr];
 	}
 
-	auto_free(machine, temp);
+	auto_free(machine(), temp);
 }
 
 
-static DRIVER_INIT( exerionb )
+DRIVER_INIT_MEMBER(exerion_state,exerionb)
 {
-	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ram = machine().root_device().memregion("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

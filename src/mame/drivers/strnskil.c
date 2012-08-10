@@ -516,28 +516,26 @@ ROM_START( banbam )
 	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
-static DRIVER_INIT( pettanp )
+DRIVER_INIT_MEMBER(strnskil_state,pettanp)
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
 //  AM_RANGE(0xd806, 0xd806) AM_READ_LEGACY(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
-	strnskil_state *state = machine.driver_data<strnskil_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::pettanp_protection_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::pettanp_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 
 }
 
-static DRIVER_INIT( banbam )
+DRIVER_INIT_MEMBER(strnskil_state,banbam)
 {
 	/* Fujitsu MB8841 4-Bit MCU */
-	strnskil_state *state = machine.driver_data<strnskil_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 }
 
-GAME( 1984, strnskil, 0,        strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )
-GAME( 1984, guiness,  strnskil, strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", 0 )
+GAME( 1984, strnskil, 0,        strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )
+GAME( 1984, guiness,  strnskil, strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", 0 )
 GAME( 1984, banbam,   0,        banbam,   banbam, strnskil_state,   banbam,  ROT0, "Sun Electronics", "BanBam", GAME_UNEMULATED_PROTECTION )
 GAME( 1984, pettanp,  banbam,   strnskil, banbam, strnskil_state,   pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_UNEMULATED_PROTECTION )

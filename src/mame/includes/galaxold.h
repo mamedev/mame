@@ -134,6 +134,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 	DECLARE_READ8_MEMBER(ttl7474_trampoline);
+	DECLARE_DRIVER_INIT(bullsdrtg);
+	DECLARE_DRIVER_INIT(ladybugg);
+	DECLARE_DRIVER_INIT(4in1);
 };
 
 
@@ -192,9 +195,6 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer );
 WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback );
 WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 
-DRIVER_INIT( 4in1 );
-DRIVER_INIT( ladybugg );
-DRIVER_INIT( bullsdrtg );
 
 MACHINE_RESET( galaxold );
 MACHINE_RESET( devilfsg );

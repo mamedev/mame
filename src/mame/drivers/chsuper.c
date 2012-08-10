@@ -44,6 +44,10 @@ protected:
 	//virtual void machine_reset();
 
 	virtual void video_start();
+public:	
+	DECLARE_DRIVER_INIT(chsuper3);
+	DECLARE_DRIVER_INIT(chmpnum);
+	DECLARE_DRIVER_INIT(chsuper2);
 };
 
 
@@ -263,22 +267,21 @@ ROM_START( chmpnum )
 	ROM_COPY( "maincpu", 0x10000, 0x00000, 0x70000 )
 ROM_END
 
-static DRIVER_INIT( chsuper2 )
+DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 {
-	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = state->memregion("gfx1")->base();
+	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
-	state->m_tilexor = 0x7f00;
+	m_tilexor = 0x7f00;
 
-	buffer = auto_alloc_array(machine, UINT8, 0x100000);
+	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
 		int j;
 
-		j = i ^ (state->m_tilexor << 5);
+		j = i ^ (m_tilexor << 5);
 
 		buffer[j] = rom[i];
 	}
@@ -286,22 +289,21 @@ static DRIVER_INIT( chsuper2 )
 	memcpy(rom,buffer,0x100000);
 }
 
-static DRIVER_INIT( chsuper3 )
+DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 {
-	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = state->memregion("gfx1")->base();
+	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
-	state->m_tilexor = 0x0e00;
+	m_tilexor = 0x0e00;
 
-	buffer = auto_alloc_array(machine, UINT8, 0x100000);
+	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
 		int j;
 
-		j = i ^ (state->m_tilexor << 5);
+		j = i ^ (m_tilexor << 5);
 
 		buffer[j] = rom[i];
 	}
@@ -309,22 +311,21 @@ static DRIVER_INIT( chsuper3 )
 	memcpy(rom,buffer,0x100000);
 }
 
-static DRIVER_INIT( chmpnum )
+DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 {
-	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = state->memregion("gfx1")->base();
+	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
-	state->m_tilexor = 0x1800;
+	m_tilexor = 0x1800;
 
-	buffer = auto_alloc_array(machine, UINT8, 0x100000);
+	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
 		int j;
 
-		j = i ^ (state->m_tilexor << 5);
+		j = i ^ (m_tilexor << 5);
 
 		j = BITSWAP24(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
 		j = BITSWAP24(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);

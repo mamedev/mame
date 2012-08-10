@@ -485,5 +485,5 @@ ROM_END
 
 
 
-GAME( 1982, shougi,  0,      shougi, shougi, shougi_state,  0, ROT0, "Alpha Denshi Co.", "Shougi", 0 )
-GAME( 1982, shougi2, shougi, shougi, shougi2, shougi_state, 0, ROT0, "Alpha Denshi Co.", "Shougi 2", 0 )
+GAME( 1982, shougi,  0,      shougi, shougi, driver_device,  0, ROT0, "Alpha Denshi Co.", "Shougi", 0 )
+GAME( 1982, shougi2, shougi, shougi, shougi2, driver_device, 0, ROT0, "Alpha Denshi Co.", "Shougi 2", 0 )

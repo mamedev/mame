@@ -178,4 +178,4 @@ ROM_END
 
 
 //    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT,    MONITOR,      COMPANY, FULLNAME
-GAME( 1981,   gomoku,        0,   gomoku,   gomoku, gomoku_state,        0,      ROT90, "Nichibutsu", "Gomoku Narabe Renju", 0 )
+GAME( 1981,   gomoku,        0,   gomoku,   gomoku, driver_device,        0,      ROT90, "Nichibutsu", "Gomoku Narabe Renju", 0 )

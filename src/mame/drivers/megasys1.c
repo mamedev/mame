@@ -3678,18 +3678,17 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 	 m_mcu_hs_ram[4/2] == _3_ && \
 	 m_mcu_hs_ram[6/2] == _4_)
 
-static DRIVER_INIT( 64street )
+DRIVER_INIT_MEMBER(megasys1_state,64street)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-//  UINT16 *ROM = (UINT16 *) state->memregion("maincpu")->base();
+//  UINT16 *ROM = (UINT16 *) memregion("maincpu")->base();
 //  ROM[0x006b8/2] = 0x6004;        // d8001 test
 //  ROM[0x10EDE/2] = 0x6012;        // watchdog
 
-	state->m_ip_select_values[0] = 0x57;
-	state->m_ip_select_values[1] = 0x53;
-	state->m_ip_select_values[2] = 0x54;
-	state->m_ip_select_values[3] = 0x55;
-	state->m_ip_select_values[4] = 0x56;
+	m_ip_select_values[0] = 0x57;
+	m_ip_select_values[1] = 0x53;
+	m_ip_select_values[2] = 0x54;
+	m_ip_select_values[3] = 0x55;
+	m_ip_select_values[4] = 0x56;
 }
 
 READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
@@ -3730,67 +3729,61 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-static DRIVER_INIT( astyanax )
+DRIVER_INIT_MEMBER(megasys1_state,astyanax)
 {
-	astyanax_rom_decode(machine, "maincpu");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),state));
+	astyanax_rom_decode(machine(), "maincpu");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 }
 
-static DRIVER_INIT( avspirit )
+DRIVER_INIT_MEMBER(megasys1_state,avspirit)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ip_select_values[0] = 0x37;
-	state->m_ip_select_values[1] = 0x35;
-	state->m_ip_select_values[2] = 0x36;
-	state->m_ip_select_values[3] = 0x33;
-	state->m_ip_select_values[4] = 0x34;
+	m_ip_select_values[0] = 0x37;
+	m_ip_select_values[1] = 0x35;
+	m_ip_select_values[2] = 0x36;
+	m_ip_select_values[3] = 0x33;
+	m_ip_select_values[4] = 0x34;
 
 	// has twice less RAM
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x060000, 0x06ffff);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x070000, 0x07ffff, state->m_ram);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x060000, 0x06ffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x070000, 0x07ffff, m_ram);
 }
 
-static DRIVER_INIT( bigstrik )
+DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ip_select_values[0] = 0x58;
-	state->m_ip_select_values[1] = 0x54;
-	state->m_ip_select_values[2] = 0x55;
-	state->m_ip_select_values[3] = 0x56;
-	state->m_ip_select_values[4] = 0x57;
+	m_ip_select_values[0] = 0x58;
+	m_ip_select_values[1] = 0x54;
+	m_ip_select_values[2] = 0x55;
+	m_ip_select_values[3] = 0x56;
+	m_ip_select_values[4] = 0x57;
 }
 
-static DRIVER_INIT( chimerab )
+DRIVER_INIT_MEMBER(megasys1_state,chimerab)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
 	/* same as cybattlr */
-	state->m_ip_select_values[0] = 0x56;
-	state->m_ip_select_values[1] = 0x52;
-	state->m_ip_select_values[2] = 0x53;
-	state->m_ip_select_values[3] = 0x54;
-	state->m_ip_select_values[4] = 0x55;
+	m_ip_select_values[0] = 0x56;
+	m_ip_select_values[1] = 0x52;
+	m_ip_select_values[2] = 0x53;
+	m_ip_select_values[3] = 0x54;
+	m_ip_select_values[4] = 0x55;
 }
 
-static DRIVER_INIT( cybattlr )
+DRIVER_INIT_MEMBER(megasys1_state,cybattlr)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ip_select_values[0] = 0x56;
-	state->m_ip_select_values[1] = 0x52;
-	state->m_ip_select_values[2] = 0x53;
-	state->m_ip_select_values[3] = 0x54;
-	state->m_ip_select_values[4] = 0x55;
+	m_ip_select_values[0] = 0x56;
+	m_ip_select_values[1] = 0x52;
+	m_ip_select_values[2] = 0x53;
+	m_ip_select_values[3] = 0x54;
+	m_ip_select_values[4] = 0x55;
 }
 
-static DRIVER_INIT( edf )
+DRIVER_INIT_MEMBER(megasys1_state,edf)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ip_select_values[0] = 0x20;
-	state->m_ip_select_values[1] = 0x21;
-	state->m_ip_select_values[2] = 0x22;
-	state->m_ip_select_values[3] = 0x23;
-	state->m_ip_select_values[4] = 0x24;
+	m_ip_select_values[0] = 0x20;
+	m_ip_select_values[1] = 0x21;
+	m_ip_select_values[2] = 0x22;
+	m_ip_select_values[3] = 0x23;
+	m_ip_select_values[4] = 0x24;
 }
 
 READ16_MEMBER(megasys1_state::edfbl_input_r)
@@ -3812,22 +3805,20 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 	return res;
 }
 
-static DRIVER_INIT( edfbl )
+DRIVER_INIT_MEMBER(megasys1_state,edfbl)
 {
-	//device_t *oki1 = machine.device("oki1");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),state));
-	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
+	//device_t *oki1 = machine().device("oki1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
+	//machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
 }
 
-static DRIVER_INIT( hayaosi1 )
+DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	state->m_ip_select_values[0] = 0x51;
-	state->m_ip_select_values[1] = 0x52;
-	state->m_ip_select_values[2] = 0x53;
-	state->m_ip_select_values[3] = 0x54;
-	state->m_ip_select_values[4] = 0x55;
+	m_ip_select_values[0] = 0x51;
+	m_ip_select_values[1] = 0x52;
+	m_ip_select_values[2] = 0x53;
+	m_ip_select_values[3] = 0x54;
+	m_ip_select_values[4] = 0x55;
 }
 
 READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
@@ -3865,16 +3856,15 @@ WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
-static DRIVER_INIT( iganinju )
+DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 {
 	//UINT16 *ROM;
 
-	phantasm_rom_decode(machine, "maincpu");
+	phantasm_rom_decode(machine(), "maincpu");
 
-	//ROM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),state));
+	//ROM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
 
 	//ROM[0x00006e/2] = 0x0420; // the only game that does
 								// not like lev 3 interrupts
@@ -3893,45 +3883,43 @@ WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
 	else				oki->write_command((data >> 8) & 0xff );
 }
 
-static DRIVER_INIT( jitsupro )
+DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 {
-	//UINT16 *ROM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	//UINT16 *ROM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
-	astyanax_rom_decode(machine, "maincpu");		// Code
+	astyanax_rom_decode(machine(), "maincpu");		// Code
 
-	jitsupro_gfx_unmangle(machine, "gfx1");	// Gfx
-	jitsupro_gfx_unmangle(machine, "gfx4");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),state));
+	jitsupro_gfx_unmangle(machine(), "gfx1");	// Gfx
+	jitsupro_gfx_unmangle(machine(), "gfx4");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),state));
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),state));
+	machine().device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
+	machine().device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
 }
 
-static DRIVER_INIT( peekaboo )
+DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 {
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),state), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
 }
 
-static DRIVER_INIT( phantasm )
+DRIVER_INIT_MEMBER(megasys1_state,phantasm)
 {
-	phantasm_rom_decode(machine, "maincpu");
+	phantasm_rom_decode(machine(), "maincpu");
 }
 
-static DRIVER_INIT( rodland )
+DRIVER_INIT_MEMBER(megasys1_state,rodland)
 {
-	rodland_rom_decode(machine, "maincpu");
+	rodland_rom_decode(machine(), "maincpu");
 }
 
-static DRIVER_INIT( rodlandj )
+DRIVER_INIT_MEMBER(megasys1_state,rodlandj)
 {
-	rodlandj_gfx_unmangle(machine, "gfx1");
-	rodlandj_gfx_unmangle(machine, "gfx4");
+	rodlandj_gfx_unmangle(machine(), "gfx1");
+	rodlandj_gfx_unmangle(machine(), "gfx4");
 
-	astyanax_rom_decode(machine, "maincpu");
+	astyanax_rom_decode(machine(), "maincpu");
 }
 
 READ16_MEMBER(megasys1_state::soldamj_spriteram16_r)
@@ -3944,20 +3932,18 @@ WRITE16_MEMBER(megasys1_state::soldamj_spriteram16_w)
 	if (offset < 0x800/2)	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-static DRIVER_INIT( soldamj )
+DRIVER_INIT_MEMBER(megasys1_state,soldamj)
 {
-	astyanax_rom_decode(machine, "maincpu");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
+	astyanax_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),state), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
-static DRIVER_INIT( soldam )
+DRIVER_INIT_MEMBER(megasys1_state,soldam)
 {
-	phantasm_rom_decode(machine, "maincpu");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
+	phantasm_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),state), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
 
@@ -3991,23 +3977,21 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 }
 
 
-static DRIVER_INIT( stdragon )
+DRIVER_INIT_MEMBER(megasys1_state,stdragon)
 {
-	phantasm_rom_decode(machine, "maincpu");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),state));
+	phantasm_rom_decode(machine(), "maincpu");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
 
-static DRIVER_INIT( stdragona )
+DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 {
-	phantasm_rom_decode(machine, "maincpu");
+	phantasm_rom_decode(machine(), "maincpu");
 
-	stdragona_gfx_unmangle(machine, "gfx1");
-	stdragona_gfx_unmangle(machine, "gfx4");
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),state));
+	stdragona_gfx_unmangle(machine(), "gfx1");
+	stdragona_gfx_unmangle(machine(), "gfx4");
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
 
 READ16_MEMBER(megasys1_state::monkelf_input_r)
@@ -4029,15 +4013,14 @@ READ16_MEMBER(megasys1_state::monkelf_input_r)
 	return res;
 }
 
-static DRIVER_INIT( monkelf )
+DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 {
 	DRIVER_INIT_CALL(avspirit);
 
-	megasys1_state *state = machine.driver_data<megasys1_state>();
-	UINT16 *ROM = (UINT16*)state->memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
 }
 
 /*************************************
@@ -4046,11 +4029,11 @@ static DRIVER_INIT( monkelf )
  *
  *************************************/
 
-GAME( 1988, lomakai,  0,        system_Z,          lomakai, megasys1_state,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
-GAME( 1988, makaiden, lomakai,  system_Z,          lomakai, megasys1_state,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
-GAME( 1988, p47,      0,        system_A,          p47, megasys1_state,      0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
-GAME( 1988, p47j,     p47,      system_A,          p47, megasys1_state,      0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
-GAME( 1988, kickoff,  0,        system_A,          kickoff, megasys1_state,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
+GAME( 1988, lomakai,  0,        system_Z,          lomakai, driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
+GAME( 1988, makaiden, lomakai,  system_Z,          lomakai, driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
+GAME( 1988, p47,      0,        system_A,          p47, driver_device,      0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
+GAME( 1988, p47j,     p47,      system_A,          p47, driver_device,      0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
+GAME( 1988, kickoff,  0,        system_A,          kickoff, driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", 0 )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", 0 )
 GAME( 1988, kazan,    0,        system_A,          kazan, megasys1_state,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
@@ -4064,7 +4047,7 @@ GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, std
 GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", GAME_NOT_WORKING ) // gfx scramble
 GAME( 1990, rodland,  0,        system_A,          rodland, megasys1_state,  rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland, megasys1_state,  rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
-GAME( 1990, rodlandjb,rodland,  system_A,          rodland, megasys1_state,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
+GAME( 1990, rodlandjb,rodland,  system_A,          rodland, driver_device,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
 GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", GAME_NOT_WORKING )

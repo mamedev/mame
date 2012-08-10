@@ -72,6 +72,42 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
 	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
+	DECLARE_DRIVER_INIT(ket);
+	DECLARE_DRIVER_INIT(killbld);
+	DECLARE_DRIVER_INIT(pgm);
+	DECLARE_DRIVER_INIT(kovsh);
+	DECLARE_DRIVER_INIT(killbldp);
+	DECLARE_DRIVER_INIT(ddp2);
+	DECLARE_DRIVER_INIT(drgw2j);
+	DECLARE_DRIVER_INIT(kov2);
+	DECLARE_DRIVER_INIT(puzzli2);
+	DECLARE_DRIVER_INIT(dw2001);
+	DECLARE_DRIVER_INIT(martmast);
+	DECLARE_DRIVER_INIT(kovlsqh2);
+	DECLARE_DRIVER_INIT(espgal);
+	DECLARE_DRIVER_INIT(happy6);
+	DECLARE_DRIVER_INIT(oldsplus);
+	DECLARE_DRIVER_INIT(kovboot);
+	DECLARE_DRIVER_INIT(kovshp);
+	DECLARE_DRIVER_INIT(kovshxas);
+	DECLARE_DRIVER_INIT(theglad);
+	DECLARE_DRIVER_INIT(kov2p);
+	DECLARE_DRIVER_INIT(olds);
+	DECLARE_DRIVER_INIT(svg);
+	DECLARE_DRIVER_INIT(photoy2k);
+	DECLARE_DRIVER_INIT(svgpcb);
+	DECLARE_DRIVER_INIT(dmnfrnt);
+	DECLARE_DRIVER_INIT(dw2v100x);
+	DECLARE_DRIVER_INIT(kovqhsgs);
+	DECLARE_DRIVER_INIT(ddp3);
+	DECLARE_DRIVER_INIT(drgw2c);
+	DECLARE_DRIVER_INIT(dwpc);
+	DECLARE_DRIVER_INIT(kov);
+	DECLARE_DRIVER_INIT(py2k2);
+	DECLARE_DRIVER_INIT(drgw2);
+	DECLARE_DRIVER_INIT(drgw3);
+	DECLARE_DRIVER_INIT(orlegend);
+	DECLARE_DRIVER_INIT(pstar);
 };
 
 
@@ -93,6 +129,8 @@ public:
 	UINT8         m_asic3_h1;
 	UINT8         m_asic3_h2;
 	UINT16        m_asic3_hold;
+	
+	DECLARE_DRIVER_INIT(orlegend);
 };
 
 
@@ -141,6 +179,22 @@ public:
 	optional_shared_ptr<UINT32> m_arm7_shareram;
 
 	cpu_device *m_prot;
+
+	DECLARE_DRIVER_INIT(photoy2k);
+	DECLARE_DRIVER_INIT(kovsh);
+	DECLARE_DRIVER_INIT(kovshp);
+	DECLARE_DRIVER_INIT(kovshxas);
+	DECLARE_DRIVER_INIT(kovlsqh2);
+	DECLARE_DRIVER_INIT(kovqhsgs);
+	DECLARE_DRIVER_INIT(ddp3);
+	DECLARE_DRIVER_INIT(ket);
+	DECLARE_DRIVER_INIT(espgal);
+	DECLARE_DRIVER_INIT(puzzli2);
+	DECLARE_DRIVER_INIT(py2k2);
+	DECLARE_DRIVER_INIT(pstar);
+	DECLARE_DRIVER_INIT(kov);
+	DECLARE_DRIVER_INIT(kovboot);
+	DECLARE_DRIVER_INIT(oldsplus);
 };
 
 /* for machine/pgmprot2.c type games */
@@ -161,6 +215,13 @@ public:
 	required_shared_ptr<UINT32> m_arm7_shareram;
 
 	cpu_device *m_prot;
+	
+	DECLARE_DRIVER_INIT(kov2);
+	DECLARE_DRIVER_INIT(kov2p);
+	DECLARE_DRIVER_INIT(martmast);
+	DECLARE_DRIVER_INIT(ddp2);
+	DECLARE_DRIVER_INIT(dw2001);
+	DECLARE_DRIVER_INIT(dwpc);
 };
 
 
@@ -183,6 +244,13 @@ public:
 	required_shared_ptr<UINT32> m_arm_ram;
 
 	cpu_device *m_prot;
+	
+	DECLARE_DRIVER_INIT(theglad);
+	DECLARE_DRIVER_INIT(svg);
+	DECLARE_DRIVER_INIT(svgpcb);
+	DECLARE_DRIVER_INIT(killbldp);
+	DECLARE_DRIVER_INIT(dmnfrnt);
+	DECLARE_DRIVER_INIT(happy6);	
 };
 
 
@@ -202,6 +270,8 @@ public:
 	UINT32        m_kb_regs[0x10];
 	required_shared_ptr<UINT16> m_sharedprotram;
 
+	DECLARE_DRIVER_INIT(killbld);
+	DECLARE_DRIVER_INIT(drgw3);
 };
 
 /* for machine/pgmprot6.c type games */
@@ -220,7 +290,8 @@ public:
 	UINT16        m_olds_bs;
 	UINT16        m_olds_cmd3;
 	required_shared_ptr<UINT16> m_sharedprotram;
-
+	
+	DECLARE_DRIVER_INIT(olds);
 };
 
 
@@ -280,7 +351,6 @@ void pgm_happy6_decrypt(running_machine &machine);
 
 /*----------- defined in machine/pgmprot.c -----------*/
 
-DRIVER_INIT( orlegend );
 
 INPUT_PORTS_EXTERN( orlegend );
 INPUT_PORTS_EXTERN( orld105k );
@@ -290,23 +360,8 @@ MACHINE_CONFIG_EXTERN( pgm_asic3 );
 /*----------- defined in machine/pgmprot1.c -----------*/
 
 /* emulations */
-DRIVER_INIT( photoy2k );
-DRIVER_INIT( kovsh );
-DRIVER_INIT( kovshp );
-DRIVER_INIT( kovlsqh2 );
-DRIVER_INIT( kovqhsgs );
-DRIVER_INIT( kovshxas );
 
 /* simulations */
-DRIVER_INIT( ddp3 );
-DRIVER_INIT( ket );
-DRIVER_INIT( espgal );
-DRIVER_INIT( puzzli2 );
-DRIVER_INIT( py2k2 );
-DRIVER_INIT( pstar );
-DRIVER_INIT( kov );
-DRIVER_INIT( kovboot );
-DRIVER_INIT( oldsplus );
 
 MACHINE_CONFIG_EXTERN( pgm_arm_type1 );
 MACHINE_CONFIG_EXTERN( pgm_arm_type1_sim );
@@ -326,15 +381,9 @@ INPUT_PORTS_EXTERN( kovsh );
 /* emulations */
 MACHINE_CONFIG_EXTERN( pgm_arm_type2 );
 
-DRIVER_INIT( kov2 );
-DRIVER_INIT( kov2p );
-DRIVER_INIT( martmast );
-DRIVER_INIT( ddp2 );
 
 /* simulations (or missing) */
 
-DRIVER_INIT( dw2001 );
-DRIVER_INIT( dwpc );
 
 INPUT_PORTS_EXTERN( ddp2 );
 INPUT_PORTS_EXTERN( kov2 );
@@ -345,36 +394,23 @@ INPUT_PORTS_EXTERN( dw2001 );
 
 MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 
-DRIVER_INIT( theglad );
-DRIVER_INIT( svg );
-DRIVER_INIT( svgpcb );
-DRIVER_INIT( killbldp );
-DRIVER_INIT( dmnfrnt );
-DRIVER_INIT( happy6 );
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 
 MACHINE_CONFIG_EXTERN( pgm_022_025_kb );
 MACHINE_CONFIG_EXTERN( pgm_022_025_dw );
 
-DRIVER_INIT( killbld );
-DRIVER_INIT( drgw3 );
 
 INPUT_PORTS_EXTERN( killbld );
 INPUT_PORTS_EXTERN( dw3 );
 
 /*----------- defined in machine/pgmprot5.c -----------*/
 
-DRIVER_INIT( drgw2 );
-DRIVER_INIT( dw2v100x );
-DRIVER_INIT( drgw2c );
-DRIVER_INIT( drgw2j );
 
 /*----------- defined in machine/pgmprot6.c -----------*/
 
 MACHINE_CONFIG_EXTERN( pgm_028_025_ol );
 
-DRIVER_INIT( olds );
 
 INPUT_PORTS_EXTERN( olds );
 

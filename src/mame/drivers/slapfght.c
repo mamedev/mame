@@ -1738,16 +1738,14 @@ ROM_START( gtstarb2 )
 ROM_END
 
 
-static DRIVER_INIT( tigerh )
+DRIVER_INIT_MEMBER(slapfght_state,tigerh)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),state), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
 }
 
-static DRIVER_INIT( tigerhb )
+DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),state), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),this));
 }
 
 
@@ -1812,30 +1810,27 @@ static void getstar_init( running_machine &machine )
 	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),state));
 }
 
-static DRIVER_INIT( getstar )
+DRIVER_INIT_MEMBER(slapfght_state,getstar)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_getstar_id = GETSTAR;
-	getstar_init(machine);
+	m_getstar_id = GETSTAR;
+	getstar_init(machine());
 }
 
-static DRIVER_INIT( getstarj )
+DRIVER_INIT_MEMBER(slapfght_state,getstarj)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_getstar_id = GETSTARJ;
-	getstar_init(machine);
+	m_getstar_id = GETSTARJ;
+	getstar_init(machine());
 }
 
-static DRIVER_INIT( gtstarb1 )
+DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	state->m_getstar_id = GTSTARB1;
-	getstar_init(machine);
+	m_getstar_id = GTSTARB1;
+	getstar_init(machine());
 
 	/* specific handlers for this bootleg */
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -1843,24 +1838,21 @@ static DRIVER_INIT( gtstarb1 )
 	ROM[0x6d56] = 0xc3; //jp instead of jp z
 }
 
-static DRIVER_INIT( gtstarb2 )
+DRIVER_INIT_MEMBER(slapfght_state,gtstarb2)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_getstar_id = GTSTARB2;
-	getstar_init(machine);
+	m_getstar_id = GTSTARB2;
+	getstar_init(machine());
 }
 
-static DRIVER_INIT( slapfigh )
+DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),state), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),this), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),this));
 }
 
-static DRIVER_INIT( perfrman )
+DRIVER_INIT_MEMBER(slapfght_state,perfrman)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
 }
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */
@@ -1870,15 +1862,15 @@ GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, slapfght_state, perfrman
 GAME( 1985, tigerh,     0,        tigerh,     tigerh, slapfght_state,   tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh, slapfght_state,   tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhb1,   tigerh,   tigerhb,    tigerh, slapfght_state,   tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh, slapfght_state,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh, slapfght_state,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh, driver_device,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh, driver_device,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
 
 GAME( 1986, alcon,      0,        slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon (US)",  GAME_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
-GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, slapfght_state, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh, slapfght_state, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
-GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh, slapfght_state, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, driver_device, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh, driver_device, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
+GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh, driver_device, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
 GAME( 1986, getstar,    0,        slapfigh,   getstar, slapfght_state,  getstar,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
 GAME( 1986, getstarj,   getstar,  slapfigh,   getstarj, slapfght_state, getstarj, ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )

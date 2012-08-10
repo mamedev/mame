@@ -83,6 +83,7 @@ public:
 	tilemap_t *m_txttilemap;
 	DECLARE_READ8_MEMBER(t5182shared_r);
 	DECLARE_WRITE8_MEMBER(t5182shared_w);
+	DECLARE_DRIVER_INIT(panicr);
 };
 
 
@@ -462,15 +463,15 @@ ROM_START( panicr )
 ROM_END
 
 
-static DRIVER_INIT( panicr )
+DRIVER_INIT_MEMBER(panicr_state,panicr)
 {
-	UINT8 *buf = auto_alloc_array(machine, UINT8, 0x80000);
+	UINT8 *buf = auto_alloc_array(machine(), UINT8, 0x80000);
 	UINT8 *rom;
 	int size;
 	int i;
 
-	rom = machine.root_device().memregion("gfx1")->base();
-	size = machine.root_device().memregion("gfx1")->bytes();
+	rom = machine().root_device().memregion("gfx1")->base();
+	size = machine().root_device().memregion("gfx1")->bytes();
 
 	// text data lines
 	for (i = 0;i < size/2;i++)
@@ -492,8 +493,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = machine.root_device().memregion("gfx2")->base();
-	size = machine.root_device().memregion("gfx2")->bytes();
+	rom = machine().root_device().memregion("gfx2")->base();
+	size = machine().root_device().memregion("gfx2")->bytes();
 
 	// tiles data lines
 	for (i = 0;i < size/4;i++)
@@ -519,8 +520,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = machine.root_device().memregion("gfx3")->base();
-	size = machine.root_device().memregion("gfx3")->bytes();
+	rom = machine().root_device().memregion("gfx3")->base();
+	size = machine().root_device().memregion("gfx3")->bytes();
 
 	// sprites data lines
 	for (i = 0;i < size/2;i++)
@@ -545,8 +546,8 @@ static DRIVER_INIT( panicr )
 
 	//rearrange  bg tilemaps a bit....
 
-	rom = machine.root_device().memregion("user1")->base();
-	size = machine.root_device().memregion("user1")->bytes();
+	rom = machine().root_device().memregion("user1")->base();
+	size = machine().root_device().memregion("user1")->bytes();
 	memcpy(buf,rom, size);
 
 	{
@@ -558,8 +559,8 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	rom = machine.root_device().memregion("user2")->base();
-	size = machine.root_device().memregion("user2")->bytes();
+	rom = machine().root_device().memregion("user2")->base();
+	size = machine().root_device().memregion("user2")->bytes();
 
 	memcpy(buf,rom, size);
 	{
@@ -571,7 +572,7 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
 

@@ -83,6 +83,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
 	DECLARE_READ8_MEMBER(dd_adpcm_status_r);
 	DECLARE_WRITE8_MEMBER(ddragonba_port_w);
+	DECLARE_DRIVER_INIT(toffy);
+	DECLARE_DRIVER_INIT(darktowr);
+	DECLARE_DRIVER_INIT(ddragon2);
+	DECLARE_DRIVER_INIT(ddragon);
+	DECLARE_DRIVER_INIT(ddragon6809);
+	DECLARE_DRIVER_INIT(chinagat);
 };
 
 

@@ -596,4 +596,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, r2dtank, 0, r2dtank, r2dtank, r2dtank_state, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", GAME_SUPPORTS_SAVE)
+GAME( 1980, r2dtank, 0, r2dtank, r2dtank, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", GAME_SUPPORTS_SAVE)

@@ -787,9 +787,9 @@ static void exprraid_gfx_expand(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( wexpressb )
+DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* HACK: this set uses M6502 irq vectors but DECO CPU-16 opcodes??? */
 	rom[0xfff7] = rom[0xfffa];
@@ -801,26 +801,24 @@ static DRIVER_INIT( wexpressb )
 	rom[0xfff3] = rom[0xfffe];
 	rom[0xfff2] = rom[0xffff];
 
-	exprraid_gfx_expand(machine);
+	exprraid_gfx_expand(machine());
 }
 
-static DRIVER_INIT( exprraid )
+DRIVER_INIT_MEMBER(exprraid_state,exprraid)
 {
-	exprraid_gfx_expand(machine);
+	exprraid_gfx_expand(machine());
 }
 
-static DRIVER_INIT( wexpressb2 )
+DRIVER_INIT_MEMBER(exprraid_state,wexpressb2)
 {
-	exprraid_state *state = machine.driver_data<exprraid_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),state));
-	exprraid_gfx_expand(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	exprraid_gfx_expand(machine());
 }
 
-static DRIVER_INIT( wexpressb3 )
+DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
 {
-	exprraid_state *state = machine.driver_data<exprraid_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),state));
-	exprraid_gfx_expand(machine);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	exprraid_gfx_expand(machine());
 }
 
 

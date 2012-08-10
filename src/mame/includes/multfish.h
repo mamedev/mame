@@ -28,4 +28,6 @@ public:
 	UINT8 m_hopper_motor;
 	UINT8 m_hopper;
 
+	DECLARE_DRIVER_INIT(ROT0);
+	DECLARE_DRIVER_INIT(customl);
 };

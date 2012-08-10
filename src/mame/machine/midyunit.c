@@ -329,10 +329,10 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
  *
  *************************************/
 
-DRIVER_INIT( narc )
+DRIVER_INIT_MEMBER(midyunit_state,narc)
 {
 	/* common init */
-	init_generic(machine, 8, SOUND_NARC, 0xcdff, 0xce29);
+	init_generic(machine(), 8, SOUND_NARC, 0xcdff, 0xce29);
 }
 
 
@@ -348,9 +348,8 @@ DRIVER_INIT( narc )
 
 /********************** Trog **************************/
 
-DRIVER_INIT( trog )
+DRIVER_INIT_MEMBER(midyunit_state,trog)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data trog_protection_data =
 	{
@@ -360,27 +359,26 @@ DRIVER_INIT( trog )
 		  0x3000, 0x1000,
 		  0x0000, 0x0000, 0x2000, 0x3000, 0x1000, 0x1000, 0x2000 }
 	};
-	state->m_prot_data = &trog_protection_data;
+	m_prot_data = &trog_protection_data;
 
 	/* common init */
-	init_generic(machine, 4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
+	init_generic(machine(), 4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
 }
 
 
 /********************** Smash TV **********************/
 
-DRIVER_INIT( smashtv )
+DRIVER_INIT_MEMBER(midyunit_state,smashtv)
 {
 	/* common init */
-	init_generic(machine, 6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
+	init_generic(machine(), 6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
 }
 
 
 /********************** High Impact Football **********************/
 
-DRIVER_INIT( hiimpact )
+DRIVER_INIT_MEMBER(midyunit_state,hiimpact)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data hiimpact_protection_data =
 	{
@@ -388,18 +386,17 @@ DRIVER_INIT( hiimpact )
 		{ 0x2000, 0x4000, 0x4000, 0x0000, 0x6000, 0x6000, 0x2000, 0x4000,
 		  0x2000, 0x4000, 0x2000, 0x0000, 0x4000, 0x6000, 0x2000 }
 	};
-	state->m_prot_data = &hiimpact_protection_data;
+	m_prot_data = &hiimpact_protection_data;
 
 	/* common init */
-	init_generic(machine, 6, SOUND_CVSD, 0x9b79, 0x9ba3);
+	init_generic(machine(), 6, SOUND_CVSD, 0x9b79, 0x9ba3);
 }
 
 
 /********************** Super High Impact Football **********************/
 
-DRIVER_INIT( shimpact )
+DRIVER_INIT_MEMBER(midyunit_state,shimpact)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data shimpact_protection_data =
 	{
@@ -407,27 +404,26 @@ DRIVER_INIT( shimpact )
 		{ 0x0000, 0x4000, 0x2000, 0x5000, 0x2000, 0x1000, 0x4000, 0x6000,
 		  0x3000, 0x0000, 0x2000, 0x5000, 0x5000, 0x5000, 0x2000 }
 	};
-	state->m_prot_data = &shimpact_protection_data;
+	m_prot_data = &shimpact_protection_data;
 
 	/* common init */
-	init_generic(machine, 6, SOUND_CVSD, 0x9c06, 0x9c15);
+	init_generic(machine(), 6, SOUND_CVSD, 0x9c06, 0x9c15);
 }
 
 
 /********************** Strike Force **********************/
 
-DRIVER_INIT( strkforc )
+DRIVER_INIT_MEMBER(midyunit_state,strkforc)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data strkforc_protection_data =
 	{
 		{ 0x1234 }
 	};
-	state->m_prot_data = &strkforc_protection_data;
+	m_prot_data = &strkforc_protection_data;
 
 	/* common init */
-	init_generic(machine, 4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
+	init_generic(machine(), 4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
 }
 
 
@@ -443,9 +439,8 @@ DRIVER_INIT( strkforc )
 
 /********************** Mortal Kombat **********************/
 
-DRIVER_INIT( mkyunit )
+DRIVER_INIT_MEMBER(midyunit_state,mkyunit)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data mk_protection_data =
 	{
@@ -454,16 +449,16 @@ DRIVER_INIT( mkyunit )
 		  0x8600, 0x7600, 0x8600, 0x8600, 0x9600, 0xd600, 0x6600, 0xb600,
 		  0xd600, 0xe600, 0xf600, 0x7600, 0xb600, 0xa600, 0x3600 }
 	};
-	state->m_prot_data = &mk_protection_data;
+	m_prot_data = &mk_protection_data;
 
 	/* common init */
-	init_generic(machine, 6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
+	init_generic(machine(), 6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
 }
 
-DRIVER_INIT( mkyawdim )
+DRIVER_INIT_MEMBER(midyunit_state,mkyawdim)
 {
 	/* common init */
-	init_generic(machine, 6, SOUND_YAWDIM, 0, 0);
+	init_generic(machine(), 6, SOUND_YAWDIM, 0, 0);
 }
 
 
@@ -480,11 +475,10 @@ READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 	return machine().rand();
 }
 
-DRIVER_INIT( mkyturbo )
+DRIVER_INIT_MEMBER(midyunit_state,mkyturbo)
 {
 	/* protection */
-	midyunit_state *state = machine.driver_data<midyunit_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
 
 	DRIVER_INIT_CALL(mkyunit);
 }
@@ -514,18 +508,17 @@ static void term2_init_common(running_machine &machine, write16_delegate hack_w)
 	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 }
 
-DRIVER_INIT( term2 )    { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2_hack_w),state)); }
-DRIVER_INIT( term2la3 ) { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2la3_hack_w),state)); }
-DRIVER_INIT( term2la2 ) { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2la2_hack_w),state)); }
-DRIVER_INIT( term2la1 ) { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2la1_hack_w),state)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2la3) { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2la3_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2la2) { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2la2_hack_w),this)); }
+DRIVER_INIT_MEMBER(midyunit_state,term2la1) { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2la1_hack_w),this)); }
 
 
 
 /********************** Total Carnage **********************/
 
-DRIVER_INIT( totcarn )
+DRIVER_INIT_MEMBER(midyunit_state,totcarn)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
 	static const struct protection_data totcarn_protection_data =
 	{
@@ -533,10 +526,10 @@ DRIVER_INIT( totcarn )
 		{ 0x4a00, 0x6a00, 0xda00, 0x6a00, 0x9a00, 0x4a00, 0x2a00, 0x9a00, 0x1a00,
 		  0x8a00, 0xaa00 }
 	};
-	state->m_prot_data = &totcarn_protection_data;
+	m_prot_data = &totcarn_protection_data;
 
 	/* common init */
-	init_generic(machine, 6, SOUND_ADPCM, 0xfc04, 0xfc2e);
+	init_generic(machine(), 6, SOUND_ADPCM, 0xfc04, 0xfc2e);
 }
 
 

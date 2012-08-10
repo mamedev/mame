@@ -32,6 +32,8 @@ public:
 	DECLARE_WRITE8_MEMBER(out_mux);
 	DECLARE_WRITE8_MEMBER(out_lamps);
 	DECLARE_WRITE8_MEMBER(grobda_DAC_w);
+	DECLARE_DRIVER_INIT(digdug2);
+	DECLARE_DRIVER_INIT(grobda);
 };
 
 

@@ -128,4 +128,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAME( 198?, segajw,  0,   segajw,  segajw, segajw_state,  0, ROT0, "Sega", "Golden Poker Series \"Joker's Wild\" (Rev. B)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS ) // TODO: correct title
+GAME( 198?, segajw,  0,   segajw,  segajw, driver_device,  0, ROT0, "Sega", "Golden Poker Series \"Joker's Wild\" (Rev. B)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS ) // TODO: correct title

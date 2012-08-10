@@ -2257,22 +2257,22 @@ static void kaneko16_expand_sample_banks(running_machine &machine, const char *r
 	}
 }
 
-static DRIVER_INIT( kaneko16 )
+DRIVER_INIT_MEMBER(kaneko16_state,kaneko16)
 {
-	kaneko16_unscramble_tiles(machine, "gfx2");
-	kaneko16_unscramble_tiles(machine, "gfx3");
+	kaneko16_unscramble_tiles(machine(), "gfx2");
+	kaneko16_unscramble_tiles(machine(), "gfx3");
 }
 
-static DRIVER_INIT( berlwall )
+DRIVER_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 {
-	kaneko16_unscramble_tiles(machine, "gfx2");
+	kaneko16_unscramble_tiles(machine(), "gfx2");
 }
 
-static DRIVER_INIT( samplebank )
+DRIVER_INIT_MEMBER(kaneko16_state,samplebank)
 {
-	kaneko16_unscramble_tiles(machine, "gfx2");
-	kaneko16_unscramble_tiles(machine, "gfx3");
-	kaneko16_expand_sample_banks(machine, "oki1");
+	kaneko16_unscramble_tiles(machine(), "gfx2");
+	kaneko16_unscramble_tiles(machine(), "gfx3");
+	kaneko16_expand_sample_banks(machine(), "oki1");
 }
 
 
@@ -3875,42 +3875,39 @@ ROM_START( bonkadv )
 	ROM_LOAD( "pc603108.102",		 0x200000, 0x100000, CRC(58458985) SHA1(9a846d604ba901eb2a59d2b6cd9c42e3b43adb6a) )
 ROM_END
 
-static DRIVER_INIT( bloodwar )
+DRIVER_INIT_MEMBER(kaneko16_state,bloodwar)
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	machine.device<nvram_device>("nvram")->set_base(state->m_nvram_save, sizeof(state->m_nvram_save));
+	machine().device<nvram_device>("nvram")->set_base(m_nvram_save, sizeof(m_nvram_save));
 	DRIVER_INIT_CALL(samplebank);
 	DRIVER_INIT_CALL(decrypt_toybox_rom);
 }
 
-static DRIVER_INIT( gtmr2 )
+DRIVER_INIT_MEMBER(kaneko16_state,gtmr2)
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	machine.device<nvram_device>("nvram")->set_base(state->m_nvram_save, sizeof(state->m_nvram_save));
+	machine().device<nvram_device>("nvram")->set_base(m_nvram_save, sizeof(m_nvram_save));
 	DRIVER_INIT_CALL(samplebank);
 	DRIVER_INIT_CALL(decrypt_toybox_rom_alt);
 }
 
 
 
-static DRIVER_INIT( shogwarr )
+DRIVER_INIT_MEMBER(kaneko16_shogwarr_state,shogwarr)
 {
 	// default sample banks
-	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w(machine, "bank11", "oki2", 0, 0x00000, 0x40000);
+	kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", 0, 0x00000, 0x40000);
 	DRIVER_INIT_CALL(kaneko16);
 }
 
 
-static DRIVER_INIT( brapboys )
+DRIVER_INIT_MEMBER(kaneko16_shogwarr_state,brapboys)
 {
-	kaneko16_shogwarr_state *state = machine.driver_data<kaneko16_shogwarr_state>();
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),this));
 
 	// default sample banks
-	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w(machine, "bank11", "oki2", 0, 0x20000, 0x20000);
+	kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", 0, 0x20000, 0x20000);
 	DRIVER_INIT_CALL(kaneko16);
 }
 

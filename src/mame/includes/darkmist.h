@@ -21,6 +21,7 @@ public:
 	tilemap_t *m_txtilemap;
 
 	DECLARE_WRITE8_MEMBER(darkmist_hw_w);
+	DECLARE_DRIVER_INIT(darkmist);
 };
 
 

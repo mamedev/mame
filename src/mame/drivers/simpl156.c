@@ -1020,11 +1020,11 @@ ROM_END
 */
 
 
-static DRIVER_INIT( simpl156 )
+DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
-	UINT8 *rom = machine.root_device().memregion("okimusic")->base();
-	int length = machine.root_device().memregion("okimusic")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+	UINT8 *rom = machine().root_device().memregion("okimusic")->base();
+	int length = machine().root_device().memregion("okimusic")->bytes();
+	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 
 	UINT32 x;
 
@@ -1045,10 +1045,10 @@ static DRIVER_INIT( simpl156 )
 
 	memcpy(rom, buf1, length);
 
-	auto_free(machine, buf1);
+	auto_free(machine(), buf1);
 
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco156_decrypt(machine);
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco156_decrypt(machine());
 }
 
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
@@ -1060,10 +1060,9 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 }
 
 
-static DRIVER_INIT( joemacr )
+DRIVER_INIT_MEMBER(simpl156_state,joemacr)
 {
-	simpl156_state *state = machine.driver_data<simpl156_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1074,10 +1073,9 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 	return m_systemram[0x18/4];
 }
 
-static DRIVER_INIT( chainrec )
+DRIVER_INIT_MEMBER(simpl156_state,chainrec)
 {
-	simpl156_state *state = machine.driver_data<simpl156_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1088,10 +1086,9 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 	return m_systemram[0xae0/4];
 }
 
-static DRIVER_INIT( prtytime )
+DRIVER_INIT_MEMBER(simpl156_state,prtytime)
 {
-	simpl156_state *state = machine.driver_data<simpl156_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1103,10 +1100,9 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-static DRIVER_INIT( charlien )
+DRIVER_INIT_MEMBER(simpl156_state,charlien)
 {
-	simpl156_state *state = machine.driver_data<simpl156_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1117,10 +1113,9 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-static DRIVER_INIT( osman )
+DRIVER_INIT_MEMBER(simpl156_state,osman)
 {
-	simpl156_state *state = machine.driver_data<simpl156_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 
 }

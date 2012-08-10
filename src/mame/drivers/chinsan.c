@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ym_port_w1);
 	DECLARE_WRITE8_MEMBER(ym_port_w2);
 	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
+	DECLARE_DRIVER_INIT(chinsan);
 };
 
 
@@ -677,9 +678,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( chinsan )
+DRIVER_INIT_MEMBER(chinsan_state,chinsan)
 {
-	mc8123_decrypt_rom(machine, "maincpu", "user1", "bank1", 4);
+	mc8123_decrypt_rom(machine(), "maincpu", "user1", "bank1", 4);
 }
 
 

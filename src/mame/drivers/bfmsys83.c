@@ -36,10 +36,9 @@ static MACHINE_CONFIG_START( bfmsys83, bfmsys83_state )
 MACHINE_CONFIG_END
 
 /*
-static DRIVER_INIT( decode )
+DRIVER_INIT_MEMBER(bfmsys83_state,decode)
 {
-    bfmsys83_state *state = machine.driver_data<bfmsys83_state>();
-    bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);
+    bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 }
 */
 
@@ -59,5 +58,5 @@ ROM_START( b83cops ) // was marked as sys85, but I think this is the sys83 set?
 	ROM_LOAD( "cops.p4", 0x8000, 0x2000, CRC(ce573b35) SHA1(f2ba22f0d55f882dd91b37e80e4bb14effd9113a) )
 ROM_END
 
-GAME( 198?, b83catms	, 0			,  bfmsys83		, bfmsys83	, bfmsys83_state, 0	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 198?, b83cops		, 0			,  bfmsys83		, bfmsys83	, bfmsys83_state, 0	, 0,		 "BFM",      "Cops & Robbers (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83catms	, 0			,  bfmsys83		, bfmsys83	, driver_device, 0	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83cops		, 0			,  bfmsys83		, bfmsys83	, driver_device, 0	, 0,		 "BFM",      "Cops & Robbers (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)

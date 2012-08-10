@@ -1554,116 +1554,108 @@ static void mcr68_common_init(running_machine &machine, int clip, int xoffset)
 }
 
 
-static DRIVER_INIT( zwackery )
+DRIVER_INIT_MEMBER(mcr68_state,zwackery)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 0, 0);
+	mcr68_common_init(machine(), 0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 }
 
 
-static DRIVER_INIT( xenophob )
+DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 0, -4);
+	mcr68_common_init(machine(), 0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
 }
 
 
-static DRIVER_INIT( spyhunt2 )
+DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 0, -6);
+	mcr68_common_init(machine(), 0, -6);
 
 	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),this));
 }
 
 
-static DRIVER_INIT( blasted )
+DRIVER_INIT_MEMBER(mcr68_state,blasted)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 0, 0);
+	mcr68_common_init(machine(), 0, 0);
 
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
 	/* after the 493; we also allow 16 E clocks for latency  */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),state), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
 }
 
-static DRIVER_INIT( intlaser )
+DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 0, 0);
+	mcr68_common_init(machine(), 0, 0);
 
 	/* Copied from Blasted */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
 
 }
 
 
 
-static DRIVER_INIT( archrivl )
+DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 16, 0);
+	mcr68_common_init(machine(), 16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
 
 	/* 49-way joystick handling is a bit tricky */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),state), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
 }
 
 
-static DRIVER_INIT( pigskin )
+DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 16, 0);
+	mcr68_common_init(machine(), 16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * 115;
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * 115;
 
-	state_save_register_global_array(machine, state->m_protection_data);
+	state_save_register_global_array(machine(), m_protection_data);
 }
 
 
-static DRIVER_INIT( trisport )
+DRIVER_INIT_MEMBER(mcr68_state,trisport)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, 0, 0);
+	mcr68_common_init(machine(), 0, 0);
 
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */
 	/* after the 493 */
-	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * 115;
+	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * 115;
 }
 
 

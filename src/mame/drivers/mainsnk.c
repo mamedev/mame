@@ -488,5 +488,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, mainsnk_state, 0,   ROT0, "SNK", "Main Event (1984)", 0)
-GAME( 1985, canvas,    0,   mainsnk, canvas, mainsnk_state,  0,   ROT0, "SNK", "Canvas Croquis", 0)
+GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", 0)
+GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", 0)

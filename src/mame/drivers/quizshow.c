@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
+	DECLARE_DRIVER_INIT(quizshow);
 };
 
 
@@ -423,10 +424,10 @@ ROM_START( quizshow )
 ROM_END
 
 
-static DRIVER_INIT( quizshow )
+DRIVER_INIT_MEMBER(quizshow_state,quizshow)
 {
-	UINT8 *gfxdata = machine.root_device().memregion("user1")->base();
-	UINT8 *dest = machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfxdata = machine().root_device().memregion("user1")->base();
+	UINT8 *dest = machine().root_device().memregion("gfx1")->base();
 
 	int tile, line;
 

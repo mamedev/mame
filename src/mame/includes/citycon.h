@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
 	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
 	DECLARE_WRITE8_MEMBER(citycon_background_w);
+	DECLARE_DRIVER_INIT(citycon);
 };
 
 

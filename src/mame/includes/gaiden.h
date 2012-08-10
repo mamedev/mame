@@ -68,6 +68,11 @@ public:
 	DECLARE_WRITE16_MEMBER(gaiden_videoram2_w);
 	DECLARE_READ16_MEMBER(gaiden_videoram2_r);
 	DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
+	DECLARE_DRIVER_INIT(raiga);
+	DECLARE_DRIVER_INIT(drgnbowl);
+	DECLARE_DRIVER_INIT(mastninj);
+	DECLARE_DRIVER_INIT(shadoww);
+	DECLARE_DRIVER_INIT(wildfang);
 };
 
 

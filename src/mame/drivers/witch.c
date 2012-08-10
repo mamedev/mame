@@ -233,6 +233,7 @@ public:
 	DECLARE_READ8_MEMBER(read_8010);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
+	DECLARE_DRIVER_INIT(witch);
 };
 
 
@@ -868,14 +869,13 @@ ROM_START( pbchmp95 )
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
-static DRIVER_INIT(witch)
+DRIVER_INIT_MEMBER(witch_state,witch)
 {
-	witch_state *state = machine.driver_data<witch_state>();
-	UINT8 *ROM = (UINT8 *)state->memregion("maincpu")->base();
-	state->membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
+	UINT8 *ROM = (UINT8 *)memregion("maincpu")->base();
+	membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
 
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), state));
-	state->m_bank = -1;
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
+	m_bank = -1;
 }
 
 GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai", "Witch", 0 )

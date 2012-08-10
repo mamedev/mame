@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilelow_w);
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
 	DECLARE_WRITE16_MEMBER(sshangha_video_w);
+	DECLARE_DRIVER_INIT(sshangha);
 };
 
 

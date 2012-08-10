@@ -47,6 +47,10 @@ public:
 	DECLARE_WRITE8_MEMBER(punchout_speech_reset_w);
 	DECLARE_WRITE8_MEMBER(punchout_speech_st_w);
 	DECLARE_WRITE8_MEMBER(punchout_speech_vcu_w);
+	DECLARE_DRIVER_INIT(armwrest);
+	DECLARE_DRIVER_INIT(spnchotj);
+	DECLARE_DRIVER_INIT(punchout);
+	DECLARE_DRIVER_INIT(spnchout);
 };
 
 
@@ -60,7 +64,3 @@ SCREEN_UPDATE_IND16( punchout_bottom );
 SCREEN_UPDATE_IND16( armwrest_top );
 SCREEN_UPDATE_IND16( armwrest_bottom );
 
-DRIVER_INIT( punchout );
-DRIVER_INIT( spnchout );
-DRIVER_INIT( spnchotj );
-DRIVER_INIT( armwrest );

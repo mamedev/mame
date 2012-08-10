@@ -95,6 +95,11 @@ public:
 	DECLARE_WRITE8_MEMBER(cvs_unknown_w);
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_ctl_w);
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_pdc_w);
+	DECLARE_DRIVER_INIT(raiders);
+	DECLARE_DRIVER_INIT(huncholy);
+	DECLARE_DRIVER_INIT(hero);
+	DECLARE_DRIVER_INIT(superbik);
+	DECLARE_DRIVER_INIT(hunchbaka);
 };
 
 

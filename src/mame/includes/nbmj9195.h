@@ -105,6 +105,7 @@ public:
 	DECLARE_READ8_MEMBER(nbmj9195_blitter_1_r);
 	DECLARE_WRITE8_MEMBER(nbmj9195_clut_0_w);
 	DECLARE_WRITE8_MEMBER(nbmj9195_clut_1_w);
+	DECLARE_DRIVER_INIT(nbmj9195);
 };
 
 

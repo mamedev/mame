@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
 	DECLARE_WRITE8_MEMBER(mouser_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(mouser_flip_screen_y_w);
+	DECLARE_DRIVER_INIT(mouser);
 };
 
 /*----------- defined in video/mouser.c -----------*/

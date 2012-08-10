@@ -785,21 +785,21 @@ ROM_START( ringkingw )
 	ROM_LOAD( "prom1.bin",    0x0800, 0x0400, CRC(913f5975) SHA1(3d1e40eeb4d5a3a4bd42ec73d05bfca13b2f1805) ) /* blue component */
 ROM_END
 
-static DRIVER_INIT( ringking3 )
+DRIVER_INIT_MEMBER(kingofb_state,ringking3)
 {
 	int i;
-	UINT8 *RAM = machine.root_device().memregion("proms")->base();
+	UINT8 *RAM = machine().root_device().memregion("proms")->base();
 
 	/* expand the first color PROM to look like the kingofb ones... */
 	for (i = 0; i < 0x100; i++)
 		RAM[i] = RAM[i + 0x100] >> 4;
 }
 
-static DRIVER_INIT( ringkingw )
+DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 {
 	int i,j,k;
-	UINT8 *PROMS = machine.root_device().memregion("proms")->base();
-	UINT8 *USER1 = machine.root_device().memregion("user1")->base();
+	UINT8 *PROMS = machine().root_device().memregion("proms")->base();
+	UINT8 *USER1 = machine().root_device().memregion("user1")->base();
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
 	for(i = 0, j = 0; j < 0x40; i++, j++)
@@ -817,8 +817,8 @@ static DRIVER_INIT( ringkingw )
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb, kingofb_state,  0,        ROT90, "Wood Place Inc.", "King of Boxer (English)", GAME_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, 0,        ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, 0,        ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb, driver_device,  0,        ROT90, "Wood Place Inc.", "King of Boxer (English)", GAME_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, driver_device, 0,        ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, driver_device, 0,        ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1985, ringking3, kingofb, kingofb,  kingofb, kingofb_state,  ringking3,ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1985, ringkingw, kingofb, kingofb,  kingofb, kingofb_state,  ringkingw,ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", GAME_SUPPORTS_SAVE )

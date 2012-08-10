@@ -142,6 +142,15 @@ public:
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_bit_w);
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_reset_w);
 	DECLARE_WRITE16_MEMBER(mouja_sound_rombank_w);
+	DECLARE_DRIVER_INIT(karatour);
+	DECLARE_DRIVER_INIT(daitorid);
+	DECLARE_DRIVER_INIT(blzntrnd);
+	DECLARE_DRIVER_INIT(mouja);
+	DECLARE_DRIVER_INIT(balcube);
+	DECLARE_DRIVER_INIT(gakusai);
+	DECLARE_DRIVER_INIT(dharmak);
+	DECLARE_DRIVER_INIT(puzzlet);
+	DECLARE_DRIVER_INIT(metro);
 };
 
 

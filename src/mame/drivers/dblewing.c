@@ -80,6 +80,7 @@ public:
 	DECLARE_READ16_MEMBER(dblewing_prot_r);
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
 	DECLARE_READ8_MEMBER(irq_latch_r);
+	DECLARE_DRIVER_INIT(dblewing);
 };
 
 UINT16 dblwings_pri_callback(UINT16 x)
@@ -748,10 +749,10 @@ ROM_START( dblewing )
 
 ROM_END
 
-static DRIVER_INIT( dblewing )
+DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
-	deco56_decrypt_gfx(machine, "gfx1");
-	deco102_decrypt_cpu(machine, "maincpu", 0x399d, 0x25, 0x3d);
+	deco56_decrypt_gfx(machine(), "gfx1");
+	deco102_decrypt_cpu(machine(), "maincpu", 0x399d, 0x25, 0x3d);
 }
 
 

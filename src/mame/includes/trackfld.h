@@ -47,6 +47,10 @@ public:
 	DECLARE_READ8_MEMBER(trackfld_speech_r);
 	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
 
+	DECLARE_DRIVER_INIT(trackfld);
+	DECLARE_DRIVER_INIT(atlantol);
+	DECLARE_DRIVER_INIT(wizzquiz);
+	DECLARE_DRIVER_INIT(mastkin);
 };
 
 

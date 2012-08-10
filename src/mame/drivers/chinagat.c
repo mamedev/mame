@@ -909,18 +909,17 @@ ROM_START( saiyugoub2 )
 ROM_END
 
 
-static DRIVER_INIT( chinagat )
+DRIVER_INIT_MEMBER(ddragon_state,chinagat)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	UINT8 *MAIN = state->memregion("maincpu")->base();
-	UINT8 *SUB = state->memregion("sub")->base();
+	UINT8 *MAIN = memregion("maincpu")->base();
+	UINT8 *SUB = memregion("sub")->base();
 
-	state->m_technos_video_hw = 1;
-	state->m_sprite_irq = M6809_IRQ_LINE;
-	state->m_sound_irq = INPUT_LINE_NMI;
+	m_technos_video_hw = 1;
+	m_sprite_irq = M6809_IRQ_LINE;
+	m_sound_irq = INPUT_LINE_NMI;
 
-	state->membank("bank1")->configure_entries(0, 6, &MAIN[0x10000], 0x4000);
-	state->membank("bank4")->configure_entries(0, 6, &SUB[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 6, &MAIN[0x10000], 0x4000);
+	membank("bank4")->configure_entries(0, 6, &SUB[0x10000], 0x4000);
 }
 
 

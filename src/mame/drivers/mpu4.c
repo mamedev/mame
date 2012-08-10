@@ -9,7 +9,7 @@
 */
 
 #include "emu.h"
-
+#include "includes/mpu4.h"
 
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mod4yam );
@@ -21,19 +21,6 @@ INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( grtecp );
-
-extern DRIVER_INIT( m_oldtmr );
-extern DRIVER_INIT( m_ccelbr );
-extern DRIVER_INIT( m_grtecp );
-extern DRIVER_INIT( m_blsbys );
-extern DRIVER_INIT( m4tst2 );
-extern DRIVER_INIT( m4tst );
-extern DRIVER_INIT( m4default );
-extern DRIVER_INIT( m4default_bigbank );
-extern DRIVER_INIT( m_frkstn );
-extern DRIVER_INIT( crystal );
-extern DRIVER_INIT( crystali );
-extern DRIVER_INIT( m4default_alt );
 
 ROM_START( m4tst )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -9230,7 +9217,7 @@ ROM_END
 /* Barcrest */
 GAME( 198?, m4tst,        0, mod2    ,   mpu4, mpu4_state,       m4tst,   ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
 GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4tst2,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
-GAME( 198?, m4clr,        0, mod2    ,   mpu4, mpu4_state,       0,       ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
+GAME( 198?, m4clr,        0, mod2    ,   mpu4, driver_device,       0,       ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 

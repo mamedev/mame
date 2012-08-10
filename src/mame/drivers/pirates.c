@@ -436,14 +436,14 @@ static void pirates_decrypt_oki(running_machine &machine)
 }
 
 
-static DRIVER_INIT( pirates )
+DRIVER_INIT_MEMBER(pirates_state,pirates)
 {
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
-	pirates_decrypt_68k(machine);
-	pirates_decrypt_p(machine);
-	pirates_decrypt_s(machine);
-	pirates_decrypt_oki(machine);
+	pirates_decrypt_68k(machine());
+	pirates_decrypt_p(machine());
+	pirates_decrypt_s(machine());
+	pirates_decrypt_oki(machine());
 
 	/* patch out protection check */
 	rom[0x62c0/2] = 0x6006; // beq -> bra
@@ -451,17 +451,16 @@ static DRIVER_INIT( pirates )
 
 READ16_MEMBER(pirates_state::genix_prot_r){	if(!offset)	return 0x0004; else	return 0x0000; }
 
-static DRIVER_INIT( genix )
+DRIVER_INIT_MEMBER(pirates_state,genix)
 {
-	pirates_decrypt_68k(machine);
-	pirates_decrypt_p(machine);
-	pirates_decrypt_s(machine);
-	pirates_decrypt_oki(machine);
+	pirates_decrypt_68k(machine());
+	pirates_decrypt_p(machine());
+	pirates_decrypt_s(machine());
+	pirates_decrypt_oki(machine());
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	pirates_state *state = machine.driver_data<pirates_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x109e98, 0x109e9b, read16_delegate(FUNC(pirates_state::genix_prot_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x109e98, 0x109e9b, read16_delegate(FUNC(pirates_state::genix_prot_r),this));
 }
 
 

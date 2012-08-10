@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE32_MEMBER(wcvol95_pf2_rowscroll_w);
 	DECLARE_WRITE32_MEMBER(wcvol95_spriteram_w);
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
+	DECLARE_DRIVER_INIT(hvysmsh);
+	DECLARE_DRIVER_INIT(wcvol95);
 };
 
 
@@ -639,18 +641,18 @@ static void descramble_sound( running_machine &machine, const char *tag )
 	auto_free(machine, buf1);
 }
 
-static DRIVER_INIT( hvysmsh )
+DRIVER_INIT_MEMBER(deco156_state,hvysmsh)
 {
-	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
-	deco156_decrypt(machine);
-	descramble_sound(machine, "oki2");
+	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
+	deco156_decrypt(machine());
+	descramble_sound(machine(), "oki2");
 }
 
-static DRIVER_INIT( wcvol95 )
+DRIVER_INIT_MEMBER(deco156_state,wcvol95)
 {
-	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
-	deco156_decrypt(machine);
-	descramble_sound(machine, "ymz");
+	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
+	deco156_decrypt(machine());
+	descramble_sound(machine(), "ymz");
 }
 
 

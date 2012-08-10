@@ -377,6 +377,8 @@ public:
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
 	DECLARE_DIRECT_UPDATE_MEMBER(missile_direct_handler);
+	DECLARE_DRIVER_INIT(missilem);
+	DECLARE_DRIVER_INIT(suprmatk);
 };
 
 
@@ -1226,10 +1228,10 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( suprmatk )
+DRIVER_INIT_MEMBER(missile_state,suprmatk)
 {
 	int i;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -1300,10 +1302,10 @@ static DRIVER_INIT( suprmatk )
 	}
 }
 
-static DRIVER_INIT( missilem )
+DRIVER_INIT_MEMBER(missile_state,missilem)
 {
-	UINT8 *src = machine.root_device().memregion("user1")->base();
-	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
+	UINT8 *src = machine().root_device().memregion("user1")->base();
+	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
 
 	// decrypt rom and put in maincpu region (result looks correct, but is untested)
 	for (int i = 0; i < 0x10000; i++)
@@ -1327,14 +1329,14 @@ static DRIVER_INIT( missilem )
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile, missile_state,         0, ROT0, "Atari", "Missile Command (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1980, missile2, missile, missile, missile, missile_state,         0, ROT0, "Atari", "Missile Command (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, missile1, missile, missile, missile, missile_state,         0, ROT0, "Atari", "Missile Command (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, missile,  0,       missile, missile, driver_device,         0, ROT0, "Atari", "Missile Command (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, missile2, missile, missile, missile, driver_device,         0, ROT0, "Atari", "Missile Command (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, missile1, missile, missile, missile, driver_device,         0, ROT0, "Atari", "Missile Command (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state, suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,        0, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,missile, missile, suprmatk, driver_device,        0, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
 
 /* the bootlegs are on different hardware and don't work */
-GAME( 1980, mcombat,  missile, missile, missile, missile_state,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
-GAME( 1980, mcombata, missile, missile, missile, missile_state,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )
-GAME( 1980, mcombats, missile, missile, missile, missile_state,         0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", GAME_NOT_WORKING )
+GAME( 1980, mcombat,  missile, missile, missile, driver_device,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
+GAME( 1980, mcombata, missile, missile, missile, driver_device,         0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )
+GAME( 1980, mcombats, missile, missile, missile, driver_device,         0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", GAME_NOT_WORKING )
 GAME( 2005, missilem, missile, missile, missile, missile_state,  missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", GAME_NOT_WORKING )

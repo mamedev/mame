@@ -109,6 +109,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	DECLARE_DRIVER_INIT(cliff);
 };
 
 
@@ -773,7 +774,7 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( cliff )
+DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
 {
 }
 

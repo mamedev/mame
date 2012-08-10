@@ -1079,9 +1079,9 @@ ROM_END
 
 
 
-static DRIVER_INIT( twincobr )
+DRIVER_INIT_MEMBER(twincobr_state,twincobr)
 {
-	twincobr_driver_savestate(machine);
+	twincobr_driver_savestate(machine());
 }
 
 

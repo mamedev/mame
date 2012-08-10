@@ -1580,27 +1580,24 @@ static void arkanoid_bootleg_init( running_machine &machine )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),state) );
 }
 
-static DRIVER_INIT( arkangc )
+DRIVER_INIT_MEMBER(arkanoid_state,arkangc)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->m_bootleg_id = ARKANGC;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = ARKANGC;
+	arkanoid_bootleg_init(machine());
 }
 
-static DRIVER_INIT( arkangc2 )
+DRIVER_INIT_MEMBER(arkanoid_state,arkangc2)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->m_bootleg_id = ARKANGC2;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = ARKANGC2;
+	arkanoid_bootleg_init(machine());
 }
 
-static DRIVER_INIT( block2 )
+DRIVER_INIT_MEMBER(arkanoid_state,block2)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	// the graphics on this bootleg have the data scrambled
 	int tile;
-	UINT8* srcgfx = state->memregion("gfx1")->base();
-	UINT8* buffer = auto_alloc_array(machine, UINT8, 0x18000);
+	UINT8* srcgfx = memregion("gfx1")->base();
+	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
 	{
@@ -1624,45 +1621,40 @@ static DRIVER_INIT( block2 )
 
 	memcpy(srcgfx, buffer, 0x18000);
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 
-	state->m_bootleg_id = BLOCK2;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = BLOCK2;
+	arkanoid_bootleg_init(machine());
 }
 
-static DRIVER_INIT( arkblock )
+DRIVER_INIT_MEMBER(arkanoid_state,arkblock)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->m_bootleg_id = ARKBLOCK;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = ARKBLOCK;
+	arkanoid_bootleg_init(machine());
 }
 
-static DRIVER_INIT( arkbloc2 )
+DRIVER_INIT_MEMBER(arkanoid_state,arkbloc2)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->m_bootleg_id = ARKBLOC2;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = ARKBLOC2;
+	arkanoid_bootleg_init(machine());
 }
 
-static DRIVER_INIT( arkgcbl )
+DRIVER_INIT_MEMBER(arkanoid_state,arkgcbl)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->m_bootleg_id = ARKGCBL;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = ARKGCBL;
+	arkanoid_bootleg_init(machine());
 }
 
-static DRIVER_INIT( paddle2 )
+DRIVER_INIT_MEMBER(arkanoid_state,paddle2)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->m_bootleg_id = PADDLE2;
-	arkanoid_bootleg_init(machine);
+	m_bootleg_id = PADDLE2;
+	arkanoid_bootleg_init(machine());
 }
 
 
-static DRIVER_INIT( tetrsark )
+DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	UINT8 *ROM = state->memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)
@@ -1670,13 +1662,13 @@ static DRIVER_INIT( tetrsark )
 		ROM[x] = ROM[x] ^ 0x94;
 	}
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd008, 0xd008, write8_delegate(FUNC(arkanoid_state::tetrsark_d008_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd008, 0xd008, write8_delegate(FUNC(arkanoid_state::tetrsark_d008_w),this));
 }
 
 
-static DRIVER_INIT( hexa )
+DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 {
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 #if 0
 
 
@@ -1690,20 +1682,20 @@ static DRIVER_INIT( hexa )
 	RAM[0x0126] = 0x00;
 #endif
 
-	machine.root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
 
 /* Game Drivers */
 
-GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, arkanoid_state, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, arkanoid_state, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, arkanoid_state, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj, arkanoid_state,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjo, arkanoid, arkanoid, arkanoidj, arkanoid_state,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj, arkanoid_state,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkanoidjb2,arkanoid, arkanoid, arkanoidj, arkanoid_state,0,        ROT90, "bootleg (Beta)", "Arkanoid (bootleg with MCU, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, arkanoid_state, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidj,  arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjo, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "Taito Corporation", "Arkanoid (Japan, older)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjb, arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkanoidjb2,arkanoid, arkanoid, arkanoidj, driver_device,0,        ROT90, "bootleg (Beta)", "Arkanoid (bootleg with MCU, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ark1ball,   arkanoid, arkanoid, ark1ball, driver_device, 0,        ROT90, "bootleg", "Arkanoid (bootleg with MCU, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc,    arkanoid, bootleg,  arkangc, arkanoid_state,  arkangc,  ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkangc2,   arkanoid, bootleg,  arkangc2, arkanoid_state, arkangc2, ROT90, "bootleg (Game Corporation)", "Arkanoid (Game Corporation bootleg, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkblock,   arkanoid, bootleg,  arkangc, arkanoid_state,  arkblock, ROT90, "bootleg (Game Corporation)", "Block (Game Corporation bootleg, set 1)", GAME_SUPPORTS_SAVE )
@@ -1713,9 +1705,9 @@ GAME( 1986, block2,     arkanoid, bootleg,  block2, arkanoid_state,   block2,   
 GAME( 1986, arkgcbl,    arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, arkgcbla,   arkanoid, bootleg,  arkgcbl, arkanoid_state,  arkgcbl,  ROT90, "bootleg", "Arkanoid (bootleg on Block hardware, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddle2,    arkanoid, bootleg,  paddle2, arkanoid_state,  paddle2,  ROT90, "bootleg", "Paddle 2 (bootleg on Block hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arkatayt,   arkanoid, bootleg,  arkatayt, arkanoid_state, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, arkanoid_state, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg, harder)", GAME_SUPPORTS_SAVE )
-GAME( 1987, arkatour,   arkanoid, arkanoid, arkanoid, arkanoid_state, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arkatayt,   arkanoid, bootleg,  arkatayt, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, driver_device, 0,        ROT90, "bootleg (Tayto)", "Arkanoid (Tayto bootleg, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1987, arkatour,   arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
 GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
 GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  0,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+GAME( 1993, brixian,    0,        brixian,  brixian, driver_device,  0,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )

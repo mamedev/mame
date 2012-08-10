@@ -94,6 +94,10 @@ public:
 	DECLARE_READ8_MEMBER(nycaptor_scrlram_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_DRIVER_INIT(cyclshtg);
+	DECLARE_DRIVER_INIT(colt);
+	DECLARE_DRIVER_INIT(bronx);
+	DECLARE_DRIVER_INIT(nycaptor);
 };
 
 

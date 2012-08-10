@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
 	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
+	DECLARE_DRIVER_INIT(mightguy);
 };
 
 

@@ -808,18 +808,16 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( fromanc2 )
+DRIVER_INIT_MEMBER(fromanc2_state,fromanc2)
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
-	state->m_subcpu_nmi_flag = 1;
-	state->m_subcpu_int_flag = 1;
-	state->m_sndcpu_nmi_flag = 1;
+	m_subcpu_nmi_flag = 1;
+	m_subcpu_int_flag = 1;
+	m_sndcpu_nmi_flag = 1;
 }
 
-static DRIVER_INIT( fromanc4 )
+DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
-	state->m_sndcpu_nmi_flag = 1;
+	m_sndcpu_nmi_flag = 1;
 }
 
 

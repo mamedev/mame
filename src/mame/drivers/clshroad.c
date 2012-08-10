@@ -461,7 +461,7 @@ ROM_START( clshroadd )
 	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END
 
-static DRIVER_INIT ( firebatl )
+DRIVER_INIT_MEMBER(clshroad_state,firebatl)
 {
 /*
 Pugsy> firebatl:0:05C6:C3:100:Fix the Game:It's a hack but seems to make it work!
@@ -472,7 +472,7 @@ without this the death sequence never ends so the game is unplayable after you
 die once, it would be nice to avoid the hack however
 
 */
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	ROM[0x05C6] = 0xc3;
 	ROM[0x05C7] = 0x8d;
@@ -480,6 +480,6 @@ die once, it would be nice to avoid the hack however
 }
 
 GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", 0 )
+GAME( 1986, clshroad, 0,        clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
+GAME( 1986, clshroadd,clshroad, clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", 0 )

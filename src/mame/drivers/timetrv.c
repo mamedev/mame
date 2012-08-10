@@ -180,4 +180,4 @@ ROM_START( timetrv )
 	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
 ROM_END
 
-GAME( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1991, timetrv,  0,       timetrv,  timetrv, driver_device,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler", GAME_NO_SOUND | GAME_NOT_WORKING )

@@ -1433,20 +1433,20 @@ ROM_END
 
 
 
-static DRIVER_INIT( trackfld )
+DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 {
-	konami1_decode(machine, "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
-static DRIVER_INIT( atlantol )
+DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt;
 	int A;
 
 	/* "konami1" encrypted opcodes */
-	decrypt = konami1_decode(machine, "maincpu");
+	decrypt = konami1_decode(machine(), "maincpu");
 
 	/* not encrypted opcodes */
 	for (A = 0; A < 0x6000; A++)
@@ -1454,8 +1454,7 @@ static DRIVER_INIT( atlantol )
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypt);
 
-	trackfld_state *state = machine.driver_data<trackfld_state>();
-	space->install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),state));
+	space->install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
 	space->nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */
@@ -1463,15 +1462,15 @@ static DRIVER_INIT( atlantol )
 	space->install_read_bank(0x1380, 0x17ff, "bank11");
 	space->install_read_bank(0x2000, 0x27ff, "bank12");
 	space->install_read_bank(0x4000, 0x5fff, "bank13");
-	state->membank("bank10")->set_base(&rom[0x0000]);
-	state->membank("bank11")->set_base(&rom[0x1380]);
-	state->membank("bank12")->set_base(&rom[0x2000]);
-	state->membank("bank13")->set_base(&rom[0x4000]);
+	membank("bank10")->set_base(&rom[0x0000]);
+	membank("bank11")->set_base(&rom[0x1380]);
+	membank("bank12")->set_base(&rom[0x2000]);
+	membank("bank13")->set_base(&rom[0x4000]);
 }
 
-static DRIVER_INIT( mastkin )
+DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 {
-	UINT8 *prom = machine.root_device().memregion("proms")->base();
+	UINT8 *prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	/* build a fake palette so the screen won't be all black */
@@ -1490,22 +1489,22 @@ static DRIVER_INIT( mastkin )
 	}
 }
 
-static DRIVER_INIT( wizzquiz )
+DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base() + 0xe000;
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base() + 0xe000;
 	int i;
 
 	/* decrypt program rom */
 	for (i = 0; i < 0x2000; i++)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	ROM = machine.root_device().memregion("user1")->base();
+	ROM = machine().root_device().memregion("user1")->base();
 
 	/* decrypt questions roms */
 	for (i = 0; i < 0x40000; i++)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	machine.root_device().membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
+	machine().root_device().membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
 }
 
 
@@ -1518,5 +1517,5 @@ GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld_state, trackfld, R
 GAME( 1988, mastkin,   0,        mastkin,  mastkin, trackfld_state,  mastkin,  ROT0,  "Du Tech", "The Masters of Kin", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1985, wizzquiz,  0,        wizzquiz, wizzquiz, trackfld_state, wizzquiz, ROT0,  "Zilec-Zenitone (Konami license)", "Wizz Quiz (Konami version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, wizzquiza, wizzquiz, wizzquiz, wizzquiz, trackfld_state, wizzquiz, ROT0,  "Zilec-Zenitone", "Wizz Quiz (version 4)", GAME_SUPPORTS_SAVE )
-GAME( 1987, reaktor,   0,        reaktor,  reaktor, trackfld_state,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1985, yieartf,   yiear,    yieartf,  yieartf, trackfld_state,  0,        ROT0,  "Konami", "Yie Ar Kung-Fu (GX361 conversion)", GAME_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1987, reaktor,   0,        reaktor,  reaktor, driver_device,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1985, yieartf,   yiear,    yieartf,  yieartf, driver_device,  0,        ROT0,  "Konami", "Yie Ar Kung-Fu (GX361 conversion)", GAME_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

@@ -2442,41 +2442,36 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( ramtiles )
+DRIVER_INIT_MEMBER(gottlieb_state,ramtiles)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->m_gfxcharlo = state->m_gfxcharhi = 0;
+	m_gfxcharlo = m_gfxcharhi = 0;
 }
 
 
-static DRIVER_INIT( romtiles )
+DRIVER_INIT_MEMBER(gottlieb_state,romtiles)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->m_gfxcharlo = state->m_gfxcharhi = 1;
+	m_gfxcharlo = m_gfxcharhi = 1;
 }
 
 
-static DRIVER_INIT( stooges )
+DRIVER_INIT_MEMBER(gottlieb_state,stooges)
 {
 	DRIVER_INIT_CALL(ramtiles);
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05803, 0x05803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05803, 0x05803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
 }
 
 
-static DRIVER_INIT( screwloo )
+DRIVER_INIT_MEMBER(gottlieb_state,screwloo)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->m_gfxcharlo = 0;
-	state->m_gfxcharhi = 1;
+	m_gfxcharlo = 0;
+	m_gfxcharhi = 1;
 }
 
 
-static DRIVER_INIT( vidvince )
+DRIVER_INIT_MEMBER(gottlieb_state,vidvince)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->m_gfxcharlo = 1;
-	state->m_gfxcharhi = 0;
+	m_gfxcharlo = 1;
+	m_gfxcharhi = 0;
 }
 
 

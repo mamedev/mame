@@ -42,25 +42,25 @@ TODO:
 #include "machine/nvram.h"
 
 
-static DRIVER_INIT( mjsikaku )
+DRIVER_INIT_MEMBER(nbmj8688_state,mjsikaku)
 {
 	nb1413m3_type = NB1413M3_MJSIKAKU;
 }
 
-static DRIVER_INIT( mmsikaku )
+DRIVER_INIT_MEMBER(nbmj8688_state,mmsikaku)
 {
 	nb1413m3_type = NB1413M3_MMSIKAKU;
 }
 
-static DRIVER_INIT( otonano )
+DRIVER_INIT_MEMBER(nbmj8688_state,otonano)
 {
 	nb1413m3_type = NB1413M3_OTONANO;
 }
 
-static DRIVER_INIT( mjcamera )
+DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
 {
-	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x20000;
-	UINT8 *prot = machine.root_device().memregion("user1")->base();
+	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x20000;
+	UINT8 *prot = machine().root_device().memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -76,10 +76,10 @@ static DRIVER_INIT( mjcamera )
 	nb1413m3_type = NB1413M3_MJCAMERA;
 }
 
-static DRIVER_INIT( kanatuen )
+DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
 {
 	/* uses the same protection data as mjcamer, but a different check */
-	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x30000;
+	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x30000;
 
 	rom[0x0004] = 0x09;
 	rom[0x0103] = 0x0e;
@@ -89,11 +89,11 @@ static DRIVER_INIT( kanatuen )
 	nb1413m3_type = NB1413M3_KANATUEN;
 }
 
-static DRIVER_INIT( kyuhito )
+DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	rom[0x0149] = 0x00;
 	rom[0x014a] = 0x00;
@@ -103,10 +103,10 @@ static DRIVER_INIT( kyuhito )
 	nb1413m3_type = NB1413M3_KYUHITO;
 }
 
-static DRIVER_INIT( idhimitu )
+DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
 {
-	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x20000;
-	UINT8 *prot = machine.root_device().memregion("user1")->base();
+	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x20000;
+	UINT8 *prot = machine().root_device().memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -122,16 +122,16 @@ static DRIVER_INIT( idhimitu )
 	nb1413m3_type = NB1413M3_IDHIMITU;
 }
 
-static DRIVER_INIT( kaguya )
+DRIVER_INIT_MEMBER(nbmj8688_state,kaguya)
 {
 	nb1413m3_type = NB1413M3_KAGUYA;
 
 }
 
-static DRIVER_INIT( kaguya2 )
+DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
 {
-	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x20000;
-	UINT8 *prot = machine.root_device().memregion("user1")->base();
+	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x20000;
+	UINT8 *prot = machine().root_device().memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -147,127 +147,127 @@ static DRIVER_INIT( kaguya2 )
 	nb1413m3_type = NB1413M3_KAGUYA2;
 }
 
-static DRIVER_INIT( secolove )
+DRIVER_INIT_MEMBER(nbmj8688_state,secolove)
 {
 	nb1413m3_type = NB1413M3_SECOLOVE;
 }
 
-static DRIVER_INIT( citylove )
+DRIVER_INIT_MEMBER(nbmj8688_state,citylove)
 {
 	nb1413m3_type = NB1413M3_CITYLOVE;
 }
 
-static DRIVER_INIT( mcitylov )
+DRIVER_INIT_MEMBER(nbmj8688_state,mcitylov)
 {
 	nb1413m3_type = NB1413M3_MCITYLOV;
 }
 
-static DRIVER_INIT( seiha )
+DRIVER_INIT_MEMBER(nbmj8688_state,seiha)
 {
 	nb1413m3_type = NB1413M3_SEIHA;
 }
 
-static DRIVER_INIT( seiham )
+DRIVER_INIT_MEMBER(nbmj8688_state,seiham)
 {
 	nb1413m3_type = NB1413M3_SEIHAM;
 }
 
-static DRIVER_INIT( korinai )
+DRIVER_INIT_MEMBER(nbmj8688_state,korinai)
 {
 	nb1413m3_type = NB1413M3_KORINAI;
 }
 
-static DRIVER_INIT( korinaim )
+DRIVER_INIT_MEMBER(nbmj8688_state,korinaim)
 {
 	nb1413m3_type = NB1413M3_KORINAIM;
 }
 
-static DRIVER_INIT( iemoto )
+DRIVER_INIT_MEMBER(nbmj8688_state,iemoto)
 {
 	nb1413m3_type = NB1413M3_IEMOTO;
 }
 
-static DRIVER_INIT( iemotom )
+DRIVER_INIT_MEMBER(nbmj8688_state,iemotom)
 {
 	nb1413m3_type = NB1413M3_IEMOTOM;
 }
 
-static DRIVER_INIT( ryuuha )
+DRIVER_INIT_MEMBER(nbmj8688_state,ryuuha)
 {
 	nb1413m3_type = NB1413M3_RYUUHA;
 }
 
-static DRIVER_INIT( ojousan )
+DRIVER_INIT_MEMBER(nbmj8688_state,ojousan)
 {
 	nb1413m3_type = NB1413M3_OJOUSAN;
 }
 
-static DRIVER_INIT( ojousanm )
+DRIVER_INIT_MEMBER(nbmj8688_state,ojousanm)
 {
 	nb1413m3_type = NB1413M3_OJOUSANM;
 }
 
-static DRIVER_INIT( bijokkoy )
+DRIVER_INIT_MEMBER(nbmj8688_state,bijokkoy)
 {
 	nb1413m3_type = NB1413M3_BIJOKKOY;
 }
 
-static DRIVER_INIT( bijokkog )
+DRIVER_INIT_MEMBER(nbmj8688_state,bijokkog)
 {
 	nb1413m3_type = NB1413M3_BIJOKKOG;
 }
 
-static DRIVER_INIT( housemnq )
+DRIVER_INIT_MEMBER(nbmj8688_state,housemnq)
 {
 	nb1413m3_type = NB1413M3_HOUSEMNQ;
 }
 
-static DRIVER_INIT( housemn2 )
+DRIVER_INIT_MEMBER(nbmj8688_state,housemn2)
 {
 	nb1413m3_type = NB1413M3_HOUSEMN2;
 }
 
-static DRIVER_INIT( orangec )
+DRIVER_INIT_MEMBER(nbmj8688_state,orangec)
 {
 	nb1413m3_type = NB1413M3_ORANGEC;
 }
 
-static DRIVER_INIT( orangeci )
+DRIVER_INIT_MEMBER(nbmj8688_state,orangeci)
 {
 	nb1413m3_type = NB1413M3_ORANGECI;
 }
 
-static DRIVER_INIT( vipclub )
+DRIVER_INIT_MEMBER(nbmj8688_state,vipclub)
 {
 	nb1413m3_type = NB1413M3_VIPCLUB;
 }
 
-static DRIVER_INIT( livegal )
+DRIVER_INIT_MEMBER(nbmj8688_state,livegal)
 {
 	nb1413m3_type = NB1413M3_LIVEGAL;
 }
 
-static DRIVER_INIT( crystalg )
+DRIVER_INIT_MEMBER(nbmj8688_state,crystalg)
 {
 	nb1413m3_type = NB1413M3_CRYSTALG;
 }
 
-static DRIVER_INIT( crystal2 )
+DRIVER_INIT_MEMBER(nbmj8688_state,crystal2)
 {
 	nb1413m3_type = NB1413M3_CRYSTAL2;
 }
 
-static DRIVER_INIT( apparel )
+DRIVER_INIT_MEMBER(nbmj8688_state,apparel)
 {
 	nb1413m3_type = NB1413M3_APPAREL;
 }
 
-static DRIVER_INIT( nightlov )
+DRIVER_INIT_MEMBER(nbmj8688_state,nightlov)
 {
 	nb1413m3_type = NB1413M3_NIGHTLOV;
 }
 
-static DRIVER_INIT( barline )
+DRIVER_INIT_MEMBER(nbmj8688_state,barline)
 {
 	nb1413m3_type = NB1413M3_BARLINE;
 }

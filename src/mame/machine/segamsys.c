@@ -1396,7 +1396,7 @@ void init_for_megadrive(running_machine &machine)
 
 
 
-DRIVER_INIT( megatech_bios )
+void init_megatech_bios(running_machine &machine)
 {
 	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 	vdp1->set_irq = sms_vdp_cpu2_irq_callback;
@@ -1411,7 +1411,7 @@ DRIVER_INIT( megatech_bios )
 	smsgg_backupram = 0;
 }
 
-DRIVER_INIT( smscm )
+void init_smscm(running_machine &machine)
 {
 	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_CODEMASTERS);
 
@@ -1428,7 +1428,7 @@ DRIVER_INIT( smscm )
 	smsgg_backupram = 0;
 }
 
-DRIVER_INIT( smspal )
+void init_smspal(running_machine &machine)
 {
 	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_STANDARD);
 
@@ -1445,7 +1445,7 @@ DRIVER_INIT( smspal )
 	smsgg_backupram = 0;
 }
 
-DRIVER_INIT( sms )
+void init_sms(running_machine &machine)
 {
 	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_STANDARD);
 
@@ -1489,7 +1489,7 @@ void init_extra_gg_ports(running_machine& machine, const char* tag)
 	io->install_legacy_read_handler     (0x00, 0x00, FUNC(sms_ioport_gg00_r));
 }
 
-DRIVER_INIT( smsgg )
+void init_smsgg(running_machine &machine)
 {
 	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_STANDARD);
 	init_extra_gg_ports(machine, "maincpu");
@@ -1505,7 +1505,7 @@ DRIVER_INIT( smsgg )
 }
 
 
-DRIVER_INIT( hazemd_segasyse )
+void init_hazemd_segasyse(running_machine &machine)
 {
 	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 //  vdp1->set_irq = sms_vdp_cpu0_irq_callback;

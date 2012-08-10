@@ -98,6 +98,13 @@ public:
 	// game-specific state
 	UINT16 *		m_loffire_sync;
 	UINT8			m_lastsurv_mux;
+	DECLARE_DRIVER_INIT(generic_xboard);
+	DECLARE_DRIVER_INIT(loffire);
+	DECLARE_DRIVER_INIT(smgp);
+	DECLARE_DRIVER_INIT(aburner2);
+	DECLARE_DRIVER_INIT(gprider);
+	DECLARE_DRIVER_INIT(rascot);
+	DECLARE_DRIVER_INIT(lastsurv);
 };
 
 

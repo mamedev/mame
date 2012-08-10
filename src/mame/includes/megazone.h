@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(megazone_flipscreen_w);
 	DECLARE_READ8_MEMBER(megazone_port_a_r);
 	DECLARE_WRITE8_MEMBER(megazone_port_b_w);
+	DECLARE_DRIVER_INIT(megazone);
 };
 
 

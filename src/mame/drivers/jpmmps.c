@@ -40,6 +40,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(jpmmps);
 };
 
 static ADDRESS_MAP_START( jpmmps_map, AS_PROGRAM, 8, jpmmps_state )
@@ -167,7 +169,7 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT( jpmmps )
+DRIVER_INIT_MEMBER(jpmmps_state,jpmmps)
 {
 }
 

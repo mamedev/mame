@@ -8433,10 +8433,10 @@ YM2203
 */
 
 /* is this the original Magical Odds? */
-static DRIVER_INIT(magoddsc)
+DRIVER_INIT_MEMBER(goldstar_state,magoddsc)
 {
 	int A;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -10058,10 +10058,10 @@ ROM_END
 
 /*********************************************************************************************************************/
 
-static DRIVER_INIT(goldstar)
+DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 {
 	int A;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (A = 0;A < 0x10000;A++)
 	{
@@ -10144,10 +10144,10 @@ static UINT8 chry10_decrypt(UINT8 cipherText)
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }
 
-static DRIVER_INIT( chry10 )
+DRIVER_INIT_MEMBER(goldstar_state,chry10)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	int size = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	int size = machine().root_device().memregion("maincpu")->bytes();
 	int start = 0;
 
 	int i;
@@ -10157,7 +10157,7 @@ static DRIVER_INIT( chry10 )
 		ROM[i] = chry10_decrypt(ROM[i]);
 	}
 
-	do_blockswaps(machine, ROM);
+	do_blockswaps(machine(), ROM);
 
 	/* The game has a PIC for protection.
        If the code enter to this sub, just
@@ -10165,13 +10165,13 @@ static DRIVER_INIT( chry10 )
     */
 	ROM[0xA5DC] = 0xc9;
 
-	dump_to_file(machine, ROM);
+	dump_to_file(machine(), ROM);
 }
 
-static DRIVER_INIT( cb3 )
+DRIVER_INIT_MEMBER(goldstar_state,cb3)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	int size = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	int size = machine().root_device().memregion("maincpu")->bytes();
 	int start = 0;
 
 	int i;
@@ -10181,16 +10181,16 @@ static DRIVER_INIT( cb3 )
 		ROM[i] = decrypt(ROM[i], i);
 	}
 
-	do_blockswaps(machine, ROM);
-	dump_to_file(machine, ROM);
+	do_blockswaps(machine(), ROM);
+	dump_to_file(machine(), ROM);
 }
 
 
-static DRIVER_INIT( chrygld )
+DRIVER_INIT_MEMBER(goldstar_state,chrygld)
 {
 	int A;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	do_blockswaps(machine, ROM);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	do_blockswaps(machine(), ROM);
 
 	// a data bitswap
 	for (A = 0;A < 0x10000;A++)
@@ -10200,12 +10200,12 @@ static DRIVER_INIT( chrygld )
 		ROM[A] = dat;
 	}
 
-	dump_to_file(machine, ROM);
+	dump_to_file(machine(), ROM);
 }
 
-static DRIVER_INIT(cm)
+DRIVER_INIT_MEMBER(goldstar_state,cm)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -10214,9 +10214,9 @@ static DRIVER_INIT(cm)
 	ROM[0x0025] = 0x9b;
 }
 
-static DRIVER_INIT(cmv4)
+DRIVER_INIT_MEMBER(goldstar_state,cmv4)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -10225,9 +10225,9 @@ static DRIVER_INIT(cmv4)
 	ROM[0x020d] = 0x9b;
 }
 
-static DRIVER_INIT(cmast91)
+DRIVER_INIT_MEMBER(goldstar_state,cmast91)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -10236,17 +10236,17 @@ static DRIVER_INIT(cmast91)
 	ROM[0x0a92] = 0x9b;
 }
 
-static DRIVER_INIT(lucky8a)
+DRIVER_INIT_MEMBER(goldstar_state,lucky8a)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	ROM[0x0010] = 0x21;
 }
 
-static DRIVER_INIT( nfb96sea )
+DRIVER_INIT_MEMBER(goldstar_state,nfb96sea)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (i = 0;i < 0x10000;i++)
 	{
@@ -10276,10 +10276,10 @@ READ8_MEMBER(goldstar_state::fixedvala8_r)
 {
 	return 0xa8;
 }
-static DRIVER_INIT( schery97 )
+DRIVER_INIT_MEMBER(goldstar_state,schery97)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10293,9 +10293,8 @@ static DRIVER_INIT( schery97 )
 
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(goldstar_state::fixedvala8_r),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(goldstar_state::fixedvalb4_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(goldstar_state::fixedvala8_r),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(goldstar_state::fixedvalb4_r),this));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -10304,10 +10303,10 @@ READ8_MEMBER(goldstar_state::fixedval38_r)
 	return 0x38;
 }
 
-static DRIVER_INIT( schery97a )
+DRIVER_INIT_MEMBER(goldstar_state,schery97a)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10323,8 +10322,7 @@ static DRIVER_INIT( schery97a )
 	}
 
 
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedval38_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedval38_r),this));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -10333,10 +10331,10 @@ READ8_MEMBER(goldstar_state::fixedvalea_r)
 	return 0xea;
 }
 
-static DRIVER_INIT( skill98 )
+DRIVER_INIT_MEMBER(goldstar_state,skill98)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10350,8 +10348,7 @@ static DRIVER_INIT( skill98 )
 
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedvalea_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedvalea_r),this));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -10360,10 +10357,10 @@ READ8_MEMBER(goldstar_state::fixedval68_r)
 	return 0x68;
 }
 
-static DRIVER_INIT( nfb96_c1 )
+DRIVER_INIT_MEMBER(goldstar_state,nfb96_c1)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10377,8 +10374,7 @@ static DRIVER_INIT( nfb96_c1 )
 		}
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x31, 0x31, read8_delegate(FUNC(goldstar_state::fixedval68_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x31, 0x31, read8_delegate(FUNC(goldstar_state::fixedval68_r),this));
 
 }
 
@@ -10387,10 +10383,10 @@ READ8_MEMBER(goldstar_state::fixedval58_r)
 	return 0x58;
 }
 
-static DRIVER_INIT( nfb96_c2 )
+DRIVER_INIT_MEMBER(goldstar_state,nfb96_c2)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10405,8 +10401,7 @@ static DRIVER_INIT( nfb96_c2 )
 
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x21, 0x21, read8_delegate(FUNC(goldstar_state::fixedval58_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x21, 0x21, read8_delegate(FUNC(goldstar_state::fixedval58_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedval80_r)
@@ -10424,10 +10419,10 @@ READ8_MEMBER(goldstar_state::fixedvalaa_r)
 	return 0xaa;
 }
 
-static DRIVER_INIT( nfb96_d )
+DRIVER_INIT_MEMBER(goldstar_state,nfb96_d)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10441,13 +10436,12 @@ static DRIVER_INIT( nfb96_d )
 		}
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
 	// nfb96b needs both of these
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x23, 0x23, read8_delegate(FUNC(goldstar_state::fixedval80_r),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(goldstar_state::fixedvalaa_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x23, 0x23, read8_delegate(FUNC(goldstar_state::fixedval80_r),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(goldstar_state::fixedvalaa_r),this));
 
 	// csel96b
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(goldstar_state::fixedval96_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(goldstar_state::fixedval96_r),this));
 
 }
 
@@ -10457,10 +10451,10 @@ READ8_MEMBER(goldstar_state::fixedvalbe_r)
 }
 
 
-static DRIVER_INIT( nfb96_dk )
+DRIVER_INIT_MEMBER(goldstar_state,nfb96_dk)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10474,8 +10468,7 @@ static DRIVER_INIT( nfb96_dk )
 		}
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(goldstar_state::fixedvalbe_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(goldstar_state::fixedvalbe_r),this));
 
 }
 
@@ -10489,10 +10482,10 @@ READ8_MEMBER(goldstar_state::fixedval84_r)
 	return 0x84;
 }
 
-static DRIVER_INIT( rp35 )
+DRIVER_INIT_MEMBER(goldstar_state,rp35)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10507,9 +10500,8 @@ static DRIVER_INIT( rp35 )
 		ROM[i] = x;
 	}
 
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(goldstar_state::fixedval84_r),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x36, 0x36, read8_delegate(FUNC(goldstar_state::fixedval90_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(goldstar_state::fixedval84_r),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x36, 0x36, read8_delegate(FUNC(goldstar_state::fixedval90_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedvalb2_r)
@@ -10517,10 +10509,10 @@ READ8_MEMBER(goldstar_state::fixedvalb2_r)
 	return 0xb2;
 }
 
-static DRIVER_INIT( rp36 )
+DRIVER_INIT_MEMBER(goldstar_state,rp36)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10536,8 +10528,7 @@ static DRIVER_INIT( rp36 )
 		ROM[i] = x;
 	}
 
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x34, 0x34, read8_delegate(FUNC(goldstar_state::fixedvalb2_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x34, 0x34, read8_delegate(FUNC(goldstar_state::fixedvalb2_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedval48_r)
@@ -10545,10 +10536,10 @@ READ8_MEMBER(goldstar_state::fixedval48_r)
 	return 0x48;
 }
 
-static DRIVER_INIT( rp36c3 )
+DRIVER_INIT_MEMBER(goldstar_state,rp36c3)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10564,8 +10555,7 @@ static DRIVER_INIT( rp36c3 )
 		ROM[i] = x;
 	}
 
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x17, 0x17, read8_delegate(FUNC(goldstar_state::fixedval48_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x17, 0x17, read8_delegate(FUNC(goldstar_state::fixedval48_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedval09_r)
@@ -10579,10 +10569,10 @@ READ8_MEMBER(goldstar_state::fixedval74_r)
 }
 
 
-static DRIVER_INIT( po33 )
+DRIVER_INIT_MEMBER(goldstar_state,po33)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10597,9 +10587,8 @@ static DRIVER_INIT( po33 )
 
 		ROM[i] = x;
 	}
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x32, 0x32, read8_delegate(FUNC(goldstar_state::fixedval74_r),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x12, 0x12, read8_delegate(FUNC(goldstar_state::fixedval09_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x32, 0x32, read8_delegate(FUNC(goldstar_state::fixedval74_r),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x12, 0x12, read8_delegate(FUNC(goldstar_state::fixedval09_r),this));
 	/* oki6295 at 0x20 */
 }
 
@@ -10613,10 +10602,10 @@ READ8_MEMBER(goldstar_state::fixedvalc7_r)
 	return 0xc7;
 }
 
-static DRIVER_INIT( match133 )
+DRIVER_INIT_MEMBER(goldstar_state,match133)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10632,15 +10621,14 @@ static DRIVER_INIT( match133 )
 		ROM[i] = x;
 	}
 
-	goldstar_state *state = machine.driver_data<goldstar_state>();
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedvalc7_r),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(goldstar_state::fixedvale4_r),state));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedvalc7_r),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(goldstar_state::fixedvale4_r),this));
 }
 
-static DRIVER_INIT(cherrys)
+DRIVER_INIT_MEMBER(goldstar_state,cherrys)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	unsigned char rawData[256] = {
 		0xCC, 0xCD, 0xCE, 0xCF, 0xC8, 0xC9, 0xCA, 0xCB, 0xC4, 0xC5, 0xC6, 0xC7,
@@ -10675,31 +10663,31 @@ static DRIVER_INIT(cherrys)
 }
 
 /* todo: remove these patches! */
-static DRIVER_INIT( unkch1 )
+DRIVER_INIT_MEMBER(goldstar_state,unkch1)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
 }
 
-static DRIVER_INIT( unkch3 )
+DRIVER_INIT_MEMBER(goldstar_state,unkch3)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
 }
 
-static DRIVER_INIT( unkch4 )
+DRIVER_INIT_MEMBER(goldstar_state,unkch4)
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
 	ROM[0x9a6f] = 0x00;
 }
 
-static DRIVER_INIT( tonypok )
+DRIVER_INIT_MEMBER(goldstar_state,tonypok)
 {
 	// the ppi doesn't seem to work properly, so just install the inputs directly
-	address_space *io = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *io = machine().device("maincpu")->memory().space(AS_IO);
 	io->install_read_port(0x04, 0x04, "IN0" );
 	io->install_read_port(0x05, 0x05, "IN1" );
 	io->install_read_port(0x06, 0x06, "IN2" );
@@ -10713,20 +10701,20 @@ static DRIVER_INIT( tonypok )
 
        YEAR  NAME       PARENT    MACHINE   INPUT     INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
 GAME(  199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0 )
-GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, goldstar_state, 0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0 )
-GAME(  199?, moonlght,  goldstar, moonlght, goldstar, goldstar_state, 0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
+GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device, 0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0 )
+GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device, 0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld, goldstar_state,  chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10, goldstar_state,   chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 
 // are these really dyna, or bootlegs?
-GAME(  199?, ncb3,      0,        ncb3,     ncb3, goldstar_state,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
-GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a, goldstar_state,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0 )
+GAME(  199?, ncb3,      0,        ncb3,     ncb3, driver_device,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
+GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a, driver_device,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0 )
 GAME(  199?, cb3,       ncb3,     ncb3,     ncb3, goldstar_state,     cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3, goldstar_state,     cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",           0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld, goldstar_state,  cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)", GAME_NOT_WORKING)
-GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3, goldstar_state,     0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",  GAME_NOT_WORKING) // fix prom decode
+GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3, driver_device,     0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",  GAME_NOT_WORKING) // fix prom decode
 
-GAME(  1996, cmast97,   ncb3,     cm97,     chrygld, goldstar_state,  0,         ROT0, "Dyna",              "Cherry Master '97",         GAME_NOT_WORKING) // fix prom decode
+GAME(  1996, cmast97,   ncb3,     cm97,     chrygld, driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",         GAME_NOT_WORKING) // fix prom decode
 
 // looks like a hack of Cherry Bonus 3
 GAME(  199?, chryangl,  ncb3,     cm,       cmasterb, goldstar_state, cmv4,      ROT0, "<unknown>",              "Cherry Angel",         GAME_NOT_WORKING )
@@ -10744,7 +10732,7 @@ GAME(  1992, cmv4,      0,        cm,       cmv4, goldstar_state,     cmv4,     
 GAME(  1992, cmv4a,     cmv4,     cm,       cmv4, goldstar_state,     cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                GAME_NOT_WORKING )	/* stealth game? */
 GAME(  199?, cmwm,      cmv4,     cm,       cmv4, goldstar_state,     cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0 )
 GAME(  1995, cmfun,     cmv4,     cm,       cmv4, goldstar_state,     cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0 )
-GAME(  1991, cmaster,   0,        cm,       cmaster, goldstar_state,  0,         ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0 )
+GAME(  1991, cmaster,   0,        cm,       cmaster, driver_device,  0,         ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0 )
 GAME(  1991, cmasterb,  cmaster,  cm,       cmasterb, goldstar_state, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0 )
 GAME(  1991, cmezspin,  cmaster,  cm,       cmasterb, goldstar_state, cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0 )
 GAME(  1991, cmasterc,  cmaster,  cmasterc, cmasterc, goldstar_state, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0 )
@@ -10764,23 +10752,23 @@ GAME(  1991, cmast91,   0,        cmast91,  cmast91, goldstar_state,  cmast91,  
 GAME(  1992, cmast92,   0,        cmast91,  cmast91, goldstar_state,  cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           GAME_NOT_WORKING ) // no gfx roms are dumped
 
 
-GAMEL( 1989, lucky8,    0,        lucky8,   lucky8, goldstar_state,   0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )
+GAMEL( 1989, lucky8,    0,        lucky8,   lucky8, driver_device,   0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )
 GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a, goldstar_state,  lucky8a,   ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )
-GAMEL( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, goldstar_state, 0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
-GAMEL( 198?, ns8lines,  0,        lucky8,   ns8lines, goldstar_state, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
-GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, goldstar_state, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
-GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, 0,         ROT0, "hack",                 "Kkot No Li (Kill the Bees)",                               GAME_IMPERFECT_COLORS, layout_lucky8 )
-GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, 0,         ROT0, "TAB Austria",          "Lady Liner",                                               0 )
-GAME(  198?, wcat3,     0,        wcat3,    lucky8, goldstar_state,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
+GAMEL( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, driver_device, 0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
+GAMEL( 198?, ns8lines,  0,        lucky8,   ns8lines, driver_device, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
+GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, driver_device, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
+GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, driver_device, 0,         ROT0, "hack",                 "Kkot No Li (Kill the Bees)",                               GAME_IMPERFECT_COLORS, layout_lucky8 )
+GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, driver_device, 0,         ROT0, "TAB Austria",          "Lady Liner",                                               0 )
+GAME(  198?, wcat3,     0,        wcat3,    lucky8, driver_device,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
 
-GAME(  1985, luckylad,  0,        lucky8,   luckylad, goldstar_state, 0,         ROT0, "Wing Co., Ltd.",       "Lucky Lady (Wing, encrypted)",                             GAME_NOT_WORKING ) // encrypted (see notes in rom_load)...
+GAME(  1985, luckylad,  0,        lucky8,   luckylad, driver_device, 0,         ROT0, "Wing Co., Ltd.",       "Lucky Lady (Wing, encrypted)",                             GAME_NOT_WORKING ) // encrypted (see notes in rom_load)...
 
-GAMEL( 1993, bingowng,  0,        bingowng, bingowng, goldstar_state, 0,         ROT0, "Wing Co., Ltd.",       "Bingo (set 1)",                                            0,                     layout_bingowng )
-GAMEL( 1993, bingownga, bingowng, bingownga,bingowng, goldstar_state, 0,         ROT0, "Wing Co., Ltd.",       "Bingo (set 2)",                                            0,                     layout_bingowng )
+GAMEL( 1993, bingowng,  0,        bingowng, bingowng, driver_device, 0,         ROT0, "Wing Co., Ltd.",       "Bingo (set 1)",                                            0,                     layout_bingowng )
+GAMEL( 1993, bingownga, bingowng, bingownga,bingowng, driver_device, 0,         ROT0, "Wing Co., Ltd.",       "Bingo (set 2)",                                            0,                     layout_bingowng )
 
-GAME(  1992, magodds,   0,        magodds,  magodds, goldstar_state,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1992, magoddsa,   magodds, magodds,  magodds, goldstar_state,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1992, magoddsb,   magodds, magodds,  magodds, goldstar_state,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magodds,   0,        magodds,  magodds, driver_device,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsa,   magodds, magodds,  magodds, driver_device,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsb,   magodds, magodds,  magodds, driver_device,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME(  1991, magoddsc,   magodds, magodds,  magoddsc, goldstar_state, magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
 GAME(  1991, magoddsd,   magodds, magodds,  magoddsc, goldstar_state, magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
 
@@ -10818,13 +10806,13 @@ GAME( 1996, roypok96b, roypok96, amcoe2,   roypok96a, goldstar_state, rp36c3,   
    some sets are messy and appear to have mismatched graphic roms, they needed to be sorted out properly
 */
 /*    YEAR  NAME       PARENT    MACHINE   INPUT      INIT       ROT    COMPANY                 FULLNAME                                                FLAGS  */
-GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl, goldstar_state,   0,         ROT0, "bootleg",              "New Fruit Bonus '96 Special Edition (bootleg, set 1)",  0 )
+GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl, driver_device,   0,         ROT0, "bootleg",              "New Fruit Bonus '96 Special Edition (bootleg, set 1)",  0 )
 GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl, goldstar_state,   nfb96sea,  ROT0, "bootleg",              "New Fruit Bonus '96 Special Edition (bootleg, set 2)",  GAME_WRONG_COLORS ) // encrypted program
-GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl, goldstar_state,   0,         ROT0, "bootleg",              "New Fruit Bonus '96 Special Edition (bootleg, set 3)",  GAME_WRONG_COLORS )
-GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl, goldstar_state,   0,         ROT0, "bootleg",              "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS )
-GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl, goldstar_state,   0,         ROT0, "bootleg",              "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS )
+GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl, driver_device,   0,         ROT0, "bootleg",              "New Fruit Bonus '96 Special Edition (bootleg, set 3)",  GAME_WRONG_COLORS )
+GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl, driver_device,   0,         ROT0, "bootleg",              "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS )
+GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl, driver_device,   0,         ROT0, "bootleg",              "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS )
 
-GAME( 2003, nfm,       0,        nfm,      nfb96bl, goldstar_state,   0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",              GAME_NOT_WORKING )
+GAME( 2003, nfm,       0,        nfm,      nfb96bl, driver_device,   0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",              GAME_NOT_WORKING )
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99" probably hacks of a 1994 version of Cherry Bonus / Cherry Master (Super Cherry Master?)
 GAME( 1999, unkch1,   0,         unkch,    unkch, goldstar_state,  unkch1,    ROT0, "bootleg",              "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

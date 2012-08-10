@@ -530,9 +530,9 @@ ROM_START( roadf2 )
 ROM_END
 
 
-static DRIVER_INIT( hyperspt )
+DRIVER_INIT_MEMBER(hyperspt_state,hyperspt)
 {
-	konami1_decode(machine, "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
 

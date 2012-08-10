@@ -37,6 +37,13 @@ public:
 	DECLARE_READ16_MEMBER(a2d_data_r);
 	DECLARE_READ16_MEMBER(pitfightb_cheap_slapstic_r);
 	void update_bank(int bank);
+	DECLARE_DRIVER_INIT(hydrap);
+	DECLARE_DRIVER_INIT(hydra);
+	DECLARE_DRIVER_INIT(pitfight9);
+	DECLARE_DRIVER_INIT(pitfight7);
+	DECLARE_DRIVER_INIT(pitfightj);
+	DECLARE_DRIVER_INIT(pitfight);
+	DECLARE_DRIVER_INIT(pitfightb);
 };
 
 

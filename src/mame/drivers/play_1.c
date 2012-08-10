@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:
+	DECLARE_DRIVER_INIT(play_1);
 };
 
 static ADDRESS_MAP_START( play_1_map, AS_PROGRAM, 8, play_1_state )
@@ -34,7 +36,7 @@ void play_1_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( play_1 )
+DRIVER_INIT_MEMBER(play_1_state,play_1)
 {
 }
 

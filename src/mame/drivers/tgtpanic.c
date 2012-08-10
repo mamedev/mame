@@ -164,4 +164,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, tgtpanic_state, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND_HW )
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, driver_device, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND_HW )

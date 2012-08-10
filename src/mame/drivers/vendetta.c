@@ -789,16 +789,14 @@ static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 		device->machine().root_device().membank("bank1")->set_entry(lines);
 }
 
-static DRIVER_INIT( vendetta )
+DRIVER_INIT_MEMBER(vendetta_state,vendetta)
 {
-	vendetta_state *state = machine.driver_data<vendetta_state>();
-	state->m_video_banking_base = 0x4000;
+	m_video_banking_base = 0x4000;
 }
 
-static DRIVER_INIT( esckids )
+DRIVER_INIT_MEMBER(vendetta_state,esckids)
 {
-	vendetta_state *state = machine.driver_data<vendetta_state>();
-	state->m_video_banking_base = 0x2000;
+	m_video_banking_base = 0x2000;
 }
 
 

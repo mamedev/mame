@@ -426,10 +426,9 @@ ROM_START( grndtour )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
-static DRIVER_INIT( iqblock )
+DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 {
-	iqblock_state *state = machine.driver_data<iqblock_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -441,18 +440,17 @@ static DRIVER_INIT( iqblock )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
-	state->m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
-	state->m_fgvideoram = rom + 0x16800;
-	state->m_bgvideoram = rom + 0x17000;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),state));
-	state->m_video_type=1;
+	m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
+	m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
+	m_fgvideoram = rom + 0x16800;
+	m_bgvideoram = rom + 0x17000;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),this));
+	m_video_type=1;
 }
 
-static DRIVER_INIT( grndtour )
+DRIVER_INIT_MEMBER(iqblock_state,grndtour)
 {
-	iqblock_state *state = machine.driver_data<iqblock_state>();
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -464,12 +462,12 @@ static DRIVER_INIT( grndtour )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
-	state->m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
-	state->m_fgvideoram = rom + 0x16800;
-	state->m_bgvideoram = rom + 0x17000;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),state));
-	state->m_video_type=0;
+	m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
+	m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
+	m_fgvideoram = rom + 0x16800;
+	m_bgvideoram = rom + 0x17000;
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),this));
+	m_video_type=0;
 }
 
 

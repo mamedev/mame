@@ -146,33 +146,32 @@ WRITE16_HANDLER( pgm_asic3_reg_w )
 
 /* Oriental Legend INIT */
 
-DRIVER_INIT( orlegend )
+DRIVER_INIT_MEMBER(pgm_asic3_state,orlegend)
 {
-	pgm_asic3_state *state = machine.driver_data<pgm_asic3_state>();
-	pgm_basic_init(machine);
+	pgm_basic_init(machine());
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
 
-	state->m_asic3_reg = 0;
-	state->m_asic3_latch[0] = 0;
-	state->m_asic3_latch[1] = 0;
-	state->m_asic3_latch[2] = 0;
-	state->m_asic3_x = 0;
-	state->m_asic3_y = 0;
-	state->m_asic3_z = 0;
-	state->m_asic3_h1 = 0;
-	state->m_asic3_h2 = 0;
-	state->m_asic3_hold = 0;
+	m_asic3_reg = 0;
+	m_asic3_latch[0] = 0;
+	m_asic3_latch[1] = 0;
+	m_asic3_latch[2] = 0;
+	m_asic3_x = 0;
+	m_asic3_y = 0;
+	m_asic3_z = 0;
+	m_asic3_h1 = 0;
+	m_asic3_h2 = 0;
+	m_asic3_hold = 0;
 
-	state->save_item(NAME(state->m_asic3_reg));
-	state->save_item(NAME(state->m_asic3_latch));
-	state->save_item(NAME(state->m_asic3_x));
-	state->save_item(NAME(state->m_asic3_y));
-	state->save_item(NAME(state->m_asic3_z));
-	state->save_item(NAME(state->m_asic3_h1));
-	state->save_item(NAME(state->m_asic3_h2));
-	state->save_item(NAME(state->m_asic3_hold));
+	save_item(NAME(m_asic3_reg));
+	save_item(NAME(m_asic3_latch));
+	save_item(NAME(m_asic3_x));
+	save_item(NAME(m_asic3_y));
+	save_item(NAME(m_asic3_z));
+	save_item(NAME(m_asic3_h1));
+	save_item(NAME(m_asic3_h2));
+	save_item(NAME(m_asic3_hold));
 }
 
 

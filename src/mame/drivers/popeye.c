@@ -614,48 +614,46 @@ ROM_END
 
 
 
-static DRIVER_INIT( skyskipr )
+DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
 		memcpy(rom,buffer,len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 
-    state_save_register_global(machine, state->m_prot0);
-    state_save_register_global(machine, state->m_prot1);
-    state_save_register_global(machine, state->m_prot_shift);
+    state_save_register_global(machine(), m_prot0);
+    state_save_register_global(machine(), m_prot1);
+    state_save_register_global(machine(), m_prot_shift);
 }
 
-static DRIVER_INIT( popeye )
+DRIVER_INIT_MEMBER(popeye_state,popeye)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
 		memcpy(rom,buffer,len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 
-    state_save_register_global(machine, state->m_prot0);
-    state_save_register_global(machine, state->m_prot1);
-    state_save_register_global(machine, state->m_prot_shift);
+    state_save_register_global(machine(), m_prot0);
+    state_save_register_global(machine(), m_prot1);
+    state_save_register_global(machine(), m_prot_shift);
 }
 
 
@@ -663,4 +661,4 @@ GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, popeye_state, skyskipr, ROT0, 
 GAME( 1982, popeye,   0,      popeye,   popeye, popeye_state,   popeye,   ROT0, "Nintendo", "Popeye (revision D)", GAME_SUPPORTS_SAVE )
 GAME( 1982, popeyeu,  popeye, popeye,   popeye, popeye_state,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", GAME_SUPPORTS_SAVE )
 GAME( 1982, popeyef,  popeye, popeye,   popeyef, popeye_state,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", GAME_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye, popeyebl, popeye, popeye_state,   0,        ROT0, "bootleg",  "Popeye (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye, popeyebl, popeye, driver_device,   0,        ROT0, "bootleg",  "Popeye (bootleg)", GAME_SUPPORTS_SAVE )

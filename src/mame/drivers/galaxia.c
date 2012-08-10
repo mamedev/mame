@@ -409,5 +409,5 @@ ROM_START( astrowar )
 ROM_END
 
 
-GAME( 1979, galaxia,  0, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1980, astrowar, 0, astrowar, galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0, astrowar, galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )

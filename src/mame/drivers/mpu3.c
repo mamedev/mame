@@ -180,6 +180,7 @@ emu_timer *m_ic21_timer;
 	DECLARE_READ8_MEMBER(pia_ic6_portb_r);
 	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
 	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
+	DECLARE_DRIVER_INIT(m3hprvpr);
 };
 
 #define DISPLAY_PORT 0
@@ -931,14 +932,13 @@ static const mpu3_chr_table hprvpr_data[64] = {
 {0x0d, 0x04},{0x1f, 0xc0},{0x16, 0xc8},{0x05, 0x78},{0x13, 0xd4},{0x1c, 0x0c},{0x02, 0x74},{0x00, 0x00},
 };
 
-static DRIVER_INIT (m3hprvpr)
+DRIVER_INIT_MEMBER(mpu3_state,m3hprvpr)
 {
-	mpu3_state *state = machine.driver_data<mpu3_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_disp_func=METER_PORT;
-	state->m_current_chr_table = hprvpr_data;
-	space->install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), state),write8_delegate(FUNC(mpu3_state::characteriser_w), state));
+	m_disp_func=METER_PORT;
+	m_current_chr_table = hprvpr_data;
+	space->install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), this),write8_delegate(FUNC(mpu3_state::characteriser_w), this));
 
 }
 
@@ -1607,7 +1607,7 @@ ROM_END
 
 #define GAME_FLAGS GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL
 
-GAME( 198?, m3tst,		0,			mpu3base, mpu3, mpu3_state, 0,		  ROT0, "Barcrest","MPU3 Unit Test (Program 5) (Barcrest) (MPU3)",GAME_FLAGS )
+GAME( 198?, m3tst,		0,			mpu3base, mpu3, driver_device, 0,		  ROT0, "Barcrest","MPU3 Unit Test (Program 5) (Barcrest) (MPU3)",GAME_FLAGS )
 
 GAME( 198?, m3autort,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Barcrest","Autoroute (Barcrest) (MPU3)",GAME_FLAGS )
 GAME( 198?, m3big20j,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Barcrest","Big 20 Joker (Barcrest) (MPU3)",GAME_FLAGS )

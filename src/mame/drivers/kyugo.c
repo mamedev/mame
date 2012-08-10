@@ -1371,23 +1371,21 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( gyrodine )
+DRIVER_INIT_MEMBER(kyugo_state,gyrodine)
 {
 	/* add watchdog */
-	kyugo_state *state = machine.driver_data<kyugo_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),this));
 }
 
 
-static DRIVER_INIT( srdmissn )
+DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
 {
-	kyugo_state *state = machine.driver_data<kyugo_state>();
 
 	/* shared RAM is mapped at 0xe000 as well  */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, state->m_shared_ram);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, m_shared_ram);
 
 	/* extra RAM on sub CPU  */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);
+	machine().device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);
 }
 
 
@@ -1401,13 +1399,13 @@ static DRIVER_INIT( srdmissn )
 GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, kyugo_state, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
 GAME( 1984, gyrodinet, gyrodine, gyrodine, gyrodine, kyugo_state, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
 GAME( 1984, buzzard,   gyrodine, gyrodine, gyrodine, kyugo_state, gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
-GAME( 1985, repulse,   0,        repulse,  repulse, kyugo_state,  0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE ) // by Crux?
-GAME( 1985, 99lstwar,  repulse,  repulse,  repulse, kyugo_state,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 99lstwara, repulse,  repulse,  repulse, kyugo_state,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 99lstwark, repulse,  repulse,  repulse, kyugo_state,  0,        ROT90, "Sega (Kyugo license)", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
-GAME( 1985, sonofphx,  repulse,  repulse,  repulse, kyugo_state,  0,        ROT90, "bootleg (Associated Overseas MFR, Inc)", "Son of Phoenix", GAME_SUPPORTS_SAVE )
-GAME( 1985, flashgal,  0,        repulse,  flashgal, kyugo_state, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, flashgala, flashgal, flashgala,flashgal, kyugo_state, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, repulse,   0,        repulse,  repulse, driver_device,  0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE ) // by Crux?
+GAME( 1985, 99lstwar,  repulse,  repulse,  repulse, driver_device,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwara, repulse,  repulse,  repulse, driver_device,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwark, repulse,  repulse,  repulse, driver_device,  0,        ROT90, "Sega (Kyugo license)", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sonofphx,  repulse,  repulse,  repulse, driver_device,  0,        ROT90, "bootleg (Associated Overseas MFR, Inc)", "Son of Phoenix", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgal,  0,        repulse,  flashgal, driver_device, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgala, flashgal, flashgala,flashgal, driver_device, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, kyugo_state, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
 GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, kyugo_state, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
 GAME( 1986, legend,    0,        legend,   legend, kyugo_state,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)

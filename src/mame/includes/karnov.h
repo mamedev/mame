@@ -45,6 +45,12 @@ public:
 	DECLARE_READ16_MEMBER(karnov_control_r);
 	DECLARE_WRITE16_MEMBER(karnov_videoram_w);
 	DECLARE_WRITE16_MEMBER(karnov_playfield_swap_w);
+	DECLARE_DRIVER_INIT(wndrplnt);
+	DECLARE_DRIVER_INIT(karnov);
+	DECLARE_DRIVER_INIT(karnovj);
+	DECLARE_DRIVER_INIT(chelnovu);
+	DECLARE_DRIVER_INIT(chelnovj);
+	DECLARE_DRIVER_INIT(chelnov);
 };
 
 enum {

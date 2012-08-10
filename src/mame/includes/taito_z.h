@@ -71,6 +71,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
+	DECLARE_DRIVER_INIT(taitoz);
+	DECLARE_DRIVER_INIT(bshark);
 };
 
 /*----------- defined in video/taito_z.c -----------*/

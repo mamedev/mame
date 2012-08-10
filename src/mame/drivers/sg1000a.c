@@ -127,6 +127,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
+	DECLARE_DRIVER_INIT(sg1000a);
+	DECLARE_DRIVER_INIT(chwrestl);
 };
 
 
@@ -322,14 +324,14 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( sg1000a )
+DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
 {
 }
 
-static DRIVER_INIT(chwrestl)
+DRIVER_INIT_MEMBER(sg1000a_state,chwrestl)
 {
 	DRIVER_INIT_CALL(sg1000a);
-	regulus_decode(machine, "maincpu");
+	regulus_decode(machine(), "maincpu");
 }
 
 /*************************************

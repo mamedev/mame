@@ -1623,9 +1623,9 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 	auto_free (machine, buffer);
 }
 
-static DRIVER_INIT( hng64_reorder_gfx )
+DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
 {
-	hng64_reorder(machine, machine.root_device().memregion("scrtile")->base(), machine.root_device().memregion("scrtile")->bytes());
+	hng64_reorder(machine(), machine().root_device().memregion("scrtile")->base(), machine().root_device().memregion("scrtile")->bytes());
 }
 
 #define HACK_REGION
@@ -1644,70 +1644,64 @@ static void hng64_patch_bios_region(running_machine& machine, int region)
 }
 #endif
 
-static DRIVER_INIT( hng64 )
+DRIVER_INIT_MEMBER(hng64_state,hng64)
 {
-	hng64_state *state = machine.driver_data<hng64_state>();
 
 	// region hacking, english error messages are more useful to us, but no english bios is dumped...
 #ifdef HACK_REGION
 // versions according to fatal fury test mode
-//  hng64_patch_bios_region(machine, 0); // 'Others Ver' (invalid?)
-	hng64_patch_bios_region(machine, 1); // Japan
-//  hng64_patch_bios_region(machine, 2); // USA
-//  hng64_patch_bios_region(machine, 3); // Korea
-//  hng64_patch_bios_region(machine, 4); // 'Others'
+//  hng64_patch_bios_region(machine(), 0); // 'Others Ver' (invalid?)
+	hng64_patch_bios_region(machine(), 1); // Japan
+//  hng64_patch_bios_region(machine(), 2); // USA
+//  hng64_patch_bios_region(machine(), 3); // Korea
+//  hng64_patch_bios_region(machine(), 4); // 'Others'
 #endif
 
 	/* 1 meg of virtual address space for the com cpu */
-	state->m_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
-	state->m_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
+	m_com_virtual_mem = auto_alloc_array(machine(), UINT8, 0x100000);
+	m_com_op_base     = auto_alloc_array(machine(), UINT8, 0x10000);
 
-	state->m_soundram = auto_alloc_array(machine, UINT16, 0x200000/2);
-	state->m_soundram2 = auto_alloc_array(machine, UINT16, 0x200000/2);
+	m_soundram = auto_alloc_array(machine(), UINT16, 0x200000/2);
+	m_soundram2 = auto_alloc_array(machine(), UINT16, 0x200000/2);
 
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
 
-static DRIVER_INIT(hng64_fght)
+DRIVER_INIT_MEMBER(hng64_state,hng64_fght)
 {
-	hng64_state *state = machine.driver_data<hng64_state>();
 
-	state->m_no_machine_error_code = 0x01000000;
+	m_no_machine_error_code = 0x01000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
-static DRIVER_INIT( fatfurwa )
+DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
 {
-	hng64_state *state = machine.driver_data<hng64_state>();
 
-	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(state->memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
+	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
-	state->m_mcu_type = FIGHT_MCU;
+	m_mcu_type = FIGHT_MCU;
 }
 
-static DRIVER_INIT( ss64 )
+DRIVER_INIT_MEMBER(hng64_state,ss64)
 {
-	hng64_state *state = machine.driver_data<hng64_state>();
 
 	DRIVER_INIT_CALL(hng64_fght);
-	state->m_mcu_type = SAMSHO_MCU;
+	m_mcu_type = SAMSHO_MCU;
 }
 
-static DRIVER_INIT(hng64_race)
+DRIVER_INIT_MEMBER(hng64_state,hng64_race)
 {
-	hng64_state *state = machine.driver_data<hng64_state>();
 
-	state->m_no_machine_error_code = 0x02000000;
-	state->m_mcu_type = RACING_MCU;
+	m_no_machine_error_code = 0x02000000;
+	m_mcu_type = RACING_MCU;
 	DRIVER_INIT_CALL(hng64);
 }
 
-static DRIVER_INIT(hng64_shoot)
+DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
 {
-	hng64_state *state = machine.driver_data<hng64_state>();
 
-	state->m_mcu_type = SHOOT_MCU;
-	state->m_no_machine_error_code = 0x03000000;
+	m_mcu_type = SHOOT_MCU;
+	m_no_machine_error_code = 0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
 

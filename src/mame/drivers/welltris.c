@@ -685,17 +685,17 @@ static const ym2610_interface ym2610_config =
 
 
 
-static DRIVER_INIT( welltris )
+DRIVER_INIT_MEMBER(welltris_state,welltris)
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	RAM[0xB91C/2] = 0x4e71;
 	RAM[0xB91E/2] = 0x4e71;
 #endif
 }
 
-static DRIVER_INIT( quiz18k )
+DRIVER_INIT_MEMBER(welltris_state,quiz18k)
 {
 	;
 }

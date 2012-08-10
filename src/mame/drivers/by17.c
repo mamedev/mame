@@ -21,6 +21,8 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
+public:	
+	DECLARE_DRIVER_INIT(by17);
 };
 
 
@@ -39,7 +41,7 @@ void by17_state::machine_reset()
 {
 }
 
-static DRIVER_INIT( by17 )
+DRIVER_INIT_MEMBER(by17_state,by17)
 {
 }
 

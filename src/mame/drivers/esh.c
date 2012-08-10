@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
+	DECLARE_DRIVER_INIT(esh);
 };
 
 
@@ -392,7 +393,7 @@ ROM_START( eshb )
 ROM_END
 
 
-static DRIVER_INIT( esh )
+DRIVER_INIT_MEMBER(esh_state,esh)
 {
 }
 

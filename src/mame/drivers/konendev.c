@@ -27,6 +27,8 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+public:
+	DECLARE_DRIVER_INIT(konendev);
 };
 
 
@@ -161,10 +163,10 @@ ROM_START( konzero )
 	ROM_LOAD32_WORD( "rmclr_l.bin", 0x00002, 0x080000, CRC(2806299c) SHA1(a069f4477b310f99ff1ff48f622dc30862589127) )
 ROM_END
 
-DRIVER_INIT( konendev )
+DRIVER_INIT_MEMBER(konendev_state,konendev)
 {
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
-	size_t  srcsize = machine.root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
+	size_t  srcsize = machine().root_device().memregion( "maincpu" )->bytes();
 	for (int i = 0; i < srcsize; i += 2)
 	{
 		int temp = src[i];

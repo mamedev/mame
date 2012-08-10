@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	DECLARE_WRITE8_MEMBER(cabaret_nmi_and_coins_w);
 	void show_out();
+	DECLARE_DRIVER_INIT(cabaret);
 };
 
 
@@ -359,9 +360,9 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 MACHINE_CONFIG_END
 
 
-static DRIVER_INIT( cabaret )
+DRIVER_INIT_MEMBER(cabaret_state,cabaret)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

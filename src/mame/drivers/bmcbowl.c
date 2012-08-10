@@ -134,6 +134,7 @@ public:
 	DECLARE_WRITE8_MEMBER(via_irq);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
+	DECLARE_DRIVER_INIT(bmcbowl);
 };
 
 
@@ -549,10 +550,9 @@ ROM_START( bmcbowl )
 
 ROM_END
 
-static DRIVER_INIT(bmcbowl)
+DRIVER_INIT_MEMBER(bmcbowl_state,bmcbowl)
 {
-	bmcbowl_state *state = machine.driver_data<bmcbowl_state>();
-	state->m_bmc_colorram = auto_alloc_array(machine, UINT8, 768);
+	m_bmc_colorram = auto_alloc_array(machine(), UINT8, 768);
 }
 
 GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl, bmcbowl_state,    bmcbowl, ROT0,  "BMC", "Konkyuu no Hoshi", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

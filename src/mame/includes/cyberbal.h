@@ -41,6 +41,9 @@ public:
 	DECLARE_READ16_MEMBER(cyberbal_sound_68k_r);
 	DECLARE_WRITE16_MEMBER(cyberbal_sound_68k_w);
 	DECLARE_WRITE16_MEMBER(cyberbal_sound_68k_dac_w);
+	DECLARE_DRIVER_INIT(cyberbalt);
+	DECLARE_DRIVER_INIT(cyberbal2p);
+	DECLARE_DRIVER_INIT(cyberbal);
 };
 
 

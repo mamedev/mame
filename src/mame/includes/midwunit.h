@@ -32,6 +32,15 @@ public:
 	DECLARE_WRITE16_MEMBER(midwunit_sound_w);
 	DECLARE_WRITE16_MEMBER(umk3_palette_hack_w);
 	DECLARE_WRITE16_MEMBER(wwfmania_io_0_w);
+	DECLARE_DRIVER_INIT(mk3r10);
+	DECLARE_DRIVER_INIT(nbahangt);
+	DECLARE_DRIVER_INIT(wwfmania);
+	DECLARE_DRIVER_INIT(umk3);
+	DECLARE_DRIVER_INIT(mk3);
+	DECLARE_DRIVER_INIT(openice);
+	DECLARE_DRIVER_INIT(rmpgwt);
+	DECLARE_DRIVER_INIT(umk3r11);
+	DECLARE_DRIVER_INIT(mk3r20);
 };
 
 /*----------- defined in machine/midwunit.c -----------*/
@@ -39,16 +48,7 @@ public:
 
 
 
-DRIVER_INIT( mk3 );
-DRIVER_INIT( mk3r20 );
-DRIVER_INIT( mk3r10 );
-DRIVER_INIT( umk3 );
-DRIVER_INIT( umk3r11 );
 
-DRIVER_INIT( openice );
-DRIVER_INIT( nbahangt );
-DRIVER_INIT( wwfmania );
-DRIVER_INIT( rmpgwt );
 
 MACHINE_RESET( midwunit );
 

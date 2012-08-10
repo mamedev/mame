@@ -101,38 +101,38 @@ public:
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 
 	// ROM board-specific driver init
-	void init_generic_5358_small();
-	void init_generic_5358();
-	void init_generic_5521();
-	void init_generic_5704();
-	void init_generic_5797();
-	void init_generic_korean();
+	DECLARE_DRIVER_INIT(generic_5521);
+	DECLARE_DRIVER_INIT(generic_5358);
+	DECLARE_DRIVER_INIT(generic_5704);
+	DECLARE_DRIVER_INIT(generic_5358_small);
+	DECLARE_DRIVER_INIT(generic_5797);
+	DECLARE_DRIVER_INIT(generic_korean);
 	
 	// game-specific driver init
-	void init_aceattac_5358();
-	void init_aliensy3_5358_small();
-	void init_altbeast_5521();
-	void init_altbeasj_5521();
-	void init_altbeas5_5521();
-	void init_altbeas4_5521();
-	void init_aurail1_5704();
-	void init_aurailj_5704();
-	void init_ddux_5704();
-	void init_dunkshot_5358_small();
-	void init_exctleag_5358();
-	void init_goldnaxe_5704();
-	void init_goldnaxe_5797();
-	void init_hwchamp_5521();
-	void init_passshtj_5358();
-	void init_sdi_5358_small();
-	void init_defense_5358_small();
-	void init_shinobi4_5521();
-	void init_shinobi3_5358();
-	void init_sjryuko_5358_small();
-	void init_timescan_5358_small();
-	void init_tturf_5704();
-	void init_wb3_5704();
-	void init_snapper();
+	DECLARE_DRIVER_INIT(isgsm);
+	DECLARE_DRIVER_INIT(tturf_5704);
+	DECLARE_DRIVER_INIT(wb3_5704);
+	DECLARE_DRIVER_INIT(hwchamp_5521);
+	DECLARE_DRIVER_INIT(altbeas5_5521);
+	DECLARE_DRIVER_INIT(sdi_5358_small);
+	DECLARE_DRIVER_INIT(altbeasj_5521);
+	DECLARE_DRIVER_INIT(ddux_5704);
+	DECLARE_DRIVER_INIT(snapper);
+	DECLARE_DRIVER_INIT(shinobi4_5521);
+	DECLARE_DRIVER_INIT(goldnaxe_5704);
+	DECLARE_DRIVER_INIT(defense_5358_small);
+	DECLARE_DRIVER_INIT(sjryuko_5358_small);
+	DECLARE_DRIVER_INIT(altbeast_5521);
+	DECLARE_DRIVER_INIT(exctleag_5358);
+	DECLARE_DRIVER_INIT(tetrbx);
+	DECLARE_DRIVER_INIT(aceattac_5358);
+	DECLARE_DRIVER_INIT(passshtj_5358);
+	DECLARE_DRIVER_INIT(shinfz);
+	DECLARE_DRIVER_INIT(dunkshot_5358_small);
+	DECLARE_DRIVER_INIT(timescan_5358_small);
+	DECLARE_DRIVER_INIT(shinobi3_5358);
+	DECLARE_DRIVER_INIT(goldnaxe_5797);
+	DECLARE_DRIVER_INIT(altbeas4_5521);
 	
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

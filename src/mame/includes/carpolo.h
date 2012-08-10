@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(carpolo_car_ball_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(carpolo_car_border_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(carpolo_timer_interrupt_clear_w);
+	DECLARE_DRIVER_INIT(carpolo);
 };
 
 

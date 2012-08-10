@@ -252,6 +252,9 @@ public:
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
 	DECLARE_READ8_MEMBER(peplus_input0_r);
+	DECLARE_DRIVER_INIT(peplus);
+	DECLARE_DRIVER_INIT(peplussb);
+	DECLARE_DRIVER_INIT(peplussbw);
 };
 
 
@@ -1224,34 +1227,31 @@ static void peplus_init(running_machine &machine)
 *************************/
 
 /* Normal board */
-static DRIVER_INIT( peplus )
+DRIVER_INIT_MEMBER(peplus_state,peplus)
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
-	state->m_wingboard = FALSE;
-	state->m_jumper_e16_e17 = FALSE;
-	peplus_init(machine);
+	m_wingboard = FALSE;
+	m_jumper_e16_e17 = FALSE;
+	peplus_init(machine());
 }
 
 /* Superboard */
-static DRIVER_INIT( peplussb )
+DRIVER_INIT_MEMBER(peplus_state,peplussb)
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
-	state->m_wingboard = FALSE;
-	state->m_jumper_e16_e17 = FALSE;
-	peplus_load_superdata(machine, "user1");
+	m_wingboard = FALSE;
+	m_jumper_e16_e17 = FALSE;
+	peplus_load_superdata(machine(), "user1");
 
-	peplus_init(machine);
+	peplus_init(machine());
 }
 
 /* Superboard with Attached Wingboard */
-static DRIVER_INIT( peplussbw )
+DRIVER_INIT_MEMBER(peplus_state,peplussbw)
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
-	state->m_wingboard = TRUE;
-	state->m_jumper_e16_e17 = TRUE;
-	peplus_load_superdata(machine, "user1");
+	m_wingboard = TRUE;
+	m_jumper_e16_e17 = TRUE;
+	peplus_load_superdata(machine(), "user1");
 
-	peplus_init(machine);
+	peplus_init(machine());
 }
 
 

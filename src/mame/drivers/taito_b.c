@@ -3705,9 +3705,9 @@ ROM_START( realpunc )
 ROM_END
 
 
-static DRIVER_INIT( taito_b )
+DRIVER_INIT_MEMBER(taitob_state,taito_b)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw, taitob_state,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )

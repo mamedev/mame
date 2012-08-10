@@ -134,6 +134,9 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+	DECLARE_DRIVER_INIT(multigmt);
+	DECLARE_DRIVER_INIT(multigam);
+	DECLARE_DRIVER_INIT(multigm3);
 };
 
 
@@ -1356,11 +1359,10 @@ ROM_START( supergm3 )
 	ROM_LOAD( "sg3.rom17", 0x180000, 0x80000, CRC(7be7fbb8) SHA1(03cda9c098eaf21326b001d5c227ad85502b6378) )
 ROM_END
 
-static DRIVER_INIT( multigam )
+DRIVER_INIT_MEMBER(multigam_state,multigam)
 {
-	multigam_state *state = machine.driver_data<multigam_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->multigam_switch_prg_rom(*space, 0x0, 0x01);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	multigam_switch_prg_rom(*space, 0x0, 0x01);
 }
 
 static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble)
@@ -1372,32 +1374,31 @@ static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble
 	}
 };
 
-static DRIVER_INIT(multigm3)
+DRIVER_INIT_MEMBER(multigam_state,multigm3)
 {
-	multigam_state *state = machine.driver_data<multigam_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
-	multigm3_decrypt(machine.root_device().memregion("maincpu")->base(), machine.root_device().memregion("maincpu")->bytes(), decode );
-	multigm3_decrypt(machine.root_device().memregion("user1")->base(), machine.root_device().memregion("user1")->bytes(), decode );
+	multigm3_decrypt(machine().root_device().memregion("maincpu")->base(), machine().root_device().memregion("maincpu")->bytes(), decode );
+	multigm3_decrypt(machine().root_device().memregion("user1")->base(), machine().root_device().memregion("user1")->bytes(), decode );
 
-	state->m_multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
+	m_multigmc_mmc3_6000_ram = auto_alloc_array(machine(), UINT8, 0x2000);
 
-	state->multigam_switch_prg_rom(*space, 0x0, 0x01);
+	multigam_switch_prg_rom(*space, 0x0, 0x01);
 }
 
-static DRIVER_INIT(multigmt)
+DRIVER_INIT_MEMBER(multigam_state,multigmt)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	UINT8* buf = auto_alloc_array(machine, UINT8, 0x80000);
+	UINT8* buf = auto_alloc_array(machine(), UINT8, 0x80000);
 	UINT8 *rom;
 	int size;
 	int i;
 	int addr;
 
-	rom = machine.root_device().memregion("maincpu")->base();
+	rom = machine().root_device().memregion("maincpu")->base();
 	size = 0x8000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1407,7 +1408,7 @@ static DRIVER_INIT(multigmt)
 		rom[i] = buf[addr];
 	}
 
-	rom = machine.root_device().memregion("user1")->base();
+	rom = machine().root_device().memregion("user1")->base();
 	size = 0x80000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1415,7 +1416,7 @@ static DRIVER_INIT(multigmt)
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
-	rom = machine.root_device().memregion("gfx1")->base();
+	rom = machine().root_device().memregion("gfx1")->base();
 	size = 0x80000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1424,9 +1425,8 @@ static DRIVER_INIT(multigmt)
 		rom[i] = BITSWAP8(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
 	}
 
-	auto_free(machine, buf);
-	multigam_state *state = machine.driver_data<multigam_state>();
-	state->multigam_switch_prg_rom(*space, 0x0, 0x01);
+	auto_free(machine(), buf);
+	multigam_switch_prg_rom(*space, 0x0, 0x01);
 };
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
@@ -1434,4 +1434,4 @@ GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, RO
 GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
 GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
 GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
-GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, 0,        ROT0, "<unknown>", "Super Game III", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, driver_device, 0,        ROT0, "<unknown>", "Super Game III", 0 )
