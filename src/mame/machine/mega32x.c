@@ -1641,7 +1641,7 @@ ADDRESS_MAP_END
 
 
 
-DRIVER_INIT_MEMBER(_32x_state,_32x)
+DRIVER_INIT_MEMBER(md_cons_state,_32x)
 {
 	_32x_dram0 = auto_alloc_array(machine(), UINT16, 0x40000/2);
 	_32x_dram1 = auto_alloc_array(machine(), UINT16, 0x40000/2);
@@ -1708,7 +1708,7 @@ DRIVER_INIT_MEMBER(_32x_state,_32x)
 	sh2drc_set_options(machine().device("32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
 	sh2drc_set_options(machine().device("32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
 
-	init_megadriv();
+	DRIVER_INIT_CALL(megadriv);
 }
 
 void _32x_check_irqs(running_machine& machine)

@@ -115,6 +115,7 @@ public:
 	DECLARE_DRIVER_INIT(demndrgn);
 	DECLARE_DRIVER_INIT(ebases);
 	DECLARE_DRIVER_INIT(gorf);
+	DECLARE_DRIVER_INIT(astrocde);
 };
 
 

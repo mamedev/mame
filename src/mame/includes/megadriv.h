@@ -124,7 +124,6 @@ public:
 	DECLARE_DRIVER_INIT(megadriv);
 	DECLARE_DRIVER_INIT(megadrij);
 	DECLARE_DRIVER_INIT(mpnew);
-	
 };
 
 class md_boot_state : public md_base_state
@@ -368,6 +367,15 @@ public:
 	
 	DECLARE_DRIVER_INIT(hshavoc);
 	DECLARE_DRIVER_INIT(topshoot);
+	
+	DECLARE_DRIVER_INIT(genesis);
+	DECLARE_DRIVER_INIT(mess_md_common);
+	DECLARE_DRIVER_INIT(_32x);
+	DECLARE_DRIVER_INIT(md_eur);
+	DECLARE_DRIVER_INIT(md_jpn);
+	DECLARE_DRIVER_INIT(mess_32x);
+	DECLARE_DRIVER_INIT(mess_32x_eur);
+	DECLARE_DRIVER_INIT(mess_32x_jpn);
 };
 
 class pico_state : public md_cons_state
@@ -410,7 +418,6 @@ public:
 	_32x_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag) { }
 
-	DECLARE_DRIVER_INIT(_32x);	
 };
 
 // Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions

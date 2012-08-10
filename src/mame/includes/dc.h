@@ -87,6 +87,9 @@ class dc_state : public driver_device
 	DECLARE_DRIVER_INIT(vf4evoct);
 	DECLARE_DRIVER_INIT(naomi_mp);
 	DECLARE_DRIVER_INIT(mvsc2);
+	DECLARE_DRIVER_INIT(dc);
+	DECLARE_DRIVER_INIT(dcus);
+	DECLARE_DRIVER_INIT(dcjp);
 };
 
 /*----------- defined in machine/dc.c -----------*/

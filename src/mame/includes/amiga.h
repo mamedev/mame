@@ -430,6 +430,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 	DECLARE_DRIVER_INIT(mquake);
+	DECLARE_DRIVER_INIT(amiga);
+	DECLARE_DRIVER_INIT(cdtv);
 };
 
 

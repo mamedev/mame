@@ -492,6 +492,8 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);
 	DECLARE_DRIVER_INIT(snes);
 	DECLARE_DRIVER_INIT(snes_hirom);	
+	DECLARE_DRIVER_INIT(snes_mess);
+	DECLARE_DRIVER_INIT(snesst);
 };
 
 /* Special chips, checked at init and used in memory handlers */
