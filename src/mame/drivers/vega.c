@@ -1,6 +1,6 @@
 /***************************************************************************
 
- Vega by Olypmia
+ Vega by Olympia
 
  I don't know much about this, and I'm unsure of the dump quality.  There
  were several dumps, and all but one had ROM10 with identical halves, however
