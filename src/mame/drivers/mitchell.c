@@ -2322,7 +2322,7 @@ GAME( 1989, pangba,    pang,     spangbl, pang, mitchell_state,     pangb,    RO
 GAME( 1989, bbros,     pang,     pang,    pang, mitchell_state,     pang,     ROT0,   "Mitchell (Capcom license)", "Buster Bros. (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, pompingw,  pang,     pang,    pang, mitchell_state,     pang,     ROT0,   "Mitchell", "Pomping World (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cworld,    0,        pang,    qtono1, mitchell_state,   cworld,   ROT0,   "Capcom", "Capcom World (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hatena,    0,        pang,    qtono1, mitchell_state,   hatena,   ROT0,   "Capcom", "Adventure Quiz 2 Hatena Hatena no Dai-Bouken (Japan 900228)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hatena,    0,        pang,    qtono1, mitchell_state,   hatena,   ROT0,   "Capcom", "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spang,     0,        pang,    pang, mitchell_state,     spang,    ROT0,   "Mitchell", "Super Pang (World 900914)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spangj,    spang,    pang,    pang, mitchell_state,     spangj,   ROT0,   "Mitchell", "Super Pang (Japan 901023)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spangbl,   spang,    spangbl, spangbl, mitchell_state,  spangbl,  ROT0,   "bootleg", "Super Pang (World 900914, bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // different sound hardware

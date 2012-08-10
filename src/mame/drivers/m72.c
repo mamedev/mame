@@ -3629,7 +3629,7 @@ GAME( 1987, rtypejp,     rtype,    rtype,       rtypep, driver_device,   0,     
 GAME( 1987, rtypeu,      rtype,    rtype,       rtype, driver_device,    0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypeb,      rtype,    rtype,       rtype, driver_device,    0,           ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
 GAME( 1987, bchopper,    0,        m72,         bchopper, m72_state, bchopper,    ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
-GAME( 1987, mrheli,      bchopper, m72,         bchopper, m72_state, mrheli,      ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
+GAME( 1987, mrheli,      bchopper, m72,         bchopper, m72_state, mrheli,      ROT0,   "Irem", "Mr. HELI no Daibouken", GAME_NO_COCKTAIL )
 GAME( 1988, nspirit,     0,        m72,         nspirit, m72_state,  nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
 GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit, m72_state,  m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
 GAME( 1988, imgfight,    0,        m72,         imgfight, m72_state, imgfight,    ROT270, "Irem", "Image Fight (World, revision A)", 0 )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
