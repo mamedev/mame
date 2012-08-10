@@ -149,21 +149,28 @@ the layer is misplaced however, different scroll regs?
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
+#include "video/kaneko_tmap.h"
+#include "video/kaneko_spr.h"
 
-class expro02_state : public kaneko16_state
+class expro02_state : public driver_device
 {
 public:
 	expro02_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_galsnew_bg_pixram(*this, "galsnew_bgram"),
-		m_galsnew_fg_pixram(*this, "galsnew_fgram")
+		m_galsnew_fg_pixram(*this, "galsnew_fgram"),
+		m_view2_0(*this, "view2_0"),
+		m_kaneko_spr(*this, "kan_spr"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
 	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
+	optional_device<kaneko_view2_tilemap_device> m_view2_0;
+	optional_device<kaneko16_sprite_device> m_kaneko_spr;
+	optional_shared_ptr<UINT16> m_spriteram;
 
 	UINT16 m_vram_0_bank_num;
 	UINT16 m_vram_1_bank_num;
@@ -175,6 +182,16 @@ public:
 };
 
 
+PALETTE_INIT( galsnew )
+{
+	int i;
+
+	/* first 2048 colors are dynamic */
+
+	/* initialize 555 RGB lookup */
+	for (i = 0; i < 32768; i++)
+		palette_set_color_rgb(machine,2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+}
 
 SCREEN_UPDATE_IND16( galsnew )
 {
@@ -215,8 +232,6 @@ SCREEN_UPDATE_IND16( galsnew )
 	}
 
 
-	// if the display is disabled, do nothing?
-	if (!state->m_disp_enable) return 0;
 
 	int i;
 
@@ -235,8 +250,7 @@ SCREEN_UPDATE_IND16( galsnew )
 
 VIDEO_START( galsnew )
 {
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	state->m_disp_enable = 1;	// default enabled for games not using it
+
 }
 
 
@@ -560,7 +574,7 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 
 
 	MCFG_VIDEO_START(galsnew)
-	MCFG_PALETTE_INIT(berlwall)
+	MCFG_PALETTE_INIT(galsnew)
 
 	/* arm watchdog */
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */

@@ -73,18 +73,24 @@ Is there another alt program rom set labeled 9 & 10?
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/kaneko16.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
+#include "video/kaneko_tmap.h"
 
-class sandscrp_state : public kaneko16_state
+
+class sandscrp_state : public driver_device
 {
 public:
 	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_view2_0(*this, "view2_0")
+	{
+	}
+
+	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 
 	UINT8 m_sprite_irq;
 	UINT8 m_unknown_irq;
@@ -108,7 +114,7 @@ public:
 
 SCREEN_UPDATE_IND16( sandscrp )
 {
-	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+	sandscrp_state *state = screen.machine().driver_data<sandscrp_state>();
 	device_t *pandora = screen.machine().device("pandora");
 	bitmap.fill(0, cliprect);
 

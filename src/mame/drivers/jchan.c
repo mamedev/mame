@@ -171,15 +171,17 @@ there are 9 PALS on the pcb (not dumped)
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
-#include "includes/kaneko16.h"
 #include "video/sknsspr.h"
 #include "machine/eeprom.h"
+#include "video/kaneko_tmap.h"
+#include "machine/kaneko_toybox.h"
 
-class jchan_state : public kaneko16_state
+class jchan_state : public driver_device
 {
 public:
 	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+		m_view2_0(*this, "view2_0"),
 		m_spriteram_1(*this, "spriteram_1"),
 		m_sprregs_1(*this, "sprregs_1"),
 		m_spriteram_2(*this, "spriteram_2"),
@@ -190,6 +192,7 @@ public:
 		m_subcpu(*this,"sub")
 		{ }
 
+	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 	bitmap_ind16 *m_sprite_bitmap_1;
 	bitmap_ind16 *m_sprite_bitmap_2;
 	UINT32* m_sprite_ram32_1;
@@ -284,8 +287,6 @@ static VIDEO_START(jchan)
 
 	state->m_spritegen1->skns_sprite_kludge(0,0);
 	state->m_spritegen2->skns_sprite_kludge(0,0);
-
-	state->m_disp_enable = 1;	// default enabled for games not using it
 }
 
 

@@ -64,15 +64,16 @@ Dumped by Uki
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
-#include "includes/kaneko16.h"
 #include "video/sknsspr.h"
 #include "machine/eeprom.h"
+#include "machine/kaneko_toybox.h"
 
-class galpani3_state : public kaneko16_state
+class galpani3_state : public driver_device
 {
 public:
 	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
 		m_priority_buffer(*this, "priority_buffer"),
 		m_framebuffer1(*this, "framebuffer1"),
 		m_framebuffer2(*this, "framebuffer2"),
@@ -94,6 +95,7 @@ public:
 		m_maincpu(*this,"maincpu")
 		{ }
 
+	optional_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_priority_buffer;
 	required_shared_ptr<UINT16> m_framebuffer1;
 	required_shared_ptr<UINT16> m_framebuffer2;
