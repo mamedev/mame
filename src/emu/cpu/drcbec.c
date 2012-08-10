@@ -938,7 +938,15 @@ int drcbe_c::execute(code_handle &entry)
 				if (PARAM2 + 1 != 0)
 					flags = FLAGS32_NZCV_ADD(temp32, PARAM1, PARAM2 + (flags & FLAG_C));
 				else
-					flags = FLAGS32_NZCV_ADD(temp32, PARAM1 + (flags & FLAG_C), PARAM2);
+                {
+                    if ((PARAM2 == 0xffffffff) && (flags & FLAG_C))
+                    {
+                        flags = FLAGS32_NZCV_ADD(temp32, PARAM1 + (flags & FLAG_C), PARAM2);
+                        flags |= FLAG_C;
+                    }
+                    else
+                        flags = FLAGS32_NZCV_ADD(temp32, PARAM1 + (flags & FLAG_C), PARAM2);
+                }
 				PARAM0 = temp32;
 				break;
 
@@ -958,10 +966,16 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SUBB, 4, 1):
 				temp32 = PARAM1 - PARAM2 - (flags & FLAG_C);
+                temp64 = (UINT64)PARAM1 - (UINT64)PARAM2 - (UINT64)(flags & FLAG_C);
 				if (PARAM2 + 1 != 0)
 					flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2 + (flags & FLAG_C));
 				else
-					flags = FLAGS32_NZCV_SUB(temp32, PARAM1 - (flags & FLAG_C), PARAM2);
+                {
+                    flags = FLAGS32_NZCV_SUB(temp32, PARAM1 - (flags & FLAG_C), PARAM2);
+                    flags &= ~(FLAG_C | FLAG_V);
+                    flags |= ((temp64>>32) & 1) ? FLAG_C : 0;
+                    flags |= (((PARAM1) ^ (PARAM2)) & ((PARAM1) ^ (temp64)) & 0x80000000) ? FLAG_V : 0;
+                }
 				PARAM0 = temp32;
 				break;
 
