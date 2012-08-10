@@ -66,6 +66,7 @@ Dumped by Uki
 #include "sound/ymz280b.h"
 #include "includes/kaneko16.h"
 #include "video/sknsspr.h"
+#include "machine/eeprom.h"
 
 class galpani3_state : public kaneko16_state
 {
@@ -90,7 +91,6 @@ public:
 		m_framebuffer1_bright2(*this, "fb1_bright2"),
 		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap_1(1024, 1024),
-		m_mcu_ram(*this, "mcu_ram"),
 		m_maincpu(*this,"maincpu")
 		{ }
 
@@ -125,8 +125,6 @@ public:
 	UINT32 m_spriteram32[0x4000/4];
 	UINT32 m_spc_regs[0x40/4];
 	bitmap_ind16 m_sprite_bitmap_1;
-	required_shared_ptr<UINT16> m_mcu_ram;
-	UINT16 m_mcu_com[4];
 	int m_regs1_i;
 	int m_regs2_i;
 	int m_regs3_i;
@@ -138,11 +136,7 @@ public:
 	sknsspr_device* m_spritegen;
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
-	DECLARE_WRITE16_MEMBER(galpani3_mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(galpani3_mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(galpani3_mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(galpani3_mcu_com3_w);
-	DECLARE_READ16_MEMBER(galpani3_mcu_status_r);
+
 	DECLARE_READ16_MEMBER(galpani3_regs1_r);
 	DECLARE_READ16_MEMBER(galpani3_regs2_r);
 	DECLARE_READ16_MEMBER(galpani3_regs3_r);
@@ -169,7 +163,10 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_bgcol_w);
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_bgcol_w);
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_bgcol_w);
-	DECLARE_DRIVER_INIT(galpani3);
+
+	DECLARE_DRIVER_INIT( galpani3 )
+	{
+	}
 };
 
 
@@ -458,7 +455,7 @@ static INPUT_PORTS_START( galpani3 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED	)
 
-	PORT_START("DSW")	/* provided by the MCU - $200386.b <- $400200 */
+	PORT_START("DSW1")	/* provided by the MCU - $200386.b <- $400200 */
 	PORT_DIPNAME( 0x0100, 0x0100, "Test Mode" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -504,111 +501,6 @@ WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
 
 
 
-/***************************************************************************
-
-                            MCU Code Simulation
-                (follows the implementation of kaneko16.c)
-
-***************************************************************************/
-
-static void galpani3_mcu_run(running_machine &machine)
-{
-	galpani3_state *state = machine.driver_data<galpani3_state>();
-	UINT16 mcu_command = state->m_mcu_ram[0x0010/2];		/* command nb */
-	UINT16 mcu_offset  = state->m_mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
-	UINT16 mcu_subcmd  = state->m_mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
-
-	logerror("%s: MCU executed command : %04X %04X\n",machine.describe_context(),mcu_command,mcu_offset*2);
-
-	/* the only MCU commands found in program code are:
-         0x04: protection: provide code/data,
-         0x03: read DSW
-         0x02: load NVRAM settings \ ATMEL AT93C46 chip,
-         0x42: save NVRAM settings / 128 bytes serial EEPROM
-    */
-	switch (mcu_command >> 8)
-	{
-		case 0x03:	// DSW
-		{
-			state->m_mcu_ram[mcu_offset] = state->ioport("DSW")->read();
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
-		}
-		break;
-
-		case 0x02: // $38950 - load NVRAM settings
-		{
-			/* NOTE: code @ $38B46 & $38ab8 does exactly what is checked after MCU command
-                     so that's what we'll mimic here... probably the initial NVRAM settings */
-			int i;
-
-			/* MCU writes 128 bytes to shared ram: last byte is the byte-sum */
-			/* first 32 bytes (header): 0x8BE08E71.L, then the string "95/06/30 Gals Panic3Ver 0.95"; */
-			state->m_mcu_ram[mcu_offset +  0] = 0x8BE0; state->m_mcu_ram[mcu_offset +  1] = 0x8E71;
-			state->m_mcu_ram[mcu_offset +  2] = 0x3935; state->m_mcu_ram[mcu_offset +  3] = 0x2F30;
-			state->m_mcu_ram[mcu_offset +  4] = 0x362F; state->m_mcu_ram[mcu_offset +  5] = 0x3330;
-			state->m_mcu_ram[mcu_offset +  6] = 0x2047; state->m_mcu_ram[mcu_offset +  7] = 0x616C;
-			state->m_mcu_ram[mcu_offset +  8] = 0x7320; state->m_mcu_ram[mcu_offset +  9] = 0x5061;
-			state->m_mcu_ram[mcu_offset + 10] = 0x6E69; state->m_mcu_ram[mcu_offset + 11] = 0x6333;
-			state->m_mcu_ram[mcu_offset + 12] = 0x5665; state->m_mcu_ram[mcu_offset + 13] = 0x7220;
-			state->m_mcu_ram[mcu_offset + 14] = 0x302E; state->m_mcu_ram[mcu_offset + 15] = 0x3935;
-			/* next 11 bytes - initial NVRAM settings */
-			state->m_mcu_ram[mcu_offset + 16] = 0x0001; state->m_mcu_ram[mcu_offset + 17] = 0x0101;
-			state->m_mcu_ram[mcu_offset + 18] = 0x0100; state->m_mcu_ram[mcu_offset + 19] = 0x0208;
-			state->m_mcu_ram[mcu_offset + 20] = 0x02FF; state->m_mcu_ram[mcu_offset + 21] = 0x0000;
-			/* rest is zeroes */
-			for (i=22;i<63;i++)
-				state->m_mcu_ram[mcu_offset + i] = 0;
-			/* and sum is $0c.b */
-			state->m_mcu_ram[mcu_offset + 63] = 0x000c;
-		}
-		break;
-
-		case 0x04: // $38842 - provides code/data
-		{
-			toxboy_handle_04_subcommand(machine, mcu_subcmd, state->m_mcu_ram);
-		}
-		break;
-
-		case 0x42: // $389ee - save NVRAM settings
-		{
-			// found, TODO: trace call in code !!!
-		}
-		break;
-
-		default:
-			logerror("UNKNOWN COMMAND\n");
-	}
-}
-
-/*
-  MCU doesn't execute exactly as it is coded right know (ala jchan):
-   * com0=com1=0xFFFF -> command to execute
-   * com2=com3=0xFFFF -> status reading only
-*/
-
-INLINE void galpani3_mcu_com_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
-{
-	galpani3_state *state = space->machine().driver_data<galpani3_state>();
-	COMBINE_DATA(&state->m_mcu_com[_n_]);
-	if (state->m_mcu_com[0] != 0xFFFF)	return;
-	if (state->m_mcu_com[1] != 0xFFFF)	return;
-	if (state->m_mcu_com[2] != 0xFFFF)	return;
-	if (state->m_mcu_com[3] != 0xFFFF)	return;
-
-	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) );
-	galpani3_mcu_run(space->machine());
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_mcu_com0_w){ galpani3_mcu_com_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(galpani3_state::galpani3_mcu_com1_w){ galpani3_mcu_com_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(galpani3_state::galpani3_mcu_com2_w){ galpani3_mcu_com_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(galpani3_state::galpani3_mcu_com3_w){ galpani3_mcu_com_w(&space, offset, data, mem_mask, 3); }
-
-READ16_MEMBER(galpani3_state::galpani3_mcu_status_r)
-{
-	logerror("cpu '%s' (PC=%06X): read mcu status\n", space.device().tag(), cpu_get_previouspc(&space.device()));
-	return 0;
-}
 
 // might be blitter regs? - there are 3, probably GRAP2 chips
 
@@ -924,13 +816,13 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
 	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_SHARE("sprregs")
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("mcu_ram") // area [C]
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w ) // area [C]
 
-	AM_RANGE(0x580000, 0x580001) AM_WRITE(galpani3_mcu_com0_w)	// ] see $387e8: these 2 locations are written (w.#$ffff)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(galpani3_mcu_com1_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
-	AM_RANGE(0x680000, 0x680001) AM_WRITE(galpani3_mcu_com2_w)	// ] see $387e8: these 2 locations are written (w.#$ffff)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(galpani3_mcu_com3_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
-	AM_RANGE(0x780000, 0x780001) AM_READ(galpani3_mcu_status_r)
+	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)	
+	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)	
+	AM_RANGE(0x680000, 0x680001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)	
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)	
+	AM_RANGE(0x780000, 0x780001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
 
 	// GRAP2 1?
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
@@ -1012,6 +904,11 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(galpani3)
 
+	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	kaneko_toybox_device::set_toybox_gametype(*device, GAME_GALPANI3);
+
 	MCFG_PALETTE_LENGTH(0x4303)
 
 	MCFG_VIDEO_START(galpani3)
@@ -1077,12 +974,7 @@ ROM_START( galpani3j ) /* Some game text in Japanese, but no "For use in Japan" 
 ROM_END
 
 
-DRIVER_INIT_MEMBER(galpani3_state,galpani3)
-{
-	DRIVER_INIT_CALL(decrypt_toybox_rom);
 
-	memset(m_mcu_com, 0, 4 * sizeof( UINT16) );
-}
 
 GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

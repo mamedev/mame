@@ -11,6 +11,38 @@ INPUT_PORTS_EXTERN( mpu4 );
 #include "gamball.lh"
 
 
+DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
+{
+	// many original barcrest / bwb sets have identification info around here
+	// this helps with sorting
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
+	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	
+	for (int j=0;j<size;j+=0x10000)
+	{
+		if (size>0x10000) printf("\nblock 0x%06x:\n",j);
+		printf("\ncopyright string:\n");
+		for (int i = 0xffe0; i<0xfff0; i++)
+		{
+			printf("%c", src[j+i]);
+		}
+		printf("\n\nidentification string:\n");
+		for (int i = 0xff28; i<0xff30; i++)
+		{
+			printf("%c", src[j+i]);
+		}
+		printf("\n");
+	}
+}
+
+DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod4yam )
+{
+	DRIVER_INIT_CALL( m4_debug_mod4yam );
+	DRIVER_INIT_CALL( m4debug );
+}
+
+
+
 INPUT_PORTS_START( m4gambal )
 	PORT_START("ORANGE1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")//  20p level
@@ -384,3 +416,123 @@ GAME(199?, m4ra		,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcr
 GAME(199?, m4sayno	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4acechs	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+
+
+#define M4SUPST_EXTRA_ROMS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "ss.chr", 0x0000, 0x000048, CRC(bd206d57) SHA1(ecfe38d9b4823ae6bc2fc440c243e6ae5e2edaa4) ) \
+
+#define M4SUPST_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SUPST_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4yam	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SUPST_SET( 199?, m4supst,		0,			"cs4b.p1",				0x0000, 0x010000, CRC(fb0aac20) SHA1(3a40be78f7add7905afa8d1226ad41bf0041a2ec), "Barcrest","Super Streak (Barcrest) (MPU4) (set 1)" )
+M4SUPST_SET( 199?, m4supst__a,	m4supst,	"cs4ad.p1",				0x0000, 0x010000, CRC(c0e81dfd) SHA1(2da922df6c102f8d0f1678e974df9e4d356e5133), "Barcrest","Super Streak (Barcrest) (MPU4) (set 2)" )
+M4SUPST_SET( 199?, m4supst__b,	m4supst,	"cs4bd.p1",				0x0000, 0x010000, CRC(dafc7ed6) SHA1(3e92d5557d2f587132f4b3b633978ab7d4333fcc), "Barcrest","Super Streak (Barcrest) (MPU4) (set 3)" )
+M4SUPST_SET( 199?, m4supst__c,	m4supst,	"cs4d.p1",				0x0000, 0x010000, CRC(c1fcda65) SHA1(11f2a45f3f821eac6b98b1988824d77aada3d759), "Barcrest","Super Streak (Barcrest) (MPU4) (set 4)" )
+M4SUPST_SET( 199?, m4supst__d,	m4supst,	"cs4dk.p1",				0x0000, 0x010000, CRC(30a46171) SHA1(ef1f2951b478ba2b2d42dfb0ec4ed59f28d79972), "Barcrest","Super Streak (Barcrest) (MPU4) (set 5)" )
+M4SUPST_SET( 199?, m4supst__e,	m4supst,	"cs4dy.p1",				0x0000, 0x010000, CRC(72b15ce7) SHA1(c451ac552ffe9bcde1990b97a60b0ed8918bf8c8), "Barcrest","Super Streak (Barcrest) (MPU4) (set 6)" )
+M4SUPST_SET( 199?, m4supst__f,	m4supst,	"cs4k.p1",				0x0000, 0x010000, CRC(f252f9ea) SHA1(251998ea752deb4f4a05c833b19e89d334334fac), "Barcrest","Super Streak (Barcrest) (MPU4) (set 7)" )
+M4SUPST_SET( 199?, m4supst__g,	m4supst,	"cs4s.p1",				0x0000, 0x010000, CRC(10f7b88d) SHA1(0aac0ebbe0ce04db49fc7de4325eea9abdfd74b5), "Barcrest","Super Streak (Barcrest) (MPU4) (set 8)" )
+M4SUPST_SET( 199?, m4supst__h,	m4supst,	"cs4y.p1",				0x0000, 0x010000, CRC(a464d09d) SHA1(d38c0f8c7c9b7f560b685781a7dcf82bc031a191), "Barcrest","Super Streak (Barcrest) (MPU4) (set 9)" )
+M4SUPST_SET( 199?, m4supst__i,	m4supst,	"csp02ad.p1",			0x0000, 0x010000, CRC(96bbbc26) SHA1(ca127151c771963c07f0f368102ede8095d11863), "Barcrest","Super Streak (Barcrest) (MPU4) (set 10)" )
+M4SUPST_SET( 199?, m4supst__j,	m4supst,	"csp02b.p1",			0x0000, 0x010000, CRC(913ea9ff) SHA1(182bcc007d007a1c7f57767358600d2de7d1e3cf), "Barcrest","Super Streak (Barcrest) (MPU4) (set 11)" )
+M4SUPST_SET( 199?, m4supst__k,	m4supst,	"csp02bd.p1",			0x0000, 0x010000, CRC(ad0137a1) SHA1(d043372ba09081dd4e807f009a6460b4b30e6453), "Barcrest","Super Streak (Barcrest) (MPU4) (set 12)" )
+M4SUPST_SET( 199?, m4supst__l,	m4supst,	"csp02c.p1",			0x0000, 0x010000, CRC(fdad4b22) SHA1(4f19922821a9d1663bd9355447209384272e7542), "Barcrest","Super Streak (Barcrest) (MPU4) (set 13)" )
+M4SUPST_SET( 199?, m4supst__m,	m4supst,	"csp02d.p1",			0x0000, 0x010000, CRC(9717a58d) SHA1(8bc495dc4db0041718ae2db14a01a789616c8764), "Barcrest","Super Streak (Barcrest) (MPU4) (set 14)" )
+M4SUPST_SET( 199?, m4supst__n,	m4supst,	"csp02dk.p1",			0x0000, 0x010000, CRC(cd8aa547) SHA1(a13dcb75507878cb133b9ef739fb41d932d4eed5), "Barcrest","Super Streak (Barcrest) (MPU4) (set 15)" )
+M4SUPST_SET( 199?, m4supst__o,	m4supst,	"csp02dr.p1",			0x0000, 0x010000, CRC(6656e588) SHA1(4001ec0d1145ef0107e62ccda61e22ba8b0cdc92), "Barcrest","Super Streak (Barcrest) (MPU4) (set 16)" )
+M4SUPST_SET( 199?, m4supst__p,	m4supst,	"csp02dy.p1",			0x0000, 0x010000, CRC(14ff7e1d) SHA1(455b6ff93a5f25dc5f43c62a6c1d9a18de1ce94b), "Barcrest","Super Streak (Barcrest) (MPU4) (set 17)" )
+M4SUPST_SET( 199?, m4supst__q,	m4supst,	"csp02k.p1",			0x0000, 0x010000, CRC(c438c754) SHA1(c1d2e664091c1eaf1e4d964a3bfd446b11d7ba41), "Barcrest","Super Streak (Barcrest) (MPU4) (set 18)" )
+M4SUPST_SET( 199?, m4supst__r,	m4supst,	"csp02r.p1",			0x0000, 0x010000, CRC(4abe0f80) SHA1(67f7f9946a26b5097b6ce719dbd599790078f365), "Barcrest","Super Streak (Barcrest) (MPU4) (set 19)" )
+M4SUPST_SET( 199?, m4supst__s,	m4supst,	"csp02s.p1",			0x0000, 0x010000, CRC(47c0068d) SHA1(5480a519a6e6df2757e66cfcf904dd6c2873cc43), "Barcrest","Super Streak (Barcrest) (MPU4) (set 20)" )
+M4SUPST_SET( 199?, m4supst__t,	m4supst,	"csp02y.p1",			0x0000, 0x010000, CRC(d51d18d8) SHA1(a65fd4326872775364d2d7a886e98a1ee07596b7), "Barcrest","Super Streak (Barcrest) (MPU4) (set 21)" )
+M4SUPST_SET( 199?, m4supst__u,	m4supst,	"cst04ad.p1",			0x0000, 0x010000, CRC(b946d40d) SHA1(c03fa48f8b64c3cf4504f472f21a38f8a55f12e6), "Barcrest","Super Streak (Barcrest) (MPU4) (set 22)" )
+M4SUPST_SET( 199?, m4supst__v,	m4supst,	"cst04b.p1",			0x0000, 0x010000, CRC(45333d45) SHA1(d6ccb39ee9b316772052f856f79424c34ff273c5), "Barcrest","Super Streak (Barcrest) (MPU4) (set 23)" )
+M4SUPST_SET( 199?, m4supst__w,	m4supst,	"cst04bd.p1",			0x0000, 0x010000, CRC(03b56b07) SHA1(903b24ab93f9584f228278729b5a99451b8e81f7), "Barcrest","Super Streak (Barcrest) (MPU4) (set 24)" )
+M4SUPST_SET( 199?, m4supst__x,	m4supst,	"cst04c.p1",			0x0000, 0x010000, CRC(9c000883) SHA1(da0a9f1afc218c14a57a46fe2ea63e166f4e3739), "Barcrest","Super Streak (Barcrest) (MPU4) (set 25)" )
+M4SUPST_SET( 199?, m4supst__y,	m4supst,	"cst04d.p1",			0x0000, 0x010000, CRC(32281bec) SHA1(a043fb615c2a66d23d85ae80cb0b1705523f411c), "Barcrest","Super Streak (Barcrest) (MPU4) (set 26)" )
+M4SUPST_SET( 199?, m4supst__z,	m4supst,	"cst04dk.p1",			0x0000, 0x010000, CRC(9345e7b7) SHA1(8bff80d2b847fbae050f77215efe3e55b98a4657), "Barcrest","Super Streak (Barcrest) (MPU4) (set 27)" )
+M4SUPST_SET( 199?, m4supst__0,	m4supst,	"cst04dr.p1",			0x0000, 0x010000, CRC(8d397063) SHA1(45642de2629e89e2495d1cbd5aed90cf2a4cf1c1), "Barcrest","Super Streak (Barcrest) (MPU4) (set 28)" )
+M4SUPST_SET( 199?, m4supst__1,	m4supst,	"cst04dy.p1",			0x0000, 0x010000, CRC(4a303ced) SHA1(6c12b956358753c8bf99bd3316646721c9ec2585), "Barcrest","Super Streak (Barcrest) (MPU4) (set 29)" )
+M4SUPST_SET( 199?, m4supst__2,	m4supst,	"cst04k.p1",			0x0000, 0x010000, CRC(a59584f5) SHA1(8cfcf069ad905277f1925e682602e129e97e619b), "Barcrest","Super Streak (Barcrest) (MPU4) (set 30)" )
+M4SUPST_SET( 199?, m4supst__3,	m4supst,	"cst04r.p1",			0x0000, 0x010000, CRC(c9771997) SHA1(ed98650c0d73f2db0fe380777d10404ccabced31), "Barcrest","Super Streak (Barcrest) (MPU4) (set 31)" )
+M4SUPST_SET( 199?, m4supst__4,	m4supst,	"cst04s.p1",			0x0000, 0x010000, CRC(cd5b848d) SHA1(4dd3dd1c883552c7b5c475156308604b12eff75a), "Barcrest","Super Streak (Barcrest) (MPU4) (set 32)" )
+M4SUPST_SET( 199?, m4supst__5,	m4supst,	"cst04y.p1",			0x0000, 0x010000, CRC(7adc00ae) SHA1(5688f0876c18faf474a6d8487fdd85f20f9fc144), "Barcrest","Super Streak (Barcrest) (MPU4) (set 33)" )
+M4SUPST_SET( 199?, m4supst__6,	m4supst,	"csu03ad.p1",			0x0000, 0x010000, CRC(5d7b6393) SHA1(19c24f4113efb6a1499936e5f89a8ad859ff8df0), "Barcrest","Super Streak (Barcrest) (MPU4) (set 34)" )
+M4SUPST_SET( 199?, m4supst__7,	m4supst,	"csu03b.p1",			0x0000, 0x010000, CRC(57826c2a) SHA1(b835eb3066fec468ab55851d1dd023484e2d57e3), "Barcrest","Super Streak (Barcrest) (MPU4) (set 35)" )
+M4SUPST_SET( 199?, m4supst__8,	m4supst,	"csu03bd.p1",			0x0000, 0x010000, CRC(092e7039) SHA1(36a7c18872e4012e3acce0d01d2cc2c201a3c867), "Barcrest","Super Streak (Barcrest) (MPU4) (set 36)" )
+M4SUPST_SET( 199?, m4supst__9,	m4supst,	"csu03c.p1",			0x0000, 0x010000, CRC(b30a3c00) SHA1(066b0007092720a6f89edf8eafffe2f8fd83edbc), "Barcrest","Super Streak (Barcrest) (MPU4) (set 37)" )
+M4SUPST_SET( 199?, m4supst__aa,	m4supst,	"csu03d.p1",			0x0000, 0x010000, CRC(03ff9d99) SHA1(390087c136e4c314de9086adb7b020e8adabe34a), "Barcrest","Super Streak (Barcrest) (MPU4) (set 38)" )
+M4SUPST_SET( 199?, m4supst__ab,	m4supst,	"csu03dk.p1",			0x0000, 0x010000, CRC(cf7e61ff) SHA1(0e328ce5ff86770fabaf91d48a8de039323d112a), "Barcrest","Super Streak (Barcrest) (MPU4) (set 39)" )
+M4SUPST_SET( 199?, m4supst__ac,	m4supst,	"csu03dr.p1",			0x0000, 0x010000, CRC(00d700d1) SHA1(8bcc3c470c42780b1f1404fc6ff53e6ec7d89ad0), "Barcrest","Super Streak (Barcrest) (MPU4) (set 40)" )
+M4SUPST_SET( 199?, m4supst__ad,	m4supst,	"csu03dy.p1",			0x0000, 0x010000, CRC(8ec77c04) SHA1(64708460439a7e124f90eef6b9628e57f7d78ebc), "Barcrest","Super Streak (Barcrest) (MPU4) (set 41)" )
+M4SUPST_SET( 199?, m4supst__ae,	m4supst,	"csu03k.p1",			0x0000, 0x010000, CRC(701a0837) SHA1(31237fd108b354fb2afc449efa3a53dee2cf7be8), "Barcrest","Super Streak (Barcrest) (MPU4) (set 42)" )
+M4SUPST_SET( 199?, m4supst__af,	m4supst,	"csu03r.p1",			0x0000, 0x010000, CRC(d86a6895) SHA1(2c42bcf5de739f01e18bd1b766eec26a6da5aa52), "Barcrest","Super Streak (Barcrest) (MPU4) (set 43)" )
+M4SUPST_SET( 199?, m4supst__ag,	m4supst,	"csu03s.p1",			0x0000, 0x010000, CRC(197bb032) SHA1(06e98713ff5fc72bffccde1cc92fc8cb63665fad), "Barcrest","Super Streak (Barcrest) (MPU4) (set 44)" )
+M4SUPST_SET( 199?, m4supst__ah,	m4supst,	"csu03y.p1",			0x0000, 0x010000, CRC(bee0e7e1) SHA1(6a1ab766af9147f0d4a7c1d2a95c9a6e3e3f4986), "Barcrest","Super Streak (Barcrest) (MPU4) (set 45)" )
+M4SUPST_SET( 199?, m4supst__ai,	m4supst,	"eeh02ad.p1",			0x0000, 0x010000, CRC(25874a6d) SHA1(12e4fb36d231c3104df3613dd3851f411a876eb0), "Barcrest","Super Streak (Barcrest) (MPU4) (set 46)" )
+M4SUPST_SET( 199?, m4supst__aj,	m4supst,	"eeh02b.p1",			0x0000, 0x010000, CRC(ef280a8a) SHA1(912a825e69482a540cf0cadfc49a37a2822f3ecb), "Barcrest","Super Streak (Barcrest) (MPU4) (set 47)" )
+M4SUPST_SET( 199?, m4supst__ak,	m4supst,	"eeh02bd.p1",			0x0000, 0x010000, CRC(5f126810) SHA1(8fe1cbc7d93e2db35225388ee0773f6a98762ca1), "Barcrest","Super Streak (Barcrest) (MPU4) (set 48)" )
+M4SUPST_SET( 199?, m4supst__al,	m4supst,	"eeh02c.p1",			0x0000, 0x010000, CRC(3f49b936) SHA1(a0d07e0101f8cc38ebc28cfc1b239793b961f5ab), "Barcrest","Super Streak (Barcrest) (MPU4) (set 49)" )
+M4SUPST_SET( 199?, m4supst__am,	m4supst,	"eeh02d.p1",			0x0000, 0x010000, CRC(14dcfe63) SHA1(3ac77c9aa9b3b77fb1df98d2b427564be41dca78), "Barcrest","Super Streak (Barcrest) (MPU4) (set 50)" )
+M4SUPST_SET( 199?, m4supst__an,	m4supst,	"eeh02dk.p1",			0x0000, 0x010000, CRC(81a39421) SHA1(6fa43e8cb83e7fb940cc224eed5ee3f254c18c4d), "Barcrest","Super Streak (Barcrest) (MPU4) (set 51)" )
+M4SUPST_SET( 199?, m4supst__ao,	m4supst,	"eeh02dr.p1",			0x0000, 0x010000, CRC(c7755823) SHA1(05626ed49a2f800555f3f404273fa910b68de75c), "Barcrest","Super Streak (Barcrest) (MPU4) (set 52)" )
+M4SUPST_SET( 199?, m4supst__ap,	m4supst,	"eeh02dy.p1",			0x0000, 0x010000, CRC(5a1e70cd) SHA1(88bb29fd52d2331b72bb04652f9578f2c2f5a9ac), "Barcrest","Super Streak (Barcrest) (MPU4) (set 53)" )
+M4SUPST_SET( 199?, m4supst__aq,	m4supst,	"eeh02k.p1",			0x0000, 0x010000, CRC(b78882ec) SHA1(79c6a6d2cfe113743d3a93eb825fccab2b025933), "Barcrest","Super Streak (Barcrest) (MPU4) (set 54)" )
+M4SUPST_SET( 199?, m4supst__ar,	m4supst,	"eeh02r.p1",			0x0000, 0x010000, CRC(ff54884e) SHA1(2783f0e562e946597288ddbec4dcd1101e188d1d), "Barcrest","Super Streak (Barcrest) (MPU4) (set 55)" )
+M4SUPST_SET( 199?, m4supst__as,	m4supst,	"eeh02s.p1",			0x0000, 0x010000, CRC(c5856c3c) SHA1(5a0e5a7188913e1c36eac894bbeeae47a4f3589c), "Barcrest","Super Streak (Barcrest) (MPU4) (set 56)" )
+M4SUPST_SET( 199?, m4supst__at,	m4supst,	"eeh02y.p1",			0x0000, 0x010000, CRC(623fa0a0) SHA1(5a49cea5e94afccbf965cbda7a8d9a74f9734a6e), "Barcrest","Super Streak (Barcrest) (MPU4) (set 57)" )
+M4SUPST_SET( 199?, m4supst__au,	m4supst,	"sp8b.p1",				0x0000, 0x010000, CRC(3b12d7e8) SHA1(92a15e5f8391d74c192e8386abdb8853a76bff05), "Barcrest","Super Streak (Barcrest) (MPU4) (set 58)" )
+M4SUPST_SET( 199?, m4supst__av,	m4supst,	"sp8bd.p1",				0x0000, 0x010000, CRC(e0d7f789) SHA1(f6157469e43059adb44e7f2eff5bf73861d5636c), "Barcrest","Super Streak (Barcrest) (MPU4) (set 59)" )
+M4SUPST_SET( 199?, m4supst__aw,	m4supst,	"sp8c.p1",				0x0000, 0x010000, CRC(da0af8ae) SHA1(91042506050967c508b30c3dc2bfa6f6a6e8b532), "Barcrest","Super Streak (Barcrest) (MPU4) (set 60)" )
+M4SUPST_SET( 199?, m4supst__ax,	m4supst,	"sp8dk.p1",				0x0000, 0x010000, CRC(92432e8f) SHA1(5e6df963ccf92a89c71ae1edd7b71ec1e3f97522), "Barcrest","Super Streak (Barcrest) (MPU4) (set 61)" )
+M4SUPST_SET( 199?, m4supst__ay,	m4supst,	"sp8k.p1",				0x0000, 0x010000, CRC(e39f74d8) SHA1(9d776e7d67859f4514c69fc4f9f43160da9a2ca1), "Barcrest","Super Streak (Barcrest) (MPU4) (set 62)" )
+M4SUPST_SET( 199?, m4supst__az,	m4supst,	"sp8s.p1",				0x0000, 0x010000, CRC(fab99461) SHA1(82f8ca06bb04396f86124dfe4de46265b2edc393), "Barcrest","Super Streak (Barcrest) (MPU4) (set 63)" )
+M4SUPST_SET( 199?, m4supst__a0,	m4supst,	"spsbd.p1",				0x0000, 0x010000, CRC(b621b32d) SHA1(9aab0e074c120cb12beac585f9c513053502955c), "Barcrest","Super Streak (Barcrest) (MPU4) (set 64)" )
+M4SUPST_SET( 199?, m4supst__a1,	m4supst,	"spsc.p1",				0x0000, 0x010000, CRC(8c7a24f5) SHA1(f86be164e05235281fb275e950cedaf6f630d29a), "Barcrest","Super Streak (Barcrest) (MPU4) (set 65)" )
+M4SUPST_SET( 199?, m4supst__a2,	m4supst,	"spsd.p1",				0x0000, 0x010000, CRC(d34d3617) SHA1(5373335557e4bbb21264bbd9d0fbaf3640f9ab35), "Barcrest","Super Streak (Barcrest) (MPU4) (set 66)" )
+M4SUPST_SET( 199?, m4supst__a3,	m4supst,	"spsdk.p1",				0x0000, 0x010000, CRC(cf2fd3e7) SHA1(50d3c0851bec90037cd65a5c55654b0e688b96ca), "Barcrest","Super Streak (Barcrest) (MPU4) (set 67)" )
+M4SUPST_SET( 199?, m4supst__a4,	m4supst,	"spsk.p1",				0x0000, 0x010000, CRC(873a1414) SHA1(47b2bbef168382112cd12ace2d6a58695f4b0254), "Barcrest","Super Streak (Barcrest) (MPU4) (set 68)" )
+M4SUPST_SET( 199?, m4supst__a5,	m4supst,	"spss.p1",				0x0000, 0x010000, CRC(5e28bdb7) SHA1(3865c891178feb744ad11b2dea491350efc48bea), "Barcrest","Super Streak (Barcrest) (MPU4) (set 69)" )
+M4SUPST_SET( 199?, m4supst__a6,	m4supst,	"stc02ad.p1",			0x0000, 0x010000, CRC(d9a2b4d1) SHA1(9a6862a44817b3ec465f126fd2a5d2c9825d846e), "Barcrest","Super Streak (Barcrest) (MPU4) (set 70)" )
+M4SUPST_SET( 199?, m4supst__a7,	m4supst,	"stc02b.p1",			0x0000, 0x010000, CRC(bd2e8e6c) SHA1(71670dccedc2f47888c1205de59a81677ffeabaa), "Barcrest","Super Streak (Barcrest) (MPU4) (set 71)" )
+M4SUPST_SET( 199?, m4supst__a8,	m4supst,	"stc02bd.p1",			0x0000, 0x010000, CRC(efbed99b) SHA1(62d80248bb666bfb49ed7546936da744e43fa870), "Barcrest","Super Streak (Barcrest) (MPU4) (set 72)" )
+M4SUPST_SET( 199?, m4supst__a9,	m4supst,	"stc02c.p1",			0x0000, 0x010000, CRC(9d342386) SHA1(b50f64d66d89dbd3dee1ff2cb430a2caa050e7c8), "Barcrest","Super Streak (Barcrest) (MPU4) (set 73)" )
+M4SUPST_SET( 199?, m4supst__ba,	m4supst,	"stc02d.p1",			0x0000, 0x010000, CRC(c43f6e65) SHA1(0278cf389f8289d7b819125ae0a612c81ea75fab), "Barcrest","Super Streak (Barcrest) (MPU4) (set 74)" )
+M4SUPST_SET( 199?, m4supst__bb,	m4supst,	"stc02dk.p1",			0x0000, 0x010000, CRC(36576570) SHA1(214a57344d8e161b3dbd07457291ed9bce011842), "Barcrest","Super Streak (Barcrest) (MPU4) (set 75)" )
+M4SUPST_SET( 199?, m4supst__bc,	m4supst,	"stc02dr.p1",			0x0000, 0x010000, CRC(450c553f) SHA1(46050285eeb10dc368ad501c61d41351c4e2fcde), "Barcrest","Super Streak (Barcrest) (MPU4) (set 76)" )
+M4SUPST_SET( 199?, m4supst__bd,	m4supst,	"stc02dy.p1",			0x0000, 0x010000, CRC(d8677dd1) SHA1(18abc0a1d28458c3b26a0d1dbf6ca8aba3f3e240), "Barcrest","Super Streak (Barcrest) (MPU4) (set 77)" )
+M4SUPST_SET( 199?, m4supst__be,	m4supst,	"stc02k.p1",			0x0000, 0x010000, CRC(c6e8d110) SHA1(9e05961b9bba502f52a03de27e608afc52f6c025), "Barcrest","Super Streak (Barcrest) (MPU4) (set 78)" )
+M4SUPST_SET( 199?, m4supst__bf,	m4supst,	"stc02r.p1",			0x0000, 0x010000, CRC(918d769f) SHA1(2a4438828d9e7efd3a94eaebe56585e7ae23d9d1), "Barcrest","Super Streak (Barcrest) (MPU4) (set 79)" )
+M4SUPST_SET( 199?, m4supst__bg,	m4supst,	"stc02s.p1",			0x0000, 0x010000, CRC(9c50fff7) SHA1(3468340d2d04cbdecd669817f8a9c4028e301eeb), "Barcrest","Super Streak (Barcrest) (MPU4) (set 80)" )
+M4SUPST_SET( 199?, m4supst__bh,	m4supst,	"stc02y.p1",			0x0000, 0x010000, CRC(0ce65e71) SHA1(02ae1fd5a41ab5a96ddcfe1cf3e8567561291961), "Barcrest","Super Streak (Barcrest) (MPU4) (set 81)" )
+M4SUPST_SET( 199?, m4supst__bi,	m4supst,	"sttad.p1",				0x0000, 0x010000, CRC(af615f05) SHA1(b2c1b8ba086a4d33f1269c28d4caa7286a27f085), "Barcrest","Super Streak (Barcrest) (MPU4) (set 82)" )
+M4SUPST_SET( 199?, m4supst__bj,	m4supst,	"sttb.p1",				0x0000, 0x010000, CRC(3119149f) SHA1(e749fcc5f95ccd29f42bfd0b140cf3cbb84d9599), "Barcrest","Super Streak (Barcrest) (MPU4) (set 83)" )
+M4SUPST_SET( 199?, m4supst__bk,	m4supst,	"sttbd.p1",				0x0000, 0x010000, CRC(cfddaf39) SHA1(0f24b5e691e1d43f6604087f0b3bc2571d2c4002), "Barcrest","Super Streak (Barcrest) (MPU4) (set 84)" )
+M4SUPST_SET( 199?, m4supst__bl,	m4supst,	"sttd.p1",				0x0000, 0x010000, CRC(8bc2498c) SHA1(a9cd3a6968186818a8c4033b1f304eac152244cf), "Barcrest","Super Streak (Barcrest) (MPU4) (set 85)" )
+M4SUPST_SET( 199?, m4supst__bm,	m4supst,	"sttdk.p1",				0x0000, 0x010000, CRC(39903dde) SHA1(f92c4380051ada7bbc5739550c8dfdd6ddaaa3fe), "Barcrest","Super Streak (Barcrest) (MPU4) (set 86)" )
+M4SUPST_SET( 199?, m4supst__bn,	m4supst,	"sttdr.p1",				0x0000, 0x010000, CRC(866f69f0) SHA1(ef9717f89b9718f1bcf8d3592f240ec9cf48bca3), "Barcrest","Super Streak (Barcrest) (MPU4) (set 87)" )
+M4SUPST_SET( 199?, m4supst__bo,	m4supst,	"sttdy.p1",				0x0000, 0x010000, CRC(74ebd933) SHA1(b308c8cae2c74e4e07c6e4afb505068220714824), "Barcrest","Super Streak (Barcrest) (MPU4) (set 88)" )
+M4SUPST_SET( 199?, m4supst__bp,	m4supst,	"sttk.p1",				0x0000, 0x010000, CRC(461db2f5) SHA1(8b97342d7ebfb33aa6aff246e8d799f4435788b7), "Barcrest","Super Streak (Barcrest) (MPU4) (set 89)" )
+M4SUPST_SET( 199?, m4supst__bq,	m4supst,	"sttr.p1",				0x0000, 0x010000, CRC(2591f6ec) SHA1(3d83d930e41e164e71d67b529967320e1eee8354), "Barcrest","Super Streak (Barcrest) (MPU4) (set 90)" )
+M4SUPST_SET( 199?, m4supst__br,	m4supst,	"stts.p1",				0x0000, 0x010000, CRC(a5e29c32) SHA1(8ba2f76505c2f40493c918b9d9524fa67999f7c1), "Barcrest","Super Streak (Barcrest) (MPU4) (set 91)" )
+M4SUPST_SET( 199?, m4supst__bs,	m4supst,	"stty.p1",				0x0000, 0x010000, CRC(7306fab9) SHA1(0da1612490fcff9b7a17f97190b6b561016c3b18), "Barcrest","Super Streak (Barcrest) (MPU4) (set 92)" )
+M4SUPST_SET( 199?, m4supst__bt,	m4supst,	"stuad.p1",				0x0000, 0x010000, CRC(e7a01b7b) SHA1(3db08800a35d440f012ca69d84c30465818b4993), "Barcrest","Super Streak (Barcrest) (MPU4) (set 93)" )
+M4SUPST_SET( 199?, m4supst__bu,	m4supst,	"stub.p1",				0x0000, 0x010000, CRC(9044badf) SHA1(af8e218e3dc457bb5f24e3f2d74a8639466c3f11), "Barcrest","Super Streak (Barcrest) (MPU4) (set 94)" )
+M4SUPST_SET( 199?, m4supst__bv,	m4supst,	"stubd.p1",				0x0000, 0x010000, CRC(438e1687) SHA1(5e0f27e95bf861d4edc55709efc79496c7353e8b), "Barcrest","Super Streak (Barcrest) (MPU4) (set 95)" )
+M4SUPST_SET( 199?, m4supst__bw,	m4supst,	"stud.p1",				0x0000, 0x010000, CRC(1cbe3bec) SHA1(005dde84e57c5517fc6d6b975cc882dae11cbf63), "Barcrest","Super Streak (Barcrest) (MPU4) (set 96)" )
+M4SUPST_SET( 199?, m4supst__bx,	m4supst,	"studk.p1",				0x0000, 0x010000, CRC(0931d501) SHA1(afa078248230cbc0acc9d3af641ec63ed0424a75), "Barcrest","Super Streak (Barcrest) (MPU4) (set 97)" )
+M4SUPST_SET( 199?, m4supst__by,	m4supst,	"studr.p1",				0x0000, 0x010000, CRC(e06e1c59) SHA1(f4454f640335dbf6f9b8154d7805102253f605b4), "Barcrest","Super Streak (Barcrest) (MPU4) (set 98)" )
+M4SUPST_SET( 199?, m4supst__bz,	m4supst,	"study.p1",				0x0000, 0x010000, CRC(8b4275e0) SHA1(267a9d2eddf41b8838eeaee06bba45f0a8b8451f), "Barcrest","Super Streak (Barcrest) (MPU4) (set 99)" )
+M4SUPST_SET( 199?, m4supst__b0,	m4supst,	"stuk.p1",				0x0000, 0x010000, CRC(a66fb54f) SHA1(4351edbf6c5de817cf6972885ff1f6c7df837c37), "Barcrest","Super Streak (Barcrest) (MPU4) (set 100)" )
+M4SUPST_SET( 199?, m4supst__b1,	m4supst,	"stur.p1",				0x0000, 0x010000, CRC(eeb3bfed) SHA1(87a753511fb384a505d3cc69ca67fe4e288cf3bb), "Barcrest","Super Streak (Barcrest) (MPU4) (set 101)" )
+M4SUPST_SET( 199?, m4supst__b2,	m4supst,	"stus.p1",				0x0000, 0x010000, CRC(19aca6ad) SHA1(1583e76a4e1058fa97efdd9a7e6f7c4fe806b2f4), "Barcrest","Super Streak (Barcrest) (MPU4) (set 102)" )
+M4SUPST_SET( 199?, m4supst__b3,	m4supst,	"stuy.p1",				0x0000, 0x010000, CRC(e6b2b76f) SHA1(bf251b751e6a8d2764c63e92d48e1a64666b9a47), "Barcrest","Super Streak (Barcrest) (MPU4) (set 103)" )
+M4SUPST_SET( 199?, m4supst__b4,	m4supst,	"superstreak1deb.bin",	0x0000, 0x010000, CRC(892ccad9) SHA1(c88daadd9778e363e154b674b57ccd07cea59836), "Barcrest","Super Streak (Barcrest) (MPU4) (set 104)" )
+M4SUPST_SET( 199?, m4supst__b5,	m4supst,	"supst2515",			0x0000, 0x010000, CRC(c073a249) SHA1(4ae37eb61dd5e50687f433fb89f65b97926b7358), "Barcrest","Super Streak (Barcrest) (MPU4) (set 105)" )

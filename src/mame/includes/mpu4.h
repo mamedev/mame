@@ -242,6 +242,8 @@ public:
 	DECLARE_DRIVER_INIT(m_grtecp);
 	DECLARE_DRIVER_INIT(m4debug);
 	DECLARE_DRIVER_INIT(m4_showstring);
+	DECLARE_DRIVER_INIT(m4_showstring_mod4yam);
+	DECLARE_DRIVER_INIT(m4_debug_mod4yam);
 	DECLARE_DRIVER_INIT(m4_showstring_mod2);
 	DECLARE_DRIVER_INIT(m4_showstring_big);
 	DECLARE_DRIVER_INIT(m_grtecpss);

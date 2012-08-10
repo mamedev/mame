@@ -4,8 +4,8 @@
  shogwarr
  brapboys
 
+  CALC3 is a NEC uPD78322 series MCU with 16K internal rom & 640 bytes of ram
 
-  MCU is a 78K series III type CPU
 
 ***************************************************************************/
 
@@ -85,7 +85,6 @@ READ16_MEMBER(kaneko_calc3_device::calc3_mcu_ram_r)
 WRITE16_MEMBER(kaneko_calc3_device::calc3_mcu_ram_w)
 {
 	COMBINE_DATA(&m_calc3_mcuram[offset]);
-	//calc3_mcu_run(machine);
 }
 
 void kaneko_calc3_device::calc3_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)

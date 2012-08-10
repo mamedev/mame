@@ -173,6 +173,7 @@ there are 9 PALS on the pcb (not dumped)
 #include "sound/ymz280b.h"
 #include "includes/kaneko16.h"
 #include "video/sknsspr.h"
+#include "machine/eeprom.h"
 
 class jchan_state : public kaneko16_state
 {
@@ -184,7 +185,6 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_sprregs_2(*this, "sprregs_2"),
 		m_mainsub_shared_ram(*this, "mainsub_shared"),
-		m_mcu_ram(*this, "mcu_ram"),
 		m_ctrl(*this, "ctrl"),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub")
@@ -202,20 +202,14 @@ public:
 	required_shared_ptr<UINT16> m_spriteram_2;
 	required_shared_ptr<UINT16> m_sprregs_2;
 	required_shared_ptr<UINT16> m_mainsub_shared_ram;
-	UINT8 m_nvram_data[128];
-	required_shared_ptr<UINT16> m_mcu_ram;
-	UINT16 m_mcu_com[4];
 	required_shared_ptr<UINT16> m_ctrl;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	sknsspr_device* m_spritegen1;
 	sknsspr_device* m_spritegen2;
-	DECLARE_WRITE16_MEMBER(jchan_mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(jchan_mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(jchan_mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(jchan_mcu_com3_w);
-	DECLARE_READ16_MEMBER(jchan_mcu_status_r);
+
+
 	DECLARE_WRITE16_MEMBER(jchan_ctrl_w);
 	DECLARE_READ16_MEMBER(jchan_ctrl_r);
 	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
@@ -224,91 +218,12 @@ public:
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_1_w);
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32_2_w);
 	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_2_w);
+
 	DECLARE_DRIVER_INIT(jchan);
 };
 
 
 
-/***************************************************************************
-
-                            MCU Code Simulation
-
-***************************************************************************/
-
-static void jchan_mcu_run(running_machine &machine)
-{
-	jchan_state *state = machine.driver_data<jchan_state>();
-	UINT16 mcu_command = state->m_mcu_ram[0x0010/2];		/* command nb */
-	UINT16 mcu_offset  = state->m_mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
-	UINT16 mcu_subcmd  = state->m_mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
-
-	logerror("%s : MCU executed command: %04X %04X %04X ",machine.describe_context(),mcu_command,mcu_offset*2,mcu_subcmd);
-
-/*
-    the only MCU commands found in program code are:
-    - 0x04: protection: provide data (see below) and code
-    - 0x03: read DSW
-    - 0x02: load game settings \ stored in ATMEL AT93C46 chip,
-    - 0x42: save game settings / 128 bytes serial EEPROM
-*/
-
-	switch (mcu_command >> 8)
-	{
-		case 0x04: /* Protection: during self-test for mcu_subcmd = 0x3d, 0x3e, 0x3f */
-		{
-			 toxboy_handle_04_subcommand(machine,mcu_subcmd,state->m_mcu_ram);
-		}
-		break;
-
-		case 0x03:	// DSW
-		{
-			state->m_mcu_ram[mcu_offset] = machine.root_device().ioport("DSW")->read();
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",machine.describe_context(),mcu_command,mcu_offset*2);
-		}
-		break;
-
-		case 0x02: /* load game settings from 93C46 EEPROM ($1090-$10dc) */
-		{
-			memcpy(&state->m_mcu_ram[mcu_offset], state->m_nvram_data, sizeof(state->m_nvram_data));
-			logerror("(load NVRAM settings)\n");
-		}
-		break;
-
-		case 0x42: /* save game settings to 93C46 EEPROM ($50d4) */
-		{
-			memcpy(state->m_nvram_data, &state->m_mcu_ram[mcu_offset], sizeof(state->m_nvram_data));
-			logerror("(save NVRAM settings)\n");
-		}
-		break;
-
-		default:
-			logerror("- UNKNOWN COMMAND!!!\n");
-	}
-}
-
-INLINE void jchan_mcu_com_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
-{
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_mcu_com[_n_]);
-	if (state->m_mcu_com[0] != 0xFFFF)	return;
-	if (state->m_mcu_com[1] != 0xFFFF)	return;
-	if (state->m_mcu_com[2] != 0xFFFF)	return;
-	if (state->m_mcu_com[3] != 0xFFFF)	return;
-
-	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) );
-	jchan_mcu_run(space->machine());
-}
-
-WRITE16_MEMBER(jchan_state::jchan_mcu_com0_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(jchan_state::jchan_mcu_com1_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(jchan_state::jchan_mcu_com2_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(jchan_state::jchan_mcu_com3_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 3); }
-
-READ16_MEMBER(jchan_state::jchan_mcu_status_r)
-{
-	logerror("cpu '%s' (PC=%06X): read mcu status\n", space.device().tag(), cpu_get_previouspc(&space.device()));
-	return 0;
-}
 
 /***************************************************************************
 
@@ -525,12 +440,12 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("mcu_ram")	// MCU [G] grid tested, cleared ($a5a-$ad8)
-	AM_RANGE(0x330000, 0x330001) AM_WRITE(jchan_mcu_com0_w)	// _[ these 2 are set to 0xFFFF
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(jchan_mcu_com1_w)	//  [ to trigger mcu to run cmd ?
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(jchan_mcu_com2_w)	// _[ these 2 are set to 0xFFFF
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(jchan_mcu_com3_w)	//  [ for mcu to return its status ?
-	AM_RANGE(0x370000, 0x370001) AM_READ(jchan_mcu_status_r)
+	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w )//	[G] MCU share
+	AM_RANGE(0x330000, 0x330001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)	
+	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)	
+	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)	
+	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)	
+	AM_RANGE(0x370000, 0x370001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
 
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
 
@@ -596,8 +511,8 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW1",0x8000,EQUALS,0x0000)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")		/* $f00002.w (-> $2000b5.b) */
@@ -607,8 +522,8 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW1",0x8000,EQUALS,0x0000)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")	/* $f00004.b */
@@ -622,20 +537,20 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EXTRA")		/* $f00006.b */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW1",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW1",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW1",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW1",0x8000,EQUALS,0x0000)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* duplicated Player 1 Button 4 (whatever the layout is) */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* duplicated Player 2 Button 4 (whatever the layout is) */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")		/* provided by the MCU - $200098.b <- $300200 */
+	PORT_START("DSW1")		/* provided by the MCU - $200098.b <- $300200 */
 	PORT_SERVICE_DIPLOC(  0x0100, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
@@ -663,7 +578,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( jchan2 )
 	PORT_INCLUDE( jchan )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )                      /* only read in the "test mode" ("Input Test" screen) */
 //  PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )             /* impacts $20011e.l once! -> impacts reading of controls at 0x0002a9b2 */
 INPUT_PORTS_END
@@ -710,7 +625,10 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+
+
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -802,17 +720,10 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(jchan_state,jchan)
+DRIVER_INIT_MEMBER( jchan_state, jchan )
 {
-	DRIVER_INIT_CALL(decrypt_toybox_rom);
-	// install these here, putting them in the memory map causes issues
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	machine().device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
-
-
-	memset(m_mcu_com, 0, 4 * sizeof( UINT16 ) );
-
-	machine().device<nvram_device>("nvram")->set_base(m_nvram_data, sizeof(m_nvram_data));
 }
 
 
