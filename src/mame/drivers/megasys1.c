@@ -1658,7 +1658,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 static MACHINE_CONFIG_START( system_Z, megasys1_state )

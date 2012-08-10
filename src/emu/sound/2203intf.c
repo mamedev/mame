@@ -11,6 +11,7 @@ struct _ym2203_state
 	void *			chip;
 	void *			psg;
 	const ym2203_interface *intf;
+	devcb_resolved_write_line irqhandler;
 	device_t *device;
 };
 
@@ -59,8 +60,8 @@ static const ssg_callbacks psgintf =
 static void IRQHandler(void *param,int irq)
 {
 	ym2203_state *info = (ym2203_state *)param;
-	if (info->intf->handler != NULL)
-		(*info->intf->handler)(info->device, irq);
+	if (!info->irqhandler.isnull())
+		info->irqhandler(irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -121,12 +122,13 @@ static DEVICE_START( ym2203 )
 			AY8910_DEFAULT_LOADS,
 			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 		},
-		NULL
+		DEVCB_NULL
 	};
 	const ym2203_interface *intf = device->static_config() ? (const ym2203_interface *)device->static_config() : &generic_2203;
 	ym2203_state *info = get_safe_token(device);
 	int rate = device->clock()/72; /* ??? */
 
+	info->irqhandler.resolve(intf->irqhandler, *device);
 	info->intf = intf;
 	info->device = device;
 	info->psg = ay8910_start_ym(NULL, YM2203, device, device->clock(), &intf->ay8910_intf);

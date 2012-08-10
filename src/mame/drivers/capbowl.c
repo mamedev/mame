@@ -323,7 +323,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write),  /* Also a status LED. See memory map above */
 	},
-	firqhandler
+	DEVCB_LINE(firqhandler)
 };
 
 

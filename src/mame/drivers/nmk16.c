@@ -3494,7 +3494,7 @@ static const ym2203_interface ym2203_nmk004_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	NMK004_irq
+	DEVCB_LINE(NMK004_irq)
 };
 
 static void ym2203_irqhandler(device_t *device, int irq)
@@ -3509,7 +3509,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	ym2203_irqhandler
+	DEVCB_LINE(ym2203_irqhandler)
 };
 
 static TIMER_DEVICE_CALLBACK( nmk16_scanline )

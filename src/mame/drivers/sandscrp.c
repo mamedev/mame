@@ -478,7 +478,7 @@ static const ym2203_interface ym2203_intf_sandscrp =
 		DEVCB_NULL,	/* Port A Write */
 		DEVCB_NULL,	/* Port B Write */
 	},
-	irq_handler	/* IRQ handler */
+	DEVCB_LINE(irq_handler)	/* IRQ handler */
 };
 
 

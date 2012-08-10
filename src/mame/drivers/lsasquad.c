@@ -560,7 +560,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(lsasquad_state,unk),
 		DEVCB_DRIVER_MEMBER(lsasquad_state,unk),
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

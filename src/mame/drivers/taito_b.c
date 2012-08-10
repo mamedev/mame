@@ -1924,7 +1924,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(taitob_state, bankswitch_w),
 		DEVCB_NULL,
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /*

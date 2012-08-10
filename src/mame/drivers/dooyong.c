@@ -800,7 +800,7 @@ static const ym2203_interface ym2203_interface_1 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler_2203_1
+	DEVCB_LINE(irqhandler_2203_1)
 };
 
 static const ym2203_interface ym2203_interface_2 =
@@ -810,7 +810,7 @@ static const ym2203_interface ym2203_interface_2 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler_2203_2
+	DEVCB_LINE(irqhandler_2203_2)
 };
 
 static const ym2151_interface ym2151_config =

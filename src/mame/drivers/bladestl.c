@@ -287,7 +287,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DEVICE_HANDLER("upd", upd7759_port_w),
 		DEVCB_DRIVER_MEMBER(bladestl_state,bladestl_port_B_w)
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const k007342_interface bladestl_k007342_intf =

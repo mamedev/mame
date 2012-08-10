@@ -1802,7 +1802,7 @@ static const ym2203_interface ym2203_interface_triple =
 		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
 		DEVCB_NULL,
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const ym2203_interface ym2203_interface_champwr =
@@ -1815,7 +1815,7 @@ static const ym2203_interface ym2203_interface_champwr =
 		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
 		DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 
@@ -1840,7 +1840,7 @@ static const ym2203_interface ym2203_interface_single =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 

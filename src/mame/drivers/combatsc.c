@@ -657,7 +657,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(combatsc_state,combatsc_portA_w),
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203_bootleg_config =
@@ -670,7 +670,7 @@ static const ym2203_interface ym2203_bootleg_config =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_START( combatsc )

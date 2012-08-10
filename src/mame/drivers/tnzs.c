@@ -1561,7 +1561,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -1582,6 +1582,7 @@ static const ym2203_interface kageki_ym2203_interface =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(tnzs_state,kageki_csport_w)
 	},
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203b_interface =
@@ -1591,7 +1592,7 @@ static const ym2203_interface ym2203b_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const ym2203_interface kabukiz_ym2203_interface =
@@ -1604,7 +1605,7 @@ static const ym2203_interface kabukiz_ym2203_interface =
 		DEVCB_DRIVER_MEMBER(tnzs_state,kabukiz_sound_bank_w),
 		DEVCB_DRIVER_MEMBER(tnzs_state,kabukiz_sample_w)
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const samples_interface tnzs_samples_interface =

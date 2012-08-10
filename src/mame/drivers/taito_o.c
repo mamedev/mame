@@ -232,7 +232,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_INPUT_PORT("DSWA"),DEVCB_INPUT_PORT("DSWB"),
 		DEVCB_NULL, DEVCB_NULL,
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const tc0080vco_interface parentj_intf =

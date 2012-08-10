@@ -518,7 +518,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	chinagat_irq_handler
+	DEVCB_LINE(chinagat_irq_handler)
 };
 
 

@@ -57,11 +57,59 @@ public:
 		  m_mcu(*this, "mcu"),
 		  m_i8255_1(*this, "i8255_1"),
 		  m_i8255_2(*this, "i8255_2"),
-		  m_i8751_vblank_hook(NULL),
+		  m_workram(*this, "workram"),
+		  m_sharrier_video(false),
 		  m_adc_select(0)
 	{ }
 
-//protected:
+	// PPI read/write callbacks
+	DECLARE_WRITE8_MEMBER( video_lamps_w );
+	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
+	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
+	DECLARE_READ8_MEMBER( adc_status_r );
+	
+	// main CPU read/write handlers
+	DECLARE_READ16_MEMBER( hangon_io_r );
+	DECLARE_WRITE16_MEMBER( hangon_io_w );
+	DECLARE_READ16_MEMBER( sharrier_io_r );
+	DECLARE_WRITE16_MEMBER( sharrier_io_w );
+
+	// Z80 sound CPU read/write handlers
+	DECLARE_READ8_MEMBER( sound_data_r );
+	DECLARE_WRITE_LINE_MEMBER( sound_irq );
+
+	// I8751-related VBLANK interrupt hanlders
+	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+
+	// game-specific driver init
+	void init_generic();
+	void init_sharrier();
+	void init_enduror();
+	void init_endurobl();
+	void init_endurob2();
+
+	// video updates
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	// internal types
+	typedef delegate<void ()> i8751_sim_delegate;
+
+	// timer IDs
+	enum
+	{
+		TID_INIT_I8751,
+		TID_PPI_WRITE
+	};
+	
+	// driver overrides
+	virtual void video_start();
+	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// I8751 simulations
+	void sharrier_i8751_sim();
+
 	// devices
 	required_device<m68000_device> m_maincpu;
 	required_device<m68000_device> m_subcpu;
@@ -70,16 +118,13 @@ public:
 	required_device<i8255_device> m_i8255_1;
 	required_device<i8255_device> m_i8255_2;
 	
+	// memory pointers	
+	required_shared_ptr<UINT16> m_workram;
+	
 	// configuration
-	void (*m_i8751_vblank_hook)(running_machine &machine);
+	bool					m_sharrier_video;
+	i8751_sim_delegate		m_i8751_vblank_hook;
 
 	// internal state
-	UINT8 		m_adc_select;
+	UINT8 					m_adc_select;
 };
-
-
-/*----------- defined in video/segahang.c -----------*/
-
-VIDEO_START( hangon );
-VIDEO_START( sharrier );
-SCREEN_UPDATE_IND16( hangon );

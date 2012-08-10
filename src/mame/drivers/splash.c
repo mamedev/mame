@@ -539,7 +539,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL, DEVCB_NULL,
 		DEVCB_NULL, DEVCB_NULL
 	},
-	ym_irq
+	DEVCB_LINE(ym_irq)
 };
 
 static INTERRUPT_GEN(  roldfrog_interrupt )

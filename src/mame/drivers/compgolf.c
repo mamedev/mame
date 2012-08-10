@@ -213,7 +213,7 @@ static const ym2203_interface ym2203_config =
 			DEVCB_DRIVER_MEMBER(compgolf_state,compgolf_scrollx_lo_w),
 			DEVCB_DRIVER_MEMBER(compgolf_state,compgolf_scrolly_lo_w),
 	},
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 

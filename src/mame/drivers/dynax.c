@@ -4274,7 +4274,7 @@ static const ym2203_interface hanamai_ym2203_interface =
 		DEVCB_NULL,							/* Port A Write */
 		DEVCB_NULL,							/* Port B Write */
 	},
-	sprtmtch_sound_callback		/* IRQ handler */
+	DEVCB_LINE(sprtmtch_sound_callback)		/* IRQ handler */
 };
 
 static const msm5205_interface hanamai_msm5205_interface =
@@ -4442,7 +4442,7 @@ static const ym2203_interface sprtmtch_ym2203_interface =
 		DEVCB_NULL,					/* Port A Write */
 		DEVCB_NULL,					/* Port B Write */
 	},
-	sprtmtch_sound_callback,	/* IRQ handler */
+	DEVCB_LINE(sprtmtch_sound_callback),	/* IRQ handler */
 };
 
 static MACHINE_CONFIG_START( sprtmtch, dynax_state )
@@ -4614,7 +4614,7 @@ static const ym2203_interface jantouki_ym2203_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	jantouki_sound_callback		/* IRQ handler */
+	DEVCB_LINE(jantouki_sound_callback)		/* IRQ handler */
 };
 
 static const msm5205_interface jantouki_msm5205_interface =

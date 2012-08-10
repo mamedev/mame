@@ -404,7 +404,7 @@ static const ym2203_interface thedeep_ym2203_intf =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static TIMER_DEVICE_CALLBACK( thedeep_interrupt )

@@ -379,7 +379,7 @@ static const ym2203_interface ym2203_config =
 			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_0_w),
 			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_1_w),
 	},
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 

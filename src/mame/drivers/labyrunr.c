@@ -163,7 +163,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203_interface_2 =
@@ -176,7 +176,7 @@ static const ym2203_interface ym2203_interface_2 =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 

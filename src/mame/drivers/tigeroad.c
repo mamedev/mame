@@ -505,7 +505,7 @@ static const ym2203_interface ym2203_config =
 			AY8910_DEFAULT_LOADS,
 			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const msm5205_interface msm5205_config =

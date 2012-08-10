@@ -203,76 +203,8 @@ static I8255_INTERFACE(single_ppi_intf)
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE HANDLERS
+//	PPI READ/WRITE CALLBACKS
 //**************************************************************************
-
-//-------------------------------------------------
-//  standard_io_r - default I/O handler for reads
-//-------------------------------------------------
-
-READ16_MEMBER( segas16a_state::standard_io_r )
-{
-	offset &= 0x3fff/2;
-	switch (offset & (0x3000/2))
-	{
-		case 0x0000/2:
-			return m_i8255->read(space, offset & 3);
-
-		case 0x1000/2:
-		{
-			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return ioport(sysports[offset & 3])->read();
-		}
-
-		case 0x2000/2:
-			return ioport((offset & 1) ? "DSW2" : "DSW1")->read();
-	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return 0xffff;
-}
-
-
-//-------------------------------------------------
-//  standard_io_r - default I/O handler for writes
-//-------------------------------------------------
-
-WRITE16_MEMBER( segas16a_state::standard_io_w )
-{
-	offset &= 0x3fff/2;
-	switch (offset & (0x3000/2))
-	{
-		case 0x0000/2:
-			// the port C handshaking signals control the Z80 NMI,
-			// so we have to sync whenever we access this PPI
-			if (ACCESSING_BITS_0_7)
-				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
-			return;
-	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  misc_io_r - miscellaneous I/O reads
-//-------------------------------------------------
-
-READ16_MEMBER( segas16a_state::misc_io_r )
-{
-	// just call custom handler
-	return m_custom_io_r(space, offset, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  misc_io_w - miscellaneous I/O writes
-//-------------------------------------------------
-
-WRITE16_MEMBER( segas16a_state::misc_io_w )
-{
-	// just call custom handler
-	m_custom_io_w(space, offset, data, mem_mask);
-}
-
 
 //-------------------------------------------------
 //  misc_control_w - miscellaneous video controls
@@ -341,6 +273,79 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
+}
+
+
+
+//**************************************************************************
+//	MAIN CPU READ/WRITE HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  standard_io_r - default I/O handler for reads
+//-------------------------------------------------
+
+READ16_MEMBER( segas16a_state::standard_io_r )
+{
+	offset &= 0x3fff/2;
+	switch (offset & (0x3000/2))
+	{
+		case 0x0000/2:
+			return m_i8255->read(space, offset & 3);
+
+		case 0x1000/2:
+		{
+			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
+			return ioport(sysports[offset & 3])->read();
+		}
+
+		case 0x2000/2:
+			return ioport((offset & 1) ? "DSW2" : "DSW1")->read();
+	}
+	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
+	return 0xffff;
+}
+
+
+//-------------------------------------------------
+//  standard_io_r - default I/O handler for writes
+//-------------------------------------------------
+
+WRITE16_MEMBER( segas16a_state::standard_io_w )
+{
+	offset &= 0x3fff/2;
+	switch (offset & (0x3000/2))
+	{
+		case 0x0000/2:
+			// the port C handshaking signals control the Z80 NMI,
+			// so we have to sync whenever we access this PPI
+			if (ACCESSING_BITS_0_7)
+				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
+			return;
+	}
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  misc_io_r - miscellaneous I/O reads
+//-------------------------------------------------
+
+READ16_MEMBER( segas16a_state::misc_io_r )
+{
+	// just call custom handler
+	return m_custom_io_r(space, offset, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  misc_io_w - miscellaneous I/O writes
+//-------------------------------------------------
+
+WRITE16_MEMBER( segas16a_state::misc_io_w )
+{
+	// just call custom handler
+	m_custom_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -1930,7 +1935,7 @@ static const ym2151_interface ym2151_config =
 //**************************************************************************
 
 static GFXDECODE_START( segas16a )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,	0, 1024 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
 

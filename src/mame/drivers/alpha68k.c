@@ -1845,7 +1845,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(alpha68k_state, porta_w),
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static void YM3812_irq( device_t *device, int param )

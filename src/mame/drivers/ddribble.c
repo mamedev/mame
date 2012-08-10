@@ -235,7 +235,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(ddribble_state,ddribble_vlm5030_ctrl_w),
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const vlm5030_interface vlm5030_config =

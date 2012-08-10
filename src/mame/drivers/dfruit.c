@@ -375,7 +375,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_INPUT_PORT("IN4"), DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
 	},
-	0
+	DEVCB_NULL
 };
 
 

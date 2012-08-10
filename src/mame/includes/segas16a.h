@@ -74,13 +74,15 @@ public:
 		  m_mj_input_num(0)
 	{ }
 	
+	// PPI read/write callbacks
+	DECLARE_WRITE8_MEMBER( misc_control_w );
+	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
+
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( standard_io_r );
 	DECLARE_WRITE16_MEMBER( standard_io_w );
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
-	DECLARE_WRITE8_MEMBER( misc_control_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
 	
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );

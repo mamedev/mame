@@ -2814,7 +2814,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),	/* portA write - not implemented */
 		DEVCB_NULL,				/* portB write */
 	},
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 

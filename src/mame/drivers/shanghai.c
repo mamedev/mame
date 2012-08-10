@@ -419,7 +419,7 @@ static const ym2203_interface sh_ym2203_interface =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -431,7 +431,7 @@ static const ym2203_interface kothello_ym2203_interface =
 		DEVCB_INPUT_PORT("DSW"),
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	seibu_ym2203_irqhandler
+	DEVCB_LINE(seibu_ym2203_irqhandler)
 };
 
 static const hd63484_interface shanghai_hd63484_intf = { 0 };

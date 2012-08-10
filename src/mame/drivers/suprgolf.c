@@ -435,7 +435,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeA),
 		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeB),
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static void adpcm_int(device_t *device)

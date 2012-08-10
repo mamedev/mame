@@ -480,7 +480,7 @@ const ym2203_interface seibu_ym2203_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	seibu_ym2203_irqhandler
+	DEVCB_LINE(seibu_ym2203_irqhandler)
 };
 
 /***************************************************************************/

@@ -13,7 +13,7 @@ typedef struct _ym2203_interface ym2203_interface;
 struct _ym2203_interface
 {
 	const ay8910_interface ay8910_intf;
-	void (*handler)(device_t *device, int irq);
+	devcb_write_line irqhandler;
 };
 
 READ8_DEVICE_HANDLER( ym2203_r );

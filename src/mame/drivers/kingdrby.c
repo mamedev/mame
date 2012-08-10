@@ -950,7 +950,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 		DEVCB_NULL,													// write A
 		DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)			// write B
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static PALETTE_INIT(kingdrby)

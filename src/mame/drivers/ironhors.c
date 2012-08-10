@@ -352,7 +352,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -455,7 +455,7 @@ static const ym2203_interface farwest_ym2203_config =
 		DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 

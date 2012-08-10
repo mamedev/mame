@@ -356,7 +356,7 @@ static const ym2203_interface ym2203_config =
         DEVCB_NULL,
         DEVCB_NULL,
     },
-    irqhandler
+    DEVCB_LINE(irqhandler)
 };
 
 static MACHINE_CONFIG_START( sothello, sothello_state )

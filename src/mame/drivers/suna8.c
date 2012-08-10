@@ -1534,7 +1534,8 @@ static const ym2203_interface rranger_ym2203_interface =
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("samples", rranger_play_samples_w),
 	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w),
-	}
+	},
+	DEVCB_NULL
 };
 
 /* 2203 + 8910 */

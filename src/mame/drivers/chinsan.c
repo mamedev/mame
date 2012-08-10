@@ -147,6 +147,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w1),
 		DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w2)
 	},
+	DEVCB_NULL
 };
 
 WRITE8_MEMBER(chinsan_state::chinsan_port00_w)

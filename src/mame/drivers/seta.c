@@ -7466,7 +7466,7 @@ static const ym2203_interface tndrcade_ym2203_interface =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 

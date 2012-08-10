@@ -450,7 +450,7 @@ static const ym2203_interface ym2203_interface_0 =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203_interface_1 =
@@ -463,7 +463,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_DRIVER_MEMBER(witch_state,xscroll_w),
 		DEVCB_DRIVER_MEMBER(witch_state,yscroll_w)
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )

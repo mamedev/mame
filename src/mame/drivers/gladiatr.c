@@ -637,7 +637,7 @@ static const ym2203_interface ppking_ym2203_interface =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const ym2203_interface gladiatr_ym2203_interface =
@@ -650,7 +650,7 @@ static const ym2203_interface gladiatr_ym2203_interface =
 		DEVCB_DRIVER_MEMBER(gladiatr_state,gladiator_int_control_w), /* port A write */
 		DEVCB_NULL,
 	},
-	gladiator_ym_irq          /* NMI request for 2nd cpu */
+	DEVCB_LINE(gladiator_ym_irq)          /* NMI request for 2nd cpu */
 };
 
 static const msm5205_interface msm5205_config =

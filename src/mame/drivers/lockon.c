@@ -441,7 +441,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(lockon_state,ym2203_out_b),
 	},
-	ym2203_irq
+	DEVCB_LINE(ym2203_irq)
 };
 
 

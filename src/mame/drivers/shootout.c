@@ -245,7 +245,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	shootout_snd_irq
+	DEVCB_LINE(shootout_snd_irq)
 };
 
 static const ym2203_interface ym2203_interface2 =
@@ -258,7 +258,7 @@ static const ym2203_interface ym2203_interface2 =
 		DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
 		DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
 	},
-	shootout_snd2_irq
+	DEVCB_LINE(shootout_snd2_irq)
 };
 
 static MACHINE_CONFIG_START( shootout, shootout_state )

@@ -301,7 +301,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_a),
 		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_b),
 	},
-	ym2203_irq_handler
+	DEVCB_LINE(ym2203_irq_handler)
 };
 
 static void ashnojoe_vclk_cb( device_t *device )

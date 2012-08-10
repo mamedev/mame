@@ -798,7 +798,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA0),	/* portA write */
 		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB0),	/* portB write */
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const ym2203_interface ym2203_interface_2 =
@@ -811,6 +811,7 @@ static const ym2203_interface ym2203_interface_2 =
 		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA1),	/* portA write */
 		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB1)		/* portB write */
 	},
+	DEVCB_NULL
 };
 
 
