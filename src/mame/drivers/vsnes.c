@@ -7,7 +7,7 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 
 RC2C03B/RP2C03B:
 - Duck Hunt
-- Mahjang
+- Mahjong
 - Pinball (Japan)
 - Star Luster *
 - Stroke & Match Golf (Japan)
@@ -2707,7 +2707,7 @@ GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, 
 GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, vsnes_state, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid" , 0 )
 GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, vsnes_state, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
 GAME( 1984, smgolf,   0,        vsnes,   golf4s, vsnes_state,   vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)", 0 )
-GAME( 1984, smgolfb,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",	             "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)", 0 )
+GAME( 1984, smgolfb,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",	              "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)", 0 )
 GAME( 1984, smgolfj,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
 GAME( 1984, ladygolfe,smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)", 0 )
 GAME( 1984, ladygolf, smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)", 0 )
@@ -2723,20 +2723,20 @@ GAME( 1986, mightybj, 0,        mightybj,mightybj, vsnes_state, vsnormal, ROT0, 
 GAME( 1985, jajamaru, 0,        jajamaru,jajamaru, vsnes_state, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
 GAME( 1987, topgun,   0,        topgun,  topgun, vsnes_state,   vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
 GAME( 1985, bnglngby, 0,        vsnes,   bnglngby, vsnes_state, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
-GAME( 1986, supxevs,  0,        vsnes,   supxevs, vsnes_state,  supxevs,  ROT0, "Namco",		     "Vs. Super Xevious", 0 )
+GAME( 1986, supxevs,  0,        vsnes,   supxevs, vsnes_state,  supxevs,  ROT0, "Namco",		          "Vs. Super Xevious", 0 )
 
 /* Light Gun games */
 GAME( 1985, duckhunt, 0,        vsnes,   duckhunt, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)", 0 )
 GAME( 1985, hogalley, 0,        vsnes,   hogalley, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
 GAME( 1986, vsgshoe,  0,        vsgshoe, vsgshoe, vsnes_state,  vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)", 0 )
-GAME( 1988, vsfdf,    0,        vsnes,   vsfdf, vsnes_state,    vsfdf,    ROT0, "Sunsoft",	             "Vs. Freedom Force", 0 )
+GAME( 1988, vsfdf,    0,        vsnes,   vsfdf, vsnes_state,    vsfdf,    ROT0, "Sunsoft",	              "Vs. Freedom Force", 0 )
 
 /* Dual games */
 GAME( 1984, vstennis, 0,        vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" , 0 )
 GAME( 1984, vstennisa,vstennis, vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set ?)" , 0 )
 GAME( 1984, wrecking, 0,        vsdual,  wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew", 0 )
 GAME( 1984, balonfgt, 0,        vsdual,  balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)", 0 )
-GAME( 1984, vsmahjng, 0,        vsdual,  vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjang (Japan)" , 0 )
+GAME( 1984, vsmahjng, 0,        vsdual,  vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)" , 0 )
 GAME( 1984, vsbball,  0,        vsdual,  vsbball, vsnes_state,  vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)", 0 )
 GAME( 1984, vsbballj, vsbball,  vsdual,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)", 0 )
 GAME( 1984, vsbballja,vsbball,  vsdual,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)", 0 )
