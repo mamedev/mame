@@ -103,63 +103,17 @@ Dip locations verified from manual for:
 
 ***************************************************************************/
 
-MACHINE_RESET( kaneko16 )
-{
 
-
-
-}
-
-static MACHINE_RESET( berlwall )
-{
-	MACHINE_RESET_CALL(kaneko16);
-
-}
-
-static MACHINE_RESET( blazeon )
-{
-	MACHINE_RESET_CALL(kaneko16);
-}
-
-static MACHINE_RESET( bloodwar )
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	state->VIEW2_2_pri = 1;
-}
-
-static MACHINE_RESET( bonkadv )
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	state->VIEW2_2_pri = 1;
-}
-
-static MACHINE_RESET( bakubrkr )
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	MACHINE_RESET_CALL(kaneko16);
-	state->VIEW2_2_pri = 1;
-}
 
 static MACHINE_RESET( gtmr )
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	MACHINE_RESET_CALL(kaneko16);
 	state->VIEW2_2_pri = 1;
 }
 
 static MACHINE_RESET( mgcrystl )
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	MACHINE_RESET_CALL(kaneko16);
-	state->VIEW2_2_pri = 0;
-}
-
-
-
-static MACHINE_RESET( shogwarr )
-{
-	kaneko16_state *state = machine.driver_data<kaneko16_state>();
-	MACHINE_RESET_CALL(kaneko16);
 	state->VIEW2_2_pri = 0;
 }
 
@@ -172,10 +126,6 @@ static MACHINE_RESET( shogwarr )
 
 ***************************************************************************/
 
-READ16_MEMBER(kaneko16_gtmr_state::kaneko16_rnd_r)
-{
-	return machine().rand() & 0xffff;
-}
 
 WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 {
@@ -569,7 +519,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)					// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)													// Random Number ? (toyboy mcu)
+	AM_RANGE(0x900000, 0x900039) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w) // only used for random number
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)						// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
@@ -636,7 +586,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)	// Random Number ?  (toyboy mcu)
+	AM_RANGE(0x900000, 0x900039) AM_DEVREADWRITE("kan_hit", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w) // only used for random number
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
@@ -1697,8 +1647,6 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_CPU_PROGRAM_MAP(berlwall)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(berlwall)
-
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)	// mangled sprites otherwise
 
@@ -1750,7 +1698,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_CPU_PROGRAM_MAP(bakubrkr)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(bakubrkr)
+	MCFG_MACHINE_RESET(gtmr)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -1821,8 +1769,6 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* D780C-2 */
 	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
 	MCFG_CPU_IO_MAP(blazeon_soundport)
-
-	MCFG_MACHINE_RESET(blazeon)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -1910,6 +1856,9 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 	kaneko_toybox_device::set_toybox_table(*device, TABLE_NORMAL);
 	kaneko_toybox_device::set_toybox_gametype(*device, GAME_NORMAL);
+	/* part of the toybox? */
+	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 1);
 
 
 	MCFG_VIDEO_START(kaneko16)
@@ -1950,13 +1899,11 @@ static MACHINE_CONFIG_DERIVED( bloodwar, gtmr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bloodwar)
 
-	MCFG_MACHINE_RESET( bloodwar )
+	MCFG_MACHINE_RESET( gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	kaneko16_sprite_device::set_priorities(*device, 2 /* never used? */ ,3 /* character selection / vs. portraits */ ,5 /* winning portrait*/ ,7 /* ? */);
 
-	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 1);
 
 
 MACHINE_CONFIG_END
@@ -1973,16 +1920,16 @@ static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bonkadv)
 
-	MCFG_MACHINE_RESET( bonkadv )
+	MCFG_MACHINE_RESET( gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	kaneko16_sprite_device::set_priorities(*device, 2 /* never used? */ ,3 /* volcano lava on level 2 */ ,5 /* in-game player */ ,7 /* demostration text */);
 
-	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 0);
 
 	MCFG_DEVICE_MODIFY("toybox")
 	kaneko_toybox_device::set_toybox_gametype(*device, GAME_BONK);
+	MCFG_DEVICE_MODIFY("kan_hit")
+	kaneko_hit_device::set_type(*device, 0);
 
 
 MACHINE_CONFIG_END
@@ -2125,7 +2072,8 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	MCFG_CPU_PROGRAM_MAP(shogwarr)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", shogwarr_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET(shogwarr)
+	MCFG_MACHINE_RESET(mgcrystl)
+
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(shogwarr_default_eeprom, 128)
 

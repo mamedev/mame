@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kaneko16.h"
 #include "includes/galpani2.h"
 
 /*
@@ -128,8 +127,6 @@ VIDEO_START( galpani2 )
 	state->m_bg15_bitmap  = auto_bitmap_ind16_alloc(machine, 256*8, 256);
 	state->m_bg8_bitmap[0] = auto_bitmap_ind16_alloc(machine, 512, 256);
 	state->m_bg8_bitmap[1] = auto_bitmap_ind16_alloc(machine, 512, 256);
-
-	state->m_disp_enable = 1;	// default enabled for games not using it
 }
 
 

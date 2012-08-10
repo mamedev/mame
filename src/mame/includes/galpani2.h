@@ -1,10 +1,10 @@
-#include "includes/kaneko16.h"
+#include "video/kaneko_spr.h"
 
-class galpani2_state : public kaneko16_state
+class galpani2_state : public driver_device
 {
 public:
 	galpani2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_bg8(*this, "bg8"),
 		m_palette(*this, "palette"),
 		m_bg8_scrollx(*this, "bg8_scrollx"),
@@ -14,7 +14,9 @@ public:
 		m_ram2(*this, "ram2"),
 		m_rombank(*this, "rombank"),
 		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"sub")
+		m_subcpu(*this,"sub"),
+		m_kaneko_spr(*this, "kan_spr"),
+		m_spriteram(*this, "spriteram")
 		{ }
 
 	required_shared_ptr_array<UINT16, 2> m_bg8;
@@ -33,6 +35,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	optional_device<kaneko16_sprite_device> m_kaneko_spr;
+	optional_shared_ptr<UINT16> m_spriteram;
+
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_init_w);
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi1_w);
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi2_w);

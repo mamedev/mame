@@ -70,7 +70,6 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(kaneko16_rnd_r);
 	DECLARE_WRITE16_MEMBER(bloodwar_oki_0_bank_w);
 	DECLARE_WRITE16_MEMBER(bloodwar_oki_1_bank_w);
 	DECLARE_WRITE16_MEMBER(bonkadv_oki_0_bank_w);

@@ -5,16 +5,28 @@
 TBSOP01 is a NEC uPD78324 series MCU with 32K internal rom & 1024 bytes of ram
 TBSOP02 is likely the same NEC uPD78324 series MCU as the TBS0P01
 
+I'm guessing the only actual difference between them is the decryption table used
+although the Jackie Chan info below contradicts that..
+
 Currently none of the MCUs' internal roms are dumped so simulation is used
 
 
-94  Bonk's Adventure            TOYBOX?            TBSOP01
-94  Blood Warrior               TOYBOX?            TBS0P01 452 9339PK001
-94  Great 1000 Miles Rally      TOYBOX                                                  "MM0525-TOYBOX199","USMM0713-TB1994 "
-95  Great 1000 Miles Rally 2    TOYBOX      KANEKO TBSOP02 454 9451MK002 (74 pin PQFP)  "USMM0713-TB1994 "
-95  Jackie Chan                 TOYBOX                                                  "USMM0713-TB1994 "
-95  Gals Panic 3                TOYBOX?            TBSOP01
+94  Bonk's Adventure             TOYBOX?            TBSOP01
+94  Blood Warrior                TOYBOX?            TBS0P01 452 9339PK001
+94  Great 1000 Miles Rally       TOYBOX                                                  "MM0525-TOYBOX199","USMM0713-TB1994 "
+94  Great 1000 Miles Rally EV/US TOYBOX                 
+95  Great 1000 Miles Rally 2     TOYBOX      KANEKO TBSOP02 454 9451MK002 (74 pin PQFP)  "USMM0713-TB1994 "
+95  Jackie Chan                  TOYBOX                                                  "USMM0713-TB1994 "
+95  Gals Panic 3                 TOYBOX?            TBSOP01
 
+ todo:
+
+ bonk:
+	Where does the hardcoded EEPROM default data come from (there is a command to restore defaults directly, not from RAM)
+	Where does the data for the additional tables come from, a transfer mode none of the other games use is used. (related to src[offs+6] and src[offs+7] params? )
+
+ galpani3:
+    Move EEPROM to default eeprom file, use same EEPROM handling as the rest
 
 
 
@@ -31,6 +43,7 @@ mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens o
     - 0x03: read DSW
     - 0x02: load game settings \ stored in ATMEL AT93C46 chip,
     - 0x42: save game settings / 128 bytes serial EEPROM
+	- 0x43: restore eeprom defaults (from internal ROM or data ROM?)
 
 */
 

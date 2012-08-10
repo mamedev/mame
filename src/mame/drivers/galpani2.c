@@ -23,7 +23,6 @@ To Do:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
-#include "includes/kaneko16.h"
 #include "includes/galpani2.h"
 
 /***************************************************************************
@@ -73,9 +72,6 @@ WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 
 static MACHINE_RESET( galpani2 )
 {
-	MACHINE_RESET_CALL(kaneko16);
-
-
 	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 

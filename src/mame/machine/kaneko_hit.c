@@ -7,6 +7,8 @@
    galpanica  - CALC1	- type 0
    sandscrp   - CALC1	- type 0 ( only uses Random Number? )
    bonkadv    - TOYBOX	- type 0 ( only uses Random Number, XY Overlap Collision bit and register '0x02' )
+   gtmr		  -	TOYBOX  - type 1 ( only uses Random Number )
+   gtmr2	  -	TOYBOX  - type 1 ( only uses Random Number )
    bloodwar   -	TOYBOX  - type 1
    shogwarr   - CALC3   - type 1
    brapboys   - CALC3   - type 2
