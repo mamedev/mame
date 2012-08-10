@@ -1101,9 +1101,9 @@ DRIVER_INIT_MEMBER(galivan_state,youmab)
 
 }
 
-GAME( 1985, galivan,  0,        galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Galivan - Cosmo Police (12/26/1985)", GAME_SUPPORTS_SAVE )
-GAME( 1985, galivan2, galivan,  galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Galivan - Cosmo Police (12/16/1985)", GAME_SUPPORTS_SAVE )
-GAME( 1985, galivan3, galivan,  galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Galivan - Cosmo Police (12/11/1985)", GAME_SUPPORTS_SAVE )
+GAME( 1985, galivan,  0,        galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/26/1985)", GAME_SUPPORTS_SAVE )
+GAME( 1985, galivan2, galivan,  galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/16/1985)", GAME_SUPPORTS_SAVE )
+GAME( 1985, galivan3, galivan,  galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/11/1985)", GAME_SUPPORTS_SAVE )
 GAME( 1986, dangar,   0,        galivan,  dangar, driver_device,   0, ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", GAME_SUPPORTS_SAVE )
 GAME( 1986, dangar2,  dangar,   galivan,  dangar2, driver_device,  0, ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986)", GAME_SUPPORTS_SAVE )
 GAME( 1986, dangarb,  dangar,   galivan,  dangarb, driver_device,  0, ROT270, "bootleg",      "Ufo Robo Dangar (bootleg)", GAME_SUPPORTS_SAVE )
