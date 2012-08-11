@@ -37,6 +37,8 @@ write:
 c000      YM2203 #2 control
 c001      YM2203 #2 write
 
+All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -209,17 +211,17 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( vulgus, vulgus_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen",vulgus_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.59)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -234,10 +236,10 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)	/* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)	/* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -249,7 +251,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( vulgus )
+ROM_START( vulgus ) /* Board ID# 84602-01A-1 */
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "vulgus.002",   0x0000, 0x2000, CRC(e49d6c5d) SHA1(48072aaa1f2603b6301d7542cc3df10ead2847bb) )
 	ROM_LOAD( "vulgus.003",   0x2000, 0x2000, CRC(51acef76) SHA1(14dda82b90f9c3a309561a73c300cb54b5fca77d) )
