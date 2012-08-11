@@ -18748,6 +18748,15 @@ m4tenten__a1	//
 m4tenten__a2	//
 m421club	// 21 Club (Barcrest)
 m4actbnk	// Action Bank (Barcrest)
+m4actbnk__a	//
+m4actbnk__b	//
+m4actbnk__c	//
+m4actbnk__d	//
+m4actbnk__e	//
+m4actbnk__f	//
+m4actbnk__g	//
+m4actbnk__h	//
+m4actbnk__i	//
 m4actbnka	//
 m4actbnkb	//
 m4actclb	// Action Club (Barcrest)
@@ -18802,7 +18811,25 @@ m4addr4c_a	//
 m4addr4c_b	//
 m4addrd		//
 m4addrc		// Adders & Ladders Classic (Barcrest)
+m4addrc__a	//
+m4addrc__b	//
+m4addrc__c	//
+m4addrc__d	//
+m4addrc__e	//
+m4addrc__f	//
+m4addrc__g	//
+m4addrc__h	//
+m4addrc__i	//
+m4addrc__j	//
+m4addrc__k	//
+m4addrc__l	//
+m4addrc__m	//
+m4addrc__n	//
 m4addrcc	// Adders & Ladders Classic Club (Barcrest)
+m4addrcc__a	//
+m4addrcc__b	//
+m4addrcc__c	//
+m4addrcc__d	//
 m4alladv	// All Cash Advance (Barcrest)
 m4alpha		// Alphabet (Barcrest)
 m4ambass	// Ambassador (Barcrest)
@@ -19580,6 +19607,20 @@ m4crzjwl	// Crown Jewels (Barcrest)
 m4crjwl		// Crown Jewels Club (Barcrest)
 m4crjwl2	// Crown Jewels Mk II Club (Barcrest)
 m4crdome	// Crystal Dome (Barcrest)
+m4crdome__a	//
+m4crdome__b	//
+m4crdome__c	//
+m4crdome__d	//
+m4crdome__e	//
+m4crdome__f	//
+m4crdome__g	//
+m4crdome__h	//
+m4crdome__i	//
+m4crdome__j	//
+m4crdome__k	//
+m4crdome__l	//
+m4crdome__m	//
+m4crdome__n	//
 m4crmaze	// Crystal Maze (Barcrest)
 m4crmaze__c	//
 m4crmaze__d	//
@@ -20224,7 +20265,6 @@ m4joljokd	//
 m4joljokh	//
 m4joljok	// Jolly Joker (Barcrest)
 m4joltav	// Jolly Taverner (Barcrest)
-m4lastrp	// Las Vegas Strip (Barcrest)
 m4goodtm	// Let The Good Times Roll (Barcrest)
 m4goodtm__a		//
 m4goodtm__b		//
@@ -20438,6 +20478,33 @@ m4luxor__x	//
 m4luxor__y	//
 m4luxor__z	//
 m4madhse	// Mad House (Barcrest)
+m4madhse__a	//
+m4madhse__b	//
+m4madhse__c	//
+m4madhse__d	//
+m4madhse__e	//
+m4madhse__f	//
+m4madhse__g	//
+m4madhse__h	//
+m4madhse__i	//
+m4madhse__j	//
+m4madhse__k	//
+m4madhse__l	//
+m4madhse__m	//
+m4madhse__n	//
+m4madhse__o	//
+m4madhse__p	//
+m4madhse__q	//
+m4madhse__r	//
+m4madhse__s	//
+m4madhse__t	//
+m4madhse__u	//
+m4madhse__v	//
+m4madhse__w	//
+m4madhse__x	//
+m4madhse__y	//
+m4madhse__z	//
+m4madhse__0	//
 m4magdrg	// Magic Dragon (Barcrest)
 m4maglin	// Magic Liner (Barcrest)
 m4magrep	// Magic Replay DeLuxe (Barcrest)
@@ -20570,6 +20637,16 @@ m4monte		// Monte Carlo (Barcrest)
 m4multcl	// Multiplay Club (Barcrest)
 m4multwy	// Multiway (Barcrest)
 m4nhtt		// New Hit the Top (Barcrest)
+m4nhtt__a	//
+m4nhtt__b	//
+m4nhtt__c	//
+m4nhtt__d	//
+m4nhtt__e	//
+m4nhtt__f	//
+m4nhtt__g	//
+m4nhtt__h	//
+m4nhtt__i	//
+m4nhtt__j	//
 m4nick		// Nickelodeon (Barcrest)
 m4nifty		// Nifty Fifty (Barcrest)
 m4niftya	//
@@ -20864,6 +20941,16 @@ m4przdty__n	//
 m4przdty__o	//
 m4przdty__p	//
 m4przfrt	// Prize Fruit & Loot (Barcrest)
+m4przfrt__a	//
+m4przfrt__b	//
+m4przfrt__c	//
+m4przfrt__d	//
+m4przfrt__e	//
+m4przfrt__f	//
+m4przfrt__g	//
+m4przfrt__h	//
+m4przfrt__i	//
+m4przfrt__j	//
 m4przhr		// Prize High Roller (Barcrest)
 m4przhr__a	//
 m4przhr__b	//
@@ -21212,6 +21299,17 @@ m4rhog2		// Road Hog 2 - I'm Back (Barcrest)
 m4rhogc		// Road Hog Club (Barcrest)
 m4roadrn	// Road Runner (Barcrest)
 m4rockmn	// Rocket Money (Barcrest)
+m4rockmn__a	//
+m4rockmn__b	//
+m4rockmn__c	//
+m4rockmn__d	//
+m4rockmn__e	//
+m4rockmn__f	//
+m4rockmn__g	//
+m4rockmn__h	//
+m4rockmn__i	//
+m4rockmn__j	//
+m4rockmn__k	//
 m4royjwl	// Royal Jewels (Barcrest)
 m4rfym		// Run For Your Money (Barcrest)
 m4rfym__a	//
@@ -21704,6 +21802,17 @@ m4tutfrt__a3	//
 m4tutfrt__a4	//
 m4tutfrt__a5	//
 m4tutcl		// Tutti Fruity Classic (Barcrest)
+m4tutcl__a	//
+m4tutcl__b	//
+m4tutcl__c	//
+m4tutcl__d	//
+m4tutcl__e	//
+m4tutcl__f	//
+m4tutcl__g	//
+m4tutcl__h	//
+m4tutcl__i	//
+m4tutcl__j	//
+m4tutcl__k	//
 m421		// Twenty One (Barcrest)
 m4twilgt	// Twilight (Barcrest)
 m4twintm	// Twin Timer (Barcrest)
@@ -21785,6 +21894,9 @@ m4vegast__r	//
 m4vegast__s	//
 m4vegast__t	//
 m4vegast__u	//
+m4vegast__v	//
+m4vegast__w	//
+m4vegast__x	//
 m4vegastg	//
 m4vivaes	// Viva Espana (Barcrest)
 m4vivaes__a		//
@@ -21844,10 +21956,8 @@ m4vivess__a	//
 m4vivess__b	//
 m4vivess__c	//
 m4vivess__d	//
-m4vivess__e	//
 m4vivess__f	//
 m4vivess__g	//
-m4vivess__h	//
 m4vivess__i	//
 m4vivess__j	//
 m4vivess__k	//
