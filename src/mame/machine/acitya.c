@@ -33,7 +33,6 @@ static void acitya_decrypt_rom_8(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x80) >> 2;
@@ -68,7 +67,6 @@ static void acitya_decrypt_rom_9(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x80) >> 0;
@@ -101,7 +99,6 @@ static void acitya_decrypt_rom_A(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		newbyte  = (inverted_oldbyte & 0x80) >> 2;
 		newbyte |= (inverted_oldbyte & 0x40) >> 2;
@@ -134,7 +131,6 @@ static void acitya_decrypt_rom_B(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x80) >> 0;

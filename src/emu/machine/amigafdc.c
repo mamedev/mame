@@ -86,7 +86,6 @@ void amiga_fdc::device_reset()
 	adkcon = 0;
 	dmacon = 0;
 	dskpt = 0;
-	dsklen = 0x4000;
 	pre_dsklen = 0x4000;
 	dma_value = 0;
 	dma_state = DMA_IDLE;

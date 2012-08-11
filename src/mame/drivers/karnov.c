@@ -799,7 +799,7 @@ static MACHINE_RESET( karnov )
 
 	state->m_flipscreen = 0;
 	state->m_scroll[0] = 0;
-	state->m_scroll[0] = 0;
+	state->m_scroll[1] = 0;
 }
 
 

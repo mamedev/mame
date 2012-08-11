@@ -422,7 +422,7 @@ if (0) {
 
 	// clip objects against the visible area
 	yclip = y; xclip = x; hclip = h; wclip = w;
-	src_yskip = src_xskip = dst_skip = 0;
+	src_yskip = src_xskip = 0;
 	if (yclip < VIS_MINY) { src_yskip = VIS_MINY - yclip; yclip = VIS_MINY; hclip -= src_yskip; }
 	if (yclip + hclip > VIS_MAXY+1) { hclip = VIS_MAXY+1 - yclip; }
 	if (xclip < VIS_MINX) { src_xskip = VIS_MINX - xclip; xclip = VIS_MINX; wclip -= src_xskip; }

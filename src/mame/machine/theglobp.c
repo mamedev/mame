@@ -82,7 +82,6 @@ static void theglobp_decrypt_rom_8(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -118,7 +117,6 @@ static void theglobp_decrypt_rom_9(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -153,7 +151,6 @@ static void theglobp_decrypt_rom_A(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -188,7 +185,6 @@ static void theglobp_decrypt_rom_B(running_machine &machine)
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
             connected to D0.  The other six data bits are converted by a
             PAL10H8 driven by the counter. */
-		newbyte = 0;
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;

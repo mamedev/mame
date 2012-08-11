@@ -750,7 +750,6 @@ void debug_view_memory::set_bytes_per_chunk(UINT8 chunkbytes)
 	pos.m_shift += 8 * ((pos.m_address % m_bytes_per_chunk) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1)));
 	pos.m_address -= pos.m_address % m_bytes_per_chunk;
 
-	m_recompute = m_update_pending = true;
 	end_update_and_set_cursor_pos(pos);
 }
 

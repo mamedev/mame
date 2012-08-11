@@ -135,7 +135,6 @@ void i8237_device::device_reset()
 	m_command = 0;
 	m_drq = 0;
 	m_mask = 0x00;
-	m_status = 0x0F;
 	m_hrq = 0;
 	m_hlda = 0;
 	m_chan[0].m_mode = 0;

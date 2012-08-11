@@ -814,17 +814,12 @@ void mc6845_device::device_start()
 	m_horiz_disp = m_vert_disp = 0;
 	m_vert_sync_pos = 0;
 	m_vert_total_adj = 0;
-	m_cursor_start_ras = m_cursor_end_ras = 0;
+	m_cursor_start_ras = m_cursor_end_ras = m_cursor_addr = 0;
 	m_cursor_blink_count = 0;
 	m_cursor_state = 0;
 	m_update_ready_bit = 0;
-	m_cursor_state = 0;
-	m_raster_counter = 0;
-	m_cursor_start_ras = 0;
-	m_cursor_end_ras = m_cursor_addr = 0;
 	m_line_address = 0;
 	m_current_disp_addr = 0;
-	m_line_address = 0;
 
 	save_item(NAME(m_hpixels_per_column));
 	save_item(NAME(m_register_address_latch));
