@@ -518,6 +518,7 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu4empire.o \
 	$(DRIVERS)/mpu4mdm.o \
 	$(DRIVERS)/mpu4crystal.o \
+	$(DRIVERS)/mpu4bwb.o \
 	$(VIDEO)/scn2674.o \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
