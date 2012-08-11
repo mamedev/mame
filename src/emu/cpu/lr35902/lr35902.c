@@ -198,8 +198,6 @@ void lr35902_cpu_device::device_reset()
 	m_L = 0x00;
 	m_SP = 0x0000;
 	m_PC = 0x0000;
-	m_timer_expired_func = NULL;
-	m_features = LR35902_FEATURE_HALT_BUG;
 	if ( c_regs ) {
 		m_A = c_regs[0] >> 8;
 		m_F = c_regs[0] & 0xFF;
