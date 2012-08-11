@@ -360,6 +360,57 @@ ROM_START( m4snklad )
 ROM_END
 
 
+ROM_START( m4excam )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ex1_4.bin", 0x0000, 0x010000, CRC(34c4aee2) SHA1(c5487c5b0144ca188bc2e3926a0343fd4c9c565a) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "ex1_0d.bin", 0x0000, 0x010000, CRC(490c510e) SHA1(21a03d8e2dd4d2c7760acbff5705f925fe9f31be) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "mdmexcalibsnd.p1", 0x000000, 0x080000, CRC(8ea73366) SHA1(3ee45ad98e03177eeef97521df7b3d1945242076) )
+	ROM_LOAD( "mdmexcalibsnd.p2", 0x080000, 0x080000, CRC(0fca6ca2) SHA1(2029d15e3b51069f5847ab3846bf6c064f0a3381) )
+	ROM_LOAD( "mdmexcalibsnd.p3", 0x100000, 0x080000, CRC(43be816a) SHA1(a95f702ec1bb20f3e0f18984948963b56769f5ba) )
+	ROM_LOAD( "mdmexcalibsnd.p4", 0x180000, 0x080000, CRC(ef8a718c) SHA1(093a5fff5bab61fc9276a7f9f3c5b728a50603b3) )
+ROM_END
+
+
+ROM_START( m4front )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ff2_1.bin", 0x0000, 0x010000, CRC(3519cba1) SHA1(d83a5370ee82e258024d20ffacec7050950b1326) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "ffsnd2_1.bin", 0x000000, 0x080000, CRC(9b3cdf12) SHA1(1a209985493f686dd37e91693361ecbf32096f66) )
+	ROM_LOAD( "ffsnd2_2.bin", 0x080000, 0x080000, CRC(0fc33bdf) SHA1(6de715e33411050ee1d2a0f08bf1c9a8001ffb4f) )
+ROM_END
+
+
+ROM_START( m4safar )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "saf4_1.bin", 0x0000, 0x010000, CRC(ad726457) SHA1(4104be61d179024fae9fb9c631677b1ba56d3f00) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+
+ROM_END
+
+ROM_START( m4snowbl )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "sb_3.p2", 0x8000, 0x004000, CRC(c22fe04e) SHA1(233ee0795b0029389247a9550ef39af95f671870) )
+	ROM_LOAD( "sb_3.p1", 0xc000, 0x004000, CRC(98fdcaba) SHA1(f4a74d5550dd9fc8bff35a583b3289e1bb0be9d5) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4ewshft )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "each_way_shifter(mdm)_v1-0.bin", 0x0000, 0x010000, CRC(506b6cf0) SHA1(870e356b9785e51c5be5d6bc6af9ea7640b51ee8) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "each_way_shifter-snd1.bin", 0x000000, 0x080000, CRC(b21f9b09) SHA1(69ac3ca2874fc3aebd34dd225a195ad1c0305d00) )
+	ROM_LOAD( "each_way_shifter-snd2.bin", 0x080000, 0x080000, CRC(e3ce5ec5) SHA1(9c7eefa4042b1b1aca3d0fbefcad10db34992c43) )
+ROM_END
+
+
 /* MDM
    most of these boot and act similar to the Empire games (ie bad text, but run OK) */
 GAME(199?, m42punlm,     0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Mdm","2p Unlimited (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
@@ -401,3 +452,8 @@ GAME(199?, m4smshgba,m4smshgb,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Md
 GAME(199?, m4smshgbb,m4smshgb,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4smshgbc,m4smshgb,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4snklad, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Mdm","Snakes & Ladders (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4excam, 0,			mod4oki    ,mpu4, mpu4_state, m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4front, 0,			mod4oki    ,mpu4, mpu4_state, m4default, ROT0,   "Mdm","Final Frontier (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4safar, 0,			mod4oki    ,mpu4, mpu4_state, m4default, ROT0,   "Mdm","Safari Club (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4snowbl, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Mdm","Snowball Bingo (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4ewshft, 0,			mod4oki    ,mpu4, mpu4_state, m4default, ROT0,   "Mdm","Each Way Shifter (Mdm) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )

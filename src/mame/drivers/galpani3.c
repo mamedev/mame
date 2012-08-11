@@ -67,6 +67,7 @@ Dumped by Uki
 #include "video/sknsspr.h"
 #include "machine/eeprom.h"
 #include "machine/kaneko_toybox.h"
+#include "video/kaneko_grap2.h"
 
 class galpani3_state : public driver_device
 {
@@ -75,96 +76,37 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_priority_buffer(*this, "priority_buffer"),
-		m_framebuffer1(*this, "framebuffer1"),
-		m_framebuffer2(*this, "framebuffer2"),
-		m_framebuffer3(*this, "framebuffer3"),
-		m_framebuffer1_palette(*this, "fb1_palette"),
-		m_framebuffer2_palette(*this, "fb2_palette"),
-		m_framebuffer3_palette(*this, "fb3_palette"),
-		m_framebuffer1_bgcol(*this, "fb1_bgcol"),
-		m_framebuffer2_bgcol(*this, "fb2_bgcol"),
-		m_framebuffer3_bgcol(*this, "fb3_bgcol"),
-		m_framebuffer3_bright1(*this, "fb3_bright1"),
-		m_framebuffer3_bright2(*this, "fb3_bright2"),
-		m_framebuffer2_bright1(*this, "fb2_bright1"),
-		m_framebuffer2_bright2(*this, "fb2_bright2"),
-		m_framebuffer1_bright1(*this, "fb1_bright1"),
-		m_framebuffer1_bright2(*this, "fb1_bright2"),
 		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap_1(1024, 1024),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_grap2_0(*this,"grap2_0"),
+		m_grap2_1(*this,"grap2_1"),
+		m_grap2_2(*this,"grap2_2")
+
+	{ }
 
 	optional_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_priority_buffer;
-	required_shared_ptr<UINT16> m_framebuffer1;
-	required_shared_ptr<UINT16> m_framebuffer2;
-	required_shared_ptr<UINT16> m_framebuffer3;
-	required_shared_ptr<UINT16> m_framebuffer1_palette;
-	required_shared_ptr<UINT16> m_framebuffer2_palette;
-	required_shared_ptr<UINT16> m_framebuffer3_palette;
-	UINT16 m_framebuffer3_scrolly;
-	UINT16 m_framebuffer3_scrollx;
-	UINT16 m_framebuffer2_scrolly;
-	UINT16 m_framebuffer2_scrollx;
-	UINT16 m_framebuffer1_scrolly;
-	UINT16 m_framebuffer1_scrollx;
+	required_shared_ptr<UINT16> m_sprregs;
+	bitmap_ind16 m_sprite_bitmap_1;
+	required_device<cpu_device> m_maincpu;
+	required_device<kaneko_grap2_device> m_grap2_0;
+	required_device<kaneko_grap2_device> m_grap2_1;
+	required_device<kaneko_grap2_device> m_grap2_2;
+
 	UINT16 m_priority_buffer_scrollx;
 	UINT16 m_priority_buffer_scrolly;
-	UINT16 m_framebuffer1_enable;
-	UINT16 m_framebuffer2_enable;
-	UINT16 m_framebuffer3_enable;
-	required_shared_ptr<UINT16> m_framebuffer1_bgcol;
-	required_shared_ptr<UINT16> m_framebuffer2_bgcol;
-	required_shared_ptr<UINT16> m_framebuffer3_bgcol;
-	required_shared_ptr<UINT16> m_framebuffer3_bright1;
-	required_shared_ptr<UINT16> m_framebuffer3_bright2;
-	required_shared_ptr<UINT16> m_framebuffer2_bright1;
-	required_shared_ptr<UINT16> m_framebuffer2_bright2;
-	required_shared_ptr<UINT16> m_framebuffer1_bright1;
-	required_shared_ptr<UINT16> m_framebuffer1_bright2;
-	required_shared_ptr<UINT16> m_sprregs;
+
 	UINT32 m_spriteram32[0x4000/4];
 	UINT32 m_spc_regs[0x40/4];
-	bitmap_ind16 m_sprite_bitmap_1;
-	int m_regs1_i;
-	int m_regs2_i;
-	int m_regs3_i;
-	UINT16 m_regs1_address_regs[0x20];
-	UINT16 m_regs2_address_regs[0x20];
-	UINT16 m_regs3_address_regs[0x20];
 
-	required_device<cpu_device> m_maincpu;
 	sknsspr_device* m_spritegen;
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
 
-	DECLARE_READ16_MEMBER(galpani3_regs1_r);
-	DECLARE_READ16_MEMBER(galpani3_regs2_r);
-	DECLARE_READ16_MEMBER(galpani3_regs3_r);
-	DECLARE_WRITE16_MEMBER(galpani3_regs1_address_w);
-	DECLARE_WRITE16_MEMBER(galpani3_regs1_go_w);
-	DECLARE_WRITE16_MEMBER(galpani3_regs2_address_w);
-	DECLARE_WRITE16_MEMBER(galpani3_regs2_go_w);
-	DECLARE_WRITE16_MEMBER(galpani3_regs3_address_w);
-	DECLARE_WRITE16_MEMBER(galpani3_regs3_go_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_palette_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_palette_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_palette_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_scrolly_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_scrollx_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_scrolly_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_scrollx_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_scrolly_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_scrollx_w);
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_enable_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_enable_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_enable_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_bgcol_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer2_bgcol_w);
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer3_bgcol_w);
+
 
 	DECLARE_DRIVER_INIT( galpani3 )
 	{
@@ -177,8 +119,6 @@ public:
  video
 
 ***************************************************************************/
-
-
 
 
 
@@ -208,6 +148,7 @@ static VIDEO_START(galpani3)
 }
 
 
+
 static int gp3_is_alpha_pen(running_machine &machine, int pen)
 {
 	galpani3_state *state = machine.driver_data<galpani3_state>();
@@ -219,33 +160,33 @@ static int gp3_is_alpha_pen(running_machine &machine, int pen)
 	}
 	else if (pen<0x4100)
 	{
-		dat = state->m_framebuffer1_palette[pen&0xff];
+		dat = state->m_grap2_0->m_framebuffer_palette[pen&0xff];
 	}
 	else if (pen<0x4200)
 	{
-		dat = state->m_framebuffer2_palette[pen&0xff];
+		dat = state->m_grap2_1->m_framebuffer_palette[pen&0xff];
 	}
 	else if (pen<0x4300)
 	{
-		dat = state->m_framebuffer3_palette[pen&0xff];
+		dat = state->m_grap2_2->m_framebuffer_palette[pen&0xff];
 	}
 	else if (pen<0x4301)
 	{
-		dat = state->m_framebuffer1_bgcol[0];
+		dat = state->m_grap2_0->m_framebuffer_bgcol;
 	}
 	else if (pen<0x4302)
 	{
-		dat = state->m_framebuffer2_bgcol[0];
+		dat = state->m_grap2_1->m_framebuffer_bgcol;
 	}
 	else if (pen<0x4303)
 	{
-		dat = state->m_framebuffer3_bgcol[0];
+		dat = state->m_grap2_2->m_framebuffer_bgcol;
 	}
 
 	if (dat&0x8000) return 1;
 	else return 0;
-
 }
+
 
 static SCREEN_UPDATE_RGB32(galpani3)
 {
@@ -258,29 +199,33 @@ static SCREEN_UPDATE_RGB32(galpani3)
 
 	bitmap.fill(0x0000, cliprect);
 
+	popmessage("%02x %02x", state->m_grap2_0->m_framebuffer_bright2, state->m_grap2_1->m_framebuffer_bright2);
+
+
+
 	{
 		int drawy, drawx;
 		for (drawy=0;drawy<512;drawy++)
 		{
-			int srcline1 = (drawy+state->m_framebuffer1_scrolly+11)&0x1ff;
-			int srcline2 = (drawy+state->m_framebuffer2_scrolly+11)&0x1ff;
-			int srcline3 = (drawy+state->m_framebuffer3_scrolly+11)&0x1ff;
+			UINT16* srcline1 = state->m_grap2_0->m_framebuffer + ((drawy+state->m_grap2_0->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			UINT16* srcline2 = state->m_grap2_1->m_framebuffer + ((drawy+state->m_grap2_1->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			UINT16* srcline3 = state->m_grap2_2->m_framebuffer + ((drawy+state->m_grap2_2->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 
-			int priline  = (drawy+state->m_priority_buffer_scrolly+11)&0x1ff;
+			UINT16*  priline  = state->m_priority_buffer + ((drawy+state->m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
 
 			for (drawx=0;drawx<512;drawx++)
 			{
-				int srcoffs1 = (drawx+state->m_framebuffer1_scrollx+67)&0x1ff;
-				int srcoffs2 = (drawx+state->m_framebuffer2_scrollx+67)&0x1ff;
-				int srcoffs3 = (drawx+state->m_framebuffer3_scrollx+67)&0x1ff;
+				int srcoffs1 = (drawx+state->m_grap2_0->m_framebuffer_scrollx+67)&0x1ff;
+				int srcoffs2 = (drawx+state->m_grap2_1->m_framebuffer_scrollx+67)&0x1ff;
+				int srcoffs3 = (drawx+state->m_grap2_2->m_framebuffer_scrollx+67)&0x1ff;
 
 				int prioffs  = (drawx+state->m_priority_buffer_scrollx+66)&0x1ff;
 
-				UINT8 dat1 = state->m_framebuffer1[(srcline1*0x200)+srcoffs1];
-				UINT8 dat2 = state->m_framebuffer2[(srcline2*0x200)+srcoffs2];
-				UINT8 dat3 = state->m_framebuffer3[(srcline3*0x200)+srcoffs3];
+				UINT8 dat1 = srcline1[srcoffs1];
+				UINT8 dat2 = srcline2[srcoffs2];
+				UINT8 dat3 = srcline3[srcoffs3];
 
-				UINT8 pridat = state->m_priority_buffer[(priline*0x200)+prioffs];
+				UINT8 pridat = priline[prioffs];
 
 				UINT32* dst = &bitmap.pix32(drawy, drawx);
 
@@ -289,12 +234,12 @@ static SCREEN_UPDATE_RGB32(galpani3)
 				// this is all wrong
 				if (pridat==0x0f) // relates to the area you've drawn over
 				{
-					if (dat1 && state->m_framebuffer1_enable)
+					if (dat1 && state->m_grap2_0->m_framebuffer_enable)
 					{
 						dst[0] = paldata[dat1+0x4000];
 					}
 
-					if (dat2 && state->m_framebuffer2_enable)
+					if (dat2 && state->m_grap2_1->m_framebuffer_enable)
 					{
 						dst[0] = paldata[dat2+0x4100];
 					}
@@ -309,7 +254,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 					/* this isn't right, but the registers have something to do with
                        alpha / mixing, and bit 0x8000 of the palette is DEFINITELY alpha
                        enable -- see fading in intro */
-					if (dat1 && state->m_framebuffer1_enable)
+					if (dat1 && state->m_grap2_0->m_framebuffer_enable)
 					{
 						UINT16 pen = dat1+0x4000;
 						UINT32 pal = paldata[pen];
@@ -321,9 +266,9 @@ static SCREEN_UPDATE_RGB32(galpani3)
 							g = (pal & 0x0000ff00)>>8;
 							b = (pal & 0x000000ff)>>0;
 
-							r = (r * state->m_framebuffer1_bright2[0]) / 0xff;
-							g = (g * state->m_framebuffer1_bright2[0]) / 0xff;
-							b = (b * state->m_framebuffer1_bright2[0]) / 0xff;
+							r = (r * state->m_grap2_0->m_framebuffer_bright2) / 0xff;
+							g = (g * state->m_grap2_0->m_framebuffer_bright2) / 0xff;
+							b = (b * state->m_grap2_0->m_framebuffer_bright2) / 0xff;
 
 							pal = (r & 0x000000ff)<<16;
 							pal |=(g & 0x000000ff)<<8;
@@ -337,7 +282,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 						}
 					}
 
-					if (dat2 && state->m_framebuffer2_enable)
+					if (dat2 && state->m_grap2_1->m_framebuffer_enable)
 					{
 						UINT16 pen = dat2+0x4100;
 						UINT32 pal = paldata[pen];
@@ -349,9 +294,9 @@ static SCREEN_UPDATE_RGB32(galpani3)
 							g = (pal & 0x0000ff00)>>8;
 							b = (pal & 0x000000ff)>>0;
 
-							r = (r * state->m_framebuffer2_bright2[0]) / 0xff;
-							g = (g * state->m_framebuffer2_bright2[0]) / 0xff;
-							b = (b * state->m_framebuffer2_bright2[0]) / 0xff;
+							r = (r * state->m_grap2_1->m_framebuffer_bright2) / 0xff;
+							g = (g * state->m_grap2_1->m_framebuffer_bright2) / 0xff;
+							b = (b * state->m_grap2_1->m_framebuffer_bright2) / 0xff;
 
 							pal = (r & 0x000000ff)<<16;
 							pal |=(g & 0x000000ff)<<8;
@@ -365,7 +310,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 						}
 					}
 
-					if (dat3 && state->m_framebuffer3_enable)
+					if (dat3 && state->m_grap2_2->m_framebuffer_enable)
 					{
 						dst[0] = paldata[dat3+0x4200];
 					}
@@ -397,6 +342,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 			}
 		}
 	}
+
 
 	state->m_sprite_bitmap_1.fill(0x0000, cliprect);
 
@@ -501,258 +447,6 @@ WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
 	m_spc_regs[offset]=(m_sprregs[offset*2+1]<<16) | (m_sprregs[offset*2]);
 }
 
-
-
-
-// might be blitter regs? - there are 3, probably GRAP2 chips
-
-READ16_MEMBER(galpani3_state::galpani3_regs1_r)
-{
-
-	switch (offset)
-	{
-		case 0x2:
-			return m_framebuffer1_enable;
-
-		case 0xb:
-		{
-			m_regs1_i^=1;
-			if (m_regs1_i) return 0xfffe;
-			else return 0xffff;
-		}
-
-		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space.device().tag(), cpu_get_previouspc(&space.device()), offset, mem_mask);
-			break;
-
-	}
-
-	return 0x0000;
-}
-
-
-READ16_MEMBER(galpani3_state::galpani3_regs2_r)
-{
-
-	switch (offset)
-	{
-		case 0x2:
-			return m_framebuffer2_enable;
-
-		case 0xb:
-		{
-			m_regs2_i^=1;
-			if (m_regs2_i) return 0xfffe;
-			else return 0xffff;
-		}
-
-		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs2_r %02x %04x\n", space.device().tag(), cpu_get_previouspc(&space.device()), offset, mem_mask);
-			break;
-
-	}
-
-	return 0x0000;
-}
-
-
-READ16_MEMBER(galpani3_state::galpani3_regs3_r)
-{
-
-	switch (offset)
-	{
-		case 0x2:
-			return m_framebuffer3_enable;
-
-		case 0xb:
-		{
-			m_regs3_i^=1;
-			if (m_regs3_i) return 0xfffe;
-			else return 0xffff;
-		}
-
-		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs3_r %02x %04x\n", space.device().tag(), cpu_get_previouspc(&space.device()), offset, mem_mask);
-			break;
-
-	}
-
-	return 0x0000;
-}
-
-
-
-static void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata)
-{
-	int rle_count = 0;
-	int normal_count = 0;
-	UINT32 dstaddress = 0;
-
-	UINT8 thebyte;
-
-	while (dstaddress<0x40000)
-	{
-		if (rle_count==0 && normal_count==0) // we need a new code byte
-		{
-			thebyte = rledata[address];
-
-			if ((thebyte & 0x80)) // stream of normal bytes follows
-			{
-				normal_count = (thebyte & 0x7f)+1;
-				address++;
-			}
-			else // rle block
-			{
-				rle_count = (thebyte & 0x7f)+1;
-				address++;
-			}
-		}
-		else if (rle_count)
-		{
-			thebyte = rledata[address];
-			framebuffer[dstaddress] = thebyte;
-			dstaddress++;
-			rle_count--;
-
-			if (rle_count==0)
-			{
-				address++;
-			}
-		}
-		else if (normal_count)
-		{
-			thebyte = rledata[address];
-			framebuffer[dstaddress] = thebyte;
-			dstaddress++;
-			normal_count--;
-			address++;
-
-		}
-	}
-
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_regs1_address_w)
-{
-
-	logerror("galpani3_regs1_address_w %04x\n",data);
-	COMBINE_DATA(&m_regs1_address_regs[offset]);
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_regs1_go_w)
-{
-
-	UINT32 address = m_regs1_address_regs[1]| (m_regs1_address_regs[0]<<16);
-	UINT8* rledata = memregion("gfx2")->base();
-
-	printf("galpani3_regs1_go_w? %08x\n",address );
-	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer1, rledata);
-}
-
-
-WRITE16_MEMBER(galpani3_state::galpani3_regs2_address_w)
-{
-
-	logerror("galpani3_regs2_address_w %04x\n",data);
-	COMBINE_DATA(&m_regs2_address_regs[offset]);
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_regs2_go_w)
-{
-
-	UINT32 address = m_regs2_address_regs[1]| (m_regs2_address_regs[0]<<16);
-	UINT8* rledata = memregion("gfx2")->base();
-
-	printf("galpani3_regs2_go_w? %08x\n", address );
-
-	// hack to prevent title screen being corrupt - these might actually be size registers
-	// for the RLE request
-	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer2, rledata);
-}
-
-
-
-WRITE16_MEMBER(galpani3_state::galpani3_regs3_address_w)
-{
-
-	logerror("galpani3_regs3_address_w %04x\n",data);
-	COMBINE_DATA(&m_regs3_address_regs[offset]);
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_regs3_go_w)
-{
-
-	UINT32 address =  m_regs3_address_regs[1]| (m_regs3_address_regs[0]<<16);
-	UINT8* rledata = memregion("gfx2")->base();
-
-	printf("galpani3_regs3_go_w? %08x\n",address );
-
-	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer3, rledata);
-}
-
-static void set_color_555_gp3(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
-{
-	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer1_palette_w)
-{
-
-	COMBINE_DATA(&m_framebuffer1_palette[offset]);
-	set_color_555_gp3(machine(), offset+0x4000, 5, 10, 0, m_framebuffer1_palette[offset]);
-}
-
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer2_palette_w)
-{
-
-	COMBINE_DATA(&m_framebuffer2_palette[offset]);
-	set_color_555_gp3(machine(), offset+0x4100, 5, 10, 0, m_framebuffer2_palette[offset]);
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer3_palette_w)
-{
-
-	COMBINE_DATA(&m_framebuffer3_palette[offset]);
-	set_color_555_gp3(machine(), offset+0x4200, 5, 10, 0, m_framebuffer3_palette[offset]);
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer3_scrolly_w)
-{
-
-	m_framebuffer3_scrolly = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer3_scrollx_w)
-{
-
-	m_framebuffer3_scrollx = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer2_scrolly_w)
-{
-
-	m_framebuffer2_scrolly = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer2_scrollx_w)
-{
-
-	m_framebuffer2_scrollx = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer1_scrolly_w)
-{
-
-	m_framebuffer1_scrolly = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer1_scrollx_w)
-{
-
-	m_framebuffer1_scrollx = data;
-}
-
 WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrollx_w)
 {
 
@@ -761,51 +455,12 @@ WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrollx_w)
 
 WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
 {
-
 	m_priority_buffer_scrolly = data;
 }
 
-/* I'm not convinced these are enables */
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer1_enable_w)
-{
-
-	m_framebuffer1_enable = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer2_enable_w)
-{
-
-	m_framebuffer2_enable = data;
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer3_enable_w)
-{
-
-	m_framebuffer3_enable = data;
-}
-
-/* definitely looks like a cycling bg colour used for the girls */
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer1_bgcol_w)
-{
-
-	COMBINE_DATA(&m_framebuffer1_bgcol[offset]);
-	set_color_555_gp3(machine(), offset+0x4300, 5, 10, 0, m_framebuffer1_bgcol[offset]);
-}
-
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer2_bgcol_w)
-{
-
-	COMBINE_DATA(&m_framebuffer2_bgcol[offset]);
-	set_color_555_gp3(machine(), offset+0x4301, 5, 10, 0, m_framebuffer2_bgcol[offset]);
-}
 
 
-WRITE16_MEMBER(galpani3_state::galpani3_framebuffer3_bgcol_w)
-{
 
-	COMBINE_DATA(&m_framebuffer3_bgcol[offset]);
-	set_color_555_gp3(machine(), offset+0x4302, 5, 10, 0, m_framebuffer3_bgcol[offset]);
-}
 
 
 
@@ -826,50 +481,9 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)	
 	AM_RANGE(0x780000, 0x780001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
 
-	// GRAP2 1?
-	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
-	AM_RANGE(0x800400, 0x800401) AM_WRITE(galpani3_framebuffer1_scrollx_w) // scroll?
-	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
-	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(galpani3_framebuffer1_scrolly_w) // scroll?
-	AM_RANGE(0x800c02, 0x800c03) AM_WRITE(galpani3_framebuffer1_enable_w) // enable?
-	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(galpani3_framebuffer1_bgcol_w) AM_SHARE("fb1_bgcol") // bg colour? cycles ingame, for girls?
-	AM_RANGE(0x800c10, 0x800c11) AM_RAM AM_SHARE("fb1_bright1") // brightness / blend amount?
-	AM_RANGE(0x800c12, 0x800c13) AM_RAM AM_SHARE("fb1_bright2") // similar.
-	AM_RANGE(0x800c18, 0x800c1b) AM_WRITE(galpani3_regs1_address_w) // ROM address of RLE data, in bytes
-	AM_RANGE(0x800c1e, 0x800c1f) AM_WRITE(galpani3_regs1_go_w) // ?
-	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
-	AM_RANGE(0x880000, 0x8801ff) AM_RAM_WRITE(galpani3_framebuffer1_palette_w) AM_SHARE("fb1_palette") // palette
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM AM_SHARE("framebuffer1")// area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
-
-	// GRAP2 2?
-	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
-	AM_RANGE(0xa00400, 0xa00401) AM_WRITE(galpani3_framebuffer2_scrollx_w)
-	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
-	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(galpani3_framebuffer2_scrolly_w)
-	AM_RANGE(0xa00c02, 0xa00c03) AM_WRITE(galpani3_framebuffer2_enable_w) // enable?
-	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(galpani3_framebuffer2_bgcol_w) AM_SHARE("fb2_bgcol") // bg colour? same values as previous layer
-	AM_RANGE(0xa00c10, 0xa00c11) AM_RAM AM_SHARE("fb2_bright1") // similar..
-	AM_RANGE(0xa00c12, 0xa00c13) AM_RAM AM_SHARE("fb2_bright2") // brightness / blend amount?
-	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
-	AM_RANGE(0xa00c18, 0xa00c1b) AM_WRITE(galpani3_regs2_address_w) // ROM address of RLE data, in bytes
-	AM_RANGE(0xa00c1e, 0xa00c1f) AM_WRITE(galpani3_regs2_go_w) // ?
-	AM_RANGE(0xa80000, 0xa801ff) AM_RAM_WRITE(galpani3_framebuffer2_palette_w) AM_SHARE("fb2_palette") // palette
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM AM_SHARE("framebuffer2") // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
-
-	// GRAP2 3?
-	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // row scroll??
-	AM_RANGE(0xc00400, 0xc00401) AM_WRITE(galpani3_framebuffer3_scrollx_w) // scroll?
-	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // column scroll??
-	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE(galpani3_framebuffer3_scrolly_w) // scroll?
-	AM_RANGE(0xc00c02, 0xc00c03) AM_WRITE(galpani3_framebuffer3_enable_w) // enable?
-	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(galpani3_framebuffer3_bgcol_w) AM_SHARE("fb3_bgcol") // bg colour? not used?
-	AM_RANGE(0xc00c10, 0xc00c11) AM_RAM AM_SHARE("fb3_bright1") // brightness / blend amount?
-	AM_RANGE(0xc00c12, 0xc00c13) AM_RAM AM_SHARE("fb3_bright2") // similar..
-	AM_RANGE(0xc00c18, 0xc00c1b) AM_WRITE(galpani3_regs3_address_w) // ROM address of RLE data, in bytes
-	AM_RANGE(0xc00c1e, 0xc00c1f) AM_WRITE(galpani3_regs3_go_w) // ?
-	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
-	AM_RANGE(0xc80000, 0xc801ff) AM_RAM_WRITE(galpani3_framebuffer3_palette_w) AM_SHARE("fb3_palette") // palette
-	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM AM_SHARE("framebuffer3") // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
+	GRAP2_AREA( 0x800000, "grap2_0" )
+	GRAP2_AREA( 0xa00000, "grap2_1" )
+	GRAP2_AREA( 0xc00000, "grap2_2" )
 
 	// ?? priority / alpha buffer?
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_SHARE("priority_buffer") // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
@@ -916,6 +530,16 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_VIDEO_START(galpani3)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
+
+	MCFG_DEVICE_ADD("grap2_0", KANEKO_GRAP2, 0)
+	kaneko_grap2_device::set_chipnum(*device, 0);
+
+	MCFG_DEVICE_ADD("grap2_1", KANEKO_GRAP2, 0)
+	kaneko_grap2_device::set_chipnum(*device, 1);
+
+	MCFG_DEVICE_ADD("grap2_2", KANEKO_GRAP2, 0)
+	kaneko_grap2_device::set_chipnum(*device, 2);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

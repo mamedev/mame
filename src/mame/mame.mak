@@ -519,6 +519,7 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu4mdm.o \
 	$(DRIVERS)/mpu4crystal.o \
 	$(DRIVERS)/mpu4bwb.o \
+	$(DRIVERS)/mpu4misc.o \
 	$(VIDEO)/scn2674.o \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
@@ -850,6 +851,7 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/galpanic.o $(VIDEO)/galpanic.o \
 	$(DRIVERS)/galpani2.o $(VIDEO)/galpani2.o \
 	$(DRIVERS)/galpani3.o \
+	$(VIDEO)/kaneko_grap2.o \
 	$(DRIVERS)/hvyunit.o \
 	$(DRIVERS)/jchan.o \
 	$(DRIVERS)/kaneko16.o $(VIDEO)/kaneko16.o \

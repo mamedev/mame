@@ -412,6 +412,19 @@ ROM_START( m4sstrek )
 	ROM_LOAD( "rhr2pprgpatched.bin", 0x0000, 0x010000, CRC(a0b3439d) SHA1(0976537a5170bf4c4f595f7fa04243a68f14b2ae) )
 ROM_END
 
+ROM_START( m4joljokd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "djj15.bin", 0x0000, 0x010000, CRC(155cb134) SHA1(c1026effeceba131df9681afd91ccd6fb43b738a) )
+ROM_END
+
+ROM_START( m4clbshf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "csss.p1", 0x0000, 0x010000, CRC(32dd9b96) SHA1(93831858b2f0ada8e4a0aa2fae59d12c53287df1) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "club_shuffle.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
+ROM_END
+
 
 GAME(199?, m4cojok	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",						GAME_FLAGS )
 GAMEL(198?,m4gambal	,0			,mod4yam	,m4gambal			, mpu4_state,m4gambal			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
@@ -549,3 +562,5 @@ M4SUPST_SET( 199?, m4supst__b4,	m4supst,	"superstreak1deb.bin",	0x0000, 0x010000
 M4SUPST_SET( 199?, m4supst__b5,	m4supst,	"supst2515",			0x0000, 0x010000, CRC(c073a249) SHA1(4ae37eb61dd5e50687f433fb89f65b97926b7358), "Barcrest","Super Streak (Barcrest) (MPU4) (set 105)" )
 
 GAME(199?, m4sstrek,  0,		mod4yam    ,mpu4, mpu4_state, m4default, ROT0,   "bootleg","Super Streak (bootleg) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND ) // works?, no sound
+GAME(199?, m4joljokd,m4joljok	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake

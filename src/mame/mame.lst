@@ -18945,6 +18945,9 @@ m4andyflu		//
 m4andyfluy		//
 m4andyfl8bs		//
 m4andybt	// Andy's Big Time Club (Barcrest)
+m4andybt__a	//
+m4andybt__b	//
+m4andybt__c	//
 m4andyfh	// Andy's Full House (Barcrest)
 m4andyfh__a		//
 m4andyfh__b		//
@@ -19117,6 +19120,11 @@ m4bagtel__af	//
 m4bagtel__ag	//
 m4bnknot	// Bank A Note (Barcrest)
 m4bnkrol	// Bank Roller Club (Barcrest)
+m4bnkrol__a	//
+m4bnkrol__b	//
+m4bnkrol__c	//
+m4bnkrol__d	//
+m4bnkrol__e	//
 m4btclok	// Beat The Clock (Barcrest)
 m4berser	// Berserk (Barcrest)
 m4berser__a	//
@@ -19238,6 +19246,7 @@ m4bdash__a2	//
 m4bdash__a3	//
 m4bdash__a4	//
 m4brktak	// Break & Take (Barcrest)
+m4brktaka	//
 m4brdway	// Broadway (Barcrest) [Dutch]
 m4brook		// Brooklyn (Barcrest)
 m4buc		// Buccaneer (Barcrest)
@@ -19854,7 +19863,6 @@ m4fastfw	// Fast Forward (Barcrest - Bwb)
 m4class		// First Class (Barcrest)
 m4flash		// Flash Cash (Barcrest)
 m4fortcb	// Fortune Club (Barcrest)
-m4frtlt		// Fruit & Loot (Barcrest)
 m4frtfl		// Fruit Full (Barcrest)
 m4frtflc	// Fruit Full Club (Barcrest)
 m4frtgm		// Fruit Game (Barcrest)
@@ -20055,6 +20063,9 @@ m4hypvip__t	//
 m4hypvip__u	//
 m4hypvip__v	//
 m4hypclb	// Hyper Viper Club (Barcrest)
+m4hypclb__a	//
+m4hypclb__b	//
+m4hypclb__c	//
 m4intcep	// Interceptor (Barcrest)
 m4intcepa	//
 m4intcepb	//
@@ -20449,6 +20460,18 @@ m4luckst__au	//
 m4luckst__av	//
 m4luckst__aw	//
 m4lucksc	// Lucky Strike Club (Barcrest) [MPU 4]
+m4lucksc__a	//
+m4lucksc__b	//
+m4lucksc__c	//
+m4lucksc__d	//
+m4lucksc__e	//
+m4lucksc__f	//
+m4lucksc__g	//
+m4lucksc__h	//
+m4lucksc__i	//
+m4lucksc__j	//
+m4lucksc__k	//
+m4lucksc__l	//
 m4luckwb	// Lucky Wild Boar (Barcrest)
 m4luxor		// Luxor (Barcrest)
 m4luxor__a	//
@@ -20951,6 +20974,8 @@ m4przfrt__g	//
 m4przfrt__h	//
 m4przfrt__i	//
 m4przfrt__j	//
+m4przfrt__k	//
+m4przfrt__l	//
 m4przhr		// Prize High Roller (Barcrest)
 m4przhr__a	//
 m4przhr__b	//
@@ -20969,6 +20994,12 @@ m4przhr__n	//
 m4przhr__o	//
 m4przhr__p	//
 m4przlux	// Prize Luxor (Barcrest)
+m4przlux__a	//
+m4przlux__b	//
+m4przlux__c	//
+m4przlux__d	//
+m4przlux__e	//
+m4przlux__f	//
 m4przmon	// Prize Money (Barcrest)
 m4przmon__a	//
 m4przmon__b	//
@@ -21262,6 +21293,9 @@ m4rhrc__7	//
 m4rhrc__8	//
 m4rhrc__aa	//
 m4rhrcl		// Red Hot Roll Club (Barcrest)
+m4rhrcl__a	//
+m4rhrcl__b	//
+m4rhrcl__c	//
 m4rwb		// Red White & Blue (Barcrest)
 m4r2r		// Reel 2 Reel (Barcrest)
 m4rmtp		// Reel Magic Turbo Play (Barcrest)
@@ -21355,6 +21389,8 @@ m4rhog2__k	//
 m4rhog2__l	//
 m4rhog2__m	//
 m4rhogc		// Road Hog Club (Barcrest)
+m4rhogc__a	//
+m4rhogc__b	//
 m4roadrn	// Road Runner (Barcrest)
 m4rockmn	// Rocket Money (Barcrest)
 m4rockmn__a	//
@@ -21510,7 +21546,6 @@ m4sunsets	//
 m4sunsett	//
 m4supslt	// Supa Slot (Barcrest)
 m4suptrn	// Supatron (Barcrest)
-m4supbj		// Super Blackjack (Barcrest)
 m4supbjc	// Super Blackjack Club (Barcrest)
 m4supbf		// Super Bucks Fizz Club (Barcrest)
 m4suphv		// Super Hyper Viper (Barcrest)
@@ -21673,7 +21708,11 @@ m4takepk__y	//
 m4takepk__z	//
 m4takepk__0	//
 m4takepk__1	//
-m4tpcl		// Take Your Pick Club (Barcrest)
+m4typcl		// Take Your Pick Club (Barcrest)
+m4typcl__a	//
+m4typcl__b	//
+m4typcl__c	//
+m4typcl__d	//
 m4techno	// Techno Reel (Barcrest)
 m4toot		// Ten Out Of Ten (Barcrest)
 m4toot__a	//
@@ -22181,6 +22220,41 @@ m4cshenc	// Cash Encounters (Bwb)
 m4czne		// Cash Zone (Bwb)
 m4csoc		// Championship Soccer (Bwb)
 m4cpycat	// Copy Cat (Bwb)
+m4cpycat__a	//
+m4cpycat__b	//
+m4cpycat__c	//
+m4cpycat__d	//
+m4cpycat__e	//
+m4cpycat__f	//
+m4cpycat__g	//
+m4cpycat__h	//
+m4cpycat__i	//
+m4cpycat__j	//
+m4cpycat__k	//
+m4cpycat__l	//
+m4cpycat__m	//
+m4cpycat__n	//
+m4cpycat__o	//
+m4cpycat__p	//
+m4cpycat__q	//
+m4cpycat__r	//
+m4cpycat__s	//
+m4cpycat__t	//
+m4cpycat__u	//
+m4cpycat__v	//
+m4cpycat__w	//
+m4cpycat__x	//
+m4cpycat__y	//
+m4cpycat__z	//
+m4cpycat__0	//
+m4cpycat__1	//
+m4cpycat__2	//
+m4cpycat__3	//
+m4cpycat__4	//
+m4cpycat__5	//
+m4cpycat__6	//
+m4cpycat__7	//
+m4cpycat__8	//
 m4cpfinl	// Cup Final (Bwb)
 m4danced	// Dancing Diamonds (Bwb)
 m4daytn		// Daytona (Bwb)
@@ -22204,7 +22278,59 @@ m4jakjok	// Jackpot Jokers (Bwb)
 m4jakjoka
 m4jflash	// Jumping Jack Flash (Bwb)
 m4kingq		// Kings & Queens (Bwb)
+m4kingq__a	//
+m4kingq__b	//
+m4kingq__c	//
+m4kingq__d	//
+m4kingq__e	//
+m4kingq__f	//
+m4kingq__g	//
+m4kingq__h	//
+m4kingq__i	//
+m4kingq__j	//
+m4kingq__k	//
+m4kingq__l	//
+m4kingq__m	//
+m4kingq__n	//
+m4kingq__o	//
+m4kingq__p	//
+m4kingq__q	//
+m4kingq__r	//
+m4kingq__s	//
+m4kingq__t	//
 m4kingqc	// Kings & Queens Classic (Bwb)
+m4kingqc__a	//
+m4kingqc__b	//
+m4kingqc__c	//
+m4kingqc__d	//
+m4kingqc__e	//
+m4kingqc__f	//
+m4kingqc__g	//
+m4kingqc__h	//
+m4kingqc__i	//
+m4kingqc__j	//
+m4kingqc__k	//
+m4kingqc__l	//
+m4kingqc__m	//
+m4kingqc__n	//
+m4kingqc__o	//
+m4kingqc__p	//
+m4kingqc__q	//
+m4kingqc__r	//
+m4kingqc__s	//
+m4kingqc__t	//
+m4kingqc__u	//
+m4kingqc__v	//
+m4kingqc__w	//
+m4kingqc__x	//
+m4kingqc__y	//
+m4kingqc__z	//
+m4kingqc__0	//
+m4kingqc__1	//
+m4kingqc__2	//
+m4kingqc__3	//
+m4kingqc__4	//
+m4kingqc__5	//
 m4lazy		// Lazy Bones (Bwb)
 m4lvlcl		// Lucky Las Vegas Classic (Bwb)
 m4ln7		// Lucky No7 (Bwb)
@@ -22227,6 +22353,31 @@ m4specu		// Speculator Club (Bwb)
 m4spinbt	// Spin The Bottle (Bwb)
 m4starst	// Stars & Stripes (Bwb)
 m4thestr	// The Streak (Bwb)
+m4thestr__a	//
+m4thestr__b	//
+m4thestr__c	//
+m4thestr__d	//
+m4thestr__e	//
+m4thestr__f	//
+m4thestr__g	//
+m4thestr__h	//
+m4thestr__i	//
+m4thestr__j	//
+m4thestr__k	//
+m4thestr__l	//
+m4thestr__m	//
+m4thestr__n	//
+m4thestr__o	//
+m4thestr__p	//
+m4thestr__q	//
+m4thestr__r	//
+m4thestr__s	//
+m4thestr__t	//
+m4thestr__u	//
+m4thestr__v	//
+m4thestr__w	//
+m4thestr__x	//
+m4thestr__y	//
 m4sunclb	// Sun Club (Bwb)
 m4sunscl	// Sunset Club (Bwb)
 m4supleg	// Super League (Bwb)
@@ -22234,10 +22385,54 @@ m4supscr	// Super Soccer (Bwb)
 m4ssclas	// Super Streak Classic (Bwb)
 m4sure		// Sure Thing (Bwb)
 m4tic		// Tic Tac Toe (Bwb)
+m4tic__a	//
+m4tic__b	//
+m4tic__c	//
+m4tic__d	//
+m4tic__e	//
+m4tic__f	//
+m4tic__g	//
+m4tic__h	//
+m4tic__i	//
+m4tic__j	//
+m4tic__k	//
+m4tic__l	//
+m4tic__m	//
+m4tic__n	//
+m4tic__o	//
+m4tic__p	//
+m4tic__q	//
+m4tic__r	//
+m4tic__s	//
 m4ticcla	// Tic Tac Toe Classic (Bwb)
-m4ticgld	// Tic Tac Toe Gold (Bwb)
-m4ticglc	// Tic Tac Toe Gold Classic (Bwb)
+m4ticglc	// Tic Tac Toe Gold (Bwb)
 m4topdog	// Top Dog (Bwb)
+m4topdog__a	//
+m4topdog__b	//
+m4topdog__c	//
+m4topdog__d	//
+m4topdog__e	//
+m4topdog__f	//
+m4topdog__g	//
+m4topdog__h	//
+m4topdog__i	//
+m4topdog__j	//
+m4topdog__k	//
+m4topdog__l	//
+m4topdog__m	//
+m4topdog__n	//
+m4topdog__o	//
+m4topdog__p	//
+m4topdog__q	//
+m4topdog__r	//
+m4topdog__s	//
+m4topdog__t	//
+m4topdog__u	//
+m4topdog__v	//
+m4topdog__w	//
+m4topdog__x	//
+m4topdog__y	//
+m4topdog__z	//
 m4trex		// Trex (Bwb)
 m4volcan	// Volcano (Bwb)
 m4vdexpr	// Voodoo Express (Bwb)
