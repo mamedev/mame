@@ -170,7 +170,7 @@ public:
 
 	// OpenGL specific options
 	bool filter() const { return bool_value(SDLOPTION_FILTER); }
-	int prescale() const { return bool_value(SDLOPTION_PRESCALE); }
+	int prescale() const { return int_value(SDLOPTION_PRESCALE); }
 	bool gl_force_pow2_texture() const { return bool_value(SDLOPTION_GL_FORCEPOW2TEXTURE); }
 	bool gl_no_texture_rect() const { return bool_value(SDLOPTION_GL_NOTEXTURERECT); }
 	bool gl_vbo() const { return bool_value(SDLOPTION_GL_VBO); }
