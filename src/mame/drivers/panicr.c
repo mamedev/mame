@@ -73,7 +73,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_scrollram(*this, "scrollram"){ }
+		m_scrollram(*this, "scrollram")
+	{ }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -618,5 +619,5 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 }
 
 
-GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Taito",               "Panic Road", GAME_NOT_WORKING )
-GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu Inc.", "Panic Road (Germany)", GAME_NOT_WORKING )
+GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", GAME_NOT_WORKING )
+GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", GAME_NOT_WORKING )
