@@ -953,7 +953,7 @@ MACHINE_CONFIG_END
 
 /*************************************************************************/
 
-ROM_START( gticlub ) /* Euro version EAA */
+ROM_START( gticlub ) /* Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00(EUR) */
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE("688eaa01.21u", 0x000003, 0x80000, CRC(824944ad) SHA1(a7bb86a2495e0579f5d82808aeed4895be2dbe3b) )
 	ROM_LOAD32_BYTE("688eaa02.19u", 0x000002, 0x80000, CRC(88e7bfb9) SHA1(fc0e945291204ee0c82bbd2c81ff241e1565c6ae) )
@@ -983,7 +983,37 @@ ROM_START( gticlub ) /* Euro version EAA */
 	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
-ROM_START( gticluba ) /* Asia version AAA */
+ROM_START( gticlubu ) /* USA version UAA - Reports: GTI CLUB(TM) System ver 1.02(USA) */
+	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
+	ROM_LOAD32_BYTE("688uaa01.21u", 0x000003, 0x80000, CRC(4e2ea7ad) SHA1(cc517df7c4df098896a2a88843fef97c9beb46f3) )
+	ROM_LOAD32_BYTE("688uaa02.19u", 0x000002, 0x80000, CRC(c0212ce1) SHA1(7716acfa1b1391e9d7a321ed46785c144d27fdd8) )
+	ROM_LOAD32_BYTE("688uaa03.21r", 0x000001, 0x80000, CRC(030246fe) SHA1(70d3591159b07aaeca60141db44f7c28d1b2dac9) )
+	ROM_LOAD32_BYTE("688uaa04.19r", 0x000000, 0x80000, CRC(9394e0b2) SHA1(9ff4ff22a307352bf127fc2b5ef9c56ecacf0aab) )
+
+	ROM_REGION32_BE(0x400000, "user2", 0)	/* data roms */
+	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
+	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
+	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
+
+	ROM_REGION(0x800000, "rfsnd", 0)	/* sound roms */
+	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
+	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
+	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
+	ROM_LOAD( "688a12.2s", 0x600000, 0x200000, CRC(510c70e3) SHA1(5af77bc98772ab7961308c3af0a80cb1bca690e3) )
+
+	ROM_REGION(0x800000, "gfx1", 0)	/* texture roms */
+	ROM_LOAD64_WORD( "688a13.18d", 0x000000, 0x200000, CRC(c8f04f91) SHA1(9da8cc3a94dbf0a1fce87c2bc9249df712ae0b0d) )
+	ROM_LOAD64_WORD( "688a14.13d", 0x000002, 0x200000, CRC(b9932735) SHA1(2492244d2acb350974202a6718bc7121325d2121) )
+	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
+	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
+ROM_END
+
+ROM_START( gticluba ) /* Asia version AAA - Reports: GTI CLUB(TM) System ver 1.00(ASI) */
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE("688aaa01.21u", 0x000003, 0x80000, CRC(06a56474) SHA1(3a457b885a35e3ee030fd51d847bcf75fce46208) )
 	ROM_LOAD32_BYTE("688aaa02.19u", 0x000002, 0x80000, CRC(3c1e714a) SHA1(557f8542b855b2b35f242c8db7396017aca6dbd8) )
@@ -1013,7 +1043,7 @@ ROM_START( gticluba ) /* Asia version AAA */
 	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
-ROM_START( gticlubj ) /* Japan version JAA */
+ROM_START( gticlubj ) /* Japan version JAA - Reports: GTI CLUB(TM) System ver 1.00(JPN) */
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE("688jaa01.21u", 0x000003, 0x80000, CRC(1492059c) SHA1(176dbd87f23f4cd8e1397e67da501738e20e5a57) )
 	ROM_LOAD32_BYTE("688jaa02.19u", 0x000002, 0x80000, CRC(7896dd69) SHA1(a3ab7b872132a5e66238e414f4b497cf7beb8b1c) )
@@ -1182,10 +1212,11 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,  0,        gticlub,  gticlub, gticlub_state,  gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticluba, gticlub,  gticlub,  gticlub, gticlub_state,  gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub, gticlub_state,  gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlub,  0,        gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubu, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticluba, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1996, thunderh, 0,        thunderh, thunderh, gticlub_state, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1996, thunderhu,thunderh, thunderh, thunderh, gticlub_state, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub_state, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAMEL( 1997, hangplt, 0,        hangplt,  hangplt, gticlub_state,  hangplt, ROT0, "Konami", "Hang Pilot", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND, layout_dualhovu )
+GAMEL( 1997, hangplt, 0,        hangplt,  hangplt,  gticlub_state, hangplt, ROT0, "Konami", "Hang Pilot", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND, layout_dualhovu )
