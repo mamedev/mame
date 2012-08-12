@@ -344,7 +344,6 @@ inline _Dest downcast(_Source *src)
 {
 #ifndef NDEBUG
 	if(dynamic_cast<_Dest>(src) != src) {
-		fprintf(stderr, "buh\n");
 		if(dynamic_cast<const device_t *>(src))
 			bitch_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(_Dest));
 		else
@@ -359,7 +358,6 @@ inline _Dest downcast(_Source &src)
 {
 #ifndef NDEBUG
 	if(&dynamic_cast<_Dest>(src) != &src) {
-		fprintf(stderr, "gah\n");
 		if(dynamic_cast<const device_t *>(&src))
 			bitch_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(_Dest));
 		else
