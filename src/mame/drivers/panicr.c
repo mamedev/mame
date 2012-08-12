@@ -462,6 +462,48 @@ ROM_START( panicr )
 	ROM_LOAD( "10l.bpr", 0x00700, 0x100, CRC(f3f29695) SHA1(2607e96564a5e6e9a542377a01f399ea86a36c48) )	// unknown
 ROM_END
 
+ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v20 main cpu */
+	ROM_LOAD16_BYTE("2g.19m",   0x0f0000, 0x08000, CRC(cf759403) SHA1(1a0911c943ecc752e46873c9a5da981745f7562d) )
+	ROM_LOAD16_BYTE("1g.19n",   0x0f0001, 0x08000, CRC(06877f9b) SHA1(8b92209d6422ff2b1f3cb66bd39a3ff84e399eec) )
+
+	ROM_REGION( 0x10000, "t5182", 0 ) /* Toshiba T5182 module */
+	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
+	ROM_LOAD( "22d.bin",   0x8000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "13f.bin", 0x000000, 0x2000, CRC(4e6b3c04) SHA1(f388969d5d822df0eaa4d8300cbf9cee47468360) )
+	ROM_LOAD( "15f.bin", 0x002000, 0x2000, CRC(d735b572) SHA1(edcdb6daec97ac01a73c5010727b1694f512be71) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "2a.bin", 0x000000, 0x20000, CRC(3ac0e5b4) SHA1(96b8bdf02002ec8ce87fd47fd21f7797a79d79c9) )
+	ROM_LOAD( "2b.bin", 0x020000, 0x20000, CRC(567d327b) SHA1(762b18ef1627d71074ba02b0eb270bd9a01ac0d8) )
+	ROM_LOAD( "2c.bin", 0x040000, 0x20000, CRC(cd77ec79) SHA1(94b61b7d77c016ae274eddbb1e66e755f312e11d) )
+	ROM_LOAD( "2d.bin", 0x060000, 0x20000, CRC(218d2c3e) SHA1(9503b3b67e71dc63448aed7815845b844e240afe) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "2j.bin", 0x000000, 0x20000, CRC(80f05923) SHA1(5c886446fd77d3c39cb4fa43ea4beb8c89d20636) )
+	ROM_LOAD( "2k.bin", 0x020000, 0x20000, CRC(35f07bca) SHA1(54e6f82c2e6e1373c3ac1c6138ef738e5a0be6d0) )
+
+	ROM_REGION( 0x04000, "user1", 0 )
+	ROM_LOAD( "5d.bin", 0x00000, 0x4000, CRC(f3466906) SHA1(42b512ba93ba7ac958402d1871c5ae015def3501) ) //tilemaps
+	ROM_REGION( 0x04000, "user2", 0 )
+	ROM_LOAD( "7d.bin", 0x00000, 0x4000, CRC(8032c1e9) SHA1(fcc8579c0117ebe9271cff31e14a30f61a9cf031) ) //attribute maps
+
+	ROM_REGION( 0x04000, "user3", 0 )
+	ROM_COPY( "user2", 0x0000, 0x0000, 0x4000 )
+
+	ROM_REGION( 0x0800,  "proms", 0 )
+	ROM_LOAD( "b.14c",   0x00000, 0x100, CRC(145d1e0d) SHA1(8073fd176a1805552a5ac00ca0d9189e6e8936b1) )	// red
+	ROM_LOAD( "a.15c",   0x00100, 0x100, CRC(c75772bc) SHA1(ec84052aedc1d53f9caba3232ffff17de69561b2) )	// green
+	ROM_LOAD( "c.13c",   0x00200, 0x100, CRC(11c11bbd) SHA1(73663b2cf7269a62011ee067a026269ce0c15a7c) )	// blue
+	ROM_LOAD( "12d.bpr", 0x00300, 0x100, CRC(0df8aa3c) SHA1(5149265d788ea4885793b0786f765524b4745f04) )	// txt lookup table
+	ROM_LOAD( "8a.bpr",  0x00400, 0x100, CRC(908684a6) SHA1(82d9cb8aed576d1132615b5341c36ef51856b3a6) )	// tile lookup table
+	ROM_LOAD( "10j.bpr", 0x00500, 0x100, CRC(1dd80ee1) SHA1(2d634e75666b919446e76fd35a06af27a1a89707) )	// sprite lookup table
+	ROM_LOAD( "d.9b",    0x00600, 0x100, CRC(f99cac4b) SHA1(b4e6d0e0186fe186e747a9f6857b97591948c682) )	// unknown
+	ROM_LOAD( "10l.bpr", 0x00700, 0x100, CRC(f3f29695) SHA1(2607e96564a5e6e9a542377a01f399ea86a36c48) )	// unknown
+ROM_END
+
 
 DRIVER_INIT_MEMBER(panicr_state,panicr)
 {
@@ -576,4 +618,5 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 }
 
 
-GAME( 1986, panicr,  0,       panicr,  panicr, panicr_state,  panicr, ROT270, "Taito", "Panic Road", GAME_NOT_WORKING )
+GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Taito",               "Panic Road", GAME_NOT_WORKING )
+GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu Inc.", "Panic Road (Germany)", GAME_NOT_WORKING )
