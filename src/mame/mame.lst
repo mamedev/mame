@@ -4580,8 +4580,9 @@ vcopa			// 1994.09 Virtua Cop (Revision A)
 vf2o			// 1994.11 Virtua Fighter 2
 vf2a			// 1995.?? Virtua Fighter 2 (Revision A)
 vf2b			// 1995.?? Virtua Fighter 2 (Revision B)
-srallyc			// 1995.02 Sega Rally Championship (Revision C)
-srallycb		// 1995.02 Sega Rally Championship (Revision B)
+srallyc			// 1995.02 Sega Rally Championship TWIN (Revision C)
+srallycb		// 1995.02 Sega Rally Championship TWIN (Revision B)
+srallyca		// 1995.02 Sega Rally Championship DX (Revision A)
 vcop2			// 1995.09 Virtua Cop 2
 vf2			// 1995.09 Virtua Fighter (Version 2.1)
 skytargt		// 1995.10 Sky Target
