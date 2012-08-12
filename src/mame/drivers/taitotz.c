@@ -896,7 +896,7 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, float scale, UINT8 alpha)
 {
 	taitotz_state *state = machine.driver_data<taitotz_state>();
-	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.primary_screen->visible_area();
 
 	UINT32 *src = &state->m_screen_ram[address];
 	taitotz_renderer::vertex_t v[10];
@@ -1053,7 +1053,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 	float zvalue = 0;//ZBUFFER_MAX;
 	m_zbuffer->fill(*(int*)&zvalue, cliprect);
 
-	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.primary_screen->visible_area();
 	vertex_t v[8];
 
 	UINT32 *src = (UINT32*)&state->m_work_ram[0];

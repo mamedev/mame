@@ -774,7 +774,7 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_polygons(running_machine &machine)
 {
-	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.primary_screen->visible_area();
 	poly_vertex v[4];
 	int poly_type;
 	int brightness;

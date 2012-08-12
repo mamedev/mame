@@ -1580,7 +1580,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
 
-	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.primary_screen->visible_area();
 	vertex_t vert[8];
 
 	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
