@@ -495,53 +495,8 @@ ROM_END
 
 
 
-ROM_START( m4gb006 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "006s.p1", 0x0000, 0x010000, CRC(6e750ab9) SHA1(2e1f08df7991efe450633e0bcec201e6fa7fdbaa) )
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "006d.p1", 0x0000, 0x010000, CRC(7e0a4282) SHA1(8fd0cbdd9cf3ac74b7b202ce7615392c1a746906) )
-	ROM_LOAD( "006y.p1", 0x0000, 0x010000, CRC(2947f4ed) SHA1(7d212bcef36e2bd792ded3e1e1638218e76da119) )
-	ROM_LOAD( "bond20_11", 0x0000, 0x010000, CRC(8d810cb1) SHA1(065d8df33472a3476dd6cf21a684db9d7c8ba829) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "006s.chr", 0x0000, 0x000048, CRC(ee3d06eb) SHA1(570a715e71d4184e4df02b7e5b68fee70e03aeb0) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "006snd.p1", 0x000000, 0x080000, CRC(44afef7d) SHA1(d8a4b6dc04e0f337db6d3b5322d066ae5f5bda41) )
-	ROM_LOAD( "006snd.p2", 0x080000, 0x080000, CRC(5f3c7cf8) SHA1(500f8fb07ef344d44c062f8d01878df1c917bcfc) )
-ROM_END
-
-ROM_START( m4gbust )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ghostbusters 2p.bin", 0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b) )
-
-	ROM_REGION( 0x10000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "gb_02___.2n3", 0x0000, 0x010000, CRC(973b3538) SHA1(31df04d9f35cbde4d5e395256927f146d1613178) )
-	ROM_LOAD( "gb_02___.3a3", 0x0000, 0x010000, CRC(2b9d94b6) SHA1(ca433240f9e926cdf5240209589951e6018a496a) )
-	ROM_LOAD( "gb_02___.3n3", 0x0000, 0x010000, CRC(99514ddd) SHA1(432d484525867c6ad68cd93a4bfded4dba36cf56) )
-	ROM_LOAD( "gb_02___.3s3", 0x0000, 0x010000, CRC(2634aa5f) SHA1(58ab973940138bdfd2690867e2ac3eb52bffb633) )
-	ROM_LOAD( "gb_05___.4a3", 0x0000, 0x010000, CRC(8be6949e) SHA1(9731a1cb0d17c3cec2bec263cd6348f05662d917) )
-	ROM_LOAD( "gb_05___.4n3", 0x0000, 0x010000, CRC(621b25f0) SHA1(bf699068284def8bad9143c5841f667f2cb6f20f) )
-	ROM_LOAD( "gb_05___.4s3", 0x0000, 0x010000, CRC(e2227701) SHA1(271682c7bf6e0f6f49f6d6b138aa19b6ef6bc626) )
-	ROM_LOAD( "gb_05_d_.4a3", 0x0000, 0x010000, CRC(a1b2b32f) SHA1(c1504b3768920f90dbd441b9d50db9676528ca97) )
-	ROM_LOAD( "gb_10___.2a3", 0x0000, 0x010000, CRC(a5c692f3) SHA1(8305c88ab8b80b407f4723df25135c25a4c0794f) )
-	ROM_LOAD( "gb_10___.2n3", 0x0000, 0x010000, CRC(de18c441) SHA1(5a7055fcd755c1ac58e1b94af243801f169f29f5) )
-	ROM_LOAD( "gb_10___.3s3", 0x0000, 0x010000, CRC(427e043b) SHA1(2f64c11a04306692ac5eb9919892f7226156dce0) )
-	ROM_LOAD( "gb_10_b_.3s3", 0x0000, 0x010000, CRC(091afb66) SHA1(ac32d7be1e1f4f1453e37017966990a481506024) )
-	ROM_LOAD( "gb_10_d_.2a3", 0x0000, 0x010000, CRC(f1446bf5) SHA1(4011d60e13045476741c5a02c64dabbe6a1ae2d6) )
-	ROM_LOAD( "gb_10_d_.2n3", 0x0000, 0x010000, CRC(cac5057d) SHA1(afcc21dbd07515ed134675b7dbfb53c048a465b0) )
-	ROM_LOAD( "gb_10_d_.3s3", 0x0000, 0x010000, CRC(776736de) SHA1(4f80d9ffdf4468801cf830e9774b6028f7684864) )
-	ROM_LOAD( "gb_20___.2n3", 0x0000, 0x010000, CRC(27fc2ee1) SHA1(2e6a042f7117b4594b2601ae166ee0db72c70ed5) )
-	ROM_LOAD( "gb_20___.3s3", 0x0000, 0x010000, CRC(4a86d879) SHA1(72e92b6482fdeb4dca36d9426a712ac24d60f7f7) )
-	ROM_LOAD( "gb_20_b_.2a3", 0x0000, 0x010000, CRC(4dd7d38f) SHA1(8a71c27189ec3089c016a8292db68f7cdc91b083) )
-	ROM_LOAD( "gb_20_b_.2n3", 0x0000, 0x010000, CRC(28cbb217) SHA1(a74978ff5e1511a33f543006b3f8ad30a77ea462) )
-	ROM_LOAD( "gb_20_b_.3s3", 0x0000, 0x010000, CRC(1a7cc3cf) SHA1(0d5764d35489bde284965c197b217a06f26a3e3b) )
-	ROM_LOAD( "gb_20_d_.2a3", 0x0000, 0x010000, CRC(70f40688) SHA1(ed14f8f460825ffa087394ef5984ae064e02f7b6) )
-	ROM_LOAD( "gb_20_d_.2n3", 0x0000, 0x010000, CRC(431c2965) SHA1(eb24e560d5c4bf419465fc760621a4fa853fff95) )
-	ROM_LOAD( "gb_20_d_.3s3", 0x0000, 0x010000, CRC(4fc69155) SHA1(09a0f2122893d9fd90204a74c8862e01386503a4) )
-
-ROM_END
 
 
 
@@ -1370,20 +1325,6 @@ ROM_END
 
 
 
-ROM_START( m4cshenc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ca_sj__c.5_1", 0x0000, 0x020000, CRC(d9131b39) SHA1(4af89a7bc10de1406f401bede41e1bc452dbb159) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ca_sj_bc.5_1", 0x0000, 0x020000, CRC(30d1fb6d) SHA1(f845bef4ad7f2f48077eed74840916e87abb24b2) )
-	ROM_LOAD( "ca_sj_dc.5_1", 0x0000, 0x020000, CRC(ac3ec716) SHA1(4ff8c26c46ec6e1321249b4d6d0c5194ed917f33) )
-	ROM_LOAD( "ca_sja_c.5_1", 0x0000, 0x020000, CRC(c56a9d0b) SHA1(b0298c2e03097ab8ba5f99892e732ff1ab784c9b) )
-	ROM_LOAD( "ca_sjb_c.5_1", 0x0000, 0x020000, CRC(8fad355d) SHA1(2ac16ad85ab8239a3e961abb06f9f71d17e5832a) )
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	ROM_LOAD( "cesnd.p1", 0x000000, 0x080000, CRC(2a10dc1a) SHA1(f6803f6e1fee2b58fe4831f59ddc08ec02792823) )
-	ROM_LOAD( "cesnd.p2", 0x080000, 0x080000, CRC(6f0b75c0) SHA1(33898d75a1e51b49950d7843069066d17c4736c5) )
-ROM_END
 
 
 ROM_START( m4czne )
@@ -1391,20 +1332,10 @@ ROM_START( m4czne )
 	ROM_LOAD( "czone 6.bin", 0x0000, 0x010000, CRC(e5b2b64e) SHA1(b73a2aed7b04184bc7c5c3d0a11d44e624a47428) )
 ROM_END
 
-
-
-
-
-
-
-
 ROM_START( m4fourmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frmr5p26.bin", 0x8000, 0x008000, CRC(f0c5bd8a) SHA1(39026459008ed5b5bd3a10841799227fef70e5b5) )
 ROM_END
-
-
-
 
 ROM_START( m4holywd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1431,21 +1362,6 @@ ROM_START( m4lazy )
 ROM_END
 
 
-ROM_START( m4lvlcl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ll__x__x.1_1", 0x0000, 0x010000, CRC(1ef1c5b4) SHA1(455c147f158f8a36a9add9b984abc22af78258cf) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ll__x__x.3_1", 0x0000, 0x010000, CRC(42b85ebc) SHA1(a352d8389674fcfd90dc4e8155e6f4a78c9ec70d) )
-	ROM_LOAD( "ll__x_dx.3_1", 0x0000, 0x010000, CRC(7753c8f0) SHA1(9600fee08529f29716697c4630730f15ef8a457b) )
-	ROM_LOAD( "ll__xa_x.3_1", 0x0000, 0x010000, CRC(79468e93) SHA1(4beaa6fe2ad095b4674473ab99a7216513923077) )
-	ROM_LOAD( "ll__xb_x.3_1", 0x0000, 0x010000, CRC(73b2fb34) SHA1(c127bc0954f8d01e9d8365a4506dde6f17da33fd) )
-	ROM_LOAD( "ll__xgdx.1_1", 0x0000, 0x010000, CRC(65824c4f) SHA1(a514e48ac0f9d4a8d7506bf6932aeee88ca17104) )
-	ROM_LOAD( "ll__xgdx.3_1", 0x0000, 0x010000, CRC(ba5b951a) SHA1(9ee36d3d42ce68f5797208633be87ddbbe605cf1) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
 
 
 
@@ -1455,59 +1371,8 @@ ROM_END
 
 
 
-ROM_START( m4oadrac )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "dr__x__x.2_0", 0x0000, 0x020000, CRC(4ca65bd9) SHA1(deb0a7d3596647210061b69a10fc6cdfc066538e) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "dr__x__x.2_1", 0x0000, 0x020000, CRC(d91773af) SHA1(3d8dda0f409f55bce9c4d4e2a8377e43fe2f1f7d) )
-	ROM_LOAD( "dr__x_dx.2_0", 0x0000, 0x020000, CRC(47f3ac5a) SHA1(e0413c55b897e96e32c3332dac041bc94da6dea3) )
-	ROM_LOAD( "dr__x_dx.2_1", 0x0000, 0x020000, CRC(f8c36b67) SHA1(c765d7a5eb4d7cd74295da26a7c6f5341a1ca257) )
-	ROM_LOAD( "dr__xa_x.2_0", 0x0000, 0x020000, CRC(702f0f7a) SHA1(8529c3eaa33cb972cc38067d176c7c8af0674147) )
-	ROM_LOAD( "dr__xa_x.2_1", 0x0000, 0x020000, CRC(cf1fc847) SHA1(6b09c0de15a380da1783a387569d83328f5b29a0) )
-	ROM_LOAD( "dr__xb_x.2_0", 0x0000, 0x020000, CRC(3ae8a72c) SHA1(a27faba69430b1d16abf62e0ef37182ab302bbbd) )
-	ROM_LOAD( "dr__xb_x.2_1", 0x0000, 0x020000, CRC(85d86011) SHA1(81f8624908299aa37e75fc5d12059b3600212d35) )
-	ROM_LOAD( "dri_xa_x.2_0", 0x0000, 0x020000, CRC(849d2a80) SHA1(c9ff0a5a543b62ca5b885f93a35b5f40e88db8c3) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "oad.chr", 0x0000, 0x000048, CRC(910b09db) SHA1(d54399660b1bf1a89712b25292ac99b740442e5c) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "oadsnd1.bin", 0x000000, 0x080000, CRC(b9a9b49b) SHA1(261e939da031768e2a2b5b171cbba55c87d1a758) )
-	ROM_LOAD( "oadsnd2.bin", 0x080000, 0x080000, CRC(94e34646) SHA1(8787d6757e4ed86417aafac0e042091189974d3b) )
-ROM_END
 
 
-
-
-ROM_START( m4rhs )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rh_sj___.4s1", 0x0000, 0x020000, CRC(be6179cd) SHA1(8aefffdffb25bc4dd7d083c7027be746181c2ff9) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "rh_sj__c.6_1", 0x0000, 0x020000, CRC(476f3cf2) SHA1(18ce990e28ca8565ade5eec9a62f0b243121af73) )
-	ROM_LOAD( "rh_sj_b_.4s1", 0x0000, 0x020000, CRC(58a4480e) SHA1(f4ecfa1debbfa9dba75263bce2c9f66741c3466f) )
-	ROM_LOAD( "rh_sj_bc.6_1", 0x0000, 0x020000, CRC(2e37a58c) SHA1(a48c96384aa81f98bfa980c93e93523ecef3d43c) )
-	ROM_LOAD( "rh_sj_d_.4s1", 0x0000, 0x020000, CRC(8f1176db) SHA1(283ef0b9515eac342a02489118bd30016ba85399) )
-	ROM_LOAD( "rh_sj_k_.4s1", 0x0000, 0x020000, CRC(3f2ef505) SHA1(28c3806bc48af21a2b7ea27d42ea9f6b4346f3b8) )
-	ROM_LOAD( "rh_sja__.4s1", 0x0000, 0x020000, CRC(b8cdd5fb) SHA1(4e336dd3d61f4fdba731951c56e440766ea8efeb) )
-	ROM_LOAD( "rh_sja_c.6_1", 0x0000, 0x020000, CRC(b7b790e5) SHA1(e2b34dc2f6ede4f4c22b11123dfaed46f2c5c45e) )
-	ROM_LOAD( "rh_sjab_.4s1", 0x0000, 0x020000, CRC(c8468d4c) SHA1(6a9f8fe10949712ecacca3bfcd7d5ab4860682e2) )
-	ROM_LOAD( "rh_sjad_.4s1", 0x0000, 0x020000, CRC(df4768f0) SHA1(74894b232b27e65058d59acf174172da86def95a) )
-	ROM_LOAD( "rh_sjak_.4s1", 0x0000, 0x020000, CRC(6f78eb2e) SHA1(a9fec7a7ad9334c3d8760e1982ac00651858cee8) )
-	ROM_LOAD( "rocky15g", 0x0000, 0x020000, CRC(05f4f333) SHA1(a1b917f6c91d751fb2433e46c4c60840b47eed9e) )
-	ROM_LOAD( "rocky15t", 0x0000, 0x020000, CRC(3fbad6de) SHA1(e8d76b3878794c769187d92d2834018a84e764ac) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "rh.chr", 0x0000, 0x000048, CRC(6e246d8f) SHA1(c6b0dff1b918c578b76f020ff70a24ea48dbae2e) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "rhp2snd", 0x0000, 0x080000, CRC(18112293) SHA1(b2bf838849ad1a9931c294ccc291ba2f5c5f45e9) )
-
-	ROM_LOAD( "rh___snd.1_1", 0x000000, 0x080000, CRC(ceebd8f4) SHA1(fe9f62034aae7d2ec097d80dc471a7fd27ddec8a) )
-	ROM_LOAD( "rh___snd.1_2", 0x080000, 0x080000, CRC(1f24cfb6) SHA1(cf1dc9d2a1c1cfb8718c89e245e9bf375fef8bfd) )
-	ROM_LOAD( "rh___snd.1_3", 0x100000, 0x080000, CRC(726958d8) SHA1(6373765b80971dd7ff5c8eaeee83966335db4d27) )
-ROM_END
 
 
 
@@ -1548,80 +1413,9 @@ ROM_END
 
 
 
-ROM_START( m4ssclas )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cs__x__x.6_0", 0x0000, 0x010000, CRC(3230284d) SHA1(bca3b4c43859ed424956c4119fa6a91a2e7d6eec) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "cs__x_dx.2_0", 0x0000, 0x010000, CRC(ea004a13) SHA1(db9a187b0672c69a6a149ec6d1025bd6da9beccd) )
-	ROM_LOAD( "cs__x_dx.6_0", 0x0000, 0x010000, CRC(6dd2d11f) SHA1(8c7e60d3e5a0d4fccb024b5c0aa21fd2b9a5ada9) )
-	ROM_LOAD( "cs__xa_x.6_0", 0x0000, 0x010000, CRC(6657e810) SHA1(0860076cf01c732f419483876991fb42a838622a) )
-	ROM_LOAD( "cs__xb_x.5_0", 0x0000, 0x010000, CRC(a5f46ff5) SHA1(a068029f774bc6ed2e76acc2eb509bc6e2490945) )
-	ROM_LOAD( "cs__xb_x.6_0", 0x0000, 0x010000, CRC(801d543c) SHA1(f0905947312fb2a526765d17cde01af5095ef923) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "ssbwb.chr", 0x0000, 0x000048, CRC(910b09db) SHA1(d54399660b1bf1a89712b25292ac99b740442e5c) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "css_____.1_1", 0x0000, 0x080000, CRC(e738fa1e) SHA1(7a1125320e0d488729aec66e658d418b96228fd0) )
-ROM_END
 
 
 
-
-ROM_START( m4ticcla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ct_20_b4.7_1", 0x0000, 0x010000, CRC(48b9a162) SHA1(2d19a5d6379dc93a56c920b3cd61a0d1a8c6b303) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ct_20_bc.4_1", 0x0000, 0x010000, CRC(fb40b5ff) SHA1(723a07a2b6b08483aa75ecdd4fd9720a66201fc3) )
-	ROM_LOAD( "ct_20_d4.7_1", 0x0000, 0x010000, CRC(3c7c862c) SHA1(a3577f29950e845a14ca68750d2ab6c56a395dba) )
-	ROM_LOAD( "ct_20_dc.4_1", 0x0000, 0x010000, CRC(0f20a790) SHA1(02876178f0af64154d490cc048a7bc1c9a6f521b) )
-	ROM_LOAD( "ct_20a_4.7_1", 0x0000, 0x010000, CRC(35318095) SHA1(888105a674c9ea8ccad33e24c05ef42936f5f4cf) )
-	ROM_LOAD( "ct_20a_c.4_1", 0x0000, 0x010000, CRC(e409f49f) SHA1(8774015ec20ed9fe54e812013dfc12d408276c31) )
-	ROM_LOAD( "ct_20b_c.4_1", 0x0000, 0x010000, CRC(864a59cf) SHA1(abd9b7a47c791ce4f91abbd3bf97bdcd9d8296ee) )
-	ROM_LOAD( "ct_20bg4.7_1", 0x0000, 0x010000, CRC(7f200f42) SHA1(0ea6aa0de88982737d818c9dac9f2605cea7bc11) )
-	ROM_LOAD( "ct_20bgc.4_1", 0x0000, 0x010000, CRC(215b8965) SHA1(883735066a1425b502e89d1234575294ac83746c) )
-	ROM_LOAD( "ct_20bt4.7_1", 0x0000, 0x010000, CRC(7c7280a4) SHA1(3dbdc53a3474f4147427ed4fa8a161a3b364d43b) )
-	ROM_LOAD( "ct_25_bc.3_1", 0x0000, 0x010000, CRC(9d6fb3b0) SHA1(a6278579d217b5544d9f0b942a7a344596153950) )
-	ROM_LOAD( "ct_25_dc.2_1", 0x0000, 0x010000, CRC(b49af435) SHA1(e5f92f114931e554eb8eb5fe89f50298783d541c) )
-	ROM_LOAD( "ct_25_dc.3_1", 0x0000, 0x010000, CRC(eb359c82) SHA1(c137768461b859d5277b08c8783b0c8625f9b1be) )
-	ROM_LOAD( "ct_25_kc.2_1", 0x0000, 0x010000, CRC(43309e7b) SHA1(d8f6ecbea618da7f54309f2a6e93210c51b68b81) )
-	ROM_LOAD( "ct_25a_c.2_1", 0x0000, 0x010000, CRC(717396ed) SHA1(6cdb0f99b40096178f6e85a0966182e704d1b99a) )
-	ROM_LOAD( "ct_25a_c.3_1", 0x0000, 0x010000, CRC(28e0a15b) SHA1(b3678ba3d1f392665cc6ec9c24c2c506a41cd4fa) )
-	ROM_LOAD( "ct_25b_c.2_1", 0x0000, 0x010000, CRC(b3d7e79c) SHA1(86c0b419c3ca054f8a2ed785cffeb03e6c5b69f2) )
-	ROM_LOAD( "ct_25b_c.3_1", 0x0000, 0x010000, CRC(e0ba763d) SHA1(453d8a0dbe616c5a8c4313b918fcfe21fed473e0) )
-	ROM_LOAD( "ct_25bgc.2_1", 0x0000, 0x010000, CRC(0869d04c) SHA1(0f0fd3982ac376c66d139655a50639f48bf740b4) )
-	ROM_LOAD( "ct_25bgc.3_1", 0x0000, 0x010000, CRC(1e0ca1d1) SHA1(0b1023cdd5cd3db657cea53c85e31ed83c2e5524) )
-	ROM_LOAD( "ct_25btc.2_1", 0x0000, 0x010000, CRC(032ec96d) SHA1(c5cef956bc0e3eb45cf128c8d0b4e1d6e5b01afe) )
-	ROM_LOAD( "ct_25btc.3_1", 0x0000, 0x010000, CRC(f656897a) SHA1(92ad5c6ce2a696298bbfc8c1750825db4e3bc80b) )
-	ROM_LOAD( "ct_30_dc.2_1", 0x0000, 0x010000, CRC(57fabdfb) SHA1(ad86621e4bc8141508c691e148a66e74fc070a88) )
-	ROM_LOAD( "ct_30a_c.2_1", 0x0000, 0x010000, CRC(800c94c3) SHA1(c78497899ea9cf27e66f6e8526b95d51215053b2) )
-	ROM_LOAD( "ct_30b_c.2_1", 0x0000, 0x010000, CRC(3036ef04) SHA1(de514a85d45d11a880ed147aebe211ffb5bee146) )
-	ROM_LOAD( "ct_30bdc.2_1", 0x0000, 0x010000, CRC(9852c9d4) SHA1(37bb20d63fa70ea99e18a16a8f11c461a377a07a) )
-	ROM_LOAD( "ct_30bgc.2_1", 0x0000, 0x010000, CRC(a1bc89b4) SHA1(4c82ce8fe78768443823e868f7cc49a06e7cc441) )
-	ROM_LOAD( "ct_30btc.2_1", 0x0000, 0x010000, CRC(cde0d12e) SHA1(5427ad700311c30cc86eccc7f1ff36cf0da3b980) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
-ROM_END
-
-
-
-
-ROM_START( m4ticglc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tg_25a_c.3_1", 0x0000, 0x010000, CRC(44b2b6b0) SHA1(c2caadd68659bd474df534101e3bc13b15a43694) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "tg_30_dc.4_1", 0x0000, 0x010000, CRC(19c0fb1e) SHA1(955da095df56f28ace6839c9b6df5669f576730c) )
-	ROM_LOAD( "tg_30a_c.4_1", 0x0000, 0x010000, CRC(3e4dcc70) SHA1(c4ad3a8633e19015d4d2b08a653119e9e4c5dcbb) )
-	ROM_LOAD( "tg_30b_c.4_1", 0x0000, 0x010000, CRC(83d1517a) SHA1(38a9269dac53ca701e4b621d5e77696142f429cd) )
-	ROM_LOAD( "tg_30bgc.4_1", 0x0000, 0x010000, CRC(a366c32d) SHA1(8d86778411ef07e06d99c12147a211d7620af9bf) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
-ROM_END
 
 
 
@@ -2353,7 +2147,6 @@ GAME(199?, m4fastfw	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 
 
 // barcrest, to split
-GAME(199?, m4gb006	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Games Bond 006 (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4c9c	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",						GAME_FLAGS|GAME_NO_SOUND ) // doesn't boot
 GAME(199?, m4ch30	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 
@@ -2373,8 +2166,6 @@ GAME(199?, m4crjwl2	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4supbjc	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake
 
 
-// check sound type etc.
-GAME(199?, m4gbust	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ghost Buster (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 
 // corrupt VFD (many XX)
 GAME(199?, m4luckwb	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Lucky Wild Boar (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
@@ -2462,20 +2253,15 @@ GAME(199?, m4twist	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bar
 // might need samples, but run silent with none
 GAME(199?, m4lineup	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Line Up (Bwb - Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // no sound with any system?
 
-GAME(199?, m4cshenc	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Bwb","Cash Encounters (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4czne	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Cash Zone (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4fourmr	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Four More (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND ) // no sound with either system?
 GAME(199?, m4holywd	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Hollywood (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4lazy	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Bwb","Lazy Bones (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4lvlcl	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Lucky Las Vegas Classic (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4oadrac	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Bwb","Ooh Aah Dracula (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4rhs	,0			,mod4oki	,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Bwb","Rocky Horror Show (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4specu	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Speculator Club (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND ) // no sound with either system
+
+
+GAME(199?, m4lazy	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_bigbank	,ROT0,   "Bwb","Lazy Bones (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4sunclb	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Sun Club (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4sunscl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Sunset Club (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4ssclas	,0			,mod4oki    ,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Super Streak Classic (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4ticcla	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Tic Tac Toe Classic (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4ticglc	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4bigban	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Big Bandit (Nova) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4crzcsn	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4crzcav	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )

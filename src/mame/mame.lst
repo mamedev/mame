@@ -18820,7 +18820,6 @@ m4addrc__c	//
 m4addrc__d	//
 m4addrc__e	//
 m4addrc__f	//
-m4addrc__g	//
 m4addrc__h	//
 m4addrc__i	//
 m4addrc__j	//
@@ -19249,7 +19248,6 @@ m4bdash__a2	//
 m4bdash__a3	//
 m4bdash__a4	//
 m4brktak	// Break & Take (Barcrest)
-m4brktaka	//
 m4brdway	// Broadway (Barcrest) [Dutch]
 m4brook		// Brooklyn (Barcrest)
 m4buc		// Buccaneer (Barcrest)
@@ -19874,7 +19872,33 @@ m4frtprs	// Fruit Preserve (Barcrest)
 m4frtprsa	//
 m4gambal	// Gamball (Barcrest)
 m4gb006		// Games Bond 006 (Barcrest)
+m4gb006__a	//
+m4gb006__b	//
+m4gb006__c	//
 m4gbust		// Ghost Buster (Barcrest)
+m4gbust__a	//
+m4gbust__b	//
+m4gbust__c	//
+m4gbust__d	//
+m4gbust__e	//
+m4gbust__f	//
+m4gbust__g	//
+m4gbust__h	//
+m4gbust__i	//
+m4gbust__j	//
+m4gbust__k	//
+m4gbust__l	//
+m4gbust__m	//
+m4gbust__n	//
+m4gbust__o	//
+m4gbust__p	//
+m4gbust__q	//
+m4gbust__r	//
+m4gbust__s	//
+m4gbust__t	//
+m4gbust__u	//
+m4gbust__v	//
+m4gbust__w	//
 m4giant		// Giant (Barcrest)
 m4gclue		// Give Us A Clue (Barcrest)
 m4gclue__a	//
@@ -22220,6 +22244,10 @@ m4blflshc	//
 m4blflshd	//
 m4blflshe	//
 m4cshenc	// Cash Encounters (Bwb)
+m4cshenc__a	//
+m4cshenc__b	//
+m4cshenc__c	//
+m4cshenc__d	//
 m4czne		// Cash Zone (Bwb)
 m4csoc		// Championship Soccer (Bwb)
 m4cpycat	// Copy Cat (Bwb)
@@ -22297,7 +22325,6 @@ m4kingq__m	//
 m4kingq__n	//
 m4kingq__o	//
 m4kingq__p	//
-m4kingq__q	//
 m4kingq__r	//
 m4kingq__s	//
 m4kingq__t	//
@@ -22316,8 +22343,6 @@ m4kingqc__k	//
 m4kingqc__l	//
 m4kingqc__m	//
 m4kingqc__n	//
-m4kingqc__o	//
-m4kingqc__p	//
 m4kingqc__q	//
 m4kingqc__r	//
 m4kingqc__s	//
@@ -22336,11 +22361,25 @@ m4kingqc__4	//
 m4kingqc__5	//
 m4lazy		// Lazy Bones (Bwb)
 m4lvlcl		// Lucky Las Vegas Classic (Bwb)
+m4lvlcl__a	//
+m4lvlcl__b	//
+m4lvlcl__c	//
+m4lvlcl__d	//
+m4lvlcl__e	//
+m4lvlcl__f	//
 m4ln7		// Lucky No7 (Bwb)
 m4madmon	// Mad Money (Bwb)
 m4madmnc	// Mad Money Classic (Bwb)
 m4mmm		// Money Mummy Money (Bwb)
 m4oadrac	// Ooh Aah Dracula (Bwb)
+m4oadrac__a	//
+m4oadrac__b	//
+m4oadrac__c	//
+m4oadrac__d	//
+m4oadrac__e	//
+m4oadrac__f	//
+m4oadrac__g	//
+m4oadrac__h	//
 m4orland	// Orlando Magic (Bwb)
 m4pzbing	// Prize Bingo (Bwb)
 m4quidin	// Quids In (Bwb)
@@ -22349,6 +22388,18 @@ m4rackem	// Rack Em Up (Bwb)
 m4rbgold	// Rainbow Gold (Bwb)
 m4rhfev		// Red Hot Fever (Bwb)
 m4rhs		// Rocky Horror Show (Bwb)
+m4rhs__a	//
+m4rhs__b	//
+m4rhs__c	//
+m4rhs__d	//
+m4rhs__e	//
+m4rhs__f	//
+m4rhs__g	//
+m4rhs__h	//
+m4rhs__i	//
+m4rhs__j	//
+m4rhs__k	//
+m4rhs__l	//
 m4sinbd		// Sinbad (Bwb)
 m4sky		// Sky Sports (Bwb)
 m4souls		// Soul Sister (Bwb)
@@ -22386,6 +22437,11 @@ m4sunscl	// Sunset Club (Bwb)
 m4supleg	// Super League (Bwb)
 m4supscr	// Super Soccer (Bwb)
 m4ssclas	// Super Streak Classic (Bwb)
+m4ssclas__a	//
+m4ssclas__b	//
+m4ssclas__c	//
+m4ssclas__d	//
+m4ssclas__e	//
 m4sure		// Sure Thing (Bwb)
 m4tic		// Tic Tac Toe (Bwb)
 m4tic__a	//
@@ -22404,11 +22460,41 @@ m4tic__m	//
 m4tic__n	//
 m4tic__o	//
 m4tic__p	//
-m4tic__q	//
 m4tic__r	//
 m4tic__s	//
 m4ticcla	// Tic Tac Toe Classic (Bwb)
+m4ticcla__a	//
+m4ticcla__b	//
+m4ticcla__c	//
+m4ticcla__d	//
+m4ticcla__e	//
+m4ticcla__f	//
+m4ticcla__g	//
+m4ticcla__h	//
+m4ticcla__i	//
+m4ticcla__j	//
+m4ticcla__k	//
+m4ticcla__l	//
+m4ticcla__m	//
+m4ticcla__n	//
+m4ticcla__o	//
+m4ticcla__p	//
+m4ticcla__q	//
+m4ticcla__r	//
+m4ticcla__s	//
+m4ticcla__t	//
+m4ticcla__u	//
+m4ticcla__v	//
+m4ticcla__w	//
+m4ticcla__x	//
+m4ticcla__y	//
+m4ticcla__z	//
+m4ticcla__0	//
 m4ticglc	// Tic Tac Toe Gold (Bwb)
+m4ticglc__a	//
+m4ticglc__b	//
+m4ticglc__c	//
+m4ticglc__d	//
 m4topdog	// Top Dog (Bwb)
 m4topdog__a	//
 m4topdog__b	//
