@@ -922,7 +922,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 			string.cat("\n");
 	}
 
-	if (software_load_warnings_message(machine).len()) {
+	if (software_load_warnings_message(machine).len()>0) {
 		string.cat(software_load_warnings_message(machine));
 		if (machine.system().flags & WARNING_FLAGS)
 			string.cat("\n");
