@@ -333,8 +333,8 @@ READ8_DEVICE_HANDLER( gaelco_serial_status_r)
 		ret |= 0x01;
 	if ((serial->m_in_ptr->stat & GAELCOSER_STATUS_RTS) != 0)
 		ret |= 0x02;
-	return ret;
 	shmem_unlock(serial->m_shmem);
+	return ret;
 }
 
 WRITE8_DEVICE_HANDLER( gaelco_serial_data_w)
