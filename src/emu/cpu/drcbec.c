@@ -1007,7 +1007,8 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 1):
 				temp64 = (INT64)(INT32)PARAM2 * (INT64)(INT32)PARAM3;
-				flags = FLAGS64_NZ(temp64);
+                temp32 = (INT32)temp64;
+				flags = FLAGS32_NZ(temp32);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (UINT32)temp64;
 				if (temp64 != (INT32)temp64)
