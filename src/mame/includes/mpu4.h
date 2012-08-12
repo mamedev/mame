@@ -248,6 +248,7 @@ public:
 	DECLARE_DRIVER_INIT(m4_showstring_big);
 	DECLARE_DRIVER_INIT(m_grtecpss);
 	DECLARE_DRIVER_INIT(connect4);
+	DECLARE_DRIVER_INIT(m4altreels);
 };
 
 /* mpu4.c, used by mpu4vid.c */

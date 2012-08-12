@@ -2476,6 +2476,20 @@ DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
 	m_current_chr_table = oldtmr_data;
 }
 
+DRIVER_INIT_MEMBER(mpu4_state,m4altreels)
+{
+	m_reel_mux=SIX_REEL_1TO8;
+	m_reels = 6;
+
+	stepper_config(machine(), 0, &barcrest_opto1_interface);
+	stepper_config(machine(), 1, &barcrest_opto1_interface);
+	stepper_config(machine(), 2, &barcrest_opto1_interface);
+	stepper_config(machine(), 3, &barcrest_opto1_interface);
+	stepper_config(machine(), 4, &barcrest_opto1_interface);
+	stepper_config(machine(), 5, &barcrest_opto1_interface);
+}
+
+
 DRIVER_INIT_MEMBER(mpu4_state,m_ccelbr)
 {
 	m_reel_mux=STANDARD_REEL;

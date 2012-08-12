@@ -8,7 +8,7 @@
 
     Several sets have large roms, containing strings which mention Compact Flash cards
      - These appear to be Adder 5 sets, I don't know if they're also meant to have
-       regular program roms like SC4 and the Adder 4.
+       regular program roms like sc5 and the Adder 4.
 
     Many sound roms are missing!
 
@@ -870,6 +870,128 @@ ROM_START( sc5cfptb )
 ROM_END
 
 
+ROM_START( sc5cfptc )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95408564.lo", 0x00001, 0x080000, CRC(a10083eb) SHA1(c6da0a1b55e07303efa5b72864a5be9a3456539d) )
+	ROM_LOAD16_BYTE( "95408565.hi", 0x00000, 0x080000, CRC(f4ce13a0) SHA1(014778d2da3ef2fea222a930e3f70b5e3c092975) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc5cfptd )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95408566.lo", 0x00001, 0x080000, CRC(ae80c8dc) SHA1(f300f7f706b48dc6fefeda66bdd51ed8e22705e0) )
+	ROM_LOAD16_BYTE( "95408567.hi", 0x00000, 0x080000, CRC(f11a6e3e) SHA1(98374f710c3dd979515dc6280845a72a31a330d5) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfpte )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95409564.lo", 0x00001, 0x080000, CRC(abcd12e3) SHA1(4e8652d0bbfaaf4e829708993a23c3736f0b8892) )
+	ROM_LOAD16_BYTE( "95409565.hi", 0x00000, 0x080000, CRC(46c03cdd) SHA1(72d63095eaea3d7239f7603ff3382eecc2a625d0) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc5cfptf )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95409566.lo", 0x00001, 0x080000, CRC(f3c6493b) SHA1(0bc97c4329930164433cb22690b6bb35b6e27c4a) )
+	ROM_LOAD16_BYTE( "95409567.hi", 0x00000, 0x080000, CRC(618cbc2b) SHA1(5ca7a7b0cd42f7be16be12e83ab82457a42ca1e6) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc5cfptg )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1371p11.hi", 0x00000, 0x080000, CRC(8c438718) SHA1(a266fe867bddcc11216f2d3f31b222d1d5af6237) )
+	ROM_LOAD16_BYTE( "p1371p11.lo", 0x00001, 0x080000, CRC(9cfe5ba9) SHA1(d2bedca469bbbbfdd2fd1584b397a26d660fea7c) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfpth )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1371s11.hi", 0x00000, 0x080000, CRC(24335da7) SHA1(a2f05a13a28d2910a3150abaebf980ba5f9c1130) )
+	ROM_LOAD16_BYTE( "p1371s11.lo", 0x00001, 0x080000, CRC(4116abb7) SHA1(897d1043178b6d0c88d9c306fc27db2f3978c76f) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfpti )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411134.lo", 0x00001, 0x080000, CRC(eb9cf02e) SHA1(68a1caf92f8b2d1b73d3eb07920b98ffb93a0451) )
+	ROM_LOAD16_BYTE( "95411135.hi", 0x00000, 0x080000, CRC(ae33cdbd) SHA1(691907e7867027d0e60558c2615ee8a51d0463a1) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfptj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95408568.lo", 0x00001, 0x080000, CRC(c091adad) SHA1(5bd2e7004af74f27192f3f425ecac47d424d41a9) )
+	ROM_LOAD16_BYTE( "95408569.hi", 0x00000, 0x080000, CRC(f35e76eb) SHA1(7bc9dfc1b812c5222378c40180c4644c4aa3f058) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfptk )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95409568.lo", 0x00001, 0x080000, CRC(005222e0) SHA1(e6b87dd98f6706e3dc61db267be7eeded07ec3fe) )
+	ROM_LOAD16_BYTE( "95409569.hi", 0x00000, 0x080000, CRC(26202661) SHA1(8379ef9b769d9e6a0922a093c6327510b5c10256) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc5cfptl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1371p91.hi", 0x00000, 0x080000, CRC(8b39df7a) SHA1(b6423e36f0dda2dd1ff11189aaa4f9a567e05af8) )
+	ROM_LOAD16_BYTE( "p1371p91.lo", 0x00001, 0x080000, CRC(2c357088) SHA1(5266734637e7aa9924bb5395fcf48994d407f015) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfptm )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1371s91.hi", 0x00000, 0x080000, CRC(22f54a59) SHA1(75cb71c453911cc5d1b5a88625d9fffa43a57f3e) )
+	ROM_LOAD16_BYTE( "p1371s91.lo", 0x00001, 0x080000, CRC(55dc637c) SHA1(8340491640d8748787d2401f3f33542c8f20c7dc) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc5cfptn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410186.lo", 0x00001, 0x080000, CRC(73483953) SHA1(ec2823d2059c65367e647ac1106dd70d18e5bc89) )
+	ROM_LOAD16_BYTE( "95410187.hi", 0x00000, 0x080000, CRC(ba91c41c) SHA1(ed556ea559724cdae0bcd0298fd2021a2b49e15a) )
+	PR1430_CRAZY_F_SIT_D_SOUNDS11
+ROM_END
+
+ROM_START( sc5cfpto )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411186.lo", 0x00001, 0x080000, CRC(7e933b3c) SHA1(90410c291902b72d95f3376657e918cd1d60d8a8) )
+	ROM_LOAD16_BYTE( "95411187.hi", 0x00000, 0x080000, CRC(cdc68736) SHA1(92bfe250d2b0f3030ce8541dbed73a37ac3dc8b9) )
+	PR1430_CRAZY_F_SIT_D_SOUNDS11
+ROM_END
+
+ROM_START( sc5cfptp )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1430p42.hi", 0x00000, 0x080000, CRC(97e3926b) SHA1(c385e2ed2eb0e043a3c84f25b1b64c934bb380e1) )
+	ROM_LOAD16_BYTE( "p1430p42.lo", 0x00001, 0x080000, CRC(9b33feaf) SHA1(31a53520e5b65b39ac1a54ba2eba13f5ce75ee50) )
+	PR1430_CRAZY_F_SIT_D_SOUNDS11
+ROM_END
+
+ROM_START( sc5cfptq )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1430p52.hi", 0x00000, 0x080000, CRC(832d2241) SHA1(98c6e5e485d474b88a7e8a313b4cc469ec14b5e9) )
+	ROM_LOAD16_BYTE( "p1430p52.lo", 0x00001, 0x080000, CRC(d9fb0e30) SHA1(fe337db428bf68abb770a5e06d8ac73cc4e7794e) )
+	PR1430_CRAZY_F_SIT_D_SOUNDS11
+ROM_END
+
+ROM_START( sc5cfptr )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1430s42.hi", 0x00000, 0x080000, CRC(a5f0acf8) SHA1(01877be0da6018d067cc683a4a2dd14c4c6f7ba3) )
+	ROM_LOAD16_BYTE( "p1430s42.lo", 0x00001, 0x080000, CRC(64522503) SHA1(16203ff08a0de9db92522b05669c0c92057a27c4) )
+	PR1430_CRAZY_F_SIT_D_SOUNDS11
+ROM_END
+
+ROM_START( sc5cfpts )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p1430s52.hi", 0x00000, 0x080000, CRC(9f7bd7f8) SHA1(b81c62398213ccefcaaca5c1d6c579c30ff67884) )
+	ROM_LOAD16_BYTE( "p1430s52.lo", 0x00001, 0x080000, CRC(623fea2b) SHA1(fe38a4a9a91fa986bf4d36c7a28c8bb2c73659b7) )
+	PR1430_CRAZY_F_SIT_D_SOUNDS11
+ROM_END
 
 
 ROM_START( sc5cknig )
@@ -4264,17 +4386,6 @@ ROM_END
 
 
 
-
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
-/* sets below had a mix of SC4/SC5/AD5 roms inside.  They've been split by platform for now */
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
-/*************************************************************************************************************************************************************************/
 
 
 
@@ -12028,9 +12139,31 @@ GAME( 200?, sc5cfcpd	,sc5cfcp,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Frui
 GAME( 200?, sc5cfcpe	,sc5cfcp,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Community Party (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1359 CASINO CRAZY FRUITS PARTY         PR1359 CRAZY F PARTY SOUNDS11
-GAME( 200?, sc5cfpt		,0,			sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Party Time (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5cfpta	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Party Time (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5cfptb	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Party Time (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpt		,0,			sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpta	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptb	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptc	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptd	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpte	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptf	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptg	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpth	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpti	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+// PR1359 CASINO CRAZY FRUITS PARTY         PR1359 TB CRAZY F P SOUNDS11
+GAME( 200?, sc5cfptj	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptk	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptl	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptm	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+// PR1430 CASINO CRAZY FRUITS SIT DOWN         PR1430 CRAZY F SIT D SOUNDS11
+GAME( 200?, sc5cfptn	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpto	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptp	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptq	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfptr	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfpts	,sc5cfpt,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Fruits Casino Party Time (Bellfruit) (Scorpion 5) (set 20)", GAME_IS_SKELETON_MECHANICAL )
+
+
+
 
 // PR3418 AWP CRAZY KNIGHTS SCORP5         PR3418 CRAZY KNIGHTS SOUNDS11     CRAZY KNIGHTS S.SITE
 GAME( 200?, sc5cknig	,0,			sc5, sc5, sc5_state, sc5, ROT0, "BFM","Crazy Knights (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -12618,7 +12751,6 @@ GAME( 200?, sc5mrrcla	,sc5mrrcl,	sc5, sc5, sc5_state, sc5, ROT0, "Mazooma","Mono
 GAME( 200?, sc5mrrclb	,sc5mrrcl,	sc5, sc5, sc5_state, sc5, ROT0, "Mazooma","Monopoly Road To Riches Club (Mazooma) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5mrrclc	,sc5mrrcl,	sc5, sc5, sc5_state, sc5, ROT0, "Mazooma","Monopoly Road To Riches Club (Mazooma) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// these contained sc4/sc5/ad5 stuff, split by platform
 
 
 // BFGP1234..............G95427832.RAZY_.PR3436 CF COMMUNITY P SOUNDS11.   (non-standard header, seems to indicate that these are actually Crazy Fruits Community Parts?)
@@ -13337,7 +13469,7 @@ GAME( 200?, sc5gdclbc	,sc5gdclb,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Gold Dig
 GAME( 200?, sc5gdclbd	,sc5gdclb,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5gdclbe	,sc5gdclb,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1604 AWP GOLDEN BALLS         PR1604 GOLDEN BALLS SOUNDS12      GOLDEN BALLS  S.SITE (same as the SC4 version)
+// PR1604 AWP GOLDEN BALLS         PR1604 GOLDEN BALLS SOUNDS12      GOLDEN BALLS  S.SITE (same as the sc5 version)
 GAME( 200?, sc5gball	,0,			sc5, sc5, sc5_state, sc5, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5gballa	,sc5gball,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5gballb	,sc5gball,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
@@ -13767,7 +13899,7 @@ GAME( 200?, sc5sladg	,sc5slad,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Snakes & L
 // PR1901 AWP SPICE IT UP SCORP5         PR1901 SPICE IT UP SOUNDS11       SPICE IT UP S.SITE
 GAME( 200?, sc5spice	,0,			sc5, sc5, sc5_state, sc5, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5spiceb	,sc5spice,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR1921 AWP SPICE IT UP SCORP4         PR1901 SPICE IT UP SOUNDS11       SPICE IT UP S.SITE   (this header is incorrect, these are SCORP 5 sets, they use opcodes not present in the SC4 cpu and have the 'SC5' at the start of the ROM)
+// PR1921 AWP SPICE IT UP SCORP4         PR1901 SPICE IT UP SOUNDS11       SPICE IT UP S.SITE   (this header is incorrect, these are SCORP 5 sets, they use opcodes not present in the sc5 cpu and have the 'SC5' at the start of the ROM)
 GAME( 200?, sc5spicea	,sc5spice,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5spicec	,sc5spice,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5spiced	,sc5spice,	sc5, sc5, sc5_state, sc5, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )

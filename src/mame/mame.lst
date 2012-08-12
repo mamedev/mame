@@ -13223,6 +13223,47 @@ sc4cfcaso	//
 sc4cfcasp	//
 sc4cfcasq	//
 sc4cfcasr	//
+sc4czfrg
+sc4cfqpsl
+sc4cfqpsm
+sc4czfrh
+sc4czfri
+sc4czfrj
+sc4czfrk
+sc4cfqpsn
+sc4cfqpso
+sc4cfcass
+sc4cfcast
+sc4cfcasu
+sc4cfcasv
+sc4cfcasw
+sc4cfcasx
+sc4cfcasy
+sc4cfcasz
+sc4cfcas0
+sc4cfcas1
+sc4cfcas2
+sc4cfcas8
+sc4cfcas9
+sc4cfcas3
+sc4cfcas4
+sc4cfcas5
+sc4cfcas6
+sc4cfcas7
+sc4cfcasaa
+sc4cfcasab
+sc4cfcasac
+sc4cfcasad
+sc4cfcasae
+sc4cfcasaf
+sc4cfcasag
+sc4cfcasah
+sc4cfcasai
+sc4cfqpsp
+sc4cfcasaj
+sc4cfcasak
+sc4cfcasal
+sc4cfcasam
 sc4cfcla	// Crazy Fruits Classic (Bellfruit)
 sc4cfclab	//
 sc4cfclac	//
@@ -14970,6 +15011,8 @@ sc4czfra	//
 sc4czfrb	//
 sc4czfrc	//
 sc4czfrd	//
+sc4czfre	//
+sc4czfrf	//
 sc4crnjw	// Crown Jewels (Bellfruit)
 sc4crnjwa	//
 sc4dnd		// Deal Or No Deal (Bellfruit)
@@ -15816,13 +15859,12 @@ sc4nunsmg	//
 sc4nunsmh	//
 sc4nunsmi	//
 sc4nunsmj	//
-sc_unsrt	//
-ad4film		//
-ad4filma	//
 
 /* Scorpion 4 + Adder 4 */
 
 ad4skill	// Skill Dice (BFM)
+ad4film		//
+ad4filma	//
 
 // Scorpion 5
 
@@ -15928,6 +15970,23 @@ sc5cfcpe	//
 sc5cfpt		// Crazy Fruits Party Time (Bellfruit)
 sc5cfpta	//
 sc5cfptb	//
+sc5cfptc
+sc5cfptd
+sc5cfptj
+sc5cfpte
+sc5cfptf
+sc5cfptk
+sc5cfptn
+sc5cfpti
+sc5cfpto
+sc5cfptg
+sc5cfptl
+sc5cfpth
+sc5cfptm
+sc5cfptp
+sc5cfptq
+sc5cfptr
+sc5cfpts
 sc5cknig	// Crazy Knights (Bellfruit)
 sc5ckniga	//
 sc5cpays	// Crazy Pays (Bellfruit)
@@ -20557,6 +20616,7 @@ m4madhse__y	//
 m4madhse__z	//
 m4madhse__0	//
 m4magdrg	// Magic Dragon (Barcrest)
+m4magtbo	// Magic Turbo
 m4maglin	// Magic Liner (Barcrest)
 m4magrep	// Magic Replay DeLuxe (Barcrest)
 m4mag7s		// Magnificent 7's (Barcrest)
@@ -22878,10 +22938,219 @@ m4wcnov		// World Cup (Nova)
 m4excaln	// Excalibur (Nova)
 
 /* Bdd? */
-m4robo
+m4robo		//
+m4robo__a	//
+m4robo__b	//
+m4robo__c	//
+m4robo__d	//
+m4robo__e	//
+m4robo__f	//
+m4robo__g	//
+m4robo__h	//
+m4robo__i	//
+m4robo__j	//
+m4robo__k	//
+m4robo__l	//
+m4robo__m	//
+m4robo__n	//
+m4robo__o	//
+m4robo__p	//
+m4robo__q	//
+m4robo__r	//
+m4robo__s	//
+m4robo__t	//
+m4robo__u	//
+m4robo__v	//
+m4robo__w	//
+m4robo__x	//
+m4robo__y	//
+m4robo__z	//
+m4robo__0	//
+m4robo__1	//
+m4robo__2	//
+m4robo__3	//
+m4robo__4	//
+m4robo__5	//
+m4robo__6	//
+m4robo__7	//
+m4robo__8	//
+m4robo__9	//
+m4robo__aa	//
+m4robo__ab	//
+
 m4trg
 m4mbel
-m4abeaut
+m4abeaut		//
+m4abeaut_1		//
+m4abeaut_2		//
+m4abeaut_3		//
+m4abeaut_4		//
+m4abeaut_5		//
+m4abeaut_6		//
+m4abeaut_7		//
+m4abeaut_8		//
+m4abeaut_9		//
+m4abeaut_u1		//
+m4abeaut_u2		//
+m4abeaut_u3		//
+m4abeaut_u4		//
+m4abeaut_u5		//
+m4abeaut_u6		//
+m4abeaut_u7		//
+m4abeaut_u8		//
+m4abeaut_u9		//
+m4abeaut_u10	//
+m4abeaut_u11	//
+m4abeaut_u12	//
+m4abeaut_u13	//
+m4abeaut_u14	//
+m4abeaut_u15	//
+m4abeaut_u16	//
+m4abeaut_u17	//
+m4abeaut_u18	//
+m4abeaut_u19	//
+m4abeaut_u20	//
+m4abeaut_u21	//
+m4abeaut_u22	//
+m4abeaut_u23	//
+m4abeaut_u24	//
+m4abeaut_u25	//
+m4abeaut_u26	//
+m4abeaut_u27	//
+m4abeaut_u28	//
+m4abeaut_u29	//
+m4abeaut_u30	//
+m4abeaut_u31	//
+m4abeaut_u32	//
+m4abeaut_u33	//
+m4abeaut_u34	//
+m4abeaut_u35	//
+m4abeaut_u36	//
+m4abeaut_u37	//
+m4abeaut_u38	//
+m4abeaut_u39	//
+m4abeaut_u40	//
+m4abeaut_u41	//
+m4abeaut_u42	//
+m4abeaut_u43	//
+m4abeaut_u44	//
+m4abeaut_u45	//
+m4abeaut_u46	//
+m4abeaut_u47	//
+m4abeaut_u48	//
+m4abeaut_u49	//
+m4abeaut_u50	//
+m4abeaut_u51	//
+m4abeaut_u52	//
+m4abeaut_u53	//
+m4abeaut_u54	//
+m4abeaut_u55	//
+m4abeaut_u56	//
+m4abeaut_u57	//
+m4abeaut_u58	//
+m4abeaut_u59	//
+m4abeaut_u60	//
+m4abeaut_u61	//
+m4abeaut_u62	//
+m4abeaut_u63	//
+m4abeaut_u64	//
+m4abeaut_r1		//
+m4abeaut_r2		//
+m4abeaut_r3		//
+m4abeaut_r4		//
+m4abeaut_r5		//
+m4abeaut_r6		//
+m4abeaut_r7		//
+m4abeaut_r8		//
+m4abeaut_r9		//
+m4abeaut_r10	//
+m4abeaut_r11	//
+m4abeaut_r12	//
+m4abeaut_r13	//
+m4abeaut_r14	//
+m4abeaut_l1		//
+m4abeaut_l2		//
+m4abeaut_l3		//
+m4abeaut_l4		//
+m4abeaut_l5		//
+m4abeaut_l6		//
+m4abeaut_l7		//
+m4abeaut_l8		//
+m4abeaut_l9		//
+m4abeaut_l10	//
+m4abeaut_l11	//
+m4abeaut_l12	//
+m4abeaut_l13	//
+m4abeaut_l14	//
+m4abeaut_l15	//
+m4abeaut_l16	//
+m4abeaut_l17	//
+m4abeaut_l18	//
+m4abeaut_l19	//
+m4abeaut_l20	//
+m4abeaut_l21	//
+m4abeaut_l22	//
+m4abeaut_l23	//
+m4abeaut_l24	//
+m4abeaut_l25	//
+m4abeaut_l26	//
+m4abeaut_l27	//
+m4abeaut_l28	//
+m4abeaut_l29	//
+m4abeaut_l30	//
+m4abeaut_l31	//
+m4abeaut_l32	//
+m4abeaut_l33	//
+m4abeaut_l34	//
+m4abeaut_l35	//
+m4abeaut_l36	//
+m4abeaut_l37	//
+m4abeaut_l38	//
+m4abeaut_pb1	//
+m4abeaut_pb2	//
+m4abeaut_i1		//
+m4abeaut_i2		//
+m4abeaut_c1		//
+m4abeaut_c2		//
+m4abeaut_c3		//
+m4abeaut_c4		//
+m4abeaut_c5		//
+m4abeaut_c6		//
+m4abeaut_c7		//
+m4abeaut_c8		//
+m4abeaut_c9		//
+m4abeaut_c10	//
+m4abeaut_c11	//
+m4abeaut_c12	//
+m4abeaut_c13	//
+m4abeaut_c14	//
+m4abeaut_c15	//
+m4abeaut_c16	//
+m4abeaut_c17	//
+m4abeaut_c18	//
+m4abeaut_c19	//
+m4abeaut_c20	//
+m4abeaut_c21	//
+m4abeaut_c22	//
+m4abeaut_c23	//
+m4abeaut_c24	//
+m4abeaut_c25	//
+m4abeaut_c26	//
+m4abeaut_c27	//
+m4abeaut_c28	//
+m4abeaut_c29	//
+m4abeaut_c30	//
+m4abeaut_c31	//
+m4abeaut_s1		//
+m4abeaut_s2		//
+m4abeaut_s3		//
+m4abeaut_s4		//
+m4abeaut_m1		//
+m4abeaut_m2		//
+m4abeaut_m3		//
+m4abeaut_m4		//
+m4abeaut_k1		//
+m4abeaut_k2		//
 m4cmont
 m4blkmgc
 m4amalad

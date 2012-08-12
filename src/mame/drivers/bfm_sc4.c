@@ -3706,6 +3706,48 @@ ROM_END
 
 
 
+ROM_START( sc4cfqpsl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95400731.lo", 0x00001, 0x080000, CRC(af64d3e8) SHA1(4bc3c91cd2f686dbc208d197e22d37c8d5a81216) )
+	ROM_LOAD16_BYTE( "95400732.hi", 0x00000, 0x080000, CRC(a80fde0f) SHA1(8b99e38aab8b845dfb26555448f1ca669b737ea1) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfqpsm )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95400733.lo", 0x00001, 0x080000, CRC(a75e21b7) SHA1(526a1d0d2cb7848310beb418f63cd69606e0f158) )
+	ROM_LOAD16_BYTE( "95400734.hi", 0x00000, 0x080000, CRC(e6f35697) SHA1(816acbbb254f83030a911928300a6fa244177f51) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfqpsn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95401731.lo", 0x00001, 0x080000, CRC(11d8d978) SHA1(b84a3e9ea1d282de05d73b48d20b2a0f49c5384d) )
+	ROM_LOAD16_BYTE( "95401732.hi", 0x00000, 0x080000, CRC(796f1e36) SHA1(ec1fc7b9384d7384b5873c572d35cb39de1239ae) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfqpso )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95401733.lo", 0x00001, 0x080000, CRC(d9b4d65e) SHA1(07196de44372ed477f7b8be40585ab9c01961f8a) )
+	ROM_LOAD16_BYTE( "95401734.hi", 0x00000, 0x080000, CRC(17ef0211) SHA1(8d21e5b5a3282fcdd5f6847d860c8c673a71431b) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfqpsp )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "crfr15hi", 0x00000, 0x080000, CRC(a33f7f3e) SHA1(157f1ad656a423070dbf8f21330ac0382a6e1898) )
+	ROM_LOAD16_BYTE( "crfr15lo", 0x00001, 0x080000, CRC(1683f3ef) SHA1(207c92942961ef7590fc4573bc91c9a16e5b9bda) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+
+
+
+
 
 ROM_START( sc4cfcas )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -3843,6 +3885,241 @@ ROM_START( sc4cfcasr )
     ROM_LOAD16_BYTE( "95413765.hi", 0x00000, 0x080000, CRC(3fc85422) SHA1(6f14fb68c327b52495386680d1de46006f1e4841) )
     ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
 ROM_END
+
+
+ROM_START( sc4cfcass )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95402826.lo", 0x00001, 0x080000, CRC(f823b1e3) SHA1(95dd2f8c94dd7f6a204c8056a3a7f2798fb134af) )
+	ROM_LOAD16_BYTE( "95402827.hi", 0x00000, 0x080000, CRC(788d2c23) SHA1(88bb8f4e977a2e44af8000f5c135e705f8e55ec4) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcast )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95402828.lo", 0x00001, 0x080000, CRC(f5bcb426) SHA1(0f6140cb742c61069f57960c6b94915529ff53b9) )
+	ROM_LOAD16_BYTE( "95402829.hi", 0x00000, 0x080000, CRC(29b382e0) SHA1(d513f7069265d73ebac3ccc6b100b262db611b17) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasu )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95403826.lo", 0x00001, 0x080000, CRC(174e86b3) SHA1(3f7ba66f3fa88340ac51bfad49f2feeefc6a1256) )
+	ROM_LOAD16_BYTE( "95403827.hi", 0x00000, 0x080000, CRC(f18004de) SHA1(46f421827b118fe3286399157a81530171a133b4) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasv )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95403828.lo", 0x00001, 0x080000, CRC(97231b0e) SHA1(ab200ea31392e1c703bddb18e200f7cda1165a71) )
+	ROM_LOAD16_BYTE( "95403829.hi", 0x00000, 0x080000, CRC(a0beaa1d) SHA1(ce532c5c474730cf1cd701eff32aa47f3e1da34d) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasw )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95406072.lo", 0x00001, 0x080000, CRC(147282fb) SHA1(3723fe14a849a7441c9a754d36a33ee3a3bf1716) )
+	ROM_LOAD16_BYTE( "95406073.hi", 0x00000, 0x080000, CRC(40343eeb) SHA1(ef95757c47f678c789d940350a77226eafe37d93) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasx )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95407072.lo", 0x00001, 0x080000, CRC(fef2d0ca) SHA1(af7f7138cfe75c293e09c5e7976b736b9e7f1f7b) )
+	ROM_LOAD16_BYTE( "95407073.hi", 0x00000, 0x080000, CRC(cb444ef6) SHA1(b851de11a178306033662604c54004c0180d26de) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasy )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95407710.lo", 0x00001, 0x080000, CRC(dd2e2992) SHA1(2ebcdde8112f4cd314f6ff22de8e61c8f81ba6ad) )
+	ROM_LOAD16_BYTE( "95407711.hi", 0x00000, 0x080000, CRC(6396f0d4) SHA1(461a326e76249b486755fbf3175b42222ae23144) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasz )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95408162.lo", 0x00001, 0x080000, CRC(30394ef9) SHA1(5c54f3199618bf2aa9a136e05ba6fe16040e4e5b) )
+	ROM_LOAD16_BYTE( "95408163.hi", 0x00000, 0x080000, CRC(212c022d) SHA1(3831cf883269e44adc800d8019db8a11f06348e0) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas0 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95408218.lo", 0x00001, 0x080000, CRC(dd7eee33) SHA1(eed75ea486c885b534b2b71b02c1ee34e81bba12) )
+	ROM_LOAD16_BYTE( "95408219.hi", 0x00000, 0x080000, CRC(60478c42) SHA1(5e679c87dae3f9ae665dbcb4a00f9feb44e03297) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+ROM_START( sc4cfcas1 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95409162.lo", 0x00001, 0x080000, CRC(9a9cd54e) SHA1(a6e683556f08d9bcbc0839eba9934d58c2190d16) )
+	ROM_LOAD16_BYTE( "95409163.hi", 0x00000, 0x080000, CRC(0813b353) SHA1(26b122fd878548ffe906ee59194ef61eea78542c) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas2 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95409218.lo", 0x00001, 0x080000, CRC(8c7e3593) SHA1(d94a17fe98eda5c087a0667cbfa607e863d9e84f) )
+	ROM_LOAD16_BYTE( "95409219.hi", 0x00000, 0x080000, CRC(cc798847) SHA1(fede2c5ebc2beb21d9b49f58272a60f3fc30a388) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+
+
+ROM_START( sc4cfcas8 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410206.lo", 0x00001, 0x080000, CRC(f8479128) SHA1(3228a81e2b72940a8f20fb0102c815455300ab43) )
+	ROM_LOAD16_BYTE( "95410207.hi", 0x00000, 0x080000, CRC(2f64a7ef) SHA1(8e05c788c20b35f233070e3a4095addc644b380a) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas9 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410518.lo", 0x00001, 0x080000, CRC(fcb3b0a6) SHA1(efdb462f91432c8cd26daa31e5adc71e38d2dd4b) )
+	ROM_LOAD16_BYTE( "95410519.hi", 0x00000, 0x080000, CRC(3838ca0f) SHA1(8cd53ec06f3c102615034984fa74040a379f81d1) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas3 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410520.lo", 0x00001, 0x080000, CRC(8f612ecc) SHA1(a7ab7cb115f0242f7825762410d77cce1ad52491) )
+	ROM_LOAD16_BYTE( "95410521.hi", 0x00000, 0x080000, CRC(fa54b8de) SHA1(cf0ac9ceba71a3f725e581bee5cd9203f7668992) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas4 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410522.lo", 0x00001, 0x080000, CRC(a221f34a) SHA1(42d6292ee3661e3aaea56c6b8684ca4c3f54a0d6) )
+	ROM_LOAD16_BYTE( "95410523.hi", 0x00000, 0x080000, CRC(8b09aadd) SHA1(10b51d10e6e11253df9b3c5acf2d929fb19772ea) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas5 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410524.lo", 0x00001, 0x080000, CRC(c309891b) SHA1(d2c8550129b14a6ddf3c251cced1bd450dfa7439) )
+	ROM_LOAD16_BYTE( "95410525.hi", 0x00000, 0x080000, CRC(868b6a77) SHA1(09b42a6f3d4371e3b24132d4c45fe062d471a9c2) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas6 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410996.lo", 0x00001, 0x080000, CRC(d9edbacd) SHA1(e6b0ef17d88dcdb53274a13848e6974cd2127ced) )
+	ROM_LOAD16_BYTE( "95410997.hi", 0x00000, 0x080000, CRC(a6118e1b) SHA1(e707da09dcf0aa5d468a00212fc3fcfb3fbcf6ed) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcas7 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95410998.lo", 0x00001, 0x080000, CRC(be6fa84d) SHA1(4c426f52c33f52b61ecdfde458e149d0a0222f87) )
+	ROM_LOAD16_BYTE( "95410999.hi", 0x00000, 0x080000, CRC(430e4b42) SHA1(9c3316167b48e08c663e0c215bda31c9f78bef0b) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+ROM_START( sc4cfcasaa )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411206.lo", 0x00001, 0x080000, CRC(3f747371) SHA1(f04d2f76ff5e0b1fc9096f05d93b555f25a433bd) )
+	ROM_LOAD16_BYTE( "95411207.hi", 0x00000, 0x080000, CRC(38a16e88) SHA1(ec94ee1cdb788d5f7e5bc262285bedceb8501c37) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasab )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411518.lo", 0x00001, 0x080000, CRC(2912f0a9) SHA1(d600c522950e127f957ca341c2ce506223ccf981) )
+	ROM_LOAD16_BYTE( "95411519.hi", 0x00000, 0x080000, CRC(1b07aa20) SHA1(4554dff7d38a71241a54f9e56072e6e5c0da9d4b) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasac )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411520.lo", 0x00001, 0x080000, CRC(f165dba0) SHA1(37ca7bcf72ed84d3c28c405344e6d5cfdc4fb020) )
+	ROM_LOAD16_BYTE( "95411521.hi", 0x00000, 0x080000, CRC(44f7fa77) SHA1(06dfdec5e46b45959561223ea960ae5458ba39c9) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasad )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411522.lo", 0x00001, 0x080000, CRC(4cf8f8dd) SHA1(18f40df751ba13defd1e080f1b76e9aece646ce5) )
+	ROM_LOAD16_BYTE( "95411523.hi", 0x00000, 0x080000, CRC(03a57868) SHA1(3e6fe8c3355aeb016b90b8d5307da367f729a5e6) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasae )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411524.lo", 0x00001, 0x080000, CRC(373e90c5) SHA1(4b1647f9c415f00653546ac31f1ef57d08e579f9) )
+	ROM_LOAD16_BYTE( "95411525.hi", 0x00000, 0x080000, CRC(ebaae63f) SHA1(aec39f680821c116eb0549f811a5077b0309499a) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasaf )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411996.lo", 0x00001, 0x080000, CRC(c85682fa) SHA1(7f5cbd1bb96c0a9170916a8d0d3b6fd500d70298) )
+	ROM_LOAD16_BYTE( "95411997.hi", 0x00000, 0x080000, CRC(6d805ccf) SHA1(8775f2a55ca8207216787bbea05b8dfa6c8ee4c6) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasag )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95411998.lo", 0x00001, 0x080000, CRC(bb2ca77e) SHA1(47100cf01fbf027316fb7d139a28de86953a5338) )
+	ROM_LOAD16_BYTE( "95411999.hi", 0x00000, 0x080000, CRC(0f825875) SHA1(9da6b169074194cd7f54525914bc19da98c94a51) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasah )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95412062.lo", 0x00001, 0x080000, CRC(4c7996c2) SHA1(022ce9a036e8e3b3a1b427d151fca0592855b1ed) )
+	ROM_LOAD16_BYTE( "95412063.hi", 0x00000, 0x080000, CRC(06906d31) SHA1(3b8a66f837a4f8bc8d97fee34c29b6cb877beb22) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasai )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95413062.lo", 0x00001, 0x080000, CRC(769b9bed) SHA1(95cf5797e6ff0bb32f80a3616cca92d5ea90a69a) )
+	ROM_LOAD16_BYTE( "95413063.hi", 0x00000, 0x080000, CRC(b7ad867f) SHA1(6fe236254e3dfdfe90ab00c7a7fe7676ece8dc1d) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+
+
+
+ROM_START( sc4cfcasaj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p6923p31.hi", 0x00000, 0x080000, CRC(6d87d1f6) SHA1(bc91361ef0ae9b94ee9d437662beca87d5916968) )
+	ROM_LOAD16_BYTE( "p6923p31.lo", 0x00001, 0x080000, CRC(21a802b6) SHA1(d2081509edfcbb889628dc910f4db1094eae64dd) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasak )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p6923p53.hi", 0x00000, 0x080000, CRC(aacd5356) SHA1(a91330815a61d2ca1f8e52d3ac162ab02643798b) )
+	ROM_LOAD16_BYTE( "p6923p53.lo", 0x00001, 0x080000, CRC(d50b7e71) SHA1(a6682a5dcd557a2ec27651d420e7bef8459fafff) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasal )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p6923s31.hi", 0x00000, 0x080000, CRC(e01f2141) SHA1(cd3ecac441f6c1cf67cf2f443dc8465d5bcfc406) )
+	ROM_LOAD16_BYTE( "p6923s31.lo", 0x00001, 0x080000, CRC(88d60172) SHA1(0c75342f861f8477ee3393426ca93f7d7da1dc7f) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4cfcasam )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "p6923s53.hi", 0x00000, 0x080000, CRC(7c92adb7) SHA1(fe4e2ad8238bccb2ae1ccec4949b27dca5d49d1e) )
+	ROM_LOAD16_BYTE( "p6923s53.lo", 0x00001, 0x080000, CRC(e347ca23) SHA1(2b0fadb6e3ac7439a748452b49475f26d93b2e92) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
 
 
 ROM_START( sc4cfcla )
@@ -16952,6 +17229,57 @@ ROM_START( sc4czfrd )
 ROM_END
 
 
+ROM_START( sc4czfre )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95400341.lo", 0x00001, 0x080000, CRC(5de1df69) SHA1(2a83c45ed694b2bf20fc1a748ecd3d00a5271832) )
+	ROM_LOAD16_BYTE( "95400342.hi", 0x00000, 0x080000, CRC(903dee0c) SHA1(529fdb14a06564afa3fcf3a2bf04f0c682c4e636) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4czfrf )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95400343.lo", 0x00001, 0x080000, CRC(d525c165) SHA1(818679010490f0266f8a8ada845d227d31bb92a6) )
+	ROM_LOAD16_BYTE( "95400344.hi", 0x00000, 0x080000, CRC(afac271f) SHA1(6bc551ed667fbcdd42722222080141d971e709c9) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4czfrg )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95400345.lo", 0x00001, 0x080000, CRC(dbf40752) SHA1(26fe336c235538ed50c4d5b67262bcaf02f74dcc) )
+	ROM_LOAD16_BYTE( "95400346.hi", 0x00000, 0x080000, CRC(28344abe) SHA1(c1c361c335114d6102b4ba97809eeb2f8cb2a299) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4czfrh )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95401341.lo", 0x00001, 0x080000, CRC(ea1b83ef) SHA1(8a526c030b8e9547fcdebfaa8316ce77adec9a69) )
+	ROM_LOAD16_BYTE( "95401342.hi", 0x00000, 0x080000, CRC(b1e080fb) SHA1(d284191feacb6636cec76e6103ed98003c04c40f) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4czfri )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95401343.lo", 0x00001, 0x080000, CRC(23aa3367) SHA1(d291432a0595c97d16e8183501a3d622bf20cc86) )
+	ROM_LOAD16_BYTE( "95401344.hi", 0x00000, 0x080000, CRC(ba038114) SHA1(3b9835224eae26af435f2d1fd2156a751a48f0e2) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc4czfrj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95401345.lo", 0x00001, 0x080000, CRC(8c3e322a) SHA1(f2663cdd8280fa661ac2aea257acc363525b60c5) )
+	ROM_LOAD16_BYTE( "95401346.hi", 0x00000, 0x080000, CRC(d9b74800) SHA1(a3b2e098c7d04fbaf98da69de41636b52e8b497c) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc4czfrk )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE( "95401347.lo", 0x00001, 0x080000, CRC(2bdabad1) SHA1(81479370e7a03d8562162cb4820157d733c5aa87) )
+	ROM_LOAD16_BYTE( "95401348.hi", 0x00000, 0x080000, CRC(63212cb9) SHA1(2eb3a00a6f18cc4c63ae84f321735be824e20889) )
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+ROM_END
+
+
 ROM_START( sc4crnjw )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95412658.lo", 0x00001, 0x080000, CRC(2d60552e) SHA1(d4bee760079e727909a97a0c78ebcb56686c8ec4) )
@@ -23196,105 +23524,6 @@ ROM_START( ad4filma )
 ROM_END
 
 
-
-// unsorted roms, mostly sound, probably for undumped sets, but kept here on the chance that they belong
-// with some of the above which could be mislabeled
-ROM_START( sc_unsrt )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
-
-	// Ali G Boyacash (Bellfruit)
-	ROM_LOAD( "95008179.bin", 0x0000, 0x100000, CRC(14b735fa) SHA1(7533510de6687747fc635a5bf66da0a58c6fc718) )
-	ROM_LOAD( "95008180.bin", 0x0000, 0x100000, CRC(ec441f54) SHA1(7e8bec5cd293f29fca2363e5f1ab278a532b8a47) )
-	// Bank It (Bellfruit)
-	ROM_LOAD( "95008545.bin", 0x0000, 0x100000, CRC(8ec806e1) SHA1(1af9dd83e4da4848b7d84ee23bee29f9bcf2b404) )
-	// Cash Climber (Bellfruit)
-	ROM_LOAD( "95008115.bin", 0x0000, 0x100000, CRC(c3b2faac) SHA1(2c54d48f5798178006e82654abed42df43457e25) )
-	ROM_LOAD( "95008116.bin", 0x0000, 0x100000, CRC(84e663f0) SHA1(cb0275cc3761aa16640ac5383125e2098ba80850) )
-	// Cash In The Box (Bellfruit)
-	ROM_LOAD( "95008135.bin", 0x0000, 0x100000, CRC(08d7040d) SHA1(c62ce0de0d57451d0c02f0796573eef1edcab947) )
-	ROM_LOAD( "95008136.bin", 0x0000, 0x100000, CRC(456cc709) SHA1(85ae7a81fbd1dc13b4395baefea82ba31e6c4d3f) )
-	// Cash Splash (Qps)
-	ROM_LOAD( "95008403.bin", 0x0000, 0x0facbf, CRC(cf3969bb) SHA1(4cb6fb4e536882a11bb6c1548ffb94daea70ca5f) )
-	// Casino Triple Classic (Bellfruit)
-	// 95008423.bin =
-	// 95008423.bin          sc4bar7    Bar 7's (Bellfruit) (Scorpion 4)
-	// 95008423.bin          sc4druby   Diamonds & Rubys (Bellfruit) (Scorpion 4)
-	// 95008423.bin          sc4goldw   Golden Winner (Bellfruit) (Scorpion 4)
-	// Champion Chips (Bellfruit)
-	ROM_LOAD( "95008558.bin", 0x0000, 0x100000, CRC(6c032de9) SHA1(3aed801f8b6f2d62fffa03054afd8ff1c3ff3ac3) )
-	// Costa Del Dosh (Bellfruit)
-	ROM_LOAD( "95008420.bin", 0x0000, 0x100000, CRC(cce5f09a) SHA1(8b1f30eb1c48a3e3c6c403f28e97918ddac51033) )
-	// Deal Or No Deal Red Hot (Bellfruit)
-	ROM_LOAD( "95009063.bin", 0x0000, 0x100000, CRC(52b4e9a1) SHA1(2ff66ed13b2307ebc24500b920585f9cf04b0f4e) )
-	ROM_LOAD( "95009064.bin", 0x0000, 0x100000, CRC(1a94524b) SHA1(f5fa0904682888131ae359671ceeff0336adf5dd) )
-	// Deal Or No Deal Spank The Banker (Bellfruit)
-	ROM_LOAD( "95009059.bin", 0x0000, 0x100000, CRC(a3264545) SHA1(94b324c93edad7975ee152a7daaf7f6d7b91cb5e) )
-	ROM_LOAD( "95009060.bin", 0x0000, 0x100000, CRC(3cb58cf3) SHA1(f1eaeba8633c42ef43b4b32deb154f0683d8d42a) )
-	// Double Agent (Bellfruit)
-	ROM_LOAD( "95008147.bin", 0x0000, 0x100000, CRC(c74ce6b4) SHA1(426ac64234bc07ba676570b90e28fa7439d68eaa) )
-	ROM_LOAD( "95008148.bin", 0x0000, 0x100000, CRC(ea146768) SHA1(2ef2e619d0c48f150619ba2176aed0fc42d43ef8) )
-	// Down Mexico Way (Mazooma)
-	ROM_LOAD( "95008379.bin", 0x0000, 0x0f1c34, CRC(3d18e770) SHA1(cdcc600a14329c645ff35fefc355a9ff6b845224) )
-	// Firecracker (Bellfruit)
-	ROM_LOAD( "95004262.bin", 0x0000, 0x080000, CRC(3f5fad9e) SHA1(528a2803baa155d66cb896f643f858238aa7f189) )
-	ROM_LOAD( "95712394.bin", 0x0000, 0x000800, CRC(2658fedf) SHA1(32125bc5a58ddd49f8be36c7cb2ebbbdf2cb292b) )
-	ROM_LOAD( "95712395.bin", 0x0000, 0x000800, CRC(d5df2317) SHA1(66f25a2a11657653f5eed3e8196d9b52119236c3) )
-	// Golden Palace (Qps)
-	ROM_LOAD( "61000120.bin", 0x0000, 0x080000, CRC(a2cdc045) SHA1(5f2534683f2399e2fe0e8686be0f2e42e1b04a74) )
-	// Grid Lock (Mazooma)
-	ROM_LOAD( "95008401.bin", 0x0000, 0x0e486b, CRC(d81d7736) SHA1(8046b95482058ea55735a278dd3b71f708d66b1a) )
-	// Hi Lo Oxo (Bellfruit)
-	ROM_LOAD( "95004278.bin", 0x0000, 0x080000, CRC(c21ff246) SHA1(56345ee0af02a51a96df98ed01ffb6202b8cd772) )
-	// Jackpot Bars (Bellfruit)
-	ROM_LOAD( "95008501.bin", 0x0000, 0x080000, CRC(dd7937a8) SHA1(7aef4f451f307d0074992cdda3401fde0112b977) )
-	// Lollywood (Mazooma)
-	ROM_LOAD( "95004332.bin", 0x0000, 0x0a5e3d, CRC(266d4371) SHA1(8e72022db71b432f53826720aac79901e8ba37af) )
-	// On The Up (Bellfruit)
-	ROM_LOAD( "95008298.bin", 0x0000, 0x100000, CRC(96a487da) SHA1(491c5133757d6f26c106d122a29cd7ed454c2353) )
-	// Pay Back (Bellfruit)
-	ROM_LOAD( "95008591.bin", 0x0000, 0x100000, CRC(1cecf466) SHA1(7c54acf00b8dd4272843a7b3b3d60dc683a5f6d8) )
-	// Pharaoh's Treasure (Bellfruit)
-	ROM_LOAD( "95008534.bin", 0x0000, 0x100000, CRC(fe599d0a) SHA1(f5f31ea43bfc446f2b3ed1c0c88b718428addbdf) )
-	// Pick 'n' Mix (Bellfruit)
-	ROM_LOAD( "95008077.bin", 0x0000, 0x100000, CRC(32a34d15) SHA1(c23ebd30165ebc80098fd956755b98cb433a3e28) )
-	ROM_LOAD( "95008078.bin", 0x0000, 0x100000, CRC(d4832994) SHA1(bdde017bb2f876252d8984a0c5b60950669f579e) )
-	// Powerball (Mazooma)
-	ROM_LOAD( "95004218", 0x0000, 0x080000, CRC(4e90206c) SHA1(475fe57a4f08b17acaf63f0863a705fd70b910db) )
-	ROM_LOAD( "95004219", 0x0000, 0x080000, CRC(f7e344a2) SHA1(7f2411373fdd49d7ef3c6990fb3cc1fe93ca3348) )
-	// Racing Cert (Bellfruit)
-	ROM_LOAD( "95008106.bin", 0x0000, 0x100000, CRC(403935bb) SHA1(471cbc822dc2765e5c32948f7b25b2301ddab990) )
-	// Random Winner (Bellfruit)
-	ROM_LOAD( "95008569.bin", 0x0000, 0x080000, CRC(1a966dd9) SHA1(1314b7ee5b6e22d504e12e9eba3b2b88f6f5d64c) )
-	// Rat Race (Bellfruit)
-	ROM_LOAD( "95008422.bin", 0x0000, 0x100000, CRC(5d9a6af7) SHA1(b32fd97d0e248f59b199c143f8fc2deddb4ec5fc) )
-	// Silver 'n' Gold (Bellfruit)
-	ROM_LOAD( "95008125.bin", 0x0000, 0x100000, CRC(ad1d69d5) SHA1(66d07488fdec6b1c65b41e20d74d5add22746334) )
-	ROM_LOAD( "95008126.bin", 0x0000, 0x100000, CRC(28f979a8) SHA1(ce480ab19b3066343bf88d2fda78dc6a71cd61e2) )
-	// Swag (Mazooma)
-	ROM_LOAD( "95008377.bin", 0x0000, 0x0f6813, CRC(55fad813) SHA1(efa07cd5aa68e1372e8de6bb955ee114cf74ae9c) )
-	// Ticket To Ride (Bellfruit)
-	ROM_LOAD( "95008580.bin", 0x0000, 0x100000, CRC(f6019676) SHA1(535896a199047e61274d82413904580572523e2a) )
-	// Trick Shot (Bellfruit)
-	ROM_LOAD( "95008402.bin", 0x0000, 0x100000, CRC(d9cbc877) SHA1(aa35f9da3d7d470ebc712a958ee2f2d2646c0cce) )
-	ROM_LOAD( "95008458.bin", 0x0000, 0x100000, CRC(845b4fec) SHA1(4f4089bd4db0fbb50594d0e96e7d6198d85c81ba) )
-	ROM_LOAD( "95008470.bin", 0x0000, 0x100000, CRC(b5162561) SHA1(28feebc4de68264b92325e58bbf95458533bde7f) )
-	ROM_LOAD( "95008513.bin", 0x0000, 0x080000, CRC(e57f076a) SHA1(9c9c4686cc39849748f212e073a0959ff93d0ed3) )
-	// Trick Shot Club (Bellfruit) [c]
-	ROM_LOAD( "95008497.bin", 0x0000, 0x100000, CRC(4f7907bd) SHA1(cf5dab2a40a07293b727e8a6f35dc1a57cdec6fc) )
-	// Uncle Sam (Mazooma)
-	ROM_LOAD( "95004360.bin", 0x0000, 0x03ab65, CRC(b357535e) SHA1(b9c03ca1c29f6414ac18e454a2a98ed24799fa92) )
-	// Up Your Streak (Bellfruit)
-	ROM_LOAD( "95008404.bin", 0x0000, 0x100000, CRC(4197f3d1) SHA1(5529090d7d396054b0b4bdf251c6c86c76ed6648) )
-	// Van Helsing (Bellfruit)
-	ROM_LOAD( "95008451.bin", 0x0000, 0x100000, CRC(061d309e) SHA1(588d0ecf6e27815054f4e164c44f3f1464be832b) )
-	ROM_LOAD( "95008452.bin", 0x0000, 0x100000, CRC(08c35e66) SHA1(531f532e55303621d17e497cddc9398745a18211) )
-	// Who Wants To Be A Millionaire Club (Bellfruit) [c]
-	// 95008197.bin = 95008197.bin          sc4legcb   Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4)
-	// 95008198.bin = 95008198.bin          sc4legcb   Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4)
-ROM_END
-
-
 /* Scorpion 4 */
 
 GAME( 200?, sc4tst		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Scorpion 4 Test Rig (Bellfruit) (Scorpion ?)", GAME_IS_SKELETON_MECHANICAL )
@@ -23817,7 +24046,12 @@ GAME( 200?, sc4cclims	,sc4cclim,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Cl
 GAME( 200?, sc4cclimt	,sc4cclim,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cclimu	,sc4cclim,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
 
-
+// PR6982 CRAZY FRUITS 1.02         95004150 CRAZY FRUITS PR6982        CRAZY FRUITS
+GAME( 200?, sc4czfr		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits 1.02 (PR6982) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+// P_6_8_ _R_Z_ _R_I_S_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _5_0_1_0_C_A_Y_F_U_T_ _R_9_2_ _
+GAME( 200?, sc4czfrd	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6982) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing (in 'up for it' set)
+// PR1212 CRAZY FRUITS          PR1152 CRAZY FRUITS SOUNDS11
+GAME( 200?, sc4czfra	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR1212) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6813 CRAZY FRUITS         PR6813 CRAZY FRUITS SOUNDS11
 GAME( 200?, sc4cfqps	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits (PR6813) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23825,6 +24059,18 @@ GAME( 200?, sc4cfqpsa	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fr
 GAME( 200?, sc4cfqpsb	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits (PR6813) (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfqpsd	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits (PR6813) (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfqpsk	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits (PR6813) (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+// PR6813 CRAZY FRUITS         PR6813 CRAZY FRUITS SOUNDS11 (same code as sc4cfqps etc.)
+GAME( 200?, sc4czfrb	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfrc	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR6813 CRAZY FRUITS         PR6813 CRAZY FRUITS SOUNDS11
+GAME( 200?, sc4czfre    ,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfrf	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfrg	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfrh	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfri	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfrj	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4czfrk	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+
 // PR2521 CRAZY FRUITS V1.0         PR6813 CRAZY FRUITS SOUNDS11
 GAME( 200?, sc4cfqpsc	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits V1.0 (PR2521) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfqpse	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits V1.0 (PR2521) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -23832,8 +24078,17 @@ GAME( 200?, sc4cfqpsf	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fr
 GAME( 200?, sc4cfqpsg	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits V1.0 (PR2521) (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfqpsh	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits V1.0 (PR2521) (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfqpsi	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits V1.0 (PR2521) (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
 // PR4613 CRAZY FRUITS SP98         PR6813 CRAZY FRUITS SOUNDS11
-GAME( 200?, sc4cfqpsj	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Crazy Fruits SP98 (PR4613) (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfqpsj	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits SP98 (PR4613) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfqpsl	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits SP98 (PR4613) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfqpsm	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits SP98 (PR4613) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfqpsn	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits SP98 (PR4613) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfqpso	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits SP98 (PR4613) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfqpsp	,sc4cfqps,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits SP98 (PR4613) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+
+
 
 // PR6923 CASINO CRAZY FRUITS         PR6923 CRAZY FRUITS SOUNDS11
 GAME( 200?, sc4cfcas	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23855,6 +24110,38 @@ GAME( 200?, sc4cfcaso	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fr
 GAME( 200?, sc4cfcasp	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfcasq	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfcasr	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcass	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcast	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasu	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasv	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasw	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasx	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 25)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasy	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 26)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasz	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 27)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas0	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 28)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas1	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 29)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas2	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 30)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas3	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 31)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas4	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 32)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas5	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 33)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas6	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 34)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas7	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 35)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas8	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 36)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas9	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 37)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasaa	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 38)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasab	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 39)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasac	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 40)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasad	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 41)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasae	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 42)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasaf	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 43)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasag	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 44)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasah	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 45)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasai	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 46)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasaj	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 47)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasak	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 48)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasal	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 49)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasam	,sc4cfcas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 50)", GAME_IS_SKELETON_MECHANICAL )
+
 
 
 // PR6931 CLUB CRAZY FRUITS         PR6931 CRZY SOUNDS11
@@ -26435,15 +26722,7 @@ GAME( 200?, sc4coron	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Corona
 GAME( 200?, sc4count	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Countdown (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4counta	,sc4count,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Countdown (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR6982 CRAZY FRUITS 1.02         95004150 CRAZY FRUITS PR6982        CRAZY FRUITS
-GAME( 200?, sc4czfr		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits 1.02 (PR6982) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
-// _R_J_C_ _U_B_R_P_6_8_ _R_Z_ _R_I_S_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _5_0_1_0_C_A_Y_F_U_T_ _R_9_2_ _
-GAME( 200?, sc4czfrd	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6982) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing (in 'up for it' set)
-// PR1212 CRAZY FRUITS          PR1152 CRAZY FRUITS SOUNDS11
-GAME( 200?, sc4czfra	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR1212) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
-// PR6813 CRAZY FRUITS         PR6813 CRAZY FRUITS SOUNDS11 (same code as sc4cfqps etc.)
-GAME( 200?, sc4czfrb	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4czfrc	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (PR6813) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR1638 AWP CROWN JEWELS         PR1608 CROWN JEWELS SOUNDS11      CROWN JEWELS  S.SITE
 GAME( 200?, sc4crnjw	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -28300,8 +28579,6 @@ GAME( 200?, sc4nunsmi	,sc4nunsm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nuns
 GAME( 200?, sc4nunsmj	,sc4nunsm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 
-GAME( 200?, sc_unsrt	,0,			sc4, sc4, sc4_state, sc4, ROT0, "<unknown>","unknown Scorpion 'Unsorted Sound' (Unknown) (Scorpion ?)", GAME_IS_SKELETON_MECHANICAL )
-
 // These all basically seem to have the same strings as header info... probably all builds of the same basic game
 
 // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
@@ -28773,6 +29050,10 @@ GAME( 200?, sc4clbmnc	,sc4clbmn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club
 //PROJECT NUMBER PR3332 AWP MONOPOLY BOOM OR BUST S4         PR3307 MPOLY BOOM OR B SOUNDS11   BOOM OR BUST  S.SITE
 GAME( 200?, sc4boomb	,0, 	    sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4boomba	,sc4boomb,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+
+
 
 
 /* Scorpion 4 + Adder 4 */

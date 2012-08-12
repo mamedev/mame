@@ -14,55 +14,293 @@ INPUT_PORTS_EXTERN( mpu4 );
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
-ROM_START( m4robo )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// robotica - latvia
-	ROM_LOAD( "rol1a312.bin", 0x0000, 0x010000, CRC(d8f62159) SHA1(3295bb956bd3cb8bbfc7a438d92e665ac46848b2) )
-	ROM_LOAD( "rol1b312.bin", 0x0000, 0x010000, CRC(a7f337e0) SHA1(3901e0a76d5591a4bbb6afd9557e8979d55b8766) )
-	ROM_LOAD( "rol1a314.bin", 0x0000, 0x010000, CRC(d357a48f) SHA1(759b22a9610d4bd6ca2056ff5c6524dde8ec5d9c) )
-	ROM_LOAD( "rol1b314.bin", 0x0000, 0x010000, CRC(34e0a470) SHA1(9274bd47127905ca53c7e62470dad9b0e8993b0b) )
-	ROM_LOAD( "rol1a315.bin", 0x0000, 0x010000, CRC(5f00eaf5) SHA1(463c25b649ed12cb126324c3d84070dd3738bec8) )
-	ROM_LOAD( "rol1b315.bin", 0x0000, 0x010000, CRC(0bfe64fb) SHA1(faae44877c94544ba2c8f32ba7195d120639b186) )
-	ROM_LOAD( "rol1a316.bin", 0x0000, 0x010000, CRC(ba88e7f5) SHA1(5abd3359ef68b7020b57928995fd72e2997f127b) )
-	ROM_LOAD( "rol1b316.bin", 0x0000, 0x010000, CRC(52e77e26) SHA1(f656d69a807c60db2f4f95a5820102db7687abc2) )
-	ROM_LOAD( "rol1a317.bin", 0x0000, 0x010000, CRC(6211818c) SHA1(b9b80b66a4fb93ce90ca91d43b68e36cc7884fa4) )
-	ROM_LOAD( "rol1b317.bin", 0x0000, 0x010000, CRC(ee243d1b) SHA1(b046bdb300a90e197a2e0c41a939f75a7a07dc05) )
 
-	// robotica - russia
-	ROM_LOAD( "ror1a315.bin", 0x0000, 0x010000, CRC(ceed653b) SHA1(f9b42d4f64f28ae72d75e99867ce9fda5fea61df) )
-	ROM_LOAD( "ror1b315.bin", 0x0000, 0x010000, CRC(d7aaa742) SHA1(84534aa4d31f1a522cc808566a076a458f7cf56d) )
-	ROM_LOAD( "ror1a314.bin", 0x0000, 0x010000, CRC(83a90df1) SHA1(d515289e717cdb84c4e9b581f44421d8ec3e14e5) )
-	ROM_LOAD( "ror1b314.bin", 0x0000, 0x010000, CRC(26b8f6df) SHA1(43204fdc59a90a462e9df41e0f0e20300b31962a) )
-	// robotica - ukraine
-	ROM_LOAD( "rou1a214.bin", 0x0000, 0x010000, CRC(be047cea) SHA1(6c3b371392babc6fcacac5b18ea1e9c0ffde811f) )
-	ROM_LOAD( "rou1b214.bin", 0x0000, 0x010000, CRC(d0005551) SHA1(497e67b969fc8db4badad116e66bd56ef591fe55) )
-	ROM_LOAD( "rou1a215.bin", 0x0000, 0x010000, CRC(8d9c419f) SHA1(a215148c11bc855429c04e427e8e3b923fb1544b) )
-	ROM_LOAD( "rou1b215.bin", 0x0000, 0x010000, CRC(a1c54015) SHA1(890f150264e840b4d2b564ad1ee5fd3013721e7e) )
-	ROM_LOAD( "rou1a314.bin", 0x0000, 0x010000, CRC(87a0aea9) SHA1(8c163c0da24ac091234d13926301c7ff4bfbf3fa) )
-	ROM_LOAD( "rou1b314.bin", 0x0000, 0x010000, CRC(fab1392f) SHA1(5094f1a417b6b4300d26ab12214ef3581e2aad77) )
-	ROM_LOAD( "rou1a315.bin", 0x0000, 0x010000, CRC(f321c23e) SHA1(9d8b5ec1cf69b4e2cae7e115edfd1139104ed49b) )
-	ROM_LOAD( "rou1b315.bin", 0x0000, 0x010000, CRC(ea660047) SHA1(9ca5dbf9451d92f1d17292c8bca647f2fff11933) )
-	ROM_LOAD( "rou1a414.bin", 0x0000, 0x010000, CRC(bb854ced) SHA1(3de424ecc3991ae7bcfae21f191f0e38de922023) )
-	ROM_LOAD( "rou1b414.bin", 0x0000, 0x010000, CRC(712e4927) SHA1(3640637d54e5081152f826bea87c0e75ee29ee8e) )
-	ROM_LOAD( "rou1a415.bin", 0x0000, 0x010000, CRC(469113c9) SHA1(ee41c7af019f48ffd2fb18c04cb9b235cae02b35) )
-	ROM_LOAD( "rou1b415.bin", 0x0000, 0x010000, CRC(abbccf1d) SHA1(92046a477adf90da69557697d7716f00f498e8b1) )
-	ROM_LOAD( "rou2a317.bin", 0x0000, 0x010000, CRC(bc1bf926) SHA1(b49d575abbe789bd675070759de3ffc1609f5445) )
-	ROM_LOAD( "rou2b317.bin", 0x0000, 0x010000, CRC(8a0d28df) SHA1(5bf0131c361b66fb825f69291dc9f42696a5a376) )
-	// robitica - old
-	ROM_LOAD( "rol1a305.bin", 0x0000, 0x010000, CRC(a6ce02e0) SHA1(cfe0229e4ab8a977c171473bb048568c889a5433) )
-	ROM_LOAD( "rol1b306.bin", 0x0000, 0x010000, CRC(55c83858) SHA1(dba5d3fedf599fd8aec3a9c9d1f515e026cc7e47) )
-	// others
-	ROM_LOAD( "rol1b310.bin", 0x0000, 0x010000, CRC(2e17a780) SHA1(d19a5192754ab76447e7f1b5086d867fb6cfd167) )
-	ROM_LOAD( "rol1a311.bin", 0x0000, 0x010000, CRC(cf09ca0e) SHA1(8380eb5a04885bbf9a5a0fc505a8ed7fa5427c79) )
-	ROM_LOAD( "rol1b311.bin", 0x0000, 0x010000, CRC(69c4fb5e) SHA1(03e88fdde3cd1085bb820d71d773d843e2f51717) )
-	ROM_LOAD( "ror1a301.bin", 0x0000, 0x010000, CRC(36ccbd04) SHA1(9dfe04d19ca76fb805880d60f7ef00f38e5e49ee) )
-	ROM_LOAD( "ror1b301.bin", 0x0000, 0x010000, CRC(b91f772a) SHA1(06340815b1cfbfe0df4f8afe7326c351ed4fb910) )
-	ROM_LOAD( "ror1a302.bin", 0x0000, 0x010000, CRC(65ebbde0) SHA1(327af87323cb302c73cb39a07498befcecb0d34a) )
-	ROM_LOAD( "ror1b302.bin", 0x0000, 0x010000, CRC(35b943df) SHA1(b652a96c273e9c8857c4089c17a9f176c8a0f1ae) )
-	ROM_LOAD( "ror1a304.bin", 0x0000, 0x010000, CRC(1cc05eef) SHA1(949b6093ee340514177291ab1b4074a0ab72c37c) )
-	ROM_LOAD( "ror1b304.bin", 0x0000, 0x010000, CRC(0315a934) SHA1(2b9c07c104b9883d8a1ce0ca5cb918f5e6f80b1f) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
+
+#define M4ROBO_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent ,mod2	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+// robotica - latvia
+
+M4ROBO_SET( 199?, m4robo,		0,		"rol1a305.bin", 0x0000, 0x010000, CRC(a6ce02e0) SHA1(cfe0229e4ab8a977c171473bb048568c889a5433), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 1)" )
+M4ROBO_SET( 199?, m4robo__1,	m4robo,	"rol1b306.bin", 0x0000, 0x010000, CRC(55c83858) SHA1(dba5d3fedf599fd8aec3a9c9d1f515e026cc7e47), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 2)" )
+M4ROBO_SET( 199?, m4robo__2,	m4robo,	"rol1b310.bin", 0x0000, 0x010000, CRC(2e17a780) SHA1(d19a5192754ab76447e7f1b5086d867fb6cfd167), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 3)" )
+M4ROBO_SET( 199?, m4robo__3,	m4robo,	"rol1a311.bin", 0x0000, 0x010000, CRC(cf09ca0e) SHA1(8380eb5a04885bbf9a5a0fc505a8ed7fa5427c79), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 4)" )
+M4ROBO_SET( 199?, m4robo__4,	m4robo,	"rol1b311.bin", 0x0000, 0x010000, CRC(69c4fb5e) SHA1(03e88fdde3cd1085bb820d71d773d843e2f51717), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 5)" )
+M4ROBO_SET( 199?, m4robo__5,	m4robo,	"rol1a312.bin", 0x0000, 0x010000, CRC(d8f62159) SHA1(3295bb956bd3cb8bbfc7a438d92e665ac46848b2), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 6)" )
+M4ROBO_SET( 199?, m4robo__a,	m4robo,	"rol1b312.bin", 0x0000, 0x010000, CRC(a7f337e0) SHA1(3901e0a76d5591a4bbb6afd9557e8979d55b8766), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 7)" )
+M4ROBO_SET( 199?, m4robo__b,	m4robo,	"rol1a314.bin", 0x0000, 0x010000, CRC(d357a48f) SHA1(759b22a9610d4bd6ca2056ff5c6524dde8ec5d9c), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 8)" )
+M4ROBO_SET( 199?, m4robo__c,	m4robo,	"rol1b314.bin", 0x0000, 0x010000, CRC(34e0a470) SHA1(9274bd47127905ca53c7e62470dad9b0e8993b0b), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 9)" )
+M4ROBO_SET( 199?, m4robo__d,	m4robo,	"rol1a315.bin", 0x0000, 0x010000, CRC(5f00eaf5) SHA1(463c25b649ed12cb126324c3d84070dd3738bec8), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 10)" )
+M4ROBO_SET( 199?, m4robo__e,	m4robo,	"rol1b315.bin", 0x0000, 0x010000, CRC(0bfe64fb) SHA1(faae44877c94544ba2c8f32ba7195d120639b186), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 11)" )
+M4ROBO_SET( 199?, m4robo__f,	m4robo,	"rol1a316.bin", 0x0000, 0x010000, CRC(ba88e7f5) SHA1(5abd3359ef68b7020b57928995fd72e2997f127b), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 12)" )
+M4ROBO_SET( 199?, m4robo__g,	m4robo,	"rol1b316.bin", 0x0000, 0x010000, CRC(52e77e26) SHA1(f656d69a807c60db2f4f95a5820102db7687abc2), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 13)" )
+M4ROBO_SET( 199?, m4robo__h,	m4robo,	"rol1a317.bin", 0x0000, 0x010000, CRC(6211818c) SHA1(b9b80b66a4fb93ce90ca91d43b68e36cc7884fa4), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 14)" )
+M4ROBO_SET( 199?, m4robo__i,	m4robo,	"rol1b317.bin", 0x0000, 0x010000, CRC(ee243d1b) SHA1(b046bdb300a90e197a2e0c41a939f75a7a07dc05), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Latvia, set 15)" )
+
+// robotica - russia
+M4ROBO_SET( 199?, m4robo__6,	m4robo,	"ror1a301.bin", 0x0000, 0x010000, CRC(36ccbd04) SHA1(9dfe04d19ca76fb805880d60f7ef00f38e5e49ee), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 1)" )
+M4ROBO_SET( 199?, m4robo__7,	m4robo,	"ror1b301.bin", 0x0000, 0x010000, CRC(b91f772a) SHA1(06340815b1cfbfe0df4f8afe7326c351ed4fb910), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 2)" )
+M4ROBO_SET( 199?, m4robo__8,	m4robo,	"ror1a302.bin", 0x0000, 0x010000, CRC(65ebbde0) SHA1(327af87323cb302c73cb39a07498befcecb0d34a), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 3)" )
+M4ROBO_SET( 199?, m4robo__9,	m4robo,	"ror1b302.bin", 0x0000, 0x010000, CRC(35b943df) SHA1(b652a96c273e9c8857c4089c17a9f176c8a0f1ae), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 4)" )
+M4ROBO_SET( 199?, m4robo__aa,	m4robo,	"ror1a304.bin", 0x0000, 0x010000, CRC(1cc05eef) SHA1(949b6093ee340514177291ab1b4074a0ab72c37c), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 5)" )
+M4ROBO_SET( 199?, m4robo__ab,	m4robo,	"ror1b304.bin", 0x0000, 0x010000, CRC(0315a934) SHA1(2b9c07c104b9883d8a1ce0ca5cb918f5e6f80b1f), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 6)" )
+M4ROBO_SET( 199?, m4robo__j,	m4robo,	"ror1a315.bin", 0x0000, 0x010000, CRC(ceed653b) SHA1(f9b42d4f64f28ae72d75e99867ce9fda5fea61df), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 7)" )
+M4ROBO_SET( 199?, m4robo__k,	m4robo,	"ror1b315.bin", 0x0000, 0x010000, CRC(d7aaa742) SHA1(84534aa4d31f1a522cc808566a076a458f7cf56d), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 8)" )
+M4ROBO_SET( 199?, m4robo__l,	m4robo,	"ror1a314.bin", 0x0000, 0x010000, CRC(83a90df1) SHA1(d515289e717cdb84c4e9b581f44421d8ec3e14e5), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 9)" )
+M4ROBO_SET( 199?, m4robo__m,	m4robo,	"ror1b314.bin", 0x0000, 0x010000, CRC(26b8f6df) SHA1(43204fdc59a90a462e9df41e0f0e20300b31962a), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Russia, set 10)" )
+// robotica - ukraine
+M4ROBO_SET( 199?, m4robo__n,	m4robo,	"rou1a214.bin", 0x0000, 0x010000, CRC(be047cea) SHA1(6c3b371392babc6fcacac5b18ea1e9c0ffde811f), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 1)" )
+M4ROBO_SET( 199?, m4robo__o,	m4robo,	"rou1b214.bin", 0x0000, 0x010000, CRC(d0005551) SHA1(497e67b969fc8db4badad116e66bd56ef591fe55), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 2)" )
+M4ROBO_SET( 199?, m4robo__p,	m4robo,	"rou1a215.bin", 0x0000, 0x010000, CRC(8d9c419f) SHA1(a215148c11bc855429c04e427e8e3b923fb1544b), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 3)" )
+M4ROBO_SET( 199?, m4robo__q,	m4robo,	"rou1b215.bin", 0x0000, 0x010000, CRC(a1c54015) SHA1(890f150264e840b4d2b564ad1ee5fd3013721e7e), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 4)" )
+M4ROBO_SET( 199?, m4robo__r,	m4robo,	"rou1a314.bin", 0x0000, 0x010000, CRC(87a0aea9) SHA1(8c163c0da24ac091234d13926301c7ff4bfbf3fa), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 5)" )
+M4ROBO_SET( 199?, m4robo__s,	m4robo,	"rou1b314.bin", 0x0000, 0x010000, CRC(fab1392f) SHA1(5094f1a417b6b4300d26ab12214ef3581e2aad77), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 6)" )
+M4ROBO_SET( 199?, m4robo__t,	m4robo,	"rou1a315.bin", 0x0000, 0x010000, CRC(f321c23e) SHA1(9d8b5ec1cf69b4e2cae7e115edfd1139104ed49b), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 7)" )
+M4ROBO_SET( 199?, m4robo__u,	m4robo,	"rou1b315.bin", 0x0000, 0x010000, CRC(ea660047) SHA1(9ca5dbf9451d92f1d17292c8bca647f2fff11933), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 8)" )
+M4ROBO_SET( 199?, m4robo__v,	m4robo,	"rou1a414.bin", 0x0000, 0x010000, CRC(bb854ced) SHA1(3de424ecc3991ae7bcfae21f191f0e38de922023), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 9)" )
+M4ROBO_SET( 199?, m4robo__w,	m4robo,	"rou1b414.bin", 0x0000, 0x010000, CRC(712e4927) SHA1(3640637d54e5081152f826bea87c0e75ee29ee8e), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 10)" )
+M4ROBO_SET( 199?, m4robo__x,	m4robo,	"rou1a415.bin", 0x0000, 0x010000, CRC(469113c9) SHA1(ee41c7af019f48ffd2fb18c04cb9b235cae02b35), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 11)" )
+M4ROBO_SET( 199?, m4robo__y,	m4robo,	"rou1b415.bin", 0x0000, 0x010000, CRC(abbccf1d) SHA1(92046a477adf90da69557697d7716f00f498e8b1), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 12)" )
+M4ROBO_SET( 199?, m4robo__z,	m4robo,	"rou2a317.bin", 0x0000, 0x010000, CRC(bc1bf926) SHA1(b49d575abbe789bd675070759de3ffc1609f5445), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 13)" )
+M4ROBO_SET( 199?, m4robo__0,	m4robo,	"rou2b317.bin", 0x0000, 0x010000, CRC(8a0d28df) SHA1(5bf0131c361b66fb825f69291dc9f42696a5a376), "Avantime?","Robotica / Dream Machine (Avantime?) (MPU4) (Ukraine, set 14)" )
+
+
+
+
+// uses 3 reels at the bottom, 3 reels at the top + 1 bonus reel at the top
+// is it a dual mpu4 board configuration (hence the a/b roms? or are these just alt versions / banks?)
+// many of the 'xxx timer' sets use the same configuration driven from a single board tho..
+
+#define M4ABEAUT_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "asm", 0 ) \
+	ROM_LOAD( "abbcz1.prn", 0x0000, 0x08e0c1, CRC(f333bd68) SHA1(05c30186116b043c0da2ca2b1fc2f1add7bd1574) ) /* this is the source code ASM? */ \
+	ROM_REGION( 0x100000, "msm6376", 0 ) /* which sound roms go with which sets?! */ \
+	ROM_LOAD( "abs011.bin", 0x0000, 0x080000, CRC(e9364aa0) SHA1(775d94f8665387538d4d8d8ddec38e2ccec2e345) ) \
+	ROM_LOAD( "abs012.bin", 0x0000, 0x080000, CRC(72371572) SHA1(4504a91486952bc42e31632131d31cf5414853d6) ) \
+	ROM_LOAD( "abs021.bin", 0x0000, 0x080000, CRC(add61ab9) SHA1(1e611bc69f129c18ce460c051f78c726f5efdf68) ) \
+	ROM_LOAD( "abs031.bin", 0x0000, 0x080000, CRC(7fe9b7f5) SHA1(4c8fedec056647f7ca9b7da66c020bcdb1e161d0) ) \
+	ROM_LOAD( "abs041.bin", 0x0000, 0x080000, CRC(563c7603) SHA1(58883c0d7ce006a5bb15760f22f291f7a01576a4) ) \
+	ROM_LOAD( "abs051.bin", 0x0000, 0x080000, CRC(5f073add) SHA1(661889257fbecc4644360aed241967674a42214b) ) \
+	ROM_LOAD( "abs041.bin", 0x0000, 0x080000, CRC(563c7603) SHA1(58883c0d7ce006a5bb15760f22f291f7a01576a4) ) \
+	ROM_REGION( 0x100000, "gals", 0 ) \
+	ROM_LOAD( "abcz.jd", 0x0000, 0x000580, CRC(86fcaa33) SHA1(c0146cd4a289d5dff26e6edc15a0781f437f46ac) ) \
+	ROM_LOAD( "abl.jd", 0x0000, 0x000580, CRC(d99e4b62) SHA1(6ae11967f7bc6edd69bd8be20c0c1960e6f3369e) ) \
+	ROM_LOAD( "abr.jd", 0x0000, 0x000580, CRC(389c4cea) SHA1(c431c51c47cbd8a7f3bd0497dd7fffccb4a3416f) ) \
+	ROM_LOAD( "abu.jd", 0x0000, 0x000580, CRC(95f7892d) SHA1(dc2ab97ff60f3532967119ff6d2dc8d9596caa01) ) \
+
+
+#define M4ABEAUT_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ABEAUT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+// ab
+M4ABEAUT_SET( 199?, m4abeaut,		0,			"aba305.bin",	0x0000, 0x010000, CRC(ab70802c) SHA1(0cb59947b0bc177b10c55e02a0c8016620e0c346), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_1,		m4abeaut,	"abb305.bin",	0x0000, 0x010000, CRC(eeb3f0e8) SHA1(b4daa4e0817cb37a6f91bf12ba9fbff0f631abd1), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_2,		m4abeaut,	"aba306.bin",	0x0000, 0x010000, CRC(6034f4eb) SHA1(8e5442ad275d48cda8327f1b86c6842807ae33b8), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_3,		m4abeaut,	"abb306.bin",	0x0000, 0x010000, CRC(d11f8a09) SHA1(8a391e7fb7e0567b1971ec118d85739910e32c33), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_4,		m4abeaut,	"aba308.bin",	0x0000, 0x010000, CRC(3aef7d45) SHA1(e11cb0175bd82c208839c8172ffee2639727bf15), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_5,		m4abeaut,	"abb308.bin",	0x0000, 0x010000, CRC(fac4099b) SHA1(643ef922c6a5abc5ac679d31a04ffd5a0ac30c61), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_6,		m4abeaut,	"aba309.bin",	0x0000, 0x010000, CRC(87204db5) SHA1(be4cc1de841e4c8581a649c86aefafaa70a28332), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_7,		m4abeaut,	"abb309.bin",	0x0000, 0x010000, CRC(dbc126af) SHA1(1190d57228918bcfa481e86d79759854c47945a6), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_8,		m4abeaut,	"ab1.bin",		0x0000, 0x010000, CRC(f4c93368) SHA1(fc57947fdc98bf544de601814e93c098667bcae3), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 9)" ) // unpaired
+M4ABEAUT_SET( 199?, m4abeaut_9,		m4abeaut,	"ab303.bin",	0x0000, 0x010000, CRC(493a6de5) SHA1(6bde7f2cec4a94132cc3d4f902626c66c8858276), "Avantime?","American Beauty (Avantime?) (MPU4) (AB, set 10)" ) // unpaired
+// am1 - new - ukraine
+M4ABEAUT_SET( 199?, m4abeaut_u1,	m4abeaut,	"abu1a214.bin", 0x0000, 0x010000, CRC(20456dce) SHA1(29fac37f0ff90a01f1d754ef953d489eadb478d8), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_u2,	m4abeaut,	"abu1b214.bin", 0x0000, 0x010000, CRC(4f4c6fd3) SHA1(3ce07496ff6d6fccabc41d62477eb0a30ed7808b), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_u3,	m4abeaut,	"abu1a215.bin", 0x0000, 0x010000, CRC(702b9cb6) SHA1(13728154c44e6acc97555dc03bd47b4ba8619739), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_u4,	m4abeaut,	"abu1b215.bin", 0x0000, 0x010000, CRC(5722255c) SHA1(12bcf680b5ea994239fe92ee73103484e8385383), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_u5,	m4abeaut,	"abu1a216.bin", 0x0000, 0x010000, CRC(1a430dfd) SHA1(e3f7cd15c8fbb42f40c5b473d07eac4b4a919349), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_u6,	m4abeaut,	"abu1b216.bin", 0x0000, 0x010000, CRC(2edee140) SHA1(6a0472debfe93ca7c0c8f22945cdc14b28f7a18d), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_u7,	m4abeaut,	"abu1a217.bin", 0x0000, 0x010000, CRC(7f372d59) SHA1(874eca687f6915ae3d777b91e1925da11c0888ef), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_u8,	m4abeaut,	"abu1b217.bin", 0x0000, 0x010000, CRC(d0eb875a) SHA1(46234883d01079e71f952b69271d62607968cbfa), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_u9,	m4abeaut,	"abu1a219.bin", 0x0000, 0x010000, CRC(54a67982) SHA1(72e7309d0782bad8edc19dc1b793d2961b8adc02), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 9)" )
+M4ABEAUT_SET( 199?, m4abeaut_u10,	m4abeaut,	"abu1b219.bin", 0x0000, 0x010000, CRC(b8dd3b7f) SHA1(ecadf9834e59dcff12a9dc4985cc362d750c301c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 10)" )
+M4ABEAUT_SET( 199?, m4abeaut_u11,	m4abeaut,	"abu1a221.bin", 0x0000, 0x010000, CRC(c95f25a1) SHA1(3cfc57507aacb8a0f29aeb5b3028b356daf8d770), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 11)" )
+M4ABEAUT_SET( 199?, m4abeaut_u12,	m4abeaut,	"abu1b221.bin", 0x0000, 0x010000, CRC(ddd4afbe) SHA1(95a407cd9e544bbaecd41a270f9c017904740bc3), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 12)" )
+M4ABEAUT_SET( 199?, m4abeaut_u13,	m4abeaut,	"abu1a222.bin", 0x0000, 0x010000, CRC(b88e349c) SHA1(1459fd8d0a2f98d919b688d7ea61fc679db4e4d5), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 13)" )
+M4ABEAUT_SET( 199?, m4abeaut_u14,	m4abeaut,	"abu1b222.bin", 0x0000, 0x010000, CRC(3879a348) SHA1(618a1c49c3cfec8846e83d9b1655a6c283eb7fda), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 14)" )
+M4ABEAUT_SET( 199?, m4abeaut_u15,	m4abeaut,	"abu1a224.bin", 0x0000, 0x010000, CRC(d4668aee) SHA1(d24cf0e22c1162cd92bc3a2bc53035690220843a), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 15)" )
+M4ABEAUT_SET( 199?, m4abeaut_u16,	m4abeaut,	"abu1b224.bin", 0x0000, 0x010000, CRC(d55bddda) SHA1(424d8832d1df39bb1250ba506226f969ec99e450), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 16)" )
+M4ABEAUT_SET( 199?, m4abeaut_u17,	m4abeaut,	"abu1a225.bin", 0x0000, 0x010000, CRC(b4904ccf) SHA1(1aac8a0e749946df74c6a9a5f2a645b468098b54), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 17)" )
+M4ABEAUT_SET( 199?, m4abeaut_u18,	m4abeaut,	"abu1b225.bin", 0x0000, 0x010000, CRC(541f51f4) SHA1(2ade2998201c65e0723dacf106c95375f807bcc1), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 18)" )
+M4ABEAUT_SET( 199?, m4abeaut_u19,	m4abeaut,	"abu1a233.bin", 0x0000, 0x010000, CRC(437a4466) SHA1(bd59705f33df39da28ab6f447dd4d99bc5c05efe), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 19)" )
+M4ABEAUT_SET( 199?, m4abeaut_u20,	m4abeaut,	"abu1b233.bin", 0x0000, 0x010000, CRC(ca42eaae) SHA1(a3d20d978a6d08ef6da6467678cd7afb7c1a5b3d), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 20)" )
+M4ABEAUT_SET( 199?, m4abeaut_u21,	m4abeaut,	"abu1a234.bin", 0x0000, 0x010000, CRC(46ef47fc) SHA1(ef07199c69239604c72bc8192bf3a92b055282c7), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 21)" )
+M4ABEAUT_SET( 199?, m4abeaut_u22,	m4abeaut,	"abu1b234.bin", 0x0000, 0x010000, CRC(12c627ab) SHA1(d0a47743b46a982e8c2e969c2131fa6f1132fa8c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 22)" )
+M4ABEAUT_SET( 199?, m4abeaut_u23,	m4abeaut,	"abu1a235.bin", 0x0000, 0x010000, CRC(a206f7dc) SHA1(cf1c726302da28d2bc101828448adc8d96f50021), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 23)" )
+M4ABEAUT_SET( 199?, m4abeaut_u24,	m4abeaut,	"abu1b235.bin", 0x0000, 0x010000, CRC(dce59ddb) SHA1(778e7030a7e7e8b2eeb28f9e88edfbf350abd955), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 24)" )
+M4ABEAUT_SET( 199?, m4abeaut_u25,	m4abeaut,	"abu1a313.bin", 0x0000, 0x010000, CRC(2961d917) SHA1(7396f7dd50e7d6c94a64bad694f752ef8e80d5f8), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 25)" )
+M4ABEAUT_SET( 199?, m4abeaut_u26,	m4abeaut,	"abu1b313.bin", 0x0000, 0x010000, CRC(fb7a721e) SHA1(6dc1320c079dc1d7677516e57a3cb0defa75056e), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 26)" )
+M4ABEAUT_SET( 199?, m4abeaut_u27,	m4abeaut,	"abu1a315.bin", 0x0000, 0x010000, CRC(42e45fea) SHA1(154119329a0ca4698492990eb36e1633449e270a), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 27)" )
+M4ABEAUT_SET( 199?, m4abeaut_u28,	m4abeaut,	"abu1b315.bin", 0x0000, 0x010000, CRC(175f3a6b) SHA1(9fcd9c5784eb4f2f51ed33812909daa2ae36b31b), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 28)" )
+M4ABEAUT_SET( 199?, m4abeaut_u29,	m4abeaut,	"abu1a316.bin", 0x0000, 0x010000, CRC(d2fa634d) SHA1(0fb2529823bbab20075f3b246a54f5d23d74ee17), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 29)" )
+M4ABEAUT_SET( 199?, m4abeaut_u30,	m4abeaut,	"abu1b316.bin", 0x0000, 0x010000, CRC(fe8d6ac8) SHA1(28a927817b1e9c8e69e71e34955bb2d71da6abc2), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 30)" )
+M4ABEAUT_SET( 199?, m4abeaut_u31,	m4abeaut,	"abu1a317.bin", 0x0000, 0x010000, CRC(37cb227a) SHA1(5af003102210cf8e21564da6fa2afe1dc197f2bd), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 31)" )
+M4ABEAUT_SET( 199?, m4abeaut_u32,	m4abeaut,	"abu1b317.bin", 0x0000, 0x010000, CRC(d29f0aa2) SHA1(e518523a32c6f5711f39a20f1866e6246e1f39e4), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 32)" )
+M4ABEAUT_SET( 199?, m4abeaut_u33,	m4abeaut,	"abu1a319.bin", 0x0000, 0x010000, CRC(f9e17cdd) SHA1(5a89b2b5b42c8d15fbb2efd59ce808642935e275), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 33)" )
+M4ABEAUT_SET( 199?, m4abeaut_u34,	m4abeaut,	"abu1b319.bin", 0x0000, 0x010000, CRC(8f510581) SHA1(7d4d8514df7a2bd7b415e33856d7b61c875b6041), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 34)" )
+M4ABEAUT_SET( 199?, m4abeaut_u35,	m4abeaut,	"abu1a321.bin", 0x0000, 0x010000, CRC(77eaf769) SHA1(9b32504f16906d1121ade88e926fcc00bf5976a6), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 35)" )
+M4ABEAUT_SET( 199?, m4abeaut_u36,	m4abeaut,	"abu1b321.bin", 0x0000, 0x010000, CRC(36fae9c1) SHA1(63a2395fced3268ecbe9b95118c8d07a411042f6), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 36)" )
+M4ABEAUT_SET( 199?, m4abeaut_u37,	m4abeaut,	"abu1a322.bin", 0x0000, 0x010000, CRC(c1d0f65c) SHA1(f4272be41f60d664490477cdddc837efbb5da573), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 37)" )
+M4ABEAUT_SET( 199?, m4abeaut_u38,	m4abeaut,	"abu1b322.bin", 0x0000, 0x010000, CRC(86007ee4) SHA1(b49d1f46dd73b1ee5811b723dd12c9b7c5def6db), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 38)" )
+M4ABEAUT_SET( 199?, m4abeaut_u39,	m4abeaut,	"abu1a325.bin", 0x0000, 0x010000, CRC(1c386b75) SHA1(a286dc423534ad9e32da131868483419a8bf313d), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 39)" )
+M4ABEAUT_SET( 199?, m4abeaut_u40,	m4abeaut,	"abu1b325.bin", 0x0000, 0x010000, CRC(1f2577ec) SHA1(b11cdaedb1896ecaa1655a5b8cd93615a64fcf55), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 40)" )
+M4ABEAUT_SET( 199?, m4abeaut_u41,	m4abeaut,	"abu1a335.bin", 0x0000, 0x010000, CRC(732bcb35) SHA1(d044f83c294bb639cbbb963ec7c40efee86c7ed6), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 41)" )
+M4ABEAUT_SET( 199?, m4abeaut_u42,	m4abeaut,	"abu1b335.bin", 0x0000, 0x010000, CRC(725e82db) SHA1(78eba2de7474509e73cd15a1e1ff648d00f7c14d), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 42)" )
+M4ABEAUT_SET( 199?, m4abeaut_u43,	m4abeaut,	"abu1a424.bin", 0x0000, 0x010000, CRC(265809eb) SHA1(9752ffa958878df2a0d44da5e5682320d0ec06ae), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 43)" )
+M4ABEAUT_SET( 199?, m4abeaut_u44,	m4abeaut,	"abu1b424.bin", 0x0000, 0x010000, CRC(0b48ddbc) SHA1(7ebd5cd91da859538ab4a7922df50df51a74c545), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 44)" )
+M4ABEAUT_SET( 199?, m4abeaut_u45,	m4abeaut,	"abu1a425.bin", 0x0000, 0x010000, CRC(9e21fccb) SHA1(e5ac645107b8e5d58c4a3e2b09049cb478547792), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 45)" )
+M4ABEAUT_SET( 199?, m4abeaut_u46,	m4abeaut,	"abu1b425.bin", 0x0000, 0x010000, CRC(18c5da7a) SHA1(8a496659b6cf7762afe2dfd691d1d66fd99ecbf2), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 46)" )
+M4ABEAUT_SET( 199?, m4abeaut_u47,	m4abeaut,	"abu1a435.bin", 0x0000, 0x010000, CRC(318841c3) SHA1(0057d8730e020816313288e87172671cfac637aa), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 47)" )
+M4ABEAUT_SET( 199?, m4abeaut_u48,	m4abeaut,	"abu1b435.bin", 0x0000, 0x010000, CRC(f99413e3) SHA1(caf168b5504352f8accb831326bf94b7141f5b76), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU1, Ukraine, set 48)" )
+// abu
+M4ABEAUT_SET( 199?, m4abeaut_u49,	m4abeaut,	"abu2a328.bin", 0x0000, 0x010000, CRC(52f787d3) SHA1(60fb468c6db705f97702bfbac69c70435dea23b2), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU2, Ukraine, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_u50,	m4abeaut,	"abu2b328.bin", 0x0000, 0x010000, CRC(590beca7) SHA1(40e7ace0a2bb27ce617d039f91e39030881b4b10), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU2, Ukraine, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_u51,	m4abeaut,	"abu2a335.bin", 0x0000, 0x010000, CRC(94177b51) SHA1(5e4e6dae888c8212a05064d754260cc923e0a733), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU2, Ukraine, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_u52,	m4abeaut,	"abu2b335.bin", 0x0000, 0x010000, CRC(d1e2967c) SHA1(df567d328f8f9f9f5ebbfc99344641198aa0d7f8), "Avantime?","American Beauty (Avantime?) (MPU4) (ABU2, Ukraine, set 4)" )
+// a2u2
+M4ABEAUT_SET( 199?, m4abeaut_u53,	m4abeaut,	"a2u2a310.bin", 0x0000, 0x010000, CRC(af3725e3) SHA1(7d36391d1f419bf7df131de12ce5e04e166a6ead), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U2, Ukraine, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_u54,	m4abeaut,	"a2u2b310.bin", 0x0000, 0x010000, CRC(b74947ca) SHA1(c1b668320bf22df773a00d5be1904d9bce9100a1), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U2, Ukraine, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_u55,	m4abeaut,	"a2u2a315.bin", 0x0000, 0x010000, CRC(31801bdf) SHA1(dff63e7838f4686fdf65503d8cf8746038d4a26e), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U2, Ukraine, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_u56,	m4abeaut,	"a2u2b315.bin", 0x0000, 0x010000, CRC(31aaa46e) SHA1(8026a5908ce2abbd4edc3537a618f700801cf78f), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U2, Ukraine, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_u57,	m4abeaut,	"a2u2a316.bin", 0x0000, 0x010000, CRC(0cb892dc) SHA1(7b7ad3515d171c20ab6102f0a439d5aac5ed3b4f), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U2, Ukraine, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_u58,	m4abeaut,	"a2u2b316.bin", 0x0000, 0x010000, CRC(ed2cedfa) SHA1(4c153c2f30c4c5821fcb378ffc9340452b041fe1), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U2, Ukraine, set 6)" )
+// a2u3
+M4ABEAUT_SET( 199?, m4abeaut_u59,	m4abeaut,	"a2u3a319.bin", 0x0000, 0x010000, CRC(586fb90e) SHA1(bd2c87593de2fd25eeb3a8c6c7576ae1bf80e4ad), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U3, Ukraine, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_u60,	m4abeaut,	"a2u3b319.bin", 0x0000, 0x010000, CRC(90aa2af2) SHA1(d4a99e817e1de8058a5f17ba758f63d1fa9535fe), "Avantime?","American Beauty (Avantime?) (MPU4) (A2U3, Ukraine, set 2)" )
+// a3u2
+M4ABEAUT_SET( 199?, m4abeaut_u61,	m4abeaut,	"a3u2a313.bin", 0x0000, 0x010000, CRC(708beb37) SHA1(6102a9211fba876c98c1198a7125cf415a9d11fc), "Avantime?","American Beauty (Avantime?) (MPU4) (A3U2, Ukraine, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_u62,	m4abeaut,	"a3u2b313.bin", 0x0000, 0x010000, CRC(9255447c) SHA1(731980e074b5409af3ee2dd4ecd9548fda8f3382), "Avantime?","American Beauty (Avantime?) (MPU4) (A3U2, Ukraine, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_u63,	m4abeaut,	"a3u2a315.bin", 0x0000, 0x010000, CRC(d49177ab) SHA1(759851624172e792427d517ddef5e54ca36228ee), "Avantime?","American Beauty (Avantime?) (MPU4) (A3U2, Ukraine, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_u64,	m4abeaut,	"a3u2b315.bin", 0x0000, 0x010000, CRC(73851092) SHA1(664f8edaa5bc12b94e645f0727247a21eb1b4d81), "Avantime?","American Beauty (Avantime?) (MPU4) (A3U2, Ukraine, set 4)" )
+// am1 - new - russia
+M4ABEAUT_SET( 199?, m4abeaut_r1,	m4abeaut,	"abr1a313.bin", 0x0000, 0x010000, CRC(60a9175a) SHA1(8365712a12c9bb96b310428ffae85451798ca37f), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_r2,	m4abeaut,	"abr1b313.bin", 0x0000, 0x010000, CRC(c55389cc) SHA1(028f08b8c8d927dc6c5300af7bdce293644e1b3c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_r3,	m4abeaut,	"abr1a316.bin", 0x0000, 0x010000, CRC(688e011b) SHA1(c52e8b298dc3a123cb8e54feac0d6eeb1dadac00), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_r4,	m4abeaut,	"abr1b316.bin", 0x0000, 0x010000, CRC(15265baf) SHA1(8aee3b20cb93d5fb5cb07110ed3a7670897ea877), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_r5,	m4abeaut,	"abr1a317.bin", 0x0000, 0x010000, CRC(0c251f11) SHA1(9d690836d87a5fd9aff82b4bf860e0fc519c5553), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_r6,	m4abeaut,	"abr1b317.bin", 0x0000, 0x010000, CRC(d7745260) SHA1(c38d10e346e80d609aef8c03940ab43ee3a891a0), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_r7,	m4abeaut,	"abr1a319.bin", 0x0000, 0x010000, CRC(30edf15d) SHA1(58ff8943af96f6c4d639a370c5b498a8c37ecee8), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_r8,	m4abeaut,	"abr1b319.bin", 0x0000, 0x010000, CRC(465d8801) SHA1(8b089b252ce6a8aeee4f109fbc343fc1314a60ff), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_r9,	m4abeaut,	"abr1a321.bin", 0x0000, 0x010000, CRC(63f89df8) SHA1(e1b7f87b84dd4de1df2487d1c2cb9f2787c4899e), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 9)" )
+M4ABEAUT_SET( 199?, m4abeaut_r10,	m4abeaut,	"abr1b321.bin", 0x0000, 0x010000, CRC(2a1c3ea6) SHA1(dac86d12b3339ac2b48981aea0407448d87287c0), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 10)" )
+M4ABEAUT_SET( 199?, m4abeaut_r11,	m4abeaut,	"abr1a325.bin", 0x0000, 0x010000, CRC(a7da1ce9) SHA1(557d387992796bf39310b9c6b71d9b2ac736f38d), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 11)" )
+M4ABEAUT_SET( 199?, m4abeaut_r12,	m4abeaut,	"abr1b325.bin", 0x0000, 0x010000, CRC(c4006f90) SHA1(55826a6408572b894331b577d088a74f1f9bba2c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 12)" )
+M4ABEAUT_SET( 199?, m4abeaut_r13,	m4abeaut,	"abr1a335.bin", 0x0000, 0x010000, CRC(a696c9d0) SHA1(8a8af53f129f48ffeef5e4f325e378c9bab40537), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 13)" )
+M4ABEAUT_SET( 199?, m4abeaut_r14,	m4abeaut,	"abr1b335.bin", 0x0000, 0x010000, CRC(79718339) SHA1(4d90362e85b51a9253ecf16447693887f2432ad6), "Avantime?","American Beauty (Avantime?) (MPU4) (ABR1, Russia, set 14)" )
+// abl0 - new - latvia
+M4ABEAUT_SET( 199?, m4abeaut_l1,	m4abeaut,	"abl0a312.bin", 0x0000, 0x010000, CRC(c35780bb) SHA1(8bbbe0ec5e96eec60b91de84d320361d1d235300), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_l2,	m4abeaut,	"abl0b312.bin", 0x0000, 0x010000, CRC(b7fb62b6) SHA1(c19bfda992a4e2da54942353f8c359caaa8a3cf2), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_l3,	m4abeaut,	"abl0a313.bin", 0x0000, 0x010000, CRC(19230b2a) SHA1(2c496796330f3790bad0bad8f55bd20ff50e3a0c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_l4,	m4abeaut,	"abl0b313.bin", 0x0000, 0x010000, CRC(fa08f549) SHA1(c4fa9799e8d41ce939139d1c72638720fabcc796), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_l5,	m4abeaut,	"abl0a317.bin", 0x0000, 0x010000, CRC(dfbc4386) SHA1(b6dd1697b4422f1c37d284c17916ddf68e2011da), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_l6,	m4abeaut,	"abl0b317.bin", 0x0000, 0x010000, CRC(cf2899ec) SHA1(36eb53b383575659ef66fde70098e07911cce793), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_l7,	m4abeaut,	"abl0a325.bin", 0x0000, 0x010000, CRC(e33dd097) SHA1(178fea0050386b55cfcc6ce4ef7e1d118a2943b3), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_l8,	m4abeaut,	"abl0b325.bin", 0x0000, 0x010000, CRC(3d5d4236) SHA1(e93ef0bd14aebda56d87b701bb4fbc22cedcff5b), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_l9,	m4abeaut,	"abl0a331.bin", 0x0000, 0x010000, CRC(4024009d) SHA1(2fb4577fb9c5b4b74f5381ff0feba629c584475f), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 9)" )
+M4ABEAUT_SET( 199?, m4abeaut_l10,	m4abeaut,	"abl0b331.bin", 0x0000, 0x010000, CRC(154a8c4d) SHA1(3076907a3402a1a8d20498435813f30c75643438), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 10)" )
+M4ABEAUT_SET( 199?, m4abeaut_l11,	m4abeaut,	"abl0a335.bin", 0x0000, 0x010000, CRC(2d5f1ec2) SHA1(63e75ce4e01f551d35483b27b95524b417a0df2f), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 11)" )
+M4ABEAUT_SET( 199?, m4abeaut_l12,	m4abeaut,	"abl0b335.bin", 0x0000, 0x010000, CRC(3c3d0177) SHA1(bbd86767a5ef70a7a795f12b111bf64b653ed53c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABL0, Latvia, set 12)" )
+// a2l0
+M4ABEAUT_SET( 199?, m4abeaut_l13,	m4abeaut,	"a2l0a301.bin", 0x0000, 0x010000, CRC(ae30bb11) SHA1(bfaaf232e6e409cf6768be262de9fdaf08d67948), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_l14,	m4abeaut,	"a2l0b301.bin", 0x0000, 0x010000, CRC(2f92ee8e) SHA1(382f8dc0abbe43e9c9aec011a5f66f3bf3d22b9d), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_l15,	m4abeaut,	"a2l0a302.bin", 0x0000, 0x010000, CRC(26f9321e) SHA1(94b9fe9059edef69ce180d8d09087f2f71adb661), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_l16,	m4abeaut,	"a2l0b302.bin", 0x0000, 0x010000, CRC(1418f724) SHA1(30f673c47066f23d2d6719cac22a557f350caab2), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_l17,	m4abeaut,	"a2l0a304.bin", 0x0000, 0x010000, CRC(5d4844ba) SHA1(cdc1f8fe886da7adecc3d3484e760fc1bff5eaf7), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_l18,	m4abeaut,	"a2l0b304.bin", 0x0000, 0x010000, CRC(fdc7e647) SHA1(7a8f09005585571586d7d99415113cbbade403ea), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_l19,	m4abeaut,	"a2l0a305.bin", 0x0000, 0x010000, CRC(91bce727) SHA1(e5fee8376aea2f5b8adc2cf53e445b48ed41cf77), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_l20,	m4abeaut,	"a2l0b305.bin", 0x0000, 0x010000, CRC(1b1065e3) SHA1(8ba3860cdf24ece523b3259df7c44544f841682d), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_l21,	m4abeaut,	"a2l0a306.bin", 0x0000, 0x010000, CRC(79e2902c) SHA1(507507abef4efb5c4b0e9714e898d7a2afb8ebc2), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 9)" )
+M4ABEAUT_SET( 199?, m4abeaut_l22,	m4abeaut,	"a2l0b306.bin", 0x0000, 0x010000, CRC(507287ea) SHA1(c6db30e7dffcc42f2615c00edf4dee871e763dbc), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 10)" )
+M4ABEAUT_SET( 199?, m4abeaut_l23,	m4abeaut,	"a2l0a307.bin", 0x0000, 0x010000, CRC(c1e0788f) SHA1(29ac2631bdb603da7ec9c81213efc06f0a920e62), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 11)" )
+M4ABEAUT_SET( 199?, m4abeaut_l24,	m4abeaut,	"a2l0b307.bin", 0x0000, 0x010000, CRC(997ee9f9) SHA1(3e4dda9c1419e8a0878b92e8693e6bdd5c812dd5), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 12)" )
+M4ABEAUT_SET( 199?, m4abeaut_l25,	m4abeaut,	"a2l0a309.bin", 0x0000, 0x010000, CRC(92be4a73) SHA1(8558269381f5c82c489b99000378b7f182f8d573), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 13)" )
+M4ABEAUT_SET( 199?, m4abeaut_l26,	m4abeaut,	"a2l0b309.bin", 0x0000, 0x010000, CRC(7167dc23) SHA1(c9c366fc8a6d486ba02af165e32579a6cc23ca95), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 14)" )
+M4ABEAUT_SET( 199?, m4abeaut_l27,	m4abeaut,	"a2l0a310.bin", 0x0000, 0x010000, CRC(2471e6e7) SHA1(7b3a17eab83181260ee04d735f65cdf7686fdbaa), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 15)" )
+M4ABEAUT_SET( 199?, m4abeaut_l28,	m4abeaut,	"a2l0b310.bin", 0x0000, 0x010000, CRC(0e064cf7) SHA1(ea15e727ec83a3c13a865737bb0706b950820111), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 16)" )
+M4ABEAUT_SET( 199?, m4abeaut_l29,	m4abeaut,	"a2l0a315.bin", 0x0000, 0x010000, CRC(1e25daf5) SHA1(ebedaab2b05c96b1ff9acbb2f7821c6ad3499f6c), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 17)" )
+M4ABEAUT_SET( 199?, m4abeaut_l30,	m4abeaut,	"a2l0b315.bin", 0x0000, 0x010000, CRC(f7113363) SHA1(3539ee920707a0c5e57563625be626f43295e4c1), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 18)" )
+M4ABEAUT_SET( 199?, m4abeaut_l31,	m4abeaut,	"a2l0a515.bin", 0x0000, 0x010000, CRC(359c971f) SHA1(35fcd55a5f46694b4807a948f80046105d2350e4), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 19)" )
+M4ABEAUT_SET( 199?, m4abeaut_l32,	m4abeaut,	"a2l0b515.bin", 0x0000, 0x010000, CRC(54202008) SHA1(6947019df7e86c42e2ec90cc188357a1c93cdda1), "Avantime?","American Beauty (Avantime?) (MPU4) (A2L0, Latvia, set 20)" )
+// a3l0
+M4ABEAUT_SET( 199?, m4abeaut_l33,	m4abeaut,	"a3l0a311.bin", 0x0000, 0x010000, CRC(51b207c5) SHA1(c6a8926b53a95ab8c2a219730bf3cb1e8fc1db31), "Avantime?","American Beauty (Avantime?) (MPU4) (A3L0, Latvia, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_l34,	m4abeaut,	"a3l0b311.bin", 0x0000, 0x010000, CRC(f5c8880a) SHA1(da83e1940123b9440b78ee6bf036bd5272e587e9), "Avantime?","American Beauty (Avantime?) (MPU4) (A3L0, Latvia, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_l35,	m4abeaut,	"a3l0a312.bin", 0x0000, 0x010000, CRC(63546571) SHA1(f203573a932cb65022bb9b159cbccd9abca282d5), "Avantime?","American Beauty (Avantime?) (MPU4) (A3L0, Latvia, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_l36,	m4abeaut,	"a3l0b312.bin", 0x0000, 0x010000, CRC(f7c7a3b7) SHA1(5c993fed16505456a41db6301c28650c8e3753d7), "Avantime?","American Beauty (Avantime?) (MPU4) (A3L0, Latvia, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_l37,	m4abeaut,	"a3l0a315.bin", 0x0000, 0x010000, CRC(9c6d6679) SHA1(e5efadc61b8a7a176ce5ff373092b8a8c8afe085), "Avantime?","American Beauty (Avantime?) (MPU4) (A3L0, Latvia, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_l38,	m4abeaut,	"a3l0b315.bin", 0x0000, 0x010000, CRC(5441f57f) SHA1(d9b0c33a4c076c3539433a904a28df8bdf5437d3), "Avantime?","American Beauty (Avantime?) (MPU4) (A3L0, Latvia, set 6)" )
+// am1 - new - projectbar
+M4ABEAUT_SET( 199?, m4abeaut_pb1,	m4abeaut,	"ajl0a314.bin", 0x0000, 0x010000, CRC(99a1a482) SHA1(1a5cbe86e9b7ba67fccfa87d8706e025edf173e6), "Avantime?","American Beauty (Avantime?) (MPU4) (AJL0, Project Bar, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_pb2,	m4abeaut,	"ajl0b314.bin", 0x0000, 0x010000, CRC(117abb65) SHA1(46418fbab1b27bef840f1f17392054ec8a1fc4d5), "Avantime?","American Beauty (Avantime?) (MPU4) (AJL0, Project Bar, set 2)" )
+// am1 - new - israel
+M4ABEAUT_SET( 199?, m4abeaut_i1,	m4abeaut,	"a2i0a215.bin", 0x0000, 0x010000, CRC(cf2425a7) SHA1(eee9bf97ff6905bea6bdec62c21fb47e2c7cb4e0), "Avantime?","American Beauty (Avantime?) (MPU4) (A2I0, Israel, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_i2,	m4abeaut,	"a2i0b215.bin", 0x0000, 0x010000, CRC(d1ae0a37) SHA1(94d6be1fceec03b9c8dc9d1b48118caded2d4b2d), "Avantime?","American Beauty (Avantime?) (MPU4) (A2I0, Israel, set 2)" )
+// am1 - new - czech
+M4ABEAUT_SET( 199?, m4abeaut_c1,	m4abeaut,	"abc1a127.bin", 0x0000, 0x010000, CRC(c64a3c57) SHA1(42aa460e8463152abed15e180255067ed08d000e), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_c2,	m4abeaut,	"abc1b127.bin", 0x0000, 0x010000, CRC(4dd74ff7) SHA1(54b6c5ddea0c6580eea4a9202c16fc53ee634f60), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_c3,	m4abeaut,	"abc1a129.bin", 0x0000, 0x010000, CRC(10e59623) SHA1(0e21fdde62e3cc31422494df4b31a8dd41ee8b4a), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_c4,	m4abeaut,	"abc1b129.bin", 0x0000, 0x010000, CRC(93a76979) SHA1(bd7bd2528e230392149e3e71f95577cf8d24faf3), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_c5,	m4abeaut,	"abc1a130.bin", 0x0000, 0x010000, CRC(ed053c43) SHA1(a6f8cd7c70e46d6088e3439f7a167b9f3a0aee8b), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_c6,	m4abeaut,	"abc1b130.bin", 0x0000, 0x010000, CRC(4b5fa794) SHA1(eb3ace534d3d94a181d5fe05966ba726a6c86536), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_c7,	m4abeaut,	"abc1a131.bin", 0x0000, 0x010000, CRC(4bc8db07) SHA1(43c63531e194aa509b4b8f07e3cef30c369c0612), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_c8,	m4abeaut,	"abc1b131.bin", 0x0000, 0x010000, CRC(1d8690ba) SHA1(c7174553b37cbf4a0916330677e0986848959e50), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_c9,	m4abeaut,	"abc1a132.bin", 0x0000, 0x010000, CRC(1dea8037) SHA1(95f40d6c3cf821380d344a8bfaca144bde569cfb), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 9)" )
+M4ABEAUT_SET( 199?, m4abeaut_c10,	m4abeaut,	"abc1b132.bin", 0x0000, 0x010000, CRC(fddfb3c2) SHA1(498f1152abf15423374b8b9a5c8c6635e2530c2c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 10)" )
+M4ABEAUT_SET( 199?, m4abeaut_c11,	m4abeaut,	"abc1a134.bin", 0x0000, 0x010000, CRC(3caed0da) SHA1(3371aba1956fd1f624f64e5ea56c92a42e68bc9c), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 11)" )
+M4ABEAUT_SET( 199?, m4abeaut_c12,	m4abeaut,	"abc1b134.bin", 0x0000, 0x010000, CRC(b9c68822) SHA1(50302685bec585f8e2884eb3db5508e87f4342f4), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 12)" )
+M4ABEAUT_SET( 199?, m4abeaut_c13,	m4abeaut,	"abc1a135.bin", 0x0000, 0x010000, CRC(9126f0a8) SHA1(3dec7d68cc6cb6e0b23945d47cf219992599a275), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 13)" )
+M4ABEAUT_SET( 199?, m4abeaut_c14,	m4abeaut,	"abc1b135.bin", 0x0000, 0x010000, CRC(7b0ee1fb) SHA1(6262805ac053d17d18e80e86980bbf66613c8662), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 14)" )
+M4ABEAUT_SET( 199?, m4abeaut_c15,	m4abeaut,	"abc1b110.bin", 0x0000, 0x010000, CRC(86c2658d) SHA1(3a8177a95696802a478964c045ca0f1b0aebcba4), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC1, Czech, set 15)" ) // unpaired
+// abc2
+M4ABEAUT_SET( 199?, m4abeaut_c16,	m4abeaut,	"abc2a127.bin", 0x0000, 0x010000, CRC(3094b4e5) SHA1(6b0fbf41ffec4bb21527dd59d1022fa90cee5b4e), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_c17,	m4abeaut,	"abc2b127.bin", 0x0000, 0x010000, CRC(44a0639d) SHA1(b370164df7b017c83ea6e0da16d4f7b57d4e3ad3), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 2)" )
+M4ABEAUT_SET( 199?, m4abeaut_c18,	m4abeaut,	"abc2a129.bin", 0x0000, 0x010000, CRC(5c3b0dd7) SHA1(bf380fa763e331893c0d9d365305f600a1d43e24), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 3)" )
+M4ABEAUT_SET( 199?, m4abeaut_c19,	m4abeaut,	"abc2b129.bin", 0x0000, 0x010000, CRC(8e11e0f6) SHA1(e52cf948ebca4884fe0ef006d1b73fa5c613c168), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 4)" )
+M4ABEAUT_SET( 199?, m4abeaut_c20,	m4abeaut,	"abc2a130.bin", 0x0000, 0x010000, CRC(8a7b5f0e) SHA1(11c98a63abe2d7749c55843a62efec9f91874eec), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 5)" )
+M4ABEAUT_SET( 199?, m4abeaut_c21,	m4abeaut,	"abc2b130.bin", 0x0000, 0x010000, CRC(f8d8deae) SHA1(368db35471e0e94e2b680489d1d922d61ec25b23), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 6)" )
+M4ABEAUT_SET( 199?, m4abeaut_c22,	m4abeaut,	"abc2a131.bin", 0x0000, 0x010000, CRC(824be635) SHA1(08b0e923fcaf5b77784cbb1ff9cc1f06b0ccd805), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 7)" )
+M4ABEAUT_SET( 199?, m4abeaut_c23,	m4abeaut,	"abc2b131.bin", 0x0000, 0x010000, CRC(42782d26) SHA1(4924f312be89f264c4d792d46e96425b1ba63ef2), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 8)" )
+M4ABEAUT_SET( 199?, m4abeaut_c24,	m4abeaut,	"abc2a132.bin", 0x0000, 0x010000, CRC(da632b39) SHA1(393430ce3e11610ff7b1aae989eb7ad26a1209f4), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 9)" )
+M4ABEAUT_SET( 199?, m4abeaut_c25,	m4abeaut,	"abc2b132.bin", 0x0000, 0x010000, CRC(ee32aa7d) SHA1(e6925f63227c96ae3ea6b132d444829b6c0bf7ee), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 10)" )
+M4ABEAUT_SET( 199?, m4abeaut_c26,	m4abeaut,	"abc2a134.bin", 0x0000, 0x010000, CRC(d979a744) SHA1(fd5a8eaba442b56b6265e9fef44f8d89d00a8602), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 11)" )
+M4ABEAUT_SET( 199?, m4abeaut_c27,	m4abeaut,	"abc2b134.bin", 0x0000, 0x010000, CRC(0705d6d8) SHA1(4b2535ab1bcf9683a50fe6a16038e37057f48ff6), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 12)" )
+M4ABEAUT_SET( 199?, m4abeaut_c28,	m4abeaut,	"abc2a135.bin", 0x0000, 0x010000, CRC(049d52bb) SHA1(ef9217c1349336410436cc83832c6b18c5dc3b78), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 13)" )
+M4ABEAUT_SET( 199?, m4abeaut_c29,	m4abeaut,	"abc2b135.bin", 0x0000, 0x010000, CRC(e5062947) SHA1(8530dfa32ea9f129b00f7cee29a23191f3484a9d), "Avantime?","American Beauty (Avantime?) (MPU4) (ABC2, Czech, set 14)" )
+// am1 - new - czech - 2meg
+M4ABEAUT_SET( 199?, m4abeaut_c30,	m4abeaut,	"m2c1a135.bin", 0x0000, 0x040000, CRC(98bf42cd) SHA1(d2f8bcc637e36ba053c7bca9034522f77490bbb3), "Avantime?","American Beauty (Avantime?) (MPU4) (M2C1, Czech, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_c31,	m4abeaut,	"m2c1b135.bin", 0x0000, 0x040000, CRC(cc48e2cf) SHA1(2666472f8b495f755cda1ee9fb0448430ff2315d), "Avantime?","American Beauty (Avantime?) (MPU4) (M2C1, Czech, set 2)" )
+// abs1 - slovakia? slovenia?
+M4ABEAUT_SET( 199?, m4abeaut_s1,	m4abeaut,	"abs1a135.bin", 0x0000, 0x010000, CRC(3143baab) SHA1(84949d00fe765e70ce8c5910a0bd859b1355ddc7), "Avantime?","American Beauty (Avantime?) (MPU4) (ABS1, Slovakia, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_s2,	m4abeaut,	"abs1b135.bin", 0x0000, 0x010000, CRC(96e27b72) SHA1(0e3c1f06cedbd3b26ab73aeee92ceadeb995e647), "Avantime?","American Beauty (Avantime?) (MPU4) (ABS1, Slovakia, set 2)" )
+// abs2
+M4ABEAUT_SET( 199?, m4abeaut_s3,	m4abeaut,	"abs2a135.bin", 0x0000, 0x010000, CRC(0664c4ef) SHA1(f642f87ff7d01f2fa995142032e27dfadc76cff7), "Avantime?","American Beauty (Avantime?) (MPU4) (ABS2, Slovakia, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_s4,	m4abeaut,	"abs2b135.bin", 0x0000, 0x010000, CRC(4c3d0187) SHA1(51bd2be8c5098784242dc86254dea7c8714e5fd9), "Avantime?","American Beauty (Avantime?) (MPU4) (ABS2, Slovakia, set 2)" )
+// abm1 - new - montenegro
+M4ABEAUT_SET( 199?, m4abeaut_m1,	m4abeaut,	"abm1a136.bin", 0x0000, 0x010000, CRC(30c987d1) SHA1(c4af4b3e849b46b5634933eb14869cead792d573), "Avantime?","American Beauty (Avantime?) (MPU4) (ABM1, Montenegro, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_m2,	m4abeaut,	"abm1b136.bin", 0x0000, 0x010000, CRC(0d9c9040) SHA1(8904244a1a732b2fe699b7d88718732c487f8049), "Avantime?","American Beauty (Avantime?) (MPU4) (ABM1, Montenegro, set 2)" )
+// abm2
+M4ABEAUT_SET( 199?, m4abeaut_m3,	m4abeaut,	"abm2a136.bin", 0x0000, 0x010000, CRC(92980ddc) SHA1(7f2432db1d97e562859b84cf6be3605b537c4379), "Avantime?","American Beauty (Avantime?) (MPU4) (ABM2, Montenegro, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_m4,	m4abeaut,	"abm2b136.bin", 0x0000, 0x010000, CRC(92a8baef) SHA1(0b3a40aa8a21ec7dd5c3aa14f3fb8b5d4b86582b), "Avantime?","American Beauty (Avantime?) (MPU4) (ABM2, Montenegro, set 2)" )
+// am1 - new - a2k
+M4ABEAUT_SET( 199?, m4abeaut_k1,	m4abeaut,	"a2k0a618.bin", 0x0000, 0x010000, CRC(fb6c2c55) SHA1(5d5631545142aa223ea15fd15cd4710aab5cc908), "Avantime?","American Beauty (Avantime?) (MPU4) (A2K0, set 1)" )
+M4ABEAUT_SET( 199?, m4abeaut_k2,	m4abeaut,	"a2k0b618.bin", 0x0000, 0x010000, CRC(545d7ffa) SHA1(1008a7a7affe4a56589e5ca691aaeb4a82218036), "Avantime?","American Beauty (Avantime?) (MPU4) (A2K0, set 2)" )
+
+
+
+
+
+
 
 ROM_START( m4trg )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -209,306 +447,116 @@ ROM_START( m4mbel )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
-// uses 3 reels at the bottom, 3 reels at the top + 1 bonus reel at the top
-// is it a dual mpu4 board configuration (hence the a/b roms?)
-ROM_START( m4abeaut )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// am1 - new - ukraine
-	ROM_LOAD( "abu1b321.bin", 0x0000, 0x010000, CRC(36fae9c1) SHA1(63a2395fced3268ecbe9b95118c8d07a411042f6) )
-	ROM_LOAD( "abu1b322.bin", 0x0000, 0x010000, CRC(86007ee4) SHA1(b49d1f46dd73b1ee5811b723dd12c9b7c5def6db) )
-	ROM_LOAD( "abu1b325.bin", 0x0000, 0x010000, CRC(1f2577ec) SHA1(b11cdaedb1896ecaa1655a5b8cd93615a64fcf55) )
-	ROM_LOAD( "abu1b335.bin", 0x0000, 0x010000, CRC(725e82db) SHA1(78eba2de7474509e73cd15a1e1ff648d00f7c14d) )
-	ROM_LOAD( "abu1b424.bin", 0x0000, 0x010000, CRC(0b48ddbc) SHA1(7ebd5cd91da859538ab4a7922df50df51a74c545) )
-	ROM_LOAD( "abu1b425.bin", 0x0000, 0x010000, CRC(18c5da7a) SHA1(8a496659b6cf7762afe2dfd691d1d66fd99ecbf2) )
-	ROM_LOAD( "abu1b435.bin", 0x0000, 0x010000, CRC(f99413e3) SHA1(caf168b5504352f8accb831326bf94b7141f5b76) )
-	ROM_LOAD( "abu2a335.bin", 0x0000, 0x010000, CRC(94177b51) SHA1(5e4e6dae888c8212a05064d754260cc923e0a733) )
-	ROM_LOAD( "abu2b335.bin", 0x0000, 0x010000, CRC(d1e2967c) SHA1(df567d328f8f9f9f5ebbfc99344641198aa0d7f8) )
-	ROM_LOAD( "abu1a222.bin", 0x0000, 0x010000, CRC(b88e349c) SHA1(1459fd8d0a2f98d919b688d7ea61fc679db4e4d5) )
-	ROM_LOAD( "abu1a224.bin", 0x0000, 0x010000, CRC(d4668aee) SHA1(d24cf0e22c1162cd92bc3a2bc53035690220843a) )
-	ROM_LOAD( "abu1a225.bin", 0x0000, 0x010000, CRC(b4904ccf) SHA1(1aac8a0e749946df74c6a9a5f2a645b468098b54) )
-	ROM_LOAD( "abu1a233.bin", 0x0000, 0x010000, CRC(437a4466) SHA1(bd59705f33df39da28ab6f447dd4d99bc5c05efe) )
-	ROM_LOAD( "abu1a234.bin", 0x0000, 0x010000, CRC(46ef47fc) SHA1(ef07199c69239604c72bc8192bf3a92b055282c7) )
-	ROM_LOAD( "abu1a235.bin", 0x0000, 0x010000, CRC(a206f7dc) SHA1(cf1c726302da28d2bc101828448adc8d96f50021) )
-	ROM_LOAD( "abu1a321.bin", 0x0000, 0x010000, CRC(77eaf769) SHA1(9b32504f16906d1121ade88e926fcc00bf5976a6) )
-	ROM_LOAD( "abu1a322.bin", 0x0000, 0x010000, CRC(c1d0f65c) SHA1(f4272be41f60d664490477cdddc837efbb5da573) )
-	ROM_LOAD( "abu1a325.bin", 0x0000, 0x010000, CRC(1c386b75) SHA1(a286dc423534ad9e32da131868483419a8bf313d) )
-	ROM_LOAD( "abu1a335.bin", 0x0000, 0x010000, CRC(732bcb35) SHA1(d044f83c294bb639cbbb963ec7c40efee86c7ed6) )
-	ROM_LOAD( "abu1a424.bin", 0x0000, 0x010000, CRC(265809eb) SHA1(9752ffa958878df2a0d44da5e5682320d0ec06ae) )
-	ROM_LOAD( "abu1a425.bin", 0x0000, 0x010000, CRC(9e21fccb) SHA1(e5ac645107b8e5d58c4a3e2b09049cb478547792) )
-	ROM_LOAD( "abu1a435.bin", 0x0000, 0x010000, CRC(318841c3) SHA1(0057d8730e020816313288e87172671cfac637aa) )
-	ROM_LOAD( "abu1b221.bin", 0x0000, 0x010000, CRC(ddd4afbe) SHA1(95a407cd9e544bbaecd41a270f9c017904740bc3) )
-	ROM_LOAD( "abu1b222.bin", 0x0000, 0x010000, CRC(3879a348) SHA1(618a1c49c3cfec8846e83d9b1655a6c283eb7fda) )
-	ROM_LOAD( "abu1b224.bin", 0x0000, 0x010000, CRC(d55bddda) SHA1(424d8832d1df39bb1250ba506226f969ec99e450) )
-	ROM_LOAD( "abu1b225.bin", 0x0000, 0x010000, CRC(541f51f4) SHA1(2ade2998201c65e0723dacf106c95375f807bcc1) )
-	ROM_LOAD( "abu1b233.bin", 0x0000, 0x010000, CRC(ca42eaae) SHA1(a3d20d978a6d08ef6da6467678cd7afb7c1a5b3d) )
-	ROM_LOAD( "abu1b234.bin", 0x0000, 0x010000, CRC(12c627ab) SHA1(d0a47743b46a982e8c2e969c2131fa6f1132fa8c) )
-	ROM_LOAD( "abu1b235.bin", 0x0000, 0x010000, CRC(dce59ddb) SHA1(778e7030a7e7e8b2eeb28f9e88edfbf350abd955) )
-	// am1 - new - russia
-	ROM_LOAD( "abr1a321.bin", 0x0000, 0x010000, CRC(63f89df8) SHA1(e1b7f87b84dd4de1df2487d1c2cb9f2787c4899e) )
-	ROM_LOAD( "abr1a325.bin", 0x0000, 0x010000, CRC(a7da1ce9) SHA1(557d387992796bf39310b9c6b71d9b2ac736f38d) )
-	ROM_LOAD( "abr1a335.bin", 0x0000, 0x010000, CRC(a696c9d0) SHA1(8a8af53f129f48ffeef5e4f325e378c9bab40537) )
-	ROM_LOAD( "abr1b321.bin", 0x0000, 0x010000, CRC(2a1c3ea6) SHA1(dac86d12b3339ac2b48981aea0407448d87287c0) )
-	ROM_LOAD( "abr1b325.bin", 0x0000, 0x010000, CRC(c4006f90) SHA1(55826a6408572b894331b577d088a74f1f9bba2c) )
-	ROM_LOAD( "abr1b335.bin", 0x0000, 0x010000, CRC(79718339) SHA1(4d90362e85b51a9253ecf16447693887f2432ad6) )
-	// am1 - new - latvia
-	ROM_LOAD( "a2l0a304.bin", 0x0000, 0x010000, CRC(5d4844ba) SHA1(cdc1f8fe886da7adecc3d3484e760fc1bff5eaf7) )
-	ROM_LOAD( "a2l0b304.bin", 0x0000, 0x010000, CRC(fdc7e647) SHA1(7a8f09005585571586d7d99415113cbbade403ea) )
-	ROM_LOAD( "abl0a313.bin", 0x0000, 0x010000, CRC(19230b2a) SHA1(2c496796330f3790bad0bad8f55bd20ff50e3a0c) )
-	ROM_LOAD( "abl0a317.bin", 0x0000, 0x010000, CRC(dfbc4386) SHA1(b6dd1697b4422f1c37d284c17916ddf68e2011da) )
-	ROM_LOAD( "abl0a325.bin", 0x0000, 0x010000, CRC(e33dd097) SHA1(178fea0050386b55cfcc6ce4ef7e1d118a2943b3) )
-	ROM_LOAD( "abl0a331.bin", 0x0000, 0x010000, CRC(4024009d) SHA1(2fb4577fb9c5b4b74f5381ff0feba629c584475f) )
-	ROM_LOAD( "abl0a335.bin", 0x0000, 0x010000, CRC(2d5f1ec2) SHA1(63e75ce4e01f551d35483b27b95524b417a0df2f) )
-	ROM_LOAD( "abl0b313.bin", 0x0000, 0x010000, CRC(fa08f549) SHA1(c4fa9799e8d41ce939139d1c72638720fabcc796) )
-	ROM_LOAD( "abl0b317.bin", 0x0000, 0x010000, CRC(cf2899ec) SHA1(36eb53b383575659ef66fde70098e07911cce793) )
-	ROM_LOAD( "abl0b325.bin", 0x0000, 0x010000, CRC(3d5d4236) SHA1(e93ef0bd14aebda56d87b701bb4fbc22cedcff5b) )
-	ROM_LOAD( "abl0b331.bin", 0x0000, 0x010000, CRC(154a8c4d) SHA1(3076907a3402a1a8d20498435813f30c75643438) )
-	ROM_LOAD( "abl0b335.bin", 0x0000, 0x010000, CRC(3c3d0177) SHA1(bbd86767a5ef70a7a795f12b111bf64b653ed53c) )
-	// am1 - new - israel
-	ROM_LOAD( "a2i0a215.bin", 0x0000, 0x010000, CRC(cf2425a7) SHA1(eee9bf97ff6905bea6bdec62c21fb47e2c7cb4e0) )
-	ROM_LOAD( "a2i0b215.bin", 0x0000, 0x010000, CRC(d1ae0a37) SHA1(94d6be1fceec03b9c8dc9d1b48118caded2d4b2d) )
-	// am1 - new - czech
-	ROM_LOAD( "abbcz1.prn", 0x0000, 0x08e0c1, CRC(f333bd68) SHA1(05c30186116b043c0da2ca2b1fc2f1add7bd1574) )
-	ROM_LOAD( "abc1a134.bin", 0x0000, 0x010000, CRC(3caed0da) SHA1(3371aba1956fd1f624f64e5ea56c92a42e68bc9c) )
-	ROM_LOAD( "abc1a135.bin", 0x0000, 0x010000, CRC(9126f0a8) SHA1(3dec7d68cc6cb6e0b23945d47cf219992599a275) )
-	ROM_LOAD( "abc1b134.bin", 0x0000, 0x010000, CRC(b9c68822) SHA1(50302685bec585f8e2884eb3db5508e87f4342f4) )
-	ROM_LOAD( "abc1b135.bin", 0x0000, 0x010000, CRC(7b0ee1fb) SHA1(6262805ac053d17d18e80e86980bbf66613c8662) )
-	ROM_LOAD( "abc2a134.bin", 0x0000, 0x010000, CRC(d979a744) SHA1(fd5a8eaba442b56b6265e9fef44f8d89d00a8602) )
-	ROM_LOAD( "abc2a135.bin", 0x0000, 0x010000, CRC(049d52bb) SHA1(ef9217c1349336410436cc83832c6b18c5dc3b78) )
-	ROM_LOAD( "abc2b134.bin", 0x0000, 0x010000, CRC(0705d6d8) SHA1(4b2535ab1bcf9683a50fe6a16038e37057f48ff6) )
-	ROM_LOAD( "abc2b135.bin", 0x0000, 0x010000, CRC(e5062947) SHA1(8530dfa32ea9f129b00f7cee29a23191f3484a9d) )
-	ROM_LOAD( "abs1a135.bin", 0x0000, 0x010000, CRC(3143baab) SHA1(84949d00fe765e70ce8c5910a0bd859b1355ddc7) )
-	ROM_LOAD( "abs1b135.bin", 0x0000, 0x010000, CRC(96e27b72) SHA1(0e3c1f06cedbd3b26ab73aeee92ceadeb995e647) )
-	ROM_LOAD( "abs2a135.bin", 0x0000, 0x010000, CRC(0664c4ef) SHA1(f642f87ff7d01f2fa995142032e27dfadc76cff7) )
-	ROM_LOAD( "abs2b135.bin", 0x0000, 0x010000, CRC(4c3d0187) SHA1(51bd2be8c5098784242dc86254dea7c8714e5fd9) )
-	// am1 - new - czech - 2meg
-	ROM_LOAD( "m2c1a135.bin", 0x0000, 0x040000, CRC(98bf42cd) SHA1(d2f8bcc637e36ba053c7bca9034522f77490bbb3) )
-	ROM_LOAD( "m2c1b135.bin", 0x0000, 0x040000, CRC(cc48e2cf) SHA1(2666472f8b495f755cda1ee9fb0448430ff2315d) )
-	// am1 - new - montenegro
-	ROM_LOAD( "abm1a136.bin", 0x0000, 0x010000, CRC(30c987d1) SHA1(c4af4b3e849b46b5634933eb14869cead792d573) )
-	ROM_LOAD( "abm1b136.bin", 0x0000, 0x010000, CRC(0d9c9040) SHA1(8904244a1a732b2fe699b7d88718732c487f8049) )
-	ROM_LOAD( "abm2a136.bin", 0x0000, 0x010000, CRC(92980ddc) SHA1(7f2432db1d97e562859b84cf6be3605b537c4379) )
-	ROM_LOAD( "abm2b136.bin", 0x0000, 0x010000, CRC(92a8baef) SHA1(0b3a40aa8a21ec7dd5c3aa14f3fb8b5d4b86582b) )
-	// am1 - new - projectbar
-	ROM_LOAD( "ajl0a314.bin", 0x0000, 0x010000, CRC(99a1a482) SHA1(1a5cbe86e9b7ba67fccfa87d8706e025edf173e6) )
-	ROM_LOAD( "ajl0b314.bin", 0x0000, 0x010000, CRC(117abb65) SHA1(46418fbab1b27bef840f1f17392054ec8a1fc4d5) )
-	// am1 - new - a2k
-	ROM_LOAD( "a2k0a618.bin", 0x0000, 0x010000, CRC(fb6c2c55) SHA1(5d5631545142aa223ea15fd15cd4710aab5cc908) )
-	ROM_LOAD( "a2k0b618.bin", 0x0000, 0x010000, CRC(545d7ffa) SHA1(1008a7a7affe4a56589e5ca691aaeb4a82218036) )
-	// am1 - misc
-	ROM_LOAD( "abu2a328.bin", 0x0000, 0x010000, CRC(52f787d3) SHA1(60fb468c6db705f97702bfbac69c70435dea23b2) ) // was in the robotica set, but is clearly american beauty
-	ROM_LOAD( "abu2b328.bin", 0x0000, 0x010000, CRC(590beca7) SHA1(40e7ace0a2bb27ce617d039f91e39030881b4b10) ) // was in the robotica set, but is clearly american beauty
-	ROM_LOAD( "a2l0a315.bin", 0x0000, 0x010000, CRC(1e25daf5) SHA1(ebedaab2b05c96b1ff9acbb2f7821c6ad3499f6c) )
-	ROM_LOAD( "a2l0a515.bin", 0x0000, 0x010000, CRC(359c971f) SHA1(35fcd55a5f46694b4807a948f80046105d2350e4) )
-	ROM_LOAD( "a2l0b315.bin", 0x0000, 0x010000, CRC(f7113363) SHA1(3539ee920707a0c5e57563625be626f43295e4c1) )
-	ROM_LOAD( "a2l0b515.bin", 0x0000, 0x010000, CRC(54202008) SHA1(6947019df7e86c42e2ec90cc188357a1c93cdda1) )
-	ROM_LOAD( "a2u2a315.bin", 0x0000, 0x010000, CRC(31801bdf) SHA1(dff63e7838f4686fdf65503d8cf8746038d4a26e) )
-	ROM_LOAD( "a2u2b315.bin", 0x0000, 0x010000, CRC(31aaa46e) SHA1(8026a5908ce2abbd4edc3537a618f700801cf78f) )
-	ROM_LOAD( "a3l0a315.bin", 0x0000, 0x010000, CRC(9c6d6679) SHA1(e5efadc61b8a7a176ce5ff373092b8a8c8afe085) )
-	ROM_LOAD( "a3l0b315.bin", 0x0000, 0x010000, CRC(5441f57f) SHA1(d9b0c33a4c076c3539433a904a28df8bdf5437d3) )
-	ROM_LOAD( "a3u2a315.bin", 0x0000, 0x010000, CRC(d49177ab) SHA1(759851624172e792427d517ddef5e54ca36228ee) )
-	ROM_LOAD( "a3u2b315.bin", 0x0000, 0x010000, CRC(73851092) SHA1(664f8edaa5bc12b94e645f0727247a21eb1b4d81) )
-	ROM_LOAD( "ab1.bin", 0x0000, 0x010000, CRC(f4c93368) SHA1(fc57947fdc98bf544de601814e93c098667bcae3) )
-	ROM_LOAD( "ab303.bin", 0x0000, 0x010000, CRC(493a6de5) SHA1(6bde7f2cec4a94132cc3d4f902626c66c8858276) )
-	ROM_LOAD( "aba306.bin", 0x0000, 0x010000, CRC(6034f4eb) SHA1(8e5442ad275d48cda8327f1b86c6842807ae33b8) )
-	ROM_LOAD( "abb306.bin", 0x0000, 0x010000, CRC(d11f8a09) SHA1(8a391e7fb7e0567b1971ec118d85739910e32c33) )
-	ROM_LOAD( "aba309.bin", 0x0000, 0x010000, CRC(87204db5) SHA1(be4cc1de841e4c8581a649c86aefafaa70a28332) )
-	ROM_LOAD( "abb309.bin", 0x0000, 0x010000, CRC(dbc126af) SHA1(1190d57228918bcfa481e86d79759854c47945a6) )
-	ROM_LOAD( "abc1a127.bin", 0x0000, 0x010000, CRC(c64a3c57) SHA1(42aa460e8463152abed15e180255067ed08d000e) )
-	ROM_LOAD( "abc1b127.bin", 0x0000, 0x010000, CRC(4dd74ff7) SHA1(54b6c5ddea0c6580eea4a9202c16fc53ee634f60) )
-	ROM_LOAD( "abc2a127.bin", 0x0000, 0x010000, CRC(3094b4e5) SHA1(6b0fbf41ffec4bb21527dd59d1022fa90cee5b4e) )
-	ROM_LOAD( "abc2b127.bin", 0x0000, 0x010000, CRC(44a0639d) SHA1(b370164df7b017c83ea6e0da16d4f7b57d4e3ad3) )
-	ROM_LOAD( "abc1a129.bin", 0x0000, 0x010000, CRC(10e59623) SHA1(0e21fdde62e3cc31422494df4b31a8dd41ee8b4a) )
-	ROM_LOAD( "abc1b129.bin", 0x0000, 0x010000, CRC(93a76979) SHA1(bd7bd2528e230392149e3e71f95577cf8d24faf3) )
-	ROM_LOAD( "abc2a129.bin", 0x0000, 0x010000, CRC(5c3b0dd7) SHA1(bf380fa763e331893c0d9d365305f600a1d43e24) )
-	ROM_LOAD( "abc2b129.bin", 0x0000, 0x010000, CRC(8e11e0f6) SHA1(e52cf948ebca4884fe0ef006d1b73fa5c613c168) )
-	ROM_LOAD( "abc1a130.bin", 0x0000, 0x010000, CRC(ed053c43) SHA1(a6f8cd7c70e46d6088e3439f7a167b9f3a0aee8b) )
-	ROM_LOAD( "abc1b130.bin", 0x0000, 0x010000, CRC(4b5fa794) SHA1(eb3ace534d3d94a181d5fe05966ba726a6c86536) )
-	ROM_LOAD( "abc2a130.bin", 0x0000, 0x010000, CRC(8a7b5f0e) SHA1(11c98a63abe2d7749c55843a62efec9f91874eec) )
-	ROM_LOAD( "abc2b130.bin", 0x0000, 0x010000, CRC(f8d8deae) SHA1(368db35471e0e94e2b680489d1d922d61ec25b23) )
-	ROM_LOAD( "abc1a131.bin", 0x0000, 0x010000, CRC(4bc8db07) SHA1(43c63531e194aa509b4b8f07e3cef30c369c0612) )
-	ROM_LOAD( "abc1b131.bin", 0x0000, 0x010000, CRC(1d8690ba) SHA1(c7174553b37cbf4a0916330677e0986848959e50) )
-	ROM_LOAD( "abc2a131.bin", 0x0000, 0x010000, CRC(824be635) SHA1(08b0e923fcaf5b77784cbb1ff9cc1f06b0ccd805) )
-	ROM_LOAD( "abc2b131.bin", 0x0000, 0x010000, CRC(42782d26) SHA1(4924f312be89f264c4d792d46e96425b1ba63ef2) )
-	ROM_LOAD( "abc1a132.bin", 0x0000, 0x010000, CRC(1dea8037) SHA1(95f40d6c3cf821380d344a8bfaca144bde569cfb) )
-	ROM_LOAD( "abc1b132.bin", 0x0000, 0x010000, CRC(fddfb3c2) SHA1(498f1152abf15423374b8b9a5c8c6635e2530c2c) )
-	ROM_LOAD( "abc2a132.bin", 0x0000, 0x010000, CRC(da632b39) SHA1(393430ce3e11610ff7b1aae989eb7ad26a1209f4) )
-	ROM_LOAD( "abc2b132.bin", 0x0000, 0x010000, CRC(ee32aa7d) SHA1(e6925f63227c96ae3ea6b132d444829b6c0bf7ee) )
-	ROM_LOAD( "abc1b110.bin", 0x0000, 0x010000, CRC(86c2658d) SHA1(3a8177a95696802a478964c045ca0f1b0aebcba4) )
-	ROM_LOAD( "abl0a312.bin", 0x0000, 0x010000, CRC(c35780bb) SHA1(8bbbe0ec5e96eec60b91de84d320361d1d235300) )
-	ROM_LOAD( "abl0b312.bin", 0x0000, 0x010000, CRC(b7fb62b6) SHA1(c19bfda992a4e2da54942353f8c359caaa8a3cf2) )
-	ROM_LOAD( "abr1a313.bin", 0x0000, 0x010000, CRC(60a9175a) SHA1(8365712a12c9bb96b310428ffae85451798ca37f) )
-	ROM_LOAD( "abu1a313.bin", 0x0000, 0x010000, CRC(2961d917) SHA1(7396f7dd50e7d6c94a64bad694f752ef8e80d5f8) )
-	ROM_LOAD( "abr1a316.bin", 0x0000, 0x010000, CRC(688e011b) SHA1(c52e8b298dc3a123cb8e54feac0d6eeb1dadac00) )
-	ROM_LOAD( "abr1b316.bin", 0x0000, 0x010000, CRC(15265baf) SHA1(8aee3b20cb93d5fb5cb07110ed3a7670897ea877) )
-	ROM_LOAD( "abr1a317.bin", 0x0000, 0x010000, CRC(0c251f11) SHA1(9d690836d87a5fd9aff82b4bf860e0fc519c5553) )
-	ROM_LOAD( "abr1b317.bin", 0x0000, 0x010000, CRC(d7745260) SHA1(c38d10e346e80d609aef8c03940ab43ee3a891a0) )
-	ROM_LOAD( "abu1a217.bin", 0x0000, 0x010000, CRC(7f372d59) SHA1(874eca687f6915ae3d777b91e1925da11c0888ef) )
-	ROM_LOAD( "abu1a317.bin", 0x0000, 0x010000, CRC(37cb227a) SHA1(5af003102210cf8e21564da6fa2afe1dc197f2bd) )
-	ROM_LOAD( "abu1b217.bin", 0x0000, 0x010000, CRC(d0eb875a) SHA1(46234883d01079e71f952b69271d62607968cbfa) )
-	ROM_LOAD( "abu1b317.bin", 0x0000, 0x010000, CRC(d29f0aa2) SHA1(e518523a32c6f5711f39a20f1866e6246e1f39e4) )
-	ROM_LOAD( "abr1a319.bin", 0x0000, 0x010000, CRC(30edf15d) SHA1(58ff8943af96f6c4d639a370c5b498a8c37ecee8) )
-	ROM_LOAD( "abr1b319.bin", 0x0000, 0x010000, CRC(465d8801) SHA1(8b089b252ce6a8aeee4f109fbc343fc1314a60ff) )
-	ROM_LOAD( "abu1a219.bin", 0x0000, 0x010000, CRC(54a67982) SHA1(72e7309d0782bad8edc19dc1b793d2961b8adc02) )
-	ROM_LOAD( "abu1a319.bin", 0x0000, 0x010000, CRC(f9e17cdd) SHA1(5a89b2b5b42c8d15fbb2efd59ce808642935e275) )
-	ROM_LOAD( "abu1b219.bin", 0x0000, 0x010000, CRC(b8dd3b7f) SHA1(ecadf9834e59dcff12a9dc4985cc362d750c301c) )
-	ROM_LOAD( "abu1b319.bin", 0x0000, 0x010000, CRC(8f510581) SHA1(7d4d8514df7a2bd7b415e33856d7b61c875b6041) )
-	ROM_LOAD( "abu1a221.bin", 0x0000, 0x010000, CRC(c95f25a1) SHA1(3cfc57507aacb8a0f29aeb5b3028b356daf8d770) )
-	ROM_LOAD( "aba305.bin", 0x0000, 0x010000, CRC(ab70802c) SHA1(0cb59947b0bc177b10c55e02a0c8016620e0c346) )
-	ROM_LOAD( "abb305.bin", 0x0000, 0x010000, CRC(eeb3f0e8) SHA1(b4daa4e0817cb37a6f91bf12ba9fbff0f631abd1) )
-	ROM_LOAD( "aba308.bin", 0x0000, 0x010000, CRC(3aef7d45) SHA1(e11cb0175bd82c208839c8172ffee2639727bf15) )
-	ROM_LOAD( "abb308.bin", 0x0000, 0x010000, CRC(fac4099b) SHA1(643ef922c6a5abc5ac679d31a04ffd5a0ac30c61) )
-	ROM_LOAD( "abu1a215.bin", 0x0000, 0x010000, CRC(702b9cb6) SHA1(13728154c44e6acc97555dc03bd47b4ba8619739) )
-	ROM_LOAD( "abu1a315.bin", 0x0000, 0x010000, CRC(42e45fea) SHA1(154119329a0ca4698492990eb36e1633449e270a) )
-	ROM_LOAD( "abu1b215.bin", 0x0000, 0x010000, CRC(5722255c) SHA1(12bcf680b5ea994239fe92ee73103484e8385383) )
-	ROM_LOAD( "abu1b315.bin", 0x0000, 0x010000, CRC(175f3a6b) SHA1(9fcd9c5784eb4f2f51ed33812909daa2ae36b31b) )
-	ROM_LOAD( "abu1a216.bin", 0x0000, 0x010000, CRC(1a430dfd) SHA1(e3f7cd15c8fbb42f40c5b473d07eac4b4a919349) )
-	ROM_LOAD( "abu1a316.bin", 0x0000, 0x010000, CRC(d2fa634d) SHA1(0fb2529823bbab20075f3b246a54f5d23d74ee17) )
-	ROM_LOAD( "abu1b216.bin", 0x0000, 0x010000, CRC(2edee140) SHA1(6a0472debfe93ca7c0c8f22945cdc14b28f7a18d) )
-	ROM_LOAD( "abu1b316.bin", 0x0000, 0x010000, CRC(fe8d6ac8) SHA1(28a927817b1e9c8e69e71e34955bb2d71da6abc2) )
-	ROM_LOAD( "abu1a214.bin", 0x0000, 0x010000, CRC(20456dce) SHA1(29fac37f0ff90a01f1d754ef953d489eadb478d8) )
-	ROM_LOAD( "abu1b214.bin", 0x0000, 0x010000, CRC(4f4c6fd3) SHA1(3ce07496ff6d6fccabc41d62477eb0a30ed7808b) )
-	ROM_LOAD( "abr1b313.bin", 0x0000, 0x010000, CRC(c55389cc) SHA1(028f08b8c8d927dc6c5300af7bdce293644e1b3c) )
-	ROM_LOAD( "abu1b313.bin", 0x0000, 0x010000, CRC(fb7a721e) SHA1(6dc1320c079dc1d7677516e57a3cb0defa75056e) )
-	ROM_LOAD( "a2l0a301.bin", 0x0000, 0x010000, CRC(ae30bb11) SHA1(bfaaf232e6e409cf6768be262de9fdaf08d67948) )
-	ROM_LOAD( "a2l0b301.bin", 0x0000, 0x010000, CRC(2f92ee8e) SHA1(382f8dc0abbe43e9c9aec011a5f66f3bf3d22b9d) )
-	ROM_LOAD( "a2l0a302.bin", 0x0000, 0x010000, CRC(26f9321e) SHA1(94b9fe9059edef69ce180d8d09087f2f71adb661) )
-	ROM_LOAD( "a2l0b302.bin", 0x0000, 0x010000, CRC(1418f724) SHA1(30f673c47066f23d2d6719cac22a557f350caab2) )
-
-	// ab2
-	ROM_LOAD( "a2l0a305.bin", 0x0000, 0x010000, CRC(91bce727) SHA1(e5fee8376aea2f5b8adc2cf53e445b48ed41cf77) )
-	ROM_LOAD( "a2l0b305.bin", 0x0000, 0x010000, CRC(1b1065e3) SHA1(8ba3860cdf24ece523b3259df7c44544f841682d) )
-	ROM_LOAD( "a2l0a306.bin", 0x0000, 0x010000, CRC(79e2902c) SHA1(507507abef4efb5c4b0e9714e898d7a2afb8ebc2) )
-	ROM_LOAD( "a2l0b306.bin", 0x0000, 0x010000, CRC(507287ea) SHA1(c6db30e7dffcc42f2615c00edf4dee871e763dbc) )
-	ROM_LOAD( "a2l0a307.bin", 0x0000, 0x010000, CRC(c1e0788f) SHA1(29ac2631bdb603da7ec9c81213efc06f0a920e62) )
-	ROM_LOAD( "a2l0b307.bin", 0x0000, 0x010000, CRC(997ee9f9) SHA1(3e4dda9c1419e8a0878b92e8693e6bdd5c812dd5) )
-	ROM_LOAD( "a2l0a310.bin", 0x0000, 0x010000, CRC(2471e6e7) SHA1(7b3a17eab83181260ee04d735f65cdf7686fdbaa) )
-	ROM_LOAD( "a2l0b310.bin", 0x0000, 0x010000, CRC(0e064cf7) SHA1(ea15e727ec83a3c13a865737bb0706b950820111) )
-	ROM_LOAD( "a2u2a310.bin", 0x0000, 0x010000, CRC(af3725e3) SHA1(7d36391d1f419bf7df131de12ce5e04e166a6ead) )
-	ROM_LOAD( "a2u2b310.bin", 0x0000, 0x010000, CRC(b74947ca) SHA1(c1b668320bf22df773a00d5be1904d9bce9100a1) )
-	ROM_LOAD( "a3l0a311.bin", 0x0000, 0x010000, CRC(51b207c5) SHA1(c6a8926b53a95ab8c2a219730bf3cb1e8fc1db31) )
-	ROM_LOAD( "a3l0b311.bin", 0x0000, 0x010000, CRC(f5c8880a) SHA1(da83e1940123b9440b78ee6bf036bd5272e587e9) )
-	ROM_LOAD( "a3l0a312.bin", 0x0000, 0x010000, CRC(63546571) SHA1(f203573a932cb65022bb9b159cbccd9abca282d5) )
-	ROM_LOAD( "a3l0b312.bin", 0x0000, 0x010000, CRC(f7c7a3b7) SHA1(5c993fed16505456a41db6301c28650c8e3753d7) )
-	ROM_LOAD( "a2u3a319.bin", 0x0000, 0x010000, CRC(586fb90e) SHA1(bd2c87593de2fd25eeb3a8c6c7576ae1bf80e4ad) )
-	ROM_LOAD( "a2u3b319.bin", 0x0000, 0x010000, CRC(90aa2af2) SHA1(d4a99e817e1de8058a5f17ba758f63d1fa9535fe) )
-	ROM_LOAD( "a3l0a312.bin", 0x0000, 0x010000, CRC(63546571) SHA1(f203573a932cb65022bb9b159cbccd9abca282d5) )
-	ROM_LOAD( "a3l0b312.bin", 0x0000, 0x010000, CRC(f7c7a3b7) SHA1(5c993fed16505456a41db6301c28650c8e3753d7) )
-	ROM_LOAD( "a2l0a305.bin", 0x0000, 0x010000, CRC(91bce727) SHA1(e5fee8376aea2f5b8adc2cf53e445b48ed41cf77) )
-	ROM_LOAD( "a2l0a306.bin", 0x0000, 0x010000, CRC(79e2902c) SHA1(507507abef4efb5c4b0e9714e898d7a2afb8ebc2) )
-	ROM_LOAD( "a2l0a307.bin", 0x0000, 0x010000, CRC(c1e0788f) SHA1(29ac2631bdb603da7ec9c81213efc06f0a920e62) )
-	ROM_LOAD( "a2l0a310.bin", 0x0000, 0x010000, CRC(2471e6e7) SHA1(7b3a17eab83181260ee04d735f65cdf7686fdbaa) )
-	ROM_LOAD( "a2l0b305.bin", 0x0000, 0x010000, CRC(1b1065e3) SHA1(8ba3860cdf24ece523b3259df7c44544f841682d) )
-	ROM_LOAD( "a2l0b306.bin", 0x0000, 0x010000, CRC(507287ea) SHA1(c6db30e7dffcc42f2615c00edf4dee871e763dbc) )
-	ROM_LOAD( "a2l0b307.bin", 0x0000, 0x010000, CRC(997ee9f9) SHA1(3e4dda9c1419e8a0878b92e8693e6bdd5c812dd5) )
-	ROM_LOAD( "a2l0b310.bin", 0x0000, 0x010000, CRC(0e064cf7) SHA1(ea15e727ec83a3c13a865737bb0706b950820111) )
-	ROM_LOAD( "a3u2a313.bin", 0x0000, 0x010000, CRC(708beb37) SHA1(6102a9211fba876c98c1198a7125cf415a9d11fc) )
-	ROM_LOAD( "a3u2b313.bin", 0x0000, 0x010000, CRC(9255447c) SHA1(731980e074b5409af3ee2dd4ecd9548fda8f3382) )
-	ROM_LOAD( "a2u2a310.bin", 0x0000, 0x010000, CRC(af3725e3) SHA1(7d36391d1f419bf7df131de12ce5e04e166a6ead) )
-	ROM_LOAD( "a2u2a316.bin", 0x0000, 0x010000, CRC(0cb892dc) SHA1(7b7ad3515d171c20ab6102f0a439d5aac5ed3b4f) )
-	ROM_LOAD( "a2u2b310.bin", 0x0000, 0x010000, CRC(b74947ca) SHA1(c1b668320bf22df773a00d5be1904d9bce9100a1) )
-	ROM_LOAD( "a2u2b316.bin", 0x0000, 0x010000, CRC(ed2cedfa) SHA1(4c153c2f30c4c5821fcb378ffc9340452b041fe1) )
-	ROM_LOAD( "a2l0a309.bin", 0x0000, 0x010000, CRC(92be4a73) SHA1(8558269381f5c82c489b99000378b7f182f8d573) )
-	ROM_LOAD( "a2l0b309.bin", 0x0000, 0x010000, CRC(7167dc23) SHA1(c9c366fc8a6d486ba02af165e32579a6cc23ca95) )
-
-
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "abs011.bin", 0x0000, 0x080000, CRC(e9364aa0) SHA1(775d94f8665387538d4d8d8ddec38e2ccec2e345) ) // snd?
-	ROM_LOAD( "abs012.bin", 0x0000, 0x080000, CRC(72371572) SHA1(4504a91486952bc42e31632131d31cf5414853d6) ) // snd?
-	ROM_LOAD( "abs021.bin", 0x0000, 0x080000, CRC(add61ab9) SHA1(1e611bc69f129c18ce460c051f78c726f5efdf68) )
-	ROM_LOAD( "abs031.bin", 0x0000, 0x080000, CRC(7fe9b7f5) SHA1(4c8fedec056647f7ca9b7da66c020bcdb1e161d0) )
-	ROM_LOAD( "abs041.bin", 0x0000, 0x080000, CRC(563c7603) SHA1(58883c0d7ce006a5bb15760f22f291f7a01576a4) ) // snd?
-	ROM_LOAD( "abs051.bin", 0x0000, 0x080000, CRC(5f073add) SHA1(661889257fbecc4644360aed241967674a42214b) ) // snd?
-	ROM_LOAD( "abs041.bin", 0x0000, 0x080000, CRC(563c7603) SHA1(58883c0d7ce006a5bb15760f22f291f7a01576a4) ) // snd?
-
-	ROM_REGION( 0x100000, "gals", 0 )
-	ROM_LOAD( "abcz.jd", 0x0000, 0x000580, CRC(86fcaa33) SHA1(c0146cd4a289d5dff26e6edc15a0781f437f46ac) )
-	ROM_LOAD( "abl.jd", 0x0000, 0x000580, CRC(d99e4b62) SHA1(6ae11967f7bc6edd69bd8be20c0c1960e6f3369e) )
-	ROM_LOAD( "abr.jd", 0x0000, 0x000580, CRC(389c4cea) SHA1(c431c51c47cbd8a7f3bd0497dd7fffccb4a3416f) )
-	ROM_LOAD( "abu.jd", 0x0000, 0x000580, CRC(95f7892d) SHA1(dc2ab97ff60f3532967119ff6d2dc8d9596caa01) )
-ROM_END
-
-
-
-
 // Casino Monte Carlo
+
+// cb apparently stands for 'credbottom' again hinting it might be a dual unit setup
 ROM_START( m4cmont )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	// archive
+	// cmc
 	ROM_LOAD( "cmc1.7",		0x0000, 0x020000, CRC(aaebab34) SHA1(36145b7d062ad5a740bcf326933f78274b99495c) )
 	ROM_LOAD( "cmc1.7cb",	0x0000, 0x020000, CRC(3a862363) SHA1(439a2a65d6e90ca9c09ea1115dedab4afa23f0bc) )
 	ROM_LOAD( "cmc1.8",		0x0000, 0x020000, CRC(428f8019) SHA1(2e271a4fd77f4c61678dc061ca4bcd8b15221457) )
 	ROM_LOAD( "cmc1.8cb",	0x0000, 0x020000, CRC(d2e2084e) SHA1(83e145b2d676f67f82f45460994df0e767e814e8) )
-	ROM_LOAD( "cmc1.9",		0x0000, 0x020000, CRC(c5a38e96) SHA1(1e8a006c5e4aa47e9155a7fec535fe2403cf5ce7) )
-	ROM_LOAD( "cmc2..5",	0x0000, 0x020000, CRC(528fc2a1) SHA1(2e815214bf627f22fe81705a973c48ff1af6bc52) )
+
+	ROM_LOAD( "cmc1.9",		0x0000, 0x020000, CRC(c5a38e96) SHA1(1e8a006c5e4aa47e9155a7fec535fe2403cf5ce7) ) // unpaired
+
+	ROM_LOAD( "cmc2.5",		0x0000, 0x020000, CRC(528fc2a1) SHA1(2e815214bf627f22fe81705a973c48ff1af6bc52) )
 	ROM_LOAD( "cmc2.5cb",	0x0000, 0x020000, CRC(8d808c36) SHA1(784d2024569157c1e96ef0c5ad921534a10341bf) )
 	ROM_LOAD( "cmc2.6",		0x0000, 0x020000, CRC(8c453974) SHA1(b8312311c637e81247682c867a30ccfca2ba2913) )
 	ROM_LOAD( "cmc2.6cb",	0x0000, 0x020000, CRC(65e4a71b) SHA1(23aa65bbb704c1e4f5350bcdbb5b2db1e3a9ff5c) )
-	ROM_LOAD( "cmc2.7",		0x0000, 0x020000, CRC(0b6937fb) SHA1(8edc3a9e8dabe4bed7bc96d68dec0e9a25526a7b) )
+
+	ROM_LOAD( "cmc2.7",		0x0000, 0x020000, CRC(0b6937fb) SHA1(8edc3a9e8dabe4bed7bc96d68dec0e9a25526a7b) ) // unpaired
+	
 	ROM_LOAD( "cmc4.1",		0x0000, 0x020000, CRC(b8a7da9f) SHA1(f4687ea3cb750393bb122b38ef3d1fe1464bb868) )
 	ROM_LOAD( "cmc4.1cb",	0x0000, 0x020000, CRC(28ca52c8) SHA1(f02a114fb39c34b3988672d5c7cae09d3c2b9067) )
+	
 	ROM_LOAD( "cmc5.1",		0x0000, 0x020000, CRC(766d63f2) SHA1(948aa7488331552c716fec4638a4cc7404f819a3) )
 	ROM_LOAD( "cmc5.1cb",	0x0000, 0x020000, CRC(9fccfd9d) SHA1(2432cb2ea23e42816474ab0b4424f427fcd9d052) )
+	
+	// cmu
 	ROM_LOAD( "cmu1.6",		0x0000, 0x020000, CRC(f059e7f6) SHA1(49b175b60a69b813055e791bbc4b5c1ffd4cc3fd) )
 	ROM_LOAD( "cmu1.6cb",	0x0000, 0x020000, CRC(60346fa1) SHA1(4235f8686c3172a78ec2349cf21b9cb808b605c6) )
+
+	ROM_LOAD( "cmu2.1",		0x0000, 0x020000, CRC(c201c172) SHA1(f8ac227d34c9e92dcb4ea2243122691bbe122230) ) // unpaired
+
+	ROM_LOAD( "cmu2.2",		0x0000, 0x020000, CRC(8b11cb80) SHA1(6a7c448496b207c5cf96e3187a18a46c66808d38) ) // unpaired
+
+	ROM_LOAD( "cmu2.3",		0x0000,	0x020000, CRC(a808151e) SHA1(2eb7a56a8b43aad7721841ac9b0f8659912f8714) )
+
 	ROM_LOAD( "cmu2.4",		0x0000, 0x020000, CRC(0ae2c103) SHA1(353b598b1e075f4c0b9aecd7c0ec1e57569671f7) )
 	ROM_LOAD( "cmu2.4cb",	0x0000, 0x020000, CRC(9a8f4954) SHA1(efb9b73d58e143a7a34660650785f2d5d7d66cfe) )
-	ROM_LOAD( "cmu6.1",		0x0000, 0x020000, CRC(7775e979) SHA1(6fce6d05b5c03577c7ddb858dda91caedc5de03d) )
-	ROM_LOAD( "cmu7.1",		0x0000, 0x020000, CRC(8dcecf8c) SHA1(729aecd339b15e6d4be4e14b81379ddc22e077cf) )
-	// credbottom
-	ROM_LOAD( "cmc1.8cb",	0x0000, 0x020000, CRC(d2e2084e) SHA1(83e145b2d676f67f82f45460994df0e767e814e8) )
-	ROM_LOAD( "cmc2.6cb",	0x0000, 0x020000, CRC(65e4a71b) SHA1(23aa65bbb704c1e4f5350bcdbb5b2db1e3a9ff5c) )
-	// old
-	ROM_LOAD( "cmc2.6",		0x0000, 0x020000, CRC(8c453974) SHA1(b8312311c637e81247682c867a30ccfca2ba2913) )
-	ROM_LOAD( "cml2.1",		0x0000, 0x020000, CRC(4dbb6239) SHA1(6da8b37e477a8ef5fb130cf5a2e34bf795cb9f8d) )
-	ROM_LOAD( "cml2.1cb",	0x0000, 0x020000, CRC(ddd6ea6e) SHA1(bd39b32a32a50f72aad498ddc06eff56bab084d0) )
-	ROM_LOAD( "cml2.2",		0x0000, 0x020000, CRC(04ab68cb) SHA1(bbe7872974b2e029a2297bdcf87099abe6157a40) )
-	ROM_LOAD( "cml2.2cb",	0x0000, 0x020000, CRC(94c6e09c) SHA1(e1d91b90542ab05dc0dc1ff795cfd393145df22d) )
-	ROM_LOAD( "cml5.1",		0x0000, 0x020000, CRC(05d0d872) SHA1(c7658a2385756aff22594c9f8e8a3618188f476c) )
-	ROM_LOAD( "cml5.1cb",	0x0000, 0x020000, CRC(95bd5025) SHA1(5e6862af044ba0d5265b6acaa418b2b8b27e8bd4) )
-	ROM_LOAD( "cml5.2",		0x0000, 0x020000, CRC(4cc0d280) SHA1(547218c17d46b2387221bb2d6f31b3651499a36d) )
-	ROM_LOAD( "cml5.2cb",	0x0000, 0x020000, CRC(dcad5ad7) SHA1(de03bbd58e7514b73bac6afb6b89f5d2e7ec013b) )
-	ROM_LOAD( "cmr1.1",		0x0000, 0x020000, CRC(b7f79cb3) SHA1(a3881ddefedbf08195dcffa9fabc71021e9aeb81) )
-	ROM_LOAD( "cmr1.1cb",	0x0000, 0x020000, CRC(279a14e4) SHA1(6e123c6167d4e27184c8ba7c4de5645f3d0499e9) )
-	ROM_LOAD( "cmr1.2",		0x0000, 0x020000, CRC(fee79641) SHA1(546c73af55ba070f756d204749a0b346cfa6f2a9) )
-	ROM_LOAD( "cmr1.2cb",	0x0000, 0x020000, CRC(6e8a1e16) SHA1(df369265d4bd50a83fe617f85cb7e80e0e046828) )
-	ROM_LOAD( "cmu2.1",		0x0000, 0x020000, CRC(c201c172) SHA1(f8ac227d34c9e92dcb4ea2243122691bbe122230) )
-	ROM_LOAD( "cmu2.2",		0x0000, 0x020000, CRC(8b11cb80) SHA1(6a7c448496b207c5cf96e3187a18a46c66808d38) )
+	ROM_LOAD( "cmu2.4_alt",	0x0000, 0x020000, CRC(0a25b9d9) SHA1(4dfd34b12357e59fe088417aff3ee1ec8e39bc29) ) // wrong label?
+
 	ROM_LOAD( "cmu5.1",		0x0000, 0x020000, CRC(341ebc78) SHA1(efd3d2536d415f2502dff58abe5ee941644a3efd) )
 	ROM_LOAD( "cmu5.1cb",	0x0000, 0x020000, CRC(a473342f) SHA1(7323ec880c972a9bd89fb155a2f720ced9ae2e0b) )
+
 	ROM_LOAD( "cmu5.2",		0x0000, 0x020000, CRC(7d0eb68a) SHA1(8d3058ae37a30262963899357344e5064911cfed) )
 	ROM_LOAD( "cmu5.2cb",	0x0000, 0x020000, CRC(ed633edd) SHA1(5c82ee6283d57f00b60f10c3ecc6f1bd6ad6657b) )
-	ROM_LOAD( "cmc1.8",		0x0000, 0x020000, CRC(428f8019) SHA1(2e271a4fd77f4c61678dc061ca4bcd8b15221457) )
-	// new
-	ROM_LOAD( "cml2.4cb",	0x0000, 0x020000, CRC(15f292c5) SHA1(e24b59e40cf4e4bdc86be1fe67bb5e274aae11ad) )
-	ROM_LOAD( "cml5.4",		0x0000, 0x020000, CRC(cdf4a0d9) SHA1(d68afa7d9a1f04e0784e14b10e3d6df3123e8724) )
-	ROM_LOAD( "cml5.4cb",	0x0000, 0x020000, CRC(5d99288e) SHA1(dc69954a93cdf38232ef1cd071c3fe3ca37e4a04) )
-	ROM_LOAD( "cmr1.4",		0x0000, 0x020000, CRC(7fd3e418) SHA1(893afea31d48995f2805161a0734c870432eee03) )
-	ROM_LOAD( "cmr1.4cb",	0x0000, 0x020000, CRC(8003f28d) SHA1(17b7469682ca7da570897f3708dfd901dd7ff9b4) )
-	ROM_LOAD( "cmu2.4_alt",	0x0000, 0x020000, CRC(0a25b9d9) SHA1(4dfd34b12357e59fe088417aff3ee1ec8e39bc29) )
+
+	ROM_LOAD( "cmu5.3",		0x0000,	0x020000, CRC(5e176814) SHA1(67fc62d45f3474065f3748c90893bc79a6aa8097) )
+	ROM_LOAD( "cmu5.3cb",	0x0000, 0x020000, CRC(ce7ae043) SHA1(714ac1ea60ad5be59a7087f9a6176d770ed14c53) )
+
 	ROM_LOAD( "cmu5.4",		0x0000, 0x020000, CRC(4495a13b) SHA1(9b4f6c12af42dde5b850cf4b65bd3baba7d4f1a0) )
 	ROM_LOAD( "cmu5.4cb",	0x0000, 0x020000, CRC(6c574c84) SHA1(18afc1a31d3edcb7985a259cc4035bccb8527ecb) )
 	ROM_LOAD( "cmu5.4h",	0x0000, 0x020000, CRC(9b51a25a) SHA1(cec9f9d9de7422d339443f75d790b4f5123c6fa2) )
+
 	ROM_LOAD( "cmu5.5",		0x0000, 0x020000, CRC(fc3ac4d3) SHA1(af951b52ca73b65e664e910427fa584266f8cf83) )
 	ROM_LOAD( "cmu5.5h",	0x0000, 0x020000, CRC(53dc93aa) SHA1(0b48d905742ca464c5018a7285db4787facf937d) )
 	ROM_LOAD( "cmu5.5k",	0x0000, 0x020000, CRC(09f69f77) SHA1(567e5a8f7d92c561152a44f3f0375ee4af46cef8) )
+
 	ROM_LOAD( "cmu5.6h",	0x0000, 0x020000, CRC(5f2b2d76) SHA1(1d313286ad19f062b0ab80eabaa07b064737f5a8) )
+
 	ROM_LOAD( "cmu5.7h",	0x0000, 0x020000, CRC(ba25a1c1) SHA1(d67c870385b21902b944211944f4712036e9ec1e) )
+
 	ROM_LOAD( "cmu5.8k",	0x0000, 0x020000, CRC(15e0b26c) SHA1(4bc931a72bc3335eee23e986da873b73c5f40925) )
 	ROM_LOAD( "cmu5.8kp",	0x0000, 0x020000, CRC(cb73a341) SHA1(fe80260eea057d64d1dfe9edf6ea0b4e6b6cdd6a) )
 	ROM_LOAD( "cmu5.9kp",	0x0000, 0x020000, CRC(7b1e568e) SHA1(13803e136d866b9ccc7b25637a47948e8251df22) )
-	ROM_LOAD( "cml2.4",		0x0000, 0x020000, CRC(7dd24473) SHA1(8806f4ceefdbd45eb4da6dd61d2080685784a3f3) )
-	// updates
+
+	ROM_LOAD( "cmu6.1",		0x0000, 0x020000, CRC(7775e979) SHA1(6fce6d05b5c03577c7ddb858dda91caedc5de03d) ) // unpaired
+
+	ROM_LOAD( "cmu7.1",		0x0000, 0x020000, CRC(8dcecf8c) SHA1(729aecd339b15e6d4be4e14b81379ddc22e077cf) ) // unpaired
+
+	// cml
+	ROM_LOAD( "cml2.1",		0x0000, 0x020000, CRC(4dbb6239) SHA1(6da8b37e477a8ef5fb130cf5a2e34bf795cb9f8d) )
+	ROM_LOAD( "cml2.1cb",	0x0000, 0x020000, CRC(ddd6ea6e) SHA1(bd39b32a32a50f72aad498ddc06eff56bab084d0) )
+
+	ROM_LOAD( "cml2.2",		0x0000, 0x020000, CRC(04ab68cb) SHA1(bbe7872974b2e029a2297bdcf87099abe6157a40) )
+	ROM_LOAD( "cml2.2cb",	0x0000, 0x020000, CRC(94c6e09c) SHA1(e1d91b90542ab05dc0dc1ff795cfd393145df22d) )
+
 	ROM_LOAD( "cml2.3",		0x0000, 0x020000, CRC(27b2b655) SHA1(1cca53b231484a0bafc90238387a0fcb64ed1ac6) )
 	ROM_LOAD( "cml2.3cb",	0x0000, 0x020000, CRC(b7df3e02) SHA1(8347e5612c5db0ac4a2276e9e26569171ddbc793) )
+
+	ROM_LOAD( "cml2.4",		0x0000, 0x020000, CRC(7dd24473) SHA1(8806f4ceefdbd45eb4da6dd61d2080685784a3f3) )
+	ROM_LOAD( "cml2.4cb",	0x0000, 0x020000, CRC(15f292c5) SHA1(e24b59e40cf4e4bdc86be1fe67bb5e274aae11ad) )
+
+
+	ROM_LOAD( "cml5.1",		0x0000, 0x020000, CRC(05d0d872) SHA1(c7658a2385756aff22594c9f8e8a3618188f476c) )
+	ROM_LOAD( "cml5.1cb",	0x0000, 0x020000, CRC(95bd5025) SHA1(5e6862af044ba0d5265b6acaa418b2b8b27e8bd4) )
+
+	ROM_LOAD( "cml5.2",		0x0000, 0x020000, CRC(4cc0d280) SHA1(547218c17d46b2387221bb2d6f31b3651499a36d) )
+	ROM_LOAD( "cml5.2cb",	0x0000, 0x020000, CRC(dcad5ad7) SHA1(de03bbd58e7514b73bac6afb6b89f5d2e7ec013b) )
+
 	ROM_LOAD( "cml5.3",		0x0000, 0x020000, CRC(6fd90c1e) SHA1(e675095e55b57dc27023be1fbfafeedd993333b7) )
 	ROM_LOAD( "cml5.3cb",	0x0000, 0x020000, CRC(ffb48449) SHA1(eb90a05cfcf3cd8492b6e89f7545a5edaa009824) )
+
+	ROM_LOAD( "cml5.4",		0x0000, 0x020000, CRC(cdf4a0d9) SHA1(d68afa7d9a1f04e0784e14b10e3d6df3123e8724) )
+	ROM_LOAD( "cml5.4cb",	0x0000, 0x020000, CRC(5d99288e) SHA1(dc69954a93cdf38232ef1cd071c3fe3ca37e4a04) )
+
+	// cmr
+
+	ROM_LOAD( "cmr1.1",		0x0000, 0x020000, CRC(b7f79cb3) SHA1(a3881ddefedbf08195dcffa9fabc71021e9aeb81) )
+	ROM_LOAD( "cmr1.1cb",	0x0000, 0x020000, CRC(279a14e4) SHA1(6e123c6167d4e27184c8ba7c4de5645f3d0499e9) )
+
+	ROM_LOAD( "cmr1.2",		0x0000, 0x020000, CRC(fee79641) SHA1(546c73af55ba070f756d204749a0b346cfa6f2a9) )
+	ROM_LOAD( "cmr1.2cb",	0x0000, 0x020000, CRC(6e8a1e16) SHA1(df369265d4bd50a83fe617f85cb7e80e0e046828) )
+	
 	ROM_LOAD( "cmr1.3",		0x0000, 0x020000, CRC(ddfe48df) SHA1(1ce72fbbac81d806c6823a2149cf217a3e417d7d) )
 	ROM_LOAD( "cmr1.3cb",	0x0000, 0x020000, CRC(4d93c088) SHA1(1b75b663f48d3e43e7e02d9c6afcfcde4813d7fc) )
-	ROM_LOAD( "cmu2.3",		0x0000,	0x020000, CRC(a808151e) SHA1(2eb7a56a8b43aad7721841ac9b0f8659912f8714) )
-	ROM_LOAD( "cmu5.3",		0x0000,	0x020000, CRC(5e176814) SHA1(67fc62d45f3474065f3748c90893bc79a6aa8097) )
-	ROM_LOAD( "cmu5.3cb",	0x0000, 0x020000, CRC(ce7ae043) SHA1(714ac1ea60ad5be59a7087f9a6176d770ed14c53) )
-	// misc
+
+	ROM_LOAD( "cmr1.4",		0x0000, 0x020000, CRC(7fd3e418) SHA1(893afea31d48995f2805161a0734c870432eee03) )
+	ROM_LOAD( "cmr1.4cb",	0x0000, 0x020000, CRC(8003f28d) SHA1(17b7469682ca7da570897f3708dfd901dd7ff9b4) )
+
+	// misc (wrong game?)
 	ROM_LOAD( "gtr5.8g1",	0x0000, 0x020000, CRC(2fb54fd3) SHA1(09e93fc45ab15a655f953e2ba86411034260dfc6) )
 	ROM_LOAD( "gtr5.8g2",	0x0000, 0x020000, CRC(f15e032c) SHA1(f44120c0635e5b1726188f52f619c57a3a6766fa) )
 	ROM_LOAD( "gtr58gaa",	0x0000, 0x020000, CRC(ad20af25) SHA1(1a5ac760894f4441d11f0974f1d0f90fabd76bf2) )
@@ -524,22 +572,16 @@ ROM_START( m4blkmgc )
 	// new - latvia
 	ROM_LOAD( "bml1a305.bin", 0x0000, 0x010000, CRC(429e2642) SHA1(9e6a0ea07adaa7a2327b2ba3706f1966fed0de36) )
 	ROM_LOAD( "bml1b305.bin", 0x0000, 0x010000, CRC(fa9e4567) SHA1(7401103c40d8efd2427953a1e398c158d6f08a64) )
+
 	// new - ukraine
+	ROM_LOAD( "bmu1a306.bin", 0x0000, 0x010000, CRC(4c3ef73a) SHA1(fa1be29e7a5240e6dfefec61d77c3ec78f5f7b11) )
+	ROM_LOAD( "bmu1b306.bin", 0x0000, 0x010000, CRC(f1ec2c3e) SHA1(ac776c2020409485265d227fe39f0ca31f23ddd7) )
+
 	ROM_LOAD( "bfu1a307.bin", 0x0000, 0x010000, CRC(68aa272c) SHA1(9f476d55a09776a621e58afddf2e3f618b278374) )
 	ROM_LOAD( "bfu1b307.bin", 0x0000, 0x010000, CRC(9c876530) SHA1(1fb95591c6b0a43aa66c7a036268e19cf27e5535) )
-	ROM_LOAD( "bmu1a306.bin", 0x0000, 0x010000, CRC(4c3ef73a) SHA1(fa1be29e7a5240e6dfefec61d77c3ec78f5f7b11) )
-	ROM_LOAD( "bmu1b306.bin", 0x0000, 0x010000, CRC(f1ec2c3e) SHA1(ac776c2020409485265d227fe39f0ca31f23ddd7) )
+
 	ROM_LOAD( "bau1a307.bin", 0x0000, 0x010000, CRC(41af6959) SHA1(81a4c4db5dd696bfaf7f36455b3970a2d652ab08) )
 	ROM_LOAD( "bau1b307.bin", 0x0000, 0x010000, CRC(1405a02b) SHA1(82504289e72900d3315f46ed31aeabc71b2c5b9e) )
-	// misc
-	ROM_LOAD( "bmu1a306.bin", 0x0000, 0x010000, CRC(4c3ef73a) SHA1(fa1be29e7a5240e6dfefec61d77c3ec78f5f7b11) )
-	ROM_LOAD( "bmu1b306.bin", 0x0000, 0x010000, CRC(f1ec2c3e) SHA1(ac776c2020409485265d227fe39f0ca31f23ddd7) )
-	ROM_LOAD( "bau1a307.bin", 0x0000, 0x010000, CRC(41af6959) SHA1(81a4c4db5dd696bfaf7f36455b3970a2d652ab08) )
-	ROM_LOAD( "bau1b307.bin", 0x0000, 0x010000, CRC(1405a02b) SHA1(82504289e72900d3315f46ed31aeabc71b2c5b9e) )
-	ROM_LOAD( "bfu1a307.bin", 0x0000, 0x010000, CRC(68aa272c) SHA1(9f476d55a09776a621e58afddf2e3f618b278374) )
-	ROM_LOAD( "bfu1b307.bin", 0x0000, 0x010000, CRC(9c876530) SHA1(1fb95591c6b0a43aa66c7a036268e19cf27e5535) )
-	ROM_LOAD( "bmu1a306.bin", 0x0000, 0x010000, CRC(4c3ef73a) SHA1(fa1be29e7a5240e6dfefec61d77c3ec78f5f7b11) )
-	ROM_LOAD( "bmu1b306.bin", 0x0000, 0x010000, CRC(f1ec2c3e) SHA1(ac776c2020409485265d227fe39f0ca31f23ddd7) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "bmsnd", 0x0000, 0x080000, CRC(81da8bc9) SHA1(a60fd689e2683b987f48e3a4c8817b169a9c3fdf) ) // from 'new' sets
@@ -582,12 +624,16 @@ ROM_START( m4bben )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bbc1a102.bin", 0x0000, 0x010000, CRC(c5010bb6) SHA1(f39ab219eafaa391b5b777c2918f059ba67b4504) )
 	ROM_LOAD( "bbc1b102.bin", 0x0000, 0x010000, CRC(9eb20181) SHA1(c183e3eab84019b6acb5040ef8d5aa238b914e78) )
+
 	ROM_LOAD( "bbc1a103.bin", 0x0000, 0x010000, CRC(34568c49) SHA1(57a772595e258b6e1a41145e4dcaa0486c7d91ae) )
 	ROM_LOAD( "bbc1b103.bin", 0x0000, 0x010000, CRC(587d1f54) SHA1(c6d5657958f029d38d0b1244032634bd023bf48d) )
+
 	ROM_LOAD( "bbc1a104.bin", 0x0000, 0x010000, CRC(ac5d175e) SHA1(0772dcb362c732760d96b9876898cfd5a1038720) )
 	ROM_LOAD( "bbc1b104.bin", 0x0000, 0x010000, CRC(ac0ba269) SHA1(de9b00f32afc7cabcf6400e3b063f844b1b03f28) )
+
 	ROM_LOAD( "bbc1a105.bin", 0x0000, 0x010000, CRC(cece9ee3) SHA1(582def521d5583ab9fc9adeedcdd09e2ab4876b8) )
 	ROM_LOAD( "bbc1b105.bin", 0x0000, 0x010000, CRC(b31f3989) SHA1(5d5a7fc49486b4f7e9a31a4a469913174ca2cb5b) )
+
 	ROM_LOAD( "bbc2a106.bin", 0x0000, 0x010000, CRC(4929273e) SHA1(0703b89884a2d410854d813fe8304eac0dbfb30e) )
 	ROM_LOAD( "bbc2b106.bin", 0x0000, 0x010000, CRC(d06687ed) SHA1(2e5b32c772f47f3f10ee90cbc72c00995871c2c0) )
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -676,10 +722,8 @@ ROM_END
 
 
 
-GAME( 19??, m4robo		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Robotica / Dream Machine (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4trg		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Turbo Reel Gambler (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4mbel		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Millennium Bells (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4abeaut	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "American Beauty (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4cmont		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Casino Monte Carlo (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Black Magic (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "American Aladdin (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)

@@ -426,20 +426,29 @@ ROM_START( m4clbshf )
 ROM_END
 
 
-GAME(199?, m4cojok	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",						GAME_FLAGS )
-GAMEL(198?,m4gambal	,0			,mod4yam	,m4gambal			, mpu4_state,m4gambal			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
-GAME(199?, m4graff	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Graffiti (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4graffd	,m4graff	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",						GAME_FLAGS )
-GAME(199?, m4monte	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Monte Carlo (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4nudbnk	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Banker (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4przmc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Monte Carlo (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4przsss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4sss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Spend Spend Spend (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4ra		,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Alert (Barcrest) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4sayno	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4acechs	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4stc	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+
+ROM_START( m4voodoo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ddo32", 0x0000, 0x010000, CRC(260dfef1) SHA1(2b4918e40808963a86d289cd251740a9b0bed70a) )
+ROM_END
+
+
+
+
+GAME(199?, m4cojok	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",GAME_FLAGS )
+GAMEL(198?,m4gambal	,0			,mod4yam	,m4gambal			, mpu4_state,m4gambal			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
+GAME(199?, m4graff	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Graffiti (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4graffd	,m4graff	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS )
+GAME(199?, m4monte	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Monte Carlo (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4nudbnk	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Banker (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4przmc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Monte Carlo (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4przsss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Spend Spend Spend (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4ra		,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Alert (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sayno	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",GAME_FLAGS)
+GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",GAME_FLAGS)
+GAME(199?, m4acechs	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",GAME_FLAGS)
+GAME(199?, m4stc	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
 
 
 #define M4SUPST_EXTRA_ROMS \
@@ -561,6 +570,7 @@ M4SUPST_SET( 199?, m4supst__b3,	m4supst,	"stuy.p1",				0x0000, 0x010000, CRC(e6b
 M4SUPST_SET( 199?, m4supst__b4,	m4supst,	"superstreak1deb.bin",	0x0000, 0x010000, CRC(892ccad9) SHA1(c88daadd9778e363e154b674b57ccd07cea59836), "Barcrest","Super Streak (Barcrest) (MPU4) (set 104)" )
 M4SUPST_SET( 199?, m4supst__b5,	m4supst,	"supst2515",			0x0000, 0x010000, CRC(c073a249) SHA1(4ae37eb61dd5e50687f433fb89f65b97926b7358), "Barcrest","Super Streak (Barcrest) (MPU4) (set 105)" )
 
-GAME(199?, m4sstrek,  0,		mod4yam    ,mpu4, mpu4_state, m4default, ROT0,   "bootleg","Super Streak (bootleg) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND ) // works?, no sound
-GAME(199?, m4joljokd,m4joljok	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // set stake
+GAME(199?, m4sstrek,  0,		mod4yam    ,mpu4, mpu4_state, m4default, ROT0,   "bootleg","Super Streak (bootleg) (MPU4)",GAME_FLAGS)
+GAME(199?, m4joljokd,m4joljok	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS)
+GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake
+GAME(199?, m4voodoo	,0			,mod4yam   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS )
