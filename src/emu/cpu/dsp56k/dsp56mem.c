@@ -839,7 +839,7 @@ void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
 			break;
 
 		// Reserved
-		case 0x05: break;
+		case 0x05:
 			logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
 			break;
 
