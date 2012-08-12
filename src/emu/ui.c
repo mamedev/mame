@@ -909,7 +909,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 	string.reset();
 
 	/* if no warnings, nothing to return */
-	if (rom_load_warnings(machine) == 0 && rom_load_knownbad(machine) == 0 && !(machine.system().flags & WARNING_FLAGS))
+	if (rom_load_warnings(machine) == 0 && rom_load_knownbad(machine) == 0 && !(machine.system().flags & WARNING_FLAGS) && software_load_warnings_message(machine).len()==0)
 		return string;
 
 	/* add a warning if any ROMs were loaded with warnings */
@@ -922,6 +922,11 @@ static astring &warnings_string(running_machine &machine, astring &string)
 			string.cat("\n");
 	}
 
+	if (software_load_warnings_message(machine).len()) {
+		string.cat(software_load_warnings_message(machine));
+		if (machine.system().flags & WARNING_FLAGS)
+			string.cat("\n");
+	}
 	/* if we have at least one warning flag, print the general header */
 	if ((machine.system().flags & WARNING_FLAGS) || rom_load_knownbad(machine) > 0)
 	{
