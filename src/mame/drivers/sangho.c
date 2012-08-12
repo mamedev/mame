@@ -36,6 +36,10 @@ is a YM2413 compatible chip.
 
 Sexy Boom's DSW setting verified via Z80 code by stephh
 
+TODO:
+- both games almost likely uses unemulated V9958 YJK mode(s)
+  http://www.msx-plaza.eu/home.php?page=mccm/mccm72/schermen_eng
+
 */
 
 #include "emu.h"
@@ -49,13 +53,13 @@ class sangho_state : public driver_device
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_v9938(*this, "v9938") { }
+		  m_v9958(*this, "v9958") { }
 
 	UINT8* m_ram;
 	UINT8 m_sexyboom_bank[8];
 	UINT8 m_pzlestar_mem_bank;
 	UINT8 m_pzlestar_rom_bank;
-	required_device<v9938_device> m_v9938;
+	required_device<v9958_device> m_v9958;
 	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
@@ -240,7 +244,7 @@ static ADDRESS_MAP_START( pzlestar_io_map, AS_IO, 8, sangho_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 	AM_RANGE( 0x91, 0x91) AM_WRITE(pzlestar_bank_w )
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write )
+	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9958", v9958_device, read, write )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
 	AM_RANGE( 0xa8, 0xa8) AM_READWRITE(pzlestar_mem_bank_r, pzlestar_mem_bank_w )
@@ -254,7 +258,7 @@ static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8, sangho_state )
 	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE("v9938", v9938_device, read, write )
+	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE("v9958", v9958_device, read, write )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 	AM_RANGE( 0xf8, 0xff) AM_WRITE(sexyboom_bank_w )
 ADDRESS_MAP_END
@@ -408,9 +412,9 @@ static TIMER_DEVICE_CALLBACK( sangho_interrupt )
 
 	if((scanline % 2) == 0)
 	{
-		state->m_v9938->set_sprite_limit(0);
-		state->m_v9938->set_resolution(RENDER_HIGH);
-		state->m_v9938->interrupt();
+		state->m_v9958->set_sprite_limit(0);
+		state->m_v9958->set_resolution(RENDER_HIGH);
+		state->m_v9958->interrupt();
 	}
 }
 
@@ -424,21 +428,21 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000)
 	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(19268)
 
 	MCFG_MACHINE_RESET(pzlestar)
 
-	MCFG_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT( v9958 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
@@ -456,21 +460,21 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000)
 	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(19268)
 
 	MCFG_MACHINE_RESET(sexyboom)
 
-	MCFG_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT( v9958 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
