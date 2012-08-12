@@ -414,10 +414,38 @@ public:
 	triforce_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{ }
+
+	DECLARE_READ64_MEMBER(gc_pi_r);
+	DECLARE_WRITE64_MEMBER(gc_pi_w);
+	DECLARE_READ64_MEMBER(gc_exi_r);
+	DECLARE_WRITE64_MEMBER(gc_exi_w);
 };
 
-static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 32, triforce_state )
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
+READ64_MEMBER(triforce_state::gc_pi_r)
+{
+	return 0;
+}
+
+WRITE64_MEMBER(triforce_state::gc_pi_w)
+{
+
+}
+
+READ64_MEMBER(triforce_state::gc_exi_r)
+{
+	return 0;
+}
+
+WRITE64_MEMBER(triforce_state::gc_exi_w)
+{
+
+}
+
+static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, triforce_state )
+	AM_RANGE(0x00000000, 0x017fffff) AM_RAM
+	AM_RANGE(0x0c003000, 0x0c003fff) AM_READWRITE(gc_pi_r, gc_pi_w)
+	AM_RANGE(0x0c006800, 0x0c0068ff) AM_READWRITE(gc_exi_r, gc_exi_w)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
 
 
@@ -434,13 +462,78 @@ static SCREEN_UPDATE_RGB32(triforce)
 static INPUT_PORTS_START( triforce )
 INPUT_PORTS_END
 
+// bootrom descrambler reversed by segher
+// Copyright 2008 Segher Boessenkool <segher@kernel.crashing.org>
+static void descrambler(UINT8* data, UINT32 size)
+{
+	UINT8 acc = 0;
+	UINT8 nacc = 0;
+
+    UINT16 t = 0x2953;
+    UINT16 u = 0xd9c2;
+    UINT16 v = 0x3ff1;
+
+    UINT8 x = 1;
+	
+	for (UINT32 it = 0; it < size;)
+	{
+		int t0 = t & 1;
+		int t1 = (t >> 1) & 1;
+		int u0 = u & 1;
+		int u1 = (u >> 1) & 1;
+		int v0 = v & 1;
+
+		x ^= t1 ^ v0;
+		x ^= (u0 | u1);
+		x ^= (t0 ^ u1 ^ v0) & (t0 ^ u0);
+
+		if (t0 == u0)
+		{
+			v >>= 1;
+			if (v0)
+				v ^= 0xb3d0;
+		}
+
+		if (t0 == 0)
+		{
+			u >>= 1;
+			if (u0)
+				u ^= 0xfb10;
+		}
+
+		t >>= 1;
+		if (t0)
+			t ^= 0xa740;
+
+		nacc++;
+		acc = 2*acc + x;
+		if (nacc == 8)
+		{
+			data[BYTE8_XOR_BE(it)] ^= acc;
+			it++;
+			nacc = 0;
+		}
+	}
+}
+
+static MACHINE_START( triforce )
+{
+	/* set conservative DRC options */
+	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+
+	UINT8 *rom = (UINT8*)machine.root_device().memregion("maincpu")->base();
+	descrambler(&rom[0x100], 0x1afe00);
+}
+
 static MACHINE_CONFIG_START( triforce_base, triforce_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
+	MCFG_CPU_ADD("maincpu", PPC603, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
 	MCFG_CPU_PROGRAM_MAP(gc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_MACHINE_START(triforce)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,6 +550,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( triforcegd, triforce_base )
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "picreturn", NULL, "maincpu", NULL)
 MACHINE_CONFIG_END
+
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
