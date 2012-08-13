@@ -761,15 +761,15 @@ void device_scheduler::rebuild_execute_list()
 			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
-		if (machine().config().m_perfect_cpu_quantum != NULL)
+		if (machine().config().m_perfect_cpu_quantum)
 		{
 			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum);
 			if (device == NULL)
-				fatalerror("Device '%s' specified for perfect interleave is not present!", machine().config().m_perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not present!", machine().config().m_perfect_cpu_quantum.cstr());
 
 			device_execute_interface *exec;
 			if (!device->interface(exec))
-				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", machine().config().m_perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", machine().config().m_perfect_cpu_quantum.cstr());
 
 			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}

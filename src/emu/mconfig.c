@@ -52,7 +52,6 @@
 
 machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	: m_minimum_quantum(attotime::zero),
-	  m_perfect_cpu_quantum(NULL),
 	  m_watchdog_vblank_count(0),
 	  m_watchdog_time(attotime::zero),
 	  m_nvram_handler(NULL),
