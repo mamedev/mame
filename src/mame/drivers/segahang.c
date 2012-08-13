@@ -1777,13 +1777,11 @@ DRIVER_INIT_MEMBER(segahang_state,sharrier)
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segahang_state::sharrier_i8751_sim), this);
 }
 
-
 DRIVER_INIT_MEMBER(segahang_state,enduror)
 {
 	DRIVER_INIT_CALL(generic);
 	m_sharrier_video = true;
 }
-
 
 DRIVER_INIT_MEMBER(segahang_state,endurobl)
 {
@@ -1796,7 +1794,6 @@ DRIVER_INIT_MEMBER(segahang_state,endurobl)
 	memcpy(decrypt + 0x10000/2, rom + 0x10000/2, 0x20000);
 	m_maincpu->space(AS_PROGRAM)->set_decrypted_region(0x000000, 0x03ffff, decrypt);
 }
-
 
 DRIVER_INIT_MEMBER(segahang_state,endurob2)
 {

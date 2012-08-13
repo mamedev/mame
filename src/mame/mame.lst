@@ -4356,11 +4356,10 @@ loffireu		// 1990.04 Line of Fire (US, FD1094, decrypted)
 				// 1990.03 Racing Hero (Japan)
 rachero			// 1990.?? Racing Hero (World, FD1094, decrypted)
 abcop			// 1990.?? A.B.Cop (World, FD1094, decrypted)
-				// 1991.01 A.B.Cop (Japan)
-				// 1990.10 GP Rider (Japan)
+abcopj			// 1991.01 A.B.Cop (Japan, FD1094, decrypted)
+gpriderj		// 1990.10 GP Rider (Japan, FD1094, decrypted)
 gprider			// 1990.?? GP Rider (World, FD1094, decrypted)
 gprideru		// 1990.12 GP Rider (US, FD1094, decrypted)
-gpriderj		// 1990.12 GP Rider (Japan, FD1094, decrypted)
 rascot			// 1991.?? Royal Ascot (Japan)
 
 

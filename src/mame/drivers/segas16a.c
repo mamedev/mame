@@ -3483,49 +3483,49 @@ DRIVER_INIT_MEMBER(segas16a_state,generic)
 
 DRIVER_INIT_MEMBER(segas16a_state,aceattaa)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaa_custom_io_r), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::dumpmtmt_i8751_sim), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,mjleague)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::mjleague_custom_io_r), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,passsht16a)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::passsht16a_custom_io_r), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,quartet)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::quartet_i8751_sim), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,fantzonep)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	sega_315_5177_decode(machine(), "soundcpu");
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,sdi)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sdi_custom_io_r), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 {
-	init_generic();
+	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
 	m_lamp_changed_w = lamp_changed_delegate(FUNC(segas16a_state::sjryuko_lamp_changed_w), this);
 }
