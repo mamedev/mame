@@ -132,8 +132,8 @@ private:
 	template<typename _PixelType, int _Width> void mode_graphic5(const pen_t *pens, _PixelType *ln, int line);
 	template<typename _PixelType, int _Width> void mode_graphic6(const pen_t *pens, _PixelType *ln, int line);
 	template<typename _PixelType, int _Width> void mode_graphic7(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_yae(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_yjk(const pen_t *pens, _PixelType *ln, int line);
+//	template<typename _PixelType, int _Width> void mode_yae(const pen_t *pens, _PixelType *ln, int line);
+//	template<typename _PixelType, int _Width> void mode_yjk(const pen_t *pens, _PixelType *ln, int line);
 	template<typename _PixelType, int _Width> void mode_unknown(const pen_t *pens, _PixelType *ln, int line);
 	template<typename _PixelType, int _Width> void default_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
 	template<typename _PixelType, int _Width> void graphic5_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
