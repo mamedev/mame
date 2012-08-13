@@ -2019,9 +2019,6 @@ static TIMER_DEVICE_CALLBACK( shogwarr_interrupt )
 	{
 		// the code for this interrupt is provided by the MCU..
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
-		
-		
-		state->m_calc3_prot->calc3_mcu_run(timer.machine());
 	}
 
 	if(scanline == 64)

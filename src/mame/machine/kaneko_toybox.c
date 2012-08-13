@@ -194,56 +194,22 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 	{
 		case 0x02:	// Read from NVRAM
 		{
+			UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
 
-			if (m_gametype == GAME_GALPANI3)
+			address_space *eeprom_space = machine.device<eeprom_device>(":eeprom")->space();
+
+			for (int i=0;i<0x80;i++)
 			{
-				/* todo: just put this in the default eeprom instead */
-
-				/* NOTE: code @ $38B46 & $38ab8 does exactly what is checked after MCU command
-						 so that's what we'll mimic here... probably the initial NVRAM settings */
-				int i;
-
-				/* MCU writes 128 bytes to shared ram: last byte is the byte-sum */
-				/* first 32 bytes (header): 0x8BE08E71.L, then the string "95/06/30 Gals Panic3Ver 0.95"; */
-				m_toybox_mcuram[mcu_offset +  0] = 0x8BE0; m_toybox_mcuram[mcu_offset +  1] = 0x8E71;
-				m_toybox_mcuram[mcu_offset +  2] = 0x3935; m_toybox_mcuram[mcu_offset +  3] = 0x2F30;
-				m_toybox_mcuram[mcu_offset +  4] = 0x362F; m_toybox_mcuram[mcu_offset +  5] = 0x3330;
-				m_toybox_mcuram[mcu_offset +  6] = 0x2047; m_toybox_mcuram[mcu_offset +  7] = 0x616C;
-				m_toybox_mcuram[mcu_offset +  8] = 0x7320; m_toybox_mcuram[mcu_offset +  9] = 0x5061;
-				m_toybox_mcuram[mcu_offset + 10] = 0x6E69; m_toybox_mcuram[mcu_offset + 11] = 0x6333;
-				m_toybox_mcuram[mcu_offset + 12] = 0x5665; m_toybox_mcuram[mcu_offset + 13] = 0x7220;
-				m_toybox_mcuram[mcu_offset + 14] = 0x302E; m_toybox_mcuram[mcu_offset + 15] = 0x3935;
-				/* next 11 bytes - initial NVRAM settings */
-				m_toybox_mcuram[mcu_offset + 16] = 0x0001; m_toybox_mcuram[mcu_offset + 17] = 0x0101;
-				m_toybox_mcuram[mcu_offset + 18] = 0x0100; m_toybox_mcuram[mcu_offset + 19] = 0x0208;
-				m_toybox_mcuram[mcu_offset + 20] = 0x02FF; m_toybox_mcuram[mcu_offset + 21] = 0x0000;
-				/* rest is zeroes */
-				for (i=22;i<63;i++)
-					m_toybox_mcuram[mcu_offset + i] = 0;
-				/* and sum is $0c.b */
-				m_toybox_mcuram[mcu_offset + 63] = 0x000c;
+				nvdat[i] = eeprom_space->read_byte(i);
 			}
-			else
-			{
-				//memcpy(&kaneko16_mcu_ram[mcu_offset], m_nvram_save, sizeof(m_nvram_save));
-				UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
 
-				address_space *eeprom_space = machine.device<eeprom_device>(":eeprom")->space();
-
-				for (int i=0;i<0x80;i++)
-				{
-					nvdat[i] = eeprom_space->read_byte(i);
-				}
-
-				logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
-			}
+			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
+	
 		}
 		break;
 
 		case 0x42:	// Write to NVRAM
 		{
-//			memcpy(m_nvram_save, &kaneko16_mcu_ram[mcu_offset], sizeof(m_nvram_save));
-
 			address_space *eeprom_space = machine.device<eeprom_device>(":eeprom")->space();
 			UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
 			for (int i=0;i<0x80;i++)

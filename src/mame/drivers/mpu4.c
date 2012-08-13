@@ -133,16 +133,39 @@ ROM_END
 ROM_START( m4calicl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2s.p1", 0x0000, 0x010000, CRC(fad153fd) SHA1(bd1f1a5c73624df45d01cb4853d87e998e434d7a) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ca2d.p1", 0x0000, 0x010000, CRC(75eb8c6f) SHA1(1bb923d06dcfa24eaf9533c083f68f4bd840834f) )
-	ROM_LOAD( "ca2f.p1", 0x0000, 0x010000, CRC(6c53cf29) SHA1(2e58453891ab4faa17ef58a81c5f3c0618d046a5) )
-	ROM_LOAD( "cald.p1", 0x0000, 0x010000, CRC(296fdeeb) SHA1(7782c0c7d8f44e2c0d48cc24c13015241e47b9ec) )
-	ROM_LOAD( "cals.p1", 0x0000, 0x010000, CRC(28a1c5fe) SHA1(e8474df609ea7f3517780b54d6f493987aad3650) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
+
+ROM_START( m4calicla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca2d.p1", 0x0000, 0x010000, CRC(75eb8c6f) SHA1(1bb923d06dcfa24eaf9533c083f68f4bd840834f) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
+ROM_END
+
+ROM_START( m4caliclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca2f.p1", 0x0000, 0x010000, CRC(6c53cf29) SHA1(2e58453891ab4faa17ef58a81c5f3c0618d046a5) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
+ROM_END
+
+ROM_START( m4caliclc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cald.p1", 0x0000, 0x010000, CRC(296fdeeb) SHA1(7782c0c7d8f44e2c0d48cc24c13015241e47b9ec) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
+ROM_END
+
+ROM_START( m4calicld )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cals.p1", 0x0000, 0x010000, CRC(28a1c5fe) SHA1(e8474df609ea7f3517780b54d6f493987aad3650) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
+ROM_END
+
+
 
 
 
@@ -200,26 +223,54 @@ ROM_START( m4ceptr )
 ROM_END
 
 
+#define M4CHASEI_EXTRAS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "chaseinvaders.chr", 0x0000, 0x000048, CRC(d7703dcd) SHA1(16fd998d1b44f35c10e5486882aa7f2d018dc82b) ) \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) ) \
+	ROM_LOAD( "cha.s2", 0x080000, 0x080000, CRC(542863fa) SHA1(501d66b2badb5036bb5dd8bac3cdb681f630a982) ) \
+
+
 ROM_START( m4chasei )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ci2c.p1", 0x0000, 0x010000, CRC(fc49a2e1) SHA1(f4f02e168cd9bf0245c2b7340fe151da66f09c5c) )
+	M4CHASEI_EXTRAS
+ROM_END
 
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4chaseia )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ch20p8pn.rom", 0x0000, 0x010000, CRC(712bd2e7) SHA1(0e83fa077f42a051aaa07a7e13196955b0ac840d) )
+	M4CHASEI_EXTRAS
+ROM_END
+
+ROM_START( m4chaseib )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chin2010l", 0x0000, 0x010000, CRC(7fe97181) SHA1(1ccf65ff108bdaa46efcb3f831fccc953297b9ac) )
+	M4CHASEI_EXTRAS
+ROM_END
+
+ROM_START( m4chaseic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ci2k.p1", 0x0000, 0x010000, CRC(8d715b8a) SHA1(5dd6f8d3d6710b0741df37af8792d942f41062d2) )
+	M4CHASEI_EXTRAS
+ROM_END
+
+ROM_START( m4chaseid )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ci2s.p1", 0x0000, 0x010000, CRC(8175e1e3) SHA1(9a4b0a0288508e7900ceac8bc3b245ac1f898b19) )
+	M4CHASEI_EXTRAS
+ROM_END
+
+ROM_START( m4chaseie )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ci2y.p1", 0x0000, 0x010000, CRC(80410946) SHA1(60a4f73eb9a35e5c246d8ef7b25bcf25b28bf8ed) )
+	M4CHASEI_EXTRAS
+ROM_END
 
-	ROM_LOAD( "chase invaders 8.bin", 0x0000, 0x010000, CRC(0bf6a8a0) SHA1(cea5ea40d71484a455615e14f6708b1bc06bbbe8) ) // bad prg (no vectors?)
-
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "chaseinvaders.chr", 0x0000, 0x000048, CRC(d7703dcd) SHA1(16fd998d1b44f35c10e5486882aa7f2d018dc82b) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) )
-	ROM_LOAD( "cha.s2", 0x080000, 0x080000, CRC(542863fa) SHA1(501d66b2badb5036bb5dd8bac3cdb681f630a982) )
+ROM_START( m4chaseif )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "chase invaders 8.bin", 0x0000, 0x010000, BAD_DUMP CRC(0bf6a8a0) SHA1(cea5ea40d71484a455615e14f6708b1bc06bbbe8) ) // bad prg (no vectors?)
+	M4CHASEI_EXTRAS
 ROM_END
 
 
@@ -238,43 +289,87 @@ ROM_END
 ROM_START( m4clbtro )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr2s.p1", 0x0000, 0x010000, CRC(6d43375c) SHA1(5be1dc85374c6a1235e0b137b46ebd7a2d7d922a) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4clbtroa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr2f.p1", 0x0000, 0x010000, CRC(fbdcd06f) SHA1(27ccdc83e60a62227d33d8cf3d516fc43908ab99) )
+ROM_END
+
+ROM_START( m4clbtrob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr2d.p1", 0x0000, 0x010000, CRC(0cc23f89) SHA1(a66c8c28073f53381c43e3e597f15f81c5c61479) )
+ROM_END
+
+ROM_START( m4clbtroc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tro20.bin", 0x0000, 0x010000, CRC(5e86c3fc) SHA1(ce2419991559839a8875060c1afe0f030190010a) )
+ROM_END
+
+ROM_START( m4clbtrod )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trod.p1", 0x0000, 0x010000, CRC(60c84612) SHA1(84dc8b34e41436331832c1a32ddac0fce269488a) )
+ROM_END
+
+ROM_START( m4clbtroe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tros.p1", 0x0000, 0x010000, CRC(5e86c3fc) SHA1(ce2419991559839a8875060c1afe0f030190010a) )
 ROM_END
+
+#define M4CLBVEG_EXTRAS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "cvegas.chr", 0x0000, 0x000048, CRC(a6c341b0) SHA1(c8c838c9bb1ced52889504b9cea8d88f1e7fa79f) ) \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cvegass1.hex", 0x0000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) ) \
+	ROM_LOAD( "cvegass2.hex", 0x0000, 0x080000, CRC(88b37145) SHA1(1c6c9ad2010e1688d3370d1f2a5ae83dc683b500) ) \
+
 
 ROM_START( m4clbveg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "clas.p1", 0x0000, 0x010000, CRC(6aad03f0) SHA1(2f611cc6f020e334dc4b87d2d907727ba15ff7ff) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "claf.p1", 0x0000, 0x010000, CRC(79b83184) SHA1(7319a405b2b0b274e03f5cd1465436f8548065e4) )
-	ROM_LOAD( "clal.p1", 0x0000, 0x010000, CRC(db0bb5a2) SHA1(2735e02642fb92bb824e3b1f415a1a3ef13a856d) )
-	ROM_LOAD( "clad.p1", 0x0000, 0x010000, CRC(4fa45cce) SHA1(58a5d6cc8608eb1aa453429e26eacea589afa524) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "cvegas.chr", 0x0000, 0x000048, CRC(a6c341b0) SHA1(c8c838c9bb1ced52889504b9cea8d88f1e7fa79f) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cvegass1.hex", 0x0000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) )
-	ROM_LOAD( "cvegass2.hex", 0x0000, 0x080000, CRC(88b37145) SHA1(1c6c9ad2010e1688d3370d1f2a5ae83dc683b500) )
+	M4CLBVEG_EXTRAS
 ROM_END
+
+ROM_START( m4clbvega )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "claf.p1", 0x0000, 0x010000, CRC(79b83184) SHA1(7319a405b2b0b274e03f5cd1465436f8548065e4) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+ROM_START( m4clbvegb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "clal.p1", 0x0000, 0x010000, CRC(db0bb5a2) SHA1(2735e02642fb92bb824e3b1f415a1a3ef13a856d) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+ROM_START( m4clbvegc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "clad.p1", 0x0000, 0x010000, CRC(4fa45cce) SHA1(58a5d6cc8608eb1aa453429e26eacea589afa524) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+#define M4CLBX_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cxs1.hex", 0x000000, 0x080000, CRC(4ce005f1) SHA1(ee0f59a9c7e0222dd63fa63ccff8f194abd01ddb) ) \
+	ROM_LOAD( "cxs2.hex", 0x080000, 0x080000, CRC(495e0730) SHA1(7ba8150fbcf974ac494a82fd373ff02185543e35) ) \
+
 
 ROM_START( m4clbx )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "clx12s.p1", 0x0000, 0x020000, CRC(6798c153) SHA1(e621e341a0fed1cb35637edb0769ae1cca72a663) )
+	M4CLBX_EXTRAS
+ROM_END
 
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4clbxa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "clx12d.p1", 0x0000, 0x020000, CRC(43e797ba) SHA1(fb2fc843176fe50c1039214d48815d6e9871ae27) )
-	ROM_LOAD( "clx12f.p1", 0x0000, 0x020000, CRC(3e6a82fe) SHA1(01ef9a15a3cf9b1191c573b36fb5758e79c3adc1) )
+	M4CLBX_EXTRAS
+ROM_END
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cxs1.hex", 0x000000, 0x080000, CRC(4ce005f1) SHA1(ee0f59a9c7e0222dd63fa63ccff8f194abd01ddb) )
-	ROM_LOAD( "cxs2.hex", 0x080000, 0x080000, CRC(495e0730) SHA1(7ba8150fbcf974ac494a82fd373ff02185543e35) )
+ROM_START( m4clbxb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "clx12f.p1", 0x0000, 0x020000, CRC(3e6a82fe) SHA1(01ef9a15a3cf9b1191c573b36fb5758e79c3adc1) )
+	M4CLBX_EXTRAS
 ROM_END
 
 
@@ -285,53 +380,121 @@ ROM_START( m4crzjk )
 	ROM_LOAD( "crjok2.04.bin", 0x0000, 0x010000, CRC(838336d6) SHA1(6f36de20c930cbbff479af2667c11152c6adb43e) )
 ROM_END
 
+#define M4CRZJWL_EXTRAS \
+	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_LOAD( "cjsound1.bin", 0x000000, 0x080000, CRC(b023f6b9) SHA1(04c362c6511442d3ab775a5ff2051bfe26d5e624) ) \
+	ROM_LOAD( "cjsound2.bin", 0x080000, 0x080000, CRC(02563a43) SHA1(dfcee4e0fdf81c726c8e13278e7950459bcaab18) ) \
+	ROM_LOAD( "cjsound3.bin", 0x100000, 0x080000, CRC(e722e438) SHA1(070f3772920fa64d5214843c313b27a5b2a4c105) ) \
+
+
 ROM_START( m4crzjwl )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cj11bin", 0x0000, 0x020000, CRC(208fda73) SHA1(8b15c197693ea7749bc961fe4e5e36b317f9f6f8) ) // crown jewels (german)
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "cjexlow", 0x0000, 0x020000, CRC(07c227c1) SHA1(286341ed44ef7cd08ca411f2b3e6936b5e83a5f3) ) // crown jewels (german)
-	ROM_LOAD( "cjgerman", 0x0000, 0x020000, CRC(b090e690) SHA1(bdbe4041085c995761306280c15f782ea3bdc110) )
-	ROM_LOAD( "cjj54.bin", 0x0000, 0x020000, CRC(16dc92e7) SHA1(b791535054d5864c7053243408a54accfa014bd1) )
-	ROM_LOAD( "gcn11", 0x0000, 0x020000, CRC(51493500) SHA1(901e60c1a7e9e628d723e199579fc82cf2e433e6) )
-	ROM_LOAD( "gcn111", 0x0000, 0x020000, CRC(b1152ce6) SHA1(1d236bad57ad38b11215efe44008bb8e4014939e) )
-	ROM_LOAD( "gjv4", 0x0000, 0x020000, CRC(df63105d) SHA1(56e28adef9ec8921da7ab8045859e834731196c5) )
-	ROM_LOAD( "gjv5", 0x0000, 0x020000, CRC(e4f0bab2) SHA1(1a13d97ff2c4fbae39327f2a5a8b110f2617857e) )
-	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(1f4743bf) SHA1(f9a0da2ed9cad5e6685c8a6d1d09e5d4bbcfacec) ) 	// Crown Jewels Deluxe (german)
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	ROM_LOAD( "cjsound1.bin", 0x000000, 0x080000, CRC(b023f6b9) SHA1(04c362c6511442d3ab775a5ff2051bfe26d5e624) )
-	ROM_LOAD( "cjsound2.bin", 0x080000, 0x080000, CRC(02563a43) SHA1(dfcee4e0fdf81c726c8e13278e7950459bcaab18) )
-	ROM_LOAD( "cjsound3.bin", 0x100000, 0x080000, CRC(e722e438) SHA1(070f3772920fa64d5214843c313b27a5b2a4c105) )
+	M4CRZJWL_EXTRAS
 ROM_END
+
+ROM_START( m4crzjwla )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjexlow", 0x0000, 0x020000, CRC(07c227c1) SHA1(286341ed44ef7cd08ca411f2b3e6936b5e83a5f3) ) // crown jewels (german)
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwlb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjgerman", 0x0000, 0x020000, CRC(b090e690) SHA1(bdbe4041085c995761306280c15f782ea3bdc110) )
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwlc )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjj54.bin", 0x0000, 0x020000, CRC(16dc92e7) SHA1(b791535054d5864c7053243408a54accfa014bd1) )
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwld )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "gcn11", 0x0000, 0x020000, CRC(51493500) SHA1(901e60c1a7e9e628d723e199579fc82cf2e433e6) )
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwle )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "gcn111", 0x0000, 0x020000, CRC(b1152ce6) SHA1(1d236bad57ad38b11215efe44008bb8e4014939e) )
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwlf )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "gjv4", 0x0000, 0x020000, CRC(df63105d) SHA1(56e28adef9ec8921da7ab8045859e834731196c5) )
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwlg )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "gjv5", 0x0000, 0x020000, CRC(e4f0bab2) SHA1(1a13d97ff2c4fbae39327f2a5a8b110f2617857e) )
+	M4CRZJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crzjwlh )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(1f4743bf) SHA1(f9a0da2ed9cad5e6685c8a6d1d09e5d4bbcfacec) ) 	// Crown Jewels Deluxe (german)
+	M4CRZJWL_EXTRAS
+ROM_END
+
+
+#define M4CRJWL_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	/* Missing? or in above set? */ \
+
 
 ROM_START( m4crjwl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cjcf.p1", 0x0000, 0x010000, CRC(7feccc74) SHA1(4d1c7c6d2085492ee4205a7383ad7dc1de4e8d60) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "cjcd.p1", 0x0000, 0x010000, CRC(cb83f226) SHA1(f09996436b3db3c8f0fe237884d9125be2b7855e) )
-	ROM_LOAD( "cjcs.p1", 0x0000, 0x010000, CRC(1054e02d) SHA1(067705f20862f6cfc4334c74e0fab1a1016d427c) )
-	ROM_LOAD( "cjn02.p1", 0x0000, 0x010000, CRC(a3d50e20) SHA1(15698e74a37d5f95a5634d48ae2a9a5d19faa2b6) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* Missing? or in above set? */
+	M4CRJWL_EXTRAS
 ROM_END
+
+ROM_START( m4crjwla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjcd.p1", 0x0000, 0x010000, CRC(cb83f226) SHA1(f09996436b3db3c8f0fe237884d9125be2b7855e) )
+	M4CRJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crjwlb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjcs.p1", 0x0000, 0x010000, CRC(1054e02d) SHA1(067705f20862f6cfc4334c74e0fab1a1016d427c) )
+	M4CRJWL_EXTRAS
+ROM_END
+
+ROM_START( m4crjwlc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cjn02.p1", 0x0000, 0x010000, CRC(a3d50e20) SHA1(15698e74a37d5f95a5634d48ae2a9a5d19faa2b6) )
+	M4CRJWL_EXTRAS
+ROM_END
+
+#define M4CRJWL2_EXTRAS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "chr.chr", 0x0000, 0x000048, CRC(c5812913) SHA1(d167b1f512c183cf01a1f4e1c1588ea0ae21331b) ) \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cjcs1.hex", 0x000000, 0x080000, CRC(2ac3ba9f) SHA1(3332f29f81918c34aeec3da6f7d001dc9922840d) ) \
+	ROM_LOAD( "cjcs2.hex", 0x080000, 0x080000, CRC(89838a9d) SHA1(502243cc0a14e63882b537f05c4cc0eb852e4a0c) ) \
+
 
 ROM_START( m4crjwl2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cj214f.p1", 0x0000, 0x010000, CRC(7ee4d30c) SHA1(2bf702bc925c473f7e9eaeb5b3ae0b00e124161a) )
+	M4CRJWL2_EXTRAS
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4crjwl2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cj214d.p1", 0x0000, 0x010000, CRC(359e2a73) SHA1(c85eeebafca14e6f975953f5daf2772a62693051) )
+	M4CRJWL2_EXTRAS
+ROM_END
+
+ROM_START( m4crjwl2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cj214s.hex", 0x0000, 0x010000, CRC(296aa885) SHA1(045b02848b37e8a04d950d54301dc6888d6178ad) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "chr.chr", 0x0000, 0x000048, CRC(c5812913) SHA1(d167b1f512c183cf01a1f4e1c1588ea0ae21331b) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cjcs1.hex", 0x000000, 0x080000, CRC(2ac3ba9f) SHA1(3332f29f81918c34aeec3da6f7d001dc9922840d) )
-	ROM_LOAD( "cjcs2.hex", 0x080000, 0x080000, CRC(89838a9d) SHA1(502243cc0a14e63882b537f05c4cc0eb852e4a0c) )
+	M4CRJWL2_EXTRAS
 ROM_END
 
 
@@ -1945,13 +2108,23 @@ GAME(199?, m4c9c	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcr
 GAME(199?, m4ch30	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",GAME_FLAGS )
 
 // corrupt vfd (bwb?)
-GAME(199?, m4clbx	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Club X (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4clbx	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Club X (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4clbxa	,m4clbx		,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Club X (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4clbxb	,m4clbx		,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Club X (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+
 GAME(199?, m4ringfr	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Ring Of Fire (Barcrest) (MPU4)",GAME_FLAGS )
 GAME(199?, m4royjwl	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",GAME_FLAGS )
 
 // play but behavior isn't like barcrest
-GAME(199?, m4crjwl	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4crjwl2	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4crjwl	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4crjwla	,m4crjwl	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4crjwlb	,m4crjwl	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4crjwlc	,m4crjwl	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+
+GAME(199?, m4crjwl2	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4crjwl2a,m4crjwl2	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4crjwl2b,m4crjwl2	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+
 GAME(199?, m4supbjc	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4)",GAME_FLAGS ) // set stake
 
 
@@ -1963,8 +2136,18 @@ GAME(199?, m4luckwb	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 // won't boot with current reel setup, not even in test mode
 GAME(199?, m4maglin	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
 GAME(199?, m4magdrg	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
-GAME(199?, m4clbveg	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4chasei	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4clbveg	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4clbvega,m4clbveg	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4clbvegb,m4clbveg	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4clbvegc,m4clbveg	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4chasei	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4chaseia,m4chasei	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4chaseib,m4chasei	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4chaseic,m4chasei	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4chaseid,m4chasei	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4chaseie,m4chasei	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
+GAME(199?, m4chaseif,m4chasei	,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 7)",GAME_FLAGS )
+
 GAME(199?, m4bluedm	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4) (DBD1.0)",GAME_FLAGS )
 GAME(199?, m4amhiwy	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )
 GAME(199?, m4addrd	,m4addr		,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Adders & Ladders (Barcrest) (DAL, Dutch) (MPU4)",GAME_FLAGS )
@@ -1976,9 +2159,20 @@ GAME(199?, m4salsa	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Ba
 GAME(199?, m4techno	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE)",GAME_FLAGS )
 GAME(199?, m4twintm	,0			,mod4oki	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
 GAME(199?, m4blkbul	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Super Play (Black Bull?) (Czech) (Barcrest) [XSP] (MPU4)",GAME_FLAGS ) // complains about coin dip
-GAME(199?, m4calicl	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4calicl	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4calicla,m4calicl	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4caliclb,m4calicl	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4caliclc,m4calicl	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4calicld,m4calicl	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+
 GAME(199?, m4bucks	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4clbtro	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4clbtro	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4clbtroa,m4clbtro	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4clbtrob,m4clbtro	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4clbtroc,m4clbtro	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4clbtrod,m4clbtro	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4clbtroe,m4clbtro	,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Club Tropicana (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
+
 GAME(199?, m4gldgat	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",GAME_FLAGS )
 GAME(199?, m4hirise	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4)",GAME_FLAGS )
 GAME(199?, m4nspot	,0			,mod2   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4)",GAME_FLAGS )
@@ -2013,7 +2207,16 @@ GAME(199?, m4magrep	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4nile	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN0.8)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4jokmil	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Jokers Millennium (Barcrest) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4drac	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Dracula (Barcrest - Nova) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4crzjwl	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwl	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwla,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlb,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlc,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 4)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwld,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 5)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwle,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 6)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlf,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 7)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlg,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 8)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlh,m4crzjwl	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 9)",GAME_FLAGS ) // DM1 SW ALM
+
 GAME(199?, m4vegastg,m4vegast	,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Vegas Strip (Barcrest) [German] (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 GAME(199?, m4jok300	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Barcrest","Jokers 300 (Barcrest) (German?) (MPU4)",GAME_FLAGS ) // also contains crystal maze stuff??
 GAME(199?, m4luckdv	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Lucky Devil (Barcrest) [Czech] (MPU4)",GAME_FLAGS ) // AUX2 locked

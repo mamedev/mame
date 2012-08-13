@@ -34,18 +34,65 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 }
 
 
+static TIMER_CALLBACK( kaneko_calc3_run_callback )
+{
+	kaneko_calc3_device* dev = (kaneko_calc3_device*)ptr;
+	dev->calc3_mcu_run(machine);
+	dev->reset_run_timer();
+}
+
 void kaneko_calc3_device::device_start()
 {
 	m_calc3_mcuram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x10000/2);
 	initial_scan_tables(this->machine());
+	m_runtimer = machine().scheduler().timer_alloc(FUNC(kaneko_calc3_run_callback), (void*)this);
+
+
+	save_item(NAME(m_calc3.mcu_status));
+	save_item(NAME(m_calc3.mcu_command_offset));
+	save_item(NAME(m_calc3.mcu_crc));
+	save_item(NAME(m_calc3.decryption_key_byte));
+	save_item(NAME(m_calc3.alternateswaps));
+	save_item(NAME(m_calc3.shift));
+	save_item(NAME(m_calc3.subtracttype));
+	save_item(NAME(m_calc3.mode));
+	save_item(NAME(m_calc3.blocksize_offset));
+	save_item(NAME(m_calc3.dataend));
+	save_item(NAME(m_calc3.database));
+	save_item(NAME(m_calc3.data_header));
+	save_item(NAME(m_calc3.writeaddress));
+	save_item(NAME(m_calc3.writeaddress_current));
+	save_item(NAME(m_calc3.dsw_addr));
+	save_item(NAME(m_calc3.eeprom_addr));
+	save_item(NAME(m_calc3.poll_addr));
+	save_item(NAME(m_calc3.checksumaddress));
+	save_pointer(NAME(m_calc3_mcuram), 0x10000/2);
+
+
+
+typedef struct
+{
+
+	int data_header[2];
+
+
+} calc3_t;
+
+
+
 
 }
 
 void kaneko_calc3_device::device_reset()
 {
 	calc3_mcu_init(this->machine());
+	reset_run_timer();
 }
 
+void kaneko_calc3_device::reset_run_timer()
+{
+	m_runtimer->adjust(attotime::from_hz(59.1854));
+}
 
 
 

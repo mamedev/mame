@@ -7,7 +7,19 @@
    some QPS sets also have large 0x3f fills but
    seem to be unrelated.
 
+
+ Excalibur
+ Exotic Fruits
+ Jumping Jack Flash
+ Mad Money Classic
+ Orlando Magic
+ X-change
+ X-s
+ X-treme
+
 */
+
+
 
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -20,62 +32,90 @@ INPUT_PORTS_EXTERN( mpu4 );
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
 
-ROM_START( m4bigmt )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bigm1320", 0x0000, 0x010000, CRC(a5085347) SHA1(93a7f7656e53461270e04190ff538959d6c917c1) )
+#define M4BIGMT_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "altmsm6376", 0 ) /* this is NOT the same, some samples are changed */ \
+	ROM_LOAD( "bigmsnd", 0x0000, 0x07db60, CRC(876c53ae) SHA1(ea2511ec9ba4ff67879212c6e2ba908873130a4e) ) \
+	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_LOAD( "tbmsnd.hex", 0x0000, 0x080000, CRC(e98da8de) SHA1(36668f2b82778f441224c94831f5b95efb9fa92b) ) \
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "tb_20___.7_1", 0x0000, 0x010000, CRC(22fae0f0) SHA1(a875adccf96fbbff69f5fe76720514767cdcae66) )
-	ROM_LOAD( "tb_20_b_.7_1", 0x0000, 0x010000, CRC(40d140a3) SHA1(fd4de8dd827db933481f671e4f10684c3b7a363a) )
-	ROM_LOAD( "tb_20_d_.7_1", 0x0000, 0x010000, CRC(86ed18c5) SHA1(1699645532134bd830e3fc2c3ff4b67b5d67ba3e) )
-	ROM_LOAD( "tb_20_k_.7_1", 0x0000, 0x010000, CRC(e4c6b896) SHA1(ccf656d14ad68edb0aea99d4d3621540b899cdb7) )
-	ROM_LOAD( "tb______.1_2", 0x0000, 0x004000, CRC(be2a3989) SHA1(5ef857101335f90cd9f6147ec330ae281bb97b2b) )
-	ROM_LOAD( "tbi20___.7_1", 0x0000, 0x010000, CRC(104f45cc) SHA1(c28c08b44c46db9d0eade1f60aeda120c3981a03) )
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	ROM_LOAD( "bigmsnd", 0x0000, 0x07db60, CRC(876c53ae) SHA1(ea2511ec9ba4ff67879212c6e2ba908873130a4e) )
-	ROM_LOAD( "tbmsnd.hex", 0x0000, 0x080000, CRC(e98da8de) SHA1(36668f2b82778f441224c94831f5b95efb9fa92b) )
-ROM_END
+#define M4BIGMT_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BIGMT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
 
 
-
-ROM_START( m4bingbl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bb_20a__.8_1", 0x0000, 0x010000, CRC(10f29ba3) SHA1(739b413f35676834ebafeb121c6059759586ec72) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "bb_20bg_.8_1", 0x0000, 0x010000, CRC(9969c9ce) SHA1(8c754335e7ff75bc46f02095c2c7d57df046db47) )
-	ROM_LOAD( "bb_20bt_.8_1", 0x0000, 0x010000, CRC(3a06f518) SHA1(79a9b1e63517f6436ee4743dfc7aa63a9cf585b8) )
-	ROM_LOAD( "bb_20s__.8_1", 0x0000, 0x010000, CRC(c5bd878e) SHA1(dc6048cf25b3a62b23761c338fe6398724b24159) )
-	ROM_LOAD( "bb_20sb_.8_1", 0x0000, 0x010000, CRC(a79627dd) SHA1(c9a6262a0e52a4d1ff073465ab6b489626ae6a2a) )
-	ROM_LOAD( "bb_20sd_.8_1", 0x0000, 0x010000, CRC(61aa7fbb) SHA1(0bf54a562d04c0b41fc35c5c84f529efa2ae9e10) )
-	ROM_LOAD( "bb_20sk_.8_1", 0x0000, 0x010000, CRC(0381dfe8) SHA1(8d3d232c10f9ec683a82464ee901f0963d9ffcd6) )
-	ROM_LOAD( "bbi20___.8_1", 0x0000, 0x010000, CRC(eae04eac) SHA1(bcc619868a065d92d09fa3b2411958b373b3edde) )
-ROM_END
+M4BIGMT_SET( 199?, m4bigmt,		0,			"bigm1320",		0x0000, 0x010000, CRC(a5085347) SHA1(93a7f7656e53461270e04190ff538959d6c917c1), "Bwb","The Big Match (Bwb) (MPU4) (set 1)" )
+M4BIGMT_SET( 199?, m4bigmt__a,	m4bigmt,	"tb_20___.7_1", 0x0000, 0x010000, CRC(22fae0f0) SHA1(a875adccf96fbbff69f5fe76720514767cdcae66), "Bwb","The Big Match (Bwb) (MPU4) (set 2)" )
+M4BIGMT_SET( 199?, m4bigmt__b,	m4bigmt,	"tb_20_b_.7_1", 0x0000, 0x010000, CRC(40d140a3) SHA1(fd4de8dd827db933481f671e4f10684c3b7a363a), "Bwb","The Big Match (Bwb) (MPU4) (set 3)" )
+M4BIGMT_SET( 199?, m4bigmt__c,	m4bigmt,	"tb_20_d_.7_1", 0x0000, 0x010000, CRC(86ed18c5) SHA1(1699645532134bd830e3fc2c3ff4b67b5d67ba3e), "Bwb","The Big Match (Bwb) (MPU4) (set 4)" )
+M4BIGMT_SET( 199?, m4bigmt__d,	m4bigmt,	"tb_20_k_.7_1", 0x0000, 0x010000, CRC(e4c6b896) SHA1(ccf656d14ad68edb0aea99d4d3621540b899cdb7), "Bwb","The Big Match (Bwb) (MPU4) (set 5)" )
+M4BIGMT_SET( 199?, m4bigmt__e,	m4bigmt,	"tb______.1_2", 0x0000, 0x004000, CRC(be2a3989) SHA1(5ef857101335f90cd9f6147ec330ae281bb97b2b), "Bwb","The Big Match (Bwb) (MPU4) (set 6)" )
+M4BIGMT_SET( 199?, m4bigmt__f,	m4bigmt,	"tbi20___.7_1", 0x0000, 0x010000, CRC(104f45cc) SHA1(c28c08b44c46db9d0eade1f60aeda120c3981a03), "Bwb","The Big Match (Bwb) (MPU4) (set 7)" )
 
 
-ROM_START( m4bingbs )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bp_20a__.2_1", 0x0000, 0x010000, CRC(ca005003) SHA1(271ff0dbee529ca15c79c9aa1047efa8993ea073) )
+#define M4BINGBL_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* Missing, or not OKI? */ \
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "bp_20bg_.2_1", 0x0000, 0x010000, CRC(1b59c32f) SHA1(0c7df33f921639bfedbddd969dcbcd62e38ff912) )
-	ROM_LOAD( "bp_20bt_.2_1", 0x0000, 0x010000, CRC(bc7a1830) SHA1(3c16432562ebaef3f17e51feebb4c35d911e90b9) )
-	ROM_LOAD( "bp_20s__.2_1", 0x0000, 0x010000, CRC(1f4f4c2e) SHA1(28f6361c7ee693635c718ea485687bf9fbf8532b) )
-	ROM_LOAD( "bp_20sb_.2_1", 0x0000, 0x010000, CRC(7d64ec7d) SHA1(bc279010642edadcba19cdfad222a783e35039b9) )
-	ROM_LOAD( "bp_20sd_.2_1", 0x0000, 0x010000, CRC(bb58b41b) SHA1(253859ab6d8033eeb94ad5c4586eadc8792bd436) )
-	ROM_LOAD( "bp_20sk_.2_1", 0x0000, 0x010000, CRC(d9731448) SHA1(2f054a99c5d1570b6e0307542c50421408a610dc) )
-ROM_END
+#define M4BINGBL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BINGBL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
 
 
-ROM_START( m4bingcl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bc_xe___.2_1", 0x0000, 0x010000, CRC(3abbc215) SHA1(b5e59b30c07c4ffef69c5729f1a28d7ee55636bd) )
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "bc_xe_b_.2_1", 0x0000, 0x010000, CRC(3e11c5c0) SHA1(2d9bc987fed040664f211bb9d13984b6cba5e25f) )
-	ROM_LOAD( "bc_xe_d_.2_1", 0x0000, 0x010000, CRC(0a3a162f) SHA1(1b0857039b0442269b8fd4c063fc99b3b50cc312) )
-ROM_END
+M4BINGBL_SET( 199?, m4bingbl,		0,			"bb_20a__.8_1", 0x0000, 0x010000, CRC(10f29ba3) SHA1(739b413f35676834ebafeb121c6059759586ec72), "Bwb","Bingo Belle (Bwb) (MPU4) (set 1)" )
+M4BINGBL_SET( 199?, m4bingbl__a,	m4bingbl,	"bb_20bg_.8_1", 0x0000, 0x010000, CRC(9969c9ce) SHA1(8c754335e7ff75bc46f02095c2c7d57df046db47), "Bwb","Bingo Belle (Bwb) (MPU4) (set 2)" )
+M4BINGBL_SET( 199?, m4bingbl__b,	m4bingbl,	"bb_20bt_.8_1", 0x0000, 0x010000, CRC(3a06f518) SHA1(79a9b1e63517f6436ee4743dfc7aa63a9cf585b8), "Bwb","Bingo Belle (Bwb) (MPU4) (set 3)" )
+M4BINGBL_SET( 199?, m4bingbl__c,	m4bingbl,	"bb_20s__.8_1", 0x0000, 0x010000, CRC(c5bd878e) SHA1(dc6048cf25b3a62b23761c338fe6398724b24159), "Bwb","Bingo Belle (Bwb) (MPU4) (set 4)" )
+M4BINGBL_SET( 199?, m4bingbl__d,	m4bingbl,	"bb_20sb_.8_1", 0x0000, 0x010000, CRC(a79627dd) SHA1(c9a6262a0e52a4d1ff073465ab6b489626ae6a2a), "Bwb","Bingo Belle (Bwb) (MPU4) (set 5)" )
+M4BINGBL_SET( 199?, m4bingbl__e,	m4bingbl,	"bb_20sd_.8_1", 0x0000, 0x010000, CRC(61aa7fbb) SHA1(0bf54a562d04c0b41fc35c5c84f529efa2ae9e10), "Bwb","Bingo Belle (Bwb) (MPU4) (set 6)" )
+M4BINGBL_SET( 199?, m4bingbl__f,	m4bingbl,	"bb_20sk_.8_1", 0x0000, 0x010000, CRC(0381dfe8) SHA1(8d3d232c10f9ec683a82464ee901f0963d9ffcd6), "Bwb","Bingo Belle (Bwb) (MPU4) (set 7)" )
+M4BINGBL_SET( 199?, m4bingbl__g,	m4bingbl,	"bbi20___.8_1", 0x0000, 0x010000, CRC(eae04eac) SHA1(bcc619868a065d92d09fa3b2411958b373b3edde), "Bwb","Bingo Belle (Bwb) (MPU4) (set 8)" )
+
+#define M4BINGBS_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* Missing, or not OKI? */ \
+
+#define M4BINGBS_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BINGBS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4BINGBS_SET( 199?, m4bingbs,		0,			"bp_20a__.2_1", 0x0000, 0x010000, CRC(ca005003) SHA1(271ff0dbee529ca15c79c9aa1047efa8993ea073), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 1)" )
+M4BINGBS_SET( 199?, m4bingbs__a,	m4bingbs,	"bp_20bg_.2_1", 0x0000, 0x010000, CRC(1b59c32f) SHA1(0c7df33f921639bfedbddd969dcbcd62e38ff912), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 2)" )
+M4BINGBS_SET( 199?, m4bingbs__b,	m4bingbs,	"bp_20bt_.2_1", 0x0000, 0x010000, CRC(bc7a1830) SHA1(3c16432562ebaef3f17e51feebb4c35d911e90b9), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 3)" )
+M4BINGBS_SET( 199?, m4bingbs__c,	m4bingbs,	"bp_20s__.2_1", 0x0000, 0x010000, CRC(1f4f4c2e) SHA1(28f6361c7ee693635c718ea485687bf9fbf8532b), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 4)" )
+M4BINGBS_SET( 199?, m4bingbs__d,	m4bingbs,	"bp_20sb_.2_1", 0x0000, 0x010000, CRC(7d64ec7d) SHA1(bc279010642edadcba19cdfad222a783e35039b9), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 5)" )
+M4BINGBS_SET( 199?, m4bingbs__e,	m4bingbs,	"bp_20sd_.2_1", 0x0000, 0x010000, CRC(bb58b41b) SHA1(253859ab6d8033eeb94ad5c4586eadc8792bd436), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 6)" )
+M4BINGBS_SET( 199?, m4bingbs__f,	m4bingbs,	"bp_20sk_.2_1", 0x0000, 0x010000, CRC(d9731448) SHA1(2f054a99c5d1570b6e0307542c50421408a610dc), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 7)" )
+
+#define M4BINGCL_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* Missing, or not OKI? */ \
+
+#define M4BINGCL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BINGCL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4BINGCL_SET( 199?, m4bingcl,		0,			"bc_xe___.2_1", 0x0000, 0x010000, CRC(3abbc215) SHA1(b5e59b30c07c4ffef69c5729f1a28d7ee55636bd), "Bwb","Bingo Club (Bwb) (MPU4) (set 1)" )
+M4BINGCL_SET( 199?, m4bingcl__a,	m4bingcl,	"bc_xe_b_.2_1", 0x0000, 0x010000, CRC(3e11c5c0) SHA1(2d9bc987fed040664f211bb9d13984b6cba5e25f), "Bwb","Bingo Club (Bwb) (MPU4) (set 2)" )
+M4BINGCL_SET( 199?, m4bingcl__b,	m4bingcl,	"bc_xe_d_.2_1", 0x0000, 0x010000, CRC(0a3a162f) SHA1(1b0857039b0442269b8fd4c063fc99b3b50cc312), "Bwb","Bingo Club (Bwb) (MPU4) (set 3)" )
 
 
 
@@ -136,16 +176,23 @@ M4BLSBYS_SET( 199?, m4blsbys__ac,	m4blsbys,	"bs_x6s__.2v1", 0x0000, 0x020000, CR
 M4BLSBYS_SET( 199?, m4blsbys__ad,	m4blsbys,	"bsix3___.2v1", 0x0000, 0x020000, CRC(4e7451fa) SHA1(b1417f948c7e80f506b90d6608f6dd79739389bf), "Bwb","Blues Boys (Bwb) (MPU4) (set 41)" )
 
 
-ROM_START( m4bluesn )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "bluesboys.bin", 0x0000, 0x020000, CRC(c1395649) SHA1(3cd0eed1f966f5391fe5de496dc747385ebfb556) )
+#define M4BLUESN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "bluesboyz.bi2", 0x000000, 0x080000, CRC(7f19a61b) SHA1(dd8742d84df24e118bdbffb1efffad1c71eb2283) ) \
+	ROM_LOAD( "bluesboyz.bi3", 0x080000, 0x080000, CRC(32363184) SHA1(8f3f53ce4d9f9b54c441263def9d8e23880507a1) ) \
+	ROM_LOAD( "bluesboyz.bi4", 0x100000, 0x080000, CRC(aa94281d) SHA1(e15b7bf97b8e307ed465d9b8cb6e5de0044f6fb5) ) \
+	ROM_LOAD( "bluesboyz.bi5", 0x180000, 0x080000, CRC(d8d7aa2e) SHA1(2d8b86fa63e6649d628c7e343d8f5c329c8f8ced) ) \
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "bluesboyz.bi2", 0x000000, 0x080000, CRC(7f19a61b) SHA1(dd8742d84df24e118bdbffb1efffad1c71eb2283) )
-	ROM_LOAD( "bluesboyz.bi3", 0x080000, 0x080000, CRC(32363184) SHA1(8f3f53ce4d9f9b54c441263def9d8e23880507a1) )
-	ROM_LOAD( "bluesboyz.bi4", 0x100000, 0x080000, CRC(aa94281d) SHA1(e15b7bf97b8e307ed465d9b8cb6e5de0044f6fb5) )
-	ROM_LOAD( "bluesboyz.bi5", 0x180000, 0x080000, CRC(d8d7aa2e) SHA1(2d8b86fa63e6649d628c7e343d8f5c329c8f8ced) )
-ROM_END
+#define M4BLUESN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BLUESN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4BLUESN_SET( 199?, m4bluesn,	m4blsbys,	"bluesboys.bin", 0x0000, 0x020000, CRC(c1395649) SHA1(3cd0eed1f966f5391fe5de496dc747385ebfb556), "Bwb","Blues Boys (Nova) (MPU4)" )
+
 
 
 #define M4CSOC_EXTRA_ROMS \
@@ -280,849 +327,994 @@ M4DAYTN_SET( 199?, m4daytn__n,	m4daytn,	"da_92_d_.1_0", 0x0000, 0x040000, CRC(9e
 
 
 
-ROM_START( m4excal )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ex_05a__.6_1", 0x0000, 0x020000, CRC(317fa289) SHA1(8a0e83a764e2a04285367e0f7ebb814fedc81400) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ex_20a_6.6_1", 0x0000, 0x020000, CRC(284937c8) SHA1(3be8bf21ab0ff97f67ce170cee48cd08ea325571) )
-	ROM_LOAD( "ex_20a_8.6_1", 0x0000, 0x020000, CRC(45fb3559) SHA1(9824d2e6bc8c2249de66aea2422b7a6efd0e37b3) )
-	ROM_LOAD( "ex_20a_c.7_1", 0x0000, 0x020000, CRC(ab773d70) SHA1(3a5e3aa3978bf0bc9a4924d3225665b583c90abc) )
-	ROM_LOAD( "ex_20atc.7_1", 0x0000, 0x020000, CRC(ec5c7bc7) SHA1(c57eb69044858b7ea43726d0f49e1c224aeb1377) )
-	ROM_LOAD( "ex_20s_6.6_1", 0x0000, 0x020000, CRC(44176959) SHA1(fcaad1732176330b382f1690293ed43fa66de084) )
-	ROM_LOAD( "ex_20s_8.6_1", 0x0000, 0x020000, CRC(29a56bc8) SHA1(7345b8bd4e3cf64ca222c59857ef7df9b1db45c1) )
-	ROM_LOAD( "ex_20sb6.6_1", 0x0000, 0x020000, CRC(e387c4b9) SHA1(cc83de53a1ffe8d75acb9c2f2ceca9bbff516df7) )
-	ROM_LOAD( "ex_20sb8.6_1", 0x0000, 0x020000, CRC(8e35c628) SHA1(000811c50189cae0f7327b4e7484eb64091a989c) )
-	ROM_LOAD( "ex_20sd6.6_1", 0x0000, 0x020000, CRC(7adbd752) SHA1(d758e202ed75ce3a99f0666c405090107cb0feca) )
-	ROM_LOAD( "ex_20sd8.6_1", 0x0000, 0x020000, CRC(1769d5c3) SHA1(3e5ff338364781e99685cde9e45707dd88d1da11) )
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	ROM_LOAD( "ex______.1_2", 0x000000, 0x080000, CRC(9305e516) SHA1(5a5c67f97761fe2e042ba31594d1881238d3227b) )
-	ROM_LOAD( "ex______.1_3", 0x080000, 0x080000, CRC(29e3709a) SHA1(2e2f089aa2a938158930f235bf821685932d698b) )
-	ROM_LOAD( "ex______.1_4", 0x100000, 0x080000, CRC(dd747003) SHA1(cf0a2936c897e3b833984c55f4825c358b723ab8) )
-ROM_END
-
-
-
-ROM_START( m4exotic )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "eo_49bg_.2_0", 0x0000, 0x020000, CRC(c3bf2286) SHA1(74090fd0a103a6c311d426f4aae8e7af8b1d3bc0) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "eo_49bm_.2_0", 0x0000, 0x020000, CRC(c748c4ca) SHA1(7d0d498f9edd792ed861c8bf9cf1bb03698d144d) )
-	ROM_LOAD( "eo_49bmd.2_0", 0x0000, 0x020000, CRC(98436c04) SHA1(1db7c95f7a0297aa3da7f1ce27c790ffa1fa4ebe) )
-	ROM_LOAD( "eo_49bmd.2g0", 0x0000, 0x020000, CRC(425a0152) SHA1(6a235c613f52c4b8985a589f89542eebd3574fde) )
-	ROM_LOAD( "eo_s9bt_.2g0", 0x0000, 0x020000, CRC(c527d333) SHA1(083d7be95d73d259fe8ec1d87a3a41089a4c44df) )
-	ROM_LOAD( "eo_sja__.2_0", 0x0000, 0x020000, CRC(5ca9557f) SHA1(5fa42c56c67b505272d358a54ebe911fdb0b905e) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-
-
-ROM_START( m4firice )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "fi_20__d.5_0", 0x0000, 0x040000, CRC(ab46574c) SHA1(d233b137f8f42b9b644b34a627fbcc5b662e8ae1) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "fi_20_bd.5_0", 0x0000, 0x040000, CRC(9b2bc052) SHA1(34b970659218fde097238b852dadedcb928f69fd) )
-	ROM_LOAD( "fi_20_dd.5_0", 0x0000, 0x040000, CRC(2bbc9855) SHA1(84d51eeadc01ac74d630a05b933343f01f04b2af) )
-	ROM_LOAD( "fi_20_kd.5_0", 0x0000, 0x040000, CRC(529b43b1) SHA1(80d4d928918fdc869b1693e21a5c25045e5c9449) )
-	ROM_LOAD( "fi_20a_d.5_0", 0x0000, 0x040000, CRC(8d6ce79d) SHA1(05954ed4b34af73c065b6203a50da9af7d8373fe) )
-	ROM_LOAD( "fi_20s_d.5_0", 0x0000, 0x040000, CRC(d0aa53af) SHA1(f71801344c17a759ec4eb8958377bbcf4b4cae65) )
-	ROM_LOAD( "fi_sj___.e_0", 0x0000, 0x040000, CRC(7f12e37a) SHA1(fb09ff782f66972b8bdeff105c5f3d1f9f676809) )
-	ROM_LOAD( "fi_sj_b_.e_0", 0x0000, 0x040000, CRC(5aef48d2) SHA1(73f410951a737f75f3e7c14e704eca9c26cfa750) )
-	ROM_LOAD( "fi_sj_d_.e_0", 0x0000, 0x040000, CRC(61822af2) SHA1(8c721229a5ce9f491cbc638b8c5fa5c0c3032700) )
-	ROM_LOAD( "fi_sj_k_.e_0", 0x0000, 0x040000, CRC(2b57036b) SHA1(60cec130770ff643af1148f16a3afe3b102e94e2) )
-	ROM_LOAD( "fi_sja__.e_0", 0x0000, 0x040000, CRC(da5e0eff) SHA1(9f5ddce366786bdf898c9410be417c8028cebeb4) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "fire_ice.s1", 0x000000, 0x080000, CRC(74ee37c1) SHA1(bc9b419dd1fd1c66090f8946247e754c0267baa3) )
-	ROM_LOAD( "fire_ice.s2", 0x080000, 0x080000, CRC(b86bafeb) SHA1(ee237f601b970dc5be8096a4018cb6a3edac500f) )
-	ROM_LOAD( "fire_ice.s3", 0x100000, 0x080000, CRC(75f349b3) SHA1(1505bec7b69e1eabd679b70d95ae58fd264ca698) )
-ROM_END
-
-
-
-
-ROM_START( m4harle )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hq_20a__.1_1", 0x0000, 0x010000, CRC(b8ae3025) SHA1(94a449eff103bf6ba1fc6e85b03061b9ce658ae0) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "hq_20bg_.1_1", 0x0000, 0x010000, CRC(31356248) SHA1(d8791b1c861ed4388660bbe78f2589db7f1e779e) )
-	ROM_LOAD( "hq_20bg_.2a1", 0x0000, 0x010000, CRC(f50898af) SHA1(ba4470abb85b92d647ff8da48dba571cec5f594e) )
-	ROM_LOAD( "hq_20bt_.1_1", 0x0000, 0x010000, CRC(925a5e9e) SHA1(e8a4f75d4f7e6825894e19a915db21ee21206b5b) )
-	ROM_LOAD( "hq_20s__.1_1", 0x0000, 0x010000, CRC(6de12c08) SHA1(df279a07ccd448b9a6948ccb059aff6306ddcc99) )
-	ROM_LOAD( "hq_20sb_.1_1", 0x0000, 0x010000, CRC(0fca8c5b) SHA1(f430f2d1ff71513426bb5cfed883797de6afd3a7) )
-	ROM_LOAD( "hq_20sd_.1_1", 0x0000, 0x010000, CRC(c9f6d43d) SHA1(4eef4ec6bff20fdf5b20b266ddd1646045390d42) )
-	ROM_LOAD( "hq_20sk_.1_1", 0x0000, 0x010000, CRC(abdd746e) SHA1(5bb7043a1a790e5c784c7a51fd3c023b3099439f) )
-	ROM_LOAD( "hq_xea__.2f1", 0x0000, 0x010000, CRC(4ef7c19c) SHA1(bd8e5c69ab31c5a9c89a7f2020a61bde5e00b6b2) )
-	ROM_LOAD( "hq_xea__.2s1", 0x0000, 0x010000, CRC(05d42107) SHA1(e1dc4e2f84ebadead994a09c53c2d9a1ed8e29aa) )
-	ROM_LOAD( "hq_xes__.2f1", 0x0000, 0x010000, CRC(9bb8ddb1) SHA1(c8bba9bdfd7a0bbcbe89cd422d37909f7ebcaa82) )
-	ROM_LOAD( "hq_xes__.2s1", 0x0000, 0x010000, CRC(d09b3d2a) SHA1(4de366ed5eae89f2bb39abc052d88cb59e846307) )
-	ROM_LOAD( "hq_xesd_.2a1", 0x0000, 0x010000, CRC(b402aa45) SHA1(6c6eed7b172604112a2c00df9fd00476d07cc971) )
-	ROM_LOAD( "hq_xesd_.2f1", 0x0000, 0x010000, CRC(3faf2584) SHA1(01b049b6ae44771f37b298dc525e16b6e9a182f2) )
-	ROM_LOAD( "hq_xesd_.2s1", 0x0000, 0x010000, CRC(748cc51f) SHA1(d2ac7c237be40564809b006bf68d09560817f97d) )
-	ROM_LOAD( "ph_20a__.2s1", 0x0000, 0x010000, CRC(559bf168) SHA1(3c6a47bba52481af3f987d284a2102a8ee2cc7e6) )
-	ROM_LOAD( "ph_20bg_.1_1", 0x0000, 0x010000, CRC(4c96d2fa) SHA1(1ff8c8c5dc6a67ac187ba0b96cd93c786884aa3b) )
-	ROM_LOAD( "ph_20bt_.1_1", 0x0000, 0x010000, CRC(eff9ee2c) SHA1(ae15ee4bbc3028580b3c6cbc8a078fbe3291283e) )
-	ROM_LOAD( "ph_20s__.1_1", 0x0000, 0x010000, CRC(4cccba32) SHA1(6d2ec2324866555dfa3f3fd5b79ff3883e1b2ebe) )
-	ROM_LOAD( "ph_20s__.2s1", 0x0000, 0x010000, CRC(80d4ed45) SHA1(c818f3e154cfa1efcd11efb71061aa5bfc2e668f) )
-	ROM_LOAD( "ph_20sb_.1_1", 0x0000, 0x010000, CRC(2ee71a61) SHA1(0e91cc5b22899f9765cabb9416fcafed790951ae) )
-	ROM_LOAD( "ph_20sb_.2f1", 0x0000, 0x010000, CRC(1f56841a) SHA1(dfd90d8af765bc981d0dcb4b0ffb5ce613bfcbed) )
-	ROM_LOAD( "ph_20sd_.1_1", 0x0000, 0x010000, CRC(e8db4207) SHA1(bd806e5b04207b3121284c485a6ab8a385231504) )
-	ROM_LOAD( "ph_20sd_.2s1", 0x0000, 0x010000, CRC(24c31570) SHA1(a6da77ebd80dc234add5da880e3472f2f1e2ca3d) )
-	ROM_LOAD( "ph_20sk_.1_1", 0x0000, 0x010000, CRC(8af0e254) SHA1(b7d80ab84684bdabe169623864b9efd0d3881f2e) )
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	ROM_LOAD( "hq______.1_2", 0x000000, 0x080000, CRC(0c8c14be) SHA1(a1268e71ea43772a532b63327f24c64fabd7e715) )
-	ROM_LOAD( "hq______.1_3", 0x080000, 0x080000, CRC(5a07e514) SHA1(6e589756c0fc4b0458ca856e918fa3b7cd396c39) )
-ROM_END
-
-
-ROM_START( m4hvhel )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "hh_20__d.2_0", 0x0000, 0x040000, CRC(801de788) SHA1(417b985714d8f0ebed93b65a3f865e03474ce9e5) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "hh_20a_d.2_0", 0x0000, 0x040000, CRC(ea4e7876) SHA1(5bf711c2bdff50fe745edefa0eebf719824d9e5b) )
-	ROM_LOAD( "hh_20s_d.2_0", 0x0000, 0x040000, CRC(a519a441) SHA1(f3c19d316c82d1ebbcfdabb6d4eaa6cfa369d287) )
-	ROM_LOAD( "hh_sj___", 0x0000, 0x040000, CRC(04577b99) SHA1(48689c3a96bc42ad64dc4d363dad38c967f0cdcc) )
-	ROM_LOAD( "hh_sj___.f_0", 0x0000, 0x040000, CRC(8ab33720) SHA1(0c9283a20c3f008baa8ce027d1266e4ef49ca56b) )
-	ROM_LOAD( "hh_sjs__.f_0", 0x0000, 0x040000, CRC(8854763d) SHA1(323bd76a014e52e3b12427998b0e2851463246c8) )
-	ROM_LOAD( "hh_vc___.g_0", 0x0000, 0x040000, CRC(db338fb7) SHA1(e7e92293374721e7360493e9ef189991dad0a1ee) )
-	ROM_LOAD( "hh_vc_d_.g_0", 0x0000, 0x040000, CRC(292468bd) SHA1(f9b19f57a49c1afd670c68b7acd85d4141adfce1) )
-	ROM_LOAD( "h_hell._pound5", 0x0000, 0x040000, CRC(cd59c0d0) SHA1(8caad9043a277fa39a3ad2d5ec3388c121e7f697) )
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	ROM_LOAD( "hh___snd.1_1", 0x000000, 0x080000, CRC(afa7ba60) SHA1(25278046252e49364d4a51de79295b87baf6018e) )
-	ROM_LOAD( "hh___snd.1_2", 0x080000, 0x080000, CRC(ec1ec822) SHA1(3fdee0526cb70f4951b7bbced74e32641ded9b7b) )
-	ROM_LOAD( "hh___snd.1_3", 0x100000, 0x080000, CRC(d4119155) SHA1(b61c71e1ee0dbfc0bb9eff1a8c019cf11731ee11) )
-ROM_END
-
-ROM_START( m4indycr )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "ic_sj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ic_sj___.2_0", 0x0000, 0x040000, CRC(6d0ddf54) SHA1(0985aa9fddb71a499d266c12893aabbab8755319) )
-	ROM_LOAD( "ic_sj_b_.1_0", 0x0000, 0x040000, CRC(4bc0cb73) SHA1(d4c048ba9578add0104f0c529f20356c3502ea71) )
-	ROM_LOAD( "ic_sj_d_.1_0", 0x0000, 0x040000, CRC(165ad977) SHA1(daa444e0d128859832094d3b07026483cd3466ce) )
-	ROM_LOAD( "ic_sj_d_.2_0", 0x0000, 0x040000, CRC(36bd0b34) SHA1(306d6e6536a4137353f9b895e64c7e9a5c79561a) )
-	ROM_LOAD( "ic_sj_k_.1_0", 0x0000, 0x040000, CRC(857fda64) SHA1(3eb230ea1adf9acb4cf83422c4bb1cde40756310) )
-	ROM_LOAD( "ic_sjs__.1_0", 0x0000, 0x040000, CRC(6310b904) SHA1(0f2cd7ed83f77423bcfb2a71144fab2047dfea13) )
-	ROM_LOAD( "icsj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54) )
-
-	ROM_REGION( 0x200000, "gals", 0 )
-	ROM_LOAD( "ic___.g", 0x0000, 0x000657, CRC(25cc2b32) SHA1(a065276fe4cc1e55f366ac216b5bc8cf934da9dd) )
-	ROM_LOAD( "ic___.p", 0x0000, 0x00058b, CRC(26388ec4) SHA1(e33183d0c3e75fe23ab6df01d561f5b65923d1db) )
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "da______.1_1", 0x000000, 0x080000, CRC(99d36c12) SHA1(f8848a28b5546649d6a3f8599dbc4ca84bdac77c) )
-	ROM_LOAD( "da______.1_2", 0x080000, 0x080000, CRC(32b40094) SHA1(f02c3b088d76116f817b536cf7cec5188b2f73bf) )
-	ROM_LOAD( "da______.1_3", 0x100000, 0x080000, CRC(2df33d18) SHA1(40afa32d6c72c6a76e3e2e61db19a16003f4e176) )
-	ROM_LOAD( "da______.1_4", 0x180000, 0x080000, CRC(8e254a3b) SHA1(bc3643ea5878bbde110ee6971c5149b3320bcffc) )
-ROM_END
-
-
-ROM_START( m4jakjok )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "jj_sj___.6_0", 0x0000, 0x040000, CRC(7bc45b0e) SHA1(f30fef8fccdac04859f1ff93198a497eff723020) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "jj_sj_k_.3_0", 0x0000, 0x040000, CRC(c33dd82f) SHA1(c1f3f6ca1c45503b7f71e897e5c27368f5efb439) )
-	ROM_LOAD( "jj_sjs__.6_0", 0x0000, 0x040000, CRC(4bcac6f5) SHA1(7dc07a7a61a6ba044020d6c2496143168c103a70) )
-	ROM_LOAD( "jj_vc___.7_0", 0x0000, 0x040000, CRC(4cdca8da) SHA1(ee7448b12380416a3bea2713ed5feca7473be8aa) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "jj_____.1_1", 0x000000, 0x080000, CRC(e759a958) SHA1(b107f4ef5a2805e56d4024940bfc632155de1eb1) )
-	ROM_LOAD( "jj_____.1_2", 0x080000, 0x080000, CRC(aa215ff0) SHA1(4bf2c6f8153730cc3ca86f78ec14063ece7d8700) )
-	ROM_LOAD( "jj_____.1_3", 0x100000, 0x080000, CRC(03c0ffc3) SHA1(2572f62362325df8b235b487d4a764218e7f1589) )
-ROM_END
-
-ROM_START( m4jakjoka )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "j_joker.s1", 0x0000, 0x080000, CRC(4ad711d2) SHA1(500381ac2a5075acd606a131cd1b382342cc3a80) )
-	ROM_LOAD( "j_joker.s2", 0x0000, 0x080000, CRC(840ba491) SHA1(f7f43d5d8e521a59fdccbd5f22935c525c3d43c2) )
-	ROM_LOAD( "j_joker.s3", 0x0000, 0x080000, CRC(2ed74890) SHA1(a3d039b4c3c9dd792300eb045e542a212d4d50ae) )
-ROM_END
-
-ROM_START( m4jflash )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "jf_25__c.2_1", 0x0000, 0x020000, CRC(4d5f1a12) SHA1(c25b6d899b74231da505bde7b671be001bdcea5d) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "jf_25a_c.2_1", 0x0000, 0x020000, CRC(76722e15) SHA1(4bd107049ad98b848cdaba3a1318373bbd06ab9f) )
-	ROM_LOAD( "jf_25b_c.2_1", 0x0000, 0x020000, CRC(35a927c6) SHA1(6776fe77ad8a85feecdedfad0eac89f9cb826fbf) )
-	ROM_LOAD( "jf_25bdc.2_1", 0x0000, 0x020000, CRC(d372689e) SHA1(ecad53022c7786f387586484a3e679afbf0bac37) )
-	ROM_LOAD( "jf_25bgc.2_1", 0x0000, 0x020000, CRC(421084bc) SHA1(b6f847468c20a3f85d9e77b633dc48adb43c970f) )
-	ROM_LOAD( "jf_25btc.2_1", 0x0000, 0x020000, CRC(1c701822) SHA1(559b4d269a3af388aa86f28ccedd22505fcdb355) )
-	ROM_LOAD( "jf_25d_c.2_1", 0x0000, 0x020000, CRC(9cde7bfc) SHA1(a0b840f00c487e963f4dd9f58e3abca7b0cea31b) )
-	ROM_LOAD( "jf_25dkc.2_1", 0x0000, 0x020000, CRC(ef583053) SHA1(23b33f0e49d8efceb4a6690ac58da1ccf6576a1a) )
-	ROM_LOAD( "jf_25k_c.2_1", 0x0000, 0x020000, CRC(d82701b8) SHA1(a784fa11877e05f2219f1452463ec3348c84e879) )
-	ROM_LOAD( "jf_25sbc.2_1", 0x0000, 0x020000, CRC(c6bce1c6) SHA1(708002059d307a02fec32a3cdb6eff995a438631) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-ROM_START( m4ln7 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "l7_20a__.1_1", 0x0000, 0x010000, CRC(bfe82d2a) SHA1(4477d737a2326602a355758d8fc06220312fc085) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "l7_20s__.1_1", 0x0000, 0x010000, CRC(0037cd57) SHA1(b5882027269cf71878a73009bc3e40d9fcfac60d) )
-	ROM_LOAD( "l7_20sb_.1_1", 0x0000, 0x010000, CRC(d53bcd66) SHA1(7f5c65d5ca3dbb8a0c38f169585fc78d512166af) )
-	ROM_LOAD( "l7_20sd_.1_1", 0x0000, 0x010000, CRC(a82d04cb) SHA1(1abe9e22f6f526ab076163ce79cff841d1b38b0a) )
-	ROM_LOAD( "l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d2104fa) SHA1(a0a65042f4db8ea5184d41c68ffcf7608580d928) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "l7______.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) )
-	ROM_LOAD( "l7______.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )
-ROM_END
-
-
-ROM_START( m4madmon )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "mm_20a__.7_1", 0x0000, 0x020000, CRC(7df66388) SHA1(4e5bcbcb2fb08b23989c83f11751400f666bbdc2) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "mm_20b__.7_1", 0x0000, 0x020000, CRC(7f592e44) SHA1(05e78347cd09d1e58f0a50a724e0563490ec5185) )
-	ROM_LOAD( "mm_20bg_.7_1", 0x0000, 0x020000, CRC(2cd8dcc2) SHA1(c4a2a423a55c6b0668739429c24c69b25e3824cf) )
-	ROM_LOAD( "mm_20bt_.7_1", 0x0000, 0x020000, CRC(6e929612) SHA1(6b1d06c3cfce440c4cefb8dd04e7a5da673d545a) )
-	ROM_LOAD( "mm_20s__.7_1", 0x0000, 0x020000, CRC(c23b338c) SHA1(0d3bc801132e68564c2bc01b810e71362047ade1) )
-	ROM_LOAD( "mm_20sb_.7_1", 0x0000, 0x020000, CRC(51be206b) SHA1(913defb24bdb7551acefefd9673f5663129edbec) )
-	ROM_LOAD( "mm_25__c.3_1", 0x0000, 0x020000, CRC(e1879caf) SHA1(4d0a804a8d81aab5bb9dec611654325e6a3fb741) )
-	ROM_LOAD( "mm_25_dc.3_1", 0x0000, 0x020000, CRC(9bc81854) SHA1(b4c42a3da0ab03a0f43846e0c3a4a0b5f3c7e65a) )
-	ROM_LOAD( "mm_25_gc.3_1", 0x0000, 0x020000, CRC(8d2f1259) SHA1(239c2430bd4ce7b53615b00fac79fb7eceecabf1) )
-	ROM_LOAD( "mm_25a_c.3_1", 0x0000, 0x020000, CRC(b45b88c2) SHA1(56ed8c83c68f410fcc5ac342abac6b1f4419cccd) )
-	ROM_LOAD( "mm_25b_c.3_1", 0x0000, 0x020000, CRC(fc33804b) SHA1(f817a6dd691739fcf7d7d622da265f63f60503f6) )
-	ROM_LOAD( "mm_25bdc.3_1", 0x0000, 0x020000, CRC(188666c0) SHA1(e8a61c327c73aac2a6b0dc674dee7bc2aa358b27) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-ROM_START( m4madmnc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cm_25__c.3_1", 0x0000, 0x020000, CRC(3d9ff5fe) SHA1(b918bb15251514f50a669216c7d00ecf23e64d1b) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "cm_25_bc.3_1", 0x0000, 0x020000, CRC(65a7b870) SHA1(58b910d7e002164cbbe1aa32c5e17dfe7cfb507d) )
-	ROM_LOAD( "cm_25_dc.3_1", 0x0000, 0x020000, CRC(fcae8cf3) SHA1(0f1e86e2f02be2e1870f0f70509bc4a2ada6d3a5) )
-	ROM_LOAD( "cm_25_kc.3_1", 0x0000, 0x020000, CRC(f66cf97b) SHA1(9b6c4da3a9d64ed2581b04ca82a945dc295931bc) )
-	ROM_LOAD( "cm_25a_c.3_1", 0x0000, 0x020000, CRC(94e21dc0) SHA1(0d35a467fdcd19909d5540c8a4461364bf7e17f3) )
-	ROM_LOAD( "cm_25b_c.3_1", 0x0000, 0x020000, CRC(95a1eb43) SHA1(a44d5c8fadf547187834c4686f6001e6e7df83f7) )
-	ROM_LOAD( "cm_25bgc.3_1", 0x0000, 0x020000, CRC(3241cdf5) SHA1(9ac4b415fff3ee3422dc6e4df7f626cddcab6c38) )
-	ROM_LOAD( "cm_25btc.3_1", 0x0000, 0x020000, CRC(b8c0f623) SHA1(62d489d82955ac492f78be77a3f2558ad080b375) )
-	ROM_LOAD( "cm_29_dc.4_1", 0x0000, 0x020000, CRC(72542e93) SHA1(f9aad1e290b345ebd93dee81a10ad3ebb61b8228) )
-	ROM_LOAD( "cm_29a_c.4_1", 0x0000, 0x020000, CRC(aa7c11ce) SHA1(3ae11b5279f975c0f6f6462d9e23180b47cbe280) )
-	ROM_LOAD( "cm_29b_c.4_1", 0x0000, 0x020000, CRC(b5d749d8) SHA1(91f318a193a7ad841ac9a7f2114385ad97555f4d) )
-	ROM_LOAD( "cm_29bgc.4_1", 0x0000, 0x020000, CRC(82f06ed1) SHA1(3f982d8fb1f689cd774f407585a8dce5d8c031a7) )
-	ROM_LOAD( "cm_29btc.4_1", 0x0000, 0x020000, CRC(dd96bbeb) SHA1(1cf461dc36a8086b3f438922e1675fbd929af771) )
-	ROM_LOAD( "cm_39_dc.4_1", 0x0000, 0x020000, CRC(c81c575e) SHA1(8c1f5151412da267381434259ca2c2d307668a74) )
-	ROM_LOAD( "cm_39a_c.4_1", 0x0000, 0x020000, CRC(10346803) SHA1(2d7b0ca2c30a24c4779c44872fc86d6ae269b51f) )
-	ROM_LOAD( "cm_39a_c.5_1", 0x0000, 0x020000, CRC(a235932f) SHA1(b6875c1119c8ed3a77d7f358298c119afac17dea) )
-	ROM_LOAD( "cm_39b_c.4_1", 0x0000, 0x020000, CRC(0f9f3015) SHA1(8a02b6a22a96c7e310a7428d36b306e8af618e9a) )
-	ROM_LOAD( "cm_39bgc.4_1", 0x0000, 0x020000, CRC(38b8171c) SHA1(5e33189d6b2d72a045c98c2bb8492961ab3d978f) )
-	ROM_LOAD( "cm_39btc.4_1", 0x0000, 0x020000, CRC(67dec226) SHA1(68bfe25ff693ea7b4469d2e7d1b6972cc421d1cc) )
-	ROM_LOAD( "cm_49_dc.4_1", 0x0000, 0x020000, CRC(e0ab38ee) SHA1(a324a1bb9f709b72de6fdd4c896326ca0004fdef) )
-	ROM_LOAD( "cm_49a_c.4_1", 0x0000, 0x020000, CRC(388307b3) SHA1(070d431171ce325f6935f5bc1fd8db3acf79b13c) )
-	ROM_LOAD( "cm_49b_c.4_1", 0x0000, 0x020000, CRC(27285fa5) SHA1(5f08bc751d7a0875b1b879d7d96aa9803fb942c6) )
-	ROM_LOAD( "cm_49bgc.4_1", 0x0000, 0x020000, CRC(100f78ac) SHA1(c5d30fa46508b00b163dbf05e572f8c23fdb6cc3) )
-	ROM_LOAD( "cm_49btc.4_1", 0x0000, 0x020000, CRC(4f69ad96) SHA1(50948166fee3cd1e6f0e378076046ee305204d61) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-
-ROM_START( m4mmm )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "mu_sj___.3_0", 0x0000, 0x040000, CRC(abdf9d1c) SHA1(e8c6a056025b44e4ec995b42b2720e6366a97283) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "mu_sja__.3_0", 0x0000, 0x040000, CRC(3d2a9ea4) SHA1(f2ec904c8cef84affaad603edf26a864bd34be29) )
-	ROM_LOAD( "mu_sjk__.3_0", 0x0000, 0x040000, CRC(34e4f8ba) SHA1(606d607faeb43190f5167aa3d10c55d9986b7e58) )
-	ROM_LOAD( "mu_sjs__.3_0", 0x0000, 0x040000, CRC(26fb12b3) SHA1(d341181be75c87b44e4066653225911ce3460ed8) )
-	ROM_LOAD( "mu_ssj__.2_0", 0x0000, 0x040000, CRC(935b6602) SHA1(d5fa5688895fe3c2ae3ad7dbbc35d9b12574c93d) )
-	ROM_LOAD( "mu_ssja_.2_0", 0x0000, 0x040000, CRC(ff97814c) SHA1(8d9d74e6b0096cdc3226cfa91d7b653855600d5a) )
-	ROM_LOAD( "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728973a) SHA1(2cd9c866fcc33150fb8d456f741ac809e0bd2b15) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "mu___snd.1_1", 0x000000, 0x080000, CRC(570cf5f8) SHA1(48b3703bf385d037e4e870dfb671b75e9bab84a7) )
-	ROM_LOAD( "mu___snd.1_2", 0x080000, 0x080000, CRC(6ec1910b) SHA1(4920fe0b7c7f4ddb14d56f50598aaf62e5867014) )
-	ROM_LOAD( "mu___snd.1_3", 0x100000, 0x080000, CRC(8699378c) SHA1(55c3e310cfde8046e58bf21a8788e697c8275b8d) )
-	ROM_LOAD( "mu___snd.1_4", 0x180000, 0x080000, CRC(54b193d8) SHA1(ab24624ce69d352a14f6bd3db127fa1c8c5f07db) )
-
-ROM_END
-
-
-ROM_START( m4orland )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "or 05a v2-1(27c010)", 0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "or_05a__.1_1", 0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed) )
-	ROM_LOAD( "or_20a__.7_1", 0x0000, 0x020000, CRC(ae524299) SHA1(3bb2bfe1c0ca0660aca148d6f17b730b7bdc8183) )
-	ROM_LOAD( "or_20b__.7_1", 0x0000, 0x020000, CRC(c8a30e2e) SHA1(8abc5437751faf61c12709c963a6819cb0b2b43f) )
-	ROM_LOAD( "or_20bg_.7_1", 0x0000, 0x020000, CRC(552561e5) SHA1(c92c4b21182511e4880b90313a673045e20b01e8) )
-	ROM_LOAD( "or_20bt_.7_1", 0x0000, 0x020000, CRC(7db2e12a) SHA1(c10989d5d6bbc8f87ad21364f6c64495dc4a3047) )
-	ROM_LOAD( "or_20s__.7_1", 0x0000, 0x020000, CRC(9ce4b650) SHA1(26a3337526d398ce265d735cfbe6d0e69c1f5cab) )
-	ROM_LOAD( "or_20sb_.7_1", 0x0000, 0x020000, CRC(90f59de7) SHA1(2bb6c0680c654265c8669a5f13346ae6afb72fb5) )
-	ROM_LOAD( "or_20sd_.7_1", 0x0000, 0x020000, CRC(242c552c) SHA1(dce5f0d38c8c6c101337028f30c05a7eb629e703) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "orlandosnd.p1", 0x000000, 0x080000, CRC(2735649d) SHA1(7b27bf2d4091ab581d399679b03f538f449f180c) )
-	ROM_LOAD( "orlandosnd.p2", 0x080000, 0x080000, CRC(0741e2ff) SHA1(c49a2809073dd058ba85ae14c888e19d3eb2b133) )
-ROM_END
-
-
-ROM_START( m4pzbing )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pb_20a__.4_1", 0x0000, 0x010000, CRC(52aa92e5) SHA1(3dc20e521677e829967e1d689c9905fb96aee639) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "pb_20ad_.4_1", 0x0000, 0x010000, CRC(f6bd6ad0) SHA1(092cb895c576ed2e995b62aba21851af6fb90959) )
-	ROM_LOAD( "pb_20bg_.4_1", 0x0000, 0x010000, CRC(593e89f4) SHA1(4ed79c889370eb5de20b434cd83b2ee3fae31ed8) )
-	ROM_LOAD( "pb_20bt_.4_1", 0x0000, 0x010000, CRC(fa51b522) SHA1(1fdebe63b871f700a664053251b02c8cf47fbb92) )
-	ROM_LOAD( "pb_20s__.4_1", 0x0000, 0x010000, CRC(601f37d9) SHA1(0971c5c5321f5ce1508a0dd8abd989939224a779) )
-	ROM_LOAD( "pb_20sb_.4_1", 0x0000, 0x010000, CRC(0234978a) SHA1(f24069883efb69de1024b6efbeb3d6a100ac5b9a) )
-ROM_END
-
-
-ROM_START( m4quidin )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "qi_20a__.3_1", 0x0000, 0x010000, CRC(88873c45) SHA1(70fa65402dbbe716a089497a8ccb06e0ba2aac6d) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "qi_20s__.3_1", 0x0000, 0x010000, CRC(3758dc38) SHA1(d22a379975e948d465e13233a796e0fb07e3c04f) )
-	ROM_LOAD( "qi_20sb_.3_1", 0x0000, 0x010000, CRC(e254dc09) SHA1(ad5853c854f628de6203be8d6c3cbaa6a600e340) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "qi_____.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) )
-	ROM_LOAD( "qi_____.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )
-ROM_END
-
-
-ROM_START( m4quidis )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pq_20a__.3_1", 0x0000, 0x010000, CRC(7eb762a1) SHA1(4546a7bf43f8ab6eb9713348e3f919de7532eed2) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "pq_20s__.3_1", 0x0000, 0x010000, CRC(71360992) SHA1(0b64f27f0edfdebca41552181ff0f2b5491ec308) )
-	ROM_LOAD( "pq_20sb_.3_1", 0x0000, 0x010000, CRC(a43a09a3) SHA1(46d83465d1026620af2f59dd4b638444ca834ad1) )
-	ROM_LOAD( "pq_20sd_.3_1", 0x0000, 0x010000, CRC(d92cc00e) SHA1(bff2b5da08cc34040b1d4d750ea6a654f9b77959) )
-	ROM_LOAD( "pq_20sk_.3_1", 0x0000, 0x010000, CRC(0c20c03f) SHA1(f802daa8ff2c159ba4831ed048e0ddd8469448da) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-ROM_START( m4rackem )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "re_sj___.2_0", 0x0000, 0x040000, CRC(e36d3f86) SHA1(a5f522c86482517b8dc735b1012f8f7668c2f18d) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "re_sj___.3_0", 0x0000, 0x040000, CRC(2f463d2f) SHA1(3410cc8a6d097a4edfcb4c57c237d1d514b507ba) )
-	ROM_LOAD( "re_sj_d_.2_0", 0x0000, 0x040000, CRC(7a31658c) SHA1(4fade421b3a1a732a99f7cb6346279ad82f55362) )
-	ROM_LOAD( "re_sjs__.2_0", 0x0000, 0x040000, CRC(d7c499c8) SHA1(73542f54322f5ffb87d16f5f66cc3a22c2849f20) )
-	ROM_LOAD( "re_sjsw_.2_0", 0x0000, 0x040000, CRC(66355370) SHA1(d54aab7403e64a67edf2baeaf1321ee5c4aa553d) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "re_snd.p1", 0x000000, 0x080000, CRC(aea88892) SHA1(457dab5cddfb9762f7e0bd61187b8052aee71c28) )
-	ROM_LOAD( "re_snd.p2", 0x080000, 0x080000, CRC(57394ec6) SHA1(cba7abebd3ab165e9531017168f51ada6cf35991) )
-	ROM_LOAD( "re_snd.p3", 0x100000, 0x080000, CRC(5d5d5309) SHA1(402615633976410225a1ee50c454391dc69a68cb) )
-ROM_END
-
-
-ROM_START( m4rbgold )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rb_20a_p.2a1", 0x0000, 0x010000, CRC(d7e6e514) SHA1(25645b69e86335622df43113908ed88a21f27e30) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "rb_20a_p.2f1", 0x0000, 0x010000, CRC(62af6db6) SHA1(0dcb679c05f090f8dab7228009a700c31f0179d8) )
-	ROM_LOAD( "rb_20sbp.2a1", 0x0000, 0x010000, CRC(ba4c2e74) SHA1(fcc325754f96e742998373c6c5c13a8509f48cd5) )
-	ROM_LOAD( "rb_20sbp.2f1", 0x0000, 0x010000, CRC(0f05a6d6) SHA1(1ba7ccbb3d78196d4b98a0a1173bf41c9dd62c1f) )
-	ROM_LOAD( "rb_20sbp.2s1", 0x0000, 0x010000, CRC(d8278b82) SHA1(8e924096e238359fd2a7f81198c8af1515dc8a19) )
-	ROM_LOAD( "rb_xea__.2a1", 0x0000, 0x010000, CRC(1bc266ff) SHA1(fcdb63613dbcf0b15744317a69bd8a1e3cf92526) )
-	ROM_LOAD( "rb_xea__.2f1", 0x0000, 0x010000, CRC(ae8bee5d) SHA1(bae49779a009a29b27c99f5e5a4b2aeca39b5626) )
-	ROM_LOAD( "rb_xea__.2s1", 0x0000, 0x010000, CRC(79a9c309) SHA1(8ad87ec153ed8a89e612011679a172fc66bae711) )
-	ROM_LOAD( "rb_xes__.2a1", 0x0000, 0x010000, CRC(14430dcc) SHA1(7e514a1857f6911a57aff7900af297412ef0d905) )
-	ROM_LOAD( "rb_xes__.2f1", 0x0000, 0x010000, CRC(a10a856e) SHA1(a8536d576b3698ccc539c8ac1c9136222b1cf297) )
-	ROM_LOAD( "rb_xes__.2s1", 0x0000, 0x010000, CRC(7628a83a) SHA1(da1833df2e88480dafd2410fb24f0fbffbdeb679) )
-	ROM_LOAD( "rb_xesb_.2f1", 0x0000, 0x010000, CRC(c321253d) SHA1(0d59b0cf7118c7932e9d89eca823ce200c5030f5) )
-	ROM_LOAD( "rb_xesb_.2s1", 0x0000, 0x010000, CRC(14030869) SHA1(283e7ca543a37a60f2d3a8c6d5473b591bb20e62) )
-	ROM_LOAD( "rb_xesd_.2a1", 0x0000, 0x010000, CRC(b054f5f9) SHA1(fdcca5375ff8f26f6889c5556216ff0fdf2bce94) )
-	ROM_LOAD( "rb_xesd_.2f1", 0x0000, 0x010000, CRC(051d7d5b) SHA1(b8216e505de00802e5e34d11eb3e18e0736fa772) )
-	ROM_LOAD( "rb_xesd_.2s1", 0x0000, 0x010000, CRC(d23f500f) SHA1(fe8d2825c8fb24c3885013c046a15ddec5cb3a1f) )
-	ROM_LOAD( "rbixe___.2a1", 0x0000, 0x010000, CRC(349fafdd) SHA1(da68e210c8c0a716c1ef62e7f404f6985903b00a) )
-	ROM_LOAD( "rbixe___.2s1", 0x0000, 0x010000, CRC(56f40a2b) SHA1(0c6c035d2a3dbef70b1bc95fa38ed62a70770739) )
-ROM_END
-
-
-ROM_START( m4rhfev )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "rt_sj___.7_0", 0x0000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "rt_sja__.7_0", 0x0000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4) )
-	ROM_LOAD( "rt_sjs__.7_0", 0x0000, 0x040000, CRC(1a8feafb) SHA1(83151f63b7ebe1c538f9334e9c3d6889d0730144) )
-	ROM_LOAD( "rt_vc___.1_0", 0x0000, 0x040000, CRC(2a8df147) SHA1(df0e7021e9d169575a1297f9851b5a64e20d1a40) )
-	ROM_LOAD( "rt_vc_d_.1_0", 0x0000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0) )
-	ROM_LOAD( "rtv.p1", 0x0000, 0x008000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) ) // doesn't belong here
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "rf_____.1_1", 0x000000, 0x080000, CRC(ac8d539d) SHA1(8baf14bece50774f93ae9eaf3effabb6882d2c43) )
-	ROM_LOAD( "rf_____.1_2", 0x080000, 0x080000, CRC(cc2fadd8) SHA1(681850e2e6164cf8af8e7501ac44f475cc07b742) )
-	ROM_LOAD( "rf_____.1_3", 0x100000, 0x080000, CRC(165aaf9f) SHA1(815224fe94a77628cef1dd0d8a238edcb4813006) )
-	ROM_LOAD( "rf_____.1_4", 0x180000, 0x080000, CRC(4f7e7b49) SHA1(f9d421eeab73e0c795a08cf166c8807e0b14ec82) )
-ROM_END
-
-
-ROM_START( m4sinbd )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sd_20__c.1_1", 0x0000, 0x020000, CRC(28cd336e) SHA1(45bdf5403c04b7d3a3645b6b44ac3d12e6463a55) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "sd_20a__.4_1", 0x0000, 0x020000, CRC(12b8f629) SHA1(c8540ecb217cf0615d7a8d080136926646ca8497) )
-	ROM_LOAD( "sd_20a__.5_1", 0x0000, 0x020000, CRC(68a3d155) SHA1(5ae47f1ca860af30c77beebe3acf615958ed59e9) )
-	ROM_LOAD( "sd_20a_c.1_1", 0x0000, 0x020000, CRC(5a5eef7c) SHA1(32d801cea0593e220ac67c2c17782fc144d02cc4) )
-	ROM_LOAD( "sd_20ad_.5_1", 0x0000, 0x020000, CRC(dc9dd7b3) SHA1(e26c8a814cdb268026e31acb668f34160ea9ce7b) )
-	ROM_LOAD( "sd_20s__.1v1", 0x0000, 0x020000, CRC(acb5aa9a) SHA1(4186058f83e241f06de842d0ae79f26a2a0e6cf0) )
-	ROM_LOAD( "sd_20s__.4_1", 0x0000, 0x020000, CRC(bce21ced) SHA1(9e089fbca1dd39e356f38d0c301162affea9316c) )
-	ROM_LOAD( "sd_20s__.5_1", 0x0000, 0x020000, CRC(939ecca5) SHA1(a9cd465fbe742b910602f861ae6ac7cedc7d9be9) )
-	ROM_LOAD( "sd_20s_p.4_1", 0x0000, 0x020000, CRC(5ae716a9) SHA1(4c9ceab423a1480f8257fad2d62b65a17788a472) )
-	ROM_LOAD( "sd_20s_s.5_1", 0x0000, 0x020000, CRC(e47c869a) SHA1(2735613aafe71e9b2a3aabb433fbd98a83a546c7) )
-	ROM_LOAD( "sd_20sb_.4_1", 0x0000, 0x020000, CRC(811efef2) SHA1(280c6d6697735faca58317925c58b687c5988b87) )
-	ROM_LOAD( "sd_20sb_.5_1", 0x0000, 0x020000, CRC(594920ec) SHA1(03ac253ef35b8fbccbfe4b2c5a7d906a3001b3ec) )
-	ROM_LOAD( "sd_20sbc.1_1", 0x0000, 0x020000, CRC(3720cf0d) SHA1(8f0e63985badbff6ac39fcf956ebff3b0655c2b9) )
-	ROM_LOAD( "sd_20sbp.4_1", 0x0000, 0x020000, CRC(671bf4b6) SHA1(ac928b47c1392e8a82404776068233e7d1dd5d28) )
-	ROM_LOAD( "sd_20sbs.5_1", 0x0000, 0x020000, CRC(2eab6ad3) SHA1(66261328999a139389198e772a69dcd994792439) )
-	ROM_LOAD( "sd_20sdc.1_1", 0x0000, 0x020000, CRC(fc386926) SHA1(6e64aeb82e62ded75e48f0faab932b63732bcf08) )
-	ROM_LOAD( "sd_25__c.1_1", 0x0000, 0x020000, CRC(348e846d) SHA1(ca0fffd59076e6e60d37f677d0c7e7f182a41b9e) )
-	ROM_LOAD( "sd_25a_c.1_1", 0x0000, 0x020000, CRC(f50c55e9) SHA1(df72b196fb21b6359282c06b960fa53117a95fee) )
-	ROM_LOAD( "sd_25sbc.1_1", 0x0000, 0x020000, CRC(0773632a) SHA1(34294e32243b903a6c1c54b8718ca7cddbd3316e) )
-	ROM_LOAD( "sd_25sdc.1_1", 0x0000, 0x020000, CRC(4917a542) SHA1(23de449d536c799032afab678b9001fa8541fb8a) )
-	ROM_LOAD( "sdi20___.1v1", 0x0000, 0x020000, CRC(c50b3555) SHA1(c2d89126b9122f48ecce52d50cd7a03cc2bf1829) )
-	ROM_LOAD( "sv_20a__.4_1", 0x0000, 0x020000, CRC(0e790ae8) SHA1(48f055f3f1f5d3392b7fba1c5c30624c1f230327) )
-	ROM_LOAD( "sv_20sb_.4_1", 0x0000, 0x020000, CRC(e88c1c29) SHA1(49d180068e4ae9cb65a58e65b4e1ac4d6657ae1d) )
-	ROM_LOAD( "svi20___.4_1", 0x0000, 0x020000, CRC(643037ed) SHA1(d4063faba3069625474dd761f9ad2dcf2f710a19) )
-	ROM_LOAD( "sinbadbwb1_1game.bin", 0x0000, 0x020000, CRC(cfe152a7) SHA1(b8ecfa8b763d04515b65eb902c18dba7198191c3) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	//These were with the last listed set, though I have no reason to believe they aren't valid for all BwB Sinbad games
-	ROM_LOAD( "sinbadbwb1_2snd.bin", 0x000000, 0x080000, CRC(2ee60ce6) SHA1(865860639e8471f97ace0beac2f4c7fddb8ca97c) )
-	ROM_LOAD( "sinbadbwb1_3snd.bin", 0x000000, 0x080000, CRC(7701e5cc) SHA1(4f9ff91f2b6b15a9c08396b52fc8509ba476ed8d) )
-ROM_END
-
-
-ROM_START( m4sky )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sk_s____.3_1", 0x0000, 0x040000, CRC(749af008) SHA1(036514f2bcb84193cfa84313f0617f3196aea73e) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8) )
-	ROM_LOAD( "sk_sj_k_.5_0", 0x0000, 0x040000, CRC(e1bab980) SHA1(1c8b127809422ab0baf1875ca907f18269a0cc17) )
-	ROM_LOAD( "sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a16ef7) SHA1(9012dcc320e8af8fef53e0dc91d3bcd6cbafa5ee) )
-	ROM_LOAD( "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176431f) SHA1(8ca90ef61486fc5a5b6527f913cd05b42ceabe3e) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-ROM_START( m4souls )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ss_06a__.4_1", 0x0000, 0x020000, CRC(00390a21) SHA1(d31d1307301fa4e8cf0ce3677e68a4c1723e4404) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ss_16a__.4_1", 0x0000, 0x020000, CRC(b9ab9612) SHA1(ad30916a0f2cc745741c99d23c23192ae4088daf) )
-	ROM_LOAD( "ss_26a__.2_1", 0x0000, 0x020000, CRC(bf9acf05) SHA1(13698b453e975a1801631163d06468f07c181b48) )
-	ROM_LOAD( "ss_26ad_.2_1", 0x0000, 0x020000, CRC(3e867df2) SHA1(0c7d57c05952cb4f737ee07f139a3593803d3d60) )
-	ROM_LOAD( "ss_26sb_.2_1", 0x0000, 0x020000, CRC(2010749e) SHA1(4220b12db7870a2efd7a7ab573e4e08ff0643e70) )
-	ROM_LOAD( "ss_26sd_.2_1", 0x0000, 0x020000, CRC(773db916) SHA1(a7d168db22d5adeb3eaf64786bbe744ce787ff68) )
-	ROM_LOAD( "ss_26sk_.2_1", 0x0000, 0x020000, CRC(9ae1672e) SHA1(79bcd12fae38dd1b0035e956148ffeaee33b9c71) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "ss______.1_2", 0x000000, 0x080000, CRC(ddea9d75) SHA1(fe5f88d49434109d0f51425e790e179dc1a02767) )
-	ROM_LOAD( "ss______.1_3", 0x080000, 0x080000, CRC(23d1e57a) SHA1(b17afdaa95522fd7ea6c12f513fa338e1fcb06f6) )
-	ROM_LOAD( "ss______.1_4", 0x100000, 0x080000, CRC(0ba3046a) SHA1(ec21fa328669bc7a5baf1ce8b9ac05f38f98e360) )
-ROM_END
-
-ROM_START( m4spinbt )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sn_37ad_.5_0", 0x0000, 0x040000, CRC(42d6faaa) SHA1(3789e85981b33ffae7c50ccca3278ae62974972d) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "sn_37b__.5_0", 0x0000, 0x040000, CRC(3a259a6f) SHA1(1acabb9e725ae1374b87808c4b3d06a329c824d0) )
-	ROM_LOAD( "sn_37bd_.5_0", 0x0000, 0x040000, CRC(f4e3f395) SHA1(545b2ea1cf4231ba1663bea0e6770976b0797cf3) )
-	ROM_LOAD( "sn_37bg_.5_0", 0x0000, 0x040000, CRC(c3ad8312) SHA1(9463903fe65462e5e9b09a992dc4625dba8452f0) )
-	ROM_LOAD( "sn_37bt_.5_0", 0x0000, 0x040000, CRC(9fd1df18) SHA1(4c647bc887cdaa2415d0308787c710c83ce1c0d3) )
-	ROM_LOAD( "sn_s7a__.5_0", 0x0000, 0x040000, CRC(69d39933) SHA1(ec2a9fb7c4977532a7a431745eb2d82d4e282159) )
-	ROM_LOAD( "sn_s7ad_.5_0", 0x0000, 0x040000, CRC(a715f0c9) SHA1(bec188edcd0580465859876f8bff2ff5a392a9e1) )
-	ROM_LOAD( "sn_s7s__.5_0", 0x0000, 0x040000, CRC(13288cc5) SHA1(2c47dcd8b57d10e0768729ad91dba12521c0d98a) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-ROM_START( m4starst )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sr_20__d.3_0", 0x0000, 0x040000, CRC(98f6619b) SHA1(fc0a568e6695c9ad0fda7bc6703c752af26a7777) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "sr_20_bd.3_0", 0x0000, 0x040000, CRC(ff8209de) SHA1(41a4c20c89b3a04612ad6298276472b888915c89) )
-	ROM_LOAD( "sr_20_kd.3_0", 0x0000, 0x040000, CRC(4c9a53d5) SHA1(43ebf6c06db58de9c3934e2dbba0d8126f3e2dda) )
-	ROM_LOAD( "sr_20a_d.3_0", 0x0000, 0x040000, CRC(e9eebb4c) SHA1(60d8010140d9debe8f12d7f810de223d9abd02a4) )
-	ROM_LOAD( "sr_20s_d.3_0", 0x0000, 0x040000, CRC(725b50e6) SHA1(3efde346022e37b09df08b8188ac76dcdfac8a4e) )
-	ROM_LOAD( "sr_sj___.5_0", 0x0000, 0x040000, CRC(7964bd86) SHA1(7078de5a61b52dedb776993643f7edd8a2c863c3) )
-	ROM_LOAD( "sr_sj_b_.5_0", 0x0000, 0x040000, CRC(4ee1f95b) SHA1(1e3d52afd19a9489608d5446ef2118561c6411b0) )
-	ROM_LOAD( "sr_sj_d_.5_0", 0x0000, 0x040000, CRC(b4d78711) SHA1(c864c944b3fa74aa1fed22afe656a37413b024ce) )
-	ROM_LOAD( "sr_sj_k_.5_0", 0x0000, 0x040000, CRC(c7681e28) SHA1(a8c1c75df33c85301257147c97d6af8808dad0d2) )
-	ROM_LOAD( "sr_sja__.5_0", 0x0000, 0x040000, CRC(aa86c4f2) SHA1(e90fd91f1d14b89714e3fb8236ac9e8a641e4c71) )
-	ROM_LOAD( "sr_sjs__.5_0", 0x0000, 0x040000, CRC(89e405e4) SHA1(5aa9053e08c27570731f65502c7fb31f0ea0a678) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "starsnd3", 0x0000, 0x080000, CRC(96882952) SHA1(bf366670aec5cb545c56caac3c63855db03d8c14) )// (?)strange id number?
-ROM_END
-
-ROM_START( m4supleg )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sl_sj.hex", 0x0000, 0x040000, CRC(254835f7) SHA1(2fafaa3da747edd27d393ad106008e898e465283) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "sl_sjs.hex", 0x0000, 0x040000, CRC(98942cd3) SHA1(858fde0a350159d089c6a0e0cc2e2eed6ab2092c) )
-	ROM_LOAD( "sl_vc.hex", 0x0000, 0x040000, CRC(1940d117) SHA1(ae7338483ac39e9e1973dde5eb837443512630dd) )
-	ROM_LOAD( "sl_vcd.hex", 0x0000, 0x040000, CRC(7aab16d1) SHA1(6da4e0d9883a48937d00bfc5929b3557de51f60e) )
-	ROM_LOAD( "sls.hex", 0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928) )
-	ROM_LOAD( "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283) ) //Whitbread?
-	ROM_REGION( 0x80000, "altsnd", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "s_leag.s1", 0x0000, 0x080000, CRC(e8d90896) SHA1(4c67507f18b5dc966e2df3685dc6c257f5053e61) ) //alt first sound rom, connected to whitbread set
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "sls1.hex", 0x000000, 0x080000, CRC(341e3d3e) SHA1(b42ec737e95e766b1b26d6225416ee0c5cad2663) )
-	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) )
-	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) )
-ROM_END
-
-
-ROM_START( m4supscr )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "multistakesoccer.bin", 0x0000, 0x040000, CRC(ce27b6a7) SHA1(f9038336137b0642da4d1520b5d71a047d8fbe12) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "sm_78___.6_0", 0x0000, 0x040000, CRC(e7022c44) SHA1(da3a5b9954f7e50dce73aeb9c46bd4631c8350d5) )
-	ROM_LOAD( "sm_78_d_.6_0", 0x0000, 0x040000, CRC(4dbe6a87) SHA1(fe2ce1fca7105afbf459ee6558744f8fee417169) )
-	ROM_LOAD( "sm_80___.6_0", 0x0000, 0x040000, CRC(7e9831ec) SHA1(d0e645ea1f6d34c507103550c248200313d033ef) )
-	ROM_LOAD( "sm_80_d_.6_0", 0x0000, 0x040000, CRC(d424772f) SHA1(938eb7a35e59db704b0737d309b7989b35ed43e0) )
-	ROM_LOAD( "sm_82___.6_0", 0x0000, 0x040000, CRC(019b4d42) SHA1(b27894f99dc2945fccb0de66f34eacc5b02a3463) )
-	ROM_LOAD( "sm_82_d_.6_0", 0x0000, 0x040000, CRC(ab270b81) SHA1(6af522e78b9b263c96cb350cbc8585be206dcd0a) )
-	ROM_LOAD( "sm_84___.6_0", 0x0000, 0x040000, CRC(809ec8b0) SHA1(965edf407a1fd7dfda2817b884ef65b3d57d51e5) )
-	ROM_LOAD( "sm_84_d_.6_0", 0x0000, 0x040000, CRC(2a228e73) SHA1(04c8d17b2f2800dac9aca81e926e6e48eb02c5ac) )
-	ROM_LOAD( "sm_86___.6_0", 0x0000, 0x040000, CRC(ff9db41e) SHA1(5996438e801534ebf5d9755b340fada67cadc942) )
-	ROM_LOAD( "sm_86_d_.6_0", 0x0000, 0x040000, CRC(5521f2dd) SHA1(add1b70a6cddc4e176697660aeff331535d92898) )
-	ROM_LOAD( "sm_88___.6_0", 0x0000, 0x040000, CRC(59e4c515) SHA1(5a76962dc6530d326bfe6ef6498c8f2ad481d6f1) )
-	ROM_LOAD( "sm_88_d_.6_0", 0x0000, 0x040000, CRC(f35883d6) SHA1(1948e06e302cdb01fbd32d711374957e9e6bd64a) )
-	ROM_LOAD( "sm_90___.6_0", 0x0000, 0x040000, CRC(cdc7c594) SHA1(acb829257472bc4420c141932b6f4c708ea04f1b) )
-	ROM_LOAD( "sm_90_d_.6_0", 0x0000, 0x040000, CRC(677b8357) SHA1(4ec54f8b7d28c0459152309a58bd5c0db1a2f036) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-ROM_START( m4sure )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "su_xf___.3_1", 0x0000, 0x010000, CRC(f85dae5c) SHA1(4c761c355fb6651f1e0cb041342f8a2ff510dfd2) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "su_xf_b_.3_1", 0x0000, 0x010000, CRC(9a760e0f) SHA1(fdacdae0e2322daa004b2385616dd34626814d42) )
-	ROM_LOAD( "su_xf_d_.3_1", 0x0000, 0x010000, CRC(5c4a5669) SHA1(55e1e853fdfdbb43e7b61b59ab642fb013a0db0e) )
-	ROM_LOAD( "suixf___.3_1", 0x0000, 0x010000, CRC(cae80b60) SHA1(23545aaf1cc3a0c8868beafb56eccedbbb6099de) )
-ROM_END
-
-
-ROM_START( m4trex )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tr_20a__.2_1", 0x0000, 0x010000, CRC(21150b8e) SHA1(1531bc6fdb8b787fed6f4f98c6463313c55efc3c) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "tr_20a_p.2_1", 0x0000, 0x010000, CRC(ec1b35bc) SHA1(944959c6d1f8e9b0bb33c659b7c515cb7585fed0) )
-	ROM_LOAD( "tr_20ab_.2_1", 0x0000, 0x010000, CRC(f4190bbf) SHA1(45c20c5e56f0bc39e3af5817eb6d705caef14b40) )
-	ROM_LOAD( "tr_20bg_.2_1", 0x0000, 0x010000, CRC(14d8d80c) SHA1(6db190550b18401a067eeb26890af39612fc3012) )
-	ROM_LOAD( "tr_20bt_.2_1", 0x0000, 0x010000, CRC(3ad19bf3) SHA1(4808f8bbb963be30eace75228d4d1decde3282b0) )
-	ROM_LOAD( "tr_20s__.2_1", 0x0000, 0x010000, CRC(2e9460bd) SHA1(8e2ac58cb1686aadad38356a4d47e9502ddbaa52) )
-	ROM_LOAD( "tr_20s_p.2_1", 0x0000, 0x010000, CRC(e39a5e8f) SHA1(d1d507040fefa959d71856395639778e898272aa) )
-	ROM_LOAD( "tr_20sb_.2_1", 0x0000, 0x010000, CRC(fb98608c) SHA1(48b4fbdc289552131b621c870d7af082b6d8916e) )
-	ROM_LOAD( "tr_20sbp.2_1", 0x0000, 0x010000, CRC(36965ebe) SHA1(f2adce7cc97b30b0bf67fd5698b867603973e87a) )
-	ROM_LOAD( "tr_20sd_.2_1", 0x0000, 0x010000, CRC(868ea921) SHA1(3055816747b4773ec67669403a81420fabbe327e) )
-	ROM_LOAD( "tr_20sdp.2_1", 0x0000, 0x010000, CRC(4b809713) SHA1(d70581ff669d19cf5a91b1546f5c02f27aeda2e4) )
-	ROM_LOAD( "tr_20sk_.2_1", 0x0000, 0x010000, CRC(5382a910) SHA1(c8b2811081ec31fecd1b435e775d29e2e6406111) )
-	ROM_LOAD( "tr_20skp.2_1", 0x0000, 0x010000, CRC(9e8c9722) SHA1(7aee25966e6d2107f8a8f89acf6af62a73ff05c9) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "tr______.1_2", 0x000000, 0x080000, CRC(75687514) SHA1(dc8f5f1db7da164175c241187cf3f0db1dd71fc9) )
-	ROM_LOAD( "tr______.1_3", 0x080000, 0x080000, CRC(1e30d4ed) SHA1(8cd916d28f5060d74a0d795f9b75ab597de1cd60) )
-ROM_END
-
-
-
-
-
-
-
-ROM_START( m4volcan )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "vo_sj___.5_0", 0x0000, 0x040000, CRC(78096ebf) SHA1(96915bc2eca00fbd82fab8b3f62e697da118acdd) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "vo_sj_d_.5_0", 0x0000, 0x040000, CRC(87e0347d) SHA1(be5d5b90739fa8ac10f6504290aa58fcf147f323) )
-	ROM_LOAD( "vo_sj_k_.5_0", 0x0000, 0x040000, CRC(8604d102) SHA1(34c7df0257ba02ace4a74ffd5b0eed11eea0c333) )
-	ROM_LOAD( "vo_sja__.5_0", 0x0000, 0x040000, CRC(d73bade2) SHA1(7e02493ec0710f109ae45e523ef3d7d275aaefab) )
-	ROM_LOAD( "vo_sjs__.5_0", 0x0000, 0x040000, CRC(51eff796) SHA1(d0efb1eb4be176906726a438fcffb50cf5ddd217) )
-	ROM_LOAD( "vo_vc___.2_0", 0x0000, 0x040000, CRC(24a9e5d6) SHA1(dd4223c3b5c024eb9d56bb45426e327b49f78dde) )
-	ROM_LOAD( "vo_vc_d_.2_0", 0x0000, 0x040000, CRC(7f7341b6) SHA1(23d46ca0eed1e942b2a0d33d6ada2434ded5819b) )
-	ROM_LOAD( "volcano_bwb_2-0.bin", 0x0000, 0x040000, CRC(20688684) SHA1(fe533341417a3a0b16f485351cb635f4e7d823db) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "vo___snd.1_1", 0x000000, 0x080000, CRC(62bb0166) SHA1(17e5557cce4e7841cbcf5d67783fe78452aacc63) )
-	ROM_LOAD( "vo___snd.1_2", 0x080000, 0x080000, CRC(1eded545) SHA1(0010833e42b33fb0fd621a1059e1cf9a123c3fbd) )
-	ROM_LOAD( "vo___snd.1_3", 0x100000, 0x080000, CRC(915f4adf) SHA1(fac6644329ee6ef0026d65d8b94c971e01770d45) )
-	ROM_LOAD( "vo___snd.1_4", 0x180000, 0x080000, CRC(fec0fbe9) SHA1(26f651c5558a80e88666403d01cf916c3a13d948) )
-ROM_END
-
-
-ROM_START( m4vdexpr )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "vd_sj___.2_0", 0x0000, 0x040000, CRC(03efd2a5) SHA1(4fc3695c24335aef11ba168f660fb519d8c9d473) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "vd_sj_d_.2_0", 0x0000, 0x040000, CRC(5073b98e) SHA1(66b020b8c096e78e1c9694f1cbc139e97314ab48) )
-	ROM_LOAD( "vd_sja__.2_0", 0x0000, 0x040000, CRC(c53dbf48) SHA1(ceee2de3ea8cb511540d90b87bc67bec3309de35) )
-	ROM_LOAD( "vd_sjs__.2_0", 0x0000, 0x040000, CRC(036157b3) SHA1(b575751006c3ee59bf0404fa0e177fee9ef9c5db) )
-	ROM_LOAD( "vd_vc___.1_0", 0x0000, 0x040000, CRC(6326e14a) SHA1(3dbfbb1cfb60dc10c6972aa2fda89c8e3c3107ea) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "vd___snd.1_1", 0x000000, 0x080000, CRC(d66b43a9) SHA1(087cf1571a9afb8c1c7cac13640fa453b614fd53) )
-	ROM_LOAD( "vd___snd.1_2", 0x080000, 0x080000, CRC(a501c887) SHA1(c56a05fd8196afb86e665fec3fe7d02b9bf94c1a) )
-	ROM_LOAD( "vd___snd.1_3", 0x100000, 0x080000, CRC(70c6bd96) SHA1(ecdd4276ff72939433630e04bba5be3df569e17e) )
-	ROM_LOAD( "vd___snd.1_4", 0x180000, 0x080000, CRC(a6753f41) SHA1(b4af3054b62c3f00f2b5a19b816507fc3a62bef4) )
-
-ROM_END
-
-
-
-ROM_START( m4xch )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ec_25b__.b_0", 0x0000, 0x020000, CRC(cec9e836) SHA1(460ec38566d7608e51b62f1ffebc18a395002ed4) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "ec_36bg_.bv0", 0x0000, 0x020000, CRC(c5d1523a) SHA1(813916008d7e7576e4594a6eb79a76c514470f31) )
-	ROM_LOAD( "ec_36bgn.bv0", 0x0000, 0x020000, CRC(4be33ee1) SHA1(888009e09c59f30649eac3238e0b70dec258cb3c) )
-	ROM_LOAD( "ec_39b__.b_0", 0x0000, 0x020000, CRC(e5d5961d) SHA1(ac3916cba91a13d1e0820982a1cefabd378647c9) )
-	ROM_LOAD( "ec_39bg_.b_0", 0x0000, 0x020000, CRC(49b2be01) SHA1(dbf808d0949a9658d23e57e7eaaa520891a4f0e0) )
-	ROM_LOAD( "ec_39bm_.b_0", 0x0000, 0x020000, CRC(29c86cf0) SHA1(384a475d34ad5d15b68d019c3771aba471f89b4d) )
-	ROM_LOAD( "ec_49bd_.b_0", 0x0000, 0x020000, CRC(02854189) SHA1(beab97ccd9889cfdb24e1fb6fb373bf9fd114eab) )
-	ROM_LOAD( "ec_49bmd.b_0", 0x0000, 0x020000, CRC(2a5578e3) SHA1(d8f100bc83721b6b0f365be7a962249af79d6162) )
-	ROM_LOAD( "ec_s9bt_.b_0", 0x0000, 0x020000, CRC(7e0a27d1) SHA1(d4a23a6c358e38a1a66a06b82af85c844f684830) )
-	ROM_LOAD( "ec_sja__.a_0", 0x0000, 0x020000, CRC(1f923f89) SHA1(84486287d55591c7e81c59a10e8cc722ec21e8f9) )
-	ROM_LOAD( "ec_sja__.b_0", 0x0000, 0x020000, CRC(16d7b8bb) SHA1(be8ab98a64aa976e25cb302b68323c6781034f2b) )
-	ROM_LOAD( "xchange.bin", 0x0000, 0x010000, CRC(c96cd014) SHA1(6e32d10c18b6b34dbcb21e75925a77e810ffe892) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "xchasnd.bin", 0x0000, 0x080000, CRC(32c44cd5) SHA1(baafb48e6f95ba152942d1e1c273ffb3c95afa82) )
-ROM_END
-
-
-ROM_START( m4xs )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "es_39b__.3_0", 0x0000, 0x020000, CRC(ba478372) SHA1(c13f9cc4261e91119aa694ec3ac81d94d9f32d22) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "es_39bg_.3_0", 0x0000, 0x020000, CRC(b689f14f) SHA1(0c3253e1f747a979f55d53fe637fc61cf50e01a3) )
-	ROM_LOAD( "es_39bm_.3_0", 0x0000, 0x020000, CRC(934f5d1e) SHA1(1ffd462d561d4a16f2392cc90a139499b74a234a) )
-	ROM_LOAD( "es_39bmd.3_0", 0x0000, 0x020000, CRC(cf663dcc) SHA1(620e65528687eb5fd6fd879e305e8b7da9b95253) )
-	ROM_LOAD( "es_49bg_.3_0", 0x0000, 0x020000, CRC(b76f1d7d) SHA1(9b43a9e847db3d4024f978b6f996534b8d52368b) )
-	ROM_LOAD( "es_49bmd.3_0", 0x0000, 0x020000, CRC(1150e499) SHA1(25d2c37e5287f73d2b11608c50f21072422850f0) )
-	ROM_LOAD( "es_sja__.3_0", 0x0000, 0x020000, CRC(5909092d) SHA1(64df6ad5ba5ac74592b525af2f4cab8a092a5766) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-
-ROM_START( m4xtrm )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9) )
-
-	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85) )
-	ROM_LOAD( "et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38) )
-
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
-
-ROM_START( m4cfinln )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cfd_7_1.bin", 0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x20000, "altrevs", 0 )
-	// 'Jackpot Version'
-	ROM_LOAD( "cfd_d0.bin", 0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef) )
-ROM_END
-
-ROM_START( m4abra )
-	ROM_REGION( 0x040000, "maincpu", 0 )
-	ROM_LOAD( "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61) )
-
-	ROM_REGION( 0x040000, "altrevs", 0 )
-	ROM_LOAD( "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886) )
-	ROM_LOAD( "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9) )
-	ROM_LOAD( "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56) )
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4wcnov )
-	ROM_REGION( 0x080000, "maincpu", 0 )
-	ROM_LOAD( "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11de) SHA1(ece14fd5f56da8cc788c53d5c1404275e9000b65) )
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4excaln )
-	ROM_REGION( 0x080000, "maincpu", 0 )
-	ROM_LOAD( "exdsx___.6_0", 0x0000, 0x080000, CRC(fcdc703c) SHA1(927870723106aebbb2b492ce9bfebe4aa25d0325) )
-
-	ROM_REGION( 0x080000, "altrevs", 0 )
-	ROM_LOAD( "exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d) )
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-
-ROM_START( m4olygn )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "ogdsx___.8_0", 0x0000, 0x040000, CRC(b51a2538) SHA1(d54f37dc14c44ab66e6d6ba6e2df8bc9ed003054) )
-	ROM_REGION( 0x40000, "altrevs", 0 )
-	ROM_LOAD( "ogdsxe__.8_0", 0x0000, 0x040000, CRC(13aa70aa) SHA1(3878c181ec07e24060935bec96e5128e6e4baf31) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4ftladn )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "fidse___.5_0", 0x00000, 0x20000, CRC(62347bbf) SHA1(2b1cd5adda831a8c74c9484ee1b616259d3e3981) )
-	ROM_RELOAD(0x20000,0x20000)
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-
-
-ROM_START( m4sinbdn )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sbds3___.a_1", 0x0000, 0x020000, CRC(9bff0e40) SHA1(f8a1263a58f828554e9df77ed0db78e627666fb5) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-
-ROM_START( m4sinbd2 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sxdsx___.2_0", 0x0000, 0x040000, CRC(4e1f98b5) SHA1(3e16e7a0cdccc9eb1a1bb6f9a0332c4582483eee) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4sinbd3 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sdd__.3_0", 0x0000, 0x040000, CRC(100098c1) SHA1(b125855c49325972f620463e32fdf124222e27d2) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4sinbdd )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sdds3__l.1w0", 0x0000, 0x040000, CRC(feedb8cf) SHA1(620b5379164d4da1200d4807199c2dc78d7d89ee) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4sinbdj )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sbds3__l.9_0", 0x0000, 0x040000, CRC(e425375a) SHA1(d2bdd8e768fc7764054eff574360f3cfb5f4f66d) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4sinbdl )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "sbds3__l.aw0", 0x0000, 0x040000, CRC(c484ef9d) SHA1(62f6644b83dd6abaf80809217edf6a8230a89268) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4sinbdw )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "sbds3___.7w1", 0x0000, 0x020000, CRC(23bc9ce0) SHA1(f750de2b781bc902c65de7109e10a5fc2d4e1c61) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-
-GAME(199?, m4bigmt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","The Big Match (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bingbl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Bingo Belle (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bingbs	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Bingo Belle Showcase (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bingcl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Bingo Club (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bluesn	,0			,bwboki		,mpu4				, mpu4_state,m_blsbys			,ROT0,	 "Nova","Blues Boys (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE) // German version, still has BWB strings, crashes during boot, but boots by chance the first time?
-GAME(199?, m4firice	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Fire & Ice (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4harle	,0			,mod4oki	,mpu4				, mpu4_state,m4default	        ,ROT0,   "Bwb","Harlequin (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4hvhel	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Heaven & Hell (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4indycr	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Indy Cars (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jakjok	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jakjoka,m4jakjok	,mod4oki    ,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4, alternate)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4ln7	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Lucky No7 (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4madmon	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Mad Money (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4mmm	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Money Mummy Money (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4pzbing	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Prize Bingo (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4quidin	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Quids In (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4quidis	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Quids In Showcase (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4rackem	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Rack Em Up (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4rbgold	,0			,mod2   	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Rainbow Gold (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4rhfev	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Red Hot Fever (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4sinbd	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Sinbad (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4sky	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Sky Sports (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4souls	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Soul Sister (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4spinbt	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Spin The Bottle (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4starst	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Stars & Stripes (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4supleg	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Super League (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4supscr	,0			,mod4oki    ,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Super Soccer (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4sure	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Sure Thing (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4trex	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Trex (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4volcan	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Volcano (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4vdexpr	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","Voodoo Express (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4excaln	,0			,bwboki		,mpu4				, mpu4_state,m_blsbys			,ROT0,	 "Nova","Excalibur (Nova) (MPU4?)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-
-GAME(199?, m4abra	,0			,bwboki		,mpu4				, mpu4_state,m_blsbys			,ROT0,	 "Bwb","Abracadabra (Bwb) (MPU4?)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME(199?, m4wcnov	,0			,bwboki		,mpu4				, mpu4_state,m_blsbys			,ROT0,	 "Nova","World Cup (Nova) (MPU4?)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4olygn		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Olympic Gold (German) (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4ftladn	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Find the Lady (Nova)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbd2	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Sinbad Deluxe 2 (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbd3	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Sinbad Deluxe 3 (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbdd	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Sinbad Deluxe [Wall Mount] (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbdj	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Sinbad [Jackpot Link] (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbdl	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Sinbad [Jackpot Link] [Wall Mount] (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4cfinln	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default_big		, 0,		 "Nova",  "Cup Final (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbdn	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default_big		, 0,		 "Nova",  "Sinbad (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sinbdw	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default_big		, 0,		 "Nova",  "Sinbad [Wall Mount] (Nova) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-
-// check banking
-GAME(199?, m4excal	,0			,mod4oki	,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","Excalibur (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4exotic	,0			,mod4oki	,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","Exotic Fruits (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jflash	,0			,mod4oki	,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","Jumping Jack Flash (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4madmnc	,0			,mod4oki    ,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","Mad Money Classic (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4orland	,0			,mod4oki    ,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","Orlando Magic (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4xch	,0			,mod4oki	,mpu4				, mpu4_state,m4default_big	,ROT0,   "Bwb","X-change (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4xs		,0			,mod4oki	,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","X-s (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4xtrm	,0			,mod4oki	,mpu4				, mpu4_state,m4default	,ROT0,   "Bwb","X-treme (Bwb) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+#define M4EXCAL_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_LOAD( "ex______.1_2", 0x000000, 0x080000, CRC(9305e516) SHA1(5a5c67f97761fe2e042ba31594d1881238d3227b) ) \
+	ROM_LOAD( "ex______.1_3", 0x080000, 0x080000, CRC(29e3709a) SHA1(2e2f089aa2a938158930f235bf821685932d698b) ) \
+	ROM_LOAD( "ex______.1_4", 0x100000, 0x080000, CRC(dd747003) SHA1(cf0a2936c897e3b833984c55f4825c358b723ab8) ) \
+
+#define M4EXCAL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4EXCAL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4EXCAL_SET( 199?, m4excal,		0,			"ex_05a__.6_1", 0x0000, 0x020000, CRC(317fa289) SHA1(8a0e83a764e2a04285367e0f7ebb814fedc81400), "Bwb","Excalibur (Bwb) (MPU4) (set 1)" )
+M4EXCAL_SET( 199?, m4excal__a,	m4excal,	"ex_20a_6.6_1", 0x0000, 0x020000, CRC(284937c8) SHA1(3be8bf21ab0ff97f67ce170cee48cd08ea325571), "Bwb","Excalibur (Bwb) (MPU4) (set 2)" )
+M4EXCAL_SET( 199?, m4excal__b,	m4excal,	"ex_20a_8.6_1", 0x0000, 0x020000, CRC(45fb3559) SHA1(9824d2e6bc8c2249de66aea2422b7a6efd0e37b3), "Bwb","Excalibur (Bwb) (MPU4) (set 3)" )
+M4EXCAL_SET( 199?, m4excal__c,	m4excal,	"ex_20a_c.7_1", 0x0000, 0x020000, CRC(ab773d70) SHA1(3a5e3aa3978bf0bc9a4924d3225665b583c90abc), "Bwb","Excalibur (Bwb) (MPU4) (set 4)" )
+M4EXCAL_SET( 199?, m4excal__d,	m4excal,	"ex_20atc.7_1", 0x0000, 0x020000, CRC(ec5c7bc7) SHA1(c57eb69044858b7ea43726d0f49e1c224aeb1377), "Bwb","Excalibur (Bwb) (MPU4) (set 5)" )
+M4EXCAL_SET( 199?, m4excal__e,	m4excal,	"ex_20s_6.6_1", 0x0000, 0x020000, CRC(44176959) SHA1(fcaad1732176330b382f1690293ed43fa66de084), "Bwb","Excalibur (Bwb) (MPU4) (set 6)" )
+M4EXCAL_SET( 199?, m4excal__f,	m4excal,	"ex_20s_8.6_1", 0x0000, 0x020000, CRC(29a56bc8) SHA1(7345b8bd4e3cf64ca222c59857ef7df9b1db45c1), "Bwb","Excalibur (Bwb) (MPU4) (set 7)" )
+M4EXCAL_SET( 199?, m4excal__g,	m4excal,	"ex_20sb6.6_1", 0x0000, 0x020000, CRC(e387c4b9) SHA1(cc83de53a1ffe8d75acb9c2f2ceca9bbff516df7), "Bwb","Excalibur (Bwb) (MPU4) (set 8)" )
+M4EXCAL_SET( 199?, m4excal__h,	m4excal,	"ex_20sb8.6_1", 0x0000, 0x020000, CRC(8e35c628) SHA1(000811c50189cae0f7327b4e7484eb64091a989c), "Bwb","Excalibur (Bwb) (MPU4) (set 9)" )
+M4EXCAL_SET( 199?, m4excal__i,	m4excal,	"ex_20sd6.6_1", 0x0000, 0x020000, CRC(7adbd752) SHA1(d758e202ed75ce3a99f0666c405090107cb0feca), "Bwb","Excalibur (Bwb) (MPU4) (set 10)" )
+M4EXCAL_SET( 199?, m4excal__j,	m4excal,	"ex_20sd8.6_1", 0x0000, 0x020000, CRC(1769d5c3) SHA1(3e5ff338364781e99685cde9e45707dd88d1da11), "Bwb","Excalibur (Bwb) (MPU4) (set 11)" )
+
+
+#define M4EXOTIC_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4EXOTIC_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4EXOTIC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4EXOTIC_SET( 199?, m4exotic,		0,			"eo_49bg_.2_0", 0x0000, 0x020000, CRC(c3bf2286) SHA1(74090fd0a103a6c311d426f4aae8e7af8b1d3bc0), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 1)" )
+M4EXOTIC_SET( 199?, m4exotic__a,	m4exotic,	"eo_49bm_.2_0", 0x0000, 0x020000, CRC(c748c4ca) SHA1(7d0d498f9edd792ed861c8bf9cf1bb03698d144d), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 2)" )
+M4EXOTIC_SET( 199?, m4exotic__b,	m4exotic,	"eo_49bmd.2_0", 0x0000, 0x020000, CRC(98436c04) SHA1(1db7c95f7a0297aa3da7f1ce27c790ffa1fa4ebe), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 3)" )
+M4EXOTIC_SET( 199?, m4exotic__c,	m4exotic,	"eo_49bmd.2g0", 0x0000, 0x020000, CRC(425a0152) SHA1(6a235c613f52c4b8985a589f89542eebd3574fde), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 4)" )
+M4EXOTIC_SET( 199?, m4exotic__d,	m4exotic,	"eo_s9bt_.2g0", 0x0000, 0x020000, CRC(c527d333) SHA1(083d7be95d73d259fe8ec1d87a3a41089a4c44df), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 5)" )
+M4EXOTIC_SET( 199?, m4exotic__e,	m4exotic,	"eo_sja__.2_0", 0x0000, 0x020000, CRC(5ca9557f) SHA1(5fa42c56c67b505272d358a54ebe911fdb0b905e), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 6)" )
+
+
+
+#define M4FIRICE_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "fire_ice.s1", 0x000000, 0x080000, CRC(74ee37c1) SHA1(bc9b419dd1fd1c66090f8946247e754c0267baa3) ) \
+	ROM_LOAD( "fire_ice.s2", 0x080000, 0x080000, CRC(b86bafeb) SHA1(ee237f601b970dc5be8096a4018cb6a3edac500f) ) \
+	ROM_LOAD( "fire_ice.s3", 0x100000, 0x080000, CRC(75f349b3) SHA1(1505bec7b69e1eabd679b70d95ae58fd264ca698) ) \
+
+#define M4FIRICE_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4FIRICE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4FIRICE_SET( 199?, m4firice,		0,			"fi_20__d.5_0", 0x0000, 0x040000, CRC(ab46574c) SHA1(d233b137f8f42b9b644b34a627fbcc5b662e8ae1), "Bwb","Fire & Ice (Bwb) (MPU4) (set 1)" )
+M4FIRICE_SET( 199?, m4firice__a,	m4firice,	"fi_20_bd.5_0", 0x0000, 0x040000, CRC(9b2bc052) SHA1(34b970659218fde097238b852dadedcb928f69fd), "Bwb","Fire & Ice (Bwb) (MPU4) (set 2)" )
+M4FIRICE_SET( 199?, m4firice__b,	m4firice,	"fi_20_dd.5_0", 0x0000, 0x040000, CRC(2bbc9855) SHA1(84d51eeadc01ac74d630a05b933343f01f04b2af), "Bwb","Fire & Ice (Bwb) (MPU4) (set 3)" )
+M4FIRICE_SET( 199?, m4firice__c,	m4firice,	"fi_20_kd.5_0", 0x0000, 0x040000, CRC(529b43b1) SHA1(80d4d928918fdc869b1693e21a5c25045e5c9449), "Bwb","Fire & Ice (Bwb) (MPU4) (set 4)" )
+M4FIRICE_SET( 199?, m4firice__d,	m4firice,	"fi_20a_d.5_0", 0x0000, 0x040000, CRC(8d6ce79d) SHA1(05954ed4b34af73c065b6203a50da9af7d8373fe), "Bwb","Fire & Ice (Bwb) (MPU4) (set 5)" )
+M4FIRICE_SET( 199?, m4firice__e,	m4firice,	"fi_20s_d.5_0", 0x0000, 0x040000, CRC(d0aa53af) SHA1(f71801344c17a759ec4eb8958377bbcf4b4cae65), "Bwb","Fire & Ice (Bwb) (MPU4) (set 6)" )
+M4FIRICE_SET( 199?, m4firice__f,	m4firice,	"fi_sj___.e_0", 0x0000, 0x040000, CRC(7f12e37a) SHA1(fb09ff782f66972b8bdeff105c5f3d1f9f676809), "Bwb","Fire & Ice (Bwb) (MPU4) (set 7)" )
+M4FIRICE_SET( 199?, m4firice__g,	m4firice,	"fi_sj_b_.e_0", 0x0000, 0x040000, CRC(5aef48d2) SHA1(73f410951a737f75f3e7c14e704eca9c26cfa750), "Bwb","Fire & Ice (Bwb) (MPU4) (set 8)" )
+M4FIRICE_SET( 199?, m4firice__h,	m4firice,	"fi_sj_d_.e_0", 0x0000, 0x040000, CRC(61822af2) SHA1(8c721229a5ce9f491cbc638b8c5fa5c0c3032700), "Bwb","Fire & Ice (Bwb) (MPU4) (set 9)" )
+M4FIRICE_SET( 199?, m4firice__i,	m4firice,	"fi_sj_k_.e_0", 0x0000, 0x040000, CRC(2b57036b) SHA1(60cec130770ff643af1148f16a3afe3b102e94e2), "Bwb","Fire & Ice (Bwb) (MPU4) (set 10)" )
+M4FIRICE_SET( 199?, m4firice__j,	m4firice,	"fi_sja__.e_0", 0x0000, 0x040000, CRC(da5e0eff) SHA1(9f5ddce366786bdf898c9410be417c8028cebeb4), "Bwb","Fire & Ice (Bwb) (MPU4) (set 11)" )
+
+
+#define M4HARLE_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "hq______.1_2", 0x000000, 0x080000, CRC(0c8c14be) SHA1(a1268e71ea43772a532b63327f24c64fabd7e715) ) \
+	ROM_LOAD( "hq______.1_3", 0x080000, 0x080000, CRC(5a07e514) SHA1(6e589756c0fc4b0458ca856e918fa3b7cd396c39) ) \
+
+#define M4HARLE_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4HARLE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4HARLE_SET( 199?, m4harle,		0,			"hq_20a__.1_1", 0x0000, 0x010000, CRC(b8ae3025) SHA1(94a449eff103bf6ba1fc6e85b03061b9ce658ae0), "Bwb","Harlequin (Bwb) (MPU4) (set 1)" )
+M4HARLE_SET( 199?, m4harle__a,	m4harle,	"hq_20bg_.1_1", 0x0000, 0x010000, CRC(31356248) SHA1(d8791b1c861ed4388660bbe78f2589db7f1e779e), "Bwb","Harlequin (Bwb) (MPU4) (set 2)" )
+M4HARLE_SET( 199?, m4harle__b,	m4harle,	"hq_20bg_.2a1", 0x0000, 0x010000, CRC(f50898af) SHA1(ba4470abb85b92d647ff8da48dba571cec5f594e), "Bwb","Harlequin (Bwb) (MPU4) (set 3)" )
+M4HARLE_SET( 199?, m4harle__c,	m4harle,	"hq_20bt_.1_1", 0x0000, 0x010000, CRC(925a5e9e) SHA1(e8a4f75d4f7e6825894e19a915db21ee21206b5b), "Bwb","Harlequin (Bwb) (MPU4) (set 4)" )
+M4HARLE_SET( 199?, m4harle__d,	m4harle,	"hq_20s__.1_1", 0x0000, 0x010000, CRC(6de12c08) SHA1(df279a07ccd448b9a6948ccb059aff6306ddcc99), "Bwb","Harlequin (Bwb) (MPU4) (set 5)" )
+M4HARLE_SET( 199?, m4harle__e,	m4harle,	"hq_20sb_.1_1", 0x0000, 0x010000, CRC(0fca8c5b) SHA1(f430f2d1ff71513426bb5cfed883797de6afd3a7), "Bwb","Harlequin (Bwb) (MPU4) (set 6)" )
+M4HARLE_SET( 199?, m4harle__f,	m4harle,	"hq_20sd_.1_1", 0x0000, 0x010000, CRC(c9f6d43d) SHA1(4eef4ec6bff20fdf5b20b266ddd1646045390d42), "Bwb","Harlequin (Bwb) (MPU4) (set 7)" )
+M4HARLE_SET( 199?, m4harle__g,	m4harle,	"hq_20sk_.1_1", 0x0000, 0x010000, CRC(abdd746e) SHA1(5bb7043a1a790e5c784c7a51fd3c023b3099439f), "Bwb","Harlequin (Bwb) (MPU4) (set 8)" )
+M4HARLE_SET( 199?, m4harle__h,	m4harle,	"hq_xea__.2f1", 0x0000, 0x010000, CRC(4ef7c19c) SHA1(bd8e5c69ab31c5a9c89a7f2020a61bde5e00b6b2), "Bwb","Harlequin (Bwb) (MPU4) (set 9)" )
+M4HARLE_SET( 199?, m4harle__i,	m4harle,	"hq_xea__.2s1", 0x0000, 0x010000, CRC(05d42107) SHA1(e1dc4e2f84ebadead994a09c53c2d9a1ed8e29aa), "Bwb","Harlequin (Bwb) (MPU4) (set 10)" )
+M4HARLE_SET( 199?, m4harle__j,	m4harle,	"hq_xes__.2f1", 0x0000, 0x010000, CRC(9bb8ddb1) SHA1(c8bba9bdfd7a0bbcbe89cd422d37909f7ebcaa82), "Bwb","Harlequin (Bwb) (MPU4) (set 11)" )
+M4HARLE_SET( 199?, m4harle__k,	m4harle,	"hq_xes__.2s1", 0x0000, 0x010000, CRC(d09b3d2a) SHA1(4de366ed5eae89f2bb39abc052d88cb59e846307), "Bwb","Harlequin (Bwb) (MPU4) (set 12)" )
+M4HARLE_SET( 199?, m4harle__l,	m4harle,	"hq_xesd_.2a1", 0x0000, 0x010000, CRC(b402aa45) SHA1(6c6eed7b172604112a2c00df9fd00476d07cc971), "Bwb","Harlequin (Bwb) (MPU4) (set 13)" )
+M4HARLE_SET( 199?, m4harle__m,	m4harle,	"hq_xesd_.2f1", 0x0000, 0x010000, CRC(3faf2584) SHA1(01b049b6ae44771f37b298dc525e16b6e9a182f2), "Bwb","Harlequin (Bwb) (MPU4) (set 14)" )
+M4HARLE_SET( 199?, m4harle__n,	m4harle,	"hq_xesd_.2s1", 0x0000, 0x010000, CRC(748cc51f) SHA1(d2ac7c237be40564809b006bf68d09560817f97d), "Bwb","Harlequin (Bwb) (MPU4) (set 15)" )
+M4HARLE_SET( 199?, m4harle__o,	m4harle,	"ph_20a__.2s1", 0x0000, 0x010000, CRC(559bf168) SHA1(3c6a47bba52481af3f987d284a2102a8ee2cc7e6), "Bwb","Harlequin (Bwb) (MPU4) (set 16)" )
+M4HARLE_SET( 199?, m4harle__p,	m4harle,	"ph_20bg_.1_1", 0x0000, 0x010000, CRC(4c96d2fa) SHA1(1ff8c8c5dc6a67ac187ba0b96cd93c786884aa3b), "Bwb","Harlequin (Bwb) (MPU4) (set 17)" )
+M4HARLE_SET( 199?, m4harle__q,	m4harle,	"ph_20bt_.1_1", 0x0000, 0x010000, CRC(eff9ee2c) SHA1(ae15ee4bbc3028580b3c6cbc8a078fbe3291283e), "Bwb","Harlequin (Bwb) (MPU4) (set 18)" )
+M4HARLE_SET( 199?, m4harle__r,	m4harle,	"ph_20s__.1_1", 0x0000, 0x010000, CRC(4cccba32) SHA1(6d2ec2324866555dfa3f3fd5b79ff3883e1b2ebe), "Bwb","Harlequin (Bwb) (MPU4) (set 19)" )
+M4HARLE_SET( 199?, m4harle__s,	m4harle,	"ph_20s__.2s1", 0x0000, 0x010000, CRC(80d4ed45) SHA1(c818f3e154cfa1efcd11efb71061aa5bfc2e668f), "Bwb","Harlequin (Bwb) (MPU4) (set 20)" )
+M4HARLE_SET( 199?, m4harle__t,	m4harle,	"ph_20sb_.1_1", 0x0000, 0x010000, CRC(2ee71a61) SHA1(0e91cc5b22899f9765cabb9416fcafed790951ae), "Bwb","Harlequin (Bwb) (MPU4) (set 21)" )
+M4HARLE_SET( 199?, m4harle__u,	m4harle,	"ph_20sb_.2f1", 0x0000, 0x010000, CRC(1f56841a) SHA1(dfd90d8af765bc981d0dcb4b0ffb5ce613bfcbed), "Bwb","Harlequin (Bwb) (MPU4) (set 22)" )
+M4HARLE_SET( 199?, m4harle__v,	m4harle,	"ph_20sd_.1_1", 0x0000, 0x010000, CRC(e8db4207) SHA1(bd806e5b04207b3121284c485a6ab8a385231504), "Bwb","Harlequin (Bwb) (MPU4) (set 23)" )
+M4HARLE_SET( 199?, m4harle__w,	m4harle,	"ph_20sd_.2s1", 0x0000, 0x010000, CRC(24c31570) SHA1(a6da77ebd80dc234add5da880e3472f2f1e2ca3d), "Bwb","Harlequin (Bwb) (MPU4) (set 24)" )
+M4HARLE_SET( 199?, m4harle__x,	m4harle,	"ph_20sk_.1_1", 0x0000, 0x010000, CRC(8af0e254) SHA1(b7d80ab84684bdabe169623864b9efd0d3881f2e), "Bwb","Harlequin (Bwb) (MPU4) (set 25)" )
+
+
+#define M4HVHEL_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_LOAD( "hh___snd.1_1", 0x000000, 0x080000, CRC(afa7ba60) SHA1(25278046252e49364d4a51de79295b87baf6018e) ) \
+	ROM_LOAD( "hh___snd.1_2", 0x080000, 0x080000, CRC(ec1ec822) SHA1(3fdee0526cb70f4951b7bbced74e32641ded9b7b) ) \
+	ROM_LOAD( "hh___snd.1_3", 0x100000, 0x080000, CRC(d4119155) SHA1(b61c71e1ee0dbfc0bb9eff1a8c019cf11731ee11) ) \
+
+#define M4HVHEL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4HVHEL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4HVHEL_SET( 199?, m4hvhel,		0,			"hh_20__d.2_0",		0x0000, 0x040000, CRC(801de788) SHA1(417b985714d8f0ebed93b65a3f865e03474ce9e5), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 1)" )
+M4HVHEL_SET( 199?, m4hvhel__a,	m4hvhel,	"hh_20a_d.2_0",		0x0000, 0x040000, CRC(ea4e7876) SHA1(5bf711c2bdff50fe745edefa0eebf719824d9e5b), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 2)" )
+M4HVHEL_SET( 199?, m4hvhel__b,	m4hvhel,	"hh_20s_d.2_0",		0x0000, 0x040000, CRC(a519a441) SHA1(f3c19d316c82d1ebbcfdabb6d4eaa6cfa369d287), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 3)" )
+M4HVHEL_SET( 199?, m4hvhel__c,	m4hvhel,	"hh_sj___",			0x0000, 0x040000, CRC(04577b99) SHA1(48689c3a96bc42ad64dc4d363dad38c967f0cdcc), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 4)" )
+M4HVHEL_SET( 199?, m4hvhel__d,	m4hvhel,	"hh_sj___.f_0",		0x0000, 0x040000, CRC(8ab33720) SHA1(0c9283a20c3f008baa8ce027d1266e4ef49ca56b), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 5)" )
+M4HVHEL_SET( 199?, m4hvhel__e,	m4hvhel,	"hh_sjs__.f_0",		0x0000, 0x040000, CRC(8854763d) SHA1(323bd76a014e52e3b12427998b0e2851463246c8), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 6)" )
+M4HVHEL_SET( 199?, m4hvhel__f,	m4hvhel,	"hh_vc___.g_0",		0x0000, 0x040000, CRC(db338fb7) SHA1(e7e92293374721e7360493e9ef189991dad0a1ee), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 7)" )
+M4HVHEL_SET( 199?, m4hvhel__g,	m4hvhel,	"hh_vc_d_.g_0",		0x0000, 0x040000, CRC(292468bd) SHA1(f9b19f57a49c1afd670c68b7acd85d4141adfce1), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 8)" )
+M4HVHEL_SET( 199?, m4hvhel__h,	m4hvhel,	"h_hell._pound5",	0x0000, 0x040000, CRC(cd59c0d0) SHA1(8caad9043a277fa39a3ad2d5ec3388c121e7f697), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 9)" )
+
+
+#define M4INDYCR_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "gals", 0 ) \
+	ROM_LOAD( "ic___.g", 0x0000, 0x000657, CRC(25cc2b32) SHA1(a065276fe4cc1e55f366ac216b5bc8cf934da9dd) ) \
+	ROM_LOAD( "ic___.p", 0x0000, 0x00058b, CRC(26388ec4) SHA1(e33183d0c3e75fe23ab6df01d561f5b65923d1db) ) \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "da______.1_1", 0x000000, 0x080000, CRC(99d36c12) SHA1(f8848a28b5546649d6a3f8599dbc4ca84bdac77c) ) \
+	ROM_LOAD( "da______.1_2", 0x080000, 0x080000, CRC(32b40094) SHA1(f02c3b088d76116f817b536cf7cec5188b2f73bf) ) \
+	ROM_LOAD( "da______.1_3", 0x100000, 0x080000, CRC(2df33d18) SHA1(40afa32d6c72c6a76e3e2e61db19a16003f4e176) ) \
+	ROM_LOAD( "da______.1_4", 0x180000, 0x080000, CRC(8e254a3b) SHA1(bc3643ea5878bbde110ee6971c5149b3320bcffc) ) \
+
+#define M4INDYCR_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4INDYCR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4INDYCR_SET( 199?, m4indycr,		0,			"ic_sj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), "Bwb","Indy Cars (Bwb) (MPU4) (set 1)" )
+M4INDYCR_SET( 199?, m4indycr__a,	m4indycr,	"ic_sj___.2_0", 0x0000, 0x040000, CRC(6d0ddf54) SHA1(0985aa9fddb71a499d266c12893aabbab8755319), "Bwb","Indy Cars (Bwb) (MPU4) (set 2)" )
+M4INDYCR_SET( 199?, m4indycr__b,	m4indycr,	"ic_sj_b_.1_0", 0x0000, 0x040000, CRC(4bc0cb73) SHA1(d4c048ba9578add0104f0c529f20356c3502ea71), "Bwb","Indy Cars (Bwb) (MPU4) (set 3)" )
+M4INDYCR_SET( 199?, m4indycr__c,	m4indycr,	"ic_sj_d_.1_0", 0x0000, 0x040000, CRC(165ad977) SHA1(daa444e0d128859832094d3b07026483cd3466ce), "Bwb","Indy Cars (Bwb) (MPU4) (set 4)" )
+M4INDYCR_SET( 199?, m4indycr__d,	m4indycr,	"ic_sj_d_.2_0", 0x0000, 0x040000, CRC(36bd0b34) SHA1(306d6e6536a4137353f9b895e64c7e9a5c79561a), "Bwb","Indy Cars (Bwb) (MPU4) (set 5)" )
+M4INDYCR_SET( 199?, m4indycr__e,	m4indycr,	"ic_sj_k_.1_0", 0x0000, 0x040000, CRC(857fda64) SHA1(3eb230ea1adf9acb4cf83422c4bb1cde40756310), "Bwb","Indy Cars (Bwb) (MPU4) (set 6)" )
+M4INDYCR_SET( 199?, m4indycr__f,	m4indycr,	"ic_sjs__.1_0", 0x0000, 0x040000, CRC(6310b904) SHA1(0f2cd7ed83f77423bcfb2a71144fab2047dfea13), "Bwb","Indy Cars (Bwb) (MPU4) (set 7)" )
+M4INDYCR_SET( 199?, m4indycr__g,	m4indycr,	"icsj___.1_0",	0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), "Bwb","Indy Cars (Bwb) (MPU4) (set 8)" )
+
+
+#define M4JAKJOK_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "jj_____.1_1", 0x000000, 0x080000, CRC(e759a958) SHA1(b107f4ef5a2805e56d4024940bfc632155de1eb1) ) \
+	ROM_LOAD( "jj_____.1_2", 0x080000, 0x080000, CRC(aa215ff0) SHA1(4bf2c6f8153730cc3ca86f78ec14063ece7d8700) ) \
+	ROM_LOAD( "jj_____.1_3", 0x100000, 0x080000, CRC(03c0ffc3) SHA1(2572f62362325df8b235b487d4a764218e7f1589) ) \
+
+#define M4JAKJOK_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4JAKJOK_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4JAKJOK_SET( 199?, m4jakjok,		0,			"jj_sj___.6_0", 0x0000, 0x040000, CRC(7bc45b0e) SHA1(f30fef8fccdac04859f1ff93198a497eff723020), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 1)" )
+M4JAKJOK_SET( 199?, m4jakjok__a,	m4jakjok,	"jj_sj_k_.3_0", 0x0000, 0x040000, CRC(c33dd82f) SHA1(c1f3f6ca1c45503b7f71e897e5c27368f5efb439), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 2)" )
+M4JAKJOK_SET( 199?, m4jakjok__b,	m4jakjok,	"jj_sjs__.6_0", 0x0000, 0x040000, CRC(4bcac6f5) SHA1(7dc07a7a61a6ba044020d6c2496143168c103a70), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 3)" )
+M4JAKJOK_SET( 199?, m4jakjok__c,	m4jakjok,	"jj_vc___.7_0", 0x0000, 0x040000, CRC(4cdca8da) SHA1(ee7448b12380416a3bea2713ed5feca7473be8aa), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 4)" )
+
+#define M4JAKJOKA_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "j_joker.s1", 0x0000, 0x080000, CRC(4ad711d2) SHA1(500381ac2a5075acd606a131cd1b382342cc3a80) ) \
+	ROM_LOAD( "j_joker.s2", 0x0000, 0x080000, CRC(840ba491) SHA1(f7f43d5d8e521a59fdccbd5f22935c525c3d43c2) ) \
+	ROM_LOAD( "j_joker.s3", 0x0000, 0x080000, CRC(2ed74890) SHA1(a3d039b4c3c9dd792300eb045e542a212d4d50ae) ) \
+
+#define M4JAKJOKA_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4JAKJOKA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4JAKJOKA_SET( 199?, m4jakjoka,	m4jakjok,	"j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431), "Bwb","Jackpot Jokers (alt) (Bwb) (MPU4)" )
+
+
+#define M4JFLASH_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4JFLASH_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4JFLASH_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4JFLASH_SET( 199?, m4jflash,		0,			"jf_25__c.2_1", 0x0000, 0x020000, CRC(4d5f1a12) SHA1(c25b6d899b74231da505bde7b671be001bdcea5d), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 1)" )
+M4JFLASH_SET( 199?, m4jflash__a,	m4jflash,	"jf_25a_c.2_1", 0x0000, 0x020000, CRC(76722e15) SHA1(4bd107049ad98b848cdaba3a1318373bbd06ab9f), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 2)" )
+M4JFLASH_SET( 199?, m4jflash__b,	m4jflash,	"jf_25b_c.2_1", 0x0000, 0x020000, CRC(35a927c6) SHA1(6776fe77ad8a85feecdedfad0eac89f9cb826fbf), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 3)" )
+M4JFLASH_SET( 199?, m4jflash__c,	m4jflash,	"jf_25bdc.2_1", 0x0000, 0x020000, CRC(d372689e) SHA1(ecad53022c7786f387586484a3e679afbf0bac37), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 4)" )
+M4JFLASH_SET( 199?, m4jflash__d,	m4jflash,	"jf_25bgc.2_1", 0x0000, 0x020000, CRC(421084bc) SHA1(b6f847468c20a3f85d9e77b633dc48adb43c970f), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 5)" )
+M4JFLASH_SET( 199?, m4jflash__e,	m4jflash,	"jf_25btc.2_1", 0x0000, 0x020000, CRC(1c701822) SHA1(559b4d269a3af388aa86f28ccedd22505fcdb355), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 6)" )
+M4JFLASH_SET( 199?, m4jflash__f,	m4jflash,	"jf_25d_c.2_1", 0x0000, 0x020000, CRC(9cde7bfc) SHA1(a0b840f00c487e963f4dd9f58e3abca7b0cea31b), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 7)" )
+M4JFLASH_SET( 199?, m4jflash__g,	m4jflash,	"jf_25dkc.2_1", 0x0000, 0x020000, CRC(ef583053) SHA1(23b33f0e49d8efceb4a6690ac58da1ccf6576a1a), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 8)" )
+M4JFLASH_SET( 199?, m4jflash__h,	m4jflash,	"jf_25k_c.2_1", 0x0000, 0x020000, CRC(d82701b8) SHA1(a784fa11877e05f2219f1452463ec3348c84e879), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 9)" )
+M4JFLASH_SET( 199?, m4jflash__i,	m4jflash,	"jf_25sbc.2_1", 0x0000, 0x020000, CRC(c6bce1c6) SHA1(708002059d307a02fec32a3cdb6eff995a438631), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 10)" )
+
+#define M4LN7_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "l7______.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) ) \
+	ROM_LOAD( "l7______.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) ) \
+
+#define M4LN7_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4LN7_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4LN7_SET( 199?, m4ln7,		0,		"l7_20a__.1_1", 0x0000, 0x010000, CRC(bfe82d2a) SHA1(4477d737a2326602a355758d8fc06220312fc085), "Bwb","Lucky No7 (Bwb) (MPU4) (set 1)" )
+M4LN7_SET( 199?, m4ln7__a,	m4ln7,	"l7_20s__.1_1", 0x0000, 0x010000, CRC(0037cd57) SHA1(b5882027269cf71878a73009bc3e40d9fcfac60d), "Bwb","Lucky No7 (Bwb) (MPU4) (set 2)" )
+M4LN7_SET( 199?, m4ln7__b,	m4ln7,	"l7_20sb_.1_1", 0x0000, 0x010000, CRC(d53bcd66) SHA1(7f5c65d5ca3dbb8a0c38f169585fc78d512166af), "Bwb","Lucky No7 (Bwb) (MPU4) (set 3)" )
+M4LN7_SET( 199?, m4ln7__c,	m4ln7,	"l7_20sd_.1_1", 0x0000, 0x010000, CRC(a82d04cb) SHA1(1abe9e22f6f526ab076163ce79cff841d1b38b0a), "Bwb","Lucky No7 (Bwb) (MPU4) (set 4)" )
+M4LN7_SET( 199?, m4ln7__d,	m4ln7,	"l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d2104fa) SHA1(a0a65042f4db8ea5184d41c68ffcf7608580d928), "Bwb","Lucky No7 (Bwb) (MPU4) (set 5)" )
+
+
+#define M4MADMON_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4MADMON_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4MADMON_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4MADMON_SET( 199?, m4madmon,		0,			"mm_20a__.7_1", 0x0000, 0x020000, CRC(7df66388) SHA1(4e5bcbcb2fb08b23989c83f11751400f666bbdc2), "Bwb","Mad Money (Bwb) (MPU4) (set 1)" )
+M4MADMON_SET( 199?, m4madmon__a,	m4madmon,	"mm_20b__.7_1", 0x0000, 0x020000, CRC(7f592e44) SHA1(05e78347cd09d1e58f0a50a724e0563490ec5185), "Bwb","Mad Money (Bwb) (MPU4) (set 2)" )
+M4MADMON_SET( 199?, m4madmon__b,	m4madmon,	"mm_20bg_.7_1", 0x0000, 0x020000, CRC(2cd8dcc2) SHA1(c4a2a423a55c6b0668739429c24c69b25e3824cf), "Bwb","Mad Money (Bwb) (MPU4) (set 3)" )
+M4MADMON_SET( 199?, m4madmon__c,	m4madmon,	"mm_20bt_.7_1", 0x0000, 0x020000, CRC(6e929612) SHA1(6b1d06c3cfce440c4cefb8dd04e7a5da673d545a), "Bwb","Mad Money (Bwb) (MPU4) (set 4)" )
+M4MADMON_SET( 199?, m4madmon__d,	m4madmon,	"mm_20s__.7_1", 0x0000, 0x020000, CRC(c23b338c) SHA1(0d3bc801132e68564c2bc01b810e71362047ade1), "Bwb","Mad Money (Bwb) (MPU4) (set 5)" )
+M4MADMON_SET( 199?, m4madmon__e,	m4madmon,	"mm_20sb_.7_1", 0x0000, 0x020000, CRC(51be206b) SHA1(913defb24bdb7551acefefd9673f5663129edbec), "Bwb","Mad Money (Bwb) (MPU4) (set 6)" )
+M4MADMON_SET( 199?, m4madmon__f,	m4madmon,	"mm_25__c.3_1", 0x0000, 0x020000, CRC(e1879caf) SHA1(4d0a804a8d81aab5bb9dec611654325e6a3fb741), "Bwb","Mad Money (Bwb) (MPU4) (set 7)" )
+M4MADMON_SET( 199?, m4madmon__g,	m4madmon,	"mm_25_dc.3_1", 0x0000, 0x020000, CRC(9bc81854) SHA1(b4c42a3da0ab03a0f43846e0c3a4a0b5f3c7e65a), "Bwb","Mad Money (Bwb) (MPU4) (set 8)" )
+M4MADMON_SET( 199?, m4madmon__h,	m4madmon,	"mm_25_gc.3_1", 0x0000, 0x020000, CRC(8d2f1259) SHA1(239c2430bd4ce7b53615b00fac79fb7eceecabf1), "Bwb","Mad Money (Bwb) (MPU4) (set 9)" )
+M4MADMON_SET( 199?, m4madmon__i,	m4madmon,	"mm_25a_c.3_1", 0x0000, 0x020000, CRC(b45b88c2) SHA1(56ed8c83c68f410fcc5ac342abac6b1f4419cccd), "Bwb","Mad Money (Bwb) (MPU4) (set 10)" )
+M4MADMON_SET( 199?, m4madmon__j,	m4madmon,	"mm_25b_c.3_1", 0x0000, 0x020000, CRC(fc33804b) SHA1(f817a6dd691739fcf7d7d622da265f63f60503f6), "Bwb","Mad Money (Bwb) (MPU4) (set 11)" )
+M4MADMON_SET( 199?, m4madmon__k,	m4madmon,	"mm_25bdc.3_1", 0x0000, 0x020000, CRC(188666c0) SHA1(e8a61c327c73aac2a6b0dc674dee7bc2aa358b27), "Bwb","Mad Money (Bwb) (MPU4) (set 12)" )
+
+
+#define M4MADMNC_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4MADMNC_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4MADMNC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4MADMNC_SET( 199?, m4madmnc,		0,			"cm_25__c.3_1", 0x0000, 0x020000, CRC(3d9ff5fe) SHA1(b918bb15251514f50a669216c7d00ecf23e64d1b), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 1)" )
+M4MADMNC_SET( 199?, m4madmnc__a,	m4madmnc,	"cm_25_bc.3_1", 0x0000, 0x020000, CRC(65a7b870) SHA1(58b910d7e002164cbbe1aa32c5e17dfe7cfb507d), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 2)" )
+M4MADMNC_SET( 199?, m4madmnc__b,	m4madmnc,	"cm_25_dc.3_1", 0x0000, 0x020000, CRC(fcae8cf3) SHA1(0f1e86e2f02be2e1870f0f70509bc4a2ada6d3a5), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 3)" )
+M4MADMNC_SET( 199?, m4madmnc__c,	m4madmnc,	"cm_25_kc.3_1", 0x0000, 0x020000, CRC(f66cf97b) SHA1(9b6c4da3a9d64ed2581b04ca82a945dc295931bc), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 4)" )
+M4MADMNC_SET( 199?, m4madmnc__d,	m4madmnc,	"cm_25a_c.3_1", 0x0000, 0x020000, CRC(94e21dc0) SHA1(0d35a467fdcd19909d5540c8a4461364bf7e17f3), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 5)" )
+M4MADMNC_SET( 199?, m4madmnc__e,	m4madmnc,	"cm_25b_c.3_1", 0x0000, 0x020000, CRC(95a1eb43) SHA1(a44d5c8fadf547187834c4686f6001e6e7df83f7), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 6)" )
+M4MADMNC_SET( 199?, m4madmnc__f,	m4madmnc,	"cm_25bgc.3_1", 0x0000, 0x020000, CRC(3241cdf5) SHA1(9ac4b415fff3ee3422dc6e4df7f626cddcab6c38), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 7)" )
+M4MADMNC_SET( 199?, m4madmnc__g,	m4madmnc,	"cm_25btc.3_1", 0x0000, 0x020000, CRC(b8c0f623) SHA1(62d489d82955ac492f78be77a3f2558ad080b375), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 8)" )
+M4MADMNC_SET( 199?, m4madmnc__h,	m4madmnc,	"cm_29_dc.4_1", 0x0000, 0x020000, CRC(72542e93) SHA1(f9aad1e290b345ebd93dee81a10ad3ebb61b8228), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 9)" )
+M4MADMNC_SET( 199?, m4madmnc__i,	m4madmnc,	"cm_29a_c.4_1", 0x0000, 0x020000, CRC(aa7c11ce) SHA1(3ae11b5279f975c0f6f6462d9e23180b47cbe280), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 10)" )
+M4MADMNC_SET( 199?, m4madmnc__j,	m4madmnc,	"cm_29b_c.4_1", 0x0000, 0x020000, CRC(b5d749d8) SHA1(91f318a193a7ad841ac9a7f2114385ad97555f4d), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 11)" )
+M4MADMNC_SET( 199?, m4madmnc__k,	m4madmnc,	"cm_29bgc.4_1", 0x0000, 0x020000, CRC(82f06ed1) SHA1(3f982d8fb1f689cd774f407585a8dce5d8c031a7), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 12)" )
+M4MADMNC_SET( 199?, m4madmnc__l,	m4madmnc,	"cm_29btc.4_1", 0x0000, 0x020000, CRC(dd96bbeb) SHA1(1cf461dc36a8086b3f438922e1675fbd929af771), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 13)" )
+M4MADMNC_SET( 199?, m4madmnc__m,	m4madmnc,	"cm_39_dc.4_1", 0x0000, 0x020000, CRC(c81c575e) SHA1(8c1f5151412da267381434259ca2c2d307668a74), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 14)" )
+M4MADMNC_SET( 199?, m4madmnc__n,	m4madmnc,	"cm_39a_c.4_1", 0x0000, 0x020000, CRC(10346803) SHA1(2d7b0ca2c30a24c4779c44872fc86d6ae269b51f), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 15)" )
+M4MADMNC_SET( 199?, m4madmnc__o,	m4madmnc,	"cm_39a_c.5_1", 0x0000, 0x020000, CRC(a235932f) SHA1(b6875c1119c8ed3a77d7f358298c119afac17dea), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 16)" )
+M4MADMNC_SET( 199?, m4madmnc__p,	m4madmnc,	"cm_39b_c.4_1", 0x0000, 0x020000, CRC(0f9f3015) SHA1(8a02b6a22a96c7e310a7428d36b306e8af618e9a), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 17)" )
+M4MADMNC_SET( 199?, m4madmnc__q,	m4madmnc,	"cm_39bgc.4_1", 0x0000, 0x020000, CRC(38b8171c) SHA1(5e33189d6b2d72a045c98c2bb8492961ab3d978f), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 18)" )
+M4MADMNC_SET( 199?, m4madmnc__r,	m4madmnc,	"cm_39btc.4_1", 0x0000, 0x020000, CRC(67dec226) SHA1(68bfe25ff693ea7b4469d2e7d1b6972cc421d1cc), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 19)" )
+M4MADMNC_SET( 199?, m4madmnc__s,	m4madmnc,	"cm_49_dc.4_1", 0x0000, 0x020000, CRC(e0ab38ee) SHA1(a324a1bb9f709b72de6fdd4c896326ca0004fdef), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 20)" )
+M4MADMNC_SET( 199?, m4madmnc__t,	m4madmnc,	"cm_49a_c.4_1", 0x0000, 0x020000, CRC(388307b3) SHA1(070d431171ce325f6935f5bc1fd8db3acf79b13c), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 21)" )
+M4MADMNC_SET( 199?, m4madmnc__u,	m4madmnc,	"cm_49b_c.4_1", 0x0000, 0x020000, CRC(27285fa5) SHA1(5f08bc751d7a0875b1b879d7d96aa9803fb942c6), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 22)" )
+M4MADMNC_SET( 199?, m4madmnc__v,	m4madmnc,	"cm_49bgc.4_1", 0x0000, 0x020000, CRC(100f78ac) SHA1(c5d30fa46508b00b163dbf05e572f8c23fdb6cc3), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 23)" )
+M4MADMNC_SET( 199?, m4madmnc__w,	m4madmnc,	"cm_49btc.4_1", 0x0000, 0x020000, CRC(4f69ad96) SHA1(50948166fee3cd1e6f0e378076046ee305204d61), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 24)" )
+
+
+
+#define M4MMM_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "mu___snd.1_1", 0x000000, 0x080000, CRC(570cf5f8) SHA1(48b3703bf385d037e4e870dfb671b75e9bab84a7) ) \
+	ROM_LOAD( "mu___snd.1_2", 0x080000, 0x080000, CRC(6ec1910b) SHA1(4920fe0b7c7f4ddb14d56f50598aaf62e5867014) ) \
+	ROM_LOAD( "mu___snd.1_3", 0x100000, 0x080000, CRC(8699378c) SHA1(55c3e310cfde8046e58bf21a8788e697c8275b8d) ) \
+	ROM_LOAD( "mu___snd.1_4", 0x180000, 0x080000, CRC(54b193d8) SHA1(ab24624ce69d352a14f6bd3db127fa1c8c5f07db) ) \
+
+#define M4MMM_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4MMM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4MMM_SET( 199?, m4mmm,		0,		"mu_sj___.3_0", 0x0000, 0x040000, CRC(abdf9d1c) SHA1(e8c6a056025b44e4ec995b42b2720e6366a97283), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 1)" )
+M4MMM_SET( 199?, m4mmm__a,	m4mmm,	"mu_sja__.3_0", 0x0000, 0x040000, CRC(3d2a9ea4) SHA1(f2ec904c8cef84affaad603edf26a864bd34be29), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 2)" )
+M4MMM_SET( 199?, m4mmm__b,	m4mmm,	"mu_sjk__.3_0", 0x0000, 0x040000, CRC(34e4f8ba) SHA1(606d607faeb43190f5167aa3d10c55d9986b7e58), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 3)" )
+M4MMM_SET( 199?, m4mmm__c,	m4mmm,	"mu_sjs__.3_0", 0x0000, 0x040000, CRC(26fb12b3) SHA1(d341181be75c87b44e4066653225911ce3460ed8), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 4)" )
+M4MMM_SET( 199?, m4mmm__d,	m4mmm,	"mu_ssj__.2_0", 0x0000, 0x040000, CRC(935b6602) SHA1(d5fa5688895fe3c2ae3ad7dbbc35d9b12574c93d), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 5)" )
+M4MMM_SET( 199?, m4mmm__e,	m4mmm,	"mu_ssja_.2_0", 0x0000, 0x040000, CRC(ff97814c) SHA1(8d9d74e6b0096cdc3226cfa91d7b653855600d5a), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 6)" )
+M4MMM_SET( 199?, m4mmm__f,	m4mmm,	"mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728973a) SHA1(2cd9c866fcc33150fb8d456f741ac809e0bd2b15), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 7)" )
+
+#define M4ORLAND_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "orlandosnd.p1", 0x000000, 0x080000, CRC(2735649d) SHA1(7b27bf2d4091ab581d399679b03f538f449f180c) ) \
+	ROM_LOAD( "orlandosnd.p2", 0x080000, 0x080000, CRC(0741e2ff) SHA1(c49a2809073dd058ba85ae14c888e19d3eb2b133) ) \
+
+#define M4ORLAND_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ORLAND_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4ORLAND_SET( 199?, m4orland,		0,			"or 05a v2-1(27c010)",	0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "Bwb","Orlando Magic (Bwb) (MPU4) (set 1)" )
+M4ORLAND_SET( 199?, m4orland__a,	m4orland,	"or_05a__.1_1",			0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed), "Bwb","Orlando Magic (Bwb) (MPU4) (set 2)" )
+M4ORLAND_SET( 199?, m4orland__b,	m4orland,	"or_20a__.7_1",			0x0000, 0x020000, CRC(ae524299) SHA1(3bb2bfe1c0ca0660aca148d6f17b730b7bdc8183), "Bwb","Orlando Magic (Bwb) (MPU4) (set 3)" )
+M4ORLAND_SET( 199?, m4orland__c,	m4orland,	"or_20b__.7_1",			0x0000, 0x020000, CRC(c8a30e2e) SHA1(8abc5437751faf61c12709c963a6819cb0b2b43f), "Bwb","Orlando Magic (Bwb) (MPU4) (set 4)" )
+M4ORLAND_SET( 199?, m4orland__d,	m4orland,	"or_20bg_.7_1",			0x0000, 0x020000, CRC(552561e5) SHA1(c92c4b21182511e4880b90313a673045e20b01e8), "Bwb","Orlando Magic (Bwb) (MPU4) (set 5)" )
+M4ORLAND_SET( 199?, m4orland__e,	m4orland,	"or_20bt_.7_1",			0x0000, 0x020000, CRC(7db2e12a) SHA1(c10989d5d6bbc8f87ad21364f6c64495dc4a3047), "Bwb","Orlando Magic (Bwb) (MPU4) (set 6)" )
+M4ORLAND_SET( 199?, m4orland__f,	m4orland,	"or_20s__.7_1",			0x0000, 0x020000, CRC(9ce4b650) SHA1(26a3337526d398ce265d735cfbe6d0e69c1f5cab), "Bwb","Orlando Magic (Bwb) (MPU4) (set 7)" )
+M4ORLAND_SET( 199?, m4orland__g,	m4orland,	"or_20sb_.7_1",			0x0000, 0x020000, CRC(90f59de7) SHA1(2bb6c0680c654265c8669a5f13346ae6afb72fb5), "Bwb","Orlando Magic (Bwb) (MPU4) (set 8)" )
+M4ORLAND_SET( 199?, m4orland__h,	m4orland,	"or_20sd_.7_1",			0x0000, 0x020000, CRC(242c552c) SHA1(dce5f0d38c8c6c101337028f30c05a7eb629e703), "Bwb","Orlando Magic (Bwb) (MPU4) (set 9)" )
+
+
+#define M4PZBING_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4PZBING_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4PZBING_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4PZBING_SET( 199?, m4pzbing,		0,			"pb_20a__.4_1", 0x0000, 0x010000, CRC(52aa92e5) SHA1(3dc20e521677e829967e1d689c9905fb96aee639), "Bwb","Prize Bingo (Bwb) (MPU4) (set 1)" )
+M4PZBING_SET( 199?, m4pzbing__a,	m4pzbing,	"pb_20ad_.4_1", 0x0000, 0x010000, CRC(f6bd6ad0) SHA1(092cb895c576ed2e995b62aba21851af6fb90959), "Bwb","Prize Bingo (Bwb) (MPU4) (set 2)" )
+M4PZBING_SET( 199?, m4pzbing__b,	m4pzbing,	"pb_20bg_.4_1", 0x0000, 0x010000, CRC(593e89f4) SHA1(4ed79c889370eb5de20b434cd83b2ee3fae31ed8), "Bwb","Prize Bingo (Bwb) (MPU4) (set 3)" )
+M4PZBING_SET( 199?, m4pzbing__c,	m4pzbing,	"pb_20bt_.4_1", 0x0000, 0x010000, CRC(fa51b522) SHA1(1fdebe63b871f700a664053251b02c8cf47fbb92), "Bwb","Prize Bingo (Bwb) (MPU4) (set 4)" )
+M4PZBING_SET( 199?, m4pzbing__d,	m4pzbing,	"pb_20s__.4_1", 0x0000, 0x010000, CRC(601f37d9) SHA1(0971c5c5321f5ce1508a0dd8abd989939224a779), "Bwb","Prize Bingo (Bwb) (MPU4) (set 5)" )
+M4PZBING_SET( 199?, m4pzbing__e,	m4pzbing,	"pb_20sb_.4_1", 0x0000, 0x010000, CRC(0234978a) SHA1(f24069883efb69de1024b6efbeb3d6a100ac5b9a), "Bwb","Prize Bingo (Bwb) (MPU4) (set 6)" )
+
+
+#define M4QUIDIN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "qi_____.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) ) \
+	ROM_LOAD( "qi_____.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) ) \
+
+#define M4QUIDIN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4QUIDIN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+
+M4QUIDIN_SET( 199?, m4quidin,		0,			"qi_20a__.3_1", 0x0000, 0x010000, CRC(88873c45) SHA1(70fa65402dbbe716a089497a8ccb06e0ba2aac6d), "Bwb","Quids In (Bwb) (MPU4) (set 1)" )
+M4QUIDIN_SET( 199?, m4quidin__a,	m4quidin,	"qi_20s__.3_1", 0x0000, 0x010000, CRC(3758dc38) SHA1(d22a379975e948d465e13233a796e0fb07e3c04f), "Bwb","Quids In (Bwb) (MPU4) (set 2)" )
+M4QUIDIN_SET( 199?, m4quidin__b,	m4quidin,	"qi_20sb_.3_1", 0x0000, 0x010000, CRC(e254dc09) SHA1(ad5853c854f628de6203be8d6c3cbaa6a600e340), "Bwb","Quids In (Bwb) (MPU4) (set 3)" )
+
+
+#define M4QUIDIS_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4QUIDIS_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4QUIDIS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4QUIDIS_SET( 199?, m4quidis,		0,			"pq_20a__.3_1", 0x0000, 0x010000, CRC(7eb762a1) SHA1(4546a7bf43f8ab6eb9713348e3f919de7532eed2), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 1)" )
+M4QUIDIS_SET( 199?, m4quidis__a,	m4quidis,	"pq_20s__.3_1", 0x0000, 0x010000, CRC(71360992) SHA1(0b64f27f0edfdebca41552181ff0f2b5491ec308), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 2)" )
+M4QUIDIS_SET( 199?, m4quidis__b,	m4quidis,	"pq_20sb_.3_1", 0x0000, 0x010000, CRC(a43a09a3) SHA1(46d83465d1026620af2f59dd4b638444ca834ad1), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 3)" )
+M4QUIDIS_SET( 199?, m4quidis__c,	m4quidis,	"pq_20sd_.3_1", 0x0000, 0x010000, CRC(d92cc00e) SHA1(bff2b5da08cc34040b1d4d750ea6a654f9b77959), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 4)" )
+M4QUIDIS_SET( 199?, m4quidis__d,	m4quidis,	"pq_20sk_.3_1", 0x0000, 0x010000, CRC(0c20c03f) SHA1(f802daa8ff2c159ba4831ed048e0ddd8469448da), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 5)" )
+
+
+#define M4RACKEM_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "re_snd.p1", 0x000000, 0x080000, CRC(aea88892) SHA1(457dab5cddfb9762f7e0bd61187b8052aee71c28) ) \
+	ROM_LOAD( "re_snd.p2", 0x080000, 0x080000, CRC(57394ec6) SHA1(cba7abebd3ab165e9531017168f51ada6cf35991) ) \
+	ROM_LOAD( "re_snd.p3", 0x100000, 0x080000, CRC(5d5d5309) SHA1(402615633976410225a1ee50c454391dc69a68cb) ) \
+
+#define M4RACKEM_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RACKEM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4RACKEM_SET( 199?, m4rackem,		0,			"re_sj___.2_0", 0x0000, 0x040000, CRC(e36d3f86) SHA1(a5f522c86482517b8dc735b1012f8f7668c2f18d), "Bwb","Rack Em Up (Bwb) (MPU4) (set 1)" )
+M4RACKEM_SET( 199?, m4rackem__a,	m4rackem,	"re_sj___.3_0", 0x0000, 0x040000, CRC(2f463d2f) SHA1(3410cc8a6d097a4edfcb4c57c237d1d514b507ba), "Bwb","Rack Em Up (Bwb) (MPU4) (set 2)" )
+M4RACKEM_SET( 199?, m4rackem__b,	m4rackem,	"re_sj_d_.2_0", 0x0000, 0x040000, CRC(7a31658c) SHA1(4fade421b3a1a732a99f7cb6346279ad82f55362), "Bwb","Rack Em Up (Bwb) (MPU4) (set 3)" )
+M4RACKEM_SET( 199?, m4rackem__c,	m4rackem,	"re_sjs__.2_0", 0x0000, 0x040000, CRC(d7c499c8) SHA1(73542f54322f5ffb87d16f5f66cc3a22c2849f20), "Bwb","Rack Em Up (Bwb) (MPU4) (set 4)" )
+M4RACKEM_SET( 199?, m4rackem__d,	m4rackem,	"re_sjsw_.2_0", 0x0000, 0x040000, CRC(66355370) SHA1(d54aab7403e64a67edf2baeaf1321ee5c4aa553d), "Bwb","Rack Em Up (Bwb) (MPU4) (set 5)" )
+
+
+
+#define M4RBGOLD_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4RBGOLD_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RBGOLD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4RBGOLD_SET( 199?, m4rbgold,		0,			"rb_20a_p.2a1", 0x0000, 0x010000, CRC(d7e6e514) SHA1(25645b69e86335622df43113908ed88a21f27e30), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 1)" )
+M4RBGOLD_SET( 199?, m4rbgold__a,	m4rbgold,	"rb_20a_p.2f1", 0x0000, 0x010000, CRC(62af6db6) SHA1(0dcb679c05f090f8dab7228009a700c31f0179d8), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 2)" )
+M4RBGOLD_SET( 199?, m4rbgold__b,	m4rbgold,	"rb_20sbp.2a1", 0x0000, 0x010000, CRC(ba4c2e74) SHA1(fcc325754f96e742998373c6c5c13a8509f48cd5), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 3)" )
+M4RBGOLD_SET( 199?, m4rbgold__c,	m4rbgold,	"rb_20sbp.2f1", 0x0000, 0x010000, CRC(0f05a6d6) SHA1(1ba7ccbb3d78196d4b98a0a1173bf41c9dd62c1f), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 4)" )
+M4RBGOLD_SET( 199?, m4rbgold__d,	m4rbgold,	"rb_20sbp.2s1", 0x0000, 0x010000, CRC(d8278b82) SHA1(8e924096e238359fd2a7f81198c8af1515dc8a19), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 5)" )
+M4RBGOLD_SET( 199?, m4rbgold__e,	m4rbgold,	"rb_xea__.2a1", 0x0000, 0x010000, CRC(1bc266ff) SHA1(fcdb63613dbcf0b15744317a69bd8a1e3cf92526), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 6)" )
+M4RBGOLD_SET( 199?, m4rbgold__f,	m4rbgold,	"rb_xea__.2f1", 0x0000, 0x010000, CRC(ae8bee5d) SHA1(bae49779a009a29b27c99f5e5a4b2aeca39b5626), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 7)" )
+M4RBGOLD_SET( 199?, m4rbgold__g,	m4rbgold,	"rb_xea__.2s1", 0x0000, 0x010000, CRC(79a9c309) SHA1(8ad87ec153ed8a89e612011679a172fc66bae711), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 8)" )
+M4RBGOLD_SET( 199?, m4rbgold__h,	m4rbgold,	"rb_xes__.2a1", 0x0000, 0x010000, CRC(14430dcc) SHA1(7e514a1857f6911a57aff7900af297412ef0d905), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 9)" )
+M4RBGOLD_SET( 199?, m4rbgold__i,	m4rbgold,	"rb_xes__.2f1", 0x0000, 0x010000, CRC(a10a856e) SHA1(a8536d576b3698ccc539c8ac1c9136222b1cf297), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 10)" )
+M4RBGOLD_SET( 199?, m4rbgold__j,	m4rbgold,	"rb_xes__.2s1", 0x0000, 0x010000, CRC(7628a83a) SHA1(da1833df2e88480dafd2410fb24f0fbffbdeb679), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 11)" )
+M4RBGOLD_SET( 199?, m4rbgold__k,	m4rbgold,	"rb_xesb_.2f1", 0x0000, 0x010000, CRC(c321253d) SHA1(0d59b0cf7118c7932e9d89eca823ce200c5030f5), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 12)" )
+M4RBGOLD_SET( 199?, m4rbgold__l,	m4rbgold,	"rb_xesb_.2s1", 0x0000, 0x010000, CRC(14030869) SHA1(283e7ca543a37a60f2d3a8c6d5473b591bb20e62), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 13)" )
+M4RBGOLD_SET( 199?, m4rbgold__m,	m4rbgold,	"rb_xesd_.2a1", 0x0000, 0x010000, CRC(b054f5f9) SHA1(fdcca5375ff8f26f6889c5556216ff0fdf2bce94), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 14)" )
+M4RBGOLD_SET( 199?, m4rbgold__n,	m4rbgold,	"rb_xesd_.2f1", 0x0000, 0x010000, CRC(051d7d5b) SHA1(b8216e505de00802e5e34d11eb3e18e0736fa772), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 15)" )
+M4RBGOLD_SET( 199?, m4rbgold__o,	m4rbgold,	"rb_xesd_.2s1", 0x0000, 0x010000, CRC(d23f500f) SHA1(fe8d2825c8fb24c3885013c046a15ddec5cb3a1f), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 16)" )
+M4RBGOLD_SET( 199?, m4rbgold__p,	m4rbgold,	"rbixe___.2a1", 0x0000, 0x010000, CRC(349fafdd) SHA1(da68e210c8c0a716c1ef62e7f404f6985903b00a), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 17)" )
+M4RBGOLD_SET( 199?, m4rbgold__q,	m4rbgold,	"rbixe___.2s1", 0x0000, 0x010000, CRC(56f40a2b) SHA1(0c6c035d2a3dbef70b1bc95fa38ed62a70770739), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 18)" )
+
+
+#define M4RHFEV_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "rf_____.1_1", 0x000000, 0x080000, CRC(ac8d539d) SHA1(8baf14bece50774f93ae9eaf3effabb6882d2c43) ) \
+	ROM_LOAD( "rf_____.1_2", 0x080000, 0x080000, CRC(cc2fadd8) SHA1(681850e2e6164cf8af8e7501ac44f475cc07b742) ) \
+	ROM_LOAD( "rf_____.1_3", 0x100000, 0x080000, CRC(165aaf9f) SHA1(815224fe94a77628cef1dd0d8a238edcb4813006) ) \
+	ROM_LOAD( "rf_____.1_4", 0x180000, 0x080000, CRC(4f7e7b49) SHA1(f9d421eeab73e0c795a08cf166c8807e0b14ec82) ) \
+
+#define M4RHFEV_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHFEV_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4RHFEV_SET( 199?, m4rhfev,		0,			"rt_sj___.7_0", 0x0000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 1)" )
+M4RHFEV_SET( 199?, m4rhfev__a,	m4rhfev,	"rt_sja__.7_0", 0x0000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 2)" )
+M4RHFEV_SET( 199?, m4rhfev__b,	m4rhfev,	"rt_sjs__.7_0", 0x0000, 0x040000, CRC(1a8feafb) SHA1(83151f63b7ebe1c538f9334e9c3d6889d0730144), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 3)" )
+M4RHFEV_SET( 199?, m4rhfev__c,	m4rhfev,	"rt_vc___.1_0", 0x0000, 0x040000, CRC(2a8df147) SHA1(df0e7021e9d169575a1297f9851b5a64e20d1a40), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 4)" )
+M4RHFEV_SET( 199?, m4rhfev__d,	m4rhfev,	"rt_vc_d_.1_0", 0x0000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 5)" )
+M4RHFEV_SET( 199?, m4rhfev__e,	m4rhfev,	"rtv.p1",		0x0000, 0x008000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 6)" ) // doesn't belong here
+
+
+#define M4SINBD_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	/*These were with the last listed set, though I have no reason to believe they aren't valid for all BwB Sinbad games */ \
+	ROM_LOAD( "sinbadbwb1_2snd.bin", 0x000000, 0x080000, CRC(2ee60ce6) SHA1(865860639e8471f97ace0beac2f4c7fddb8ca97c) ) \
+	ROM_LOAD( "sinbadbwb1_3snd.bin", 0x000000, 0x080000, CRC(7701e5cc) SHA1(4f9ff91f2b6b15a9c08396b52fc8509ba476ed8d) ) \
+
+#define M4SINBD_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SINBD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SINBD_SET( 199?, m4sinbd,		0,			"sd_20__c.1_1",			0x0000, 0x020000, CRC(28cd336e) SHA1(45bdf5403c04b7d3a3645b6b44ac3d12e6463a55), "Bwb","Sinbad (Bwb) (MPU4) (set 1)" )
+M4SINBD_SET( 199?, m4sinbd__a,	m4sinbd,	"sd_20a__.4_1",			0x0000, 0x020000, CRC(12b8f629) SHA1(c8540ecb217cf0615d7a8d080136926646ca8497), "Bwb","Sinbad (Bwb) (MPU4) (set 2)" )
+M4SINBD_SET( 199?, m4sinbd__b,	m4sinbd,	"sd_20a__.5_1",			0x0000, 0x020000, CRC(68a3d155) SHA1(5ae47f1ca860af30c77beebe3acf615958ed59e9), "Bwb","Sinbad (Bwb) (MPU4) (set 3)" )
+M4SINBD_SET( 199?, m4sinbd__c,	m4sinbd,	"sd_20a_c.1_1",			0x0000, 0x020000, CRC(5a5eef7c) SHA1(32d801cea0593e220ac67c2c17782fc144d02cc4), "Bwb","Sinbad (Bwb) (MPU4) (set 4)" )
+M4SINBD_SET( 199?, m4sinbd__d,	m4sinbd,	"sd_20ad_.5_1",			0x0000, 0x020000, CRC(dc9dd7b3) SHA1(e26c8a814cdb268026e31acb668f34160ea9ce7b), "Bwb","Sinbad (Bwb) (MPU4) (set 5)" )
+M4SINBD_SET( 199?, m4sinbd__e,	m4sinbd,	"sd_20s__.1v1",			0x0000, 0x020000, CRC(acb5aa9a) SHA1(4186058f83e241f06de842d0ae79f26a2a0e6cf0), "Bwb","Sinbad (Bwb) (MPU4) (set 6)" )
+M4SINBD_SET( 199?, m4sinbd__f,	m4sinbd,	"sd_20s__.4_1",			0x0000, 0x020000, CRC(bce21ced) SHA1(9e089fbca1dd39e356f38d0c301162affea9316c), "Bwb","Sinbad (Bwb) (MPU4) (set 7)" )
+M4SINBD_SET( 199?, m4sinbd__g,	m4sinbd,	"sd_20s__.5_1",			0x0000, 0x020000, CRC(939ecca5) SHA1(a9cd465fbe742b910602f861ae6ac7cedc7d9be9), "Bwb","Sinbad (Bwb) (MPU4) (set 8)" )
+M4SINBD_SET( 199?, m4sinbd__h,	m4sinbd,	"sd_20s_p.4_1",			0x0000, 0x020000, CRC(5ae716a9) SHA1(4c9ceab423a1480f8257fad2d62b65a17788a472), "Bwb","Sinbad (Bwb) (MPU4) (set 9)" )
+M4SINBD_SET( 199?, m4sinbd__i,	m4sinbd,	"sd_20s_s.5_1",			0x0000, 0x020000, CRC(e47c869a) SHA1(2735613aafe71e9b2a3aabb433fbd98a83a546c7), "Bwb","Sinbad (Bwb) (MPU4) (set 10)" )
+M4SINBD_SET( 199?, m4sinbd__j,	m4sinbd,	"sd_20sb_.4_1",			0x0000, 0x020000, CRC(811efef2) SHA1(280c6d6697735faca58317925c58b687c5988b87), "Bwb","Sinbad (Bwb) (MPU4) (set 11)" )
+M4SINBD_SET( 199?, m4sinbd__k,	m4sinbd,	"sd_20sb_.5_1",			0x0000, 0x020000, CRC(594920ec) SHA1(03ac253ef35b8fbccbfe4b2c5a7d906a3001b3ec), "Bwb","Sinbad (Bwb) (MPU4) (set 12)" )
+M4SINBD_SET( 199?, m4sinbd__l,	m4sinbd,	"sd_20sbc.1_1",			0x0000, 0x020000, CRC(3720cf0d) SHA1(8f0e63985badbff6ac39fcf956ebff3b0655c2b9), "Bwb","Sinbad (Bwb) (MPU4) (set 13)" )
+M4SINBD_SET( 199?, m4sinbd__m,	m4sinbd,	"sd_20sbp.4_1",			0x0000, 0x020000, CRC(671bf4b6) SHA1(ac928b47c1392e8a82404776068233e7d1dd5d28), "Bwb","Sinbad (Bwb) (MPU4) (set 14)" )
+M4SINBD_SET( 199?, m4sinbd__n,	m4sinbd,	"sd_20sbs.5_1",			0x0000, 0x020000, CRC(2eab6ad3) SHA1(66261328999a139389198e772a69dcd994792439), "Bwb","Sinbad (Bwb) (MPU4) (set 15)" )
+M4SINBD_SET( 199?, m4sinbd__o,	m4sinbd,	"sd_20sdc.1_1",			0x0000, 0x020000, CRC(fc386926) SHA1(6e64aeb82e62ded75e48f0faab932b63732bcf08), "Bwb","Sinbad (Bwb) (MPU4) (set 16)" )
+M4SINBD_SET( 199?, m4sinbd__p,	m4sinbd,	"sd_25__c.1_1",			0x0000, 0x020000, CRC(348e846d) SHA1(ca0fffd59076e6e60d37f677d0c7e7f182a41b9e), "Bwb","Sinbad (Bwb) (MPU4) (set 17)" )
+M4SINBD_SET( 199?, m4sinbd__q,	m4sinbd,	"sd_25a_c.1_1",			0x0000, 0x020000, CRC(f50c55e9) SHA1(df72b196fb21b6359282c06b960fa53117a95fee), "Bwb","Sinbad (Bwb) (MPU4) (set 18)" )
+M4SINBD_SET( 199?, m4sinbd__r,	m4sinbd,	"sd_25sbc.1_1",			0x0000, 0x020000, CRC(0773632a) SHA1(34294e32243b903a6c1c54b8718ca7cddbd3316e), "Bwb","Sinbad (Bwb) (MPU4) (set 19)" )
+M4SINBD_SET( 199?, m4sinbd__s,	m4sinbd,	"sd_25sdc.1_1",			0x0000, 0x020000, CRC(4917a542) SHA1(23de449d536c799032afab678b9001fa8541fb8a), "Bwb","Sinbad (Bwb) (MPU4) (set 20)" )
+M4SINBD_SET( 199?, m4sinbd__t,	m4sinbd,	"sdi20___.1v1",			0x0000, 0x020000, CRC(c50b3555) SHA1(c2d89126b9122f48ecce52d50cd7a03cc2bf1829), "Bwb","Sinbad (Bwb) (MPU4) (set 21)" )
+M4SINBD_SET( 199?, m4sinbd__u,	m4sinbd,	"sv_20a__.4_1",			0x0000, 0x020000, CRC(0e790ae8) SHA1(48f055f3f1f5d3392b7fba1c5c30624c1f230327), "Bwb","Sinbad (Bwb) (MPU4) (set 22)" )
+M4SINBD_SET( 199?, m4sinbd__v,	m4sinbd,	"sv_20sb_.4_1",			0x0000, 0x020000, CRC(e88c1c29) SHA1(49d180068e4ae9cb65a58e65b4e1ac4d6657ae1d), "Bwb","Sinbad (Bwb) (MPU4) (set 23)" )
+M4SINBD_SET( 199?, m4sinbd__w,	m4sinbd,	"svi20___.4_1",			0x0000, 0x020000, CRC(643037ed) SHA1(d4063faba3069625474dd761f9ad2dcf2f710a19), "Bwb","Sinbad (Bwb) (MPU4) (set 24)" )
+M4SINBD_SET( 199?, m4sinbd__x,	m4sinbd,	"sinbadbwb1_1game.bin", 0x0000, 0x020000, CRC(cfe152a7) SHA1(b8ecfa8b763d04515b65eb902c18dba7198191c3), "Bwb","Sinbad (Bwb) (MPU4) (set 25)" )
+
+
+#define M4SKY_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4SKY_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SKY_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SKY_SET( 199?, m4sky,		0,		"sk_s____.3_1", 0x0000, 0x040000, CRC(749af008) SHA1(036514f2bcb84193cfa84313f0617f3196aea73e), "Bwb","Sky Sports (Bwb) (MPU4) (set 1)" )
+M4SKY_SET( 199?, m4sky__a,	m4sky,	"sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8), "Bwb","Sky Sports (Bwb) (MPU4) (set 2)" )
+M4SKY_SET( 199?, m4sky__b,	m4sky,	"sk_sj_k_.5_0", 0x0000, 0x040000, CRC(e1bab980) SHA1(1c8b127809422ab0baf1875ca907f18269a0cc17), "Bwb","Sky Sports (Bwb) (MPU4) (set 3)" )
+M4SKY_SET( 199?, m4sky__c,	m4sky,	"sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a16ef7) SHA1(9012dcc320e8af8fef53e0dc91d3bcd6cbafa5ee), "Bwb","Sky Sports (Bwb) (MPU4) (set 4)" )
+M4SKY_SET( 199?, m4sky__d,	m4sky,	"sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176431f) SHA1(8ca90ef61486fc5a5b6527f913cd05b42ceabe3e), "Bwb","Sky Sports (Bwb) (MPU4) (set 5)" )
+
+
+#define M4SOULS_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "ss______.1_2", 0x000000, 0x080000, CRC(ddea9d75) SHA1(fe5f88d49434109d0f51425e790e179dc1a02767) ) \
+	ROM_LOAD( "ss______.1_3", 0x080000, 0x080000, CRC(23d1e57a) SHA1(b17afdaa95522fd7ea6c12f513fa338e1fcb06f6) ) \
+	ROM_LOAD( "ss______.1_4", 0x100000, 0x080000, CRC(0ba3046a) SHA1(ec21fa328669bc7a5baf1ce8b9ac05f38f98e360) ) \
+
+#define M4SOULS_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SOULS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4SOULS_SET( 199?, m4souls,		0,			"ss_06a__.4_1", 0x0000, 0x020000, CRC(00390a21) SHA1(d31d1307301fa4e8cf0ce3677e68a4c1723e4404), "Bwb","Soul Sister (Bwb) (MPU4) (set 1)" )
+M4SOULS_SET( 199?, m4souls__a,	m4souls,	"ss_16a__.4_1", 0x0000, 0x020000, CRC(b9ab9612) SHA1(ad30916a0f2cc745741c99d23c23192ae4088daf), "Bwb","Soul Sister (Bwb) (MPU4) (set 2)" )
+M4SOULS_SET( 199?, m4souls__b,	m4souls,	"ss_26a__.2_1", 0x0000, 0x020000, CRC(bf9acf05) SHA1(13698b453e975a1801631163d06468f07c181b48), "Bwb","Soul Sister (Bwb) (MPU4) (set 3)" )
+M4SOULS_SET( 199?, m4souls__c,	m4souls,	"ss_26ad_.2_1", 0x0000, 0x020000, CRC(3e867df2) SHA1(0c7d57c05952cb4f737ee07f139a3593803d3d60), "Bwb","Soul Sister (Bwb) (MPU4) (set 4)" )
+M4SOULS_SET( 199?, m4souls__d,	m4souls,	"ss_26sb_.2_1", 0x0000, 0x020000, CRC(2010749e) SHA1(4220b12db7870a2efd7a7ab573e4e08ff0643e70), "Bwb","Soul Sister (Bwb) (MPU4) (set 5)" )
+M4SOULS_SET( 199?, m4souls__e,	m4souls,	"ss_26sd_.2_1", 0x0000, 0x020000, CRC(773db916) SHA1(a7d168db22d5adeb3eaf64786bbe744ce787ff68), "Bwb","Soul Sister (Bwb) (MPU4) (set 6)" )
+M4SOULS_SET( 199?, m4souls__f,	m4souls,	"ss_26sk_.2_1", 0x0000, 0x020000, CRC(9ae1672e) SHA1(79bcd12fae38dd1b0035e956148ffeaee33b9c71), "Bwb","Soul Sister (Bwb) (MPU4) (set 7)" )
+
+
+
+#define M4SPINBT_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4SPINBT_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SPINBT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SPINBT_SET( 199?, m4spinbt,		0,			"sn_37ad_.5_0", 0x0000, 0x040000, CRC(42d6faaa) SHA1(3789e85981b33ffae7c50ccca3278ae62974972d), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 1)" )
+M4SPINBT_SET( 199?, m4spinbt__a,	m4spinbt,	"sn_37b__.5_0", 0x0000, 0x040000, CRC(3a259a6f) SHA1(1acabb9e725ae1374b87808c4b3d06a329c824d0), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 2)" )
+M4SPINBT_SET( 199?, m4spinbt__b,	m4spinbt,	"sn_37bd_.5_0", 0x0000, 0x040000, CRC(f4e3f395) SHA1(545b2ea1cf4231ba1663bea0e6770976b0797cf3), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 3)" )
+M4SPINBT_SET( 199?, m4spinbt__c,	m4spinbt,	"sn_37bg_.5_0", 0x0000, 0x040000, CRC(c3ad8312) SHA1(9463903fe65462e5e9b09a992dc4625dba8452f0), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 4)" )
+M4SPINBT_SET( 199?, m4spinbt__d,	m4spinbt,	"sn_37bt_.5_0", 0x0000, 0x040000, CRC(9fd1df18) SHA1(4c647bc887cdaa2415d0308787c710c83ce1c0d3), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 5)" )
+M4SPINBT_SET( 199?, m4spinbt__e,	m4spinbt,	"sn_s7a__.5_0", 0x0000, 0x040000, CRC(69d39933) SHA1(ec2a9fb7c4977532a7a431745eb2d82d4e282159), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 6)" )
+M4SPINBT_SET( 199?, m4spinbt__f,	m4spinbt,	"sn_s7ad_.5_0", 0x0000, 0x040000, CRC(a715f0c9) SHA1(bec188edcd0580465859876f8bff2ff5a392a9e1), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 7)" )
+M4SPINBT_SET( 199?, m4spinbt__g,	m4spinbt,	"sn_s7s__.5_0", 0x0000, 0x040000, CRC(13288cc5) SHA1(2c47dcd8b57d10e0768729ad91dba12521c0d98a), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 8)" )
+
+#define M4STARST_EXTRA_ROMS \
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "starsnd3", 0x0000, 0x080000, CRC(96882952) SHA1(bf366670aec5cb545c56caac3c63855db03d8c14) )/* (?)strange id number? */ \
+
+#define M4STARST_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4STARST_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4STARST_SET( 199?, m4starst,		0,			"sr_20__d.3_0", 0x0000, 0x040000, CRC(98f6619b) SHA1(fc0a568e6695c9ad0fda7bc6703c752af26a7777), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 1)" )
+M4STARST_SET( 199?, m4starst__a,	m4starst,	"sr_20_bd.3_0", 0x0000, 0x040000, CRC(ff8209de) SHA1(41a4c20c89b3a04612ad6298276472b888915c89), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 2)" )
+M4STARST_SET( 199?, m4starst__b,	m4starst,	"sr_20_kd.3_0", 0x0000, 0x040000, CRC(4c9a53d5) SHA1(43ebf6c06db58de9c3934e2dbba0d8126f3e2dda), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 3)" )
+M4STARST_SET( 199?, m4starst__c,	m4starst,	"sr_20a_d.3_0", 0x0000, 0x040000, CRC(e9eebb4c) SHA1(60d8010140d9debe8f12d7f810de223d9abd02a4), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 4)" )
+M4STARST_SET( 199?, m4starst__d,	m4starst,	"sr_20s_d.3_0", 0x0000, 0x040000, CRC(725b50e6) SHA1(3efde346022e37b09df08b8188ac76dcdfac8a4e), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 5)" )
+M4STARST_SET( 199?, m4starst__e,	m4starst,	"sr_sj___.5_0", 0x0000, 0x040000, CRC(7964bd86) SHA1(7078de5a61b52dedb776993643f7edd8a2c863c3), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 6)" )
+M4STARST_SET( 199?, m4starst__f,	m4starst,	"sr_sj_b_.5_0", 0x0000, 0x040000, CRC(4ee1f95b) SHA1(1e3d52afd19a9489608d5446ef2118561c6411b0), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 7)" )
+M4STARST_SET( 199?, m4starst__g,	m4starst,	"sr_sj_d_.5_0", 0x0000, 0x040000, CRC(b4d78711) SHA1(c864c944b3fa74aa1fed22afe656a37413b024ce), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 8)" )
+M4STARST_SET( 199?, m4starst__h,	m4starst,	"sr_sj_k_.5_0", 0x0000, 0x040000, CRC(c7681e28) SHA1(a8c1c75df33c85301257147c97d6af8808dad0d2), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 9)" )
+M4STARST_SET( 199?, m4starst__i,	m4starst,	"sr_sja__.5_0", 0x0000, 0x040000, CRC(aa86c4f2) SHA1(e90fd91f1d14b89714e3fb8236ac9e8a641e4c71), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 10)" )
+M4STARST_SET( 199?, m4starst__j,	m4starst,	"sr_sjs__.5_0", 0x0000, 0x040000, CRC(89e405e4) SHA1(5aa9053e08c27570731f65502c7fb31f0ea0a678), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 11)" )
+
+
+#define M4SUPLEG_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "sls1.hex", 0x000000, 0x080000, CRC(341e3d3e) SHA1(b42ec737e95e766b1b26d6225416ee0c5cad2663) ) \
+	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) ) \
+	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) ) \
+
+#define M4SUPLEG_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SUPLEG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SUPLEG_SET( 199?, m4supleg,		0,			"sl_sj.hex",	0x0000, 0x040000, CRC(254835f7) SHA1(2fafaa3da747edd27d393ad106008e898e465283), "Bwb","Super League (Bwb) (MPU4) (set 1)" )
+M4SUPLEG_SET( 199?, m4supleg__a,	m4supleg,	"sl_sjs.hex",	0x0000, 0x040000, CRC(98942cd3) SHA1(858fde0a350159d089c6a0e0cc2e2eed6ab2092c), "Bwb","Super League (Bwb) (MPU4) (set 2)" )
+M4SUPLEG_SET( 199?, m4supleg__b,	m4supleg,	"sl_vc.hex",	0x0000, 0x040000, CRC(1940d117) SHA1(ae7338483ac39e9e1973dde5eb837443512630dd), "Bwb","Super League (Bwb) (MPU4) (set 3)" )
+M4SUPLEG_SET( 199?, m4supleg__c,	m4supleg,	"sl_vcd.hex",	0x0000, 0x040000, CRC(7aab16d1) SHA1(6da4e0d9883a48937d00bfc5929b3557de51f60e), "Bwb","Super League (Bwb) (MPU4) (set 4)" )
+M4SUPLEG_SET( 199?, m4supleg__d,	m4supleg,	"sls.hex",		0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928), "Bwb","Super League (Bwb) (MPU4) (set 5)" )
+
+#define M4SUPLEGW_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "s_leag.s1",0x000000, 0x080000, CRC(e8d90896) SHA1(4c67507f18b5dc966e2df3685dc6c257f5053e61) ) \
+	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) ) \
+	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) ) \
+
+#define M4SUPLEGW_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SUPLEGW_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4SUPLEGW_SET( 199?, m4suplegw,	m4supleg,	"s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283), "Bwb","Super League (Whitbread / Bwb) (MPU4)" ) //Whitbread?
+
+
+
+
+#define M4SUPSCR_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4SUPSCR_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SUPSCR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4SUPSCR_SET( 199?, m4supscr,		0,			"multistakesoccer.bin", 0x0000, 0x040000, CRC(ce27b6a7) SHA1(f9038336137b0642da4d1520b5d71a047d8fbe12), "Bwb","Super Soccer (Bwb) (MPU4) (set 1)" )
+M4SUPSCR_SET( 199?, m4supscr__a,	m4supscr,	"sm_78___.6_0",			0x0000, 0x040000, CRC(e7022c44) SHA1(da3a5b9954f7e50dce73aeb9c46bd4631c8350d5), "Bwb","Super Soccer (Bwb) (MPU4) (set 2)" )
+M4SUPSCR_SET( 199?, m4supscr__b,	m4supscr,	"sm_78_d_.6_0",			0x0000, 0x040000, CRC(4dbe6a87) SHA1(fe2ce1fca7105afbf459ee6558744f8fee417169), "Bwb","Super Soccer (Bwb) (MPU4) (set 3)" )
+M4SUPSCR_SET( 199?, m4supscr__c,	m4supscr,	"sm_80___.6_0",			0x0000, 0x040000, CRC(7e9831ec) SHA1(d0e645ea1f6d34c507103550c248200313d033ef), "Bwb","Super Soccer (Bwb) (MPU4) (set 4)" )
+M4SUPSCR_SET( 199?, m4supscr__d,	m4supscr,	"sm_80_d_.6_0",			0x0000, 0x040000, CRC(d424772f) SHA1(938eb7a35e59db704b0737d309b7989b35ed43e0), "Bwb","Super Soccer (Bwb) (MPU4) (set 5)" )
+M4SUPSCR_SET( 199?, m4supscr__e,	m4supscr,	"sm_82___.6_0",			0x0000, 0x040000, CRC(019b4d42) SHA1(b27894f99dc2945fccb0de66f34eacc5b02a3463), "Bwb","Super Soccer (Bwb) (MPU4) (set 6)" )
+M4SUPSCR_SET( 199?, m4supscr__f,	m4supscr,	"sm_82_d_.6_0",			0x0000, 0x040000, CRC(ab270b81) SHA1(6af522e78b9b263c96cb350cbc8585be206dcd0a), "Bwb","Super Soccer (Bwb) (MPU4) (set 7)" )
+M4SUPSCR_SET( 199?, m4supscr__g,	m4supscr,	"sm_84___.6_0",			0x0000, 0x040000, CRC(809ec8b0) SHA1(965edf407a1fd7dfda2817b884ef65b3d57d51e5), "Bwb","Super Soccer (Bwb) (MPU4) (set 8)" )
+M4SUPSCR_SET( 199?, m4supscr__h,	m4supscr,	"sm_84_d_.6_0",			0x0000, 0x040000, CRC(2a228e73) SHA1(04c8d17b2f2800dac9aca81e926e6e48eb02c5ac), "Bwb","Super Soccer (Bwb) (MPU4) (set 9)" )
+M4SUPSCR_SET( 199?, m4supscr__i,	m4supscr,	"sm_86___.6_0",			0x0000, 0x040000, CRC(ff9db41e) SHA1(5996438e801534ebf5d9755b340fada67cadc942), "Bwb","Super Soccer (Bwb) (MPU4) (set 10)" )
+M4SUPSCR_SET( 199?, m4supscr__j,	m4supscr,	"sm_86_d_.6_0",			0x0000, 0x040000, CRC(5521f2dd) SHA1(add1b70a6cddc4e176697660aeff331535d92898), "Bwb","Super Soccer (Bwb) (MPU4) (set 11)" )
+M4SUPSCR_SET( 199?, m4supscr__k,	m4supscr,	"sm_88___.6_0",			0x0000, 0x040000, CRC(59e4c515) SHA1(5a76962dc6530d326bfe6ef6498c8f2ad481d6f1), "Bwb","Super Soccer (Bwb) (MPU4) (set 12)" )
+M4SUPSCR_SET( 199?, m4supscr__l,	m4supscr,	"sm_88_d_.6_0",			0x0000, 0x040000, CRC(f35883d6) SHA1(1948e06e302cdb01fbd32d711374957e9e6bd64a), "Bwb","Super Soccer (Bwb) (MPU4) (set 13)" )
+M4SUPSCR_SET( 199?, m4supscr__m,	m4supscr,	"sm_90___.6_0",			0x0000, 0x040000, CRC(cdc7c594) SHA1(acb829257472bc4420c141932b6f4c708ea04f1b), "Bwb","Super Soccer (Bwb) (MPU4) (set 14)" )
+M4SUPSCR_SET( 199?, m4supscr__n,	m4supscr,	"sm_90_d_.6_0",			0x0000, 0x040000, CRC(677b8357) SHA1(4ec54f8b7d28c0459152309a58bd5c0db1a2f036), "Bwb","Super Soccer (Bwb) (MPU4) (set 15)" )
+
+#define M4SURE_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4SURE_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SURE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4SURE_SET( 199?, m4sure,		0,		"su_xf___.3_1", 0x0000, 0x010000, CRC(f85dae5c) SHA1(4c761c355fb6651f1e0cb041342f8a2ff510dfd2), "Bwb","Sure Thing (Bwb) (MPU4) (set 1)" )
+M4SURE_SET( 199?, m4sure__a,	m4sure,	"su_xf_b_.3_1", 0x0000, 0x010000, CRC(9a760e0f) SHA1(fdacdae0e2322daa004b2385616dd34626814d42), "Bwb","Sure Thing (Bwb) (MPU4) (set 2)" )
+M4SURE_SET( 199?, m4sure__b,	m4sure,	"su_xf_d_.3_1", 0x0000, 0x010000, CRC(5c4a5669) SHA1(55e1e853fdfdbb43e7b61b59ab642fb013a0db0e), "Bwb","Sure Thing (Bwb) (MPU4) (set 3)" )
+M4SURE_SET( 199?, m4sure__c,	m4sure,	"suixf___.3_1", 0x0000, 0x010000, CRC(cae80b60) SHA1(23545aaf1cc3a0c8868beafb56eccedbbb6099de), "Bwb","Sure Thing (Bwb) (MPU4) (set 4)" )
+
+
+#define M4TREX_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "tr______.1_2", 0x000000, 0x080000, CRC(75687514) SHA1(dc8f5f1db7da164175c241187cf3f0db1dd71fc9) ) \
+	ROM_LOAD( "tr______.1_3", 0x080000, 0x080000, CRC(1e30d4ed) SHA1(8cd916d28f5060d74a0d795f9b75ab597de1cd60) ) \
+
+#define M4TREX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TREX_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4TREX_SET( 199?, m4trex,		0,		"tr_20a__.2_1", 0x0000, 0x010000, CRC(21150b8e) SHA1(1531bc6fdb8b787fed6f4f98c6463313c55efc3c), "Bwb","Trex (Bwb) (MPU4) (set 1)" )
+M4TREX_SET( 199?, m4trex__a,	m4trex,	"tr_20a_p.2_1", 0x0000, 0x010000, CRC(ec1b35bc) SHA1(944959c6d1f8e9b0bb33c659b7c515cb7585fed0), "Bwb","Trex (Bwb) (MPU4) (set 2)" )
+M4TREX_SET( 199?, m4trex__b,	m4trex,	"tr_20ab_.2_1", 0x0000, 0x010000, CRC(f4190bbf) SHA1(45c20c5e56f0bc39e3af5817eb6d705caef14b40), "Bwb","Trex (Bwb) (MPU4) (set 3)" )
+M4TREX_SET( 199?, m4trex__c,	m4trex,	"tr_20bg_.2_1", 0x0000, 0x010000, CRC(14d8d80c) SHA1(6db190550b18401a067eeb26890af39612fc3012), "Bwb","Trex (Bwb) (MPU4) (set 4)" )
+M4TREX_SET( 199?, m4trex__d,	m4trex,	"tr_20bt_.2_1", 0x0000, 0x010000, CRC(3ad19bf3) SHA1(4808f8bbb963be30eace75228d4d1decde3282b0), "Bwb","Trex (Bwb) (MPU4) (set 5)" )
+M4TREX_SET( 199?, m4trex__e,	m4trex,	"tr_20s__.2_1", 0x0000, 0x010000, CRC(2e9460bd) SHA1(8e2ac58cb1686aadad38356a4d47e9502ddbaa52), "Bwb","Trex (Bwb) (MPU4) (set 6)" )
+M4TREX_SET( 199?, m4trex__f,	m4trex,	"tr_20s_p.2_1", 0x0000, 0x010000, CRC(e39a5e8f) SHA1(d1d507040fefa959d71856395639778e898272aa), "Bwb","Trex (Bwb) (MPU4) (set 7)" )
+M4TREX_SET( 199?, m4trex__g,	m4trex,	"tr_20sb_.2_1", 0x0000, 0x010000, CRC(fb98608c) SHA1(48b4fbdc289552131b621c870d7af082b6d8916e), "Bwb","Trex (Bwb) (MPU4) (set 8)" )
+M4TREX_SET( 199?, m4trex__h,	m4trex,	"tr_20sbp.2_1", 0x0000, 0x010000, CRC(36965ebe) SHA1(f2adce7cc97b30b0bf67fd5698b867603973e87a), "Bwb","Trex (Bwb) (MPU4) (set 9)" )
+M4TREX_SET( 199?, m4trex__i,	m4trex,	"tr_20sd_.2_1", 0x0000, 0x010000, CRC(868ea921) SHA1(3055816747b4773ec67669403a81420fabbe327e), "Bwb","Trex (Bwb) (MPU4) (set 10)" )
+M4TREX_SET( 199?, m4trex__j,	m4trex,	"tr_20sdp.2_1", 0x0000, 0x010000, CRC(4b809713) SHA1(d70581ff669d19cf5a91b1546f5c02f27aeda2e4), "Bwb","Trex (Bwb) (MPU4) (set 11)" )
+M4TREX_SET( 199?, m4trex__k,	m4trex,	"tr_20sk_.2_1", 0x0000, 0x010000, CRC(5382a910) SHA1(c8b2811081ec31fecd1b435e775d29e2e6406111), "Bwb","Trex (Bwb) (MPU4) (set 12)" )
+M4TREX_SET( 199?, m4trex__l,	m4trex,	"tr_20skp.2_1", 0x0000, 0x010000, CRC(9e8c9722) SHA1(7aee25966e6d2107f8a8f89acf6af62a73ff05c9), "Bwb","Trex (Bwb) (MPU4) (set 13)" )
+
+
+
+#define M4VOLCAN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "vo___snd.1_1", 0x000000, 0x080000, CRC(62bb0166) SHA1(17e5557cce4e7841cbcf5d67783fe78452aacc63) ) \
+	ROM_LOAD( "vo___snd.1_2", 0x080000, 0x080000, CRC(1eded545) SHA1(0010833e42b33fb0fd621a1059e1cf9a123c3fbd) ) \
+	ROM_LOAD( "vo___snd.1_3", 0x100000, 0x080000, CRC(915f4adf) SHA1(fac6644329ee6ef0026d65d8b94c971e01770d45) ) \
+	ROM_LOAD( "vo___snd.1_4", 0x180000, 0x080000, CRC(fec0fbe9) SHA1(26f651c5558a80e88666403d01cf916c3a13d948) ) \
+
+#define M4VOLCAN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4VOLCAN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4VOLCAN_SET( 199?, m4volcan,		0,			"vo_sj___.5_0",			0x0000, 0x040000, CRC(78096ebf) SHA1(96915bc2eca00fbd82fab8b3f62e697da118acdd), "Bwb","Volcano (Bwb) (MPU4) (set 1)" )
+M4VOLCAN_SET( 199?, m4volcan__a,	m4volcan,	"vo_sj_d_.5_0",			0x0000, 0x040000, CRC(87e0347d) SHA1(be5d5b90739fa8ac10f6504290aa58fcf147f323), "Bwb","Volcano (Bwb) (MPU4) (set 2)" )
+M4VOLCAN_SET( 199?, m4volcan__b,	m4volcan,	"vo_sj_k_.5_0",			0x0000, 0x040000, CRC(8604d102) SHA1(34c7df0257ba02ace4a74ffd5b0eed11eea0c333), "Bwb","Volcano (Bwb) (MPU4) (set 3)" )
+M4VOLCAN_SET( 199?, m4volcan__c,	m4volcan,	"vo_sja__.5_0",			0x0000, 0x040000, CRC(d73bade2) SHA1(7e02493ec0710f109ae45e523ef3d7d275aaefab), "Bwb","Volcano (Bwb) (MPU4) (set 4)" )
+M4VOLCAN_SET( 199?, m4volcan__d,	m4volcan,	"vo_sjs__.5_0",			0x0000, 0x040000, CRC(51eff796) SHA1(d0efb1eb4be176906726a438fcffb50cf5ddd217), "Bwb","Volcano (Bwb) (MPU4) (set 5)" )
+M4VOLCAN_SET( 199?, m4volcan__e,	m4volcan,	"vo_vc___.2_0",			0x0000, 0x040000, CRC(24a9e5d6) SHA1(dd4223c3b5c024eb9d56bb45426e327b49f78dde), "Bwb","Volcano (Bwb) (MPU4) (set 6)" )
+M4VOLCAN_SET( 199?, m4volcan__f,	m4volcan,	"vo_vc_d_.2_0",			0x0000, 0x040000, CRC(7f7341b6) SHA1(23d46ca0eed1e942b2a0d33d6ada2434ded5819b), "Bwb","Volcano (Bwb) (MPU4) (set 7)" )
+M4VOLCAN_SET( 199?, m4volcan__g,	m4volcan,	"volcano_bwb_2-0.bin",	0x0000, 0x040000, CRC(20688684) SHA1(fe533341417a3a0b16f485351cb635f4e7d823db), "Bwb","Volcano (Bwb) (MPU4) (set 8)" )
+
+#define M4VDEXPR_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "vd___snd.1_1", 0x000000, 0x080000, CRC(d66b43a9) SHA1(087cf1571a9afb8c1c7cac13640fa453b614fd53) ) \
+	ROM_LOAD( "vd___snd.1_2", 0x080000, 0x080000, CRC(a501c887) SHA1(c56a05fd8196afb86e665fec3fe7d02b9bf94c1a) ) \
+	ROM_LOAD( "vd___snd.1_3", 0x100000, 0x080000, CRC(70c6bd96) SHA1(ecdd4276ff72939433630e04bba5be3df569e17e) ) \
+	ROM_LOAD( "vd___snd.1_4", 0x180000, 0x080000, CRC(a6753f41) SHA1(b4af3054b62c3f00f2b5a19b816507fc3a62bef4) ) \
+
+#define M4VDEXPR_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4VDEXPR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4VDEXPR_SET( 199?, m4vdexpr,		0,			"vd_sj___.2_0", 0x0000, 0x040000, CRC(03efd2a5) SHA1(4fc3695c24335aef11ba168f660fb519d8c9d473), "Bwb","Voodoo Express (Bwb) (MPU4) (set 1)" )
+M4VDEXPR_SET( 199?, m4vdexpr__a,	m4vdexpr,	"vd_sj_d_.2_0", 0x0000, 0x040000, CRC(5073b98e) SHA1(66b020b8c096e78e1c9694f1cbc139e97314ab48), "Bwb","Voodoo Express (Bwb) (MPU4) (set 2)" )
+M4VDEXPR_SET( 199?, m4vdexpr__b,	m4vdexpr,	"vd_sja__.2_0", 0x0000, 0x040000, CRC(c53dbf48) SHA1(ceee2de3ea8cb511540d90b87bc67bec3309de35), "Bwb","Voodoo Express (Bwb) (MPU4) (set 3)" )
+M4VDEXPR_SET( 199?, m4vdexpr__c,	m4vdexpr,	"vd_sjs__.2_0", 0x0000, 0x040000, CRC(036157b3) SHA1(b575751006c3ee59bf0404fa0e177fee9ef9c5db), "Bwb","Voodoo Express (Bwb) (MPU4) (set 4)" )
+M4VDEXPR_SET( 199?, m4vdexpr__d,	m4vdexpr,	"vd_vc___.1_0", 0x0000, 0x040000, CRC(6326e14a) SHA1(3dbfbb1cfb60dc10c6972aa2fda89c8e3c3107ea), "Bwb","Voodoo Express (Bwb) (MPU4) (set 5)" )
+
+
+#define M4XCH_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "xchasnd.bin", 0x0000, 0x080000, CRC(32c44cd5) SHA1(baafb48e6f95ba152942d1e1c273ffb3c95afa82) ) \
+
+#define M4XCH_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4XCH_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4XCH_SET( 199?, m4xch,		0,		"ec_25b__.b_0", 0x0000, 0x020000, CRC(cec9e836) SHA1(460ec38566d7608e51b62f1ffebc18a395002ed4), "Bwb","X-change (Bwb) (MPU4) (set 1)" )
+M4XCH_SET( 199?, m4xch__a,	m4xch,	"ec_36bg_.bv0", 0x0000, 0x020000, CRC(c5d1523a) SHA1(813916008d7e7576e4594a6eb79a76c514470f31), "Bwb","X-change (Bwb) (MPU4) (set 2)" )
+M4XCH_SET( 199?, m4xch__b,	m4xch,	"ec_36bgn.bv0", 0x0000, 0x020000, CRC(4be33ee1) SHA1(888009e09c59f30649eac3238e0b70dec258cb3c), "Bwb","X-change (Bwb) (MPU4) (set 3)" )
+M4XCH_SET( 199?, m4xch__c,	m4xch,	"ec_39b__.b_0", 0x0000, 0x020000, CRC(e5d5961d) SHA1(ac3916cba91a13d1e0820982a1cefabd378647c9), "Bwb","X-change (Bwb) (MPU4) (set 4)" )
+M4XCH_SET( 199?, m4xch__d,	m4xch,	"ec_39bg_.b_0", 0x0000, 0x020000, CRC(49b2be01) SHA1(dbf808d0949a9658d23e57e7eaaa520891a4f0e0), "Bwb","X-change (Bwb) (MPU4) (set 5)" )
+M4XCH_SET( 199?, m4xch__e,	m4xch,	"ec_39bm_.b_0", 0x0000, 0x020000, CRC(29c86cf0) SHA1(384a475d34ad5d15b68d019c3771aba471f89b4d), "Bwb","X-change (Bwb) (MPU4) (set 6)" )
+M4XCH_SET( 199?, m4xch__f,	m4xch,	"ec_49bd_.b_0", 0x0000, 0x020000, CRC(02854189) SHA1(beab97ccd9889cfdb24e1fb6fb373bf9fd114eab), "Bwb","X-change (Bwb) (MPU4) (set 7)" )
+M4XCH_SET( 199?, m4xch__g,	m4xch,	"ec_49bmd.b_0", 0x0000, 0x020000, CRC(2a5578e3) SHA1(d8f100bc83721b6b0f365be7a962249af79d6162), "Bwb","X-change (Bwb) (MPU4) (set 8)" )
+M4XCH_SET( 199?, m4xch__h,	m4xch,	"ec_s9bt_.b_0", 0x0000, 0x020000, CRC(7e0a27d1) SHA1(d4a23a6c358e38a1a66a06b82af85c844f684830), "Bwb","X-change (Bwb) (MPU4) (set 9)" )
+M4XCH_SET( 199?, m4xch__i,	m4xch,	"ec_sja__.a_0", 0x0000, 0x020000, CRC(1f923f89) SHA1(84486287d55591c7e81c59a10e8cc722ec21e8f9), "Bwb","X-change (Bwb) (MPU4) (set 10)" )
+M4XCH_SET( 199?, m4xch__j,	m4xch,	"ec_sja__.b_0", 0x0000, 0x020000, CRC(16d7b8bb) SHA1(be8ab98a64aa976e25cb302b68323c6781034f2b), "Bwb","X-change (Bwb) (MPU4) (set 11)" )
+M4XCH_SET( 199?, m4xch__k,	m4xch,	"xchange.bin",	0x0000, 0x010000, CRC(c96cd014) SHA1(6e32d10c18b6b34dbcb21e75925a77e810ffe892), "Bwb","X-change (Bwb) (MPU4) (set 12)" )
+
+
+#define M4XS_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4XS_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4XS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4XS_SET( 199?, m4xs,		0,		"es_39b__.3_0", 0x0000, 0x020000, CRC(ba478372) SHA1(c13f9cc4261e91119aa694ec3ac81d94d9f32d22), "Bwb","X-s (Bwb) (MPU4) (set 1)" )
+M4XS_SET( 199?, m4xs__a,	m4xs,	"es_39bg_.3_0", 0x0000, 0x020000, CRC(b689f14f) SHA1(0c3253e1f747a979f55d53fe637fc61cf50e01a3), "Bwb","X-s (Bwb) (MPU4) (set 2)" )
+M4XS_SET( 199?, m4xs__b,	m4xs,	"es_39bm_.3_0", 0x0000, 0x020000, CRC(934f5d1e) SHA1(1ffd462d561d4a16f2392cc90a139499b74a234a), "Bwb","X-s (Bwb) (MPU4) (set 3)" )
+M4XS_SET( 199?, m4xs__c,	m4xs,	"es_39bmd.3_0", 0x0000, 0x020000, CRC(cf663dcc) SHA1(620e65528687eb5fd6fd879e305e8b7da9b95253), "Bwb","X-s (Bwb) (MPU4) (set 4)" )
+M4XS_SET( 199?, m4xs__d,	m4xs,	"es_49bg_.3_0", 0x0000, 0x020000, CRC(b76f1d7d) SHA1(9b43a9e847db3d4024f978b6f996534b8d52368b), "Bwb","X-s (Bwb) (MPU4) (set 5)" )
+M4XS_SET( 199?, m4xs__e,	m4xs,	"es_49bmd.3_0", 0x0000, 0x020000, CRC(1150e499) SHA1(25d2c37e5287f73d2b11608c50f21072422850f0), "Bwb","X-s (Bwb) (MPU4) (set 6)" )
+M4XS_SET( 199?, m4xs__f,	m4xs,	"es_sja__.3_0", 0x0000, 0x020000, CRC(5909092d) SHA1(64df6ad5ba5ac74592b525af2f4cab8a092a5766), "Bwb","X-s (Bwb) (MPU4) (set 7)" )
+
+	
+#define M4XTRM_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4XTRM_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4XTRM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4XTRM_SET( 199?, m4xtrm,		0,		"et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9), "Bwb","X-treme (Bwb) (MPU4) (set 1)" )
+M4XTRM_SET( 199?, m4xtrm__a,	m4xtrm,	"et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85), "Bwb","X-treme (Bwb) (MPU4) (set 2)" )
+M4XTRM_SET( 199?, m4xtrm__b,	m4xtrm,	"et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38), "Bwb","X-treme (Bwb) (MPU4) (set 3)" )
+
+
+#define M4CFINLN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4CFINLN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4CFINLN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4CFINLN_SET( 199?, m4cfinln,		m4cpfinl,	"cfd_7_1.bin",	0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945), "Bwb","Cup Final (Nova) (MPU4) (set 1)" )
+M4CFINLN_SET( 199?, m4cfinln__a,	m4cpfinl,	"cfd_d0.bin",	0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef), "Bwb","Cup Final (Nova) (MPU4) (set 2)" )
+
+#define M4ABRA_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4ABRA_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ABRA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4ABRA_SET( 199?, m4abra,		0,		"nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "Bwb","Abracadabra (Bwb) (MPU4) (set 1)" )
+M4ABRA_SET( 199?, m4abra__a,	m4abra,	"nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "Bwb","Abracadabra (Bwb) (MPU4) (set 2)" )
+M4ABRA_SET( 199?, m4abra__b,	m4abra,	"nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "Bwb","Abracadabra (Bwb) (MPU4) (set 3)" )
+M4ABRA_SET( 199?, m4abra__c,	m4abra,	"nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "Bwb","Abracadabra (Bwb) (MPU4) (set 4)" )
+
+#define M4WCNOV_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4WCNOV_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4WCNOV_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4WCNOV_SET( 199?, m4wcnov,		0,	"wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11de) SHA1(ece14fd5f56da8cc788c53d5c1404275e9000b65), "Bwb","World Cup (Nova) (MPU4)" )
+
+#define M4EXCALN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4EXCALN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4EXCALN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4EXCALN_SET( 199?, m4excaln,	m4excal,	"exdsx___.6_0", 0x0000, 0x080000, CRC(fcdc703c) SHA1(927870723106aebbb2b492ce9bfebe4aa25d0325), "Bwb","Excalibur (Nova) (MPU4) (set 1)" )
+M4EXCALN_SET( 199?, m4excaln__a,m4excal,	"exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d), "Bwb","Excalibur (Nova) (MPU4) (set 2)" )
+
+
+#define M4OLYGN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4OLYGN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4OLYGN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4OLYGN_SET( 199?, m4olygn,		0,			"ogdsx___.8_0", 0x0000, 0x040000, CRC(b51a2538) SHA1(d54f37dc14c44ab66e6d6ba6e2df8bc9ed003054), "Bwb","Olympic Gold (German) (Nova) (MPU4) (set 1)" )
+M4OLYGN_SET( 199?, m4olygn__a,	m4olygn,	"ogdsxe__.8_0", 0x0000, 0x040000, CRC(13aa70aa) SHA1(3878c181ec07e24060935bec96e5128e6e4baf31), "Bwb","Olympic Gold (German) (Nova) (MPU4) (set 2)" )
+
+
+#define M4FTLADN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4FTLADN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4FTLADN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4FTLADN_SET( 199?, m4ftladn,	0,		"fidse___.5_0", 0x00000, 0x20000, CRC(62347bbf) SHA1(2b1cd5adda831a8c74c9484ee1b616259d3e3981), "Bwb","Find the Lady (Nova) (MPU4)" )
+
+#define M4SINBDN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+#define M4SINBDN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SINBDN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SINBDN_SET( 199?, m4sinbdn,		0,			"sbds3___.a_1", 0x0000, 0x020000, CRC(9bff0e40) SHA1(f8a1263a58f828554e9df77ed0db78e627666fb5), "Bwb","Sinbad (Nova) (MPU4) (set 1)" )
+M4SINBDN_SET( 199?, m4sinbdn__a,	m4sinbdn,	"sbds3___.7w1", 0x0000, 0x020000, CRC(23bc9ce0) SHA1(f750de2b781bc902c65de7109e10a5fc2d4e1c61), "Bwb","Sinbad (Nova) (MPU4) (set 2)" )
+M4SINBDN_SET( 199?, m4sinbdn__b,	m4sinbdn,	"sxdsx___.2_0", 0x0000, 0x040000, CRC(4e1f98b5) SHA1(3e16e7a0cdccc9eb1a1bb6f9a0332c4582483eee), "Bwb","Sinbad (Nova) (MPU4) (set 3)" )
+M4SINBDN_SET( 199?, m4sinbdn__c,	m4sinbdn,	"sdd__.3_0",	0x0000, 0x040000, CRC(100098c1) SHA1(b125855c49325972f620463e32fdf124222e27d2), "Bwb","Sinbad (Nova) (MPU4) (set 4)" )
+M4SINBDN_SET( 199?, m4sinbdn__d,	m4sinbdn,	"sdds3__l.1w0", 0x0000, 0x040000, CRC(feedb8cf) SHA1(620b5379164d4da1200d4807199c2dc78d7d89ee), "Bwb","Sinbad (Nova) (MPU4) (set 5)" )
+M4SINBDN_SET( 199?, m4sinbdn__e,	m4sinbdn,	"sbds3__l.9_0", 0x0000, 0x040000, CRC(e425375a) SHA1(d2bdd8e768fc7764054eff574360f3cfb5f4f66d), "Bwb","Sinbad (Nova) (MPU4) (set 6)" )
+M4SINBDN_SET( 199?, m4sinbdn__f,	m4sinbdn,	"sbds3__l.aw0", 0x0000, 0x040000, CRC(c484ef9d) SHA1(62f6644b83dd6abaf80809217edf6a8230a89268), "Bwb","Sinbad (Nova) (MPU4) (set 7)" )
+
+
+
+

@@ -41,8 +41,9 @@ public:
 	DECLARE_WRITE16_MEMBER(calc3_mcu_com2_w);
 	DECLARE_WRITE16_MEMBER(calc3_mcu_com3_w);
 
-	void calc3_mcu_run(running_machine &machine);
+	void reset_run_timer();
 
+	void calc3_mcu_run(running_machine &machine);
 
 protected:
 	virtual void device_start();
@@ -58,6 +59,7 @@ private:
 	UINT8 shift_bits(UINT8 dat, int bits);
 	int calc3_decompress_table(running_machine& machine, int tabnum, UINT8* dstram, int dstoffset);
 
+	emu_timer* m_runtimer;
 
 };
 

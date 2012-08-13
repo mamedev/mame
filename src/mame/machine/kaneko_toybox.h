@@ -3,8 +3,6 @@
 
 #define GAME_NORMAL (0)
 #define	GAME_BONK (1)
-#define	GAME_GALPANI3 (2)	
-
 
 #define	TABLE_NORMAL (0)
 #define	TABLE_ALT (1)

@@ -199,7 +199,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 
 	bitmap.fill(0x0000, cliprect);
 
-	popmessage("%02x %02x", state->m_grap2_0->m_framebuffer_bright2, state->m_grap2_1->m_framebuffer_bright2);
+//	popmessage("%02x %02x", state->m_grap2_0->m_framebuffer_bright2, state->m_grap2_1->m_framebuffer_bright2);
 
 
 
@@ -523,7 +523,6 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
-	kaneko_toybox_device::set_toybox_gametype(*device, GAME_GALPANI3);
 
 	MCFG_PALETTE_LENGTH(0x4303)
 
