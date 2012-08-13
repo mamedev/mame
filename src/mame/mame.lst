@@ -22351,6 +22351,16 @@ m4cshenc__c	//
 m4cshenc__d	//
 m4czne		// Cash Zone (Bwb)
 m4csoc		// Championship Soccer (Bwb)
+m4csoc__a	//
+m4csoc__b	//
+m4csoc__c	//
+m4csoc__d	//
+m4csoc__e	//
+m4csoc__f	//
+m4csoc__g	//
+m4csoc__h	//
+m4csoc__i	//
+m4csoc__j	//
 m4cpycat	// Copy Cat (Bwb)
 m4cpycat__a	//
 m4cpycat__b	//
@@ -22388,8 +22398,56 @@ m4cpycat__6	//
 m4cpycat__7	//
 m4cpycat__8	//
 m4cpfinl	// Cup Final (Bwb)
+m4cpfinl__a	//
+m4cpfinl__b	//
+m4cpfinl__c	//
+m4cpfinl__d	//
+m4cpfinl__e	//
+m4cpfinl__f	//
+m4cpfinl__g	//
+m4cpfinl__h	//
+m4cpfinl__i	//
+m4cpfinl__j	//
+m4cpfinl__k	//
 m4danced	// Dancing Diamonds (Bwb)
+m4danced__a	//
+m4danced__b	//
+m4danced__c	//
+m4danced__d	//
+m4danced__e	//
+m4danced__f	//
+m4danced__g	//
+m4danced__h	//
+m4danced__i	//
+m4danced__j	//
+m4danced__k	//
+m4danced__l	//
+m4danced__m	//
+m4danced__n	//
+m4danced__o	//
+m4danced__p	//
+m4danced__q	//
+m4danced__r	//
+m4danced__s	//
+m4danced__t	//
+m4danced__u	//
+m4danced__v	//
+m4danced__w	//
 m4daytn		// Daytona (Bwb)
+m4daytn__a	//
+m4daytn__b	//
+m4daytn__c	//
+m4daytn__d	//
+m4daytn__e	//
+m4daytn__f	//
+m4daytn__g	//
+m4daytn__h	//
+m4daytn__i	//
+m4daytn__j	//
+m4daytn__k	//
+m4daytn__l	//
+m4daytn__m	//
+m4daytn__n	//
 m4excal		// Excalibur (Bwb)
 m4exotic	// Exotic Fruits (Bwb)
 m4firice	// Fire & Ice (Bwb)
@@ -22632,8 +22690,64 @@ m4xtrm		// X-treme (Bwb)
 
 /* Concept */
 m4rhfevc	// Red Hot Fever (Concept)
+m4rhfevc__a	//
+m4rhfevc__b	//
+m4rhfevc__c	//
+m4rhfevc__d	//
+m4rhfevc__e	//
+m4rhfevc__f	//
+m4rhfevc__g	//
+m4rhfevc__h	//
+m4rhfevc__i	//
+m4rhfevc__j	//
+m4rhfevc__k	//
+m4rhfevc__l	//
+m4rhfevc__m	//
+m4rhfevc__n	//
+m4rhfevc__o	//
+m4rhfevc__p	//
+m4rhfevc__q	//
+m4rhfevc__r	//
+m4rhfevc__s	//
+m4rhfevc__t	//
+m4rhfevc__u	//
+m4rhfevc__v	//
+m4rhfevc__w	//
+m4rhfevc__x	//
+m4rhfevc__y	//
 m4nudgwc	// Nudge a Win (Concept)
 m4pulwnc	// Pull-a-Win (Concept)
+m4pulwnc__a	//
+m4pulwnc__b	//
+m4pulwnc__c	//
+m4pulwnc__d	//
+m4pulwnc__e	//
+m4pulwnc__f	//
+m4pulwnc__g	//
+m4pulwnc__h	//
+m4pulwnc__i	//
+m4pulwnc__j	//
+m4pulwnc__k	//
+m4pulwnc__l	//
+m4pulwnc__m	//
+m4pulwnc__n	//
+m4pulwnc__o	//
+m4pulwnc__p	//
+m4pulwnc__q	//
+m4pulwnc__r	//
+m4pulwnc__s	//
+m4pulwnc__t	//
+m4pulwnc__u	//
+m4pulwnc__v	//
+m4pulwnc__w	//
+m4pulwnc__x	//
+m4pulwnc__y	//
+m4pulwnc__z	//
+m4pulwnc__0	//
+m4pulwnc__1	//
+m4pulwnc__2	//
+m4pulwnc__3	//
+m4pulwnc__4	//
 m4spnwnc	// Spin-A-Win (Concept)
 
 /* Empire */
@@ -22946,10 +23060,50 @@ m4spotln	// Spotlight (Nova)
 m4sdquid	// Sundance Quid (Qps)
 m4tornad	// Tornado (Qps - Mazooma)
 m4vivan		// Viva Las Vegas (Nova)
+m4blsbys		// Blues Boys (Bwb)
+m4blsbys__a		//
+m4blsbys__b		//
+m4blsbys__c		//
+m4blsbys__d		//
+m4blsbys__e		//
+m4blsbys__f		//
+m4blsbys__g		//
+m4blsbys__h		//
+m4blsbys__i		//
+m4blsbys__j		//
+m4blsbys__k		//
+m4blsbys__l		//
+m4blsbys__m		//
+m4blsbys__n		//
+m4blsbys__o		//
+m4blsbys__p		//
+m4blsbys__q		//
+m4blsbys__r		//
+m4blsbys__s		//
+m4blsbys__t		//
+m4blsbys__u		//
+m4blsbys__v		//
+m4blsbys__w		//
+m4blsbys__x		//
+m4blsbys__y		//
+m4blsbys__z		//
+m4blsbys__0		//
+m4blsbys__1		//
+m4blsbys__2		//
+m4blsbys__3		//
+m4blsbys__4		//
+m4blsbys__5		//
+m4blsbys__6		//
+m4blsbys__7		//
+m4blsbys__8		//
+m4blsbys__9		//
+m4blsbys__aa	//
+m4blsbys__ab	//
+m4blsbys__ac	//
+m4blsbys__ad	//
 
 /* Unsorted */
 
-m4blsbys	// Blues Boys (Version 6)
 m4conn4		// Connect 4
 
 m4surf		// Super Surfin' (Gemini)
@@ -23051,7 +23205,70 @@ m4trg__2	//
 m4trg__3	//
 m4trg__4	//
 
-m4mbel
+m4mbel		//
+m4mbel__a	//
+m4mbel__b	//
+m4mbel__c	//
+m4mbel__d	//
+m4mbel__e	//
+m4mbel__f	//
+m4mbel__g	//
+m4mbel__h	//
+m4mbel__i	//
+m4mbel__j	//
+m4mbel__k	//
+m4mbel__l	//
+m4mbel__m	//
+m4mbel__n	//
+m4mbel__o	//
+m4mbel__p	//
+m4mbel__q	//
+m4mbel__r	//
+m4mbel__s	//
+m4mbel__t	//
+m4mbel__u	//
+m4mbel__v	//
+m4mbel__w	//
+m4mbel__x	//
+m4mbel__y	//
+m4mbel__z	//
+m4mbel__0	//
+m4mbel__1	//
+m4mbel__2	//
+m4mbel__3	//
+m4mbel__4	//
+m4mbel__5	//
+m4mbel__6	//
+m4mbel__7	//
+m4mbel__8	//
+m4mbel__9	//
+m4mbel__aa	//
+m4mbel__ab	//
+m4mbel__ac	//
+m4mbel__ad	//
+m4mbel__ae	//
+m4mbel__af	//
+m4mbel__ag	//
+m4mbel__ah	//
+m4mbel__ai	//
+m4mbel__aj	//
+m4mbel__ak	//
+m4mbel__al	//
+m4mbel__am	//
+m4mbel__an	//
+m4mbel__ao	//
+m4mbel__ap	//
+m4mbel__aq	//
+m4mbel__ar	//
+m4mbel__as	//
+m4mbel__at	//
+m4mbel__au	//
+m4mbel__av	//
+m4mbel__aw	//
+m4mbel__ax	//
+m4mbel__ay	//
+m4mbel__az	//
+m4mbel__a0	//
 m4abeaut		//
 m4abeaut_1		//
 m4abeaut_2		//
@@ -23282,6 +23499,73 @@ m4rmtpd__ak	//
 m4rmtpd__al	//
 m4rmtpd__am	//
 m4cmont
+m4cmont_1	//
+m4cmont_2	//
+m4cmont_3	//
+m4cmont_4	//
+m4cmont_5	//
+m4cmont_6	//
+m4cmont_7	//
+m4cmont_8	//
+m4cmont_9	//
+m4cmont_10	//
+m4cmont_11	//
+m4cmont_12	//
+m4cmont_13	//
+m4cmont_u1	//
+m4cmont_u2	//
+m4cmont_u3	//
+m4cmont_u4	//
+m4cmont_u5	//
+m4cmont_u6	//
+m4cmont_u7	//
+m4cmont_u8	//
+m4cmont_u9	//
+m4cmont_u10	//
+m4cmont_u11	//
+m4cmont_u12	//
+m4cmont_u13	//
+m4cmont_u14	//
+m4cmont_u15	//
+m4cmont_u16	//
+m4cmont_u17	//
+m4cmont_u18	//
+m4cmont_u19	//
+m4cmont_u20	//
+m4cmont_u21	//
+m4cmont_u22	//
+m4cmont_u23	//
+m4cmont_u24	//
+m4cmont_u25	//
+m4cmont_u26	//
+m4cmont_u27	//
+m4cmont_l1	//
+m4cmont_l2	//
+m4cmont_l3	//
+m4cmont_l4	//
+m4cmont_l5	//
+m4cmont_l6	//
+m4cmont_l7	//
+m4cmont_l8	//
+m4cmont_l9	//
+m4cmont_l10	//
+m4cmont_l11	//
+m4cmont_l12	//
+m4cmont_l13	//
+m4cmont_l14	//
+m4cmont_l15	//
+m4cmont_l16	//
+m4cmont_r1	//
+m4cmont_r2	//
+m4cmont_r3	//
+m4cmont_r4	//
+m4cmont_r5	//
+m4cmont_r6	//
+m4cmont_r7	//
+m4cmont_r8	//
+m4cmont_gt1	//
+m4cmont_gt2	//
+m4cmont_gt3	//
 m4blkmgc
 m4amalad
 m4bben

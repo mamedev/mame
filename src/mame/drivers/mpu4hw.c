@@ -454,13 +454,20 @@ static MACHINE_RESET( mpu4 )
 	state->m_chr_value		= 0;
 
 
-	/* init rom bank, some games don't set this, and will assume bank 0,set 0 */
 	{
 		UINT8 *rom = state->memregion("maincpu")->base();
+		size_t romsize = state->memregion("maincpu")->bytes();
+
+		int numbanks = romsize / 0x10000;
 
 		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
-		state->membank("bank1")->set_entry(0);
+		// some Bwb games must default to the last bank, does anything not like this
+		// behavior?
+		// some Bwb games don't work anyway tho, they seem to dislike something else
+		// about the way the regular banking behaves, not related to the CB2 stuff
+		state->membank("bank1")->set_entry(numbanks-1);
+
 		machine.device("maincpu")->reset();
 	}
 }
@@ -502,8 +509,9 @@ used in some cabinets instead of the main control.
 */
 WRITE8_MEMBER(mpu4_state::bankswitch_w)
 {
-//  printf("bank %02x\n", data);
+//	printf("bankswitch_w %02x\n", data);
 
+	// m_pageset is never even set??
 	m_pageval = (data & 0x03);
 	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
@@ -517,6 +525,11 @@ READ8_MEMBER(mpu4_state::bankswitch_r)
 
 WRITE8_MEMBER(mpu4_state::bankset_w)
 {
+
+//	printf("bankset_w %02x\n", data);
+
+	// m_pageset is never even set??
+
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
 	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
@@ -1513,6 +1526,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 	//Some BWB games use this to drive the bankswitching
 	if (m_bwb_bank)
 	{
+		//printf("pia_gb_cb2_w %d\n", state);
 		m_pageval = state;
 		membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 	}

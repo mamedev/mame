@@ -445,212 +445,178 @@ M4RMTPD_SET( 199?, m4rmtpd__al,	m4rmtpd,	"rduha511.bin", 0x0000, 0x010000, CRC(8
 M4RMTPD_SET( 199?, m4rmtpd__am,	m4rmtpd,	"rduhb511.bin", 0x0000, 0x010000, CRC(2b65eb19) SHA1(b00543b74ad5262b85f66f5e8cfdaee351f62f23), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 50)" )
 
 
+#define M4MBEL_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing */ \
 
 
-ROM_START( m4mbel )
-	ROM_REGION( 0x200000, "maincpu", 0 )
+#define M4MBEL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4MBEL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
 
-	// orig
-	ROM_LOAD( "mb3.1.1", 0x0000, 0x020000, CRC(acd2faac) SHA1(fea7e21089ebba3eb1137f86852996fc1b38a395) )
-	ROM_LOAD( "mb3.1cb", 0x0000, 0x020000, CRC(3cbf72fb) SHA1(869faded810b2be6e8cdb9f159ac659e7f2af074) )
-	ROM_LOAD( "mb3.1s.1s", 0x0000, 0x010000, CRC(f3c122a4) SHA1(e72c389bab09baf7b03911ce172dd05e0a2f0154) )
-	ROM_LOAD( "mb31cbs", 0x0000, 0x010000, CRC(65839202) SHA1(9bc8b54e3ac3273a65fe08066e679f73cb22784e) )
-	// old
-	ROM_LOAD( "mb1.4b", 0x0000, 0x020000, CRC(89b1d56e) SHA1(ec45a6b6987b7c5048d9cb83cbd477807bae737b) )
-	ROM_LOAD( "mb1.4p", 0x0000, 0x020000, CRC(d76c717d) SHA1(0865245fb21ea51f7863815e6ac36abb4ef31bec) )
-	ROM_LOAD( "mb1.4pc", 0x0000, 0x020000, CRC(f70c3d82) SHA1(c28ee358217dc94e8b722648c81ff49bd2800dfc) )
-	ROM_LOAD( "mb1.4pk", 0x0000, 0x020000, CRC(52d06243) SHA1(96d4eca4b25d06f1efa1f73a529877c7462fd477) )
-	ROM_LOAD( "mb1.4po", 0x0000, 0x020000, CRC(bed2897d) SHA1(b64b92c7b33ed69354eb2a5c2257424c698a3ec9) )
-	ROM_LOAD( "mb1.4pp", 0x0000, 0x020000, CRC(f653a0e2) SHA1(13b2ee53b092b820f9e86583d760a0bc4de5967e) )
-	ROM_LOAD( "mb1.4ps", 0x0000, 0x020000, CRC(f653a0e2) SHA1(13b2ee53b092b820f9e86583d760a0bc4de5967e) )
-	ROM_LOAD( "mb1.5pc", 0x0000, 0x020000, CRC(f972f856) SHA1(727c9033bb764523f2507aad962ecdd1eb1f1c76) )
-	ROM_LOAD( "mb1.5pk", 0x0000, 0x020000, CRC(fae8e88f) SHA1(c80ac974694fb0cd2b8420ba3c6ef3a45c54cecf) )
-	ROM_LOAD( "mb14pks", 0x0000, 0x020000, CRC(d061968e) SHA1(96ec79f065ddeefb0e3c71594afe366435b47d79) )
-	ROM_LOAD( "mbl2.1b", 0x0000, 0x020000, CRC(5cab8008) SHA1(8b69836657a756c84399dc7d867792eddbbc4d96) )
-	ROM_LOAD( "mbp2.2po", 0x0000, 0x020000, CRC(7b90836f) SHA1(fb20bf53f2d4878ebb5619637b2449b539f7d99b) )
-	ROM_LOAD( "mbpl3.2c", 0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec) )
-	ROM_LOAD( "mbplv2.2b", 0x0000, 0x020000, CRC(96ea5593) SHA1(c2208e90737a4bc15b235daa7e5a15cc7d953feb) )
-	ROM_LOAD( "mbpu11bs", 0x0000, 0x020000, CRC(e02dba46) SHA1(147bddee1c4a534efb494052f1aba0d36b904ec4) )
-	ROM_LOAD( "mbpv2.2b", 0x0000, 0x020000, CRC(543a28ce) SHA1(3a9d45c697b769294d5421bb467ce7436b498ec2) )
-	ROM_LOAD( "mbpv2.2p", 0x0000, 0x020000, CRC(223b5cb8) SHA1(3196a0bc0e812b4282eb21d2f75776523ac0a17c) )
-	ROM_LOAD( "mb1.1k", 0x0000, 0x020000, CRC(00763b37) SHA1(2314ea5e8541e2be2492135785317f4fdd998692) )
-	ROM_LOAD( "mb1.1kw", 0x0000, 0x010000, CRC(d1ccefe4) SHA1(dba63d0a75fe614e77ac24ae23bfd0d924dd3e9a) )
-	// new
-	ROM_LOAD( "mb1.2k", 0x0000, 0x020000, CRC(a84eb1fb) SHA1(3b6bcfa8ae29796fd2effd7c9e5a95c5ba38ec7c) )
-	ROM_LOAD( "mb1.2kw", 0x0000, 0x020000, CRC(b4f0c93e) SHA1(3432c5a2c5091f311a981f819f4f4b7af63e041b) )
-	ROM_LOAD( "mb1.5", 0x0000, 0x020000, CRC(719623b5) SHA1(fdd56de9990d82b8630c1d71f5ef4dfaedc43b96) )
-	ROM_LOAD( "mb1.5b", 0x0000, 0x020000, CRC(21895fa2) SHA1(07d9fe42d71af962a1ba9a005cfd5f44773ebde4) )
-	ROM_LOAD( "mb1.5i", 0x0000, 0x020000, CRC(7cfcfc60) SHA1(d902e735634d5e4f6fa4fc73ddc88bfbbbe27d4b) )
-	ROM_LOAD( "mb1.5is", 0x0000, 0x010000, CRC(2503da02) SHA1(216454810187dfdd1eb4c97e38ab19572a523b70) )
-	ROM_LOAD( "mb1.5p", 0x0000, 0x020000, CRC(ee7ee9a3) SHA1(cbf39b97ecb7a1098416d06fd8e3128a6a3a203f) )
-	ROM_LOAD( "mb1.5pc_alt", 0x0000, 0x020000, CRC(fbe129f0) SHA1(d65dbd129983966752d7b87e40b58c149fcc9f1f) )
-	ROM_LOAD( "mb1.5pk_alt", 0x0000, 0x020000, CRC(47194d12) SHA1(120bd07d92c684f8351920ba1ea1c2c8c0dcd9fb) )
-	ROM_LOAD( "mb3.1", 0x0000, 0x020000, CRC(acd2faac) SHA1(fea7e21089ebba3eb1137f86852996fc1b38a395) )
-	ROM_LOAD( "mb3.1cb", 0x0000, 0x020000, CRC(3cbf72fb) SHA1(869faded810b2be6e8cdb9f159ac659e7f2af074) )
-	ROM_LOAD( "mbl2.2b", 0x0000, 0x020000, CRC(f4930ac4) SHA1(2218764397821d2be6de02f54fd9df299c21359a) )
-	ROM_LOAD( "mbp0.2r", 0x0000, 0x020000, CRC(bd107631) SHA1(2d01a16bb339bbd1d65f83416b83d5f3f4b0fe93) )
-	ROM_LOAD( "mbp1.1r.1_alt", 0x0000, 0x020000, CRC(9b4becba) SHA1(c8f8c370dcec624bfc0f68463c0e3e317e084994) )
-	ROM_LOAD( "mbp2.1rc.1_alt", 0x0000, 0x020000, CRC(0b2664ed) SHA1(100fa8f637124ce58b5dfa431ea50e93cb4bb57e) )
-	ROM_LOAD( "mbp2.3i", 0x0000, 0x020000, CRC(8048d05f) SHA1(373a275e9c715263dac6d5bee35aa6bdf4177788) )
-	ROM_LOAD( "mbp2.3is", 0x0000, 0x010000, CRC(5fe13c3f) SHA1(bc4f609745b992f73410c8e0bc018824008773b9) )
-	ROM_LOAD( "mbp2.3pc", 0x0000, 0x020000, CRC(994ee429) SHA1(ae6c3df90a4248f0f8fb86348bba726d983cda48) )
-	ROM_LOAD( "mbp2.3pg", 0x0000, 0x020000, CRC(a17701c0) SHA1(2587eafee1d324bd27d267d146a03eab8594bc43) )
-	ROM_LOAD( "mbpl2.5.5", 0x0000, 0x020000, CRC(21965f32) SHA1(7b848dfd94a9c88df33e9e9858428d4f889205d6) )
-	ROM_LOAD( "mbpl3.3c", 0x0000, 0x020000, CRC(638903a8) SHA1(27f0ed58d98f8f9d5c909afdc04a4570df57161f) )
-	ROM_LOAD( "mbplv2.3b", 0x0000, 0x020000, CRC(1fed0ec0) SHA1(a9a7f5bb56b30cae552bb7f8bccdabf1651921af) )
-	ROM_LOAD( "mbplv2.3v", 0x0000, 0x020000, CRC(3ed2df5f) SHA1(a81dfac3c1a913c3b278a178ca653702cbfaa91d) )
-	ROM_LOAD( "mbplv2.5.5", 0x0000, 0x020000, CRC(21965f32) SHA1(7b848dfd94a9c88df33e9e9858428d4f889205d6) )
-	ROM_LOAD( "mbplv25v", 0x0000, 0x020000, CRC(00a98ead) SHA1(c7811385552e2effbe39538ef15f341504e297c6) )
-	ROM_LOAD( "mbpu0.4", 0x0000, 0x020000, CRC(cf1deb23) SHA1(634be8ceaf2b15c02d3460cb239226c750ff7446) )
-	ROM_LOAD( "mbpu2.3", 0x0000, 0x020000, CRC(a522972b) SHA1(6692d97619250099022aa4a78259a92198c660e6) )
-	ROM_LOAD( "mbpu2.3v", 0x0000, 0x020000, CRC(841d46b4) SHA1(cc2606acf765e66ee2a8ea7d44f4339a99d1fb65) )
-	ROM_LOAD( "mbpu2.4", 0x0000, 0x020000, CRC(1bd94496) SHA1(3ce809e822796c3553cc27ab99793f2156f17e04) )
-	ROM_LOAD( "mbpu2.5", 0x0000, 0x020000, CRC(73bf7c1c) SHA1(2b92b77624c0bc6cd4986f75e143b8858f132de4) )
-	ROM_LOAD( "mbpv2.3b", 0x0000, 0x020000, CRC(dd3d739d) SHA1(1b70d71a0cf727b1ddb68d983bb0705bcc34281a) )
-	ROM_LOAD( "mbpv2.3p", 0x0000, 0x020000, CRC(f824f17a) SHA1(c1d3224f4de47e7db7064f516c941119b4434dbc) )
-	// 180101
-	ROM_LOAD( "mbpu0.3", 0x0000, 0x020000, CRC(71e6389e) SHA1(b72ea3dce8ccd83bbb03e545d0e3441bae5ff0fb) )
-	ROM_LOAD( "mbpu0.3v", 0x0000, 0x020000, CRC(50d9e901) SHA1(57e8a4271c3287b80d5db9b03a571d880f974181) )
-	ROM_LOAD( "mbpu0.4", 0x0000, 0x020000, CRC(cf1deb23) SHA1(634be8ceaf2b15c02d3460cb239226c750ff7446) )
-	ROM_LOAD( "mbpv0.3b", 0x0000, 0x020000, CRC(09f9dc28) SHA1(998d82f8cf353778f2e81b117809dc059b0a9b80) )
-	ROM_LOAD( "mbpv0.3p", 0x0000, 0x020000, CRC(2ce05ecf) SHA1(a9d9b36f28622ddb4444ec72a21fb50063b1fa7c) )
-	ROM_LOAD( "mbp0.1r", 0x0000, 0x020000, CRC(369cebf6) SHA1(a576d1b6c4a4aba6aab75dbd250fce5500d7f657) )
-	// VLADMIR
-	ROM_LOAD( "mbp1.1r.1", 0x0000, 0x020000, CRC(ba743d25) SHA1(b2d0f3058ad202f0d58e08eb66a5ba3efc7bb67b) )
-	ROM_LOAD( "mbp2.1rc.1", 0x0000, 0x020000, CRC(2a19b572) SHA1(98d7831d897f14633f8335cb343bf6d1e9d00328) )
-	ROM_LOAD( "mbpu0.5", 0x0000, 0x020000, CRC(449176e4) SHA1(937f391d1bc12def836a6d128a4d15f994a198b9) )
-	ROM_LOAD( "mbpu2.4v", 0x0000, 0x020000, CRC(3ae69509) SHA1(9b0f160734102d8d0c2f91c3ebe039738fe3b017) )
-	ROM_LOAD( "mbpu2.5v", 0x0000, 0x020000, CRC(f81b831b) SHA1(734950b9fadd956bc16b927c05296a9346e0927a) )
-	// misc
-	ROM_LOAD( "mb1.3b", 0x0000, 0x020000, CRC(8650d0d5) SHA1(089ab315e97c7ff1d898357b2d083fe33bb7a329) )
-	ROM_LOAD( "mb1.4b", 0x0000, 0x020000, CRC(89b1d56e) SHA1(ec45a6b6987b7c5048d9cb83cbd477807bae737b) )
-	ROM_LOAD( "mb1.4p", 0x0000, 0x020000, CRC(d76c717d) SHA1(0865245fb21ea51f7863815e6ac36abb4ef31bec) )
-	ROM_LOAD( "mb1.4po", 0x0000, 0x020000, CRC(bed2897d) SHA1(b64b92c7b33ed69354eb2a5c2257424c698a3ec9) )
-	ROM_LOAD( "mbp2.2po", 0x0000, 0x020000, CRC(7b90836f) SHA1(fb20bf53f2d4878ebb5619637b2449b539f7d99b) )
-	ROM_LOAD( "mbplv2.2b_alt", 0x0000, 0x020000, CRC(eca1600a) SHA1(ae1eb4587172c64d24737e6564bb8b423155b84d) )
-	ROM_LOAD( "mbpv2.2b", 0x0000, 0x020000, CRC(543a28ce) SHA1(3a9d45c697b769294d5421bb467ce7436b498ec2) )
-	ROM_LOAD( "mbpv2.2p", 0x0000, 0x020000, CRC(223b5cb8) SHA1(3196a0bc0e812b4282eb21d2f75776523ac0a17c) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
+
+M4MBEL_SET( 199?, m4mbel,		0,		"mb1.1k",			0x0000, 0x020000, CRC(00763b37) SHA1(2314ea5e8541e2be2492135785317f4fdd998692), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 1)" )
+M4MBEL_SET( 199?, m4mbel__a,	m4mbel,	"mb1.1kw",			0x0000, 0x010000, CRC(d1ccefe4) SHA1(dba63d0a75fe614e77ac24ae23bfd0d924dd3e9a), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 2)" )
+M4MBEL_SET( 199?, m4mbel__b,	m4mbel,	"mb1.3b",			0x0000, 0x020000, CRC(8650d0d5) SHA1(089ab315e97c7ff1d898357b2d083fe33bb7a329), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 3)" )
+M4MBEL_SET( 199?, m4mbel__c,	m4mbel,	"mb1.2k",			0x0000, 0x020000, CRC(a84eb1fb) SHA1(3b6bcfa8ae29796fd2effd7c9e5a95c5ba38ec7c), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 4)" )
+M4MBEL_SET( 199?, m4mbel__d,	m4mbel,	"mb1.2kw",			0x0000, 0x020000, CRC(b4f0c93e) SHA1(3432c5a2c5091f311a981f819f4f4b7af63e041b), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 5)" )
+M4MBEL_SET( 199?, m4mbel__e,	m4mbel,	"mb1.4b",			0x0000, 0x020000, CRC(89b1d56e) SHA1(ec45a6b6987b7c5048d9cb83cbd477807bae737b), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 6)" )
+M4MBEL_SET( 199?, m4mbel__f,	m4mbel,	"mb1.4p",			0x0000, 0x020000, CRC(d76c717d) SHA1(0865245fb21ea51f7863815e6ac36abb4ef31bec), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 7)" )
+M4MBEL_SET( 199?, m4mbel__g,	m4mbel,	"mb1.4pc",			0x0000, 0x020000, CRC(f70c3d82) SHA1(c28ee358217dc94e8b722648c81ff49bd2800dfc), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 8)" )
+M4MBEL_SET( 199?, m4mbel__h,	m4mbel,	"mb1.4pk",			0x0000, 0x020000, CRC(52d06243) SHA1(96d4eca4b25d06f1efa1f73a529877c7462fd477), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 9)" )
+M4MBEL_SET( 199?, m4mbel__i,	m4mbel,	"mb14pks",			0x0000, 0x020000, CRC(d061968e) SHA1(96ec79f065ddeefb0e3c71594afe366435b47d79), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 10)" )
+M4MBEL_SET( 199?, m4mbel__j,	m4mbel,	"mb1.4po",			0x0000, 0x020000, CRC(bed2897d) SHA1(b64b92c7b33ed69354eb2a5c2257424c698a3ec9), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 11)" )
+M4MBEL_SET( 199?, m4mbel__k,	m4mbel,	"mb1.4pp",			0x0000, 0x020000, CRC(f653a0e2) SHA1(13b2ee53b092b820f9e86583d760a0bc4de5967e), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 12)" )
+M4MBEL_SET( 199?, m4mbel__l,	m4mbel,	"mb1.4ps",			0x0000, 0x020000, CRC(f653a0e2) SHA1(13b2ee53b092b820f9e86583d760a0bc4de5967e), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 13)" )
+M4MBEL_SET( 199?, m4mbel__m,	m4mbel,	"mb1.5pc",			0x0000, 0x020000, CRC(f972f856) SHA1(727c9033bb764523f2507aad962ecdd1eb1f1c76), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 14)" )
+M4MBEL_SET( 199?, m4mbel__n,	m4mbel,	"mb1.5pk",			0x0000, 0x020000, CRC(fae8e88f) SHA1(c80ac974694fb0cd2b8420ba3c6ef3a45c54cecf), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 15)" )
+M4MBEL_SET( 199?, m4mbel__o,	m4mbel,	"mb1.5",			0x0000, 0x020000, CRC(719623b5) SHA1(fdd56de9990d82b8630c1d71f5ef4dfaedc43b96), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 16)" )
+M4MBEL_SET( 199?, m4mbel__p,	m4mbel,	"mb1.5b",			0x0000, 0x020000, CRC(21895fa2) SHA1(07d9fe42d71af962a1ba9a005cfd5f44773ebde4), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 17)" )
+M4MBEL_SET( 199?, m4mbel__q,	m4mbel,	"mb1.5i",			0x0000, 0x020000, CRC(7cfcfc60) SHA1(d902e735634d5e4f6fa4fc73ddc88bfbbbe27d4b), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 18)" )
+M4MBEL_SET( 199?, m4mbel__r,	m4mbel,	"mb1.5is",			0x0000, 0x010000, CRC(2503da02) SHA1(216454810187dfdd1eb4c97e38ab19572a523b70), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 19)" )
+M4MBEL_SET( 199?, m4mbel__s,	m4mbel,	"mb1.5p",			0x0000, 0x020000, CRC(ee7ee9a3) SHA1(cbf39b97ecb7a1098416d06fd8e3128a6a3a203f), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 20)" )
+M4MBEL_SET( 199?, m4mbel__t,	m4mbel,	"mb1.5pc_alt",		0x0000, 0x020000, CRC(fbe129f0) SHA1(d65dbd129983966752d7b87e40b58c149fcc9f1f), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 21)" )
+M4MBEL_SET( 199?, m4mbel__u,	m4mbel,	"mb1.5pk_alt",		0x0000, 0x020000, CRC(47194d12) SHA1(120bd07d92c684f8351920ba1ea1c2c8c0dcd9fb), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 22)" )
+M4MBEL_SET( 199?, m4mbel__v,	m4mbel,	"mbl2.2b",			0x0000, 0x020000, CRC(f4930ac4) SHA1(2218764397821d2be6de02f54fd9df299c21359a), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 23)" )
+M4MBEL_SET( 199?, m4mbel__w,	m4mbel,	"mbl2.1b",			0x0000, 0x020000, CRC(5cab8008) SHA1(8b69836657a756c84399dc7d867792eddbbc4d96), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 24)" )
+M4MBEL_SET( 199?, m4mbel__x,	m4mbel,	"mb3.1cb",			0x0000, 0x020000, CRC(3cbf72fb) SHA1(869faded810b2be6e8cdb9f159ac659e7f2af074), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 25)" )
+M4MBEL_SET( 199?, m4mbel__y,	m4mbel,	"mb3.1s",			0x0000, 0x010000, CRC(f3c122a4) SHA1(e72c389bab09baf7b03911ce172dd05e0a2f0154), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 26)" )
+M4MBEL_SET( 199?, m4mbel__z,	m4mbel,	"mb31cbs",			0x0000, 0x010000, CRC(65839202) SHA1(9bc8b54e3ac3273a65fe08066e679f73cb22784e), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 27)" )
+M4MBEL_SET( 199?, m4mbel__0,	m4mbel,	"mb3.1",			0x0000, 0x020000, CRC(acd2faac) SHA1(fea7e21089ebba3eb1137f86852996fc1b38a395), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 28)" )
+M4MBEL_SET( 199?, m4mbel__1,	m4mbel,	"mbp0.1r",			0x0000, 0x020000, CRC(369cebf6) SHA1(a576d1b6c4a4aba6aab75dbd250fce5500d7f657), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 29)" )
+M4MBEL_SET( 199?, m4mbel__2,	m4mbel,	"mbp0.2r",			0x0000, 0x020000, CRC(bd107631) SHA1(2d01a16bb339bbd1d65f83416b83d5f3f4b0fe93), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 30)" )
+M4MBEL_SET( 199?, m4mbel__3,	m4mbel,	"mbpu0.3",			0x0000, 0x020000, CRC(71e6389e) SHA1(b72ea3dce8ccd83bbb03e545d0e3441bae5ff0fb), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 31)" )
+M4MBEL_SET( 199?, m4mbel__4,	m4mbel,	"mbpu0.3v",			0x0000, 0x020000, CRC(50d9e901) SHA1(57e8a4271c3287b80d5db9b03a571d880f974181), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 32)" )
+M4MBEL_SET( 199?, m4mbel__5,	m4mbel,	"mbpv0.3b",			0x0000, 0x020000, CRC(09f9dc28) SHA1(998d82f8cf353778f2e81b117809dc059b0a9b80), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 33)" )
+M4MBEL_SET( 199?, m4mbel__6,	m4mbel,	"mbpv0.3p",			0x0000, 0x020000, CRC(2ce05ecf) SHA1(a9d9b36f28622ddb4444ec72a21fb50063b1fa7c), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 34)" )
+M4MBEL_SET( 199?, m4mbel__7,	m4mbel,	"mbpu0.4",			0x0000, 0x020000, CRC(cf1deb23) SHA1(634be8ceaf2b15c02d3460cb239226c750ff7446), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 35)" )
+M4MBEL_SET( 199?, m4mbel__8,	m4mbel,	"mbpu0.5",			0x0000, 0x020000, CRC(449176e4) SHA1(937f391d1bc12def836a6d128a4d15f994a198b9), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 36)" )
+M4MBEL_SET( 199?, m4mbel__9,	m4mbel,	"mbp1.1r.1",		0x0000, 0x020000, CRC(ba743d25) SHA1(b2d0f3058ad202f0d58e08eb66a5ba3efc7bb67b), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 37)" )
+M4MBEL_SET( 199?, m4mbel__aa,	m4mbel,	"mbp1.1r.1_alt",	0x0000, 0x020000, CRC(9b4becba) SHA1(c8f8c370dcec624bfc0f68463c0e3e317e084994), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 38)" )
+M4MBEL_SET( 199?, m4mbel__ab,	m4mbel,	"mbpu11bs",			0x0000, 0x020000, CRC(e02dba46) SHA1(147bddee1c4a534efb494052f1aba0d36b904ec4), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 39)" )
+M4MBEL_SET( 199?, m4mbel__ac,	m4mbel,	"mbp2.1rc.1",		0x0000, 0x020000, CRC(2a19b572) SHA1(98d7831d897f14633f8335cb343bf6d1e9d00328), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 40)" )
+M4MBEL_SET( 199?, m4mbel__ad,	m4mbel,	"mbp2.1rc.1_alt",	0x0000, 0x020000, CRC(0b2664ed) SHA1(100fa8f637124ce58b5dfa431ea50e93cb4bb57e), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 41)" )
+M4MBEL_SET( 199?, m4mbel__ae,	m4mbel,	"mbp2.2po",			0x0000, 0x020000, CRC(7b90836f) SHA1(fb20bf53f2d4878ebb5619637b2449b539f7d99b), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 42)" )
+M4MBEL_SET( 199?, m4mbel__af,	m4mbel,	"mbplv2.2b",		0x0000, 0x020000, CRC(96ea5593) SHA1(c2208e90737a4bc15b235daa7e5a15cc7d953feb), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 43)" )
+M4MBEL_SET( 199?, m4mbel__ag,	m4mbel,	"mbplv2.2b_alt",	0x0000, 0x020000, CRC(eca1600a) SHA1(ae1eb4587172c64d24737e6564bb8b423155b84d), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 44)" )
+M4MBEL_SET( 199?, m4mbel__ah,	m4mbel,	"mbpv2.2b",			0x0000, 0x020000, CRC(543a28ce) SHA1(3a9d45c697b769294d5421bb467ce7436b498ec2), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 45)" )
+M4MBEL_SET( 199?, m4mbel__ai,	m4mbel,	"mbpv2.2p",			0x0000, 0x020000, CRC(223b5cb8) SHA1(3196a0bc0e812b4282eb21d2f75776523ac0a17c), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 46)" )
+M4MBEL_SET( 199?, m4mbel__aj,	m4mbel,	"mbplv2.3b",		0x0000, 0x020000, CRC(1fed0ec0) SHA1(a9a7f5bb56b30cae552bb7f8bccdabf1651921af), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 47)" )
+M4MBEL_SET( 199?, m4mbel__ak,	m4mbel,	"mbplv2.3v",		0x0000, 0x020000, CRC(3ed2df5f) SHA1(a81dfac3c1a913c3b278a178ca653702cbfaa91d), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 48)" )
+M4MBEL_SET( 199?, m4mbel__al,	m4mbel,	"mbp2.3i",			0x0000, 0x020000, CRC(8048d05f) SHA1(373a275e9c715263dac6d5bee35aa6bdf4177788), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 49)" )
+M4MBEL_SET( 199?, m4mbel__am,	m4mbel,	"mbp2.3is",			0x0000, 0x010000, CRC(5fe13c3f) SHA1(bc4f609745b992f73410c8e0bc018824008773b9), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 50)" )
+M4MBEL_SET( 199?, m4mbel__an,	m4mbel,	"mbp2.3pc",			0x0000, 0x020000, CRC(994ee429) SHA1(ae6c3df90a4248f0f8fb86348bba726d983cda48), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 51)" )
+M4MBEL_SET( 199?, m4mbel__ao,	m4mbel,	"mbp2.3pg",			0x0000, 0x020000, CRC(a17701c0) SHA1(2587eafee1d324bd27d267d146a03eab8594bc43), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 52)" )
+M4MBEL_SET( 199?, m4mbel__ap,	m4mbel,	"mbpv2.3b",			0x0000, 0x020000, CRC(dd3d739d) SHA1(1b70d71a0cf727b1ddb68d983bb0705bcc34281a), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 53)" )
+M4MBEL_SET( 199?, m4mbel__aq,	m4mbel,	"mbpv2.3p",			0x0000, 0x020000, CRC(f824f17a) SHA1(c1d3224f4de47e7db7064f516c941119b4434dbc), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 54)" )
+M4MBEL_SET( 199?, m4mbel__ar,	m4mbel,	"mbpu2.3",			0x0000, 0x020000, CRC(a522972b) SHA1(6692d97619250099022aa4a78259a92198c660e6), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 55)" )
+M4MBEL_SET( 199?, m4mbel__as,	m4mbel,	"mbpu2.3v",			0x0000, 0x020000, CRC(841d46b4) SHA1(cc2606acf765e66ee2a8ea7d44f4339a99d1fb65), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 56)" )
+M4MBEL_SET( 199?, m4mbel__at,	m4mbel,	"mbpu2.4",			0x0000, 0x020000, CRC(1bd94496) SHA1(3ce809e822796c3553cc27ab99793f2156f17e04), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 57)" )
+M4MBEL_SET( 199?, m4mbel__au,	m4mbel,	"mbpu2.4v",			0x0000, 0x020000, CRC(3ae69509) SHA1(9b0f160734102d8d0c2f91c3ebe039738fe3b017), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 58)" )
+M4MBEL_SET( 199?, m4mbel__av,	m4mbel,	"mbpl2.5.5",		0x0000, 0x020000, CRC(21965f32) SHA1(7b848dfd94a9c88df33e9e9858428d4f889205d6), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 59)" )
+M4MBEL_SET( 199?, m4mbel__aw,	m4mbel,	"mbplv25v",			0x0000, 0x020000, CRC(00a98ead) SHA1(c7811385552e2effbe39538ef15f341504e297c6), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 60)" )
+M4MBEL_SET( 199?, m4mbel__ax,	m4mbel,	"mbpu2.5",			0x0000, 0x020000, CRC(73bf7c1c) SHA1(2b92b77624c0bc6cd4986f75e143b8858f132de4), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 61)" )
+M4MBEL_SET( 199?, m4mbel__ay,	m4mbel,	"mbpu2.5v",			0x0000, 0x020000, CRC(f81b831b) SHA1(734950b9fadd956bc16b927c05296a9346e0927a), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 62)" )
+M4MBEL_SET( 199?, m4mbel__az,	m4mbel,	"mbpl3.2c",			0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 63)" )
+M4MBEL_SET( 199?, m4mbel__a0,	m4mbel,	"mbpl3.3c",			0x0000, 0x020000, CRC(638903a8) SHA1(27f0ed58d98f8f9d5c909afdc04a4570df57161f), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 64)" )
 
 // Casino Monte Carlo
-
 // cb apparently stands for 'credbottom' again hinting it might be a dual unit setup
-ROM_START( m4cmont )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// cmc
-	ROM_LOAD( "cmc1.7",		0x0000, 0x020000, CRC(aaebab34) SHA1(36145b7d062ad5a740bcf326933f78274b99495c) )
-	ROM_LOAD( "cmc1.7cb",	0x0000, 0x020000, CRC(3a862363) SHA1(439a2a65d6e90ca9c09ea1115dedab4afa23f0bc) )
-	ROM_LOAD( "cmc1.8",		0x0000, 0x020000, CRC(428f8019) SHA1(2e271a4fd77f4c61678dc061ca4bcd8b15221457) )
-	ROM_LOAD( "cmc1.8cb",	0x0000, 0x020000, CRC(d2e2084e) SHA1(83e145b2d676f67f82f45460994df0e767e814e8) )
 
-	ROM_LOAD( "cmc1.9",		0x0000, 0x020000, CRC(c5a38e96) SHA1(1e8a006c5e4aa47e9155a7fec535fe2403cf5ce7) ) // unpaired
+#define M4CMONT_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "mcsnd1.dat", 0x000000, 0x080000, CRC(9477e648) SHA1(1abefced0cf708ad035720d5e58dc7dae50de5d1) ) \
+	ROM_LOAD( "mcsnd2.dat", 0x080000, 0x080000, CRC(088796bd) SHA1(877bf21add8ef95f5384a88e1287bd9aa5dbfa95) ) \
+  
 
-	ROM_LOAD( "cmc2.5",		0x0000, 0x020000, CRC(528fc2a1) SHA1(2e815214bf627f22fe81705a973c48ff1af6bc52) )
-	ROM_LOAD( "cmc2.5cb",	0x0000, 0x020000, CRC(8d808c36) SHA1(784d2024569157c1e96ef0c5ad921534a10341bf) )
-	ROM_LOAD( "cmc2.6",		0x0000, 0x020000, CRC(8c453974) SHA1(b8312311c637e81247682c867a30ccfca2ba2913) )
-	ROM_LOAD( "cmc2.6cb",	0x0000, 0x020000, CRC(65e4a71b) SHA1(23aa65bbb704c1e4f5350bcdbb5b2db1e3a9ff5c) )
-
-	ROM_LOAD( "cmc2.7",		0x0000, 0x020000, CRC(0b6937fb) SHA1(8edc3a9e8dabe4bed7bc96d68dec0e9a25526a7b) ) // unpaired
-	
-	ROM_LOAD( "cmc4.1",		0x0000, 0x020000, CRC(b8a7da9f) SHA1(f4687ea3cb750393bb122b38ef3d1fe1464bb868) )
-	ROM_LOAD( "cmc4.1cb",	0x0000, 0x020000, CRC(28ca52c8) SHA1(f02a114fb39c34b3988672d5c7cae09d3c2b9067) )
-	
-	ROM_LOAD( "cmc5.1",		0x0000, 0x020000, CRC(766d63f2) SHA1(948aa7488331552c716fec4638a4cc7404f819a3) )
-	ROM_LOAD( "cmc5.1cb",	0x0000, 0x020000, CRC(9fccfd9d) SHA1(2432cb2ea23e42816474ab0b4424f427fcd9d052) )
-	
-	// cmu
-	ROM_LOAD( "cmu1.6",		0x0000, 0x020000, CRC(f059e7f6) SHA1(49b175b60a69b813055e791bbc4b5c1ffd4cc3fd) )
-	ROM_LOAD( "cmu1.6cb",	0x0000, 0x020000, CRC(60346fa1) SHA1(4235f8686c3172a78ec2349cf21b9cb808b605c6) )
-
-	ROM_LOAD( "cmu2.1",		0x0000, 0x020000, CRC(c201c172) SHA1(f8ac227d34c9e92dcb4ea2243122691bbe122230) ) // unpaired
-
-	ROM_LOAD( "cmu2.2",		0x0000, 0x020000, CRC(8b11cb80) SHA1(6a7c448496b207c5cf96e3187a18a46c66808d38) ) // unpaired
-
-	ROM_LOAD( "cmu2.3",		0x0000,	0x020000, CRC(a808151e) SHA1(2eb7a56a8b43aad7721841ac9b0f8659912f8714) )
-
-	ROM_LOAD( "cmu2.4",		0x0000, 0x020000, CRC(0ae2c103) SHA1(353b598b1e075f4c0b9aecd7c0ec1e57569671f7) )
-	ROM_LOAD( "cmu2.4cb",	0x0000, 0x020000, CRC(9a8f4954) SHA1(efb9b73d58e143a7a34660650785f2d5d7d66cfe) )
-	ROM_LOAD( "cmu2.4_alt",	0x0000, 0x020000, CRC(0a25b9d9) SHA1(4dfd34b12357e59fe088417aff3ee1ec8e39bc29) ) // wrong label?
-
-	ROM_LOAD( "cmu5.1",		0x0000, 0x020000, CRC(341ebc78) SHA1(efd3d2536d415f2502dff58abe5ee941644a3efd) )
-	ROM_LOAD( "cmu5.1cb",	0x0000, 0x020000, CRC(a473342f) SHA1(7323ec880c972a9bd89fb155a2f720ced9ae2e0b) )
-
-	ROM_LOAD( "cmu5.2",		0x0000, 0x020000, CRC(7d0eb68a) SHA1(8d3058ae37a30262963899357344e5064911cfed) )
-	ROM_LOAD( "cmu5.2cb",	0x0000, 0x020000, CRC(ed633edd) SHA1(5c82ee6283d57f00b60f10c3ecc6f1bd6ad6657b) )
-
-	ROM_LOAD( "cmu5.3",		0x0000,	0x020000, CRC(5e176814) SHA1(67fc62d45f3474065f3748c90893bc79a6aa8097) )
-	ROM_LOAD( "cmu5.3cb",	0x0000, 0x020000, CRC(ce7ae043) SHA1(714ac1ea60ad5be59a7087f9a6176d770ed14c53) )
-
-	ROM_LOAD( "cmu5.4",		0x0000, 0x020000, CRC(4495a13b) SHA1(9b4f6c12af42dde5b850cf4b65bd3baba7d4f1a0) )
-	ROM_LOAD( "cmu5.4cb",	0x0000, 0x020000, CRC(6c574c84) SHA1(18afc1a31d3edcb7985a259cc4035bccb8527ecb) )
-	ROM_LOAD( "cmu5.4h",	0x0000, 0x020000, CRC(9b51a25a) SHA1(cec9f9d9de7422d339443f75d790b4f5123c6fa2) )
-
-	ROM_LOAD( "cmu5.5",		0x0000, 0x020000, CRC(fc3ac4d3) SHA1(af951b52ca73b65e664e910427fa584266f8cf83) )
-	ROM_LOAD( "cmu5.5h",	0x0000, 0x020000, CRC(53dc93aa) SHA1(0b48d905742ca464c5018a7285db4787facf937d) )
-	ROM_LOAD( "cmu5.5k",	0x0000, 0x020000, CRC(09f69f77) SHA1(567e5a8f7d92c561152a44f3f0375ee4af46cef8) )
-
-	ROM_LOAD( "cmu5.6h",	0x0000, 0x020000, CRC(5f2b2d76) SHA1(1d313286ad19f062b0ab80eabaa07b064737f5a8) )
-
-	ROM_LOAD( "cmu5.7h",	0x0000, 0x020000, CRC(ba25a1c1) SHA1(d67c870385b21902b944211944f4712036e9ec1e) )
-
-	ROM_LOAD( "cmu5.8k",	0x0000, 0x020000, CRC(15e0b26c) SHA1(4bc931a72bc3335eee23e986da873b73c5f40925) )
-	ROM_LOAD( "cmu5.8kp",	0x0000, 0x020000, CRC(cb73a341) SHA1(fe80260eea057d64d1dfe9edf6ea0b4e6b6cdd6a) )
-	ROM_LOAD( "cmu5.9kp",	0x0000, 0x020000, CRC(7b1e568e) SHA1(13803e136d866b9ccc7b25637a47948e8251df22) )
-
-	ROM_LOAD( "cmu6.1",		0x0000, 0x020000, CRC(7775e979) SHA1(6fce6d05b5c03577c7ddb858dda91caedc5de03d) ) // unpaired
-
-	ROM_LOAD( "cmu7.1",		0x0000, 0x020000, CRC(8dcecf8c) SHA1(729aecd339b15e6d4be4e14b81379ddc22e077cf) ) // unpaired
-
-	// cml
-	ROM_LOAD( "cml2.1",		0x0000, 0x020000, CRC(4dbb6239) SHA1(6da8b37e477a8ef5fb130cf5a2e34bf795cb9f8d) )
-	ROM_LOAD( "cml2.1cb",	0x0000, 0x020000, CRC(ddd6ea6e) SHA1(bd39b32a32a50f72aad498ddc06eff56bab084d0) )
-
-	ROM_LOAD( "cml2.2",		0x0000, 0x020000, CRC(04ab68cb) SHA1(bbe7872974b2e029a2297bdcf87099abe6157a40) )
-	ROM_LOAD( "cml2.2cb",	0x0000, 0x020000, CRC(94c6e09c) SHA1(e1d91b90542ab05dc0dc1ff795cfd393145df22d) )
-
-	ROM_LOAD( "cml2.3",		0x0000, 0x020000, CRC(27b2b655) SHA1(1cca53b231484a0bafc90238387a0fcb64ed1ac6) )
-	ROM_LOAD( "cml2.3cb",	0x0000, 0x020000, CRC(b7df3e02) SHA1(8347e5612c5db0ac4a2276e9e26569171ddbc793) )
-
-	ROM_LOAD( "cml2.4",		0x0000, 0x020000, CRC(7dd24473) SHA1(8806f4ceefdbd45eb4da6dd61d2080685784a3f3) )
-	ROM_LOAD( "cml2.4cb",	0x0000, 0x020000, CRC(15f292c5) SHA1(e24b59e40cf4e4bdc86be1fe67bb5e274aae11ad) )
+#define M4CMONT_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4CMONT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
 
 
-	ROM_LOAD( "cml5.1",		0x0000, 0x020000, CRC(05d0d872) SHA1(c7658a2385756aff22594c9f8e8a3618188f476c) )
-	ROM_LOAD( "cml5.1cb",	0x0000, 0x020000, CRC(95bd5025) SHA1(5e6862af044ba0d5265b6acaa418b2b8b27e8bd4) )
+// cmc
+M4CMONT_SET( 199?, m4cmont,		0,			"cmc1.7",		0x0000, 0x020000, CRC(aaebab34) SHA1(36145b7d062ad5a740bcf326933f78274b99495c), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 1)" )
+M4CMONT_SET( 199?, m4cmont_1,	m4cmont,	"cmc1.7cb",		0x0000, 0x020000, CRC(3a862363) SHA1(439a2a65d6e90ca9c09ea1115dedab4afa23f0bc), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 2)" )
+M4CMONT_SET( 199?, m4cmont_2,	m4cmont,	"cmc1.8",		0x0000, 0x020000, CRC(428f8019) SHA1(2e271a4fd77f4c61678dc061ca4bcd8b15221457), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 3)" )
+M4CMONT_SET( 199?, m4cmont_3,	m4cmont,	"cmc1.8cb",		0x0000, 0x020000, CRC(d2e2084e) SHA1(83e145b2d676f67f82f45460994df0e767e814e8), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 4)" )
+M4CMONT_SET( 199?, m4cmont_4,	m4cmont,	"cmc1.9",		0x0000, 0x020000, CRC(c5a38e96) SHA1(1e8a006c5e4aa47e9155a7fec535fe2403cf5ce7), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 5)" ) // unpaired
+M4CMONT_SET( 199?, m4cmont_5,	m4cmont,	"cmc2.5",		0x0000, 0x020000, CRC(528fc2a1) SHA1(2e815214bf627f22fe81705a973c48ff1af6bc52), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 6)" )
+M4CMONT_SET( 199?, m4cmont_6,	m4cmont,	"cmc2.5cb",		0x0000, 0x020000, CRC(8d808c36) SHA1(784d2024569157c1e96ef0c5ad921534a10341bf), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 7)" )
+M4CMONT_SET( 199?, m4cmont_7,	m4cmont,	"cmc2.6",		0x0000, 0x020000, CRC(8c453974) SHA1(b8312311c637e81247682c867a30ccfca2ba2913), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 8)" )
+M4CMONT_SET( 199?, m4cmont_8,	m4cmont,	"cmc2.6cb",		0x0000, 0x020000, CRC(65e4a71b) SHA1(23aa65bbb704c1e4f5350bcdbb5b2db1e3a9ff5c), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 9)" )
+M4CMONT_SET( 199?, m4cmont_9,	m4cmont,	"cmc2.7",		0x0000, 0x020000, CRC(0b6937fb) SHA1(8edc3a9e8dabe4bed7bc96d68dec0e9a25526a7b), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 10)" ) // unpaired
+M4CMONT_SET( 199?, m4cmont_10,	m4cmont,	"cmc4.1",		0x0000, 0x020000, CRC(b8a7da9f) SHA1(f4687ea3cb750393bb122b38ef3d1fe1464bb868), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 11)" )
+M4CMONT_SET( 199?, m4cmont_11,	m4cmont,	"cmc4.1cb",		0x0000, 0x020000, CRC(28ca52c8) SHA1(f02a114fb39c34b3988672d5c7cae09d3c2b9067), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 12)" )
+M4CMONT_SET( 199?, m4cmont_12,	m4cmont,	"cmc5.1",		0x0000, 0x020000, CRC(766d63f2) SHA1(948aa7488331552c716fec4638a4cc7404f819a3), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 13)" )
+M4CMONT_SET( 199?, m4cmont_13,	m4cmont,	"cmc5.1cb",		0x0000, 0x020000, CRC(9fccfd9d) SHA1(2432cb2ea23e42816474ab0b4424f427fcd9d052), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Czech, set 14)" )
+// cmu
+M4CMONT_SET( 199?, m4cmont_u1,	m4cmont,	"cmu1.6",		0x0000, 0x020000, CRC(f059e7f6) SHA1(49b175b60a69b813055e791bbc4b5c1ffd4cc3fd), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 1)" )
+M4CMONT_SET( 199?, m4cmont_u2,	m4cmont,	"cmu1.6cb",		0x0000, 0x020000, CRC(60346fa1) SHA1(4235f8686c3172a78ec2349cf21b9cb808b605c6), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 2)" )
+M4CMONT_SET( 199?, m4cmont_u3,	m4cmont,	"cmu2.1",		0x0000, 0x020000, CRC(c201c172) SHA1(f8ac227d34c9e92dcb4ea2243122691bbe122230), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 3)" ) // unpaired
+M4CMONT_SET( 199?, m4cmont_u4,	m4cmont,	"cmu2.2",		0x0000, 0x020000, CRC(8b11cb80) SHA1(6a7c448496b207c5cf96e3187a18a46c66808d38), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 4)" ) // unpaired
+M4CMONT_SET( 199?, m4cmont_u5,	m4cmont,	"cmu2.3",		0x0000,	0x020000, CRC(a808151e) SHA1(2eb7a56a8b43aad7721841ac9b0f8659912f8714), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 5)" )
+M4CMONT_SET( 199?, m4cmont_u6,	m4cmont,	"cmu2.4",		0x0000, 0x020000, CRC(0ae2c103) SHA1(353b598b1e075f4c0b9aecd7c0ec1e57569671f7), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 6)" )
+M4CMONT_SET( 199?, m4cmont_u7,	m4cmont,	"cmu2.4cb",		0x0000, 0x020000, CRC(9a8f4954) SHA1(efb9b73d58e143a7a34660650785f2d5d7d66cfe), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 7)" )
+M4CMONT_SET( 199?, m4cmont_u8,	m4cmont,	"cmu2.4_alt",	0x0000, 0x020000, CRC(0a25b9d9) SHA1(4dfd34b12357e59fe088417aff3ee1ec8e39bc29), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 8)" ) // wrong label?
+M4CMONT_SET( 199?, m4cmont_u9,	m4cmont,	"cmu5.1",		0x0000, 0x020000, CRC(341ebc78) SHA1(efd3d2536d415f2502dff58abe5ee941644a3efd), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 9)" )
+M4CMONT_SET( 199?, m4cmont_u10,	m4cmont,	"cmu5.1cb",		0x0000, 0x020000, CRC(a473342f) SHA1(7323ec880c972a9bd89fb155a2f720ced9ae2e0b), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 10)" )
+M4CMONT_SET( 199?, m4cmont_u11,	m4cmont,	"cmu5.2",		0x0000, 0x020000, CRC(7d0eb68a) SHA1(8d3058ae37a30262963899357344e5064911cfed), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 11)" )
+M4CMONT_SET( 199?, m4cmont_u12,	m4cmont,	"cmu5.2cb",		0x0000, 0x020000, CRC(ed633edd) SHA1(5c82ee6283d57f00b60f10c3ecc6f1bd6ad6657b), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 12)" )
+M4CMONT_SET( 199?, m4cmont_u13,	m4cmont,	"cmu5.3",		0x0000,	0x020000, CRC(5e176814) SHA1(67fc62d45f3474065f3748c90893bc79a6aa8097), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 13)" )
+M4CMONT_SET( 199?, m4cmont_u14,	m4cmont,	"cmu5.3cb",		0x0000, 0x020000, CRC(ce7ae043) SHA1(714ac1ea60ad5be59a7087f9a6176d770ed14c53), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 14)" )
+M4CMONT_SET( 199?, m4cmont_u15,	m4cmont,	"cmu5.4",		0x0000, 0x020000, CRC(4495a13b) SHA1(9b4f6c12af42dde5b850cf4b65bd3baba7d4f1a0), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 15)" )
+M4CMONT_SET( 199?, m4cmont_u16,	m4cmont,	"cmu5.4cb",		0x0000, 0x020000, CRC(6c574c84) SHA1(18afc1a31d3edcb7985a259cc4035bccb8527ecb), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 16)" )
+M4CMONT_SET( 199?, m4cmont_u17,	m4cmont,	"cmu5.4h",		0x0000, 0x020000, CRC(9b51a25a) SHA1(cec9f9d9de7422d339443f75d790b4f5123c6fa2), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 17)" )
+M4CMONT_SET( 199?, m4cmont_u18,	m4cmont,	"cmu5.5",		0x0000, 0x020000, CRC(fc3ac4d3) SHA1(af951b52ca73b65e664e910427fa584266f8cf83), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 18)" )
+M4CMONT_SET( 199?, m4cmont_u19,	m4cmont,	"cmu5.5h",		0x0000, 0x020000, CRC(53dc93aa) SHA1(0b48d905742ca464c5018a7285db4787facf937d), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 19)" )
+M4CMONT_SET( 199?, m4cmont_u20,	m4cmont,	"cmu5.5k",		0x0000, 0x020000, CRC(09f69f77) SHA1(567e5a8f7d92c561152a44f3f0375ee4af46cef8), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 20)" )
+M4CMONT_SET( 199?, m4cmont_u21,	m4cmont,	"cmu5.6h",		0x0000, 0x020000, CRC(5f2b2d76) SHA1(1d313286ad19f062b0ab80eabaa07b064737f5a8), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 21)" )
+M4CMONT_SET( 199?, m4cmont_u22,	m4cmont,	"cmu5.7h",		0x0000, 0x020000, CRC(ba25a1c1) SHA1(d67c870385b21902b944211944f4712036e9ec1e), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 22)" )
+M4CMONT_SET( 199?, m4cmont_u23,	m4cmont,	"cmu5.8k",		0x0000, 0x020000, CRC(15e0b26c) SHA1(4bc931a72bc3335eee23e986da873b73c5f40925), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 23)" )
+M4CMONT_SET( 199?, m4cmont_u24,	m4cmont,	"cmu5.8kp",		0x0000, 0x020000, CRC(cb73a341) SHA1(fe80260eea057d64d1dfe9edf6ea0b4e6b6cdd6a), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 24)" )
+M4CMONT_SET( 199?, m4cmont_u25,	m4cmont,	"cmu5.9kp",		0x0000, 0x020000, CRC(7b1e568e) SHA1(13803e136d866b9ccc7b25637a47948e8251df22), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 25)" )
+M4CMONT_SET( 199?, m4cmont_u26,	m4cmont,	"cmu6.1",		0x0000, 0x020000, CRC(7775e979) SHA1(6fce6d05b5c03577c7ddb858dda91caedc5de03d), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 26)" ) // unpaired
+M4CMONT_SET( 199?, m4cmont_u27,	m4cmont,	"cmu7.1",		0x0000, 0x020000, CRC(8dcecf8c) SHA1(729aecd339b15e6d4be4e14b81379ddc22e077cf), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Ukraine, set 27)" ) // unpaired
+// cml
+M4CMONT_SET( 199?, m4cmont_l1,	m4cmont,	"cml2.1",		0x0000, 0x020000, CRC(4dbb6239) SHA1(6da8b37e477a8ef5fb130cf5a2e34bf795cb9f8d), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 1)" )
+M4CMONT_SET( 199?, m4cmont_l2,	m4cmont,	"cml2.1cb",		0x0000, 0x020000, CRC(ddd6ea6e) SHA1(bd39b32a32a50f72aad498ddc06eff56bab084d0), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 2)" )
+M4CMONT_SET( 199?, m4cmont_l3,	m4cmont,	"cml2.2",		0x0000, 0x020000, CRC(04ab68cb) SHA1(bbe7872974b2e029a2297bdcf87099abe6157a40), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 3)" )
+M4CMONT_SET( 199?, m4cmont_l4,	m4cmont,	"cml2.2cb",		0x0000, 0x020000, CRC(94c6e09c) SHA1(e1d91b90542ab05dc0dc1ff795cfd393145df22d), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 4)" )
+M4CMONT_SET( 199?, m4cmont_l5,	m4cmont,	"cml2.3",		0x0000, 0x020000, CRC(27b2b655) SHA1(1cca53b231484a0bafc90238387a0fcb64ed1ac6), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 5)" )
+M4CMONT_SET( 199?, m4cmont_l6,	m4cmont,	"cml2.3cb",		0x0000, 0x020000, CRC(b7df3e02) SHA1(8347e5612c5db0ac4a2276e9e26569171ddbc793), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 6)" )
+M4CMONT_SET( 199?, m4cmont_l7,	m4cmont,	"cml2.4",		0x0000, 0x020000, CRC(7dd24473) SHA1(8806f4ceefdbd45eb4da6dd61d2080685784a3f3), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 7)" )
+M4CMONT_SET( 199?, m4cmont_l8,	m4cmont,	"cml2.4cb",		0x0000, 0x020000, CRC(15f292c5) SHA1(e24b59e40cf4e4bdc86be1fe67bb5e274aae11ad), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 8)" )
+M4CMONT_SET( 199?, m4cmont_l9,	m4cmont,	"cml5.1",		0x0000, 0x020000, CRC(05d0d872) SHA1(c7658a2385756aff22594c9f8e8a3618188f476c), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 9)" )
+M4CMONT_SET( 199?, m4cmont_l10,	m4cmont,	"cml5.1cb",		0x0000, 0x020000, CRC(95bd5025) SHA1(5e6862af044ba0d5265b6acaa418b2b8b27e8bd4), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 10)" )
+M4CMONT_SET( 199?, m4cmont_l11,	m4cmont,	"cml5.2",		0x0000, 0x020000, CRC(4cc0d280) SHA1(547218c17d46b2387221bb2d6f31b3651499a36d), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 11)" )
+M4CMONT_SET( 199?, m4cmont_l12,	m4cmont,	"cml5.2cb",		0x0000, 0x020000, CRC(dcad5ad7) SHA1(de03bbd58e7514b73bac6afb6b89f5d2e7ec013b), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 12)" )
+M4CMONT_SET( 199?, m4cmont_l13,	m4cmont,	"cml5.3",		0x0000, 0x020000, CRC(6fd90c1e) SHA1(e675095e55b57dc27023be1fbfafeedd993333b7), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 13)" )
+M4CMONT_SET( 199?, m4cmont_l14,	m4cmont,	"cml5.3cb",		0x0000, 0x020000, CRC(ffb48449) SHA1(eb90a05cfcf3cd8492b6e89f7545a5edaa009824), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 14)" )
+M4CMONT_SET( 199?, m4cmont_l15,	m4cmont,	"cml5.4",		0x0000, 0x020000, CRC(cdf4a0d9) SHA1(d68afa7d9a1f04e0784e14b10e3d6df3123e8724), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 15)" )
+M4CMONT_SET( 199?, m4cmont_l16,	m4cmont,	"cml5.4cb",		0x0000, 0x020000, CRC(5d99288e) SHA1(dc69954a93cdf38232ef1cd071c3fe3ca37e4a04), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Latvia, set 16)" )
+// cmr
+M4CMONT_SET( 199?, m4cmont_r1,	m4cmont,	"cmr1.1",		0x0000, 0x020000, CRC(b7f79cb3) SHA1(a3881ddefedbf08195dcffa9fabc71021e9aeb81), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 1)" )
+M4CMONT_SET( 199?, m4cmont_r2,	m4cmont,	"cmr1.1cb",		0x0000, 0x020000, CRC(279a14e4) SHA1(6e123c6167d4e27184c8ba7c4de5645f3d0499e9), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 2)" )
+M4CMONT_SET( 199?, m4cmont_r3,	m4cmont,	"cmr1.2",		0x0000, 0x020000, CRC(fee79641) SHA1(546c73af55ba070f756d204749a0b346cfa6f2a9), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 3)" )
+M4CMONT_SET( 199?, m4cmont_r4,	m4cmont,	"cmr1.2cb",		0x0000, 0x020000, CRC(6e8a1e16) SHA1(df369265d4bd50a83fe617f85cb7e80e0e046828), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 4)" )
+M4CMONT_SET( 199?, m4cmont_r5,	m4cmont,	"cmr1.3",		0x0000, 0x020000, CRC(ddfe48df) SHA1(1ce72fbbac81d806c6823a2149cf217a3e417d7d), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 5)" )
+M4CMONT_SET( 199?, m4cmont_r6,	m4cmont,	"cmr1.3cb",		0x0000, 0x020000, CRC(4d93c088) SHA1(1b75b663f48d3e43e7e02d9c6afcfcde4813d7fc), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 6)" )
+M4CMONT_SET( 199?, m4cmont_r7,	m4cmont,	"cmr1.4",		0x0000, 0x020000, CRC(7fd3e418) SHA1(893afea31d48995f2805161a0734c870432eee03), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 7)" )
+M4CMONT_SET( 199?, m4cmont_r8,	m4cmont,	"cmr1.4cb",		0x0000, 0x020000, CRC(8003f28d) SHA1(17b7469682ca7da570897f3708dfd901dd7ff9b4), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (Russia, set 8)" )
+// misc (wrong game?)
+M4CMONT_SET( 199?, m4cmont_gt1,	m4cmont,	"gtr5.8g1",		0x0000, 0x020000, CRC(2fb54fd3) SHA1(09e93fc45ab15a655f953e2ba86411034260dfc6), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (GTR, set 1)" )
+M4CMONT_SET( 199?, m4cmont_gt2,	m4cmont,	"gtr5.8g2",		0x0000, 0x020000, CRC(f15e032c) SHA1(f44120c0635e5b1726188f52f619c57a3a6766fa), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (GTR, set 2)" )
+M4CMONT_SET( 199?, m4cmont_gt3,	m4cmont,	"gtr58gaa",		0x0000, 0x020000, CRC(ad20af25) SHA1(1a5ac760894f4441d11f0974f1d0f90fabd76bf2), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (GTR, set 3)" )
 
-	ROM_LOAD( "cml5.2",		0x0000, 0x020000, CRC(4cc0d280) SHA1(547218c17d46b2387221bb2d6f31b3651499a36d) )
-	ROM_LOAD( "cml5.2cb",	0x0000, 0x020000, CRC(dcad5ad7) SHA1(de03bbd58e7514b73bac6afb6b89f5d2e7ec013b) )
 
-	ROM_LOAD( "cml5.3",		0x0000, 0x020000, CRC(6fd90c1e) SHA1(e675095e55b57dc27023be1fbfafeedd993333b7) )
-	ROM_LOAD( "cml5.3cb",	0x0000, 0x020000, CRC(ffb48449) SHA1(eb90a05cfcf3cd8492b6e89f7545a5edaa009824) )
-
-	ROM_LOAD( "cml5.4",		0x0000, 0x020000, CRC(cdf4a0d9) SHA1(d68afa7d9a1f04e0784e14b10e3d6df3123e8724) )
-	ROM_LOAD( "cml5.4cb",	0x0000, 0x020000, CRC(5d99288e) SHA1(dc69954a93cdf38232ef1cd071c3fe3ca37e4a04) )
-
-	// cmr
-
-	ROM_LOAD( "cmr1.1",		0x0000, 0x020000, CRC(b7f79cb3) SHA1(a3881ddefedbf08195dcffa9fabc71021e9aeb81) )
-	ROM_LOAD( "cmr1.1cb",	0x0000, 0x020000, CRC(279a14e4) SHA1(6e123c6167d4e27184c8ba7c4de5645f3d0499e9) )
-
-	ROM_LOAD( "cmr1.2",		0x0000, 0x020000, CRC(fee79641) SHA1(546c73af55ba070f756d204749a0b346cfa6f2a9) )
-	ROM_LOAD( "cmr1.2cb",	0x0000, 0x020000, CRC(6e8a1e16) SHA1(df369265d4bd50a83fe617f85cb7e80e0e046828) )
-	
-	ROM_LOAD( "cmr1.3",		0x0000, 0x020000, CRC(ddfe48df) SHA1(1ce72fbbac81d806c6823a2149cf217a3e417d7d) )
-	ROM_LOAD( "cmr1.3cb",	0x0000, 0x020000, CRC(4d93c088) SHA1(1b75b663f48d3e43e7e02d9c6afcfcde4813d7fc) )
-
-	ROM_LOAD( "cmr1.4",		0x0000, 0x020000, CRC(7fd3e418) SHA1(893afea31d48995f2805161a0734c870432eee03) )
-	ROM_LOAD( "cmr1.4cb",	0x0000, 0x020000, CRC(8003f28d) SHA1(17b7469682ca7da570897f3708dfd901dd7ff9b4) )
-
-	// misc (wrong game?)
-	ROM_LOAD( "gtr5.8g1",	0x0000, 0x020000, CRC(2fb54fd3) SHA1(09e93fc45ab15a655f953e2ba86411034260dfc6) )
-	ROM_LOAD( "gtr5.8g2",	0x0000, 0x020000, CRC(f15e032c) SHA1(f44120c0635e5b1726188f52f619c57a3a6766fa) )
-	ROM_LOAD( "gtr58gaa",	0x0000, 0x020000, CRC(ad20af25) SHA1(1a5ac760894f4441d11f0974f1d0f90fabd76bf2) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "mcsnd1.dat", 0x0000, 0x080000, CRC(9477e648) SHA1(1abefced0cf708ad035720d5e58dc7dae50de5d1) )
-	ROM_LOAD( "mcsnd2.dat", 0x0000, 0x080000, CRC(088796bd) SHA1(877bf21add8ef95f5384a88e1287bd9aa5dbfa95) )
-ROM_END
 
 // black magic
 ROM_START( m4blkmgc )
@@ -807,8 +773,6 @@ ROM_START( m4kingg )
 ROM_END
 
 
-GAME( 19??, m4mbel		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Millennium Bells (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4cmont		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Casino Monte Carlo (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Black Magic (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "American Aladdin (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
 GAME( 19??, m4bben		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Big Ben (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
