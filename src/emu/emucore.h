@@ -334,20 +334,21 @@ private:
 
 class device_t;
 
-void bitch_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
-void bitch_bad_device_cast(const device_t *dev, const std::type_info &dst_type);
+void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
+void report_bad_device_cast(const device_t *dev, const std::type_info &dst_type);
 
 // template function for casting from a base class to a derived class that is checked
 // in debug builds and fast in release builds
 template<class _Dest, class _Source>
 inline _Dest downcast(_Source *src)
 {
-#ifndef NDEBUG
-	if(dynamic_cast<_Dest>(src) != src) {
-		if(dynamic_cast<const device_t *>(src))
-			bitch_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(_Dest));
+#ifdef MAME_DEBUG
+	if (dynamic_cast<_Dest>(src) != src)
+	{
+		if (dynamic_cast<const device_t *>(src) != NULL)
+			report_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(_Dest));
 		else
-			bitch_bad_cast(typeid(src), typeid(_Dest));
+			report_bad_cast(typeid(src), typeid(_Dest));
 	}
 #endif
 	return static_cast<_Dest>(src);
@@ -356,12 +357,13 @@ inline _Dest downcast(_Source *src)
 template<class _Dest, class _Source>
 inline _Dest downcast(_Source &src)
 {
-#ifndef NDEBUG
-	if(&dynamic_cast<_Dest>(src) != &src) {
-		if(dynamic_cast<const device_t *>(&src))
-			bitch_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(_Dest));
+#ifdef MAME_DEBUG
+	if (&dynamic_cast<_Dest>(src) != &src)
+	{
+		if (dynamic_cast<const device_t *>(&src) != NULL)
+			report_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(_Dest));
 		else
-			bitch_bad_cast(typeid(src), typeid(_Dest));
+			report_bad_cast(typeid(src), typeid(_Dest));
 	}
 #endif
 	return static_cast<_Dest>(src);
