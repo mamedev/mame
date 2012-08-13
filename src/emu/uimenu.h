@@ -52,14 +52,6 @@ typedef enum _ui_menu_reset_options ui_menu_reset_options;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* forward declarations */
-class ui_menu;
-
-
-/* menu-related callback functions */
-typedef void (*ui_menu_custom_func)(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-
-
 /* menu-related events */
 struct ui_menu_event
 {
