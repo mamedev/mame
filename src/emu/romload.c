@@ -1306,13 +1306,11 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	{
 		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
 		romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only partial\n", swname, swlist);
-		romdata->warnings++;
 	}
 	if (software_get_support(device->machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_NO)
 	{
 		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
 		romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only preliminary\n", swname, swlist);
-		romdata->warnings++;
 	}
 
 	/* loop until we hit the end */
