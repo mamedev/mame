@@ -2575,7 +2575,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
 }
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4default_bigbank)
+DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default);
@@ -2601,7 +2601,7 @@ WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	DRIVER_INIT_CALL(m4default_bigbank);
+	DRIVER_INIT_CALL(m4default_big);
 	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),this));
 	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),this));
 }

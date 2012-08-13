@@ -299,67 +299,153 @@ M4ABEAUT_SET( 199?, m4abeaut_k2,	m4abeaut,	"a2k0b618.bin", 0x0000, 0x010000, CRC
 
 
 
+#define M4TRG_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "trgsound.dat", 0x0000, 0x080000, CRC(b9eeffbd) SHA1(9ab8005bbabb30358e3e1ccc007372542bc2e799) ) \
+
+
+#define M4TRG_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TRG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
 
 
 
-ROM_START( m4trg )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// new
-	ROM_LOAD( "tglp3.2c", 0x0000, 0x020000, CRC(6c1602cd) SHA1(0cc8aa53584c4da7e39e359cdff08a8b7ab1fd9e) )
-	ROM_LOAD( "tglp3.3c", 0x0000, 0x020000, CRC(c42e8801) SHA1(bf70ca76eb4748a5b85608c50b9bff2776c1bbd7) )
-	ROM_LOAD( "tglpv2.2", 0x0000, 0x020000, CRC(6a393a3c) SHA1(1bb98d61cc50828e63993a178a8bf895952de375) )
-	ROM_LOAD( "tglpv2.3b", 0x0000, 0x020000, CRC(c77c7a08) SHA1(f0104298132666cff9d81829bd5f58904c290290) )
-	ROM_LOAD( "tgpr1.1", 0x0000, 0x020000, CRC(53f9f5fe) SHA1(0787ecff459d8ae748847f17f6d3dbfa15b87db4) )
-	ROM_LOAD( "tgpu", 0x0000, 0x020000, CRC(4aa9f068) SHA1(947586a7f65743443c0846f7b3043d7c6ffecdd8) )
-	ROM_LOAD( "tgpu1.2b", 0x0000, 0x020000, CRC(b702579d) SHA1(11c67c5a322c71dc4e31c28b83ce810ce3c870d7) )
-	ROM_LOAD( "tgpv1.3", 0x0000, 0x020000, CRC(b0e4a452) SHA1(88e2b3bad1b83101f910b9a9c9bd6c000726fc3a) )
-	ROM_LOAD( "tgpv1.4b", 0x0000, 0x020000, CRC(18dc2e9e) SHA1(a4fc75ac91cfb0dba3cff3a4d07d8842720ae00f) )
-	ROM_LOAD( "tot5p.dat", 0x0000, 0x020000, CRC(2bf48dce) SHA1(27b8f482a5486aeafd926af98fdebbc9acbb4aca) )
-	ROM_LOAD( "tr0201.1", 0x0000, 0x020000, CRC(6d72c203) SHA1(43262e2b46eab3d52fcd34d6ff45ceadfefb0684) )
-	ROM_LOAD( "tr0201.1k", 0x0000, 0x020000, CRC(8d764623) SHA1(61ba1cafb64909042bfd6b23380333cf0d2a5ee4) )
-	ROM_LOAD( "trgu1.2b", 0x0000, 0x020000, CRC(a718f459) SHA1(3f2e28c67d442be89fab3514f3397d58c0b54f3f) )
-	ROM_LOAD( "trgv1.3", 0x0000, 0x020000, CRC(d04fa5da) SHA1(b0e6ed25337f250abf1f5ac5bb7073306618d3e0) )
-	ROM_LOAD( "trgv1.4", 0x0000, 0x020000, CRC(eab15c79) SHA1(a96aeba746f5ec53514b1bc34d93785dc63a8421) )
-	ROM_LOAD( "trgv1.5.5", 0x0000, 0x020000, CRC(e900c054) SHA1(bae3c719e645aeb9b513ef11b92a242bbf8e052e) )
-	ROM_LOAD( "trgv1.5b", 0x0000, 0x020000, CRC(c1dc1031) SHA1(a79c7158095e12587e3c120258921b8a1f8610a2) )
-	ROM_LOAD( "trgv1.6b", 0x0000, 0x020000, CRC(69e49afd) SHA1(5db4e9c84a03e5ac61fed47a6d5dd991bfe39998) )
-	ROM_LOAD( "mbpl3.2c", 0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec) )
-	// trg
-	ROM_LOAD( "tglp3.2c", 0x0000, 0x020000, CRC(6c1602cd) SHA1(0cc8aa53584c4da7e39e359cdff08a8b7ab1fd9e) )
-	ROM_LOAD( "tglpv2.2", 0x0000, 0x020000, CRC(6a393a3c) SHA1(1bb98d61cc50828e63993a178a8bf895952de375) )
-	ROM_LOAD( "tgpu1.1b", 0x0000, 0x020000, CRC(1f3add51) SHA1(d7d2933505cf6e86aeb7efc4d2133a8be320bb25) )
-	ROM_LOAD( "tgpv1.3", 0x0000, 0x020000, CRC(b0e4a452) SHA1(88e2b3bad1b83101f910b9a9c9bd6c000726fc3a) )
-	ROM_LOAD( "trgu1.1b", 0x0000, 0x020000, CRC(0f207e95) SHA1(a63cb9ebcb39de04ba36bd5bcffaa959586fc99b) )
-	ROM_LOAD( "trgv1.3", 0x0000, 0x020000, CRC(d04fa5da) SHA1(b0e6ed25337f250abf1f5ac5bb7073306618d3e0) )
-	ROM_LOAD( "trgv1.4", 0x0000, 0x020000, CRC(eab15c79) SHA1(a96aeba746f5ec53514b1bc34d93785dc63a8421) )
-	ROM_LOAD( "trgv1.5.5", 0x0000, 0x020000, CRC(e900c054) SHA1(bae3c719e645aeb9b513ef11b92a242bbf8e052e) )
-	ROM_LOAD( "trgv1.5b", 0x0000, 0x020000, CRC(c1dc1031) SHA1(a79c7158095e12587e3c120258921b8a1f8610a2) )
-	// 221001
-	ROM_LOAD( "tgpu1.4b", 0x0000, 0x020000, CRC(344de34d) SHA1(403edd6760a1b0ccddb634fc9bdbe4af5a011c10) )
-	// misc
-	ROM_LOAD( "rmtp4cz", 0x0000, 0x010000, CRC(1c5fd88b) SHA1(a25b78b0a88ec9468c9ede4b3784e017e7cb571c) )
-	ROM_LOAD( "tglpv1.1s", 0x0000, 0x010000, CRC(a7579e5f) SHA1(b4d78570ef5c32bd0dce75600c2ad64884f894e6) )
-	ROM_LOAD( "tgpu1.3b", 0x0000, 0x020000, CRC(3c8eca5a) SHA1(09b19660f4f3f319576393f961b61f16d738f6c3) )
-	ROM_LOAD( "tgpv1.1s", 0x0000, 0x010000, CRC(6f5f33cb) SHA1(6b7708755809a0486e3cbb84f3487f0979c1311d) )
-	ROM_LOAD( "tgpv1.2s", 0x0000, 0x010000, CRC(d7b000cb) SHA1(e07643107a00cada3259d79c731ba7c60e1f1e39) )
-	ROM_LOAD( "trglatv1.3s", 0x0000, 0x010000, CRC(03a6e6d0) SHA1(d73c921ee29054084ffe70ecd6f165f7930526cc) )
-	ROM_LOAD( "trglatv1.4s.4s", 0x0000, 0x010000, CRC(61f97a62) SHA1(9b0b55d2c3a00d6095307480587b71ee12e03eb7) )
-	ROM_LOAD( "trgv1.3s", 0x0000, 0x010000, CRC(cbae4b44) SHA1(5db57cebcdaf384e63d7cf5337285b96b0557169) )
-	ROM_LOAD( "trgv1.4s.4s", 0x0000, 0x010000, CRC(a9f1d7f6) SHA1(508dddaf8e7b747adb8398bc68e14894a792e003) )
-	ROM_LOAD( "rmtp.s8", 0x0000, 0x010000, CRC(91570052) SHA1(4a7a084403057e193602ee36a623a61c9ccad726) )
-	// 512
-	ROM_LOAD( "tgpv1.2s", 0x0000, 0x010000, CRC(d7b000cb) SHA1(e07643107a00cada3259d79c731ba7c60e1f1e39) )
-	ROM_LOAD( "trglatv1.3s", 0x0000, 0x010000, CRC(03a6e6d0) SHA1(d73c921ee29054084ffe70ecd6f165f7930526cc) )
-	ROM_LOAD( "trglatv1.4s.4s", 0x0000, 0x010000, CRC(61f97a62) SHA1(9b0b55d2c3a00d6095307480587b71ee12e03eb7) )
-	ROM_LOAD( "trgv1.3s", 0x0000, 0x010000, CRC(cbae4b44) SHA1(5db57cebcdaf384e63d7cf5337285b96b0557169) )
-	ROM_LOAD( "trgv1.4s.4s", 0x0000, 0x010000, CRC(a9f1d7f6) SHA1(508dddaf8e7b747adb8398bc68e14894a792e003) )
-	ROM_LOAD( "tglpv1.1s", 0x0000, 0x010000, CRC(a7579e5f) SHA1(b4d78570ef5c32bd0dce75600c2ad64884f894e6) )
-	ROM_LOAD( "tgpv1.1s", 0x0000, 0x010000, CRC(6f5f33cb) SHA1(6b7708755809a0486e3cbb84f3487f0979c1311d) )
+// roms of different sizes again, might also be main / sub setups
+M4TRG_SET( 199?, m4trg,		0,		"tglp3.2c",		0x0000, 0x020000, CRC(6c1602cd) SHA1(0cc8aa53584c4da7e39e359cdff08a8b7ab1fd9e), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 1)" )
+M4TRG_SET( 199?, m4trg__a,	m4trg,	"tglp3.3c",		0x0000, 0x020000, CRC(c42e8801) SHA1(bf70ca76eb4748a5b85608c50b9bff2776c1bbd7), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 2)" )
+M4TRG_SET( 199?, m4trg__b,	m4trg,	"tglpv2.2",		0x0000, 0x020000, CRC(6a393a3c) SHA1(1bb98d61cc50828e63993a178a8bf895952de375), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 3)" )
+M4TRG_SET( 199?, m4trg__c,	m4trg,	"tglpv2.3b",	0x0000, 0x020000, CRC(c77c7a08) SHA1(f0104298132666cff9d81829bd5f58904c290290), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 4)" )
+M4TRG_SET( 199?, m4trg__d,	m4trg,	"tglpv1.1s",	0x0000, 0x010000, CRC(a7579e5f) SHA1(b4d78570ef5c32bd0dce75600c2ad64884f894e6), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 5)" )
+M4TRG_SET( 199?, m4trg__e,	m4trg,	"tgpr1.1",		0x0000, 0x020000, CRC(53f9f5fe) SHA1(0787ecff459d8ae748847f17f6d3dbfa15b87db4), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 6)" )
+M4TRG_SET( 199?, m4trg__f,	m4trg,	"tgpu",			0x0000, 0x020000, CRC(4aa9f068) SHA1(947586a7f65743443c0846f7b3043d7c6ffecdd8), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 7)" )
+M4TRG_SET( 199?, m4trg__g,	m4trg,	"tgpu1.1b",		0x0000, 0x020000, CRC(1f3add51) SHA1(d7d2933505cf6e86aeb7efc4d2133a8be320bb25), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 8)" )
+M4TRG_SET( 199?, m4trg__h,	m4trg,	"tgpu1.2b",		0x0000, 0x020000, CRC(b702579d) SHA1(11c67c5a322c71dc4e31c28b83ce810ce3c870d7), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 9)" )
+M4TRG_SET( 199?, m4trg__i,	m4trg,	"tgpu1.3b",		0x0000, 0x020000, CRC(3c8eca5a) SHA1(09b19660f4f3f319576393f961b61f16d738f6c3), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 10)" )
+M4TRG_SET( 199?, m4trg__j,	m4trg,	"tgpu1.4b",		0x0000, 0x020000, CRC(344de34d) SHA1(403edd6760a1b0ccddb634fc9bdbe4af5a011c10), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 11)" )
+M4TRG_SET( 199?, m4trg__k,	m4trg,	"tgpv1.1s",		0x0000, 0x010000, CRC(6f5f33cb) SHA1(6b7708755809a0486e3cbb84f3487f0979c1311d), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 12)" )
+M4TRG_SET( 199?, m4trg__l,	m4trg,	"tgpv1.2s",		0x0000, 0x010000, CRC(d7b000cb) SHA1(e07643107a00cada3259d79c731ba7c60e1f1e39), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 13)" )
+M4TRG_SET( 199?, m4trg__m,	m4trg,	"tgpv1.3",		0x0000, 0x020000, CRC(b0e4a452) SHA1(88e2b3bad1b83101f910b9a9c9bd6c000726fc3a), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 14)" )
+M4TRG_SET( 199?, m4trg__n,	m4trg,	"tgpv1.4b",		0x0000, 0x020000, CRC(18dc2e9e) SHA1(a4fc75ac91cfb0dba3cff3a4d07d8842720ae00f), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 15)" )
+M4TRG_SET( 199?, m4trg__o,	m4trg,	"trgv1.3",		0x0000, 0x020000, CRC(d04fa5da) SHA1(b0e6ed25337f250abf1f5ac5bb7073306618d3e0), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 16)" )
+M4TRG_SET( 199?, m4trg__p,	m4trg,	"trgv1.3s",		0x0000, 0x010000, CRC(cbae4b44) SHA1(5db57cebcdaf384e63d7cf5337285b96b0557169), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 17)" )
+M4TRG_SET( 199?, m4trg__q,	m4trg,	"trgv1.4",		0x0000, 0x020000, CRC(eab15c79) SHA1(a96aeba746f5ec53514b1bc34d93785dc63a8421), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 18)" )
+M4TRG_SET( 199?, m4trg__r,	m4trg,	"trgv1.4s.4s",	0x0000, 0x010000, CRC(a9f1d7f6) SHA1(508dddaf8e7b747adb8398bc68e14894a792e003), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 19)" )
+M4TRG_SET( 199?, m4trg__s,	m4trg,	"trgv1.5.5",	0x0000, 0x020000, CRC(e900c054) SHA1(bae3c719e645aeb9b513ef11b92a242bbf8e052e), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 20)" )
+M4TRG_SET( 199?, m4trg__t,	m4trg,	"trgv1.5b",		0x0000, 0x020000, CRC(c1dc1031) SHA1(a79c7158095e12587e3c120258921b8a1f8610a2), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 21)" )
+M4TRG_SET( 199?, m4trg__u,	m4trg,	"trgv1.6b",		0x0000, 0x020000, CRC(69e49afd) SHA1(5db4e9c84a03e5ac61fed47a6d5dd991bfe39998), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 22)" )
+M4TRG_SET( 199?, m4trg__v,	m4trg,	"tot5p.dat",	0x0000, 0x020000, CRC(2bf48dce) SHA1(27b8f482a5486aeafd926af98fdebbc9acbb4aca), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 23)" )
+M4TRG_SET( 199?, m4trg__w,	m4trg,	"tr0201.1",		0x0000, 0x020000, CRC(6d72c203) SHA1(43262e2b46eab3d52fcd34d6ff45ceadfefb0684), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 24)" )
+M4TRG_SET( 199?, m4trg__x,	m4trg,	"tr0201.1k",	0x0000, 0x020000, CRC(8d764623) SHA1(61ba1cafb64909042bfd6b23380333cf0d2a5ee4), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 25)" )
+M4TRG_SET( 199?, m4trg__y,	m4trg,	"trgu1.1b",		0x0000, 0x020000, CRC(0f207e95) SHA1(a63cb9ebcb39de04ba36bd5bcffaa959586fc99b), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 26)" )
+M4TRG_SET( 199?, m4trg__z,	m4trg,	"trgu1.2b",		0x0000, 0x020000, CRC(a718f459) SHA1(3f2e28c67d442be89fab3514f3397d58c0b54f3f), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 27)" )
+M4TRG_SET( 199?, m4trg__0,	m4trg,	"trglatv1.3s",	0x0000, 0x010000, CRC(03a6e6d0) SHA1(d73c921ee29054084ffe70ecd6f165f7930526cc), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 28)" )
+M4TRG_SET( 199?, m4trg__1,	m4trg,	"trglatv1.4s",	0x0000, 0x010000, CRC(61f97a62) SHA1(9b0b55d2c3a00d6095307480587b71ee12e03eb7), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 29)" )
+M4TRG_SET( 199?, m4trg__2,	m4trg,	"mbpl3.2c",		0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 30)" )
+M4TRG_SET( 199?, m4trg__3,	m4trg,	"rmtp.s8",		0x0000, 0x010000, CRC(91570052) SHA1(4a7a084403057e193602ee36a623a61c9ccad726), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 31)" )
+M4TRG_SET( 199?, m4trg__4,	m4trg,	"rmtp4cz",		0x0000, 0x010000, CRC(1c5fd88b) SHA1(a25b78b0a88ec9468c9ede4b3784e017e7cb571c), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 32)" )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "trgsound.dat", 0x0000, 0x080000, CRC(b9eeffbd) SHA1(9ab8005bbabb30358e3e1ccc007372542bc2e799) ) // from misc
-	//ROM_LOAD( "trgsound.dat", 0x0000, 0x080000, CRC(b9eeffbd) SHA1(9ab8005bbabb30358e3e1ccc007372542bc2e799) ) // from trg
-ROM_END
+
+
+#define M4RMTP_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "rm.s3", 0x0000, 0x080000, CRC(250e64f2) SHA1(627c4dc5cdc7d0a7cb6f74991ae91b71a2f4dbc6) ) \
+
+
+#define M4RMTP_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RMTP_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4RMTP_SET( 199?, m4rmtp,		0,		"r4iha202.bin", 0x0000, 0x010000, CRC(b1588632) SHA1(ad21bbc5e99fd6b511e6881e8b20dcad177b937f), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 1)" )
+M4RMTP_SET( 199?, m4rmtp__a,	m4rmtp,	"r4iha203.bin", 0x0000, 0x010000, CRC(7f31cb76) SHA1(9a2a595afb9ff1b3165638d247ab98475ae0bfcd), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 2)" )
+M4RMTP_SET( 199?, m4rmtp__b,	m4rmtp,	"r4iha204.bin", 0x0000, 0x010000, CRC(1cc3a32d) SHA1(b6ed012a6d743ba2416e25e7c49ce9985bbacbd7), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 3)" )
+M4RMTP_SET( 199?, m4rmtp__c,	m4rmtp,	"r4iha205.bin", 0x0000, 0x010000, CRC(1a238632) SHA1(a15ca5801d41985387bc65579b6d6ee2ef7d8eee), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 4)" )
+M4RMTP_SET( 199?, m4rmtp__d,	m4rmtp,	"r4iua202.bin", 0x0000, 0x010000, CRC(c96d630a) SHA1(90ed759602aa3a052434b3f604ec26ec9e204e68), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 5)" )
+M4RMTP_SET( 199?, m4rmtp__e,	m4rmtp,	"r4iua203.bin", 0x0000, 0x010000, CRC(550fdfec) SHA1(d57eaba6690cbff2302559e9cea9e5d0f79cf9f9), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 6)" )
+M4RMTP_SET( 199?, m4rmtp__f,	m4rmtp,	"r4iua204.bin", 0x0000, 0x010000, CRC(cd8d166f) SHA1(4d78726df35914444be26ac9e1e3e1949b6a3d99), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 7)" )
+M4RMTP_SET( 199?, m4rmtp__g,	m4rmtp,	"r4iua205.bin", 0x0000, 0x010000, CRC(46df24f3) SHA1(31000815a90e47e744091bbf0fe9e96baac8d7e3), "Avantime?","Reel Magic Turbo Play (Avantime?) (MPU4) (set 8)" )
+
+
+#define M4RMTPD_EXTRA_ROMS \
+	ROM_REGION( 0x10000, "gal", 0 ) \
+	ROM_LOAD( "rmdxi", 0x0000, 0x000b57, CRC(c16021ec) SHA1(df77e410ea2edae1559e40a877e292f0d1969b0a) ) \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing */ \
+
+
+#define M4RMTPD_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RMTPD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+
+M4RMTPD_SET( 199?, m4rmtpd,		0,			"rdiua202.bin", 0x0000, 0x010000, CRC(faa875ea) SHA1(d8d206fed8965a26dd8ded38a3be018311ccf407), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 1)" )
+M4RMTPD_SET( 199?, m4rmtpd__a,	m4rmtpd,	"r2iha203.bin", 0x0000, 0x010000, CRC(1cea7710) SHA1(a250569800d3679f317a485ac7a31b4f4fa7db78), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 2)" )
+M4RMTPD_SET( 199?, m4rmtpd__b,	m4rmtpd,	"r2iha204.bin", 0x0000, 0x010000, CRC(c82cd025) SHA1(f26f2bbd83d673c61bd2609914349b45c31f4a5d), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 3)" )
+M4RMTPD_SET( 199?, m4rmtpd__c,	m4rmtpd,	"r2iha205.bin", 0x0000, 0x010000, CRC(e53da9a5) SHA1(5019f5bd89c230459629670b808c59888a0f1ee9), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 4)" )
+M4RMTPD_SET( 199?, m4rmtpd__d,	m4rmtpd,	"r2iha206.bin", 0x0000, 0x010000, CRC(f89b73b3) SHA1(34a9a8053e881b8aad578ef58209c8ff888b30f7), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 5)" )
+M4RMTPD_SET( 199?, m4rmtpd__e,	m4rmtpd,	"r2iua203.bin", 0x0000, 0x010000, CRC(9590a747) SHA1(9f1a1277bdcbe0f23abcf38850eae939997c2e00), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 6)" )
+M4RMTPD_SET( 199?, m4rmtpd__f,	m4rmtpd,	"r2iua205.bin", 0x0000, 0x010000, CRC(2eefca1a) SHA1(cabc0c8a3dddc881aab899c5419663efff5412d3), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 7)" )
+M4RMTPD_SET( 199?, m4rmtpd__g,	m4rmtpd,	"r2iua206.bin", 0x0000, 0x010000, CRC(c4a1a218) SHA1(8208468ae9ddde7d387f7194e1f7d44f6e7ca730), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 8)" )
+M4RMTPD_SET( 199?, m4rmtpd__h,	m4rmtpd,	"r3iha224.bin", 0x0000, 0x010000, CRC(a2e161ac) SHA1(bd63c9726cdf037919c8655221bc6416cef322aa), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 9)" )
+M4RMTPD_SET( 199?, m4rmtpd__i,	m4rmtpd,	"r3iha225.bin", 0x0000, 0x010000, CRC(f49a41e9) SHA1(6c29ba4bf76aaafa79ce68f58f6672baa47fe147), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 10)" )
+M4RMTPD_SET( 199?, m4rmtpd__j,	m4rmtpd,	"r3iua224.bin", 0x0000, 0x010000, CRC(715b7de7) SHA1(013827680c389968f2f80f97c565716757d696b2), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 11)" )
+M4RMTPD_SET( 199?, m4rmtpd__k,	m4rmtpd,	"r3iua225.bin", 0x0000, 0x010000, CRC(37086f91) SHA1(413b32a8e354467a30c71dce3d1cb76795ff813d), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 12)" )
+M4RMTPD_SET( 199?, m4rmtpd__l,	m4rmtpd,	"r4iha201.bin", 0x0000, 0x010000, CRC(789cfca1) SHA1(31aa7bf9461cb6c4f692d605463fde1f604b1614), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 13)" )
+M4RMTPD_SET( 199?, m4rmtpd__m,	m4rmtpd,	"r4iua201.bin", 0x0000, 0x010000, CRC(ce0e2553) SHA1(4c9df36a7b8950a273cefceb6ba6817d8b862c78), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 14)" )
+M4RMTPD_SET( 199?, m4rmtpd__n,	m4rmtpd,	"rdiha202.bin", 0x0000, 0x010000, CRC(02e01481) SHA1(253c2c8e800a4e6d1008745101e2457d76ac57d4), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 15)" )
+M4RMTPD_SET( 199?, m4rmtpd__o,	m4rmtpd,	"rdiha212.bin", 0x0000, 0x010000, CRC(90984ae9) SHA1(b25a12f0529af64315c461363c788c22e30d4016), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 16)" )
+M4RMTPD_SET( 199?, m4rmtpd__p,	m4rmtpd,	"rdiha213.bin", 0x0000, 0x010000, CRC(e9fa4c97) SHA1(07c75418890231102cf336f2d3f0048fe4884862), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 17)" )
+M4RMTPD_SET( 199?, m4rmtpd__q,	m4rmtpd,	"rdiha214.bin", 0x0000, 0x010000, CRC(42f3a5e0) SHA1(3cf26e55edf0dcde9510e50c4b781ba8b906f092), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 18)" )
+M4RMTPD_SET( 199?, m4rmtpd__r,	m4rmtpd,	"rdiha215.bin", 0x0000, 0x010000, CRC(2b704591) SHA1(9b880f40d3b268c96af5dab179760994c5a074c9), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 19)" )
+M4RMTPD_SET( 199?, m4rmtpd__s,	m4rmtpd,	"rdiha217.bin", 0x0000, 0x010000, CRC(6df58d97) SHA1(df8f419a1e3acc68a3755c49e258db5af9102598), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 20)" )
+M4RMTPD_SET( 199?, m4rmtpd__t,	m4rmtpd,	"rdiha219.bin", 0x0000, 0x010000, CRC(66f3ffa6) SHA1(1b1daf4b02e400d943f2a917be0f4452be891aaf), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 21)" )
+M4RMTPD_SET( 199?, m4rmtpd__u,	m4rmtpd,	"rdiha220.bin", 0x0000, 0x010000, CRC(2047c55b) SHA1(8f0e6608271634a6a0f06e76df93dddd404c93cd), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 22)" )
+M4RMTPD_SET( 199?, m4rmtpd__v,	m4rmtpd,	"rdiha221.bin", 0x0000, 0x010000, CRC(6e87f591) SHA1(750e9f01c1a3143d7d97a5b9b11d09aed72ca928), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 23)" )
+M4RMTPD_SET( 199?, m4rmtpd__w,	m4rmtpd,	"rdiha222.bin", 0x0000, 0x010000, CRC(d200f6ec) SHA1(07e0e270a2184f24373cbe0a8a5e44c3d215d9a2), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 24)" )
+M4RMTPD_SET( 199?, m4rmtpd__x,	m4rmtpd,	"rdiha223.bin", 0x0000, 0x010000, CRC(042a5a96) SHA1(3bc2dfb89c6781eb9fb105e5f8ea1576d7b49ad3), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 25)" )
+M4RMTPD_SET( 199?, m4rmtpd__y,	m4rmtpd,	"rdihb202.bin", 0x0000, 0x010000, CRC(136c31ec) SHA1(abb095bd4ec0a0879f49e668f1ea08df026262e7), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 26)" )
+M4RMTPD_SET( 199?, m4rmtpd__z,	m4rmtpd,	"rdiua204.bin", 0x0000, 0x010000, CRC(a6110b45) SHA1(61d08250fa3b5d7eb7cdf63562d7a6cc9a27372c), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 27)" )
+M4RMTPD_SET( 199?, m4rmtpd__0,	m4rmtpd,	"rdiua205.bin", 0x0000, 0x010000, CRC(9f20d810) SHA1(e2a576313fa49fc72001d5de67e93c08423e8dd8), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 28)" )
+M4RMTPD_SET( 199?, m4rmtpd__1,	m4rmtpd,	"rdiua206.bin", 0x0000, 0x010000, CRC(2954e2c3) SHA1(e4c9f51748bc1296298f95ca817e852f9e0ca38b), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 29)" )
+M4RMTPD_SET( 199?, m4rmtpd__2,	m4rmtpd,	"rdiua207.bin", 0x0000, 0x010000, CRC(58f334d1) SHA1(b91288731750445e4cfcf87fe6a9504723b59fa9), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 30)" )
+M4RMTPD_SET( 199?, m4rmtpd__3,	m4rmtpd,	"rdiua208.bin", 0x0000, 0x010000, CRC(13e6d84d) SHA1(6f75a75dfd6922349f8d29c955c1849522f8656c), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 31)" )
+M4RMTPD_SET( 199?, m4rmtpd__4,	m4rmtpd,	"rdiua209.bin", 0x0000, 0x010000, CRC(f41af938) SHA1(f2d4e23717f49961fe104971b3a0da9aabbf0e05), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 32)" )
+M4RMTPD_SET( 199?, m4rmtpd__5,	m4rmtpd,	"rdiua212.bin", 0x0000, 0x010000, CRC(c56a6433) SHA1(7ff8943843c334a79fc3b40bb004abb3f2c2d079), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 33)" )
+M4RMTPD_SET( 199?, m4rmtpd__6,	m4rmtpd,	"rdiua213.bin", 0x0000, 0x010000, CRC(cdd5f399) SHA1(a4359c5166fbcd4ea2bb6820bbfead6bc2b2a4ef), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 34)" )
+M4RMTPD_SET( 199?, m4rmtpd__7,	m4rmtpd,	"rdiua214.bin", 0x0000, 0x010000, CRC(04fa9d21) SHA1(c337486ece94a7004420edca677e6688eef1ac9e), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 35)" )
+M4RMTPD_SET( 199?, m4rmtpd__8,	m4rmtpd,	"rdiua215.bin", 0x0000, 0x010000, CRC(43d8ca5e) SHA1(e5e24ed24bd5c1135392c98910d2797e621ecbd5), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 36)" )
+M4RMTPD_SET( 199?, m4rmtpd__9,	m4rmtpd,	"rdiua217.bin", 0x0000, 0x010000, CRC(3c58970e) SHA1(15b7368078750021202ee7b4886a6510fcc1ba0d), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 37)" )
+M4RMTPD_SET( 199?, m4rmtpd__aa,	m4rmtpd,	"rdiua219.bin", 0x0000, 0x010000, CRC(54f8fe63) SHA1(48d1b04dde6056b839ec84daa40a7d6871893b3e), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 38)" )
+M4RMTPD_SET( 199?, m4rmtpd__ab,	m4rmtpd,	"rdiua220.bin", 0x0000, 0x010000, CRC(768715f6) SHA1(5c4102b4d2400806dd0f5a6f3e48da4d290d5255), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 39)" )
+M4RMTPD_SET( 199?, m4rmtpd__ac,	m4rmtpd,	"rdiua222.bin", 0x0000, 0x010000, CRC(07413d93) SHA1(e752fe382d222eefd4fe975fa40559fedd579320), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 40)" )
+M4RMTPD_SET( 199?, m4rmtpd__ad,	m4rmtpd,	"rdiua223.bin", 0x0000, 0x010000, CRC(80185ebf) SHA1(ae885325f2c63f7dbb034f8e3f3882d0b36aff99), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 41)" )
+M4RMTPD_SET( 199?, m4rmtpd__ae,	m4rmtpd,	"rdiub202.bin", 0x0000, 0x010000, CRC(4a8d7cf7) SHA1(cb1525d89d3a411163bfe9e70c8b0d1aa6cefdf5), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 42)" )
+M4RMTPD_SET( 199?, m4rmtpd__af,	m4rmtpd,	"rdmha210.bin", 0x0000, 0x010000, CRC(7061373e) SHA1(67da39d1de4f3877f12bd1fd5545046f9dabfde9), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 43)" )
+M4RMTPD_SET( 199?, m4rmtpd__ag,	m4rmtpd,	"rdmhb210.bin", 0x0000, 0x010000, CRC(12c71e8a) SHA1(9bb45e72f202d3af19988ebf30ea4c2248d387fc), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 44)" )
+M4RMTPD_SET( 199?, m4rmtpd__ah,	m4rmtpd,	"rdpka316.bin", 0x0000, 0x010000, CRC(5178175d) SHA1(a732a82226c34be0b7f84e9f9e4700bd72da1c19), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 45)" )
+M4RMTPD_SET( 199?, m4rmtpd__ai,	m4rmtpd,	"rdpka318.bin", 0x0000, 0x010000, CRC(2789179f) SHA1(8d4b1e75995ea5b64fac1a36a98506aacfd1800a), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 46)" )
+M4RMTPD_SET( 199?, m4rmtpd__aj,	m4rmtpd,	"rdpkb316.bin", 0x0000, 0x010000, CRC(09d4f4c5) SHA1(fbc2b0710ef048c221b007692e9a97b99f1edbc0), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 47)" )
+M4RMTPD_SET( 199?, m4rmtpd__ak,	m4rmtpd,	"rdpkb318.bin", 0x0000, 0x010000, CRC(428aa7f2) SHA1(f85d173c25d0ab9d8c3c4d87b4fc27c3342b3dec), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 48)" )
+M4RMTPD_SET( 199?, m4rmtpd__al,	m4rmtpd,	"rduha511.bin", 0x0000, 0x010000, CRC(823e0323) SHA1(4137a05efe87851a9f9ffcd6519bb57398773095), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 49)" )
+M4RMTPD_SET( 199?, m4rmtpd__am,	m4rmtpd,	"rduhb511.bin", 0x0000, 0x010000, CRC(2b65eb19) SHA1(b00543b74ad5262b85f66f5e8cfdaee351f62f23), "Avantime?","Reel Magic Turbo Play Deluxe (Avantime?) (MPU4) (set 50)" )
+
+
+
 
 ROM_START( m4mbel )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -721,17 +807,15 @@ ROM_START( m4kingg )
 ROM_END
 
 
-
-GAME( 19??, m4trg		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Turbo Reel Gambler (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4mbel		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Millennium Bells (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4cmont		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Casino Monte Carlo (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Black Magic (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "American Aladdin (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4bben		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Big Ben (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4bbox		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Brain Box (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4frnudg	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Fruit & Nudge (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4frmtx		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Fruit Matrix (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4jok2k		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Joker 2000 (Avantime?) (Latvia) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4mjp		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Mega Jackpot (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4milrou	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "Millennium Roulette (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4kingg		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Bdd", "King George (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4mbel		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Millennium Bells (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4cmont		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Casino Monte Carlo (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Black Magic (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "American Aladdin (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4bben		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Big Ben (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4bbox		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Brain Box (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4frnudg	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Fruit & Nudge (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4frmtx		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Fruit Matrix (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4jok2k		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Joker 2000 (Avantime?) (Latvia) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4mjp		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Mega Jackpot (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4milrou	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Millennium Roulette (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+GAME( 19??, m4kingg		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "King George (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)

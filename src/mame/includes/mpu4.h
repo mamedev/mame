@@ -232,7 +232,7 @@ public:
 	DECLARE_DRIVER_INIT(m4tst2);
 	DECLARE_DRIVER_INIT(crystal);
 	DECLARE_DRIVER_INIT(m_frkstn);
-	DECLARE_DRIVER_INIT(m4default_bigbank);
+	DECLARE_DRIVER_INIT(m4default_big);
 	DECLARE_DRIVER_INIT(m4default);
 	DECLARE_DRIVER_INIT(m_blsbys);
 	DECLARE_DRIVER_INIT(m_oldtmr);

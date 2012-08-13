@@ -19375,7 +19375,16 @@ m4buc__ay	//
 m4buc__az	//
 m4bucks		// Bucks Fizz Club (Barcrest)
 m4calama	// Calamari Club (Barcrest)
-m4calamab	//
+m4calama__a	//
+m4calama__b	//
+m4calama__c	//
+m4calama__d	//
+m4calama__e	//
+m4calama__f	//
+m4calama__g	//
+m4calama__h	//
+m4calama__i	//
+m4calama__j	//
 m4calicl	// California Club (Barcrest)
 m4cardcs	// Card Cash (Barcrest)
 m4cojok		// Carry On Joker (Barcrest)
@@ -19669,6 +19678,28 @@ m4clbveg	// Club Vegas (Barcrest)
 m4clbx		// Club X (Barcrest)
 m4copcsh	// Coppa Cash (Barcrest)
 m4coscas	// Cosmic Casino (Barcrest)
+m4coscas__a	//
+m4coscas__b	//
+m4coscas__c	//
+m4coscas__d	//
+m4coscas__e	//
+m4coscas__f	//
+m4coscas__g	//
+m4coscas__h	//
+m4coscas__i	//
+m4coscas__j	//
+m4coscas__k	//
+m4coscas__l	//
+m4coscas__m	//
+m4coscas__n	//
+m4coscas__o	//
+m4coscas__p	//
+m4coscas__q	//
+m4coscas__r	//
+m4coscas__s	//
+m4coscas__t	//
+m4coscas__u	//
+m4coscas__v	//
 m4crkpot	// Crackpot Club (Barcrest)
 m4crkpota	//
 m4crkpotb	//
@@ -19743,7 +19774,10 @@ m4denmendty	//
 m4denmen_h1	//
 m4denmen_h3	//
 m4dbl9		// Double 9's (Barcrest)
-m4dbldmn	// Double Diamond Club (Barcrest)
+m4dbldm		// Double Diamond Club (Barcrest)
+m4dbldm__a	//
+m4dbldm__b	//
+m4dbldm__c	//
 m4dblup		// Double Up (Barcrest)
 m4drac		// Dracula (Barcrest - Nova)
 m4dtyfre		// Duty Free (Barcrest)
@@ -19921,6 +19955,12 @@ m4eaw__bz	//
 m4exprs		// Express (Barcrest)
 m4exgam		// Extra Game (Fairplay - Barcrest)
 m4fastfw	// Fast Forward (Barcrest - Bwb)
+m4fastfw__a	//
+m4fastfw__b	//
+m4fastfw__c	//
+m4fastfw__d	//
+m4fastfw__e	//
+m4fastfw__f	//
 m4class		// First Class (Barcrest)
 m4flash		// Flash Cash (Barcrest)
 m4fortcb	// Fortune Club (Barcrest)
@@ -21386,8 +21426,6 @@ m4rhrcl__b	//
 m4rhrcl__c	//
 m4rwb		// Red White & Blue (Barcrest)
 m4r2r		// Reel 2 Reel (Barcrest)
-m4rmtp		// Reel Magic Turbo Play (Barcrest)
-m4rmtpd		// Reel Magic Turbo Play Deluxe (Barcrest)
 m4reelpk	// Reel Poker (Barcrest)
 m4reeltm	// Reel Timer (Barcrest)
 m4richfm	// Rich & Famous (Barcrest)
@@ -21605,6 +21643,9 @@ m4solsil	// Solid Silver Club (Barcrest)
 m4solsila	//
 m4sss		// Spend Spend Spend (Barcrest)
 m4squid		// Squids In (Barcrest)
+m4squid__a	//
+m4squid__b	//
+m4squid__c	//
 m4stakeu	// Stake Up Club (Barcrest)
 m4stakeua	//
 m4stards	// Stardust (Barcrest)
@@ -22978,7 +23019,39 @@ m4robo__9	//
 m4robo__aa	//
 m4robo__ab	//
 
-m4trg
+m4trg		//
+m4trg__a	//
+m4trg__b	//
+m4trg__c	//
+m4trg__d	//
+m4trg__e	//
+m4trg__f	//
+m4trg__g	//
+m4trg__h	//
+m4trg__i	//
+m4trg__j	//
+m4trg__k	//
+m4trg__l	//
+m4trg__m	//
+m4trg__n	//
+m4trg__o	//
+m4trg__p	//
+m4trg__q	//
+m4trg__r	//
+m4trg__s	//
+m4trg__t	//
+m4trg__u	//
+m4trg__v	//
+m4trg__w	//
+m4trg__x	//
+m4trg__y	//
+m4trg__z	//
+m4trg__0	//
+m4trg__1	//
+m4trg__2	//
+m4trg__3	//
+m4trg__4	//
+
 m4mbel
 m4abeaut		//
 m4abeaut_1		//
@@ -23151,6 +23224,64 @@ m4abeaut_m3		//
 m4abeaut_m4		//
 m4abeaut_k1		//
 m4abeaut_k2		//
+m4rmtp		// Reel Magic Turbo Play
+m4rmtp__a	//
+m4rmtp__b	//
+m4rmtp__c	//
+m4rmtp__d	//
+m4rmtp__e	//
+m4rmtp__f	//
+m4rmtp__g	//
+m4rmtpd		// Reel Magic Turbo Play Deluxe
+m4rmtpd__a	//
+m4rmtpd__b	//
+m4rmtpd__c	//
+m4rmtpd__d	//
+m4rmtpd__e	//
+m4rmtpd__f	//
+m4rmtpd__g	//
+m4rmtpd__h	//
+m4rmtpd__i	//
+m4rmtpd__j	//
+m4rmtpd__k	//
+m4rmtpd__l	//
+m4rmtpd__m	//
+m4rmtpd__n	//
+m4rmtpd__o	//
+m4rmtpd__p	//
+m4rmtpd__q	//
+m4rmtpd__r	//
+m4rmtpd__s	//
+m4rmtpd__t	//
+m4rmtpd__u	//
+m4rmtpd__v	//
+m4rmtpd__w	//
+m4rmtpd__x	//
+m4rmtpd__y	//
+m4rmtpd__z	//
+m4rmtpd__0	//
+m4rmtpd__1	//
+m4rmtpd__2	//
+m4rmtpd__3	//
+m4rmtpd__4	//
+m4rmtpd__5	//
+m4rmtpd__6	//
+m4rmtpd__7	//
+m4rmtpd__8	//
+m4rmtpd__9	//
+m4rmtpd__aa	//
+m4rmtpd__ab	//
+m4rmtpd__ac	//
+m4rmtpd__ad	//
+m4rmtpd__ae	//
+m4rmtpd__af	//
+m4rmtpd__ag	//
+m4rmtpd__ah	//
+m4rmtpd__ai	//
+m4rmtpd__aj	//
+m4rmtpd__ak	//
+m4rmtpd__al	//
+m4rmtpd__am	//
 m4cmont
 m4blkmgc
 m4amalad

@@ -435,22 +435,6 @@ ROM_END
 
 
 
-GAME(199?, m4cojok	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",GAME_FLAGS )
-GAMEL(198?,m4gambal	,0			,mod4yam	,m4gambal			, mpu4_state,m4gambal			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
-GAME(199?, m4graff	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Graffiti (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4graffd	,m4graff	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS )
-GAME(199?, m4monte	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Monte Carlo (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4nudbnk	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Banker (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4przmc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Monte Carlo (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4przsss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4sss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Spend Spend Spend (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4ra		,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Alert (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4sayno	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",GAME_FLAGS)
-GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",GAME_FLAGS)
-GAME(199?, m4acechs	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",GAME_FLAGS)
-GAME(199?, m4stc	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
-
-
 #define M4SUPST_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "ss.chr", 0x0000, 0x000048, CRC(bd206d57) SHA1(ecfe38d9b4823ae6bc2fc440c243e6ae5e2edaa4) ) \
@@ -570,6 +554,92 @@ M4SUPST_SET( 199?, m4supst__b3,	m4supst,	"stuy.p1",				0x0000, 0x010000, CRC(e6b
 M4SUPST_SET( 199?, m4supst__b4,	m4supst,	"superstreak1deb.bin",	0x0000, 0x010000, CRC(892ccad9) SHA1(c88daadd9778e363e154b674b57ccd07cea59836), "Barcrest","Super Streak (Barcrest) (MPU4) (set 104)" )
 M4SUPST_SET( 199?, m4supst__b5,	m4supst,	"supst2515",			0x0000, 0x010000, CRC(c073a249) SHA1(4ae37eb61dd5e50687f433fb89f65b97926b7358), "Barcrest","Super Streak (Barcrest) (MPU4) (set 105)" )
 
+#define M4FASTFW_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent ,mod4yam	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4FASTFW_SET( 199?, m4fastfw,		0,			"ffo05__1.0",	0x0000, 0x010000, CRC(8b683969) SHA1(7469b551e4d6f65550d54ee39b2bac07cf3dbd4b), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 1)" )
+M4FASTFW_SET( 199?, m4fastfw__a,	m4fastfw,	"ffo10__1.0",	0x0000, 0x010000, CRC(294288fd) SHA1(87d25f6333b6862fcc57a550b5cc7c0bc64e72cd), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 2)" )
+M4FASTFW_SET( 199?, m4fastfw__b,	m4fastfw,	"ffo10d_1.0",	0x0000, 0x010000, CRC(8d96f3d4) SHA1(2070a335cfa3f9de1bd9e9094d91cce81b91347d), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 3)" )
+M4FASTFW_SET( 199?, m4fastfw__c,	m4fastfw,	"ffo20__1.0",	0x0000, 0x010000, CRC(9528291e) SHA1(61c0eb8ce955f708e8a68a28f253706267e28254), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 4)" )
+M4FASTFW_SET( 199?, m4fastfw__d,	m4fastfw,	"ffo20d_1.0",	0x0000, 0x010000, CRC(5bae35fe) SHA1(7e4d61ed97ddd170bd1424f34d0327093668da3f), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 5)" )
+M4FASTFW_SET( 199?, m4fastfw__e,	m4fastfw,	"ffo20dy1.0",	0x0000, 0x010000, CRC(37167d46) SHA1(94b87697615f81b746ce3bcc64fc893f865e00dc), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 6)" )
+M4FASTFW_SET( 199?, m4fastfw__f,	m4fastfw,	"fastf206",		0x0000, 0x010000, CRC(a830b121) SHA1(0bf813ee75bd8e109e6688b91bd0983d341a6695), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 7)" )
+
+
+
+// these seem to all be mod4yam, so why is there a sample rom? from another game of the same title?
+#define M4VIVALV_EXTRA_ROMS \
+	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_LOAD( "vivalasvegas4.bin", 0x0000, 0x080000, CRC(76971425) SHA1(0974a9dce51cc3dd4e26cec11a948c9c8021fde4) ) \
+
+#define M4VIVALV_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4VIVALV_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4yam	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4VIVALV_SET( 199?, m4vivalv,		0,			"5p5vivalasvegas6.bin",			0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 1)" )
+M4VIVALV_SET( 199?, m4vivalv__a,	m4vivalv,	"v.las vegas 6 10p 10m.bin",	0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 2)" )
+M4VIVALV_SET( 199?, m4vivalv__b,	m4vivalv,	"vegas15g",						0x0000, 0x020000, CRC(5b804e4d) SHA1(5967b9f4e28e5a5e5e7005a29ecb30fc661800e0), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 3)" )
+M4VIVALV_SET( 199?, m4vivalv__c,	m4vivalv,	"vegas15t",						0x0000, 0x020000, CRC(9d15f44f) SHA1(3a3f2034de9ba56cb2cb18b4898f2829a2019d4e), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 4)" )
+M4VIVALV_SET( 199?, m4vivalv__e,	m4vivalv,	"viva05_11",					0x0000, 0x010000, CRC(1e6ea483) SHA1(e6a53eb1bf3b8e661287c0d57fc6ab5ed41755a3), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 6)" )
+M4VIVALV_SET( 199?, m4vivalv__f,	m4vivalv,	"viva10_11",					0x0000, 0x010000, CRC(246a39b7) SHA1(c0f5c21374e43b42df5df0ada0967a34ecefbdb4), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 7)" )
+M4VIVALV_SET( 199?, m4vivalv__g,	m4vivalv,	"viva20_1.1",					0x0000, 0x010000, CRC(80ea2429) SHA1(e5d258967340fe85dd5baf6ba16f82ce83307b68), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 8)" )
+M4VIVALV_SET( 199?, m4vivalv__h,	m4vivalv,	"viva20_11",					0x0000, 0x010000, CRC(51b93018) SHA1(fc13179e3e1939839c3b90d7600a7eb301ea03da), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 9)" )
+M4VIVALV_SET( 199?, m4vivalv__i,	m4vivalv,	"viva58c",						0x0000, 0x010000, CRC(719d0802) SHA1(ba6bd5fbf49f0ada383cb2e8faa037b78f6af587), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 10)" )
+M4VIVALV_SET( 199?, m4vivalv__j,	m4vivalv,	"viva_05_.4",					0x0000, 0x010000, CRC(b094914f) SHA1(8217b4bb7a8d55fb8e86018ffc520a63f41a79b8), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 11)" )
+M4VIVALV_SET( 199?, m4vivalv__k,	m4vivalv,	"viva_05_.8",					0x0000, 0x010000, CRC(c5c09c10) SHA1(47890d0ba1c2ca53231ac148a02f046452dce1b4), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 12)" )
+M4VIVALV_SET( 199?, m4vivalv__l,	m4vivalv,	"viva_10_.4",					0x0000, 0x010000, CRC(b1d5e820) SHA1(68012216d7e82168c7468d1e54c527c15d268917), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 13)" )
+M4VIVALV_SET( 199?, m4vivalv__m,	m4vivalv,	"viva_10_.8",					0x0000, 0x010000, CRC(f392c81c) SHA1(cb3320b688b315dbc226f45b78490fed439ee9a2), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 14)" )
+M4VIVALV_SET( 199?, m4vivalv__n,	m4vivalv,	"viva_20_.4",					0x0000, 0x010000, CRC(e1efc846) SHA1(a4bf7f5c4febe5a71a09e23876387328e1bba87b), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 15)" )
+M4VIVALV_SET( 199?, m4vivalv__o,	m4vivalv,	"viva_20_.8",					0x0000, 0x010000, CRC(f538a1fc) SHA1(d0dbd22a1cb4b7ec5bfa304ba544806e01150662), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 16)" )
+M4VIVALV_SET( 199?, m4vivalv__p,	m4vivalv,	"vlv208ac",						0x0000, 0x010000, CRC(416535ee) SHA1(f2b0177fecd5076d9d89c819fe9402fc944c8d77), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 17)" )
+M4VIVALV_SET( 199?, m4vivalv__q,	m4vivalv,	"vlvad.p1",						0x0000, 0x010000, CRC(88262812) SHA1(f0a31d510c1b06af122df493585c04a49177f06d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 18)" )
+M4VIVALV_SET( 199?, m4vivalv__r,	m4vivalv,	"vlvb.p1",						0x0000, 0x010000, CRC(c4caec15) SHA1(d88c6e081a6bbdd80f773713b038293cabdeee8c), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 19)" )
+M4VIVALV_SET( 199?, m4vivalv__s,	m4vivalv,	"vlvc.p1",						0x0000, 0x010000, CRC(4d651ba4) SHA1(7746656f0a9f8af8e265568f7479edef9a2247d9), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 20)" )
+M4VIVALV_SET( 199?, m4vivalv__t,	m4vivalv,	"vlvd.p1",						0x0000, 0x010000, CRC(cce926c7) SHA1(8e3a0cef0cbee66d264da5d6dfc7ec2fbdcd9584), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 21)" )
+M4VIVALV_SET( 199?, m4vivalv__u,	m4vivalv,	"vlvdy.p1",						0x0000, 0x010000, CRC(6e17cbc8) SHA1(5c69eda0ff6a01d9d0d434ff7ce1ac1e67b16362), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 22)" )
+M4VIVALV_SET( 199?, m4vivalv__v,	m4vivalv,	"vlvk.p1",						0x0000, 0x010000, CRC(b5f2157e) SHA1(574f3e2890ac5479790ea92760c6500d37e6637d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 23)" )
+M4VIVALV_SET( 199?, m4vivalv__w,	m4vivalv,	"vlvs.p1",						0x0000, 0x010000, CRC(b7fb3e19) SHA1(c6cc4175f8c100fc37e6e7014b0744054b4e547a), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 24)" )
+M4VIVALV_SET( 199?, m4vivalv__x,	m4vivalv,	"vlvy.p1",						0x0000, 0x010000, CRC(3211caf3) SHA1(3634ef11099c2f4938529bb262cc2556ad96a675), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 25)" )
+M4VIVALV_SET( 199?, m4vivalv__y,	m4vivalv,	"vv_05___.3_3",					0x0000, 0x010000, CRC(bb8361f6) SHA1(d5f651a66be1cab3662798751a290a65c29bba64), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 26)" )
+M4VIVALV_SET( 199?, m4vivalv__z,	m4vivalv,	"vv_05_b_.3_3",					0x0000, 0x010000, CRC(12079321) SHA1(5b5dd55080c04393a45d3ef9c63b6fef5de9b7cd), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 27)" )
+M4VIVALV_SET( 199?, m4vivalv__0,	m4vivalv,	"vv_05_d_.3_3",					0x0000, 0x010000, CRC(b758df52) SHA1(f4d47a93fa1b1deb84654bb2272767093f3463c2), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 28)" )
+M4VIVALV_SET( 199?, m4vivalv__1,	m4vivalv,	"vv_05_k_.3_3",					0x0000, 0x010000, CRC(9875c59c) SHA1(c31a7fc5df8af9d931353bc095a59befe808434b), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 29)" )
+M4VIVALV_SET( 199?, m4vivalv__2,	m4vivalv,	"vv_05a__.3_3",					0x0000, 0x010000, CRC(0f416e47) SHA1(54338fbef5f227c440c04448b51e8f0ec04a4cc7), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 30)" )
+M4VIVALV_SET( 199?, m4vivalv__3,	m4vivalv,	"vv_10___.3_3",					0x0000, 0x010000, CRC(dc8db002) SHA1(305547b4f0b1e1bde9354e5ed9f18f99c6829cab), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 31)" )
+M4VIVALV_SET( 199?, m4vivalv__4,	m4vivalv,	"vv_10_b_.3_3",					0x0000, 0x010000, CRC(e1c4b292) SHA1(4516c7d918935862824e206626a5a24f936ec514), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 32)" )
+M4VIVALV_SET( 199?, m4vivalv__5,	m4vivalv,	"vv_10_d_.3_3",					0x0000, 0x010000, CRC(e9dda1ee) SHA1(6363b5b26be22cb1f5aac71e98c5e5a5064839f4), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 33)" )
+M4VIVALV_SET( 199?, m4vivalv__6,	m4vivalv,	"vv_10_k_.3_3",					0x0000, 0x010000, CRC(70fc4c56) SHA1(02cbaadd3575ef0d9dc192aabbe39a735893a662), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 34)" )
+M4VIVALV_SET( 199?, m4vivalv__7,	m4vivalv,	"vv_10a__.3_3",					0x0000, 0x010000, CRC(c908d65a) SHA1(5af180e697c22c27380e275d76708103e298cf41), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 35)" )
+M4VIVALV_SET( 199?, m4vivalv__8,	m4vivalv,	"vvi05___.3_3",					0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 36)" )
+
+
+
+
+GAME(199?, m4cojok	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Carry On Joker (Barcrest) (MPU4)",GAME_FLAGS )
+GAMEL(198?,m4gambal	,0			,mod4yam	,m4gambal			, mpu4_state,m4gambal			,ROT0,   "Barcrest","Gamball (Barcrest) (MPU4)",GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
+GAME(199?, m4graff	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Graffiti (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4graffd	,m4graff	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS )
+GAME(199?, m4monte	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Monte Carlo (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4nudbnk	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Banker (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4przmc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Monte Carlo (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4przsss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sss	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Spend Spend Spend (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4ra		,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Red Alert (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sayno	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Say No More (Barcrest) (MPU4)",GAME_FLAGS)
+GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",GAME_FLAGS)
+GAME(199?, m4acechs	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Ace Chase (Bwb) (MPU4)",GAME_FLAGS)
+GAME(199?, m4stc	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
 GAME(199?, m4sstrek,  0,		mod4yam    ,mpu4, mpu4_state, m4default, ROT0,   "bootleg","Super Streak (bootleg) (MPU4)",GAME_FLAGS)
 GAME(199?, m4joljokd,m4joljok	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS)
 GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake
