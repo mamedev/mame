@@ -20854,7 +20854,6 @@ m4nspot		// Night Spot Club (Barcrest)
 m4nspota	//
 m4nspotb	//
 m4nile		// Nile Jewels (Barcrest)
-m4nudgew	// Nudge A Win (Barcrest)
 m4nudbnk	// Nudge Banker (Barcrest)
 m4nnww		// Nudge Nudge Wink Wink (Barcrest)
 m4nnww__a	//
@@ -23090,6 +23089,14 @@ m4rhfevc__w	//
 m4rhfevc__x	//
 m4rhfevc__y	//
 m4nudgwc	// Nudge a Win (Concept)
+m4nudgwc__a	//
+m4nudgwc__b	//
+m4nudgwc__c	//
+m4nudgwc__d	//
+m4nudgwc__e	//
+m4nudgwc__f	//
+m4nudgwc__g	//
+m4nudgwc__h	//
 m4pulwnc	// Pull-a-Win (Concept)
 m4pulwnc__a	//
 m4pulwnc__b	//
@@ -23123,6 +23130,8 @@ m4pulwnc__2	//
 m4pulwnc__3	//
 m4pulwnc__4	//
 m4spnwnc	// Spin-A-Win (Concept)
+m4spnwnc__a	//
+m4spnwnc__b	//
 
 /* Empire */
 
@@ -23423,14 +23432,31 @@ m4ccc
 m4treel
 m4treela
 m4nod
-m4dcrls
+m4dcrls		// Double Crazy Reels (Qps)
+m4dcrls__a	//
+m4dcrls__b	//
+m4dcrls__c	//
+m4dcrls__d	//
+m4dcrls__e	//
+m4dcrls__f	//
+m4dcrls__g	//
+m4dcrls__h	//
+m4dcrls__i	//
+m4dcrls__j	//
+m4dcrls__k	//
+m4dcrls__l	//
+m4dcrls__m	//
+m4dcrls__n	//
+m4dcrls__o	//
+m4dcrls__p	//
+m4dcrls__q	//
+m4dcrls__r	//
 m4aliz		// AlizBaz (Qps)
 m4bluesn	// Blues Boys (Nova)
 m4c2		// Circus Circus 2 (Nova)
 m4coney		// Coney Island (Qps)
 m4cfinln	// Cup Final (Nova)
 m4cfinln__a	//
-m4dcrazy	// D' Crazy Reels (Qps)
 m4ftladn	// Find the Lady (Nova)
 m4goldnn	// Golden Years (Nova)
 m4jungjk	// Jungle Jackpots (Mazooma - Qps)

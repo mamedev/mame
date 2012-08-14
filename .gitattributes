@@ -4337,6 +4337,7 @@ src/mame/machine/megacd.c svneol=native#text/plain
 src/mame/machine/megadriv.c svneol=native#text/plain
 src/mame/machine/megasvp.c svneol=native#text/plain
 src/mame/machine/megavdp.c svneol=native#text/plain
+src/mame/machine/megavdp.h svneol=native#text/plain
 src/mame/machine/meters.c svneol=native#text/plain
 src/mame/machine/meters.h svneol=native#text/plain
 src/mame/machine/mexico86.c svneol=native#text/plain

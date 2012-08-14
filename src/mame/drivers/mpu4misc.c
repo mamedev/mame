@@ -126,43 +126,43 @@ ROM_START( m4jiggin )
 ROM_END
 
 
-
-ROM_START( m4dcrazy )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "70000130.bin", 0x0000, 0x080000, CRC(9d700a27) SHA1(c73c7fc4233dace32fac90a6b46dba5c12979160) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000131.bin", 0x0000, 0x080000, CRC(a7fcfcc8) SHA1(cc7b164e79d86d68112ac86e1ab9e81885cfcabf) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
+#define M4DCRLS_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "dcr_sounds.bin", 0x0000, 0x09664e, CRC(431cecbc) SHA1(b564ae8d083fef84328526192626a220e979d5ad) ) /* intelhex */ \
+	ROM_LOAD( "71000110.bin", 0x0000, 0x080000, CRC(0373a197) SHA1(b32bf521e36b5a53170d3a6ec545ce8db3a5094d) ) \
 
 
-ROM_START( m4dcrls )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "70000116.bin", 0x0000, 0x040000, CRC(27e5ad77) SHA1(83cabd8b52efc6c0d5530b55683295208f64abb6) ) // dcr_std_340.bin
+#define M4DCRLS_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DCRLS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000117.bin", 0x0000, 0x080000, CRC(4106758c) SHA1(3d2b12f1820a65f00fd70856b7765b6f35a8688e) )
-	ROM_LOAD( "70000118.bin", 0x0000, 0x080000, CRC(3603f93c) SHA1(cb969568e0244b465f8b120faba3adb65fe001e6) )
-	ROM_LOAD( "70000134.bin", 0x0000, 0x080000, CRC(a81e80e7) SHA1(852c0b3afe8c22b6e6afe585efb8fec7aeb2aecb) )
-	ROM_LOAD( "70001115.bin", 0x0000, 0x040000, CRC(26432b07) SHA1(ef7303793252210f3fd07b12f5684b5d2cc828ab) ) // dcr_data_340_lv.bin
-	ROM_LOAD( "70001116.bin", 0x0000, 0x040000, CRC(522191e8) SHA1(f80656290295b556d4b67c4458d8f856f8b937fb) )
-	ROM_LOAD( "70001117.bin", 0x0000, 0x080000, CRC(7dcf4e36) SHA1(593089aec7efe8b14b953c5d7b0f552c0906730a) )
-	ROM_LOAD( "70001118.bin", 0x0000, 0x080000, CRC(6732182c) SHA1(aa6620458d381fc37c226f996eab12840573cf80) )
-	ROM_LOAD( "70001134.bin", 0x0000, 0x080000, CRC(a382156e) SHA1(db884dac04f556ecf49f7ecaba0bc3e51a4822f8) )
-	ROM_LOAD( "70001172.bin", 0x0000, 0x080000, CRC(32040f0f) SHA1(9f0452bc33e292ce61650f60f2943a3cef0da050) )
-	ROM_LOAD( "70001173.bin", 0x0000, 0x080000, CRC(0d5f138a) SHA1(e65832d01b11010a7c71230596e3fbc2c750d175) )
-	ROM_LOAD( "dcr_data_340.bin", 0x0000, 0x010000, CRC(fc12e68f) SHA1(f07a42323651ef9aefac24c3b9296a98068c2dc2) )
-	ROM_LOAD( "dcr_gala_hopper_340.bin", 0x0000, 0x040000, CRC(e8a19eda) SHA1(14b49d7c9b8ad7c3f8605b2a57740aab2b98d030) )
-	ROM_LOAD( "dcr_gala_hopper_340_lv.bin", 0x0000, 0x040000, CRC(e0d08c0e) SHA1(7c6a4e30bacfcbd895e418d4ce66425ec4f118f9) )
-	ROM_LOAD( "dcr_mecca_340.bin", 0x0000, 0x040000, CRC(f18ac60f) SHA1(ffdd8d096ebc062a36a8d22cf881d0fa95adc2db) )
-	ROM_LOAD( "dcr_mecca_340_lv.bin", 0x0000, 0x040000, CRC(0eb204c1) SHA1(648f5b90776f99155fd54257aabecb8c9f90abec) )
-	ROM_LOAD( "dcr_std_340_lv.bin", 0x0000, 0x040000, CRC(d9632301) SHA1(19ac680f00e085d94fc45f765c975f3da1ca1eb3) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "dcr_sounds.bin", 0x0000, 0x09664e, CRC(431cecbc) SHA1(b564ae8d083fef84328526192626a220e979d5ad) ) // intelhex
-	ROM_LOAD( "71000110.bin", 0x0000, 0x080000, CRC(0373a197) SHA1(b32bf521e36b5a53170d3a6ec545ce8db3a5094d) )
-ROM_END
+
+M4DCRLS_SET( 199?, m4dcrls,			0,			"70000116.bin",					0x0000, 0x040000, CRC(27e5ad77) SHA1(83cabd8b52efc6c0d5530b55683295208f64abb6), "Qps","Double Crazy Reels (Qps) (MPU4) (set 1)" ) // dcr_std_340.bin
+M4DCRLS_SET( 199?, m4dcrls__a,		m4dcrls,	"70000117.bin",					0x0000, 0x080000, CRC(4106758c) SHA1(3d2b12f1820a65f00fd70856b7765b6f35a8688e), "Qps","Double Crazy Reels (Qps) (MPU4) (set 2)" )
+M4DCRLS_SET( 199?, m4dcrls__b,		m4dcrls,	"70000118.bin",					0x0000, 0x080000, CRC(3603f93c) SHA1(cb969568e0244b465f8b120faba3adb65fe001e6), "Qps","Double Crazy Reels (Qps) (MPU4) (set 3)" )
+M4DCRLS_SET( 199?, m4dcrls__c,		m4dcrls,	"70000134.bin",					0x0000, 0x080000, CRC(a81e80e7) SHA1(852c0b3afe8c22b6e6afe585efb8fec7aeb2aecb), "Qps","Double Crazy Reels (Qps) (MPU4) (set 4)" )
+M4DCRLS_SET( 199?, m4dcrls__d,		m4dcrls,	"70000130.bin",					0x0000, 0x080000, CRC(9d700a27) SHA1(c73c7fc4233dace32fac90a6b46dba5c12979160), "Qps","Double Crazy Reels (Qps) (MPU4) (set 5)" )
+M4DCRLS_SET( 199?, m4dcrls__e,		m4dcrls,	"70000131.bin",					0x0000, 0x080000, CRC(a7fcfcc8) SHA1(cc7b164e79d86d68112ac86e1ab9e81885cfcabf), "Qps","Double Crazy Reels (Qps) (MPU4) (set 6)" )
+M4DCRLS_SET( 199?, m4dcrls__f,		m4dcrls,	"70001117.bin",					0x0000, 0x080000, CRC(7dcf4e36) SHA1(593089aec7efe8b14b953c5d7b0f552c0906730a), "Qps","Double Crazy Reels (Qps) (MPU4) (set 7)" )
+M4DCRLS_SET( 199?, m4dcrls__g,		m4dcrls,	"70001118.bin",					0x0000, 0x080000, CRC(6732182c) SHA1(aa6620458d381fc37c226f996eab12840573cf80), "Qps","Double Crazy Reels (Qps) (MPU4) (set 8)" )
+M4DCRLS_SET( 199?, m4dcrls__h,		m4dcrls,	"70001134.bin",					0x0000, 0x080000, CRC(a382156e) SHA1(db884dac04f556ecf49f7ecaba0bc3e51a4822f8), "Qps","Double Crazy Reels (Qps) (MPU4) (set 9)" )
+M4DCRLS_SET( 199?, m4dcrls__i,		m4dcrls,	"70001172.bin",					0x0000, 0x080000, CRC(32040f0f) SHA1(9f0452bc33e292ce61650f60f2943a3cef0da050), "Qps","Double Crazy Reels (Qps) (MPU4) (set 10)" )
+M4DCRLS_SET( 199?, m4dcrls__j,		m4dcrls,	"70001173.bin",					0x0000, 0x080000, CRC(0d5f138a) SHA1(e65832d01b11010a7c71230596e3fbc2c750d175), "Qps","Double Crazy Reels (Qps) (MPU4) (set 11)" )
+M4DCRLS_SET( 199?, m4dcrls__k,		m4dcrls,	"dcr_gala_hopper_340.bin",		0x0000, 0x040000, CRC(e8a19eda) SHA1(14b49d7c9b8ad7c3f8605b2a57740aab2b98d030), "Qps","Double Crazy Reels (Qps) (MPU4) (set 12)" )
+M4DCRLS_SET( 199?, m4dcrls__l,		m4dcrls,	"dcr_gala_hopper_340_lv.bin",	0x0000, 0x040000, CRC(e0d08c0e) SHA1(7c6a4e30bacfcbd895e418d4ce66425ec4f118f9), "Qps","Double Crazy Reels (Qps) (MPU4) (set 13)" )
+M4DCRLS_SET( 199?, m4dcrls__m,		m4dcrls,	"dcr_mecca_340.bin",			0x0000, 0x040000, CRC(f18ac60f) SHA1(ffdd8d096ebc062a36a8d22cf881d0fa95adc2db), "Qps","Double Crazy Reels (Qps) (MPU4) (set 14)" )
+M4DCRLS_SET( 199?, m4dcrls__n,		m4dcrls,	"dcr_mecca_340_lv.bin",			0x0000, 0x040000, CRC(0eb204c1) SHA1(648f5b90776f99155fd54257aabecb8c9f90abec), "Qps","Double Crazy Reels (Qps) (MPU4) (set 15)" )
+M4DCRLS_SET( 199?, m4dcrls__o,		m4dcrls,	"dcr_std_340_lv.bin",			0x0000, 0x040000, CRC(d9632301) SHA1(19ac680f00e085d94fc45f765c975f3da1ca1eb3), "Qps","Double Crazy Reels (Qps) (MPU4) (set 16)" )
+M4DCRLS_SET( 199?, m4dcrls__p,		m4dcrls,	"70001115.bin",					0x0000, 0x040000, CRC(26432b07) SHA1(ef7303793252210f3fd07b12f5684b5d2cc828ab), "Qps","Double Crazy Reels (Qps) (MPU4) (set 17)" ) // dcr_data_340_lv.bin
+M4DCRLS_SET( 199?, m4dcrls__q,		m4dcrls,	"70001116.bin",					0x0000, 0x040000, CRC(522191e8) SHA1(f80656290295b556d4b67c4458d8f856f8b937fb), "Qps","Double Crazy Reels (Qps) (MPU4) (set 18)" )
+M4DCRLS_SET( 199?, m4dcrls__r,		m4dcrls,	"dcr_data_340.bin",				0x0000, 0x010000, CRC(fc12e68f) SHA1(f07a42323651ef9aefac24c3b9296a98068c2dc2), "Qps","Double Crazy Reels (Qps) (MPU4) (set 19)" ) // too small?
+
+
 
 
 ROM_START( m4jungjk )
@@ -409,8 +409,6 @@ GAME(199?, m4jiggin,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global"
 
 /* QPS */
 // 'START UP'
-GAME( 199?, m4dcrazy	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "D' Crazy Reels (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4dcrls		, m4dcrazy	,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Double Crazy Reels (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE) // or mazooma?
 GAME( 199?, m4jungjk	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Jungle Jackpots (Mazooma - Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
 GAME( 199?, m4rhnote	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Red Hot Notes (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
 GAME( 199?, m4rhrock	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Red Hot Rocks (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)

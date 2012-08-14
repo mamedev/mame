@@ -996,6 +996,26 @@ static WRITE16_HANDLER( _32x_68k_pwm_w )
 /**********************************************************************************************/
 
 static UINT16 _32x_a1518a_reg;
+#define MAX_HPOSITION 480
+
+static UINT16 get_hposition(void)
+{
+	attotime time_elapsed_since_megadriv_scanline_timer;
+	UINT16 value4;
+
+	time_elapsed_since_megadriv_scanline_timer = megadriv_scanline_timer->time_elapsed();
+
+	if (time_elapsed_since_megadriv_scanline_timer.attoseconds<(ATTOSECONDS_PER_SECOND/megadriv_framerate /megadrive_total_scanlines))
+	{
+		value4 = (UINT16)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds) / (double)(ATTOSECONDS_PER_SECOND/megadriv_framerate /megadrive_total_scanlines)));
+	}
+	else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
+	{
+		value4 = MAX_HPOSITION;
+	}
+
+	return value4;
+}
 
 static READ16_HANDLER( _32x_common_vdp_regs_r )
 {

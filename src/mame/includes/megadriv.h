@@ -56,8 +56,6 @@ extern void megadriv_stop_scanline_timer(void);
 
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag);
 
-extern READ16_HANDLER( megadriv_vdp_r );
-extern WRITE16_HANDLER( megadriv_vdp_w );
 
 /* These handlers are needed by megaplay.c */
 extern READ16_HANDLER( megadriv_68k_io_read );
@@ -446,7 +444,6 @@ extern int _32x_displaymode;
 extern int _32x_videopriority;
 extern int _32x_hcount_compare_val;
 extern int megadrive_vblank_flag;
-extern UINT16 get_hposition(void);
 extern int genesis_scanline_counter;
 
 class segacd_state : public _32x_state	// use _32x_state as base to make easier the combo 32X + SCD
@@ -495,8 +492,6 @@ extern TIMER_DEVICE_CALLBACK( megadriv_render_timer_callback );
 extern TIMER_DEVICE_CALLBACK( irq6_on_callback );
 extern int megadrive_irq6_pending;
 extern int megadrive_irq4_pending;
-extern bitmap_ind16* megadriv_render_bitmap;
 extern timer_device* megadriv_scanline_timer;
-extern timer_device* irq6_on_timer;
 extern timer_device* irq4_on_timer;
-extern void megadriv_reset_vdp(void);
+extern void megadriv_reset_vdp(running_machine &machine);
