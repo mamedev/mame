@@ -43,7 +43,29 @@ Notes:
 Added Dip Locations based on Service Mode
 
 
-Is this based on some Seta / Taito HW design, the sprite-tilemaps look familiar
+The video system is a little weird, and looks like it was overdesigned for
+what the hardware is capable of.
+
+The video RAM can be viewed as 8 'banks', the first bank is the sprite 'list'
+The other video banks contain 1x32 tile strips which are the sprites.
+
+For every tile strip the first bank contains an x/y position, entries
+which would coincide with strips in the first bank are left blank, presumably
+due to this bank being the actual list.
+
+This would suggest the hardware is capable of drawing 31x32 (992) sprites,
+each made of 1x32 tile strips, however the game only ever appears to use 3
+banks of tile strips (96 sprites)
+
+Priority isn't understood (other attributes, sort by y pos?)
+
+Furthermore there are two sets of graphics, background tiles and 'sprite'
+tiles which are of different bitdepths, but are addressed in the same way.
+
+Tilemap hookup is just to make viewing easier, it's not used for rendering
+
+
+There is also an additional 8x8 text layer..
 
 */
 
@@ -59,10 +81,26 @@ public:
 	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_tilemapram(*this, "tilemapram"),
-		m_tilemapram2(*this, "tilemapram2"){ }
+		m_spriteram0(*this, "spriteram0"),
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram3(*this, "spriteram3"),
+		m_spriteram4(*this, "spriteram4"),
+		m_spriteram5(*this, "spriteram5"),
+		m_spriteram6(*this, "spriteram6"),
+		m_spriteram7(*this, "spriteram7")	
+	{ 
+	}
 
 	required_shared_ptr<UINT16> m_tilemapram;
-	required_shared_ptr<UINT16> m_tilemapram2;
+	required_shared_ptr<UINT16> m_spriteram0;
+	required_shared_ptr<UINT16> m_spriteram1;
+	required_shared_ptr<UINT16> m_spriteram2;
+	required_shared_ptr<UINT16> m_spriteram3;
+	required_shared_ptr<UINT16> m_spriteram4;
+	required_shared_ptr<UINT16> m_spriteram5;
+	required_shared_ptr<UINT16> m_spriteram6;
+	required_shared_ptr<UINT16> m_spriteram7;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
 	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
@@ -71,72 +109,116 @@ public:
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
 	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
+
+	DECLARE_WRITE16_MEMBER(bg_videoram0_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram1_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram2_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram3_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram4_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram5_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram6_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram7_w);
+
+	UINT16*		 m_spriteram[8];
+	tilemap_t    *m_bg_tilemap[8];
+
 };
 
+#define GET_INFO( ram ) \
+	blackt96_state *state = machine.driver_data<blackt96_state>(); \
+	int tileno = (ram[tile_index*2+1] & 0x1fff); \
+	int rgn = (ram[tile_index*2+1] & 0x2000) >> 13; \
+	int flipyx = (ram[tile_index*2+1] & 0xc000)>>14; \
+	int col = (ram[tile_index*2] & 0x00ff); \
+	if (rgn==1) col >>=4; \
+	SET_TILE_INFO(1-rgn, tileno, col, TILE_FLIPYX(flipyx)); \
+
+
+static TILE_GET_INFO( get_bg0_tile_info ) { GET_INFO(state->m_spriteram0); }
+static TILE_GET_INFO( get_bg1_tile_info ) { GET_INFO(state->m_spriteram1); }
+static TILE_GET_INFO( get_bg2_tile_info ) { GET_INFO(state->m_spriteram2); }
+static TILE_GET_INFO( get_bg3_tile_info ) { GET_INFO(state->m_spriteram3); }
+static TILE_GET_INFO( get_bg4_tile_info ) { GET_INFO(state->m_spriteram4); }
+static TILE_GET_INFO( get_bg5_tile_info ) { GET_INFO(state->m_spriteram5); }
+static TILE_GET_INFO( get_bg6_tile_info ) { GET_INFO(state->m_spriteram6); }
+static TILE_GET_INFO( get_bg7_tile_info ) { GET_INFO(state->m_spriteram7); }
+
+WRITE16_MEMBER(blackt96_state::bg_videoram0_w) { COMBINE_DATA(&m_spriteram0[offset]); m_bg_tilemap[0]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram1_w) { COMBINE_DATA(&m_spriteram1[offset]); m_bg_tilemap[1]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram2_w) { COMBINE_DATA(&m_spriteram2[offset]); m_bg_tilemap[2]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram3_w) { COMBINE_DATA(&m_spriteram3[offset]); m_bg_tilemap[3]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram4_w) { COMBINE_DATA(&m_spriteram4[offset]); m_bg_tilemap[4]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram5_w) { COMBINE_DATA(&m_spriteram5[offset]); m_bg_tilemap[5]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram6_w) { COMBINE_DATA(&m_spriteram6[offset]); m_bg_tilemap[6]->mark_tile_dirty(offset/2); }
+WRITE16_MEMBER(blackt96_state::bg_videoram7_w) { COMBINE_DATA(&m_spriteram7[offset]); m_bg_tilemap[7]->mark_tile_dirty(offset/2); }
 
 static VIDEO_START( blackt96 )
 {
+	blackt96_state *state = machine.driver_data<blackt96_state>();
+
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_bg0_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[2] = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[3] = tilemap_create(machine, get_bg3_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[4] = tilemap_create(machine, get_bg4_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[5] = tilemap_create(machine, get_bg5_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[6] = tilemap_create(machine, get_bg6_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[7] = tilemap_create(machine, get_bg7_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+
+	state->m_spriteram[0] = state->m_spriteram0;
+	state->m_spriteram[1] = state->m_spriteram1;
+	state->m_spriteram[2] =	state->m_spriteram2;
+	state->m_spriteram[3] = state->m_spriteram3;
+	state->m_spriteram[4] = state->m_spriteram4;
+	state->m_spriteram[5] = state->m_spriteram5;
+	state->m_spriteram[6] =	state->m_spriteram6;
+	state->m_spriteram[7] = state->m_spriteram7;
 }
 
-static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int stripnum, int xbase, int ybase, int bg)
+static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column, int bg)
 {
 	blackt96_state *state = machine.driver_data<blackt96_state>();
-	const gfx_element *gfxspr = machine.gfx[1];
+	/* the very first 'page' in the spriteram contains the x/y positions for each tile strip */
 	const gfx_element *gfxbg = machine.gfx[0];
+	const gfx_element *gfxspr = machine.gfx[1];
 
-	int base = stripnum;
-	int count = 0;
-	int y;
+	int base = column * (0x80/2);
+	base += page * 2;
 
-	for (y=0;y<32;y++)
+	/* ---- ---- ---x xxxx
+	   xxxx ---y yyyy yyyy */
+
+	int xx=  ((state->m_spriteram[0][base+0]&0x001f)<<4) | (state->m_spriteram[0][base+1]&0xf000)>>12;
+	int yy = ((state->m_spriteram[0][base+1]&0x1ff));
+
+	if (xx&0x100) xx-=0x200;
+	yy = 0x1ff-yy;
+	if (yy&0x100) yy-=0x200;
+
+	yy -= 32;
+
+	UINT16* base2 = state->m_spriteram[page]+column * (0x80/2);
+
+	for (int y=0;y<32;y++)
 	{
-		UINT16 tile = (state->m_tilemapram2[count*2 + (base/2)+1]&0x3fff);
-		UINT16 flipx = (state->m_tilemapram2[count*2 + (base/2)+1]&0x4000);
-		UINT16 colour = (state->m_tilemapram2[count*2 + (base/2)]&0x00ff);
+		/* -Xtt tttt tttt tttt
+		   ---- ---- cccc cccc */
+
+		UINT16 tile = (base2[y*2+1]&0x3fff);
+		UINT16 flipx = (base2[y*2+1]&0x4000);
+		UINT16 colour = (base2[y*2]&0x00ff);
 
 		if (tile&0x2000)
 		{
-			if (bg) drawgfx_transpen(bitmap,cliprect,gfxbg,tile&0x1fff,colour>>4,flipx,0,xbase,ybase+y*16,0);
+			if (bg) drawgfx_transpen(bitmap,cliprect,gfxbg,tile&0x1fff,colour>>4,flipx,0,xx,yy+y*16,0);
 		}
 		else
 		{
-			if (!bg) drawgfx_transpen(bitmap,cliprect,gfxspr,tile&0x1fff,colour,flipx,0,xbase,ybase+y*16,0);
+			if (!bg) drawgfx_transpen(bitmap,cliprect,gfxspr,tile&0x1fff,colour,flipx,0,xx,yy+y*16,0);
 		}
-
-		count++;
 	}
-
 }
 
-static void draw_main(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bg)
-{
-	blackt96_state *state = machine.driver_data<blackt96_state>();
-
-	int x;
-
-
-	for (x=(0x1000/2)-2;x>=0;x-=2)
-	{
-		int xx;
-		int yy;
-		int s = 0;
-
-		xx=  ((state->m_tilemapram2[x+0]&0x001f)<<4) | (state->m_tilemapram2[x+1]&0xf000)>>12;
-		yy = ((state->m_tilemapram2[x+1]&0x1ff));
-
-		if (xx&0x100) xx-=0x200;
-		yy = 0x1ff-yy;
-		if (yy&0x100) yy-=0x200;
-
-		s = x*2;
-		s &=0xfff;
-		s += (x&7)*0x800;
-
-
-		draw_strip(machine,bitmap,cliprect,s,xx,yy,bg);
-	}
-
-}
 
 static SCREEN_UPDATE_IND16( blackt96 )
 {
@@ -147,11 +229,29 @@ static SCREEN_UPDATE_IND16( blackt96 )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	draw_main(screen.machine(),bitmap,cliprect,1);
-	draw_main(screen.machine(),bitmap,cliprect,0);
+	int strip;
+	int page;
+
+	for (strip=0;strip<32;strip++)
+	{
+		for (page = 7;page>0;page--)
+		{
+			draw_strip(screen.machine(), bitmap, cliprect, page, strip, 1);
+		}
+	}
+
+	for (strip=0;strip<32;strip++)
+	{
+		for (page = 7;page>0;page--)
+		{
+			draw_strip(screen.machine(), bitmap, cliprect, page, strip, 0);
+		}
+	}
+
 
 	/* Text Layer */
 	count = 0;
+
 	for (x=0;x<64;x++)
 	{
 		for (y=0;y<32;y++)
@@ -188,7 +288,16 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("tilemapram") // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("tilemapram2")// sprite list + sprite tilemaps
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(bg_videoram0_w) AM_SHARE("spriteram0")
+	AM_RANGE(0x201000, 0x201fff) AM_RAM_WRITE(bg_videoram1_w) AM_SHARE("spriteram1")
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(bg_videoram2_w) AM_SHARE("spriteram2")
+	AM_RANGE(0x203000, 0x203fff) AM_RAM_WRITE(bg_videoram3_w) AM_SHARE("spriteram3")
+	AM_RANGE(0x204000, 0x204fff) AM_RAM_WRITE(bg_videoram4_w) AM_SHARE("spriteram4")
+	AM_RANGE(0x205000, 0x205fff) AM_RAM_WRITE(bg_videoram5_w) AM_SHARE("spriteram5")
+	AM_RANGE(0x206000, 0x206fff) AM_RAM_WRITE(bg_videoram6_w) AM_SHARE("spriteram6")
+	AM_RANGE(0x207000, 0x207fff) AM_RAM_WRITE(bg_videoram7_w) AM_SHARE("spriteram7")
+
+
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
@@ -435,7 +544,7 @@ static const gfx_layout blackt962_layout =
 };
 
 
-static const gfx_layout blackt963_layout =
+static const gfx_layout blackt96_text_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -449,7 +558,7 @@ static const gfx_layout blackt963_layout =
 static GFXDECODE_START( blackt96 )
 	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,    0x0, 0x10  )
 	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,   0x0, 0x80  )
-	GFXDECODE_ENTRY( "gfx3", 0, blackt963_layout,   0x0, 0x80  )
+	GFXDECODE_ENTRY( "gfx3", 0, blackt96_text_layout,   0x0, 0x80  )
 GFXDECODE_END
 
 
