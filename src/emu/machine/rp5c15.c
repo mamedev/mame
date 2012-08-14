@@ -236,6 +236,16 @@ void rp5c15_device::device_start()
 
 	m_clkout_timer = timer_alloc(TIMER_CLKOUT);
 
+	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_ram, 0, sizeof(m_ram));
+	m_mode = 0;
+	m_reset = 0;
+	m_alarm = 0;
+	m_alarm_on = 0;
+	m_1hz = 0;
+	m_16hz = 0;
+	m_clkout = 0;
+
 	// state saving
 	save_item(NAME(m_reg[MODE00]));
 	save_item(NAME(m_reg[MODE01]));
