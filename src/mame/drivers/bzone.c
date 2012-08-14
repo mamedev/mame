@@ -73,9 +73,9 @@
     XXXX01XX   Missile appears after 20,000 points
     XXXX00XX   Missile appears after 30,000 points
     XX11XXXX   No bonus tank
-    XX10XXXX   Bonus taks at 15,000 and 100,000 points  $
-    XX01XXXX   Bonus taks at 20,000 and 100,000 points
-    XX00XXXX   Bonus taks at 50,000 and 100,000 points
+    XX10XXXX   Bonus tanks at 15,000 and 100,000 points  $
+    XX01XXXX   Bonus tanks at 25,000 and 100,000 points
+    XX00XXXX   Bonus tanks at 50,000 and 100,000 points
     11XXXXXX   English language
     10XXXXXX   French language
     01XXXXXX   German language
@@ -379,7 +379,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x0c, "30000" )\
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("M10:5,6")\
 	PORT_DIPSETTING(	0x10, "15k and 100k" )\
-	PORT_DIPSETTING(	0x20, "20k and 100k" )\
+	PORT_DIPSETTING(	0x20, "25k and 100k" )\
 	PORT_DIPSETTING(	0x30, "50k and 100k" )\
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )\
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("M10:7,8")\
