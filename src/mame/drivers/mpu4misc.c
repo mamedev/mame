@@ -367,6 +367,31 @@ ROM_END
 
 
 
+ROM_START( m4looplt )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "70000500.bin", 0x0000, 0x080000, CRC(040699a5) SHA1(e1ebc23684c5bc1faaac7409d2179488c3022872) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "70000500a.bin", 0x0000, 0x080000, CRC(0668f52d) SHA1(6560309facf0022e3c14421b848f212b18be7550) )
+	ROM_LOAD( "70000501.bin", 0x0000, 0x080000, CRC(e2fbbfcf) SHA1(fc060468bf5e732626af8c3d0d6fc119a529c330) )
+	ROM_LOAD( "70000501a.bin", 0x0000, 0x080000, CRC(42bef934) SHA1(c332eb6566ef5f9ac56d1c3944635296c21b3193) )
+	ROM_LOAD( "70000504.bin", 0x0000, 0x080000, CRC(15e2c1c3) SHA1(69257749f1909b7ecc9c94cc2a27a5d4e6608251) )
+	ROM_LOAD( "70000505.bin", 0x0000, 0x080000, CRC(f28f59bd) SHA1(d5cdb0c020693c7922c5243f9d18054d47ed039d) )
+	ROM_LOAD( "70000506.bin", 0x0000, 0x080000, CRC(a3d40e9a) SHA1(97ac40e814824450e6705bc3240fffd4d0015b46) )
+	ROM_LOAD( "70000507.bin", 0x0000, 0x080000, CRC(756eefe4) SHA1(b253fbd94fdab5df32375a02d16d9ba333e8d71c) )
+	ROM_LOAD( "70001500.bin", 0x0000, 0x080000, CRC(0b9761a4) SHA1(e7a5e4b90d2e60808a7797d124308973130c440d) )
+	ROM_LOAD( "70001500a.bin", 0x0000, 0x080000, CRC(09f90d2c) SHA1(addfd0d20ef9cafba042aa05ee84db85f060b67a) )
+	ROM_LOAD( "70001501.bin", 0x0000, 0x080000, CRC(6ce9f76c) SHA1(467701786f8de136c9780a4ef93be6bb932d235d) )
+	ROM_LOAD( "70001501a.bin", 0x0000, 0x080000, CRC(ccacb197) SHA1(c7573f309e9c79b2999229c46f78fd0283c4a064) )
+	ROM_LOAD( "70001504.bin", 0x0000, 0x080000, CRC(1a7339c2) SHA1(575477d8abe3765d9cd4345336d0f7fa3a69202a) )
+	ROM_LOAD( "70001505.bin", 0x0000, 0x080000, CRC(7c9d111e) SHA1(8f98feb70cdcd77b5e7bb6a015c935403a53f428) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "71000500.bin", 0x0000, 0x080000, CRC(94fe58f4) SHA1(e07d8e6d4b1e660abc4fa08d703fc0e586f3570d) )
+ROM_END
+
+
+
 /* Global */
 // boot to "Percent Change" then "*initializing*"
 GAME(199?, m4bangin,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
@@ -397,3 +422,4 @@ GAME( 199?, m4rhwhl		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "
 // different behavior
 GAME( 199?, m4rdeal		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Reel Deal (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
 GAME( 199?, m4sdquid	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Sundance Quid (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
+GAME( 199?, m4looplt	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Loop The Loot (Qps) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)

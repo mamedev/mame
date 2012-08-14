@@ -19688,7 +19688,6 @@ m4clbtroa	//
 m4clbtrob	//
 m4clbtroc	//
 m4clbtrod	//
-m4clbtroe	//
 m4clbveg	// Club Vegas (Barcrest)
 m4clbvega	//
 m4clbvegb	//
@@ -19812,6 +19811,8 @@ m4dbldm__a	//
 m4dbldm__b	//
 m4dbldm__c	//
 m4dblup		// Double Up (Barcrest)
+m4draca		//
+m4dracb		//
 m4drac		// Dracula (Barcrest - Nova)
 m4dtyfre		// Duty Free (Barcrest)
 m4dtyfref5ad		//
@@ -19997,6 +19998,8 @@ m4fastfw__f	//
 m4class		// First Class (Barcrest)
 m4flash		// Flash Cash (Barcrest)
 m4fortcb	// Fortune Club (Barcrest)
+m4fortcba	//
+m4fortcbb	//
 m4frtfl		// Fruit Full (Barcrest)
 m4frtflc	// Fruit Full Club (Barcrest)
 m4frtgm		// Fruit Game (Barcrest)
@@ -20109,6 +20112,11 @@ m4hijinx__9	//
 m4hijinx__aa	//
 m4hijinx__ab	//
 m4hirise	// High Rise (Barcrest)
+m4hirisea	//
+m4hiriseb	//
+m4hirisec	//
+m4hirised	//
+m4hirisee	//
 m4hiroll	// High Roller (Barcrest)
 m4hittop	// Hit The Top (Barcrest)
 m4hittop__a	//
@@ -20508,6 +20516,7 @@ m4goodtm__a5	//
 m4goodtm__a6	//
 m4libty		// Liberty (Barcrest)
 m4lineup	// Line Up (Bwb - Barcrest)
+m4lineupa	//
 m4loadmn	// Loads A Money (Barcrest)
 m4loadmna	//
 m4loadmnb	//
@@ -20633,6 +20642,12 @@ m4lucksc__j	//
 m4lucksc__k	//
 m4lucksc__l	//
 m4luckwb	// Lucky Wild Boar (Barcrest)
+m4luckwba	//
+m4luckwbb	//
+m4luckwbc	//
+m4luckwbd	//
+m4luckwbe	//
+m4luckwbf	//
 m4luxor		// Luxor (Barcrest)
 m4luxor__a	//
 m4luxor__b	//
@@ -20836,6 +20851,8 @@ m4nifty		// Nifty Fifty (Barcrest)
 m4niftya	//
 m4niftyb	//
 m4nspot		// Night Spot Club (Barcrest)
+m4nspota	//
+m4nspotb	//
 m4nile		// Nile Jewels (Barcrest)
 m4nudgew	// Nudge A Win (Barcrest)
 m4nudbnk	// Nudge Banker (Barcrest)
@@ -20945,6 +20962,9 @@ m4nnwwc__ac	//
 m4nnwwc__ad	//
 m4nudqst	// Nudge Quest (Barcrest)
 m4nudshf	// Nudge Shuffle (Barcrest)
+m4nudshfa	//
+m4nudshfb	//
+m4nudshfc	//
 m4nudup		// Nudge Up (Barcrest)
 m4num1		// Number One (Barcrest)
 m4oldtmr	// Old Timer (Barcrest)
@@ -21709,7 +21729,12 @@ m4sunsett	//
 m4supslt	// Supa Slot (Barcrest)
 m4suptrn	// Supatron (Barcrest)
 m4supbjc	// Super Blackjack Club (Barcrest)
+m4supbjca	//
+m4supbjcb	//
+m4supbjcc	//
+m4supbjcd	//
 m4supbf		// Super Bucks Fizz Club (Barcrest)
+m4supbfa	//
 m4suphv		// Super Hyper Viper (Barcrest)
 m4suphv__a	//
 m4suphv__b	//
@@ -21876,6 +21901,7 @@ m4typcl__b	//
 m4typcl__c	//
 m4typcl__d	//
 m4techno	// Techno Reel (Barcrest)
+m4technoa	//
 m4toot		// Ten Out Of Ten (Barcrest)
 m4toot__a	//
 m4toot__b	//
@@ -22012,12 +22038,19 @@ m4topten__ax	//
 m4toptena	//
 m4toplot	// Top The Lot (Barcrest)
 m4toptim	// Top Timer (Barcrest)
+m4toptima	//
 m4tricol	// Tricolor (Barcrest)
 m4tribnk	// Triple Bank (Barcrest)
 m4tridic	// Triple Dice (Barcrest)
 m4tropcl	// Tropicana Club (Barcrest)
+m4tropcla	//
+m4tropclb	//
+m4tropclc	//
+m4tropcld	//
 m4tupen		// Tuppenny Cracker (Barcrest - Bootleg)
 m4tbplay	// Turbo Play (Barcrest)
+m4tbplaya	//
+m4tbplayb	//
 m4tbreel	// Turbo Reel (Barcrest)
 m4tbrldx	// Turbo Reel Deluxe (Barcrest)
 m4tutfrt	// Tutti Fruity (Barcrest)
@@ -22104,6 +22137,8 @@ m421		// Twenty One (Barcrest)
 m4twilgt	// Twilight (Barcrest)
 m4twintm	// Twin Timer (Barcrest)
 m4twist		// Twist Again (Barcrest)
+m4twista	//
+m4twistb	//
 m4univ		// Universe (Barcrest)
 m4uuaw		// Up Up and Away (Barcrest)
 m4uuaw__a	//
@@ -22582,7 +22617,6 @@ m4indycr__c	//
 m4indycr__d	//
 m4indycr__e	//
 m4indycr__f	//
-m4indycr__g	//
 m4jakjok	// Jackpot Jokers (Bwb)
 m4jakjok__a	//
 m4jakjok__b	//
@@ -22650,6 +22684,8 @@ m4kingqc__3	//
 m4kingqc__4	//
 m4kingqc__5	//
 m4lazy		// Lazy Bones (Bwb)
+m4lazya		//
+m4lazyb		//
 m4lvlcl		// Lucky Las Vegas Classic (Bwb)
 m4lvlcl__a	//
 m4lvlcl__b	//
@@ -22863,7 +22899,10 @@ m4thestr__w	//
 m4thestr__x	//
 m4thestr__y	//
 m4sunclb	// Sun Club (Bwb)
+m4sunclba	//
 m4sunscl	// Sunset Club (Bwb)
+m4sunscla	//
+m4sunsclb	//
 m4supleg	// Super League (Bwb)
 m4supleg__a	//
 m4supleg__b	//
@@ -23345,24 +23384,44 @@ m4barcrz	// Bar Crazy (unknown)
 m4bonzbn	// Bingo Bonanza (unknown)
 m4cld02		// Unknown MPU4 'CLD 0.2C'
 m4dnj		// Double Nudge (unknown)
+m4dnja		//
+m4dnjb		//
 m4matdr		// Matador (unknown)
 m4ttak		// Tic Tac Take (unknown)
 m4hslo		// Unknown MPU4 'HOT 3.0'
 m4sbx		// Super Bear X
+m4sbxa		//
+m4sbxb		//
+m4sbxc		//
+m4sbxd		//
+m4sbxe		//
 m4bclimb	// Bear Climber
 m4captb		// Captain Bear
 m4jungj		// Jungle Japes
+m4jungja	//
+m4jungjb	//
+m4jungjc	//
 m4fsx		// Fun Spot X
+m4fsxa		//
+m4fsxb		//
 m4unkjok	// Unknown MPU4 'Joker'
+m4unkjoka	//
+m4unkjokb	//
+m4unkjokc	//
 m4remag		// Unknown MPU4 'ZTP 0.7'
 m4rmg		// Unknown MPU4 'CTP 0.4'
 m4wnud		// Unknown MPU4 'W Nudge'
 m4t266		// Unknown MPU4 'TTO 1.1'
 m4brnze		// Bronze Voyage (unknown)
+m4brnzea	//
+m4brnzeb	//
 m4riotrp	// Rio Tropico (unknown)
 m4ccop
+m4ccopa
+m4ccopb
 m4ccc
 m4treel
+m4treela
 m4nod
 m4dcrls
 m4aliz		// AlizBaz (Qps)
@@ -23444,18 +23503,31 @@ m4blsbys__ad	//
 m4conn4		// Connect 4
 
 m4surf		// Super Surfin' (Gemini)
+m4surfa		//
+m4surfb		//
 m4wife		// Money Or Yer Wife (Gemini)
 m4blkgd		// Black Gold (Gemini)
+m4blkgda	//
 m4excam		// Excalibur (Mdm)
 m4front		// Final Frontier (Mdm)
 m4pick		// Pick A Fruit (Jpm)
 m4safar		// Safari Club (Mdm)
 m4zill		// Zillionare's Challenge (Pure Leisure)
+m4zilla		//
 m4snowbl	//
 m4hstr		// Happy Streak (Coinworld)
+m4hstra		//
+m4hstrb		//
 m4hstrcs	// Casino Happy Streak (Coinworld)
+m4hstrcsa	//
+m4hstrcsb	//
+m4hstrcsc	//
+m4hstrcsd	//
 m4ddb		// Ding Dong Bells (Coinworld)
+m4ddba		//
 m4hapfrt	// Happy Fruits (Coinworld)
+m4hapfrta	//
+m4hapfrtb	//
 m4frcrak	// Fruit Cracker
 m4ewshft	// Each Way Shifter
 m4jiggin	// Jiggin' In The Riggin'

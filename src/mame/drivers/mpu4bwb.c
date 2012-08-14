@@ -497,7 +497,6 @@ M4INDYCR_SET( 199?, m4indycr__c,	m4indycr,	"ic_sj_d_.1_0", 0x0000, 0x040000, CRC
 M4INDYCR_SET( 199?, m4indycr__d,	m4indycr,	"ic_sj_d_.2_0", 0x0000, 0x040000, CRC(36bd0b34) SHA1(306d6e6536a4137353f9b895e64c7e9a5c79561a), "Bwb","Indy Cars (Bwb) (MPU4) (set 5)" )
 M4INDYCR_SET( 199?, m4indycr__e,	m4indycr,	"ic_sj_k_.1_0", 0x0000, 0x040000, CRC(857fda64) SHA1(3eb230ea1adf9acb4cf83422c4bb1cde40756310), "Bwb","Indy Cars (Bwb) (MPU4) (set 6)" )
 M4INDYCR_SET( 199?, m4indycr__f,	m4indycr,	"ic_sjs__.1_0", 0x0000, 0x040000, CRC(6310b904) SHA1(0f2cd7ed83f77423bcfb2a71144fab2047dfea13), "Bwb","Indy Cars (Bwb) (MPU4) (set 7)" )
-M4INDYCR_SET( 199?, m4indycr__g,	m4indycr,	"icsj___.1_0",	0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), "Bwb","Indy Cars (Bwb) (MPU4) (set 8)" )
 
 
 #define M4JAKJOK_EXTRA_ROMS \
