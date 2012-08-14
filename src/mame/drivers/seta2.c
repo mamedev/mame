@@ -29,6 +29,7 @@ P0-113A                 1994    Mobile Suit Gundam EX Revue             Banprest
 P0-123A                 1996    Wakakusamonogatari Mahjong Yonshimai    Maboroshi Ware
 P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
+P-FG-02                 1997    Reel'N Quake                            <unknown>
 P0-140B                 2000    Funcube                                 Namco
 P0-140B                 2000    Namco Stars                             Namco
 P0-142A                 1999    Puzzle De Bowling                       Nihon System / Moss
@@ -38,7 +39,6 @@ B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001-2  Funcube 2 - 5                           Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
-P-FG-02                 ????    Reel'N Quake                            <unknown>
 -------------------------------------------------------------------------------------------
 
 TODO:
@@ -3058,6 +3058,8 @@ Program ROMs:
   Labeled roms (undumped) have been seen as KF003002 & KF003004, which
   revision do have?
 
+V1.05 program roms have been seen with labels dated 12/17/97
+
 ***************************************************************************/
 
 ROM_START( reelquak )
@@ -3380,6 +3382,7 @@ GAME( 1995, grdians,  0,        grdians,  grdians, driver_device,  0,        ROT
 GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, driver_device, 0,        ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", GAME_NO_COCKTAIL )
 GAME( 1996, myangel,  0,        myangel,  myangel, driver_device,  0,        ROT0, "Namco",                 "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "Namco",                 "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl, driver_device,  0,        ROT0, "Nihon System / Moss",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
 GAME( 2000, penbros,  0,        penbros,  penbros, driver_device,  0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
 GAME( 2000, namcostr, 0,        namcostr, funcube, driver_device,  0,        ROT0, "Namco",                 "Namco Stars",                                  GAME_NO_COCKTAIL | GAME_NOT_WORKING )
@@ -3398,4 +3401,3 @@ GAME( 2001, funcube2, 0,        funcube2, funcube, seta2_state,  funcube2, ROT0,
 GAME( 2001, funcube3, 0,        funcube3, funcube, seta2_state,  funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NO_COCKTAIL )
 GAME( 2001, funcube4, 0,        funcube2, funcube, seta2_state,  funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_COCKTAIL )
 GAME( 2002, funcube5, 0,        funcube2, funcube, seta2_state,  funcube2, ROT0, "Namco",                 "Funcube 5 (v1.0)",                             GAME_NO_COCKTAIL )
-GAME( ????, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
