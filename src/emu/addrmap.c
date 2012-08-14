@@ -896,7 +896,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, end
 			// mask consistency has already been checked in
 			// unitmask_is_appropriate, so one bit is enough
 			for (int slot=0; slot < max_slot_count; slot++)
-				if (global_mask & (1ULL << (slot * entry_bits)))
+				if (global_mask & (1ULL << ((slot ^ slot_xor_mask) * entry_bits)))
 					slot_offset[slot_count++] = (slot ^ slot_xor_mask) * entry_bits;
 
 			// Merge in all the map contents in order
