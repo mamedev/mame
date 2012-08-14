@@ -971,7 +971,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bullsdrt_port_map, AS_IO, 8, centiped_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
 	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_SHARE("bullsdrt_bank")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE("snsnd", sn76496n_device, write)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE("snsnd", sn76496_new_device, write)
 ADDRESS_MAP_END
 
 
@@ -1929,7 +1929,7 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76496N, 12096000/8)
+	MCFG_SOUND_ADD("snsnd", SN76496_NEW, 12096000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

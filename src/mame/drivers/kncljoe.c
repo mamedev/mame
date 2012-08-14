@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn1", sn76489n_device, write)
-	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE("sn2", sn76489n_device, write)
+	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn1", sn76489_new_device, write)
+	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE("sn2", sn76489_new_device, write)
 	AM_RANGE(0xd807, 0xd807) AM_READNOP		/* unknown read */
 	AM_RANGE(0xd817, 0xd817) AM_READNOP		/* unknown read */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
@@ -324,11 +324,11 @@ static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn1", SN76489N, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("sn1", SN76489_NEW, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_CONFIG(psg_intf)
 	
-	MCFG_SOUND_ADD("sn2", SN76489N, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("sn2", SN76489_NEW, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

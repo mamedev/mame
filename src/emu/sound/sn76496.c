@@ -900,14 +900,14 @@ void sn76496_base_device::register_for_save_states()
 //  save_item(NAME(m_freq0_is_max));
 }
 
-const device_type SN76496N = &device_creator<sn76496n_device>;
-const device_type U8106N = &device_creator<u8106n_device>;
-const device_type Y2404N = &device_creator<y2404n_device>;
-const device_type SN76489N = &device_creator<sn76489n_device>;
-const device_type SN76489AN = &device_creator<sn76489an_device>;
-const device_type SN76494N = &device_creator<sn76494n_device>;
-const device_type SN94624N = &device_creator<sn94624n_device>;
-const device_type NCR7496N = &device_creator<ncr7496n_device>;
-const device_type GAMEGEARN = &device_creator<gamegearn_device>;
-const device_type SEGAPSGN = &device_creator<segapsgn_device>;
+const device_type SN76496_NEW = &device_creator<sn76496_new_device>;
+const device_type U8106_NEW = &device_creator<u8106_new_device>;
+const device_type Y2404_NEW = &device_creator<y2404_new_device>;
+const device_type SN76489_NEW = &device_creator<sn76489_new_device>;
+const device_type SN76489A_NEW = &device_creator<sn76489a_new_device>;
+const device_type SN76494_NEW = &device_creator<sn76494_new_device>;
+const device_type SN94624_NEW = &device_creator<sn94624_new_device>;
+const device_type NCR7496_NEW = &device_creator<ncr7496_new_device>;
+const device_type GAMEGEAR_NEW = &device_creator<gamegear_new_device>;
+const device_type SEGAPSG_NEW = &device_creator<segapsg_new_device>;
 

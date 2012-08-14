@@ -134,8 +134,8 @@ static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76489n_device, write)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76489n_device, write)
+	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76489_new_device, write)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76489_new_device, write)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
@@ -172,11 +172,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8, ladybug_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489n_device, write)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76489n_device, write)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("sn3", sn76489n_device, write)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("sn4", sn76489n_device, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn5", sn76489n_device, write)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489_new_device, write)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76489_new_device, write)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("sn3", sn76489_new_device, write)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("sn4", sn76489_new_device, write)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn5", sn76489_new_device, write)
 	AM_RANGE(0x28, 0x3f) AM_WRITE(sraider_misc_w)  // lots unknown
 ADDRESS_MAP_END
 
@@ -802,11 +802,11 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn1", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn2", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
@@ -845,23 +845,23 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn1", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn2", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn3", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn4", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn4", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn5", SN76489N, 4000000)
+	MCFG_SOUND_ADD("sn5", SN76489_NEW, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

@@ -230,9 +230,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, appoooh_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489n_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489n_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76489n_device, write)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_new_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_new_device, write)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76489_new_device, write)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(appoooh_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(appoooh_out_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(appoooh_scroll_w) /* unknown */
@@ -453,15 +453,15 @@ static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489N, 18432000/6)
+	MCFG_SOUND_ADD("sn1", SN76489_NEW, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489N, 18432000/6)
+	MCFG_SOUND_ADD("sn2", SN76489_NEW, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76489N, 18432000/6)
+	MCFG_SOUND_ADD("sn3", SN76489_NEW, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_SOUND_CONFIG(psg_intf)
 

@@ -189,8 +189,8 @@ static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76489n_device, write)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76489n_device, write)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76489_new_device, write)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76489_new_device, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
 ADDRESS_MAP_END
 
@@ -423,11 +423,11 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489N, 10000000/4)
+	MCFG_SOUND_ADD("sn1", SN76489_NEW, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 	
-	MCFG_SOUND_ADD("sn2", SN76489N, 10000000/4)
+	MCFG_SOUND_ADD("sn2", SN76489_NEW, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 	

@@ -121,9 +121,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	// sound command latch
 	AM_RANGE(0x8001, 0x8001) AM_WRITENOP	// ???
-	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489an_device, write)	// trigger read of latch
+	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489a_new_device, write)	// trigger read of latch
 	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76489an_device, write)	// trigger read of latch
+	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76489a_new_device, write)	// trigger read of latch
 	AM_RANGE(0x8005, 0x8005) AM_READ(mikie_sh_timer_r)
 	AM_RANGE(0x8079, 0x8079) AM_WRITENOP	// ???
 	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ???
@@ -304,11 +304,11 @@ static MACHINE_CONFIG_START( mikie, mikie_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489AN, XTAL/8)
+	MCFG_SOUND_ADD("sn1", SN76489A_NEW, XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 	MCFG_SOUND_CONFIG(psg_intf)
 	
-	MCFG_SOUND_ADD("sn2", SN76489AN, CLK)
+	MCFG_SOUND_ADD("sn2", SN76489A_NEW, CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

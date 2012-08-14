@@ -537,7 +537,7 @@ static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("snsnd", sn76489an_device, write)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1124,22 +1124,6 @@ static GFXDECODE_START( lemnangl )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
- 
- 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-    DEVCB_NULL
-};
-
 
 static MACHINE_START( homedata )
 {
@@ -1281,10 +1265,9 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489AN, 16000000/4)     // SN76489AN actually
+	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
-	
+
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1403,8 +1386,7 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
-	
+
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
