@@ -58,7 +58,7 @@ void segaxbd_state::video_start()
 
 
 //**************************************************************************
-//  VIDEO STARTUP
+//  VIDEO UPDATE
 //**************************************************************************
 
 UINT32 segaxbd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
