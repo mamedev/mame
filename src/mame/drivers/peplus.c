@@ -220,6 +220,9 @@ public:
 	UINT8 m_bv_pulse;
 	UINT8 m_bv_denomination;
 	UINT64 m_bv_cycles;
+	UINT8 m_bv_last_enable_state;
+	UINT8 m_bv_enable_state;
+	UINT8 m_bv_enable_count;
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
 	DECLARE_WRITE8_MEMBER(peplus_io_w);
@@ -488,6 +491,8 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
 	output_set_value("pe_bnkc5",(data >> 5) & 1); /* SDS Out */
 	output_set_value("pe_bnkc6",(data >> 6) & 1); /* N/A */
 	output_set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
+
+	m_bv_enable_state = (data >> 4) & 1;
 }
 
 WRITE8_MEMBER(peplus_state::i2c_nvram_w)
@@ -569,6 +574,10 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 {
 /*
         Emulating IGT IDO22 Pulse Protocol (IGT Smoke 2.2)
+		ID022 protocol requires a 20ms on/off pulse x times for denomination followed by a 50ms stop pulse.
+		The DBV then waits for at least 3 toggling (ACK) pulses of alternating 20ms each from the game.
+		If no toggling received within 200ms, the bill was rejected by the game (e.g. Max Credits reached).
+		Once toggling received, the DBV stacks the bill and sends two 10ms stacked pulses separated by a 10ms pause.
 
         TODO: Will need to include IGT IDO23 (IGT 2.5) for Superboard games.
         PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
@@ -644,17 +653,48 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 			if (curr_cycles - m_bv_cycles >= 833.3 * 50) {
 				m_bv_cycles = curr_cycles;
 				m_bv_pulse = 0;
+
+				// Reset Toggle Details
+				m_bv_last_enable_state = m_bv_enable_state;
+				m_bv_enable_count = 0;
+
 				m_bv_state++;
 			}
 			break;
-		case 0x04: // Stop Pulse 50ms OFF
-			if (curr_cycles - m_bv_cycles >= 833.3 * 50) {
+		case 0x04: // Begin Toggle Polling
+			if (m_bv_enable_state != m_bv_last_enable_state) {
+				m_bv_enable_count++;
+				m_bv_last_enable_state = m_bv_enable_state;
+
+				// Got Enough Toggles, Advance to Stacking
+				if (m_bv_enable_count == 0x03) {
+					m_bv_cycles = curr_cycles;
+					m_bv_pulse = 1;
+					m_bv_state++;
+				}
+			} else {
+				// No Toggling Found, Game Rejected Bill
+				if (curr_cycles - m_bv_cycles >= 833.3 * 200) {
+					m_bv_pulse = 0;
+					m_bv_state = 0;
+				}
+			}
+			break;
+		case 0x05: // Stacked Pulse 10ms ON
+			if (curr_cycles - m_bv_cycles >= 833.3 * 10) {
+				m_bv_cycles = curr_cycles;
+				m_bv_pulse = 0;
+				m_bv_state++;
+			}
+			break;
+		case 0x06: // Stacked Pulse 10ms OFF
+			if (curr_cycles - m_bv_cycles >= 833.3 * 10) {
 				m_bv_cycles = curr_cycles;
 				m_bv_pulse = 1;
 				m_bv_state++;
 			}
 			break;
-		case 0x05: // Stacked Pulse 10ms ON
+		case 0x07: // Stacked Pulse 10ms ON
 			if (curr_cycles - m_bv_cycles >= 833.3 * 10) {
 				m_bv_cycles = curr_cycles;
 				m_bv_pulse = 0;
