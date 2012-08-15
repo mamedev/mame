@@ -259,6 +259,17 @@
 		0xc4c00..fff:	Texture RAM readback
 		0xc8c00..fff:	Texture RAM readback
 		0xccc00..fff:	Texture RAM readback
+
+
+
+		Bujutsu status:
+
+		Main:
+			 0xe948 ->  0x1ea4(): Waiting for [0x168700] != 1  @ 0x1ebc
+
+		Gfx:
+			0x3b1a0 -> 0x3ad70(): Waiting for [0x132000] != 0  @ 0x3adf4
+			
 */
 
 
@@ -316,6 +327,7 @@ public:
 	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
 
 	void gfx_init(running_machine &machine);
+	void gfx_exit(running_machine &machine);
 	void gfx_reset(running_machine &machine);
 	void gfx_fifo_exec(running_machine &machine);
 	UINT32 gfx_read_gram(UINT32 address);
@@ -345,7 +357,16 @@ private:
 class cobra_fifo
 {
 public:
-	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose)
+	typedef enum
+	{
+		EVENT_EMPTY,
+		EVENT_HALF_FULL,
+		EVENT_FULL,
+	} EventType;
+
+	typedef delegate<void (EventType)> event_delegate;
+
+	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose, event_delegate event_callback)
 	{
 		m_data = auto_alloc_array(machine, UINT64, capacity);
 
@@ -356,6 +377,8 @@ public:
 		m_num = 0;
 
 		m_verbose = verbose;
+
+		m_event_callback = event_callback;
 	}
 
 	void push(const device_t *cpu, UINT64 data);
@@ -376,6 +399,7 @@ private:
 	bool m_verbose;
 	const char *m_name;
 	UINT64 *m_data;
+	event_delegate m_event_callback;
 };
 
 class cobra_state : public driver_device
@@ -436,6 +460,11 @@ public:
 	cobra_fifo *m_m2sfifo;
 	cobra_fifo *m_s2mfifo;
 
+	void gfxfifo_in_event_callback(cobra_fifo::EventType event);
+	void gfxfifo_out_event_callback(cobra_fifo::EventType event);
+	void m2sfifo_event_callback(cobra_fifo::EventType event);
+	void s2mfifo_event_callback(cobra_fifo::EventType event);
+
 	UINT8 m_m2s_int_enable;
 	UINT8 m_s2m_int_enable;
 	UINT8 m_vblank_enable;
@@ -467,7 +496,7 @@ public:
 
 	int m_gfx_register_select;
 	UINT64 *m_gfx_register;
-	UINT64 m_gfx_fifo_mem[4];
+	UINT64 m_gfx_fifo_mem[256];
 	int m_gfx_fifo_cache_addr;
 	int m_gfx_fifo_loopback;
 	int m_gfx_unknown_v1;
@@ -591,6 +620,8 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 
 static void cobra_video_exit(running_machine *machine)
 {
+	cobra_state *state = machine->driver_data<cobra_state>();
+	state->m_renderer->gfx_exit(*machine);
 }
 
 VIDEO_START( cobra )
@@ -712,6 +743,11 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 	}
 
 	m_num++;
+
+	if (m_num >= m_size)
+		m_event_callback(EVENT_FULL);
+	if (m_num == (m_size / 2))
+		m_event_callback(EVENT_HALF_FULL);
 }
 
 bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
@@ -767,6 +803,11 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 
 	m_num--;
 
+	if (m_num == 0)
+		m_event_callback(EVENT_EMPTY);
+	if (m_num == (m_size / 2))
+		m_event_callback(EVENT_HALF_FULL);
+
 	*result = r;
 
 	return true;
@@ -810,10 +851,52 @@ void cobra_fifo::flush()
 	m_num = 0;
 	m_rpos = 0;
 	m_wpos = 0;
+
+	m_event_callback(EVENT_EMPTY);
 }
 
 
 /*****************************************************************************/
+
+void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
+{
+	switch (event)
+	{
+		case cobra_fifo::EVENT_EMPTY:
+			break;
+		
+		case cobra_fifo::EVENT_HALF_FULL:
+			break;
+
+		case cobra_fifo::EVENT_FULL:
+			break;
+	}
+}
+
+void cobra_state::s2mfifo_event_callback(cobra_fifo::EventType event)
+{
+	switch (event)
+	{
+		case cobra_fifo::EVENT_EMPTY:
+			break;
+		
+		case cobra_fifo::EVENT_HALF_FULL:
+			break;
+
+		case cobra_fifo::EVENT_FULL:
+			break;
+	}
+}
+
+void cobra_state::gfxfifo_in_event_callback(cobra_fifo::EventType event)
+{
+
+}
+
+void cobra_state::gfxfifo_out_event_callback(cobra_fifo::EventType event)
+{
+
+}
 
 /*****************************************************************************/
 // Main board (PPC603)
@@ -1022,7 +1105,11 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		m_vblank_enable = (UINT8)(data >> 24);
 
-		//printf("main_fifo_w: 0xffff0004: %02X\n", (UINT8)(data >> 24));
+		if ((m_vblank_enable & 0x80) == 0)
+		{
+			// clear the interrupt
+			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		}
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -1059,7 +1146,11 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		m_m2s_int_enable = (UINT8)(data);
 
-		printf("main_fifo_w: 0xffff0007: %02X\n", (UINT8)(data >> 0));
+		if ((m_m2s_int_enable & 0x80) == 0)
+		{
+			// clear the interrupt
+			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		}
 	}
 
 	if (ACCESSING_BITS_56_63)
@@ -1206,6 +1297,11 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 
 			// give sub cpu a bit more time to stabilize on the current fifo status
 			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(1));
+
+			if (m_m2s_int_enable & 0x80)
+			{
+				cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+			}
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
@@ -1535,6 +1631,22 @@ void cobra_renderer::gfx_init(running_machine &machine)
 	m_gfx_gram = auto_alloc_array(machine, UINT32, 0x40000);
 	
 	cobra->m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
+}
+
+void cobra_renderer::gfx_exit(running_machine &machine)
+{
+	/*
+	FILE *file;
+	file = fopen("texture_ram.bin","wb");
+	for (int i=0; i < 0x100000; i++)
+	{
+		fputc((UINT8)(m_texture_ram[i] >> 24), file);
+		fputc((UINT8)(m_texture_ram[i] >> 16), file);
+		fputc((UINT8)(m_texture_ram[i] >> 8), file);
+		fputc((UINT8)(m_texture_ram[i] >> 0), file);
+	}
+	fclose(file);
+	*/
 }
 
 void cobra_renderer::gfx_reset(running_machine &machine)
@@ -2371,14 +2483,16 @@ static void gfx_cpu_dc_store(device_t *device, UINT32 address)
 		UINT64 i = (UINT64)(cobra->m_gfx_fifo_cache_addr) << 32;
 		cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
 
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[0] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[0] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[1] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[1] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[2] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[2] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[3] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[3] >>  0) | i);
+		UINT32 a = (address / 8) & 0xff;
+
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+0] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+0] >>  0) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+1] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+1] >>  0) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+2] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+2] >>  0) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >>  0) | i);
 
 		cobra->m_renderer->gfx_fifo_exec(device->machine());
 	}
@@ -2421,9 +2535,9 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 static ADDRESS_MAP_START( cobra_gfx_map, AS_PROGRAM, 64, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("gfx_main_ram_0")
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM AM_SHARE("gfx_main_ram_1")
-	AM_RANGE(0x10000000, 0x1000001f) AM_WRITE(gfx_fifo0_w) AM_MIRROR(0xfe0)
-	AM_RANGE(0x18000000, 0x1800001f) AM_WRITE(gfx_fifo1_w) AM_MIRROR(0xfe0)
-	AM_RANGE(0x1e000000, 0x1e00001f) AM_WRITE(gfx_fifo2_w) AM_MIRROR(0xfe0)
+	AM_RANGE(0x10000000, 0x100007ff) AM_WRITE(gfx_fifo0_w)
+	AM_RANGE(0x18000000, 0x180007ff) AM_WRITE(gfx_fifo1_w)
+	AM_RANGE(0x1e000000, 0x1e0007ff) AM_WRITE(gfx_fifo2_w)
 	AM_RANGE(0x20000000, 0x20000007) AM_WRITE(gfx_buf_w)							// this might really map to 0x1e000000, depending on the pagetable
 	AM_RANGE(0x7f000000, 0x7f00ffff) AM_RAM AM_SHARE("pagetable")
 	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_REGION("user3", 0)					/* Boot ROM */
@@ -2558,10 +2672,37 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(cobra_state, cobra)
 {
 
-	m_gfxfifo_in  = auto_alloc(machine(), cobra_fifo(machine(), 8192, "GFXFIFO_IN", GFXFIFO_IN_VERBOSE != 0));
-	m_gfxfifo_out = auto_alloc(machine(), cobra_fifo(machine(), 8192, "GFXFIFO_IN", GFXFIFO_OUT_VERBOSE != 0));
-	m_m2sfifo     = auto_alloc(machine(), cobra_fifo(machine(), 2048, "M2SFIFO", M2SFIFO_VERBOSE != 0));
-	m_s2mfifo     = auto_alloc(machine(), cobra_fifo(machine(), 2048, "S2MFIFO", S2MFIFO_VERBOSE != 0));
+	m_gfxfifo_in  = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   8192,
+							   "GFXFIFO_IN",
+							   GFXFIFO_IN_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::gfxfifo_in_event_callback), this))
+							   );
+
+	m_gfxfifo_out = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   8192,
+							   "GFXFIFO_OUT",
+							   GFXFIFO_OUT_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::gfxfifo_out_event_callback), this))
+							   );
+
+	m_m2sfifo     = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   2048,
+							   "M2SFIFO",
+							   M2SFIFO_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::m2sfifo_event_callback), this))
+							   );
+
+	m_s2mfifo     = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   2048,
+							   "S2MFIFO",
+							   S2MFIFO_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::s2mfifo_event_callback), this))
+							   );
 
 	ppc_set_dcstore_callback(m_maincpu, main_cpu_dc_store);
 
