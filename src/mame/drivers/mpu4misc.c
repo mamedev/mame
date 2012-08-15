@@ -163,232 +163,297 @@ M4DCRLS_SET( 199?, m4dcrls__q,		m4dcrls,	"70001116.bin",					0x0000, 0x040000, C
 M4DCRLS_SET( 199?, m4dcrls__r,		m4dcrls,	"dcr_data_340.bin",				0x0000, 0x010000, CRC(fc12e68f) SHA1(f07a42323651ef9aefac24c3b9296a98068c2dc2), "Qps","Double Crazy Reels (Qps) (MPU4) (set 19)" ) // too small?
 
 
+#define M4JUNGJK_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000080.lo.hex", 0x0000, 0x134084, CRC(f3866082) SHA1(f33f6d7e078d7072cc7c67672b3afa3e90e1f805) ) \
+	ROM_LOAD( "71000080.hi.hex", 0x0000, 0x12680f, CRC(2a9db1df) SHA1(73823c3db5c68068dadf6d9b4c93b47c0cf13bd3) ) \
+	ROM_LOAD( "71000080.p1", 0x000000, 0x080000, CRC(b39d5e03) SHA1(94c9208601ea230463b460f5b6ea668363d239f4) ) \
+	ROM_LOAD( "71000080.p2", 0x080000, 0x080000, CRC(ad6da9af) SHA1(9ec8c8fd7b9bcd1d4c6ed93726fafe9a50a15894) ) \
 
 
-ROM_START( m4jungjk )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "jjsoft_v550_1346_e7a3_lv.bin", 0x0000, 0x040000, CRC(c5315a0c) SHA1(5fd2115e033e0310ded3cfb39f31dc31b4d6bb5a) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000102.bin", 0x0000, 0x040000, CRC(e5f03540) SHA1(9a14cb4eade9f6b1c6d6cf78306259dbc108f1a5) )
-	ROM_LOAD( "jj.bin", 0x0000, 0x040000, CRC(9e15c1b6) SHA1(9d4f3707f2cc2f0e8eb9051181bf8b368be3cbcf) )
-	ROM_LOAD( "jjlump_v400_19a3.bin", 0x0000, 0x040000, CRC(bc86c415) SHA1(6cd828578835dafe5d8d46810dc70d47abd4e8b2) )
-	ROM_LOAD( "70000092.bin", 0x0000, 0x040000, CRC(6530bc6c) SHA1(27819e760c84fbb40f354e87910fb15b3058e2a8) )
-	ROM_LOAD( "jungle.p1", 0x0000, 0x080000, CRC(ed0eb72c) SHA1(e32590cb3eb7d07fb210bee1be3c0ee01554cb47) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000080.lo.hex", 0x0000, 0x134084, CRC(f3866082) SHA1(f33f6d7e078d7072cc7c67672b3afa3e90e1f805) )
-	ROM_LOAD( "71000080.hi.hex", 0x0000, 0x12680f, CRC(2a9db1df) SHA1(73823c3db5c68068dadf6d9b4c93b47c0cf13bd3) )
-	ROM_LOAD( "71000080.p1", 0x000000, 0x080000, CRC(b39d5e03) SHA1(94c9208601ea230463b460f5b6ea668363d239f4) )
-	ROM_LOAD( "71000080.p2", 0x080000, 0x080000, CRC(ad6da9af) SHA1(9ec8c8fd7b9bcd1d4c6ed93726fafe9a50a15894) )
-ROM_END
-
-
-ROM_START( m4rhnote )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "70000120.bin", 0x0000, 0x040000, CRC(d1ce1e1c) SHA1(2fc2b041b4e9fcade4b2ce6a0bc709f4174e2d88) )
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000121.bin", 0x0000, 0x040000, CRC(1e1a26c0) SHA1(8a80a94d280c82887a0f7da607988597df23e1fb) )
-	ROM_LOAD( "70000125.bin", 0x0000, 0x080000, CRC(67a617a2) SHA1(3900c0cc3f8e4d52105096c1e21903cb83b8c1b7) )
-	ROM_LOAD( "70000126.bin", 0x0000, 0x080000, CRC(68deffbe) SHA1(9b94776aa0416309204987ac9109a65ad3234f1b) )
-	ROM_LOAD( "70000132.bin", 0x0000, 0x080000, CRC(50c06d0d) SHA1(8d629d77390b92c5e30104237245f92dc8f52a6c) )
-	ROM_LOAD( "70000133.bin", 0x0000, 0x080000, CRC(fb198e1b) SHA1(6fb03680ad29ca750fe2e75f48a05f538ddac9b7) )
-	ROM_LOAD( "70000135.bin", 0x0000, 0x080000, CRC(02531c21) SHA1(de9da10bc81ab02ba131da1a1733eda1948dc3cc) )
-	ROM_LOAD( "70001122.bin", 0x0000, 0x040000, CRC(13171ffc) SHA1(e49a2080afd27c0de183da64baa2060020910155) )
-	ROM_LOAD( "70001124.bin", 0x0000, 0x040000, CRC(8acb2d7d) SHA1(ffd4f0e1f80b41b6f54af31e5dcd41fe12e4ea0b) )
-	ROM_LOAD( "70001125.bin", 0x0000, 0x080000, CRC(6b202a88) SHA1(63f7325c8dc373f771f02e5bf9ac0c0d33a906bd) )
-	ROM_LOAD( "70001126.bin", 0x0000, 0x080000, CRC(0db90e12) SHA1(0b010ca878ecabb47c0a0eec0badd595b2bafbfb) )
-	ROM_LOAD( "70001135.bin", 0x0000, 0x080000, CRC(a9ed9178) SHA1(446919e869a9cc20f469954504adf448474d702b) )
-	ROM_LOAD( "70001150.bin", 0x0000, 0x040000, CRC(3c3f4e45) SHA1(114c18e0fa8de224992138b72bf789ace39dffa0) )
-	ROM_LOAD( "70001151.bin", 0x0000, 0x040000, CRC(0cb1f440) SHA1(7ebdac6ea495d96c7713a284fdad4da0874de3f2) )
-	ROM_LOAD( "70001153.bin", 0x0000, 0x040000, CRC(e8ba9b3a) SHA1(71af6dd77da419868391e01f565c24a70d55b396) ) // rhn_gala_hopper_120.bin
-	ROM_LOAD( "70001160.bin", 0x0000, 0x040000, CRC(2d532681) SHA1(fb4321b6922cf35780adbdc5f030ef0df8d6cc9a) )
-	ROM_LOAD( "70001161.bin", 0x0000, 0x040000, CRC(e9a49319) SHA1(001163ece7a405a27fd71fdeb97489db143749a7) )
-	ROM_LOAD( "70001502.bin", 0x0000, 0x040000, CRC(d1b332f1) SHA1(07db228705b0bce47107cf5458986e830b988cee) )
-	ROM_LOAD( "70001503.bin", 0x0000, 0x040000, CRC(2a44069a) SHA1(0a1581ba552e0e93d6bc3b7298014ea4b6793da1) )
-	ROM_LOAD( "70001510.bin", 0x0000, 0x080000, CRC(87cb4cae) SHA1(49c97e0e79a8cd1417e9e07a13afe736d00ef3df) )
-	ROM_LOAD( "rhn_data_110_lv.bin", 0x0000, 0x040000, CRC(1f74c472) SHA1(86a170ddb001f817e960e7c166399280ad620bf0) )
-	ROM_LOAD( "rhn_gala_hopper_120_lv.bin", 0x0000, 0x040000, CRC(521b6402) SHA1(7d260c45fa339f5ca34f8e335875ad47bb093a04) )
-	ROM_LOAD( "rhn_mecca_120.bin", 0x0000, 0x040000, CRC(f131e386) SHA1(73672e6e66400b953dda7f2254082eff73dbf058) )
-	ROM_LOAD( "rhn_mecca_120_lv.bin", 0x0000, 0x040000, CRC(471e5263) SHA1(79c205e0d8e748aa72f9f3fadad248edf71f5ae0) )
-	ROM_LOAD( "rhn_std_110.bin", 0x0000, 0x040000, CRC(439f27d2) SHA1(4ad01c4dc9bbab7520fb281198777aea56f600b0) )
-	ROM_LOAD( "rhn_std_110_lv.bin", 0x0000, 0x040000, CRC(922b8196) SHA1(6fdbf301aaadacaeabf29ad11c67b22122954051) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000120.hex", 0x0000, 0x112961, CRC(5eb5245e) SHA1(449b02baf56e5798f656d9aee497b88d34f562cc) )
-	ROM_LOAD( "rhnsnd.bin", 0x0000, 0x080000, CRC(e03eaa43) SHA1(69117021adc1a8968d50703336147a7344c62100) )
-ROM_END
-
-ROM_START( m4rhrock )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "rhr_v200_1625_da8c_nlv.bin", 0x0000, 0x040000, CRC(dd67f5b3) SHA1(19b7b57ef20a2ad7997cf748396b246fda87db70) )
-	ROM_LOAD( "rhr_v300_1216_ce52_nlv.bin", 0x0000, 0x040000, CRC(86b0d683) SHA1(c6553bf65c055c4f911c215ba112eaa672357290) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) // intelhex, needs convertig
-	ROM_LOAD( "71000200.hi.hex", 0x0000, 0x0ff0f8, CRC(998e28ea) SHA1(f54a69af16e05119df2697bc01e548ac51ed3e11) )
-	ROM_LOAD( "71000200.lo.hex", 0x0000, 0x134084, CRC(ccd0b35f) SHA1(6d3ef65577a46c68f8628675d146f829c9a99659) )
-ROM_END
-
-
-ROM_START( m4rhwhl )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "70001184.bin", 0x0000, 0x080000, CRC(8792d95b) SHA1(24b4f78728db7ee95d1fcd3ba38b49a20baaae6b) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "rhw_v100_1333_6d40_lv.bin", 0x0000, 0x080000, CRC(9ef7b655) SHA1(605822eaee44bebf554218ef7346192a6a84077e) )
-	ROM_LOAD( "rhw_v310_0925_0773_lv_p.bin", 0x0000, 0x080000, CRC(11880908) SHA1(0165bacf73dd54959975b3f186e256fd8d690d34) )
-	ROM_LOAD( "rhw_v310_0931_fa02_lv.bin", 0x0000, 0x080000, CRC(5642892e) SHA1(7a80edf9aefac9731751afa8250de07004c55e77) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000180.hi.hex", 0x0000, 0x04da98, CRC(0ffa11a5) SHA1(a3f8eb00b6771cb49965a717e27d0b544c6b2f4f) ) // as intelhex?
-	ROM_LOAD( "71000180.lo.hex", 0x0000, 0x134084, CRC(6dfc7474) SHA1(806b4b8ca5fa868581b4bf33080b9c486ce71bb6) )// as intelhex?
-	ROM_LOAD( "redhotwheelssnd.p1", 0x0000, 0x080000, CRC(7b274a71) SHA1(38ba69084819133253b41f2eb1d784104e5f10f7) )
-	ROM_LOAD( "redhotwheelssnd.p2", 0x0000, 0x080000, CRC(e36e19e2) SHA1(204554622c9020479b095acd4fbab1f21f829137) )
-ROM_END
-
-ROM_START( m4rdeal )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "70000703.bin", 0x0000, 0x080000, CRC(11e51311) SHA1(71a4327fa01cd7e899d423adc34c732ed56118d8) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000704.bin", 0x0000, 0x080000, CRC(b161c08b) SHA1(bb914eb900aff0f6eeec33ff8a595a288306e073) )
-	ROM_LOAD( "70000723.bin", 0x0000, 0x080000, CRC(bb166401) SHA1(1adf244e97d52cc5a5116a01d804caadd1034507) )
-	ROM_LOAD( "70000724.bin", 0x0000, 0x080000, CRC(37df89e5) SHA1(6e7da02053be91f27257e3c5f952bbea9df3bc09) )
-	ROM_LOAD( "70001622.bin", 0x0000, 0x080000, CRC(1a8fff86) SHA1(e0bdb4fa233acdf18d535821fb9fc2cf69ac4f5e) )
-	ROM_LOAD( "70001623.bin", 0x0000, 0x080000, CRC(97a223f8) SHA1(d1a87391a8178cb47664968031a7d17d9082847b) )
-	ROM_LOAD( "70001703.bin", 0x0000, 0x080000, CRC(1b89777e) SHA1(09b87d352d27c2847dec0a147dea7cc75f07ffa5) )
-	ROM_LOAD( "70001704.bin", 0x0000, 0x080000, CRC(11f3834d) SHA1(8c56cf60b064e8d755c5e760fcf6f0284ef710f9) )
-	ROM_LOAD( "70001744.bin", 0x0000, 0x080000, CRC(6de0d366) SHA1(ec42608f3b9c7cf8e6b81541767a8664478e7ab4) )
-	ROM_LOAD( "70001745.bin", 0x0000, 0x080000, CRC(4c0e9cab) SHA1(6003d4553f053a253965ba786553b00b7e197069) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4shoknr )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "snr_v300_1218_3019_lv.bin", 0x0000, 0x040000, CRC(bec80497) SHA1(08de5e29a063b01fb904a156170a3063633115ab) )
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "snr_v300_1221_c8ff_nlv.bin", 0x0000, 0x040000, CRC(d191b361) SHA1(4146e509e77878a51e32de877768504b3c85e6f8) )
-	ROM_LOAD( "snr_v200_1145_047f_lv.bin", 0x0000, 0x040000, CRC(73ef1e1a) SHA1(6ccaf64daa5acacfba4df576281bb5478f2fbd29) )
-	ROM_LOAD( "snr_v200_1655_5a69_nlv.bin", 0x0000, 0x040000, CRC(50ba0c6b) SHA1(767fd59858fc55ae95f096f00c54bd619369a56c) )
-	ROM_LOAD( "shock.p1", 0x0000, 0x080000, CRC(65fb2f47) SHA1(33b997843a705fc446f33beb127b672a282286c4) ) // check if it's just an overdump of above sets
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "snrsnd.p1", 0x000000, 0x080000, CRC(985c7c8c) SHA1(d2740ff6192c21af3a8a8a9a92b6fd604b40e9d1) )
-	ROM_LOAD( "snrsnd.p2", 0x080000, 0x080000, CRC(6a3a57ce) SHA1(3aaa0a761e17a2a14196cb023b10a49b44ba1046) )
-	ROM_LOAD( "shock.s2", 0x080000, 0x080000, CRC(10e9912f) SHA1(833d2b125bf30bdb8de71f6c9d8a9fe92701f741) ) // alt snd2
-ROM_END
-
-ROM_START( m4tornad )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "torn_v110_1146_979d_lv.bin", 0x0000, 0x040000, CRC(3160bddd) SHA1(4f36b081c8f6859a3fe55e1f177a0406c2480987) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "torn_v110_1153_955f_nlv.bin", 0x0000, 0x040000, CRC(c437040d) SHA1(50c5ba655989b7f6a2ee61af0ad007ce825f4364) )
-	ROM_LOAD( "tornsp_v110_1148_95bd_nlv.bin", 0x0000, 0x040000, CRC(f0933eb6) SHA1(a726b02ae6298ecfb6a01f7ecb09bac50ca13114) )
-	ROM_LOAD( "tornsp_v110_1151_9693_lv.bin", 0x0000, 0x040000, CRC(05c48766) SHA1(e20916cd67904601cd25b3c6f70030c5302d12a6) )
-	ROM_LOAD( "torn_v200_1613_efe5_nlv.bin", 0x0000, 0x040000, CRC(32936ae5) SHA1(f7ec8b9c0e74c0e51ea4b9c8f450f64907ce3300) )
-	ROM_LOAD( "torn_v200_1617_ece9_lv.bin", 0x0000, 0x040000, CRC(c7c4d335) SHA1(955303d446e78bfa1ceeb07ca62cb6e11e478592) )
-	ROM_LOAD( "tornsp_v200_1623_eee3_nlv.bin", 0x0000, 0x040000, CRC(6b4f8baf) SHA1(fea21f43b3bbc1c969a7426ca956898e3680823f) )
-	ROM_LOAD( "tornsp_v200_1626_ec93_lv.bin", 0x0000, 0x040000, CRC(9e18327f) SHA1(7682cd172903cd5c26873306e70394c154e66c30) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000300.hi.hex", 0x0000, 0x0be342, CRC(f9021a32) SHA1(4bd7d7306385ef37dd9cbb5085dbc104657abc0e) )
-	ROM_LOAD( "71000300.lo.hex", 0x0000, 0x134084, CRC(af34658d) SHA1(63a6db1f5ed00fa6208c63e0a2211ba2afe0e9a1) )
-	ROM_LOAD( "tornadosnd.p1", 0x0000, 0x080000, CRC(cac88f25) SHA1(6ccbf372d983a47a49caedb8a526fc7703b31ed4) )
-	ROM_LOAD( "tornadosnd.p2", 0x080000, 0x080000, CRC(ef4f563d) SHA1(1268061edd93474296e3454e0a2e706b90c0621c) )
-ROM_END
+#define M4JUNGJK_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4JUNGJK_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
 
 
 
-ROM_START( m4shkwav )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "swave_v210_1135_08dd_lv.bin", 0x0000, 0x040000, CRC(ca9d40a3) SHA1(65c9e4aa022eb6fe70d619f67638c37ad578ddbf) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "swave_v210_11376_0bb3_nlv.bin", 0x0000, 0x040000, CRC(3fcaf973) SHA1(28258c8c60e6b542e1789cd8a4cfd530d1ed6084) )
-	ROM_LOAD( "swsplv.bin", 0x0000, 0x040000, CRC(1e33e93f) SHA1(3e87f8ed35da776e1968c9574c140cc3984ea8de) )
-	ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x080000, CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) )
-	ROM_LOAD( "swave_v300_1552_13ed_nlv.bin", 0x0000, 0x040000, CRC(b0e03f04) SHA1(fdd113af30fd9e87b171ecdf3be7e720366476b3) )
-	ROM_LOAD( "swave_v300_1555_119d_lv.bin", 0x0000, 0x040000, CRC(45b786d4) SHA1(24fd4fdea684103334385ca329f384796b496e2c) )
-	ROM_LOAD( "swsp_v300_1602_e1b2_nlv.bin", 0x0000, 0x040000, CRC(4ed74015) SHA1(0ab2167ba0ce6f1a1317c2087091187b9fa94c27) )
-	ROM_LOAD( "swsp_v300_1606_ded8_lv.bin", 0x0000, 0x040000, CRC(bb80f9c5) SHA1(95f577c427204b83bec0128acfd89dda90938d1f) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000250.hi.hex", 0x0000, 0x0c852b, CRC(e3a857c7) SHA1(66619b7926ae7df970045fffd7e20763abfe14a4) )
-	ROM_LOAD( "71000250.lo.hex", 0x0000, 0x134084, CRC(46758bc5) SHA1(18d02960580646b276e7a6aabdeb4ca449ec5ea0) )
-	ROM_LOAD( "shocksnd.p1", 0x000000, 0x080000, CRC(54bf0ddb) SHA1(693b855367972b5a45e9d2d6152849ab2cde38a7) )
-	ROM_LOAD( "shocksnd.p2", 0x080000, 0x080000, CRC(facebc55) SHA1(75367473646cfc735f4d1267e13a9c92ea19c4e3) )
-ROM_END
+M4JUNGJK_SET( 199?, m4jungjk,		0,			"jjsoft_v550_1346_e7a3_lv.bin", 0x0000, 0x040000, CRC(c5315a0c) SHA1(5fd2115e033e0310ded3cfb39f31dc31b4d6bb5a), "Qps","Jungle Jackpots (Qps) (MPU4) (set 1)" )
+M4JUNGJK_SET( 199?, m4jungjk__a,	m4jungjk,	"70000102.bin",					0x0000, 0x040000, CRC(e5f03540) SHA1(9a14cb4eade9f6b1c6d6cf78306259dbc108f1a5), "Qps","Jungle Jackpots (Qps) (MPU4) (set 2)" )
+M4JUNGJK_SET( 199?, m4jungjk__b,	m4jungjk,	"jj.bin",						0x0000, 0x040000, CRC(9e15c1b6) SHA1(9d4f3707f2cc2f0e8eb9051181bf8b368be3cbcf), "Qps","Jungle Jackpots (Qps) (MPU4) (set 3)" )
+M4JUNGJK_SET( 199?, m4jungjk__c,	m4jungjk,	"jjlump_v400_19a3.bin",			0x0000, 0x040000, CRC(bc86c415) SHA1(6cd828578835dafe5d8d46810dc70d47abd4e8b2), "Qps","Jungle Jackpots (Qps) (MPU4) (set 4)" )
+M4JUNGJK_SET( 199?, m4jungjk__d,	m4jungjk,	"70000092.bin",					0x0000, 0x040000, CRC(6530bc6c) SHA1(27819e760c84fbb40f354e87910fb15b3058e2a8), "Qps","Jungle Jackpots (Qps) (MPU4) (set 5)" )
+M4JUNGJK_SET( 199?, m4jungjk__e,	m4jungjk,	"jungle.p1",					0x0000, 0x080000, CRC(ed0eb72c) SHA1(e32590cb3eb7d07fb210bee1be3c0ee01554cb47), "Qps","Jungle Jackpots (Qps) (MPU4) (set 6)" )
 
 
 
-ROM_START( m4clab )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "70000019.bin", 0x0000, 0x040000, CRC(23a12863) SHA1(4047cb8cbc03f96f2b8681b6276e100e8e9194a5) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 )
-	ROM_LOAD( "70000020.bin", 0x0000, 0x040000, CRC(88af7368) SHA1(14dea4267a4365286eea1e02b9b44d4053618cbe) )
-	ROM_LOAD( "70000052.bin", 0x0000, 0x040000, CRC(99e60d45) SHA1(ec28bdd4ffb9674c2e9f8ab72aac3cb6011e7d6f) )
-	ROM_LOAD( "70000053.bin", 0x0000, 0x040000, CRC(3ddf8b29) SHA1(0087ccd3429c081a3121e97d649914ab2cf8caa6) )
-	ROM_LOAD( "clab_v300_1028_c23a_lv_10p.bin", 0x0000, 0x040000, CRC(c2ca098a) SHA1(e2bf80366af925a4c880a3377b79d494760f286f) )
-	ROM_LOAD( "clab_v300_1031_3fb7_nlv_10p.bin", 0x0000, 0x040000, CRC(1502527f) SHA1(8a3dd5600ad9a073ea6fb8412178daa575002e56) )
-	ROM_LOAD( "clab_v300_1033_1175_nlv_20p.bin", 0x0000, 0x040000, CRC(ba26efd7) SHA1(bf9c0dbf6882ddc42680c7d23c9b858eb12e5646) )
-	ROM_LOAD( "clab_v400_1249_0162_nlv.bin", 0x0000, 0x040000, CRC(df256c84) SHA1(f4d0fc5acd7d0ac770cae548744ce18dfb9ec67c) )
-	ROM_LOAD( "clab_v410_1254_1ca2_lv.bin", 0x0000, 0x040000, CRC(6e2ee8a9) SHA1(e64a01c93b879c9ade441bd4f1ce381f6e65a655) )
-	ROM_LOAD( "clab_v410_1254_6e11_nlv.bin", 0x0000, 0x040000, CRC(efe4fcb9) SHA1(8a2f02593c7fbea060c78a98abd82fd970661e05) )
-	ROM_LOAD( "clabrom", 0x0000, 0x040000, CRC(d80ecff5) SHA1(2608e95b718ecd49d880fd9911cb97e6644a307d) )
+#define M4RHNOTE_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000120.hex", 0x0000, 0x112961, CRC(5eb5245e) SHA1(449b02baf56e5798f656d9aee497b88d34f562cc) ) \
+	ROM_LOAD( "rhnsnd.bin", 0x0000, 0x080000, CRC(e03eaa43) SHA1(69117021adc1a8968d50703336147a7344c62100) ) \
 
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000010.lo", 0x0000, 0x134084, CRC(c39bbae4) SHA1(eee333376612a96a4c344729a96cc60c217bfde3) )
-	ROM_LOAD( "71000010.hi", 0x0000, 0x091c0b, CRC(d0d3cb4f) SHA1(eaacf9ed3a6b6dcda8e1a3edbc3a9a2a51ffcbd8) )
-	ROM_LOAD( "clab_snd1_c8a6.bin", 0x0000, 0x080000, CRC(cf9de981) SHA1(e5c73e9b9db9ac512602c2dd586ca5cf65f98bc1) )
-	ROM_LOAD( "clab_snd2_517a.bin", 0x080000, 0x080000, CRC(d4eb949e) SHA1(0ebbd1b5e3c86da94f35c69d9d60e36844cc4d7e) )
-ROM_END
+#define M4RHNOTE_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHNOTE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
 
-ROM_START( m4sdquid )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "70000352.bin", 0x0000, 0x040000, CRC(303d6177) SHA1(aadff8a81244bfd62d1cc088caf01496e1ff61db) )
+M4RHNOTE_SET( 199?, m4rhnote,		0,			"70000120.bin",					0x0000, 0x040000, CRC(d1ce1e1c) SHA1(2fc2b041b4e9fcade4b2ce6a0bc709f4174e2d88), "Qps","Red Hot Notess (Qps) (MPU4) (set 1)" )
+M4RHNOTE_SET( 199?, m4rhnote__a,	m4rhnote,	"70000121.bin",					0x0000, 0x040000, CRC(1e1a26c0) SHA1(8a80a94d280c82887a0f7da607988597df23e1fb), "Qps","Red Hot Notess (Qps) (MPU4) (set 2)" )
+M4RHNOTE_SET( 199?, m4rhnote__b,	m4rhnote,	"70000125.bin",					0x0000, 0x080000, CRC(67a617a2) SHA1(3900c0cc3f8e4d52105096c1e21903cb83b8c1b7), "Qps","Red Hot Notess (Qps) (MPU4) (set 3)" )
+M4RHNOTE_SET( 199?, m4rhnote__c,	m4rhnote,	"70000126.bin",					0x0000, 0x080000, CRC(68deffbe) SHA1(9b94776aa0416309204987ac9109a65ad3234f1b), "Qps","Red Hot Notess (Qps) (MPU4) (set 4)" )
+M4RHNOTE_SET( 199?, m4rhnote__d,	m4rhnote,	"70000132.bin",					0x0000, 0x080000, CRC(50c06d0d) SHA1(8d629d77390b92c5e30104237245f92dc8f52a6c), "Qps","Red Hot Notess (Qps) (MPU4) (set 5)" )
+M4RHNOTE_SET( 199?, m4rhnote__e,	m4rhnote,	"70000133.bin",					0x0000, 0x080000, CRC(fb198e1b) SHA1(6fb03680ad29ca750fe2e75f48a05f538ddac9b7), "Qps","Red Hot Notess (Qps) (MPU4) (set 6)" )
+M4RHNOTE_SET( 199?, m4rhnote__f,	m4rhnote,	"70000135.bin",					0x0000, 0x080000, CRC(02531c21) SHA1(de9da10bc81ab02ba131da1a1733eda1948dc3cc), "Qps","Red Hot Notess (Qps) (MPU4) (set 7)" )
+M4RHNOTE_SET( 199?, m4rhnote__g,	m4rhnote,	"70001122.bin",					0x0000, 0x040000, CRC(13171ffc) SHA1(e49a2080afd27c0de183da64baa2060020910155), "Qps","Red Hot Notess (Qps) (MPU4) (set 8)" )
+M4RHNOTE_SET( 199?, m4rhnote__h,	m4rhnote,	"70001124.bin",					0x0000, 0x040000, CRC(8acb2d7d) SHA1(ffd4f0e1f80b41b6f54af31e5dcd41fe12e4ea0b), "Qps","Red Hot Notess (Qps) (MPU4) (set 9)" )
+M4RHNOTE_SET( 199?, m4rhnote__i,	m4rhnote,	"70001125.bin",					0x0000, 0x080000, CRC(6b202a88) SHA1(63f7325c8dc373f771f02e5bf9ac0c0d33a906bd), "Qps","Red Hot Notess (Qps) (MPU4) (set 10)" )
+M4RHNOTE_SET( 199?, m4rhnote__j,	m4rhnote,	"70001126.bin",					0x0000, 0x080000, CRC(0db90e12) SHA1(0b010ca878ecabb47c0a0eec0badd595b2bafbfb), "Qps","Red Hot Notess (Qps) (MPU4) (set 11)" )
+M4RHNOTE_SET( 199?, m4rhnote__k,	m4rhnote,	"70001135.bin",					0x0000, 0x080000, CRC(a9ed9178) SHA1(446919e869a9cc20f469954504adf448474d702b), "Qps","Red Hot Notess (Qps) (MPU4) (set 12)" )
+M4RHNOTE_SET( 199?, m4rhnote__l,	m4rhnote,	"70001150.bin",					0x0000, 0x040000, CRC(3c3f4e45) SHA1(114c18e0fa8de224992138b72bf789ace39dffa0), "Qps","Red Hot Notess (Qps) (MPU4) (set 13)" )
+M4RHNOTE_SET( 199?, m4rhnote__m,	m4rhnote,	"70001151.bin",					0x0000, 0x040000, CRC(0cb1f440) SHA1(7ebdac6ea495d96c7713a284fdad4da0874de3f2), "Qps","Red Hot Notess (Qps) (MPU4) (set 14)" )
+M4RHNOTE_SET( 199?, m4rhnote__n,	m4rhnote,	"70001153.bin",					0x0000, 0x040000, CRC(e8ba9b3a) SHA1(71af6dd77da419868391e01f565c24a70d55b396), "Qps","Red Hot Notess (Qps) (MPU4) (set 15)" ) // rhn_gala_hopper_120.bin
+M4RHNOTE_SET( 199?, m4rhnote__o,	m4rhnote,	"70001160.bin",					0x0000, 0x040000, CRC(2d532681) SHA1(fb4321b6922cf35780adbdc5f030ef0df8d6cc9a), "Qps","Red Hot Notess (Qps) (MPU4) (set 16)" )
+M4RHNOTE_SET( 199?, m4rhnote__p,	m4rhnote,	"70001161.bin",					0x0000, 0x040000, CRC(e9a49319) SHA1(001163ece7a405a27fd71fdeb97489db143749a7), "Qps","Red Hot Notess (Qps) (MPU4) (set 17)" )
+M4RHNOTE_SET( 199?, m4rhnote__q,	m4rhnote,	"70001502.bin",					0x0000, 0x040000, CRC(d1b332f1) SHA1(07db228705b0bce47107cf5458986e830b988cee), "Qps","Red Hot Notess (Qps) (MPU4) (set 18)" )
+M4RHNOTE_SET( 199?, m4rhnote__r,	m4rhnote,	"70001503.bin",					0x0000, 0x040000, CRC(2a44069a) SHA1(0a1581ba552e0e93d6bc3b7298014ea4b6793da1), "Qps","Red Hot Notess (Qps) (MPU4) (set 19)" )
+M4RHNOTE_SET( 199?, m4rhnote__s,	m4rhnote,	"70001510.bin",					0x0000, 0x080000, CRC(87cb4cae) SHA1(49c97e0e79a8cd1417e9e07a13afe736d00ef3df), "Qps","Red Hot Notess (Qps) (MPU4) (set 20)" )
+M4RHNOTE_SET( 199?, m4rhnote__t,	m4rhnote,	"rhn_data_110_lv.bin",			0x0000, 0x040000, CRC(1f74c472) SHA1(86a170ddb001f817e960e7c166399280ad620bf0), "Qps","Red Hot Notess (Qps) (MPU4) (set 21)" )
+M4RHNOTE_SET( 199?, m4rhnote__u,	m4rhnote,	"rhn_gala_hopper_120_lv.bin",	0x0000, 0x040000, CRC(521b6402) SHA1(7d260c45fa339f5ca34f8e335875ad47bb093a04), "Qps","Red Hot Notess (Qps) (MPU4) (set 22)" )
+M4RHNOTE_SET( 199?, m4rhnote__v,	m4rhnote,	"rhn_mecca_120.bin",			0x0000, 0x040000, CRC(f131e386) SHA1(73672e6e66400b953dda7f2254082eff73dbf058), "Qps","Red Hot Notess (Qps) (MPU4) (set 23)" )
+M4RHNOTE_SET( 199?, m4rhnote__w,	m4rhnote,	"rhn_mecca_120_lv.bin",			0x0000, 0x040000, CRC(471e5263) SHA1(79c205e0d8e748aa72f9f3fadad248edf71f5ae0), "Qps","Red Hot Notess (Qps) (MPU4) (set 24)" )
+M4RHNOTE_SET( 199?, m4rhnote__x,	m4rhnote,	"rhn_std_110.bin",				0x0000, 0x040000, CRC(439f27d2) SHA1(4ad01c4dc9bbab7520fb281198777aea56f600b0), "Qps","Red Hot Notess (Qps) (MPU4) (set 25)" )
+M4RHNOTE_SET( 199?, m4rhnote__y,	m4rhnote,	"rhn_std_110_lv.bin",			0x0000, 0x040000, CRC(922b8196) SHA1(6fdbf301aaadacaeabf29ad11c67b22122954051), "Qps","Red Hot Notess (Qps) (MPU4) (set 26)" )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000353.bin", 0x0000, 0x040000, CRC(6e3a9dfc) SHA1(1d5d04140811e17267102c0618ffdaf70f71f717) )
-	ROM_LOAD( "70000354.bin", 0x0000, 0x080000, CRC(eb938886) SHA1(e6e882f28230b51091b2543df17c65e491a94f94) )
-	ROM_LOAD( "70000355.bin", 0x0000, 0x080000, CRC(c4b857b3) SHA1(6b58ee5d780551a665e737ea291b04ab641e8029) )
-	ROM_LOAD( "70001352.bin", 0x0000, 0x040000, CRC(0356e899) SHA1(51666a0ec4d29165f64391efa2339ea82710fa4c) )
-	ROM_LOAD( "70001353.bin", 0x0000, 0x040000, CRC(324b4a86) SHA1(fd4cd59e3519e23ab824c84546ab50b3803766bf) )
-	ROM_LOAD( "70001354.bin", 0x0000, 0x080000, CRC(e9aee455) SHA1(f9babcb90fe88fd522e4be7d8b794c9c1cd4f780) )
-	ROM_LOAD( "70001355.bin", 0x0000, 0x080000, CRC(ebc428c3) SHA1(c75738fc547c5b1783a6c5a6ebb06eea5730683d) )
-	ROM_LOAD( "70001401.bin", 0x0000, 0x080000, CRC(f83b1551) SHA1(d32f84938edfc4c3d9763fb3eecf56ed9102d979) )
-	ROM_LOAD( "70001411.bin", 0x0000, 0x080000, CRC(fa0c95ec) SHA1(1a792e7ed8fa092fdb34a7b31df316d6afca3e90) )
-	ROM_LOAD( "70001451.bin", 0x0000, 0x080000, CRC(2d288982) SHA1(bf3e1e1e20eb2d1d9ca6d0a8b48ef9c57aeb30bd) )
-	ROM_LOAD( "70001461.bin", 0x0000, 0x080000, CRC(73238425) SHA1(a744adabd8854c6b45820899f15ebb2c2a74dd4d) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
+#define M4RHROCK_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) /* intelhex, needs converting */ \
+	ROM_LOAD( "71000200.hi.hex", 0x0000, 0x0ff0f8, CRC(998e28ea) SHA1(f54a69af16e05119df2697bc01e548ac51ed3e11) ) \
+	ROM_LOAD( "71000200.lo.hex", 0x0000, 0x134084, CRC(ccd0b35f) SHA1(6d3ef65577a46c68f8628675d146f829c9a99659) ) \
+
+
+#define M4RHROCK_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHROCK_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
 
 
 
-ROM_START( m4looplt )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "70000500.bin", 0x0000, 0x080000, CRC(040699a5) SHA1(e1ebc23684c5bc1faaac7409d2179488c3022872) )
+M4RHROCK_SET( 199?, m4rhrock,		0,			"rhr_v200_1625_da8c_nlv.bin", 0x0000, 0x040000, CRC(dd67f5b3) SHA1(19b7b57ef20a2ad7997cf748396b246fda87db70), "Qps","Red Hot Rocks (Qps) (MPU4) (set 1)" )
+M4RHROCK_SET( 199?, m4rhrock__a,	m4rhrock,	"rhr_v300_1216_ce52_nlv.bin", 0x0000, 0x040000, CRC(86b0d683) SHA1(c6553bf65c055c4f911c215ba112eaa672357290), "Qps","Red Hot Rocks (Qps) (MPU4) (set 2)" )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "70000500a.bin", 0x0000, 0x080000, CRC(0668f52d) SHA1(6560309facf0022e3c14421b848f212b18be7550) )
-	ROM_LOAD( "70000501.bin", 0x0000, 0x080000, CRC(e2fbbfcf) SHA1(fc060468bf5e732626af8c3d0d6fc119a529c330) )
-	ROM_LOAD( "70000501a.bin", 0x0000, 0x080000, CRC(42bef934) SHA1(c332eb6566ef5f9ac56d1c3944635296c21b3193) )
-	ROM_LOAD( "70000504.bin", 0x0000, 0x080000, CRC(15e2c1c3) SHA1(69257749f1909b7ecc9c94cc2a27a5d4e6608251) )
-	ROM_LOAD( "70000505.bin", 0x0000, 0x080000, CRC(f28f59bd) SHA1(d5cdb0c020693c7922c5243f9d18054d47ed039d) )
-	ROM_LOAD( "70000506.bin", 0x0000, 0x080000, CRC(a3d40e9a) SHA1(97ac40e814824450e6705bc3240fffd4d0015b46) )
-	ROM_LOAD( "70000507.bin", 0x0000, 0x080000, CRC(756eefe4) SHA1(b253fbd94fdab5df32375a02d16d9ba333e8d71c) )
-	ROM_LOAD( "70001500.bin", 0x0000, 0x080000, CRC(0b9761a4) SHA1(e7a5e4b90d2e60808a7797d124308973130c440d) )
-	ROM_LOAD( "70001500a.bin", 0x0000, 0x080000, CRC(09f90d2c) SHA1(addfd0d20ef9cafba042aa05ee84db85f060b67a) )
-	ROM_LOAD( "70001501.bin", 0x0000, 0x080000, CRC(6ce9f76c) SHA1(467701786f8de136c9780a4ef93be6bb932d235d) )
-	ROM_LOAD( "70001501a.bin", 0x0000, 0x080000, CRC(ccacb197) SHA1(c7573f309e9c79b2999229c46f78fd0283c4a064) )
-	ROM_LOAD( "70001504.bin", 0x0000, 0x080000, CRC(1a7339c2) SHA1(575477d8abe3765d9cd4345336d0f7fa3a69202a) )
-	ROM_LOAD( "70001505.bin", 0x0000, 0x080000, CRC(7c9d111e) SHA1(8f98feb70cdcd77b5e7bb6a015c935403a53f428) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "71000500.bin", 0x0000, 0x080000, CRC(94fe58f4) SHA1(e07d8e6d4b1e660abc4fa08d703fc0e586f3570d) )
-ROM_END
+
+#define M4RHWHL_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000180.hi.hex", 0x0000, 0x04da98, CRC(0ffa11a5) SHA1(a3f8eb00b6771cb49965a717e27d0b544c6b2f4f) ) \
+	ROM_LOAD( "71000180.lo.hex", 0x0000, 0x134084, CRC(6dfc7474) SHA1(806b4b8ca5fa868581b4bf33080b9c486ce71bb6) ) \
+	ROM_LOAD( "redhotwheelssnd.p1", 0x0000, 0x080000, CRC(7b274a71) SHA1(38ba69084819133253b41f2eb1d784104e5f10f7) ) \
+	ROM_LOAD( "redhotwheelssnd.p2", 0x0000, 0x080000, CRC(e36e19e2) SHA1(204554622c9020479b095acd4fbab1f21f829137) ) \
+
+#define M4RHWHL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHWHL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4RHWHL_SET( 199?, m4rhwhl,		0,			"70001184.bin",					0x0000, 0x080000, CRC(8792d95b) SHA1(24b4f78728db7ee95d1fcd3ba38b49a20baaae6b), "Qps","Red Hot Wheels (Qps) (MPU4) (set 1)" )
+M4RHWHL_SET( 199?, m4rhwhl__a,	m4rhwhl,	"rhw_v100_1333_6d40_lv.bin",	0x0000, 0x080000, CRC(9ef7b655) SHA1(605822eaee44bebf554218ef7346192a6a84077e), "Qps","Red Hot Wheels (Qps) (MPU4) (set 2)" )
+M4RHWHL_SET( 199?, m4rhwhl__b,	m4rhwhl,	"rhw_v310_0925_0773_lv_p.bin",	0x0000, 0x080000, CRC(11880908) SHA1(0165bacf73dd54959975b3f186e256fd8d690d34), "Qps","Red Hot Wheels (Qps) (MPU4) (set 3)" )
+M4RHWHL_SET( 199?, m4rhwhl__c,	m4rhwhl,	"rhw_v310_0931_fa02_lv.bin",	0x0000, 0x080000, CRC(5642892e) SHA1(7a80edf9aefac9731751afa8250de07004c55e77), "Qps","Red Hot Wheels (Qps) (MPU4) (set 4)" )
+
+
+
+
+#define M4RDEAL_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+
+#define M4RDEAL_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RDEAL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4RDEAL_SET( 199?, m4rdeal,		0,			"70000703.bin", 0x0000, 0x080000, CRC(11e51311) SHA1(71a4327fa01cd7e899d423adc34c732ed56118d8), "Qps","Reel Deal (Qps) (MPU4) (set 1)" )
+M4RDEAL_SET( 199?, m4rdeal__a,	m4rdeal,	"70000704.bin", 0x0000, 0x080000, CRC(b161c08b) SHA1(bb914eb900aff0f6eeec33ff8a595a288306e073), "Qps","Reel Deal (Qps) (MPU4) (set 2)" )
+M4RDEAL_SET( 199?, m4rdeal__b,	m4rdeal,	"70000723.bin", 0x0000, 0x080000, CRC(bb166401) SHA1(1adf244e97d52cc5a5116a01d804caadd1034507), "Qps","Reel Deal (Qps) (MPU4) (set 3)" )
+M4RDEAL_SET( 199?, m4rdeal__c,	m4rdeal,	"70000724.bin", 0x0000, 0x080000, CRC(37df89e5) SHA1(6e7da02053be91f27257e3c5f952bbea9df3bc09), "Qps","Reel Deal (Qps) (MPU4) (set 4)" )
+M4RDEAL_SET( 199?, m4rdeal__d,	m4rdeal,	"70001622.bin", 0x0000, 0x080000, CRC(1a8fff86) SHA1(e0bdb4fa233acdf18d535821fb9fc2cf69ac4f5e), "Qps","Reel Deal (Qps) (MPU4) (set 5)" )
+M4RDEAL_SET( 199?, m4rdeal__e,	m4rdeal,	"70001623.bin", 0x0000, 0x080000, CRC(97a223f8) SHA1(d1a87391a8178cb47664968031a7d17d9082847b), "Qps","Reel Deal (Qps) (MPU4) (set 6)" )
+M4RDEAL_SET( 199?, m4rdeal__f,	m4rdeal,	"70001703.bin", 0x0000, 0x080000, CRC(1b89777e) SHA1(09b87d352d27c2847dec0a147dea7cc75f07ffa5), "Qps","Reel Deal (Qps) (MPU4) (set 7)" )
+M4RDEAL_SET( 199?, m4rdeal__g,	m4rdeal,	"70001704.bin", 0x0000, 0x080000, CRC(11f3834d) SHA1(8c56cf60b064e8d755c5e760fcf6f0284ef710f9), "Qps","Reel Deal (Qps) (MPU4) (set 8)" )
+M4RDEAL_SET( 199?, m4rdeal__h,	m4rdeal,	"70001744.bin", 0x0000, 0x080000, CRC(6de0d366) SHA1(ec42608f3b9c7cf8e6b81541767a8664478e7ab4), "Qps","Reel Deal (Qps) (MPU4) (set 9)" )
+M4RDEAL_SET( 199?, m4rdeal__i,	m4rdeal,	"70001745.bin", 0x0000, 0x080000, CRC(4c0e9cab) SHA1(6003d4553f053a253965ba786553b00b7e197069), "Qps","Reel Deal (Qps) (MPU4) (set 10)" )
+
+
+#define M4SHOKNR_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "snrsnd.p1", 0x000000, 0x080000, CRC(985c7c8c) SHA1(d2740ff6192c21af3a8a8a9a92b6fd604b40e9d1) ) \
+	ROM_LOAD( "snrsnd.p2", 0x080000, 0x080000, CRC(6a3a57ce) SHA1(3aaa0a761e17a2a14196cb023b10a49b44ba1046) ) \
+	ROM_LOAD( "shock.s2", 0x080000, 0x080000, CRC(10e9912f) SHA1(833d2b125bf30bdb8de71f6c9d8a9fe92701f741) ) /* alt snd2 */ \
+
+#define M4SHOKNR_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SHOKNR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SHOKNR_SET( 199?, m4shoknr,		0,			"snr_v300_1218_3019_lv.bin",	0x0000, 0x040000, CRC(bec80497) SHA1(08de5e29a063b01fb904a156170a3063633115ab), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 1)" )
+M4SHOKNR_SET( 199?, m4shoknr__a,	m4shoknr,	"snr_v300_1221_c8ff_nlv.bin",	0x0000, 0x040000, CRC(d191b361) SHA1(4146e509e77878a51e32de877768504b3c85e6f8), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 2)" )
+M4SHOKNR_SET( 199?, m4shoknr__b,	m4shoknr,	"snr_v200_1145_047f_lv.bin",	0x0000, 0x040000, CRC(73ef1e1a) SHA1(6ccaf64daa5acacfba4df576281bb5478f2fbd29), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 3)" )
+M4SHOKNR_SET( 199?, m4shoknr__c,	m4shoknr,	"snr_v200_1655_5a69_nlv.bin",	0x0000, 0x040000, CRC(50ba0c6b) SHA1(767fd59858fc55ae95f096f00c54bd619369a56c), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 4)" )
+M4SHOKNR_SET( 199?, m4shoknr__d,	m4shoknr,	"shock.p1",						0x0000, 0x080000, CRC(65fb2f47) SHA1(33b997843a705fc446f33beb127b672a282286c4), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 5)" ) // check if it's just an overdump of above sets
+
+#define M4TORNAD_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000300.hi.hex", 0x0000, 0x0be342, CRC(f9021a32) SHA1(4bd7d7306385ef37dd9cbb5085dbc104657abc0e) ) \
+	ROM_LOAD( "71000300.lo.hex", 0x0000, 0x134084, CRC(af34658d) SHA1(63a6db1f5ed00fa6208c63e0a2211ba2afe0e9a1) ) \
+	ROM_LOAD( "tornadosnd.p1", 0x0000, 0x080000, CRC(cac88f25) SHA1(6ccbf372d983a47a49caedb8a526fc7703b31ed4) ) \
+	ROM_LOAD( "tornadosnd.p2", 0x080000, 0x080000, CRC(ef4f563d) SHA1(1268061edd93474296e3454e0a2e706b90c0621c) ) \
+
+#define M4TORNAD_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TORNAD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4TORNAD_SET( 199?, m4tornad,		0,			"torn_v110_1146_979d_lv.bin",		0x0000, 0x040000, CRC(3160bddd) SHA1(4f36b081c8f6859a3fe55e1f177a0406c2480987), "Qps","Tornado (Qps) (MPU4) (set 1)" )
+M4TORNAD_SET( 199?, m4tornad__a,	m4tornad,	"torn_v110_1153_955f_nlv.bin",		0x0000, 0x040000, CRC(c437040d) SHA1(50c5ba655989b7f6a2ee61af0ad007ce825f4364), "Qps","Tornado (Qps) (MPU4) (set 2)" )
+M4TORNAD_SET( 199?, m4tornad__b,	m4tornad,	"tornsp_v110_1148_95bd_nlv.bin",	0x0000, 0x040000, CRC(f0933eb6) SHA1(a726b02ae6298ecfb6a01f7ecb09bac50ca13114), "Qps","Tornado (Qps) (MPU4) (set 3)" )
+M4TORNAD_SET( 199?, m4tornad__c,	m4tornad,	"tornsp_v110_1151_9693_lv.bin",		0x0000, 0x040000, CRC(05c48766) SHA1(e20916cd67904601cd25b3c6f70030c5302d12a6), "Qps","Tornado (Qps) (MPU4) (set 4)" )
+M4TORNAD_SET( 199?, m4tornad__d,	m4tornad,	"torn_v200_1613_efe5_nlv.bin",		0x0000, 0x040000, CRC(32936ae5) SHA1(f7ec8b9c0e74c0e51ea4b9c8f450f64907ce3300), "Qps","Tornado (Qps) (MPU4) (set 5)" )
+M4TORNAD_SET( 199?, m4tornad__e,	m4tornad,	"torn_v200_1617_ece9_lv.bin",		0x0000, 0x040000, CRC(c7c4d335) SHA1(955303d446e78bfa1ceeb07ca62cb6e11e478592), "Qps","Tornado (Qps) (MPU4) (set 6)" )
+M4TORNAD_SET( 199?, m4tornad__f,	m4tornad,	"tornsp_v200_1623_eee3_nlv.bin",	0x0000, 0x040000, CRC(6b4f8baf) SHA1(fea21f43b3bbc1c969a7426ca956898e3680823f), "Qps","Tornado (Qps) (MPU4) (set 7)" )
+M4TORNAD_SET( 199?, m4tornad__g,	m4tornad,	"tornsp_v200_1626_ec93_lv.bin",		0x0000, 0x040000, CRC(9e18327f) SHA1(7682cd172903cd5c26873306e70394c154e66c30), "Qps","Tornado (Qps) (MPU4) (set 8)" )
+
+
+#define M4SHKWAV_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000250.hi.hex", 0x0000, 0x0c852b, CRC(e3a857c7) SHA1(66619b7926ae7df970045fffd7e20763abfe14a4) ) \
+	ROM_LOAD( "71000250.lo.hex", 0x0000, 0x134084, CRC(46758bc5) SHA1(18d02960580646b276e7a6aabdeb4ca449ec5ea0) ) \
+	ROM_LOAD( "shocksnd.p1", 0x000000, 0x080000, CRC(54bf0ddb) SHA1(693b855367972b5a45e9d2d6152849ab2cde38a7) ) \
+	ROM_LOAD( "shocksnd.p2", 0x080000, 0x080000, CRC(facebc55) SHA1(75367473646cfc735f4d1267e13a9c92ea19c4e3) ) \
+
+#define M4SHKWAV_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SHKWAV_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+M4SHKWAV_SET( 199?, m4shkwav,		0,			"swave_v210_1135_08dd_lv.bin",		0x0000, 0x040000, CRC(ca9d40a3) SHA1(65c9e4aa022eb6fe70d619f67638c37ad578ddbf), "Qps","Shockwave (Qps) (MPU4) (set 1)" )
+M4SHKWAV_SET( 199?, m4shkwav__a,	m4shkwav,	"swave_v210_11376_0bb3_nlv.bin",	0x0000, 0x040000, CRC(3fcaf973) SHA1(28258c8c60e6b542e1789cd8a4cfd530d1ed6084), "Qps","Shockwave (Qps) (MPU4) (set 2)" )
+M4SHKWAV_SET( 199?, m4shkwav__b,	m4shkwav,	"swsplv.bin",						0x0000, 0x040000, CRC(1e33e93f) SHA1(3e87f8ed35da776e1968c9574c140cc3984ea8de), "Qps","Shockwave (Qps) (MPU4) (set 3)" )
+M4SHKWAV_SET( 199?, m4shkwav__c,	m4shkwav,	"sho1_0lv.bin",						0x0000, 0x080000, CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87), "Qps","Shockwave (Qps) (MPU4) (set 4)" )
+M4SHKWAV_SET( 199?, m4shkwav__d,	m4shkwav,	"swave_v300_1552_13ed_nlv.bin",		0x0000, 0x040000, CRC(b0e03f04) SHA1(fdd113af30fd9e87b171ecdf3be7e720366476b3), "Qps","Shockwave (Qps) (MPU4) (set 5)" )
+M4SHKWAV_SET( 199?, m4shkwav__e,	m4shkwav,	"swave_v300_1555_119d_lv.bin",		0x0000, 0x040000, CRC(45b786d4) SHA1(24fd4fdea684103334385ca329f384796b496e2c), "Qps","Shockwave (Qps) (MPU4) (set 6)" )
+M4SHKWAV_SET( 199?, m4shkwav__f,	m4shkwav,	"swsp_v300_1602_e1b2_nlv.bin",		0x0000, 0x040000, CRC(4ed74015) SHA1(0ab2167ba0ce6f1a1317c2087091187b9fa94c27), "Qps","Shockwave (Qps) (MPU4) (set 7)" )
+M4SHKWAV_SET( 199?, m4shkwav__g,	m4shkwav,	"swsp_v300_1606_ded8_lv.bin",		0x0000, 0x040000, CRC(bb80f9c5) SHA1(95f577c427204b83bec0128acfd89dda90938d1f), "Qps","Shockwave (Qps) (MPU4) (set 8)" )
+
+
+#define M4CLAB_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000010.lo", 0x0000, 0x134084, CRC(c39bbae4) SHA1(eee333376612a96a4c344729a96cc60c217bfde3) ) \
+	ROM_LOAD( "71000010.hi", 0x0000, 0x091c0b, CRC(d0d3cb4f) SHA1(eaacf9ed3a6b6dcda8e1a3edbc3a9a2a51ffcbd8) ) \
+	ROM_LOAD( "clab_snd1_c8a6.bin", 0x0000, 0x080000, CRC(cf9de981) SHA1(e5c73e9b9db9ac512602c2dd586ca5cf65f98bc1) ) \
+	ROM_LOAD( "clab_snd2_517a.bin", 0x080000, 0x080000, CRC(d4eb949e) SHA1(0ebbd1b5e3c86da94f35c69d9d60e36844cc4d7e) ) \
+
+#define M4CLAB_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4CLAB_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4CLAB_SET( 199?, m4clab,		0,		"70000019.bin",						0x0000, 0x040000, CRC(23a12863) SHA1(4047cb8cbc03f96f2b8681b6276e100e8e9194a5), "Qps","Cash Lab (Qps) (MPU4) (set 1)" )
+M4CLAB_SET( 199?, m4clab__a,	m4clab,	"70000020.bin",						0x0000, 0x040000, CRC(88af7368) SHA1(14dea4267a4365286eea1e02b9b44d4053618cbe), "Qps","Cash Lab (Qps) (MPU4) (set 2)" )
+M4CLAB_SET( 199?, m4clab__b,	m4clab,	"70000052.bin",						0x0000, 0x040000, CRC(99e60d45) SHA1(ec28bdd4ffb9674c2e9f8ab72aac3cb6011e7d6f), "Qps","Cash Lab (Qps) (MPU4) (set 3)" )
+M4CLAB_SET( 199?, m4clab__c,	m4clab,	"70000053.bin",						0x0000, 0x040000, CRC(3ddf8b29) SHA1(0087ccd3429c081a3121e97d649914ab2cf8caa6), "Qps","Cash Lab (Qps) (MPU4) (set 4)" )
+M4CLAB_SET( 199?, m4clab__d,	m4clab,	"clab_v300_1028_c23a_lv_10p.bin",	0x0000, 0x040000, CRC(c2ca098a) SHA1(e2bf80366af925a4c880a3377b79d494760f286f), "Qps","Cash Lab (Qps) (MPU4) (set 5)" )
+M4CLAB_SET( 199?, m4clab__e,	m4clab,	"clab_v300_1031_3fb7_nlv_10p.bin",	0x0000, 0x040000, CRC(1502527f) SHA1(8a3dd5600ad9a073ea6fb8412178daa575002e56), "Qps","Cash Lab (Qps) (MPU4) (set 6)" )
+M4CLAB_SET( 199?, m4clab__f,	m4clab,	"clab_v300_1033_1175_nlv_20p.bin",	0x0000, 0x040000, CRC(ba26efd7) SHA1(bf9c0dbf6882ddc42680c7d23c9b858eb12e5646), "Qps","Cash Lab (Qps) (MPU4) (set 7)" )
+M4CLAB_SET( 199?, m4clab__g,	m4clab,	"clab_v400_1249_0162_nlv.bin",		0x0000, 0x040000, CRC(df256c84) SHA1(f4d0fc5acd7d0ac770cae548744ce18dfb9ec67c), "Qps","Cash Lab (Qps) (MPU4) (set 8)" )
+M4CLAB_SET( 199?, m4clab__h,	m4clab,	"clab_v410_1254_1ca2_lv.bin",		0x0000, 0x040000, CRC(6e2ee8a9) SHA1(e64a01c93b879c9ade441bd4f1ce381f6e65a655), "Qps","Cash Lab (Qps) (MPU4) (set 9)" )
+M4CLAB_SET( 199?, m4clab__i,	m4clab,	"clab_v410_1254_6e11_nlv.bin",		0x0000, 0x040000, CRC(efe4fcb9) SHA1(8a2f02593c7fbea060c78a98abd82fd970661e05), "Qps","Cash Lab (Qps) (MPU4) (set 10)" )
+M4CLAB_SET( 199?, m4clab__j,	m4clab,	"clabrom",							0x0000, 0x040000, CRC(d80ecff5) SHA1(2608e95b718ecd49d880fd9911cb97e6644a307d), "Qps","Cash Lab (Qps) (MPU4) (set 11)" )
+
+#define M4SDQUID_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+
+#define M4SDQUID_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SDQUID_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4SDQUID_SET( 199?, m4sdquid,		0,			"70000352.bin", 0x0000, 0x040000, CRC(303d6177) SHA1(aadff8a81244bfd62d1cc088caf01496e1ff61db), "Qps","Sundance Quid (Qps) (MPU4) (set 1)" )
+M4SDQUID_SET( 199?, m4sdquid__a,	m4sdquid,	"70000353.bin", 0x0000, 0x040000, CRC(6e3a9dfc) SHA1(1d5d04140811e17267102c0618ffdaf70f71f717), "Qps","Sundance Quid (Qps) (MPU4) (set 2)" )
+M4SDQUID_SET( 199?, m4sdquid__b,	m4sdquid,	"70000354.bin", 0x0000, 0x080000, CRC(eb938886) SHA1(e6e882f28230b51091b2543df17c65e491a94f94), "Qps","Sundance Quid (Qps) (MPU4) (set 3)" )
+M4SDQUID_SET( 199?, m4sdquid__c,	m4sdquid,	"70000355.bin", 0x0000, 0x080000, CRC(c4b857b3) SHA1(6b58ee5d780551a665e737ea291b04ab641e8029), "Qps","Sundance Quid (Qps) (MPU4) (set 4)" )
+M4SDQUID_SET( 199?, m4sdquid__d,	m4sdquid,	"70001352.bin", 0x0000, 0x040000, CRC(0356e899) SHA1(51666a0ec4d29165f64391efa2339ea82710fa4c), "Qps","Sundance Quid (Qps) (MPU4) (set 5)" )
+M4SDQUID_SET( 199?, m4sdquid__e,	m4sdquid,	"70001353.bin", 0x0000, 0x040000, CRC(324b4a86) SHA1(fd4cd59e3519e23ab824c84546ab50b3803766bf), "Qps","Sundance Quid (Qps) (MPU4) (set 6)" )
+M4SDQUID_SET( 199?, m4sdquid__f,	m4sdquid,	"70001354.bin", 0x0000, 0x080000, CRC(e9aee455) SHA1(f9babcb90fe88fd522e4be7d8b794c9c1cd4f780), "Qps","Sundance Quid (Qps) (MPU4) (set 7)" )
+M4SDQUID_SET( 199?, m4sdquid__g,	m4sdquid,	"70001355.bin", 0x0000, 0x080000, CRC(ebc428c3) SHA1(c75738fc547c5b1783a6c5a6ebb06eea5730683d), "Qps","Sundance Quid (Qps) (MPU4) (set 8)" )
+M4SDQUID_SET( 199?, m4sdquid__h,	m4sdquid,	"70001401.bin", 0x0000, 0x080000, CRC(f83b1551) SHA1(d32f84938edfc4c3d9763fb3eecf56ed9102d979), "Qps","Sundance Quid (Qps) (MPU4) (set 9)" )
+M4SDQUID_SET( 199?, m4sdquid__i,	m4sdquid,	"70001411.bin", 0x0000, 0x080000, CRC(fa0c95ec) SHA1(1a792e7ed8fa092fdb34a7b31df316d6afca3e90), "Qps","Sundance Quid (Qps) (MPU4) (set 10)" )
+M4SDQUID_SET( 199?, m4sdquid__j,	m4sdquid,	"70001451.bin", 0x0000, 0x080000, CRC(2d288982) SHA1(bf3e1e1e20eb2d1d9ca6d0a8b48ef9c57aeb30bd), "Qps","Sundance Quid (Qps) (MPU4) (set 11)" )
+M4SDQUID_SET( 199?, m4sdquid__k,	m4sdquid,	"70001461.bin", 0x0000, 0x080000, CRC(73238425) SHA1(a744adabd8854c6b45820899f15ebb2c2a74dd4d), "Qps","Sundance Quid (Qps) (MPU4) (set 12)" )
+
+
+
+#define M4LOOPLT_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "71000500.bin", 0x0000, 0x080000, CRC(94fe58f4) SHA1(e07d8e6d4b1e660abc4fa08d703fc0e586f3570d) ) \
+
+#define M4LOOPLT_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4LOOPLT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4LOOPLT_SET( 199?, m4looplt,		0,			"70000500.bin",		0x0000, 0x080000, CRC(040699a5) SHA1(e1ebc23684c5bc1faaac7409d2179488c3022872), "Qps","Loop The Loot (Qps) (MPU4) (set 1)" )
+M4LOOPLT_SET( 199?, m4looplt__a,	m4looplt,	"70000500a.bin",	0x0000, 0x080000, CRC(0668f52d) SHA1(6560309facf0022e3c14421b848f212b18be7550), "Qps","Loop The Loot (Qps) (MPU4) (set 2)" )
+M4LOOPLT_SET( 199?, m4looplt__b,	m4looplt,	"70000501.bin",		0x0000, 0x080000, CRC(e2fbbfcf) SHA1(fc060468bf5e732626af8c3d0d6fc119a529c330), "Qps","Loop The Loot (Qps) (MPU4) (set 3)" )
+M4LOOPLT_SET( 199?, m4looplt__c,	m4looplt,	"70000501a.bin",	0x0000, 0x080000, CRC(42bef934) SHA1(c332eb6566ef5f9ac56d1c3944635296c21b3193), "Qps","Loop The Loot (Qps) (MPU4) (set 4)" )
+M4LOOPLT_SET( 199?, m4looplt__d,	m4looplt,	"70000504.bin",		0x0000, 0x080000, CRC(15e2c1c3) SHA1(69257749f1909b7ecc9c94cc2a27a5d4e6608251), "Qps","Loop The Loot (Qps) (MPU4) (set 5)" )
+M4LOOPLT_SET( 199?, m4looplt__e,	m4looplt,	"70000505.bin",		0x0000, 0x080000, CRC(f28f59bd) SHA1(d5cdb0c020693c7922c5243f9d18054d47ed039d), "Qps","Loop The Loot (Qps) (MPU4) (set 6)" )
+M4LOOPLT_SET( 199?, m4looplt__f,	m4looplt,	"70000506.bin",		0x0000, 0x080000, CRC(a3d40e9a) SHA1(97ac40e814824450e6705bc3240fffd4d0015b46), "Qps","Loop The Loot (Qps) (MPU4) (set 7)" )
+M4LOOPLT_SET( 199?, m4looplt__g,	m4looplt,	"70000507.bin",		0x0000, 0x080000, CRC(756eefe4) SHA1(b253fbd94fdab5df32375a02d16d9ba333e8d71c), "Qps","Loop The Loot (Qps) (MPU4) (set 8)" )
+M4LOOPLT_SET( 199?, m4looplt__h,	m4looplt,	"70001500.bin",		0x0000, 0x080000, CRC(0b9761a4) SHA1(e7a5e4b90d2e60808a7797d124308973130c440d), "Qps","Loop The Loot (Qps) (MPU4) (set 9)" )
+M4LOOPLT_SET( 199?, m4looplt__i,	m4looplt,	"70001500a.bin",	0x0000, 0x080000, CRC(09f90d2c) SHA1(addfd0d20ef9cafba042aa05ee84db85f060b67a), "Qps","Loop The Loot (Qps) (MPU4) (set 10)" )
+M4LOOPLT_SET( 199?, m4looplt__j,	m4looplt,	"70001501.bin",		0x0000, 0x080000, CRC(6ce9f76c) SHA1(467701786f8de136c9780a4ef93be6bb932d235d), "Qps","Loop The Loot (Qps) (MPU4) (set 11)" )
+M4LOOPLT_SET( 199?, m4looplt__k,	m4looplt,	"70001501a.bin",	0x0000, 0x080000, CRC(ccacb197) SHA1(c7573f309e9c79b2999229c46f78fd0283c4a064), "Qps","Loop The Loot (Qps) (MPU4) (set 12)" )
+M4LOOPLT_SET( 199?, m4looplt__l,	m4looplt,	"70001504.bin",		0x0000, 0x080000, CRC(1a7339c2) SHA1(575477d8abe3765d9cd4345336d0f7fa3a69202a), "Qps","Loop The Loot (Qps) (MPU4) (set 13)" )
+M4LOOPLT_SET( 199?, m4looplt__m,	m4looplt,	"70001505.bin",		0x0000, 0x080000, CRC(7c9d111e) SHA1(8f98feb70cdcd77b5e7bb6a015c935403a53f428), "Qps","Loop The Loot (Qps) (MPU4) (set 14)" )
 
 
 
@@ -407,17 +472,3 @@ GAME(199?, m4jiggin,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global"
 
 
 
-/* QPS */
-// 'START UP'
-GAME( 199?, m4jungjk	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Jungle Jackpots (Mazooma - Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4rhnote	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Red Hot Notes (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4rhrock	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Red Hot Rocks (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4shoknr	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Shock 'n' Roll (Mazooma - Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4tornad	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Tornado (Qps - Mazooma) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4shkwav	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Shockwave (Mazooma - Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4clab		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Cash Lab (Mazooma - Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4rhwhl		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Red Hot Wheels (Mazooma - Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE) // wants link
-// different behavior
-GAME( 199?, m4rdeal		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Reel Deal (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4sdquid	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Sundance Quid (Qps) (MPU4)", GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4looplt	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Loop The Loot (Qps) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)

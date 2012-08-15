@@ -616,169 +616,242 @@ M4CMONT_SET( 199?, m4cmont_gt2,	m4cmont,	"gtr5.8g2",		0x0000, 0x020000, CRC(f15e
 M4CMONT_SET( 199?, m4cmont_gt3,	m4cmont,	"gtr58gaa",		0x0000, 0x020000, CRC(ad20af25) SHA1(1a5ac760894f4441d11f0974f1d0f90fabd76bf2), "Avantime?","Casino Monte Carlo (Avantime?) (MPU4) (GTR, set 3)" )
 
 
+#define M4BLKMGC_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "bmsnd", 0x0000, 0x080000, CRC(81da8bc9) SHA1(a60fd689e2683b987f48e3a4c8817b169a9c3fdf) ) \
+  
 
-// black magic
-ROM_START( m4blkmgc )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// new - latvia
-	ROM_LOAD( "bml1a305.bin", 0x0000, 0x010000, CRC(429e2642) SHA1(9e6a0ea07adaa7a2327b2ba3706f1966fed0de36) )
-	ROM_LOAD( "bml1b305.bin", 0x0000, 0x010000, CRC(fa9e4567) SHA1(7401103c40d8efd2427953a1e398c158d6f08a64) )
-
-	// new - ukraine
-	ROM_LOAD( "bmu1a306.bin", 0x0000, 0x010000, CRC(4c3ef73a) SHA1(fa1be29e7a5240e6dfefec61d77c3ec78f5f7b11) )
-	ROM_LOAD( "bmu1b306.bin", 0x0000, 0x010000, CRC(f1ec2c3e) SHA1(ac776c2020409485265d227fe39f0ca31f23ddd7) )
-
-	ROM_LOAD( "bfu1a307.bin", 0x0000, 0x010000, CRC(68aa272c) SHA1(9f476d55a09776a621e58afddf2e3f618b278374) )
-	ROM_LOAD( "bfu1b307.bin", 0x0000, 0x010000, CRC(9c876530) SHA1(1fb95591c6b0a43aa66c7a036268e19cf27e5535) )
-
-	ROM_LOAD( "bau1a307.bin", 0x0000, 0x010000, CRC(41af6959) SHA1(81a4c4db5dd696bfaf7f36455b3970a2d652ab08) )
-	ROM_LOAD( "bau1b307.bin", 0x0000, 0x010000, CRC(1405a02b) SHA1(82504289e72900d3315f46ed31aeabc71b2c5b9e) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "bmsnd", 0x0000, 0x080000, CRC(81da8bc9) SHA1(a60fd689e2683b987f48e3a4c8817b169a9c3fdf) ) // from 'new' sets
-ROM_END
-
-// amercian aladdin
-ROM_START( m4amalad )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	//new
-	ROM_LOAD( "aag1.4",			0x0000, 0x020000, CRC(0da943a1) SHA1(50915ce67687f15a36b5c38b1c1c6773bd3ecf9f) )
-	ROM_LOAD( "aav1.2b",		0x0000, 0x020000, CRC(81905010) SHA1(25866a2f8072031facdd69a07b4c1a46ba560d36) )
-	ROM_LOAD( "aav1.2s.2s",		0x0000, 0x010000, CRC(3bfb0faa) SHA1(3a4fe6d47e995f40cb03984dbd1fc98669513b4a) )
-	ROM_LOAD( "jpaltest.dat",	0x0000, 0x020000, CRC(0d50228b) SHA1(884a4271899d6bb4eadd7315f20146a08e21c5c9) )
-	ROM_LOAD( "jpaltst2.dat",	0x0000, 0x020000, CRC(872728ce) SHA1(eeab5487e6ce12e239ce6143c0e761737e56bcbe) )
-	ROM_LOAD( "lglv2.2b",		0x0000, 0x020000, CRC(04015f49) SHA1(23f252c129a54ae7ffe99682c71e14b4b27d465b) )
-	ROM_LOAD( "aag1.1",			0x0000, 0x020000, CRC(5e426c67) SHA1(6a59996998eff1870d7492afa1056ca77ec3f281) )
-	ROM_LOAD( "aag1.2",			0x0000, 0x020000, CRC(631d4be8) SHA1(207655c2d4a5500631ed4df8db5625177b5d4d12) )
-	ROM_LOAD( "aag1.3",			0x0000, 0x020000, CRC(3a9552a9) SHA1(7695899b6ed52d0c7530b5ed0829cfdbb3892fa2) )
-	//old
-	ROM_LOAD( "aav1.1b",		0x0000, 0x020000, CRC(cb8a3385) SHA1(39e2df941977faa1afc88a6189f8b35e8f605c95) )
-	ROM_LOAD( "aav1.1s",		0x0000, 0x010000, CRC(2bb83dee) SHA1(06ce5640c76c95ba9a9178b5f75e2cb3b358b4ed) )
-	ROM_LOAD( "lgv1.1b",		0x0000, 0x020000, CRC(1113f54a) SHA1(9cf4b50b4e24be0c31e325fdb02a82e93c31b93d) )
-	ROM_LOAD( "lgv1.1s",		0x0000, 0x010000, CRC(3e3f9615) SHA1(717e0f371625b44b09be8567bc8a4a230899bcbc) )
-	ROM_LOAD( "aalatv1.1b",		0x0000, 0x020000, CRC(3af6291f) SHA1(ca09f66a8c0f0e1c1dadac096c5cbf738ceaf9be) )
-	ROM_LOAD( "aalatv1.1s",		0x0000, 0x010000, CRC(582bd6ea) SHA1(8c353a0089f5d796fed2b381429a6795eb9e9b11) )
-	//misc
-	ROM_LOAD( "aalatv1.1b",		0x0000, 0x020000, CRC(3af6291f) SHA1(ca09f66a8c0f0e1c1dadac096c5cbf738ceaf9be) )
-	ROM_LOAD( "aalatv1.1s",		0x0000, 0x010000, CRC(582bd6ea) SHA1(8c353a0089f5d796fed2b381429a6795eb9e9b11) )
-	ROM_LOAD( "aav1.1b",		0x0000, 0x020000, CRC(cb8a3385) SHA1(39e2df941977faa1afc88a6189f8b35e8f605c95) )
-	ROM_LOAD( "aav1.1s",		0x0000, 0x010000, CRC(2bb83dee) SHA1(06ce5640c76c95ba9a9178b5f75e2cb3b358b4ed) )
-	ROM_LOAD( "lgv1.1b",		0x0000, 0x020000, CRC(1113f54a) SHA1(9cf4b50b4e24be0c31e325fdb02a82e93c31b93d) )
-	ROM_LOAD( "lgv1.1s",		0x0000, 0x010000, CRC(3e3f9615) SHA1(717e0f371625b44b09be8567bc8a4a230899bcbc) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "aasnd", 0x0000, 0x080000, CRC(6b78f3de) SHA1(4f10afdc5cf7c84e2d048f7c9c5f83323f1e5a6e) )
-ROM_END
-
-// big ben - some of these were also in the black magic set (incorrectly?)
-ROM_START( m4bben )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "bbc1a102.bin", 0x0000, 0x010000, CRC(c5010bb6) SHA1(f39ab219eafaa391b5b777c2918f059ba67b4504) )
-	ROM_LOAD( "bbc1b102.bin", 0x0000, 0x010000, CRC(9eb20181) SHA1(c183e3eab84019b6acb5040ef8d5aa238b914e78) )
-
-	ROM_LOAD( "bbc1a103.bin", 0x0000, 0x010000, CRC(34568c49) SHA1(57a772595e258b6e1a41145e4dcaa0486c7d91ae) )
-	ROM_LOAD( "bbc1b103.bin", 0x0000, 0x010000, CRC(587d1f54) SHA1(c6d5657958f029d38d0b1244032634bd023bf48d) )
-
-	ROM_LOAD( "bbc1a104.bin", 0x0000, 0x010000, CRC(ac5d175e) SHA1(0772dcb362c732760d96b9876898cfd5a1038720) )
-	ROM_LOAD( "bbc1b104.bin", 0x0000, 0x010000, CRC(ac0ba269) SHA1(de9b00f32afc7cabcf6400e3b063f844b1b03f28) )
-
-	ROM_LOAD( "bbc1a105.bin", 0x0000, 0x010000, CRC(cece9ee3) SHA1(582def521d5583ab9fc9adeedcdd09e2ab4876b8) )
-	ROM_LOAD( "bbc1b105.bin", 0x0000, 0x010000, CRC(b31f3989) SHA1(5d5a7fc49486b4f7e9a31a4a469913174ca2cb5b) )
-
-	ROM_LOAD( "bbc2a106.bin", 0x0000, 0x010000, CRC(4929273e) SHA1(0703b89884a2d410854d813fe8304eac0dbfb30e) )
-	ROM_LOAD( "bbc2b106.bin", 0x0000, 0x010000, CRC(d06687ed) SHA1(2e5b32c772f47f3f10ee90cbc72c00995871c2c0) )
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "bben1s.bin", 0x0000, 0x02dbc5, CRC(9240317e) SHA1(d9167e52a09ff1783bb10e2e34fb80bdf555f00e) )
-ROM_END
-
-ROM_START( m4bbox )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "bbb1.bin", 0x0000, 0x010000, CRC(b668e08e) SHA1(f401405419689ea5ad06dfd815aaef9e1b7ed4e1) )
-	ROM_LOAD( "bbb13.bin", 0x0000, 0x010000, CRC(9601d921) SHA1(e179b5155070af880d10a64d44454d84ec329800) )
-	ROM_LOAD( "bbb2.bin", 0x0000, 0x010000, CRC(1bcf9f83) SHA1(f5d2a352e79d1d2694b3c854a0a532662173416a) )
-	ROM_LOAD( "bbb3.bin", 0x0000, 0x010000, CRC(21608fa5) SHA1(ca565442f8d6d8a8dfca847b5a638551ce15cf07) )
-	ROM_LOAD( "bbb5.bin", 0x0000, 0x010000, CRC(4c0384f3) SHA1(c1ed2171cbe781d3b1842d5ed999e2d601ccf0c4) )
-	ROM_LOAD( "bbb6.bin", 0x0000, 0x010000, CRC(5a4d4ca4) SHA1(127b961ecfb61ec2a201ec736d2c677b0e894b0b) )
-	ROM_LOAD( "bbb7.bin", 0x0000, 0x010000, CRC(c0c0de55) SHA1(d2140ba83b1210a0d3061d23b9e8e6b2b59f7f0e) )
-	ROM_LOAD( "bbb8.bin", 0x0000, 0x010000, CRC(67373388) SHA1(e4f0907783cb4305fea6ea4591bef7f333a5041e) )
-	ROM_LOAD( "loreel2.bin", 0x0000, 0x010000, CRC(77c1d85c) SHA1(8cfc12c8814b42003cfe85e170426e224660b4fb) )
-	ROM_LOAD( "bbb9.bin", 0x0000, 0x010000, CRC(191f3da0) SHA1(8ee7cf349d97b1819ddb99a6dc91c0a364597e9f) )
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "bb1snd.bin", 0x0000, 0x068880, CRC(69d53f5a) SHA1(dd7958060804fda97a1fdf69c230bfab092b9707) )
-ROM_END
+#define M4BLKMGC_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BLKMGC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
 
 
 
-ROM_START( m4frnudg )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "fanhc11.bin", 0x0000, 0x010000, CRC(d2fe9df9) SHA1(7b519e4ed447f8c59fda972fc398f6ff423a8f92) )
-	ROM_LOAD( "fanhc12.bin", 0x0000, 0x010000, CRC(2b2176e0) SHA1(9acffc05c02e76a6cbe4cfd708ff2d94ecb6c308) )
-	ROM_LOAD( "fanhc8.bin", 0x0000, 0x010000, CRC(d1eecc15) SHA1(7dd3d218bc42ed7a92b8cd04b3de0eecda1d7eb0) )
-	ROM_LOAD( "fanhc9.bin", 0x0000, 0x010000, CRC(0b581d12) SHA1(e62c831d8d21eb3c9a15ebe7f0245e804f912e32) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4frmtx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "fm1.bin", 0x0000, 0x010000, CRC(0d11ffee) SHA1(50a3f97cf76855ba503a833e4198c154a57b6847) )
-	ROM_LOAD( "fm2.bin", 0x0000, 0x010000, CRC(ab143a49) SHA1(c4ba0671b154707fd69d58fd3bf65f5ba4d2bf53) )
-	ROM_LOAD( "fm4.bin", 0x0000, 0x010000, CRC(cbe09e1d) SHA1(00d17c6a189ac1a60ec9acbe2babb5a69dec3711) )
-	ROM_LOAD( "fm6.bin", 0x0000, 0x010000, CRC(a6180a22) SHA1(572869b407e6cf048c045562144f703b7a91893f) )
-	ROM_LOAD( "fm7.bin", 0x0000, 0x010000, CRC(7607746e) SHA1(8697842d643cb31bafdee42f5c9cebffbcfac850) )
-	ROM_LOAD( "fmuk1.bin", 0x0000, 0x010000, CRC(1e798ba4) SHA1(e8d06f8281bc9bc52c7ddd3133abf7eaa231d731) )
-	ROM_LOAD( "frmatx3", 0x0000, 0x010000, CRC(d3c47cad) SHA1(e89d8df496405903f51c31bf48774bfa877d90c2) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "fmsnd1.bin", 0x0000, 0x080000, CRC(300fcb23) SHA1(c3a7424089e7893972e04a6a5e77cfb4e0ffc8ec) ) // snd?
-	ROM_REGION( 0x100000, "pals", 0 )
-	ROM_LOAD( "fm.jed", 0x0000, 0x000580, CRC(dc166c8e) SHA1(0cc49836b7ad57daa54e08f10f07aa279ccc53a0) )
-ROM_END
-
-ROM_START( m4jok2k )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// latvia
-	ROM_LOAD( "j300 1.512", 0x0000, 0x010000, CRC(3a52da14) SHA1(b2b7f32093938f8b793fa4c425cd5beaeaa83286) )
-	ROM_LOAD( "j300 2.512", 0x0000, 0x010000, CRC(6d3c6b99) SHA1(b5f34043e3cc93908b7ff969ae2546862a3a79ce) )
-	ROM_LOAD( "joker2000.dat", 0x0000, 0x020000, CRC(339c5b70) SHA1(17d8ad7a4458780c574ca8b1e30c63d5749d5ec1) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4mjp )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "code.bin", 0x0000, 0x020000, CRC(c57d0148) SHA1(4d21a501ea64eb4fcf22ae9fba81b8982a55730e) )
-	ROM_LOAD( "mjl02.bin", 0x0000, 0x010000, CRC(014d1765) SHA1(5cc4039e574b3a68be6d639453b217ce9a0841f0) )
-	ROM_LOAD( "mju02.bin", 0x0000, 0x010000, CRC(22955f46) SHA1(abeb74772f5bcde8d827ec6f5d47dfb6153176db) )
-	ROM_LOAD( "mjl03.bin", 0x0000, 0x010000, CRC(0d66868b) SHA1(f90aebfa1024510615ae45436923fc4e4b4004b1) )
-	ROM_LOAD( "mjl04.bin", 0x0000, 0x010000, CRC(f6eb4d2a) SHA1(09ea2e67fca9b198ecef989a92cf95dcbb2b3895) )
-	ROM_LOAD( "mju03.bin", 0x0000, 0x010000, CRC(c6b69d82) SHA1(3128550f23bc4398098583f3fd88e1056f18ca3c) )
-	ROM_LOAD( "mju04.bin", 0x0000, 0x010000, CRC(c493b819) SHA1(9fc95282691cc217d252148db6e2efa8dcff31ee) )
-	ROM_LOAD( "tl01.bin", 0x0000, 0x010000, CRC(a36a320f) SHA1(5b074d620484c168ce969082aae4051b7a41f64a) )
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "mjsnd1.bin", 0x0000, 0x080000, CRC(e9b62ebb) SHA1(d930dffdb933f3359ae210d2c1ab5ada9964c398) )
-ROM_END
-
-ROM_START( m4milrou )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "nonp1.dat", 0x0000, 0x020000, CRC(b7503d57) SHA1(dc0ba6073ae278b8406cc7e30e4b4fed21df61c8) )
-	ROM_LOAD( "p1.dat", 0x0000, 0x020000, CRC(b3f4a2b0) SHA1(01ee5ef5eea0f83791d68b2d9bdb5be6c6495a28) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4kingg )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "kgiha101.bin", 0x0000, 0x010000, CRC(4da8bea1) SHA1(63fbad82877f772f3f559026eaddb69e09d6556b) )
-	ROM_LOAD( "kgiha102.bin", 0x0000, 0x010000, CRC(573687b0) SHA1(eafc90120297201fc1ba40029b592ec25d972690) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
+// new - latvia
+M4BLKMGC_SET( 199?, m4blkmgc,		0,			"bml1a305.bin", 0x0000, 0x010000, CRC(429e2642) SHA1(9e6a0ea07adaa7a2327b2ba3706f1966fed0de36), "Avantime?","Black Magic (Avantime?) (MPU4) (Latvia, set 1)" )
+M4BLKMGC_SET( 199?, m4blkmgc_1,		m4blkmgc,	"bml1b305.bin", 0x0000, 0x010000, CRC(fa9e4567) SHA1(7401103c40d8efd2427953a1e398c158d6f08a64), "Avantime?","Black Magic (Avantime?) (MPU4) (Latvia, set 2)" )
+// new - ukraine
+M4BLKMGC_SET( 199?, m4blkmgc_u1,	m4blkmgc,	"bmu1a306.bin", 0x0000, 0x010000, CRC(4c3ef73a) SHA1(fa1be29e7a5240e6dfefec61d77c3ec78f5f7b11), "Avantime?","Black Magic (Avantime?) (MPU4) (Ukraine, set 1)" )
+M4BLKMGC_SET( 199?, m4blkmgc_u2,	m4blkmgc,	"bmu1b306.bin", 0x0000, 0x010000, CRC(f1ec2c3e) SHA1(ac776c2020409485265d227fe39f0ca31f23ddd7), "Avantime?","Black Magic (Avantime?) (MPU4) (Ukraine, set 2)" )
+M4BLKMGC_SET( 199?, m4blkmgc_u3,	m4blkmgc,	"bfu1a307.bin", 0x0000, 0x010000, CRC(68aa272c) SHA1(9f476d55a09776a621e58afddf2e3f618b278374), "Avantime?","Black Magic (Avantime?) (MPU4) (Ukraine, set 3)" )
+M4BLKMGC_SET( 199?, m4blkmgc_u4,	m4blkmgc,	"bfu1b307.bin", 0x0000, 0x010000, CRC(9c876530) SHA1(1fb95591c6b0a43aa66c7a036268e19cf27e5535), "Avantime?","Black Magic (Avantime?) (MPU4) (Ukraine, set 4)" )
+M4BLKMGC_SET( 199?, m4blkmgc_u5,	m4blkmgc,	"bau1a307.bin", 0x0000, 0x010000, CRC(41af6959) SHA1(81a4c4db5dd696bfaf7f36455b3970a2d652ab08), "Avantime?","Black Magic (Avantime?) (MPU4) (Ukraine, set 5)" )
+M4BLKMGC_SET( 199?, m4blkmgc_u6,	m4blkmgc,	"bau1b307.bin", 0x0000, 0x010000, CRC(1405a02b) SHA1(82504289e72900d3315f46ed31aeabc71b2c5b9e), "Avantime?","Black Magic (Avantime?) (MPU4) (Ukraine, set 6)" )
 
 
-GAME( 19??, m4blkmgc	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Black Magic (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4amalad	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "American Aladdin (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4bben		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Big Ben (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4bbox		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Brain Box (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4frnudg	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Fruit & Nudge (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4frmtx		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Fruit Matrix (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4jok2k		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Joker 2000 (Avantime?) (Latvia) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4mjp		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Mega Jackpot (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4milrou	,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "Millennium Roulette (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
-GAME( 19??, m4kingg		,  0		 ,  mod4oki		, mpu4		, mpu4_state, m4default		,	ROT0,  "Avantime?", "King George (Avantime?) (MPU4)"		, GAME_FLAGS|GAME_MECHANICAL|GAME_NO_SOUND)
+
+#define M4AMALAD_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "aasnd", 0x0000, 0x080000, CRC(6b78f3de) SHA1(4f10afdc5cf7c84e2d048f7c9c5f83323f1e5a6e) ) \
+  
+
+#define M4AMALAD_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4AMALAD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4AMALAD_SET( 199?, m4amalad,		0,			"aag1.4",			0x0000, 0x020000, CRC(0da943a1) SHA1(50915ce67687f15a36b5c38b1c1c6773bd3ecf9f), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 1)" )
+M4AMALAD_SET( 199?, m4amalad__a,	m4amalad,	"aag1.3",			0x0000, 0x020000, CRC(3a9552a9) SHA1(7695899b6ed52d0c7530b5ed0829cfdbb3892fa2), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 2)" )
+M4AMALAD_SET( 199?, m4amalad__b,	m4amalad,	"aag1.2",			0x0000, 0x020000, CRC(631d4be8) SHA1(207655c2d4a5500631ed4df8db5625177b5d4d12), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 3)" )
+M4AMALAD_SET( 199?, m4amalad__c,	m4amalad,	"aag1.1",			0x0000, 0x020000, CRC(5e426c67) SHA1(6a59996998eff1870d7492afa1056ca77ec3f281), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 4)" )
+M4AMALAD_SET( 199?, m4amalad__d,	m4amalad,	"aav1.2b",			0x0000, 0x020000, CRC(81905010) SHA1(25866a2f8072031facdd69a07b4c1a46ba560d36), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 5)" )
+M4AMALAD_SET( 199?, m4amalad__e,	m4amalad,	"aav1.2s",			0x0000, 0x010000, CRC(3bfb0faa) SHA1(3a4fe6d47e995f40cb03984dbd1fc98669513b4a), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 6)" )
+M4AMALAD_SET( 199?, m4amalad__f,	m4amalad,	"aav1.1b",			0x0000, 0x020000, CRC(cb8a3385) SHA1(39e2df941977faa1afc88a6189f8b35e8f605c95), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 7)" )
+M4AMALAD_SET( 199?, m4amalad__g,	m4amalad,	"aav1.1s",			0x0000, 0x010000, CRC(2bb83dee) SHA1(06ce5640c76c95ba9a9178b5f75e2cb3b358b4ed), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 8)" )
+M4AMALAD_SET( 199?, m4amalad__h,	m4amalad,	"aalatv1.1b",		0x0000, 0x020000, CRC(3af6291f) SHA1(ca09f66a8c0f0e1c1dadac096c5cbf738ceaf9be), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 9)" )
+M4AMALAD_SET( 199?, m4amalad__i,	m4amalad,	"aalatv1.1s",		0x0000, 0x010000, CRC(582bd6ea) SHA1(8c353a0089f5d796fed2b381429a6795eb9e9b11), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 10)" )
+M4AMALAD_SET( 199?, m4amalad__j,	m4amalad,	"lglv2.2b",			0x0000, 0x020000, CRC(04015f49) SHA1(23f252c129a54ae7ffe99682c71e14b4b27d465b), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 11)" )
+M4AMALAD_SET( 199?, m4amalad__k,	m4amalad,	"lgv1.1b",			0x0000, 0x020000, CRC(1113f54a) SHA1(9cf4b50b4e24be0c31e325fdb02a82e93c31b93d), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 12)" )
+M4AMALAD_SET( 199?, m4amalad__l,	m4amalad,	"lgv1.1s",			0x0000, 0x010000, CRC(3e3f9615) SHA1(717e0f371625b44b09be8567bc8a4a230899bcbc), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 13)" )
+M4AMALAD_SET( 199?, m4amalad__m,	m4amalad,	"jpaltest.dat",		0x0000, 0x020000, CRC(0d50228b) SHA1(884a4271899d6bb4eadd7315f20146a08e21c5c9), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 14)" )
+M4AMALAD_SET( 199?, m4amalad__n,	m4amalad,	"jpaltst2.dat",		0x0000, 0x020000, CRC(872728ce) SHA1(eeab5487e6ce12e239ce6143c0e761737e56bcbe), "Avantime?","American Aladdin (Avantime?) (MPU4) (set 15)" )
+
+
+
+
+#define M4BBEN_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "bben1s.bin", 0x0000, 0x02dbc5, CRC(9240317e) SHA1(d9167e52a09ff1783bb10e2e34fb80bdf555f00e) ) \
+  
+#define M4BBEN_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BBEN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4BBEN_SET( 199?, m4bben,		0,		"bbc1a102.bin", 0x0000, 0x010000, CRC(c5010bb6) SHA1(f39ab219eafaa391b5b777c2918f059ba67b4504), "Avantime?","Big Ben (Avantime?) (MPU4) (set 1)" )
+M4BBEN_SET( 199?, m4bben__a,	m4bben,	"bbc1b102.bin", 0x0000, 0x010000, CRC(9eb20181) SHA1(c183e3eab84019b6acb5040ef8d5aa238b914e78), "Avantime?","Big Ben (Avantime?) (MPU4) (set 2)" )
+M4BBEN_SET( 199?, m4bben__b,	m4bben,	"bbc1a103.bin", 0x0000, 0x010000, CRC(34568c49) SHA1(57a772595e258b6e1a41145e4dcaa0486c7d91ae), "Avantime?","Big Ben (Avantime?) (MPU4) (set 3)" )
+M4BBEN_SET( 199?, m4bben__c,	m4bben,	"bbc1b103.bin", 0x0000, 0x010000, CRC(587d1f54) SHA1(c6d5657958f029d38d0b1244032634bd023bf48d), "Avantime?","Big Ben (Avantime?) (MPU4) (set 4)" )
+M4BBEN_SET( 199?, m4bben__d,	m4bben,	"bbc1a104.bin", 0x0000, 0x010000, CRC(ac5d175e) SHA1(0772dcb362c732760d96b9876898cfd5a1038720), "Avantime?","Big Ben (Avantime?) (MPU4) (set 5)" )
+M4BBEN_SET( 199?, m4bben__e,	m4bben,	"bbc1b104.bin", 0x0000, 0x010000, CRC(ac0ba269) SHA1(de9b00f32afc7cabcf6400e3b063f844b1b03f28), "Avantime?","Big Ben (Avantime?) (MPU4) (set 6)" )
+M4BBEN_SET( 199?, m4bben__f,	m4bben,	"bbc1a105.bin", 0x0000, 0x010000, CRC(cece9ee3) SHA1(582def521d5583ab9fc9adeedcdd09e2ab4876b8), "Avantime?","Big Ben (Avantime?) (MPU4) (set 7)" )
+M4BBEN_SET( 199?, m4bben__g,	m4bben,	"bbc1b105.bin", 0x0000, 0x010000, CRC(b31f3989) SHA1(5d5a7fc49486b4f7e9a31a4a469913174ca2cb5b), "Avantime?","Big Ben (Avantime?) (MPU4) (set 8)" )
+M4BBEN_SET( 199?, m4bben__h,	m4bben,	"bbc2a106.bin", 0x0000, 0x010000, CRC(4929273e) SHA1(0703b89884a2d410854d813fe8304eac0dbfb30e), "Avantime?","Big Ben (Avantime?) (MPU4) (set 9)" )
+M4BBEN_SET( 199?, m4bben__i,	m4bben,	"bbc2b106.bin", 0x0000, 0x010000, CRC(d06687ed) SHA1(2e5b32c772f47f3f10ee90cbc72c00995871c2c0), "Avantime?","Big Ben (Avantime?) (MPU4) (set 10)" )
+
+	
+
+
+#define M4BBOX_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "bb1snd.bin", 0x0000, 0x068880, CRC(69d53f5a) SHA1(dd7958060804fda97a1fdf69c230bfab092b9707) ) \
+  
+#define M4BBOX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BBOX_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+
+M4BBOX_SET( 199?, m4bbox,		0,		"bbb1.bin",		0x0000, 0x010000, CRC(b668e08e) SHA1(f401405419689ea5ad06dfd815aaef9e1b7ed4e1), "Avantime?","Brain Box (Avantime?) (MPU4) (set 1)" )
+M4BBOX_SET( 199?, m4bbox__a,	m4bbox,	"bbb13.bin",	0x0000, 0x010000, CRC(9601d921) SHA1(e179b5155070af880d10a64d44454d84ec329800), "Avantime?","Brain Box (Avantime?) (MPU4) (set 2)" )
+M4BBOX_SET( 199?, m4bbox__b,	m4bbox,	"bbb2.bin",		0x0000, 0x010000, CRC(1bcf9f83) SHA1(f5d2a352e79d1d2694b3c854a0a532662173416a), "Avantime?","Brain Box (Avantime?) (MPU4) (set 3)" )
+M4BBOX_SET( 199?, m4bbox__c,	m4bbox,	"bbb3.bin",		0x0000, 0x010000, CRC(21608fa5) SHA1(ca565442f8d6d8a8dfca847b5a638551ce15cf07), "Avantime?","Brain Box (Avantime?) (MPU4) (set 4)" )
+M4BBOX_SET( 199?, m4bbox__d,	m4bbox,	"bbb5.bin",		0x0000, 0x010000, CRC(4c0384f3) SHA1(c1ed2171cbe781d3b1842d5ed999e2d601ccf0c4), "Avantime?","Brain Box (Avantime?) (MPU4) (set 5)" )
+M4BBOX_SET( 199?, m4bbox__e,	m4bbox,	"bbb6.bin",		0x0000, 0x010000, CRC(5a4d4ca4) SHA1(127b961ecfb61ec2a201ec736d2c677b0e894b0b), "Avantime?","Brain Box (Avantime?) (MPU4) (set 6)" )
+M4BBOX_SET( 199?, m4bbox__f,	m4bbox,	"bbb7.bin",		0x0000, 0x010000, CRC(c0c0de55) SHA1(d2140ba83b1210a0d3061d23b9e8e6b2b59f7f0e), "Avantime?","Brain Box (Avantime?) (MPU4) (set 7)" )
+M4BBOX_SET( 199?, m4bbox__g,	m4bbox,	"bbb8.bin",		0x0000, 0x010000, CRC(67373388) SHA1(e4f0907783cb4305fea6ea4591bef7f333a5041e), "Avantime?","Brain Box (Avantime?) (MPU4) (set 8)" )
+M4BBOX_SET( 199?, m4bbox__h,	m4bbox,	"loreel2.bin",	0x0000, 0x010000, CRC(77c1d85c) SHA1(8cfc12c8814b42003cfe85e170426e224660b4fb), "Avantime?","Brain Box (Avantime?) (MPU4) (set 9)" )
+M4BBOX_SET( 199?, m4bbox__i,	m4bbox,	"bbb9.bin",		0x0000, 0x010000, CRC(191f3da0) SHA1(8ee7cf349d97b1819ddb99a6dc91c0a364597e9f), "Avantime?","Brain Box (Avantime?) (MPU4) (set 10)" )
+
+
+
+
+#define M4FRNUDG_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+  
+#define M4FRNUDG_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4FRNUDG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4FRNUDG_SET( 199?, m4frnudg,		0,			"fanhc11.bin",	0x0000, 0x010000, CRC(d2fe9df9) SHA1(7b519e4ed447f8c59fda972fc398f6ff423a8f92), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 1)" )
+M4FRNUDG_SET( 199?, m4frnudg__a,	m4frnudg,	"fanhc12.bin",	0x0000, 0x010000, CRC(2b2176e0) SHA1(9acffc05c02e76a6cbe4cfd708ff2d94ecb6c308), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 2)" )
+M4FRNUDG_SET( 199?, m4frnudg__b,	m4frnudg,	"fanhc8.bin",	0x0000, 0x010000, CRC(d1eecc15) SHA1(7dd3d218bc42ed7a92b8cd04b3de0eecda1d7eb0), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 3)" )
+M4FRNUDG_SET( 199?, m4frnudg__c,	m4frnudg,	"fanhc9.bin",	0x0000, 0x010000, CRC(0b581d12) SHA1(e62c831d8d21eb3c9a15ebe7f0245e804f912e32), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 4)" )
+	
+
+#define M4FRMTX_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "fmsnd1.bin", 0x0000, 0x080000, CRC(300fcb23) SHA1(c3a7424089e7893972e04a6a5e77cfb4e0ffc8ec)) \
+	ROM_REGION( 0x100000, "pals", 0 ) \
+	ROM_LOAD( "fm.jed", 0x0000, 0x000580, CRC(dc166c8e) SHA1(0cc49836b7ad57daa54e08f10f07aa279ccc53a0)) \
+  
+#define M4FRMTX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4FRMTX_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+M4FRMTX_SET( 199?, m4frmtx,		0,			"fm1.bin",		0x0000, 0x010000, CRC(0d11ffee) SHA1(50a3f97cf76855ba503a833e4198c154a57b6847), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 1)" )
+M4FRMTX_SET( 199?, m4frmtx__a,	m4frmtx,	"fm2.bin",		0x0000, 0x010000, CRC(ab143a49) SHA1(c4ba0671b154707fd69d58fd3bf65f5ba4d2bf53), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 2)" )
+M4FRMTX_SET( 199?, m4frmtx__b,	m4frmtx,	"fm4.bin",		0x0000, 0x010000, CRC(cbe09e1d) SHA1(00d17c6a189ac1a60ec9acbe2babb5a69dec3711), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 3)" )
+M4FRMTX_SET( 199?, m4frmtx__c,	m4frmtx,	"fm6.bin",		0x0000, 0x010000, CRC(a6180a22) SHA1(572869b407e6cf048c045562144f703b7a91893f), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 4)" )
+M4FRMTX_SET( 199?, m4frmtx__d,	m4frmtx,	"fm7.bin",		0x0000, 0x010000, CRC(7607746e) SHA1(8697842d643cb31bafdee42f5c9cebffbcfac850), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 5)" )
+M4FRMTX_SET( 199?, m4frmtx__e,	m4frmtx,	"fmuk1.bin",	0x0000, 0x010000, CRC(1e798ba4) SHA1(e8d06f8281bc9bc52c7ddd3133abf7eaa231d731), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 6)" )
+M4FRMTX_SET( 199?, m4frmtx__f,	m4frmtx,	"frmatx3",		0x0000, 0x010000, CRC(d3c47cad) SHA1(e89d8df496405903f51c31bf48774bfa877d90c2), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 7)" )
+
+	
+
+
+#define M4JOK2K_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+
+#define M4JOK2K_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4JOK2K_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+// latvia
+M4JOK2K_SET( 199?, m4jok2k,		0,			"j300 1.512",		0x0000, 0x010000, CRC(3a52da14) SHA1(b2b7f32093938f8b793fa4c425cd5beaeaa83286), "Avantime?","Joker 2000 (Avantime?) (MPU4) (set 1)" )
+M4JOK2K_SET( 199?, m4jok2k__a,	m4jok2k,	"j300 2.512",		0x0000, 0x010000, CRC(6d3c6b99) SHA1(b5f34043e3cc93908b7ff969ae2546862a3a79ce), "Avantime?","Joker 2000 (Avantime?) (MPU4) (set 2)" )
+M4JOK2K_SET( 199?, m4jok2k__b,	m4jok2k,	"joker2000.dat",	0x0000, 0x020000, CRC(339c5b70) SHA1(17d8ad7a4458780c574ca8b1e30c63d5749d5ec1), "Avantime?","Joker 2000 (Avantime?) (MPU4) (set 3)" )
+
+
+
+
+
+#define M4MJP_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "mjsnd1.bin", 0x0000, 0x080000, CRC(e9b62ebb) SHA1(d930dffdb933f3359ae210d2c1ab5ada9964c398) ) \
+
+#define M4MJP_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4MJP_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4MJP_SET( 199?, m4mjp,		0,		"code.bin",		0x0000, 0x020000, CRC(c57d0148) SHA1(4d21a501ea64eb4fcf22ae9fba81b8982a55730e), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 1)" )
+M4MJP_SET( 199?, m4mjp__a,	m4mjp,	"mjl02.bin",	0x0000, 0x010000, CRC(014d1765) SHA1(5cc4039e574b3a68be6d639453b217ce9a0841f0), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 2)" )
+M4MJP_SET( 199?, m4mjp__b,	m4mjp,	"mju02.bin",	0x0000, 0x010000, CRC(22955f46) SHA1(abeb74772f5bcde8d827ec6f5d47dfb6153176db), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 3)" )
+M4MJP_SET( 199?, m4mjp__c,	m4mjp,	"mjl03.bin",	0x0000, 0x010000, CRC(0d66868b) SHA1(f90aebfa1024510615ae45436923fc4e4b4004b1), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 4)" )
+M4MJP_SET( 199?, m4mjp__d,	m4mjp,	"mjl04.bin",	0x0000, 0x010000, CRC(f6eb4d2a) SHA1(09ea2e67fca9b198ecef989a92cf95dcbb2b3895), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 5)" )
+M4MJP_SET( 199?, m4mjp__e,	m4mjp,	"mju03.bin",	0x0000, 0x010000, CRC(c6b69d82) SHA1(3128550f23bc4398098583f3fd88e1056f18ca3c), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 6)" )
+M4MJP_SET( 199?, m4mjp__f,	m4mjp,	"mju04.bin",	0x0000, 0x010000, CRC(c493b819) SHA1(9fc95282691cc217d252148db6e2efa8dcff31ee), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 7)" )
+M4MJP_SET( 199?, m4mjp__g,	m4mjp,	"tl01.bin",		0x0000, 0x010000, CRC(a36a320f) SHA1(5b074d620484c168ce969082aae4051b7a41f64a), "Avantime?","Mega Jackpot (Avantime?) (MPU4) (set 8)" )
+
+
+
+#define M4MILROU_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+
+#define M4MILROU_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4MILROU_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4MILROU_SET( 199?, m4milrou,		0,			"nonp1.dat",	0x0000, 0x020000, CRC(b7503d57) SHA1(dc0ba6073ae278b8406cc7e30e4b4fed21df61c8), "Avantime?","Millennium Roulette (Avantime?) (MPU4) (set 1)" )
+M4MILROU_SET( 199?, m4milrou__a,	m4milrou,	"p1.dat",		0x0000, 0x020000, CRC(b3f4a2b0) SHA1(01ee5ef5eea0f83791d68b2d9bdb5be6c6495a28), "Avantime?","Millennium Roulette (Avantime?) (MPU4) (set 2)" )
+
+
+
+
+#define M4KINGG_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+
+#define M4KINGG_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4KINGG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4default ,ROT0,company,title,GAME_FLAGS ) \
+
+
+M4KINGG_SET( 199?, m4kingg,		0,			"kgiha101.bin", 0x0000, 0x010000, CRC(4da8bea1) SHA1(63fbad82877f772f3f559026eaddb69e09d6556b), "Avantime?","King George (Avantime?) (MPU4) (set 1)" )
+M4KINGG_SET( 199?, m4kingg__a,	m4kingg,	"kgiha102.bin", 0x0000, 0x010000, CRC(573687b0) SHA1(eafc90120297201fc1ba40029b592ec25d972690), "Avantime?","King George (Avantime?) (MPU4) (set 2)" )
+
+
+

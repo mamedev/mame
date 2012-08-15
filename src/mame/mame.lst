@@ -23460,17 +23460,94 @@ m4cfinln__a	//
 m4ftladn	// Find the Lady (Nova)
 m4goldnn	// Golden Years (Nova)
 m4jungjk	// Jungle Jackpots (Mazooma - Qps)
+m4jungjk__a	//
+m4jungjk__b	//
+m4jungjk__c	//
+m4jungjk__d	//
+m4jungjk__e	//
 m4clab		// Cash Lab (Mazooma - Qps)
+m4clab__a	//
+m4clab__b	//
+m4clab__c	//
+m4clab__d	//
+m4clab__e	//
+m4clab__f	//
+m4clab__g	//
+m4clab__h	//
+m4clab__i	//
+m4clab__j	//
 m4looplt	// Loop The Loot (Qps)
+m4looplt__a	//
+m4looplt__b	//
+m4looplt__c	//
+m4looplt__d	//
+m4looplt__e	//
+m4looplt__f	//
+m4looplt__g	//
+m4looplt__h	//
+m4looplt__i	//
+m4looplt__j	//
+m4looplt__k	//
+m4looplt__l	//
+m4looplt__m	//
 m4mgpn		// Monaco Grand Prix (Nova)
 m4olygn		// Olympic Gold (Nova)
 m4olygn__a	//
 m4rhnote	// Red Hot Notes (Qps)
+m4rhnote__a	//
+m4rhnote__b	//
+m4rhnote__c	//
+m4rhnote__d	//
+m4rhnote__e	//
+m4rhnote__f	//
+m4rhnote__g	//
+m4rhnote__h	//
+m4rhnote__i	//
+m4rhnote__j	//
+m4rhnote__k	//
+m4rhnote__l //
+m4rhnote__m	//
+m4rhnote__n	//
+m4rhnote__o	//
+m4rhnote__p	//
+m4rhnote__q	//
+m4rhnote__r	//
+m4rhnote__s	//
+m4rhnote__t	//
+m4rhnote__u	//
+m4rhnote__v	//
+m4rhnote__w	//
+m4rhnote__x	//
+m4rhnote__y	//
 m4rhrock	// Red Hot Rocks (Qps)
+m4rhrock__a	//
 m4rhwhl		// Red Hot Wheels (Mazooma - Qps)
+m4rhwhl__a	//
+m4rhwhl__b	//
+m4rhwhl__c	//
 m4rdeal		// Reel Deal (Qps)
+m4rdeal__a	//
+m4rdeal__b	//
+m4rdeal__c	//
+m4rdeal__d	//
+m4rdeal__e	//
+m4rdeal__f	//
+m4rdeal__g	//
+m4rdeal__h	//
+m4rdeal__i	//
 m4shoknr	// Shock 'n' Roll (Mazooma - Qps)
+m4shoknr__a	//
+m4shoknr__b	//
+m4shoknr__c	//
+m4shoknr__d	//
 m4shkwav	// Shockwave (Mazooma - Qps)
+m4shkwav__a	//
+m4shkwav__b	//
+m4shkwav__c	//
+m4shkwav__d	//
+m4shkwav__e	//
+m4shkwav__f	//
+m4shkwav__g	//
 m4sinbdn	// Sinbad (Nova)
 m4sinbdn__a	//
 m4sinbdn__b	//
@@ -23480,7 +23557,25 @@ m4sinbdn__e	//
 m4sinbdn__f	//
 m4spotln	// Spotlight (Nova)
 m4sdquid	// Sundance Quid (Qps)
+m4sdquid__a	//
+m4sdquid__b	//
+m4sdquid__c	//
+m4sdquid__d	//
+m4sdquid__e	//
+m4sdquid__f	//
+m4sdquid__g	//
+m4sdquid__h	//
+m4sdquid__i	//
+m4sdquid__j	//
+m4sdquid__k	//
 m4tornad	// Tornado (Qps - Mazooma)
+m4tornad__a	//
+m4tornad__b	//
+m4tornad__c	//
+m4tornad__d	//
+m4tornad__e	//
+m4tornad__f	//
+m4tornad__g	//
 m4vivan		// Viva Las Vegas (Nova)
 m4blsbys		// Blues Boys (Bwb)
 m4blsbys__a		//
@@ -24004,16 +24099,75 @@ m4cmont_r8	//
 m4cmont_gt1	//
 m4cmont_gt2	//
 m4cmont_gt3	//
-m4blkmgc
-m4amalad
-m4bben
-m4bbox
-m4frnudg
-m4frmtx
-m4jok2k
-m4mjp
-m4milrou
-m4kingg
+m4blkmgc	// Black Magic
+m4blkmgc_1	//
+m4blkmgc_u1	//
+m4blkmgc_u2	//
+m4blkmgc_u3	//
+m4blkmgc_u4	//
+m4blkmgc_u5	//
+m4blkmgc_u6	//
+m4amalad	// American Aladdin
+m4amalad__a	//
+m4amalad__b	//
+m4amalad__c	//
+m4amalad__d	//
+m4amalad__e	//
+m4amalad__f	//
+m4amalad__g	//
+m4amalad__h	//
+m4amalad__i	//
+m4amalad__j	//
+m4amalad__k	//
+m4amalad__l	//
+m4amalad__m	//
+m4amalad__n	//
+m4bben		// Big Ben
+m4bben__a	//
+m4bben__b	//
+m4bben__c	//
+m4bben__d	//
+m4bben__e	//
+m4bben__f	//
+m4bben__g	//
+m4bben__h	//
+m4bben__i	//
+m4bbox		// Brain Box
+m4bbox__a	//
+m4bbox__b	//
+m4bbox__c	//
+m4bbox__d	//
+m4bbox__e	//
+m4bbox__f	//
+m4bbox__g	//
+m4bbox__h	//
+m4bbox__i	//
+m4frnudg	// Fruit & Nudge
+m4frnudg__a	//
+m4frnudg__b	//
+m4frnudg__c	//
+m4frmtx		// Fruit Matrix
+m4frmtx__a	//
+m4frmtx__b	//
+m4frmtx__c	//
+m4frmtx__d	//
+m4frmtx__e	//
+m4frmtx__f	//
+m4jok2k		// Joker 2000
+m4jok2k__a	//
+m4jok2k__b	//
+m4mjp		// Mega Jackpot
+m4mjp__a	//
+m4mjp__b	//
+m4mjp__c	//
+m4mjp__d	//
+m4mjp__e	//
+m4mjp__f	//
+m4mjp__g	//
+m4milrou	// Millennium Roulette
+m4milrou__a	//
+m4kingg		// King George
+m4kingg__a	//
 
 // MPU4 + Video board
 
