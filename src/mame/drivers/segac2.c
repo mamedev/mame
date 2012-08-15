@@ -1278,6 +1278,30 @@ static SCREEN_UPDATE_RGB32(segac2_new)
 }
 
 
+// the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
+void genesis_vdp_sndirqline_callback_segac2(running_machine &machine, bool state)
+{
+	if (state==true)
+		cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+}
+
+// the line usually used to drive irq6 is not connected
+void genesis_vdp_lv6irqline_callback_segac2(running_machine &machine, bool state)
+{
+	//
+}
+
+// the scanline interrupt seems connected as usual
+void genesis_vdp_lv4irqline_callback_segac2(running_machine &machine, bool state)
+{
+	if (state==true)
+		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	else
+		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
+}
+
+
+
 static MACHINE_CONFIG_START( segac, segac2_state )
 
 	/* basic machine hardware */
@@ -1291,6 +1315,9 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segac2);
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segac2);
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_segac2);
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1762,7 +1789,6 @@ void segac2_state::segac2_common_init(running_machine& machine, int (*func)(int 
 	state->m_prot_func = func;
 
 	genvdp_use_cram = 0;
-	genesis_always_irq6 = 1;
 	genesis_other_hacks = 0;
 
 	if (upd != NULL)

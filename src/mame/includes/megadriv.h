@@ -14,6 +14,8 @@
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
 
+#include "machine/megavdp.h"
+
 #define MASTER_CLOCK_NTSC 53693175
 #define MASTER_CLOCK_PAL  53203424
 #define SEGACD_CLOCK      12500000
@@ -98,7 +100,6 @@ extern int segac2_bg_pal_lookup[4];
 extern int segac2_sp_pal_lookup[4];
 
 extern int genvdp_use_cram;
-extern int genesis_always_irq6;
 extern int genesis_other_hacks;
 
 extern int megadrive_6buttons_pad;
@@ -115,8 +116,11 @@ class md_base_state : public driver_device
 {
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) { }
-	
+	: driver_device(mconfig, type, tag),
+		m_vdp(*this,"gen_vdp")
+	{ }
+	required_device<sega_genesis_vdp_device> m_vdp;
+
 	DECLARE_DRIVER_INIT(megadriv_c2);
 	DECLARE_DRIVER_INIT(megadrie);
 	DECLARE_DRIVER_INIT(megadriv);

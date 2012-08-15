@@ -1,5 +1,6 @@
 /* Sega Megadrive / Genesis VDP */
 
+#pragma once
 
 /*  The VDP occupies addresses C00000h to C0001Fh.
 
@@ -141,19 +142,27 @@
 #define MEGADRIVE_REG17_UNUSED          ((m_vdp_regs[0x17]&0x3f)>>0)
 
 
-
+typedef void (*genesis_vdp_sndirqline_callback_func)(running_machine &machine, bool state);
+typedef void (*genesis_vdp_lv6irqline_callback_func)(running_machine &machine, bool state);
+typedef void (*genesis_vdp_lv4irqline_callback_func)(running_machine &machine, bool state);
 
 class sega_genesis_vdp_device : public device_t
 {
 public:
 	sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
+	static void set_genesis_vdp_sndirqline_callback(device_t &device, genesis_vdp_sndirqline_callback_func callback);
+	static void set_genesis_vdp_lv6irqline_callback(device_t &device, genesis_vdp_lv6irqline_callback_func callback);
+	static void set_genesis_vdp_lv4irqline_callback(device_t &device, genesis_vdp_lv4irqline_callback_func callback);
+
 	DECLARE_READ16_MEMBER( megadriv_vdp_r );
 	DECLARE_WRITE16_MEMBER( megadriv_vdp_w );
 
-	void genesis_render_scanline(running_machine &machine, int scanline);
+
+	void genesis_render_scanline(running_machine &machine);
 	void vdp_handle_scanline_callback(running_machine &machine, int scanline);
-	void vdp_handle_irq6_on_callback(running_machine &machine, int param);
+	void vdp_handle_irq6_on_timer_callback(running_machine &machine, int param);
+	void vdp_handle_irq4_on_timer_callback(running_machine &machine, int param);
 	void vdp_handle_vblank(screen_device &screen);
 	void device_reset_old();
 
@@ -163,6 +172,10 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
+	genesis_vdp_sndirqline_callback_func m_genesis_vdp_sndirqline_callback;
+	genesis_vdp_lv6irqline_callback_func m_genesis_vdp_lv6irqline_callback;
+	genesis_vdp_lv6irqline_callback_func m_genesis_vdp_lv4irqline_callback;
 
 private:
 
@@ -177,6 +190,8 @@ private:
 	int m_imode_odd_frame;
 	int m_sprite_collision;
 
+	int megadrive_imode;
+
 	UINT16* m_vdp_regs;
 	UINT16* m_vram;
 	UINT16* m_cram;
@@ -184,6 +199,13 @@ private:
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
 	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
 	UINT16* m_internal_sprite_attribute_table;
+
+	// these are used internally by the VDP to schedule when after the start of a scanline
+	// to trigger the various interrupts / rendering to our bitmap, bit of a hack really
+	emu_timer* irq6_on_timer;
+	emu_timer* irq4_on_timer;
+	emu_timer* megadriv_render_timer;
+
 
 
 	UINT16 vdp_vram_r(void);

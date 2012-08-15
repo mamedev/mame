@@ -14,8 +14,6 @@ extern int megadrive_irq6_scanline;
 extern cpu_device *_svp_cpu;
 extern int segacd_wordram_mapped;
 extern timer_device* megadriv_scanline_timer;
-extern timer_device* irq6_on_timer;
-extern timer_device* irq4_on_timer;
 
 extern UINT32* _32x_render_videobuffer_to_screenbuffer_helper(running_machine &machine, int scanline);
 extern void _32x_scanline_cb0(running_machine& machine);
@@ -26,8 +24,6 @@ extern int _32x_displaymode;
 extern int _32x_videopriority;
 extern int _32x_is_connected;
 
-extern void megadriv_z80_hold(running_machine &machine);
-extern void megadriv_z80_clear(running_machine &machine);
 
 #define MAX_HPOSITION 480
 
@@ -37,7 +33,6 @@ extern void megadriv_z80_clear(running_machine &machine);
 int megadrive_visible_scanlines;
 int megadrive_irq6_scanline;
 int megadrive_z80irq_scanline;
-int megadrive_imode = 0;
 int megadriv_framerate;
 int megadrive_total_scanlines;
 int megadrive_vblank_flag = 0;
@@ -50,8 +45,6 @@ int segac2_sp_pal_lookup[4];
 
 // hacks for C2
 int genvdp_use_cram = 0; // c2 uses it's own palette ram
-int genesis_always_irq6 = 0; // c2 never enables the irq6, different source??
-int genesis_other_hacks = 0; // misc hacks
 
 UINT16* megadrive_vdp_palette_lookup;
 UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
@@ -62,22 +55,89 @@ UINT16* megadrive_ram;
 
 int megadrive_region_export;
 int megadrive_region_pal;
-timer_device* megadriv_render_timer;
 
 
 
 
 
+void genesis_vdp_sndirqline_callback_default(running_machine &machine, bool state)
+{
+	// if you haven't actually hooked this up....
+	fatalerror("m_genesis_vdp_sndirqline_callback should be connected to something!\n");
+}
+
+void genesis_vdp_lv6irqline_callback_default(running_machine &machine, bool state)
+{
+	// or this...
+	fatalerror("m_genesis_vdp_lv6irqline_callback should be connected to something!\n");
+}
+
+void genesis_vdp_lv4irqline_callback_default(running_machine &machine, bool state)
+{
+	// or this...
+	fatalerror("m_genesis_vdp_lv4irqline_callback should be connected to something!\n");
+}
 
 const device_type SEGA_GEN_VDP = &device_creator<sega_genesis_vdp_device>;
 
 sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_GEN_VDP, "sega_genesis_vdp_device", tag, owner, clock)
 {
+	m_genesis_vdp_sndirqline_callback = genesis_vdp_sndirqline_callback_default;
+	m_genesis_vdp_lv6irqline_callback = genesis_vdp_lv6irqline_callback_default;
+	m_genesis_vdp_lv4irqline_callback = genesis_vdp_lv4irqline_callback_default;
+}
 
+static TIMER_CALLBACK( megadriv_render_timer_callback )
+{
+	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
+	vdp->genesis_render_scanline(machine);
+}
+
+void sega_genesis_vdp_device::vdp_handle_irq6_on_timer_callback(running_machine &machine, int param)
+{
+// megadrive_irq6_pending = 1;
+	if (MEGADRIVE_REG01_IRQ6_ENABLE)
+		m_genesis_vdp_lv6irqline_callback(machine, true);
+}
+
+static TIMER_CALLBACK( irq6_on_timer_callback )
+{
+	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
+	vdp->vdp_handle_irq6_on_timer_callback(machine, param);
+}
+
+void sega_genesis_vdp_device::vdp_handle_irq4_on_timer_callback(running_machine &machine, int param)
+{
+	m_genesis_vdp_lv4irqline_callback(machine, true);
+}
+
+static TIMER_CALLBACK( irq4_on_timer_callback )
+{
+	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
+	vdp->vdp_handle_irq4_on_timer_callback(machine, param);
 }
 
 
+
+
+void sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(device_t &device, genesis_vdp_sndirqline_callback_func callback)
+{
+	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
+	dev.m_genesis_vdp_sndirqline_callback = callback;
+}
+
+void sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(device_t &device, genesis_vdp_lv6irqline_callback_func callback)
+{
+	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
+	dev.m_genesis_vdp_lv6irqline_callback = callback;
+}
+
+void sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(device_t &device, genesis_vdp_lv4irqline_callback_func callback)
+{
+	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
+	dev.m_genesis_vdp_lv4irqline_callback = callback;
+}
 
 void sega_genesis_vdp_device::device_start()
 {
@@ -111,6 +171,7 @@ void sega_genesis_vdp_device::device_start()
 	save_item(NAME(m_irq4counter));
 	save_item(NAME(m_imode_odd_frame));
 	save_item(NAME(m_sprite_collision));
+	save_item(NAME(megadrive_imode));
 
 
 
@@ -120,6 +181,9 @@ void sega_genesis_vdp_device::device_start()
 
 	m_render_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
 
+	irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
+	irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
+	megadriv_render_timer = machine().scheduler().timer_alloc(FUNC(megadriv_render_timer_callback), (void*)this);
 
 }
 
@@ -132,17 +196,16 @@ void sega_genesis_vdp_device::device_reset()
 	m_vdp_address = 0;
 	m_vram_fill_pending = 0;
 	m_vram_fill_length = 0;
-	m_irq4counter = 0;
+	m_irq4counter = -1;
 	m_imode_odd_frame = 0;
 	m_sprite_collision = 0;
+	megadrive_imode = 0;
 }
 
 void sega_genesis_vdp_device::device_reset_old()
 {
 	// other stuff, are we sure we want to set some of these every reset?
-	// it's called from MACHIN_RESET( megadriv )
-	megadrive_imode = 0;
-	m_irq4counter = -1;
+	// it's called from MACHINE_RESET( megadriv )
 	megadrive_total_scanlines = 262;
 	megadrive_visible_scanlines = 224;
 	megadrive_irq6_scanline = 224;
@@ -335,9 +398,9 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(running_machine &machin
 		if (megadrive_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-				cputag_set_input_line(machine, ":maincpu", 4, HOLD_LINE);
+				m_genesis_vdp_lv4irqline_callback(machine, true);
 			else
-				cputag_set_input_line(machine, ":maincpu", 4, CLEAR_LINE);
+				m_genesis_vdp_lv4irqline_callback(machine, false);
 		}
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
@@ -352,9 +415,10 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(running_machine &machin
 		if (megadrive_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE )
-				cputag_set_input_line(machine, ":maincpu", 6, HOLD_LINE);
+				m_genesis_vdp_lv6irqline_callback(machine, true);
 			else
-				cputag_set_input_line(machine, ":maincpu", 6, CLEAR_LINE);
+				m_genesis_vdp_lv6irqline_callback(machine, false);
+
 		}
 
 		/* ??? */
@@ -2587,21 +2651,21 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 	}
 }
 
-void sega_genesis_vdp_device::genesis_render_scanline(running_machine &machine, int scanline)
+void sega_genesis_vdp_device::genesis_render_scanline(running_machine &machine)
 {
-	//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
-	genesis_render_spriteline_to_spritebuffer(genesis_scanline_counter);
-	genesis_render_videoline_to_videobuffer(scanline);
-	genesis_render_videobuffer_to_screenbuffer(machine, scanline);
+	int scanline = genesis_scanline_counter;
+	if (scanline>=0 && scanline<megadrive_visible_scanlines)
+	{
+		//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
+		genesis_render_spriteline_to_spritebuffer(genesis_scanline_counter);
+		genesis_render_videoline_to_videobuffer(scanline);
+		genesis_render_videobuffer_to_screenbuffer(machine, scanline);
+	}
 }
 
 
 VIDEO_START(megadriv)
 {
-
-
-
-
 	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x40);
 	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x40);
 
@@ -2640,7 +2704,6 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(running_machine &mach
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		megadriv_scanline_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
 		megadriv_render_timer->adjust(attotime::from_usec(1));
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
@@ -2697,19 +2760,14 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(running_machine &mach
 			_32x_scanline_cb1();
 		}
 
-
-		if (machine.device(":genesis_snd_z80") != NULL)
+		if (genesis_scanline_counter == megadrive_z80irq_scanline)
 		{
-			if (genesis_scanline_counter == megadrive_z80irq_scanline)
-			{
-				megadriv_z80_hold(machine);
-			}
-			if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
-			{
-				megadriv_z80_clear(machine);
-			}
+			m_genesis_vdp_sndirqline_callback(machine, true);
 		}
-
+		if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
+		{
+			m_genesis_vdp_sndirqline_callback(machine, false);
+		}
 	}
 	else /* pretend we're still on the same scanline to compensate for rounding errors */
 	{
@@ -2718,35 +2776,8 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(running_machine &mach
 
 }
 
-TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback )
-{
-	sega_genesis_vdp_device *vdp = timer.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
 
-	/* This function is called at the very start of every scanline starting at the very
-       top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
-       VIDEO_EOF) */
 
-	timer.machine().scheduler().synchronize();
-	vdp->vdp_handle_scanline_callback(timer.machine(), param);
-	
-}
-
-void sega_genesis_vdp_device::vdp_handle_irq6_on_callback(running_machine &machine, int param)
-{
-	//mame_printf_debug("irq6 active on %d\n",genesis_scanline_counter);
-
-	{
-//      megadrive_irq6_pending = 1;
-		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6)
-			cputag_set_input_line(machine, ":maincpu", 6, HOLD_LINE);
-	}
-}
-
-TIMER_DEVICE_CALLBACK( irq6_on_callback )
-{
-	sega_genesis_vdp_device *vdp = timer.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-	vdp->vdp_handle_irq6_on_callback(timer.machine(), param);
-}
 
 void sega_genesis_vdp_device::vdp_handle_vblank(screen_device &screen)
 {
@@ -2763,8 +2794,6 @@ void sega_genesis_vdp_device::vdp_handle_vblank(screen_device &screen)
 	m_imode_odd_frame^=1;
 //      cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (screen.machine().root_device().ioport(":RESET")->read_safe(0x00) & 0x01)
-		cputag_set_input_line(screen.machine(), ":maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 
 	if (MEGADRIVE_REG01_240_LINE)
@@ -2827,7 +2856,6 @@ void sega_genesis_vdp_device::vdp_handle_vblank(screen_device &screen)
 
 	screen.machine().primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
 
-	megadriv_scanline_timer->adjust(attotime::zero);
 
 	if(_32x_is_connected)
 		_32x_hcount_compare_val = -1;
@@ -2835,27 +2863,7 @@ void sega_genesis_vdp_device::vdp_handle_vblank(screen_device &screen)
 
 
 
-SCREEN_VBLANK(megadriv)
-{
-	// rising edge
-	if (vblank_on)
-	{
-		sega_genesis_vdp_device *vdp = screen.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-		vdp->vdp_handle_vblank(screen);
-	}
-}
 
-
-TIMER_DEVICE_CALLBACK( megadriv_render_timer_callback )
-{
-	sega_genesis_vdp_device *vdp = timer.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-
-	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
-	{
-	
-		vdp->genesis_render_scanline(timer.machine(), genesis_scanline_counter);
-	}
-}
 
 void megadriv_reset_vdp(running_machine &machine)
 {
