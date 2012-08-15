@@ -214,7 +214,7 @@ ROM_START( m4gvibes )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "gvsnd.p1", 0x0000, 0x080000, CRC(ac56b475) SHA1(8017784e5dd8e6d85857ff989c553d04c2ea217a) )
 
-	ROM_REGION( 0x080000, "altrevs", 0 )
+	ROM_REGION( 0x080000, "altmsm6376", 0 )
 	// different SFX, does this belong to a specific revision?
 	ROM_LOAD( "gv2snd.bin", 0x0000, 0x080000, CRC(e11ebc9c) SHA1(3f4e8148bc3687af77838b770bbc219a3f50f1c6) )
 ROM_END

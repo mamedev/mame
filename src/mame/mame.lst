@@ -20087,7 +20087,6 @@ m4grbbnkb	//
 m4graff		// Graffiti (Barcrest)
 m4graff__a	//
 m4graff__b	//
-m4graff__c	//
 m4graffd	//
 m4grands	// Grandstand Club (Barcrest)
 m4grandsa	//
@@ -23316,6 +23315,7 @@ m4frightb	//
 m4frightc	//
 m4frightd	//
 m4frighte	//
+m4frightf	//
 m4gamblr	// The Gambler (Empire)
 m4gamblra	//
 m4gamblrb	//
@@ -23467,6 +23467,8 @@ m4vfm		// Value For Money (Global)
 m4bangina	//
 m4banginb	//
 m4wwc		// Wacky Weekend Club (Global)
+m4wwca		//
+m4wwcb		//
 m4screw		// Screwin' Around (Global)
 m4screwp
 m4screwa
@@ -23495,35 +23497,103 @@ m4stand2	// Stand To Deliver (DJE)
 m4frkstn	// Frank 'n' Stein (unencrypted)
 m4frkstna	//
 m4frkstnb	//
+m4frkstnc	//
+m4frkstnd	//
+m4frkstne	//
+m4frkstnf	//
+m4frkstng	//
 m4aladn		// Aladdin's Cave (Crystal)
+m4aladna	//
+m4aladnb	//
+m4aladnc	//
+m4aladnd	//
+m4aladne	//
+m4aladnf	//
+m4aladng	//
+m4aladnh	//
+m4aladni	//
 m4bagcsh	// Bags Of Cash Club (Crystal)
+m4bagcsha	//
 m4bucclb	// Buccaneer Club (Crystal)
+m4bucclba	//
+m4bucclbb	//
+m4bucclbc	//
 m4bullio	// Bullion Club (Crystal)
+m4bullioa	//
+m4bulliob	//
 m4carou		// Carousel Club (Crystal)
+m4caroua	//
+m4caroub	//
+m4carouc	//
 m4cclimb	// Crazy Climber (Crystal)
+m4cclimba	//
 m4crzcl		// Crazy Climber Club (Crystal)
-m4crzclc	// Crazy Club Climber (Crystal)
+m4crzcla	//
+m4crzclb	//
+m4crzclc	//
+m4crzcld	//
 m4elitc		// Elite Club (Crystal)
+m4elitca	//
 m4fairg		// Fairground (Crystal)
 m4frmani	// Fruit Mania (Crystal)
+m4frmania	//
+m4frmanib	//
+m4frmanic	//
 m4goldxc	// Gold Exchange Club (Crystal)
+m4goldxca	//
+m4goldxcb	//
+m4goldxcc	//
+m4goldxcd	//
+m4goldxce	//
 m4goldfc	// Gold Fever (Crystal)
+m4goldfca	//
+m4goldfcb	//
 m4hirol		// Hi Roller Club (Crystal)
+m4hirola	//
 m4kingqn	// Kings & Queens Club (Crystal)
+m4kingqna	//
 m4lotclb	// Lottery Club (Crystal)
+m4lotclba	//
 m4montrl	// Money Trail (Crystal)
+m4montrla	//
+m4montrlb	//
+m4montrlc	//
+m4montrld	//
 m4mystiq	// Mystique Club (Crystal)
+m4mystiqa	//
+m4mystiqb	//
+m4mystiqc	//
 m4nudwin	// Nudge & Win (Crystal)
+m4nudwina	//
 m4paracl	// Paradise Club (Crystal)
+m4paracla	//
 m4rlpick	// Reel Picks (Crystal)
+m4rlpicka	//
+m4rlpickb	//
+m4rlpickc	//
 m4twstr		// Twister (Crystal)
+m4twstra	//
+m4twstrb	//
+m4twstrc	//
+m4twstrd	//
 m4twstcl	// Twister Club (Crystal)
+m4twstcla	//
+m4twstclb	//
 m4dz		// Danger Zone (Crystal?)
 m4tylb		// Thank Your Lucky Bars (Crystal)
+m4tylba		//
 m4magi7		// Magic 7s (Crystal)
+m4magi7a	//
 m4rags		// Rags to Riches Club (Crystal)
+m4ragsa		//
+m4ragsb		//
+m4ragsc		//
 m4riocr		// Rio Grande (Grystal)
+m4riocra	//
 m4ndup		// Nudge Double Up (Crystal)
+m4ndupa		//
+m4ndupb		//
+m4ndupc		//
 
 /* Unknown */
 
@@ -23790,6 +23860,7 @@ m4hapfrtb	//
 m4frcrak	// Fruit Cracker
 m4ewshft	// Each Way Shifter
 m4jiggin	// Jiggin' In The Riggin'
+m4jiggina	//
 m4sunday	// Sunday Sport
 m4jp777		// Jackpot 777
 m4booze		// Booze Cruise

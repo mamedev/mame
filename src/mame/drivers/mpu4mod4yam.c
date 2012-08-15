@@ -210,7 +210,7 @@ ROM_END
 ROM_START( m4graffd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "grafittirom.bin", 0x0000, 0x010000, CRC(36135d6e) SHA1(e71eedabae36971739f8a6fd56a4a954de29944b) )
-	ROM_REGION( 0x10000, "snd", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_REGION( 0x10000, "snd", 0 )
 	// these are just trash I think, only a few bits used, and if it's ym based it shouldn't have them anyway.
 	ROM_LOAD( "grafittisound.bin", 0x0000, 0x010000, CRC(2d9bfff9) SHA1(ded774bcd2a7e10e4e2fc7b40976c9dcea0de6e3) )
 	ROM_LOAD( "grafittisound2.bin", 0x0000, 0x010000, CRC(c06c5517) SHA1(9e11f93638d37ba6f7b34a78eea043821ca4e188) )
@@ -272,7 +272,6 @@ M4GAMBAL_SET( 199?, m4gambal__c,	m4gambal,	"gbll20-6", 0x0000, 0x010000, CRC(f34
 M4GRAFF_SET( 199?, m4graff,		0,			"graffo6",	0x0000, 0x010000, CRC(7349c9ca) SHA1(2744035d6c7897394c8fead27f48779047590fba), "Barcrest","Graffiti (Barcrest) (MPU4) (set 1)" )
 M4GRAFF_SET( 199?, m4graff__a,	m4graff,	"grax.p1",	0x0000, 0x010000, CRC(2e03a7d8) SHA1(333373fe15ae165dd24d5c11fef23f2e9b0388bf), "Barcrest","Graffiti (Barcrest) (MPU4) (set 2)" )
 M4GRAFF_SET( 199?, m4graff__b,	m4graff,	"graxc.p1",	0x0000, 0x010000, CRC(7620657b) SHA1(2aec38ee0f826c7bb012522fd098a6fdb857c9da), "Barcrest","Graffiti (Barcrest) (MPU4) (set 3)" )
-M4GRAFF_SET( 199?, m4graff__c,	m4graff,	"grfi20o6",	0x0000, 0x010000, CRC(7349c9ca) SHA1(2744035d6c7897394c8fead27f48779047590fba), "Barcrest","Graffiti (Barcrest) (MPU4) (set 4)" )
 
 #define M4MONTE_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \

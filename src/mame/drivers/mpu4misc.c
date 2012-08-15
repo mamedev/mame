@@ -47,24 +47,37 @@ ROM_START( m4banginb )
 ROM_END
 
 
+#define M4WWC_SOUND \
+	ROM_REGION( 0x180000, "altmsm6376", 0 ) \
+	/* 2 sets of sound roms, one contains an extra sample */ \
+	ROM_LOAD( "wacky1.hex", 0x000000, 0x080000, CRC(379d7af6) SHA1(3b1988c1ab570c075572d0e9bf03fcb331ea4a2c) ) \
+	/* rom 2? should it match? */ \
+	ROM_LOAD( "wacky3.hex", 0x100000, 0x080000, CRC(c7def11a) SHA1(6aab2b7f7e4c852891ee09e91a8a085e9b28803f) ) \
+	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_LOAD( "wacky1snd.bin", 0x000000, 0x080000, CRC(45d6869a) SHA1(c1294522d190d22852b5c6006c92911f9e89cfac) ) \
+	ROM_LOAD( "wacky2snd.bin", 0x080000, 0x080000, CRC(18b5f8c8) SHA1(e4dc312eea777c2375ba8c2be2f3c2be71bea5c4) ) \
+	ROM_LOAD( "wacky3snd.bin", 0x100000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) ) \
+
+
 ROM_START( m4wwc )
 	ROM_REGION( 0x020000, "maincpu", 0 )
 	ROM_LOAD( "wack1-9n.p1", 0x0000, 0x020000, CRC(7ba6fd92) SHA1(3a5c7f9b3ebd8593c76132b46163c9d1299e210e) )
-
-	ROM_REGION( 0x020000, "altrevs", 0 )
-	ROM_LOAD( "wack1-9p.p1", 0x0000, 0x020000, CRC(4046b5eb) SHA1(e1ec9158810387b41b574202e9f27e7b741ac81c) )
-	ROM_LOAD( "wacky.hex", 0x0000, 0x020000, CRC(a94a06fd) SHA1(a5856b6903fdd35f9dca19b114ca56c106a308f2) )
-
-	ROM_REGION( 0x180000, "msm6376", 0 )
-	/* 2 sets of sound roms, one contains an extra sample */
-	ROM_LOAD( "wacky1.hex", 0x000000, 0x080000, CRC(379d7af6) SHA1(3b1988c1ab570c075572d0e9bf03fcb331ea4a2c) )
-	/* rom 2? should it match? */
-	ROM_LOAD( "wacky3.hex", 0x100000, 0x080000, CRC(c7def11a) SHA1(6aab2b7f7e4c852891ee09e91a8a085e9b28803f) )
-
-	ROM_LOAD( "wacky1snd.bin", 0x000000, 0x080000, CRC(45d6869a) SHA1(c1294522d190d22852b5c6006c92911f9e89cfac) )
-	ROM_LOAD( "wacky2snd.bin", 0x080000, 0x080000, CRC(18b5f8c8) SHA1(e4dc312eea777c2375ba8c2be2f3c2be71bea5c4) )
-	ROM_LOAD( "wacky3snd.bin", 0x100000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) )
+	M4WWC_SOUND
 ROM_END
+
+ROM_START( m4wwca )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "wack1-9p.p1", 0x0000, 0x020000, CRC(4046b5eb) SHA1(e1ec9158810387b41b574202e9f27e7b741ac81c) )
+	M4WWC_SOUND
+ROM_END
+
+ROM_START( m4wwcb )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "wacky.hex", 0x0000, 0x020000, CRC(a94a06fd) SHA1(a5856b6903fdd35f9dca19b114ca56c106a308f2) )
+	M4WWC_SOUND
+ROM_END
+
+
 
 
 ROM_START( m4screw )
@@ -113,16 +126,22 @@ ROM_START( m4vfm )
 	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
+#define M4JIGGIN_SOUND \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "jigsnd1.oki", 0x000000, 0x080000, CRC(581fa143) SHA1(e35186597fc7932d306080ecc82c55af4b769367) ) \
+	ROM_LOAD( "jigsnd2.oki", 0x080000, 0x080000, CRC(34c6fc3a) SHA1(6bfe52a94d8bed5b30d9ed741db7816ddc712aa3) ) \
+
+
 ROM_START( m4jiggin )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "jig2-1n.p1", 0x0000, 0x010000, CRC(9ea16d00) SHA1(4b4f1519eb6565ce76665595154c58cd0d0ab6fd) )
+	M4JIGGIN_SOUND
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_START( m4jiggina )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "jig2-1p.p1", 0x0000, 0x010000, CRC(09e6e111) SHA1(800a1dbc64c6a631cf3e53bd5f17b5d56955c92e) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "jigsnd1.oki", 0x000000, 0x080000, CRC(581fa143) SHA1(e35186597fc7932d306080ecc82c55af4b769367) )
-	ROM_LOAD( "jigsnd2.oki", 0x080000, 0x080000, CRC(34c6fc3a) SHA1(6bfe52a94d8bed5b30d9ed741db7816ddc712aa3) )
+	M4JIGGIN_SOUND
 ROM_END
 
 
@@ -462,13 +481,16 @@ M4LOOPLT_SET( 199?, m4looplt__m,	m4looplt,	"70001505.bin",		0x0000, 0x080000, CR
 GAME(199?, m4bangin,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4bangina, m4bangin,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4banginb, m4bangin,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4wwc,	  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4wwc,	  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 1)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4wwca,	  m4wwc,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 2)" ,   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4wwcb,	  m4wwc,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4) (set 3)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4screw,	  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4screwp,  m4screw,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4screwa,  m4screw,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4screwb,  m4screw,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4vfm,	  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jiggin,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4jiggin,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 1)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4jiggina, m4jiggin,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Global","Jiggin' In The Riggin' (Global) (MPU4) (set 2)",   GAME_FLAGS|GAME_NO_SOUND )
 
 
 
