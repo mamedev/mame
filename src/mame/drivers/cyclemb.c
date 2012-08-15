@@ -70,7 +70,7 @@ Dumped by Chack'n
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
+#include "sound/2203intf.h"
 #include "machine/tait8741.h"
 
 
@@ -79,6 +79,8 @@ class cyclemb_state : public driver_device
 public:
 	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
@@ -86,6 +88,8 @@ public:
 		m_obj3_ram(*this, "obj3_ram")
 	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
 	required_shared_ptr<UINT8> m_obj1_ram;
@@ -374,7 +378,7 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 #endif
 
@@ -388,7 +392,7 @@ READ8_MEMBER(cyclemb_state::mcu_status_r)
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 #endif
 
@@ -414,7 +418,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 {
 	if(offset == 1) //status port
 	{
-		//printf("STATUS PC=%04x\n",cpu_get_pc(&space->device()));
+		//printf("STATUS PC=%04x\n",cpu_get_pc(m_maincpu));
 
 		return 1;
 	}
@@ -422,14 +426,14 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 	{
 		UINT8 i,pt;
 
-		//printf("%04x\n",cpu_get_pc(&space->device()));
+		//printf("%04x\n",cpu_get_pc(m_maincpu));
 
 		/* TODO: internal state of this */
-		if(cpu_get_pc(&space.device()) == m_dsw_pc_hack)
+		if(cpu_get_pc(m_maincpu) == m_dsw_pc_hack)
 			m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 		else if(m_mcu[0].rst)
 		{
-			//printf("READ PC=%04x\n",cpu_get_pc(&space->device()));
+			//printf("READ PC=%04x\n",cpu_get_pc(m_maincpu));
 			{
 
 				switch(m_mcu[0].state)
@@ -472,9 +476,8 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 					default:
 						//printf("%02x\n",m_mcu[0].txd);
 						m_mcu[0].rxd = 0x00;
+						break;
 				}
-				//	m_mcu[0].rxd = space->machine().rand();
-				//	break;
 			}
 
 
@@ -496,7 +499,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 {
 	if(offset == 1) //command port
 	{
-		//printf("%02x CMD PC=%04x\n",data,cpu_get_pc(&space->device()));
+		//printf("%02x CMD PC=%04x\n",data,cpu_get_pc(m_maincpu));
 		switch(data)
 		{
 			case 0:
@@ -531,7 +534,8 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 	}
 	else
 	{
-		//printf("%02x DATA PC=%04x\n",data,cpu_get_pc(&space->device()));
+		//printf("%02x DATA PC=%04x\n",data,cpu_get_pc(m_maincpu));
+
 		m_mcu[0].txd = data;
 
 		if(m_mcu[0].txd == 0x41)
@@ -558,6 +562,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
+	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(skydest_i8741_0_r, skydest_i8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
@@ -566,7 +571,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( skydest_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
+	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
 	AM_RANGE(0xc080, 0xc081) AM_READWRITE(skydest_i8741_0_r, skydest_i8741_0_w)
+	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
@@ -579,7 +586,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
 
@@ -891,12 +898,12 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,18000000/3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/3) // Z8400BPS
 	MCFG_CPU_PROGRAM_MAP(cyclemb_map)
 	MCFG_CPU_IO_MAP(cyclemb_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,18000000/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(cyclemb_sound_map)
 	MCFG_CPU_IO_MAP(cyclemb_sound_io)
 
@@ -918,8 +925,9 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 18000000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_18MHz/12)
+	//MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
