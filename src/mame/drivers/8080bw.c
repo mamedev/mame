@@ -3115,9 +3115,8 @@ ROM_START( mlander )
 	ROM_LOAD( "ml6.u31",    0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
 
 	ROM_REGION( 0x0800, "proms", 0 )		/* color map */
-	/* !! not dumped yet, these were taken from sisv/intruder */
-	ROM_LOAD( "01.bin",       0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
-	ROM_LOAD( "02.bin",       0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+	ROM_LOAD( "01.bin",     0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.bin",     0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( grescue )
@@ -3708,7 +3707,7 @@ GAME( 1979, galxwars2,galxwars, invadpt2, galxwars, driver_device, 0, ROT270, "U
 GAME( 1979, galxwarst,galxwars, invadpt2, galxwars, driver_device, 0, ROT270, "Universal (Taito license?)", "Galaxy Wars (Taito?)" , GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* Copyright Not Displayed */
 GAME( 1979, starw,    galxwars, invaders, galxwars, driver_device, 0, ROT270, "bootleg", "Star Wars", GAME_SUPPORTS_SAVE )
 GAME( 1979, lrescue,  0,        lrescue,  lrescue, driver_device,  0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, mlander,  lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, mlander,  lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
 GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, grescue,  lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, driver_device, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
