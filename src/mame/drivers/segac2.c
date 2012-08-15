@@ -113,10 +113,10 @@ static MACHINE_START( segac2 )
 static MACHINE_RESET( segac2 )
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
-	megadrive_ram = reinterpret_cast<UINT16 *>(state->memshare("nvram")->ptr());
-
-	/* set up interrupts and such */
-	MACHINE_RESET_CALL(megadriv);
+	megadriv_framerate = 60;
+	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+	megadriv_scanline_timer->adjust(attotime::zero);
+	megadriv_reset_vdp(machine);
 
 	/* determine how many sound banks */
 	state->m_sound_banks = 0;
@@ -1789,7 +1789,6 @@ void segac2_state::segac2_common_init(running_machine& machine, int (*func)(int 
 	state->m_prot_func = func;
 
 	genvdp_use_cram = 0;
-	genesis_other_hacks = 0;
 
 	if (upd != NULL)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));

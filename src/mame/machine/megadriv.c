@@ -56,7 +56,15 @@ static cpu_device *_genesis_snd_z80_cpu;
 int genesis_other_hacks = 0; // misc hacks
 
 timer_device* megadriv_scanline_timer;
+UINT16* megadrive_ram = NULL;
 
+struct genesis_z80_vars
+{
+	int z80_is_reset;
+	int z80_has_bus;
+	UINT32 z80_bank_addr;
+	UINT8* z80_prgram;
+};
 
 genesis_z80_vars genz80;
 
@@ -956,9 +964,6 @@ SCREEN_UPDATE_RGB32(megadriv)
 
 /*****************************************************************************************/
 
-static int hazemdchoice_megadrive_region_export;
-static int hazemdchoice_megadrive_region_pal;
-static int hazemdchoice_megadriv_framerate;
 
 MACHINE_START( megadriv )
 {
@@ -970,8 +975,6 @@ MACHINE_RESET( megadriv )
 {
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
-
-	megadriv_framerate = hazemdchoice_megadriv_framerate;
 
 	if (machine.device("genesis_snd_z80") != NULL)
 	{
@@ -993,8 +996,8 @@ MACHINE_RESET( megadriv )
 	{
 	//  set_refresh_rate(megadriv_framerate);
 	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
-
-		memset(megadrive_ram,0x00,0x10000);
+		if (megadrive_ram)
+			memset(megadrive_ram,0x00,0x10000);
 	}
 
 	megadriv_reset_vdp(machine);
@@ -1091,6 +1094,23 @@ void genesis_vdp_lv4irqline_callback_genesis_68k(running_machine &machine, bool 
 		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
 }
 
+/* Callback when the 68k takes an IRQ */
+static IRQ_CALLBACK(genesis_int_callback)
+{
+	md_base_state *state = device->machine().driver_data<md_base_state>();
+
+	if (irqline==4)
+	{
+		state->m_vdp->vdp_clear_irq4_pending();
+	}
+
+	if (irqline==6)
+	{
+		state->m_vdp->vdp_clear_irq6_pending();
+	}
+
+	return (0x60+irqline*4)/4; // vector address
+}
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
 	MCFG_TIMER_ADD("md_scan_timer", megadriv_scanline_timer_callback)
@@ -1376,22 +1396,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 MACHINE_CONFIG_END
 
 
-/* Callback when the genesis enters interrupt code */
-static IRQ_CALLBACK(genesis_int_callback)
-{
-	if (irqline==4)
-	{
-		megadrive_irq4_pending = 0;
-	}
 
-	if (irqline==6)
-	{
-		megadrive_irq6_pending = 0;
-	//  mame_printf_debug("clear pending!\n");
-	}
-
-	return (0x60+irqline*4)/4; // vector address
-}
 
 static int megadriv_tas_callback(device_t *device)
 {
@@ -1513,9 +1518,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 	genesis_other_hacks = 0;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
+	megadriv_framerate = 60;
 }
 
 
@@ -1526,9 +1529,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv)
 	genesis_other_hacks = 1;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
+	megadriv_framerate = 60;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadrij)
@@ -1537,9 +1538,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrij)
 	genesis_other_hacks = 1;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 0;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
+	megadriv_framerate = 60;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadrie)
@@ -1548,9 +1547,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	genesis_other_hacks = 1;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 1;
-	hazemdchoice_megadriv_framerate = 50;
+	megadriv_framerate = 50;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,mpnew)

@@ -7,10 +7,6 @@
 
 #include "sound/sn76496.h"
 
-extern int megadrive_imode;
-extern int megadrive_total_scanlines;
-extern int megadrive_visible_scanlines;
-extern int megadrive_irq6_scanline;
 extern cpu_device *_svp_cpu;
 extern int segacd_wordram_mapped;
 extern timer_device* megadriv_scanline_timer;
@@ -29,16 +25,10 @@ extern int _32x_is_connected;
 
 
 /* external gunk still has dependencies on these */
-
-int megadrive_visible_scanlines;
-int megadrive_irq6_scanline;
-int megadrive_z80irq_scanline;
 int megadriv_framerate;
 int megadrive_total_scanlines;
 int megadrive_vblank_flag = 0;
 int genesis_scanline_counter = 0;
-int megadrive_irq6_pending = 0;
-int megadrive_irq4_pending = 0;
 
 int segac2_bg_pal_lookup[4];
 int segac2_sp_pal_lookup[4];
@@ -50,8 +40,6 @@ UINT16* megadrive_vdp_palette_lookup;
 UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
 UINT16* megadrive_vdp_palette_lookup_shadow;
 UINT16* megadrive_vdp_palette_lookup_highlight;
-UINT16* megadrive_ram;
-
 
 int megadrive_region_export;
 int megadrive_region_pal;
@@ -172,8 +160,11 @@ void sega_genesis_vdp_device::device_start()
 	save_item(NAME(m_imode_odd_frame));
 	save_item(NAME(m_sprite_collision));
 	save_item(NAME(megadrive_imode));
-
-
+	save_item(NAME(megadrive_irq6_pending));
+	save_item(NAME(megadrive_irq4_pending));
+	save_item(NAME(megadrive_visible_scanlines));
+	save_item(NAME(megadrive_irq6_scanline));
+	save_item(NAME(megadrive_z80irq_scanline));
 
 	m_sprite_renderline = auto_alloc_array(machine(), UINT8, 1024);
 	m_highpri_renderline = auto_alloc_array(machine(), UINT8, 320);
@@ -200,6 +191,8 @@ void sega_genesis_vdp_device::device_reset()
 	m_imode_odd_frame = 0;
 	m_sprite_collision = 0;
 	megadrive_imode = 0;
+	megadrive_irq6_pending = 0;
+	megadrive_irq4_pending = 0;
 }
 
 void sega_genesis_vdp_device::device_reset_old()

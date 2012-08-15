@@ -165,6 +165,9 @@ public:
 	void vdp_handle_irq4_on_timer_callback(running_machine &machine, int param);
 	void vdp_handle_vblank(screen_device &screen);
 	void device_reset_old();
+	void vdp_clear_irq6_pending(void) { megadrive_irq6_pending = 0; };
+	void vdp_clear_irq4_pending(void) { megadrive_irq4_pending = 0; };
+
 
 	bitmap_ind16* m_render_bitmap;
 
@@ -189,8 +192,16 @@ private:
 	int m_irq4counter;
 	int m_imode_odd_frame;
 	int m_sprite_collision;
+	int megadrive_irq6_pending;
+	int megadrive_irq4_pending;
 
 	int megadrive_imode;
+
+
+	int megadrive_visible_scanlines;
+	int megadrive_irq6_scanline;
+	int megadrive_z80irq_scanline;
+
 
 	UINT16* m_vdp_regs;
 	UINT16* m_vram;

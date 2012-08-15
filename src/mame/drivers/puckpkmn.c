@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
 
 	/* Unknown reads/writes: */
 	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP							/* ? */
@@ -248,17 +248,13 @@ static ADDRESS_MAP_START( jzth_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
 
 	AM_RANGE(0xa00000, 0xa00551) AM_NOP
 
 	AM_RANGE(0xA11100, 0xA11101) AM_NOP
 
 	AM_RANGE(0x710000, 0x710001) AM_READWRITE(bl_710000_r,bl_710000_w) // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
-
-
-
-
 ADDRESS_MAP_END
 
 static READ16_HANDLER(puckpkmna_70001c_r)
