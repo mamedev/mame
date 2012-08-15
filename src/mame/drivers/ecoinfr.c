@@ -36,6 +36,7 @@
 
 #define UPD8251_TAG      "upd8251"
 
+#define GAME_FLAGS GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
 
 class ecoinfr_state : public driver_device
 {
@@ -667,163 +668,326 @@ MACHINE_CONFIG_END
 ********************************************************************************************************************/
 
 
-ROM_START( ec_barx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "iss354.rom", 0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483) )
-//  ROM_LOAD( "rom1.bin", 0x0000, 0x008000, CRC(1) SHA1(1) ) // testing only
+#define EC_BARX_OTHERS \
+	ROM_REGION( 0x200000, "pal", 0 ) \
+	/* Pal dump? check it.. */ \
+	ROM_LOAD( "bxpal", 0x0000, 0x000c80, CRC(e30cd1ff) SHA1(4a1ee1703a677143412aa367cfe7d7d346812d87) ) \
+	ROM_REGION( 0x200000, "sndz80", 0 ) \
+	/* apparently all games using these PCBs had the same sound rom.. */ \
+	ROM_LOAD( "barxsnd.bin", 0x0000, 0x001000, CRC(7d37fda1) SHA1(fb906615067887d9daecdbc741cfa4ac710c4627) ) \
+
+#define EC_BARX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_BARX_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
 
-	ROM_REGION( 0x200000, "altrevs", 0 )
+/* 32Kb With Header / Space for Header */
 
-	/* Unique ROM containing 1993 Electrocoin Copyright */
-	ROM_LOAD( "bxc1&6c.rom", 0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3) )
+// Some Roms below use a header at the start, containing 8x8 Byte strings to describe what type of set it is
+// address | string    description                                        | legend for comments
+// 20 - 27 | Protoco | Protocol? (Data recording etc.)                    | P--- ----
+// 28 - 2f | NoteAc1 | Note Acceptor Type 1? (just NoteAcc on some sets)  | -1-- ----  (or -N-- ----)
+// 30 - 37 | NoteAc2 | Note Acceptor Type 2?                              | --2- ----
+// 38 - 3f | SecMete | Secondary Meters?                                  | ---S ----
+// 40 - 47 | Keys    | Uses JP Keys?                                      | ---- K---
+// 48 - 4f | 10pHopp | Different Hopper Type?                             | ---- -H--
+// 50 - 57 | ?????   | not seen used                                      | ---- --?-
+// 58 - 5f | GALA    | ? (in some of the earlier sets this is a 0 fill)   | ---- ---G  (or ---- ---0)
+EC_BARX_SET( 199?, ec_barx,		0,			"iss354.rom",	0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483), "Electrocoin","Bar X (Electrocoin) (set 1)" )
+EC_BARX_SET( 199?, ec_barx__a,	ec_barx,	"iss9007.rom",	0x0000, 0x008000, CRC(c73b7c4e) SHA1(2d1fecb8efd4b80d1249034efc5ea9c1d3cb660b), "Electrocoin","Bar X (Electrocoin) (set 2)" )
+EC_BARX_SET( 199?, ec_barx__b,	ec_barx,	"iss9011.rom",	0x0000, 0x008000, CRC(7b69ff3c) SHA1(f13e71fa2ae997fd2c80ca060cdbe2115468df6b), "Electrocoin","Bar X (Electrocoin) (set 3)" )
+EC_BARX_SET( 199?, ec_barx__c,	ec_barx,	"iss9015.rom",	0x0000, 0x008000, CRC(fd2fabe8) SHA1(2a0261c39187746a53ff7c32a759ba1311ec56a9), "Electrocoin","Bar X (Electrocoin) (set 4)" )
+EC_BARX_SET( 199?, ec_barx__d,	ec_barx,	"iss9201.rom",	0x0000, 0x008000, CRC(35cf9280) SHA1(d271a89178b026c2847b8f192c72f8ce841a1548), "Electrocoin","Bar X (Electrocoin) (set 5)" )
+EC_BARX_SET( 199?, ec_barx__e,	ec_barx,	"iss9204.rom",	0x0000, 0x008000, CRC(e8ced9c9) SHA1(a028c2bf35add11c2ff3b98cf34925acb99ef1c4), "Electrocoin","Bar X (Electrocoin) (set 6)" )
+// No Header info, or title info (although there is space for one)
+EC_BARX_SET( 199?, ec_barx__f,	ec_barx,	"barx5ft",		0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1), "Electrocoin","Bar X (Electrocoin) (set 7)" )
+EC_BARX_SET( 199?, ec_barx__g,	ec_barx,	"bx503cas",		0x0000, 0x008000, CRC(ac974ac2) SHA1(d317730506c075b108c68b3fc5628837b12863fe), "Electrocoin","Bar X (Electrocoin) (set 8)" )
+// Sets below all marked '2001 BARX' (older header type?)
+EC_BARX_SET( 199?, ec_barx__h,	ec_barx,	"issa091",		0x0000, 0x008000, CRC(6748c76c) SHA1(115b6f30971fbbbd67ece3eeba66431c7440267e), "Electrocoin","Bar X (Electrocoin) (set 9)" )  // ---- ---0
+EC_BARX_SET( 199?, ec_barx__i,	ec_barx,	"issa092",		0x0000, 0x008000, CRC(82c4e44d) SHA1(a253779c3666eb1c3b4a45f22478b2310a23540a), "Electrocoin","Bar X (Electrocoin) (set 10)" ) // -N-- ---0
+EC_BARX_SET( 199?, ec_barx__j,	ec_barx,	"issa096",		0x0000, 0x008000, CRC(8536c23d) SHA1(3acca3016dd5a8a183f646095856fffca9d0fd9c), "Electrocoin","Bar X (Electrocoin) (set 11)" ) // P--- ---0
+EC_BARX_SET( 199?, ec_barx__k,	ec_barx,	"issa097",		0x0000, 0x008000, CRC(0650275f) SHA1(eb06a7b245103aeb53973897128063b04e599fde), "Electrocoin","Bar X (Electrocoin) (set 12)" ) // PN-- ---0
+// 2001 BARX (newer header type?)
+// Are these actually 'Super Bar X'? They have SBARX strings in them near build dates etc.
+EC_BARX_SET( 199?, ec_barx__l,	ec_barx,	"issa793",		0x0000, 0x008000, CRC(e3de7b43) SHA1(5d33d39f59e30510ac89d9a03979f17a4a3707eb), "Electrocoin","Bar X (Electrocoin) (set 13)" ) // ---- ----
+EC_BARX_SET( 199?, ec_barx__m,	ec_barx,	"issa794",		0x0000, 0x008000, CRC(47334130) SHA1(08204545d20fa017321183126a856446b08e09b9), "Electrocoin","Bar X (Electrocoin) (set 14)" ) // -1-- ----
+EC_BARX_SET( 199?, ec_barx__n,	ec_barx,	"issa795",		0x0000, 0x008000, CRC(d24936fd) SHA1(f0efa2d30c71285d31ae2c47ce2baef3bb72bc66), "Electrocoin","Bar X (Electrocoin) (set 15)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__o,	ec_barx,	"issa796",		0x0000, 0x008000, CRC(0d5c020d) SHA1(f41e015773c908228f55f1ce3e35b22ad4b6bf33), "Electrocoin","Bar X (Electrocoin) (set 16)" ) // -1-S K---
+EC_BARX_SET( 199?, ec_barx__p,	ec_barx,	"issa797",		0x0000, 0x008000, CRC(57cf216a) SHA1(070297c07404f92928581d73751e82158e9567d7), "Electrocoin","Bar X (Electrocoin) (set 17)" ) // ---S K---
+EC_BARX_SET( 199?, ec_barx__q,	ec_barx,	"issa798",		0x0000, 0x008000, CRC(c15f25e2) SHA1(b7a32876a7f8512451d911f0611cbdc8a083a79e), "Electrocoin","Bar X (Electrocoin) (set 18)" ) // -1-- ----
+EC_BARX_SET( 199?, ec_barx__r,	ec_barx,	"issa799",		0x0000, 0x008000, CRC(9682ca8c) SHA1(a6846bff4aaa9ccf997f7049300b62138a405e20), "Electrocoin","Bar X (Electrocoin) (set 19)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__s,	ec_barx,	"issa800",		0x0000, 0x008000, CRC(55ab4892) SHA1(7b71d6c70f6f2083b2cce93198a74034502f61fa), "Electrocoin","Bar X (Electrocoin) (set 20)" ) // -1-S K---
+EC_BARX_SET( 199?, ec_barx__t,	ec_barx,	"issa801",		0x0000, 0x008000, CRC(4823d2ec) SHA1(df9cbea4c96411fb5d7707627ea2fc3aca0681cf), "Electrocoin","Bar X (Electrocoin) (set 21)" ) // ---- -H--
+EC_BARX_SET( 199?, ec_barx__u,	ec_barx,	"issa802",		0x0000, 0x008000, CRC(5408417a) SHA1(1a45271ae593bb071a4fa0053cae8b10bd1ba49a), "Electrocoin","Bar X (Electrocoin) (set 22)" ) // ---S KH--
+EC_BARX_SET( 199?, ec_barx__v,	ec_barx,	"issa803",		0x0000, 0x008000, CRC(748981a0) SHA1(bbad9f0ea44883e458710b15e2652b0e76dc873d), "Electrocoin","Bar X (Electrocoin) (set 23)" ) // P--- ----
+EC_BARX_SET( 199?, ec_barx__w,	ec_barx,	"issa804",		0x0000, 0x008000, CRC(a6730955) SHA1(7ebf9967b9e40ca89da8951a1711d592ef87160d), "Electrocoin","Bar X (Electrocoin) (set 24)" ) // P1-- ----
+EC_BARX_SET( 199?, ec_barx__x,	ec_barx,	"issa805",		0x0000, 0x008000, CRC(8c1cf7f4) SHA1(0ff139c38d68a66b40c8ac611bf05cb3a9d852fa), "Electrocoin","Bar X (Electrocoin) (set 25)" ) // P-2S K---
+EC_BARX_SET( 199?, ec_barx__y,	ec_barx,	"issa806",		0x0000, 0x008000, CRC(a1aee26b) SHA1(966e595029b5518ddee422afae6d633da0e8e4e4), "Electrocoin","Bar X (Electrocoin) (set 26)" ) // P1-S K---
+EC_BARX_SET( 199?, ec_barx__z,	ec_barx,	"issa807",		0x0000, 0x008000, CRC(b9332da4) SHA1(622a94a1c5226cf42263b0642e695e1af71c611c), "Electrocoin","Bar X (Electrocoin) (set 27)" ) // P--S K---
+EC_BARX_SET( 199?, ec_barx__0,	ec_barx,	"issa808",		0x0000, 0x008000, CRC(3b8fda84) SHA1(74cfaef125900d89b8c936a7cb3668fd7642fbfe), "Electrocoin","Bar X (Electrocoin) (set 28)" ) // P1-- ----
+EC_BARX_SET( 199?, ec_barx__1,	ec_barx,	"issa809",		0x0000, 0x008000, CRC(58c10603) SHA1(653c0afb57feda9d4a02f6590aacb9cf63b931c9), "Electrocoin","Bar X (Electrocoin) (set 29)" ) // P-2S K---
+EC_BARX_SET( 199?, ec_barx__2,	ec_barx,	"issa810",		0x0000, 0x008000, CRC(aafff06c) SHA1(0ae798d965299b2b9f10d3707877ede722c0eb7a), "Electrocoin","Bar X (Electrocoin) (set 30)" ) // P1-S K---
+EC_BARX_SET( 199?, ec_barx__3,	ec_barx,	"issa811",		0x0000, 0x008000, CRC(ac2ceda1) SHA1(3299f07db8670bffbcfbbdfc1fd44179f5a5ccf6), "Electrocoin","Bar X (Electrocoin) (set 31)" ) // P--- -H--
+EC_BARX_SET( 199?, ec_barx__4,	ec_barx,	"issa812",		0x0000, 0x008000, CRC(8a1e9002) SHA1(3c82e3761007feaa61a2c029951c6e3336224a1c), "Electrocoin","Bar X (Electrocoin) (set 32)" ) // P--S KH--
+EC_BARX_SET( 199?, ec_barx__5,	ec_barx,	"issa813",		0x0000, 0x008000, CRC(0ea31930) SHA1(16d38501dba2079e4d573beca5f1216820bac1bc), "Electrocoin","Bar X (Electrocoin) (set 33)" ) // --2- ----
+EC_BARX_SET( 199?, ec_barx__6,	ec_barx,	"issa814",		0x0000, 0x008000, CRC(50e4f6ff) SHA1(84758c19e36b03af2f6f2645ebb685795d667f9f), "Electrocoin","Bar X (Electrocoin) (set 34)" ) // --2- ----
+EC_BARX_SET( 199?, ec_barx__7,	ec_barx,	"issa815",		0x0000, 0x008000, CRC(a3b72d9e) SHA1(f08fe4372392ff72301dafca972953e779a546c4), "Electrocoin","Bar X (Electrocoin) (set 35)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__8,	ec_barx,	"issa816",		0x0000, 0x008000, CRC(7b79e1dd) SHA1(ec2fc0a60bd90addbd79a1620e97f290907dbd5c), "Electrocoin","Bar X (Electrocoin) (set 36)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__9,	ec_barx,	"issa817",		0x0000, 0x008000, CRC(05006125) SHA1(6b71c68579f8ec9b3bb0ba208df69c2125ebb9e7), "Electrocoin","Bar X (Electrocoin) (set 37)" ) // P-2- ----
+EC_BARX_SET( 199?, ec_barx__aa,	ec_barx,	"issa818",		0x0000, 0x008000, CRC(3aee13d9) SHA1(3645a83c6c9f40b5ed356ce45129fe860aba907d), "Electrocoin","Bar X (Electrocoin) (set 38)" ) // P-2- ----
+EC_BARX_SET( 199?, ec_barx__ab,	ec_barx,	"issa819",		0x0000, 0x008000, CRC(76f10c3a) SHA1(bcdb9c82e9b14c2e351bf6caeb44173c2376e48e), "Electrocoin","Bar X (Electrocoin) (set 39)" ) // P-2S K---
+EC_BARX_SET( 199?, ec_barx__ac,	ec_barx,	"issa820",		0x0000, 0x008000, CRC(9c04f02a) SHA1(c0bf63fe00679025a56d867b216f84ec4536d06c), "Electrocoin","Bar X (Electrocoin) (set 40)" ) // P-2S K---
+EC_BARX_SET( 199?, ec_barx__ad,	ec_barx,	"issa821",		0x0000, 0x008000, CRC(cb72cc59) SHA1(c1c12a921a9b57a252ad00eaadbba35073b9b64d), "Electrocoin","Bar X (Electrocoin) (set 41)" ) // -1-- ----
+EC_BARX_SET( 199?, ec_barx__ae,	ec_barx,	"issa822",		0x0000, 0x008000, CRC(97e04639) SHA1(fc769882bb9a96de0d1121c7ceae60960b654915), "Electrocoin","Bar X (Electrocoin) (set 42)" ) // -1-- ----
+EC_BARX_SET( 199?, ec_barx__af,	ec_barx,	"issa823",		0x0000, 0x008000, CRC(a306982b) SHA1(e0a442145728c563ed9020346db32e89a3dac985), "Electrocoin","Bar X (Electrocoin) (set 43)" ) // -1-S K---
+EC_BARX_SET( 199?, ec_barx__ag,	ec_barx,	"issa824",		0x0000, 0x008000, CRC(14b24861) SHA1(f90850d0bb38ade91dcdd7aaa29c916341d3f65f), "Electrocoin","Bar X (Electrocoin) (set 44)" ) // -1-S K---
+EC_BARX_SET( 199?, ec_barx__ah,	ec_barx,	"issa825",		0x0000, 0x008000, CRC(5543a633) SHA1(3cfcea2c123b90704e69e5ce9f06920022911802), "Electrocoin","Bar X (Electrocoin) (set 45)" ) // P1-- ----
+EC_BARX_SET( 199?, ec_barx__ai,	ec_barx,	"issa826",		0x0000, 0x008000, CRC(809f651f) SHA1(86c2f813dba787b2774b49ed272f825725ec3712), "Electrocoin","Bar X (Electrocoin) (set 46)" ) // P1-- ----
+EC_BARX_SET( 199?, ec_barx__aj,	ec_barx,	"issa827",		0x0000, 0x008000, CRC(90714254) SHA1(b9610d220ecfedf26c3c4942f0dbb569841cdf56), "Electrocoin","Bar X (Electrocoin) (set 47)" ) // P1-S K---
+EC_BARX_SET( 199?, ec_barx__ak,	ec_barx,	"issa828",		0x0000, 0x008000, CRC(f8695abf) SHA1(2837d6a6b69dd27070cbf1309b51f02b0df98a94), "Electrocoin","Bar X (Electrocoin) (set 48)" ) // P1-S K---
+EC_BARX_SET( 199?, ec_barx__al,	ec_barx,	"issa829",		0x0000, 0x008000, CRC(cab2e171) SHA1(e6f9e91350dd41ec3c12fc221a59529277f47b2b), "Electrocoin","Bar X (Electrocoin) (set 49)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__am,	ec_barx,	"issa830",		0x0000, 0x008000, CRC(9c0984cf) SHA1(bc80f0e31c726bd03aaeaa3cd9b0f99a8fecf79b), "Electrocoin","Bar X (Electrocoin) (set 50)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__an,	ec_barx,	"issa831",		0x0000, 0x008000, CRC(4baceee5) SHA1(23f5acba763d7ba49f017c0cf1a4a11f21febe63), "Electrocoin","Bar X (Electrocoin) (set 51)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__ao,	ec_barx,	"issa832",		0x0000, 0x008000, CRC(2148f157) SHA1(6b948797b5032e4b4968af55f71e03bbf78f7434), "Electrocoin","Bar X (Electrocoin) (set 52)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__ap,	ec_barx,	"issa833",		0x0000, 0x008000, CRC(50d050f3) SHA1(59ad7193aef694be6b8905a233828f292ebd5d5b), "Electrocoin","Bar X (Electrocoin) (set 53)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__aq,	ec_barx,	"issa834",		0x0000, 0x008000, CRC(819c1c27) SHA1(863830eed8dc3e7e92321c163d26ae3a9b97a649), "Electrocoin","Bar X (Electrocoin) (set 54)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__ar,	ec_barx,	"issa835",		0x0000, 0x008000, CRC(a8674b53) SHA1(5808991783779a9aca730d8a1fde70552f2c9bf5), "Electrocoin","Bar X (Electrocoin) (set 55)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__as,	ec_barx,	"issa836",		0x0000, 0x008000, CRC(47df4193) SHA1(3a4e05e1fcc0cf6471fa40751e8f80548ebc09cc), "Electrocoin","Bar X (Electrocoin) (set 56)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__at,	ec_barx,	"issa837",		0x0000, 0x008000, CRC(cce0c4a9) SHA1(a7e30dd7de82bf36e8b442eded6b07a9df24c7a6), "Electrocoin","Bar X (Electrocoin) (set 57)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__au,	ec_barx,	"issa838",		0x0000, 0x008000, CRC(a9fdedb4) SHA1(8d987939a7779e896e4af560b2a39ca9b1fb3ac7), "Electrocoin","Bar X (Electrocoin) (set 58)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__av,	ec_barx,	"issa839",		0x0000, 0x008000, CRC(d58f6e4f) SHA1(cb91aa8db2b4730b25e7e5da7d03d9637fbec59c), "Electrocoin","Bar X (Electrocoin) (set 59)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__aw,	ec_barx,	"issa840",		0x0000, 0x008000, CRC(1025caf3) SHA1(859081242091976c222729199eb3fec6f6c45621), "Electrocoin","Bar X (Electrocoin) (set 60)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__ax,	ec_barx,	"issa841",		0x0000, 0x008000, CRC(b1685ed8) SHA1(42995a5219ec697b5e760c25b9bddace41ebded8), "Electrocoin","Bar X (Electrocoin) (set 61)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__ay,	ec_barx,	"issa842",		0x0000, 0x008000, CRC(20dca8c1) SHA1(46b76df179fc306cfd0054f723fc9763f3b46a84), "Electrocoin","Bar X (Electrocoin) (set 62)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__az,	ec_barx,	"issa843",		0x0000, 0x008000, CRC(15b6f976) SHA1(fef5db76d61fda4e62e50fd891e4981cc0323a22), "Electrocoin","Bar X (Electrocoin) (set 63)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__a0,	ec_barx,	"issa844",		0x0000, 0x008000, CRC(6e07e53b) SHA1(b2bd1613fbaf0e0f3b009347c30073f2fec91784), "Electrocoin","Bar X (Electrocoin) (set 64)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__a1,	ec_barx,	"issa845",		0x0000, 0x008000, CRC(422f6ccb) SHA1(fe5eaaa98c30a6d4ec72d5f9e276afe7359a1db7), "Electrocoin","Bar X (Electrocoin) (set 65)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__a2,	ec_barx,	"issa846",		0x0000, 0x008000, CRC(c8938b90) SHA1(819ac3de9a0ca19469f60d26e363c292faa10abf), "Electrocoin","Bar X (Electrocoin) (set 66)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__a3,	ec_barx,	"issa847",		0x0000, 0x008000, CRC(dc56de4b) SHA1(a4cce8bba89ae1d803b7fe050dc2e9bde1383f7c), "Electrocoin","Bar X (Electrocoin) (set 67)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__a4,	ec_barx,	"issa848",		0x0000, 0x008000, CRC(8410fe03) SHA1(6ee50e699b67ac73cb38ab8aa9d3f6efb6865918), "Electrocoin","Bar X (Electrocoin) (set 68)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__a5,	ec_barx,	"issa849",		0x0000, 0x008000, CRC(3cf53845) SHA1(e6e9dc3a8757e95647db2f64912ea5ad88cfcd60), "Electrocoin","Bar X (Electrocoin) (set 69)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__a6,	ec_barx,	"issa850",		0x0000, 0x008000, CRC(ed830402) SHA1(8fa389e9f04c446864784736c4bc08006cb37304), "Electrocoin","Bar X (Electrocoin) (set 70)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__a7,	ec_barx,	"issa851",		0x0000, 0x008000, CRC(cf79dc09) SHA1(7f4bf280431a800ae742507cb944c2c01bc54d15), "Electrocoin","Bar X (Electrocoin) (set 71)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__a8,	ec_barx,	"issa852",		0x0000, 0x008000, CRC(3b4a2615) SHA1(b466e15d2dfce81f2a89ab9a5b41b32158f109f1), "Electrocoin","Bar X (Electrocoin) (set 72)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__a9,	ec_barx,	"issa853",		0x0000, 0x008000, CRC(5d0c39c2) SHA1(debe88d7f8d35ba621388d5a21a6e5358faafa06), "Electrocoin","Bar X (Electrocoin) (set 73)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__ba,	ec_barx,	"issa854",		0x0000, 0x008000, CRC(ce227e95) SHA1(83cee7b83e66cea40a5b7f6025e010f45309c64b), "Electrocoin","Bar X (Electrocoin) (set 74)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__bb,	ec_barx,	"issa855",		0x0000, 0x008000, CRC(0dd7873b) SHA1(bc64924cbfc16289c6e7365c0b3276d9a940a917), "Electrocoin","Bar X (Electrocoin) (set 75)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__bc,	ec_barx,	"issa856",		0x0000, 0x008000, CRC(0477e51f) SHA1(53c7a5fab006b8545f1aeed562920a099cbdb73e), "Electrocoin","Bar X (Electrocoin) (set 76)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__bd,	ec_barx,	"issa857",		0x0000, 0x008000, CRC(a1d646ef) SHA1(4cdb39d4623d514b0cec673aa5523f128797b152), "Electrocoin","Bar X (Electrocoin) (set 77)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__be,	ec_barx,	"issa858",		0x0000, 0x008000, CRC(228533f5) SHA1(e89d5078e319d48b7d313b4f54c1d18d0b29598b), "Electrocoin","Bar X (Electrocoin) (set 78)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__bf,	ec_barx,	"issa859",		0x0000, 0x008000, CRC(f782eab9) SHA1(791a07d3cb2c77c9a22eb4d9cbf949049bab9bf7), "Electrocoin","Bar X (Electrocoin) (set 79)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__bg,	ec_barx,	"issa860",		0x0000, 0x008000, CRC(6d4ff59a) SHA1(fc404e037bd63adc8de4b6cc857958007406dc8c), "Electrocoin","Bar X (Electrocoin) (set 80)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__bh,	ec_barx,	"issa861",		0x0000, 0x008000, CRC(1b8fd981) SHA1(70221f793c092534bc8c0825aa759aa548d01c98), "Electrocoin","Bar X (Electrocoin) (set 81)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__bi,	ec_barx,	"issa862",		0x0000, 0x008000, CRC(ceface32) SHA1(4a869b83ffd5c59a7cc64b1ee088fc788f57ff0f), "Electrocoin","Bar X (Electrocoin) (set 82)" ) // --2S K---
+EC_BARX_SET( 199?, ec_barx__bj,	ec_barx,	"issa863",		0x0000, 0x008000, CRC(1a7fa7d2) SHA1(06855a05102ff757a397b2c438b8c60cb66477c8), "Electrocoin","Bar X (Electrocoin) (set 83)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__bk,	ec_barx,	"issa864",		0x0000, 0x008000, CRC(08869eee) SHA1(6df205a743d64799635075170eb752ece35ff9af), "Electrocoin","Bar X (Electrocoin) (set 84)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__bl,	ec_barx,	"issa865",		0x0000, 0x008000, CRC(5b487e21) SHA1(aa9dbc1491e0a82f7634ddf73f9df3cffc85a1d9), "Electrocoin","Bar X (Electrocoin) (set 85)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__bm,	ec_barx,	"issa866",		0x0000, 0x008000, CRC(d23d2999) SHA1(7616d5ab8d9b371a625b9fb667b6807333f89c6e), "Electrocoin","Bar X (Electrocoin) (set 86)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__bn,	ec_barx,	"issa867",		0x0000, 0x008000, CRC(1e8b47ff) SHA1(2328e0b39ad1d0bc40e2f403d59cf4c5793dd1fa), "Electrocoin","Bar X (Electrocoin) (set 87)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__bo,	ec_barx,	"issa868",		0x0000, 0x008000, CRC(e2616b21) SHA1(32b0dcadd5a1fbde41426fdf03a1a7515384c685), "Electrocoin","Bar X (Electrocoin) (set 88)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__bp,	ec_barx,	"issa869",		0x0000, 0x008000, CRC(1bce989f) SHA1(704f165ca34e4df3e0699ebc7867294df860edb3), "Electrocoin","Bar X (Electrocoin) (set 89)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__bq,	ec_barx,	"issa870",		0x0000, 0x008000, CRC(592f94f7) SHA1(f845c5324a1c49e1ca4dc0538b422de30f669d95), "Electrocoin","Bar X (Electrocoin) (set 90)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__br,	ec_barx,	"issa871",		0x0000, 0x008000, CRC(aed724b8) SHA1(9ccb4c1a10e86610ac6c241df31a0d2513985127), "Electrocoin","Bar X (Electrocoin) (set 91)" ) // P1-S K--G
+EC_BARX_SET( 199?, ec_barx__bs,	ec_barx,	"issa872",		0x0000, 0x008000, CRC(957536b1) SHA1(4ca031ba9b3bd5e178abe7951498f8202fa4cd48), "Electrocoin","Bar X (Electrocoin) (set 92)" ) // P1-- ---G
+EC_BARX_SET( 199?, ec_barx__bt,	ec_barx,	"issa873",		0x0000, 0x008000, CRC(171cdb19) SHA1(f0f7cb81b220d757c5dadbe9e2cc0dbc6aa02962), "Electrocoin","Bar X (Electrocoin) (set 93)" ) // P-2S K--G
+EC_BARX_SET( 199?, ec_barx__bu,	ec_barx,	"issa874",		0x0000, 0x008000, CRC(704f999c) SHA1(259430d175c22a33f222ab1138159b8fc838c98f), "Electrocoin","Bar X (Electrocoin) (set 94)" ) // P1-S K--G
+/* Unique ROM containing 1993 Electrocoin Copyright - for a z180 instead? */
+EC_BARX_SET( 199?, ec_barx__bv,	ec_barx,	"bxc1&6c.rom",	0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3), "Electrocoin","Bar X (Electrocoin) (set 95)" )
 
-	/* 32Kb With Header / Space for Header */
 
-	// Some Roms below use a header at the start, containing 8x8 Byte strings to describe what type of set it is
-	// address | string    description                                        | legend for comments
-	// 20 - 27 | Protoco | Protocol? (Data recording etc.)                    | P--- ----
-	// 28 - 2f | NoteAc1 | Note Acceptor Type 1? (just NoteAcc on some sets)  | -1-- ----  (or -N-- ----)
-	// 30 - 37 | NoteAc2 | Note Acceptor Type 2?                              | --2- ----
-	// 38 - 3f | SecMete | Secondary Meters?                                  | ---S ----
-	// 40 - 47 | Keys    | Uses JP Keys?                                      | ---- K---
-	// 48 - 4f | 10pHopp | Different Hopper Type?                             | ---- -H--
-	// 50 - 57 | ?????   | not seen used                                      | ---- --?-
-	// 58 - 5f | GALA    | ? (in some of the earlier sets this is a 0 fill)   | ---- ---G  (or ---- ---0)
 
-	// No Header info, or title info (although there is space for one)
-	ROM_LOAD( "barx5ft", 0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1) )
-	ROM_LOAD( "bx503cas", 0x0000, 0x008000, CRC(ac974ac2) SHA1(d317730506c075b108c68b3fc5628837b12863fe) )
+#define EC_BIG7_OTHERS \
+	ROM_REGION( 0x200000, "sndz80", 0 ) \
+	ROM_LOAD( "big7snd", 0x0000, 0x002000, CRC(b530d91f) SHA1(f4e70e05d11e92a82f4bf8d78859b2a94fa5f22b) ) \
 
-	//ROM_LOAD( "iss354.rom", 0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483) ) // loaded as maincpu
-	ROM_LOAD( "iss9007.rom", 0x0000, 0x008000, CRC(c73b7c4e) SHA1(2d1fecb8efd4b80d1249034efc5ea9c1d3cb660b) )
-	ROM_LOAD( "iss9011.rom", 0x0000, 0x008000, CRC(7b69ff3c) SHA1(f13e71fa2ae997fd2c80ca060cdbe2115468df6b) )
-	ROM_LOAD( "iss9015.rom", 0x0000, 0x008000, CRC(fd2fabe8) SHA1(2a0261c39187746a53ff7c32a759ba1311ec56a9) )
-	ROM_LOAD( "iss9201.rom", 0x0000, 0x008000, CRC(35cf9280) SHA1(d271a89178b026c2847b8f192c72f8ce841a1548) )
-	ROM_LOAD( "iss9204.rom", 0x0000, 0x008000, CRC(e8ced9c9) SHA1(a028c2bf35add11c2ff3b98cf34925acb99ef1c4) )
+#define EC_BIG7_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_BIG7_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
-	// Sets below all marked '2001 BARX' (older header type?)
-	ROM_LOAD( "issa091", 0x0000, 0x008000, CRC(6748c76c) SHA1(115b6f30971fbbbd67ece3eeba66431c7440267e) ) // ---- ---0
-	ROM_LOAD( "issa092", 0x0000, 0x008000, CRC(82c4e44d) SHA1(a253779c3666eb1c3b4a45f22478b2310a23540a) ) // -N-- ---0
-	ROM_LOAD( "issa096", 0x0000, 0x008000, CRC(8536c23d) SHA1(3acca3016dd5a8a183f646095856fffca9d0fd9c) ) // P--- ---0
-	ROM_LOAD( "issa097", 0x0000, 0x008000, CRC(0650275f) SHA1(eb06a7b245103aeb53973897128063b04e599fde) ) // PN-- ---0
+// This is almost certainly a mix of 'Big7' and 'Super Big7' ROMs
+/* All have 'BIG7' and type info in header */
+EC_BIG7_SET( 199?, ec_big7,		0,			"big7.bin",					0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 1)" )
+EC_BIG7_SET( 199?, ec_big7__a,	ec_big7,	"iss3025.rom",				0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 2)" )
+EC_BIG7_SET( 199?, ec_big7__b,	ec_big7,	"iss3027.rom",				0x0000, 0x008000, CRC(7dc5ccbe) SHA1(2e904f6dced08ed38c4e5c0adfa6904b80a0a0fa), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 3)" )
+EC_BIG7_SET( 199?, ec_big7__c,	ec_big7,	"iss3033.rom",				0x0000, 0x008000, CRC(52e6c6b7) SHA1(9ff5c6cca014735f8cffffb56a85657b0941e9f8), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 4)" )
+EC_BIG7_SET( 199?, ec_big7__d,	ec_big7,	"iss3034.rom",				0x0000, 0x008000, CRC(7f27bf12) SHA1(1fb7ca712cb801f67da6a9b50eddc3992972534e), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 5)" )
+EC_BIG7_SET( 199?, ec_big7__e,	ec_big7,	"iss3035.rom",				0x0000, 0x008000, CRC(8612b896) SHA1(31fb781a4dd2f82e77dc87d37be378974983ade4), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 6)" )
+EC_BIG7_SET( 199?, ec_big7__f,	ec_big7,	"iss3049.rom",				0x0000, 0x008000, CRC(b820d03e) SHA1(80e0208a31468ace7d75ce10f88c2267c0eb92b4), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 7)" )
+EC_BIG7_SET( 199?, ec_big7__g,	ec_big7,	"iss3050.rom",				0x0000, 0x008000, CRC(cff49d4c) SHA1(3a6c58f942cbd716218468a8061d1f3f7be6ea13), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 8)" )
+EC_BIG7_SET( 199?, ec_big7__h,	ec_big7,	"iss3051.rom",				0x0000, 0x008000, CRC(3b5b37d1) SHA1(56070c1f7d00b7b3984590d4824da88850ff6a9f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 9)" )
+EC_BIG7_SET( 199?, ec_big7__i,	ec_big7,	"iss3052.rom",				0x0000, 0x008000, CRC(4f3512bb) SHA1(f9b3dd180143fc40f7b737aed23b78920ac5d267), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 10)" )
+EC_BIG7_SET( 199?, ec_big7__j,	ec_big7,	"iss3053.rom",				0x0000, 0x008000, CRC(99ba426a) SHA1(b0545b3ae649d89a14da61e56ac3899896a37e82), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 11)" )
+EC_BIG7_SET( 199?, ec_big7__k,	ec_big7,	"iss3054.rom",				0x0000, 0x008000, CRC(9598d331) SHA1(194339222b97ff8d97aa1d49e5fecc666a67ea49), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 12)" )
+EC_BIG7_SET( 199?, ec_big7__l,	ec_big7,	"iss3055.rom",				0x0000, 0x008000, CRC(3c4eb15c) SHA1(3bb7bdf206fc0fc4310df86733b459e1558aea4f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 13)" )
+EC_BIG7_SET( 199?, ec_big7__m,	ec_big7,	"iss3056.rom",				0x0000, 0x008000, CRC(202a820e) SHA1(a9b2c9f7995b4e1b0d4e8009a026174f0352d15f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 14)" )
+EC_BIG7_SET( 199?, ec_big7__n,	ec_big7,	"iss3057.rom",				0x0000, 0x008000, CRC(db7b5c05) SHA1(c4ef81636766154a7b65be42d7689d32a0a922e7), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 15)" )
+EC_BIG7_SET( 199?, ec_big7__o,	ec_big7,	"iss3058.rom",				0x0000, 0x008000, CRC(a772f630) SHA1(8e60a08bfe884ef51893c51f11e9a4d2024f6e2f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 16)" )
+EC_BIG7_SET( 199?, ec_big7__p,	ec_big7,	"iss3059.rom",				0x0000, 0x008000, CRC(3b217d60) SHA1(7b39df64ce1cff64e737fe9c78e6de3cb3546336), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 17)" )
+EC_BIG7_SET( 199?, ec_big7__q,	ec_big7,	"iss3060.rom",				0x0000, 0x008000, CRC(29a1f750) SHA1(33a0de2f240228842c93e39939c28a5d6bba669e), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 18)" )
+EC_BIG7_SET( 199?, ec_big7__r,	ec_big7,	"iss3061.rom",				0x0000, 0x008000, CRC(f1a7da0b) SHA1(0ffed598ba8a5dfb83c8b05a80f3499cb00686ec), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 19)" )
+EC_BIG7_SET( 199?, ec_big7__s,	ec_big7,	"iss3062.rom",				0x0000, 0x008000, CRC(bff8c7e7) SHA1(db23240eafea82e540a410b135f32c64260fba2e), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 20)" )
+EC_BIG7_SET( 199?, ec_big7__t,	ec_big7,	"iss3063.rom",				0x0000, 0x008000, CRC(c3471a8c) SHA1(edde9a96ec380f95ad2fc473f78fc5d34fd1769d), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 21)" )
+EC_BIG7_SET( 199?, ec_big7__u,	ec_big7,	"iss3064.rom",				0x0000, 0x008000, CRC(a635c5bc) SHA1(476e1fffbddefa230b96b0e1d3bb50f9ef08b24a), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 22)" )
+EC_BIG7_SET( 199?, ec_big7__v,	ec_big7,	"iss3065.rom",				0x0000, 0x008000, CRC(bd2315f8) SHA1(365f87e6ef68f330d47e7d614f02b3775758ac4c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 23)" )
+EC_BIG7_SET( 199?, ec_big7__w,	ec_big7,	"iss3066.rom",				0x0000, 0x008000, CRC(ccfb82e0) SHA1(08095517eb0bd8931286567171c307603b0cdeff), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 24)" )
+EC_BIG7_SET( 199?, ec_big7__x,	ec_big7,	"iss3067.rom",				0x0000, 0x008000, CRC(4543588f) SHA1(dd888f113fb2a326565e73514d682db43ad545b7), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 25)" )
+EC_BIG7_SET( 199?, ec_big7__y,	ec_big7,	"iss3068.rom",				0x0000, 0x008000, CRC(2329e40e) SHA1(c5072f40b334eedb3a62a234b2f49498165b30d2), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 26)" )
+EC_BIG7_SET( 199?, ec_big7__z,	ec_big7,	"iss3220.rom",				0x0000, 0x008000, CRC(005a926b) SHA1(8fcbf14e44a61f3db96c500c8f9912ab1dbe9c39), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 27)" )
+EC_BIG7_SET( 199?, ec_big7__0,	ec_big7,	"iss3221.rom",				0x0000, 0x008000, CRC(ed6d729b) SHA1(c897a9d58731cd82fdf8d4ee492ea5fe5542f3e8), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 28)" )
+EC_BIG7_SET( 199?, ec_big7__1,	ec_big7,	"iss3222.rom",				0x0000, 0x008000, CRC(d5f340d6) SHA1(0b9aba173cdec3c9a54038e042902420c78ae1b2), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 29)" )
+EC_BIG7_SET( 199?, ec_big7__2,	ec_big7,	"iss3223.rom",				0x0000, 0x008000, CRC(b5c9465d) SHA1(c51270c597bd6264e6440cdad726d032e8df45e6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 30)" )
+EC_BIG7_SET( 199?, ec_big7__3,	ec_big7,	"iss3224.rom",				0x0000, 0x008000, CRC(6f776b1f) SHA1(027689cf24bbf2386d9710c7e13329988168c253), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 31)" )
+EC_BIG7_SET( 199?, ec_big7__4,	ec_big7,	"iss3225.rom",				0x0000, 0x008000, CRC(3fb0b783) SHA1(b65deadcb5fc1b50064d7f6cfc8fe141051074fb), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 32)" )
+EC_BIG7_SET( 199?, ec_big7__5,	ec_big7,	"iss3226.rom",				0x0000, 0x008000, CRC(c9ee61ff) SHA1(bd5fb65ed2f1e3a23325aee98b420f6c263bf0c1), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 33)" )
+EC_BIG7_SET( 199?, ec_big7__6,	ec_big7,	"iss3227.rom",				0x0000, 0x008000, CRC(a4065969) SHA1(1aa88869ed17844b993bf3138e616b60198e6603), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 34)" )
+EC_BIG7_SET( 199?, ec_big7__7,	ec_big7,	"iss3228.rom",				0x0000, 0x008000, CRC(1893a5dc) SHA1(6e5069ddf3356742f7edf8ac04cd9d0897ac436c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 35)" )
+EC_BIG7_SET( 199?, ec_big7__8,	ec_big7,	"iss3229.rom",				0x0000, 0x008000, CRC(b9368f58) SHA1(614cd2940e2429923945e42411ff59b52d4fff9c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 36)" )
+EC_BIG7_SET( 199?, ec_big7__9,	ec_big7,	"iss3230.rom",				0x0000, 0x008000, CRC(9bf662c8) SHA1(7909d1e4775d9efad299cbce7b86dda2d3a21bed), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 37)" )
+EC_BIG7_SET( 199?, ec_big7__aa,	ec_big7,	"iss3231.rom",				0x0000, 0x008000, CRC(4862536a) SHA1(d5d80467c798dd3361c8ac367a1b2734741cc8f8), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 38)" )
+EC_BIG7_SET( 199?, ec_big7__ab,	ec_big7,	"iss3232.rom",				0x0000, 0x008000, CRC(7c5b1a26) SHA1(292ababf9be8303724b0cff12004202ac8cee674), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 39)" )
+EC_BIG7_SET( 199?, ec_big7__ac,	ec_big7,	"iss3233.rom",				0x0000, 0x008000, CRC(b753592b) SHA1(e0414808276c76e609ac4fb006b08952528603d3), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 40)" )
+EC_BIG7_SET( 199?, ec_big7__ad,	ec_big7,	"iss3234.rom",				0x0000, 0x008000, CRC(6e96db38) SHA1(ae569a37c866183a08706d0b50254822382cd156), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 41)" )
+EC_BIG7_SET( 199?, ec_big7__ae,	ec_big7,	"iss3235.rom",				0x0000, 0x008000, CRC(672f3f29) SHA1(7497cf5fa3cd9e5652dbbd4c691b8bdc0943a9e5), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 42)" )
+EC_BIG7_SET( 199?, ec_big7__af,	ec_big7,	"iss3236.rom",				0x0000, 0x008000, CRC(3eb8a0b4) SHA1(f41c76fac44bfd9c9275e2cf45e8bd16d72b800b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 43)" )
+EC_BIG7_SET( 199?, ec_big7__ag,	ec_big7,	"iss3237.rom",				0x0000, 0x008000, CRC(db876c46) SHA1(f986407029e1c35651daea1fde87f8a3bb1b1965), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 44)" )
+EC_BIG7_SET( 199?, ec_big7__ah,	ec_big7,	"iss3238.rom",				0x0000, 0x008000, CRC(c7d1d398) SHA1(3b37b9596bc3771a6f1a698bee4dce8d642d982f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 45)" )
+EC_BIG7_SET( 199?, ec_big7__ai,	ec_big7,	"iss3239.rom",				0x0000, 0x008000, CRC(f62450a6) SHA1(d2c88483cb0d3a83a2974550e8e8e71642bb28ce), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 46)" )
+EC_BIG7_SET( 199?, ec_big7__aj,	ec_big7,	"iss3240.rom",				0x0000, 0x008000, CRC(e8e56ca4) SHA1(d16390b600f9966b779638e3bc2e7f9a72e8d1be), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 47)" ) // 'Super Big 7' ?
+/* No indication, header space */
+EC_BIG7_SET( 199?, ec_big7__au,	ec_big7,	"big76c.bin",				0x0000, 0x008000, CRC(12048afc) SHA1(a9da4d65efd794ebdb3daad0615a5c6a81135763), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 58)" )
+EC_BIG7_SET( 199?, ec_big7__av,	ec_big7,	"big7_issue382_8tkn.bin",	0x0000, 0x008000, CRC(706d87dd) SHA1(9c066ca8d5119d15bd09c07110fc66c1fe890a0c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 59)" )
+EC_BIG7_SET( 199?, ec_big7__az,	ec_big7,	"iss179.rom",				0x0000, 0x008000, CRC(ef34fa31) SHA1(4cd19c50449af95d8448266b8fca6ff94437c22d), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 63)" )
+EC_BIG7_SET( 199?, ec_big7__a0,	ec_big7,	"iss2017.rom",				0x0000, 0x008000, CRC(165dc63c) SHA1(f820bc99755f38a911357e705075d24d3aac43b7), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 64)" )
+EC_BIG7_SET( 199?, ec_big7__a1,	ec_big7,	"iss2019.rom",				0x0000, 0x008000, CRC(475b224a) SHA1(c837aa0c73cf5947b6b4d106d4f0967da040e5dc), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 65)" )
+EC_BIG7_SET( 199?, ec_big7__a2,	ec_big7,	"iss513.rom",				0x0000, 0x008000, CRC(ca302c47) SHA1(9fb9cdd140baa0ec36250b4ebd0a25450348075f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 66)" )
+// No Header - Taken from a Super Big 7 Set
+EC_BIG7_SET( 199?, ec_big7__ak,	ec_big7,	"iss197.rom",				0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 48)" ) // 'Super Big 7' ?
+EC_BIG7_SET( 199?, ec_big7__al,	ec_big7,	"sb7.58",					0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 49)" )  // 'Super Big 7' ?
+/* sets below have different behavior, maybe 3rd party? */
+// Different Code structure, no space for header - checking some kind of device at 0xa000 */
+EC_BIG7_SET( 199?, ec_big7__am,	ec_big7,	"sb710d",					0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 50)" )  // 'Super Big 7' ?
+EC_BIG7_SET( 199?, ec_big7__an,	ec_big7,	"b710",						0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 51)" )
+EC_BIG7_SET( 199?, ec_big7__as,	ec_big7,	"big78t",					0x0000, 0x008000, CRC(310ffd92) SHA1(1cfc3801bb04d4e3d4c2d6e271c3ac71c49d466b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 56)" )
+EC_BIG7_SET( 199?, ec_big7__at,	ec_big7,	"genbig.bin",				0x0000, 0x008000, CRC(025b129f) SHA1(07d53f8780fca7b90243c01f5892f3c0622ca387), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 57)" )
+/* device at a100? */
+EC_BIG7_SET( 199?, ec_big7__ar,	ec_big7,	"big 7 8 1-0.bin",			0x0000, 0x008000, CRC(164fd1e6) SHA1(25be8962f8b7a6a78345dd60319a391c583b6b2f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 55)" )
+/* No indication, no space for header */
+EC_BIG7_SET( 199?, ec_big7__ao,	ec_big7,	"b75p4",					0x0000, 0x008000, CRC(27ad1971) SHA1(4c1248d5815143dc0b23ada909c4f1fc16a1a18b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 52)" )
+EC_BIG7_SET( 199?, ec_big7__ap,	ec_big7,	"b78ac",					0x0000, 0x008000, CRC(454e9ac5) SHA1(a700a399632fa546473503f8e7e8dc3abc966ee6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 53)" )
+EC_BIG7_SET( 199?, ec_big7__aq,	ec_big7,	"b7rb5",					0x0000, 0x008000, CRC(cc59283a) SHA1(63d53f6f5e9c16df77a430443aade18722d7bcd7), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 54)" )
+/* device at a000? */
+EC_BIG7_SET( 199?, ec_big7__aw,	ec_big7,	"bigcon10.hex",				0x0000, 0x008000, CRC(b1176841) SHA1(ef23a61355ff194b1dd2c54bc94b175272a8058d), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 60)" )
+EC_BIG7_SET( 199?, ec_big7__ax,	ec_big7,	"bigcon8c.hex",				0x0000, 0x008000, CRC(5b586abc) SHA1(8cabb266db4e0453e081ce6ff3ee0c850b66bede), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 61)" )
+EC_BIG7_SET( 199?, ec_big7__ay,	ec_big7,	"bigcon8t.hex",				0x0000, 0x008000, CRC(809e2ec5) SHA1(15a1da75f24c167089051645362c9f53be54e16e), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 62)" )
 
-	// 2001 BARX (newer header type?)
-	// Are these actually 'Super Bar X'? They have SBARX strings in them near build dates etc.
-	ROM_LOAD( "issa793", 0x0000, 0x008000, CRC(e3de7b43) SHA1(5d33d39f59e30510ac89d9a03979f17a4a3707eb) ) // ---- ----
-	ROM_LOAD( "issa794", 0x0000, 0x008000, CRC(47334130) SHA1(08204545d20fa017321183126a856446b08e09b9) ) // -1-- ----
-	ROM_LOAD( "issa795", 0x0000, 0x008000, CRC(d24936fd) SHA1(f0efa2d30c71285d31ae2c47ce2baef3bb72bc66) ) // --2S K---
-	ROM_LOAD( "issa796", 0x0000, 0x008000, CRC(0d5c020d) SHA1(f41e015773c908228f55f1ce3e35b22ad4b6bf33) ) // -1-S K---
-	ROM_LOAD( "issa797", 0x0000, 0x008000, CRC(57cf216a) SHA1(070297c07404f92928581d73751e82158e9567d7) ) // ---S K---
 
-	ROM_LOAD( "issa798", 0x0000, 0x008000, CRC(c15f25e2) SHA1(b7a32876a7f8512451d911f0611cbdc8a083a79e) ) // -1-- ----
-	ROM_LOAD( "issa799", 0x0000, 0x008000, CRC(9682ca8c) SHA1(a6846bff4aaa9ccf997f7049300b62138a405e20) ) // --2S K---
-	ROM_LOAD( "issa800", 0x0000, 0x008000, CRC(55ab4892) SHA1(7b71d6c70f6f2083b2cce93198a74034502f61fa) ) // -1-S K---
-	ROM_LOAD( "issa801", 0x0000, 0x008000, CRC(4823d2ec) SHA1(df9cbea4c96411fb5d7707627ea2fc3aca0681cf) ) // ---- -H--
-	ROM_LOAD( "issa802", 0x0000, 0x008000, CRC(5408417a) SHA1(1a45271ae593bb071a4fa0053cae8b10bd1ba49a) ) // ---S KH--
-	ROM_LOAD( "issa803", 0x0000, 0x008000, CRC(748981a0) SHA1(bbad9f0ea44883e458710b15e2652b0e76dc873d) ) // P--- ----
+#define EC_SBARX_OTHERS \
+	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
+	/* probably the same sound rom */  \
 
-	ROM_LOAD( "issa804", 0x0000, 0x008000, CRC(a6730955) SHA1(7ebf9967b9e40ca89da8951a1711d592ef87160d) ) // P1-- ----
-	ROM_LOAD( "issa805", 0x0000, 0x008000, CRC(8c1cf7f4) SHA1(0ff139c38d68a66b40c8ac611bf05cb3a9d852fa) ) // P-2S K---
-	ROM_LOAD( "issa806", 0x0000, 0x008000, CRC(a1aee26b) SHA1(966e595029b5518ddee422afae6d633da0e8e4e4) ) // P1-S K---
-	ROM_LOAD( "issa807", 0x0000, 0x008000, CRC(b9332da4) SHA1(622a94a1c5226cf42263b0642e695e1af71c611c) ) // P--S K---
+#define EC_SBARX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_SBARX_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
-	ROM_LOAD( "issa808", 0x0000, 0x008000, CRC(3b8fda84) SHA1(74cfaef125900d89b8c936a7cb3668fd7642fbfe) ) // P1-- ----
-	ROM_LOAD( "issa809", 0x0000, 0x008000, CRC(58c10603) SHA1(653c0afb57feda9d4a02f6590aacb9cf63b931c9) ) // P-2S K---
-	ROM_LOAD( "issa810", 0x0000, 0x008000, CRC(aafff06c) SHA1(0ae798d965299b2b9f10d3707877ede722c0eb7a) ) // P1-S K---
 
-	ROM_LOAD( "issa811", 0x0000, 0x008000, CRC(ac2ceda1) SHA1(3299f07db8670bffbcfbbdfc1fd44179f5a5ccf6) ) // P--- -H--
-	ROM_LOAD( "issa812", 0x0000, 0x008000, CRC(8a1e9002) SHA1(3c82e3761007feaa61a2c029951c6e3336224a1c) ) // P--S KH--
-
-	ROM_LOAD( "issa813", 0x0000, 0x008000, CRC(0ea31930) SHA1(16d38501dba2079e4d573beca5f1216820bac1bc) ) // --2- ----
-	ROM_LOAD( "issa814", 0x0000, 0x008000, CRC(50e4f6ff) SHA1(84758c19e36b03af2f6f2645ebb685795d667f9f) ) // --2- ----
-	ROM_LOAD( "issa815", 0x0000, 0x008000, CRC(a3b72d9e) SHA1(f08fe4372392ff72301dafca972953e779a546c4) ) // --2S K---
-	ROM_LOAD( "issa816", 0x0000, 0x008000, CRC(7b79e1dd) SHA1(ec2fc0a60bd90addbd79a1620e97f290907dbd5c) ) // --2S K---
-	ROM_LOAD( "issa817", 0x0000, 0x008000, CRC(05006125) SHA1(6b71c68579f8ec9b3bb0ba208df69c2125ebb9e7) ) // P-2- ----
-	ROM_LOAD( "issa818", 0x0000, 0x008000, CRC(3aee13d9) SHA1(3645a83c6c9f40b5ed356ce45129fe860aba907d) ) // P-2- ----
-	ROM_LOAD( "issa819", 0x0000, 0x008000, CRC(76f10c3a) SHA1(bcdb9c82e9b14c2e351bf6caeb44173c2376e48e) ) // P-2S K---
-	ROM_LOAD( "issa820", 0x0000, 0x008000, CRC(9c04f02a) SHA1(c0bf63fe00679025a56d867b216f84ec4536d06c) ) // P-2S K---
-	ROM_LOAD( "issa821", 0x0000, 0x008000, CRC(cb72cc59) SHA1(c1c12a921a9b57a252ad00eaadbba35073b9b64d) ) // -1-- ----
-	ROM_LOAD( "issa822", 0x0000, 0x008000, CRC(97e04639) SHA1(fc769882bb9a96de0d1121c7ceae60960b654915) ) // -1-- ----
-	ROM_LOAD( "issa823", 0x0000, 0x008000, CRC(a306982b) SHA1(e0a442145728c563ed9020346db32e89a3dac985) ) // -1-S K---
-	ROM_LOAD( "issa824", 0x0000, 0x008000, CRC(14b24861) SHA1(f90850d0bb38ade91dcdd7aaa29c916341d3f65f) ) // -1-S K---
-	ROM_LOAD( "issa825", 0x0000, 0x008000, CRC(5543a633) SHA1(3cfcea2c123b90704e69e5ce9f06920022911802) ) // P1-- ----
-	ROM_LOAD( "issa826", 0x0000, 0x008000, CRC(809f651f) SHA1(86c2f813dba787b2774b49ed272f825725ec3712) ) // P1-- ----
-	ROM_LOAD( "issa827", 0x0000, 0x008000, CRC(90714254) SHA1(b9610d220ecfedf26c3c4942f0dbb569841cdf56) ) // P1-S K---
-	ROM_LOAD( "issa828", 0x0000, 0x008000, CRC(f8695abf) SHA1(2837d6a6b69dd27070cbf1309b51f02b0df98a94) ) // P1-S K---
-
-	ROM_LOAD( "issa829", 0x0000, 0x008000, CRC(cab2e171) SHA1(e6f9e91350dd41ec3c12fc221a59529277f47b2b) ) // P1-- ---G
-	ROM_LOAD( "issa830", 0x0000, 0x008000, CRC(9c0984cf) SHA1(bc80f0e31c726bd03aaeaa3cd9b0f99a8fecf79b) ) // P-2S K--G
-	ROM_LOAD( "issa831", 0x0000, 0x008000, CRC(4baceee5) SHA1(23f5acba763d7ba49f017c0cf1a4a11f21febe63) ) // P1-S K--G
-
-	ROM_LOAD( "issa832", 0x0000, 0x008000, CRC(2148f157) SHA1(6b948797b5032e4b4968af55f71e03bbf78f7434) ) // P1-- ---G
-	ROM_LOAD( "issa833", 0x0000, 0x008000, CRC(50d050f3) SHA1(59ad7193aef694be6b8905a233828f292ebd5d5b) ) // P-2S K--G
-	ROM_LOAD( "issa834", 0x0000, 0x008000, CRC(819c1c27) SHA1(863830eed8dc3e7e92321c163d26ae3a9b97a649) ) // P1-S K--G
-
-	ROM_LOAD( "issa835", 0x0000, 0x008000, CRC(a8674b53) SHA1(5808991783779a9aca730d8a1fde70552f2c9bf5) ) // P1-- ---G
-	ROM_LOAD( "issa836", 0x0000, 0x008000, CRC(47df4193) SHA1(3a4e05e1fcc0cf6471fa40751e8f80548ebc09cc) ) // P-2S K--G
-	ROM_LOAD( "issa837", 0x0000, 0x008000, CRC(cce0c4a9) SHA1(a7e30dd7de82bf36e8b442eded6b07a9df24c7a6) ) // P1-S K--G
-
-	ROM_LOAD( "issa838", 0x0000, 0x008000, CRC(a9fdedb4) SHA1(8d987939a7779e896e4af560b2a39ca9b1fb3ac7) ) // P1-- ---G
-	ROM_LOAD( "issa839", 0x0000, 0x008000, CRC(d58f6e4f) SHA1(cb91aa8db2b4730b25e7e5da7d03d9637fbec59c) ) // P-2S K--G
-	ROM_LOAD( "issa840", 0x0000, 0x008000, CRC(1025caf3) SHA1(859081242091976c222729199eb3fec6f6c45621) ) // P1-S K--G
-
-	ROM_LOAD( "issa841", 0x0000, 0x008000, CRC(b1685ed8) SHA1(42995a5219ec697b5e760c25b9bddace41ebded8) ) // P1-- ---G
-	ROM_LOAD( "issa842", 0x0000, 0x008000, CRC(20dca8c1) SHA1(46b76df179fc306cfd0054f723fc9763f3b46a84) ) // P-2S K--G
-	ROM_LOAD( "issa843", 0x0000, 0x008000, CRC(15b6f976) SHA1(fef5db76d61fda4e62e50fd891e4981cc0323a22) ) // P1-S K--G
-
-	ROM_LOAD( "issa844", 0x0000, 0x008000, CRC(6e07e53b) SHA1(b2bd1613fbaf0e0f3b009347c30073f2fec91784) ) // P1-- ---G
-	ROM_LOAD( "issa845", 0x0000, 0x008000, CRC(422f6ccb) SHA1(fe5eaaa98c30a6d4ec72d5f9e276afe7359a1db7) ) // P-2S K--G
-	ROM_LOAD( "issa846", 0x0000, 0x008000, CRC(c8938b90) SHA1(819ac3de9a0ca19469f60d26e363c292faa10abf) ) // P1-S K--G
-
-	ROM_LOAD( "issa847", 0x0000, 0x008000, CRC(dc56de4b) SHA1(a4cce8bba89ae1d803b7fe050dc2e9bde1383f7c) ) // P1-- ---G
-	ROM_LOAD( "issa848", 0x0000, 0x008000, CRC(8410fe03) SHA1(6ee50e699b67ac73cb38ab8aa9d3f6efb6865918) ) // P-2S K--G
-	ROM_LOAD( "issa849", 0x0000, 0x008000, CRC(3cf53845) SHA1(e6e9dc3a8757e95647db2f64912ea5ad88cfcd60) ) // P1-S K--G
-
-	ROM_LOAD( "issa850", 0x0000, 0x008000, CRC(ed830402) SHA1(8fa389e9f04c446864784736c4bc08006cb37304) ) // P1-- ---G
-	ROM_LOAD( "issa851", 0x0000, 0x008000, CRC(cf79dc09) SHA1(7f4bf280431a800ae742507cb944c2c01bc54d15) ) // P-2S K--G
-	ROM_LOAD( "issa852", 0x0000, 0x008000, CRC(3b4a2615) SHA1(b466e15d2dfce81f2a89ab9a5b41b32158f109f1) ) // P1-S K--G
-
-	ROM_LOAD( "issa853", 0x0000, 0x008000, CRC(5d0c39c2) SHA1(debe88d7f8d35ba621388d5a21a6e5358faafa06) ) // P1-- ---G
-	ROM_LOAD( "issa854", 0x0000, 0x008000, CRC(ce227e95) SHA1(83cee7b83e66cea40a5b7f6025e010f45309c64b) ) // P-2S K--G
-	ROM_LOAD( "issa855", 0x0000, 0x008000, CRC(0dd7873b) SHA1(bc64924cbfc16289c6e7365c0b3276d9a940a917) ) // P1-S K--G
-
-	ROM_LOAD( "issa856", 0x0000, 0x008000, CRC(0477e51f) SHA1(53c7a5fab006b8545f1aeed562920a099cbdb73e) ) // P1-- ---G
-	ROM_LOAD( "issa857", 0x0000, 0x008000, CRC(a1d646ef) SHA1(4cdb39d4623d514b0cec673aa5523f128797b152) ) // P-2S K--G
-	ROM_LOAD( "issa858", 0x0000, 0x008000, CRC(228533f5) SHA1(e89d5078e319d48b7d313b4f54c1d18d0b29598b) ) // P1-S K--G
-
-	ROM_LOAD( "issa859", 0x0000, 0x008000, CRC(f782eab9) SHA1(791a07d3cb2c77c9a22eb4d9cbf949049bab9bf7) ) // --2S K---
-	ROM_LOAD( "issa860", 0x0000, 0x008000, CRC(6d4ff59a) SHA1(fc404e037bd63adc8de4b6cc857958007406dc8c) ) // --2S K---
-	ROM_LOAD( "issa861", 0x0000, 0x008000, CRC(1b8fd981) SHA1(70221f793c092534bc8c0825aa759aa548d01c98) ) // --2S K---
-	ROM_LOAD( "issa862", 0x0000, 0x008000, CRC(ceface32) SHA1(4a869b83ffd5c59a7cc64b1ee088fc788f57ff0f) ) // --2S K---
-
-	ROM_LOAD( "issa863", 0x0000, 0x008000, CRC(1a7fa7d2) SHA1(06855a05102ff757a397b2c438b8c60cb66477c8) ) // P1-- ---G
-	ROM_LOAD( "issa864", 0x0000, 0x008000, CRC(08869eee) SHA1(6df205a743d64799635075170eb752ece35ff9af) ) // P-2S K--G
-	ROM_LOAD( "issa865", 0x0000, 0x008000, CRC(5b487e21) SHA1(aa9dbc1491e0a82f7634ddf73f9df3cffc85a1d9) ) // P1-S K--G
-
-	ROM_LOAD( "issa866", 0x0000, 0x008000, CRC(d23d2999) SHA1(7616d5ab8d9b371a625b9fb667b6807333f89c6e) ) // P1-- ---G
-	ROM_LOAD( "issa867", 0x0000, 0x008000, CRC(1e8b47ff) SHA1(2328e0b39ad1d0bc40e2f403d59cf4c5793dd1fa) ) // P-2S K--G
-	ROM_LOAD( "issa868", 0x0000, 0x008000, CRC(e2616b21) SHA1(32b0dcadd5a1fbde41426fdf03a1a7515384c685) ) // P1-S K--G
-
-	ROM_LOAD( "issa869", 0x0000, 0x008000, CRC(1bce989f) SHA1(704f165ca34e4df3e0699ebc7867294df860edb3) ) // P1-- ---G
-	ROM_LOAD( "issa870", 0x0000, 0x008000, CRC(592f94f7) SHA1(f845c5324a1c49e1ca4dc0538b422de30f669d95) ) // P-2S K--G
-	ROM_LOAD( "issa871", 0x0000, 0x008000, CRC(aed724b8) SHA1(9ccb4c1a10e86610ac6c241df31a0d2513985127) ) // P1-S K--G
-
-	ROM_LOAD( "issa872", 0x0000, 0x008000, CRC(957536b1) SHA1(4ca031ba9b3bd5e178abe7951498f8202fa4cd48) ) // P1-- ---G
-	ROM_LOAD( "issa873", 0x0000, 0x008000, CRC(171cdb19) SHA1(f0f7cb81b220d757c5dadbe9e2cc0dbc6aa02962) ) // P-2S K--G
-	ROM_LOAD( "issa874", 0x0000, 0x008000, CRC(704f999c) SHA1(259430d175c22a33f222ab1138159b8fc838c98f) ) // P1-S K--G
-
-	/****** Other Stuff in here ******/
-
-	ROM_REGION( 0x200000, "pal", 0 )
-	// Pal dump? check it..
-	ROM_LOAD( "bxpal", 0x0000, 0x000c80, CRC(e30cd1ff) SHA1(4a1ee1703a677143412aa367cfe7d7d346812d87) )
-
-	ROM_REGION( 0x200000, "sndz80", 0 )
-	// apparently all games using these PCBs had the same sound rom..
-	ROM_LOAD( "barxsnd.bin", 0x0000, 0x001000, CRC(7d37fda1) SHA1(fb906615067887d9daecdbc741cfa4ac710c4627) )
-ROM_END
-
+/* No header (all 0x00) space for one tho */
+EC_SBARX_SET( 199?, ec_sbarx,		0,			"iss129.rom",							0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b), "Electrocoin","Super Bar X (Electrocoin) (set 1)" )
+EC_SBARX_SET( 199?, ec_sbarx__a,	ec_sbarx,	"iss173.rom",							0x0000, 0x008000, CRC(984f9c18) SHA1(f160eeee6ea70c79502fc68f70cb973e1ca029b8), "Electrocoin","Super Bar X (Electrocoin) (set 2)" )
+EC_SBARX_SET( 199?, ec_sbarx__b,	ec_sbarx,	"iss2012.rom",							0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059), "Electrocoin","Super Bar X (Electrocoin) (set 3)" )
+EC_SBARX_SET( 199?, ec_sbarx__c,	ec_sbarx,	"sbx5red",								0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec), "Electrocoin","Super Bar X (Electrocoin) (set 4)" )
+EC_SBARX_SET( 199?, ec_sbarx__d,	ec_sbarx,	"sbx8elac",								0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df), "Electrocoin","Super Bar X (Electrocoin) (set 5)" )
+EC_SBARX_SET( 199?, ec_sbarx__e,	ec_sbarx,	"superbarx_issue129_10cash.bin",		0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b), "Electrocoin","Super Bar X (Electrocoin) (set 6)" ) // doesn't do port09 0x40 changed 40
+EC_SBARX_SET( 199?, ec_sbarx__f,	ec_sbarx,	"superbarx_issue158_sitdown10cash.bin",	0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52), "Electrocoin","Super Bar X (Electrocoin) (set 7)" ) // ^^ 
+/* Identified as 'SBARX2' header like BIG7 */
+EC_SBARX_SET( 199?, ec_sbarx__t,	ec_sbarx,	"iss3001.rom",							0x0000, 0x008000, CRC(01390318) SHA1(e01a4160f774e376b5527ddee084a0be3eef865e), "Electrocoin","Super Bar X (Electrocoin) (set 22)" )
+EC_SBARX_SET( 199?, ec_sbarx__u,	ec_sbarx,	"iss3002.rom",							0x0000, 0x008000, CRC(84b323f9) SHA1(911b1355a8baa5adb4f956ead7379cb4b69abdcb), "Electrocoin","Super Bar X (Electrocoin) (set 23)" )
+EC_SBARX_SET( 199?, ec_sbarx__v,	ec_sbarx,	"iss3003.rom",							0x0000, 0x008000, CRC(aeac581f) SHA1(ffafdf444b77a1cbc71ba0dbd4e08b48a1182a6d), "Electrocoin","Super Bar X (Electrocoin) (set 24)" )
+EC_SBARX_SET( 199?, ec_sbarx__w,	ec_sbarx,	"iss3004.rom",							0x0000, 0x008000, CRC(a3f9d261) SHA1(ae8657a4336a3508f79fbe089afddfcfdb76ef7f), "Electrocoin","Super Bar X (Electrocoin) (set 25)" )
+EC_SBARX_SET( 199?, ec_sbarx__x,	ec_sbarx,	"iss3005.rom",							0x0000, 0x008000, CRC(cd0d29ff) SHA1(fb52aea3cd2b2c7e133594b92657466988fae8aa), "Electrocoin","Super Bar X (Electrocoin) (set 26)" )
+EC_SBARX_SET( 199?, ec_sbarx__y,	ec_sbarx,	"iss3006.rom",							0x0000, 0x008000, CRC(d8cd43af) SHA1(9bc1131a860b2f5421c17546720d4eb438215c63), "Electrocoin","Super Bar X (Electrocoin) (set 27)" )
+EC_SBARX_SET( 199?, ec_sbarx__z,	ec_sbarx,	"iss3007.rom",							0x0000, 0x008000, CRC(fecc57d6) SHA1(54b324049fae1dbef7b8b2eb7dd7967dc20d6f0f), "Electrocoin","Super Bar X (Electrocoin) (set 28)" )
+EC_SBARX_SET( 199?, ec_sbarx__0,	ec_sbarx,	"iss3008.rom",							0x0000, 0x008000, CRC(714459a7) SHA1(887391e73dfc216631273b56ea55ccafe566000a), "Electrocoin","Super Bar X (Electrocoin) (set 29)" )
+EC_SBARX_SET( 199?, ec_sbarx__1,	ec_sbarx,	"iss3009.rom",							0x0000, 0x008000, CRC(702a1225) SHA1(eb7b3b3ab4f41fdf7ea04b0a50b6ea1bdf9678e8), "Electrocoin","Super Bar X (Electrocoin) (set 30)" )
+EC_SBARX_SET( 199?, ec_sbarx__2,	ec_sbarx,	"iss3010.rom",							0x0000, 0x008000, CRC(a6fcfc08) SHA1(0626072425f93d95cd782bdbf62f528621bb86d6), "Electrocoin","Super Bar X (Electrocoin) (set 31)" )
+EC_SBARX_SET( 199?, ec_sbarx__3,	ec_sbarx,	"iss3011.rom",							0x0000, 0x008000, CRC(4ab461f0) SHA1(521eb529838ca84ce26f6a77ba60a272426243f0), "Electrocoin","Super Bar X (Electrocoin) (set 32)" )
+EC_SBARX_SET( 199?, ec_sbarx__4,	ec_sbarx,	"iss3012.rom",							0x0000, 0x008000, CRC(2f4c9ad8) SHA1(f78c5bdf3b0f75db59ce4075b82bb58d6ce2cf8c), "Electrocoin","Super Bar X (Electrocoin) (set 33)" )
+EC_SBARX_SET( 199?, ec_sbarx__5,	ec_sbarx,	"iss3013.rom",							0x0000, 0x008000, CRC(6bcf4550) SHA1(ae80f1482992d681556b10bfe86251920f317a8e), "Electrocoin","Super Bar X (Electrocoin) (set 34)" )
+EC_SBARX_SET( 199?, ec_sbarx__6,	ec_sbarx,	"iss3014.rom",							0x0000, 0x008000, CRC(ddb2220f) SHA1(244e3a481a386d01b473f041e3fb3cc343b5a966), "Electrocoin","Super Bar X (Electrocoin) (set 35)" )
+EC_SBARX_SET( 199?, ec_sbarx__7,	ec_sbarx,	"iss3015.rom",							0x0000, 0x008000, CRC(83a51dc7) SHA1(6dea8ae51fd9ca057db3495f2c616e347dfd9c07), "Electrocoin","Super Bar X (Electrocoin) (set 36)" )
+EC_SBARX_SET( 199?, ec_sbarx__8,	ec_sbarx,	"iss3016.rom",							0x0000, 0x008000, CRC(d7fdccff) SHA1(4d2490cf5577b5d757183dbc47a1f869863e15c0), "Electrocoin","Super Bar X (Electrocoin) (set 37)" )
+EC_SBARX_SET( 199?, ec_sbarx__9,	ec_sbarx,	"iss3017.rom",							0x0000, 0x008000, CRC(d83961b0) SHA1(0144cf5a2bd45735ce44df6ed119e37ed7bf82c2), "Electrocoin","Super Bar X (Electrocoin) (set 38)" )
+EC_SBARX_SET( 199?, ec_sbarx__aa,	ec_sbarx,	"iss3018.rom",							0x0000, 0x008000, CRC(6d7fc134) SHA1(af82b6e7e16c5a9df284d0c2d44b1a000bcdf9aa), "Electrocoin","Super Bar X (Electrocoin) (set 39)" )
+EC_SBARX_SET( 199?, ec_sbarx__ab,	ec_sbarx,	"iss3019.rom",							0x0000, 0x008000, CRC(a1e8b73b) SHA1(d2400ed2ac4d9b41a5fd2cb0910677b329b17ca5), "Electrocoin","Super Bar X (Electrocoin) (set 40)" )
+EC_SBARX_SET( 199?, ec_sbarx__ac,	ec_sbarx,	"iss3020.rom",							0x0000, 0x008000, CRC(40eb69d5) SHA1(0fe9d62dabc909c85176e187b95bb99c4372b0d5), "Electrocoin","Super Bar X (Electrocoin) (set 41)" )
+EC_SBARX_SET( 199?, ec_sbarx__ad,	ec_sbarx,	"iss3200.rom",							0x0000, 0x008000, CRC(16cb8ba6) SHA1(b98b4b9b97deb35e9286188ee3e5e0f977f97271), "Electrocoin","Super Bar X (Electrocoin) (set 42)" )
+EC_SBARX_SET( 199?, ec_sbarx__ae,	ec_sbarx,	"iss3201.rom",							0x0000, 0x008000, CRC(79fea244) SHA1(2332d2d587eb138293edb169201112a028e26a2f), "Electrocoin","Super Bar X (Electrocoin) (set 43)" )
+EC_SBARX_SET( 199?, ec_sbarx__af,	ec_sbarx,	"iss3202.rom",							0x0000, 0x008000, CRC(bb928182) SHA1(d4294cfd0b4b94257d436eadf500cc12dcdc495e), "Electrocoin","Super Bar X (Electrocoin) (set 44)" )
+EC_SBARX_SET( 199?, ec_sbarx__ag,	ec_sbarx,	"iss3203.rom",							0x0000, 0x008000, CRC(b417a15f) SHA1(f1f82b54178848573504f9a9841f30e191ac8455), "Electrocoin","Super Bar X (Electrocoin) (set 45)" )
+EC_SBARX_SET( 199?, ec_sbarx__ah,	ec_sbarx,	"iss3204.rom",							0x0000, 0x008000, CRC(09b3b872) SHA1(eed041162751658e0270f4e27a7411d61b84b4a9), "Electrocoin","Super Bar X (Electrocoin) (set 46)" )
+EC_SBARX_SET( 199?, ec_sbarx__ai,	ec_sbarx,	"iss3205.rom",							0x0000, 0x008000, CRC(67f3bdcc) SHA1(00d4ef2b50b1eda0aedfa3cb6dcef78d9b80bd35), "Electrocoin","Super Bar X (Electrocoin) (set 47)" )
+EC_SBARX_SET( 199?, ec_sbarx__aj,	ec_sbarx,	"iss3206.rom",							0x0000, 0x008000, CRC(f7bcbf95) SHA1(6a71bce7fcec1e8135dd42901974aa0debdb566c), "Electrocoin","Super Bar X (Electrocoin) (set 48)" )
+EC_SBARX_SET( 199?, ec_sbarx__ak,	ec_sbarx,	"iss3207.rom",							0x0000, 0x008000, CRC(ac0b929d) SHA1(cc40f128a5a3c2e4ff6b30f1bf95fbdfa68137b5), "Electrocoin","Super Bar X (Electrocoin) (set 49)" )
+EC_SBARX_SET( 199?, ec_sbarx__al,	ec_sbarx,	"iss3208.rom",							0x0000, 0x008000, CRC(594fe5c2) SHA1(6bf7402c899ba31c1063301468b3fb89063fb58f), "Electrocoin","Super Bar X (Electrocoin) (set 50)" )
+EC_SBARX_SET( 199?, ec_sbarx__am,	ec_sbarx,	"iss3209.rom",							0x0000, 0x008000, CRC(cd5bf63f) SHA1(043f67bb669cfbe8548c5689a69cde8260528ffd), "Electrocoin","Super Bar X (Electrocoin) (set 51)" )
+EC_SBARX_SET( 199?, ec_sbarx__an,	ec_sbarx,	"iss3210.rom",							0x0000, 0x008000, CRC(0faec005) SHA1(b22b2dbcc5e023d7c76a6d4fb5636b5ae2e08d13), "Electrocoin","Super Bar X (Electrocoin) (set 52)" )
+EC_SBARX_SET( 199?, ec_sbarx__ao,	ec_sbarx,	"iss3211.rom",							0x0000, 0x008000, CRC(4861770e) SHA1(ee4813370b27ff58dc78aa62c799efbaefc1e61d), "Electrocoin","Super Bar X (Electrocoin) (set 53)" )
+EC_SBARX_SET( 199?, ec_sbarx__ap,	ec_sbarx,	"iss3212.rom",							0x0000, 0x008000, CRC(d11bcb08) SHA1(854318b64cc1ff7eed4d57796ae873f7088ef48a), "Electrocoin","Super Bar X (Electrocoin) (set 54)" )
+EC_SBARX_SET( 199?, ec_sbarx__aq,	ec_sbarx,	"iss3213.rom",							0x0000, 0x008000, CRC(0f57908b) SHA1(2a15b2659b4db7caa1d3b0dfdc712a746dcf189d), "Electrocoin","Super Bar X (Electrocoin) (set 55)" )
+EC_SBARX_SET( 199?, ec_sbarx__ar,	ec_sbarx,	"iss3214.rom",							0x0000, 0x008000, CRC(61f13078) SHA1(d934972e3124a1ed8a0e86c52ab4733db86c7c23), "Electrocoin","Super Bar X (Electrocoin) (set 56)" )
+EC_SBARX_SET( 199?, ec_sbarx__as,	ec_sbarx,	"iss3215.rom",							0x0000, 0x008000, CRC(c61a459d) SHA1(e44ccd607bed807281358b405bb1d1f66f9eb26b), "Electrocoin","Super Bar X (Electrocoin) (set 57)" )
+EC_SBARX_SET( 199?, ec_sbarx__at,	ec_sbarx,	"iss3216.rom",							0x0000, 0x008000, CRC(803847c8) SHA1(ccf04a669d4f43dae74b4d37fefd3bc696299162), "Electrocoin","Super Bar X (Electrocoin) (set 58)" )
+EC_SBARX_SET( 199?, ec_sbarx__au,	ec_sbarx,	"iss3217.rom",							0x0000, 0x008000, CRC(a63e76ff) SHA1(f19c848eca3b63743f9ab4f43f872a00a023d51c), "Electrocoin","Super Bar X (Electrocoin) (set 59)" )
+EC_SBARX_SET( 199?, ec_sbarx__av,	ec_sbarx,	"iss3218.rom",							0x0000, 0x008000, CRC(ba47f5d5) SHA1(b20e02782ac25713dfeb0513740eb3d048dee282), "Electrocoin","Super Bar X (Electrocoin) (set 60)" )
+EC_SBARX_SET( 199?, ec_sbarx__aw,	ec_sbarx,	"iss3219.rom",							0x0000, 0x008000, CRC(72a9fd90) SHA1(191f375b41f56fab20b01926e3e55ddd691cd488), "Electrocoin","Super Bar X (Electrocoin) (set 61)" )
+EC_SBARX_SET( 199?, ec_sbarx__ax,	ec_sbarx,	"iss3268.rom",							0x0000, 0x008000, CRC(9ed62096) SHA1(78962170324b2af08143885d6033f14910195490), "Electrocoin","Super Bar X (Electrocoin) (set 62)" )
+EC_SBARX_SET( 199?, ec_sbarx__ay,	ec_sbarx,	"iss3269.rom",							0x0000, 0x008000, CRC(f3ae26cb) SHA1(18bf2c468f91a56b461e7f8037dd822735d40b23), "Electrocoin","Super Bar X (Electrocoin) (set 63)" )
+EC_SBARX_SET( 199?, ec_sbarx__az,	ec_sbarx,	"iss3270.rom",							0x0000, 0x008000, CRC(1b364354) SHA1(497f3a24e8c7da967ead5c460f5d7395d1ce689a), "Electrocoin","Super Bar X (Electrocoin) (set 64)" )
+EC_SBARX_SET( 199?, ec_sbarx__a0,	ec_sbarx,	"iss3271.rom",							0x0000, 0x008000, CRC(9f3ebc4e) SHA1(084ac6b0e90a735b139ac2624650127672f79ee7), "Electrocoin","Super Bar X (Electrocoin) (set 65)" )
+EC_SBARX_SET( 199?, ec_sbarx__a1,	ec_sbarx,	"iss3272.rom",							0x0000, 0x008000, CRC(b2f6e8cb) SHA1(0477a6b9ae0d900435fa570c1cada77eb902c25b), "Electrocoin","Super Bar X (Electrocoin) (set 66)" )
+EC_SBARX_SET( 199?, ec_sbarx__a2,	ec_sbarx,	"iss3273.rom",							0x0000, 0x008000, CRC(05b6c2c4) SHA1(c78eb44d440f8ca75f6904e6ab780708663351a9), "Electrocoin","Super Bar X (Electrocoin) (set 67)" )
+EC_SBARX_SET( 199?, ec_sbarx__a3,	ec_sbarx,	"iss3274.rom",							0x0000, 0x008000, CRC(489ecef1) SHA1(64d18423407670ac2afff70de4d6f4f371afd74b), "Electrocoin","Super Bar X (Electrocoin) (set 68)" )
+EC_SBARX_SET( 199?, ec_sbarx__a4,	ec_sbarx,	"iss3275.rom",							0x0000, 0x008000, CRC(8597c0ab) SHA1(774e5c2e91f7317ca4e3cd305a387f2d284de15f), "Electrocoin","Super Bar X (Electrocoin) (set 69)" )
+EC_SBARX_SET( 199?, ec_sbarx__a5,	ec_sbarx,	"iss3276.rom",							0x0000, 0x008000, CRC(59528755) SHA1(81373e0625f93e68900c0ba1c986011fa8541028), "Electrocoin","Super Bar X (Electrocoin) (set 70)" )
+EC_SBARX_SET( 199?, ec_sbarx__a6,	ec_sbarx,	"iss3277.rom",							0x0000, 0x008000, CRC(ae614832) SHA1(055a0cecbb6e9939c26db1af67e2823b9c55de0b), "Electrocoin","Super Bar X (Electrocoin) (set 71)" )
+EC_SBARX_SET( 199?, ec_sbarx__a7,	ec_sbarx,	"iss3278.rom",							0x0000, 0x008000, CRC(a5b504e1) SHA1(5c9e17482f204073f8aab8540463231ccac85c7e), "Electrocoin","Super Bar X (Electrocoin) (set 72)" )
+EC_SBARX_SET( 199?, ec_sbarx__a8,	ec_sbarx,	"iss3279.rom",							0x0000, 0x008000, CRC(bd2a7c56) SHA1(1b4e95b3e82999e276bd72c768311ccfaaeae4a9), "Electrocoin","Super Bar X (Electrocoin) (set 73)" )
+EC_SBARX_SET( 199?, ec_sbarx__a9,	ec_sbarx,	"iss3280.rom",							0x0000, 0x008000, CRC(511d4f2f) SHA1(d9fa6baf0e23eaa7d62d3a09cbdd7fc05f955f68), "Electrocoin","Super Bar X (Electrocoin) (set 74)" )
+EC_SBARX_SET( 199?, ec_sbarx__ba,	ec_sbarx,	"iss3281.rom",							0x0000, 0x008000, CRC(37a21ce2) SHA1(165015ece80706ca0a0062b884c25c054906d9f7), "Electrocoin","Super Bar X (Electrocoin) (set 75)" )
+EC_SBARX_SET( 199?, ec_sbarx__bb,	ec_sbarx,	"iss3282.rom",							0x0000, 0x008000, CRC(1d44636f) SHA1(3502c576b4806685a28da3c70a4a534dfe8446f5), "Electrocoin","Super Bar X (Electrocoin) (set 76)" )
+EC_SBARX_SET( 199?, ec_sbarx__bc,	ec_sbarx,	"iss3283.rom",							0x0000, 0x008000, CRC(54155620) SHA1(33e1d0332cff80cab8402ea4aa6048a8e64445e8), "Electrocoin","Super Bar X (Electrocoin) (set 77)" )
+EC_SBARX_SET( 199?, ec_sbarx__bd,	ec_sbarx,	"iss3284.rom",							0x0000, 0x008000, CRC(cf0db191) SHA1(dd41b9a89c5a7061ae63ba9dd10d407b58621b43), "Electrocoin","Super Bar X (Electrocoin) (set 78)" )
+EC_SBARX_SET( 199?, ec_sbarx__be,	ec_sbarx,	"iss3285.rom",							0x0000, 0x008000, CRC(b0f3d198) SHA1(06c6d7a3d7aa4c108d4f9c9e5854fb8c0db8749c), "Electrocoin","Super Bar X (Electrocoin) (set 79)" )
+EC_SBARX_SET( 199?, ec_sbarx__bf,	ec_sbarx,	"iss3286.rom",							0x0000, 0x008000, CRC(50fe610b) SHA1(18aa1f884933606bbb5e970aaee89ca7f31cb177), "Electrocoin","Super Bar X (Electrocoin) (set 80)" )
+EC_SBARX_SET( 199?, ec_sbarx__bg,	ec_sbarx,	"iss3287.rom",							0x0000, 0x008000, CRC(694aa6a5) SHA1(a679bfd98b105028a87ec8366af67ffaefde6711), "Electrocoin","Super Bar X (Electrocoin) (set 81)" )
+EC_SBARX_SET( 199?, ec_sbarx__bh,	ec_sbarx,	"iss9401.rom",							0x0000, 0x008000, CRC(abe83480) SHA1(581fab39096b6327b8e88c7ce848126123f524b8), "Electrocoin","Super Bar X (Electrocoin) (set 82)" )
+EC_SBARX_SET( 199?, ec_sbarx__bi,	ec_sbarx,	"iss9405.rom",							0x0000, 0x008000, CRC(6435586d) SHA1(95f2cda1bc80bb8f7c3d2d2b41abbfd634a88237), "Electrocoin","Super Bar X (Electrocoin) (set 83)" ) // from unknown set
+/* No Header, type 2 - closer to the BRUNEL sets but these make writes to the reel ports */
+EC_SBARX_SET( 199?, ec_sbarx__g,	ec_sbarx,	"sbx5nc.10",							0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9), "Electrocoin","Super Bar X (Electrocoin) (set 8)" )
+EC_SBARX_SET( 199?, ec_sbarx__h,	ec_sbarx,	"sbx5nc.20",							0x0000, 0x008000, CRC(0ceb3e29) SHA1(e96e1470292208825407ba64750121dd3c7bf857), "Electrocoin","Super Bar X (Electrocoin) (set 9)" )
+EC_SBARX_SET( 199?, ec_sbarx__o,	ec_sbarx,	"sbxup",								0x0000, 0x008000, CRC(f8d7e9db) SHA1(7dea1f7215070a8a413af63d0e379b2e228e63d7), "Electrocoin","Super Bar X (Electrocoin) (set 16)" )
+EC_SBARX_SET( 199?, ec_sbarx__p,	ec_sbarx,	"sbxup_10",								0x0000, 0x008000, CRC(3c932de3) SHA1(2c1e09436a5895aa738567843c7f25ed047dc9ac), "Electrocoin","Super Bar X (Electrocoin) (set 17)" )
+/* 1991 BRUNEL RESEARCH Copyright, device at a000 / a001 / a100 */
+EC_SBARX_SET( 199?, ec_sbarx__i,	ec_sbarx,	"sbarx.210",							0x0000, 0x008000, CRC(1e9933b2) SHA1(ee546cd2f0659c669b98a14f032298ebc4fa7e5c), "Electrocoin","Super Bar X (Electrocoin) (set 10)" )
+EC_SBARX_SET( 199?, ec_sbarx__j,	ec_sbarx,	"sbx18ac",								0x0000, 0x008000, CRC(a3b4cfbe) SHA1(20f78d565504878d0d6a53b6bc32e31d3a32c736), "Electrocoin","Super Bar X (Electrocoin) (set 11)" )
+EC_SBARX_SET( 199?, ec_sbarx__k,	ec_sbarx,	"sbx2 8t",								0x0000, 0x008000, CRC(c63e8d0a) SHA1(17ccb75602a2738296b419761835008ef798fdb0), "Electrocoin","Super Bar X (Electrocoin) (set 12)" )
+EC_SBARX_SET( 199?, ec_sbarx__l,	ec_sbarx,	"sbx210",								0x0000, 0x008000, CRC(1e9933b2) SHA1(ee546cd2f0659c669b98a14f032298ebc4fa7e5c), "Electrocoin","Super Bar X (Electrocoin) (set 13)" )
+EC_SBARX_SET( 199?, ec_sbarx__m,	ec_sbarx,	"sbx28ac",								0x0000, 0x008000, CRC(338ff3e3) SHA1(d8470b029aff7b6b8f07df19d9edcf3d01b7e3d0), "Electrocoin","Super Bar X (Electrocoin) (set 14)" )
+EC_SBARX_SET( 199?, ec_sbarx__n,	ec_sbarx,	"sbx8d",								0x0000, 0x008000, CRC(c63e8d0a) SHA1(17ccb75602a2738296b419761835008ef798fdb0), "Electrocoin","Super Bar X (Electrocoin) (set 15)" )
+EC_SBARX_SET( 199?, ec_sbarx__q,	ec_sbarx,	"super bar x 8 1-0.bin",				0x0000, 0x008000, CRC(b33e2891) SHA1(c0383740776a20f41de3f1a46c766a8e6c53101f), "Electrocoin","Super Bar X (Electrocoin) (set 18)" )
+/* 1993 Electrocoin Copyright - z180 code */
+EC_SBARX_SET( 199?, ec_sbarx__r,	ec_sbarx,	"sbarx6c.bin",							0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f), "Electrocoin","Super Bar X (Electrocoin) (set 20)" ) // aka sbarx6t
 
 
 
@@ -835,98 +999,6 @@ ROM_START( ec_bxd7s )
 	ROM_LOAD( "issc330", 0x0000, 0x008000, CRC(4a8231ff) SHA1(470813fff14eeff3caad2cde710d4d1361231299) ) // -1-- ----
 	ROM_LOAD( "issc325.rom", 0x0000, 0x008000, CRC(153f90a2) SHA1(df250a02e6b9c130b5f8856c1fdb9012517d15ce) ) // in an unknown set
 	ROM_LOAD( "issc337", 0x0000, 0x008000, CRC(79b791aa) SHA1(ee6257b198b950d31690f1b12b98bdf483216b9d) ) // P-2S K---   in a set marked 'magic bars'
-ROM_END
-
-
-// This is almost certainly a mix of 'Big7' and 'Super Big7' ROMs
-ROM_START( ec_big7 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "big7.bin", 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6) )
-
-	ROM_REGION( 0x200000, "altrevs", 0 )
-
-	/* No indication, no space for header */
-	ROM_LOAD( "b710", 0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006) )
-	ROM_LOAD( "b75p4", 0x0000, 0x008000, CRC(27ad1971) SHA1(4c1248d5815143dc0b23ada909c4f1fc16a1a18b) )
-	ROM_LOAD( "b78ac", 0x0000, 0x008000, CRC(454e9ac5) SHA1(a700a399632fa546473503f8e7e8dc3abc966ee6) )
-	ROM_LOAD( "b7rb5", 0x0000, 0x008000, CRC(cc59283a) SHA1(63d53f6f5e9c16df77a430443aade18722d7bcd7) )
-	ROM_LOAD( "big 7 8 1-0.bin", 0x0000, 0x008000, CRC(164fd1e6) SHA1(25be8962f8b7a6a78345dd60319a391c583b6b2f) )
-	ROM_LOAD( "big78t", 0x0000, 0x008000, CRC(310ffd92) SHA1(1cfc3801bb04d4e3d4c2d6e271c3ac71c49d466b) )
-	ROM_LOAD( "genbig.bin", 0x0000, 0x008000, CRC(025b129f) SHA1(07d53f8780fca7b90243c01f5892f3c0622ca387) )
-
-	/* No indication, header space */
-	ROM_LOAD( "big76c.bin", 0x0000, 0x008000, CRC(12048afc) SHA1(a9da4d65efd794ebdb3daad0615a5c6a81135763) )
-	ROM_LOAD( "big7_issue382_8tkn.bin", 0x0000, 0x008000, CRC(706d87dd) SHA1(9c066ca8d5119d15bd09c07110fc66c1fe890a0c) )
-	ROM_LOAD( "bigcon10.hex", 0x0000, 0x008000, CRC(b1176841) SHA1(ef23a61355ff194b1dd2c54bc94b175272a8058d) )
-	ROM_LOAD( "bigcon8c.hex", 0x0000, 0x008000, CRC(5b586abc) SHA1(8cabb266db4e0453e081ce6ff3ee0c850b66bede) )
-	ROM_LOAD( "bigcon8t.hex", 0x0000, 0x008000, CRC(809e2ec5) SHA1(15a1da75f24c167089051645362c9f53be54e16e) )
-	ROM_LOAD( "iss179.rom", 0x0000, 0x008000, CRC(ef34fa31) SHA1(4cd19c50449af95d8448266b8fca6ff94437c22d) )
-	ROM_LOAD( "iss2017.rom", 0x0000, 0x008000, CRC(165dc63c) SHA1(f820bc99755f38a911357e705075d24d3aac43b7) )
-	ROM_LOAD( "iss2019.rom", 0x0000, 0x008000, CRC(475b224a) SHA1(c837aa0c73cf5947b6b4d106d4f0967da040e5dc) )
-	ROM_LOAD( "iss513.rom", 0x0000, 0x008000, CRC(ca302c47) SHA1(9fb9cdd140baa0ec36250b4ebd0a25450348075f) )
-
-	// I think all the roms below are 'Super Big 7'
-
-	/* All have 'BIG7' and type info in header */
-	ROM_LOAD( "big7.bin", 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6) )
-	ROM_LOAD( "iss3025.rom", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) )
-	ROM_LOAD( "iss3027.rom", 0x0000, 0x008000, CRC(7dc5ccbe) SHA1(2e904f6dced08ed38c4e5c0adfa6904b80a0a0fa) )
-	ROM_LOAD( "iss3033.rom", 0x0000, 0x008000, CRC(52e6c6b7) SHA1(9ff5c6cca014735f8cffffb56a85657b0941e9f8) )
-	ROM_LOAD( "iss3034.rom", 0x0000, 0x008000, CRC(7f27bf12) SHA1(1fb7ca712cb801f67da6a9b50eddc3992972534e) )
-	ROM_LOAD( "iss3035.rom", 0x0000, 0x008000, CRC(8612b896) SHA1(31fb781a4dd2f82e77dc87d37be378974983ade4) )
-	ROM_LOAD( "iss3049.rom", 0x0000, 0x008000, CRC(b820d03e) SHA1(80e0208a31468ace7d75ce10f88c2267c0eb92b4) )
-	ROM_LOAD( "iss3050.rom", 0x0000, 0x008000, CRC(cff49d4c) SHA1(3a6c58f942cbd716218468a8061d1f3f7be6ea13) )
-	ROM_LOAD( "iss3051.rom", 0x0000, 0x008000, CRC(3b5b37d1) SHA1(56070c1f7d00b7b3984590d4824da88850ff6a9f) )
-	ROM_LOAD( "iss3052.rom", 0x0000, 0x008000, CRC(4f3512bb) SHA1(f9b3dd180143fc40f7b737aed23b78920ac5d267) )
-	ROM_LOAD( "iss3053.rom", 0x0000, 0x008000, CRC(99ba426a) SHA1(b0545b3ae649d89a14da61e56ac3899896a37e82) )
-	ROM_LOAD( "iss3054.rom", 0x0000, 0x008000, CRC(9598d331) SHA1(194339222b97ff8d97aa1d49e5fecc666a67ea49) )
-	ROM_LOAD( "iss3055.rom", 0x0000, 0x008000, CRC(3c4eb15c) SHA1(3bb7bdf206fc0fc4310df86733b459e1558aea4f) )
-	ROM_LOAD( "iss3056.rom", 0x0000, 0x008000, CRC(202a820e) SHA1(a9b2c9f7995b4e1b0d4e8009a026174f0352d15f) )
-	ROM_LOAD( "iss3057.rom", 0x0000, 0x008000, CRC(db7b5c05) SHA1(c4ef81636766154a7b65be42d7689d32a0a922e7) )
-	ROM_LOAD( "iss3058.rom", 0x0000, 0x008000, CRC(a772f630) SHA1(8e60a08bfe884ef51893c51f11e9a4d2024f6e2f) )
-	ROM_LOAD( "iss3059.rom", 0x0000, 0x008000, CRC(3b217d60) SHA1(7b39df64ce1cff64e737fe9c78e6de3cb3546336) )
-	ROM_LOAD( "iss3060.rom", 0x0000, 0x008000, CRC(29a1f750) SHA1(33a0de2f240228842c93e39939c28a5d6bba669e) )
-	ROM_LOAD( "iss3061.rom", 0x0000, 0x008000, CRC(f1a7da0b) SHA1(0ffed598ba8a5dfb83c8b05a80f3499cb00686ec) )
-	ROM_LOAD( "iss3062.rom", 0x0000, 0x008000, CRC(bff8c7e7) SHA1(db23240eafea82e540a410b135f32c64260fba2e) )
-	ROM_LOAD( "iss3063.rom", 0x0000, 0x008000, CRC(c3471a8c) SHA1(edde9a96ec380f95ad2fc473f78fc5d34fd1769d) )
-	ROM_LOAD( "iss3064.rom", 0x0000, 0x008000, CRC(a635c5bc) SHA1(476e1fffbddefa230b96b0e1d3bb50f9ef08b24a) )
-	ROM_LOAD( "iss3065.rom", 0x0000, 0x008000, CRC(bd2315f8) SHA1(365f87e6ef68f330d47e7d614f02b3775758ac4c) )
-	ROM_LOAD( "iss3066.rom", 0x0000, 0x008000, CRC(ccfb82e0) SHA1(08095517eb0bd8931286567171c307603b0cdeff) )
-	ROM_LOAD( "iss3067.rom", 0x0000, 0x008000, CRC(4543588f) SHA1(dd888f113fb2a326565e73514d682db43ad545b7) )
-	ROM_LOAD( "iss3068.rom", 0x0000, 0x008000, CRC(2329e40e) SHA1(c5072f40b334eedb3a62a234b2f49498165b30d2) )
-	ROM_LOAD( "iss3220.rom", 0x0000, 0x008000, CRC(005a926b) SHA1(8fcbf14e44a61f3db96c500c8f9912ab1dbe9c39) )
-	ROM_LOAD( "iss3221.rom", 0x0000, 0x008000, CRC(ed6d729b) SHA1(c897a9d58731cd82fdf8d4ee492ea5fe5542f3e8) )
-	ROM_LOAD( "iss3222.rom", 0x0000, 0x008000, CRC(d5f340d6) SHA1(0b9aba173cdec3c9a54038e042902420c78ae1b2) )
-	ROM_LOAD( "iss3223.rom", 0x0000, 0x008000, CRC(b5c9465d) SHA1(c51270c597bd6264e6440cdad726d032e8df45e6) )
-	ROM_LOAD( "iss3224.rom", 0x0000, 0x008000, CRC(6f776b1f) SHA1(027689cf24bbf2386d9710c7e13329988168c253) )
-	ROM_LOAD( "iss3225.rom", 0x0000, 0x008000, CRC(3fb0b783) SHA1(b65deadcb5fc1b50064d7f6cfc8fe141051074fb) )
-	ROM_LOAD( "iss3226.rom", 0x0000, 0x008000, CRC(c9ee61ff) SHA1(bd5fb65ed2f1e3a23325aee98b420f6c263bf0c1) )
-	ROM_LOAD( "iss3227.rom", 0x0000, 0x008000, CRC(a4065969) SHA1(1aa88869ed17844b993bf3138e616b60198e6603) )
-	ROM_LOAD( "iss3228.rom", 0x0000, 0x008000, CRC(1893a5dc) SHA1(6e5069ddf3356742f7edf8ac04cd9d0897ac436c) )
-	ROM_LOAD( "iss3229.rom", 0x0000, 0x008000, CRC(b9368f58) SHA1(614cd2940e2429923945e42411ff59b52d4fff9c) )
-	ROM_LOAD( "iss3230.rom", 0x0000, 0x008000, CRC(9bf662c8) SHA1(7909d1e4775d9efad299cbce7b86dda2d3a21bed) )
-	ROM_LOAD( "iss3231.rom", 0x0000, 0x008000, CRC(4862536a) SHA1(d5d80467c798dd3361c8ac367a1b2734741cc8f8) )
-	ROM_LOAD( "iss3232.rom", 0x0000, 0x008000, CRC(7c5b1a26) SHA1(292ababf9be8303724b0cff12004202ac8cee674) )
-	ROM_LOAD( "iss3233.rom", 0x0000, 0x008000, CRC(b753592b) SHA1(e0414808276c76e609ac4fb006b08952528603d3) )
-	ROM_LOAD( "iss3234.rom", 0x0000, 0x008000, CRC(6e96db38) SHA1(ae569a37c866183a08706d0b50254822382cd156) )
-	ROM_LOAD( "iss3235.rom", 0x0000, 0x008000, CRC(672f3f29) SHA1(7497cf5fa3cd9e5652dbbd4c691b8bdc0943a9e5) )
-	ROM_LOAD( "iss3236.rom", 0x0000, 0x008000, CRC(3eb8a0b4) SHA1(f41c76fac44bfd9c9275e2cf45e8bd16d72b800b) )
-	ROM_LOAD( "iss3237.rom", 0x0000, 0x008000, CRC(db876c46) SHA1(f986407029e1c35651daea1fde87f8a3bb1b1965) )
-	ROM_LOAD( "iss3238.rom", 0x0000, 0x008000, CRC(c7d1d398) SHA1(3b37b9596bc3771a6f1a698bee4dce8d642d982f) )
-	ROM_LOAD( "iss3239.rom", 0x0000, 0x008000, CRC(f62450a6) SHA1(d2c88483cb0d3a83a2974550e8e8e71642bb28ce) )
-
-//  ROM_LOAD( "sbig7_5_3025.bin", 0x0000, 0x008000, CRC(26c9382a) SHA1(8c4fe06a8e5171e6f2c91b0aee14484aca386a9c) ) // 'Super Big 7' ?
-	ROM_LOAD( "iss3240.rom", 0x0000, 0x008000, CRC(e8e56ca4) SHA1(d16390b600f9966b779638e3bc2e7f9a72e8d1be) ) // 'Super Big 7' ?
-
-	// No Header - Taken from a Super Big 7 Set
-	ROM_LOAD( "iss197.rom", 0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c) ) // 'Super Big 7' ?
-	ROM_LOAD( "sb7.58", 0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01) )  // 'Super Big 7' ?
-	// Different Code structure, no space for header */
-	ROM_LOAD( "sb710d", 0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c) )  // 'Super Big 7' ?
-
-
-	ROM_REGION( 0x200000, "sndz80", 0 )
-	ROM_LOAD( "big7snd", 0x0000, 0x002000, CRC(b530d91f) SHA1(f4e70e05d11e92a82f4bf8d78859b2a94fa5f22b) )
 ROM_END
 
 
@@ -1017,7 +1089,6 @@ ROM_START( ec_mag7s )
 	// These are '2001 COOL7' (from Bar X 7 set)
 	ROM_LOAD( "issa943", 0x0000, 0x008000, CRC(e13a597f) SHA1(ab833fb8cc9529fc307b0252b922a77911802abe) ) // P--- ----
 	ROM_LOAD( "issa945", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) ) // P-2S K---
-	//ROM_LOAD( "issa945 (dereg)", 0x0000, 0x008000, CRC(9c251b36) SHA1(319a82e9f0a5cd0e3c9d72ddb8203a9363cc3936) )
 	// 2001 COOL7 (from Unknown set)
 	ROM_LOAD( "issa998.rom", 0x0000, 0x008000, CRC(7314e2a8) SHA1(3a108bf2ba0173ecab85fe7110174f5db8f75e17) )
 
@@ -1146,101 +1217,6 @@ ROM_START( ec_redbr )
 ROM_END
 
 
-
-ROM_START( ec_supbx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	/* No header (all 0x00) space for one tho */
-	ROM_LOAD( "iss129.rom", 0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b) )
-	ROM_LOAD( "iss173.rom", 0x0000, 0x008000, CRC(984f9c18) SHA1(f160eeee6ea70c79502fc68f70cb973e1ca029b8) )
-	ROM_LOAD( "iss2012.rom", 0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059) )
-	ROM_LOAD( "sbx5red", 0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec) )
-	ROM_LOAD( "sbx8elac", 0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df) )
-	ROM_LOAD( "superbarx_issue129_10cash.bin", 0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b) )
-	ROM_LOAD( "superbarx_issue158_sitdown10cash.bin", 0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52) )
-
-	/* No Header, type 2 - closer to the BRUNEL sets */
-	ROM_LOAD( "sbx5nc.10", 0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9) )
-	ROM_LOAD( "sbx5nc.20", 0x0000, 0x008000, CRC(0ceb3e29) SHA1(e96e1470292208825407ba64750121dd3c7bf857) )
-
-	/* 1991 BRUNEL RESEARCH Copyright */
-	ROM_LOAD( "sbarx.210", 0x0000, 0x008000, CRC(1e9933b2) SHA1(ee546cd2f0659c669b98a14f032298ebc4fa7e5c) )
-	ROM_LOAD( "sbx18ac", 0x0000, 0x008000, CRC(a3b4cfbe) SHA1(20f78d565504878d0d6a53b6bc32e31d3a32c736) )
-	ROM_LOAD( "sbx2 8t", 0x0000, 0x008000, CRC(c63e8d0a) SHA1(17ccb75602a2738296b419761835008ef798fdb0) )
-	ROM_LOAD( "sbx210", 0x0000, 0x008000, CRC(1e9933b2) SHA1(ee546cd2f0659c669b98a14f032298ebc4fa7e5c) )
-	ROM_LOAD( "sbx28ac", 0x0000, 0x008000, CRC(338ff3e3) SHA1(d8470b029aff7b6b8f07df19d9edcf3d01b7e3d0) )
-	ROM_LOAD( "sbx8d", 0x0000, 0x008000, CRC(c63e8d0a) SHA1(17ccb75602a2738296b419761835008ef798fdb0) )
-	ROM_LOAD( "sbxup", 0x0000, 0x008000, CRC(f8d7e9db) SHA1(7dea1f7215070a8a413af63d0e379b2e228e63d7) )
-	ROM_LOAD( "sbxup_10", 0x0000, 0x008000, CRC(3c932de3) SHA1(2c1e09436a5895aa738567843c7f25ed047dc9ac) )
-	ROM_LOAD( "super bar x 8 1-0.bin", 0x0000, 0x008000, CRC(b33e2891) SHA1(c0383740776a20f41de3f1a46c766a8e6c53101f) )
-
-	/* 1993 Electrocoin Copyright */
-	ROM_LOAD( "sbarx6c.bin", 0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f) )
-	ROM_LOAD( "sbarx6t", 0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f) )
-
-	/* Identified as 'SBARX2' header like BIG7 */
-	ROM_LOAD( "iss3001.rom", 0x0000, 0x008000, CRC(01390318) SHA1(e01a4160f774e376b5527ddee084a0be3eef865e) )
-	ROM_LOAD( "iss3002.rom", 0x0000, 0x008000, CRC(84b323f9) SHA1(911b1355a8baa5adb4f956ead7379cb4b69abdcb) )
-	ROM_LOAD( "iss3003.rom", 0x0000, 0x008000, CRC(aeac581f) SHA1(ffafdf444b77a1cbc71ba0dbd4e08b48a1182a6d) )
-	ROM_LOAD( "iss3004.rom", 0x0000, 0x008000, CRC(a3f9d261) SHA1(ae8657a4336a3508f79fbe089afddfcfdb76ef7f) )
-	ROM_LOAD( "iss3005.rom", 0x0000, 0x008000, CRC(cd0d29ff) SHA1(fb52aea3cd2b2c7e133594b92657466988fae8aa) )
-	ROM_LOAD( "iss3006.rom", 0x0000, 0x008000, CRC(d8cd43af) SHA1(9bc1131a860b2f5421c17546720d4eb438215c63) )
-	ROM_LOAD( "iss3007.rom", 0x0000, 0x008000, CRC(fecc57d6) SHA1(54b324049fae1dbef7b8b2eb7dd7967dc20d6f0f) )
-	ROM_LOAD( "iss3008.rom", 0x0000, 0x008000, CRC(714459a7) SHA1(887391e73dfc216631273b56ea55ccafe566000a) )
-	ROM_LOAD( "iss3009.rom", 0x0000, 0x008000, CRC(702a1225) SHA1(eb7b3b3ab4f41fdf7ea04b0a50b6ea1bdf9678e8) )
-	ROM_LOAD( "iss3010.rom", 0x0000, 0x008000, CRC(a6fcfc08) SHA1(0626072425f93d95cd782bdbf62f528621bb86d6) )
-	ROM_LOAD( "iss3011.rom", 0x0000, 0x008000, CRC(4ab461f0) SHA1(521eb529838ca84ce26f6a77ba60a272426243f0) )
-	ROM_LOAD( "iss3012.rom", 0x0000, 0x008000, CRC(2f4c9ad8) SHA1(f78c5bdf3b0f75db59ce4075b82bb58d6ce2cf8c) )
-	ROM_LOAD( "iss3013.rom", 0x0000, 0x008000, CRC(6bcf4550) SHA1(ae80f1482992d681556b10bfe86251920f317a8e) )
-	ROM_LOAD( "iss3014.rom", 0x0000, 0x008000, CRC(ddb2220f) SHA1(244e3a481a386d01b473f041e3fb3cc343b5a966) )
-	ROM_LOAD( "iss3015.rom", 0x0000, 0x008000, CRC(83a51dc7) SHA1(6dea8ae51fd9ca057db3495f2c616e347dfd9c07) )
-	ROM_LOAD( "iss3016.rom", 0x0000, 0x008000, CRC(d7fdccff) SHA1(4d2490cf5577b5d757183dbc47a1f869863e15c0) )
-	ROM_LOAD( "iss3017.rom", 0x0000, 0x008000, CRC(d83961b0) SHA1(0144cf5a2bd45735ce44df6ed119e37ed7bf82c2) )
-	ROM_LOAD( "iss3018.rom", 0x0000, 0x008000, CRC(6d7fc134) SHA1(af82b6e7e16c5a9df284d0c2d44b1a000bcdf9aa) )
-	ROM_LOAD( "iss3019.rom", 0x0000, 0x008000, CRC(a1e8b73b) SHA1(d2400ed2ac4d9b41a5fd2cb0910677b329b17ca5) )
-	ROM_LOAD( "iss3020.rom", 0x0000, 0x008000, CRC(40eb69d5) SHA1(0fe9d62dabc909c85176e187b95bb99c4372b0d5) )
-	ROM_LOAD( "iss3200.rom", 0x0000, 0x008000, CRC(16cb8ba6) SHA1(b98b4b9b97deb35e9286188ee3e5e0f977f97271) )
-	ROM_LOAD( "iss3201.rom", 0x0000, 0x008000, CRC(79fea244) SHA1(2332d2d587eb138293edb169201112a028e26a2f) )
-	ROM_LOAD( "iss3202.rom", 0x0000, 0x008000, CRC(bb928182) SHA1(d4294cfd0b4b94257d436eadf500cc12dcdc495e) )
-	ROM_LOAD( "iss3203.rom", 0x0000, 0x008000, CRC(b417a15f) SHA1(f1f82b54178848573504f9a9841f30e191ac8455) )
-	ROM_LOAD( "iss3204.rom", 0x0000, 0x008000, CRC(09b3b872) SHA1(eed041162751658e0270f4e27a7411d61b84b4a9) )
-	ROM_LOAD( "iss3205.rom", 0x0000, 0x008000, CRC(67f3bdcc) SHA1(00d4ef2b50b1eda0aedfa3cb6dcef78d9b80bd35) )
-	ROM_LOAD( "iss3206.rom", 0x0000, 0x008000, CRC(f7bcbf95) SHA1(6a71bce7fcec1e8135dd42901974aa0debdb566c) )
-	ROM_LOAD( "iss3207.rom", 0x0000, 0x008000, CRC(ac0b929d) SHA1(cc40f128a5a3c2e4ff6b30f1bf95fbdfa68137b5) )
-	ROM_LOAD( "iss3208.rom", 0x0000, 0x008000, CRC(594fe5c2) SHA1(6bf7402c899ba31c1063301468b3fb89063fb58f) )
-	ROM_LOAD( "iss3209.rom", 0x0000, 0x008000, CRC(cd5bf63f) SHA1(043f67bb669cfbe8548c5689a69cde8260528ffd) )
-	ROM_LOAD( "iss3210.rom", 0x0000, 0x008000, CRC(0faec005) SHA1(b22b2dbcc5e023d7c76a6d4fb5636b5ae2e08d13) )
-	ROM_LOAD( "iss3211.rom", 0x0000, 0x008000, CRC(4861770e) SHA1(ee4813370b27ff58dc78aa62c799efbaefc1e61d) )
-	ROM_LOAD( "iss3212.rom", 0x0000, 0x008000, CRC(d11bcb08) SHA1(854318b64cc1ff7eed4d57796ae873f7088ef48a) )
-	ROM_LOAD( "iss3213.rom", 0x0000, 0x008000, CRC(0f57908b) SHA1(2a15b2659b4db7caa1d3b0dfdc712a746dcf189d) )
-	ROM_LOAD( "iss3214.rom", 0x0000, 0x008000, CRC(61f13078) SHA1(d934972e3124a1ed8a0e86c52ab4733db86c7c23) )
-	ROM_LOAD( "iss3215.rom", 0x0000, 0x008000, CRC(c61a459d) SHA1(e44ccd607bed807281358b405bb1d1f66f9eb26b) )
-	ROM_LOAD( "iss3216.rom", 0x0000, 0x008000, CRC(803847c8) SHA1(ccf04a669d4f43dae74b4d37fefd3bc696299162) )
-	ROM_LOAD( "iss3217.rom", 0x0000, 0x008000, CRC(a63e76ff) SHA1(f19c848eca3b63743f9ab4f43f872a00a023d51c) )
-	ROM_LOAD( "iss3218.rom", 0x0000, 0x008000, CRC(ba47f5d5) SHA1(b20e02782ac25713dfeb0513740eb3d048dee282) )
-	ROM_LOAD( "iss3219.rom", 0x0000, 0x008000, CRC(72a9fd90) SHA1(191f375b41f56fab20b01926e3e55ddd691cd488) )
-	ROM_LOAD( "iss3268.rom", 0x0000, 0x008000, CRC(9ed62096) SHA1(78962170324b2af08143885d6033f14910195490) )
-	ROM_LOAD( "iss3269.rom", 0x0000, 0x008000, CRC(f3ae26cb) SHA1(18bf2c468f91a56b461e7f8037dd822735d40b23) )
-	ROM_LOAD( "iss3270.rom", 0x0000, 0x008000, CRC(1b364354) SHA1(497f3a24e8c7da967ead5c460f5d7395d1ce689a) )
-	ROM_LOAD( "iss3271.rom", 0x0000, 0x008000, CRC(9f3ebc4e) SHA1(084ac6b0e90a735b139ac2624650127672f79ee7) )
-	ROM_LOAD( "iss3272.rom", 0x0000, 0x008000, CRC(b2f6e8cb) SHA1(0477a6b9ae0d900435fa570c1cada77eb902c25b) )
-	ROM_LOAD( "iss3273.rom", 0x0000, 0x008000, CRC(05b6c2c4) SHA1(c78eb44d440f8ca75f6904e6ab780708663351a9) )
-	ROM_LOAD( "iss3274.rom", 0x0000, 0x008000, CRC(489ecef1) SHA1(64d18423407670ac2afff70de4d6f4f371afd74b) )
-	ROM_LOAD( "iss3275.rom", 0x0000, 0x008000, CRC(8597c0ab) SHA1(774e5c2e91f7317ca4e3cd305a387f2d284de15f) )
-	ROM_LOAD( "iss3276.rom", 0x0000, 0x008000, CRC(59528755) SHA1(81373e0625f93e68900c0ba1c986011fa8541028) )
-	ROM_LOAD( "iss3277.rom", 0x0000, 0x008000, CRC(ae614832) SHA1(055a0cecbb6e9939c26db1af67e2823b9c55de0b) )
-	ROM_LOAD( "iss3278.rom", 0x0000, 0x008000, CRC(a5b504e1) SHA1(5c9e17482f204073f8aab8540463231ccac85c7e) )
-	ROM_LOAD( "iss3279.rom", 0x0000, 0x008000, CRC(bd2a7c56) SHA1(1b4e95b3e82999e276bd72c768311ccfaaeae4a9) )
-	ROM_LOAD( "iss3280.rom", 0x0000, 0x008000, CRC(511d4f2f) SHA1(d9fa6baf0e23eaa7d62d3a09cbdd7fc05f955f68) )
-	ROM_LOAD( "iss3281.rom", 0x0000, 0x008000, CRC(37a21ce2) SHA1(165015ece80706ca0a0062b884c25c054906d9f7) )
-	ROM_LOAD( "iss3282.rom", 0x0000, 0x008000, CRC(1d44636f) SHA1(3502c576b4806685a28da3c70a4a534dfe8446f5) )
-	ROM_LOAD( "iss3283.rom", 0x0000, 0x008000, CRC(54155620) SHA1(33e1d0332cff80cab8402ea4aa6048a8e64445e8) )
-	ROM_LOAD( "iss3284.rom", 0x0000, 0x008000, CRC(cf0db191) SHA1(dd41b9a89c5a7061ae63ba9dd10d407b58621b43) )
-	ROM_LOAD( "iss3285.rom", 0x0000, 0x008000, CRC(b0f3d198) SHA1(06c6d7a3d7aa4c108d4f9c9e5854fb8c0db8749c) )
-	ROM_LOAD( "iss3286.rom", 0x0000, 0x008000, CRC(50fe610b) SHA1(18aa1f884933606bbb5e970aaee89ca7f31cb177) )
-	ROM_LOAD( "iss3287.rom", 0x0000, 0x008000, CRC(694aa6a5) SHA1(a679bfd98b105028a87ec8366af67ffaefde6711) )
-	ROM_LOAD( "iss9401.rom", 0x0000, 0x008000, CRC(abe83480) SHA1(581fab39096b6327b8e88c7ce848126123f524b8) )
-	ROM_LOAD( "iss9405.rom", 0x0000, 0x008000, CRC(6435586d) SHA1(95f2cda1bc80bb8f7c3d2d2b41abbfd634a88237) ) // from unknown set
-ROM_END
 
 
 
@@ -1514,16 +1490,12 @@ DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
 	// descramble here
 }
 
-#define GAME_FLAGS GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
 
 // Regular HW Type (there are all rather jumbled up and need sorting properly at some point)
-GAME( 19??, ec_barx,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Bar X (Electrocoin)"		, GAME_FLAGS)
 GAME( 19??, ec_mag7s,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin) (?)"		, GAME_FLAGS) // roms had various labels, but all seem to be the same thing / mixed up.
 GAME( 19??, ec_bxd7s,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Diamond 7s (2006 COOL7) (Electrocoin) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_big7,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Big 7 / Super Big 7 (Electrocoin) (?)"		, GAME_FLAGS) // these sets were all mixed up, so I've just put them together for now.
 GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Casino Bar X (Electrocoin) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_FLAGS) // a mix of REDBAR and 2001 REDBAR
-GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_FLAGS)
@@ -1531,12 +1503,12 @@ GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
 GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_FLAGS) // scrambled roms
 GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Big 7 (MAB PCB) (Electrocoin) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_supbxmab,ec_supbx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_FLAGS)
+GAME( 19??, ec_supbxmab,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_FLAGS)
 
 //Games using the MAB scrambling, but identified as being from Concept Games
 GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Casino Bar X (Concept Games Ltd) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_multb,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Multi Bar (Concept Games Ltd) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_supbxcon,ec_supbx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)"		, GAME_FLAGS)
+GAME( 19??, ec_supbxcon,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_casmb,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Casino Multi Bar (Concept Games Ltd) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_supmb,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Super Multi Bar (Concept Games Ltd) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_stkex,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)"		, GAME_FLAGS)
