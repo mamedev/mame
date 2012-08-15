@@ -169,6 +169,9 @@ int ui_get_show_profiler(void);
 /* force the menus to display */
 void ui_show_menu(void);
 
+/* force the mouse visibility status */
+void ui_show_mouse(bool status);
+
 /* return true if a menu is displayed */
 int ui_is_menu_active(void);
 

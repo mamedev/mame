@@ -122,6 +122,17 @@ static output_delegate output_cb[OUTPUT_CHANNEL_COUNT] =
 ***************************************************************************/
 
 /*-------------------------------------------------
+    mame_is_valid_machine - return true if the
+    given machine is valid
+-------------------------------------------------*/
+
+int mame_is_valid_machine(running_machine &machine)
+{
+	return (&machine == global_machine);
+}
+
+
+/*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
@@ -164,6 +175,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 			valid.check_shared_source(*system);
 		}
 
+		ui_show_mouse(false);
 
 		// create the machine configuration
 		machine_config config(*system, options);

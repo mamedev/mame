@@ -429,7 +429,6 @@ const options_entry windows_options::s_option_entries[] =
 
 	// input options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_HIDE_CURSOR ";hc",                    "1",        OPTION_BOOLEAN,    "hide cursor in full screen or if mouse is enabled" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
 
 	{ NULL }
