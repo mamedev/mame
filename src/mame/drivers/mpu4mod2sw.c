@@ -1400,11 +1400,13 @@ ROM_END
 ROM_START( m4bjac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bjak1.8", 0x0000, 0x010000, CRC(e6a3c263) SHA1(fb28657cb43a0f24354382518d5d5be9cfdfa1d1) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "bj.chr", 0x0000, 0x000048, CRC(b7851f82) SHA1(a6b2ae283b8e251169508ab6a2cba2fb70f706bf) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "c2js.hex", 0x0000, 0x010000, CRC(3e6dd1f3) SHA1(dbd87368124244931b8868eb740b02a1775ed734) )
+ROM_START( m4bjaca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c2js.p1", 0x0000, 0x010000, CRC(3e6dd1f3) SHA1(dbd87368124244931b8868eb740b02a1775ed734) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "bj.chr", 0x0000, 0x000048, CRC(b7851f82) SHA1(a6b2ae283b8e251169508ab6a2cba2fb70f706bf) )
 ROM_END
@@ -1418,29 +1420,48 @@ ROM_END
 ROM_START( m4clbcnt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "con12.bin", 0x0000, 0x010000, CRC(e577d7bc) SHA1(be4d6d75f33782c503f91659b5f69d1fb4c220da) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4clbcnta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "con1_0.bin", 0x0000, 0x010000, CRC(2a758619) SHA1(77f993090b7d01901635c56fd9256f57d2371c6d) )
+ROM_END
+
+ROM_START( m4clbcntb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "con1-1.bin", 0x0000, 0x010000, CRC(9fc1fefc) SHA1(5638c978687526858cbcb105bdb499dce2d234d3) )
+ROM_END
+
+ROM_START( m4clbcntc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "conf.p1", 0x0000, 0x010000, CRC(7900cee0) SHA1(afcd77e5bc05a21b5eb7b26c66d94ce21f2ce501) )
+ROM_END
+
+ROM_START( m4clbcntd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cons.p1", 0x0000, 0x010000, CRC(afe71a40) SHA1(b0065e131eb8fcf7a2fd420f60e2174d927db450) )
 ROM_END
 
 ROM_START( m4class )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dfc20.bin", 0x0000, 0x010000, CRC(1fa0c771) SHA1(b374d2cdc1bfc35a2e6fe35b9d21f2784b8c52e8) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4classa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dfc20dsl.bin", 0x0000, 0x010000, CRC(dc1c8b87) SHA1(52235f9d393c574fdd26aa2ec60e6db70538fb9d) )
 ROM_END
 
 ROM_START( m4frtfl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frtfull", 0x0000, 0x010000, CRC(4f5389e2) SHA1(bb6d43d428c1e8db07fe58d1b83c05ce5fcdcc7d) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4frtfla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fruitfull.hex", 0x0000, 0x010000, CRC(c264d497) SHA1(93843efbf1b4207a4722f49dd5dddf2c52bb1b8f) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
 ROM_END
@@ -1448,7 +1469,6 @@ ROM_END
 ROM_START( m4frtflc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ffcs.p1", 0x0000, 0x010000, CRC(db917142) SHA1(0f32f0c1ed6733b4557fd19f24f2b1dda26ccc44) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
 ROM_END
@@ -1457,8 +1477,10 @@ ROM_END
 ROM_START( m4frtlnk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "flcs.p1", 0x0000, 0x010000, CRC(f66a6810) SHA1(e91cdba6b52df6e633d6ce5036a82f5c2dbb1d19) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4frtlnka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "flinkv6", 0x0000, 0x010000, CRC(ca9c1034) SHA1(f7e02372a1c7cd41097db63d4a921387d22e02b4) )
 ROM_END
 
@@ -1470,8 +1492,12 @@ ROM_END
 ROM_START( m4jpjmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vjcs.p1", 0x0000, 0x010000, CRC(90280752) SHA1(bc2fcefc00adbae9ca2e116108b53ab932ab57b2) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 )
+ROM_START( m4jpjmpa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jackjump-vjc1-3.bin", 0x0000, 0x010000, CRC(fa713c10) SHA1(766912ea891166d7d7f0360e81bdad58b6064eb1) )
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
@@ -1481,16 +1507,38 @@ ROM_END
 ROM_START( m4milclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mi2d.p1", 0x0000, 0x010000, CRC(ce697bbd) SHA1(86c1729014eff9925a5f62189236a9c5bd11534b) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "mi2f.p1", 0x0000, 0x010000, CRC(224922a4) SHA1(59bc1fbfe20c533eb6462f01196a5f2d35ceb92d) )
-	ROM_LOAD( "mi2s.p1", 0x0000, 0x010000, CRC(f69b69c7) SHA1(4f881f5307db2c100535fa75a8eb42d0f7382c93) )
-	ROM_LOAD( "mild.p1", 0x0000, 0x010000, CRC(16da3df9) SHA1(0f1838f99c14763132c2a3b79363496c6baa5e88) )
-	ROM_LOAD( "mils.p1", 0x0000, 0x010000, CRC(0742defd) SHA1(ac25d8adb40bc5b4124241cc5d970d4c10c6f5fd) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
 ROM_END
+
+ROM_START( m4milclba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mi2f.p1", 0x0000, 0x010000, CRC(224922a4) SHA1(59bc1fbfe20c533eb6462f01196a5f2d35ceb92d) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
+ROM_END
+
+ROM_START( m4milclbb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mi2s.p1", 0x0000, 0x010000, CRC(f69b69c7) SHA1(4f881f5307db2c100535fa75a8eb42d0f7382c93) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
+ROM_END
+
+ROM_START( m4milclbc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mild.p1", 0x0000, 0x010000, CRC(16da3df9) SHA1(0f1838f99c14763132c2a3b79363496c6baa5e88) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
+ROM_END
+
+ROM_START( m4milclbd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mils.p1", 0x0000, 0x010000, CRC(0742defd) SHA1(ac25d8adb40bc5b4124241cc5d970d4c10c6f5fd) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
+ROM_END
+
 
 ROM_START( m4bigchd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1501,10 +1549,13 @@ ROM_END
 ROM_START( m4dbl9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "du91.0", 0x0000, 0x010000, CRC(6207753d) SHA1(b19bcb60707b73f37e9bd8177d0b15847af0213f) )
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "du91.chr", 0x0000, 0x000048, CRC(9724122d) SHA1(a41687eec84cad453c1a2a89317078f48ca0895f) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4dbl9a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d9s_6.bin", 0x0000, 0x010000, CRC(6029d46a) SHA1(0823f29f17562675a6f250429e46655c0b2e8f2c) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "du91.chr", 0x0000, 0x000048, CRC(9724122d) SHA1(a41687eec84cad453c1a2a89317078f48ca0895f) )
 ROM_END
@@ -1512,12 +1563,30 @@ ROM_END
 ROM_START( m4nick )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nilx.p1", 0x0000, 0x010000, CRC(210be67b) SHA1(b4f7b955ffe6a991f06334cb7eb2aebcf5fe11b3) )
+ROM_END
 
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4nicka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nilc.p1", 0x0000, 0x010000, CRC(8e612b50) SHA1(a33142ca3988e449ae94978946ed0f171c52c5fa) )
+ROM_END
+
+ROM_START( m4nickb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nilxb.p1", 0x0000, 0x010000, CRC(41fde39d) SHA1(fbb179d942a1ffb9c84925402179c7c7fd0a7692) )
+ROM_END
+
+ROM_START( m4nickc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nilxc.p1", 0x0000, 0x010000, CRC(38cabacf) SHA1(67aafaecc93a348dcdf7beaf6c93c16101fccb55) )
+ROM_END
+
+ROM_START( m4nickd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nilxk.p1", 0x0000, 0x010000, CRC(ceb04af2) SHA1(1cd65356fba532b4c34e03b418708b982e8e0828) )
+ROM_END
+
+ROM_START( m4nicke )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nick_21.bin", 0x0000, 0x010000, CRC(77a0ba57) SHA1(d56bdd52f81d707b5138f00e68b10130cac1225f) )
 ROM_END
 
@@ -1530,16 +1599,21 @@ ROM_END
 ROM_START( m4joltav )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tavs.p1", 0x0000, 0x010000, CRC(12bdf083) SHA1(c1b73bfd05ae6128d1760083383805fdaf328003) )
+ROM_END
 
-	ROM_REGION( 0x20000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+ROM_START( m4joltava )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jto20__1.1", 0x0000, 0x010000, CRC(4790c4ec) SHA1(2caab4ccc91158f6b76817e76c1d092ef1a79cd9) )
+ROM_END
+
+ROM_START( m4joltavb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jto20d_1.1", 0x0000, 0x010000, CRC(dff09dfc) SHA1(c13f31f7d96075f7c94ae5e79fc1f9b8ce7e4c80) )
 ROM_END
 
 ROM_START( m4btclok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "beattheclock.hex", 0x6000, 0x00a000, CRC(a0d4e463) SHA1(45d1df08bfd70caf63b14d2ccc56038ed85e23d0) )
-
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "btc.chr", 0x0000, 0x000048, CRC(c77e5215) SHA1(c9e26ed593840cbc47dad893ea4df476f1d69ecd) )
 ROM_END
@@ -1683,7 +1757,7 @@ GAME(199?, m4solsila	,m4solsil	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,
 GAME(199?, m4starbr		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Stars And Bars (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4sunset		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
-GAME(199?, m4sb5		,m4sunset	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.3)",	GAME_FLAGS )
+GAME(199?, m4sb5		,m4sunset	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.3)",GAME_FLAGS )
 GAME(199?, m4sunsetd	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SBU 2.0)",GAME_FLAGS )
 GAME(199?, m4sunsete	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
 GAME(199?, m4sunsetf	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
@@ -1702,176 +1776,201 @@ GAME(199?, m4sunsetr	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,RO
 GAME(199?, m4sunsets	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
 GAME(199?, m4sunsett	,m4sunset	,mod2   	,mpu4				, mpu4_state,m4_showstring		,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
 
-GAME(199?, m4supslt		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4supslt		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4suptub		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 1))",						GAME_FLAGS )
-GAME(199?, m4suptuba	,m4suptub	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 2)",						GAME_FLAGS )
+GAME(199?, m4suptub		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 1))",GAME_FLAGS )
+GAME(199?, m4suptuba	,m4suptub	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 2)",GAME_FLAGS )
 
-GAME(199?, m4suptwo		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Two (Barcrest) (MPU4)",						GAME_FLAGS ) // set % key
+GAME(199?, m4suptwo		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Super Two (Barcrest) (MPU4)",GAME_FLAGS ) // set % key
 
-GAME(199?, m4tiktak		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4tiktak		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4topact		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 1)",						GAME_FLAGS )
-GAME(199?, m4topacta	,m4topact	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 2)",						GAME_FLAGS )
+GAME(199?, m4topact		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4topacta	,m4topact	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4topst		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4topst		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4toptak		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4toptak		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4tribnk		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Bank (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4tribnk		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Bank (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4tupen		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tuppenny Cracker (Barcrest - Bootleg) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4tupen		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tuppenny Cracker (Barcrest - Bootleg) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m421			,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",						GAME_FLAGS ) // reel issues
+GAME(199?, m421			,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",GAME_FLAGS ) // reel issues
 
-GAME(199?, m4alpha		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",						GAME_FLAGS )
+GAME(199?, m4alpha		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4bnknot		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",						GAME_FLAGS )
+GAME(199?, m4bnknot		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4bjack		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 1)",						GAME_FLAGS )
-GAME(199?, m4bjacka		,m4bjack	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 2)",						GAME_FLAGS )
+GAME(199?, m4bjack		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4bjacka		,m4bjack	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4bjsm		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM H)",						GAME_FLAGS ) // reel issues
-GAME(199?, m4bjsma		,m4bjsm		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4)",						GAME_FLAGS ) // complains about battery, is this a different game?
+GAME(199?, m4bjsm		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM H)",GAME_FLAGS ) // reel issues
+GAME(199?, m4bjsma		,m4bjsm		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4)",GAME_FLAGS ) // complains about battery, is this a different game?
 
-GAME(199?, m4blstbk		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blast A Bank (Barcrest) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4blstbk		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blast A Bank (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(198?, m4supsl		,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4)", GAME_FLAGS )
+GAME(198?, m4supsl		,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4wayin		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 1)",						GAME_FLAGS )
-GAME(199?, m4wayina		,m4wayin	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 2)",						GAME_FLAGS ) // bad chr
+GAME(199?, m4wayin		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4wayina		,m4wayin	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // bad chr
 
 
 /* Bwb */
 
-GAME(199?, m4flshlt		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 1)",   GAME_FLAGS )
-GAME(199?, m4flshlta	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",   GAME_FLAGS )
-GAME(199?, m4flshltb	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 3)",   GAME_FLAGS )
-GAME(199?, m4flshltc	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 4)",   GAME_FLAGS )
-GAME(199?, m4flshltd	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 5)",   GAME_FLAGS )
-GAME(199?, m4flshlte	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 6)",   GAME_FLAGS )
-GAME(199?, m4flshltf	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 7)",   GAME_FLAGS )
-GAME(199?, m4flshltg	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 8)",   GAME_FLAGS )
+GAME(199?, m4flshlt		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4flshlta	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4flshltb	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4flshltc	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4flshltd	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4flshlte	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 6)",GAME_FLAGS )
+GAME(199?, m4flshltf	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 7)",GAME_FLAGS )
+GAME(199?, m4flshltg	,m4flshlt	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 8)",GAME_FLAGS )
 
-GAME(199?, m4blflsh		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",   GAME_FLAGS )
-GAME(199?, m4blflsha	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 2)",   GAME_FLAGS )
-GAME(199?, m4blflshb	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 3)",   GAME_FLAGS )
-GAME(199?, m4blflshc	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 4)",   GAME_FLAGS )
-GAME(199?, m4blflshd	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 5)",   GAME_FLAGS )
-GAME(199?, m4blflshe	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 6)",   GAME_FLAGS )
+GAME(199?, m4blflsh		,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4blflsha	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4blflshb	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4blflshc	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4blflshd	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4blflshe	,m4blflsh	,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 6)",GAME_FLAGS )
 
 /* Pcp */
 
-GAME(199?, m4cshino		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",						GAME_FLAGS ) // runs, but no lamps or other display..
+GAME(199?, m4cshino		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",GAME_FLAGS ) // runs, but no lamps or other display..
 
-GAME(199?, m4jjc		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 1)",						GAME_FLAGS ) // runs, but no lamps or other display..
-GAME(199?, m4jjca		,m4jjc		,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 2)",						GAME_FLAGS ) // runs, but no lamps or other display..
+GAME(199?, m4jjc		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 1)",GAME_FLAGS ) // runs, but no lamps or other display..
+GAME(199?, m4jjca		,m4jjc		,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 2)",GAME_FLAGS ) // runs, but no lamps or other display..
 
-GAME(199?, m4spton		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Spot On (Pcp) (MPU4)",						GAME_FLAGS ) // runs, but no lamps or other display..
+GAME(199?, m4spton		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Spot On (Pcp) (MPU4)",GAME_FLAGS ) // runs, but no lamps or other display..
 
-GAME(199?, m4exlin		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 1)",						GAME_FLAGS )
-GAME(199?, m4exlina		,m4exlin	,mod2	    ,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 2)",						GAME_FLAGS )
+GAME(199?, m4exlin		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4exlina		,m4exlin	,mod2	    ,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4supjst		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 1)",						GAME_FLAGS )
-GAME(199?, m4supjsta	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 2)",						GAME_FLAGS )
-GAME(199?, m4supjstb	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 3)",						GAME_FLAGS )
-GAME(199?, m4supjstc	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 4)",						GAME_FLAGS )
-GAME(199?, m4supjstd	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 5)",						GAME_FLAGS )
-GAME(199?, m4supjste	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 6)",						GAME_FLAGS )
+GAME(199?, m4supjst		,0			,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4supjsta	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4supjstb	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4supjstc	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4supjstd	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4supjste	,m4supjst	,mod2		,mpu4				, mpu4_state,m4default, ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 6)",GAME_FLAGS )
 
-GAME(199?, m4frcrak, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",   GAME_FLAGS )
+GAME(199?, m4frcrak, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",GAME_FLAGS )
 
 /* Misc */
 
-GAME(199?, m4spnwin		,0			,mod2		,mpu4, mpu4_state, m4default, ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 1)",   GAME_FLAGS ) // works?
-GAME(199?, m4spnwina	,m4spnwin	,mod2		,mpu4, mpu4_state, m4default, ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 2)",   GAME_FLAGS )
+GAME(199?, m4spnwin		,0			,mod2		,mpu4, mpu4_state, m4default, ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) // works?
+GAME(199?, m4spnwina	,m4spnwin	,mod2		,mpu4, mpu4_state, m4default, ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4pick, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Jpm","Pick A Fruit (Jpm) (MPU4)",   GAME_FLAGS )
+GAME(199?, m4pick, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Jpm","Pick A Fruit (Jpm) (MPU4)",GAME_FLAGS )
 
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4, mpu4_state,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
-GAME(199?, m4ttak	,  0,		mod2	,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",   GAME_FLAGS )
+GAME(199?, m4ttak	,  0,		mod2	,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4actbnka,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
-GAME(199?, m4actbnkb,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",						GAME_FLAGS ) 
+GAME(199?, m4actbnka,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
+GAME(199?, m4actbnkb,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",GAME_FLAGS ) 
 
-GAME(199?, m4actclb		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",						GAME_FLAGS ) // set stake to boot
-GAME(199?, m4actclba	,m4actclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",						GAME_FLAGS ) //  ^^
+GAME(199?, m4actclb		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",GAME_FLAGS ) // set stake to boot
+GAME(199?, m4actclba	,m4actclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",GAME_FLAGS ) //  ^^
 
-GAME(199?, m4bluemn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",						GAME_FLAGS )
-GAME(199?, m4bluemna	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",						GAME_FLAGS )
-GAME(199?, m4bluemnb	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",						GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4bluemn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
+GAME(199?, m4bluemna	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )
+GAME(199?, m4bluemnb	,m4bluemn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
-GAME(199?, m4take2		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",						GAME_FLAGS )
-GAME(199?, m4take2a		,m4take2			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.1)",						GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4take2		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )
+GAME(199?, m4take2a		,m4take2			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
-GAME(199?, m4pont		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",						GAME_FLAGS ) // set stake to boot
-GAME(199?, m4ponta		,m4pont				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",						GAME_FLAGS )//  ^^
+GAME(199?, m4pont		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",GAME_FLAGS ) // set stake to boot
+GAME(199?, m4ponta		,m4pont				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",GAME_FLAGS )//  ^^
 
-GAME(199?, m4loadmn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 1)",						GAME_FLAGS )
-GAME(199?, m4loadmna	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 2)",						GAME_FLAGS )
-GAME(199?, m4loadmnb	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 3)",						GAME_FLAGS )
+GAME(199?, m4loadmn		,0					,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4loadmna	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4loadmnb	,m4loadmn			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
-GAME(199?, m4celclb	,0						,mod2   	,mpu4				, mpu4_state,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",						GAME_FLAGS ) // set stake
+GAME(199?, m4celclb	,0						,mod2   	,mpu4				, mpu4_state,m_ccelbr			,ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",GAME_FLAGS ) // set stake
 
-GAME(199?, m4centpt, 0						,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",						GAME_FLAGS )
-GAME(199?, m4centpta,m4centpt				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",						GAME_FLAGS )
+GAME(199?, m4centpt, 0						,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",GAME_FLAGS )
+GAME(199?, m4centpta,m4centpt				,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4clbcls	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",						GAME_FLAGS ) // set stake (still moans tho)
+GAME(199?, m4clbcls	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",GAME_FLAGS ) // set stake (still moans tho)
 
 // OC9 (on cloud 9?)
-GAME(199?, m4c999	,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 1)",						GAME_FLAGS )
-GAME(199?, m4c999a	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 2)",						GAME_FLAGS )
+GAME(199?, m4c999	,0			,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4c999a	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
 // make sure these are the same
-GAME(199?, m4c999b	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.6)",						GAME_FLAGS ) // bad chr
-GAME(199?, m4c999c	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.0)",						GAME_FLAGS ) // bad chr
+GAME(199?, m4c999b	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.6)",GAME_FLAGS ) // bad chr
+GAME(199?, m4c999c	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.0)",GAME_FLAGS ) // bad chr
 
 
 // GEEN TUBES (press Q to open door and 'W' to play anyway, as long as the game works and doesn't report reel errors)
-GAME(199?, m4ambass	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ambassador (Barcrest) (DAM, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4atlan	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Atlantis (Barcrest) (DAT, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bjc	,0			,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Black Jack Club (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4exprs	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Express (Barcrest) (DXP, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4brdway	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Broadway (Barcrest) (DBR, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bigbn	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Big Ben (Barcrest) (DBB, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4cheryo	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Cherryo (Barcrest) (DCH, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4giant	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Giant (Barcrest) (DGI, Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4holdon	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Hold On (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4libty	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Liberty (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4meglnk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Megalink (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4multwy	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4num1	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Number One (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4nudup	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Up (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4omega	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Omega (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4randr	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Random Roulette (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4samu	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4stards	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Stardust (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tbreel	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 1)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tbrldx	,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4taj	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tricol	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4tridic	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4twilgt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4wildms	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4ambass	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ambassador (Barcrest) (DAM, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4atlan	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Atlantis (Barcrest) (DAT, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bjc	,0			,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Black Jack Club (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4exprs	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Express (Barcrest) (DXP, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4brdway	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Broadway (Barcrest) (DBR, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bigbn	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Big Ben (Barcrest) (DBB, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4cheryo	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Cherryo (Barcrest) (DCH, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4giant	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Giant (Barcrest) (DGI, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4holdon	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Hold On (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4libty	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Liberty (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4meglnk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Megalink (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4multwy	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4num1	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Number One (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4nudup	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nudge Up (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4omega	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Omega (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4randr	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Random Roulette (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4samu	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Samurai (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4stards	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Stardust (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4tbreel	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4tbrldx	,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",GAME_FLAGS )
+GAME(199?, m4taj	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4tricol	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4tridic	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4twilgt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4wildms	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 // these all have reel issues, but test mode produces ay sounds
-GAME(199?, m4suptrn	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Supatron (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bjac	,0			,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m421club	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4clbcnt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4class	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","First Class (Barcrest) [DFC, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4frtfl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4frtflc	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4frtlnk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4thehit	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4jpjmp	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4milclb	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4bigchd,0	        ,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // why code BCH on a dutch?
+GAME(199?, m4suptrn	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Supatron (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bjac	,0			,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4bjaca	,m4bjac		,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m421club	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",GAME_FLAGS )
+GAME(199?, m4clbcnt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4clbcnta,m4clbcnt	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4clbcntb,m4clbcnt	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4clbcntc,m4clbcnt	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4clbcntd,m4clbcnt	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Connect (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4class	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","First Class (Barcrest) [DFC, Dutch] (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4classa	,m4class	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","First Class (Barcrest) [DFC, Dutch] (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4frtfl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4frtfla	,m4frtfl	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4frtflc	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Full Club (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4frtlnk	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4frtlnka,m4frtlnk	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4thehit	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4jpjmp	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4jpjmpa	,m4jpjmp	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4milclb	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4milclba,m4milclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4milclbb,m4milclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4milclbc,m4milclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4milclbd,m4milclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+
+GAME(199?, m4bigchd,0	        ,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Big Chief (Barcrest) [BCH, Dutch] (MPU4)",GAME_FLAGS ) // why code BCH on a dutch?
 
 
-GAME(199?, m4dbl9	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Double 9's (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4nick	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4joljok	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4joltav	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4dbl9	,0			,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Double 9's (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4dbl9a	,m4dbl9		,mod2		,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Double 9's (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+
+GAME(199?, m4nick	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4nicka	,m4nick		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4nickb	,m4nick		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4nickc	,m4nick		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4nickd	,m4nick		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4nicke	,m4nick		,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
+
+GAME(199?, m4joljok	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4joltav	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4joltava,m4joltav	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4joltavb,m4joltav	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+
 // Bad CHR Alarm
-GAME(199?, m4btclok		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4brktak		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )
+GAME(199?, m4btclok		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4brktak		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",GAME_FLAGS )
