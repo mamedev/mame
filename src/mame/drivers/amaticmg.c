@@ -5,8 +5,7 @@
 
   Encrypted gambling hardware based on a custom CPU.
 
-  Driver by Roberto Fresca.
-
+  Driver by Roberto Fresca & Angelo Salese
 
 ***********************************************************************************
 
