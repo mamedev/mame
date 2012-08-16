@@ -849,7 +849,7 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	MCFG_SCREEN_UPDATE_STATIC(trojan)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("5205", MSM5205, XTAL_455kHz)	/* verified on PCB */
+	MCFG_SOUND_ADD("5205", MSM5205, XTAL_384kHz)	/* verified on PCB */
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
