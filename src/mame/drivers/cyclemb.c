@@ -994,7 +994,7 @@ ROM_START( skydest )
     ROM_LOAD( "pd0-16.10d",   0x002000, 0x002000, CRC(19ce8106) SHA1(31186d3b1c0d124da82310930a002a481941ebb1) )
 
 	ROM_REGION( 0x4000, "tilemap_data", ROMREGION_INVERT )
-    ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) )
+    ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) ) // on daughterboard
 
 	ROM_REGION( 0x10000, "sprite_data", ROMREGION_ERASEFF )
     ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) ) //ok
@@ -1010,8 +1010,12 @@ ROM_START( skydest )
 	ROM_LOAD( "green.11t",    0x000, 0x100, CRC(f803beb7) SHA1(9c979a296de04728d43c94e9e06f8d8600dc9cfb) )
     ROM_LOAD( "red.11u",      0x100, 0x100, CRC(24b7b6f3) SHA1(c2f6477baa5be038c41f5f2ecd16522a6b8d84db) )
 
+	ROM_REGION( 0x40, "timing_proms", 0 ) //???
+	ROM_LOAD( "p1.2e",        0x000, 0x020, NO_DUMP )
+	ROM_LOAD( "p0.4e",        0x020, 0x020, NO_DUMP )
+
 	ROM_REGION( 0x100, "unk_prom", 0 ) //???
-	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) )
+	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) ) // on daughterboard, _not_ a color prom
 ROM_END
 
 DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
