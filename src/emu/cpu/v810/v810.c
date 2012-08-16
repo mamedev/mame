@@ -946,55 +946,75 @@ static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
 }
 
 /* TODO: clocks */
-static void opMOVBSU(v810_state *cpustate,UINT32 op)
-{
-	UINT32 srcoff,dstoff,src,dst,size;
-	UINT32 tmp;
-
-//	printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
-
-	dstoff = cpustate->R26;
-	srcoff = cpustate->R27;
-	size =  cpustate->R28;
-	dst = cpustate->R29 & ~3;
-	src = cpustate->R30 & ~3;
-
-	tmp = R_W(cpustate,src);
-	W_W(cpustate,dst,tmp);
-
-	srcoff++;
-	dstoff++;
-
-	srcoff&=0x1f;
-	dstoff&=0x1f;
-
-	if(srcoff == 0)
-		src+=4;
-
-	if(dstoff == 0)
-		dst+=4;
-
-	size --;
-
-	cpustate->R26 = dstoff;
-	cpustate->R27 = srcoff;
-	cpustate->R28 = size;
-	cpustate->R29 = dst;
-	cpustate->R30 = src;
-
-	if(size != 0)
-		cpustate->PC-=2;
-}
-
 static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 {
 	if(!(op & 8))
 		fatalerror("V810: unknown BSU opcode %04x",op);
 
-	switch(op & 0xf)
 	{
-		case 0xb: opMOVBSU(cpustate,op); break;
-		default: fatalerror("V810: unemulated BSU opcode %04x\n",op);
+		UINT32 srcbit,dstbit,src,dst,size;
+		UINT32 dsttmp,tmp;
+		UINT8 srctmp;
+
+//		printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
+
+		dstbit = cpustate->R26;
+		srcbit = cpustate->R27;
+		size =  cpustate->R28;
+		dst = cpustate->R29 & ~3;
+		src = cpustate->R30 & ~3;
+
+		switch(op & 0xf)
+		{
+			case 0x8: // ORBSU
+				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
+				dsttmp = R_W(cpustate,dst);
+
+				tmp = dsttmp | (srctmp << dstbit);
+
+				W_W(cpustate,dst,tmp);
+				break;
+			case 0xb: // MOVBSU
+				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
+				dsttmp = (R_W(cpustate,dst) & ~(1 << dstbit));
+
+				tmp = (srctmp << dstbit) | dsttmp;
+
+				W_W(cpustate,dst,tmp);
+				break;
+			case 0xd: // ANDNBSU
+				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
+				dsttmp = R_W(cpustate,dst);
+
+				tmp = dsttmp & (~(srctmp << dstbit));
+
+				W_W(cpustate,dst,tmp);
+				break;
+			default: fatalerror("V810: unemulated BSU opcode %04x\n",op);
+		}
+
+		srcbit++;
+		dstbit++;
+
+		srcbit&=0x1f;
+		dstbit&=0x1f;
+
+		if(srcbit == 0)
+			src+=4;
+
+		if(dstbit == 0)
+			dst+=4;
+
+		size --;
+
+		cpustate->R26 = dstbit;
+		cpustate->R27 = srcbit;
+		cpustate->R28 = size;
+		cpustate->R29 = dst;
+		cpustate->R30 = src;
+
+		if(size != 0)
+			cpustate->PC-=2;
 	}
 
 	return clkIF+1; //TODO: correct?
