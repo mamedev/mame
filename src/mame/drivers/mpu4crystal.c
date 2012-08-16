@@ -675,6 +675,7 @@ ROM_END
 ROM_START( m4dz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dangerzone1_2.bin", 0x8000, 0x08000, CRC(eb4582f8) SHA1(df4cbbbb927b512b1ace34986ce29b17d7815e49) )
+	M4DZ_SOUND
 ROM_END
 
 #define M4TYLB_SOUND \
