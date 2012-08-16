@@ -945,6 +945,61 @@ static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
 	return clkIF+1;
 }
 
+/* TODO: clocks */
+static void opMOVBSU(v810_state *cpustate,UINT32 op)
+{
+	UINT32 srcoff,dstoff,src,dst,size;
+	UINT32 tmp;
+
+//	printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
+
+	dstoff = cpustate->R26;
+	srcoff = cpustate->R27;
+	size =  cpustate->R28;
+	dst = cpustate->R29 & ~3;
+	src = cpustate->R30 & ~3;
+
+	tmp = R_W(cpustate,src);
+	W_W(cpustate,dst,tmp);
+
+	srcoff++;
+	dstoff++;
+
+	srcoff&=0x1f;
+	dstoff&=0x1f;
+
+	if(srcoff == 0)
+		src+=4;
+
+	if(dstoff == 0)
+		dst+=4;
+
+	size --;
+
+	cpustate->R26 = dstoff;
+	cpustate->R27 = srcoff;
+	cpustate->R28 = size;
+	cpustate->R29 = dst;
+	cpustate->R30 = src;
+
+	if(size != 0)
+		cpustate->PC-=2;
+}
+
+static UINT32 opBSU(v810_state *cpustate,UINT32 op)
+{
+	if(!(op & 8))
+		fatalerror("V810: unknown BSU opcode %04x",op);
+
+	switch(op & 0xf)
+	{
+		case 0xb: opMOVBSU(cpustate,op); break;
+		default: fatalerror("V810: unemulated BSU opcode %04x\n",op);
+	}
+
+	return clkIF+1; //TODO: correct?
+}
+
 static UINT32 (*const OpCodeTable[64])(v810_state *cpustate,UINT32 op) =
 {
 	/* 0x00 */ opMOVr,  	// mov r1,r2            1
@@ -978,7 +1033,7 @@ static UINT32 (*const OpCodeTable[64])(v810_state *cpustate,UINT32 op) =
 	/* 0x1c */ opLDSR,  	// ldsr reg2,regID          2
 	/* 0x1d */ opSTSR,  	// stsr regID,reg2          2
 	/* 0x1e */ opDI,	// DI               2
-	/* 0x1f */ opUNDEF,
+	/* 0x1f */ opBSU,
 	/* 0x20 */ opB, 	// Branch (7 bit opcode)
 	/* 0x21 */ opB, 	// Branch (7 bit opcode)
 	/* 0x22 */ opB, 	// Branch (7 bit opcode)
