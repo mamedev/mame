@@ -927,6 +927,38 @@ static void opCVTW(v810_state *cpustate,UINT32 op)
 	SETREG(cpustate,GET2,f2u(val1));
 }
 
+static void opMPYHW(v810_state *cpustate,UINT32 op)
+{
+	int val1=(GETREG(cpustate,GET1) & 0xffff);
+	int val2=(GETREG(cpustate,GET2) & 0xffff);
+	SET_OV(0);
+	val2*=val1;
+	SET_Z((val2==0.0)?1:0);
+	SET_S((val2<0.0)?1:0);
+	SETREG(cpustate,GET2,val2);
+}
+
+static void opXB(v810_state *cpustate,UINT32 op)
+{
+	int val=GETREG(cpustate,GET2);
+	SET_OV(0);
+	val = (val & 0xffff0000) | ((val & 0xff) << 8) | ((val & 0xff00) >> 8);
+	SET_Z((val==0.0)?1:0);
+	SET_S((val<0.0)?1:0);
+	SETREG(cpustate,GET2,val);
+}
+
+
+static void opXH(v810_state *cpustate,UINT32 op)
+{
+	int val=GETREG(cpustate,GET2);
+	SET_OV(0);
+	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
+	SET_Z((val==0.0)?1:0);
+	SET_S((val<0.0)?1:0);
+	SETREG(cpustate,GET2,val);
+}
+
 static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
 {
 	UINT32 tmp=R_OP(cpustate,cpustate->PC);
@@ -940,7 +972,12 @@ static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
 			case 0x5: opSUBF(cpustate,op);break;
 			case 0x6: opMULF(cpustate,op);break;
 			case 0x7: opDIVF(cpustate,op);break;
+			case 0x8: opXB(cpustate,op);  break; // *
+			case 0x9: opXH(cpustate,op);  break; // *
 			case 0xb: opTRNC(cpustate,op);break;
+			case 0xc: opMPYHW(cpustate,op); break; // *
+			// * <- Virtual Boy specific?
+			default: printf("Floating point %02x\n",(tmp&0xfc00) >> 10);break;
 	}
 	return clkIF+1;
 }
