@@ -1708,6 +1708,12 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 			throw fatal;
 		}
 
+		/* Sanity checks */
+		if (software_info_ptr->shortname == NULL)
+			throw emu_fatalerror("Software entry is missing the name attribute!\n");
+		if (software_info_ptr->longname == NULL)
+			throw emu_fatalerror("Software entry '%s' is missing the description element!\n", software_info_ptr->shortname);
+
 		/* Create a copy of the software and part information */
 		*sw_info = auto_alloc_clear( image->device().machine(), software_info );
 		(*sw_info)->shortname = auto_strdup( image->device().machine(), software_info_ptr->shortname );
