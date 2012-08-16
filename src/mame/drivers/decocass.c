@@ -1259,10 +1259,11 @@ ROM_END
 
 /* 19 Disco No.1 / Sweet Heart */
 ROM_START( cdiscon1 )
+/* Photo of Dongle shows DP-1190B (the "B" is in a seperate white box then the DP-1190 label) */
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "cdiscon1.pro", 0x0000, 0x0800, CRC(0f793fab) SHA1(331f1b1b482fcd10f42c388a503f9af62d705401) )
+	ROM_LOAD( "dp-1190_b.dgl", 0x0000, 0x0800, CRC(0f793fab) SHA1(331f1b1b482fcd10f42c388a503f9af62d705401) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cdiscon1.cas", 0x0000, 0x8000, CRC(1429a397) SHA1(12f9e03fcda31dc6161a39bf5c3315a1e9e94565) )
