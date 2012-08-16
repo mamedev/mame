@@ -243,11 +243,11 @@ int main(int argc, char *argv[])
 	}
 	fprintf(stderr, "%d drivers found\n", drivcount);
 
-	// sort the list
-	qsort(drivlist, drivcount, sizeof(*drivlist), sort_callback);
-
 	// add a reference to the ___empty driver
 	drivlist[drivcount++] = "___empty";
+
+	// sort the list
+	qsort(drivlist, drivcount, sizeof(*drivlist), sort_callback);
 
 	// start with a header
 	printf("#include \"emu.h\"\n\n");
