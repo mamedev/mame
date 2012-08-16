@@ -1087,170 +1087,204 @@ EC_MAG7S_SET( 199?, ec_mag7s__a0,	ec_mag7s,	"majic",   0x0000, 0x008000, CRC(a1c
 	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
 // These are '2001 REDBAR' (older header type with 0 at end)
-EC_REDBR_SET( 199?, ec_redbr,		0,			"issa101",					0x0000, 0x008000, CRC(05bba52d) SHA1(fe1f80a6621564f8ea0fd741618ebd80a78a0055), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 1)" )
-EC_REDBR_SET( 199?, ec_redbr__a,	ec_redbr,	"issa102",					0x0000, 0x008000, CRC(9aebf74c) SHA1(4da5d9240a2dcfdaa96a8a784ea5745c90108f9e), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 2)" )
-EC_REDBR_SET( 199?, ec_redbr__b,	ec_redbr,	"issa106",					0x0000, 0x008000, CRC(77219ea1) SHA1(e4432e7c16b8911b272ae0bf3daf993649c4fd5f), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 3)" )
-EC_REDBR_SET( 199?, ec_redbr__c,	ec_redbr,	"issa107",					0x0000, 0x008000, CRC(e6e84ed9) SHA1(2151304bf7c2032edefd84ceb91a02af9df09c64), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 4)" )
+EC_REDBR_SET( 199?, ec_redbr,		0,			"issa101",					0x0000, 0x008000, CRC(05bba52d) SHA1(fe1f80a6621564f8ea0fd741618ebd80a78a0055), "Electrocoin","Red Bar (Electrocoin) (set 1)" )
+EC_REDBR_SET( 199?, ec_redbr__a,	ec_redbr,	"issa102",					0x0000, 0x008000, CRC(9aebf74c) SHA1(4da5d9240a2dcfdaa96a8a784ea5745c90108f9e), "Electrocoin","Red Bar (Electrocoin) (set 2)" )
+EC_REDBR_SET( 199?, ec_redbr__b,	ec_redbr,	"issa106",					0x0000, 0x008000, CRC(77219ea1) SHA1(e4432e7c16b8911b272ae0bf3daf993649c4fd5f), "Electrocoin","Red Bar (Electrocoin) (set 3)" )
+EC_REDBR_SET( 199?, ec_redbr__c,	ec_redbr,	"issa107",					0x0000, 0x008000, CRC(e6e84ed9) SHA1(2151304bf7c2032edefd84ceb91a02af9df09c64), "Electrocoin","Red Bar (Electrocoin) (set 4)" )
 // These are '2001 REDBAR' (newer header type)
-EC_REDBR_SET( 199?, ec_redbr__d,	ec_redbr,	"issa875",					0x0000, 0x008000, CRC(44cf12be) SHA1(4b9f001c9776989b4b21ed589b1dceb6cb040096), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 5)" )
-EC_REDBR_SET( 199?, ec_redbr__e,	ec_redbr,	"issa876",					0x0000, 0x008000, CRC(ef5d1343) SHA1(a609377a3dcfa7914a7a548e80e31fee3a6237fd), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 6)" )
-EC_REDBR_SET( 199?, ec_redbr__f,	ec_redbr,	"issa877",					0x0000, 0x008000, CRC(b39fa433) SHA1(0e2b012246259eab5f60575f404937077a285355), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 7)" )
-EC_REDBR_SET( 199?, ec_redbr__g,	ec_redbr,	"issa878",					0x0000, 0x008000, CRC(10ae2224) SHA1(f911e1762856bf5e0e23671bc3b34619d826363b), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 8)" )
-EC_REDBR_SET( 199?, ec_redbr__h,	ec_redbr,	"issa879",					0x0000, 0x008000, CRC(b50cf166) SHA1(89d5e0d5a4c72b34873c973806731afd2297539a), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 9)" )
-EC_REDBR_SET( 199?, ec_redbr__i,	ec_redbr,	"issa880",					0x0000, 0x008000, CRC(13c9cc9a) SHA1(d49b53e65066dded0b9cbf7b25ece320efa25a6b), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 10)" )
-EC_REDBR_SET( 199?, ec_redbr__j,	ec_redbr,	"issa881",					0x0000, 0x008000, CRC(5293c78f) SHA1(88de1a47bb01b47ecf36965e204be31c1e0edff8), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 11)" )
-EC_REDBR_SET( 199?, ec_redbr__k,	ec_redbr,	"issa882",					0x0000, 0x008000, CRC(2647ec6c) SHA1(58d14f140f4f421642a25054a4ebf121c77341b3), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 12)" )
-EC_REDBR_SET( 199?, ec_redbr__l,	ec_redbr,	"issa883",					0x0000, 0x008000, CRC(fbfbd720) SHA1(19c2ddf3edada5b93bef062e3f018f191f4b7c27), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 13)" )
-EC_REDBR_SET( 199?, ec_redbr__m,	ec_redbr,	"issa884",					0x0000, 0x008000, CRC(d453b1eb) SHA1(bc1f71c5bb8cbce8d7b3b5e5dbebd6739e1dc8d5), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 14)" )
-EC_REDBR_SET( 199?, ec_redbr__n,	ec_redbr,	"issa885",					0x0000, 0x008000, CRC(84032ad0) SHA1(f208a3d49d92e41a8027e8dae639984eeb4f38e1), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 15)" )
-EC_REDBR_SET( 199?, ec_redbr__o,	ec_redbr,	"issa886",					0x0000, 0x008000, CRC(08b62c24) SHA1(6284e2a60e4a4f134a850a2939ae6fd1c35527eb), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 16)" )
-EC_REDBR_SET( 199?, ec_redbr__p,	ec_redbr,	"issa887",					0x0000, 0x008000, CRC(71bfe8d0) SHA1(3de358518bc45287544a1473765d25931defec74), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 17)" )
-EC_REDBR_SET( 199?, ec_redbr__q,	ec_redbr,	"issa888",					0x0000, 0x008000, CRC(2e540dca) SHA1(920d294a06d0f79296c3ea36ffda38ffe6163865), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 18)" )
-EC_REDBR_SET( 199?, ec_redbr__r,	ec_redbr,	"issa889",					0x0000, 0x008000, CRC(12e36b6c) SHA1(77532657aa292fe921bff568c9cb2e5ca9a9dcc3), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 19)" )
-EC_REDBR_SET( 199?, ec_redbr__s,	ec_redbr,	"issa890",					0x0000, 0x008000, CRC(95dfeeef) SHA1(e3410ef6e58cd359c0474dfa5cf03c6a41324b5c), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 20)" )
-EC_REDBR_SET( 199?, ec_redbr__t,	ec_redbr,	"issa891",					0x0000, 0x008000, CRC(c8dbc495) SHA1(2a515df781859a14bf08d127648e021ba6555437), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 21)" )
-EC_REDBR_SET( 199?, ec_redbr__u,	ec_redbr,	"issa892",					0x0000, 0x008000, CRC(ece4429f) SHA1(b216f3c6a0c93871f24b0c15d1d8318a3cf94ca4), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 22)" )
-EC_REDBR_SET( 199?, ec_redbr__v,	ec_redbr,	"issa893",					0x0000, 0x008000, CRC(78ff5b1a) SHA1(5c26d234372a84ae02ba9a1b45f28db11beab0b5), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 23)" )
-EC_REDBR_SET( 199?, ec_redbr__w,	ec_redbr,	"issa894",					0x0000, 0x008000, CRC(d80638d6) SHA1(0df25fd35fbd91df2a3f0e4285a25ae0aad495b6), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 24)" )
-EC_REDBR_SET( 199?, ec_redbr__x,	ec_redbr,	"issa895",					0x0000, 0x008000, CRC(c6cf5865) SHA1(429a36c79dc415634d1a654fea12af1296b9d079), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 25)" )
-EC_REDBR_SET( 199?, ec_redbr__y,	ec_redbr,	"issa896",					0x0000, 0x008000, CRC(be073a53) SHA1(454cdb86aefd4cee15eeeb8711368321c2b6847b), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 26)" )
-EC_REDBR_SET( 199?, ec_redbr__z,	ec_redbr,	"issa897",					0x0000, 0x008000, CRC(1b5dbe15) SHA1(5f22b49ad28aeacdab66166e686051169543c302), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 27)" )
-EC_REDBR_SET( 199?, ec_redbr__0,	ec_redbr,	"issa898",					0x0000, 0x008000, CRC(d10ffa0f) SHA1(d5355672efc175e9b087d17da15f7de8d605c787), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 28)" )
-EC_REDBR_SET( 199?, ec_redbr__1,	ec_redbr,	"issa899",					0x0000, 0x008000, CRC(53291642) SHA1(2b18ee9ba5ac3f5dde1424fb8e0b90e5b07c98d8), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 29)" )
-EC_REDBR_SET( 199?, ec_redbr__2,	ec_redbr,	"issa900",					0x0000, 0x008000, CRC(45d906ea) SHA1(bd6253bbfc33b5c23a4abeb9c458b761a838c3f9), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 30)" )
-EC_REDBR_SET( 199?, ec_redbr__3,	ec_redbr,	"issa901",					0x0000, 0x008000, CRC(2ad3fad8) SHA1(7fb431744077923275be27af2244f6e58e3a7d8c), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 31)" )
-EC_REDBR_SET( 199?, ec_redbr__4,	ec_redbr,	"issa902",					0x0000, 0x008000, CRC(e8960b96) SHA1(2849f8a6da2499c5a9d1138ec1a4187e7105f4d4), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 32)" )
-EC_REDBR_SET( 199?, ec_redbr__5,	ec_redbr,	"issa903",					0x0000, 0x008000, CRC(68963097) SHA1(a7d859306d46b69893d76657fd13eee9f24f31dd), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 33)" )
-EC_REDBR_SET( 199?, ec_redbr__6,	ec_redbr,	"issa904",					0x0000, 0x008000, CRC(4b02cb77) SHA1(a221fa9eb17e55b9802d9080694a9df3985da238), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 34)" )
-EC_REDBR_SET( 199?, ec_redbr__7,	ec_redbr,	"issa905",					0x0000, 0x008000, CRC(ad3c4b1d) SHA1(fc44eb8af0ecc43e49df7a3bec867af7558300ab), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 35)" )
-EC_REDBR_SET( 199?, ec_redbr__8,	ec_redbr,	"issa906",					0x0000, 0x008000, CRC(04b8defd) SHA1(11dc07778cf8fb78ceded78370c4638c446898b7), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 36)" )
-EC_REDBR_SET( 199?, ec_redbr__9,	ec_redbr,	"issa907",					0x0000, 0x008000, CRC(2e8d3d19) SHA1(c60198aced2d78a5d3e24f56190ba70d51bb9f5a), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 37)" )
-EC_REDBR_SET( 199?, ec_redbr__aa,	ec_redbr,	"issa908",					0x0000, 0x008000, CRC(3bac5c64) SHA1(0a838c29e7df2a635d61dc41ba07831876c56e4f), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 38)" )
-EC_REDBR_SET( 199?, ec_redbr__ab,	ec_redbr,	"issa909",					0x0000, 0x008000, CRC(195c27a3) SHA1(a04b0ad0a34549a10c8ffd5ed1002073f3cc1df7), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 39)" )
-EC_REDBR_SET( 199?, ec_redbr__ac,	ec_redbr,	"issa910",					0x0000, 0x008000, CRC(47a6064b) SHA1(7862fab231aab326e09a6c94369c2632869f0ca4), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 40)" )
-EC_REDBR_SET( 199?, ec_redbr__ad,	ec_redbr,	"issa911",					0x0000, 0x008000, CRC(f51e04c6) SHA1(894598a099f4074c30daa3edbba3ac79ccec06bf), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 41)" )
-EC_REDBR_SET( 199?, ec_redbr__ae,	ec_redbr,	"issa912",					0x0000, 0x008000, CRC(39e16f1a) SHA1(d579a11e048addee45391f95b13686ebd7634e18), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 42)" )
-EC_REDBR_SET( 199?, ec_redbr__af,	ec_redbr,	"issa913",					0x0000, 0x008000, CRC(eee9e4aa) SHA1(b35e6a520c5fd87b0d5aa831feb84efc99b0536c), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 43)" )
-EC_REDBR_SET( 199?, ec_redbr__ag,	ec_redbr,	"issa914",					0x0000, 0x008000, CRC(0172f29d) SHA1(5ad731226cc5fca9c7a098bbf457d0feffa4444c), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 44)" )
-EC_REDBR_SET( 199?, ec_redbr__ah,	ec_redbr,	"issa915",					0x0000, 0x008000, CRC(9c0c74cc) SHA1(c109f119c7374d767ec79f2eca1c8e611c35c562), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 45)" )
-EC_REDBR_SET( 199?, ec_redbr__ai,	ec_redbr,	"issa916",					0x0000, 0x008000, CRC(8109abbb) SHA1(d62babfda5c08b566741c9e4a3680d5d28f3d9a3), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 46)" )
-EC_REDBR_SET( 199?, ec_redbr__aj,	ec_redbr,	"issa917",					0x0000, 0x008000, CRC(59030083) SHA1(1c7fed8717b9f291ed171f4d948470c183e25474), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 47)" )
-EC_REDBR_SET( 199?, ec_redbr__ak,	ec_redbr,	"issa918",					0x0000, 0x008000, CRC(a8b59637) SHA1(3a5b372643212fe478c0f83828c27a46ed923a87), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 48)" )
-EC_REDBR_SET( 199?, ec_redbr__al,	ec_redbr,	"issa919",					0x0000, 0x008000, CRC(6d8e60fe) SHA1(af3a09438176ddfce74b4d377268b9946d5c96cc), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 49)" )
-EC_REDBR_SET( 199?, ec_redbr__am,	ec_redbr,	"issa920",					0x0000, 0x008000, CRC(d9a6839d) SHA1(46ab0b6262f66d07f3cb3eaad2ecced7a2dc418d), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 50)" )
-EC_REDBR_SET( 199?, ec_redbr__an,	ec_redbr,	"issa921",					0x0000, 0x008000, CRC(58aa9d2a) SHA1(bab8e920cfd939913722d8a7b502624a7a67db71), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 51)" )
-EC_REDBR_SET( 199?, ec_redbr__ao,	ec_redbr,	"issa922",					0x0000, 0x008000, CRC(accf4ce0) SHA1(92830ece912145d01bb7c177ce8d0686dbb1bea1), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 52)" )
-EC_REDBR_SET( 199?, ec_redbr__ap,	ec_redbr,	"issa923",					0x0000, 0x008000, CRC(8f4328e9) SHA1(a0dd8a1ec643d8f5d98492f6fd9b7d2f08ecd64c), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 53)" )
-EC_REDBR_SET( 199?, ec_redbr__aq,	ec_redbr,	"issa924",					0x0000, 0x008000, CRC(f238edb7) SHA1(b4bf3c1831928b9f6bed9ca7b8cefea8c132eb17), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 54)" )
-EC_REDBR_SET( 199?, ec_redbr__ar,	ec_redbr,	"issa925",					0x0000, 0x008000, CRC(0179d257) SHA1(bcee53ab7430274539362d30ddf8f351783c10ad), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 55)" )
-EC_REDBR_SET( 199?, ec_redbr__as,	ec_redbr,	"issa926",					0x0000, 0x008000, CRC(eea16728) SHA1(b9aa46a2adbed7ac8b155f0de569ab2e2ac21b84), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 56)" )
-EC_REDBR_SET( 199?, ec_redbr__at,	ec_redbr,	"issa927",					0x0000, 0x008000, CRC(ce53791c) SHA1(daa0704f6a98404dc50d3a2f659a08075842c6fb), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 57)" )
-EC_REDBR_SET( 199?, ec_redbr__au,	ec_redbr,	"issa928",					0x0000, 0x008000, CRC(67201399) SHA1(7f014000a070173b90f54ab7639502fb2c594167), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 58)" )
-EC_REDBR_SET( 199?, ec_redbr__av,	ec_redbr,	"issa929",					0x0000, 0x008000, CRC(0fe2dfb5) SHA1(78aeeca13e3fc32afb1317d59be4e4eade022cc0), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 59)" )
-EC_REDBR_SET( 199?, ec_redbr__aw,	ec_redbr,	"issa930",					0x0000, 0x008000, CRC(b24d4e38) SHA1(36eb0415b19e0abaa7eab45c1121c0757509e4eb), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 60)" )
-EC_REDBR_SET( 199?, ec_redbr__ax,	ec_redbr,	"issa931",					0x0000, 0x008000, CRC(5047eb2d) SHA1(dbd57dbf6a0ca6f2f532811700dfa8f5e2d96810), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 61)" )
-EC_REDBR_SET( 199?, ec_redbr__ay,	ec_redbr,	"issa932",					0x0000, 0x008000, CRC(5577e4b6) SHA1(85ce8761d7ea37b5e5bca213a655e40af98594e1), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 62)" )
+EC_REDBR_SET( 199?, ec_redbr__d,	ec_redbr,	"issa875",					0x0000, 0x008000, CRC(44cf12be) SHA1(4b9f001c9776989b4b21ed589b1dceb6cb040096), "Electrocoin","Red Bar (Electrocoin) (set 5)" )
+EC_REDBR_SET( 199?, ec_redbr__e,	ec_redbr,	"issa876",					0x0000, 0x008000, CRC(ef5d1343) SHA1(a609377a3dcfa7914a7a548e80e31fee3a6237fd), "Electrocoin","Red Bar (Electrocoin) (set 6)" )
+EC_REDBR_SET( 199?, ec_redbr__f,	ec_redbr,	"issa877",					0x0000, 0x008000, CRC(b39fa433) SHA1(0e2b012246259eab5f60575f404937077a285355), "Electrocoin","Red Bar (Electrocoin) (set 7)" )
+EC_REDBR_SET( 199?, ec_redbr__g,	ec_redbr,	"issa878",					0x0000, 0x008000, CRC(10ae2224) SHA1(f911e1762856bf5e0e23671bc3b34619d826363b), "Electrocoin","Red Bar (Electrocoin) (set 8)" )
+EC_REDBR_SET( 199?, ec_redbr__h,	ec_redbr,	"issa879",					0x0000, 0x008000, CRC(b50cf166) SHA1(89d5e0d5a4c72b34873c973806731afd2297539a), "Electrocoin","Red Bar (Electrocoin) (set 9)" )
+EC_REDBR_SET( 199?, ec_redbr__i,	ec_redbr,	"issa880",					0x0000, 0x008000, CRC(13c9cc9a) SHA1(d49b53e65066dded0b9cbf7b25ece320efa25a6b), "Electrocoin","Red Bar (Electrocoin) (set 10)" )
+EC_REDBR_SET( 199?, ec_redbr__j,	ec_redbr,	"issa881",					0x0000, 0x008000, CRC(5293c78f) SHA1(88de1a47bb01b47ecf36965e204be31c1e0edff8), "Electrocoin","Red Bar (Electrocoin) (set 11)" )
+EC_REDBR_SET( 199?, ec_redbr__k,	ec_redbr,	"issa882",					0x0000, 0x008000, CRC(2647ec6c) SHA1(58d14f140f4f421642a25054a4ebf121c77341b3), "Electrocoin","Red Bar (Electrocoin) (set 12)" )
+EC_REDBR_SET( 199?, ec_redbr__l,	ec_redbr,	"issa883",					0x0000, 0x008000, CRC(fbfbd720) SHA1(19c2ddf3edada5b93bef062e3f018f191f4b7c27), "Electrocoin","Red Bar (Electrocoin) (set 13)" )
+EC_REDBR_SET( 199?, ec_redbr__m,	ec_redbr,	"issa884",					0x0000, 0x008000, CRC(d453b1eb) SHA1(bc1f71c5bb8cbce8d7b3b5e5dbebd6739e1dc8d5), "Electrocoin","Red Bar (Electrocoin) (set 14)" )
+EC_REDBR_SET( 199?, ec_redbr__n,	ec_redbr,	"issa885",					0x0000, 0x008000, CRC(84032ad0) SHA1(f208a3d49d92e41a8027e8dae639984eeb4f38e1), "Electrocoin","Red Bar (Electrocoin) (set 15)" )
+EC_REDBR_SET( 199?, ec_redbr__o,	ec_redbr,	"issa886",					0x0000, 0x008000, CRC(08b62c24) SHA1(6284e2a60e4a4f134a850a2939ae6fd1c35527eb), "Electrocoin","Red Bar (Electrocoin) (set 16)" )
+EC_REDBR_SET( 199?, ec_redbr__p,	ec_redbr,	"issa887",					0x0000, 0x008000, CRC(71bfe8d0) SHA1(3de358518bc45287544a1473765d25931defec74), "Electrocoin","Red Bar (Electrocoin) (set 17)" )
+EC_REDBR_SET( 199?, ec_redbr__q,	ec_redbr,	"issa888",					0x0000, 0x008000, CRC(2e540dca) SHA1(920d294a06d0f79296c3ea36ffda38ffe6163865), "Electrocoin","Red Bar (Electrocoin) (set 18)" )
+EC_REDBR_SET( 199?, ec_redbr__r,	ec_redbr,	"issa889",					0x0000, 0x008000, CRC(12e36b6c) SHA1(77532657aa292fe921bff568c9cb2e5ca9a9dcc3), "Electrocoin","Red Bar (Electrocoin) (set 19)" )
+EC_REDBR_SET( 199?, ec_redbr__s,	ec_redbr,	"issa890",					0x0000, 0x008000, CRC(95dfeeef) SHA1(e3410ef6e58cd359c0474dfa5cf03c6a41324b5c), "Electrocoin","Red Bar (Electrocoin) (set 20)" )
+EC_REDBR_SET( 199?, ec_redbr__t,	ec_redbr,	"issa891",					0x0000, 0x008000, CRC(c8dbc495) SHA1(2a515df781859a14bf08d127648e021ba6555437), "Electrocoin","Red Bar (Electrocoin) (set 21)" )
+EC_REDBR_SET( 199?, ec_redbr__u,	ec_redbr,	"issa892",					0x0000, 0x008000, CRC(ece4429f) SHA1(b216f3c6a0c93871f24b0c15d1d8318a3cf94ca4), "Electrocoin","Red Bar (Electrocoin) (set 22)" )
+EC_REDBR_SET( 199?, ec_redbr__v,	ec_redbr,	"issa893",					0x0000, 0x008000, CRC(78ff5b1a) SHA1(5c26d234372a84ae02ba9a1b45f28db11beab0b5), "Electrocoin","Red Bar (Electrocoin) (set 23)" )
+EC_REDBR_SET( 199?, ec_redbr__w,	ec_redbr,	"issa894",					0x0000, 0x008000, CRC(d80638d6) SHA1(0df25fd35fbd91df2a3f0e4285a25ae0aad495b6), "Electrocoin","Red Bar (Electrocoin) (set 24)" )
+EC_REDBR_SET( 199?, ec_redbr__x,	ec_redbr,	"issa895",					0x0000, 0x008000, CRC(c6cf5865) SHA1(429a36c79dc415634d1a654fea12af1296b9d079), "Electrocoin","Red Bar (Electrocoin) (set 25)" )
+EC_REDBR_SET( 199?, ec_redbr__y,	ec_redbr,	"issa896",					0x0000, 0x008000, CRC(be073a53) SHA1(454cdb86aefd4cee15eeeb8711368321c2b6847b), "Electrocoin","Red Bar (Electrocoin) (set 26)" )
+EC_REDBR_SET( 199?, ec_redbr__z,	ec_redbr,	"issa897",					0x0000, 0x008000, CRC(1b5dbe15) SHA1(5f22b49ad28aeacdab66166e686051169543c302), "Electrocoin","Red Bar (Electrocoin) (set 27)" )
+EC_REDBR_SET( 199?, ec_redbr__0,	ec_redbr,	"issa898",					0x0000, 0x008000, CRC(d10ffa0f) SHA1(d5355672efc175e9b087d17da15f7de8d605c787), "Electrocoin","Red Bar (Electrocoin) (set 28)" )
+EC_REDBR_SET( 199?, ec_redbr__1,	ec_redbr,	"issa899",					0x0000, 0x008000, CRC(53291642) SHA1(2b18ee9ba5ac3f5dde1424fb8e0b90e5b07c98d8), "Electrocoin","Red Bar (Electrocoin) (set 29)" )
+EC_REDBR_SET( 199?, ec_redbr__2,	ec_redbr,	"issa900",					0x0000, 0x008000, CRC(45d906ea) SHA1(bd6253bbfc33b5c23a4abeb9c458b761a838c3f9), "Electrocoin","Red Bar (Electrocoin) (set 30)" )
+EC_REDBR_SET( 199?, ec_redbr__3,	ec_redbr,	"issa901",					0x0000, 0x008000, CRC(2ad3fad8) SHA1(7fb431744077923275be27af2244f6e58e3a7d8c), "Electrocoin","Red Bar (Electrocoin) (set 31)" )
+EC_REDBR_SET( 199?, ec_redbr__4,	ec_redbr,	"issa902",					0x0000, 0x008000, CRC(e8960b96) SHA1(2849f8a6da2499c5a9d1138ec1a4187e7105f4d4), "Electrocoin","Red Bar (Electrocoin) (set 32)" )
+EC_REDBR_SET( 199?, ec_redbr__5,	ec_redbr,	"issa903",					0x0000, 0x008000, CRC(68963097) SHA1(a7d859306d46b69893d76657fd13eee9f24f31dd), "Electrocoin","Red Bar (Electrocoin) (set 33)" )
+EC_REDBR_SET( 199?, ec_redbr__6,	ec_redbr,	"issa904",					0x0000, 0x008000, CRC(4b02cb77) SHA1(a221fa9eb17e55b9802d9080694a9df3985da238), "Electrocoin","Red Bar (Electrocoin) (set 34)" )
+EC_REDBR_SET( 199?, ec_redbr__7,	ec_redbr,	"issa905",					0x0000, 0x008000, CRC(ad3c4b1d) SHA1(fc44eb8af0ecc43e49df7a3bec867af7558300ab), "Electrocoin","Red Bar (Electrocoin) (set 35)" )
+EC_REDBR_SET( 199?, ec_redbr__8,	ec_redbr,	"issa906",					0x0000, 0x008000, CRC(04b8defd) SHA1(11dc07778cf8fb78ceded78370c4638c446898b7), "Electrocoin","Red Bar (Electrocoin) (set 36)" )
+EC_REDBR_SET( 199?, ec_redbr__9,	ec_redbr,	"issa907",					0x0000, 0x008000, CRC(2e8d3d19) SHA1(c60198aced2d78a5d3e24f56190ba70d51bb9f5a), "Electrocoin","Red Bar (Electrocoin) (set 37)" )
+EC_REDBR_SET( 199?, ec_redbr__aa,	ec_redbr,	"issa908",					0x0000, 0x008000, CRC(3bac5c64) SHA1(0a838c29e7df2a635d61dc41ba07831876c56e4f), "Electrocoin","Red Bar (Electrocoin) (set 38)" )
+EC_REDBR_SET( 199?, ec_redbr__ab,	ec_redbr,	"issa909",					0x0000, 0x008000, CRC(195c27a3) SHA1(a04b0ad0a34549a10c8ffd5ed1002073f3cc1df7), "Electrocoin","Red Bar (Electrocoin) (set 39)" )
+EC_REDBR_SET( 199?, ec_redbr__ac,	ec_redbr,	"issa910",					0x0000, 0x008000, CRC(47a6064b) SHA1(7862fab231aab326e09a6c94369c2632869f0ca4), "Electrocoin","Red Bar (Electrocoin) (set 40)" )
+EC_REDBR_SET( 199?, ec_redbr__ad,	ec_redbr,	"issa911",					0x0000, 0x008000, CRC(f51e04c6) SHA1(894598a099f4074c30daa3edbba3ac79ccec06bf), "Electrocoin","Red Bar (Electrocoin) (set 41)" )
+EC_REDBR_SET( 199?, ec_redbr__ae,	ec_redbr,	"issa912",					0x0000, 0x008000, CRC(39e16f1a) SHA1(d579a11e048addee45391f95b13686ebd7634e18), "Electrocoin","Red Bar (Electrocoin) (set 42)" )
+EC_REDBR_SET( 199?, ec_redbr__af,	ec_redbr,	"issa913",					0x0000, 0x008000, CRC(eee9e4aa) SHA1(b35e6a520c5fd87b0d5aa831feb84efc99b0536c), "Electrocoin","Red Bar (Electrocoin) (set 43)" )
+EC_REDBR_SET( 199?, ec_redbr__ag,	ec_redbr,	"issa914",					0x0000, 0x008000, CRC(0172f29d) SHA1(5ad731226cc5fca9c7a098bbf457d0feffa4444c), "Electrocoin","Red Bar (Electrocoin) (set 44)" )
+EC_REDBR_SET( 199?, ec_redbr__ah,	ec_redbr,	"issa915",					0x0000, 0x008000, CRC(9c0c74cc) SHA1(c109f119c7374d767ec79f2eca1c8e611c35c562), "Electrocoin","Red Bar (Electrocoin) (set 45)" )
+EC_REDBR_SET( 199?, ec_redbr__ai,	ec_redbr,	"issa916",					0x0000, 0x008000, CRC(8109abbb) SHA1(d62babfda5c08b566741c9e4a3680d5d28f3d9a3), "Electrocoin","Red Bar (Electrocoin) (set 46)" )
+EC_REDBR_SET( 199?, ec_redbr__aj,	ec_redbr,	"issa917",					0x0000, 0x008000, CRC(59030083) SHA1(1c7fed8717b9f291ed171f4d948470c183e25474), "Electrocoin","Red Bar (Electrocoin) (set 47)" )
+EC_REDBR_SET( 199?, ec_redbr__ak,	ec_redbr,	"issa918",					0x0000, 0x008000, CRC(a8b59637) SHA1(3a5b372643212fe478c0f83828c27a46ed923a87), "Electrocoin","Red Bar (Electrocoin) (set 48)" )
+EC_REDBR_SET( 199?, ec_redbr__al,	ec_redbr,	"issa919",					0x0000, 0x008000, CRC(6d8e60fe) SHA1(af3a09438176ddfce74b4d377268b9946d5c96cc), "Electrocoin","Red Bar (Electrocoin) (set 49)" )
+EC_REDBR_SET( 199?, ec_redbr__am,	ec_redbr,	"issa920",					0x0000, 0x008000, CRC(d9a6839d) SHA1(46ab0b6262f66d07f3cb3eaad2ecced7a2dc418d), "Electrocoin","Red Bar (Electrocoin) (set 50)" )
+EC_REDBR_SET( 199?, ec_redbr__an,	ec_redbr,	"issa921",					0x0000, 0x008000, CRC(58aa9d2a) SHA1(bab8e920cfd939913722d8a7b502624a7a67db71), "Electrocoin","Red Bar (Electrocoin) (set 51)" )
+EC_REDBR_SET( 199?, ec_redbr__ao,	ec_redbr,	"issa922",					0x0000, 0x008000, CRC(accf4ce0) SHA1(92830ece912145d01bb7c177ce8d0686dbb1bea1), "Electrocoin","Red Bar (Electrocoin) (set 52)" )
+EC_REDBR_SET( 199?, ec_redbr__ap,	ec_redbr,	"issa923",					0x0000, 0x008000, CRC(8f4328e9) SHA1(a0dd8a1ec643d8f5d98492f6fd9b7d2f08ecd64c), "Electrocoin","Red Bar (Electrocoin) (set 53)" )
+EC_REDBR_SET( 199?, ec_redbr__aq,	ec_redbr,	"issa924",					0x0000, 0x008000, CRC(f238edb7) SHA1(b4bf3c1831928b9f6bed9ca7b8cefea8c132eb17), "Electrocoin","Red Bar (Electrocoin) (set 54)" )
+EC_REDBR_SET( 199?, ec_redbr__ar,	ec_redbr,	"issa925",					0x0000, 0x008000, CRC(0179d257) SHA1(bcee53ab7430274539362d30ddf8f351783c10ad), "Electrocoin","Red Bar (Electrocoin) (set 55)" )
+EC_REDBR_SET( 199?, ec_redbr__as,	ec_redbr,	"issa926",					0x0000, 0x008000, CRC(eea16728) SHA1(b9aa46a2adbed7ac8b155f0de569ab2e2ac21b84), "Electrocoin","Red Bar (Electrocoin) (set 56)" )
+EC_REDBR_SET( 199?, ec_redbr__at,	ec_redbr,	"issa927",					0x0000, 0x008000, CRC(ce53791c) SHA1(daa0704f6a98404dc50d3a2f659a08075842c6fb), "Electrocoin","Red Bar (Electrocoin) (set 57)" )
+EC_REDBR_SET( 199?, ec_redbr__au,	ec_redbr,	"issa928",					0x0000, 0x008000, CRC(67201399) SHA1(7f014000a070173b90f54ab7639502fb2c594167), "Electrocoin","Red Bar (Electrocoin) (set 58)" )
+EC_REDBR_SET( 199?, ec_redbr__av,	ec_redbr,	"issa929",					0x0000, 0x008000, CRC(0fe2dfb5) SHA1(78aeeca13e3fc32afb1317d59be4e4eade022cc0), "Electrocoin","Red Bar (Electrocoin) (set 59)" )
+EC_REDBR_SET( 199?, ec_redbr__aw,	ec_redbr,	"issa930",					0x0000, 0x008000, CRC(b24d4e38) SHA1(36eb0415b19e0abaa7eab45c1121c0757509e4eb), "Electrocoin","Red Bar (Electrocoin) (set 60)" )
+EC_REDBR_SET( 199?, ec_redbr__ax,	ec_redbr,	"issa931",					0x0000, 0x008000, CRC(5047eb2d) SHA1(dbd57dbf6a0ca6f2f532811700dfa8f5e2d96810), "Electrocoin","Red Bar (Electrocoin) (set 61)" )
+EC_REDBR_SET( 199?, ec_redbr__ay,	ec_redbr,	"issa932",					0x0000, 0x008000, CRC(5577e4b6) SHA1(85ce8761d7ea37b5e5bca213a655e40af98594e1), "Electrocoin","Red Bar (Electrocoin) (set 62)" )
 // Header 'REDBAR' - From 'Super Red Bar' set
-EC_REDBR_SET( 199?, ec_redbr__az,	ec_redbr,	"iss3037.rom",				0x0000, 0x008000, CRC(b1984539) SHA1(b8ff3690e47d10ef2d15ccc9198715a83d75a428), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 63)" )
-EC_REDBR_SET( 199?, ec_redbr__a0,	ec_redbr,	"iss3038.rom",				0x0000, 0x008000, CRC(890109fe) SHA1(69c47284497ad3488cff8f36b1ec615bf043fc5f), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 64)" )
-EC_REDBR_SET( 199?, ec_redbr__a1,	ec_redbr,	"iss3039.rom",				0x0000, 0x008000, CRC(25179e39) SHA1(6dd59e5eb3bb769d0018ae2691422108260a2c87), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 65)" )
-EC_REDBR_SET( 199?, ec_redbr__a2,	ec_redbr,	"iss3041.rom",				0x0000, 0x008000, CRC(eefe3086) SHA1(971e71026b8d519fa424180ecf029b6ba9abf5c2), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 66)" )
-EC_REDBR_SET( 199?, ec_redbr__a3,	ec_redbr,	"iss3042.rom",				0x0000, 0x008000, CRC(e5f69b11) SHA1(8de839b74dd3eea85b956ae0cb1d535926ce9489), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 67)" )
-EC_REDBR_SET( 199?, ec_redbr__a4,	ec_redbr,	"iss3043.rom",				0x0000, 0x008000, CRC(276fa423) SHA1(a69962ad6fa38d45b36da6bcff95f69f7175fff0), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 68)" )
-EC_REDBR_SET( 199?, ec_redbr__a5,	ec_redbr,	"iss3044.rom",				0x0000, 0x008000, CRC(9ce127a6) SHA1(2f223b37d0c6aca27b001c0ec81e413ff04dca86), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 69)" )
-EC_REDBR_SET( 199?, ec_redbr__a6,	ec_redbr,	"iss3045.rom",				0x0000, 0x008000, CRC(a79742a3) SHA1(42950e9e61bdf134753cd3fdc6e65446586530fd), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 70)" )
-EC_REDBR_SET( 199?, ec_redbr__a7,	ec_redbr,	"iss3047.rom",				0x0000, 0x008000, CRC(6f9defbe) SHA1(52c9791225373f109f63d5476a5b19aaeceb5058), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 71)" )
-EC_REDBR_SET( 199?, ec_redbr__a8,	ec_redbr,	"iss3048.rom",				0x0000, 0x008000, CRC(f26fcfe5) SHA1(0176366fb46d897a5e106611da885065655df576), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 72)" )
-EC_REDBR_SET( 199?, ec_redbr__a9,	ec_redbr,	"iss3256.rom",				0x0000, 0x008000, CRC(e9909913) SHA1(b53466238b8e39a45cdbc09dd18e19aab9044027), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 73)" )
-EC_REDBR_SET( 199?, ec_redbr__ba,	ec_redbr,	"iss3257.rom",				0x0000, 0x008000, CRC(27837c49) SHA1(4408a2066ae427b6f66b2d2be3928d85213c3dcf), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 74)" )
-EC_REDBR_SET( 199?, ec_redbr__bb,	ec_redbr,	"iss3258.rom",				0x0000, 0x008000, CRC(5a8214b9) SHA1(40cf50468157020ffd52f69308210cb93d94e6ab), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 75)" )
-EC_REDBR_SET( 199?, ec_redbr__bc,	ec_redbr,	"iss3259.rom",				0x0000, 0x008000, CRC(170a2827) SHA1(2d5f9991468e999c3874f04ef0396abc18c5de1d), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 76)" )
-EC_REDBR_SET( 199?, ec_redbr__bd,	ec_redbr,	"iss3260.rom",				0x0000, 0x008000, CRC(5f27fa81) SHA1(27d4463211f824abfb3a09270b38ddb68da75691), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 77)" )
-EC_REDBR_SET( 199?, ec_redbr__be,	ec_redbr,	"iss3261.rom",				0x0000, 0x008000, CRC(38dbbb65) SHA1(184dc9257db5cbf255fc997547be72c27ad9179b), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 78)" )
-EC_REDBR_SET( 199?, ec_redbr__bf,	ec_redbr,	"iss3262.rom",				0x0000, 0x008000, CRC(a51a240a) SHA1(fce1a96b15726bd08acd487c61776f7f805880c6), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 79)" )
-EC_REDBR_SET( 199?, ec_redbr__bg,	ec_redbr,	"iss3263.rom",				0x0000, 0x008000, CRC(e672b24d) SHA1(f33b750b2ede7d107684cea05903266ae98d8203), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 80)" )
-EC_REDBR_SET( 199?, ec_redbr__bh,	ec_redbr,	"iss3264.rom",				0x0000, 0x008000, CRC(a6c6efb7) SHA1(9ea95ee91745008edd1bed3c83e40325d92d6fb0), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 81)" )
-EC_REDBR_SET( 199?, ec_redbr__bi,	ec_redbr,	"iss3265.rom",				0x0000, 0x008000, CRC(10948d89) SHA1(bb503c895777dee197ad8fba49c3b52a5380a06e), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 82)" )
-EC_REDBR_SET( 199?, ec_redbr__bj,	ec_redbr,	"iss3266.rom",				0x0000, 0x008000, CRC(8228a9bf) SHA1(42f44bc7708703905f55143107395c7c10d4e150), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 83)" )
-EC_REDBR_SET( 199?, ec_redbr__bk,	ec_redbr,	"iss3267.rom",				0x0000, 0x008000, CRC(5398a151) SHA1(e1d37141707c703b5f6c13fd839bfd3c2da632a3), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 84)" )
-EC_REDBR_SET( 199?, ec_redbr__bl,	ec_redbr,	"srb58.bin",				0x0000, 0x008000, CRC(b2855bc7) SHA1(c9bc47250077050fb689fc552abc0f60c2acb8ea), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 85)" )
-EC_REDBR_SET( 199?, ec_redbr__bm,	ec_redbr,	"srb_10cash_ver153.bin",	0x0000, 0x008000, CRC(96f966f9) SHA1(82a87f8eb4914ed7fcc90751b119f72dda29532e), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 86)" )
+EC_REDBR_SET( 199?, ec_redbr__az,	ec_redbr,	"iss3037.rom",				0x0000, 0x008000, CRC(b1984539) SHA1(b8ff3690e47d10ef2d15ccc9198715a83d75a428), "Electrocoin","Red Bar (Electrocoin) (set 63)" )
+EC_REDBR_SET( 199?, ec_redbr__a0,	ec_redbr,	"iss3038.rom",				0x0000, 0x008000, CRC(890109fe) SHA1(69c47284497ad3488cff8f36b1ec615bf043fc5f), "Electrocoin","Red Bar (Electrocoin) (set 64)" )
+EC_REDBR_SET( 199?, ec_redbr__a1,	ec_redbr,	"iss3039.rom",				0x0000, 0x008000, CRC(25179e39) SHA1(6dd59e5eb3bb769d0018ae2691422108260a2c87), "Electrocoin","Red Bar (Electrocoin) (set 65)" )
+EC_REDBR_SET( 199?, ec_redbr__a2,	ec_redbr,	"iss3041.rom",				0x0000, 0x008000, CRC(eefe3086) SHA1(971e71026b8d519fa424180ecf029b6ba9abf5c2), "Electrocoin","Red Bar (Electrocoin) (set 66)" )
+EC_REDBR_SET( 199?, ec_redbr__a3,	ec_redbr,	"iss3042.rom",				0x0000, 0x008000, CRC(e5f69b11) SHA1(8de839b74dd3eea85b956ae0cb1d535926ce9489), "Electrocoin","Red Bar (Electrocoin) (set 67)" )
+EC_REDBR_SET( 199?, ec_redbr__a4,	ec_redbr,	"iss3043.rom",				0x0000, 0x008000, CRC(276fa423) SHA1(a69962ad6fa38d45b36da6bcff95f69f7175fff0), "Electrocoin","Red Bar (Electrocoin) (set 68)" )
+EC_REDBR_SET( 199?, ec_redbr__a5,	ec_redbr,	"iss3044.rom",				0x0000, 0x008000, CRC(9ce127a6) SHA1(2f223b37d0c6aca27b001c0ec81e413ff04dca86), "Electrocoin","Red Bar (Electrocoin) (set 69)" )
+EC_REDBR_SET( 199?, ec_redbr__a6,	ec_redbr,	"iss3045.rom",				0x0000, 0x008000, CRC(a79742a3) SHA1(42950e9e61bdf134753cd3fdc6e65446586530fd), "Electrocoin","Red Bar (Electrocoin) (set 70)" )
+EC_REDBR_SET( 199?, ec_redbr__a7,	ec_redbr,	"iss3047.rom",				0x0000, 0x008000, CRC(6f9defbe) SHA1(52c9791225373f109f63d5476a5b19aaeceb5058), "Electrocoin","Red Bar (Electrocoin) (set 71)" )
+EC_REDBR_SET( 199?, ec_redbr__a8,	ec_redbr,	"iss3048.rom",				0x0000, 0x008000, CRC(f26fcfe5) SHA1(0176366fb46d897a5e106611da885065655df576), "Electrocoin","Red Bar (Electrocoin) (set 72)" )
+EC_REDBR_SET( 199?, ec_redbr__a9,	ec_redbr,	"iss3256.rom",				0x0000, 0x008000, CRC(e9909913) SHA1(b53466238b8e39a45cdbc09dd18e19aab9044027), "Electrocoin","Red Bar (Electrocoin) (set 73)" )
+EC_REDBR_SET( 199?, ec_redbr__ba,	ec_redbr,	"iss3257.rom",				0x0000, 0x008000, CRC(27837c49) SHA1(4408a2066ae427b6f66b2d2be3928d85213c3dcf), "Electrocoin","Red Bar (Electrocoin) (set 74)" )
+EC_REDBR_SET( 199?, ec_redbr__bb,	ec_redbr,	"iss3258.rom",				0x0000, 0x008000, CRC(5a8214b9) SHA1(40cf50468157020ffd52f69308210cb93d94e6ab), "Electrocoin","Red Bar (Electrocoin) (set 75)" )
+EC_REDBR_SET( 199?, ec_redbr__bc,	ec_redbr,	"iss3259.rom",				0x0000, 0x008000, CRC(170a2827) SHA1(2d5f9991468e999c3874f04ef0396abc18c5de1d), "Electrocoin","Red Bar (Electrocoin) (set 76)" )
+EC_REDBR_SET( 199?, ec_redbr__bd,	ec_redbr,	"iss3260.rom",				0x0000, 0x008000, CRC(5f27fa81) SHA1(27d4463211f824abfb3a09270b38ddb68da75691), "Electrocoin","Red Bar (Electrocoin) (set 77)" )
+EC_REDBR_SET( 199?, ec_redbr__be,	ec_redbr,	"iss3261.rom",				0x0000, 0x008000, CRC(38dbbb65) SHA1(184dc9257db5cbf255fc997547be72c27ad9179b), "Electrocoin","Red Bar (Electrocoin) (set 78)" )
+EC_REDBR_SET( 199?, ec_redbr__bf,	ec_redbr,	"iss3262.rom",				0x0000, 0x008000, CRC(a51a240a) SHA1(fce1a96b15726bd08acd487c61776f7f805880c6), "Electrocoin","Red Bar (Electrocoin) (set 79)" )
+EC_REDBR_SET( 199?, ec_redbr__bg,	ec_redbr,	"iss3263.rom",				0x0000, 0x008000, CRC(e672b24d) SHA1(f33b750b2ede7d107684cea05903266ae98d8203), "Electrocoin","Red Bar (Electrocoin) (set 80)" )
+EC_REDBR_SET( 199?, ec_redbr__bh,	ec_redbr,	"iss3264.rom",				0x0000, 0x008000, CRC(a6c6efb7) SHA1(9ea95ee91745008edd1bed3c83e40325d92d6fb0), "Electrocoin","Red Bar (Electrocoin) (set 81)" )
+EC_REDBR_SET( 199?, ec_redbr__bi,	ec_redbr,	"iss3265.rom",				0x0000, 0x008000, CRC(10948d89) SHA1(bb503c895777dee197ad8fba49c3b52a5380a06e), "Electrocoin","Red Bar (Electrocoin) (set 82)" )
+EC_REDBR_SET( 199?, ec_redbr__bj,	ec_redbr,	"iss3266.rom",				0x0000, 0x008000, CRC(8228a9bf) SHA1(42f44bc7708703905f55143107395c7c10d4e150), "Electrocoin","Red Bar (Electrocoin) (set 83)" )
+EC_REDBR_SET( 199?, ec_redbr__bk,	ec_redbr,	"iss3267.rom",				0x0000, 0x008000, CRC(5398a151) SHA1(e1d37141707c703b5f6c13fd839bfd3c2da632a3), "Electrocoin","Red Bar (Electrocoin) (set 84)" )
+EC_REDBR_SET( 199?, ec_redbr__bl,	ec_redbr,	"srb58.bin",				0x0000, 0x008000, CRC(b2855bc7) SHA1(c9bc47250077050fb689fc552abc0f60c2acb8ea), "Electrocoin","Red Bar (Electrocoin) (set 85)" )
+EC_REDBR_SET( 199?, ec_redbr__bm,	ec_redbr,	"srb_10cash_ver153.bin",	0x0000, 0x008000, CRC(96f966f9) SHA1(82a87f8eb4914ed7fcc90751b119f72dda29532e), "Electrocoin","Red Bar (Electrocoin) (set 86)" )
 // These are 'REDBAR' they use the same header format as ec_big7
-EC_REDBR_SET( 199?, ec_redbr__bn,	ec_redbr,	"iss2021.rom",				0x0000, 0x008000, CRC(71fffd80) SHA1(49cc502e54e135bb131b8ac096619df9f1f29055), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 87)" )
-EC_REDBR_SET( 199?, ec_redbr__bo,	ec_redbr,	"iss3040.bin",				0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 88)" )
-EC_REDBR_SET( 199?, ec_redbr__bp,	ec_redbr,	"iss3046.rom",				0x0000, 0x008000, CRC(14109012) SHA1(d008488216d8e9c0dbe6d1c07d59b84637a8f41c), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 89)" )
-EC_REDBR_SET( 199?, ec_redbr__bq,	ec_redbr,	"iss9013.rom",				0x0000, 0x008000, CRC(d18d50b2) SHA1(7c471a15f33d22d8d1eb4971c8e3d2c360ec8db9), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 90)" )
+EC_REDBR_SET( 199?, ec_redbr__bn,	ec_redbr,	"iss2021.rom",				0x0000, 0x008000, CRC(71fffd80) SHA1(49cc502e54e135bb131b8ac096619df9f1f29055), "Electrocoin","Red Bar (Electrocoin) (set 87)" )
+EC_REDBR_SET( 199?, ec_redbr__bo,	ec_redbr,	"iss3040.bin",				0x0000, 0x008000, CRC(530c52a8) SHA1(65cc627baadd6385c314a4477475c69c1b213a5d), "Electrocoin","Red Bar (Electrocoin) (set 88)" )
+EC_REDBR_SET( 199?, ec_redbr__bp,	ec_redbr,	"iss3046.rom",				0x0000, 0x008000, CRC(14109012) SHA1(d008488216d8e9c0dbe6d1c07d59b84637a8f41c), "Electrocoin","Red Bar (Electrocoin) (set 89)" )
+EC_REDBR_SET( 199?, ec_redbr__bq,	ec_redbr,	"iss9013.rom",				0x0000, 0x008000, CRC(d18d50b2) SHA1(7c471a15f33d22d8d1eb4971c8e3d2c360ec8db9), "Electrocoin","Red Bar (Electrocoin) (set 90)" )
 // These are 'REDBAR'  Header area is all 0x00
-EC_REDBR_SET( 199?, ec_redbr__br,	ec_redbr,	"iss9409.rom",				0x0000, 0x008000, CRC(d35db982) SHA1(6f171e133a932c94843b6d03431bf6a3befaae86), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 91)" ) // from 'Casino Red Bar' set
-EC_REDBR_SET( 199?, ec_redbr__bs,	ec_redbr,	"iss9403.rom",				0x0000, 0x008000, CRC(b82c3ce7) SHA1(a13d9ea7dd6dd5172240dc51ccdfb8dabdc8f5b2), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 92)" )
-EC_REDBR_SET( 199?, ec_redbr__bt,	ec_redbr,	"iss9407.rom",				0x0000, 0x008000, CRC(e48992cf) SHA1(5d8dcf7be0d1f86ad795b2722f62009641d92528), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 93)" )
-EC_REDBR_SET( 199?, ec_redbr__bu,	ec_redbr,	"iss9410.rom",				0x0000, 0x008000, CRC(3711d488) SHA1(2455bc5635d9d318e0b2716547405e18a2d71bbe), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 94)" )
-EC_REDBR_SET( 199?, ec_redbr__bv,	ec_redbr,	"iss9411.rom",				0x0000, 0x008000, CRC(3ea6f32b) SHA1(e489c6a210f37e9c3c755321bfe979bf2f4898f5), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 95)" )
-EC_REDBR_SET( 199?, ec_redbr__bw,	ec_redbr,	"iss9412.rom",				0x0000, 0x008000, CRC(ddde37fb) SHA1(8a3a61bbe75e2d0e916a31a55fbd03ec38ed0c3e), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 96)" )
+EC_REDBR_SET( 199?, ec_redbr__br,	ec_redbr,	"iss9409.rom",				0x0000, 0x008000, CRC(d35db982) SHA1(6f171e133a932c94843b6d03431bf6a3befaae86), "Electrocoin","Red Bar (Electrocoin) (set 91)" ) // from 'Casino Red Bar' set
+EC_REDBR_SET( 199?, ec_redbr__bs,	ec_redbr,	"iss9403.rom",				0x0000, 0x008000, CRC(b82c3ce7) SHA1(a13d9ea7dd6dd5172240dc51ccdfb8dabdc8f5b2), "Electrocoin","Red Bar (Electrocoin) (set 92)" )
+EC_REDBR_SET( 199?, ec_redbr__bt,	ec_redbr,	"iss9407.rom",				0x0000, 0x008000, CRC(e48992cf) SHA1(5d8dcf7be0d1f86ad795b2722f62009641d92528), "Electrocoin","Red Bar (Electrocoin) (set 93)" )
+EC_REDBR_SET( 199?, ec_redbr__bu,	ec_redbr,	"iss9410.rom",				0x0000, 0x008000, CRC(3711d488) SHA1(2455bc5635d9d318e0b2716547405e18a2d71bbe), "Electrocoin","Red Bar (Electrocoin) (set 94)" )
+EC_REDBR_SET( 199?, ec_redbr__bv,	ec_redbr,	"iss9411.rom",				0x0000, 0x008000, CRC(3ea6f32b) SHA1(e489c6a210f37e9c3c755321bfe979bf2f4898f5), "Electrocoin","Red Bar (Electrocoin) (set 95)" )
+EC_REDBR_SET( 199?, ec_redbr__bw,	ec_redbr,	"iss9412.rom",				0x0000, 0x008000, CRC(ddde37fb) SHA1(8a3a61bbe75e2d0e916a31a55fbd03ec38ed0c3e), "Electrocoin","Red Bar (Electrocoin) (set 96)" )
 // Header 'REDBAR' - From Super Big 7 sets (some device at a001)
-EC_REDBR_SET( 199?, ec_redbr__bx,	ec_redbr,	"sb78ac",					0x0000, 0x008000, CRC(1eee47a4) SHA1(ebf5a535cddc50299ed07a2c424b4a46f5cf2b27), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 97)" )
-EC_REDBR_SET( 199?, ec_redbr__by,	ec_redbr,	"sbig.710",					0x0000, 0x008000, CRC(1220cea2) SHA1(97a8f6d1221acc1a6c3f84dd8e14693a40bd8de7), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 98)" )
-EC_REDBR_SET( 199?, ec_redbr__b0,	ec_redbr,	"sbig78d",					0x0000, 0x008000, CRC(bd5af5f2) SHA1(d1efaf21aad9869f593a9cb3732a7d120f2ff55b), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 100)" )
-EC_REDBR_SET( 199?, ec_redbr__b1,	ec_redbr,	"sbig78t",					0x0000, 0x008000, CRC(598b2bc3) SHA1(e9bc7dac5328e1973e56a4d8f3929d9cb7c606f1), "Electrocoin","Red Bar (Electrocoin) (Electrocoin) (set 101)" )
+EC_REDBR_SET( 199?, ec_redbr__bx,	ec_redbr,	"sb78ac",					0x0000, 0x008000, CRC(1eee47a4) SHA1(ebf5a535cddc50299ed07a2c424b4a46f5cf2b27), "Electrocoin","Red Bar (Electrocoin) (set 97)" )
+EC_REDBR_SET( 199?, ec_redbr__by,	ec_redbr,	"sbig.710",					0x0000, 0x008000, CRC(1220cea2) SHA1(97a8f6d1221acc1a6c3f84dd8e14693a40bd8de7), "Electrocoin","Red Bar (Electrocoin) (set 98)" )
+EC_REDBR_SET( 199?, ec_redbr__b0,	ec_redbr,	"sbig78d",					0x0000, 0x008000, CRC(bd5af5f2) SHA1(d1efaf21aad9869f593a9cb3732a7d120f2ff55b), "Electrocoin","Red Bar (Electrocoin) (set 100)" )
+EC_REDBR_SET( 199?, ec_redbr__b1,	ec_redbr,	"sbig78t",					0x0000, 0x008000, CRC(598b2bc3) SHA1(e9bc7dac5328e1973e56a4d8f3929d9cb7c606f1), "Electrocoin","Red Bar (Electrocoin) (set 101)" )
+
+
+
+#define EC_BXD7S_OTHERS \
+	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
+	/* probably the same sound rom */  \
+
+#define EC_BXD7S_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_BXD7S_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
+
+
+// These are '2006 COOL7'
+EC_BXD7S_SET( 199?, ec_bxd7s,		0,			"issc193.dat",	0x0000, 0x008000, CRC(2f3fb9e2) SHA1(426f7436c8a22f1d8a05a5ccef6b6b5551441028), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 1)" )  // P-2S K---
+EC_BXD7S_SET( 199?, ec_bxd7s__a,	ec_bxd7s,	"issc331",		0x0000, 0x008000, CRC(83c09f9d) SHA1(4ef9bb5ae779309d25bf673d8a59ea8cf65c84ba), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 2)" )  // --2S K---
+EC_BXD7S_SET( 199?, ec_bxd7s__b,	ec_bxd7s,	"issc330",		0x0000, 0x008000, CRC(4a8231ff) SHA1(470813fff14eeff3caad2cde710d4d1361231299), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 3)" ) // -1-- ----
+EC_BXD7S_SET( 199?, ec_bxd7s__c,	ec_bxd7s,	"issc325.rom",	0x0000, 0x008000, CRC(153f90a2) SHA1(df250a02e6b9c130b5f8856c1fdb9012517d15ce), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 4)" ) // in an unknown set
+EC_BXD7S_SET( 199?, ec_bxd7s__d,	ec_bxd7s,	"issc337",		0x0000, 0x008000, CRC(79b791aa) SHA1(ee6257b198b950d31690f1b12b98bdf483216b9d), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 5)" ) // P-2S K---   in a set marked 'magic bars'
 
 
 
 
 
-ROM_START( ec_bxd7s )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// These are '2006 COOL7'
-	ROM_LOAD( "issc193.dat", 0x0000, 0x008000, CRC(2f3fb9e2) SHA1(426f7436c8a22f1d8a05a5ccef6b6b5551441028) )  // P-2S K---
-	ROM_LOAD( "issc331",     0x0000, 0x008000, CRC(83c09f9d) SHA1(4ef9bb5ae779309d25bf673d8a59ea8cf65c84ba) )  // --2S K---
-	ROM_LOAD( "issc330", 0x0000, 0x008000, CRC(4a8231ff) SHA1(470813fff14eeff3caad2cde710d4d1361231299) ) // -1-- ----
-	ROM_LOAD( "issc325.rom", 0x0000, 0x008000, CRC(153f90a2) SHA1(df250a02e6b9c130b5f8856c1fdb9012517d15ce) ) // in an unknown set
-	ROM_LOAD( "issc337", 0x0000, 0x008000, CRC(79b791aa) SHA1(ee6257b198b950d31690f1b12b98bdf483216b9d) ) // P-2S K---   in a set marked 'magic bars'
-ROM_END
+#define EC_CASBX_OTHERS \
+	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
+	/* probably the same sound rom */  \
+
+#define EC_CASBX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_CASBX_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
 
-ROM_START( ec_casbx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	/* No header space, Z80 code */
-	ROM_LOAD( "bx125p25", 0x0000, 0x010000, CRC(beff03e1) SHA1(d0bf997f9766a801274a02242755df3419879bd4) )
-	ROM_LOAD( "x125n34.bin", 0x0000, 0x010000, CRC(5ab73808) SHA1(f857bd9a9a2f1c7c795a7203f2932acac051ae55) )
-
-	// These are '2006 BARX'
-	ROM_LOAD( "issc287", 0x0000, 0x008000, CRC(fe528b9f) SHA1(ac2a7648b9a706de780a059e7f77573be1d6b9cd) ) // P--- ----
-	ROM_LOAD( "issc293", 0x0000, 0x008000, CRC(93c83913) SHA1(b4cfed0836f57d7f6c828273468a89532607cde2) ) // P-2S K---
-
-	// These are '2006 BARX' (from Bar X Deluxe set)
-	ROM_LOAD( "issc289", 0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae) ) // P-2S K---
-ROM_END
+// These are '2006 BARX'
+EC_CASBX_SET( 199?, ec_casbx,		0,			"issc287",		0x0000, 0x008000, CRC(fe528b9f) SHA1(ac2a7648b9a706de780a059e7f77573be1d6b9cd), "Electrocoin","Casino Bar X (Electrocoin) (set 1)" ) // P--- ----
+EC_CASBX_SET( 199?, ec_casbx__a,	ec_casbx,	"issc293",		0x0000, 0x008000, CRC(93c83913) SHA1(b4cfed0836f57d7f6c828273468a89532607cde2), "Electrocoin","Casino Bar X (Electrocoin) (set 2)" ) // P-2S K---
+// These are '2006 BARX' (from Bar X Deluxe set)
+EC_CASBX_SET( 199?, ec_casbx__b,	ec_casbx,	"issc289",		0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae), "Electrocoin","Casino Bar X (Electrocoin) (set 3)" ) // P-2S K---
+/* No header space, Z80 code */
+EC_CASBX_SET( 199?, ec_casbx__c,	ec_casbx,	"bx125p25",		0x0000, 0x010000, CRC(beff03e1) SHA1(d0bf997f9766a801274a02242755df3419879bd4), "Electrocoin","Casino Bar X (Electrocoin) (set 4)" ) // different?
+EC_CASBX_SET( 199?, ec_casbx__d,	ec_casbx,	"x125n34.bin",	0x0000, 0x010000, CRC(5ab73808) SHA1(f857bd9a9a2f1c7c795a7203f2932acac051ae55), "Electrocoin","Casino Bar X (Electrocoin) (set 5)" ) // different?
 
 
 
-ROM_START( ec_spbxd )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	/* No header (space for one, but 0x00 fill) - Electrocin 1993 copyright near end */
-	ROM_LOAD( "iss132.rom", 0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c) )
-	ROM_LOAD( "iss133.rom", 0x0000, 0x008000, CRC(9522c295) SHA1(7b9f1c672c15b5e353c19ad5237ffd85f4c83fdb) )
-	ROM_LOAD( "iss134.rom", 0x0000, 0x008000, CRC(888809a6) SHA1(5e1163ef63616f4934a4894772457b70c5ef4fb2) )
-	ROM_LOAD( "iss176.rom", 0x0000, 0x008000, CRC(f6d0c2cd) SHA1(dfd5e040f2aa42d2186a0d3c94f692cfc560236a) )
-ROM_END
+
+#define EC_SPBDX_OTHERS \
+	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
+	/* probably the same sound rom */  \
+
+#define EC_SPBDX_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_SPBDX_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
 
+/* No header (space for one, but 0x00 fill) - Electrocin 1993 copyright near end */
+EC_SPBDX_SET( 199?, ec_spbdx,		0,			"iss132.rom",	0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 1)" )
+EC_SPBDX_SET( 199?, ec_spbdx__a,	ec_spbdx,	"iss133.rom",	0x0000, 0x008000, CRC(9522c295) SHA1(7b9f1c672c15b5e353c19ad5237ffd85f4c83fdb), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 2)" )
+EC_SPBDX_SET( 199?, ec_spbdx__b,	ec_spbdx,	"iss134.rom",	0x0000, 0x008000, CRC(888809a6) SHA1(5e1163ef63616f4934a4894772457b70c5ef4fb2), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 3)" )
+EC_SPBDX_SET( 199?, ec_spbdx__c,	ec_spbdx,	"iss176.rom",	0x0000, 0x008000, CRC(f6d0c2cd) SHA1(dfd5e040f2aa42d2186a0d3c94f692cfc560236a), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 4)" )
+EC_SPBDX_SET( 199?, ec_spbdx__d,	ec_spbdx,	"300615",		0x0000, 0x008000, CRC(8a5a4e35) SHA1(be3acfaf116ae23a61aac581d9f83287cddcdaab), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 5)" ) // bad?
 
-ROM_START( ec_unk1 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// (c)1993 ELECTROCOIN string near end, although the start seems missing? bad dump of something else?
-	ROM_LOAD( "300615", 0x0000, 0x008000, CRC(8a5a4e35) SHA1(be3acfaf116ae23a61aac581d9f83287cddcdaab) )
-ROM_END
 
-ROM_START( ec_unk5 )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	// No Header info (all 0x00)
-	ROM_LOAD( "iss9016.rom", 0x0000, 0x008000, CRC(e8ebafd0) SHA1(fa9fc04d04f9ac2360c66727afaf567527e95e01) )
-	ROM_LOAD( "iss9207.rom", 0x0000, 0x008000, CRC(f646702a) SHA1(9e2e7da0edaecd021861145b6abd1498fc3b563a) )
-	ROM_LOAD( "iss9208.rom", 0x0000, 0x008000, CRC(b4c3c98a) SHA1(10aeeca8c7b2923e3768f82c672229898c51062d) )
+#define EC_UNK5_OTHERS \
+	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
+	/* probably the same sound rom */  \
 
-	// No header.. no space for header
-	ROM_LOAD( "v1.1non_protocol.hex", 0x0000, 0x02680d, CRC(0b76e2de) SHA1(1bc330558e69b316a26d659463406324f24b5978) ) // convert from HEX and check
-ROM_END
+#define EC_UNK5_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_UNK5_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
+
+
+// No Header info (all 0x00)
+EC_UNK5_SET( 199?, ec_unk5,		0,			"iss9016.rom",			0x0000, 0x008000, CRC(e8ebafd0) SHA1(fa9fc04d04f9ac2360c66727afaf567527e95e01), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 1)" )
+EC_UNK5_SET( 199?, ec_unk5__a,	ec_unk5,	"iss9207.rom",			0x0000, 0x008000, CRC(f646702a) SHA1(9e2e7da0edaecd021861145b6abd1498fc3b563a), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 2)" )
+EC_UNK5_SET( 199?, ec_unk5__b,	ec_unk5,	"iss9208.rom",			0x0000, 0x008000, CRC(b4c3c98a) SHA1(10aeeca8c7b2923e3768f82c672229898c51062d), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 3)" )
+// No header.. no space for header
+EC_UNK5_SET( 199?, ec_unk5__c,	ec_unk5,	"v1.1non_protocol.hex", 0x0000, 0x02680d, CRC(0b76e2de) SHA1(1bc330558e69b316a26d659463406324f24b5978), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 4)" ) // convert from HEX and check
+
 
 
 /********************************************************************************************************************
@@ -1495,12 +1529,7 @@ DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
 }
 
 
-// Regular HW Type (there are all rather jumbled up and need sorting properly at some point)
-GAME( 19??, ec_bxd7s,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Bar X Diamond 7s (2006 COOL7) (Electrocoin) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Casino Bar X (Electrocoin) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_FLAGS)
+
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
 GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_FLAGS) // scrambled roms

@@ -26190,6 +26190,10 @@ ec_mag7s__ay	//
 ec_mag7s__az	//
 ec_mag7s__a0	//
 ec_bxd7s	// Bar X Diamond 7s (2006 COOL7) (Electrocoin)
+ec_bxd7s__a		//
+ec_bxd7s__b		//
+ec_bxd7s__c		//
+ec_bxd7s__d		//
 ec_big7		// Big 7 / Super Big 7 (Electrocoin)
 ec_big7__a	//
 ec_big7__b	//
@@ -26257,6 +26261,10 @@ ec_big7__a0	//
 ec_big7__a1	//
 ec_big7__a2	//
 ec_casbx	// Casino Bar X (Electrocoin)
+ec_casbx__a	//
+ec_casbx__b	//
+ec_casbx__c	//
+ec_casbx__d	//
 ec_redbr	// Red Bar (Electrocoin)
 ec_redbr__a		//
 ec_redbr__b		//
@@ -26435,9 +26443,16 @@ ec_sbarx__bb	//
 ec_sbarx__bc	//
 ec_sbarx__bd	//
 ec_sbarx__be	//
-ec_spbxd	// Super Bar X Deluxe (Electrocoin)
-ec_unk1		// Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin)
+ec_spbdx	// Super Bar X Deluxe (Electrocoin)
+ec_spbdx__a	//
+ec_spbdx__b	//
+ec_spbdx__c	//
+ec_spbdx__d	//
 ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin)
+ec_unk5__a	//
+ec_unk5__b	//
+ec_unk5__c	//
+
 ec_barxmab	// Bar X (MAB PCB) (Electrocoin)
 ec_spbg7mab	// Super Big 7 (MAB PCB) (Electrocoin)
 ec_supbxmab	// Super Bar X (MAB PCB) (Electrocoin)
