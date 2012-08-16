@@ -46,7 +46,63 @@ void kaneko_hit_device::set_type(device_t &device, int hittype)
 
 void kaneko_hit_device::device_start()
 {
+	/* m_hit */
+	save_item(NAME(m_hit.x1p));
+	save_item(NAME(m_hit.y1p));
+	save_item(NAME(m_hit.x1s));
+	save_item(NAME(m_hit.y1s));
+	save_item(NAME(m_hit.x2p));
+	save_item(NAME(m_hit.y2p));
+	save_item(NAME(m_hit.x2s));
+	save_item(NAME(m_hit.y2s));
+	save_item(NAME(m_hit.x12));
+	save_item(NAME(m_hit.y12));
+	save_item(NAME(m_hit.x21));
+	save_item(NAME(m_hit.y21));
+	save_item(NAME(m_hit.mult_a));
+	save_item(NAME(m_hit.mult_b));
 
+	/* m_hit3 */
+	save_item(NAME(m_hit3.x1p));
+	save_item(NAME(m_hit3.y1p));
+	save_item(NAME(m_hit3.z1p));
+	save_item(NAME(m_hit3.x1s));
+	save_item(NAME(m_hit3.y1s));
+	save_item(NAME(m_hit3.z1s));
+	save_item(NAME(m_hit3.x2p));
+	save_item(NAME(m_hit3.y2p));
+	save_item(NAME(m_hit3.z2p));
+	save_item(NAME(m_hit3.x2s));
+	save_item(NAME(m_hit3.y2s));
+	save_item(NAME(m_hit3.z2s));
+	save_item(NAME(m_hit3.x1po));
+	save_item(NAME(m_hit3.y1po));
+	save_item(NAME(m_hit3.z1po));
+	save_item(NAME(m_hit3.x1so));
+	save_item(NAME(m_hit3.y1so));
+	save_item(NAME(m_hit3.z1so));
+	save_item(NAME(m_hit3.x2po));
+	save_item(NAME(m_hit3.y2po));
+	save_item(NAME(m_hit3.z2po));
+	save_item(NAME(m_hit3.x2so));
+	save_item(NAME(m_hit3.y2so));
+	save_item(NAME(m_hit3.z2so));
+	save_item(NAME(m_hit3.x12));
+	save_item(NAME(m_hit3.y12));
+	save_item(NAME(m_hit3.z12));
+	save_item(NAME(m_hit3.x21));
+	save_item(NAME(m_hit3.y21));
+	save_item(NAME(m_hit3.z21));
+	save_item(NAME(m_hit3.x_coll));
+	save_item(NAME(m_hit3.y_coll));
+	save_item(NAME(m_hit3.z_coll));
+	save_item(NAME(m_hit3.x1tox2));
+	save_item(NAME(m_hit3.y1toy2));
+	save_item(NAME(m_hit3.z1toz2));
+	save_item(NAME(m_hit3.mult_a));
+	save_item(NAME(m_hit3.mult_b));
+	save_item(NAME(m_hit3.flags));
+	save_item(NAME(m_hit3.mode));
 }
 
 void kaneko_hit_device::device_reset()

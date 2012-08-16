@@ -34,6 +34,22 @@ void kaneko_grap2_device::device_start()
 	m_framebuffer_palette = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x200/2);
 	m_framebuffer_unk1 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400/2);
 	m_framebuffer_unk2 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400/2);
+
+	save_pointer(NAME(m_framebuffer), 0x80000/2);
+	save_pointer(NAME(m_framebuffer_palette), 0x200/2);
+	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
+	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
+
+	save_item(NAME(m_framebuffer_bgcol));
+	save_item(NAME(m_framebuffer_scrolly));
+	save_item(NAME(m_framebuffer_scrollx));
+	save_item(NAME(m_framebuffer_enable));
+	save_item(NAME(m_regs1_i));
+	save_item(NAME(m_framebuffer_bright1));
+	save_item(NAME(m_framebuffer_bright2));
+	save_item(NAME(m_regs1_address_regs[0x0]));
+	save_item(NAME(m_regs1_address_regs[0x1]));
+
 }
 
 void kaneko_grap2_device::device_reset()
@@ -131,7 +147,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 	UINT32 address = m_regs1_address_regs[1]| (m_regs1_address_regs[0]<<16);
 	UINT8* rledata = memregion(":gfx2")->base();
 
-	printf("galpani3_regs1_go_w? %08x\n",address );
+//	printf("galpani3_regs1_go_w? %08x\n",address );
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer, rledata);
 }
 

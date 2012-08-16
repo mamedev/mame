@@ -4381,7 +4381,7 @@ M4PRZRF_SET( 199?, m4przrf__j,	m4przrf,	"pr8y.p1",	0x0000, 0x020000, CRC(8740c01
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZRFM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
 
 
 
@@ -4569,7 +4569,7 @@ M4LUCKSC_SET( 199?, m4lucksc__l,	m4lucksc,	"lsc_.1_1",		0x0000, 0x020000, CRC(79
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZLUX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
+	GAME(year, setname, parent ,mod4oki	,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
 
 
 M4PRZLUX_SET( 199?, m4przlux,		0,			"plxs.p1",	0x0000, 0x010000, CRC(0aea0339) SHA1(28da52924fe2bf00799ef466143103e08399f5f5), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 1)" )
@@ -4689,7 +4689,7 @@ M4KINGQC_SET( 199?, m4kingqc__k,	m4kingqc,	"cn_20bgc.5_1", 0x0000, 0x010000, CRC
 M4KINGQC_SET( 199?, m4kingqc__l,	m4kingqc,	"cn_20btc.2_1", 0x0000, 0x010000, CRC(b8f0ade0) SHA1(5b5344f799b27833f6456ae852eb5085afb3dbe5), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 13)" )
 M4KINGQC_SET( 199?, m4kingqc__m,	m4kingqc,	"cn_20btc.3_1", 0x0000, 0x010000, CRC(b92f3787) SHA1(7efd815cf1a9a738ffae2c3ce19149f47d465c72), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 14)" )
 M4KINGQC_SET( 199?, m4kingqc__n,	m4kingqc,	"cn_20btc.5_1", 0x0000, 0x010000, CRC(e2b8baf0) SHA1(23e966a6cc94c26903bfe943160a327529d7e21b), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 15)" )
-M4KINGQC_SET( 199?, m4kingqc__q,	m4kingqc,	"cn_20sbc.5_1", 0x0000, 0x007e02, CRC(a20d7293) SHA1(2e83b73907b867aec20edacb9b49250f746faa3e), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 16)" )
+M4KINGQC_SET( 199?, m4kingqc__q,	m4kingqc,	"cn_20sbc.5_1", 0x0000, 0x010000, CRC(8b49bf8c) SHA1(2c6835e343e7cdcc197c0105e13cc4f6ddd3f0d3), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 16)" )
 M4KINGQC_SET( 199?, m4kingqc__r,	m4kingqc,	"cn_25_bc.2_1", 0x0000, 0x010000, CRC(3e2b2d7b) SHA1(9a68cf4902ca210e8fb52a35b4c507708c7f6d2a), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 17)" )
 M4KINGQC_SET( 199?, m4kingqc__s,	m4kingqc,	"cn_25_dc.2_1", 0x0000, 0x010000, CRC(eb384ef6) SHA1(489c59d8e1e6296ec2b05fb0aa307c48f3486aa2), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 18)" )
 M4KINGQC_SET( 199?, m4kingqc__t,	m4kingqc,	"cn_25_kc.2_1", 0x0000, 0x010000, CRC(bd11e742) SHA1(0c3b290e3010bc3f904f9087ee89efe63072b8c3), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 19)" )

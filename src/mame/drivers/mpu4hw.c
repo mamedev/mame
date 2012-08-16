@@ -458,6 +458,9 @@ static MACHINE_RESET( mpu4 )
 		UINT8 *rom = state->memregion("maincpu")->base();
 		size_t romsize = state->memregion("maincpu")->bytes();
 
+		if (romsize < 0x10000)
+			fatalerror("maincpu ROM region is < 0x10000 bytes, check ROM\n");
+
 		int numbanks = romsize / 0x10000;
 
 		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
@@ -2593,9 +2596,18 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default);
-	m_bwb_bank=1;
-	space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
-	space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
+
+	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	if (size<=0x10000)
+	{
+		printf("extended banking selected on set <=0x10000 in size, ignoring");
+	}
+	else
+	{
+		m_bwb_bank=1;
+		space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
+		space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
+	}
 }
 
 

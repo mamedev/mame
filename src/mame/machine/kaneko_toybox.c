@@ -25,10 +25,6 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 	Where does the hardcoded EEPROM default data come from (there is a command to restore defaults directly, not from RAM)
 	Where does the data for the additional tables come from, a transfer mode none of the other games use is used. (related to src[offs+6] and src[offs+7] params? )
 
- galpani3:
-    Move EEPROM to default eeprom file, use same EEPROM handling as the rest
-
-
 
 MCU parameters:
 ---------------
@@ -80,6 +76,14 @@ void kaneko_toybox_device::device_start()
 	m_toybox_mcuram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x10000/2);
 	memset(m_toybox_mcu_com, 0, 4 * sizeof( UINT16) );
 	toxboy_decrypt_rom(this->machine());
+
+
+	save_pointer(NAME(m_toybox_mcuram), 0x10000/2);
+	save_item(NAME(m_toybox_mcu_com[0]));
+	save_item(NAME(m_toybox_mcu_com[1]));
+	save_item(NAME(m_toybox_mcu_com[2]));
+	save_item(NAME(m_toybox_mcu_com[3]));
+
 }
 
 void kaneko_toybox_device::device_reset()
