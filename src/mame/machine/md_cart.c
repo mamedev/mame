@@ -102,7 +102,8 @@ enum
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */
 	SBUBBOB,                     /* Super Bubble Bobble */
-	TOPFIGHTER                   /* Top Fighter 2000 MK VIII */
+	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
+	PSOLAR						 /* Pier Solar */
 };
 
 typedef struct _md_pcb  md_pcb;
@@ -160,7 +161,8 @@ static const md_pcb pcb_list[] =
 	{"TOPFIGHTER", TOPFIGHTER},
 	{"POKEMON", POKEMON},
 	{"POKEMON2", POKEMON2},
-	{"MULAN", MULAN}
+	{"MULAN", MULAN},
+	{"PSOLAR", PSOLAR}
 };
 
 static int md_get_pcb_id(const char *pcb)
@@ -176,7 +178,7 @@ static int md_get_pcb_id(const char *pcb)
 	return SEGA_STD;
 }
 
-#define MAX_MD_CART_SIZE 0x500000
+#define MAX_MD_CART_SIZE 0x800000
 
 /* where a fresh copy of rom is stashed for reset and banking setup */
 #define VIRGIN_COPY_GEN 0xd00000
@@ -834,7 +836,44 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 }
 
+/*************************************
+ *  Pier Solar banking
+ *************************************/
 
+static WRITE16_HANDLER( psolar_bank_w )
+{
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
+	logerror("switch bank %02x, page %02x\n",offset, data);
+	memcpy(&ROM[0x280000 + (0x80000 * offset)], &ROM[VIRGIN_COPY_GEN + (0x80000 * (data&0x0f))], 0x80000);
+}
+
+static WRITE16_HANDLER( psolar_unk_w )
+{
+	logerror("A13001 write %02x\n", data);
+}
+
+static int psolar_rdcnt = 0;
+
+static READ16_HANDLER( psolar_hack_r )
+{
+	// ugly hack until we don't know much about game protection
+	// first 3 reads from 15e6 return 0x00000010, then normal 0x00018010 value for crc check
+	UINT16 res;
+	if (psolar_rdcnt < 6) {
+		psolar_rdcnt++;
+		if (offset)
+			res = 0x10;
+		else
+			res = 0x00;
+	} else {
+		if (offset)
+			res = 0x8010;
+		else
+			res = 0x0001;
+	}
+	logerror("read 0x15e6 %d\n",psolar_rdcnt);
+	return res;
+}
 /*************************************
  *
  *  Handlers for SRAM & EEPROM
@@ -1006,6 +1045,193 @@ static WRITE16_HANDLER( codemasters_eeprom_w )
 
 //  i2cmem_sda_write(space->machine().device("i2cmem"), state->m_md_cart.i2c_clk);
 //  i2cmem_scl_write(space->machine().device("i2cmem"), state->m_md_cart.i2c_mem);
+}
+
+/* ST M95320 32Kbit serial EEPROM implementation */
+
+#define M95320_SIZE 0x1000
+typedef enum
+{
+	IDLE = 0,
+	CMD_WRSR,
+	CMD_RDSR,
+	CMD_READ,
+	CMD_WRITE,
+	READING,
+	WRITING
+} STMSTATE;
+
+class stm95_device
+{
+public:
+	stm95_device() : stm_state(IDLE), stream_pos(0) {};
+	UINT8	*eeprom_data;
+	void	set_cs_line(int);
+	void	set_halt_line(int state) {}; // not implemented
+	void	set_si_line(int);
+	void	set_sck_line(int state);
+	int		get_so_line(void);
+protected:
+	int		latch;
+	int		reset_line;
+	int		sck_line;
+	int		WEL;
+
+	STMSTATE	stm_state;
+	int		stream_pos;
+	int		stream_data;
+	int		eeprom_addr;
+};
+
+void stm95_device::set_cs_line(int state)
+{
+	reset_line = state;
+	if (reset_line != CLEAR_LINE)
+	{
+		stream_pos = 0;
+		stm_state = IDLE;
+	}
+}
+
+void stm95_device::set_si_line(int state)
+{
+	latch = state;
+}
+
+int stm95_device::get_so_line(void)
+{
+	if (stm_state == READING || stm_state == CMD_RDSR)
+		return (stream_data >> 8) & 1;
+	else
+		return 0;
+}
+
+void stm95_device::set_sck_line(int state)
+{
+	if (reset_line == CLEAR_LINE)
+	{
+		if (state == ASSERT_LINE && sck_line == CLEAR_LINE)
+		{
+			switch (stm_state)
+			{
+				case IDLE:
+					stream_data = (stream_data << 1) | (latch ? 1 : 0);
+					stream_pos++;
+					if (stream_pos == 8)
+					{
+						stream_pos = 0;
+						//printf("STM95 EEPROM: got cmd %02X\n", stream_data&0xff);
+						switch(stream_data & 0xff)
+						{
+							case 0x01:	// write status register
+								if (WEL != 0)
+									stm_state = CMD_WRSR;
+								WEL = 0;
+								break;
+							case 0x02:	// write
+								if (WEL != 0)
+									stm_state = CMD_WRITE;
+								stream_data = 0;
+								WEL = 0;
+								break;
+							case 0x03:	// read
+								stm_state = CMD_READ;
+								stream_data = 0;
+								break;
+							case 0x04:	// write disable
+								WEL = 0;
+								break;
+							case 0x05:	// read status register
+								stm_state = CMD_RDSR;
+								stream_data = WEL<<1;
+								break;
+							case 0x06:	// write enable
+								WEL = 1;
+								break;
+							default:
+								logerror("STM95 EEPROM: unknown cmd %02X\n", stream_data&0xff);
+						}
+					}
+					break;
+				case CMD_WRSR:
+					stream_pos++;		// just skip, don't care block protection
+					if (stream_pos == 8)
+					{
+						stm_state = IDLE;
+						stream_pos = 0;
+					}
+					break;
+				case CMD_RDSR:
+					stream_data = stream_data<<1;
+					stream_pos++;
+					if (stream_pos == 8)
+					{
+						stm_state = IDLE;
+						stream_pos = 0;
+					}
+					break;
+				case CMD_READ:
+					stream_data = (stream_data << 1) | (latch ? 1 : 0);
+					stream_pos++;
+					if (stream_pos == 16)
+					{
+						eeprom_addr = stream_data & (M95320_SIZE - 1);
+						stream_data = eeprom_data[eeprom_addr];
+						stm_state = READING;
+						stream_pos = 0;
+					}
+					break;
+				case READING:
+					stream_data = stream_data<<1;
+					stream_pos++;
+					if (stream_pos == 8)
+					{
+						if (++eeprom_addr == M95320_SIZE)
+							eeprom_addr = 0;
+						stream_data |= eeprom_data[eeprom_addr];
+						stream_pos = 0;
+					}
+					break;
+				case CMD_WRITE:
+					stream_data = (stream_data << 1) | (latch ? 1 : 0);
+					stream_pos++;
+					if (stream_pos == 16)
+					{
+						eeprom_addr = stream_data & (M95320_SIZE - 1);
+						stm_state = WRITING;
+						stream_pos = 0;
+					}
+					break;
+				case WRITING:
+					stream_data = (stream_data << 1) | (latch ? 1 : 0);
+					stream_pos++;
+					if (stream_pos == 8)
+					{
+						eeprom_data[eeprom_addr] = stream_data;
+						if (++eeprom_addr == M95320_SIZE)
+							eeprom_addr = 0;
+						stream_pos = 0;
+					}
+					break;
+			}
+		}
+	}
+	sck_line = state;
+}
+
+stm95_device STM95;
+
+static READ16_HANDLER( psolar_eeprom_r )
+{
+	return STM95.get_so_line() & 1;
+}
+
+static WRITE16_HANDLER( psolar_eeprom_w )
+{
+	STM95.set_si_line(data & 0x01);
+	STM95.set_cs_line((data & 0x08)?ASSERT_LINE:CLEAR_LINE);
+	STM95.set_halt_line((data & 0x04)?ASSERT_LINE:CLEAR_LINE);
+	STM95.set_sck_line((data & 0x02)?ASSERT_LINE:CLEAR_LINE);
 }
 
 /*************************************
@@ -1215,6 +1441,13 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
 
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x700000, 0x7fffff, FUNC(topfig_bank_w) );
 			break;
+		case PSOLAR:
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa13002, 0xa13007, FUNC(psolar_bank_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa13000, 0xa13001, FUNC(psolar_unk_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0015e6, 0x0015e9, FUNC(psolar_hack_r));
+			psolar_rdcnt = 0;
+			break;
 	}
 
 	/* games whose protection gets patched out */
@@ -1363,6 +1596,17 @@ static void setup_megadriv_sram(device_image_interface &image)
 			state->m_md_cart.has_serial_eeprom = 1;
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x300000, 0x300001, FUNC(codemasters_eeprom_w));
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x380000, 0x380001, FUNC(codemasters_eeprom_r));
+			break;
+		case PSOLAR:
+			state->m_md_cart.sram_start = 0x800000;
+			state->m_md_cart.sram_end = state->m_md_cart.sram_start + M95320_SIZE - 1;
+			state->m_md_cart.sram = auto_alloc_array(machine, UINT16, M95320_SIZE / sizeof(UINT16));
+			image.battery_load(state->m_md_cart.sram, M95320_SIZE, 0xff);
+			STM95.eeprom_data = (UINT8*)state->m_md_cart.sram;
+
+			state->m_md_cart.has_serial_eeprom = 1;
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa13008, 0xa13009, FUNC(psolar_eeprom_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa1300a, 0xa1300b, FUNC(psolar_eeprom_r));
 			break;
 	}
 
@@ -1551,7 +1795,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 
 	state->m_md_cart.last_loaded_image_length = -1;
 
-	length = image.fread( rawROM + 0x2000, 0x600000);
+	length = image.fread( rawROM + 0x2000, 0x800000);
 
 	logerror("image length = 0x%x\n", length);
 
@@ -1824,7 +2068,10 @@ static int megadrive_load_nonlist(device_image_interface &image)
 			    if (!allendianmemcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
 					state->m_md_cart.type = SSF2;
 			    break;
-
+			case 0x800000:
+			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-574023-", 12)) // Pier Solar
+					state->m_md_cart.type = PSOLAR;
+			    break;
 			default:
 			    break;
 		}

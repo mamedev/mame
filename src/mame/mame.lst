@@ -11471,6 +11471,9 @@ crzmon_5		// (c) 2003
 crzmon_7		// (c) 2003
 crzmon_8		// (c) 2003
 crzmon_9		// (c) 2003
+//crzmon_10		// (c) 2003
+//crzmon_11		// (c) 2003
+//crzmon_12		// (c) 2003
 
 // Fruit Cocktail
 //fcockt		// (c) 2003
@@ -11485,6 +11488,8 @@ fcockt_9		// (c) 2003
 fcockt_10		// (c) 2003
 fcockt_11		// (c) 2003
 fcockt_12		// (c) 2003
+//fcockt_13		// (c) 2003
+fcockt_14		// (c) 2003
 
 // Lucky Haunter
 //lhaunt		// (c) 2003
@@ -11495,6 +11500,8 @@ lhaunt_5		// (c) 2003
 lhaunt_6		// (c) 2003
 lhaunt_7		// (c) 2003
 lhaunt_8		// (c) 2003
+//lhaunt_9		// (c) 2003
+lhaunt_10		// (c) 2003
 
 // Rollfruit
 //rollfr		// (c) 2003
@@ -11510,6 +11517,8 @@ garage_4		// (c) 2004
 garage_5		// (c) 2004
 garage_6		// (c) 2004
 garage_7		// (c) 2004
+//garage_8		// (c) 2004
+garage_9		// (c) 2004
 
 // Rock Climber
 //rclimb_2  	// (c) 2004
@@ -11517,6 +11526,8 @@ rclimb			// (c) 2004
 rclimb_3		// (c) 2004
 rclimb_4		// (c) 2004
 rclimb_5		// (c) 2004
+//rclimb_6		// (c) 2004
+rclimb_7		// (c) 2004
 
 // Sweet Life
 sweetl			// (c) 2004
@@ -11526,6 +11537,8 @@ sweetl_2		// (c) 2004
 resdnt			// (c) 2004
 resdnt_2		// (c) 2004
 resdnt_3		// (c) 2004
+//resdnt_4		// (c) 2004
+//resdnt_5		// (c) 2004
 
 // Island
 island			// (c) 2005
@@ -11541,24 +11554,37 @@ pirate_4		// (c) 2005
 island2			// (c) 2006
 island2_3		// (c) 2006
 island2_4		// (c) 2006
+island2_5		// (c) 2006
+island2_6		// (c) 2006
 
 // Pirate 2
 pirate2			// (c) 2006
 pirate2_2		// (c) 2006
+pirate2_3		// (c) 2006
+pirate2_4		// (c) 2006
 
 // Keks
 keks			// (c) 2006
 keks_2			// (c) 2006
 keks_3			// (c) 2006
+keks_4			// (c) 2006
+keks_5			// (c) 2006
 
 // Gnome
 gnome			// (c) 2007
 gnome_2			// (c) 2007
 gnome_3			// (c) 2007
+gnome_4			// (c) 2007
+gnome_5			// (c) 2007
+//gnome_6			// (c) 2007
+gnome_7			// (c) 2007
+//gnome_8			// (c) 2007
 
 // Sweet Life 2
 sweetl2			// (c) 2007
 sweetl2_2		// (c) 2007
+sweetl2_3		// (c) 2007
+sweetl2_4		// (c) 2007
 
 // Fruit Cocktail 2
 fcockt2			// (c) 2008
@@ -11566,6 +11592,8 @@ fcockt2			// (c) 2008
 fcockt2_3		// (c) 2008
 fcockt2_4		// (c) 2008
 fcockt2_5		// (c) 2008
+fcockt2_6		// (c) 2008
+fcockt2_7		// (c) 2008
 
 
 // Igrosoft bootleg sets
@@ -11665,6 +11693,8 @@ gnome_2a		// bootleg
 gnome_3a		// bootleg
 gnome_3b		// bootleg
 gnome_3c		// bootleg
+gnome_5a		// bootleg
+gnome_5b		// bootleg
 sweetl2_2a		// bootleg - Sweet Life 2
 sweetl2_2b		// bootleg
 sweetl2_2c		// bootleg
