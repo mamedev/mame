@@ -5,7 +5,7 @@
 
   Encrypted gambling hardware based on a custom CPU.
 
-  Driver by Roberto Fresca & Angelo Salese.
+  Driver by Roberto Fresca.
 
 
 ***********************************************************************************
@@ -362,6 +362,11 @@
 ***********************************************************************************
 
 
+  [2012/08/15]
+
+  - Added dynamic length to the color PROMs decode routines based on ROM region length.
+    This fixes a horrible hang/crash in DEBUG=1 builds.
+
   [2012/04/27]
 
   - Reworked the decryption function.
@@ -538,7 +543,7 @@ static PALETTE_INIT( amaticmg2 )
 	int	r, g, b;
 	int	i;
 
-	for (i = 0; i < 0x20000; i+=2)
+	for (i = 0; i < machine.root_device().memregion("proms")->bytes(); i+=2)
 	{
 		b = ((color_prom[1] & 0xf8) >> 3);
 		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
@@ -828,6 +833,11 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 	DEVCB_DRIVER_MEMBER(amaticmg_state,out_c_w)			/* Port C write */
 };
 
+
+/************************************
+*       Machine Start & Reset       *
+************************************/
+
 static MACHINE_START( amaticmg )
 {
 	UINT8 *rombank = machine.root_device().memregion("maincpu")->base();
@@ -842,6 +852,7 @@ static MACHINE_RESET( amaticmg )
 	state->membank("bank1")->set_entry(0);
 	state->m_nmi_mask = 0;
 }
+
 
 /************************************
 *          Machine Drivers          *
@@ -1106,7 +1117,7 @@ DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 *           Game Drivers            *
 ************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                        LAYOUT */
+/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                        LAYOUT */
 GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 GAME_IMPERFECT_SOUND,                                                                                        layout_suprstar )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
