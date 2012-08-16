@@ -88,6 +88,8 @@
 #define LOG_PALETTE			0
 #define LOG_IOCHIP			0
 
+int segac2_bg_pal_lookup[4];
+int segac2_sp_pal_lookup[4];
 
 static void recompute_palette_tables( running_machine &machine );
 
@@ -113,12 +115,20 @@ static MACHINE_START( segac2 )
 static MACHINE_RESET( segac2 )
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
-	megadriv_framerate = 60;
+//	megadriv_framerate = 60;
 
 
 //	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
 //	megadriv_scanline_timer->adjust(attotime::zero);
+	segac2_bg_pal_lookup[0] = 0x00;
+	segac2_bg_pal_lookup[1] = 0x10;
+	segac2_bg_pal_lookup[2] = 0x20;
+	segac2_bg_pal_lookup[3] = 0x30;
 
+	segac2_sp_pal_lookup[0] = 0x00;
+	segac2_sp_pal_lookup[1] = 0x10;
+	segac2_sp_pal_lookup[2] = 0x20;
+	segac2_sp_pal_lookup[3] = 0x30;
 
 	megadriv_reset_vdp(machine);
 
@@ -226,19 +236,19 @@ static WRITE16_HANDLER( palette_w )
 	/* set the color */
 	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
-	megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
-	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
+//	megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
+//	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
 
 	tmpr = r >> 1;
 	tmpg = g >> 1;
 	tmpb = b >> 1;
-	megadrive_vdp_palette_lookup_shadow[offset] = (tmpb) | (tmpg << 5) | (tmpr << 10);
+	palette_set_color_rgb(space->machine(), offset + 0x800, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
 
 	// how is it calculated on c2?
 	tmpr = tmpr | 0x10;
 	tmpg = tmpg | 0x10;
 	tmpb = tmpb | 0x10;
-	megadrive_vdp_palette_lookup_highlight[offset] = (tmpb) | (tmpg << 5) | (tmpr << 10);
+	palette_set_color_rgb(space->machine(), offset + 0x1000, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
 }
 
 
@@ -1261,25 +1271,72 @@ static const ym3438_interface ym3438_intf =
 static VIDEO_START(segac2_new)
 {
 	VIDEO_START_CALL(megadriv);
-
-	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x1000/2);
-	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x1000/2);
-	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine, UINT16, 0x1000/2);
-	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine, UINT16, 0x1000/2);
 }
 
+// C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
+//  and applies it's own external colour circuity 
 static SCREEN_UPDATE_RGB32(segac2_new)
 {
+	const pen_t *paldata = screen.machine().pens;
 	segac2_state *state = screen.machine().driver_data<segac2_state>();
 	if (!state->m_segac2_enable_display)
 	{
-		bitmap.fill(get_black_pen(screen.machine()));
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
-	SCREEN_UPDATE32_CALL(megadriv);
+	sega_genesis_vdp_device *vdp = state->m_vdp;
+
+	/* Copy our screen buffer here */
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		UINT32* desty = &bitmap.pix32(y, 0);
+		UINT16* srcy;
+		
+		srcy = vdp->m_render_line_raw;
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			UINT16 src = srcy[x];
+			switch (src & 0x1c0)
+			{
+				case 0x000:
+					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x800];
+					break;
+				case 0x040:
+					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4]];
+					break;
+				case 0x080:
+					desty[x] = paldata[(src&0x0f) | segac2_sp_pal_lookup[(src & 0x30)>>4]];
+					break;
+				case 0x0c0:
+					// bg pen
+					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x1000];
+					break;
+				case 0x100:
+					// shadow
+					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x800];
+					break;
+				case 0x140:
+					// normal
+					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4]];
+					break;
+				case 0x180:
+					// sprite
+					desty[x] = paldata[(src&0x0f) | segac2_sp_pal_lookup[(src & 0x30)>>4]];
+					break;
+				case 0x1c0:
+					// highlight
+					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x1000];
+					break;
+			}
+		}
+	}
+
 	return 0;
 }
+
+
 
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
@@ -1335,7 +1392,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SCREEN_UPDATE_STATIC(segac2_new)
 	MCFG_SCREEN_VBLANK_STATIC( megadriv )
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_LENGTH(2048*3)
 
 	MCFG_VIDEO_START(segac2_new)
 

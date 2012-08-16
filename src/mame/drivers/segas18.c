@@ -62,11 +62,9 @@
 #include "machine/segaic16.h"
 #include "machine/nvram.h"
 #include "includes/segas18.h"
-#include "includes/genesis.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "includes/segaipt.h"
-
 
 /*************************************
  *
@@ -105,7 +103,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			{
 				case ROM_BOARD_171_SHADOW:	break;	// ???
 				case ROM_BOARD_171_5874:	
-				case ROM_BOARD_171_5987:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::legacy_wrapper_r<genesis_vdp_r>), this), write16_delegate(FUNC(segas18_state::legacy_wrapper<genesis_vdp_w>), this)); break;
+				case ROM_BOARD_171_5987:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
 				default:					assert(false);
 			}
 			break;
@@ -113,7 +111,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 		case 1:
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_SHADOW:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::legacy_wrapper_r<genesis_vdp_r>), this), write16_delegate(FUNC(segas18_state::legacy_wrapper<genesis_vdp_w>), this)); break;
+				case ROM_BOARD_171_SHADOW:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
 				case ROM_BOARD_171_5874:	mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate());	break;
 				case ROM_BOARD_171_5987:	if (romsize <= 0x100000)
 												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
@@ -205,6 +203,9 @@ void segas18_state::machine_reset()
 {
 	segaic16_tilemap_reset(machine(), 0);
 
+	megadriv_reset_vdp(machine());
+	genvdp_use_cram = 1;
+	
 	// if we are running with a real live 8751, we need to boost the interleave at startup
 	if (m_mcu != NULL && m_mcu->type() == I8751)
 		synchronize(TID_INITIAL_BOOST);
@@ -565,6 +566,22 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
 {
 	m_mcu_data = data;
 	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
+}
+
+/*************************************
+ *
+ *  VDP memory handlers
+ *
+ *************************************/
+
+READ16_MEMBER( segas18_state::genesis_vdp_r )
+{
+	return m_vdp->megadriv_vdp_r(space,offset,mem_mask);
+}
+
+WRITE16_MEMBER( segas18_state::genesis_vdp_w )
+{
+	m_vdp->megadriv_vdp_w(space,offset,data,mem_mask);
 }
 
 
@@ -1195,6 +1212,19 @@ GFXDECODE_END
 
 
 
+// are any of the VDP interrupt lines hooked up to anything?
+void genesis_vdp_sndirqline_callback_segas18(running_machine &machine, bool state)
+{
+}
+
+void genesis_vdp_lv6irqline_callback_segas18(running_machine &machine, bool state)
+{
+}
+
+void genesis_vdp_lv4irqline_callback_segas18(running_machine &machine, bool state)
+{
+}
+
 /*************************************
  *
  *  Machine driver
@@ -1216,6 +1246,17 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
+
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segas18);
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segas18);
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_segas18);
+	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
+	sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(*device, 0x2000);
+
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
+
+
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.23)    // verified on pcb
@@ -1224,7 +1265,7 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
 
 	MCFG_GFXDECODE(segas18)
-	MCFG_PALETTE_LENGTH(2048*3+2048)
+	MCFG_PALETTE_LENGTH(2048*3+2048 + 64*3)
 
 	MCFG_SEGA16SP_ADD_16B("segaspr1")
 

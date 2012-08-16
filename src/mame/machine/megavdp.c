@@ -30,16 +30,10 @@ int megadrive_total_scanlines;
 int megadrive_vblank_flag = 0;
 int genesis_scanline_counter = 0;
 
-int segac2_bg_pal_lookup[4];
-int segac2_sp_pal_lookup[4];
 
 // hacks for C2
 int genvdp_use_cram = 0; // c2 uses it's own palette ram
 
-UINT16* megadrive_vdp_palette_lookup;
-UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
-UINT16* megadrive_vdp_palette_lookup_shadow;
-UINT16* megadrive_vdp_palette_lookup_highlight;
 
 int megadrive_region_export;
 int megadrive_region_pal;
@@ -75,6 +69,7 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 	m_genesis_vdp_lv6irqline_callback = genesis_vdp_lv6irqline_callback_default;
 	m_genesis_vdp_lv4irqline_callback = genesis_vdp_lv4irqline_callback_default;
 	m_use_alt_timing = 0;
+	m_palwrite_base = -1;
 }
 
 static TIMER_CALLBACK( megadriv_render_timer_callback )
@@ -134,6 +129,14 @@ void sega_genesis_vdp_device::set_genesis_vdp_alt_timing(device_t &device, int u
 	dev.m_use_alt_timing = use_alt_timing;
 }
 
+void sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base)
+{
+	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
+	dev.m_palwrite_base = palwrite_base;
+}
+
+
+
 
 void sega_genesis_vdp_device::device_start()
 {
@@ -178,6 +181,19 @@ void sega_genesis_vdp_device::device_start()
 	m_highpri_renderline = auto_alloc_array(machine(), UINT8, 320);
 	m_video_renderline = auto_alloc_array(machine(), UINT32, 320);
 
+	megadrive_vdp_palette_lookup = auto_alloc_array(machine(), UINT16, 0x40);
+	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine(), UINT16, 0x40);
+
+	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine(), UINT16, 0x40);
+	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine(), UINT16, 0x40);
+
+	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
+	memset(megadrive_vdp_palette_lookup_sprite,0x00,0x40*2);
+
+	memset(megadrive_vdp_palette_lookup_shadow,0x00,0x40*2);
+	memset(megadrive_vdp_palette_lookup_highlight,0x00,0x40*2);
+
+
 	if (!m_use_alt_timing)
 	{
 		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
@@ -187,11 +203,14 @@ void sega_genesis_vdp_device::device_start()
 		m_render_line = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
 	}
 
+	m_render_line_raw = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
 
 	irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
 	irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
 	megadriv_render_timer = machine().scheduler().timer_alloc(FUNC(megadriv_render_timer_callback), (void*)this);
 
+	m_space68k = machine().device<legacy_cpu_device>(":maincpu")->space();
+	m_cpu68k = machine().device<legacy_cpu_device>(":maincpu");
 }
 
 void sega_genesis_vdp_device::device_reset()
@@ -275,7 +294,12 @@ void sega_genesis_vdp_device::write_cram_value(running_machine &machine, int off
 		r = ((data >> 1)&0x07);
 		g = ((data >> 5)&0x07);
 		b = ((data >> 9)&0x07);
-		palette_set_color_rgb(machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
+		if (m_palwrite_base != -1)
+		{
+			palette_set_color_rgb(machine,offset + m_palwrite_base ,pal3bit(r),pal3bit(g),pal3bit(b));
+			palette_set_color_rgb(machine,offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
+			palette_set_color_rgb(machine,offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
+		}
 		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
@@ -452,14 +476,13 @@ void sega_genesis_vdp_device::update_m_vdp_code_and_address(void)
                             ((m_vdp_command_part2 & 0x0003) << 14);
 }
 
-UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source);
+UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space* space68k);
 
-UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source)
+UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space* space68k)
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
 	// note, the RV bit on 32x is important for this to work, because it causes a normal cart mapping - see tempo
-	address_space *space68k = machine.device<legacy_cpu_device>("maincpu")->space();
 
 	//printf("vdp_get_word_from_68k_mem_default %08x\n", source);
 
@@ -552,11 +575,11 @@ void sega_genesis_vdp_device::megadrive_do_insta_68k_to_vram_dma(running_machine
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	device_spin_until_time(machine.device(":maincpu"), attotime::from_nsec(length * 1000 / 3500));
+	device_spin_until_time(m_cpu68k, attotime::from_nsec(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
-		vdp_vram_write(vdp_get_word_from_68k_mem(machine, source));
+		vdp_vram_write(vdp_get_word_from_68k_mem(machine, source, m_space68k));
 		source+=2;
 		if (source>0xffffff) source = 0xe00000;
 	}
@@ -582,7 +605,7 @@ void sega_genesis_vdp_device::megadrive_do_insta_68k_to_cram_dma(running_machine
 	{
 		//if (m_vdp_address>=0x80) return; // abandon
 
-		write_cram_value(machine, (m_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(machine, source));
+		write_cram_value(machine, (m_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(machine, source, m_space68k));
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
@@ -610,7 +633,7 @@ void sega_genesis_vdp_device::megadrive_do_insta_68k_to_vsram_dma(running_machin
 	{
 		if (m_vdp_address>=0x80) return; // abandon
 
-		m_vsram[(m_vdp_address&0x7e)>>1] = vdp_get_word_from_68k_mem(machine, source);
+		m_vsram[(m_vdp_address&0x7e)>>1] = vdp_get_word_from_68k_mem(machine, source, m_space68k);
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
@@ -2575,13 +2598,24 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 				}
 			}
 
+			if (!(dat&0x20000))
+				m_render_line_raw[x] = 0x100;
+			else
+				m_render_line_raw[x] = 0x000;
 
+	
 			if (drawn==0)
 			{
 				if (dat&0x10000)
-					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f) | segac2_sp_pal_lookup[(dat&0x30)>>4]];
+				{
+					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x3f)];
+					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
+				}
 				else
-					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+				{
+					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x3f)];
+					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
+				}
 			}
 
 
@@ -2619,6 +2653,11 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 				}
 			}
 
+			if (!(dat&0x20000))
+				m_render_line_raw[x] = 0x100;
+			else
+				m_render_line_raw[x] = 0x000;
+
 
 			if (drawn==0)
 			{
@@ -2631,23 +2670,27 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 					case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
 					case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
 					case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-						lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+						lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat&0x3f)];
+						m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
 						break;
 
 					case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 					case 0x8000: // low pri, highlight sprite = normal;
-						lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+						lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x3f)];
+						m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 						break;
 
 					case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 					case 0x18000: // (sprite) low pri, highlight sprite = normal;
-						lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f)  | segac2_sp_pal_lookup[(dat&0x30)>>4]];
+						lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x3f)];
+						m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 						break;
 
 
 					case 0x0c000: // normal pri, highlight set = highlight?
 					case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-						lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+						lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat&0x3f)];
+						m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
 						break;
 
 					case 0x0a000: // shadow set, highlight set - not possible
@@ -2655,9 +2698,10 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 					case 0x1a000: // (sprite)shadow set, highlight set - not possible
 					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					default:
-						lineptr[x] = machine.rand()&0x3f;
+						lineptr[x] = m_render_line_raw[x] |= (machine.rand()&0x3f);
 					break;
 				}
+
 			}
 
 
@@ -2701,28 +2745,6 @@ void sega_genesis_vdp_device::genesis_render_scanline(running_machine &machine)
 
 VIDEO_START(megadriv)
 {
-	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x40);
-	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x40);
-
-	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine, UINT16, 0x40);
-	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine, UINT16, 0x40);
-
-	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
-	memset(megadrive_vdp_palette_lookup_sprite,0x00,0x40*2);
-
-	memset(megadrive_vdp_palette_lookup_shadow,0x00,0x40*2);
-	memset(megadrive_vdp_palette_lookup_highlight,0x00,0x40*2);
-
-	/* no special lookups */
-	segac2_bg_pal_lookup[0] = 0x00;
-	segac2_bg_pal_lookup[1] = 0x10;
-	segac2_bg_pal_lookup[2] = 0x20;
-	segac2_bg_pal_lookup[3] = 0x30;
-
-	segac2_sp_pal_lookup[0] = 0x00;
-	segac2_sp_pal_lookup[1] = 0x10;
-	segac2_sp_pal_lookup[2] = 0x20;
-	segac2_sp_pal_lookup[3] = 0x30;
 }
 
 
@@ -2879,16 +2901,16 @@ void sega_genesis_vdp_device::vdp_handle_eof(running_machine &machine)
 	switch (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1))
 	{
 		 /* note, add 240 mode + init new timings! */
-		case 0:scr_width = 256;break;// configure_screen(0, 256-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
-		case 1:scr_width = 256;break;// configure_screen(0, 256-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); mame_printf_debug("invalid screenmode!\n"); break;
-		case 2:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break; /* technically invalid, but used in rare cases */
-		case 3:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
+		case 0:scr_width = 256;break;
+		case 1:scr_width = 256;break;
+		case 2:scr_width = 320;break;
+		case 3:scr_width = 320;break;
 	}
 //      mame_printf_debug("my mode %02x", m_vdp_regs[0x0c]);
 
 	visarea.set(0, scr_width-1, 0, megadrive_visible_scanlines-1);
 
-	machine.primary_screen->configure(480, megadrive_total_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
+	machine.primary_screen->configure(480, megadrive_total_scanlines, visarea, machine.primary_screen->frame_period().attoseconds);
 
 
 	if(_32x_is_connected)

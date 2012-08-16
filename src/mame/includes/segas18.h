@@ -41,6 +41,7 @@
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "machine/megavdp.h"
 
 
 // ======================> segas18_state
@@ -55,6 +56,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_mcu(*this, "mcu"),
+		  m_vdp(*this, "gen_vdp"),
 		  m_nvram(*this, "nvram"),
 		  m_workram(*this, "workram"),
 		  m_romboard(ROM_BOARD_INVALID),
@@ -92,6 +94,10 @@ public:
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE8_MEMBER( soundbank_w );
 	DECLARE_WRITE8_MEMBER( mcu_data_w );
+
+	DECLARE_READ16_MEMBER( genesis_vdp_r );
+	DECLARE_WRITE16_MEMBER( genesis_vdp_w );
+
 
 	// custom I/O
 	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );
@@ -142,6 +148,7 @@ protected:
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
+	required_device<sega_genesis_vdp_device> m_vdp;
 	required_device<nvram_device> m_nvram;
 
 	// memory pointers	

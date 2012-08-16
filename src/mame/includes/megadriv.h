@@ -452,8 +452,8 @@ extern WRITE16_HANDLER( jcart_ctrl_w );
 extern READ16_HANDLER( jcart_ctrl_r );
 
 /* machine/megavdp.c */
-extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source);
-extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source);
+extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space* space);
+extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space* space);
 extern int megadriv_framerate;
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
@@ -468,9 +468,7 @@ extern int genvdp_use_cram;
 extern int megadrive_region_export;
 extern int megadrive_region_pal;
 TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
-TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing );
 
 /* machine/megadriv.c */
 extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
 extern timer_device* megadriv_scanline_timer;
-extern void megadriv_reset_vdp(running_machine &machine);

@@ -146,6 +146,11 @@ typedef void (*genesis_vdp_sndirqline_callback_func)(running_machine &machine, b
 typedef void (*genesis_vdp_lv6irqline_callback_func)(running_machine &machine, bool state);
 typedef void (*genesis_vdp_lv4irqline_callback_func)(running_machine &machine, bool state);
 
+TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing );
+extern void megadriv_reset_vdp(running_machine &machine);
+extern int genvdp_use_cram;
+
+
 class sega_genesis_vdp_device : public device_t
 {
 public:
@@ -155,8 +160,11 @@ public:
 	static void set_genesis_vdp_lv6irqline_callback(device_t &device, genesis_vdp_lv6irqline_callback_func callback);
 	static void set_genesis_vdp_lv4irqline_callback(device_t &device, genesis_vdp_lv4irqline_callback_func callback);
 	static void set_genesis_vdp_alt_timing(device_t &device, int use_alt_timing);
+	static void set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base);
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
+	
+	int m_palwrite_base; // if we want to write to the actual MAME palette..
 
 	DECLARE_READ16_MEMBER( megadriv_vdp_r );
 	DECLARE_WRITE16_MEMBER( megadriv_vdp_w );
@@ -181,6 +189,7 @@ public:
 
 	bitmap_ind16* m_render_bitmap;
 	UINT16* m_render_line;
+	UINT16* m_render_line_raw;
 
 protected:
 	virtual void device_start();
@@ -266,6 +275,13 @@ private:
 	UINT8* m_sprite_renderline;
 	UINT8* m_highpri_renderline;
 	UINT32* m_video_renderline;
+	UINT16* megadrive_vdp_palette_lookup;
+	UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
+	UINT16* megadrive_vdp_palette_lookup_shadow;
+	UINT16* megadrive_vdp_palette_lookup_highlight;
+
+	address_space *m_space68k;
+	legacy_cpu_device* m_cpu68k;
 
 };
 

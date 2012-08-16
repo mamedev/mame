@@ -69,9 +69,6 @@ void segas18_state::video_start()
 	// initialize the tile/text layers
 	segaic16_tilemap_init(machine(), 0, SEGAIC16_TILEMAP_16B, 0x000, 0, 8);
 
-	// create the VDP
-	system18_vdp_start(machine());
-
 	save_item(NAME(m_grayscale_enable));
 	save_item(NAME(m_vdp_enable));
 	save_item(NAME(m_vdp_mixing));
@@ -132,25 +129,41 @@ void segas18_state::set_vdp_mixing(UINT8 mixing)
 
 void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
+
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *src = &m_temp_bitmap.pix(y);
+	//	UINT16 *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
+	//	UINT16 *src2 = vdp->m_render_line_raw;
+
 		UINT16 *dst = &bitmap.pix(y);
 		UINT8 *pri = &priority_bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pix = src[x];
-			if (pix != 0xffff)
+			if (m_vdp->m_render_line_raw[x] & 0x100)
 			{
-				dst[x] = pix;
-				pri[x] |= priority;
+				int pix = m_vdp->m_render_line_raw[x] & 0x3f;
+				if (pix & 0xf)
+				{
+					switch (pix & 0xc0)
+					{
+						case 0x00:					
+							dst[x] = pix + 0x2000; /* 0x2040 - would be shadow? */
+							break;
+						case 0x40:
+						case 0x80:
+							dst[x] = pix + 0x2000;
+							break;
+						case 0xc0:
+							dst[x] = pix + 0x2000; /* 0x2080 - would be higlight? */
+							break;
+					}
+					pri[x] |= priority;
+				}
 			}
 		}
 	}
 }
-
-
 
 /*************************************
  *
@@ -213,10 +226,6 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
-
-	// if the VDP is enabled, update our tmp_bitmap
-	if (m_vdp_enable)
-		system18_vdp_update(m_temp_bitmap, cliprect);
 
 	// reset priorities
 	machine().priority_bitmap.fill(0, cliprect);
