@@ -260,7 +260,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 	devtag_reset(machine, "ymsnd");
 
-	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
+	megadriv_stop_scanline_timer(machine);// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
 	segae_md_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
 
 

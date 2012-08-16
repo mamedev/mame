@@ -114,8 +114,12 @@ static MACHINE_RESET( segac2 )
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
 	megadriv_framerate = 60;
-	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
-	megadriv_scanline_timer->adjust(attotime::zero);
+
+
+//	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+//	megadriv_scanline_timer->adjust(attotime::zero);
+
+
 	megadriv_reset_vdp(machine);
 
 	/* determine how many sound banks */
@@ -1312,12 +1316,16 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET(segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(megadriv_timers)
+//	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segac2);
 	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segac2);
 	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_segac2);
+	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
+
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

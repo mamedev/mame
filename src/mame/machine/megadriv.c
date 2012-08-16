@@ -940,7 +940,16 @@ SCREEN_UPDATE_RGB32(megadriv)
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32* desty = &bitmap.pix32(y, 0);
-		UINT16* srcy = &vdp->m_render_bitmap->pix(y, 0);
+		UINT16* srcy;
+		
+		if (!vdp->m_use_alt_timing)
+		{
+			srcy = &vdp->m_render_bitmap->pix(y, 0);
+		}
+		else
+		{
+			srcy = vdp->m_render_line;
+		}
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -973,6 +982,8 @@ MACHINE_START( megadriv )
 
 MACHINE_RESET( megadriv )
 {
+	md_base_state *state = machine.driver_data<md_base_state>();
+
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
@@ -987,10 +998,11 @@ MACHINE_RESET( megadriv )
 
 	megadrive_reset_io(machine);
 
-	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
-
-
-	megadriv_scanline_timer->adjust(attotime::zero);
+	if (!state->m_vdp->m_use_alt_timing)
+	{
+		megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+		megadriv_scanline_timer->adjust(attotime::zero);
+	}
 
 	if (genesis_other_hacks)
 	{
@@ -1027,9 +1039,12 @@ MACHINE_RESET( megadriv )
 	}
 }
 
-void megadriv_stop_scanline_timer(void)
+void megadriv_stop_scanline_timer(running_machine &machine)
 {
-	megadriv_scanline_timer->reset();
+	md_base_state *state = machine.driver_data<md_base_state>();
+
+	if (!state->m_vdp->m_use_alt_timing)
+		megadriv_scanline_timer->reset();
 }
 
 
@@ -1117,6 +1132,7 @@ MACHINE_CONFIG_FRAGMENT( megadriv_timers )
 MACHINE_CONFIG_END
 
 
+
 MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
@@ -1142,10 +1158,12 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
+
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 	MCFG_NVRAM_HANDLER(megadriv)
 
@@ -1195,7 +1213,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
@@ -1608,16 +1626,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 }
 
 
-// called at the start of each scanline
-TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback )
-{
-	md_base_state *state = timer.machine().driver_data<md_base_state>();
 
-	timer.machine().scheduler().synchronize();
-	state->m_vdp->vdp_handle_scanline_callback(timer.machine(), param);
-
-	megadriv_scanline_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
-}
 
 
 
@@ -1631,7 +1640,10 @@ SCREEN_VBLANK(megadriv)
 	// rising edge
 	if (vblank_on)
 	{
-		state->m_vdp->vdp_handle_vblank(screen);
-		megadriv_scanline_timer->adjust(attotime::zero);
+		if (!state->m_vdp->m_use_alt_timing)
+		{
+			state->m_vdp->vdp_handle_eof(screen.machine());
+			megadriv_scanline_timer->adjust(attotime::zero);
+		}
 	}
 }

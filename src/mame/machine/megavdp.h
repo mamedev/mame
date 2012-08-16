@@ -154,22 +154,33 @@ public:
 	static void set_genesis_vdp_sndirqline_callback(device_t &device, genesis_vdp_sndirqline_callback_func callback);
 	static void set_genesis_vdp_lv6irqline_callback(device_t &device, genesis_vdp_lv6irqline_callback_func callback);
 	static void set_genesis_vdp_lv4irqline_callback(device_t &device, genesis_vdp_lv4irqline_callback_func callback);
+	static void set_genesis_vdp_alt_timing(device_t &device, int use_alt_timing);
+
+	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 
 	DECLARE_READ16_MEMBER( megadriv_vdp_r );
 	DECLARE_WRITE16_MEMBER( megadriv_vdp_w );
+
+	int genesis_get_scanline_counter(running_machine &machine);
 
 
 	void genesis_render_scanline(running_machine &machine);
 	void vdp_handle_scanline_callback(running_machine &machine, int scanline);
 	void vdp_handle_irq6_on_timer_callback(running_machine &machine, int param);
 	void vdp_handle_irq4_on_timer_callback(running_machine &machine, int param);
-	void vdp_handle_vblank(screen_device &screen);
+	void vdp_handle_eof(running_machine &machine);
 	void device_reset_old();
 	void vdp_clear_irq6_pending(void) { megadrive_irq6_pending = 0; };
 	void vdp_clear_irq4_pending(void) { megadrive_irq4_pending = 0; };
 
+	void vdp_clear_bitmap(void)
+	{
+		if (m_render_bitmap)
+			m_render_bitmap->fill(0);
+	}
 
 	bitmap_ind16* m_render_bitmap;
+	UINT16* m_render_line;
 
 protected:
 	virtual void device_start();
@@ -237,10 +248,10 @@ private:
 
 	void handle_dma_bits(running_machine &machine);
 
-	UINT16 get_hposition(void);
-	UINT16 megadriv_read_hv_counters(void);
+	UINT16 get_hposition(running_machine &machine);
+	UINT16 megadriv_read_hv_counters(running_machine &machine);
 
-	UINT16 megadriv_vdp_ctrl_port_r(void);
+	UINT16 megadriv_vdp_ctrl_port_r(running_machine &machine);
 	UINT16 megadriv_vdp_data_port_r(running_machine &machine);
 	void megadriv_vdp_data_port_w(running_machine &machine, int data);
 	void megadriv_vdp_ctrl_port_w(running_machine &machine, int data);

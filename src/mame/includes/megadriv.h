@@ -53,7 +53,7 @@ extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;
 
 extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
-extern void megadriv_stop_scanline_timer(void);
+extern void megadriv_stop_scanline_timer(running_machine &machine);
 
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag);
 
@@ -467,6 +467,8 @@ extern int segac2_sp_pal_lookup[4];
 extern int genvdp_use_cram;
 extern int megadrive_region_export;
 extern int megadrive_region_pal;
+TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
+TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing );
 
 /* machine/megadriv.c */
 extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
