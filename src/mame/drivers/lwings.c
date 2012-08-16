@@ -1067,143 +1067,190 @@ ROM_END
 
 ROM_START( trojan )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "t4",           0x00000, 0x8000, CRC(c1bbeb4e) SHA1(248ae4184d25b642b282ef44ac729c0f7952834d) )
-	ROM_LOAD( "t6",           0x10000, 0x8000, CRC(d49592ef) SHA1(b538bac3c73f35474cc6745a4e4dc3ab6217eaac) )
-	ROM_LOAD( "tb05.bin",     0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
+	ROM_LOAD( "t4.10n",   0x00000, 0x8000, CRC(c1bbeb4e) SHA1(248ae4184d25b642b282ef44ac729c0f7952834d) )
+	ROM_LOAD( "t6.13n",   0x10000, 0x8000, CRC(d49592ef) SHA1(b538bac3c73f35474cc6745a4e4dc3ab6217eaac) )
+	ROM_LOAD( "tb05.12n", 0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tb02.bin",     0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
+	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* 64k for ADPCM CPU (CPU not emulated) */
-	ROM_LOAD( "tb01.bin",     0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "tb03.bin",     0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
+	ROM_LOAD( "tb03.8k", 0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "tb13.bin",     0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
-	ROM_LOAD( "tb09.bin",     0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
-	ROM_LOAD( "tb12.bin",     0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
-	ROM_LOAD( "tb08.bin",     0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
-	ROM_LOAD( "tb11.bin",     0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
-	ROM_LOAD( "tb07.bin",     0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
-	ROM_LOAD( "tb14.bin",     0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
-	ROM_LOAD( "tb10.bin",     0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
+	ROM_LOAD( "tb13.6b", 0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
+	ROM_LOAD( "tb09.6a", 0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
+	ROM_LOAD( "tb12.4b", 0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
+	ROM_LOAD( "tb08.4a", 0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
+	ROM_LOAD( "tb11.3b", 0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
+	ROM_LOAD( "tb07.3a", 0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
+	ROM_LOAD( "tb14.8b", 0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
+	ROM_LOAD( "tb10.8a", 0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "tb18.bin",     0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
-	ROM_LOAD( "tb16.bin",     0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
-	ROM_LOAD( "tb17.bin",     0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
-	ROM_LOAD( "tb15.bin",     0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
-	ROM_LOAD( "tb22.bin",     0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
-	ROM_LOAD( "tb20.bin",     0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
-	ROM_LOAD( "tb21.bin",     0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
-	ROM_LOAD( "tb19.bin",     0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
+	ROM_LOAD( "tb18.7l", 0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
+	ROM_LOAD( "tb16.3l", 0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
+	ROM_LOAD( "tb17.5l", 0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
+	ROM_LOAD( "tb15.2l", 0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
+	ROM_LOAD( "tb22.7n", 0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
+	ROM_LOAD( "tb20.3n", 0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
+	ROM_LOAD( "tb21.5n", 0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
+	ROM_LOAD( "tb19.2n", 0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "tb25.bin",     0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
-	ROM_LOAD( "tb24.bin",     0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
+	ROM_LOAD( "tb25.15n", 0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
+	ROM_LOAD( "tb24.13n", 0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
-	ROM_LOAD( "tb23.bin",     0x00000, 0x08000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )  /* Tile Map */
+	ROM_LOAD( "tb23.9n", 0x00000, 0x08000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )	/* Tile Map (had a RED strip across label) */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tbp24s10.7j",  0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
-	ROM_LOAD( "mb7114e.1e",   0x0100, 0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
+	ROM_LOAD( "tbp24s10.7j", 0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
+	ROM_LOAD( "mb7114e.1e",  0x0100, 0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
+ROM_END
+
+ROM_START( trojana )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "tb4.10n",  0x00000, 0x8000, CRC(0113a551) SHA1(933ebaf73fb70772fc2cf2b9143bf00757505772) )
+	ROM_LOAD( "tb6.13n",  0x10000, 0x8000, CRC(aa127a5b) SHA1(0b7115c2ffe8456ef463e22d68e03a2e396abf92) )
+	ROM_LOAD( "tb05.12n", 0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "tb03.8k", 0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "tb13.6b", 0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
+	ROM_LOAD( "tb09.6a", 0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
+	ROM_LOAD( "tb12.4b", 0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
+	ROM_LOAD( "tb08.4a", 0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
+	ROM_LOAD( "tb11.3b", 0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
+	ROM_LOAD( "tb07.3a", 0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
+	ROM_LOAD( "tb14.8b", 0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
+	ROM_LOAD( "tb10.8a", 0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "tb18.7l", 0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
+	ROM_LOAD( "tb16.3l", 0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
+	ROM_LOAD( "tb17.5l", 0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
+	ROM_LOAD( "tb15.2l", 0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
+	ROM_LOAD( "tb22.7n", 0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
+	ROM_LOAD( "tb20.3n", 0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
+	ROM_LOAD( "tb21.5n", 0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
+	ROM_LOAD( "tb19.2n", 0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 )
+	ROM_LOAD( "tb25.15n", 0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
+	ROM_LOAD( "tb24.13n", 0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
+
+	ROM_REGION( 0x08000, "gfx5", 0 )
+	ROM_LOAD( "tb23.9n", 0x00000, 0x08000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )	/* Tile Map (had a RED strip across label) */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp24s10.7j", 0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
+	ROM_LOAD( "mb7114e.1e",  0x0100, 0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
 ROM_END
 
 ROM_START( trojanr )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "tb04.bin",     0x00000, 0x8000, CRC(92670f27) SHA1(d2cb35a9fade971770db1a58e961bc03cc3de6ff) )
-	ROM_LOAD( "tb06.bin",     0x10000, 0x8000, CRC(a4951173) SHA1(2d3db0ee3a1680f2cce21cf15f8bd434325d8648) )
-	ROM_LOAD( "tb05.bin",     0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
+	ROM_LOAD( "tb04.10n", 0x00000, 0x8000, CRC(92670f27) SHA1(d2cb35a9fade971770db1a58e961bc03cc3de6ff) )
+	ROM_LOAD( "tb06.13n", 0x10000, 0x8000, CRC(a4951173) SHA1(2d3db0ee3a1680f2cce21cf15f8bd434325d8648) )
+	ROM_LOAD( "tb05.12n", 0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tb02.bin",     0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
+	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
-	ROM_LOAD( "tb01.bin",     0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
+	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "tb03.bin",     0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
+	ROM_LOAD( "tb03.8k", 0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "tb13.bin",     0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
-	ROM_LOAD( "tb09.bin",     0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
-	ROM_LOAD( "tb12.bin",     0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
-	ROM_LOAD( "tb08.bin",     0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
-	ROM_LOAD( "tb11.bin",     0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
-	ROM_LOAD( "tb07.bin",     0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
-	ROM_LOAD( "tb14.bin",     0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
-	ROM_LOAD( "tb10.bin",     0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
+	ROM_LOAD( "tb13.6b", 0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
+	ROM_LOAD( "tb09.6a", 0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
+	ROM_LOAD( "tb12.4b", 0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
+	ROM_LOAD( "tb08.4a", 0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
+	ROM_LOAD( "tb11.3b", 0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
+	ROM_LOAD( "tb07.3a", 0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
+	ROM_LOAD( "tb14.8b", 0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
+	ROM_LOAD( "tb10.8a", 0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "tb18.bin",     0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
-	ROM_LOAD( "tb16.bin",     0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
-	ROM_LOAD( "tb17.bin",     0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
-	ROM_LOAD( "tb15.bin",     0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
-	ROM_LOAD( "tb22.bin",     0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
-	ROM_LOAD( "tb20.bin",     0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
-	ROM_LOAD( "tb21.bin",     0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
-	ROM_LOAD( "tb19.bin",     0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
+	ROM_LOAD( "tb18.7l", 0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
+	ROM_LOAD( "tb16.3l", 0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
+	ROM_LOAD( "tb17.5l", 0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
+	ROM_LOAD( "tb15.2l", 0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
+	ROM_LOAD( "tb22.7n", 0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
+	ROM_LOAD( "tb20.3n", 0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
+	ROM_LOAD( "tb21.5n", 0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
+	ROM_LOAD( "tb19.2n", 0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "tb25.bin",     0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
-	ROM_LOAD( "tb24.bin",     0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
+	ROM_LOAD( "tb25.15n", 0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
+	ROM_LOAD( "tb24.13n", 0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
-	ROM_LOAD( "tb23.bin",     0x0000,  0x8000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )  /* Tile Map */
+	ROM_LOAD( "tb23.9n", 0x00000, 0x08000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )	/* Tile Map (had a RED strip across label) */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tbp24s10.7j",  0x0000,  0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
-	ROM_LOAD( "mb7114e.1e",   0x0100,  0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
+	ROM_LOAD( "tbp24s10.7j", 0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
+	ROM_LOAD( "mb7114e.1e",  0x0100, 0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
 ROM_END
 
 ROM_START( trojanj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "troj-04.rom",  0x00000, 0x8000, CRC(0b5a7f49) SHA1(eebdfaf905a2b7ac8a0f0f9a7ae4a0daf130a5ea) )
-	ROM_LOAD( "troj-06.rom",  0x10000, 0x8000, CRC(dee6ed92) SHA1(80aa16f2ae23581d00f4d58a2075993e7171ed0c) )
-	ROM_LOAD( "tb05.bin",     0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
+	ROM_LOAD( "troj-04.10n", 0x00000, 0x8000, CRC(0b5a7f49) SHA1(eebdfaf905a2b7ac8a0f0f9a7ae4a0daf130a5ea) )
+	ROM_LOAD( "troj-06.13n", 0x10000, 0x8000, CRC(dee6ed92) SHA1(80aa16f2ae23581d00f4d58a2075993e7171ed0c) )
+	ROM_LOAD( "tb05.12n",    0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tb02.bin",     0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
+	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* 64k for ADPCM CPU (CPU not emulated) */
-	ROM_LOAD( "tb01.bin",     0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
+	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "tb03.bin",     0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
+	ROM_LOAD( "tb03.8k", 0x00000, 0x4000, CRC(581a2b4c) SHA1(705b499da5d01a946f06234a4bab72a291c79034) )     /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "tb13.bin",     0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
-	ROM_LOAD( "tb09.bin",     0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
-	ROM_LOAD( "tb12.bin",     0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
-	ROM_LOAD( "tb08.bin",     0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
-	ROM_LOAD( "tb11.bin",     0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
-	ROM_LOAD( "tb07.bin",     0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
-	ROM_LOAD( "tb14.bin",     0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
-	ROM_LOAD( "tb10.bin",     0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
+	ROM_LOAD( "tb13.6b", 0x00000, 0x8000, CRC(285a052b) SHA1(8ce055c7ac9ce1560552fc7f857f60e7a5af0779) )     /* tiles */
+	ROM_LOAD( "tb09.6a", 0x08000, 0x8000, CRC(aeb693f7) SHA1(a811ea67abdd4adfc68224257973802e2a36fc36) )
+	ROM_LOAD( "tb12.4b", 0x10000, 0x8000, CRC(dfb0fe5c) SHA1(82542692ab71b9126e6c301ed0803db58734273c) )
+	ROM_LOAD( "tb08.4a", 0x18000, 0x8000, CRC(d3a4c9d1) SHA1(3d787f6a4583b80f2d254947890f676cda17b242) )
+	ROM_LOAD( "tb11.3b", 0x20000, 0x8000, CRC(00f0f4fd) SHA1(3a862360a26ae1c3a945949d6d47f88aa4b728a4) )
+	ROM_LOAD( "tb07.3a", 0x28000, 0x8000, CRC(dff2ee02) SHA1(4877c52f2a0e24a95bcda1d8636ea993c2c3c240) )
+	ROM_LOAD( "tb14.8b", 0x30000, 0x8000, CRC(14bfac18) SHA1(84266140e9679912dbbb185fd3b9b497297dcb16) )
+	ROM_LOAD( "tb10.8a", 0x38000, 0x8000, CRC(71ba8a6d) SHA1(53ff6850f9f8a19c57c19ef56fd45975f0ec133e) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "tb18.bin",     0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
-	ROM_LOAD( "tb16.bin",     0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
-	ROM_LOAD( "tb17.bin",     0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
-	ROM_LOAD( "tb15.bin",     0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
-	ROM_LOAD( "tb22.bin",     0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
-	ROM_LOAD( "tb20.bin",     0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
-	ROM_LOAD( "tb21.bin",     0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
-	ROM_LOAD( "tb19.bin",     0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
+	ROM_LOAD( "tb18.7l", 0x00000, 0x8000, CRC(862c4713) SHA1(a3707d950f4f5de5208e64207016ef2256eb8c5b) )     /* sprites */
+	ROM_LOAD( "tb16.3l", 0x08000, 0x8000, CRC(d86f8cbd) SHA1(8a16130632e20ad3cae8e817da7b661c3ac60f30) )
+	ROM_LOAD( "tb17.5l", 0x10000, 0x8000, CRC(12a73b3f) SHA1(6bb54d4fdf01fd2cdd76a0b47be4d8cae8a1e19b) )
+	ROM_LOAD( "tb15.2l", 0x18000, 0x8000, CRC(bb1a2769) SHA1(9884dceb00e6d88908a1c107b83cc1711b0cf1f7) )
+	ROM_LOAD( "tb22.7n", 0x20000, 0x8000, CRC(39daafd4) SHA1(1e49a273f51cccec3141d540032fd9a3041a3cbd) )
+	ROM_LOAD( "tb20.3n", 0x28000, 0x8000, CRC(94615d2a) SHA1(112a299ff1bb878cf7e24c2ad337440c3df0a6d5) )
+	ROM_LOAD( "tb21.5n", 0x30000, 0x8000, CRC(66c642bd) SHA1(b57f0f8d8e21c9f94ffc0e9f9304b5ab5d4ed3fc) )
+	ROM_LOAD( "tb19.2n", 0x38000, 0x8000, CRC(81d5ab36) SHA1(31103759676a8d1badaf7bde79e7f28d69486106) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "tb25.bin",     0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
-	ROM_LOAD( "tb24.bin",     0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
+	ROM_LOAD( "tb25.15n", 0x00000, 0x8000, CRC(6e38c6fa) SHA1(c51228d5d063dcf4361c76fa49dbe18db80c50a0) )     /* Bk Tiles */
+	ROM_LOAD( "tb24.13n", 0x08000, 0x8000, CRC(14fc6cf2) SHA1(080a2d845cb36c637f76d8e062725bd13dd1aed0) )
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
-	ROM_LOAD( "tb23.bin",     0x0000,  0x8000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )  /* Tile Map */
+	ROM_LOAD( "tb23.9n", 0x00000, 0x08000, CRC(eda13c0e) SHA1(806f0819af8b25c2b46de3d1fd95bc9c0e883bd9) )	/* Tile Map */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tbp24s10.7j",  0x0000,  0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
-	ROM_LOAD( "mb7114e.1e",   0x0100,  0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
+	ROM_LOAD( "tbp24s10.7j", 0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
+	ROM_LOAD( "mb7114e.1e",  0x0100, 0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) )	/* priority (not used) */
 ROM_END
 
 ROM_START( avengers )
@@ -1355,13 +1402,14 @@ ROM_END
 
 GAME( 1985, sectionz,  0,        lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",     "Section Z (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, sectionza, sectionz, lwings,   sectionz, driver_device, 0, ROT0,  "Capcom",     "Section Z (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwings,    0,        lwings,   lwings, driver_device,   0, ROT90, "Capcom",     "Legendary Wings (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwings2,   lwings,   lwings,   lwings, driver_device,   0, ROT90, "Capcom",     "Legendary Wings (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwingsj,   lwings,   lwings,   lwings, driver_device,   0, ROT90, "Capcom",     "Ares no Tsubasa (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb, driver_device,  0, ROT90, "bootleg",    "Legendary Wings (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojan,    0,        trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",     "Trojan (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanr,   trojan,   trojan,   trojan, driver_device,   0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", GAME_SUPPORTS_SAVE )
-GAME( 1986, trojanj,   trojan,   trojan,   trojan, driver_device,   0, ROT0,  "Capcom",     "Tatakai no Banka (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lwings,    0,        lwings,   lwings,   driver_device, 0, ROT90, "Capcom",     "Legendary Wings (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lwings2,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",     "Legendary Wings (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   driver_device, 0, ROT90, "Capcom",     "Ares no Tsubasa (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  driver_device, 0, ROT90, "bootleg",    "Legendary Wings (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, trojan,    0,        trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",     "Trojan (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,   trojanls, driver_device, 0, ROT0,  "Capcom",     "Trojan (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, trojanr,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", GAME_SUPPORTS_SAVE )
+GAME( 1986, trojanj,   trojan,   trojan,   trojan,   driver_device, 0, ROT0,  "Capcom",     "Tatakai no Banka (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, avengers,  0,        avengers, avengers, driver_device, 0, ROT90, "Capcom",     "Avengers (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, avengers2, avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",     "Avengers (US set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, buraiken,  avengers, avengers, avengers, driver_device, 0, ROT90, "Capcom",     "Hissatsu Buraiken (Japan)", GAME_SUPPORTS_SAVE )
