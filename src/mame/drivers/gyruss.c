@@ -185,7 +185,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w) AM_READNOP
 	AM_RANGE(0x4000, 0x403f) AM_RAM
 	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE(gyruss_spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
