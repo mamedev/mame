@@ -2245,7 +2245,7 @@ void tms3203x_device::mpyf_imm(UINT32 op)
 #define MPYI(dreg, src1, src2)										\
 {																	\
 	INT64 _res = (INT64)((INT32)(src1 << 8) >> 8) * (INT64)((INT32)(src2 << 8) >> 8);\
-	if (!OVM() || (_res >= -0x80000000 && _res <= 0x7fffffff))		\
+	if (!OVM() || (_res >= -(INT64)0x80000000 && _res <= (INT64)0x7fffffff))		\
 		IREG(dreg) = _res;											\
 	else															\
 		IREG(dreg) = (_res < 0) ? 0x80000000 : 0x7fffffff;			\
