@@ -1,11 +1,12 @@
 /***************************************************************************
 
-    MSM6242 Real Time Clock
+    MSM6242 / Epson RTC 62421 / 62423 Real Time Clock
 
     TODO:
     - HOLD mechanism
-    - IRQ ACK
-    - why skns tries to read uninitialized registers?
+    - IRQs are grossly mapped
+    - STOP / RESET mechanism
+    - why skns.c games try to read uninitialized registers?
 
 ***************************************************************************/
 
@@ -250,6 +251,13 @@ WRITE8_MEMBER( msm6242_device::write )
 	{
 		case MSM6242_REG_CD:
 		{
+			/*
+			x--- 30s ADJ
+			-x-- IRQ FLAG
+			--x- BUSY
+			---x HOLD
+			*/
+
 			m_reg[0] = data & 0x0f;
 
 			#if 0
@@ -269,36 +277,45 @@ WRITE8_MEMBER( msm6242_device::write )
 		}
 
 		case MSM6242_REG_CE:
-		m_reg[1] = data & 0x0f;
-		if((data & 3) == 0) // MASK & STD = 0
 		{
-			m_irq_flag = 1;
-			m_irq_type = (data & 0xc) >> 2;
-			//m_std_timer->adjust(attotime::from_msec(timer_param[(data & 0xc) >> 2]), 0, attotime::from_msec(timer_param[(data & 0xc) >> 2]));
-		}
-		else
-		{
-			m_irq_flag = 0;
-			if ( !m_out_int_func.isnull() )
-				m_out_int_func( CLEAR_LINE );
-		}
+			/*
+			xx-- t0,t1 (timing irq)
+			--x- STD
+			---x MASK
+			*/
 
-		return;
-
-		case MSM6242_REG_CF:
-		{
-			/* the 12/24 mode bit can only be changed while REST is 1 */
-			if ((data ^ m_reg[2]) & 0x04)
+			m_reg[1] = data & 0x0f;
+			if((data & 3) == 0) // MASK & STD = 0
 			{
-				m_reg[2] = (m_reg[2] & 0x04) | (data & ~0x04);
-
-				if (m_reg[2] & 1)
-					m_reg[2] = (m_reg[2] & ~0x04) | (data & 0x04);
+				m_irq_flag = 1;
+				m_irq_type = (data & 0xc) >> 2;
+				//m_std_timer->adjust(attotime::from_msec(timer_param[(data & 0xc) >> 2]), 0, attotime::from_msec(timer_param[(data & 0xc) >> 2]));
 			}
 			else
 			{
-				m_reg[2] = data & 0x0f;
+				m_irq_flag = 0;
+				if ( !m_out_int_func.isnull() )
+					m_out_int_func( CLEAR_LINE );
 			}
+
+			return;
+		}
+
+		case MSM6242_REG_CF:
+		{
+			/*
+			x--- TEST
+			-x-- 24/12
+			--x- STOP
+			---x RESET
+			*/
+
+			/* the 12/24 mode bit can only be changed when RESET does a 1 -> 0 transition */
+			if (((data & 0x01) == 0x00) && (m_reg[2] & 0x01))
+				m_reg[2] = (m_reg[2] & ~0x04) | (data & 0x04);
+			else
+				m_reg[2] = (data & 0x0b) | (m_reg[2] & 4);
+
 			return;
 		}
 	}

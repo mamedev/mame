@@ -1,3 +1,5 @@
+#include "machine/msm6242.h"
+
 #define FIGHT_MCU  1
 #define SHOOT_MCU  2
 #define RACING_MCU 3
@@ -9,6 +11,7 @@ public:
 	hng64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
 		m_cart(*this, "cart"),
 		m_sysregs(*this, "sysregs"),
@@ -27,6 +30,7 @@ public:
 		m_com_mmu_mem(*this, "com_mmu_mem"){ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<msm6242_device> m_rtc;
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_cart;
 	required_shared_ptr<UINT32> m_sysregs;

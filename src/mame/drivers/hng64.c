@@ -525,14 +525,22 @@ WRITE32_MEMBER(hng64_state::hng64_pal_w)
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
 {
-	system_time systime;
-
-	machine().base_datetime(systime);
+	UINT16 rtc_addr;
 
 #if 0
 	if((offset*4) != 0x1084)
 		printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(&space.device()), offset*4);
 #endif
+
+	rtc_addr = offset >> 1;
+
+	if((rtc_addr & 0xff0) == 0x420)
+	{
+		if((rtc_addr & 0xf) == 0xd)
+			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10; // bit 4 disables "system log reader"
+
+		return m_rtc->read(space, (rtc_addr) & 0xf);
+	}
 
 	switch(offset*4)
 	{
@@ -543,24 +551,6 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		//case 0x108c:
 		case 0x1104: return m_interrupt_level_request;
 		case 0x1254: return 0x00000000; //dma status, 0x800
-		/* 4-bit RTC */
-		case 0x2104: return (systime.local_time.second % 10);
-		case 0x210c: return (systime.local_time.second / 10);
-		case 0x2114: return (systime.local_time.minute % 10);
-		case 0x211c: return (systime.local_time.minute / 10);
-		case 0x2124: return (systime.local_time.hour % 10);
-		case 0x212c: return (systime.local_time.hour / 10);
-		case 0x2134: return (systime.local_time.mday % 10);
-		case 0x213c: return (systime.local_time.mday / 10);
-		case 0x2144: return ((systime.local_time.month+1) % 10);
-		case 0x214c: return ((systime.local_time.month+1) / 10);
-		case 0x2154: return (systime.local_time.year%10);
-		case 0x215c: return ((systime.local_time.year%100)/10);
-		case 0x2164: return (systime.local_time.weekday);
-
-		case 0x216c: return 0x00000010; //disables "system log reader"
-
-		case 0x217c: return 0; //RTC status?
 	}
 
 //  printf("%08x\n",offset*4);
@@ -602,8 +592,13 @@ static void hng64_do_dma(address_space *space)
 
 WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 {
-
 	COMBINE_DATA (&m_sysregs[offset]);
+
+	if(((offset >> 1) & 0xff0) == 0x420)
+	{
+		m_rtc->write(space, (offset >> 1) & 0xf,data);
+		return;
+	}
 
 #if 0
 	if(((offset*4) & 0x1200) == 0x1200)
@@ -626,7 +621,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			hng64_do_dma(&space);
 			break;
 		//default:
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], cpu_get_pc(&space.device()));
+		//	printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], cpu_get_pc(&space.device()));
 	}
 }
 
@@ -1791,6 +1786,12 @@ static MACHINE_RESET(hyperneo)
 	state->m_mcu_en = 0;
 }
 
+
+static MSM6242_INTERFACE( hng64_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	/* basic machine hardware */
@@ -1807,6 +1808,7 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_CPU_IO_MAP(hng_comm_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_MSM6242_ADD("rtc", hng64_rtc_intf)
 
 	MCFG_GFXDECODE(hng64)
 	MCFG_MACHINE_START(hyperneo)
