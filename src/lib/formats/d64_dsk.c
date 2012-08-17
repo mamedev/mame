@@ -533,11 +533,15 @@ static floperr_t d64_read_track(floppy_image_legacy *floppy, int head, int track
 		UINT8 speed_byte = (speed << 6) | (speed << 4) | (speed << 2) | speed;
 
 		memset(((UINT8*)buffer) + gcr_track_size, speed_byte, G64_SPEED_BLOCK_SIZE);
+
+		LOG_FORMATS("D64 track %.1f length %u\n", get_dos_track(track), gcr_track_size);
 	}
 	else	/* half tracks */
 	{
 		/* set track length to 0 */
 		memset(buffer, 0, buflen);
+
+		LOG_FORMATS("D64 track %.1f length %u\n", get_dos_track(track), 0);
 	}
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -751,13 +755,15 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 				{
 					tag->track_offset[head][track] = track_offset;
 					tag->error_offset[head][track] = errors_size;
+					tag->speed_zone[track] = DOS25_SPEED_ZONE[track];
 
 					track_offset += DOS25_SECTORS_PER_TRACK[track] * SECTOR_SIZE;
 					/* also store an error entry for each sector */
 					errors_size += DOS25_SECTORS_PER_TRACK[track];
 
-					LOG_FORMATS("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
-					if (has_errors) LOG_FORMATS("D64 head %u track %u error offset: %04x\n", head, track + 1, tag->error_offset[head][track]);
+					LOG_FORMATS("D64 head %u track %u offset %05x", head, track + 1, tag->track_offset[head][track]);
+					if (has_errors) LOG_FORMATS(" errors %05x", tag->error_offset[head][track]);
+					LOG_FORMATS(" speed %u\n", tag->speed_zone[track]);
 				}
 			}
 			else
@@ -772,6 +778,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 					/* full track */
 					tag->track_offset[head][track] = track_offset;
 					tag->error_offset[head][track] = errors_size;
+					tag->speed_zone[track] = DOS1_SPEED_ZONE[track / 2];
 
 					if (dos == DOS1)
 					{
@@ -786,27 +793,11 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 						errors_size += DOS2_SECTORS_PER_TRACK[track / 2];
 					}
 
-					LOG_FORMATS("D64 head %u track %.1f data offset: %04x\n", head, get_dos_track(track), tag->track_offset[head][track]);
-					if (has_errors) LOG_FORMATS("D64 head %u track %.1f error offset: %04x\n", head, get_dos_track(track), tag->error_offset[head][track]);
+					LOG_FORMATS("D64 head %u track %.1f offset %05x", head, get_dos_track(track), tag->track_offset[head][track]);
+					if (has_errors) LOG_FORMATS(" errors %05x", tag->error_offset[head][track]);
+					LOG_FORMATS(" speed %u\n", tag->speed_zone[track]);
 				}
 			}
-		}
-	}
-
-	/* determine speed zones */
-	for (track = 0; track < tag->tracks; track++)
-	{
-		if (dos == DOS25)
-		{
-			tag->speed_zone[track] = DOS25_SPEED_ZONE[track];
-
-			LOG_FORMATS("D64 track %u speed zone: %u\n", track + 1, tag->speed_zone[track]);
-		}
-		else
-		{
-			tag->speed_zone[track] = DOS1_SPEED_ZONE[track / 2];
-
-			LOG_FORMATS("D64 track %.1f speed zone: %u\n", get_dos_track(track), tag->speed_zone[track]);
 		}
 	}
 
