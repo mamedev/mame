@@ -111,7 +111,7 @@ public:
 	astring &expand(int length) { ensure_room(length); return *this; }
 
 	// length query
-	int len() const { return m_len; }
+	int len() const { return strlen(m_text); }
 
 	// copy helpers
 	astring &cpy(const char *src, int count);
@@ -184,7 +184,6 @@ private:
 	char *			m_text;
 	int				m_alloclen;
 	char			m_smallbuf[64];
-	int 			m_len;
 };
 
 
