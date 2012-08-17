@@ -160,6 +160,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, m_cram_size( cram_size )
 	, m_palette_offset( palette_offset )
+	, m_supports_224_240( supports_224_240 )
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 {
 }

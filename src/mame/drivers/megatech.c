@@ -413,8 +413,8 @@ static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8, mtech_state )
 	AM_RANGE(0x3f, 0x3f) AM_WRITE_LEGACY(megatech_bios_port_ctrl_w)
 
 	AM_RANGE(0x7f, 0x7f) AM_READWRITE_LEGACY(sms_vcounter_r, megatech_bios_port_7f_w)
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(sms_vdp_data_r, sms_vdp_data_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(sms_vdp_ctrl_r, sms_vdp_ctrl_w)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE( "vdp1", sega315_5124_device, vram_read, vram_write )
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE( "vdp1", sega315_5124_device, register_read, register_write )
 
 	AM_RANGE(0xdc, 0xdd) AM_READ_LEGACY(megatech_bios_joypad_r)  // player inputs
 ADDRESS_MAP_END
@@ -426,7 +426,6 @@ DRIVER_INIT_MEMBER(mtech_state,mt_slot)
 	m_megatech_banked_ram = auto_alloc_array(machine(), UINT8, 0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
-	init_megatech_bios(machine());
 
 	// this gets set in DEVICE_IMAGE_LOAD
 	memset(m_cart_is_genesis, 0, sizeof(m_cart_is_genesis));
@@ -474,10 +473,33 @@ static MACHINE_RESET(mtnew)
 	state->m_mt_bank_addr = 0;
 
 	MACHINE_RESET_CALL(megadriv);
-	MACHINE_RESET_CALL(megatech_bios);
 	MACHINE_RESET_CALL(megatech_md_sms);
 	megatech_select_game(machine, 0);
 }
+
+static SCREEN_UPDATE_RGB32( megatech_menu )
+{
+	mtech_state *state = screen.machine().driver_data<mtech_state>();
+	state->m_vdp1->screen_update(screen,bitmap,cliprect);
+	return 0;
+}
+
+
+
+WRITE_LINE_MEMBER( mtech_state::int_callback )
+{
+	m_bioscpu->set_input_line(0, state);
+}
+
+
+static const sega315_5124_interface _vdp_intf =
+{
+	false,
+	"menu",
+	DEVCB_DRIVER_LINE_MEMBER(mtech_state, int_callback),
+	DEVCB_NULL,
+};
+
 
 static MACHINE_CONFIG_START( megatech, mtech_state )
 	/* basic machine hardware */
@@ -495,11 +517,17 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
 	MCFG_SCREEN_ADD("menu", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(342,262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_STATIC(megatech_bios)
-	MCFG_SCREEN_VBLANK_STATIC(megatech_bios)
+	// check frq
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
+		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
+	MCFG_SCREEN_UPDATE_STATIC( megatech_menu )	/* Combines and copies a bitmap */
+
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5124)
+
+	MCFG_SEGA315_5246_ADD("vdp1", _vdp_intf)
+
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_UPDATE_STATIC(mtnew)

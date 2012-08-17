@@ -610,6 +610,12 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 			clip.max_y = ((16-(block/0x800))*16)+15;
 		}
 
+		if (clip.min_y < screen.visible_area().min_y)
+			clip.min_y = screen.visible_area().min_y;
+
+		if (clip.max_y > screen.visible_area().max_y)
+			clip.max_y = screen.visible_area().max_y;
+
 		for (cnt=0; cnt<0x800; cnt+=8)
 		{
 			offs = (block + cnt) / 2;
@@ -689,6 +695,13 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 			clip.min_y = (16-(block/0x800))*16;
 			clip.max_y = ((16-(block/0x800))*16)+15;
 		}
+
+		if (clip.min_y < screen.visible_area().min_y)
+			clip.min_y = screen.visible_area().min_y;
+
+		if (clip.max_y > screen.visible_area().max_y)
+			clip.max_y = screen.visible_area().max_y;
+
 
 		for (cnt=0; cnt<0x800; cnt+=8)
 		{

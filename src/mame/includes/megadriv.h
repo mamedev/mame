@@ -15,6 +15,7 @@
 #include "cpu/ssp1601/ssp1601.h"
 
 #include "machine/megavdp.h"
+#include "video/315_5124.h"
 
 #define MASTER_CLOCK_NTSC 53693175
 #define MASTER_CLOCK_PAL  53203424
@@ -261,7 +262,12 @@ class mplay_state : public md_base_state
 public:
 	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
-	m_ic3_ram(*this, "ic3_ram") { }
+	m_ic3_ram(*this, "ic3_ram"),
+	m_vdp1(*this, "vdp1"),
+	m_bioscpu(*this, "mtbios")
+
+	
+	{ }
 
 	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
 	// is to read from 0x8000-0xffff
@@ -279,9 +285,11 @@ public:
 
 	UINT16 *m_genesis_io_ram;
 	required_shared_ptr<UINT8> m_ic3_ram;
+	optional_device<sega315_5124_device> m_vdp1;
+	required_device<cpu_device>          m_bioscpu;
 	UINT8* m_ic37_ram;
 	UINT16 *m_ic36_ram;
-	
+	DECLARE_WRITE_LINE_MEMBER( int_callback );
 	DECLARE_DRIVER_INIT(megaplay);
 };
 
@@ -289,7 +297,18 @@ class mtech_state : public md_base_state
 {
 public:
 	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag),
+		m_vdp1(*this, "vdp1"),
+		m_bioscpu(*this, "mtbios")
+	{ }
+
+
+	required_device<sega315_5124_device> m_vdp1;
+	required_device<cpu_device>          m_bioscpu;
+
+
+	DECLARE_WRITE_LINE_MEMBER( int_callback );
+
 
 	UINT8 m_mt_cart_select_reg;
 	UINT32 m_bios_port_ctrl;
