@@ -95,7 +95,7 @@ void debug_console_init(running_machine &machine)
 		return;
 
 	/* print the opening lines */
-	debug_console_printf(machine, "MAME new debugger version %s\n", build_version);
+	debug_console_printf(machine, "%s debugger version %s\n", emulator_info::get_appname(), build_version);
 	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine.system().name, machine.system().description);
 
 	/* request callback upon exiting */
