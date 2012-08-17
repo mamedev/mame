@@ -100,8 +100,9 @@ m_searchpath = combinedpath;
 
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
+				const char *name = ROM_GETNAME(rom);
 				hash_collection hashes(ROM_GETHASHDATA(rom));
-				device_t *shared_device = find_shared_device(*device, hashes, ROM_GETLENGTH(rom));
+				device_t *shared_device = find_shared_device(*device, name, hashes, ROM_GETLENGTH(rom));
 
 				// count the number of files with hashes
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
@@ -123,7 +124,7 @@ m_searchpath = combinedpath;
 				if (record != NULL)
 				{
 					// count the number of files that are found.
-					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_device(*device, record->actual_hashes(), record->actual_length()) == NULL))
+					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_device(*device, name, record->actual_hashes(), record->actual_length()) == NULL))
 					{
 						found++;
 						if (shared_device != NULL)
@@ -487,11 +488,9 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 //  shares a media entry with the same hashes
 //-------------------------------------------------
 
-device_t *media_auditor::find_shared_device(device_t &device, const hash_collection &romhashes, UINT64 romlength)
+device_t *media_auditor::find_shared_device(device_t &device, const char *name, const hash_collection &romhashes, UINT64 romlength)
 {
-	// doesn't apply to NO_DUMP items
-	if (romhashes.flag(hash_collection::FLAG_NO_DUMP))
-		return NULL;
+	bool dumped = !romhashes.flag(hash_collection::FLAG_NO_DUMP);
 
 	// special case for non-root devices
 	device_t *highest_device = NULL;
@@ -502,7 +501,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const hash_collect
 				if (ROM_GETLENGTH(rom) == romlength)
 				{
 					hash_collection hashes(ROM_GETHASHDATA(rom));
-					if (hashes == romhashes)
+					if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
 						highest_device = &device;
 				}
 	}
@@ -518,7 +517,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const hash_collect
 						if (ROM_GETLENGTH(rom) == romlength)
 						{
 							hash_collection hashes(ROM_GETHASHDATA(rom));
-							if (hashes == romhashes)
+							if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
 								highest_device = scandevice;
 						}
 		}
