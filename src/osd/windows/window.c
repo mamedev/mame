@@ -607,8 +607,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	//if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!machine.paused() && wininput_should_hide_mouse())))
-	if (winwindow_has_focus())
+	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!machine.paused() && wininput_should_hide_mouse())))
 	{
 		win_window_info *window = win_window_list;
 		RECT bounds;

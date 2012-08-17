@@ -193,6 +193,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_UI_FONT,                                    "default",   OPTION_STRING,     "specify a font to use" },
 	{ OPTION_RAMSIZE ";ram",                             NULL,        OPTION_STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "display confirm quit screen on exit" },
+	{ OPTION_UI_MOUSE,                               	 "0",         OPTION_BOOLEAN,    "display ui mouse cursor" },
 	{ NULL }
 };
 
