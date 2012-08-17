@@ -1,10 +1,13 @@
 /***************************************************************************
 
   Thunder Zone       (c) 1991 Data East Corporation (World 2 players)
+  Thunder Zone       (c) 1991 Data East Corporation (Japan 2 players)
   Desert Assault     (c) 1991 Data East Corporation (USA 4 players)
   Desert Assault     (c) 1991 Data East Corporation (USA 2 players)
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
+
+PCB DE-0344-3 (verified for the Japan set)
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -626,60 +629,202 @@ MACHINE_CONFIG_END
 
 /**********************************************************************************/
 
-ROM_START( dassault )
+ROM_START( thndzone )
 	ROM_REGION(0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE("01.bin", 0x00000, 0x20000, CRC(14f17ea7) SHA1(0bb8b7dba05f1ea42e68838861f0d4c263eac6b3) )
-	ROM_LOAD16_BYTE("03.bin", 0x00001, 0x20000, CRC(bed1b90c) SHA1(c100f89b69025e2ff885b35a733abc627da98a07) )
-	ROM_LOAD16_BYTE("gs00",   0x40000, 0x20000, CRC(b7277175) SHA1(ffb19c4dd12e0391f01de57c46a7998885fe22bf) )
-	ROM_LOAD16_BYTE("gs02",   0x40001, 0x20000, CRC(cde31e35) SHA1(0219845308c9f46e73b0504bd2aefa2fa74f388e) )
+	ROM_LOAD16_BYTE("gz01.a15", 0x00000, 0x20000, CRC(15e8c328) SHA1(8876b5fde77604c2fe4654271ceb341a8fa460c1) )
+	ROM_LOAD16_BYTE("gz03.a17", 0x00001, 0x20000, CRC(aab5c86e) SHA1(c3560b15360ddf14e8444d9f70724e698b2bd42f) )
+	ROM_LOAD16_BYTE("gt00.a14", 0x40000, 0x20000, CRC(b7277175) SHA1(ffb19c4dd12e0391f01de57c46a7998885fe22bf) ) /* Same data as GS00.A14 */
+	ROM_LOAD16_BYTE("gt02.a16", 0x40001, 0x20000, CRC(cde31e35) SHA1(0219845308c9f46e73b0504bd2aefa2fa74f388e) ) /* Same data as GS02.A16 */
 
 	ROM_REGION(0x80000, "sub", 0 ) /* 68000 code (Sub cpu) */
-	ROM_LOAD16_BYTE("hc10-1.bin", 0x00000, 0x20000, CRC(ac5ac770) SHA1(bf6640900c2f9c8091168bf106edf85350c34652) )
-	ROM_LOAD16_BYTE("hc08-1.bin", 0x00001, 0x20000, CRC(864dca56) SHA1(0967f613684b539d10b67e4f6033c890e2134ea2) )
-	ROM_LOAD16_BYTE("gs11",       0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) )
-	ROM_LOAD16_BYTE("gs09",       0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) )
+	ROM_LOAD16_BYTE("gz10.a12",   0x00000, 0x20000, CRC(79f919e9) SHA1(b6793173e310b1df07cf3e9209da1fbec3a8a05b) )
+	ROM_LOAD16_BYTE("gz08.a9",    0x00001, 0x20000, CRC(d47d7836) SHA1(8a5d3e8b89f5dfd6bac83f7b093ddb03d5ecef73) )
+	ROM_LOAD16_BYTE("gt11-1.a14", 0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GS11.A14 */
+	ROM_LOAD16_BYTE("gt09-1.a11", 0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GS09.A11 */
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
-	ROM_LOAD( "gs04",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) )
+	ROM_LOAD( "gt04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "gs05", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) )
-	ROM_LOAD16_BYTE( "gs06", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) )
+	ROM_LOAD16_BYTE( "gt05.h11", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) ) /* Same data for all regions, different label */
+	ROM_LOAD16_BYTE( "gt06.h12", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x120000, "gfx2", 0 )
-	ROM_LOAD( "maj-02", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
+	ROM_LOAD( "maj-02.h14", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
 	/* Other 0x20000 filled in later */
 
 	ROM_REGION(0x200000, "gfx3", 0 )
-	ROM_LOAD( "maj-01", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
-	ROM_LOAD( "maj-00", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
+	ROM_LOAD( "maj-01.c18", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
+	ROM_LOAD( "maj-00.c17", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
 
 	ROM_REGION( 0x400000, "gfx4", 0 ) /* sprites chip 1 */
-	ROM_LOAD( "maj-04", 0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
-	ROM_LOAD( "maj-05", 0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
-	ROM_LOAD( "maj-06", 0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
-	ROM_LOAD( "maj-07", 0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
-	ROM_LOAD( "maj-08", 0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
-	ROM_LOAD( "maj-09", 0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
-	ROM_LOAD( "maj-10", 0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
-	ROM_LOAD( "maj-11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
+	ROM_LOAD( "maj-04.r1",  0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
+	ROM_LOAD( "maj-05.r2",  0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
+	ROM_LOAD( "maj-06.r3",  0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
+	ROM_LOAD( "maj-07.r5",  0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
+	ROM_LOAD( "maj-08.s6",  0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
+	ROM_LOAD( "maj-09.s8",  0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
+	ROM_LOAD( "maj-10.s9",  0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
+	ROM_LOAD( "maj-11.s11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
 
 	ROM_REGION( 0x80000, "gfx5", 0 ) /* sprites chip 2 */
-	ROM_LOAD16_BYTE( "gs12",   0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) )
-	ROM_LOAD16_BYTE( "gs13",   0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) )
-	ROM_LOAD16_BYTE( "gs14",   0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
-	ROM_LOAD16_BYTE( "gs15",   0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
+	ROM_LOAD16_BYTE( "gt12.n1", 0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) )
+	ROM_LOAD16_BYTE( "gt13.n2", 0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) )
+	ROM_LOAD16_BYTE( "gt14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
+	ROM_LOAD16_BYTE( "gt15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
 	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "gs07",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
+	ROM_LOAD( "gt07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* Same data as GS07.H15 */
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
 
-	ROM_REGION( 0x1000, "proms", 0 )
+	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Timing??  Unused */
-	/* Above prom also at 16s and 17s */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+
+	ROM_REGION( 0x1000, "plds", 0 )
+	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7c",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7d",  0x0400, 0x0104, CRC(199e83fd) SHA1(ebb5d66f29935b0a58e79b0db30611b5dce328a6) ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7e",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7l",  0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.8e",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.9d",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.10c", 0x0e00, 0x0104, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+ROM_START( thndzonej )
+	ROM_REGION(0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE("gu01.a15", 0x00000, 0x20000, CRC(eb28f8e8) SHA1(834f89db3ef48a71d20c0ec3a0c2231e115d7f48) )
+	ROM_LOAD16_BYTE("gu03.a17", 0x00001, 0x20000, CRC(9ad2b431) SHA1(c2fb88b4d2df93e3f787fe49c240573e1bc2844e) )
+	ROM_LOAD16_BYTE("gu00.a14", 0x40000, 0x20000, CRC(fca9e84f) SHA1(a0ecf99eace7357b05da8f8fe06b9bbf7d16d95a) )
+	ROM_LOAD16_BYTE("gu02.a16", 0x40001, 0x20000, CRC(b6026bae) SHA1(673b7f7a432580ec1780d1efa2b48184af428698) )
+
+	ROM_REGION(0x80000, "sub", 0 ) /* 68000 code (Sub cpu) */
+	ROM_LOAD16_BYTE("gu10.a12", 0x00000, 0x20000, CRC(8042e87d) SHA1(dc69b13fc06d94a2bc5569e96931e6d9496bd44f) )
+	ROM_LOAD16_BYTE("gu08.a9",  0x00001, 0x20000, CRC(c8895bfa) SHA1(6a5421bd926e0aa86c81e345f2dfe5265bd3add2) )
+	ROM_LOAD16_BYTE("gu11.a14", 0x40000, 0x20000, CRC(c0d6eb82) SHA1(44070e6d37f5327cf7f647e44ea49a1fe6844e5e) )
+	ROM_LOAD16_BYTE("gu09.a11", 0x40001, 0x20000, CRC(42de13a7) SHA1(f948d31e368499fd8c35da0c7dd7519cfbd4b5f7) )
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "gu04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
+
+	ROM_REGION(0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "gu05.h11", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) ) /* Same data for all regions, different label */
+	ROM_LOAD16_BYTE( "gu06.h12", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) ) /* Same data for all regions, different label */
+
+	ROM_REGION(0x120000, "gfx2", 0 )
+	ROM_LOAD( "maj-02.h14", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
+	/* Other 0x20000 filled in later */
+
+	ROM_REGION(0x200000, "gfx3", 0 )
+	ROM_LOAD( "maj-01.c18", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
+	ROM_LOAD( "maj-00.c17", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
+
+	ROM_REGION( 0x400000, "gfx4", 0 ) /* sprites chip 1 */
+	ROM_LOAD( "maj-04.r1",  0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
+	ROM_LOAD( "maj-05.r2",  0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
+	ROM_LOAD( "maj-06.r3",  0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
+	ROM_LOAD( "maj-07.r5",  0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
+	ROM_LOAD( "maj-08.s6",  0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
+	ROM_LOAD( "maj-09.s8",  0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
+	ROM_LOAD( "maj-10.s9",  0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
+	ROM_LOAD( "maj-11.s11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
+
+	ROM_REGION( 0x80000, "gfx5", 0 ) /* sprites chip 2 */
+	/* Although the other Mask ROMs on the PCB are MAJ-xx, for the Japan version, these 4 are actually MAL-xx */
+	ROM_LOAD16_BYTE( "mal-12.n1", 0x000000, 0x20000, NO_DUMP ) /* Mask ROM - Need to verify if these are the same or different as the other sets */
+	ROM_LOAD16_BYTE( "mal-13.n2", 0x000001, 0x20000, NO_DUMP ) /* Mask ROM - Need to verify if these are the same or different as the other sets */
+	ROM_LOAD16_BYTE( "mal-14.n3", 0x040000, 0x20000, NO_DUMP ) /* Mask ROM - Need to verify if these are the same or different as the other sets */
+	ROM_LOAD16_BYTE( "mal-15.n5", 0x040001, 0x20000, NO_DUMP ) /* Mask ROM - Need to verify if these are the same or different as the other sets */
+	ROM_LOAD16_BYTE( "gt12.n1", 0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) ) /* REMOVE when MAL-12.N1 is dumped & added */
+	ROM_LOAD16_BYTE( "gt13.n2", 0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) ) /* REMOVE when MAL-13.N2 is dumped & added */
+	ROM_LOAD16_BYTE( "gt14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) ) /* REMOVE when MAL-14.N3 is dumped & added */
+	ROM_LOAD16_BYTE( "gt15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) ) /* REMOVE when MAL-15.N5 is dumped & added */
+
+	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	/* This rom is also a Mask ROM label MAL-07 and _NOT_ MAJ-07 */
+	ROM_LOAD( "mal-07.h15",  0x00000,  0x20000, NO_DUMP ) /* Mask ROM - Need to verify if these are the same or different as the other sets */
+	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* REMOVE when MAL-07.H15 is dumped & added */
+
+	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+
+	ROM_REGION( 0x1000, "plds", 0 )
+	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7c",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7d",  0x0400, 0x0104, CRC(199e83fd) SHA1(ebb5d66f29935b0a58e79b0db30611b5dce328a6) ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7e",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.7l",  0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.8e",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.9d",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b.10c", 0x0e00, 0x0104, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+ROM_START( dassault )
+	ROM_REGION(0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE("01.a15",   0x00000, 0x20000, CRC(14f17ea7) SHA1(0bb8b7dba05f1ea42e68838861f0d4c263eac6b3) )
+	ROM_LOAD16_BYTE("03.a17",   0x00001, 0x20000, CRC(bed1b90c) SHA1(c100f89b69025e2ff885b35a733abc627da98a07) )
+	ROM_LOAD16_BYTE("gs00.a14", 0x40000, 0x20000, CRC(b7277175) SHA1(ffb19c4dd12e0391f01de57c46a7998885fe22bf) ) /* Same data as GT00.A14 */
+	ROM_LOAD16_BYTE("gs02.a16", 0x40001, 0x20000, CRC(cde31e35) SHA1(0219845308c9f46e73b0504bd2aefa2fa74f388e) ) /* Same data as GT02.A16 */
+
+	ROM_REGION(0x80000, "sub", 0 ) /* 68000 code (Sub cpu) */
+	ROM_LOAD16_BYTE("hc10-1.a12", 0x00000, 0x20000, CRC(ac5ac770) SHA1(bf6640900c2f9c8091168bf106edf85350c34652) )
+	ROM_LOAD16_BYTE("hc08-1.a9",  0x00001, 0x20000, CRC(864dca56) SHA1(0967f613684b539d10b67e4f6033c890e2134ea2) )
+	ROM_LOAD16_BYTE("gs11.a14",   0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GT11-1.A14 */
+	ROM_LOAD16_BYTE("gs09.a11",   0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GT09-1.A11 */
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "gs04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
+
+	ROM_REGION(0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "gs05.h11", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) ) /* Same data for all regions, different label */
+	ROM_LOAD16_BYTE( "gs06.h12", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) ) /* Same data for all regions, different label */
+
+	ROM_REGION(0x120000, "gfx2", 0 )
+	ROM_LOAD( "maj-02.h14", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
+	/* Other 0x20000 filled in later */
+
+	ROM_REGION(0x200000, "gfx3", 0 )
+	ROM_LOAD( "maj-01.c18", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
+	ROM_LOAD( "maj-00.c17", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
+
+	ROM_REGION( 0x400000, "gfx4", 0 ) /* sprites chip 1 */
+	ROM_LOAD( "maj-04.r1",  0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
+	ROM_LOAD( "maj-05.r2",  0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
+	ROM_LOAD( "maj-06.r3",  0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
+	ROM_LOAD( "maj-07.r5",  0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
+	ROM_LOAD( "maj-08.s6",  0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
+	ROM_LOAD( "maj-09.s8",  0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
+	ROM_LOAD( "maj-10.s9",  0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
+	ROM_LOAD( "maj-11.s11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
+
+	ROM_REGION( 0x80000, "gfx5", 0 ) /* sprites chip 2 */
+	ROM_LOAD16_BYTE( "gs12.n1", 0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) )
+	ROM_LOAD16_BYTE( "gs13.n2", 0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) )
+	ROM_LOAD16_BYTE( "gs14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
+	ROM_LOAD16_BYTE( "gs15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
+
+	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
+
+	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -694,124 +839,59 @@ ROM_END
 
 ROM_START( dassault4 )
 	ROM_REGION(0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE("gs01", 0x00000, 0x20000, CRC(8613634d) SHA1(69b64e54fde3b5f1ee3435d7327b84e7a7d43f6d) )
-	ROM_LOAD16_BYTE("gs03", 0x00001, 0x20000, CRC(ea860bd4) SHA1(6e4e2d004433ad5842b4bc895eaa8f55bd1ee168) )
-	ROM_LOAD16_BYTE("gs00", 0x40000, 0x20000, CRC(b7277175) SHA1(ffb19c4dd12e0391f01de57c46a7998885fe22bf) )
-	ROM_LOAD16_BYTE("gs02", 0x40001, 0x20000, CRC(cde31e35) SHA1(0219845308c9f46e73b0504bd2aefa2fa74f388e) )
+	ROM_LOAD16_BYTE("gs01.a15", 0x00000, 0x20000, CRC(8613634d) SHA1(69b64e54fde3b5f1ee3435d7327b84e7a7d43f6d) )
+	ROM_LOAD16_BYTE("gs03.a17", 0x00001, 0x20000, CRC(ea860bd4) SHA1(6e4e2d004433ad5842b4bc895eaa8f55bd1ee168) )
+	ROM_LOAD16_BYTE("gs00.a14", 0x40000, 0x20000, CRC(b7277175) SHA1(ffb19c4dd12e0391f01de57c46a7998885fe22bf) ) /* Same data as GT00.A14 */
+	ROM_LOAD16_BYTE("gs02.a16", 0x40001, 0x20000, CRC(cde31e35) SHA1(0219845308c9f46e73b0504bd2aefa2fa74f388e) ) /* Same data as GT02.A16 */
 
 	ROM_REGION(0x80000, "sub", 0 ) /* 68000 code (Sub cpu) */
-	ROM_LOAD16_BYTE("gs10",   0x00000, 0x20000, CRC(285f72a3) SHA1(d01972aec500805ca1abed14983064cd14e942d4) )
-	ROM_LOAD16_BYTE("gs08",   0x00001, 0x20000, CRC(16691ede) SHA1(dc481dfc6104833a6fd18be6275e77ecc0510165) )
-	ROM_LOAD16_BYTE("gs11",   0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) )
-	ROM_LOAD16_BYTE("gs09",   0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) )
+	ROM_LOAD16_BYTE("gs10.a12", 0x00000, 0x20000, CRC(285f72a3) SHA1(d01972aec500805ca1abed14983064cd14e942d4) )
+	ROM_LOAD16_BYTE("gs08.a9",  0x00001, 0x20000, CRC(16691ede) SHA1(dc481dfc6104833a6fd18be6275e77ecc0510165) )
+	ROM_LOAD16_BYTE("gs11.a14", 0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GT11-1.A14 */
+	ROM_LOAD16_BYTE("gs09.a11", 0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GT09-1.A11 */
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
-	ROM_LOAD( "gs04",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) )
+	ROM_LOAD( "gs04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "gs05", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) )
-	ROM_LOAD16_BYTE( "gs06", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) )
+	ROM_LOAD16_BYTE( "gs05.h11", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) ) /* Same data for all regions, different label */
+	ROM_LOAD16_BYTE( "gs06.h12", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x120000, "gfx2", 0 )
-	ROM_LOAD( "maj-02", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
+	ROM_LOAD( "maj-02.h14", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
 	/* Other 0x20000 filled in later */
 
 	ROM_REGION(0x200000, "gfx3", 0 )
-	ROM_LOAD( "maj-01", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
-	ROM_LOAD( "maj-00", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
+	ROM_LOAD( "maj-01.c18", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
+	ROM_LOAD( "maj-00.c17", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
 
 	ROM_REGION( 0x400000, "gfx4", 0 ) /* sprites chip 1 */
-	ROM_LOAD( "maj-04", 0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
-	ROM_LOAD( "maj-05", 0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
-	ROM_LOAD( "maj-06", 0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
-	ROM_LOAD( "maj-07", 0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
-	ROM_LOAD( "maj-08", 0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
-	ROM_LOAD( "maj-09", 0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
-	ROM_LOAD( "maj-10", 0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
-	ROM_LOAD( "maj-11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
+	ROM_LOAD( "maj-04.r1",  0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
+	ROM_LOAD( "maj-05.r2",  0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
+	ROM_LOAD( "maj-06.r3",  0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
+	ROM_LOAD( "maj-07.r5",  0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
+	ROM_LOAD( "maj-08.s6",  0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
+	ROM_LOAD( "maj-09.s8",  0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
+	ROM_LOAD( "maj-10.s9",  0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
+	ROM_LOAD( "maj-11.s11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
 
 	ROM_REGION( 0x80000, "gfx5", 0 ) /* sprites chip 2 */
-	ROM_LOAD16_BYTE( "gs12",   0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) )
-	ROM_LOAD16_BYTE( "gs13",   0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) )
-	ROM_LOAD16_BYTE( "gs14",   0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
-	ROM_LOAD16_BYTE( "gs15",   0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
+	ROM_LOAD16_BYTE( "gs12.n1", 0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) )
+	ROM_LOAD16_BYTE( "gs13.n2", 0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) )
+	ROM_LOAD16_BYTE( "gs14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
+	ROM_LOAD16_BYTE( "gs15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
 	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "gs07",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
+	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
 
-	ROM_REGION( 0x1000, "proms", 0 )
+	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Timing??  Unused */
-	/* Above prom also at 16s and 17s */
-
-	ROM_REGION( 0x1000, "plds", 0 )
-	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7c",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7d",  0x0400, 0x0104, CRC(199e83fd) SHA1(ebb5d66f29935b0a58e79b0db30611b5dce328a6) ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7e",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7l",  0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.8e",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.9d",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.10c", 0x0e00, 0x0104, NO_DUMP ) /* PAL is read protected */
-ROM_END
-
-ROM_START( thndzone )
-	ROM_REGION(0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE("gz_01.bin", 0x00000, 0x20000, CRC(15e8c328) SHA1(8876b5fde77604c2fe4654271ceb341a8fa460c1) )
-	ROM_LOAD16_BYTE("gz_03.bin", 0x00001, 0x20000, CRC(aab5c86e) SHA1(c3560b15360ddf14e8444d9f70724e698b2bd42f) )
-	ROM_LOAD16_BYTE("gs00",   0x40000, 0x20000, CRC(b7277175) SHA1(ffb19c4dd12e0391f01de57c46a7998885fe22bf) ) /* Aka GT00 */
-	ROM_LOAD16_BYTE("gs02",   0x40001, 0x20000, CRC(cde31e35) SHA1(0219845308c9f46e73b0504bd2aefa2fa74f388e) ) /* Aka GT02 etc */
-
-	ROM_REGION(0x80000, "sub", 0 ) /* 68000 code (Sub cpu) */
-	ROM_LOAD16_BYTE("gz_10.bin", 0x00000, 0x20000, CRC(79f919e9) SHA1(b6793173e310b1df07cf3e9209da1fbec3a8a05b) )
-	ROM_LOAD16_BYTE("gz_08.bin", 0x00001, 0x20000, CRC(d47d7836) SHA1(8a5d3e8b89f5dfd6bac83f7b093ddb03d5ecef73) )
-	ROM_LOAD16_BYTE("gs11",      0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) )
-	ROM_LOAD16_BYTE("gs09",      0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) )
-
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
-	ROM_LOAD( "gs04",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) )
-
-	ROM_REGION(0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "gs05", 0x000000, 0x10000, CRC(0aae996a) SHA1(d37a12b057e9934212362d7eafa575c961819a27) )
-	ROM_LOAD16_BYTE( "gs06", 0x000001, 0x10000, CRC(4efdf03d) SHA1(835d22829c6d0f4efc76801b449f9a779f460f1c) )
-
-	ROM_REGION(0x120000, "gfx2", 0 )
-	ROM_LOAD( "maj-02", 0x000000, 0x100000, CRC(383bbc37) SHA1(c537ab147a2770ce28ee185b08dd62d35249bfa9) )
-	/* Other 0x20000 filled in later */
-
-	ROM_REGION(0x200000, "gfx3", 0 )
-	ROM_LOAD( "maj-01", 0x000000, 0x100000, CRC(9840a204) SHA1(096c351769da5184c3d9a05495370134acc9507a) )
-	ROM_LOAD( "maj-00", 0x100000, 0x100000, CRC(87ea8d16) SHA1(db47123aa2ebbb800cfc5cfcf50309bc39cadbcd) )
-
-	ROM_REGION( 0x400000, "gfx4", 0 ) /* sprites chip 1 */
-	ROM_LOAD( "maj-04", 0x000000, 0x80000, CRC(36e49b19) SHA1(bfbc45b635bf3d46ff8b8a514a3f352bf3a95535) )
-	ROM_LOAD( "maj-05", 0x080000, 0x80000, CRC(80fc71cc) SHA1(65b15afbe5d628051b012777d486b6ce92a3795c) )
-	ROM_LOAD( "maj-06", 0x100000, 0x80000, CRC(2e7a684b) SHA1(cffeda1a816dad30d6b1cb12458661188d625d40) )
-	ROM_LOAD( "maj-07", 0x180000, 0x80000, CRC(3acc1f78) SHA1(87ec65b4f54a66370754534d03f4c9217531b42f) )
-	ROM_LOAD( "maj-08", 0x200000, 0x80000, CRC(1958a36d) SHA1(466a30dcd2ea13028272ed2187f890ee20d6636b) )
-	ROM_LOAD( "maj-09", 0x280000, 0x80000, CRC(c21087a1) SHA1(b769c5f2f9b9c525d121902fe9557a6bfc077b99) )
-	ROM_LOAD( "maj-10", 0x300000, 0x80000, CRC(a02fa641) SHA1(14b999a441964e612700bf21945a948eaebb253e) )
-	ROM_LOAD( "maj-11", 0x380000, 0x80000, CRC(dabe9305) SHA1(44d69fe55e674de7f4c610d295d4528d4b2eb150) )
-
-	ROM_REGION( 0x80000, "gfx5", 0 ) /* sprites chip 2 */
-	ROM_LOAD16_BYTE( "gs12",   0x000000, 0x20000, CRC(9a86a015) SHA1(968576b8422393ab9a93d98c15428b1c11417b3d) )
-	ROM_LOAD16_BYTE( "gs13",   0x000001, 0x20000, CRC(f4709905) SHA1(697842a3d7bc2588c77833c3af8938e6f0b1238d) )
-	ROM_LOAD16_BYTE( "gs14",   0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
-	ROM_LOAD16_BYTE( "gs15",   0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
-
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "gs07",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
-
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
-
-	ROM_REGION( 0x1000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Timing??  Unused */
-	/* Above prom also at 16s and 17s */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -863,6 +943,7 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 
 /**********************************************************************************/
 
-GAME( 1991, thndzone, 0,        dassault, thndzone, dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, dassault, thndzone, dassault, dassault, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", GAME_SUPPORTS_SAVE )
-GAME( 1991, dassault4,thndzone, dassault, dassault4, dassault_state,dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", GAME_SUPPORTS_SAVE )
+GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", GAME_SUPPORTS_SAVE )
