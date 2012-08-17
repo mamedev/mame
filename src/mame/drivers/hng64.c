@@ -549,7 +549,10 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 		//case 0x107c:
 		case 0x1084: return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
-		case 0x1104: return m_interrupt_level_request;
+		case 0x1104: return m_irq_level;
+		case 0x111c:
+			printf("Read to IRQ ACK?\n");
+			break;
 		case 0x1254: return 0x00000000; //dma status, 0x800
 	}
 
@@ -601,19 +604,19 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 	}
 
 #if 0
-	if(((offset*4) & 0x1200) == 0x1200)
+	if(((offset*4) & 0xff00) == 0x1100)
 		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], cpu_get_pc(&space.device()));
 #endif
 
 	switch(offset*4)
 	{
-		//case 0x100c: *DOCUMENT*
-
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], cpu_get_pc(&space.device()));
 			break;
-		case 0x111c: /*irq ack */ break;
+		//0x110c global irq mask?
+		/* irq ack */
+		case 0x111c: m_irq_pending &= ~m_sysregs[offset]; m_set_irq(0x0000); break;
 		case 0x1204: m_dma_start = m_sysregs[offset]; break;
 		case 0x1214: m_dma_dst = m_sysregs[offset]; break;
 		case 0x1224:
@@ -725,7 +728,6 @@ READ32_MEMBER(hng64_state::shoot_io_r)
 /* Roads Edge / Xtreme Rally */
 READ32_MEMBER(hng64_state::racing_io_r)
 {
-
 	switch (offset*4)
 	{
         case 0x000:
@@ -1363,6 +1365,9 @@ static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
+	AM_RANGE(0xc002, 0xc003) AM_NOP // buriki one fills the log, wants 0xffff
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hng64 )
 	PORT_START("VBLANK")
@@ -1708,31 +1713,62 @@ static const mips3_config vr4300_config =
 	16384				/* data cache size */
 };
 
+void hng64_state::m_set_irq(UINT32 irq_vector)
+{
+	/*
+		TODO:
+		- irq sources;
+		- irq priority;
+		- is there an irq mask mechanism?
+		- is irq level cleared too when the irq acks?
+
+		This is written with irqs DISABLED
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 (actually this is cleared even if it isn't fired?)
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq? needed by xrally and roadedge
+
+		samsho64 / samsho64_2 does this during running:
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
+		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000040. (PC=800008fc) <- most notably causes TLBL error in fatfurwa
+	*/
+
+	m_irq_pending |= irq_vector;
+
+	if(m_irq_pending)
+	{
+		int i;
+		for(i=0;i<31;i++)
+		{
+			if(m_irq_pending & 1 << i)
+			{
+				m_irq_level = i;
+				break;
+			}
+		}
+
+		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
+	}
+	else
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+}
 
 static TIMER_DEVICE_CALLBACK( hng64_irq )
 {
 	hng64_state *state = timer.machine().driver_data<hng64_state>();
 	int scanline = param;
-	int irq_fired,irq_type;
 
-	irq_fired = irq_type = 0;
-
-	/* there are more, the sources are unknown at the moment */
 	switch(scanline)
 	{
-		case 224*2:	state->m_interrupt_level_request = 0; irq_fired = 1; irq_type = 1; break;
-		case 0*2: state->m_interrupt_level_request = 1; irq_fired = 1; irq_type = 1; break;
-		case 64*2: state->m_interrupt_level_request = 2; irq_fired = 1; irq_type = 1; break;
-		case 128*2:  state->m_interrupt_level_request = 11; irq_fired = 1; irq_type = 1; break;
-		case (0+1)*2:
-		case (224+1)*2:
-		case (64+1)*2:
-		case (128+1)*2:
-			irq_fired = 1; irq_type = 0; break;
+		case 224*2:	state->m_set_irq(0x0001);  break; // lv 0 vblank irq
+		//case 0*2:   state->m_set_irq(0x0002);  break; // lv 1
+		//case 64*2:  state->m_set_irq(0x0004);  break; // lv 2
+		case 128*2: state->m_set_irq(0x0800);  break; // lv 11 network irq?
 	}
-
-	if(irq_fired)
-		device_set_input_line(state->m_maincpu, 0, (irq_type) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1802,6 +1838,7 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	MCFG_CPU_ADD("audiocpu", V33, 8000000)				// v53, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
+	MCFG_CPU_IO_MAP(hng_sound_io)
 
 	MCFG_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
 	MCFG_CPU_PROGRAM_MAP(hng_comm_map)

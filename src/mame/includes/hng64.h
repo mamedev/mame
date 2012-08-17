@@ -71,7 +71,6 @@ public:
 
 	UINT32 m_activeBuffer;
 	UINT32 m_no_machine_error_code;
-	int m_interrupt_level_request;
 
 	UINT32 m_unk_vreg_toggle;
 	UINT32 m_p1_trig;
@@ -172,6 +171,10 @@ public:
 	DECLARE_DRIVER_INIT(ss64);
 	DECLARE_DRIVER_INIT(hng64_fght);
 	DECLARE_DRIVER_INIT(hng64_reorder_gfx);
+
+	void m_set_irq(UINT32 irq_vector);
+	UINT32 m_irq_pending;
+	int m_irq_level;
 };
 
 
