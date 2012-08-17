@@ -580,6 +580,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 	const char *linestart;
 	float cury = y;
 	float maxwidth = 0;
+	float aspect = machine.render().ui_aspect();
 
 	/* if we don't want wrapping, guarantee a huge wrapwidth */
 	if (wrap == WRAP_NEVER)
@@ -628,7 +629,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 				break;
 
 			/* get the width of this character */
-			chwidth = ui_get_char_width(machine, schar);
+			chwidth = ui_get_font(machine)->char_width(lineheight, aspect, schar);
 
 			/* if we hit a space, remember the location and width *without* the space */
 			if (schar == ' ')
@@ -672,7 +673,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 					if (scharcount == -1)
 						break;
 
-					curwidth -= ui_get_char_width(machine, schar);
+					curwidth -= ui_get_font(machine)->char_width(lineheight, aspect, schar);
 				}
 			}
 
@@ -680,7 +681,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 			else if (wrap == WRAP_TRUNCATE)
 			{
 				/* add in the width of the ... */
-				curwidth += 3.0f * ui_get_char_width(machine, '.');
+				curwidth += 3.0f * ui_get_font(machine)->char_width(lineheight, aspect, '.');
 
 				/* while we are above the wrap width, back up one character */
 				while (curwidth > wrapwidth && s > linestart)
@@ -691,7 +692,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 					if (scharcount == -1)
 						break;
 
-					curwidth -= ui_get_char_width(machine, schar);
+					curwidth -= ui_get_font(machine)->char_width(lineheight, aspect, schar);
 				}
 			}
 		}
@@ -721,8 +722,8 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 
 			if (draw != DRAW_NONE)
 			{
-				container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), linechar);
-				curx += ui_get_char_width(machine, linechar);
+				container->add_char(curx, cury, lineheight, aspect, fgcolor, *ui_get_font(machine), linechar);
+				curx += ui_get_font(machine)->char_width(lineheight, aspect, linechar);
 			}
 			linestart += linecharcount;
 		}
@@ -730,12 +731,12 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 		/* append ellipses if needed */
 		if (wrap == WRAP_TRUNCATE && *s != 0 && draw != DRAW_NONE)
 		{
-			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), '.');
-			curx += ui_get_char_width(machine, '.');
-			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), '.');
-			curx += ui_get_char_width(machine, '.');
-			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), '.');
-			curx += ui_get_char_width(machine, '.');
+			container->add_char(curx, cury, lineheight, aspect, fgcolor, *ui_get_font(machine), '.');
+			curx += ui_get_font(machine)->char_width(lineheight, aspect, '.');
+			container->add_char(curx, cury, lineheight, aspect, fgcolor, *ui_get_font(machine), '.');
+			curx += ui_get_font(machine)->char_width(lineheight, aspect, '.');
+			container->add_char(curx, cury, lineheight, aspect, fgcolor, *ui_get_font(machine), '.');
+			curx += ui_get_font(machine)->char_width(lineheight, aspect, '.');
 		}
 
 		/* if we're not word-wrapping, we're done */
