@@ -81,6 +81,7 @@ bool astring::ensure_room(int length)
 	// swap in the new buffer and free the old one
 	char *oldbuf = (m_text == m_smallbuf) ? NULL : m_text;
 	m_text = strcpy(newbuf, m_text);
+	m_len = strlen(m_text);
 	m_alloclen = alloclen;
 	delete[] oldbuf;
 
@@ -133,6 +134,7 @@ astring &astring::init()
 	m_text = m_smallbuf;
 	m_alloclen = ARRAY_LENGTH(m_smallbuf);
 	m_smallbuf[0] = 0;
+	m_len = 0;
 	return *this;
 }
 
@@ -167,6 +169,7 @@ astring &astring::cpy(const char *src, int count)
 	if (count > 0 && m_text != src)
 		memcpy(m_text, src, count);
 	m_text[count] = 0;
+	m_len = count;
 	return *this;
 }
 
@@ -178,7 +181,7 @@ astring &astring::cpy(const char *src, int count)
 
 astring &astring::cpysubstr(const astring &src, int start, int count)
 {
-	normalize_substr(start, count, strlen(src.m_text));
+	normalize_substr(start, count, src.len());
 	return cpy(src.m_text + start, count);
 }
 
@@ -203,6 +206,7 @@ astring &astring::ins(int insbefore, const char *src, int count)
 		memmove(m_text + insbefore + count, m_text + insbefore, dstlength - insbefore);
 	memcpy(m_text + insbefore, src, count);
 	m_text[dstlength + count] = 0;
+	m_len = dstlength + count;
 	return *this;
 }
 
@@ -214,7 +218,7 @@ astring &astring::ins(int insbefore, const char *src, int count)
 
 astring &astring::inssubstr(int insbefore, const astring &src, int start, int count)
 {
-	normalize_substr(start, count, strlen(src.m_text));
+	normalize_substr(start, count, src.len());
 	return ins(insbefore, src.m_text + start, count);
 }
 
@@ -231,12 +235,13 @@ astring &astring::substr(int start, int count)
 		return *this;
 
 	// normalize parameters
-	normalize_substr(start, count, strlen(m_text));
+	normalize_substr(start, count, len());
 
 	// move the data and NULL-terminate
 	if (count > 0 && start > 0)
 		memmove(m_text, m_text + start, count);
 	m_text[count] = 0;
+	m_len = count;
 	return *this;
 }
 
@@ -253,13 +258,14 @@ astring &astring::del(int start, int count)
 		return *this;
 
 	// normalize parameters
-	int strlength = strlen(m_text);
+	int strlength = len();
 	normalize_substr(start, count, strlength);
 
 	// move the data and NULL-terminate
 	if (count > 0)
 		memmove(m_text + start, m_text + start + count, strlength - (start + count));
 	m_text[strlength - count] = 0;
+	m_len = strlength - count;
 	return *this;
 }
 
@@ -329,7 +335,7 @@ int astring::cmp(const char *str2, int count) const
 
 int astring::cmpsubstr(const astring &str2, int start, int count) const
 {
-	normalize_substr(start, count, strlen(str2.m_text));
+	normalize_substr(start, count, str2.len());
 	return cmp(str2.m_text + start, count);
 }
 
@@ -361,7 +367,7 @@ int astring::icmp(const char *str2, int count) const
 
 int astring::icmpsubstr(const astring &str2, int start, int count) const
 {
-	normalize_substr(start, count, strlen(str2.m_text));
+	normalize_substr(start, count, str2.len());
 	return icmp(str2.m_text + start, count);
 }
 
@@ -439,6 +445,7 @@ astring &astring::delchr(int ch)
 		if (*src != ch)
 			*dst++ = *src;
 	*dst = 0;
+	m_len = strlen(m_text);
 	return *this;
 }
 
@@ -492,7 +499,7 @@ astring &astring::makelower()
 astring &astring::trimspace()
 {
 	// first remove stuff from the end
-	for (char *ptr = m_text + strlen(m_text) - 1; ptr >= m_text && (!(*ptr & 0x80) && isspace(UINT8(*ptr))); ptr--)
+	for (char *ptr = m_text + len() - 1; ptr >= m_text && (!(*ptr & 0x80) && isspace(UINT8(*ptr))); ptr--)
 		*ptr = 0;
 
 	// then count how much to remove from the beginning
@@ -500,5 +507,6 @@ astring &astring::trimspace()
 	for (ptr = m_text; *ptr != 0 && (!(*ptr & 0x80) && isspace(UINT8(*ptr))); ptr++) ;
 	if (ptr > m_text)
 		substr(ptr - m_text);
+	m_len = strlen(m_text);
 	return *this;
 }

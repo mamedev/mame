@@ -184,6 +184,7 @@ private:
 	char *			m_text;
 	int				m_alloclen;
 	char			m_smallbuf[64];
+	int 			m_len;
 };
 
 
