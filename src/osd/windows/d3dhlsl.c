@@ -2779,7 +2779,7 @@ static file_error open_next(d3d_info *d3d, emu_file &file, const char *templ, co
 				end = snapstr.len();
 
 			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!");
+				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an astring
 			astring snapdevname;

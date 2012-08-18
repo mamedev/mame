@@ -796,7 +796,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 						round_nearest(vofs + prim->bounds.y0));
 				break;
 			default:
-				throw emu_fatalerror("Unexpected render_primitive type");
+				throw emu_fatalerror("Unexpected render_primitive type\n");
 		}
 	}
 

@@ -238,7 +238,7 @@ void winwindow_init(running_machine &machine)
 	// create an event to signal UI pausing
 	ui_pause_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (!ui_pause_event)
-		fatalerror("Failed to create pause event");
+		fatalerror("Failed to create pause event\n");
 
 	// if multithreading, create a thread to run the windows
 	if (multithreading_enabled)
@@ -246,13 +246,13 @@ void winwindow_init(running_machine &machine)
 		// create an event to signal when the window thread is ready
 		window_thread_ready_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 		if (!window_thread_ready_event)
-			fatalerror("Failed to create window thread ready event");
+			fatalerror("Failed to create window thread ready event\n");
 
 		// create a thread to run the windows from
 		temp = _beginthreadex(NULL, 0, thread_entry, NULL, 0, (unsigned *)&window_threadid);
 		window_thread = (HANDLE)temp;
 		if (window_thread == NULL)
-			fatalerror("Failed to create window thread");
+			fatalerror("Failed to create window thread\n");
 
 		// set the thread priority equal to the main MAME thread
 		SetThreadPriority(window_thread, GetThreadPriority(GetCurrentThread()));
@@ -711,7 +711,7 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 
 	// handle error conditions
 	if (window->init_state == -1)
-		fatalerror("Unable to complete window creation");
+		fatalerror("Unable to complete window creation\n");
 }
 
 
@@ -880,7 +880,7 @@ static void create_window_class(void)
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
-			fatalerror("Failed to create window class");
+			fatalerror("Failed to create window class\n");
 		classes_created = TRUE;
 	}
 }

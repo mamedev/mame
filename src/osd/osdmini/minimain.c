@@ -139,7 +139,7 @@ void mini_osd_interface::init(running_machine &machine)
 	// let's pretend like we have a keyboard device
 	keyboard_device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device("Keyboard");
 	if (keyboard_device == NULL)
-		fatalerror("Error creating keyboard device");
+		fatalerror("Error creating keyboard device\n");
 
 	// our faux keyboard only has a couple of keys (corresponding to the
 	// common defaults)
