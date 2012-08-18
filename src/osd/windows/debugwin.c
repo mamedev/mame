@@ -416,7 +416,7 @@ void debugwin_init_windows(running_machine &machine)
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
-			fatalerror("Unable to register debug window class");
+			fatalerror("Unable to register debug window class\n");
 
 		// initialize the description of the view class
 		wc.lpszClassName	= TEXT("MAMEDebugView");
@@ -424,7 +424,7 @@ void debugwin_init_windows(running_machine &machine)
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
-			fatalerror("Unable to register debug view class");
+			fatalerror("Unable to register debug view class\n");
 
 		class_registered = TRUE;
 	}
@@ -446,17 +446,12 @@ void debugwin_init_windows(running_machine &machine)
 			// create a standard font
 			t_face = tstring_from_utf8(options.debugger_font());
 			debug_font = CreateFont(-MulDiv(size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
-						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, t_face);
+						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, t_face);
 			osd_free(t_face);
+			t_face = NULL;
 
-			// fall back to Lucida Console 8
 			if (debug_font == NULL)
-			{
-				debug_font = CreateFont(-MulDiv(8, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
-							ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, TEXT("Lucida Console"));
-				if (debug_font == NULL)
-					fatalerror("Unable to create debug font");
-			}
+				fatalerror("Unable to create debugger font\n");
 
 			// get the metrics
 			old_font = SelectObject(temp_dc, debug_font);
