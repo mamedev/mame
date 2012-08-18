@@ -195,7 +195,7 @@ void gdrom_device::ExecCommand( int *transferLength )
 		case 0x30: // CD_READ
 			if (command[1] & 1)
 			{
-				fatalerror("GDROM: MSF mode used for CD_READ, unsupported");
+				fatalerror("GDROM: MSF mode used for CD_READ, unsupported\n");
 				*transferLength = 0;
 			}
 			else
@@ -208,12 +208,12 @@ void gdrom_device::ExecCommand( int *transferLength )
 
 				if (read_type != 2)	// mode 1
 				{
-					fatalerror("GDROM: Unhandled read_type %d", read_type);
+					fatalerror("GDROM: Unhandled read_type %d\n", read_type);
 				}
 
 				if (data_select != 2)	// just sector data
 				{
-					fatalerror("GDROM: Unhandled data_select %d", data_select);
+					fatalerror("GDROM: Unhandled data_select %d\n", data_select);
 				}
 
 				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", lba, blocks, blocks * bytes_per_sector, read_type, data_select);

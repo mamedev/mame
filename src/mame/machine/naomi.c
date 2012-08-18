@@ -78,7 +78,7 @@ static UINT8 asciihex_to_dec(UINT8 in)
     */
 	else
 	{
-		fatalerror("unexpected value in asciihex_to_dec");
+		fatalerror("unexpected value in asciihex_to_dec\n");
 	}
 
 

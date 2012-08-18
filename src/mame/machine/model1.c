@@ -16,7 +16,7 @@ static UINT32 fifoout_pop(address_space *space)
 	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT32 v;
 	if(state->m_fifoout_wpos == state->m_fifoout_rpos) {
-		fatalerror("TGP FIFOOUT underflow (%x)", cpu_get_pc(&space->device()));
+		fatalerror("TGP FIFOOUT underflow (%x)\n", cpu_get_pc(&space->device()));
 	}
 	v = state->m_fifoout_data[state->m_fifoout_rpos++];
 	if(state->m_fifoout_rpos == FIFO_SIZE)
@@ -2077,7 +2077,7 @@ static void copro_fifoin_push(address_space *space, UINT32 data)
 	model1_state *state = space->machine().driver_data<model1_state>();
 	if (state->m_copro_fifoin_num == FIFO_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(&space->device()));
+		fatalerror("Copro FIFOIN overflow (at %08X)\n", cpu_get_pc(&space->device()));
 		return;
 	}
 
@@ -2123,7 +2123,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 	model1_state *state = device->machine().driver_data<model1_state>();
 	if (state->m_copro_fifoout_num == FIFO_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(device));
+		fatalerror("Copro FIFOOUT overflow (at %08X)\n", cpu_get_pc(device));
 		return;
 	}
 

@@ -267,7 +267,7 @@ static DEVICE_START( namco_06xx )
 			else if (type == NAMCO_54XX)
 				state->m_write[devnum] = namco_54xx_write;
 			else
-				fatalerror("Unknown device type %s connected to Namco 06xx", state->m_device[devnum]->name());
+				fatalerror("Unknown device type %s connected to Namco 06xx\n", state->m_device[devnum]->name());
 		}
 
 	/* allocate a timer */

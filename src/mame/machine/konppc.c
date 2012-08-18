@@ -216,7 +216,7 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 {
 	if (offset >= 2)
 	{
-		fatalerror("dsp_comm_w: %08X, %08X", data, offset);
+		fatalerror("dsp_comm_w: %08X, %08X\n", data, offset);
 	}
 
 	switch (cgboard_type)

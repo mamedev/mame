@@ -474,7 +474,7 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 			break;
 
 		default:
-			fatalerror("play_xa: unhandled xa mode %08x",hdr[2]);
+			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
 			return;
 	}
 

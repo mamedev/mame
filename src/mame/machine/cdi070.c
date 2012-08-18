@@ -56,7 +56,7 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
             scc68070->timers.timer0_timer->adjust(period);
             break;
         default:
-            fatalerror( "Unsupported timer channel to scc68070_set_timer_callback!" );
+            fatalerror( "Unsupported timer channel to scc68070_set_timer_callback!\n" );
     }
 }
 
