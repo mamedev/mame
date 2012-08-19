@@ -12032,6 +12032,119 @@ raaspec			// (c) Roy Abel & Associates 1984
 //3do_pal
 orbatak
 
+// Global VR
+hyperv2			// Hyper V2 (Global VR) Install - 06/12/02
+hyperv2a		// Hyper V2 (Global VR) Install - 09/30/01
+gvrxpsys		// Global VR XP OS Install - 09/30/01
+gvrxpsup		// Global VR XP OS Update/Install - 06/11/02
+
+bhead2k			// Beach Head 2000 Install - 05/27/03
+bhead2ka		// Beach Head 2000 Install - 09/16/01
+bhead2k2		// Beach Head 2002 Install - 05/27/03
+bhead2k3		// Beach Head 2003 Desert War Install - 05/27/03
+nfsug			// Need For Speed: Underground Install (2 Discs) (v1.1)
+
+// Leisure Ent.
+roul			// (c) 1990
+
+// Accept LTD.
+hitpoker		// (c) 1997
+
+// Videotronics
+vpoker			// (c) 198?
+5acespkr		// (c) 198?
+
+// Play Mechanix
+specfrce		// (c) 2002 ICE/Play Mechanix
+jnero			// (c) 2004 ICE/Play Mechanix
+
+// Amatic Trading GMBH
+suprstar		// (c) 1996 Amatic
+am_mg24			// (c) 2000 Amatic
+am_mg3			// (c) 2000 Amatic
+am_mg3a			// (c) 2000 Amatic
+am_mg35i		// (c) Amatic
+am_mg34i		// (c) Amatic
+am_mg33i		// (c) Amatic
+am_mg31i		// (c) Amatic
+
+
+neptunp2
+rgum
+
+// Extrema Systems International Ltd.
+poker72
+
+// Blitz System Inc.
+megadpkr		// (c) 1990 Blitz System Inc
+megadpkrb		// (c) 1990 Blitz System Inc
+
+// Blitz System Inc. 68k + Blitter Hardware
+megadblj		// (c) 1990 Blitz Systems Inc.
+megadble		// (c) 1990 Blitz Systems Inc.
+maxidbl			// (c) 1992 Blitz Systems Inc.
+bankrob			// (c) 1993 Entertainment Technology Corp.
+bankroba		// (c) 1993 Entertainment Technology Corp.
+poker52			// (c) 1993 Blitz Systems Inc. ?
+steaser			// (c) 1993 unknown
+dualgame		// (c) 1995 Labtronix Technologies
+hermit			// (c) 1995 Dugamex
+deucesw2		// (c) 1997
+cj3play			// (c) 1998 Cadillac Jack
+cjffruit		// (c) 1998 Cadillac Jack
+ilpag			// (c) 199? unknown
+
+// Olympic Video Gaming
+hotstuff
+
+// Interactive Light
+savquest
+
+// Jamie System Development
+xtom3d
+
+// Jubilee
+jubileep
+
+// Golden Games / C+M Technics AG
+swisspkr		// (c) 1990 Golden Games
+moviecrd		// (c) 1998 Golden Games
+
+// NSM
+nsmpoker
+
+// Advanced Video Technologies
+avtsym14		// (c) 1985 AVT
+avtsym25		// (c) 1985 AVT
+avtbingo		// (c) 1985 AVT
+avtnfl			// (c) 1989 AVT
+
+// Corona hardware
+winner81		// (c) 1981 Corona Co, Ltd.
+winner81b		// (c) 1981 Corona Co, Ltd.
+winner82		// (c) 1982 Corona Co, Ltd.
+re800ea			// (c) 1991 Entretenimientos GEMINIS
+re800v1			// (c) 1991 Entretenimientos GEMINIS
+re800v3			// (c) 1992 Entretenimientos GEMINIS
+rcirulet		// (c) 199? Entretenimientos GEMINIS
+luckyrlt		// (c) 1990 unknown
+
+dfruit
+
+umipoker
+saiyukip
+
+tmspoker
+kas89			// 1989, SFC S.R.L.
+caspoker		// 1987, PM / Beck Elektronik.
+wildpkr			// 199?, TAB Austria.
+
+manohman		// 199?, Merkur.
+
+
+// TTL logic games
+pong			// (c) 1972 Atari
+pongf			// (c) 1972 Atari - no subcycles
 
 
 
@@ -26581,93 +26694,6 @@ spss4240
 //unkfr
 //unkfra
 
-// Leisure Ent.
-roul			// (c) 1990
-
-// Accept LTD.
-hitpoker		// (c) 1997
-
-// Videotronics
-vpoker			// (c) 198?
-5acespkr		// (c) 198?
-
-// Play Mechanix
-specfrce		// (c) 2002 ICE/Play Mechanix
-jnero			// (c) 2004 ICE/Play Mechanix
-
-// Amatic Trading GMBH
-suprstar		// (c) 1996 Amatic
-am_mg24			// (c) 2000 Amatic
-am_mg3			// (c) 2000 Amatic
-am_mg3a			// (c) 2000 Amatic
-am_mg35i		// (c) Amatic
-am_mg34i		// (c) Amatic
-am_mg33i		// (c) Amatic
-am_mg31i		// (c) Amatic
-
-
-neptunp2
-rgum
-
-// Extrema Systems International Ltd.
-poker72
-
-// Blitz System Inc.
-megadpkr		// (c) 1990 Blitz System Inc
-megadpkrb		// (c) 1990 Blitz System Inc
-
-// Blitz System Inc. 68k + Blitter Hardware
-megadblj		// (c) 1990 Blitz Systems Inc.
-megadble		// (c) 1990 Blitz Systems Inc.
-maxidbl			// (c) 1992 Blitz Systems Inc.
-bankrob			// (c) 1993 Entertainment Technology Corp.
-bankroba		// (c) 1993 Entertainment Technology Corp.
-poker52			// (c) 1993 Blitz Systems Inc. ?
-steaser			// (c) 1993 unknown
-dualgame		// (c) 1995 Labtronix Technologies
-hermit			// (c) 1995 Dugamex
-deucesw2		// (c) 1997
-cj3play			// (c) 1998 Cadillac Jack
-cjffruit		// (c) 1998 Cadillac Jack
-ilpag			// (c) 199? unknown
-
-// Olympic Video Gaming
-hotstuff
-
-// Interactive Light
-savquest
-
-// Jamie System Development
-xtom3d
-
-// Jubilee
-jubileep
-
-// Golden Games / C+M Technics AG
-swisspkr		// (c) 1990 Golden Games
-moviecrd		// (c) 1998 Golden Games
-
-// NSM
-nsmpoker
-
-// Advanced Video Technologies
-avtsym14		// (c) 1985 AVT
-avtsym25		// (c) 1985 AVT
-avtbingo		// (c) 1985 AVT
-avtnfl			// (c) 1989 AVT
-
-// Corona hardware
-winner81		// (c) 1981 Corona Co, Ltd.
-winner81b		// (c) 1981 Corona Co, Ltd.
-winner82		// (c) 1982 Corona Co, Ltd.
-re800ea			// (c) 1991 Entretenimientos GEMINIS
-re800v1			// (c) 1991 Entretenimientos GEMINIS
-re800v3			// (c) 1992 Entretenimientos GEMINIS
-rcirulet		// (c) 199? Entretenimientos GEMINIS
-luckyrlt		// (c) 1990 unknown
-
-dfruit
-
 // allied.c
 allied
 suprpick
@@ -28222,29 +28248,3 @@ skijump
 spacecty
 strike
 
-umipoker
-saiyukip
-
-tmspoker
-kas89			// 1989, SFC S.R.L.
-caspoker		// 1987, PM / Beck Elektronik.
-wildpkr			// 199?, TAB Austria.
-
-manohman		// 199?, Merkur.
-
-// Global VR
-hyperv2			// Hyper V2 (Global VR) Install - 06/12/02
-hyperv2a		// Hyper V2 (Global VR) Install - 09/30/01
-gvrxpsys		// Global VR XP OS Install - 09/30/01
-gvrxpsup		// Global VR XP OS Update/Install - 06/11/02
-
-bhead2k			// Beach Head 2000 Install - 05/27/03
-bhead2ka		// Beach Head 2000 Install - 09/16/01
-bhead2k2		// Beach Head 2002 Install - 05/27/03
-bhead2k3		// Beach Head 2003 Desert War Install - 05/27/03
-nfsug			// Need For Speed: Underground Install (2 Discs) (v1.1)
-
-
-// TTL logic games
-pong			// (c) 1972 Atari
-pongf			// (c) 1972 Atari - no subcycles
