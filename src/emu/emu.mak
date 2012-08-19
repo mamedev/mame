@@ -285,6 +285,9 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/hd44102.o		\
 	$(EMUVIDEO)/hd61830.o		\
 	$(EMUVIDEO)/hd63484.o		\
+	$(EMUVIDEO)/huc6202.o		\
+	$(EMUVIDEO)/huc6260.o		\
+	$(EMUVIDEO)/huc6270.o		\
 	$(EMUVIDEO)/i8275.o			\
 	$(EMUVIDEO)/k053250.o		\
 	$(EMUVIDEO)/mc6845.o		\
