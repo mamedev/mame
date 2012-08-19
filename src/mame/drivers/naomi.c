@@ -6019,7 +6019,7 @@ ROM_START( starseek )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0005", 0, BAD_DUMP SHA1(f5513c88528741798ee49f936b9b69480360f103) )
+	DISK_IMAGE_READONLY( "gdl-0005", 0, SHA1(9778c00e063f29cb401d1877f277e97ec84c7dc4) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
     //PIC16C621A-20 (317-5077-JPN)
@@ -6064,7 +6064,7 @@ ROM_START( ikaruga )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0010", 0, BAD_DUMP SHA1(65dcc22dd9e9b70975096464ad8e31a4a73dc5fd) )
+	DISK_IMAGE_READONLY( "gdl-0010", 0, SHA1(cdae4618adfd8eab5a06fbb491ce18a0286e3cae) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-5081-JPN)
@@ -6123,7 +6123,7 @@ ROM_START( chocomk )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0014a", 0, BAD_DUMP SHA1(f88d8203c8692f51c9492d5549a3ad7d9583dc6f) )
+	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(f2e94fef622e3142aaaf95c8a013356eb72eae82) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-5085-JPN)
@@ -6200,7 +6200,7 @@ ROM_START( shikgam2 )
 	ROM_LOAD("shikgam2-default-eeprom.bin", 0, 0x80, CRC(5fb60e27) SHA1(a64242083a718f0a4b1d2e4707f5eb7480265719))
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0021", 0, BAD_DUMP SHA1(f5036711a28a211e8d71400a8322db3172c5733f) )
+	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(ca572f71d559b36206a5d70bdeb2db9aebcb227b) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-5095-JPN)
@@ -6317,7 +6317,7 @@ ROM_START( senko )
 	ROM_LOAD("senko-default-eeprom.bin", 0, 0x80, CRC(b3d3be09) SHA1(55af4f6e35f82f683682bf731d3070bc275d6e57))
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0030a", 0, BAD_DUMP  SHA1(1f7ade47e37a0026451b5baf3ba746400de8d156) )
+	DISK_IMAGE_READONLY( "gdl-0030a", 0, SHA1(85503fc0793b883f84b191f5ea50c763773c6f59) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-5107-JPN)
@@ -6515,7 +6515,7 @@ ROM_START( karous )
 	ROM_LOAD("karous-default-eeprom.bin", 0, 0x80, CRC(b017451c) SHA1(a16d8e2cde8ebe0e2dd6d0b5c027bcdff56a809b))
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0040", 0, BAD_DUMP SHA1(a62c8d4b6c5be44a4aeeea1a1a94f3d0fe542593) )
+	DISK_IMAGE_READONLY( "gdl-0040", 0, SHA1(a3ca75c20aff34c35bc8e0af609b7353cb9123d9) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-5125-COM)
@@ -7011,6 +7011,17 @@ ROM_START( ngdup23c )
 	ROM_LOAD("317-0338-jpn.pic", 0x00, 0x4000, CRC(b177ba7d) SHA1(f751ec43a8e944a01eeda58c01b7bc73e5df749d) )
 ROM_END
 
+ROM_START( ngdup23e )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0023e", 0, SHA1(cc592e5b32273f93866c4447e1fb56751911992c))
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+    // PIC and sticker unknown
+	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
+ROM_END
 
 ROM_START( puyofev )
 	NAOMIGD_BIOS
@@ -7321,7 +7332,7 @@ ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compre
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0036f", 0, BAD_DUMP SHA1(ea35d6ecdf94e5c9a545952758da80f658755df0) )
+	DISK_IMAGE_READONLY( "gds-0036f", 0, SHA1(197ee1b09531f9bf204033de182e39ec5128d9f6) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0387-COM)
@@ -7421,6 +7432,17 @@ ROM_START( initdexp )
 	ROM_LOAD("317-0343-com.pic", 0x00, 0x4000, CRC(80eea4eb) SHA1(5aedc0d52a2a8a2d186ca591094835d972574092) )
 ROM_END
 
+ROM_START( inidv3cy )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0039b", 0, SHA1(49521709c44a4eee1b384455940b3fec6e03e8fe) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+    // PIC/sticker unknown
+	ROM_LOAD("317-unk-com.pic", 0x00, 0x4000, NO_DUMP )
+ROM_END
 
 
 /**********************************************
@@ -8017,7 +8039,7 @@ ROM_END
 // 0023B Naomi DIMM Firmware Updater (Rev B)
 /* 0023C */ GAME( 2001, ngdup23c,  naomigd,  naomigd, naomi, dc_state,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev C) (GDS-0023C)", GAME_FLAGS )
 // 0023D Naomi DIMM Firmware Updater (Rev D)
-// 0023E Naomi DIMM Firmware Updater (Rev E)
+/* 0023E */ GAME( 2001, ngdup23e,  naomigd,  naomigd, naomi, dc_state,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev E) (GDS-0023E)", GAME_FLAGS ) 
 // 0024  Virtua Fighter 4 Evolution
 /* 0024A */ GAME( 2002, vf4evoa,   vf4evo,   naomi2gd,naomi, dc_state,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 Evolution (Rev A) (GDS-0024A)", GAME_FLAGS )
 /* 0024B */ GAME( 2002, vf4evo,    naomi2,   naomi2gd,naomi, dc_state,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 Evolution (Rev B) (GDS-0024B)", GAME_FLAGS )
@@ -8048,7 +8070,7 @@ ROM_END
 // 0038
 // 0039  Initial D: Arcade Stage Ver. 3 Cycraft Edition
 // 0039A Initial D: Arcade Stage Ver. 3 Cycraft Edition (Rev A)
-// 0039B Initial D: Arcade Stage Ver. 3 Cycraft Edition (Rev B)
+/* 0039B */ GAME( 2006, inidv3cy, naomi2, naomigd, naomi, dc_state,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev. B) (GDS-0039B)", GAME_FLAGS ) 
 // 0040
 // 0041  Dragon Treasure 3
 // 0041A Dragon Treasure 3 (Rev A)
