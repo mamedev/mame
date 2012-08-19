@@ -672,7 +672,7 @@ cutieq			// (c) 1979 Namco
 navarone		// (c) 1980 Namco
 kaitein			// [1980] Namco
 kaitei			// [1980] K.K. Tokki
-sos			// [1980] Namco
+sos				// [1980] Namco
 tankbatt		// (c) 1980 Namco
 tankbattb		// bootleg
 warpwarp		// (c) 1981 Namco
@@ -2446,7 +2446,7 @@ snowbrosc		// MIN16-02 (c) 1990 Toaplan + Romstar license
 snowbrosj		// MIN16-02 (c) 1990 Toaplan
 snowbrosd		// MIN16-02 (c) 1990 Toaplan + Dooyong license
 wintbob			// bootleg
-// modifeid snowbros 'clone' hardware
+// modified snowbros 'clone' hardware
 honeydol		// (c) 1995 Barko Corp
 twinadv			// (c) 1995 Barko Corp
 twinadvk		// (c) 1995 Barko Corp
@@ -2526,47 +2526,47 @@ bbakraidj		// (c) 1999 8ing
 bbakraidja		// (c) 1999 8ing
 
 /*
-Toa Plan's board list
-(translated from http://www.aianet.ne.jp/~eisetu/rom/rom_toha.html)
+  Toa Plan's board list
+  (translated from http://www.aianet.ne.jp/~eisetu/rom/rom_toha.html)
 
-Title              ROMno.   Remark(1)   Remark(2)
---------------------------------------------------
-Tiger Heli           A47      GX-551
-Hishouzame           B02      TP-007
-Kyukyoku Tiger       B30      TP-011
-Dash Yarou           B45      TP-012
-Tatsujin             B65      TP-013B   M6100649A
-Zero Wing            O15      TP-015
-Horror Story         O16      TP-016
-Same!Same!Same!      O17      TP-017
-Out Zone                      TP-018
-Vimana                        TP-019
-Teki Paki            O20      TP-020
-Ghox               TP-21      TP-021
-Dogyuun                       TP-022
-Tatsujin Oh                   TP-024    *1
-Fixeight                      TP-026
-V-V                           TP-027
+  Title              ROMno.   Remark(1)   Remark(2)
+  --------------------------------------------------
+  Tiger Heli           A47      GX-551
+  Hishouzame           B02      TP-007
+  Kyukyoku Tiger       B30      TP-011
+  Dash Yarou           B45      TP-012
+  Tatsujin             B65      TP-013B   M6100649A
+  Zero Wing            O15      TP-015
+  Horror Story         O16      TP-016
+  Same!Same!Same!      O17      TP-017
+  Out Zone                      TP-018
+  Vimana                        TP-019
+  Teki Paki            O20      TP-020
+  Ghox               TP-21      TP-021
+  Dogyuun                       TP-022
+  Tatsujin Oh                   TP-024    *1
+  Fixeight                      TP-026
+  V-V                           TP-027
 
-*1 There is a doubt this game uses TP-024 board and TP-025 romsets.
+  *1 There is a doubt this game uses TP-024 board and TP-025 romsets.
 
-86 Mahjong Sisters                                 Kit 2P 8W+2B     HC    Mahjong TP-
-88 Dash                                            Kit 2P 8W+2B                   TP-
-89 Fire Shark                                      Kit 2P 8W+2B     VC    Shooter TP-017
-89 Twin Hawk                                       Kit 2P 8W+2B     VC    Shooter TP-
-91 Whoopie                                         Kit 2P 8W+2B     HC    Action
-92 Teki Paki                                       Kit 2P                         TP-020
-92 Ghox                                            Kit 2P Paddle+1B VC    Action  TP-021
-10/92 Dogyuun                                         Kit 2P 8W+2B     VC    Shooter TP-022
-92/93 Knuckle Bash                 Atari Games        Kit 2P 8W+2B     HC    Action  TP-023
-10/92 Tatsujin II/Truxton II       Taito              Kit 2P 8W+2B     VC    Shooter TP-024
-10/92 Truxton II/Tatsujin II       Taito              Kit 2P 8W+2B     VC    Shooter TP-024
- Pipi & Bipi                                                                    TP-025
-92 Fix Eight                                       Kit 2P 8W+2B     VC    Action  TP-026
-12/92 V  -  V (5)/Grind Stormer                       Kit 2P 8W+2B     VC    Shooter TP-027
-1/93 Grind Stormer/V - V (Five)                      Kit 2P 8W+2B     VC    Shooter TP-027
-2/94 Batsugun                                        Kit 2P 8W+2B     VC            TP-
-4/94 Snow Bros. 2                                    Kit 2P 8W+2B     HC    Action  TP-
+  86 Mahjong Sisters                                 Kit 2P 8W+2B     HC    Mahjong TP-
+  88 Dash                                            Kit 2P 8W+2B                   TP-
+  89 Fire Shark                                      Kit 2P 8W+2B     VC    Shooter TP-017
+  89 Twin Hawk                                       Kit 2P 8W+2B     VC    Shooter TP-
+  91 Whoopie                                         Kit 2P 8W+2B     HC    Action
+  92 Teki Paki                                       Kit 2P                         TP-020
+  92 Ghox                                            Kit 2P Paddle+1B VC    Action  TP-021
+  10/92 Dogyuun                                      Kit 2P 8W+2B     VC    Shooter TP-022
+  92/93 Knuckle Bash                 Atari Games     Kit 2P 8W+2B     HC    Action  TP-023
+  10/92 Tatsujin II/Truxton II       Taito           Kit 2P 8W+2B     VC    Shooter TP-024
+  10/92 Truxton II/Tatsujin II       Taito           Kit 2P 8W+2B     VC    Shooter TP-024
+        Pipi & Bipi                                                                    TP-025
+  92 Fix Eight                                       Kit 2P 8W+2B     VC    Action  TP-026
+  12/92 V  -  V (5)/Grind Stormer                    Kit 2P 8W+2B     VC    Shooter TP-027
+  1/93 Grind Stormer/V - V (Five)                    Kit 2P 8W+2B     VC    Shooter TP-027
+  2/94 Batsugun                                      Kit 2P 8W+2B     VC            TP-
+  4/94 Snow Bros. 2                                  Kit 2P 8W+2B     HC    Action  TP-
 */
 
 // Cave games
@@ -4078,10 +4078,10 @@ dakkochn		// 836-6483 (S2)
 ufosensi		// 834-6659 (S2)
 ufosensib		// bootleg
 /*
-other System 1 / System 2 games:
+  other System 1 / System 2 games:
 
-WarBall
-DokiDoki Penguin Land *not confirmed
+  WarBall
+  DokiDoki Penguin Land *not confirmed
 */
 
 // Sega System E games (Master System hardware)
@@ -4097,6 +4097,7 @@ tetrisse		// (c) 1988
 shtzone			// (c) 1987
 
 // other Sega 8-bit games
+stactics		// (c) 1981 Sega
 turbo			// (c) 1981 Sega
 turboa			// (c) 1981 Sega
 turbob			// (c) 1981 Sega
@@ -4701,18 +4702,18 @@ karianx			// (c) 1996 Deniam
 logicpr2		// (c) 1997 Deniam (Japan)
 
 /*
-Deniam is a Korean company (http://deniam.co.kr).
+  Deniam is a Korean company (http://deniam.co.kr).
 
-Game list:
-Title            System     Date
----------------- ---------- ----------
-GO!GO!           deniam-16b 1995/10/11
-Logic Pro        deniam-16b 1996/10/20
-Karian Cross     deniam-16b 1997/04/17
-LOTTERY GAME     deniam-16c 1997/05/21
-Logic Pro 2      deniam-16c 1997/06/20
-Propose          deniam-16c 1997/06/21
-BOMULEUL CHAJARA SEGA ST-V  1997/04/11
+  Game list:
+  Title            System     Date
+  ---------------- ---------- ----------
+  GO!GO!           deniam-16b 1995/10/11
+  Logic Pro        deniam-16b 1996/10/20
+  Karian Cross     deniam-16b 1997/04/17
+  LOTTERY GAME     deniam-16c 1997/05/21
+  Logic Pro 2      deniam-16c 1997/06/20
+  Propose          deniam-16c 1997/06/21
+  BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 */
 
 // System C games
@@ -8132,12 +8133,12 @@ netwars			// (c) 1983 Orca + Esco Trading Co license
 vastar			// (c) 1983 Sesame Japan
 vastar2			// (c) 1983 Sesame Japan
 /*
-other Orca games:
-82 Battle Cross                         Kit 2P
-82 River Patrol Empire Mfg/Kerstens Ind Ded 2P        HC Action
-82 Slalom                               Kit 2P        HC Action
-83 Net Wars                                 2P
-83 Super Crush                          Kit 2P           Action
+  other Orca games:
+  82 Battle Cross                         Kit 2P
+  82 River Patrol Empire Mfg/Kerstens Ind Ded 2P        HC Action
+  82 Slalom                               Kit 2P        HC Action
+  83 Net Wars                                 2P
+  83 Super Crush                          Kit 2P           Action
 */
 
 // Gaelco 2D games
@@ -8193,11 +8194,11 @@ atvtrack		// (c) 2002 - Ref 020419
 atvtracka		// (c) 2002 - Ref 020419
 
 /*
-Remaining Gaelco Games:
-=======================
-1999: Rolling Extreme
-2000: Football Power
-2001: Smashing Drive
+  Remaining Gaelco Games:
+  =======================
+  1999: Rolling Extreme
+  2000: Football Power
+  2001: Smashing Drive
 */
 
 // Galeco PC based games
@@ -8500,13 +8501,13 @@ shangha3		// (c) 1993 Sunsoft
 heberpop		// (c) 1994 Sunsoft / Atlus
 blocken			// (c) 1994 KID / Visco
 /*
-Other Sun games
-1978.11 (GT)Block Perfect
-1978.12 (GT)Block Challenger
-1979.04 Galaxy Force
-1979.07 Run Away
-1979.12 Warp 1
-1980.10 Cosmo Police (Cosmopolis?)
+  Other Sun games
+  1978.11 (GT)Block Perfect
+  1978.12 (GT)Block Challenger
+  1979.04 Galaxy Force
+  1979.07 Run Away
+  1979.12 Warp 1
+  1980.10 Cosmo Police (Cosmopolis?)
 */
 
 // SunA games
@@ -10037,7 +10038,7 @@ deltrace		// bootleg
 monzagp			// (c) 1981 Olympia
 dday			// (c) 1982 Olympia
 ddayc			// (c) 1982 Olympia + Centuri license
-stactics		// [1981 Sega]
+flipjack		// 1983? Jackson Co., Ltd.
 exterm			// (c) 1989 Premier Technology - a Gottlieb game
 flower			// (c) 1986 Komax license
 flowerj			// 834-5998 (c) 1986 Sega / Alpha license?
@@ -10069,6 +10070,7 @@ blkbustr		// (c) 1983 Kiwako + ECI license
 polyplay
 amspdwy			// no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
 amspdwya		// no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
+jankenmn		// (c) 1985 Sunwise
 othldrby		// (c) 1995 Sunwise
 quizpun 		// (c) 1989 Space Computer System of Korea
 quizpun2		// (c) 1989 Space Computer System of Korea
@@ -10320,9 +10322,10 @@ tankbatl		// (c) 1992 Microprose Games Inc.
 dynadice		// ?
 atamanot		// (c) 1983 Yachiyo Denki / Uni Enterprize
 ssingles		// Yachiyo?
-tcl			// (c) 1995 Uniwang
+tcl				// (c) 1995 Uniwang
 othello			// (c) 1984 Success
 sothello		// (c) 1986 Success / Fujiwara
+tonton			// 199?, Success.
 quake			// (c) 19?? Lazer-Tron / iD Software
 majorpkr		// (c) 1994 PAL System.
 su2000			// (c) 1993 Virtuality
@@ -12028,6 +12031,10 @@ raaspec			// (c) Roy Abel & Associates 1984
 3do
 //3do_pal
 orbatak
+
+
+
+
 
 /* Drivers below are mostly mechanical games, usually with no video display, requiring external artwork to function. */
 
@@ -28219,27 +28226,23 @@ umipoker
 saiyukip
 
 tmspoker
-tonton			// 199?, Success.
 kas89			// 1989, SFC S.R.L.
 caspoker		// 1987, PM / Beck Elektronik.
 wildpkr			// 199?, TAB Austria.
 
 manohman		// 199?, Merkur.
-jankenmn		// 1985, Sunwise.
-
-flipjack		// 1983? Jackson Co., Ltd.
 
 // Global VR
 hyperv2			// Hyper V2 (Global VR) Install - 06/12/02
-hyperv2a                // Hyper V2 (Global VR) Install - 09/30/01
-gvrxpsys                // Global VR XP OS Install - 09/30/01
-gvrxpsup                // Global VR XP OS Update/Install - 06/11/02
+hyperv2a		// Hyper V2 (Global VR) Install - 09/30/01
+gvrxpsys		// Global VR XP OS Install - 09/30/01
+gvrxpsup		// Global VR XP OS Update/Install - 06/11/02
 
-bhead2k                 // Beach Head 2000 Install - 05/27/03
-bhead2ka                // Beach Head 2000 Install - 09/16/01
-bhead2k2                // Beach Head 2002 Install - 05/27/03
-bhead2k3                // Beach Head 2003 Desert War Install - 05/27/03
-nfsug                   // Need For Speed: Underground Install (2 Discs) (v1.1)
+bhead2k			// Beach Head 2000 Install - 05/27/03
+bhead2ka		// Beach Head 2000 Install - 09/16/01
+bhead2k2		// Beach Head 2002 Install - 05/27/03
+bhead2k3		// Beach Head 2003 Desert War Install - 05/27/03
+nfsug			// Need For Speed: Underground Install (2 Discs) (v1.1)
 
 
 // TTL logic games
