@@ -175,13 +175,13 @@ int mame_execute(emu_options &options, osd_interface &osd)
 			valid.check_shared_source(*system);
 		}
 
-		ui_show_mouse(false);
-
 		// create the machine configuration
 		machine_config config(*system, options);
 
 		// create the machine structure and driver
 		running_machine machine(config, osd, started_empty);
+
+		ui_show_mouse(machine.system().flags & GAME_CLICKABLE_ARTWORK);
 
 		// looooong term: remove this
 		global_machine = &machine;

@@ -72,6 +72,7 @@ const UINT32 GAME_TYPE_CONSOLE				= 0x00080000;	// console system
 const UINT32 GAME_TYPE_COMPUTER				= 0x00100000;	// any kind of computer including home computers, minis, calcs,...
 const UINT32 GAME_TYPE_OTHER				= 0x00200000;	// any other emulated system that doesn't fit above (ex. clock, satelite receiver,...)
 const UINT32 GAME_IMPERFECT_KEYBOARD		= 0x00400000;	// keyboard is known to be wrong
+const UINT32 GAME_CLICKABLE_ARTWORK			= 0x00800000;	// marking that artwork is clickable and require mouse cursor
 
 // useful combinations of flags
 const UINT32 GAME_IS_SKELETON				= GAME_NO_SOUND | GAME_NOT_WORKING; // mask for skelly games

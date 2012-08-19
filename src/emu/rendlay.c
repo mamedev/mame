@@ -2156,8 +2156,6 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	// allocate a copy of the input tag
 	m_input_tag = xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", "");
 
-	if (m_input_tag.len()>0) ui_show_mouse(true);
-
 	// find the associated element
 	const char *name = xml_get_attribute_string_with_subst(machine, itemnode, "element", NULL);
 	if (name != NULL)
