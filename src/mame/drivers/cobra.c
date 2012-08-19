@@ -469,8 +469,10 @@ public:
 	UINT8 m_s2m_int_enable;
 	UINT8 m_vblank_enable;
 
-	int m2sfifo_unk_flag;
-	int s2mfifo_unk_flag;
+	UINT8 m_m2s_int_mode;
+	UINT8 m_s2m_int_mode;
+
+	UINT8 m_main_int_active;
 
 
 	UINT32 *m_comram[2];
@@ -863,7 +865,22 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 	switch (event)
 	{
 		case cobra_fifo::EVENT_EMPTY:
+		{
+			cputag_set_input_line(machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+
+			// give sub cpu a bit more time to stabilize on the current fifo status
+			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(1));
+
+			if (m_m2s_int_enable & 0x80)
+			{
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+			}
+
+			// EXISR needs to update for the *next* instruction during FIFO tests
+			// TODO: try to abort the timeslice before the next instruction?
+			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x10);
 			break;
+		}
 		
 		case cobra_fifo::EVENT_HALF_FULL:
 			break;
@@ -1005,15 +1022,6 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		UINT64 value;
 		m_s2mfifo->pop(&space.device(), &value);
 
-		if (m_s2mfifo->is_empty())
-		{
-			s2mfifo_unk_flag = 1;
-		}
-		else if (m_s2mfifo->is_full())
-		{
-			s2mfifo_unk_flag = 0;
-		}
-
 		r |= (UINT64)(value & 0xff) << 40;
 	}
 	if (ACCESSING_BITS_32_39)
@@ -1027,19 +1035,14 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		//         x         M2S FIFO unknown flag
 
 		int value = 0x01;
-		//value |= s2mfifo_unk_flag ? 0x2 : 0x0;
 
-		if (m_s2mfifo->is_empty())
+		if (m_s2mfifo->is_empty())		// TODO: this is an interrupt
 		{
 			value |= 0x2;
 		}
-		else if (!m_s2mfifo->is_full() && !m_s2mfifo->is_half_full())
-		{
-			//value |= s2mfifo_unk_flag ? 0x2 : 0x0;
-		}
 
-		value |= m2sfifo_unk_flag ? 0x8 : 0x0;
-
+		//value |= (m_main_int_active & 2) ? 0x00 : 0x02;
+		value |= (m_main_int_active & 1) ? 0x00 : 0x08;
 		value |= (m_gfx_unk_flag & 0x80) ? 0x00 : 0x04;
 
 		r |= (UINT64)(value) << 32;
@@ -1055,15 +1058,12 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		// Register 0xffff0002:
 		// Main-to-Sub FIFO write data
 
-		//printf("MAIN: M2S FIFO data write %02X\n", (UINT8)(data >> 40) & 0xff);
-
 		m_m2sfifo->push(&space.device(), (UINT8)(data >> 40));
 
 		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
-		// this is a hack...
-		// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
-		// the EXISR at the same time as the FIFO status updates.....
+		// EXISR needs to update for the *next* instruction during FIFO tests
+		// TODO: try to abort the timeslice before the next instruction?
 		cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x10);
 	}
 	if (ACCESSING_BITS_32_39)
@@ -1073,23 +1073,32 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		//
 		// 7 6 5 4 3 2 1 0
 		//----------------
-		//         x            M2S unknown flag
+		//         x            M2S interrupt mode (0 = empty, 1 = half full)
 		// x                    Comram page
 
-		if (!m_m2sfifo->is_empty())
+		m_m2s_int_mode = ((data >> 32) & 0x8) ? 1 : 0;
+
+		if (m_m2s_int_mode)
 		{
-			if (m_m2sfifo->is_half_full())
+			if (!m_m2sfifo->is_half_full())
 			{
-				m2sfifo_unk_flag = 0x8;
+				m_main_int_active |= 1;
 			}
 			else
 			{
-				m2sfifo_unk_flag = ((data >> 32) & 0x8) ? 0 : 1;
+				m_main_int_active &= ~1;
 			}
 		}
 		else
 		{
-			m2sfifo_unk_flag = 0x0;
+			if (m_m2sfifo->is_empty())
+			{
+				m_main_int_active |= 1;
+			}
+			else
+			{
+				m_main_int_active &= ~1;
+			}
 		}
 
 		m_comram_page = ((data >> 32) & 0x80) ? 1 : 0;
@@ -1124,6 +1133,8 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		if ((m_s2m_int_enable & 0x80) == 0)
 		{
+			m_main_int_active &= ~2;
+
 			// clear the interrupt
 			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 		}
@@ -1291,24 +1302,6 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		UINT64 value;
 		m_m2sfifo->pop(&space.device(), &value);
 
-		if (m_m2sfifo->is_empty())
-		{
-			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
-
-			// give sub cpu a bit more time to stabilize on the current fifo status
-			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(1));
-
-			if (m_m2s_int_enable & 0x80)
-			{
-				cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
-			}
-
-			// this is a hack...
-			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
-			// the EXISR at the same time as the FIFO status updates.....
-			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x10);
-		}
-
 		r |= (value & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
@@ -1356,46 +1349,42 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		// fire off an interrupt if enabled
 		if (m_s2m_int_enable & 0x80)
 		{
+			m_main_int_active |= 2;
+
 			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		// Register 0x7E380001
+		//
+		// 7 6 5 4 3 2 1 0
+		//----------------
+		//               x    S2M interrupt mode (0 = empty, 1 = half full)
 
-		if (!m_s2mfifo->is_empty())
+		m_s2m_int_mode = (data & 0x10000) ? 1 : 0;
+
+		if (m_s2m_int_mode)
 		{
-			if (m_s2mfifo->is_half_full())
+			if (!m_s2mfifo->is_half_full())
 			{
-				s2mfifo_unk_flag = 1;
+				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x08);
 			}
 			else
 			{
-				s2mfifo_unk_flag = (~(data >> 16) & 0x1);
+				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x08);
 			}
 		}
 		else
 		{
-			s2mfifo_unk_flag = 0;
-		}
-
-		if (!s2mfifo_unk_flag)
-		{
-//          cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, ASSERT_LINE);
-
-			// this is a hack...
-			// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
-			// the EXISR at the same time as the FIFO status updates.....
-			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x08);
-		}
-		else
-		{
-//          cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ1, CLEAR_LINE);
-
-			// this is a hack...
-			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
-			// the EXISR at the same time as the FIFO status updates.....
-			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x08);
+			if (m_s2mfifo->is_empty())
+			{
+				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x08);
+			}
+			else
+			{
+				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x08);
+			}
 		}
 	}
 }
