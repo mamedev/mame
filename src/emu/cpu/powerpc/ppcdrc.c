@@ -2452,7 +2452,7 @@ static int generate_opcode(powerpc_state *ppc, drcuml_block *block, compiler_sta
 
 		case 0x0b:	/* CMPI */
 			UML_CMP(block, R32(G_RA(op)), (INT16)G_SIMM(op));							// cmp     ra,uimm
-			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);							// getflgs i0,zcs
+			UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);							// getflgs i0,zvcs
 			UML_LOAD(block, I0, ppc->impstate->cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);								// or      [crn],i0,[xerso]
 			return TRUE;
@@ -3061,7 +3061,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
 		case 0x000:	/* CMP */
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));									// cmp     ra,rb
-			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);							// getflgs i0,zcs
+			UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);							// getflgs i0,zvcs
 			UML_LOAD(block, I0, ppc->impstate->cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
 			UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32);								// or      [crn],i0,[xerso]
 			return TRUE;
