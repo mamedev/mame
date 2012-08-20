@@ -3468,32 +3468,6 @@ static void I386OP(retf_i32)(i386_state *cpustate)			// Opcode 0xca
 	CYCLES(cpustate,CYCLES_RET_IMM_INTERSEG);
 }
 
-static void I386OP(xlat32)(i386_state *cpustate)			// Opcode 0xd7
-{
-	UINT32 ea;
-	if( cpustate->segment_prefix ) {
-		if(cpustate->address_size)
-		{
-			ea = i386_translate(cpustate, cpustate->segment_override, REG16(BX) + REG8(AL), 0 );
-		}
-		else
-		{
-			ea = i386_translate(cpustate, cpustate->segment_override, REG32(EBX) + REG8(AL), 0 );
-		}
-	} else {
-		if(cpustate->address_size)
-		{
-			ea = i386_translate(cpustate, DS, REG16(BX) + REG8(AL), 0 );
-		}
-		else
-		{
-			ea = i386_translate(cpustate, DS, REG32(EBX) + REG8(AL), 0 );
-		}
-	}
-	REG8(AL) = READ8(cpustate,ea);
-	CYCLES(cpustate,CYCLES_XLAT);
-}
-
 static void I386OP(load_far_pointer32)(i386_state *cpustate, int s)
 {
 	UINT8 modrm = FETCH(cpustate);

@@ -238,7 +238,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xD4,		OP_I386,					I386OP(aam),					I386OP(aam),				},
 	{ 0xD5,		OP_I386,					I386OP(aad),					I386OP(aad),				},
 	{ 0xD6,		OP_I386,					I386OP(setalc),					I386OP(setalc),				},
-	{ 0xD7,		OP_I386,					I386OP(xlat16),					I386OP(xlat32),				},
+	{ 0xD7,		OP_I386,					I386OP(xlat),					I386OP(xlat),				},
 	{ 0xD8,		OP_I386,					I386OP(escape),					I386OP(escape),				},
 	{ 0xD9,		OP_I386,					I386OP(escape),					I386OP(escape),				},
 	{ 0xDA,		OP_I386,					I386OP(escape),					I386OP(escape),				},

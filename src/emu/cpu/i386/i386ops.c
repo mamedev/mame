@@ -2489,3 +2489,29 @@ static void I386OP(invalid)(i386_state *cpustate)
 	report_invalid_opcode(cpustate);
 	i386_trap(cpustate, 6, 0, 0);
 }
+
+static void I386OP(xlat)(i386_state *cpustate)			// Opcode 0xd7
+{
+	UINT32 ea;
+	if( cpustate->segment_prefix ) {
+		if(cpustate->address_size)
+		{
+			ea = i386_translate(cpustate, cpustate->segment_override, REG16(BX) + REG8(AL), 0 );
+		}
+		else
+		{
+			ea = i386_translate(cpustate, cpustate->segment_override, REG32(EBX) + REG8(AL), 0 );
+		}
+	} else {
+		if(cpustate->address_size)
+		{
+			ea = i386_translate(cpustate, DS, REG16(BX) + REG8(AL), 0 );
+		}
+		else
+		{
+			ea = i386_translate(cpustate, DS, REG32(EBX) + REG8(AL), 0 );
+		}
+	}
+	REG8(AL) = READ8(cpustate,ea);
+	CYCLES(cpustate,CYCLES_XLAT);
+}
