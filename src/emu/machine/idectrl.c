@@ -1286,8 +1286,13 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 //  if (BANK(bank, offset) != IDE_BANK0_DATA && BANK(bank, offset) != IDE_BANK0_STATUS_COMMAND && BANK(bank, offset) != IDE_BANK1_STATUS_CONTROL)
 		LOG(("%s:IDE read at %d:%X, size=%d\n", device->machine().describe_context(), bank, offset, size));
 
-	if (ide->drive[ide->cur_drive].slot->is_ready()) {
-		ide->status |= IDE_STATUS_DRIVE_READY;
+	if (ide->drive[ide->cur_drive].slot->is_connected())
+	{
+		if (ide->drive[ide->cur_drive].slot->is_ready()) {
+			ide->status |= IDE_STATUS_DRIVE_READY;
+		} else {
+			ide->status &= ~IDE_STATUS_DRIVE_READY;
+		}
 	}
 
 	switch (BANK(bank, offset))

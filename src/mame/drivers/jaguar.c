@@ -1774,6 +1774,10 @@ static MACHINE_CONFIG_START( cojagr3k, cojag_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cojagr3k_rom, cojagr3k )
+	MCFG_DEVICE_REMOVE("drive_0")
+	MCFG_IDE_SLOT_ADD("drive_0", ide_devices, NULL, NULL, true)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
 
@@ -2529,14 +2533,14 @@ CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   cojag_state, jaguar
 GAME( 1996, area51,    0,        cojagr3k,  area51, cojag_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,   area51,   cojag68k,  area51, cojag_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license)", 0 )
 GAME( 1995, area51a,   area51,   cojag68k,  area51, cojag_state,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license)", 0 )
-GAME( 1995, fishfren,  0,        cojagr3k,  fishfren, cojag_state, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
-GAME( 1996, freezeat,  0,        cojagr3k,  freezeat, cojag_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
-GAME( 1996, freezeatjp,freezeat, cojagr3k,  freezeat, cojag_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
-GAME( 1996, freezeat2, freezeat, cojagr3k,  freezeat, cojag_state, freezeat2,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
-GAME( 1996, freezeat3, freezeat, cojagr3k,  freezeat, cojag_state, freezeat3,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
-GAME( 1996, freezeat4, freezeat, cojagr3k,  freezeat, cojag_state, freezeat4,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
-GAME( 1996, freezeat5, freezeat, cojagr3k,  freezeat, cojag_state, freezeat5,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
-GAME( 1996, freezeat6, freezeat, cojagr3k,  freezeat, cojag_state, freezeat6,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
+GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, cojag_state, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
+GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, cojag_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
+GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, cojag_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
+GAME( 1996, freezeat2, freezeat, cojagr3k_rom,  freezeat, cojag_state, freezeat2,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
+GAME( 1996, freezeat3, freezeat, cojagr3k_rom,  freezeat, cojag_state, freezeat3,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
+GAME( 1996, freezeat4, freezeat, cojagr3k_rom,  freezeat, cojag_state, freezeat4,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
+GAME( 1996, freezeat5, freezeat, cojagr3k_rom,  freezeat, cojag_state, freezeat5,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
+GAME( 1996, freezeat6, freezeat, cojagr3k_rom,  freezeat, cojag_state, freezeat6,ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
 GAME( 1996, maxforce,  0,        cojagr3k,  area51, cojag_state,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
 GAME( 1996, maxf_102,  maxforce, cojagr3k,  area51, cojag_state,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
 GAME( 1996, maxf_ng,   maxforce, cojagr3k,  area51, cojag_state,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
