@@ -1860,7 +1860,7 @@ GAME(199?, m4frcrak, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Pcp","F
 GAME(199?, m4spnwin		,0			,mod2		,mpu4, mpu4_state, m4default, ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) // works?
 GAME(199?, m4spnwina	,m4spnwin	,mod2		,mpu4, mpu4_state, m4default, ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4pick, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "Jpm","Pick A Fruit (Jpm) (MPU4)",GAME_FLAGS )
+GAME(199?, m4pick, 0,			mod2    ,mpu4, mpu4_state, m4default, ROT0,   "JPM","Pick A Fruit (JPM) (MPU4)",GAME_FLAGS )
 
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4, mpu4_state,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
