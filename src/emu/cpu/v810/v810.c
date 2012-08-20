@@ -920,7 +920,7 @@ static void opCVTS(v810_state *cpustate,UINT32 op)
 static void opCVTW(v810_state *cpustate,UINT32 op)
 {
 	//TODO: CY
-	float val1=GETREG(cpustate,GET1);
+	float val1=(INT32)GETREG(cpustate,GET1);
 	SET_OV(0);
 	SET_Z((val1==0.0)?1:0);
 	SET_S((val1<0.0)?1:0);
