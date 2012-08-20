@@ -2494,7 +2494,7 @@ static void I386OP(xlat)(i386_state *cpustate)			// Opcode 0xd7
 {
 	UINT32 ea;
 	if( cpustate->segment_prefix ) {
-		if(cpustate->address_size)
+		if(!cpustate->address_size)
 		{
 			ea = i386_translate(cpustate, cpustate->segment_override, REG16(BX) + REG8(AL), 0 );
 		}
@@ -2503,7 +2503,7 @@ static void I386OP(xlat)(i386_state *cpustate)			// Opcode 0xd7
 			ea = i386_translate(cpustate, cpustate->segment_override, REG32(EBX) + REG8(AL), 0 );
 		}
 	} else {
-		if(cpustate->address_size)
+		if(!cpustate->address_size)
 		{
 			ea = i386_translate(cpustate, DS, REG16(BX) + REG8(AL), 0 );
 		}
