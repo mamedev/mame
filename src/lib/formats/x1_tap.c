@@ -26,6 +26,7 @@
 
 static int cas_size;
 static int samplerate;
+static int new_format;
 
 static int x1_fill_wave(INT16* buffer, UINT8 data, int sample_pos)
 {
@@ -46,22 +47,17 @@ static int x1_fill_wave(INT16* buffer, UINT8 data, int sample_pos)
 static int x1_handle_tap(INT16* buffer, const UINT8* casdata)
 {
 	int sample_count = 0;
-	int data_pos = 0x28;
+	int data_pos = new_format ? 0x28 : 0x04;
 
-	if(memcmp(casdata, "TAPE",4))  // header check
-	{
-		LOG_FORMATS("TAP: image is not a 'new' format TAP image\n");
-		return -1;
-	}
-	if(samplerate != 8000)
+	if (samplerate != 8000)
 	{
 		LOG_FORMATS("TAP: images that are not 8000Hz are not yet supported\n");
 		return -1;
 	}
 
-	while(sample_count < cas_size)
+	while (sample_count < cas_size)
 	{
-		sample_count += x1_fill_wave(buffer,casdata[data_pos],sample_count);
+		sample_count += x1_fill_wave(buffer, casdata[data_pos], sample_count);
 		data_pos++;
 	}
 
@@ -75,11 +71,23 @@ static int x1_cas_to_wav_size (const UINT8 *casdata, int caslen)
 {
 	UINT32 ret;
 
-	ret = casdata[0x20] | (casdata[0x21] << 8) | (casdata[0x22] << 16) | (casdata[0x23] << 24);
-	cas_size = ret;
+	if (!memcmp(casdata, "TAPE", 4))  // new TAP format
+	{
+		ret = casdata[0x20] | (casdata[0x21] << 8) | (casdata[0x22] << 16) | (casdata[0x23] << 24);
+		cas_size = ret;
 
-	samplerate = casdata[0x1c] | (casdata[0x1d] << 8) | (casdata[0x1e] << 16) | (casdata[0x1f] << 24);
-
+		samplerate = casdata[0x1c] | (casdata[0x1d] << 8) | (casdata[0x1e] << 16) | (casdata[0x1f] << 24);
+		new_format = 1;
+	}
+	else  // old TAP format
+	{
+		ret = (caslen - 4) * 8; // each byte = 8 samples
+		cas_size = ret;
+		
+		samplerate = casdata[0x00] | (casdata[0x01] << 8) | (casdata[0x02] << 16) | (casdata[0x03] << 24);
+		new_format = 0;
+	}
+	
 	return ret;
 }
 
