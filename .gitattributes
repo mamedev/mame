@@ -5443,3 +5443,4 @@ src/tools/srcclean.c svneol=native#text/plain
 src/tools/tools.mak svneol=native#text/plain
 src/tools/unidasm.c svneol=native#text/plain
 src/version.c svneol=native#text/plain
+/whatsnew_0146u5.txt svneol=native#text/plain
