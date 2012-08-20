@@ -56,10 +56,17 @@
 //============================================================
 
 #define USE_DELEGATES			(1)
-#define USE_DOUBLE				(0)
+#define USE_DELEGATES_A			(0)
 
-#define NET_LIST_SIZE			(32)
-#define NET_LIST_MASK			(0x1f)
+#define NETLIST_CLOCK 	      	   (U64(1000000000))
+
+#define NLTIME_FROM_NS(_t)	netlist_time::from_ns(_t)
+#define NLTIME_FROM_US(_t)	netlist_time::from_us(_t)
+#define NLTIME_FROM_MS(_t)	netlist_time::from_ms(_t)
+#define NLTIME_IMMEDIATE	netlist_time::from_ns(0)
+
+#define NETLIST_HIGHIMP_V	(1.23456e20)		/* some voltage we should never see */
+
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -83,7 +90,7 @@
 		netlist.register_link(# _name "." # _input, # _output);						\
 
 #define NETDEV_PARAM(_name, _val)													\
-		netlist.find_param(# _name)->setTo(_val);
+		netlist.find_param(# _name).initial(_val);
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
@@ -93,15 +100,15 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 #define NETLIST_END  }
 
-#define NETLIST_INCLUDE(_name)														\
+#define NETLIST_INCLUDE(_name) 														\
 		NETLIST_NAME(_name)(netlist);												\
 
 
-#define NETLIST_MEMREGION(_name)													\
+#define NETLIST_MEMREGION(_name) 													\
 		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());		\
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
-#define ATTR_ALIGN __attribute__ ((aligned(64)))
+#define ATTR_ALIGN __attribute__ ((aligned(128)))
 #else
 #define ATTR_ALIGN
 #endif
@@ -115,58 +122,57 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void _chip :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name) ATTR_HOT ATTR_ALIGN inline void _chip :: _name (void)
 
-#define NETLIB_TIMER_CALLBACK(_chip) ATTR_HOT void _chip :: timer_cb(INT32 timer_id)
-
-#define NETLIB_SIGNAL(_name, _num_input)											\
-	class _name : public net_signal_t< _num_input >									\
+#define NETLIB_SIGNAL(_name, _num_input, _check)									\
+	class _name : public net_signal_t<_num_input, _check>							\
 	{																				\
-	public:																			\
-		_name (netlist_setup_t *parent, const char *name)							\
-		: net_signal_t<_num_input>(parent, name) { }								\
-		ATTR_HOT void update();														\
+	public:						 													\
+		_name () : net_signal_t<_num_input, _check>() { }							\
 	};																				\
 
 #define NETLIB_DEVICE(_name, _priv)													\
-	class _name : public net_dev_t													\
+	class _name : public net_device_t												\
 	{																				\
 	public:																			\
-		_name (netlist_setup_t *parent, const char *name)							\
-		: net_dev_t(parent, name) { }												\
+		_name () : net_device_t() { }												\
 		ATTR_HOT void update();														\
 		ATTR_COLD void start();														\
-	private:																		\
+	protected:																		\
+		_priv																		\
+	}																				\
+
+#define NETLIB_SUBDEVICE(_name, _priv)												\
+	class _name : public net_core_device_t											\
+	{																				\
+	public:																			\
+		_name () : net_core_device_t() { }											\
+		ATTR_HOT void update();														\
+	/*protected:*/																	\
 		_priv																		\
 	}																				\
 
 #define NETLIB_DEVICE_WITH_PARAMS(_name, _priv)										\
-	class _name : public net_dev_t													\
+	class _name : public net_device_t												\
 	{																				\
 	public:																			\
-		_name (netlist_setup_t *parent, const char *name)							\
-		: net_dev_t(parent, name) { }												\
+		_name () : net_device_t() { }												\
 		ATTR_HOT void update_param();												\
 		ATTR_HOT void update();														\
 		ATTR_COLD void start();														\
-	private:																		\
+	/* protected: */																\
 		_priv																		\
 	}																				\
 
 // MAME specific
 
-#define MCFG_NETLIST_ADD(_tag, _clock, _setup, _subcycles)  						\
-    MCFG_DEVICE_ADD(_tag, NETLIST, _clock)											\
-    MCFG_NETLIST_SUBCYCLES(_subcycles)												\
-    MCFG_NETLIST_SETUP(_setup)														\
+#define MCFG_NETLIST_ADD(_tag, _setup )						  						\
+    MCFG_DEVICE_ADD(_tag, NETLIST, NETLIST_CLOCK) 									\
+    MCFG_NETLIST_SETUP(_setup) 														\
 
-#define MCFG_NETLIST_REPLACE(_tag, _clock, _setup, _subcycles)  					\
-    MCFG_DEVICE_REPLACE(_tag, NETLIST, _clock)										\
-    MCFG_NETLIST_SUBCYCLES(_subcycles)												\
-    MCFG_NETLIST_SETUP(_setup)														\
+#define MCFG_NETLIST_REPLACE(_tag, _setup)						  					\
+    MCFG_DEVICE_REPLACE(_tag, NETLIST, NETLIST_CLOCK)								\
+    MCFG_NETLIST_SETUP(_setup) 														\
 
-#define MCFG_NETLIST_SUBCYCLES(_subcycles)											\
-	netlist_mame_device::static_set_subcycles(*device, _subcycles); 				\
-
-#define MCFG_NETLIST_SETUP(_setup)													\
+#define MCFG_NETLIST_SETUP(_setup) 													\
 	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));		\
 
 
@@ -175,69 +181,98 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 // ----------------------------------------------------------------------------------------
 
 
-enum net_input_type {
-	NET_INP_TYPE_PASSIVE,
-	NET_INP_TYPE_ACTIVE
-};
-
-enum { nst_LOW = 0, nst_HIGH = 1};
-//typedef  double net_sig_t;
-//enum net_sig_t { nst_LOW = 0, nst_HIGH = 1};
-
-// ----------------------------------------------------------------------------------------
-// net_input_t
-// ----------------------------------------------------------------------------------------
-
-class net_output_t;
-
-#if !USE_DOUBLE
-#if 0
-typedef  UINT8 net_sig_t;
-#define INPVAL(_x) (*(_x))
-#define GETINPPTR(_x) (_x).Q_ptr()
-typedef net_sig_t * RESTRICT net_input_t;
-#else
-typedef UINT8 net_sig_t;
-//#define INPVAL(_x) ((_x)->Q())
-#define INPVAL(_x) INP(_x)
-#define GETINPPTR(_x) (&(_x))
-class net_input_t {
-public:
-	net_output_t * RESTRICT o;
-};
-#endif
-#else
-typedef  double net_sig_t;
-#define INPVAL(_x) ((int)*(_x))
-#define GETINPPTR(_x) (_x).Q_ptr()
-typedef net_sig_t * RESTRICT net_input_t;
-#endif
-
-
-
-typedef delegate<void (const net_sig_t)> net_output_delegate;
-
-#if USE_DELEGATES
+#if USE_DELEGATES || USE_DELEGATES_A
 typedef delegate<void ()> net_update_delegate;
-typedef delegate<void (const net_output_t *out, UINT8 ns_delay)> net_register_delegate;
 #endif
 
-class net_dev_t;
-class net_param_t;
-class netlist_setup_t;
-class netlist_base_t;
+typedef UINT8 net_sig_t;
+
+typedef delegate<void (const double)> net_output_delegate;
 
 // ----------------------------------------------------------------------------------------
-// net_list_t
+// Support classes
 // ----------------------------------------------------------------------------------------
+
+struct netlist_time
+{
+public:
+
+	typedef UINT64 INTERNALTYPE;
+
+	static const INTERNALTYPE RESOLUTION = U64(1024000000000);
+
+	inline netlist_time() : m_time(0) {}
+
+	friend netlist_time operator-(const netlist_time &left, const netlist_time &right);
+	friend netlist_time operator+(const netlist_time &left, const netlist_time &right);
+	friend netlist_time operator*(const netlist_time &left, const UINT64 factor);
+	friend bool operator>(const netlist_time &left, const netlist_time &right);
+	friend bool operator<(const netlist_time &left, const netlist_time &right);
+	friend bool operator>=(const netlist_time &left, const netlist_time &right);
+	friend bool operator<=(const netlist_time &left, const netlist_time &right);
+
+	inline netlist_time &operator=(const netlist_time right) { m_time = right.m_time; return *this; }
+	inline netlist_time &operator+=(const netlist_time &right) { m_time += right.m_time; return *this; }
+
+	inline const INTERNALTYPE as_raw() const { return m_time; }
+
+	static inline const netlist_time from_ns(const int ns) { return netlist_time((UINT64) ns * RESOLUTION / U64(1000000000)); }
+	static inline const netlist_time from_us(const int us) { return netlist_time((UINT64) us * RESOLUTION / U64(1000000)); }
+	static inline const netlist_time from_ms(const int ms) { return netlist_time((UINT64) ms * RESOLUTION / U64(1000)); }
+	static inline const netlist_time from_hz(const UINT64 hz) { return netlist_time(RESOLUTION / hz); }
+	static inline const netlist_time from_raw(const INTERNALTYPE raw) { return netlist_time(raw); }
+
+	static const netlist_time zero;
+
+protected:
+
+	inline netlist_time(const INTERNALTYPE val) : m_time(val) {}
+
+	INTERNALTYPE m_time;
+};
+
+inline netlist_time operator-(const netlist_time &left, const netlist_time &right)
+{
+	return netlist_time::from_raw(left.m_time - right.m_time);
+}
+
+inline netlist_time operator*(const netlist_time &left, const UINT64 factor)
+{
+	return netlist_time::from_raw(left.m_time * factor);
+}
+
+inline netlist_time operator+(const netlist_time &left, const netlist_time &right)
+{
+	return netlist_time::from_raw(left.m_time + right.m_time);
+}
+
+inline bool operator<(const netlist_time &left, const netlist_time &right)
+{
+	return (left.m_time < right.m_time);
+}
+
+inline bool operator>(const netlist_time &left, const netlist_time &right)
+{
+	return (left.m_time > right.m_time);
+}
+
+inline bool operator<=(const netlist_time &left, const netlist_time &right)
+{
+	return (left.m_time <= right.m_time);
+}
+
+inline bool operator>=(const netlist_time &left, const netlist_time &right)
+{
+	return (left.m_time >= right.m_time);
+}
 
 template <class _ListClass, int _NumElements>
 struct net_list_t
 {
 public:
-	net_list_t() //(int max_elements = 64)
+	net_list_t()
 	{
-		//m_list = global_alloc_array_clear(_ListClass, max_elements);
+		m_list = global_alloc_array(_ListClass, _NumElements);
 		m_ptr = m_list;
 		m_ptr--;
 	}
@@ -247,135 +282,416 @@ public:
 
 		*(++m_ptr) = elem;
 	}
-	ATTR_HOT inline _ListClass *first() { return m_list; }
-	ATTR_HOT inline _ListClass *last()  { return m_ptr; }
-	ATTR_HOT inline _ListClass item(int i) { return m_list[i]; }
-	inline int count() { return m_ptr - m_list + 1; }
-	ATTR_HOT inline bool empty() { return (m_ptr < m_list); }
+	ATTR_HOT inline _ListClass *first() const { return m_list; }
+	ATTR_HOT inline _ListClass *last() const  { return m_ptr; }
+	ATTR_HOT inline _ListClass item(int i) const { return m_list[i]; }
+	inline int count() const { return m_ptr - m_list + 1; }
+	ATTR_HOT inline bool empty() const { return (m_ptr < m_list); }
 	ATTR_HOT inline void clear() { m_ptr = m_list - 1; }
 private:
 	_ListClass * m_ptr;
-	_ListClass m_list[_NumElements];
+	//_ListClass m_list[_NumElements];
+	_ListClass *m_list;
 };
+
+#define SIZE ((1 << _Size) - 1)
+
+template <class _QC, int _Size>
+class netlist_timed_queue
+{
+public:
+	struct entry_t
+	{
+	public:
+		inline entry_t() {}
+		inline entry_t(netlist_time atime, _QC elem) : m_time(atime), m_object(elem) {}
+		ATTR_HOT inline const netlist_time &time() const { return m_time; }
+		ATTR_HOT inline _QC object() const { return m_object; }
+	private:
+		netlist_time m_time;
+		_QC m_object;
+	};
+
+
+	netlist_timed_queue()
+	{
+		clear();
+	}
+
+	ATTR_HOT inline bool is_empty() { return ((m_start & SIZE) == (m_end & SIZE)); }
+	ATTR_HOT inline bool is_not_empty() { return ((m_start & SIZE) != (m_end & SIZE)); }
+
+	ATTR_HOT void push(const entry_t &e);
+
+	ATTR_HOT inline entry_t &pop()
+	{
+		m_end--;
+		return item(m_end);
+	}
+
+	ATTR_COLD void clear()
+	{
+		m_end = m_start = (1 << _Size) >> 1;
+	}
+private:
+	ATTR_HOT inline entry_t &item(UINT32 x) { return m_list[x & SIZE]; }
+	ATTR_HOT inline void set_item(UINT32 x, const entry_t &aitem) { m_list[x & SIZE] = aitem; }
+
+	UINT32 m_start;
+	UINT32 m_end;
+	entry_t m_list[SIZE + 1];
+};
+
+template <class _QC, int _Size>
+ATTR_HOT ATTR_ALIGN void netlist_timed_queue<_QC, _Size>::push(const entry_t &e)
+{
+	if (is_empty() || (e.time() <= item(m_end - 1).time()))
+	{
+		set_item(m_end,  e);
+		m_end++;
+	}
+	else if (e.time() >= item(m_start).time())
+	{
+		m_start--;
+		set_item(m_start, e);
+	}
+	else
+	{
+		register UINT32 i = m_end;
+		register UINT32 j = i - 1;
+		m_end++;
+		while ((e.time() > item(j).time()))
+		{
+			set_item(i, item(j));
+			i = j;
+			j--;
+		}
+		set_item(i, e);
+	}
+}
+// ----------------------------------------------------------------------------------------
+// forward definitions
+// ----------------------------------------------------------------------------------------
+
+class net_output_t;
+class net_core_device_t;
+class net_param_t;
+class netlist_setup_t;
+class netlist_base_t;
+
+// ----------------------------------------------------------------------------------------
+// net_input_t
+// ----------------------------------------------------------------------------------------
+
+class net_object_t
+{
+public:
+	enum type_t {
+		INPUT = 0,
+		OUTPUT = 1,
+		DEVICE = 2,
+		PARAM = 3,
+		TYPE_MASK = 0x03,
+		SIGNAL_DIGITAL = 0x00,
+		SIGNAL_ANALOG =  0x10,
+		SIGNAL_MASK = 	 0x10,
+	};
+
+	net_object_t(int atype)
+		: m_objtype(atype) {}
+
+	ATTR_HOT inline int object_type() const { return m_objtype; }
+	ATTR_HOT inline int object_type(int mask) const { return m_objtype & mask; }
+
+private:
+	int m_objtype;
+};
+
+
+class net_input_t : public net_object_t
+{
+public:
+
+	enum net_input_state {
+		INP_STATE_PASSIVE = 0,
+		INP_STATE_ACTIVE = 1,
+		INP_STATE_HL = 2,
+		INP_STATE_LH = 4,
+	};
+
+	net_input_t(const int atype) : net_object_t(atype), m_state(INP_STATE_ACTIVE) {}
+	ATTR_COLD void init(net_core_device_t *dev,int astate = INP_STATE_ACTIVE);
+
+	ATTR_HOT inline net_output_t * RESTRICT output() const { return m_output; }
+	ATTR_HOT inline bool is_state(const net_input_state astate) { return (m_state & astate); }
+	ATTR_HOT inline UINT32 state() const { return m_state; }
+
+	ATTR_COLD void set_output(net_output_t *aout)	{ m_output = aout; }
+	ATTR_HOT inline void inactivate();
+	ATTR_HOT inline void activate();
+	ATTR_HOT inline void activate_hl();
+	ATTR_HOT inline void activate_lh();
+
+	ATTR_HOT inline net_core_device_t * RESTRICT netdev() const { return m_netdev; }
+
+	double m_low_thresh_V;
+	double m_high_thresh_V;
+
+#if USE_DELEGATES
+	net_update_delegate h;
+#endif
+
+private:
+	UINT32 m_state;
+	net_core_device_t * RESTRICT m_netdev;
+	net_output_t * RESTRICT m_output;
+};
+
+class logic_input_t : public net_input_t
+{
+public:
+	logic_input_t()
+		: net_input_t(INPUT | SIGNAL_DIGITAL)
+	{
+		// default to TTL
+		m_low_thresh_V = 0.8;
+		m_high_thresh_V = 2.0;
+	}
+
+	ATTR_HOT inline net_sig_t Q() const;
+	ATTR_HOT inline net_sig_t last_Q() const;
+
+	ATTR_COLD inline void set_thresholds(double low, double high)
+	{
+		m_low_thresh_V = low;
+		m_high_thresh_V = high;
+	}
+};
+
+class ttl_input_t : public logic_input_t
+{
+public:
+	ttl_input_t()
+		: logic_input_t() { set_thresholds(0.8 , 2.0); }
+};
+
+class analog_input_t : public net_input_t
+{
+public:
+	analog_input_t()
+		: net_input_t(INPUT | SIGNAL_ANALOG) { }
+
+	ATTR_HOT inline bool is_highz() const;
+	ATTR_HOT inline double Q_Analog() const;
+};
+
+//#define INPVAL(_x) (_x).Q()
+
+
+
 
 // ----------------------------------------------------------------------------------------
 // net_output_t
 // ----------------------------------------------------------------------------------------
 
-class net_output_t
+class net_output_t : public net_object_t
 {
 public:
-	net_output_t();
 
-	ATTR_HOT inline void clear()	{ set_Q(nst_LOW); }
-	ATTR_HOT inline void set()  	{ set_Q(nst_HIGH); }
-	ATTR_HOT inline void setTo(const net_sig_t val) { set_Q(val); }
-	ATTR_HOT inline void setTo(const net_sig_t val, const UINT8 delay_ns) { set_Q(val,delay_ns); }
-	ATTR_HOT inline void setToNoCheck(const net_sig_t val)
+	net_output_t(int atype);
+
+	friend net_sig_t logic_input_t::Q() const;
+
+	ATTR_HOT inline const net_sig_t last_Q() const	{ return m_last_Q; 	}
+	ATTR_HOT inline const net_sig_t new_Q() const	{ return m_new_Q; 	}
+
+	ATTR_HOT inline const double Q_Analog() const
 	{
-		m_new_Q = val;
-		register_in_list();
+		switch (object_type(SIGNAL_MASK))
+		{
+		case SIGNAL_DIGITAL:	return m_Q ? m_high_V : m_low_V;
+		case SIGNAL_ANALOG:		return m_Q_analog;
+		default: 				assert(true);
+		}
+
+		return 0;
 	}
-
-	ATTR_HOT inline void setToNoCheck(const net_sig_t val, const UINT8 delay_ns)
-	{
-		m_new_Q = val;
-		register_in_list(delay_ns);
-	}
-
-	ATTR_COLD void initial(const net_sig_t val) { m_Q = val; m_new_Q = val; }
-
-	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q;	}
 
 	inline net_sig_t *Q_ptr()		{ return &m_Q; }
-	inline net_sig_t *new_Q_ptr()	{ return &m_new_Q; }
+	inline net_sig_t *new_Q_ptr() 	{ return &m_new_Q; }
 
-	ATTR_COLD void register_con(net_dev_t *dev);
+	ATTR_COLD void register_con(net_input_t &inp);
 
 	ATTR_HOT void update_devs();
+	ATTR_COLD void update_devs_force();
 
-	ATTR_HOT inline void update_out() {
-		m_Q = m_new_Q;
-		//m_QD = m_new_QD;
-	}
+	ATTR_HOT inline const net_core_device_t *netdev() const { return m_netdev; }
 
-	ATTR_HOT inline const net_dev_t *ttl_dev() { return m_ttldev; }
+	ATTR_HOT inline void inc_active();
+	ATTR_HOT inline void dec_active() { m_active--; }
+	ATTR_HOT inline int active_count() { return m_active; }
 
-	ATTR_COLD void set_ttl_dev(net_dev_t *dev);
+	ATTR_COLD void set_netdev(const net_core_device_t *dev);
 
-private:
+protected:
 
-	ATTR_HOT inline void register_in_list(const UINT8 delay_ns);
-	ATTR_HOT inline void register_in_list();
+	/* prohibit use in device functions
+	 * current (pending) state can be inquired using new_Q()
+	 */
+	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q; 	}
 
-	ATTR_HOT inline void set_Q(const net_sig_t newQ)
+	ATTR_HOT inline void register_in_listPS(const netlist_time delay_ps);
+
+	ATTR_HOT inline void set_Q_PS(const net_sig_t newQ, const netlist_time delay_ps)
 	{
 		if (newQ != m_new_Q)
 		{
 			m_new_Q = newQ;
-			//m_new_QD = newQ ? 1.0 : 0.0;
-			register_in_list();
+			register_in_listPS(delay_ps);
 		}
+	}
+	ATTR_HOT inline void set_Q_NoCheckPS(const net_sig_t val, const netlist_time delay_ps)
+	{
+		m_new_Q = val;
+		register_in_listPS(delay_ps);
 	}
 
-	ATTR_HOT inline void set_Q(const net_sig_t newQ, const UINT8 delay_ns)
+	ATTR_HOT inline void set_Q_PS_Analog(const double newQ, const netlist_time delay_ps)
 	{
-		if (newQ != m_new_Q)
+		if (newQ != m_new_Q_analog)
 		{
-			m_new_Q = newQ;
-			//m_new_QD = newQ ? 1.0 : 0.0;
-			register_in_list(delay_ns);
+			m_new_Q_analog = newQ;
+			register_in_listPS(delay_ps);
 		}
 	}
+	ATTR_HOT inline void set_Q_NoCheckPS_Analog(const double val, const netlist_time delay_ps)
+	{
+		m_new_Q_analog = val;
+		register_in_listPS(delay_ps);
+	}
+
+	netlist_time m_time;
+	int m_in_queue;
 
 	net_sig_t m_Q;
 	net_sig_t m_new_Q;
-	double m_QD;
-	double m_new_QD;
+	net_sig_t m_last_Q;
+	double m_Q_analog;
+	double m_new_Q_analog;
+
 	netlist_base_t *m_netlist;
+
+	int m_active;
 	int m_num_cons;
-#if USE_DELEGATES
-	net_update_delegate m_cons[32];
-#else
-	//net_dev_t **m_cons;
-	net_dev_t *m_cons[32];
-#endif
-	net_dev_t *m_ttldev;
+	net_input_t *m_cons[48];
+
+	const net_core_device_t *m_netdev;
+	double m_low_V;
+	double m_high_V;
+
+};
+
+class logic_output_t : public net_output_t
+{
+public:
+
+	logic_output_t()
+		: net_output_t(OUTPUT | SIGNAL_DIGITAL)
+	{
+		// Default to TTL
+		m_low_V = 0.3;
+		m_high_V = 3.4;
+	}
+
+	ATTR_COLD void initial(const net_sig_t val) { m_Q = val; m_new_Q = val; m_last_Q = !val; }
+	ATTR_HOT inline void clear() 	{ set_Q_PS(0, netlist_time::zero); }
+	ATTR_HOT inline void set()   	{ set_Q_PS(1, netlist_time::zero); }
+	ATTR_HOT inline void setToPS(const UINT8 val, const netlist_time delay_ps) { set_Q_PS(val, delay_ps); }
+	ATTR_HOT inline void setToNoCheckPS(const UINT8 val, const netlist_time delay_ps) { set_Q_NoCheckPS(val, delay_ps); }
+	ATTR_COLD inline void set_levels(const double low, const double high)
+	{
+		m_low_V = low;
+		m_high_V = high;
+	}
+};
+
+class ttl_output_t : public logic_output_t
+{
+public:
+
+	ttl_output_t()
+		: logic_output_t()
+	{ set_levels(0.3, 3.4); }
+
+};
+
+class analog_output_t : public net_output_t
+{
+public:
+
+	analog_output_t()
+		: net_output_t(OUTPUT | SIGNAL_ANALOG) { }
+
+	ATTR_COLD void initial(double val) { m_Q_analog = val; m_new_Q_analog = val; }
+	ATTR_HOT inline void setToPS(const double val, const netlist_time delay_ps) { set_Q_PS_Analog(val,delay_ps); }
+	ATTR_HOT inline void setToNoCheckPS(const double val, const netlist_time delay_ps) { set_Q_NoCheckPS_Analog(val,delay_ps); }
 };
 
 // ----------------------------------------------------------------------------------------
-// net_dev_t
+// net_device_t
 // ----------------------------------------------------------------------------------------
 
-class net_dev_t
+class net_core_device_t : public net_object_t
 {
 public:
-	net_dev_t(netlist_setup_t *setup, const char *name)
-	: m_setup(setup), m_variable_input_count(false), m_name(name)
+
+#if USE_DELEGATES
+	friend class net_input_t; // for access to update
+#endif
+
+	net_core_device_t();
+
+	virtual ~net_core_device_t();
+
+	ATTR_COLD void init_core(netlist_base_t *anetlist, const char *name);
+
+	ATTR_COLD const char *name() const { return m_name; }
+
+	ATTR_HOT inline void update_device()
 	{
-		assert(name != NULL);
+#if USE_DELEGATES_A
+		h();
+#else
+		update();
+#endif
 	}
-
-	virtual ~net_dev_t();
-
-	ATTR_HOT virtual void timer_cb(INT32 timer_id) {}
-
-	const char *name() const { return m_name; }
-	inline netlist_setup_t *setup() { return m_setup; }
-
-	ATTR_HOT void update_timed();
 
 	ATTR_HOT virtual void update_param() {}
 
-	ATTR_HOT virtual void update() { }
+	ATTR_HOT inline net_sig_t INPVAL_PASSIVE(logic_input_t &inp)
+	{
+		net_sig_t ret;
+		inp.activate();
+		ret = inp.Q();
+		inp.inactivate();
+		return ret;
+	}
 
-	ATTR_HOT inline net_sig_t INP(net_input_t &v) { return v.o->Q(); }
+	ATTR_HOT inline net_sig_t INPVAL(const logic_input_t &inp)
+	{
+		assert(inp.state() != net_input_t::INP_STATE_PASSIVE);
+		return inp.Q();
+	}
 
-	ATTR_COLD virtual void start() {}
+	ATTR_HOT inline net_sig_t INPVAL_LAST(const logic_input_t &inp) { return inp.last_Q(); }
 
-	net_list_t<const char *, 20> m_inputs;
+	ATTR_HOT inline double INPANALOG(const analog_input_t &inp) { return inp.Q_Analog(); }
 
-	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
+	ATTR_HOT inline netlist_base_t *netlist() const { return m_netlist; }
+
+	ATTR_COLD inline net_output_t * GETINPPTR(net_output_t &out) const { return &out; }
+
+	net_list_t<net_core_device_t *, 20> m_subdevs;
 
 	/* stats */
 	osd_ticks_t total_time;
@@ -383,77 +699,125 @@ public:
 
 protected:
 
-	void register_output(const char *name, net_output_t *out);
-	void register_input(const char *name, net_input_t *in, net_input_type type = NET_INP_TYPE_ACTIVE);
-	void register_param(const char *sname, net_param_t *param, double initialVal = 0.0);
+	ATTR_HOT virtual void update() { }
+
+	ATTR_COLD void register_subdevice(net_core_device_t &subdev);
+
+	netlist_base_t *m_netlist;
+
+private:
+
+	net_update_delegate h;
+	const char *m_name;
+};
+
+
+class net_device_t : public net_core_device_t
+{
+public:
+
+	net_device_t();
+
+	virtual ~net_device_t();
+
+	ATTR_COLD void init(netlist_setup_t *setup, const char *name);
+
+	ATTR_COLD netlist_setup_t *setup() const { return m_setup; }
+
+	ATTR_COLD virtual void start() {}
+
+	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
+
+	ATTR_COLD void register_output(const char *name, net_output_t &out);
+	ATTR_COLD void register_output(const net_core_device_t &dev, const char *name, net_output_t &out);
+
+	ATTR_COLD void register_input(const char *name, net_input_t &in, int state = net_input_t::INP_STATE_ACTIVE);
+	ATTR_COLD void register_input(net_core_device_t &dev, const char *name, net_input_t &in, int state = net_input_t::INP_STATE_ACTIVE);
+
+	ATTR_COLD void register_link_internal(net_input_t &in, net_output_t &out);
+	ATTR_COLD void register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out);
+
+	net_list_t<const char *, 20> m_inputs;
+
+protected:
+
+	ATTR_COLD void register_param(const char *sname, net_param_t &param, const double initialVal = 0.0);
+	ATTR_COLD void register_param(net_core_device_t &dev, const char *sname, net_param_t &param, const double initialVal = 0.0);
 
 	netlist_setup_t *m_setup;
 	bool m_variable_input_count;
 
 private:
-
-	const char *m_name;
 };
-
-
 
 class net_param_t
 {
 public:
 	net_param_t() { }
 
-	inline void setTo(const double param) { m_param = param; m_ttldev->update_param(); }
-	inline void setTo(const int param) { m_param = param; m_ttldev->update_param(); }
+	inline void setTo(const double param) { m_param = param; m_netdev->update_param(); }
+	inline void setTo(const int param) { m_param = param; m_netdev->update_param(); }
 	inline void initial(const double val) { m_param = val; }
 	inline void initial(const int val) { m_param = val; }
 
-	inline double Value()		{ return m_param;	}
-	inline int    ValueInt()	{ return m_param;	}
+	ATTR_HOT inline double Value() const		{ return m_param; 	}
+	ATTR_HOT inline int    ValueInt() const 	{ return (int) m_param; 	}
 
-	ATTR_HOT inline const net_dev_t *ttl_dev() { return m_ttldev; }
-	void set_ttl_dev(net_dev_t *dev) { m_ttldev = dev; }
+	ATTR_HOT inline net_core_device_t &netdev() const { return *m_netdev; }
+	void set_netdev(net_core_device_t &dev) { m_netdev = &dev; }
 
 private:
 
 	double m_param;
-	net_dev_t *m_ttldev;
+	net_core_device_t *m_netdev;
 };
 
 // ----------------------------------------------------------------------------------------
 // net_signal_t
 // ----------------------------------------------------------------------------------------
 
-template <int _numdev>
-class net_signal_t : public net_dev_t
+template <int _numdev, int _check>
+class net_signal_t : public net_device_t
 {
 public:
-	net_signal_t(netlist_setup_t *parent, const char *name)
-	: net_dev_t(parent, name) { }
+	net_signal_t()
+	: net_device_t() { }
 
-	//ATTR_HOT virtual void update() = 0;
 	ATTR_COLD void start()
 	{
 		const char *sIN[8] = { "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8" };
 
-		register_output("Q", &m_Q);
+		register_output("Q", m_Q);
 		for (int i=0; i < _numdev; i++)
-			register_input(sIN[i], &m_i[i]);
+		{
+			register_input(sIN[i], m_i[i], net_input_t::INP_STATE_ACTIVE);
+		}
+		m_Q.initial(1);
+	}
+
+	ATTR_HOT inline void update()
+	{
+		static netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+		for (int i=0; i< _numdev; i++)
+		{
+			m_i[i].activate();
+			if (INPVAL(m_i[i]) == _check)
+			{
+				m_Q.setToPS(!_check, times[_check]);// ? 15000 : 22000);
+				for (int j = i + 1; j < _numdev; j++)
+					m_i[j].inactivate();
+				return;
+			}
+			m_i[i].inactivate();
+		}
+		m_Q.setToPS(_check, times[1-_check]);// ? 22000 : 15000);
+		for (int i = 0; i < _numdev; i++)
+			m_i[i].activate();
 	}
 
 protected:
-	net_input_t m_i[_numdev];
-	net_output_t m_Q;
-};
-
-// ----------------------------------------------------------------------------------------
-// netlist_base_timer_t
-// ----------------------------------------------------------------------------------------
-
-class netlist_base_timer_t
-{
-public:
-	netlist_base_timer_t() {}
-	virtual void adjust_timer(double delay) = 0;
+	ttl_input_t m_i[8];
+	ttl_output_t m_Q;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -464,21 +828,10 @@ class netlist_setup_t
 {
 public:
 
-	struct net_input_setup_t {
-	public:
-		net_input_setup_t(net_input_t *inp, net_input_type type = NET_INP_TYPE_ACTIVE)
-		: m_inp(inp), m_type(type) {}
-		net_input_t *inp() { return m_inp; }
-		net_input_type type() { return m_type; }
-	private:
-		net_input_t *m_inp;
-		net_input_type m_type;
-	};
-
-	typedef tagmap_t<net_dev_t *, 393> tagmap_devices_t;
+	typedef tagmap_t<net_device_t *, 393> tagmap_devices_t;
 	typedef tagmap_t<astring *, 393> tagmap_astring_t;
 	typedef tagmap_t<net_output_t *, 393> tagmap_output_t;
-	typedef tagmap_t<net_input_setup_t *, 393> tagmap_input_t;
+	typedef tagmap_t<net_input_t *, 393> tagmap_input_t;
 	typedef tagmap_t<net_param_t *, 393> tagmap_param_t;
 
 	netlist_setup_t(netlist_base_t &netlist);
@@ -486,18 +839,18 @@ public:
 
 	netlist_base_t &netlist() { return m_netlist; }
 
-	net_dev_t *register_dev(net_dev_t *dev);
+	net_device_t *register_dev(net_device_t *dev);
 	void remove_dev(const char *name);
 
 	void register_output(const char *name, net_output_t *out);
-	void register_input(const char *name, net_input_t *inp, net_input_type type = NET_INP_TYPE_ACTIVE);
+	void register_input(const char *name, net_input_t *inp);
 	void register_alias(const char *alias, const char *out);
 	void register_param(const char *sname, net_param_t *param);
 
 	void register_link(const char *sin, const char *sout);
 
-	net_output_t *find_output(const char *outname_in);
-	net_param_t *find_param(const char *param_in);
+	net_output_t &find_output(const char *outname_in);
+	net_param_t &find_param(const char *param_in);
 
 	void register_callback(const char *devname, net_output_delegate delegate);
 
@@ -522,7 +875,6 @@ private:
 	tagmap_param_t  m_params;
 	tagmap_astring_t  m_links;
 
-	void step_all_devices();
 	net_output_t *find_output_exact(const char *outname_in);
 	const char *resolve_alias(const char *name) const;
 };
@@ -535,45 +887,43 @@ class netlist_base_t
 {
 public:
 
-	netlist_base_t(bool sub_cycle_exact);
+	struct entry_t
+	{
+	public:
+		entry_t() {}
+		entry_t(netlist_time atime, net_output_t *aout) : time(atime), out(aout) {}
+		netlist_time time;
+		net_output_t *out;
+	};
+	typedef netlist_timed_queue<net_output_t *, 9> queue_t;
+
+	netlist_base_t();
 	virtual ~netlist_base_t();
 
-	virtual netlist_base_timer_t *alloc_timer(net_dev_t *dev, INT32 timer_id) = 0;
+	void set_clock_freq(UINT64 clockfreq);
 
-	void set_clock_freq(int clockfreq);
-	void set_gatedelay(int gatedelay);
-
-	ATTR_HOT inline void register_in_list(net_output_t *out, const UINT8 delay_ns)
+	ATTR_HOT inline void register_in_listPS1(net_output_t *out, const netlist_time attime)
 	{
-		m_output_list[m_sub_cycle_exact ? ((m_current + delay_ns / m_divisor) & m_netlist_mask) : 0].add(out);
+		m_queue.push(queue_t::entry_t(attime, out));
 	}
 
-	ATTR_HOT inline void register_in_list(net_output_t *out)
-	{
-		m_output_list[m_sub_cycle_exact ? (m_current & m_netlist_mask) : 0].add(out);
-	}
+	ATTR_HOT void process_list(INT32 &atime);
 
-	ATTR_HOT inline void reset_list()
-	{
-		m_output_list[m_sub_cycle_exact ? m_current : 0].clear();
-	}
-
-	ATTR_COLD void reset_lists()
-	{
-		for (int i = 0; i <= m_netlist_mask; i++)
-			m_output_list[i].clear();
-	}
-
-	ATTR_HOT void process_list(void);
+	ATTR_HOT inline netlist_time &time() { return m_time_ps; }
 
 protected:
-	UINT8 m_current;
-	UINT8 m_divisor;
-	UINT8 m_netlist_mask;
-	bool  m_sub_cycle_exact;
-	net_list_t<net_output_t *, 512> m_output_list[NET_LIST_SIZE];
-	int  m_gatedelay;
-	int  m_clockfreq;
+	netlist_time m_time_ps;
+	UINT32	 m_rem;
+	UINT32 	m_div;
+
+	queue_t m_queue;
+
+	// performance
+	int m_perf_out_processed;
+	int m_perf_inp_processed;
+	int m_perf_inp_active;
+	UINT64 m_perf_list_len;
+
 
 private:
 
@@ -581,17 +931,14 @@ private:
 
 
 // ----------------------------------------------------------------------------------------
-// dev_callback
+// netdev_callback
 // ----------------------------------------------------------------------------------------
 
-class netdev_callback : public net_dev_t
+class netdev_callback : public net_device_t
 {
 public:
-	netdev_callback(netlist_setup_t *parent, const char *name)
-	: net_dev_t(parent, name)
-	{
-		register_input("IN", &m_in);
-	}
+	netdev_callback()
+	: net_device_t() {}
 
 	void register_callback(net_output_delegate callback)
 	{
@@ -599,35 +946,120 @@ public:
 	}
 
 	ATTR_HOT void update();
+	ATTR_COLD void start()
+	{
+		register_input("IN", m_in);
+	}
+
 
 private:
-	net_input_t m_in;
+	analog_input_t m_in;
 	net_output_delegate m_callback;
 };
+
+// ----------------------------------------------------------------------------------------
+// netdev_*_const
+// ----------------------------------------------------------------------------------------
+
+#define NETDEV_TTL_CONST(_name, _v)													\
+		NET_REGISTER_DEV(netdev_ttl_const, _name)									\
+		NETDEV_PARAM(_name.CONST, _v)												\
+
+#define NETDEV_ANALOG_CONST(_name, _v)												\
+		NET_REGISTER_DEV(netdev_analog_const, _name)								\
+		NETDEV_PARAM(_name.CONST, _v)												\
+
+
+NETLIB_DEVICE_WITH_PARAMS(netdev_ttl_const,
+	ttl_output_t m_Q;
+	net_param_t m_const;
+);
+
+NETLIB_DEVICE_WITH_PARAMS(netdev_analog_const,
+	analog_output_t m_Q;
+	net_param_t m_const;
+);
 
 // ----------------------------------------------------------------------------------------
 // Inline implementations
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT inline void net_output_t::register_in_list(const UINT8 delay_ns)
+ATTR_HOT inline void net_input_t::inactivate()
 {
-	m_netlist->register_in_list(this, delay_ns);
+	if (m_state != INP_STATE_PASSIVE)
+	{
+		m_state = INP_STATE_PASSIVE;
+		m_output->dec_active();
+	}
 }
 
-ATTR_HOT inline void net_output_t::register_in_list()
+ATTR_HOT inline void net_input_t::activate()
 {
-	m_netlist->register_in_list(this);
+	if (m_state == INP_STATE_PASSIVE)
+		m_output->inc_active();
+	m_state = INP_STATE_ACTIVE;
 }
+
+ATTR_HOT inline void net_input_t::activate_hl()
+{
+	if (m_state == INP_STATE_PASSIVE)
+		m_output->inc_active();
+	m_state = INP_STATE_HL;
+}
+
+ATTR_HOT inline void net_input_t::activate_lh()
+{
+	if (m_state == INP_STATE_PASSIVE)
+		m_output->inc_active();
+	m_state = INP_STATE_LH;
+}
+
+
+ATTR_HOT inline void net_output_t::register_in_listPS(const netlist_time delay_ps)
+{
+	m_time = m_netlist->time() + delay_ps;
+	m_in_queue = 0;		/* not queued */
+	if (m_active > 0)
+	{
+		m_in_queue = 1;		/* pending */
+		m_netlist->register_in_listPS1(this, m_time);
+	}
+}
+
+ATTR_HOT inline void net_output_t::inc_active()
+{
+	m_active++;
+	if (m_active == 1 && m_in_queue == 0)
+	{
+		if (m_time >= m_netlist->time())
+		{
+			m_in_queue = 1;		/* pending */
+			m_netlist->register_in_listPS1(this, m_time);
+		}
+		else
+		{
+			m_Q = m_last_Q = m_new_Q;
+			m_Q_analog = m_new_Q_analog;
+			m_in_queue = 2;
+		}
+	}
+}
+
+
+ATTR_HOT inline net_sig_t logic_input_t::Q() const { return output()->Q(); }
+ATTR_HOT inline net_sig_t logic_input_t::last_Q() const { return output()->last_Q(); }
+ATTR_HOT inline double analog_input_t::Q_Analog() const { return output()->Q_Analog(); }
+ATTR_HOT inline bool analog_input_t::is_highz() const { return output()->Q_Analog() == NETLIST_HIGHIMP_V; }
 
 // ----------------------------------------------------------------------------------------
 // net_dev class factory
 // ----------------------------------------------------------------------------------------
 
-class net_dev_t_base_factory
+class net_device_t_base_factory
 {
 public:
-    virtual ~net_dev_t_base_factory() {}
-	virtual net_dev_t *Create(netlist_setup_t *setup, const char *name) = 0;
+    virtual ~net_device_t_base_factory() {}
+	virtual net_device_t *Create(netlist_setup_t *setup, const char *name) = 0;
 
 	const char *name() { return m_name; }
 	const char *classname() { return m_classname; }
@@ -637,67 +1069,37 @@ protected:
 };
 
 template <class C>
-class net_dev_t_factory : public net_dev_t_base_factory
+class net_device_t_factory : public net_device_t_base_factory
 {
 public:
-	net_dev_t_factory(const char *name, const char *classname) { m_name = name; m_classname = classname; }
-	net_dev_t *Create(netlist_setup_t *setup, const char *name)
+	net_device_t_factory(const char *name, const char *classname) { m_name = name; m_classname = classname; }
+	net_device_t *Create(netlist_setup_t *setup, const char *name)
 	{
-		net_dev_t *r = global_alloc_clear(C(setup, name));
+		net_device_t *r = global_alloc_clear(C());
+		r->init(setup, name);
 		return r;
 	}
 };
 
-net_dev_t *net_create_device_by_classname(const char *classname, netlist_setup_t *setup, const char *icname);
-net_dev_t *net_create_device_by_name(const char *name, netlist_setup_t *setup, const char *icname);
+net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t *setup, const char *icname);
+net_device_t *net_create_device_by_name(const char *name, netlist_setup_t *setup, const char *icname);
 
 // ----------------------------------------------------------------------------------------
 // MAME glue classes
 // ----------------------------------------------------------------------------------------
 
-class netlist_timer_t : public netlist_base_timer_t
-{
-public:
-	netlist_timer_t(device_t &parent, net_dev_t *dev, INT32 timer_id)
-	: netlist_base_timer_t()
-	{
-		m_param = timer_id;
-		m_timer = parent.machine().scheduler().timer_alloc(timer_expired_delegate(&netlist_timer_t::timer_cb, "netlist_timer_t::timer_cb", this), dev);
-	}
-
-	virtual void adjust_timer(double delay)
-	{
-		m_timer->adjust(attotime::from_double(delay) ,m_param, attotime::never);
-	}
-
-	void timer_cb(void *ptr, INT32 param)
-	{
-		net_dev_t *dev = (net_dev_t *) ptr;
-		dev->timer_cb(param);
-	}
-private:
-
-	INT32	m_param;
-	emu_timer *m_timer;
-};
 
 class netlist_t : public netlist_base_t
 {
 public:
 
-	netlist_t(device_t &parent, bool sub_cycle_exact)
-	: netlist_base_t(sub_cycle_exact),
+	netlist_t(device_t &parent)
+	: netlist_base_t(),
 	  m_parent(parent)
 	{}
 	virtual ~netlist_t() { };
 
 	inline running_machine &machine()	{ return m_parent.machine(); }
-
-	virtual netlist_base_timer_t *alloc_timer(net_dev_t *dev, INT32 timer_id)
-	{
-		netlist_timer_t *ret = new netlist_timer_t(m_parent, dev, timer_id);
-		return ret;
-	}
 
 	device_t &parent() { return m_parent; }
 
@@ -707,7 +1109,6 @@ private:
 
 // ======================> netlist_mame_device
 
-
 class netlist_mame_device : public device_t,
 					  public device_execute_interface
 {
@@ -716,6 +1117,7 @@ public:
 	template<bool _Required, class _NETClass>
 	class output_finder;
 	class optional_output;
+	template<class _C>
 	class required_output;
 	class optional_param;
 	class required_param;
@@ -724,14 +1126,10 @@ public:
 	// construction/destruction
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_subcycles(device_t &device, int subcycles);
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
 
 	netlist_setup_t &setup() { return *m_setup; }
 	netlist_t &netlist() { return *m_netlist; }
-
-	//ATTR_HOT inline UINT64 Clocks() { return m_clockcnt; }
-	ATTR_HOT inline int SubCycles() const { return m_subcycles; }
 
 	net_list_t<on_device_start *, 393> m_device_start_list;
 
@@ -749,7 +1147,6 @@ protected:
 	ATTR_HOT virtual void execute_run();
 
     netlist_t *m_netlist;
-	net_output_t *m_clock_input;
 
 	netlist_setup_t *m_setup;
 
@@ -758,16 +1155,9 @@ private:
     void step_one_clock();
 	void save_state();
 
-	int m_clock;
-	int m_subcycles;
-
 	void (*m_setup_func)(netlist_setup_t &);
 
-	UINT32 dummy[8];
-
 	int m_icount;
-	int m_ss;
-	int m_clk;
 
 
 };
@@ -817,21 +1207,22 @@ public:
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = m_netlist->setup().find_output(m_output);
+		this->m_target = &m_netlist->setup().find_output(m_output);
 		return this->report_missing(this->m_target != NULL, "output", false);
 	}
 
 };
 
 // required devices are similar but throw an error if they are not found
-class netlist_mame_device::required_output : public netlist_mame_device::output_finder<true, net_output_t>
+template<class _C>
+class netlist_mame_device::required_output : public netlist_mame_device::output_finder<true, _C>
 {
 public:
-	required_output(device_t &base, const char *tag, const char *output) : output_finder<true, net_output_t>(base, tag, output) { }
+	required_output(device_t &base, const char *tag, const char *output) : output_finder<true, _C>(base, tag, output) { }
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = m_netlist->setup().find_output(m_output);
+		this->m_target = (_C *) &(this->m_netlist->setup().find_output(this->m_output));
 		return this->report_missing(this->m_target != NULL, "output", true);
 	}
 
@@ -845,7 +1236,7 @@ public:
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = m_netlist->setup().find_param(m_output);
+		this->m_target = &m_netlist->setup().find_param(m_output);
 		return this->report_missing(this->m_target != NULL, "parameter", false);
 	}
 
@@ -859,12 +1250,13 @@ public:
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = m_netlist->setup().find_param(m_output);
+		this->m_target = &m_netlist->setup().find_param(m_output);
 		return this->report_missing(this->m_target != NULL, "output", true);
 	}
 };
 
 // device type definition
 extern const device_type NETLIST;
+
 
 #endif

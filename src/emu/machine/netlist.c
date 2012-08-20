@@ -42,10 +42,10 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-
 ****************************************************************************/
 
 #include "netlist.h"
+#include "net_lib.h"
 
 //============================================================
 //  DEBUGGING
@@ -53,11 +53,6 @@
 
 #define VERBOSE					(0)
 #define KEEP_STATISTICS			(0)
-
-
-#if KEEP_STATISTICS && USE_DELEGATES
-#error "Statistics only work without delegates!"
-#endif
 
 #if (VERBOSE)
 
@@ -71,9 +66,9 @@
 //============================================================
 
 #if KEEP_STATISTICS
-#define add_to_stat(v,x)		do { atomic_add32((v), (x)); } while (0)
+#define add_to_stat(v,x)		do { v += (x); } while (0)
 #define inc_stat(v)				add_to_stat(v, 1)
-#define begin_timing(v)			do { (v) -= get_profile_ticks(); } while (0)
+#define begin_timing(v)	 		do { (v) -= get_profile_ticks(); } while (0)
 #define end_timing(v)			do { (v) += get_profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)		do { } while (0)
@@ -81,6 +76,9 @@
 #define begin_timing(v)			do { } while (0)
 #define end_timing(v)			do { } while (0)
 #endif
+
+
+const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
 // ----------------------------------------------------------------------------------------
 // A netlist parser
@@ -103,86 +101,96 @@ public:
 			n = getname('(');
 			VERBOSE_OUT(("Parser: Device: %s\n", n));
 			if (strcmp(n,"NET_ALIAS") == 0)
-			{
-				char *alias;
-				char *out;
-				m_p++;
-				skipws();
-				alias = getname(',');
-				m_p++;
-				skipws();
-				out = getname(')');
-				m_p++;
-				VERBOSE_OUT(("Parser: Alias: %s %s\n", alias, out));
-				m_setup.register_alias(alias, out);
-			}
+				net_alias();
 			else if (strcmp(n,"NETDEV_PARAM") == 0)
-			{
-				char *param;
-				double val;
-				m_p++;
-				skipws();
-				param = getname(',');
-				m_p++;
-				skipws();
-				val = eval_param();
-				m_p++;
-				VERBOSE_OUT(("Parser: Param: %s %f\n", param, val));
-				m_setup.find_param(param)->setTo(val);
-			}
-			else if (strcmp(n,"NETDEV_CONST") == 0)
-			{
-				char *devname;
-				net_dev_t *dev;
-				char paramfq[30];
-				double val;
-				m_p++;
-				skipws();
-				devname = getname(',');
-				dev = net_create_device_by_name(n, &m_setup, devname);
-				m_setup.register_dev(dev);
-				m_p++;
-				skipws();
-				val = eval_param();
-				m_p++;
-				strcpy(paramfq, devname);
-				strcat(paramfq, ".CONST");
-				VERBOSE_OUT(("Parser: Const: %s %f\n", devname, val));
-				m_setup.find_param(paramfq)->setTo(val);
-			}
+				netdev_param();
+			else if ((strcmp(n,"NETDEV_TTL_CONST") == 0) || (strcmp(n,"NETDEV_ANALOG_CONST") == 0))
+				netdev_const(n);
 			else
-			{
-				char *devname;
-				net_dev_t *dev;
-				int cnt;
-
-				m_p++;
-				skipws();
-				devname = getname2(',', ')');
-				dev = net_create_device_by_name(n, &m_setup, devname);
-				m_setup.register_dev(dev);
-				skipws();
-				VERBOSE_OUT(("Parser: IC: %s\n", n));
-				cnt = 0;
-				while (*m_p != ')')
-				{
-					m_p++;
-					skipws();
-					n = getname2(',', ')');
-					VERBOSE_OUT(("Parser: ID: %s %s\n", n, dev->m_inputs.item(cnt)));
-					m_setup.register_link(dev->m_inputs.item(cnt), n);
-					skipws();
-					cnt++;
-					//return 0;
-				}
-				if (cnt != dev->m_inputs.count() && !dev->variable_input_count())
-					fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname, dev->m_inputs.count(), cnt);
-				m_p++;
-			}
+				netdev_device(n);
 		}
 	}
 
+	void net_alias()
+	{
+		char *alias;
+		char *out;
+		skipws();
+		alias = getname(',');
+		skipws();
+		out = getname(')');
+		VERBOSE_OUT(("Parser: Alias: %s %s\n", alias, out));
+		m_setup.register_alias(alias, out);
+	}
+
+	void netdev_param()
+	{
+		char *param;
+		double val;
+		skipws();
+		param = getname(',');
+		skipws();
+		val = eval_param();
+		VERBOSE_OUT(("Parser: Param: %s %f\n", param, val));
+		m_setup.find_param(param).initial(val);
+		check_char(')');
+	}
+
+	void netdev_const(const char *dev_name)
+	{
+		char *devname;
+		net_device_t *dev;
+		char paramfq[30];
+		double val;
+
+		skipws();
+		devname = getname(',');
+		dev = net_create_device_by_name(dev_name, &m_setup, devname);
+		m_setup.register_dev(dev);
+		skipws();
+		val = eval_param();
+		check_char(')');
+		strcpy(paramfq, devname);
+		strcat(paramfq, ".CONST");
+		VERBOSE_OUT(("Parser: Const: %s %f\n", devname, val));
+		m_setup.find_param(paramfq).setTo(val);
+	}
+
+	void netdev_device(const char *dev_type)
+	{
+		char *devname;
+		net_device_t *dev;
+		int cnt;
+
+		skipws();
+		devname = getname2(',', ')');
+		dev = net_create_device_by_name(dev_type, &m_setup, devname);
+		m_setup.register_dev(dev);
+		skipws();
+		VERBOSE_OUT(("Parser: IC: %s\n", n));
+		cnt = 0;
+		while (*m_p != ')')
+		{
+			m_p++;
+			skipws();
+			char *output_name = getname2(',', ')');
+			VERBOSE_OUT(("Parser: ID: %s %s\n", output_name, dev->m_inputs.item(cnt)));
+			m_setup.register_link(dev->m_inputs.item(cnt), output_name);
+			skipws();
+			cnt++;
+		}
+		if (cnt != dev->m_inputs.count() && !dev->variable_input_count())
+			fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname, dev->m_inputs.count(), cnt);
+		check_char(')');
+	}
+
 private:
+
+	char *cdup(const char *s)
+	{
+		return core_strdup(s);
+	}
+
 	void skipeol()
 	{
 		while (*m_p)
@@ -190,6 +198,8 @@ private:
 			if (*m_p == 10)
 			{
 				m_p++;
+				if (*m_p && *m_p == 13)
+					m_p++;
 				return;
 			}
 			m_p++;
@@ -226,7 +236,8 @@ private:
 		while (*m_p != sep)
 			*p1++ = *m_p++;
 		*p1 = 0;
-		return core_strdup(buf);
+		m_p++;
+		return cdup(buf);
 	}
 
 	char *getname2(char sep1, char sep2)
@@ -237,7 +248,18 @@ private:
 		while ((*m_p != sep1) && (*m_p != sep2))
 			*p1++ = *m_p++;
 		*p1 = 0;
-		return core_strdup(buf);
+		return cdup(buf);
+	}
+
+	void check_char(char ctocheck)
+	{
+		skipws();
+		if (*m_p == ctocheck)
+		{
+			m_p++;
+			return;
+		}
+		fatalerror("Parser: expected '%c' found '%c'", ctocheck, *m_p);
 	}
 
 	double eval_param()
@@ -255,7 +277,7 @@ private:
 				f = i;
 		ret = strtod(s+strlen(macs[f]), &e);
 		if ((f>0) && (*e != ')'))
-			exit(0);
+			fatalerror("Parser: Error with parameter ...");
 		if (f>0)
 			e++;
 		m_p = e;
@@ -269,82 +291,141 @@ private:
 
 
 // ----------------------------------------------------------------------------------------
+// netdev_a_to_d
+// ----------------------------------------------------------------------------------------
+
+class netdev_a_to_d_proxy : public net_device_t
+{
+public:
+	netdev_a_to_d_proxy(net_input_t &in_proxied) : net_device_t()
+	{
+		assert_always(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL, "Digital signal expected");
+		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
+		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
+	}
+
+	ATTR_HOT void update()
+	{
+		if (m_I.Q_Analog() > m_I.m_high_thresh_V)
+			m_Q.setToPS(1, NLTIME_FROM_NS(1));
+		else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
+			m_Q.setToPS(0, NLTIME_FROM_NS(1));
+	}
+
+	ATTR_COLD void start()
+	{
+		m_I.init(this);
+		m_Q.set_netdev(this);
+
+		m_Q.initial(1);
+	}
+
+	analog_input_t m_I;
+	ttl_output_t m_Q;
+};
+
+// ----------------------------------------------------------------------------------------
+// netdev_const
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(netdev_ttl_const)
+{
+	register_output("Q", m_Q);
+	register_param("CONST", m_const, 0.0);
+}
+
+NETLIB_UPDATE(netdev_ttl_const)
+{
+}
+
+NETLIB_UPDATE_PARAM(netdev_ttl_const)
+{
+	m_Q.setToPS(m_const.ValueInt(), NLTIME_IMMEDIATE);
+}
+
+NETLIB_START(netdev_analog_const)
+{
+	register_output("Q", m_Q);
+	register_param("CONST", m_const, 0.0);
+}
+
+NETLIB_UPDATE(netdev_analog_const)
+{
+}
+
+NETLIB_UPDATE_PARAM(netdev_analog_const)
+{
+	m_Q.initial(m_const.Value());
+}
+
+// ----------------------------------------------------------------------------------------
 // netlist_base_t
 // ----------------------------------------------------------------------------------------
 
 
-netlist_base_t::netlist_base_t(bool sub_cycle_exact)
+netlist_base_t::netlist_base_t()
 	//m_output_list(ttl_list_t<output_t *>(2048)),
-	:  m_current(0), m_divisor(32), m_sub_cycle_exact(sub_cycle_exact), m_gatedelay(100), m_clockfreq(1000000)
+	//:  m_divisor(32), m_gatedelay(100), m_clockfreq(1000000)
+	: m_div(1024)
 {
-	m_netlist_mask = NET_LIST_MASK;
-	reset_lists();
 }
 
 netlist_base_t::~netlist_base_t()
 {
 }
 
-void netlist_base_t::set_clock_freq(int clockfreq)
+void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 {
-	m_clockfreq = clockfreq;
-	m_divisor = U64(100000000000) / m_clockfreq / m_gatedelay;
-	VERBOSE_OUT(("Divisor %d\n", m_divisor));
+	m_div = netlist_time::from_hz(clockfreq).as_raw();
+	VERBOSE_OUT(("Setting clock %lld and divisor %d\n", clockfreq, m_div));
 }
 
-void netlist_base_t::set_gatedelay(int gatedelay)
+ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 {
-	m_gatedelay = gatedelay;
-	m_divisor = U64(100000000000) / m_clockfreq / m_gatedelay;
-	VERBOSE_OUT(("Divisor %d\n", m_divisor));
-}
 
-ATTR_HOT inline void netlist_base_t::process_list(void)
-{
-	net_list_t<net_output_t *, 512> &list =  m_output_list[m_sub_cycle_exact ? m_current : 0];
-#if 0
-	net_output_t * RESTRICT * RESTRICT first;
-	net_output_t * RESTRICT * RESTRICT last;
-
-	first = list.first();
-	last = list.last();
-	while (first <= last)
+	while ( (atime > 0) && (m_queue.is_not_empty()))
 	{
-		net_output_t * RESTRICT * RESTRICT out = first;
-		while (out <= last)
-		{
-			(*out)->update_out();
-			(*out)->update_devs();
-			out++;
-		}
-		first = last + 1;
-		last = list.last();
-	}
-#else
-	net_output_t * RESTRICT * RESTRICT out;
+		queue_t::entry_t e = m_queue.pop();
+ 		netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
 
-	out = list.first();
-	while (out <= list.last())
+		atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+		m_time_ps = e.time();
+
+		e.object()->update_devs();
+
+		add_to_stat(m_perf_out_processed, 1);
+		add_to_stat(m_perf_list_len, m_end);
+	}
+
+	if (atime > 0)
 	{
-		(*out)->update_out();
-		(*out)->update_devs();
-		out++;
+		m_time_ps += netlist_time::from_raw(atime * m_div);
+		atime = 0;
 	}
-#endif
-	reset_list();
 
-	if (m_sub_cycle_exact)
-		m_current = (m_current + 1) & m_netlist_mask;
+	if (KEEP_STATISTICS)
+		printf("%f\n", (double) m_perf_list_len / (double) m_perf_out_processed);
 }
+
+// ----------------------------------------------------------------------------------------
+// Default netlist elements ...
+// ----------------------------------------------------------------------------------------
+
+
+static NETLIST_START(base)
+	NETDEV_TTL_CONST(ttlhigh, 1)
+	NETDEV_TTL_CONST(ttllow, 0)
+	NETDEV_ANALOG_CONST(NC, NETLIST_HIGHIMP_V)
+NETLIST_END
 
 // ----------------------------------------------------------------------------------------
 // netlist_setup_t
 // ----------------------------------------------------------------------------------------
 
 netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
-	//m_output_list(ttl_list_t<output_t *>(2048)),
 	: m_netlist(netlist)
 {
+	NETLIST_NAME(base)(*this);
 }
 
 netlist_setup_t::~netlist_setup_t()
@@ -352,7 +433,7 @@ netlist_setup_t::~netlist_setup_t()
 }
 
 
-net_dev_t *netlist_setup_t::register_dev(net_dev_t *dev)
+net_device_t *netlist_setup_t::register_dev(net_device_t *dev)
 {
 	if (!(m_devices.add(dev->name(), dev, false)==TMERR_NONE))
 		fatalerror("Error adding %s to device list\n", dev->name());
@@ -378,7 +459,7 @@ static void remove_start_with(T &hm, astring &sw)
 
 void netlist_setup_t::remove_dev(const char *name)
 {
-	net_dev_t *dev = m_devices.find(name);
+	net_device_t *dev = m_devices.find(name);
 	astring temp = name;
 	if (dev == NULL)
 		fatalerror("Device %s does not exist\n", name);
@@ -413,11 +494,10 @@ void netlist_setup_t::register_output(const char *name, net_output_t *out)
 		fatalerror("Error adding output %s to output list\n", name);
 }
 
-void netlist_setup_t::register_input(const char *name, net_input_t *inp, net_input_type type)
+void netlist_setup_t::register_input(const char *name, net_input_t *inp)
 {
-	net_input_setup_t *setup_inp = new net_input_setup_t(inp, type);
 	VERBOSE_OUT(("input %s\n", name));
-	if (!(m_inputs.add(name, setup_inp, false) == TMERR_NONE))
+	if (!(m_inputs.add(name, inp, false) == TMERR_NONE))
 		fatalerror("Error adding input %s to input list\n", name);
 }
 
@@ -431,7 +511,7 @@ void netlist_setup_t::register_link(const char *sin, const char *sout)
 
 void netlist_setup_t::register_param(const char *sname, net_param_t *param)
 {
-	astring temp = param->ttl_dev()->name();
+	astring temp = param->netdev().name();
 	temp.cat(".");
 	temp.cat(sname);
 	if (!(m_params.add(temp, param, false)==TMERR_NONE))
@@ -454,7 +534,7 @@ net_output_t *netlist_setup_t::find_output_exact(const char *outname_in)
 	return ret;
 }
 
-net_output_t *netlist_setup_t::find_output(const char *outname_in)
+net_output_t &netlist_setup_t::find_output(const char *outname_in)
 {
 	const char *outname = resolve_alias(outname_in);
 	net_output_t *ret;
@@ -471,10 +551,10 @@ net_output_t *netlist_setup_t::find_output(const char *outname_in)
 	if (ret == NULL)
 		fatalerror("output %s(%s) not found!", outname_in, outname);
 	VERBOSE_OUT(("Found input %s\n", outname));
-	return ret;
+	return *ret;
 }
 
-net_param_t *netlist_setup_t::find_param(const char *param_in)
+net_param_t &netlist_setup_t::find_param(const char *param_in)
 {
 	const char *outname = resolve_alias(param_in);
 	net_param_t *ret;
@@ -483,7 +563,7 @@ net_param_t *netlist_setup_t::find_param(const char *param_in)
 	if (ret == NULL)
 		fatalerror("parameter %s(%s) not found!", param_in, outname);
 	VERBOSE_OUT(("Found parameter %s\n", outname));
-	return ret;
+	return *ret;
 }
 
 void netlist_setup_t::resolve_inputs(void)
@@ -493,39 +573,47 @@ void netlist_setup_t::resolve_inputs(void)
 	{
 		const astring *sout = entry->object();
 		astring sin = entry->tag();
-		net_input_setup_t *in = m_inputs.find(sin);
-		int p = sin.find(".");
-		const char *devname = sin.substr(0, p);
-		net_dev_t *dev = m_devices.find(devname);
-		net_output_t *out = find_output(sout->cstr() );
+		net_input_t *in = m_inputs.find(sin);
 
-		(*in->inp()).o = GETINPPTR(*out);
-		//in->inp()->v = out->Q_ptr();
-		if (in->type() == NET_INP_TYPE_ACTIVE)
-			out->register_con(dev);
+		net_output_t  &out = find_output(sout->cstr());
+		if (out.object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_ANALOG
+				&& in->object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_DIGITAL)
+		{
+			// 			fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
+			// 			fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
+			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*in);
+			proxy->init(this, "abc");
+			proxy->start();
+			in->set_output(proxy->GETINPPTR(proxy->m_Q));
+			//Next check would not work with dynamic activation
+			//if (in->state() != net_input_t::INP_STATE_PASSIVE)
+				proxy->m_Q.register_con(*in);
+			proxy->m_I.set_output(&out);
+			//if (proxy->m_I.state() != net_input_t::INP_STATE_PASSIVE)
+				out.register_con(proxy->m_I);
+		}
+		else
+		{
+			in->set_output(out.netdev()->GETINPPTR(out));
+
+			//Next check would not work with dynamic activation
+			//if (in->state() != net_input_t::INP_STATE_PASSIVE)
+				out.register_con(*in);
+		}
+	}
+	/* make sure params are set now .. */
+	for (tagmap_param_t::entry_t *entry = m_params.first(); entry != NULL; entry = m_params.next(entry))
+	{
+		entry->object()->netdev().update_param();
 	}
 
-	step_all_devices();
-	//reset_list();
-    //process_list();
-}
-
-void netlist_setup_t::step_all_devices()
-{
-    m_netlist.reset_list();
-
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	/* make sure all outputs are triggered once */
+	for (tagmap_output_t::entry_t *entry = m_outputs.first(); entry != NULL; entry = m_outputs.next(entry))
 	{
-		net_dev_t &dev = *entry->object();
-		dev.update_param();
-		dev.update();
-
-		for (tagmap_output_t::entry_t *entry = m_outputs.first(); entry != NULL; entry = m_outputs.next(entry))
-		{
-			net_output_t &out = *entry->object();
-			out.update_out();
-		}
-		m_netlist.reset_lists();
+		net_output_t *out = entry->object();
+		out->update_devs_force();
+		INT32 time = 1000;
+		m_netlist.process_list(time);
 	}
 }
 
@@ -548,118 +636,237 @@ void netlist_setup_t::print_stats()
 
 
 // ----------------------------------------------------------------------------------------
+// net_core_device_t
+// ----------------------------------------------------------------------------------------
+
+net_core_device_t::net_core_device_t()
+: net_object_t(DEVICE)
+{
+}
+
+net_core_device_t::~net_core_device_t()
+{
+}
+
+
+ATTR_COLD void net_core_device_t::init_core(netlist_base_t *anetlist, const char *name)
+{
+	m_netlist = anetlist;
+	m_name = name;
+#if USE_DELEGATES_A
+	h = net_update_delegate(&net_core_device_t::update, "update", this);
+#endif
+}
+
+
+ATTR_COLD void net_core_device_t::register_subdevice(net_core_device_t &subdev)
+{
+	m_subdevs.add(&subdev);
+	subdev.init_core(m_netlist, this->name());
+	//subdev.start();
+}
+
+// ----------------------------------------------------------------------------------------
 // net_dev_t
 // ----------------------------------------------------------------------------------------
 
-net_dev_t::~net_dev_t()
+
+net_device_t::net_device_t()
+: net_core_device_t(), m_variable_input_count(false)
 {
 }
 
-ATTR_HOT void net_dev_t::update_timed()
+net_device_t::~net_device_t()
 {
-	inc_stat(&stat_count);
-	begin_timing(total_time);
-	update();
-	end_timing(total_time);
 }
 
-void net_dev_t::register_output(const char *name, net_output_t *port)
+ATTR_COLD void net_device_t::init(netlist_setup_t *setup, const char *name)
 {
-	astring temp = this->name();
+	m_setup = setup;
+	init_core(&setup->netlist(), name);
+}
+
+void net_device_t::register_output(const net_core_device_t &dev, const char *name, net_output_t &port)
+{
+	astring temp = dev.name();
 	temp.cat(".");
 	temp.cat(name);
-	port->set_ttl_dev(this);
-	m_setup->register_output(temp, port);
+	port.set_netdev(&dev);
+	m_setup->register_output(temp, &port);
 }
 
-void net_dev_t::register_input(const char *name, net_input_t *inp, net_input_type type)
+void net_device_t::register_output(const char *name, net_output_t &port)
 {
-	astring temp = this->name();
+	register_output(*this, name, port);
+}
+
+void net_device_t::register_input(net_core_device_t &dev, const char *name, net_input_t &inp, int type)
+{
+	astring temp = dev.name();
 	temp.cat(".");
 	temp.cat(name);
+	inp.init(&dev, type);
 	m_inputs.add(core_strdup(temp.cstr()));
-	m_setup->register_input(temp, inp, type);
+	m_setup->register_input(temp, &inp);
 }
 
-void net_dev_t::register_param(const char *name, net_param_t *param, double initialVal)
+void net_device_t::register_input(const char *name, net_input_t &inp, int type)
 {
-	param->set_ttl_dev(this);
-	param->initial(initialVal);
-	m_setup->register_param(name, param);
+	register_input(*this, name, inp, type);
+}
+
+void net_device_t::register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out)
+{
+	in.set_output(GETINPPTR(out));
+	in.init(&dev);
+	//if (in.state() != net_input_t::INP_STATE_PASSIVE)
+		out.register_con(in);
+}
+
+void net_device_t::register_link_internal(net_input_t &in, net_output_t &out)
+{
+	register_link_internal(*this, in, out);
+}
+
+void net_device_t::register_param(net_core_device_t &dev, const char *name, net_param_t &param, double initialVal)
+{
+	param.set_netdev(dev);
+	param.initial(initialVal);
+	m_setup->register_param(name, &param);
+}
+
+void net_device_t::register_param(const char *name, net_param_t &param, double initialVal)
+{
+	register_param(*this,name, param, initialVal);
+}
+
+// ----------------------------------------------------------------------------------------
+// net_input_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD void net_input_t::init(net_core_device_t *dev, int astate)
+{
+	m_netdev = dev;
+	m_state = astate;
+#if USE_DELEGATES
+	h = net_update_delegate(&net_core_device_t::update, "update", dev);
+#endif
 }
 
 // ----------------------------------------------------------------------------------------
 // net_output_t
 // ----------------------------------------------------------------------------------------
 
-net_output_t::net_output_t()
+net_output_t::net_output_t(int atype)
+	: net_object_t(atype)
 {
-#if USE_DELEGATES
-	//m_cons = global_alloc_array_clear(net_update_delegate, 32);
-#else
-	// m_cons = global_alloc_array_clear(net_dev_t *, 32);
-#endif
-	//m_Q = parent.alloc_sig();
-	//m_new_Q = parent.alloc_sig();
-	m_num_cons = 0;
+	m_last_Q = 1;
 	m_Q = 0;
 	m_new_Q = m_Q;
+	m_active = 0;
+	m_in_queue = 2;
 }
 
-ATTR_COLD void net_output_t::set_ttl_dev(net_dev_t *dev)
+ATTR_COLD void net_output_t::set_netdev(const net_core_device_t *dev)
 {
-	m_ttldev = dev;
-	m_netlist = &dev->setup()->netlist();
+	m_netdev = dev;
+	m_netlist = dev->netlist();
 }
 
-
-ATTR_COLD void net_output_t::register_con(net_dev_t *dev)
+static inline void update_dev(const net_input_t *inp, const UINT32 mask)
 {
-	assert(m_num_cons<32);
+	if ((inp->state() & mask) != 0)
+	{
+		begin_timing(inp->netdev()->total_time);
+		inc_stat(inp->netdev()->stat_count);
 #if USE_DELEGATES
-	net_update_delegate aDelegate = net_update_delegate(&net_dev_t::update, "update", dev);
-	for (int i=0; i < m_num_cons; i++)
-		if (m_cons[i] == aDelegate)
-			return;
-	m_cons[m_num_cons++] = aDelegate;
+		inp->h();
 #else
-	for (int i=0; i < m_num_cons; i++)
-		if (m_cons[i] == dev)
-			return;
-	m_cons[m_num_cons++] = dev;
+		inp->netdev()->update_device();
 #endif
+		end_timing(inp->netdev()->total_time);
+	}
 }
 
 ATTR_HOT inline void net_output_t::update_devs()
 {
-#if USE_DELEGATES
 
-	net_update_delegate *s = m_cons;
-	net_update_delegate *e = s + m_num_cons;
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
+	m_Q = m_new_Q;
+	m_Q_analog = m_new_Q_analog;
 
-	while (s<e)
+	//UINT32 mask = 1 | ((m_last_Q & (m_Q ^ 1)) << 1) | (((m_last_Q ^ 1) & m_Q) << 2);
+	const UINT32 mask = masks[ (m_last_Q  << 1) | m_Q ];
+
+	switch (m_num_cons)
 	{
-		(*s++)();
+	case 2:
+		update_dev(m_cons[1], mask);
+	case 1:
+		update_dev(m_cons[0], mask);
+		break;
+	default:
+		{
+			for (int i=0; i < m_num_cons; i++)
+				update_dev(m_cons[i], mask);
+		}
+	case 0:
+		break;
 	}
-#else
-	net_dev_t **s = m_cons;
-	net_dev_t **e = s + m_num_cons;
 
-#if KEEP_STATISTICS
-	while (s<e)
-		(*s++)->update_timed();
+	m_in_queue = 2; /* mark as taken ... */
+	m_last_Q = m_Q;
+}
+
+ATTR_COLD  void net_output_t::update_devs_force()
+{
+	net_input_t **s = m_cons;
+	int i =  m_num_cons;
+
+	m_Q = m_new_Q;
+	m_Q_analog = m_new_Q_analog;
+	while (i-- > 0)
+	{
+		if (((*s)->state() & net_input_t::INP_STATE_ACTIVE) != 0)
+#if USE_DELEGATES
+			(*s)->h();
 #else
-	while (s<e)
-		(*s++)->update();
+			(*s)->netdev()->update_device();
 #endif
+		s++;
+	}
+
+	m_last_Q = m_Q;
+}
+
+ATTR_COLD void net_output_t::register_con(net_input_t &input)
+{
+	int i;
+	if (m_num_cons >= ARRAY_LENGTH(m_cons))
+		fatalerror("Connections exceeded for %s\n", m_netdev->name());
+
+	/* keep similar devices together */
+	for (i = 0; i < m_num_cons; i++)
+#if USE_DELEGATES
+		if (m_cons[i]->h == input.h)
+			break;
+#else
+	if (m_cons[i]->netdev() == input.netdev())
+		break;
 #endif
+	for (int j = m_num_cons; j > i; j--)
+		m_cons[j] = m_cons[j - 1];
+	m_cons[i] = &input;
+	m_num_cons++;
+	if (input.state() != net_input_t::INP_STATE_PASSIVE)
+		m_active++;
 }
 
 NETLIB_UPDATE(netdev_callback)
 {
 	// FIXME: Remove after device cleanup
 	if (!m_callback.isnull())
-		m_callback(INPVAL(m_in));
+		m_callback(INPANALOG(m_in));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -674,17 +881,6 @@ netlist_mame_device::netlist_mame_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, NETLIST, "netlist", tag, owner, clock),
 	  device_execute_interface(mconfig, *this)
 {
-	m_clock = clock;
-}
-
-void netlist_mame_device::static_set_subcycles(device_t &device, int subcycles)
-{
-	netlist_mame_device &netlist = downcast<netlist_mame_device &>(device);
-
-	assert((subcycles & 1) == 0);
-	assert( subcycles > 0);
-
-	netlist.m_subcycles = subcycles;
 }
 
 void netlist_mame_device::static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &))
@@ -701,8 +897,8 @@ void netlist_mame_device::device_start()
 {
 
 	//double dt = clocks_to_attotime(1).as_double();
-	m_netlist = global_alloc_clear(netlist_t(*this, m_subcycles > 2));
-    m_netlist->set_clock_freq(m_clock *  m_subcycles);
+	m_netlist = global_alloc_clear(netlist_t(*this));
+    m_netlist->set_clock_freq(this->clock());
 
 	m_setup = global_alloc_clear(netlist_setup_t(*m_netlist));
 
@@ -717,18 +913,12 @@ void netlist_mame_device::device_start()
 
     m_setup->resolve_inputs();
 
-    //m_clockcnt = 0;
-
-	m_clock_input = m_setup->find_output("clk");
-
 	//save_item(NAME(m_clockcnt));
 	save_state();
 	/* TODO: we have to save the round robin queue as well */
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
-	m_ss = SubCycles() / 2;
-	m_clk = 0;
 }
 
 void netlist_mame_device::device_reset()
@@ -761,37 +951,25 @@ void netlist_mame_device::save_state()
 
 UINT64 netlist_mame_device::execute_clocks_to_cycles(UINT64 clocks) const
 {
-	return clocks * SubCycles();
+	return clocks;
 }
 
 UINT64 netlist_mame_device::execute_cycles_to_clocks(UINT64 cycles) const
 {
-	return cycles / SubCycles();
+	return cycles;
 }
 
 ATTR_HOT void netlist_mame_device::execute_run()
 {
 	//bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	osd_ticks_t a =  -osd_ticks();
-	UINT8 ssdiv2 = (SubCycles() / 2);
-	//int p = m_icount;
-	do
-	{
-		// debugging
-		//m_ppc = m_pc; // copy PC to previous PC
-		//if (check_debugger)
-		//  debugger_instruction_hook(this, 0); //m_pc);
-		if (--m_ss == 0)
-		{
-			m_ss = ssdiv2;
-			m_clk = !m_clk;
-			m_clock_input->setTo(m_clk);
-		}
-		m_netlist->process_list();
-		m_icount--;
-	} while (m_icount > 0);
-	a+=osd_ticks();
-	//printf("%ld %d %ld\n", (long) a, p, (long) (a * 1000 / p));
+
+	// debugging
+	//m_ppc = m_pc;	// copy PC to previous PC
+	//if (check_debugger)
+	//	debugger_instruction_hook(this, 0); //m_pc);
+
+	m_netlist->process_list(m_icount);
+
 }
 
 

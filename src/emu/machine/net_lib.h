@@ -54,12 +54,14 @@
 // Special chips
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_CONST(_name, _v)														\
-		NET_REGISTER_DEV(netdev_const, _name)										\
-		NETDEV_PARAM(_name.CONST, _v)												\
+#define NETDEV_CLOCK(_name)															\
+		NET_REGISTER_DEV(netdev_clock, _name)										\
 
-#define NETDEV_INPUT(_name)															\
-		NET_REGISTER_DEV(netdev_input, _name)										\
+#define NETDEV_LOGIC_INPUT(_name)													\
+		NET_REGISTER_DEV(netdev_logic_input, _name)									\
+
+#define NETDEV_ANALOG_INPUT(_name)													\
+		NET_REGISTER_DEV(netdev_analog_input, _name)								\
 
 #define NETDEV_CALLBACK(_name, _IN)													\
 		NET_REGISTER_DEV(netdev_callback, _name)									\
@@ -92,7 +94,7 @@
 
 #define TTL_7402_NOR(_name, _I1, _I2)												\
 		NET_REGISTER_DEV(nic7402, _name)											\
-		NET_CONNECT(_name, I1, _I1)													\
+		NET_CONNECT(_name, I1, _I1)		 											\
 		NET_CONNECT(_name, I2, _I2)													\
 
 #define TTL_7404_INVERT(_name, _I1)													\
@@ -145,7 +147,7 @@
 
 #define TTL_7486_XOR(_name, _I1, _I2)												\
 		NET_REGISTER_DEV(nic7486, _name)											\
-		NET_CONNECT(_name, I1, _I1)													\
+		NET_CONNECT(_name, I1, _I1)		 											\
 		NET_CONNECT(_name, I2, _I2)													\
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)						\
@@ -185,9 +187,10 @@
 		NET_CONNECT(_name, R91, _R91)												\
 		NET_CONNECT(_name, R92, _R92)												\
 
-#define TTL_7493(_name, _CLK, _R1, _R2)												\
+#define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)										\
 		NET_REGISTER_DEV(nic7493, _name)											\
-		NET_CONNECT(_name, CLK, _CLK)												\
+		NET_CONNECT(_name, CLKA, _CLKA)												\
+		NET_CONNECT(_name, CLKB, _CLKB)												\
 		NET_CONNECT(_name, R1,  _R1)												\
 		NET_CONNECT(_name, R2,  _R2)												\
 
@@ -198,7 +201,7 @@
 		NET_CONNECT(_name, K,  _K)													\
 		NET_CONNECT(_name, CLRQ,  _CLRQ)											\
 
-#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)										\
+#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)							 			\
 		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
 
 #define TTL_74153(_name, _A1, _A2, _A3, _A4, _A, _B, _GA)							\
@@ -224,46 +227,50 @@
 		NET_CONNECT(_name, D,    _D)												\
 
 
-#define NE555N_MSTABLE(_name, _TRIG)												\
+#define NE555N_MSTABLE(_name, _TRIG, _CV)											\
 		NET_REGISTER_DEV(nicNE555N_MSTABLE, _name)									\
 		NET_CONNECT(_name, TRIG, _TRIG)												\
+		NET_CONNECT(_name, CV, _CV)													\
+
+#define NETDEV_MIXER3(_name, _I1, _I2, _I3)											\
+		NET_REGISTER_DEV(nicMixer8, _name)											\
+		NET_CONNECT(_name, I1, _I1)													\
+		NET_CONNECT(_name, I2, _I2)													\
+		NET_CONNECT(_name, I3, _I3)													\
 
 // ----------------------------------------------------------------------------------------
 // Special support devices ...
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS(netdev_const,
-	net_output_t m_Q;
-	net_param_t m_const;
+NETLIB_DEVICE(netdev_logic_input,
+	ttl_output_t m_Q;
 );
 
-NETLIB_DEVICE(netdev_input,
-	net_output_t m_Q;
+NETLIB_DEVICE(netdev_analog_input,
+	analog_output_t m_Q;
 );
+
+
 
 
 // ----------------------------------------------------------------------------------------
 // Special devices ...
 // ----------------------------------------------------------------------------------------
 
-/* This class is an artificial delay circuit delaying a signal until the next low to high transition
- * this is needed by pong to model delays in the hblank circuit
- */
 
-NETLIB_DEVICE(netdev_delay_lh,
-	net_input_t m_clk;
-	net_input_t m_D;
+NETLIB_DEVICE_WITH_PARAMS(netdev_clock,
+	ttl_input_t m_feedback;
+	ttl_output_t m_Q;
 
-	net_sig_t m_lastclk;
-
-	net_output_t m_Q;
+	net_param_t m_freq;
+	netlist_time m_inc;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(nicMultiSwitch,
-	net_input_t m_I[8];
+	analog_input_t m_I[8];
 
-	net_output_t m_Q;
-	net_output_t m_low;
+	analog_output_t m_Q;
+	analog_output_t m_low;
 
 	net_param_t m_POS;
 
@@ -271,11 +278,22 @@ NETLIB_DEVICE_WITH_PARAMS(nicMultiSwitch,
 );
 
 NETLIB_DEVICE(nicRSFF,
-	net_input_t m_S;
-	net_input_t m_R;
+	ttl_input_t m_S;
+	ttl_input_t m_R;
 
-	net_output_t m_Q;
-	net_output_t m_QQ;
+	ttl_output_t m_Q;
+	ttl_output_t m_QQ;
+);
+
+NETLIB_DEVICE_WITH_PARAMS(nicMixer8,
+	analog_input_t m_I[8];
+
+	analog_output_t m_Q;
+	analog_output_t m_low;
+
+	net_param_t m_R[8];
+
+	double m_w[8];
 );
 
 // ----------------------------------------------------------------------------------------
@@ -284,186 +302,252 @@ NETLIB_DEVICE(nicRSFF,
 
 NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 
-	ATTR_HOT void timer_cb(INT32 timer_id);
+	//ATTR_HOT void timer_cb(INT32 timer_id);
 
-	net_input_t m_trigger;
+	analog_input_t m_trigger;
+	analog_input_t m_CV;
+	analog_input_t m_THRESHOLD; /* internal */
 
-	UINT8 m_last;
-	UINT8 m_fired;
-	double m_time;
+	bool m_last;
 
-	net_output_t m_Q;
+	analog_output_t m_Q;
+	analog_output_t m_THRESHOLD_OUT; /* internal */
 
-	netlist_base_timer_t *m_timer;
+	//netlist_base_timer_t *m_timer;
 	net_param_t m_R;
 	net_param_t m_C;
 	net_param_t m_VS;
 	net_param_t m_VL;
-	net_param_t m_VT;
 );
 
-NETLIB_SIGNAL(nic7400, 2)
-NETLIB_SIGNAL(nic7402, 2)
-NETLIB_SIGNAL(nic7404, 1)
-NETLIB_SIGNAL(nic7410, 3)
-NETLIB_SIGNAL(nic7420, 4)
-NETLIB_SIGNAL(nic7425, 4)
-NETLIB_SIGNAL(nic7427, 3)
-NETLIB_SIGNAL(nic7430, 8)
-NETLIB_SIGNAL(nic7450, 4)
+NETLIB_SIGNAL(nic7400, 2, 0)
+NETLIB_SIGNAL(nic7402, 2, 1)
+NETLIB_SIGNAL(nic7410, 3, 0)
+NETLIB_SIGNAL(nic7420, 4, 0)
+NETLIB_SIGNAL(nic7425, 4, 1)
+NETLIB_SIGNAL(nic7427, 3, 1)
+NETLIB_SIGNAL(nic7430, 8, 0)
 
+NETLIB_DEVICE(nic7404,
+	ttl_input_t m_I;
+	ttl_output_t m_Q;
+);
+
+NETLIB_DEVICE(nic7450,
+	ttl_input_t m_I0;
+	ttl_input_t m_I1;
+	ttl_input_t m_I2;
+	ttl_input_t m_I3;
+	ttl_output_t m_Q;
+);
+
+#if 0
 NETLIB_DEVICE(nic7474,
-	net_input_t m_clk;
-	net_input_t m_D;
-	net_input_t m_clrQ;
-	net_input_t m_preQ;
+	ttl_input_t m_clk;
+	ttl_input_t m_D;
+	ttl_input_t m_clrQ;
+	ttl_input_t m_preQ;
 
 	net_sig_t m_lastclk;
 
-	net_output_t m_Q;
-	net_output_t m_QQ;
+	ttl_output_t m_Q;
+	ttl_output_t m_QQ;
 );
 
-NETLIB_SIGNAL(nic7486, 2)
+#else
+NETLIB_SUBDEVICE(nic7474sub,
+	ttl_input_t m_clk;
+
+    UINT8 m_nextD;
+	ttl_output_t m_Q;
+	ttl_output_t m_QQ;
+);
+
+NETLIB_DEVICE(nic7474,
+	nic7474sub sub;
+
+	ttl_input_t m_D;
+	ttl_input_t m_clrQ;
+	ttl_input_t m_preQ;
+);
+#endif
+
+NETLIB_DEVICE(nic7486,
+		ttl_input_t m_I0;
+		ttl_input_t m_I1;
+		ttl_output_t m_Q;
+);
 
 /* 74107 does latch data during high !
  * For modelling purposes, we assume 74107 and 74107A are the same
  */
 
 
+NETLIB_SUBDEVICE(nic74107Asub,
+	ttl_input_t m_clk;
+
+	UINT8 m_Q1;
+	UINT8 m_Q2;
+	UINT8 m_F;
+
+	ttl_output_t m_Q;
+	ttl_output_t m_QQ;
+
+);
+
 NETLIB_DEVICE(nic74107A,
-	net_input_t m_clk;
-	net_input_t m_J;
-	net_input_t m_K;
-	net_input_t m_clrQ;
+	nic74107Asub sub;
 
-	net_sig_t m_lastclk;
+	ttl_input_t m_J;
+	ttl_input_t m_K;
+	ttl_input_t m_clrQ;
 
-	net_output_t m_Q;
-	net_output_t m_QQ;
 );
 
 class nic74107 : public nic74107A
 {
 public:
-	nic74107(netlist_setup_t *parent, const char *name)
-	:	nic74107A(parent, name) {}
+	nic74107()
+	: 	nic74107A() {}
 
 };
 
 
+NETLIB_SUBDEVICE(nic7493ff,
+	ttl_input_t m_I;
+	ttl_output_t m_Q;
+	UINT8 m_active;
+);
+
+#if 1
+NETLIB_DEVICE(nic7493,
+	ttl_input_t m_R1;
+	ttl_input_t m_R2;
+
+	nic7493ff A;
+	nic7493ff B;
+	nic7493ff C;
+	nic7493ff D;
+
+);
+#else
+
 NETLIB_DEVICE(nic7493,
 	ATTR_HOT void update_outputs();
 
-	net_input_t m_R1;
-	net_input_t m_R2;
-	net_input_t m_clk;
+	ttl_input_t m_clk;
+	ttl_input_t m_R1;
+	ttl_input_t m_R2;
 
-	UINT8 m_lastclk;
+	ttl_output_t m_QA;
+	ttl_output_t m_QB;
+	ttl_output_t m_QC;
+	ttl_output_t m_QD;
+
 	UINT8 m_cnt;
-
-	net_output_t m_QA;
-	net_output_t m_QB;
-	net_output_t m_QC;
-	net_output_t m_QD;
 );
+#endif
 
 NETLIB_DEVICE(nic7490,
 	ATTR_HOT void update_outputs();
 
-	net_input_t m_R1;
-	net_input_t m_R2;
-	net_input_t m_R91;
-	net_input_t m_R92;
-	net_input_t m_clk;
+	ttl_input_t m_R1;
+	ttl_input_t m_R2;
+	ttl_input_t m_R91;
+	ttl_input_t m_R92;
+	ttl_input_t m_clk;
 
-	net_sig_t m_lastclk;
 	UINT8 m_cnt;
 
-	net_output_t m_QA;
-	net_output_t m_QB;
-	net_output_t m_QC;
-	net_output_t m_QD;
+	ttl_output_t m_QA;
+	ttl_output_t m_QB;
+	ttl_output_t m_QC;
+	ttl_output_t m_QD;
 );
 
 /* ripple-carry counter on low-high clock transition */
-NETLIB_DEVICE(nic9316,
+
+NETLIB_SUBDEVICE(nic9316sub,
 	ATTR_HOT void update_outputs_all();
 	ATTR_HOT void update_outputs();
 
-	net_input_t m_clk;
-	net_input_t m_ENP;
-	net_input_t m_ENT;
-	net_input_t m_CLRQ;
-	net_input_t m_LOADQ;
-	net_input_t m_A;
-	net_input_t m_B;
-	net_input_t m_C;
-	net_input_t m_D;
+	ttl_input_t m_clk;
 
-	UINT8 m_lastclk;
+	ttl_input_t m_LOADQ;
+	ttl_input_t m_ENT;
+	ttl_input_t m_A;
+	ttl_input_t m_B;
+	ttl_input_t m_C;
+	ttl_input_t m_D;
+
 	UINT8 m_cnt;
 
-	net_output_t m_QA;
-	net_output_t m_QB;
-	net_output_t m_QC;
-	net_output_t m_QD;
-	net_output_t m_RC;
+	ttl_output_t m_QA;
+	ttl_output_t m_QB;
+	ttl_output_t m_QC;
+	ttl_output_t m_QD;
+	ttl_output_t m_RC;
+);
+
+NETLIB_DEVICE(nic9316,
+	nic9316sub sub;
+	ttl_input_t m_ENP;
+	ttl_input_t m_CLRQ;
 );
 
 NETLIB_DEVICE(nic7483,
-	net_input_t m_CI;
-	net_input_t m_A1;
-	net_input_t m_A2;
-	net_input_t m_A3;
-	net_input_t m_A4;
-	net_input_t m_B1;
-	net_input_t m_B2;
-	net_input_t m_B3;
-	net_input_t m_B4;
-	net_input_t m_clk;
+	ttl_input_t m_CI;
+	ttl_input_t m_A1;
+	ttl_input_t m_A2;
+	ttl_input_t m_A3;
+	ttl_input_t m_A4;
+	ttl_input_t m_B1;
+	ttl_input_t m_B2;
+	ttl_input_t m_B3;
+	ttl_input_t m_B4;
+	ttl_input_t m_clk;
 
 	UINT8 m_lastr;
 
-	net_output_t m_SA;
-	net_output_t m_SB;
-	net_output_t m_SC;
-	net_output_t m_SD;
-	net_output_t m_CO;
+	ttl_output_t m_SA;
+	ttl_output_t m_SB;
+	ttl_output_t m_SC;
+	ttl_output_t m_SD;
+	ttl_output_t m_CO;
 
 );
 
 /* one half of a nic74153 */
 
 NETLIB_DEVICE(nic74153,
-	net_input_t m_I[4];
-	net_input_t m_A;
-	net_input_t m_B;
-	net_input_t m_GA;
+	ttl_input_t m_I[4];
+	ttl_input_t m_A;
+	ttl_input_t m_B;
+	ttl_input_t m_GA;
 
-	net_output_t m_AY;
+	ttl_output_t m_AY;
 );
 
 NETLIB_DEVICE(nic7448,
 	static const UINT8 tab7448[16][7];
 
-	net_input_t m_A0;
-	net_input_t m_A1;
-	net_input_t m_A2;
-	net_input_t m_A3;
-	net_input_t m_LTQ;
-	net_input_t m_RBIQ;
-	net_input_t m_BIQ;
+	ttl_input_t m_A0;
+	ttl_input_t m_A1;
+	ttl_input_t m_A2;
+	ttl_input_t m_A3;
+	ttl_input_t m_LTQ;
+	ttl_input_t m_RBIQ;
+	ttl_input_t m_BIQ;
 
 	UINT8 m_state;
 
-	net_output_t m_a;
-	net_output_t m_b;
-	net_output_t m_c;
-	net_output_t m_d;
-	net_output_t m_e;
-	net_output_t m_f;
-	net_output_t m_g;
+	ttl_output_t m_a;
+	ttl_output_t m_b;
+	ttl_output_t m_c;
+	ttl_output_t m_d;
+	ttl_output_t m_e;
+	ttl_output_t m_f;
+	ttl_output_t m_g;
 );
 
 
