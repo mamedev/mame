@@ -88,8 +88,8 @@ public:
 		m_spriteram4(*this, "spriteram4"),
 		m_spriteram5(*this, "spriteram5"),
 		m_spriteram6(*this, "spriteram6"),
-		m_spriteram7(*this, "spriteram7")	
-	{ 
+		m_spriteram7(*this, "spriteram7")
+	{
 	}
 
 	required_shared_ptr<UINT16> m_tilemapram;
@@ -186,7 +186,7 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	base += page * 2;
 
 	/* ---- ---- ---x xxxx
-	   xxxx ---y yyyy yyyy */
+       xxxx ---y yyyy yyyy */
 
 	int xx=  ((state->m_spriteram[0][base+0]&0x001f)<<4) | (state->m_spriteram[0][base+1]&0xf000)>>12;
 	int yy = ((state->m_spriteram[0][base+1]&0x1ff));
@@ -202,7 +202,7 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	for (int y=0;y<32;y++)
 	{
 		/* -Xtt tttt tttt tttt
-		   ---- ---- cccc cccc */
+           ---- ---- cccc cccc */
 
 		UINT16 tile = (base2[y*2+1]&0x3fff);
 		UINT16 flipx = (base2[y*2+1]&0x4000);

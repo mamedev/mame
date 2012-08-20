@@ -63,8 +63,8 @@ dac_device::dac_device(const machine_config &mconfig, const char *tag, device_t 
 
 
 //-------------------------------------------------
-//  write_unsigned8 - write an 8-bit value, 
-//	keeping the scaled result unsigned
+//  write_unsigned8 - write an 8-bit value,
+//  keeping the scaled result unsigned
 //-------------------------------------------------
 
 WRITE8_MEMBER( dac_device::write_unsigned8 )
@@ -74,8 +74,8 @@ WRITE8_MEMBER( dac_device::write_unsigned8 )
 
 
 //-------------------------------------------------
-//  write_signed8 - write an 8-bit value, 
-//	keeping the scaled result signed
+//  write_signed8 - write an 8-bit value,
+//  keeping the scaled result signed
 //-------------------------------------------------
 
 WRITE8_MEMBER( dac_device::write_signed8 )

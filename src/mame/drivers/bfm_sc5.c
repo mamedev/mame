@@ -31,7 +31,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:	
+public:
 	DECLARE_DRIVER_INIT(sc5);
 };
 

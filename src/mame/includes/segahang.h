@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
 	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
 	DECLARE_READ8_MEMBER( adc_status_r );
-	
+
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( hangon_io_r );
 	DECLARE_WRITE16_MEMBER( hangon_io_w );
@@ -100,7 +100,7 @@ protected:
 		TID_INIT_I8751,
 		TID_PPI_WRITE
 	};
-	
+
 	// driver overrides
 	virtual void video_start();
 	virtual void machine_reset();
@@ -116,14 +116,14 @@ protected:
 	optional_device<i8751_device> m_mcu;
 	required_device<i8255_device> m_i8255_1;
 	required_device<i8255_device> m_i8255_2;
-	
-	// memory pointers	
+
+	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
-	
+
 	// configuration
 	bool					m_sharrier_video;
 	i8751_sim_delegate		m_i8751_vblank_hook;
 
 	// internal state
-	UINT8 					m_adc_select;
+	UINT8					m_adc_select;
 };

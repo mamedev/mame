@@ -3,13 +3,13 @@
    It is thought that this is done by the 'CALC1' 'TOYBOX' and 'CALC3' protection chips found on the various boards
    however we have 3 implementations, and they don't quite pair up with the chips at the moment, this might be
    because our implementations are wrong / incomplete, or in some cases the newer chips are backwards compatible.
-   
-   galpanica  - CALC1	- type 0
-   sandscrp   - CALC1	- type 0 ( only uses Random Number? )
-   bonkadv    - TOYBOX	- type 0 ( only uses Random Number, XY Overlap Collision bit and register '0x02' )
-   gtmr		  -	TOYBOX  - type 1 ( only uses Random Number )
-   gtmr2	  -	TOYBOX  - type 1 ( only uses Random Number )
-   bloodwar   -	TOYBOX  - type 1
+
+   galpanica  - CALC1   - type 0
+   sandscrp   - CALC1   - type 0 ( only uses Random Number? )
+   bonkadv    - TOYBOX  - type 0 ( only uses Random Number, XY Overlap Collision bit and register '0x02' )
+   gtmr       - TOYBOX  - type 1 ( only uses Random Number )
+   gtmr2      - TOYBOX  - type 1 ( only uses Random Number )
+   bloodwar   - TOYBOX  - type 1
    shogwarr   - CALC3   - type 1
    brapboys   - CALC3   - type 2
 
@@ -118,7 +118,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_r)
 		case 0: return kaneko_hit_type0_r(space,offset,mem_mask);
 		case 1: return kaneko_hit_type1_r(space,offset,mem_mask);
 		case 2: return kaneko_hit_type2_r(space,offset,mem_mask);
-		
+
 		default:
 			fatalerror("kaneko_hit_r called, but m_hittype not set\n");
 			return 0;
@@ -132,7 +132,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
 		case 0: kaneko_hit_type0_w(space,offset,data, mem_mask); break;
 		case 1: kaneko_hit_type1_w(space,offset,data, mem_mask); break;
 		case 2: kaneko_hit_type2_w(space,offset,data, mem_mask); break;
-		
+
 		default:
 			fatalerror("kaneko_hit_r called, but m_hittype not set\n");
 			break;

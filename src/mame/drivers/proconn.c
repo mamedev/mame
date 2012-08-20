@@ -464,7 +464,7 @@ ROM_START( pr_bearxk )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bx8t10n6.bin", 0x0000, 0x008000, CRC(829dcc99) SHA1(014b53999becb241a3fcd34e802be8b58bfeb3c4) )
 ROM_END
-	
+
 ROM_START( pr_bearxl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "p_bx41.bin", 0x0000, 0x008000, CRC(e9212049) SHA1(215038324baa928b3c41495e78a2be68c8a1a767) )//bx1c20n7.bin
@@ -585,17 +585,17 @@ ROM_START( pr_7hvnc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "7h10p3c_380.bin", 0x0000, 0x010000, CRC(9fafd2a1) SHA1(7da1fa02005e0e232b7bb01088b180c32f271b00) )//10p 3 pound cash rom 380
 ROM_END
-	
+
 ROM_START( pr_7hvnd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "7775prb", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )//5p 3 pound cash 105
 ROM_END
-	
+
 ROM_START( pr_7hvne )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "777 heaven 892a20pn-390 (27256)", 0x0000, 0x008000, CRC(ffd1a8e0) SHA1(4b3a72c855d5b28d8be5db13166c58a44a1cbb59) )
 ROM_END
-	
+
 ROM_START( pr_7hvnf )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "777 heaven 892a10pn-380 (27256)", 0x0000, 0x008000, CRC(ca9d2108) SHA1(ebbb54c6640c67ce905a2dbf83f9f2fde31d342f) )
@@ -676,7 +676,7 @@ ROM_START( pr_7hvnu )
 	ROM_LOAD( "cl7h1020", 0x0000, 0x010000, CRC(b12e3219) SHA1(634f6984d9ef6ef9964841b5586143d82d8b52f7) )
 ROM_END
 
-	
+
 ROM_START( pr_alwy9 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "always 9 10p.bin", 0x0000, 0x010000, CRC(aff337c0) SHA1(a335a857c1bba696150d51cabfd39a2996c1092f) )
@@ -696,7 +696,7 @@ ROM_END
 	ROM_REGION( 0x80000, "snd", 0 )\
 	ROM_LOAD( "080snd1.bin", 0x0000, 0x020000, CRC(011170ab) SHA1(60a174c09261c2ee230c4194d918173b41f267de) )\
 	ROM_LOAD( "080snd2.bin", 0x020000, 0x020000, CRC(9189793b) SHA1(b47a3c214eb01595581f1e9d18c154560ee02ca1) )\
-	
+
 ROM_START( pr_batls )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "batt72c", 0x0000, 0x010000, CRC(6c6ab1f1) SHA1(6e0663fcdfa1948d9d74b6df388d09fed73f0ed2) )
@@ -757,8 +757,8 @@ ROM_END
 	ROM_REGION( 0x80000, "snd", 0 )\
 	ROM_LOAD( "010snd1 316e.bin" , 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )\
 	ROM_LOAD( "010snd2 9e9a.bin" , 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )\
-	
-	
+
+
 ROM_START( pr_bulls )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "beye58c", 0x0000, 0x010000, CRC(5fc52311) SHA1(dd4d3f29ec608c37d3d644bfbfa3ba06cc134b59) )
@@ -833,7 +833,7 @@ ROM_END
 	ROM_REGION( 0x80000, "snd", 0 )\
 	ROM_LOAD( "006snd1.000", 0x0000, 0x020000, CRC(f906857a) SHA1(cfa47a3e887e6788c577d31bb567f7fbaaf0bbf3) )\
 	ROM_LOAD( "006snd2.000", 0x0000, 0x020000, CRC(8445d0ef) SHA1(fd2ecc96f74e99e8f5ea7c7772fbd451ce52e889) )\
-	
+
 ROM_START( pr_chico )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "006a20pn.810", 0x0000, 0x010000, CRC(c4b491b7) SHA1(7629857cf6f1f69fb9ccf82a290a491cf695d373) )
@@ -844,13 +844,13 @@ ROM_END
 ROM_START( pr_chicoa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "006a25pn.810", 0x0000, 0x010000, CRC(d765215c) SHA1(22fe8d4b387e9fbc34a72ea1583b1c040f7761bc) )
-	
+
 	pr_chico_sound
 ROM_END
 
 ROM_START( pr_chicob )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "chic8c", 0x0000, 0x010000, CRC(2d5628be) SHA1(0c3f60f72a4d4eb458cac8ca4fe7d5584cbe4f18) )	
+	ROM_LOAD( "chic8c", 0x0000, 0x010000, CRC(2d5628be) SHA1(0c3f60f72a4d4eb458cac8ca4fe7d5584cbe4f18) )
 
 	pr_chico_sound
 ROM_END
@@ -867,7 +867,7 @@ ROM_END
 ROM_START( pr_coolma )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cm5pndan", 0x0000, 0x010000, CRC(e0697fe6) SHA1(d4b66272030dd64c86834f0546376dd02cfb0cc4) )
-	
+
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "cmsnd.bin", 0x0000, 0x080000, CRC(db79a326) SHA1(afe19eaa5d63c871ed80ffdfc8fb991a8c16cb36) )
 ROM_END

@@ -530,7 +530,7 @@ M4MBEL_SET( 199?, m4mbel__a0,	m4mbel,	"mbpl3.3c",			0x0000, 0x020000, CRC(638903
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "mcsnd1.dat", 0x000000, 0x080000, CRC(9477e648) SHA1(1abefced0cf708ad035720d5e58dc7dae50de5d1) ) \
 	ROM_LOAD( "mcsnd2.dat", 0x080000, 0x080000, CRC(088796bd) SHA1(877bf21add8ef95f5384a88e1287bd9aa5dbfa95) ) \
-  
+
 
 #define M4CMONT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -619,7 +619,7 @@ M4CMONT_SET( 199?, m4cmont_gt3,	m4cmont,	"gtr58gaa",		0x0000, 0x020000, CRC(ad20
 #define M4BLKMGC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "bmsnd", 0x0000, 0x080000, CRC(81da8bc9) SHA1(a60fd689e2683b987f48e3a4c8817b169a9c3fdf) ) \
-  
+
 
 #define M4BLKMGC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -647,7 +647,7 @@ M4BLKMGC_SET( 199?, m4blkmgc_u6,	m4blkmgc,	"bau1b307.bin", 0x0000, 0x010000, CRC
 #define M4AMALAD_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "aasnd", 0x0000, 0x080000, CRC(6b78f3de) SHA1(4f10afdc5cf7c84e2d048f7c9c5f83323f1e5a6e) ) \
-  
+
 
 #define M4AMALAD_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -680,7 +680,7 @@ M4AMALAD_SET( 199?, m4amalad__n,	m4amalad,	"jpaltst2.dat",		0x0000, 0x020000, CR
 #define M4BBEN_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "bben1s.bin", 0x0000, 0x02dbc5, CRC(9240317e) SHA1(d9167e52a09ff1783bb10e2e34fb80bdf555f00e) ) \
-  
+
 #define M4BBEN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
@@ -702,13 +702,13 @@ M4BBEN_SET( 199?, m4bben__g,	m4bben,	"bbc1b105.bin", 0x0000, 0x010000, CRC(b31f3
 M4BBEN_SET( 199?, m4bben__h,	m4bben,	"bbc2a106.bin", 0x0000, 0x010000, CRC(4929273e) SHA1(0703b89884a2d410854d813fe8304eac0dbfb30e), "Avantime?","Big Ben (Avantime?) (MPU4) (set 9)" )
 M4BBEN_SET( 199?, m4bben__i,	m4bben,	"bbc2b106.bin", 0x0000, 0x010000, CRC(d06687ed) SHA1(2e5b32c772f47f3f10ee90cbc72c00995871c2c0), "Avantime?","Big Ben (Avantime?) (MPU4) (set 10)" )
 
-	
+
 
 
 #define M4BBOX_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "bb1snd.bin", 0x0000, 0x068880, CRC(69d53f5a) SHA1(dd7958060804fda97a1fdf69c230bfab092b9707) ) \
-  
+
 #define M4BBOX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
@@ -735,7 +735,7 @@ M4BBOX_SET( 199?, m4bbox__i,	m4bbox,	"bbb9.bin",		0x0000, 0x010000, CRC(191f3da0
 
 #define M4FRNUDG_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-  
+
 #define M4FRNUDG_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
@@ -749,14 +749,14 @@ M4FRNUDG_SET( 199?, m4frnudg,		0,			"fanhc11.bin",	0x0000, 0x010000, CRC(d2fe9df
 M4FRNUDG_SET( 199?, m4frnudg__a,	m4frnudg,	"fanhc12.bin",	0x0000, 0x010000, CRC(2b2176e0) SHA1(9acffc05c02e76a6cbe4cfd708ff2d94ecb6c308), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 2)" )
 M4FRNUDG_SET( 199?, m4frnudg__b,	m4frnudg,	"fanhc8.bin",	0x0000, 0x010000, CRC(d1eecc15) SHA1(7dd3d218bc42ed7a92b8cd04b3de0eecda1d7eb0), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 3)" )
 M4FRNUDG_SET( 199?, m4frnudg__c,	m4frnudg,	"fanhc9.bin",	0x0000, 0x010000, CRC(0b581d12) SHA1(e62c831d8d21eb3c9a15ebe7f0245e804f912e32), "Avantime?","Fruit & Nudge (Avantime?) (MPU4) (set 4)" )
-	
+
 
 #define M4FRMTX_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "fmsnd1.bin", 0x0000, 0x080000, CRC(300fcb23) SHA1(c3a7424089e7893972e04a6a5e77cfb4e0ffc8ec)) \
 	ROM_REGION( 0x100000, "pals", 0 ) \
 	ROM_LOAD( "fm.jed", 0x0000, 0x000580, CRC(dc166c8e) SHA1(0cc49836b7ad57daa54e08f10f07aa279ccc53a0)) \
-  
+
 #define M4FRMTX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
@@ -773,7 +773,7 @@ M4FRMTX_SET( 199?, m4frmtx__d,	m4frmtx,	"fm7.bin",		0x0000, 0x010000, CRC(760774
 M4FRMTX_SET( 199?, m4frmtx__e,	m4frmtx,	"fmuk1.bin",	0x0000, 0x010000, CRC(1e798ba4) SHA1(e8d06f8281bc9bc52c7ddd3133abf7eaa231d731), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 6)" )
 M4FRMTX_SET( 199?, m4frmtx__f,	m4frmtx,	"frmatx3",		0x0000, 0x010000, CRC(d3c47cad) SHA1(e89d8df496405903f51c31bf48774bfa877d90c2), "Avantime?","Fruit Matrix (Avantime?) (MPU4) (set 7)" )
 
-	
+
 
 
 #define M4JOK2K_EXTRA_ROMS \

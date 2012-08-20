@@ -10,419 +10,419 @@
 
 ****************************************************************************
 
-	The FD1094 is a custom CPU based on the 68000, which runs encrypted code.
-	The decryption key is stored in 8KB of battery-backed RAM; when the battery
-	dies, the CPU can no longer decrypt the program code and the game stops
-	working (though the CPU itself still works - it just uses a wrong decryption
-	key).
+    The FD1094 is a custom CPU based on the 68000, which runs encrypted code.
+    The decryption key is stored in 8KB of battery-backed RAM; when the battery
+    dies, the CPU can no longer decrypt the program code and the game stops
+    working (though the CPU itself still works - it just uses a wrong decryption
+    key).
 
-	Being a 68000, the encryption works on 16-bit words. Only words fetched from
-	program space are decrypted; words fetched from data space are not affected.
+    Being a 68000, the encryption works on 16-bit words. Only words fetched from
+    program space are decrypted; words fetched from data space are not affected.
 
-	The decryption can logically be split in two parts. The first part consists
-	of a series of conditional XORs and bitswaps, controlled by the decryption
-	key, which will be described in the next paragraph. The second part does a
-	couple more XORs which don't depend on the key, followed by the replacement
-	of several values with FFFF. This last step is done to prevent usage of any
-	PC-relative opcode, which would easily allow an intruder to dump decrypted
-	values from program space. The FFFF replacement may affect either ~300 values
-	or ~5000, depending on the decryption key.
+    The decryption can logically be split in two parts. The first part consists
+    of a series of conditional XORs and bitswaps, controlled by the decryption
+    key, which will be described in the next paragraph. The second part does a
+    couple more XORs which don't depend on the key, followed by the replacement
+    of several values with FFFF. This last step is done to prevent usage of any
+    PC-relative opcode, which would easily allow an intruder to dump decrypted
+    values from program space. The FFFF replacement may affect either ~300 values
+    or ~5000, depending on the decryption key.
 
-	The main part of the decryption can itself be subdivided in four consecutive
-	steps. The first one is executed only if bit 15 of the encrypted value is 1;
-	the second one only if bit 14 of the _current_ value is 1; the third one only
-	if bit 13 of the current value is 1; the fourth one is always executed. The
-	first three steps consist of a few conditional XORs and a final conditional
-	bitswap; the fourth one consists of a fixed XOR and a few conditional
-	bitswaps. There is, however, a special case: if bits 15, 14 and 13 of the
-	encrypted value are all 0, none of the above steps are executed, replaced by
-	a single fixed bitswap.
+    The main part of the decryption can itself be subdivided in four consecutive
+    steps. The first one is executed only if bit 15 of the encrypted value is 1;
+    the second one only if bit 14 of the _current_ value is 1; the third one only
+    if bit 13 of the current value is 1; the fourth one is always executed. The
+    first three steps consist of a few conditional XORs and a final conditional
+    bitswap; the fourth one consists of a fixed XOR and a few conditional
+    bitswaps. There is, however, a special case: if bits 15, 14 and 13 of the
+    encrypted value are all 0, none of the above steps are executed, replaced by
+    a single fixed bitswap.
 
-	In the end, the decryption of a value at a given address is controlled by 32
-	boolean variables; 8 of them change at every address (repeating after 0x2000
-	words), and constitute the main key which is stored in the battery-backed
-	RAM; the other 24 don't change with the address, and depend solely on bytes
-	1, 2, and 3 of the battery-backed RAM, modified by the "state" which the CPU
-	is in.
+    In the end, the decryption of a value at a given address is controlled by 32
+    boolean variables; 8 of them change at every address (repeating after 0x2000
+    words), and constitute the main key which is stored in the battery-backed
+    RAM; the other 24 don't change with the address, and depend solely on bytes
+    1, 2, and 3 of the battery-backed RAM, modified by the "state" which the CPU
+    is in.
 
-	The CPU can be in one of 256 possible states. The 8 bits of the state modify
-	the 24 bits of the global key in a fixed way, which isn't affected by the
-	battery-backed RAM.
-	On reset, the CPU goes in state 0x00. The state can then be modified by the
-	program, executing the instruction
-	CMPI.L  #$00xxFFFF, D0
-	where xx is the state.
-	When an interrupt happens, the CPU enters "irq mode", forcing a specific
-	state, which is stored in byte 0 of the battery-backed RAM. Irq mode can also
-	be selected by the program with the instruction
-	CMPI.L  #$0200FFFF, D0
-	When RTE is executed, the CPU leaves irq mode, restoring the previous state.
-	This can also be done by the program with the instruction
-	CMPI.L  #$0300FFFF, D0
+    The CPU can be in one of 256 possible states. The 8 bits of the state modify
+    the 24 bits of the global key in a fixed way, which isn't affected by the
+    battery-backed RAM.
+    On reset, the CPU goes in state 0x00. The state can then be modified by the
+    program, executing the instruction
+    CMPI.L  #$00xxFFFF, D0
+    where xx is the state.
+    When an interrupt happens, the CPU enters "irq mode", forcing a specific
+    state, which is stored in byte 0 of the battery-backed RAM. Irq mode can also
+    be selected by the program with the instruction
+    CMPI.L  #$0200FFFF, D0
+    When RTE is executed, the CPU leaves irq mode, restoring the previous state.
+    This can also be done by the program with the instruction
+    CMPI.L  #$0300FFFF, D0
 
-	Since bytes 0-3 of the battery-backed RAM are used to store the irq state and
-	the global key, they have a double use: this one, and the normal 8-bit key
-	that changes at every address. To prevent that double use, the CPU fetches
-	the 8-bit key from a different place when decrypting words 0-3, but this only
-	happens after wrapping around at least once; when decrypting the first four
-	words of memory, which correspond the the initial SP and initial PC vectors,
-	the 8-bit key is taken from bytes 0-3 of RAM. Instead, when fetching the
-	vectors, the global key is handled differently, to prevent double use of
-	those bytes. But this special handling of the global key doesn't apply to
-	normal operations: reading words 1-3 from program space results in bytes 1-3
-	of RAM being used both for the 8-bit key and for the 24-bit global key.
-
-
-
-	There is still uncertainty about the assignment of two global key bits.
-
-	key[1]
-	------
-	key_0b invert;  \ bits 7,5 always 1 for now (but 0 in a bad CPU)
-	global_xor0;    /
-	key_5b invert;  bit 6
-	key_2b invert;  bit 4
-	key_1b invert;  bit 3 always 1 for now (but 0 in a bad CPU)
-	global_xor1;    bit 2
-	key_0c invert;  bit 1
-	global_swap2;   bit 0
-
-	key[2]
-	------
-	key_1a invert;  bit 7 always 1 for now (but 0 in a bad CPU)
-	key_6b invert;  bit 6 always 1 for now (but 0 in a bad CPU)
-	global_swap0a;  bit 5
-	key_7a invert;  bit 4
-	key_4a invert;  bit 3
-	global_swap0b;  bit 2
-	key_6a invert;  bit 1
-	key_3a invert;  bit 0
-
-	key[3]
-	------
-	key_2a invert;  bit 7 always 1 for now (but 0 in a bad CPU)
-	global_swap3;   bit 6 always 1 for now (but 0 in a bad CPU)
-	key_5a_invert;  bit 5
-	global_swap1;   bit 4
-	key_3b invert;  bit 3
-	global_swap4;   bit 2
-	key_0a invert;  bit 1
-	key_4b invert;  bit 0
+    Since bytes 0-3 of the battery-backed RAM are used to store the irq state and
+    the global key, they have a double use: this one, and the normal 8-bit key
+    that changes at every address. To prevent that double use, the CPU fetches
+    the 8-bit key from a different place when decrypting words 0-3, but this only
+    happens after wrapping around at least once; when decrypting the first four
+    words of memory, which correspond the the initial SP and initial PC vectors,
+    the 8-bit key is taken from bytes 0-3 of RAM. Instead, when fetching the
+    vectors, the global key is handled differently, to prevent double use of
+    those bytes. But this special handling of the global key doesn't apply to
+    normal operations: reading words 1-3 from program space results in bytes 1-3
+    of RAM being used both for the 8-bit key and for the 24-bit global key.
 
 
-	Analysis of the data contained in the 8k key data indicates some regularities.
-	To begin with, in all the keys seen so far, bit 7 ($80) in key values at
-	addresses $0004-$0FFF is always set to 1. Similarly, bit 6 ($40) in key values
-	at addresses $1000-$1FFF is always set to 1.
 
-	Even more interesting, however, is that analyzing the low 6 bits of the key
-	data reveals that a simple linear congruential generator has been used
-	consistently to generate the key bits. The LCG is of the form:
+    There is still uncertainty about the assignment of two global key bits.
 
-	    temp = A * val;
-	    val' = temp + (temp << 16);
+    key[1]
+    ------
+    key_0b invert;  \ bits 7,5 always 1 for now (but 0 in a bad CPU)
+    global_xor0;    /
+    key_5b invert;  bit 6
+    key_2b invert;  bit 4
+    key_1b invert;  bit 3 always 1 for now (but 0 in a bad CPU)
+    global_xor1;    bit 2
+    key_0c invert;  bit 1
+    global_swap2;   bit 0
 
-	and it appears to be calculated to at least 22 bits. In all cases seen so far,
-	the value of 'A' is fixed at $29. To generate the low 6 bits of the key, the
-	result of the LCG is shifted right 16 bits and inverted.
+    key[2]
+    ------
+    key_1a invert;  bit 7 always 1 for now (but 0 in a bad CPU)
+    key_6b invert;  bit 6 always 1 for now (but 0 in a bad CPU)
+    global_swap0a;  bit 5
+    key_7a invert;  bit 4
+    key_4a invert;  bit 3
+    global_swap0b;  bit 2
+    key_6a invert;  bit 1
+    key_3a invert;  bit 0
 
-	The following pseudo-code will generate 7 of the 8 bits of the key data
-	successfully for all known keys, given the values of the 'shift' and 'B'
-	parameters, as well as an initial 'seed' for the generator:
-
-	void genkey(UINT32 seed, UINT8 *output)
-	{
-	    int bytenum;
-
-	    for (bytenum = 4; bytenum < 8192; bytenum++)
-	    {
-	        UINT8 byteval;
-
-	        seed = seed * 0x29;
-	        seed += seed << 16;
-
-	        byteval = (~seed >> 16) & 0x3f;
-	        byteval |= (bytenum < 0x1000) ? 0x80 : 0x40;
-
-	        output[bytenum] = byteval;
-	    }
-	}
-
-	This only leaves one bit per key value (and the global key) left to determine.
-	It is worth pointing out that this remaining bit is the same bit that controls
-	how many opcodes to blank to $FFFF: 0 means a smaller subset (~300), while 1
-	indicates a much larger subset (~5000). Looking at the correlations between
-	where the key has this bit set to 0, and the presence of opcodes that would
-	be blanked as a result, seems to imply that the key is generated based on the
-	plaintext. That is, this final bit is set to 1 by default (hence blanking
-	more aggressively), and cleared to 0 if any plaintext words affected by the
-	byte in question would be incorrectly blanked.
+    key[3]
+    ------
+    key_2a invert;  bit 7 always 1 for now (but 0 in a bad CPU)
+    global_swap3;   bit 6 always 1 for now (but 0 in a bad CPU)
+    key_5a_invert;  bit 5
+    global_swap1;   bit 4
+    key_3b invert;  bit 3
+    global_swap4;   bit 2
+    key_0a invert;  bit 1
+    key_4b invert;  bit 0
 
 
-	When the keys were generated, the LCG seed wasn't input directly. Instead,
-	another value was entered, which in most cases was derived from the current
-	date/time. The LCG seed is obtained from that value via a multiplication.
-	The current date/time was also used in most cases to select the three bytes of
-	the global key. Interestingly, the global key must be inverted and read in
-	decimal representation to see this, while the seed must be read in hexadecimal
-	representation.
+    Analysis of the data contained in the 8k key data indicates some regularities.
+    To begin with, in all the keys seen so far, bit 7 ($80) in key values at
+    addresses $0004-$0FFF is always set to 1. Similarly, bit 6 ($40) in key values
+    at addresses $1000-$1FFF is always set to 1.
 
-	For some reason, bit 3 of the first byte of the global key was always set to 1
-	regardless of the value input into the key generator program, so e.g. the
-	input "88 01 23" would become "80 01 23".
+    Even more interesting, however, is that analyzing the low 6 bits of the key
+    data reveals that a simple linear congruential generator has been used
+    consistently to generate the key bits. The LCG is of the form:
 
-	The very first byte of internal RAM, which indicates the IRQ state, doesn't
-	seem to follow the same procedure. The IRQ state was probably decided at an
-	earlier time, not during the final key generation.
+        temp = A * val;
+        val' = temp + (temp << 16);
+
+    and it appears to be calculated to at least 22 bits. In all cases seen so far,
+    the value of 'A' is fixed at $29. To generate the low 6 bits of the key, the
+    result of the LCG is shifted right 16 bits and inverted.
+
+    The following pseudo-code will generate 7 of the 8 bits of the key data
+    successfully for all known keys, given the values of the 'shift' and 'B'
+    parameters, as well as an initial 'seed' for the generator:
+
+    void genkey(UINT32 seed, UINT8 *output)
+    {
+        int bytenum;
+
+        for (bytenum = 4; bytenum < 8192; bytenum++)
+        {
+            UINT8 byteval;
+
+            seed = seed * 0x29;
+            seed += seed << 16;
+
+            byteval = (~seed >> 16) & 0x3f;
+            byteval |= (bytenum < 0x1000) ? 0x80 : 0x40;
+
+            output[bytenum] = byteval;
+        }
+    }
+
+    This only leaves one bit per key value (and the global key) left to determine.
+    It is worth pointing out that this remaining bit is the same bit that controls
+    how many opcodes to blank to $FFFF: 0 means a smaller subset (~300), while 1
+    indicates a much larger subset (~5000). Looking at the correlations between
+    where the key has this bit set to 0, and the presence of opcodes that would
+    be blanked as a result, seems to imply that the key is generated based on the
+    plaintext. That is, this final bit is set to 1 by default (hence blanking
+    more aggressively), and cleared to 0 if any plaintext words affected by the
+    byte in question would be incorrectly blanked.
 
 
-	summary:
-	--------
+    When the keys were generated, the LCG seed wasn't input directly. Instead,
+    another value was entered, which in most cases was derived from the current
+    date/time. The LCG seed is obtained from that value via a multiplication.
+    The current date/time was also used in most cases to select the three bytes of
+    the global key. Interestingly, the global key must be inverted and read in
+    decimal representation to see this, while the seed must be read in hexadecimal
+    representation.
 
-	   +------------------------------------------------- 317- part #
-	   |       +----------------------------------------- IRQ state (hex)
-	   |       |     +----------------------------------- global key (inverted, dec)
-	   |       |     |        +-------------------------- main key seed (hex) (LCG seed = seed * 0x2F1E21)
-	   |       |     |        |        +----------------- game
-	   |       |     |        |        |      +---------- year
-	   |       |     |        |        |      |        +- inferred key generation date
-	   |       |     |        |        |      |        |
-	--------  -- --------  ------  -------- ----  --------------------------
-	0041      12 87 06 19  895963  bullet   1987  87/06/19 (atypical)
-	0045      34 97 02 39  384694  suprleag 1987  (atypical)
-	0049      F1 87 10 28  8932F7  shinobi2 1987  87/10/28 (atypical)
-	0050      F1 87 10 28  8932F7  shinobi1 1987  87/10/28 (atypical)
-	0053      00 00 00 00  020000  sonicbom 1987  atypical
-	0056      CD 80 01 23  032ABC  thndrbld 1987  88/01/23 (atypical)
-	0059                           aceattac 1988
-	0060      45 80 03 30  343210  aceattaa 1988  88/03/30 (atypical)
-	0065                           altbeaj1 1988
-	0068      20 80 06 10  880610  altbeaj3 1988  88/06/10
-	0070      59 80 08 06  880806  passshtj 1988  88/08/06
-	0074      47 80 08 06  880806  passshta 1988  88/08/06
-	0071      20 80 08 09  880809  passsht  1988  88/08/09
-	0079      98 80 09 05  880906  exctleag 1988  88/09/05-88/09/06 (atypical)
-	0080      96 80 08 26  880826  passsht  1988  88/08/26
-	0058-02C  FF 80 10 07  881007  sspirtfc 1988  88/10/07
-	0084      0E 80 10 31  881031  wb31     1988  88/10/31
-	0085      26 80 11 08  881108  wb32     1988  88/11/08
-	0087      69 80 11 08  881108  wb34     1988  88/11/08
-	0089      52 80 11 29  881129  wb33     1988  88/11/29
-	0058-03B  71 80 11 25  881125  ggroundj 1988  88/11/25
-	0058-03C  04 80 11 27  881127  gground  1988  88/11/27
-	0090      AB 80 01 27  247333  wrestwa1 1989  atypical
-	0091      68 80 11 27  881127  tetris1  1988  88/11/27
-	0092      10 80 11 28  881128  tetris2  1988  88/11/28
-	0093      25 80 11 29  881129  tetris   1988  88/11/29
-	0093A     35 02 09 17  900209  tetris3  1988  90/02/09
-	0096      21 80 11 21  881121  ddux     1988  88/11/21
-	0102      AB 80 02 03  04588A  wrestwa2 1989  atypical
-	0058-04B  27 03 27 14  032714  crkdownj 1989  89/03/27 14:xx
-	0058-04C  19 03 27 05  032705  crkdown  1989  89/03/27 05:xx
-	0058-04D  DC 03 27 06  032706  crkdownu 1989  89/03/27 06:xx
-	0110      19 81 03 29  032916  goldnax1 1989  89/03/29 16:xx
-	0115      12 04 05 11  040511  bayroutj 1989  89/04/05 11:xx
-	0116      11 03 30 09  033009  bayroute 1989  89/03/30 09:xx
-	0118      22 81 03 07  030719  toutrun  1989  89/03/07 19:xx
-	toutrun2  22 81 03 07  031113  toutrun2 1989  89/03/11 13:xx (atypical)
-	0120      0D 81 03 29  032916  goldnax3 1989  89/03/29 16:xx
-	0121      35 81 03 29  032916  goldnaxj 1989  89/03/29 16:xx
-	0122      03 81 04 04  890404  goldnaxu 1989  89/04/04
-	0058-05B  92 81 06 09  890609  sgmastj  1989  89/06/09
-	0058-05C  30 81 06 13  890613  sgmastc  1989  89/06/13
-	0058-05D                       sgmast   1989
-	0124A     80 06 21 11  890621  smgpj    1989  89/06/21 11:xx
-	0125A     DE 06 15 16  890615  smgpu    1989  89/06/15 16:xx
-	0126      54 05 28 01  890528  smgp5    1989  89/05/28 01:xx
-	0126A     74 06 16 15  890616  smgp     1989  89/06/16 15:xx
-	0127A     5F 81 07 06  890706  fpoint   1989  89/07/06
-	0128      55 00 28 20  890828  eswatj   1989  89/08/28 20:xx
-	0129      0A 00 28 20  890828  eswatu   1989  89/08/28 20:xx
-	0130      EC 00 28 19  890828  eswat    1989  89/08/28 19:xx
-	0134      DE 81 11 30  891130  loffirej 1989  89/11/30
-	0135      98 81 11 31  891131  loffireu 1989  89/11/31
-	0136      12 81 11 29  891129  loffire  1989  89/11/29
-	0139      49 03 25 15  891125  bloxeed  1990  89/11/25 15:xx
-	0142      91 01 24 17  900124  mvpj     1989  90/01/24 17:xx
-	0143      20 02 02 18  900202  mvp      1989  90/02/02 18:xx
-	0144      2E 02 23 18  022318  rachero  1989  90/02/23 18:xx
-	0058-06B  88 03 15 09  900315  roughrac 1990  90/03/15 09:xx
-	0146      10 04 26 17  900426  astormj  1990  90/04/26 17:xx
-	0147      2D 04 14 14  900414  astormu  1990  90/04/14 14:xx
-	0148      50 04 26 15  900426  astorm3  1990  90/04/26 15:xx
-	0153      FC 04 10 14  900410  pontoon  1990  90/04/10 14:xx
-	0157      20 07 20 10  900720  mwalkj   1990  90/07/20 10:xx
-	0158      DE 07 15 15  900715  mwalku   1990  90/07/15 15:xx
-	0159      39 07 20 10  900720  mwalk    1990  90/07/20 10:xx
-	0162      8F 01 14 15  900914  gprider1 1990  90/09/14 15:xx
-	0163      99 01 13 15  900913  gprider  1990  90/09/13 15:xx
-	5023      EF 04 18 05  900917  ryukyu   1990  90/09/17 12:18? (atypical)
-	0165      56 82 11 25  901125  lghostu  1990  90/11/25
-	0166      A2 82 11 24  901124  lghost   1990  90/11/24
-	0169B     48 06 35 32  901205  abcop    1990  90/12/05 14:35? (atypical)
-	0058-08B  4E 04 17 15  910206  qsww     1991  91/02/06 12:17? (atypical)
-	0175      91 83 03 22  910322  cltchtrj 1991  91/03/22
-	0176      FC 83 03 14  910314  cltchitr 1991  91/03/14
-	0179A     73 06 55 17  910318  cottonj  1991  91/03/18 14:55? (atypical)
-	0180      73 03 53 00  910403  cottonu  1991  91/04/03 11:53? (atypical)
-	0181A     73 06 55 17  910318  cotton   1991  91/03/18 14:55? (atypical)
-	0058-09D  91 83 06 26  910618  dcclubfd 1991  91/06/18-91/06/26 (atypical)
-	0182      07 07 12 14  921401  ddcrewj  1991  92/07/12 14:01? (atypical)
-	0184      07 07 12 16  921622  ddcrew2  1991  92/07/12 16:22? (atypical)
-	0186      5F 83 07 01  912030  ddcrewu  1991  92/07/01 20:30? (atypical)
-	0190      07 07 17 16  921716  ddcrew   1991  92/07/17 17:16? (atypical)
-	ddcrew1   91 84 07 42  910744  ddcrew1  1991  92/07/xx 07:44? (atypical)
-	0196      4A 20 12 22  920623  desertbr 1992  92/06/23 20:12? (atypical)
-	0197A     3F 84 06 19  920612  wwallyja 1992  92/06/12-92/06/19 (atypical)
-	0197B     3F 84 06 19  920612  wwallyj  1992  92/06/12-92/06/19 (atypical)
+    For some reason, bit 3 of the first byte of the global key was always set to 1
+    regardless of the value input into the key generator program, so e.g. the
+    input "88 01 23" would become "80 01 23".
 
-	----
+    The very first byte of internal RAM, which indicates the IRQ state, doesn't
+    seem to follow the same procedure. The IRQ state was probably decided at an
+    earlier time, not during the final key generation.
 
-	Bad CPUs that gave some more information about the global key:
 
-	          global01 global02 global03
-	          -------- -------- --------
-	          .....    ..       ..
-	unknown   11111111 11110110 10111110  (Shinobi 16A, part no. unreadable, could be dead)
-	unknown   10101011 11111000 11010101  (unknown ddcrewa key)
-	dead      00001111 00001111 00001111  (Alien Storm CPU with no battery)
-	bad       11100000 10101011 10111001  (flaky 317-0049)
+    summary:
+    --------
 
-	----
+       +------------------------------------------------- 317- part #
+       |       +----------------------------------------- IRQ state (hex)
+       |       |     +----------------------------------- global key (inverted, dec)
+       |       |     |        +-------------------------- main key seed (hex) (LCG seed = seed * 0x2F1E21)
+       |       |     |        |        +----------------- game
+       |       |     |        |        |      +---------- year
+       |       |     |        |        |      |        +- inferred key generation date
+       |       |     |        |        |      |        |
+    --------  -- --------  ------  -------- ----  --------------------------
+    0041      12 87 06 19  895963  bullet   1987  87/06/19 (atypical)
+    0045      34 97 02 39  384694  suprleag 1987  (atypical)
+    0049      F1 87 10 28  8932F7  shinobi2 1987  87/10/28 (atypical)
+    0050      F1 87 10 28  8932F7  shinobi1 1987  87/10/28 (atypical)
+    0053      00 00 00 00  020000  sonicbom 1987  atypical
+    0056      CD 80 01 23  032ABC  thndrbld 1987  88/01/23 (atypical)
+    0059                           aceattac 1988
+    0060      45 80 03 30  343210  aceattaa 1988  88/03/30 (atypical)
+    0065                           altbeaj1 1988
+    0068      20 80 06 10  880610  altbeaj3 1988  88/06/10
+    0070      59 80 08 06  880806  passshtj 1988  88/08/06
+    0074      47 80 08 06  880806  passshta 1988  88/08/06
+    0071      20 80 08 09  880809  passsht  1988  88/08/09
+    0079      98 80 09 05  880906  exctleag 1988  88/09/05-88/09/06 (atypical)
+    0080      96 80 08 26  880826  passsht  1988  88/08/26
+    0058-02C  FF 80 10 07  881007  sspirtfc 1988  88/10/07
+    0084      0E 80 10 31  881031  wb31     1988  88/10/31
+    0085      26 80 11 08  881108  wb32     1988  88/11/08
+    0087      69 80 11 08  881108  wb34     1988  88/11/08
+    0089      52 80 11 29  881129  wb33     1988  88/11/29
+    0058-03B  71 80 11 25  881125  ggroundj 1988  88/11/25
+    0058-03C  04 80 11 27  881127  gground  1988  88/11/27
+    0090      AB 80 01 27  247333  wrestwa1 1989  atypical
+    0091      68 80 11 27  881127  tetris1  1988  88/11/27
+    0092      10 80 11 28  881128  tetris2  1988  88/11/28
+    0093      25 80 11 29  881129  tetris   1988  88/11/29
+    0093A     35 02 09 17  900209  tetris3  1988  90/02/09
+    0096      21 80 11 21  881121  ddux     1988  88/11/21
+    0102      AB 80 02 03  04588A  wrestwa2 1989  atypical
+    0058-04B  27 03 27 14  032714  crkdownj 1989  89/03/27 14:xx
+    0058-04C  19 03 27 05  032705  crkdown  1989  89/03/27 05:xx
+    0058-04D  DC 03 27 06  032706  crkdownu 1989  89/03/27 06:xx
+    0110      19 81 03 29  032916  goldnax1 1989  89/03/29 16:xx
+    0115      12 04 05 11  040511  bayroutj 1989  89/04/05 11:xx
+    0116      11 03 30 09  033009  bayroute 1989  89/03/30 09:xx
+    0118      22 81 03 07  030719  toutrun  1989  89/03/07 19:xx
+    toutrun2  22 81 03 07  031113  toutrun2 1989  89/03/11 13:xx (atypical)
+    0120      0D 81 03 29  032916  goldnax3 1989  89/03/29 16:xx
+    0121      35 81 03 29  032916  goldnaxj 1989  89/03/29 16:xx
+    0122      03 81 04 04  890404  goldnaxu 1989  89/04/04
+    0058-05B  92 81 06 09  890609  sgmastj  1989  89/06/09
+    0058-05C  30 81 06 13  890613  sgmastc  1989  89/06/13
+    0058-05D                       sgmast   1989
+    0124A     80 06 21 11  890621  smgpj    1989  89/06/21 11:xx
+    0125A     DE 06 15 16  890615  smgpu    1989  89/06/15 16:xx
+    0126      54 05 28 01  890528  smgp5    1989  89/05/28 01:xx
+    0126A     74 06 16 15  890616  smgp     1989  89/06/16 15:xx
+    0127A     5F 81 07 06  890706  fpoint   1989  89/07/06
+    0128      55 00 28 20  890828  eswatj   1989  89/08/28 20:xx
+    0129      0A 00 28 20  890828  eswatu   1989  89/08/28 20:xx
+    0130      EC 00 28 19  890828  eswat    1989  89/08/28 19:xx
+    0134      DE 81 11 30  891130  loffirej 1989  89/11/30
+    0135      98 81 11 31  891131  loffireu 1989  89/11/31
+    0136      12 81 11 29  891129  loffire  1989  89/11/29
+    0139      49 03 25 15  891125  bloxeed  1990  89/11/25 15:xx
+    0142      91 01 24 17  900124  mvpj     1989  90/01/24 17:xx
+    0143      20 02 02 18  900202  mvp      1989  90/02/02 18:xx
+    0144      2E 02 23 18  022318  rachero  1989  90/02/23 18:xx
+    0058-06B  88 03 15 09  900315  roughrac 1990  90/03/15 09:xx
+    0146      10 04 26 17  900426  astormj  1990  90/04/26 17:xx
+    0147      2D 04 14 14  900414  astormu  1990  90/04/14 14:xx
+    0148      50 04 26 15  900426  astorm3  1990  90/04/26 15:xx
+    0153      FC 04 10 14  900410  pontoon  1990  90/04/10 14:xx
+    0157      20 07 20 10  900720  mwalkj   1990  90/07/20 10:xx
+    0158      DE 07 15 15  900715  mwalku   1990  90/07/15 15:xx
+    0159      39 07 20 10  900720  mwalk    1990  90/07/20 10:xx
+    0162      8F 01 14 15  900914  gprider1 1990  90/09/14 15:xx
+    0163      99 01 13 15  900913  gprider  1990  90/09/13 15:xx
+    5023      EF 04 18 05  900917  ryukyu   1990  90/09/17 12:18? (atypical)
+    0165      56 82 11 25  901125  lghostu  1990  90/11/25
+    0166      A2 82 11 24  901124  lghost   1990  90/11/24
+    0169B     48 06 35 32  901205  abcop    1990  90/12/05 14:35? (atypical)
+    0058-08B  4E 04 17 15  910206  qsww     1991  91/02/06 12:17? (atypical)
+    0175      91 83 03 22  910322  cltchtrj 1991  91/03/22
+    0176      FC 83 03 14  910314  cltchitr 1991  91/03/14
+    0179A     73 06 55 17  910318  cottonj  1991  91/03/18 14:55? (atypical)
+    0180      73 03 53 00  910403  cottonu  1991  91/04/03 11:53? (atypical)
+    0181A     73 06 55 17  910318  cotton   1991  91/03/18 14:55? (atypical)
+    0058-09D  91 83 06 26  910618  dcclubfd 1991  91/06/18-91/06/26 (atypical)
+    0182      07 07 12 14  921401  ddcrewj  1991  92/07/12 14:01? (atypical)
+    0184      07 07 12 16  921622  ddcrew2  1991  92/07/12 16:22? (atypical)
+    0186      5F 83 07 01  912030  ddcrewu  1991  92/07/01 20:30? (atypical)
+    0190      07 07 17 16  921716  ddcrew   1991  92/07/17 17:16? (atypical)
+    ddcrew1   91 84 07 42  910744  ddcrew1  1991  92/07/xx 07:44? (atypical)
+    0196      4A 20 12 22  920623  desertbr 1992  92/06/23 20:12? (atypical)
+    0197A     3F 84 06 19  920612  wwallyja 1992  92/06/12-92/06/19 (atypical)
+    0197B     3F 84 06 19  920612  wwallyj  1992  92/06/12-92/06/19 (atypical)
 
-	Notes:
+    ----
 
-	We start in state 0.
-	Vectors are fetched:
-	   SP.HI @ $000000 -> mainkey = key[0], globalkey = { $00, $00, $00 }, less aggressive blanking
-	   SP.LO @ $000002 -> mainkey = key[1], globalkey = { $00, $00, $00 }, less aggressive blanking
-	   PC.HI @ $000004 -> mainkey = key[2], globalkey = { key[1], $00, $00 }
-	   PC.LO @ $000006 -> mainkey = key[3], globalkey = { key[1], key[2], $00 }
+    Bad CPUs that gave some more information about the global key:
 
-	driver    FD1094    SP plain  SP enc    PC plain  PC enc    States Used
-	--------  --------  --------  --------  --------  --------  -----------
-	aceattaa  317-0060  00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC
-	altbeaj3  317-0068  FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93 A7 D8
-	altbeaj1  317-0065            C9C5F299            CCDDECDD
-	bayroute  317-0116  00504000  5EB40000  00001000  5533A184  00 04 11 18
-	bayroutj  317-0115  00504000  56150000  00001000  85948DCF  00 05 12 16
-	bullet    317-0041  00000000  57355D96  00001882  8DDC8CF4         (deduced, not 100% sure)
-	cotton    317-0181a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
-	cottonu   317-0180  00204000  5DB20000  00000716  A1840716  00 0E 73
-	cottonj   317-0179a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
-	ddux      317-0096  00000000  5F94AF59  00000406  AF5987A0  00 21 28 70 D9
-	eswat     317-0130  00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA
-	eswatu    317-0129  00000000  5537AF59  00000400  55334735  00 0A 12 C3 CC
-	eswatj    317-0128  00000000  A711AF59  00000400  55334735  00 63 CB D5
-	exctleag  317-0079? 00000000  5537AF59  00000410  83018384         (deduced, not 100% sure)
-	fpoint    317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
-	fpoint1   317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
-	goldnaxu  317-0122  FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51 72 99 F6
-	goldnaxj  317-0121  FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12 35 58 7A 9E
-	goldnax3  317-0120  FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF
-	goldnax1  317-0110  FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48 5D
-	mvp       317-0143  00000000  5F94A711  00000416  BD59DC5B  00 19 20 88 98
-	mvpj      317-0142  00000000  5F94AF59  00000416  BD599C7D  00 19 35 91 DA
-	passsht   317-0080  00000000  AF59AF59  00003202  C2003923  00 11 52 96 EE
-	passshta  317-0074  00000000  AF59AF59  000031E4  C2003F8C  00 12 47 83 A7
-	passshtj  317-0070  00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83 FE
-	ryukyu    317-5023  00203800  AF49D30B  0000042E  FC5863B5  00 DC EF
-	shinobi2  317-0049  FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 9B 9C F1
-	sonicbom  317-0053  00000000  5735AF59  00001000  FC587133  00
-	suprleag  317-0045? 00000000  A711AF59            BD59CE5B
-	tetris2   317-0092  00000000  5735AF59  00000410  AF598685  00 10 52 74 97 FC
-	tetris1   317-0091  00000000  5D92AF59  00000410  AF59AE58  99 25 42 5B 68 FC
-	wb34      317-0087  FFFFFF7E  B2978997  00000500  AF590500  00 11 64 69 82
-	wb33      317-0089  FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71
-	wb32      317-0085  FFFFFF7E  B2F78997  00000500  AF590500  00 10 13 26 77
-	wrestwa2  317-0102  00000000  5D96AF59  00000414  EE588E5B  00 12 A7 AB CC F9 FC
-	wrestwa1  317-0090  00000000  5D96AF59  00000414  8301AE18  00 12 A7 AB CC F9 FC
+              global01 global02 global03
+              -------- -------- --------
+              .....    ..       ..
+    unknown   11111111 11110110 10111110  (Shinobi 16A, part no. unreadable, could be dead)
+    unknown   10101011 11111000 11010101  (unknown ddcrewa key)
+    dead      00001111 00001111 00001111  (Alien Storm CPU with no battery)
+    bad       11100000 10101011 10111001  (flaky 317-0049)
 
-	suprleag pc possibilities:
-	  101E -> follows an RTS
-	  108E -> follows 3 NOPs
-	  11C4
-	  11C8
-	  1212
-	  1214
-	  1218
-	  1282
-	  1284
-	  1288
-	  1342
-	  1416
-	  141C
-	  1486
-	  148C
-	  1606
-	  1E52
-	  1E54
+    ----
 
-	bullet pc possibilities:
-	  0822
-	  0824
-	  0882
-	  0884
-	  0C08
-	  137C
-	  1822
-	  1824
-	  1882
-	  1884
-	  1C08
+    Notes:
 
-	tetris1:
-	  410: 4ff9 0000 0000  lea $0.l, a7
-	  416: 46fc 2700       move #$2700, sr
-	  41a: 0c80 005b ffff  cmpi.l #$5bffff, d0
+    We start in state 0.
+    Vectors are fetched:
+       SP.HI @ $000000 -> mainkey = key[0], globalkey = { $00, $00, $00 }, less aggressive blanking
+       SP.LO @ $000002 -> mainkey = key[1], globalkey = { $00, $00, $00 }, less aggressive blanking
+       PC.HI @ $000004 -> mainkey = key[2], globalkey = { key[1], $00, $00 }
+       PC.LO @ $000006 -> mainkey = key[3], globalkey = { key[1], key[2], $00 }
 
-	  400: 4e71            nop
-	  402: 4e73            rte
+    driver    FD1094    SP plain  SP enc    PC plain  PC enc    States Used
+    --------  --------  --------  --------  --------  --------  -----------
+    aceattaa  317-0060  00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC
+    altbeaj3  317-0068  FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93 A7 D8
+    altbeaj1  317-0065            C9C5F299            CCDDECDD
+    bayroute  317-0116  00504000  5EB40000  00001000  5533A184  00 04 11 18
+    bayroutj  317-0115  00504000  56150000  00001000  85948DCF  00 05 12 16
+    bullet    317-0041  00000000  57355D96  00001882  8DDC8CF4         (deduced, not 100% sure)
+    cotton    317-0181a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
+    cottonu   317-0180  00204000  5DB20000  00000716  A1840716  00 0E 73
+    cottonj   317-0179a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
+    ddux      317-0096  00000000  5F94AF59  00000406  AF5987A0  00 21 28 70 D9
+    eswat     317-0130  00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA
+    eswatu    317-0129  00000000  5537AF59  00000400  55334735  00 0A 12 C3 CC
+    eswatj    317-0128  00000000  A711AF59  00000400  55334735  00 63 CB D5
+    exctleag  317-0079? 00000000  5537AF59  00000410  83018384         (deduced, not 100% sure)
+    fpoint    317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
+    fpoint1   317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
+    goldnaxu  317-0122  FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51 72 99 F6
+    goldnaxj  317-0121  FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12 35 58 7A 9E
+    goldnax3  317-0120  FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF
+    goldnax1  317-0110  FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48 5D
+    mvp       317-0143  00000000  5F94A711  00000416  BD59DC5B  00 19 20 88 98
+    mvpj      317-0142  00000000  5F94AF59  00000416  BD599C7D  00 19 35 91 DA
+    passsht   317-0080  00000000  AF59AF59  00003202  C2003923  00 11 52 96 EE
+    passshta  317-0074  00000000  AF59AF59  000031E4  C2003F8C  00 12 47 83 A7
+    passshtj  317-0070  00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83 FE
+    ryukyu    317-5023  00203800  AF49D30B  0000042E  FC5863B5  00 DC EF
+    shinobi2  317-0049  FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 9B 9C F1
+    sonicbom  317-0053  00000000  5735AF59  00001000  FC587133  00
+    suprleag  317-0045? 00000000  A711AF59            BD59CE5B
+    tetris2   317-0092  00000000  5735AF59  00000410  AF598685  00 10 52 74 97 FC
+    tetris1   317-0091  00000000  5D92AF59  00000410  AF59AE58  99 25 42 5B 68 FC
+    wb34      317-0087  FFFFFF7E  B2978997  00000500  AF590500  00 11 64 69 82
+    wb33      317-0089  FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71
+    wb32      317-0085  FFFFFF7E  B2F78997  00000500  AF590500  00 10 13 26 77
+    wrestwa2  317-0102  00000000  5D96AF59  00000414  EE588E5B  00 12 A7 AB CC F9 FC
+    wrestwa1  317-0090  00000000  5D96AF59  00000414  8301AE18  00 12 A7 AB CC F9 FC
 
-	tetris2:
-	  410: 4ff9 0000 0000  lea $0.l, a7
-	  416: 46fc 2700       move #$2700, sr
-	  41a: 0c80 0052 ffff  cmpi.l #$52ffff, d0
+    suprleag pc possibilities:
+      101E -> follows an RTS
+      108E -> follows 3 NOPs
+      11C4
+      11C8
+      1212
+      1214
+      1218
+      1282
+      1284
+      1288
+      1342
+      1416
+      141C
+      1486
+      148C
+      1606
+      1E52
+      1E54
 
-	  400: 4e71            nop
-	  402: 4e73            rte
+    bullet pc possibilities:
+      0822
+      0824
+      0882
+      0884
+      0C08
+      137C
+      1822
+      1824
+      1882
+      1884
+      1C08
 
-	wrestwa1:
-	  414: 4ff8 0000       lea $0.w, a7
-	  418: 46fc 2700       move #$2700, sr
-	  41c: 0c80 00fc ffff  cmpi.l #$fcffff, d0
+    tetris1:
+      410: 4ff9 0000 0000  lea $0.l, a7
+      416: 46fc 2700       move #$2700, sr
+      41a: 0c80 005b ffff  cmpi.l #$5bffff, d0
 
-	mvp:
-	  416: 4ff8 0000       lea $0.w, a7
-	  41a: 46fc 2700       move #$2700, sr
-	  41e: 7000            moveq #0, d0
-	  420: 2200            move.l d0, d1
-	  ...
-	  42c: 2e00            move.l d0, d7
-	  42e: 2040            movea.l d0, a0
-	  ...
-	  43a: 2c40            movea.l d0, a6
-	  43c: 0c80 0098 ffff  cmpi.l #$98ffff, d0
+      400: 4e71            nop
+      402: 4e73            rte
 
-	wb34:
-	  500: 46fc 2700       move #$2700, sr
-	  504: 0c80 0064 ffff  cmpi.l #$64ffff, d0
+    tetris2:
+      410: 4ff9 0000 0000  lea $0.l, a7
+      416: 46fc 2700       move #$2700, sr
+      41a: 0c80 0052 ffff  cmpi.l #$52ffff, d0
 
-	goldnaxu:
-	  400: 6000 000c       bra $40e
-	  40e: 4ff8 ff00       lea $ff00.w, a7
-	  412: 46fc 2700       move #$2700, sr
-	  416: 0c80 0072 ffff  cmpi.l #$72ffff, d0
+      400: 4e71            nop
+      402: 4e73            rte
 
-	ryukyu:
-	  42e: 4e71            nop
-	  ...
-	  440: 0c80 00dc ffff  cmpi.l #$dcffff, d0
+    wrestwa1:
+      414: 4ff8 0000       lea $0.w, a7
+      418: 46fc 2700       move #$2700, sr
+      41c: 0c80 00fc ffff  cmpi.l #$fcffff, d0
 
-	eswat:
-	  400: 4ff8 0000       lea $0.w, a7
-	  404: 46fc 2700       move #$2700, sr
-	  408: 0c80 000c ffff  cmpi.l #$cffff, d0
+    mvp:
+      416: 4ff8 0000       lea $0.w, a7
+      41a: 46fc 2700       move #$2700, sr
+      41e: 7000            moveq #0, d0
+      420: 2200            move.l d0, d1
+      ...
+      42c: 2e00            move.l d0, d7
+      42e: 2040            movea.l d0, a0
+      ...
+      43a: 2c40            movea.l d0, a6
+      43c: 0c80 0098 ffff  cmpi.l #$98ffff, d0
+
+    wb34:
+      500: 46fc 2700       move #$2700, sr
+      504: 0c80 0064 ffff  cmpi.l #$64ffff, d0
+
+    goldnaxu:
+      400: 6000 000c       bra $40e
+      40e: 4ff8 ff00       lea $ff00.w, a7
+      412: 46fc 2700       move #$2700, sr
+      416: 0c80 0072 ffff  cmpi.l #$72ffff, d0
+
+    ryukyu:
+      42e: 4e71            nop
+      ...
+      440: 0c80 00dc ffff  cmpi.l #$dcffff, d0
+
+    eswat:
+      400: 4ff8 0000       lea $0.w, a7
+      404: 46fc 2700       move #$2700, sr
+      408: 0c80 000c ffff  cmpi.l #$cffff, d0
 
 *****************************************************************************/
 
@@ -431,7 +431,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 // device type definition
@@ -531,7 +531,7 @@ const UINT16 fd1094_device::s_masked_opcodes[] =
 
 
 //**************************************************************************
-//	DECRYPTION CACHE HELPER
+//  DECRYPTION CACHE HELPER
 //**************************************************************************
 
 //-------------------------------------------------
@@ -562,7 +562,7 @@ void fd1094_decryption_cache::reset()
 
 //-------------------------------------------------
 //  configure - configure the address and size
-//	of the region we are caching
+//  of the region we are caching
 //-------------------------------------------------
 
 void fd1094_decryption_cache::configure(offs_t baseaddress, UINT32 size, offs_t rgnoffset)
@@ -580,7 +580,7 @@ void fd1094_decryption_cache::configure(offs_t baseaddress, UINT32 size, offs_t 
 
 //-------------------------------------------------
 //  decrypted_opcodes - return a pointer to the
-//	decrypted opcodes for the given state
+//  decrypted opcodes for the given state
 //-------------------------------------------------
 
 UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
@@ -598,7 +598,7 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 
 
 //**************************************************************************
-//	CORE IMPLEMENTATION
+//  CORE IMPLEMENTATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -625,7 +625,7 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 		m_masked_opcodes_lookup[0][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 		m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 	}
-	
+
 	// add some more opcodes for the more aggressive table
 	for (int opcode = 0; opcode < 65536; opcode += 2)
 		if ((opcode & 0xff80) == 0x4e80 || (opcode & 0xf0f8) == 0x50c8 || (opcode & 0xf000) == 0x6000)
@@ -634,8 +634,8 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  change_state - set the current state of the 
-//	chip
+//  change_state - set the current state of the
+//  chip
 //-------------------------------------------------
 
 void fd1094_device::change_state(int newstate)
@@ -671,7 +671,7 @@ void fd1094_device::change_state(int newstate)
 
 
 //**************************************************************************
-//	DEVICE OVERRIDES
+//  DEVICE OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -682,7 +682,7 @@ void fd1094_device::device_start()
 {
 	// start the base device
 	m68000_device::device_start();
-	
+
 	// find the key
 	m_key = memregion("key")->base();
 	if (m_key == NULL)
@@ -694,7 +694,7 @@ void fd1094_device::device_start()
 		m_srcbase = reinterpret_cast<UINT16 *>(region()->base());
 		m_srcbytes = region()->bytes();
 	}
-	
+
 	// if no ROM region, see if there's a memory share with our name
 	else
 	{
@@ -705,7 +705,7 @@ void fd1094_device::device_start()
 			m_srcbytes = share->bytes();
 		}
 	}
-	
+
 	// if we got nothing, error
 	if (m_srcbase == NULL)
 		throw emu_fatalerror("FD1094 found no data to decrypt!");
@@ -722,7 +722,7 @@ void fd1094_device::device_start()
 	m68k_set_cmpild_callback(this, &fd1094_device::cmp_callback);
 	m68k_set_rte_callback(this, &fd1094_device::rte_callback);
 	device_set_irq_callback(this, &fd1094_device::irq_callback);
-	
+
 	// save state
 	save_item(NAME(m_state));
 	save_item(NAME(m_irqmode));
@@ -757,14 +757,14 @@ void fd1094_device::device_postload()
 
 
 //**************************************************************************
-//	INTERNAL HELPERS
+//  INTERNAL HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  decrypt_one - decrypt a single opcode given
-//	the address, data, and keys; note that the
-//	address provided is the word address
-//	(physical address / 2)
+//  the address, data, and keys; note that the
+//  address provided is the word address
+//  (physical address / 2)
 //-------------------------------------------------
 
 UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_key, UINT8 state, bool vector_fetch)
@@ -821,14 +821,14 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 		gkey3 ^= 0x02;	// key_0a invert
 		gkey3 ^= 0x40;	// global_swap3
 	}
-	
+
 	// for address xx0000-xx0006 (but only if >= 000008), use key xx2000-xx2006
 	UINT8 mainkey;
 	if ((address & 0x0ffc) == 0 && address >= 4)
 		mainkey = main_key[(address & 0x1fff) | 0x1000];
 	else
 		mainkey = main_key[address & 0x1fff];
-		
+
 	UINT8 key_F;
 	if (address & 0x1000)	key_F = BIT(mainkey,7);
 	else					key_F = BIT(mainkey,6);
@@ -956,7 +956,7 @@ void fd1094_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, 
 
 //-------------------------------------------------
 //  default_state_change - handle state changes
-//	for standard cases
+//  for standard cases
 //-------------------------------------------------
 
 void fd1094_device::default_state_change(UINT8 state)
@@ -967,12 +967,12 @@ void fd1094_device::default_state_change(UINT8 state)
 
 
 //**************************************************************************
-//	STATIC CALLBACKS
+//  STATIC CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
-//  cmp_callback - callback for CMP.L instructions 
-//	(state change)
+//  cmp_callback - callback for CMP.L instructions
+//  (state change)
 //-------------------------------------------------
 
 void fd1094_device::cmp_callback(device_t *device, UINT32 val, UINT8 reg)
@@ -983,8 +983,8 @@ void fd1094_device::cmp_callback(device_t *device, UINT32 val, UINT8 reg)
 
 
 //-------------------------------------------------
-//  irq_callback - callback when the FD1094 enters 
-//	interrupt code
+//  irq_callback - callback when the FD1094 enters
+//  interrupt code
 //-------------------------------------------------
 
 IRQ_CALLBACK( fd1094_device::irq_callback )
@@ -996,7 +996,7 @@ IRQ_CALLBACK( fd1094_device::irq_callback )
 
 //-------------------------------------------------
 //  rte_callback - callback when an RTE instruction
-//	is encountered
+//  is encountered
 //-------------------------------------------------
 
 void fd1094_device::rte_callback(device_t *device)

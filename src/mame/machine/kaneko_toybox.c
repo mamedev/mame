@@ -1,5 +1,5 @@
 /* Kaneko 'Toybox' protection
- 
+
  the following chips have been seen
 
 TBSOP01 is a NEC uPD78324 series MCU with 32K internal rom & 1024 bytes of ram
@@ -14,7 +14,7 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 94  Bonk's Adventure             TOYBOX?            TBSOP01
 94  Blood Warrior                TOYBOX?            TBS0P01 452 9339PK001
 94  Great 1000 Miles Rally       TOYBOX                                                  "MM0525-TOYBOX199","USMM0713-TB1994 "
-94  Great 1000 Miles Rally EV/US TOYBOX                 
+94  Great 1000 Miles Rally EV/US TOYBOX
 95  Great 1000 Miles Rally 2     TOYBOX      KANEKO TBSOP02 454 9451MK002 (74 pin PQFP)  "USMM0713-TB1994 "
 95  Jackie Chan                  TOYBOX                                                  "USMM0713-TB1994 "
 95  Gals Panic 3                 TOYBOX?            TBSOP01
@@ -22,8 +22,8 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
  todo:
 
  bonk:
-	Where does the hardcoded EEPROM default data come from (there is a command to restore defaults directly, not from RAM)
-	Where does the data for the additional tables come from, a transfer mode none of the other games use is used. (related to src[offs+6] and src[offs+7] params? )
+    Where does the hardcoded EEPROM default data come from (there is a command to restore defaults directly, not from RAM)
+    Where does the data for the additional tables come from, a transfer mode none of the other games use is used. (related to src[offs+6] and src[offs+7] params? )
 
 
 MCU parameters:
@@ -39,7 +39,7 @@ mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens o
     - 0x03: read DSW
     - 0x02: load game settings \ stored in ATMEL AT93C46 chip,
     - 0x42: save game settings / 128 bytes serial EEPROM
-	- 0x43: restore eeprom defaults (from internal ROM or data ROM?)
+    - 0x43: restore eeprom defaults (from internal ROM or data ROM?)
 
 */
 
@@ -208,7 +208,7 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 			}
 
 			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine.describe_context(), mcu_command, mcu_offset*2);
-	
+
 		}
 		break;
 
@@ -231,8 +231,8 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 			if (m_gametype == GAME_BONK)
 			{
 				//memcpy(m_nvram_save, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
-				
-				
+
+
 				address_space *eeprom_space = machine.device<eeprom_device>(":eeprom")->space();
 				UINT8* nvdat = (UINT8*)&bonkadv_mcu_43[0];
 				for (int i=0;i<0x80;i++)

@@ -91,7 +91,7 @@ public:
 	DECLARE_READ16_MEMBER( standard_io_r );
 	DECLARE_WRITE16_MEMBER( standard_io_w );
 	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
-	
+
 	// sound CPU read/write handlers
 	DECLARE_WRITE8_MEMBER( upd7759_control_w );
 	DECLARE_READ8_MEMBER( upd7759_status_r );
@@ -107,7 +107,7 @@ public:
 	DECLARE_DRIVER_INIT(generic_5358_small);
 	DECLARE_DRIVER_INIT(generic_5797);
 	DECLARE_DRIVER_INIT(generic_korean);
-	
+
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(isgsm);
 	DECLARE_DRIVER_INIT(tturf_5704);
@@ -133,7 +133,7 @@ public:
 	DECLARE_DRIVER_INIT(shinobi3_5358);
 	DECLARE_DRIVER_INIT(goldnaxe_5797);
 	DECLARE_DRIVER_INIT(altbeas4_5521);
-	
+
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -163,13 +163,13 @@ protected:
 		ROM_BOARD_171_5797,				// 171-5797
 		ROM_BOARD_KOREAN				// (custom Korean)
 	};
-	
+
 	// device overrides
 	virtual void video_start();
 	virtual void machine_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// internal helpers	
+	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
 
 	// i8751 simulations
@@ -191,7 +191,7 @@ protected:
 	DECLARE_READ16_MEMBER( sdi_custom_io_r );
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
 	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
-	
+
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
@@ -205,24 +205,24 @@ protected:
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
 	required_device<nvram_device> m_nvram;
 
-	// memory pointers	
+	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
 	segas16b_rom_board	m_romboard;
 	int					m_tilemap_type;
-	read16_delegate	 	m_custom_io_r;
-	write16_delegate 	m_custom_io_w;
+	read16_delegate		m_custom_io_r;
+	write16_delegate	m_custom_io_w;
 	bool				m_disable_screen_blanking;
 	const UINT8 *		m_i8751_initial_config;
 	i8751_sim_delegate	m_i8751_vblank_hook;
-	UINT8 				m_atomicp_sound_divisor;
+	UINT8				m_atomicp_sound_divisor;
 
 	// game-specific state
-	UINT8 				m_atomicp_sound_count;
-	UINT8 				m_hwc_input_value;
-	UINT8 				m_mj_input_num;
-	UINT8 				m_mj_last_val;
+	UINT8				m_atomicp_sound_count;
+	UINT8				m_hwc_input_value;
+	UINT8				m_mj_input_num;
+	UINT8				m_mj_last_val;
 };
 
 
@@ -279,21 +279,21 @@ public:
 	virtual void machine_reset();
 
 	// configuration
-	UINT8 			m_read_xor;
+	UINT8			m_read_xor;
 	typedef delegate<UINT32 (UINT32)> security_callback_delegate;
 	security_callback_delegate m_security_callback;
 
 	// internal state
-	UINT16 			m_cart_addrlatch;
-	UINT32 			m_cart_addr;
-	UINT8 			m_data_type;
-	UINT32 			m_data_addr;
-	UINT8  			m_data_mode;
-	UINT16 			m_addr_latch;
-	UINT32 			m_security_value;
-	UINT16 			m_security_latch;
-	UINT8 			m_rle_control_position;
-	UINT8 			m_rle_control_byte;
-	bool 			m_rle_latched;
-	UINT8 			m_rle_byte;
+	UINT16			m_cart_addrlatch;
+	UINT32			m_cart_addr;
+	UINT8			m_data_type;
+	UINT32			m_data_addr;
+	UINT8			m_data_mode;
+	UINT16			m_addr_latch;
+	UINT32			m_security_value;
+	UINT16			m_security_latch;
+	UINT8			m_rle_control_position;
+	UINT8			m_rle_control_byte;
+	bool			m_rle_latched;
+	UINT8			m_rle_byte;
 };

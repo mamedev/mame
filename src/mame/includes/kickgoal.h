@@ -45,7 +45,7 @@ public:
 
 	int m_bg_base;
 	int m_bg_mask;
-	
+
 	int m_bg2_base;
 	int m_bg2_mask;
 	int m_bg2_region;

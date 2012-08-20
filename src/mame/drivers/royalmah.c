@@ -4711,8 +4711,8 @@ ROM_END
 
 
 DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
-{	
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x8000 );	
+{
+	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x8000 );
 }
 
 DRIVER_INIT_MEMBER(royalmah_state,janptr96)

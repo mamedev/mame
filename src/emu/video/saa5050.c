@@ -215,7 +215,7 @@ void saa5050_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	for (sy = 0; sy <= saa5050->y; sy++)
 	{
 		bool dblhi = false;
-		
+
 		/* Set start of line state */
 		saa5050->flags = 0;
 		saa5050->prvchr = 32;

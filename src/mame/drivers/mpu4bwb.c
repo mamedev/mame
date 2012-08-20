@@ -2,7 +2,7 @@
  - these are Bwb originals, not rebuilds..
    typically they have large 0x3f fills in rom..
    some have information about the various set
-   types in unused areas 
+   types in unused areas
 
    some QPS sets also have large 0x3f fills but
    seem to be unrelated.
@@ -1181,7 +1181,7 @@ M4XS_SET( 199?, m4xs__d,	m4xs,	"es_49bg_.3_0", 0x0000, 0x020000, CRC(b76f1d7d) S
 M4XS_SET( 199?, m4xs__e,	m4xs,	"es_49bmd.3_0", 0x0000, 0x020000, CRC(1150e499) SHA1(25d2c37e5287f73d2b11608c50f21072422850f0), "Bwb","X-s (Bwb) (MPU4) (set 6)" )
 M4XS_SET( 199?, m4xs__f,	m4xs,	"es_sja__.3_0", 0x0000, 0x020000, CRC(5909092d) SHA1(64df6ad5ba5ac74592b525af2f4cab8a092a5766), "Bwb","X-s (Bwb) (MPU4) (set 7)" )
 
-	
+
 #define M4XTRM_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */ \

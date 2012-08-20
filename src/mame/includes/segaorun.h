@@ -83,7 +83,7 @@ public:
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE16_MEMBER( nop_w );
-	
+
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
 
@@ -111,7 +111,7 @@ protected:
 		TID_IRQ2_GEN,
 		TID_SOUND_WRITE
 	};
-	
+
 	// device overrides
 	virtual void machine_reset();
 	virtual void video_start();
@@ -126,7 +126,7 @@ protected:
 	DECLARE_WRITE16_MEMBER( outrun_custom_io_w );
 	DECLARE_READ16_MEMBER( shangon_custom_io_r );
 	DECLARE_WRITE16_MEMBER( shangon_custom_io_w );
-	
+
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
@@ -137,16 +137,16 @@ protected:
 
 	// memory
 	required_shared_ptr<UINT16> m_workram;
-	
+
 	// configuration
-	read16_delegate	 	m_custom_io_r;
-	write16_delegate 	m_custom_io_w;
+	read16_delegate		m_custom_io_r;
+	write16_delegate	m_custom_io_w;
 	const UINT8 *		m_custom_map;
 	bool				m_shangon_video;
 
 	// internal state
 	emu_timer *			m_scanline_timer;
-	UINT8 				m_irq2_state;
-	UINT8 				m_adc_select;
-	UINT8 				m_vblank_irq_state;
+	UINT8				m_irq2_state;
+	UINT8				m_adc_select;
+	UINT8				m_vblank_irq_state;
 };

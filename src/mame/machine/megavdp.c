@@ -2603,7 +2603,7 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 			else
 				m_render_line_raw[x] = 0x000;
 
-	
+
 			if (drawn==0)
 			{
 				if (dat&0x10000)

@@ -62,9 +62,9 @@ INPUT_PORTS_END
 /* in many sets the 0x100 - 0x1ff area contains revision information
    and sometimes bugfix notes..
 
-   in other sets 0x200 - 0x204 contains 'bank' or 'reels' maybe to 
+   in other sets 0x200 - 0x204 contains 'bank' or 'reels' maybe to
    indicate if the roms are for a topbox or the player unit?
-   
+
    there doesn't seem to be a hard defined standard for this header
    information, it probably varies between manufacturer
 
@@ -349,7 +349,7 @@ ROM_START( ep_wipeoe )
 	ROM_LOAD16_BYTE( "i00pwo17.g1", 0x000001, 0x020000, CRC(026c77ac) SHA1(deee91163e955dcc58d78fb3bad266dbf8036913) )
 	EP_WIPEO_SOUND
 ROM_END
-	
+
 
 #define EP_FUNNY_SOUND \
 	ROM_REGION( 0x100000, "ymz", 0 ) \
@@ -1641,7 +1641,7 @@ ROM_START( ep_cfall )
 	ROM_LOAD16_BYTE( "sa980008.g1", 0x00001, 0x020000, CRC(8366da15) SHA1(a7ca77ba8297df24e8f008844e25935848528613) )
 	EP_CFALL_SOUND
 ROM_END
-	
+
 ROM_START( ep_cfalla )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sa980170.g0", 0x00000, 0x020000, CRC(3625c374) SHA1(9559516ed6b3612749615ddc7638b0a26648d9e7) )
@@ -1920,7 +1920,7 @@ ROM_START( ep_mario )
 	ROM_LOAD16_BYTE( "970024g1", 0x00001, 0x020000, CRC(968cac01) SHA1(de032081acdbd7242cde168a0c70d87233cb6b48) )
 	EP_MARIO_SOUND
 ROM_END
-	
+
 ROM_START( ep_marioa )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "970025g0", 0x00000, 0x020000, CRC(f2b71e7c) SHA1(b06f4fcc97b57b6ae4bbdaa7e99224c9af2d62df) )
@@ -2151,7 +2151,7 @@ ROM_START( ep_25crt )
 	ROM_LOAD16_BYTE( "1ba6.1g1", 0x000001, 0x020000, CRC(fcac8e99) SHA1(a5aeec7ba1415525ac57427c8eca2309377d1a42) )
 	EP_25CRT_SOUND
 ROM_END
-	
+
 ROM_START( ep_25crta )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "msb02029.g0", 0x000000, 0x020000, CRC(0062a16b) SHA1(0025bca547826e47f27965284a6b9f5fe9394dc3) )
@@ -2858,7 +2858,7 @@ ROM_START( ep_fortg )
 	ROM_LOAD16_BYTE( "f_n_gl.g1", 0x000001, 0x020000, CRC(c35cbb80) SHA1(401e81a8ec2c23b3494f4603a4f9f6fb5f83c4dd) )
 	EP_FORTG_SOUND
 ROM_END
-	
+
 ROM_START( ep_fortga )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "i01nfg35.g0", 0x000000, 0x020000, CRC(99fd5271) SHA1(331ae4edafb13caae93a2a4e3f9bc53a56a081fa) )
@@ -5913,7 +5913,7 @@ ROM_START( ep_fullm )
 	ROM_LOAD16_BYTE( "i00pff19.g3", 0x040001, 0x020000, CRC(d34de35f) SHA1(cc144e67153a329034cc54673c7c363c94be1b61) )
 	EP_FULLM_SOUND
 ROM_END
-	
+
 ROM_START( ep_fullma )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "i00nff14.g0", 0x000000, 0x020000, CRC(825e2004) SHA1(5462c5b813799409ab44161b40fbf8ae00736444) )

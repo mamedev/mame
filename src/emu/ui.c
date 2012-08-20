@@ -437,7 +437,7 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 	else
 		popup_text_end = 0;
 
-	if (ui_mouse_show || (machine.options().ui_mouse() && ui_is_menu_active())) 
+	if (ui_mouse_show || (machine.options().ui_mouse() && ui_is_menu_active()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		int mouse_button;
@@ -915,7 +915,7 @@ void ui_show_menu(void)
 
 
 /*-------------------------------------------------
-    ui_show_mouse - change mouse status 
+    ui_show_mouse - change mouse status
 -------------------------------------------------*/
 
 void ui_show_mouse(bool status)

@@ -1,5 +1,5 @@
 /* ST0020 - Seta Zooming Sprites + Blitter
-  
+
   (gdfs also has a tilemap, I don't know if this chip supplies that)
 
  The ST0032 seems very similar, used by the newer Jockey Club II boards
@@ -49,8 +49,8 @@ static const gfx_layout layout_16x8x8_2 =
 void st0020_device::device_start()
 {
 	m_st0020_gfxram = auto_alloc_array_clear(machine(), UINT16, 4 * 0x100000 / 2);
-	m_st0020_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x80000 / 2);  
-	m_st0020_blitram = auto_alloc_array_clear(machine(), UINT16, 0x100 / 2);  
+	m_st0020_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x80000 / 2);
+	m_st0020_blitram = auto_alloc_array_clear(machine(), UINT16, 0x100 / 2);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
 		if (machine().gfx[m_gfx_index] == 0)
@@ -200,7 +200,7 @@ WRITE16_MEMBER(st0020_device::st0020_blitram_w)
 }
 
 
-	
+
 /*
     Sprites RAM is 0x80000 bytes long. The first 0x2000? bytes hold a list
     of sprites to display (the list can be made shorter using an end-of-list
@@ -381,7 +381,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 				}
 			}
 
-			
+
 #if 0 /* doesn't compile in a device context (can't use ui_draw_text? */
 			if (machine.input().code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
 			{

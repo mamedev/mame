@@ -508,7 +508,7 @@ static TIMER_DEVICE_CALLBACK( expro02_scanline )
 
 static MACHINE_RESET( galsnew )
 {
-//	expro02_state *state = machine.driver_data<expro02_state>();
+//  expro02_state *state = machine.driver_data<expro02_state>();
 }
 
 /*************************************

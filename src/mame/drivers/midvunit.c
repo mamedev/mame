@@ -1755,7 +1755,7 @@ void midvunit_state::init_crusnwld_common(offs_t speedup)
 		m_generic_speedup = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
 }
 DRIVER_INIT_MEMBER(midvunit_state,crusnwld)  { init_crusnwld_common(0xd4c0); }
-#if 0                                
+#if 0
 DRIVER_INIT_MEMBER(midvunit_state,crusnw20)  { init_crusnwld_common(0xd49c); }
 DRIVER_INIT_MEMBER(midvunit_state,crusnw13)  { init_crusnwld_common(0); }
 #endif

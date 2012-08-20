@@ -68,10 +68,10 @@ public:
 		memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
 	}
 
-	// compare/timer chip callbacks	
+	// compare/timer chip callbacks
 	void timer_ack_callback();
 	void sound_data_w(UINT8 data);
-	
+
 	// YM2151 chip callbacks
 	WRITE_LINE_MEMBER( sound_cpu_irq );
 
@@ -84,17 +84,17 @@ public:
 	READ16_MEMBER( iochip_1_r );
 	WRITE16_MEMBER( iochip_1_w );
 	WRITE16_MEMBER( iocontrol_w );
-	
+
 	// game-specific main CPU read/write handlers
 	WRITE16_MEMBER( loffire_sync0_w );
 	READ16_MEMBER( rascot_excs_r );
 	WRITE16_MEMBER( rascot_excs_w );
 	READ16_MEMBER( smgp_excs_r );
 	WRITE16_MEMBER( smgp_excs_w );
-	
+
 	// sound Z80 CPU read/write handlers
 	READ8_MEMBER( sound_data_r );
-	
+
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(generic);
 	DECLARE_DRIVER_INIT(aburner2);
@@ -119,7 +119,7 @@ protected:
 		TID_IRQ2_GEN,
 		TID_SOUND_WRITE
 	};
-	
+
 	// device overrides
 	virtual void machine_reset();
 	virtual void video_start();
@@ -148,16 +148,16 @@ protected:
 
 	// configuration
 	bool			m_gprider_hack;
-	bool 			m_adc_reverse[8];
+	bool			m_adc_reverse[8];
 	ioread_delegate	m_iochip_custom_io_r[2][8];
 	iowrite_delegate m_iochip_custom_io_w[2][8];
-	UINT8 			m_road_priority;
-	
+	UINT8			m_road_priority;
+
 	// internal state
 	emu_timer *		m_scanline_timer;
-	UINT8 			m_timer_irq_state;
-	UINT8 			m_vblank_irq_state;
-	UINT8 			m_iochip_regs[2][8];
+	UINT8			m_timer_irq_state;
+	UINT8			m_vblank_irq_state;
+	UINT8			m_iochip_regs[2][8];
 
 	// game-specific state
 	UINT16 *		m_loffire_sync;

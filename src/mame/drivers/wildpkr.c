@@ -212,7 +212,7 @@ static PALETTE_INIT( wildpkr )
 static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-//	AM_RANGE(0x800000, 0x800003) ACRTC?
+//  AM_RANGE(0x800000, 0x800003) ACRTC?
 	AM_RANGE(0x800180, 0x800181) AM_READNOP // protection, puts m68k code snippets to RAM
 	AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
 	AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
-//	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)	//guess
+//  MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)   //guess
 
 	MCFG_MACHINE_START(wildpkr)
 

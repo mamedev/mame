@@ -993,7 +993,7 @@ static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 		UINT32 dsttmp,tmp;
 		UINT8 srctmp;
 
-//		printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
+//      printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
 
 		dstbit = cpustate->R26;
 		srcbit = cpustate->R27;

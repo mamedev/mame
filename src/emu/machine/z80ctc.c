@@ -108,7 +108,7 @@ WRITE8_MEMBER( z80ctc_device::write )
 
 //-------------------------------------------------
 //  trg0-3 - standard write line handlers for each
-//	trigger
+//  trigger
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { trigger(0, state); }

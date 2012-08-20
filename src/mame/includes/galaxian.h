@@ -217,7 +217,7 @@ public:
 	DECLARE_DRIVER_INIT(anteateruk);
 	DECLARE_DRIVER_INIT(superbon);
 	DECLARE_DRIVER_INIT(calipso);
-	DECLARE_DRIVER_INIT(moonwar);	
+	DECLARE_DRIVER_INIT(moonwar);
 };
 
 

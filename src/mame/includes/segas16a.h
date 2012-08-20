@@ -73,7 +73,7 @@ public:
 		  m_read_port(0),
 		  m_mj_input_num(0)
 	{ }
-	
+
 	// PPI read/write callbacks
 	DECLARE_WRITE8_MEMBER( misc_control_w );
 	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE16_MEMBER( standard_io_w );
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
-	
+
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
 	DECLARE_WRITE8_MEMBER( n7751_command_w );
@@ -131,7 +131,7 @@ protected:
 		TID_INIT_I8751,
 		TID_PPI_WRITE
 	};
-	
+
 	// driver overrides
 	virtual void video_start();
 	virtual void machine_reset();
@@ -140,7 +140,7 @@ protected:
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();
 	void quartet_i8751_sim();
-	
+
 	// custom I/O handlers
 	DECLARE_READ16_MEMBER( aceattaa_custom_io_r );
 	DECLARE_READ16_MEMBER( mjleague_custom_io_r );
@@ -159,7 +159,7 @@ protected:
 	optional_device<i8243_device> m_n7751_i8243;
 	required_device<nvram_device> m_nvram;
 
-	// memory pointers	
+	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
@@ -169,12 +169,12 @@ protected:
 	lamp_changed_delegate	m_lamp_changed_w;
 
 	// internal state
-	UINT8 					m_video_control;
-	UINT8 					m_mcu_control;
-	UINT8 					m_n7751_command;
-	UINT32 					m_n7751_rom_address;
-	UINT8 					m_last_buttons1;
-	UINT8 					m_last_buttons2;
-	UINT8 					m_read_port;
-	UINT8 					m_mj_input_num;
+	UINT8					m_video_control;
+	UINT8					m_mcu_control;
+	UINT8					m_n7751_command;
+	UINT32					m_n7751_rom_address;
+	UINT8					m_last_buttons1;
+	UINT8					m_last_buttons2;
+	UINT8					m_read_port;
+	UINT8					m_mj_input_num;
 };

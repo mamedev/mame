@@ -1756,7 +1756,7 @@ It sat at the back of an arcade repair workshop for about 15 years.
 There's an external sound board. No ROMs on it but there's an NEC D78P014 MCU(?)
 and an Altera FPGA and other sound related stuff, plus a Sony CXD1178Q (RGBDAC?)
 
-The game boots here to a message screen and complains and won't go further. 
+The game boots here to a message screen and complains and won't go further.
 Probably the external sound PCB is required to boot up.
 It's missing the special cable so I can't connect it.
 
@@ -1794,7 +1794,7 @@ ROM_START( nndmseala )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )	// 16x16x8 (Rotation)
 	ROM_LOAD( "mr97032-01.ic2", 0x000000, 0x400000, CRC(18c1a394) SHA1(491a2eb190efb5684f5eddb317adacd55afa727c) )
-	
+
 	ROM_REGION( 0x100000, "gfx4", 0 )	// 8x8x8 (Foreground)
 	ROM_LOAD( "mr97032-03.ic8", 0x000000, 0x100000, CRC(5678a378) SHA1(306a3238590fa6e274e3c2ad334f5f210738dd7d) )
 

@@ -199,7 +199,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 
 	bitmap.fill(0x0000, cliprect);
 
-//	popmessage("%02x %02x", state->m_grap2_0->m_framebuffer_bright2, state->m_grap2_1->m_framebuffer_bright2);
+//  popmessage("%02x %02x", state->m_grap2_0->m_framebuffer_bright2, state->m_grap2_1->m_framebuffer_bright2);
 
 
 
@@ -475,10 +475,10 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE( "toybox", kaneko_toybox_device, toybox_mcu_ram_r, toybox_mcu_ram_w ) // area [C]
 
-	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)	
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)	
-	AM_RANGE(0x680000, 0x680001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)	
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)	
+	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com0_w)
+	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com1_w)
+	AM_RANGE(0x680000, 0x680001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com2_w)
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, toybox_mcu_com3_w)
 	AM_RANGE(0x780000, 0x780001) AM_DEVREAD( "toybox", kaneko_toybox_device, toybox_mcu_status_r)
 
 	GRAP2_AREA( 0x800000, "grap2_0" )

@@ -72,10 +72,10 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
     400000-400003: OKI M9810
     600000-61ffff: VRAM
     620000-620005: video registers
- 
+
     I/O map:
     port 1: player 2 inputs
- 
+
     port 2 bit 3: must be "1" to avoid SERVICE ERROR
     port 2 bit 6: FPGA chip select
     port 2 bit 7: FPGA clock in
@@ -86,9 +86,9 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
     port 3 bit 3: EEPROM clock
     port 3 bit 4: EEPROM data to EEPROM
     port 3 bit 5: EEPROM data from EEPROM
- 
+
     port 4: player 1 inputs
- 
+
     port 6 bit 3: FPGA data bit in
 
     port G bit 0: watchdog (toggled each frame)
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START(invqix_io_map, AS_IO, 8, invqix_state)
 	AM_RANGE(H8_PORT_2, H8_PORT_2) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(H8_PORT_3, H8_PORT_3) AM_READWRITE(port3_r, port3_w)
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READ_PORT("P4")
-	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_READWRITE(port5_r, port5_w) 
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w) 
+	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_READWRITE(port5_r, port5_w)
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(port6_r, port6_w)
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READ(porta_r)
 	AM_RANGE(H8_PORT_G, H8_PORT_G) AM_READ(portg_r) AM_WRITENOP
 ADDRESS_MAP_END
@@ -297,9 +297,9 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START4 )	PORT_NAME("Right 2 players start") // start B-2 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START4 )	PORT_NAME("Right 2 players start") // start B-2
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)

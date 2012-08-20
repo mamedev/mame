@@ -19,7 +19,7 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
-public:	
+public:
 	DECLARE_DRIVER_INIT(bingo);
 };
 
@@ -63,7 +63,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset();
 public:
-	DECLARE_DRIVER_INIT(seeben);	
+	DECLARE_DRIVER_INIT(seeben);
 };
 
 
@@ -102,7 +102,7 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
-public:	
+public:
 	DECLARE_DRIVER_INIT(splin);
 };
 

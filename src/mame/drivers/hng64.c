@@ -624,7 +624,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			hng64_do_dma(&space);
 			break;
 		//default:
-		//	printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], cpu_get_pc(&space.device()));
+		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], cpu_get_pc(&space.device()));
 	}
 }
 
@@ -1716,26 +1716,26 @@ static const mips3_config vr4300_config =
 void hng64_state::m_set_irq(UINT32 irq_vector)
 {
 	/*
-		TODO:
-		- irq sources;
-		- irq priority;
-		- is there an irq mask mechanism?
-		- is irq level cleared too when the irq acks?
+        TODO:
+        - irq sources;
+        - irq priority;
+        - is there an irq mask mechanism?
+        - is irq level cleared too when the irq acks?
 
-		This is written with irqs DISABLED
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 (actually this is cleared even if it isn't fired?)
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq? needed by xrally and roadedge
+        This is written with irqs DISABLED
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 (actually this is cleared even if it isn't fired?)
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq? needed by xrally and roadedge
 
-		samsho64 / samsho64_2 does this during running:
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
-		HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000040. (PC=800008fc) <- most notably causes TLBL error in fatfurwa
-	*/
+        samsho64 / samsho64_2 does this during running:
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
+        HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000040. (PC=800008fc) <- most notably causes TLBL error in fatfurwa
+    */
 
 	m_irq_pending |= irq_vector;
 

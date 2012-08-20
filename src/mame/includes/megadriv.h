@@ -189,12 +189,12 @@ public:
 		m_protcount = 0;
 		return ret;
 	}
-	
+
 	DECLARE_DRIVER_INIT(aladmdb);
 	DECLARE_DRIVER_INIT(mk3mdb);
 	DECLARE_DRIVER_INIT(ssf2mdb);
 	DECLARE_DRIVER_INIT(srmdb);
-	DECLARE_DRIVER_INIT(topshoot);	
+	DECLARE_DRIVER_INIT(topshoot);
 	DECLARE_DRIVER_INIT(puckpkmn);
 };
 
@@ -228,7 +228,7 @@ public:
 
 	/* sound-related variables */
 	UINT8		m_sound_banks;		/* number of sound banks */
-	
+
 	DECLARE_DRIVER_INIT(c2boot);
 	DECLARE_DRIVER_INIT(bloxeedc);
 	DECLARE_DRIVER_INIT(columns);
@@ -266,7 +266,7 @@ public:
 	m_vdp1(*this, "vdp1"),
 	m_bioscpu(*this, "mtbios")
 
-	
+
 	{ }
 
 	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
@@ -364,10 +364,10 @@ public:
 	UINT8 m_jcart_io_data[2];
 
 	megadriv_cart m_md_cart;
-	
+
 	DECLARE_DRIVER_INIT(hshavoc);
 	DECLARE_DRIVER_INIT(topshoot);
-	
+
 	DECLARE_DRIVER_INIT(genesis);
 	DECLARE_DRIVER_INIT(mess_md_common);
 	DECLARE_DRIVER_INIT(_32x);

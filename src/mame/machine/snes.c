@@ -1991,7 +1991,7 @@ MACHINE_RESET( snes )
 
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT_MEMBER(snes_state,snes)
-{	
+{
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;

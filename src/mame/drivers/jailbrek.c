@@ -242,8 +242,8 @@ GFXDECODE_END
  *  Sound definitions
  *
  *************************************/
- 
- 
+
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	MCFG_SOUND_ADD("snsnd", SN76489A_NEW, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
-	
+
 	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

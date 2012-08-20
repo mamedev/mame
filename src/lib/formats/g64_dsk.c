@@ -137,14 +137,14 @@ static floperr_t g64_read_track(floppy_image_legacy *floppy, int head, int track
 {
 	/*
 
-		The following is written into the buffer:
+        The following is written into the buffer:
 
-		n bytes of track data
-		1982 bytes of speed zone data
+        n bytes of track data
+        1982 bytes of speed zone data
 
-		get_track_size() returns n (size of track data)
+        get_track_size() returns n (size of track data)
 
-	*/
+    */
 
 	struct g64dsk_tag *tag = get_tag(floppy);
 	floperr_t err;

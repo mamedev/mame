@@ -185,7 +185,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 
 //**************************************************************************
-//	PPI INTERFACES
+//  PPI INTERFACES
 //**************************************************************************
 
 static I8255_INTERFACE(single_ppi_intf)
@@ -201,7 +201,7 @@ static I8255_INTERFACE(single_ppi_intf)
 
 
 //**************************************************************************
-//	PPI READ/WRITE CALLBACKS
+//  PPI READ/WRITE CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -241,7 +241,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 
 	// bit 4: enable display
 	segaic16_set_display_enable(machine(), data & 0x10);
-	
+
 	// bits 0 & 1: update coin counters
 	coin_counter_w(machine(), 1, data & 0x02);
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -276,7 +276,7 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE HANDLERS
+//  MAIN CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -349,7 +349,7 @@ WRITE16_MEMBER( segas16a_state::misc_io_w )
 
 
 //**************************************************************************
-//	Z80 SOUND CPU READ/WRITE HANDLERS
+//  Z80 SOUND CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -433,7 +433,7 @@ WRITE8_DEVICE_HANDLER( segas16a_state::static_n7751_rom_offset_w )
 
 
 //**************************************************************************
-//	N7751 SOUND GENERATOR CPU READ/WRITE HANDLERS
+//  N7751 SOUND GENERATOR CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -486,7 +486,7 @@ READ8_MEMBER( segas16a_state::n7751_t1_r )
 
 
 //**************************************************************************
-//	I8751 MCU READ/WRITE HANDLERS
+//  I8751 MCU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -501,7 +501,7 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 
 	// apply reset to the main CPU
 	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	// apply IRQ bits to the main CPU
 	for (int irqline = 1; irqline <= 7; irqline++)
 		m_maincpu->set_input_line(irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
@@ -521,7 +521,7 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 
 //-------------------------------------------------
 //  mcu_io_w - handle I/O space writes, which map
-//	to the 68000's address space
+//  to the 68000's address space
 //-------------------------------------------------
 
 WRITE8_MEMBER( segas16a_state::mcu_io_w )
@@ -576,7 +576,7 @@ WRITE8_MEMBER( segas16a_state::mcu_io_w )
 
 //-------------------------------------------------
 //  mcu_io_r - handle I/O space reads, which map
-//	to the 68000's address space
+//  to the 68000's address space
 //-------------------------------------------------
 
 READ8_MEMBER( segas16a_state::mcu_io_r )
@@ -586,12 +586,12 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 		case 0:
 			// access watchdog? (unsure about this one)
 			if (offset >= 0x0000 && offset < 0x3fff)
-				return watchdog_reset_r(space, 0);		
-			
+				return watchdog_reset_r(space, 0);
+
 			// access main work RAM
 			else if (offset >= 0x4000 && offset < 0x8000)
 				return m_maincpu->space(AS_PROGRAM)->read_byte(0xc70001 ^ (offset & 0x3fff));
-			
+
 			// access misc I/O space
 			else if (offset >= 0x8000 && offset < 0xc000)
 				return m_maincpu->space(AS_PROGRAM)->read_byte(0xc40001 ^ (offset & 0x3fff));
@@ -627,13 +627,13 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 
 
 //**************************************************************************
-//	I8751-RELATED VBLANK INTERRUPT HANDLERS
+//  I8751-RELATED VBLANK INTERRUPT HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  mcu_irq_assert - signal an interrupt to the
-//	I8751 MCU, and boost interleave to ensure
-//	good synchronization with the main CPU
+//  I8751 MCU, and boost interleave to ensure
+//  good synchronization with the main CPU
 //-------------------------------------------------
 
 INTERRUPT_GEN_MEMBER( segas16a_state::mcu_irq_assert )
@@ -649,7 +649,7 @@ INTERRUPT_GEN_MEMBER( segas16a_state::mcu_irq_assert )
 
 //-------------------------------------------------
 //  i8751_main_cpu_vblank - if we have a fake
-//	handler, we hook this to execute it
+//  handler, we hook this to execute it
 //-------------------------------------------------
 
 INTERRUPT_GEN_MEMBER( segas16a_state::i8751_main_cpu_vblank )
@@ -662,7 +662,7 @@ INTERRUPT_GEN_MEMBER( segas16a_state::i8751_main_cpu_vblank )
 
 
 //**************************************************************************
-//	DRIVER OVERRIDES
+//  DRIVER OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -692,7 +692,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			else if (m_mcu != NULL)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
-		
+
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
 			m_i8255->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
@@ -703,12 +703,12 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //**************************************************************************
-//	I8751 SIMULATIONS
+//  I8751 SIMULATIONS
 //**************************************************************************
 
 //-------------------------------------------------
 //  dumpmtmt_i8751_sim - simulate the I8751
-//	from Dump Matsumoto
+//  from Dump Matsumoto
 //-------------------------------------------------
 
 void segas16a_state::dumpmtmt_i8751_sim()
@@ -758,7 +758,7 @@ void segas16a_state::dumpmtmt_i8751_sim()
 
 //-------------------------------------------------
 //  quartet_i8751_sim - simulate the I8751
-//	from Quartet
+//  from Quartet
 //-------------------------------------------------
 
 void segas16a_state::quartet_i8751_sim()
@@ -779,12 +779,12 @@ void segas16a_state::quartet_i8751_sim()
 
 
 //**************************************************************************
-//	CUSTOM I/O HANDLERS
+//  CUSTOM I/O HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  aceattaa_custom_io_r - custom I/O read handler
-//	for Ace Attacker
+//  for Ace Attacker
 //-------------------------------------------------
 
 READ16_MEMBER( segas16a_state::aceattaa_custom_io_r )
@@ -831,7 +831,7 @@ READ16_MEMBER( segas16a_state::aceattaa_custom_io_r )
 
 //-------------------------------------------------
 //  mjleague_custom_io_r - custom I/O read handler
-//	for Major League
+//  for Major League
 //-------------------------------------------------
 
 READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
@@ -911,7 +911,7 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 
 //-------------------------------------------------
 //  passsht16a_custom_io_r - custom I/O read handler
-//	for Passing Shot
+//  for Passing Shot
 //-------------------------------------------------
 
 READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
@@ -944,7 +944,7 @@ READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
 
 //-------------------------------------------------
 //  sdi_custom_io_r - custom I/O read handler
-//	for SDI
+//  for SDI
 //-------------------------------------------------
 
 READ16_MEMBER( segas16a_state::sdi_custom_io_r )
@@ -965,7 +965,7 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 
 //-------------------------------------------------
 //  sjryuko_custom_io_r - custom I/O read handler
-//	for Sukeban Jansi Ryuko
+//  for Sukeban Jansi Ryuko
 //-------------------------------------------------
 
 READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
@@ -999,7 +999,7 @@ void segas16a_state::sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval)
 
 
 //**************************************************************************
-//	MAIN CPU ADDRESS MAPS
+//  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas16a_state )
@@ -1017,7 +1017,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SOUND CPU ADDRESS MAPS
+//  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16a_state )
@@ -1038,7 +1038,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	N7751 SOUND GENERATOR CPU ADDRESS MAPS
+//  N7751 SOUND GENERATOR CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas16a_state )
@@ -1052,7 +1052,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	I8751 MCU ADDRESS MAPS
+//  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas16a_state )
@@ -1065,7 +1065,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	GENERIC PORT DEFINITIONS
+//  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( system16a_generic )
@@ -1119,7 +1119,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC PORT DEFINITIONS
+//  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( aceattaa )
@@ -1917,7 +1917,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND CONFIGURATIONS
+//  SOUND CONFIGURATIONS
 //**************************************************************************
 
 static const ym2151_interface ym2151_config =
@@ -1929,7 +1929,7 @@ static const ym2151_interface ym2151_config =
 
 
 //**************************************************************************
-//	GRAPHICS DECODING
+//  GRAPHICS DECODING
 //**************************************************************************
 
 static GFXDECODE_START( segas16a )
@@ -1939,7 +1939,7 @@ GFXDECODE_END
 
 
 //**************************************************************************
-//	GENERIC MACHINE DRIVERS
+//  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_START( system16a, segas16a_state )
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROM definitions
+//  ROM definitions
 //**************************************************************************
 
 
@@ -3443,7 +3443,7 @@ ROM_END
 
 
 //**************************************************************************
-//	CONFIGURATION
+//  CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -3533,7 +3533,7 @@ DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 
 
 //**************************************************************************
-//	GAME DRIVERS
+//  GAME DRIVERS
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,                  INPUT,      INIT,                            MONITOR,COMPANY,FULLNAME,FLAGS

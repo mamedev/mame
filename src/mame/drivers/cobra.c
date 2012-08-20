@@ -2,55 +2,55 @@
 
 
     Games on this hardware
-	----------------------
+    ----------------------
 
-	Game                                     ID        Year    Notes
-	-----------------------------------------------------------------------
-	Fighting Bujutsu / Fighting Wu-Shu     | G?645   | 1997  | 
-	Racing Jam DX                          | GY676   | 1997  | GY676-PWB(F) LAN board
+    Game                                     ID        Year    Notes
+    -----------------------------------------------------------------------
+    Fighting Bujutsu / Fighting Wu-Shu     | G?645   | 1997  |
+    Racing Jam DX                          | GY676   | 1997  | GY676-PWB(F) LAN board
 
 
-	Hardware overview:
-	
-	COBRA/603 GN645-PWB(A)   CPU Board
-	----------------------------------
-	    IBM PowerPC 603EV
-		Motorola XPC105ARX66CD
+    Hardware overview:
 
-	COBRA/403 GN645-PWB(B)   SUB Board
-	----------------------------------
-		IBM PowerPC 403GA-JC33C1 (32MHz)
-		TI TMS57002
-		Ricoh RF5c400
-		M48T58-70PC1 Timekeeper
-		ADC1038CIN A/D Converter
-		2x AM7203A(?) FIFO (2K x 9)
+    COBRA/603 GN645-PWB(A)   CPU Board
+    ----------------------------------
+        IBM PowerPC 603EV
+        Motorola XPC105ARX66CD
 
-	COBRA/604 GN645-PWB(C)   GFX Board
-	----------------------------------
-		IBM PowerPC 604
-		Motorola XPC105ARX66CD
-		Toshiba TMP47P241VM MCU (internal ROM?)
-		4x CY7C4231 FIFO (2K x 9)
-		Xilinx XC4300E FPGA
-		Xilinx XC9536 FPGA
+    COBRA/403 GN645-PWB(B)   SUB Board
+    ----------------------------------
+        IBM PowerPC 403GA-JC33C1 (32MHz)
+        TI TMS57002
+        Ricoh RF5c400
+        M48T58-70PC1 Timekeeper
+        ADC1038CIN A/D Converter
+        2x AM7203A(?) FIFO (2K x 9)
 
-	GN645-PWB(D) Video Board (Also labeled IBM 36H3800. Seems to be related to the RS/6000 OpenGL accelerators.)
-	-----------------------------------
-		89G9380 (Xilinx part with an IBM sticker)
-		PKA0702
-		PLA0702 (4 dies on the chip)
-		RAA0800
-		BTA0803
-		4x TOA2602
-		Bt121KPJ80 RAMDAC
+    COBRA/604 GN645-PWB(C)   GFX Board
+    ----------------------------------
+        IBM PowerPC 604
+        Motorola XPC105ARX66CD
+        Toshiba TMP47P241VM MCU (internal ROM?)
+        4x CY7C4231 FIFO (2K x 9)
+        Xilinx XC4300E FPGA
+        Xilinx XC9536 FPGA
 
-	GY676-PWB(F) LAN Board
-	----------------------
-	    Xilinx XC5210 FPGA
-		Xilinx XC5204 FPGA
-		Konami K001604 (2D tilemaps + 2x ROZ)
-		Bt121KPC80 RAMDAC
+    GN645-PWB(D) Video Board (Also labeled IBM 36H3800. Seems to be related to the RS/6000 OpenGL accelerators.)
+    -----------------------------------
+        89G9380 (Xilinx part with an IBM sticker)
+        PKA0702
+        PLA0702 (4 dies on the chip)
+        RAA0800
+        BTA0803
+        4x TOA2602
+        Bt121KPJ80 RAMDAC
+
+    GY676-PWB(F) LAN Board
+    ----------------------
+        Xilinx XC5210 FPGA
+        Xilinx XC5204 FPGA
+        Konami K001604 (2D tilemaps + 2x ROZ)
+        Bt121KPC80 RAMDAC
 */
 
 /*
@@ -107,169 +107,169 @@
 
 
 
-	Bujutsu GL functions (603 board):
-	
-	?         : glDebugSwitch
-	0x0000b784: glBindTexture?
-	0x0000d40c: glEnable?
-	0x0000d7f4: glDisable?
-	0x0000d840: glAlphaFunc
-	0x0000d9a4: glNewList
-	0x0000dab0: glMatrixMode
-	?         : glOrtho
-	?         : glViewport
-	0x0000db6c: glIdentity?
-	0x0000dbf0: glFrustum
-	?         : glCullFace
-	?         : glClear
-	?         : glCallList
-	?         : glLightfv
-	?         : glMaterialfv
-	0x0001b5c8: glBlendFunc
-	0x0001b8b0: glStencilOp
-	?         : glStencilFunc
-	0x000471e0: glTexParameterf
-	0x0004a228: glColorMaterial
-	?         : glFogfv
-	?         : glFogf
-	0x0004a7a8: glDepthFunc
-	0x000508a8: glMaterialf
-	0x000508fc: glLightModelfv
-	0x00050a50: glTexEnvf
-	?         : glTexEnvfv
-	0x00050cc8: ? (param 0xff) could be glStencilMask
-	0x00050d54: glFogi
-	0x00050da0: glHint
-	0x000cba6c: glTexParameteri
+    Bujutsu GL functions (603 board):
+
+    ?         : glDebugSwitch
+    0x0000b784: glBindTexture?
+    0x0000d40c: glEnable?
+    0x0000d7f4: glDisable?
+    0x0000d840: glAlphaFunc
+    0x0000d9a4: glNewList
+    0x0000dab0: glMatrixMode
+    ?         : glOrtho
+    ?         : glViewport
+    0x0000db6c: glIdentity?
+    0x0000dbf0: glFrustum
+    ?         : glCullFace
+    ?         : glClear
+    ?         : glCallList
+    ?         : glLightfv
+    ?         : glMaterialfv
+    0x0001b5c8: glBlendFunc
+    0x0001b8b0: glStencilOp
+    ?         : glStencilFunc
+    0x000471e0: glTexParameterf
+    0x0004a228: glColorMaterial
+    ?         : glFogfv
+    ?         : glFogf
+    0x0004a7a8: glDepthFunc
+    0x000508a8: glMaterialf
+    0x000508fc: glLightModelfv
+    0x00050a50: glTexEnvf
+    ?         : glTexEnvfv
+    0x00050cc8: ? (param 0xff) could be glStencilMask
+    0x00050d54: glFogi
+    0x00050da0: glHint
+    0x000cba6c: glTexParameteri
 
 
 
-	GFX Registers:
+    GFX Registers:
 
-		0x00090:		Viewport width / 2?
-		0x0009c:		Viewport center X
-		0x000a4:		Viewport height / 2?
-		0x000ac:		Viewport center Y
+        0x00090:        Viewport width / 2?
+        0x0009c:        Viewport center X
+        0x000a4:        Viewport height / 2?
+        0x000ac:        Viewport center Y
 
-		0x00114:		High word: framebuffer pitch?   Low word: framebuffer pixel size?
-		
-		0x00118:		xxxxxxxx xxxxxxxx -------- --------				Framebuffer pixel read X pos
-						-------- -------- xxxxxxxx xxxxxxxx				Framebuffer pixel read Y pos
-		
-		0x0011c:		Same as above?
-		
-		0x00458:		Set to 0x02100000 (0xff) by texselect()
+        0x00114:        High word: framebuffer pitch?   Low word: framebuffer pixel size?
 
-		0x02904:		-------- ------xx xx------ --------				Tex mag filter?
-						-------- -------- --xxxx-- --------				Tex min filter?
+        0x00118:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read X pos
+                        -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read Y pos
 
-		0x02908:		-------- ----xxx- -------- --------				Tex wrap S (0 = repeat, 1 = mirror, 2 = clamp)
-						-------- -------x xx------ --------				Tex wrap T
+        0x0011c:        Same as above?
 
-		0x02910:		xxxx---- -------- -------- --------				Texture width shift (size = 1 << X)
-						----xxxx -------- -------- --------				Texture height shift (size = 1 << X)
-						-------- ----x--- -------- --------				?
-						-------- -------- -x------ --------				?
-						-------- -------- -------- xxx-----				Texture format (texel size, 2 = 4-bit, 3 = 8-bit, 4 = 16-bit)
-						-------- -------- -------- ---xxx--				Texture format param
+        0x00458:        Set to 0x02100000 (0xff) by texselect()
 
-		0x02914:		--xxxxxx xxxxxxxx xx------ --------				? (texture param, set to 0x1243)
+        0x02904:        -------- ------xx xx------ --------             Tex mag filter?
+                        -------- -------- --xxxx-- --------             Tex min filter?
 
-		0x40018:		Set to 0x0001040a (0xc0) by mode_stipple()		(bits 24..27 = stipple pattern?)
-		0x400d0:		Set to 0x80000000 (0x80) by mode_stipple()
-		0x400f4:		Set to 0x40000000 (0x80) by texselect()
+        0x02908:        -------- ----xxx- -------- --------             Tex wrap S (0 = repeat, 1 = mirror, 2 = clamp)
+                        -------- -------x xx------ --------             Tex wrap T
 
-		0x40114:		-------- ----x--- -------- --------				Scissor enable
+        0x02910:        xxxx---- -------- -------- --------             Texture width shift (size = 1 << X)
+                        ----xxxx -------- -------- --------             Texture height shift (size = 1 << X)
+                        -------- ----x--- -------- --------             ?
+                        -------- -------- -x------ --------             ?
+                        -------- -------- -------- xxx-----             Texture format (texel size, 2 = 4-bit, 3 = 8-bit, 4 = 16-bit)
+                        -------- -------- -------- ---xxx--             Texture format param
 
-		0x40138:		Set to 0x88800000 (0xe0) by mode_viewclip()
-		
-		0x40160:		xxxxxxxx xxxxxxxx -------- --------				Scissor Left
-						-------- -------- xxxxxxxx xxxxxxxx				Scissor Top
+        0x02914:        --xxxxxx xxxxxxxx xx------ --------             ? (texture param, set to 0x1243)
 
-		0x40164:		xxxxxxxx xxxxxxxx -------- --------				Scissor Right
-						-------- -------- xxxxxxxx xxxxxxxx				Scissor Bottom
+        0x40018:        Set to 0x0001040a (0xc0) by mode_stipple()      (bits 24..27 = stipple pattern?)
+        0x400d0:        Set to 0x80000000 (0x80) by mode_stipple()
+        0x400f4:        Set to 0x40000000 (0x80) by texselect()
 
-		0x40170:		xxxxxxxx xxxxxxxx -------- --------				Viewport Left
-						-------- -------- xxxxxxxx xxxxxxxx				Viewport Top
+        0x40114:        -------- ----x--- -------- --------             Scissor enable
 
-		0x40174:		xxxxxxxx xxxxxxxx -------- --------				Viewport Right
-						-------- -------- xxxxxxxx xxxxxxxx				Viewport Bottom
+        0x40138:        Set to 0x88800000 (0xe0) by mode_viewclip()
 
-		0x40198:		x------- -------- -------- --------				Alpha test enable?
-						-------- xxx----- -------- --------				Alpha test function (0 = never, 1 = less, 2 = lequal, 3 = greater,
-																							 4 = gequal, 5 = equal, 6 = notequal, 7 = always)
-		
-		0x4019c:		x------- -------- -------- --------				Fog enable
-						----x--- -------- -------- --------				0 = table fog, 1 = linear fog
+        0x40160:        xxxxxxxx xxxxxxxx -------- --------             Scissor Left
+                        -------- -------- xxxxxxxx xxxxxxxx             Scissor Top
 
-		0x401bc:														Texture env mode
-						xxx----- -------- -------- --------				?
-						---xxx-- -------- -------- --------				?
+        0x40164:        xxxxxxxx xxxxxxxx -------- --------             Scissor Right
+                        -------- -------- xxxxxxxx xxxxxxxx             Scissor Bottom
 
-		0x8001c:		(mask 0xfe) 0xc1d60060 = (not equal, 6)			Stencil register
-									0xca9b0010 = (not equal, 1)
-									0x037dfff0 = (never)
-									0x2616fff0 = (greater)
-									0x459cfff0 = (greater/equal)
-									0x6672fff0 = (less)
-									0x8827fff0 = (less/equal)
-									0xa92b0100 = (equal, 16)
+        0x40170:        xxxxxxxx xxxxxxxx -------- --------             Viewport Left
+                        -------- -------- xxxxxxxx xxxxxxxx             Viewport Top
 
-						-------- -------- xxxxxxxx xxxx----				Stencil reference value?
-						xxx----- -------- -------- --------				Stencil function?
+        0x40174:        xxxxxxxx xxxxxxxx -------- --------             Viewport Right
+                        -------- -------- xxxxxxxx xxxxxxxx             Viewport Bottom
 
-		
-		0x80020:		-------- ----xxx- -------- --------				Depth test function (7 = always?)
+        0x40198:        x------- -------- -------- --------             Alpha test enable?
+                        -------- xxx----- -------- --------             Alpha test function (0 = never, 1 = less, 2 = lequal, 3 = greater,
+                                                                                             4 = gequal, 5 = equal, 6 = notequal, 7 = always)
 
-		0x80050:		(mask 0x7c) 0x04445500 = (As, 1-As)				Blend register
-									0x04111100 = (1, 1)
-									0x04441100 = (As, 1)
-									0x04114400 = (1, As)
-									0x04681100 = (Cd, 1)
-									0x04680000 = (Cd, 0)
-									0x04002400 = (0, Cs)
-									0x04e11100 = (Ad, 1-Ad)
-									0x04889900 = (pseudo-fog)
+        0x4019c:        x------- -------- -------- --------             Fog enable
+                        ----x--- -------- -------- --------             0 = table fog, 1 = linear fog
 
-						-----x-- -------- -------- --------				Blend enable?
-						-------- xxxx---- -------- --------				source factor?
-						-------- ----xxxx -------- --------				source?
-						-------- -------- xxxx---- --------				dest factor?
-						-------- -------- ----xxxx --------				dest?
-						
+        0x401bc:                                                        Texture env mode
+                        xxx----- -------- -------- --------             ?
+                        ---xxx-- -------- -------- --------             ?
 
-		0x80054:		Set to 0x02400000 (0xe0) by mode_stencilmod()
+        0x8001c:        (mask 0xfe) 0xc1d60060 = (not equal, 6)         Stencil register
+                                    0xca9b0010 = (not equal, 1)
+                                    0x037dfff0 = (never)
+                                    0x2616fff0 = (greater)
+                                    0x459cfff0 = (greater/equal)
+                                    0x6672fff0 = (less)
+                                    0x8827fff0 = (less/equal)
+                                    0xa92b0100 = (equal, 16)
 
-		0x800a4:		x------- -------- -------- --------				Logic op enable?
-						-----xxx x------- -------- --------				Logic op (0 = clear, 1 = and, 2 = and reverse, 3 = copy,
-																				  4 = and inverted, 5 = noop, 6 = xor, 7 = or inverted,
-																				  8 = nor, 9 = equiv, 10 = invert, 11 = or reverse,
-																				  12 = copy inverted, 13 = or inverted, 14 = nand, 15 = set)
-
-		0x80114:		(0xcc) by mode_colormask()
-		0x80118:		(0xcc) by mode_colormask()
-
-		0x8011c:		xxxxxxxx xxxx---- -------- --------				Stencil mask
-
-		0x80120:		-------- -------- xxxxxxxx xxxxxxxx				Depth mask register
-
-		0xc0c00..fff:	Texture RAM readback
-		0xc3020:		Start address for texram writes?
-		0xc3028:		Reads address from texram?
-		0xc4c00..fff:	Texture RAM readback
-		0xc8c00..fff:	Texture RAM readback
-		0xccc00..fff:	Texture RAM readback
+                        -------- -------- xxxxxxxx xxxx----             Stencil reference value?
+                        xxx----- -------- -------- --------             Stencil function?
 
 
+        0x80020:        -------- ----xxx- -------- --------             Depth test function (7 = always?)
 
-		Bujutsu status:
+        0x80050:        (mask 0x7c) 0x04445500 = (As, 1-As)             Blend register
+                                    0x04111100 = (1, 1)
+                                    0x04441100 = (As, 1)
+                                    0x04114400 = (1, As)
+                                    0x04681100 = (Cd, 1)
+                                    0x04680000 = (Cd, 0)
+                                    0x04002400 = (0, Cs)
+                                    0x04e11100 = (Ad, 1-Ad)
+                                    0x04889900 = (pseudo-fog)
 
-		Main:
-			 0xe948 ->  0x1ea4(): Waiting for [0x168700] != 1  @ 0x1ebc
+                        -----x-- -------- -------- --------             Blend enable?
+                        -------- xxxx---- -------- --------             source factor?
+                        -------- ----xxxx -------- --------             source?
+                        -------- -------- xxxx---- --------             dest factor?
+                        -------- -------- ----xxxx --------             dest?
 
-		Gfx:
-			0x3b1a0 -> 0x3ad70(): Waiting for [0x132000] != 0  @ 0x3adf4
-			
+
+        0x80054:        Set to 0x02400000 (0xe0) by mode_stencilmod()
+
+        0x800a4:        x------- -------- -------- --------             Logic op enable?
+                        -----xxx x------- -------- --------             Logic op (0 = clear, 1 = and, 2 = and reverse, 3 = copy,
+                                                                                  4 = and inverted, 5 = noop, 6 = xor, 7 = or inverted,
+                                                                                  8 = nor, 9 = equiv, 10 = invert, 11 = or reverse,
+                                                                                  12 = copy inverted, 13 = or inverted, 14 = nand, 15 = set)
+
+        0x80114:        (0xcc) by mode_colormask()
+        0x80118:        (0xcc) by mode_colormask()
+
+        0x8011c:        xxxxxxxx xxxx---- -------- --------             Stencil mask
+
+        0x80120:        -------- -------- xxxxxxxx xxxxxxxx             Depth mask register
+
+        0xc0c00..fff:   Texture RAM readback
+        0xc3020:        Start address for texram writes?
+        0xc3028:        Reads address from texram?
+        0xc4c00..fff:   Texture RAM readback
+        0xc8c00..fff:   Texture RAM readback
+        0xccc00..fff:   Texture RAM readback
+
+
+
+        Bujutsu status:
+
+        Main:
+             0xe948 ->  0x1ea4(): Waiting for [0x168700] != 1  @ 0x1ebc
+
+        Gfx:
+            0x3b1a0 -> 0x3ad70(): Waiting for [0x132000] != 0  @ 0x3adf4
+
 */
 
 
@@ -511,15 +511,15 @@ public:
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
 	/*
-	UINT32 *fb = &m_framebuffer->pix32(scanline);
+    UINT32 *fb = &m_framebuffer->pix32(scanline);
 
-	UINT32 color = 0xffff0000; // TODO
+    UINT32 color = 0xffff0000; // TODO
 
-	for (int x = extent.startx; x < extent.stopx; x++)
-	{
-		fb[x] = color;
-	}
-	*/
+    for (int x = extent.startx; x < extent.stopx; x++)
+    {
+        fb[x] = color;
+    }
+    */
 }
 
 void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -881,7 +881,7 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x10);
 			break;
 		}
-		
+
 		case cobra_fifo::EVENT_HALF_FULL:
 			break;
 
@@ -896,7 +896,7 @@ void cobra_state::s2mfifo_event_callback(cobra_fifo::EventType event)
 	{
 		case cobra_fifo::EVENT_EMPTY:
 			break;
-		
+
 		case cobra_fifo::EVENT_HALF_FULL:
 			break;
 
@@ -1251,13 +1251,13 @@ ADDRESS_MAP_END
 
 // Interrupts:
 
-// Serial Transmit		JVS
-// DMA0:				Sound-related (TMS57002?)
-// DMA2:				SCSI?
-// DMA3:				JVS
-// External IRQ0		M2SFIFO
-// External IRQ1		S2MFIFO (mostly dummy, only disables the interrupt)
-// External IRQ2		SCSI Interrupt?
+// Serial Transmit      JVS
+// DMA0:                Sound-related (TMS57002?)
+// DMA2:                SCSI?
+// DMA3:                JVS
+// External IRQ0        M2SFIFO
+// External IRQ1        S2MFIFO (mostly dummy, only disables the interrupt)
+// External IRQ2        SCSI Interrupt?
 
 //static int ucount = 0;
 
@@ -1318,7 +1318,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		//       x            M2S FIFO full flag
 		//     x              M2S FIFO empty flag
 		//   x                M2S FIFO half-full flag
-		// x				  Comram page
+		// x                  Comram page
 
 		UINT32 value = 0x00;
 		value |= m_s2mfifo->is_full() ? 0x00 : 0x01;
@@ -1559,7 +1559,7 @@ static void sub_jvs_w(device_t *device, UINT8 data)
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM											// Main RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)			// Double buffered shared RAM between Main and Sub
-//  AM_RANGE(0x78000000, 0x780000ff) AM_MIRROR(0x80000000) AM_NOP											// SCSI controller (unused)
+//  AM_RANGE(0x78000000, 0x780000ff) AM_MIRROR(0x80000000) AM_NOP                                           // SCSI controller (unused)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16_LEGACY("rfsnd", rf5c400_r, rf5c400_w, 0xffffffff)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
@@ -1618,24 +1618,24 @@ void cobra_renderer::gfx_init(running_machine &machine)
 	cobra_state *cobra = machine.driver_data<cobra_state>();
 
 	m_gfx_gram = auto_alloc_array(machine, UINT32, 0x40000);
-	
+
 	cobra->m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
 }
 
 void cobra_renderer::gfx_exit(running_machine &machine)
 {
 	/*
-	FILE *file;
-	file = fopen("texture_ram.bin","wb");
-	for (int i=0; i < 0x100000; i++)
-	{
-		fputc((UINT8)(m_texture_ram[i] >> 24), file);
-		fputc((UINT8)(m_texture_ram[i] >> 16), file);
-		fputc((UINT8)(m_texture_ram[i] >> 8), file);
-		fputc((UINT8)(m_texture_ram[i] >> 0), file);
-	}
-	fclose(file);
-	*/
+    FILE *file;
+    file = fopen("texture_ram.bin","wb");
+    for (int i=0; i < 0x100000; i++)
+    {
+        fputc((UINT8)(m_texture_ram[i] >> 24), file);
+        fputc((UINT8)(m_texture_ram[i] >> 16), file);
+        fputc((UINT8)(m_texture_ram[i] >> 8), file);
+        fputc((UINT8)(m_texture_ram[i] >> 0), file);
+    }
+    fclose(file);
+    */
 }
 
 void cobra_renderer::gfx_reset(running_machine &machine)
@@ -1737,7 +1737,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			w2 = cobra->m_gfx_re_command_word2;
 		}
 
-	
+
 
 		switch ((w1 >> 24) & 0xff)
 		{
@@ -1850,19 +1850,19 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				// Draw graphics primitives
 
 				// 0x00: xxxx---- -------- -------- --------    Command
-				// 0x00: ----xxxx -------- -------- --------	Primitive type (0 = triangle, 2 = point, 3 = line)
-				// 0x00: -------- xx------ -------- --------	?
-				// 0x00: -------- -------- -------- xxxxxxxx	Number of units (amount of bits is uncertain)
+				// 0x00: ----xxxx -------- -------- --------    Primitive type (0 = triangle, 2 = point, 3 = line)
+				// 0x00: -------- xx------ -------- --------    ?
+				// 0x00: -------- -------- -------- xxxxxxxx    Number of units (amount of bits is uncertain)
 				//
 				// 0x01: -x------ -------- -------- --------    Has extra flags word (used by lines only)
 				// 0x01: --x----- -------- -------- --------    Has extra unknown float (seems to be fog-related?)
 				// 0x01: ---x---- -------- -------- --------    Always 1?
 				// 0x01: -------- xx------ -------- --------    ?
 				// 0x01: -------- --x----- -------- --------    Has texture coords
-				// 0x01: -------- ---x---- -------- --------	?
-				// 0x01: -------- ----x--- -------- --------	?
-				// 0x01: -------- -------- ------xx xx------	? (always set to 1s?)
-				// 0x01: -------- -------- -------- -------x	Has extra unknown float
+				// 0x01: -------- ---x---- -------- --------    ?
+				// 0x01: -------- ----x--- -------- --------    ?
+				// 0x01: -------- -------- ------xx xx------    ? (always set to 1s?)
+				// 0x01: -------- -------- -------- -------x    Has extra unknown float
 
 				int i;
 				int num = 0;
@@ -1893,12 +1893,12 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					{
 						fifo_in->pop(NULL, &in);
 					}
-					
+
 					if (w2 & 0x20000000)		// unknown float (0.0f ... 1.0f)
 					{
 						fifo_in->pop(NULL, &in);
 					}
-					
+
 					fifo_in->pop(NULL, &vert[i].x);				// X coord
 					fifo_in->pop(NULL, &vert[i].y);				// Y coord
 					fifo_in->pop(NULL, &in);					// coord?
@@ -2015,7 +2015,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 						case 0x0e0000:		buffer = &m_overlay->pix32(y); break;
 						case 0x000800:		buffer = &m_zbuffer->pix32(y); break;
 						case 0x000200:		buffer = &m_stencil->pix32(y); break;
-						
+
 						default:
 						{
 							fatalerror("gfxfifo_exec: fb write to buffer %08X!\n", m_gfx_gram[0x80100/4]);
@@ -2047,7 +2047,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			{
 				// Read a specified pixel position from a pixelbuffer
 
-//				printf("GFX: FB read X: %d, Y: %d\n", (UINT16)(m_gfx_gram[0x118/4] >> 16), (UINT16)(m_gfx_gram[0x118/4]));
+//              printf("GFX: FB read X: %d, Y: %d\n", (UINT16)(m_gfx_gram[0x118/4] >> 16), (UINT16)(m_gfx_gram[0x118/4]));
 
 				int x = (m_gfx_gram[0x118/4] >> 16) & 0xffff;
 				int y = m_gfx_gram[0x118/4] & 0xffff;
@@ -2060,7 +2060,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					case 0x0e0000:		buffer = &m_overlay->pix32(y); break;
 					case 0x000800:		buffer = &m_zbuffer->pix32(y); break;
 					case 0x000200:		buffer = &m_stencil->pix32(y); break;
-						
+
 					default:
 					{
 						fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);
@@ -2194,7 +2194,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				UINT32 ret = gfx_read_gram(reg);
 				fifo_out->push(NULL, ret);
 
-		//		printf("GFX: reg read %08X\n", reg);
+		//      printf("GFX: reg read %08X\n", reg);
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -2774,7 +2774,7 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	}
 
 	// hd patches
-	// 0x18932c = 0x38600000			skips check_one_scene()
+	// 0x18932c = 0x38600000            skips check_one_scene()
 }
 
 DRIVER_INIT_MEMBER(cobra_state,racjamdx)

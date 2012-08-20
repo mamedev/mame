@@ -115,11 +115,11 @@ static MACHINE_START( segac2 )
 static MACHINE_RESET( segac2 )
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
-//	megadriv_framerate = 60;
+//  megadriv_framerate = 60;
 
 
-//	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
-//	megadriv_scanline_timer->adjust(attotime::zero);
+//  megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+//  megadriv_scanline_timer->adjust(attotime::zero);
 	segac2_bg_pal_lookup[0] = 0x00;
 	segac2_bg_pal_lookup[1] = 0x10;
 	segac2_bg_pal_lookup[2] = 0x20;
@@ -236,8 +236,8 @@ static WRITE16_HANDLER( palette_w )
 	/* set the color */
 	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
-//	megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
-//	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
+//  megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
+//  megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
 
 	tmpr = r >> 1;
 	tmpg = g >> 1;
@@ -1274,7 +1274,7 @@ static VIDEO_START(segac2_new)
 }
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
-//  and applies it's own external colour circuity 
+//  and applies it's own external colour circuity
 static SCREEN_UPDATE_RGB32(segac2_new)
 {
 	const pen_t *paldata = screen.machine().pens;
@@ -1292,7 +1292,7 @@ static SCREEN_UPDATE_RGB32(segac2_new)
 	{
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
-		
+
 		srcy = vdp->m_render_line_raw;
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -1373,7 +1373,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET(segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-//	MCFG_FRAGMENT_ADD(megadriv_timers)
+//  MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segac2);

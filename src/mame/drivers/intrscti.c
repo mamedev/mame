@@ -23,7 +23,7 @@ public:
 		m_vram(*this, "vram"){ }
 
 	required_shared_ptr<UINT8> m_vram;
-//	DECLARE_READ8_MEMBER(unk_r);
+//  DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_DRIVER_INIT(intrscti);
 };
 
@@ -202,8 +202,8 @@ DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 		cpu[i+0x8000]=0xc9; // ret
 
 	/*
-	0x8208 -> string copy
-	*/
+    0x8208 -> string copy
+    */
 
 	/* one of the protection sub-routines does this */
 	for (i=0;i<0x400;i++)

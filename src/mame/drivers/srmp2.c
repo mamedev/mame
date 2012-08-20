@@ -1566,9 +1566,9 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta", 				"Super Real Mahjong Part 1 (Japan)",  0 )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta", 				"Super Real Mahjong Part 2 (Japan)",  0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta", 				"Super Real Mahjong Part 3 (Japan)",  0 )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",				"Super Real Mahjong Part 1 (Japan)",  0 )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",				"Super Real Mahjong Part 2 (Japan)",  0 )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",				"Super Real Mahjong Part 3 (Japan)",  0 )
 GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",	"Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)",  0 )
 GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",				"Mahjong Yuugi (Japan set 1)",        0 )
 GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",				"Mahjong Yuugi (Japan set 2)",        0 )

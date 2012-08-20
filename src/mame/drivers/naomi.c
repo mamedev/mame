@@ -4867,7 +4867,7 @@ ROM_START( sambap )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "sambaproto.ic22",0x000000, 0x0400000, CRC(ca069449) SHA1(03c2498664df187a98b335f1757979ebcf45c591) ) 
+    ROM_LOAD( "sambaproto.ic22",0x000000, 0x0400000, CRC(ca069449) SHA1(03c2498664df187a98b335f1757979ebcf45c591) )
 	ROM_LOAD("mpr-22950.ic1",  0x0800000, 0x0800000, CRC(16dee15c) SHA1(b46849e492756ff406bf8956303472255fcf55a5) )
 	ROM_LOAD("mpr-22951.ic2",  0x1000000, 0x0800000, CRC(f509496f) SHA1(41281576f7d58c8ede9c0a89bfd46a98d5b97033) )
 	ROM_LOAD("mpr-22952.ic3",  0x1800000, 0x0800000, CRC(fb9b3ef0) SHA1(e9d44b673c273e97445a12186496a0594e291542) )
@@ -8040,7 +8040,7 @@ ROM_END
 // 0023B Naomi DIMM Firmware Updater (Rev B)
 /* 0023C */ GAME( 2001, ngdup23c,  naomigd,  naomigd, naomi, dc_state,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev C) (GDS-0023C)", GAME_FLAGS )
 // 0023D Naomi DIMM Firmware Updater (Rev D)
-/* 0023E */ GAME( 2001, ngdup23e,  naomigd,  naomigd, naomi, dc_state,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev E) (GDS-0023E)", GAME_FLAGS ) 
+/* 0023E */ GAME( 2001, ngdup23e,  naomigd,  naomigd, naomi, dc_state,    naomigd,    ROT0, "Sega", "Naomi DIMM Firmware Updater (Rev E) (GDS-0023E)", GAME_FLAGS )
 // 0024  Virtua Fighter 4 Evolution
 /* 0024A */ GAME( 2002, vf4evoa,   vf4evo,   naomi2gd,naomi, dc_state,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 Evolution (Rev A) (GDS-0024A)", GAME_FLAGS )
 /* 0024B */ GAME( 2002, vf4evo,    naomi2,   naomi2gd,naomi, dc_state,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 Evolution (Rev B) (GDS-0024B)", GAME_FLAGS )
@@ -8071,7 +8071,7 @@ ROM_END
 // 0038
 // 0039  Initial D: Arcade Stage Ver. 3 Cycraft Edition
 // 0039A Initial D: Arcade Stage Ver. 3 Cycraft Edition (Rev A)
-/* 0039B */ GAME( 2006, inidv3cy, naomi2, naomigd, naomi, dc_state,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev. B) (GDS-0039B)", GAME_FLAGS ) 
+/* 0039B */ GAME( 2006, inidv3cy, naomi2, naomigd, naomi, dc_state,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev. B) (GDS-0039B)", GAME_FLAGS )
 // 0040
 // 0041  Dragon Treasure 3
 // 0041A Dragon Treasure 3 (Rev A)

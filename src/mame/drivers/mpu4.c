@@ -2,10 +2,10 @@
 
 /* todo: driver inits (basic hw reel, protection configs etc.) should probably be moved here
          once the actual code for them is cleaned up and can be put into neater structures
-		 like bfm_sc4
-		 
-		 due to the vast number of sets here this might be further split up by manufacturer
-		 
+         like bfm_sc4
+
+         due to the vast number of sets here this might be further split up by manufacturer
+
 */
 
 #include "emu.h"
@@ -434,7 +434,7 @@ ROM_END
 
 ROM_START( m4crzjwlh )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(1f4743bf) SHA1(f9a0da2ed9cad5e6685c8a6d1d09e5d4bbcfacec) ) 	// Crown Jewels Deluxe (german)
+	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(1f4743bf) SHA1(f9a0da2ed9cad5e6685c8a6d1d09e5d4bbcfacec) )	// Crown Jewels Deluxe (german)
 	M4CRZJWL_EXTRAS
 ROM_END
 
@@ -2392,7 +2392,7 @@ GAME( 198?, m4clr,        0, mod2    ,   mpu4, driver_device,       0,       ROT
 
 
 // other issues
-GAME(199?, m4casmul	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Casino Multiplay (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4casmul	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Casino Multiplay (Barcrest) (MPU4)",GAME_FLAGS )
 
 
 
@@ -2608,13 +2608,13 @@ GAME(199?, m4sunscl	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bw
 GAME(199?, m4sunscla,m4sunscl	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4sunsclb,m4sunscl	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
 
-GAME(199?, m4bigban	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4crzcsn	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4crzcav	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4dragon	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4hilonv	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4octo	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4sctagt	,0			,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bigban	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4crzcsn	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4crzcav	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4dragon	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4hilonv	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4octo	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sctagt	,0			,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS )
 
 
 
@@ -2736,7 +2736,7 @@ GAME( 199?, m4nod		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Eu
 // not sure about several of the nova ones
 GAME( 199?, m4aliz		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
 GAME( 199?, m4coney		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Qps",   "Coney Island (Qps) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
-GAME( 199?, m4crzjk		, 0			,  mod2   		, mpu4		, mpu4_state, m4default		, 0,		 "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )  // COIN   ALM
+GAME( 199?, m4crzjk		, 0			,  mod2 		, mpu4		, mpu4_state, m4default		, 0,		 "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )  // COIN   ALM
 GAME( 199?, m4c2		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE) // COIN   ALM
 // regular barcrest structure
 GAME( 199?, m4vivan		, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "Nova",  "Viva Las Vegas (Nova) (MPU4)",GAME_FLAGS|GAME_MECHANICAL|GAME_SUPPORTS_SAVE)
@@ -2749,6 +2749,6 @@ GAME( 199?, m4goldnn	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "
 
 
 
-GAME(199?, m4sunseta	,m4sunset	,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetb	,m4sunset	,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
-GAME(199?, m4sunsetc	,m4sunset	,mod4oki   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2
+GAME(199?, m4sunseta	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetb	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
+GAME(199?, m4sunsetc	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2

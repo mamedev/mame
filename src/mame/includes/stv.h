@@ -189,7 +189,7 @@ public:
 	DECLARE_DRIVER_INIT(znpwfv);
 	DECLARE_DRIVER_INIT(othellos);
 	DECLARE_DRIVER_INIT(mausuke);
-	
+
 	DECLARE_DRIVER_INIT(saturnus);
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);

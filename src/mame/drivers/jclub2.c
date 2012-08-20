@@ -6,7 +6,7 @@
   various hardware revisions
   all use a MC68EC020FG16 CPU
 
-	extra customs
+    extra customs
 
   jclub2  : SETA ST-0032 (video + sound? **1),                       SETA ST-0013, SETA ST-0017     ( PCB E79-001 rev 01a )
   jclub2o : SETA ST-0020 (video), SETA ST-0016 (sound + video? **2), SETA ST-0013, SETA ST-0017     ( E06-00409 /  E06-00407 )
@@ -26,7 +26,7 @@
   **1 ST-0032 seems to be similar to ST-0020 but the ram / list formats aren't the same, maybe it handles sound as there doesn't
    seem to be any other dedicated sound chip
 
-  **2 ST-0016 video functionality is probably not used 
+  **2 ST-0016 video functionality is probably not used
 
 
 
@@ -883,7 +883,7 @@ Main CPU : MC68EC020FG16
 
 Graphics : SETA ST-0032 70C600JF505
 
-Others : 
+Others :
      SETA ST-0013
      SETA ST-0017
 
@@ -1001,14 +1001,14 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	// is there a way (key sequence) to reprogram it??
 	// I bet the original sets need similar get further in their boot sequence
 	UINT8  *eeprom = (UINT8 *)  machine().root_device().memregion("eeprom")->base();
-	if (eeprom != NULL)	
+	if (eeprom != NULL)
 	{
 		size_t len = machine().root_device().memregion("eeprom")->bytes();
 		UINT8* temp = (UINT8*)auto_alloc_array(machine(), UINT8, len);
 		int i;
 		for (i = 0; i < len; i++)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
-		
+
 		memcpy(eeprom, temp, len);
 		auto_free(machine(), temp);
 	}

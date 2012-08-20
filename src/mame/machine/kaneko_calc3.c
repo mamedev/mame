@@ -12,13 +12,13 @@
 /*
     MCU Tasks:
 
-	- Read Dipswitch
+    - Read Dipswitch
     - Read / Write the EEPROM
     - Supply code / data snippets to the 68000 by decrypting them from ROM
 
-	
-	may also be responsible for the hit detection (kaneko_hit.c)
-	
+
+    may also be responsible for the hit detection (kaneko_hit.c)
+
 */
 
 #include "emu.h"

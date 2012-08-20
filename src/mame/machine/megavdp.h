@@ -155,7 +155,7 @@ class sega_genesis_vdp_device : public device_t
 {
 public:
 	sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void set_genesis_vdp_sndirqline_callback(device_t &device, genesis_vdp_sndirqline_callback_func callback);
 	static void set_genesis_vdp_lv6irqline_callback(device_t &device, genesis_vdp_lv6irqline_callback_func callback);
 	static void set_genesis_vdp_lv4irqline_callback(device_t &device, genesis_vdp_lv4irqline_callback_func callback);
@@ -163,7 +163,7 @@ public:
 	static void set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base);
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
-	
+
 	int m_palwrite_base; // if we want to write to the actual MAME palette..
 
 	DECLARE_READ16_MEMBER( megadriv_vdp_r );
@@ -228,7 +228,7 @@ private:
 	UINT16* m_cram;
 	UINT16* m_vsram;
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
-	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
+       to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
 	UINT16* m_internal_sprite_attribute_table;
 
 	// these are used internally by the VDP to schedule when after the start of a scanline

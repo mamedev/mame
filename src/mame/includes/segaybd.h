@@ -100,14 +100,14 @@ public:
 protected:
 	// internal types
 	typedef delegate<void (UINT16)> output_delegate;
-	
+
 	// timer IDs
 	enum
 	{
 		TID_IRQ2_GEN,
 		TID_SOUND_WRITE
 	};
-	
+
 	// device overrides
 	virtual void machine_reset();
 	virtual void video_start();
@@ -127,12 +127,12 @@ protected:
 	output_delegate	m_output_cb2;
 
 	// internal state
-	UINT16 			m_pdrift_bank;
+	UINT16			m_pdrift_bank;
 	emu_timer *		m_scanline_timer;
-	UINT8 			m_analog_data[4];
+	UINT8			m_analog_data[4];
 	int 			m_irq2_scanline;
-	UINT8 			m_timer_irq_state;
-	UINT8 			m_vblank_irq_state;
-	UINT8 			m_misc_io_data[0x10];
+	UINT8			m_timer_irq_state;
+	UINT8			m_vblank_irq_state;
+	UINT8			m_misc_io_data[0x10];
 	bitmap_ind16	m_tmp_bitmap;
 };

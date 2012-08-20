@@ -5035,6 +5035,7 @@ mbaa			// 2008.09 Melty Blood Actress Again
 				// 2009.?? Project Cerberus (planned to be released in 2009)
 ngdup23a		// DIMM Firmware Updater (Rev A)
 ngdup23c        // DIMM Firmware Updater (Rev C)
+ngdup23e        // DIMM Firmware Updater (Rev E)
 
 // NAOMI based (System SP)
 				// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
@@ -25935,7 +25936,7 @@ pr_nifty		// Nifty Fifty (Project)
 pr_upnun		// Up & Under (Project)
 pr_bears		// Bear Streak (Coinworld)
 pr_bearsa
-pr_bearsb	
+pr_bearsb
 pr_bearx		// Bear X (Coinworld)
 pr_bearxa
 pr_bearxb

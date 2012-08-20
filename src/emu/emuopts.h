@@ -348,7 +348,7 @@ public:
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 
-	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }	
+	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
 
 	// device-specific options

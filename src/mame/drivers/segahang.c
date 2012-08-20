@@ -59,7 +59,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 const UINT32 MASTER_CLOCK_25MHz = 25174800;
@@ -69,7 +69,7 @@ const UINT32 MASTER_CLOCK_8MHz = 8000000;
 
 
 //**************************************************************************
-//	PPI INTERFACES
+//  PPI INTERFACES
 //**************************************************************************
 
 static I8255_INTERFACE(hangon_ppi_intf_0)
@@ -95,12 +95,12 @@ static I8255_INTERFACE(hangon_ppi_intf_1)
 
 
 //**************************************************************************
-//	PPI READ/WRITE CALLBACKS
+//  PPI READ/WRITE CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
 //  video_lamps_w - screen flip, sprite shadows,
-//	display enable, lamps, and coin counters
+//  display enable, lamps, and coin counters
 //-------------------------------------------------
 
 WRITE8_MEMBER( segahang_state::video_lamps_w )
@@ -120,7 +120,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	// bit 7: screen flip
 	segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
 	segaic16_sprites_set_flip(machine(), 0, data & 0x80);
-	
+
 	// bit 6: shadow/highlight control
 	segaic16_sprites_set_shadow(machine(), 0, ~data & 0x40);
 
@@ -130,7 +130,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	// bits 2 & 3: control the lamps
 	set_led_status(machine(), 1, data & 0x08);
 	set_led_status(machine(), 0, data & 0x04);
-	
+
 	// bits 0 & 1: update coin counters
 	coin_counter_w(machine(), 1, data & 0x02);
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -139,7 +139,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 
 //-------------------------------------------------
 //  tilemap_sound_w - handshaking bits, plus
-//	tilemap control and global sound mute
+//  tilemap control and global sound mute
 //-------------------------------------------------
 
 WRITE8_MEMBER( segahang_state::tilemap_sound_w )
@@ -156,14 +156,14 @@ WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 	//  D1 : SCONT0 - Tilemap origin bit 0
 	//  D0 : MUTE (1= audio on, 0= audio off)
 	//
-	
+
 	// bit 7: NMI signal to the sound CPU
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	// bits 1 & 2: tilemap origin
 	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
-	
+
 	// bit 0: sound mute
 	machine().sound().system_enable(data & 0x01);
 }
@@ -171,22 +171,22 @@ WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 
 //-------------------------------------------------
 //  sub_control_adc_w - sub CPU control and ADC
-//	selects
+//  selects
 //-------------------------------------------------
 
 WRITE8_MEMBER( segahang_state::sub_control_adc_w )
 {
 	//
-	//	Sub PPI port A
+	//  Sub PPI port A
 	//
 	//  D6 : INTR line on second CPU
 	//  D5 : RESET line on second CPU
 	//  D3-D2 : ADC_SELECT
 	//
-	
+
 	// bit 6: INTR line
 	m_subcpu->set_input_line(4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	// bit 5: RESET line
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -213,7 +213,7 @@ READ8_MEMBER( segahang_state::adc_status_r )
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE HANDLERS
+//  MAIN CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -277,7 +277,7 @@ WRITE16_MEMBER( segahang_state::hangon_io_w )
 
 //-------------------------------------------------
 //  sharrier_io_r - I/O handler for Space Harrier
-//	boards
+//  boards
 //-------------------------------------------------
 
 READ16_MEMBER( segahang_state::sharrier_io_r )
@@ -311,7 +311,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 
 //-------------------------------------------------
 //  sharrier_io_w - I/O handler for Space Harrier
-//	boards
+//  boards
 //-------------------------------------------------
 
 WRITE16_MEMBER( segahang_state::sharrier_io_w )
@@ -354,7 +354,7 @@ static TIMER_DEVICE_CALLBACK( hangon_irq )
 
 
 //**************************************************************************
-//	Z80 SOUND CPU READ/WRITE HANDLERS
+//  Z80 SOUND CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -381,12 +381,12 @@ WRITE_LINE_MEMBER( segahang_state::sound_irq )
 
 
 //**************************************************************************
-//	I8751-RELATED VBLANK INTERRUPT HANDLERS
+//  I8751-RELATED VBLANK INTERRUPT HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  i8751_main_cpu_vblank - if we have a fake
-//	handler, we hook this to execute it
+//  handler, we hook this to execute it
 //-------------------------------------------------
 
 INTERRUPT_GEN_MEMBER( segahang_state::i8751_main_cpu_vblank )
@@ -399,7 +399,7 @@ INTERRUPT_GEN_MEMBER( segahang_state::i8751_main_cpu_vblank )
 
 
 //**************************************************************************
-//	DRIVER OVERRIDES
+//  DRIVER OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -434,7 +434,7 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			else if (m_mcu != NULL)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
-		
+
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
 			m_i8255_1->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
@@ -445,12 +445,12 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //**************************************************************************
-//	I8751 SIMULATIONS
+//  I8751 SIMULATIONS
 //**************************************************************************
 
 //-------------------------------------------------
 //  sharrier_i8751_sim - simulate the I8751
-//	from Space Harrier
+//  from Space Harrier
 //-------------------------------------------------
 
 void segahang_state::sharrier_i8751_sim()
@@ -465,7 +465,7 @@ void segahang_state::sharrier_i8751_sim()
 
 
 //**************************************************************************
-//	MAIN CPU ADDRESS MAPS
+//  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
@@ -498,7 +498,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SUB CPU ADDRESS MAPS
+//  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
  // On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
@@ -513,7 +513,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SOUND CPU ADDRESS MAPS
+//  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( sound_map_2203, AS_PROGRAM, 8, segahang_state )
@@ -555,7 +555,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	I8751 MCU ADDRESS MAPS
+//  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segahang_state )
@@ -564,7 +564,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	GENERIC PORT DEFINITIONS
+//  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( hangon_generic )
@@ -627,7 +627,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC PORT DEFINITIONS
+//  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( hangon )
@@ -789,7 +789,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND CONFIGURATIONS
+//  SOUND CONFIGURATIONS
 //**************************************************************************
 
 static const ym2203_interface ym2203_config =
@@ -815,7 +815,7 @@ static const sega_pcm_interface segapcm_interface =
 
 
 //**************************************************************************
-//	GRAPHICS DECODING
+//  GRAPHICS DECODING
 //**************************************************************************
 
 static GFXDECODE_START( segahang )
@@ -825,7 +825,7 @@ GFXDECODE_END
 
 
 //**************************************************************************
-//	GENERIC MACHINE DRIVERS
+//  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_START( shared_base, segahang_state )
@@ -973,7 +973,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	SPECIFIC MACHINE DRIVERS
+//  SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_DERIVED( hangon, hangon_base )
@@ -1032,7 +1032,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROM definitions
+//  ROM definitions
 //**************************************************************************
 
 
@@ -1152,15 +1152,15 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//	Super Hang-On (Japan Ver.)
-//	(c)1987 Sega
-//	Ride-on Type
+//  Super Hang-On (Japan Ver.)
+//  (c)1987 Sega
+//  Ride-on Type
 //
-//	CPU: FD1094 317-0038
+//  CPU: FD1094 317-0038
 //
-//	Top   : Label 834-6273
-//	Middle: 834-5704 (Label 837-6340)
-//	Bottom: 834-5668 (Label 837-6341)
+//  Top   : Label 834-6273
+//  Middle: 834-5704 (Label 837-6340)
+//  Bottom: 834-5668 (Label 837-6341)
 //
 ROM_START( shangonro )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1353,7 +1353,7 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Space Harrier
-//	CPU: 68000 + i8751 (315-5163)
+//  CPU: 68000 + i8751 (315-5163)
 //
 //  ASSY CPU BD 834-5797
 //  ASSY CONTROL BD 834-5798
@@ -1745,7 +1745,7 @@ ROM_END
 
 
 //**************************************************************************
-//	CONFIGURATION
+//  CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1809,7 +1809,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 
 
 //**************************************************************************
-//	GAME DRIVERS
+//  GAME DRIVERS
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                        MONITOR,COMPANY,FULLNAME,FLAGS

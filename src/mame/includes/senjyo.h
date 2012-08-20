@@ -31,7 +31,7 @@ public:
 	int m_single_rate;
 	int m_single_volume;
 	int m_sound_state;
-	
+
 	required_device<dac_device> m_dac;
 
 	required_shared_ptr<UINT8> m_spriteram;

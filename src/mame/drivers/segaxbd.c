@@ -302,7 +302,7 @@ ROMs:
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 const UINT32 MASTER_CLOCK = XTAL_50MHz;
@@ -311,12 +311,12 @@ const UINT32 SOUND_CLOCK = XTAL_16MHz;
 
 
 //**************************************************************************
-//	COMPARE/TIMER CHIP CALLBACKS
+//  COMPARE/TIMER CHIP CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
 //  timer_ack_callback - acknowledge a timer chip
-//	interrupt signal
+//  interrupt signal
 //-------------------------------------------------
 
 void segaxbd_state::timer_ack_callback()
@@ -339,7 +339,7 @@ void segaxbd_state::sound_data_w(UINT8 data)
 
 
 //**************************************************************************
-//	YM2151 CHIP CALLBACKS
+//  YM2151 CHIP CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER( segaxbd_state::sound_cpu_irq )
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE CALLBACKS
+//  MAIN CPU READ/WRITE CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -427,7 +427,7 @@ inline UINT16 segaxbd_state::iochip_r(int which, int port, int inputval)
 
 //-------------------------------------------------
 //  iochip_0_r - handle reads from the first I/O
-//	chip
+//  chip
 //-------------------------------------------------
 
 READ16_MEMBER( segaxbd_state::iochip_0_r )
@@ -465,7 +465,7 @@ READ16_MEMBER( segaxbd_state::iochip_0_r )
 
 //-------------------------------------------------
 //  iochip_0_w - handle writes to the first I/O
-//	chip
+//  chip
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaxbd_state::iochip_0_w )
@@ -508,7 +508,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 			machine().sound().system_enable(data & 0x80);
 			break;
 
-		default: 
+		default:
 			break;
 	}
 
@@ -522,7 +522,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 
 //-------------------------------------------------
 //  iochip_1_r - handle reads from the second I/O
-//	chip
+//  chip
 //-------------------------------------------------
 
 READ16_MEMBER( segaxbd_state::iochip_1_r )
@@ -557,7 +557,7 @@ READ16_MEMBER( segaxbd_state::iochip_1_r )
 
 //-------------------------------------------------
 //  iochip_1_w - handle writes to the second I/O
-//	chip
+//  chip
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaxbd_state::iochip_1_w )
@@ -579,7 +579,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_1_w )
 
 //-------------------------------------------------
 //  iocontrol_w - handle writes to the I/O control
-//	port
+//  port
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaxbd_state::iocontrol_w )
@@ -595,12 +595,12 @@ WRITE16_MEMBER( segaxbd_state::iocontrol_w )
 
 
 //**************************************************************************
-//	GAME-SPECIFIC MAIN CPU READ/WRITE HANDLERS
+//  GAME-SPECIFIC MAIN CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  loffire_sync0_w - force synchronization on
-//	writes to this address for Line of Fire
+//  writes to this address for Line of Fire
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
@@ -636,8 +636,8 @@ WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
 
 
 //-------------------------------------------------
-//  smgp_excs_r - /EXCS region reads for 
-//	Super Monaco GP
+//  smgp_excs_r - /EXCS region reads for
+//  Super Monaco GP
 //-------------------------------------------------
 
 READ16_MEMBER( segaxbd_state::smgp_excs_r )
@@ -648,8 +648,8 @@ READ16_MEMBER( segaxbd_state::smgp_excs_r )
 
 
 //-------------------------------------------------
-//  smgp_excs_w - /EXCS region writes for 
-//	Super Monaco GP
+//  smgp_excs_w - /EXCS region writes for
+//  Super Monaco GP
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
@@ -660,7 +660,7 @@ WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 
 
 //**************************************************************************
-//	SOUND Z80 CPU READ/WRITE CALLBACKS
+//  SOUND Z80 CPU READ/WRITE CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -676,7 +676,7 @@ READ8_MEMBER( segaxbd_state::sound_data_r )
 
 
 //**************************************************************************
-//	DRIVER OVERRIDES
+//  DRIVER OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -754,12 +754,12 @@ void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 //**************************************************************************
-//	CUSTOM I/O HANDLERS
+//  CUSTOM I/O HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  generic_iochip0_lamps_w - shared handler for
-//	coin counters and lamps
+//  coin counters and lamps
 //-------------------------------------------------
 
 void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
@@ -788,7 +788,7 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 
 //-------------------------------------------------
 //  aburner2_iochip0_motor_r - motor I/O reads
-//	for Afterburner II
+//  for Afterburner II
 //-------------------------------------------------
 
 UINT8 segaxbd_state::aburner2_iochip0_motor_r(UINT8 data)
@@ -802,7 +802,7 @@ UINT8 segaxbd_state::aburner2_iochip0_motor_r(UINT8 data)
 
 //-------------------------------------------------
 //  aburner2_iochip0_motor_w - motor I/O writes
-//	for Afterburner II
+//  for Afterburner II
 //-------------------------------------------------
 
 void segaxbd_state::aburner2_iochip0_motor_w(UINT8 data)
@@ -813,7 +813,7 @@ void segaxbd_state::aburner2_iochip0_motor_w(UINT8 data)
 
 //-------------------------------------------------
 //  smgp_iochip0_motor_r - motor I/O reads
-//	for Super Monaco GP
+//  for Super Monaco GP
 //-------------------------------------------------
 
 UINT8 segaxbd_state::smgp_iochip0_motor_r(UINT8 data)
@@ -827,7 +827,7 @@ UINT8 segaxbd_state::smgp_iochip0_motor_r(UINT8 data)
 
 //-------------------------------------------------
 //  smgp_iochip0_motor_w - motor I/O reads
-//	for Super Monaco GP
+//  for Super Monaco GP
 //-------------------------------------------------
 
 void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
@@ -838,7 +838,7 @@ void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
 
 //-------------------------------------------------
 //  lastsurv_iochip1_port_r - muxed I/O reads
-//	for Last Survivor
+//  for Last Survivor
 //-------------------------------------------------
 
 UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
@@ -850,7 +850,7 @@ UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
 
 //-------------------------------------------------
 //  lastsurv_iochip0_muxer_w - muxed I/O writes
-//	for Last Survivor
+//  for Last Survivor
 //-------------------------------------------------
 
 void segaxbd_state::lastsurv_iochip0_muxer_w(UINT8 data)
@@ -862,12 +862,12 @@ void segaxbd_state::lastsurv_iochip0_muxer_w(UINT8 data)
 
 
 //**************************************************************************
-//	INTERNAL HELPERS
+//  INTERNAL HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  update_main_irqs - flush IRQ state to the
-//	CPU device
+//  CPU device
 //-------------------------------------------------
 
 void segaxbd_state::update_main_irqs()
@@ -900,7 +900,7 @@ void segaxbd_state::update_main_irqs()
 
 //-------------------------------------------------
 //  m68k_reset_callback - callback for when the
-//	main 68000 is reset
+//  main 68000 is reset
 //-------------------------------------------------
 
 void segaxbd_state::m68k_reset_callback(device_t *device)
@@ -913,7 +913,7 @@ void segaxbd_state::m68k_reset_callback(device_t *device)
 
 
 //**************************************************************************
-//	MAIN CPU ADDRESS MAPS
+//  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
@@ -950,7 +950,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SUB CPU ADDRESS MAPS
+//  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
@@ -970,7 +970,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	Z80 SOUND CPU ADDRESS MAPS
+//  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaxbd_state )
@@ -990,7 +990,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SUPER MONACO GP 2ND SOUND CPU ADDRESS MAPS
+//  SUPER MONACO GP 2ND SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
 // Sound Board
@@ -1012,7 +1012,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SUPER MONACO GP MOTOR BOARD CPU ADDRESS MAPS
+//  SUPER MONACO GP MOTOR BOARD CPU ADDRESS MAPS
 //**************************************************************************
 
 // Motor Board, not yet emulated
@@ -1032,7 +1032,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SUPER MONACO GP LINK BOARD CPU ADDRESS MAPS
+//  SUPER MONACO GP LINK BOARD CPU ADDRESS MAPS
 //**************************************************************************
 
 // Link Board, not yet emulated
@@ -1051,7 +1051,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	RASCOT UNKNOWN Z80 CPU ADDRESS MAPS
+//  RASCOT UNKNOWN Z80 CPU ADDRESS MAPS
 //**************************************************************************
 
 // Z80, unknown function
@@ -1069,7 +1069,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	GENERIC PORT DEFINITIONS
+//  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( xboard_generic )
@@ -1111,7 +1111,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC PORT DEFINITIONS
+//  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( aburner )
@@ -1284,17 +1284,17 @@ static INPUT_PORTS_START( lastsurv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )
 
 	PORT_START("MUX0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)	
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)	
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)	
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)	
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W)
 
 	PORT_START("MUX1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)	
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)	
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)	
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(1) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("MUX2")
@@ -1316,7 +1316,7 @@ static INPUT_PORTS_START( lastsurv )
 	PORT_DIPSETTING(    0x0c, "Off" )
 	PORT_DIPSETTING(    0x08, "On (2)" )
 	PORT_DIPSETTING(    0x04, "On (4)" )
-//	PORT_DIPSETTING(    0x00, "No Use" )
+//  PORT_DIPSETTING(    0x00, "No Use" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
@@ -1548,7 +1548,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND DEFINITIONS
+//  SOUND DEFINITIONS
 //**************************************************************************
 
 static const ym2151_interface ym2151_config =
@@ -1564,7 +1564,7 @@ static const sega_pcm_interface segapcm_interface =
 
 
 //**************************************************************************
-//	GRAPHICS DEFINITIONS
+//  GRAPHICS DEFINITIONS
 //**************************************************************************
 
 static GFXDECODE_START( segaxbd )
@@ -1574,7 +1574,7 @@ GFXDECODE_END
 
 
 //**************************************************************************
-//	GENERIC MACHINE DRIVERS
+//  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_START( xboard, segaxbd_state )
@@ -1598,7 +1598,7 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
-	
+
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
 	MCFG_SEGA_315_5250_TIMER_ACK(segaxbd_state, timer_ack_callback)
 	MCFG_SEGA_315_5250_SOUND_WRITE(segaxbd_state, sound_data_w)
@@ -1637,7 +1637,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC MACHINE DRIVERS
+//  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_DERIVED( lastsurv_fd1094, xboard_fd1094 )
@@ -1687,7 +1687,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROM DEFINITIONS
+//  ROM DEFINITIONS
 //**************************************************************************
 
 
@@ -3165,7 +3165,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Royal Ascot - should be X-Board, or closely related, although it's a main display / terminal setup, 
+//  Royal Ascot - should be X-Board, or closely related, although it's a main display / terminal setup,
 //  and we only have the ROMs for one of those parts..
 //
 ROM_START( rascot )
@@ -3202,7 +3202,7 @@ ROM_END
 
 
 //**************************************************************************
-//	CONFIGURATION
+//  CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -3295,7 +3295,7 @@ DRIVER_INIT_MEMBER(segaxbd_state,gprider)
 
 
 //**************************************************************************
-//	GAME DRIVERS
+//  GAME DRIVERS
 //**************************************************************************
 
 //    YEAR, NAME,     PARENT,   MACHINE,        INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS

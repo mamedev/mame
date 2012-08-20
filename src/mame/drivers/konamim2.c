@@ -1314,4 +1314,4 @@ GAME( 1998, evilngt, 0,         m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte,  evilngt,       m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    m2,    m2,	driver_device, 0,      "3DO",  "3DO M2",   	GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    m2,    m2,	driver_device, 0,      "3DO",  "3DO M2",	GAME_NOT_WORKING | GAME_NO_SOUND )

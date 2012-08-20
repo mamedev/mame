@@ -191,7 +191,7 @@ public:
 	DECLARE_DRIVER_INIT(cps2crpt);
 	DECLARE_DRIVER_INIT(ssf2tb);
 	DECLARE_DRIVER_INIT(pzloop2);
-	DECLARE_DRIVER_INIT(gigaman2);	
+	DECLARE_DRIVER_INIT(gigaman2);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

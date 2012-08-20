@@ -78,7 +78,7 @@ public:
 	UINT8 read(int ch) { return m_channel[ch].read(); }
 	void write(int ch, UINT8 data) { m_channel[ch].write(data); }
 	void trigger(int ch, UINT8 data) { m_channel[ch].trigger(data); }
-	
+
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

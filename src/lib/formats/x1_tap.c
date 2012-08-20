@@ -83,11 +83,11 @@ static int x1_cas_to_wav_size (const UINT8 *casdata, int caslen)
 	{
 		ret = (caslen - 4) * 8; // each byte = 8 samples
 		cas_size = ret;
-		
+
 		samplerate = casdata[0x00] | (casdata[0x01] << 8) | (casdata[0x02] << 16) | (casdata[0x03] << 24);
 		new_format = 0;
 	}
-	
+
 	return ret;
 }
 

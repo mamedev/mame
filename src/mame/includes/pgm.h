@@ -129,7 +129,7 @@ public:
 	UINT8         m_asic3_h1;
 	UINT8         m_asic3_h2;
 	UINT16        m_asic3_hold;
-	
+
 	DECLARE_DRIVER_INIT(orlegend);
 };
 
@@ -215,7 +215,7 @@ public:
 	required_shared_ptr<UINT32> m_arm7_shareram;
 
 	cpu_device *m_prot;
-	
+
 	DECLARE_DRIVER_INIT(kov2);
 	DECLARE_DRIVER_INIT(kov2p);
 	DECLARE_DRIVER_INIT(martmast);
@@ -244,13 +244,13 @@ public:
 	required_shared_ptr<UINT32> m_arm_ram;
 
 	cpu_device *m_prot;
-	
+
 	DECLARE_DRIVER_INIT(theglad);
 	DECLARE_DRIVER_INIT(svg);
 	DECLARE_DRIVER_INIT(svgpcb);
 	DECLARE_DRIVER_INIT(killbldp);
 	DECLARE_DRIVER_INIT(dmnfrnt);
-	DECLARE_DRIVER_INIT(happy6);	
+	DECLARE_DRIVER_INIT(happy6);
 };
 
 
@@ -290,7 +290,7 @@ public:
 	UINT16        m_olds_bs;
 	UINT16        m_olds_cmd3;
 	required_shared_ptr<UINT16> m_sharedprotram;
-	
+
 	DECLARE_DRIVER_INIT(olds);
 };
 

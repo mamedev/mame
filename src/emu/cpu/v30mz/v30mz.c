@@ -155,7 +155,7 @@ void v30mz_cpu_device::device_start()
 	save_item(NAME(m_seg_prefix_next));
 
 	// Register state for debugger
-//	state_add( NEC_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");
+//  state_add( NEC_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");
 	state_add( NEC_IP, "IP", m_ip         ).callimport().callexport().formatstr("%04X");
 	state_add( NEC_SP, "SP", m_regs.w[SP] ).callimport().callexport().formatstr("%04X");
 	state_add( NEC_AW, "AW", m_regs.w[AW] ).callimport().callexport().formatstr("%04X");
@@ -1369,7 +1369,7 @@ void v30mz_cpu_device::execute_run()
 				DEF_r8b();
 				ADDB();
 				RegByte(m_dst);
-				CLKM(1,2); 
+				CLKM(1,2);
 				break;
 
 			case 0x03: // i_add_r16w
@@ -2781,7 +2781,7 @@ void v30mz_cpu_device::execute_run()
 				ANDW();
 				CLK(1);
 				break;
-	
+
 			case 0xaa: // i_stosb
 				i_stosb();
 				break;
@@ -3295,7 +3295,7 @@ void v30mz_cpu_device::execute_run()
 
 					m_sregs[CS] = tmp1;
 					m_ip = tmp;
-					CLK(7); 
+					CLK(7);
 				}
 				break;
 

@@ -31,7 +31,7 @@ class kaneko16_sprite_device : public device_t
 {
 public:
 	kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock,  device_type type);
-	
+
 	static void set_altspacing(device_t &device, int spacing);
 	static void set_fliptype(device_t &device, int fliptype);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
@@ -101,7 +101,7 @@ class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 public:
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void get_sprite_attributes(struct tempsprite *s, UINT16 attr);
-	int get_sprite_type(void){ return 0; }; 
+	int get_sprite_type(void){ return 0; };
 };
 
 extern const device_type KANEKO_VU002_SPRITE;
@@ -111,7 +111,7 @@ class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 public:
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void get_sprite_attributes(struct tempsprite *s, UINT16 attr);
-	int get_sprite_type(void){ return 1; }; 
+	int get_sprite_type(void){ return 1; };
 };
 
 extern const device_type KANEKO_KC002_SPRITE;

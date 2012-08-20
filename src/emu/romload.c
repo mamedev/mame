@@ -1493,7 +1493,7 @@ int rom_load_warnings(running_machine &machine)
 
 
 /*-------------------------------------------------
-    software_load_warnings_message - return the 
+    software_load_warnings_message - return the
     software load warnings we generated
 -------------------------------------------------*/
 

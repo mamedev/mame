@@ -1,28 +1,28 @@
 /*
-	SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
+    SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
 
-	This is a somewhat terrible implementation and should probably just be rewritten from scratch
-	it is currently used by mpu4vid.c and still quite heavily tied to the behavior of that.
+    This is a somewhat terrible implementation and should probably just be rewritten from scratch
+    it is currently used by mpu4vid.c and still quite heavily tied to the behavior of that.
 
-	I don't know if the timing bugs with those games comes from this, or emulation of the other
-	MPU4 devices tho because even some of the non-video games seem laggy and prone to failure.
+    I don't know if the timing bugs with those games comes from this, or emulation of the other
+    MPU4 devices tho because even some of the non-video games seem laggy and prone to failure.
 
-	-- currently expects (from the host driver)
-	 decoded gfx in regions 0,1,2,3 in various formats (normal, double height etc.)
-	  eventually the chip should just handle this without the need to decode anything
+    -- currently expects (from the host driver)
+     decoded gfx in regions 0,1,2,3 in various formats (normal, double height etc.)
+      eventually the chip should just handle this without the need to decode anything
 
      a callback function for when the irqs are changed / updated
 
-	 a call from the video start from your video start function
+     a call from the video start from your video start function
 
-	 a call to the scanline function each scanline
+     a call to the scanline function each scanline
 
-	 a call to the video draw (with ram pointer) from a screen update function
-	
-	 video to be on the primary screen
+     a call to the video draw (with ram pointer) from a screen update function
 
-	 this could all be simplified / changed, the chip can actually be hooked up in various ways
-	 including working on a per scanline basis with almost no ram
+     video to be on the primary screen
+
+     this could all be simplified / changed, the chip can actually be hooked up in various ways
+     including working on a per scanline basis with almost no ram
 */
 
 #include "emu.h"
@@ -35,7 +35,7 @@ const device_type SCN2674_VIDEO = &device_creator<scn2674_device>;
 
 static void default_scn2674_callback(running_machine &machine)
 {
-//	logerror("no scn2674_callback\n");
+//  logerror("no scn2674_callback\n");
 }
 
 
@@ -697,7 +697,7 @@ void scn2674_device::scn2674_do_scanline(running_machine &machine, int scanline)
 		m_linecounter =297;//hold the counter in the vsync point, it's not clear whether this is done or not
 	}
 	scn2674_line(machine);
-//	timer.machine().scheduler().synchronize();
+//  timer.machine().scheduler().synchronize();
 }
 
 

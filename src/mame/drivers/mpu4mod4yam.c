@@ -17,7 +17,7 @@ DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
 	// this helps with sorting
 	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
 	int size = machine().root_device().memregion( "maincpu" )->bytes();
-	
+
 	for (int j=0;j<size;j+=0x10000)
 	{
 		if (size>0x10000) printf("\nblock 0x%06x:\n",j);
@@ -645,9 +645,9 @@ M4VIVALV_SET( 199?, m4vivalv__8,	m4vivalv,	"vvi05___.3_3",					0x0000, 0x010000,
 
 
 GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",GAME_FLAGS)
-GAME(199?, m4stc	,0			,mod4yam   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
+GAME(199?, m4stc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
 GAME(199?, m4sstrek	,m4supst	,mod4yam    ,mpu4				, mpu4_state,m4default			,ROT0,   "bootleg","Super Streak (bootleg) (MPU4)",GAME_FLAGS)
 GAME(199?, m4joljokd,m4joljok	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS)
 GAME(199?, m4clbshf	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake
-GAME(199?, m4voodoo	,0			,mod4yam   	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS )
+GAME(199?, m4voodoo	,0			,mod4yam	,mpu4				, mpu4_state,m4altreels			,ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS )
 GAME(199?, m4graffd	,m4graff	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS )

@@ -491,7 +491,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_spc_direct);
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);
 	DECLARE_DRIVER_INIT(snes);
-	DECLARE_DRIVER_INIT(snes_hirom);	
+	DECLARE_DRIVER_INIT(snes_hirom);
 	DECLARE_DRIVER_INIT(snes_mess);
 	DECLARE_DRIVER_INIT(snesst);
 };

@@ -456,7 +456,7 @@ ROM_START( m4cashzn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "caz_1_2.p1", 0x0000, 0x010000, CRC(78383d52) SHA1(cd69d4e600273e3da7aa61e51266e8f1765ad5dc) )
 ROM_END
-	
+
 ROM_START( m4cashzna )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "caz_1_5.p1", 0x0000, 0x010000, CRC(c0d80d62) SHA1(e062be12159a67b5da883345565f3a52a1dd2ebe) )
@@ -985,7 +985,7 @@ ROM_END
 ROM_START( m4supjstb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "super jester 2.1.90 10p 4.80 p1.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) )
-//	ROM_LOAD( "31.1.90cj10p4.80v6.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) ) // marked crown jester?
+//  ROM_LOAD( "31.1.90cj10p4.80v6.bin", 0x8000, 0x008000, CRC(14f2dc51) SHA1(7dcf54a25bcaa2081f906d0ad44bcae183a32371) ) // marked crown jester?
 ROM_END
 
 ROM_START( m4supjstc )
@@ -1867,7 +1867,7 @@ GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4, mpu4_state,   connect4,  
 GAME(199?, m4ttak	,  0,		mod2	,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4actbnka,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
-GAME(199?, m4actbnkb,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",GAME_FLAGS ) 
+GAME(199?, m4actbnkb,m4actbnk	,mod2		,mpu4jackpot8tkn	, mpu4_state,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4actclb		,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",GAME_FLAGS ) // set stake to boot
 GAME(199?, m4actclba	,m4actclb	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",GAME_FLAGS ) //  ^^

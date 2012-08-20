@@ -37,7 +37,7 @@ static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap,
 		}
 
 
-	
+
 	/* Fill the bitmap with pen 0. This is wrong, but will work most of
        the times. To do it right, each pixel should be drawn with pen 0
        of the bottomost tile that covers it (which is pretty tricky to do) */

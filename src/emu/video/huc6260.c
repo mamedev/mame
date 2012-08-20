@@ -98,23 +98,23 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 		case HUC6260_HSYNC_START:		/* Start of HSync */
 			m_hsync_changed( 0 );
-//			if ( v == 0 )
-//			{
-//				/* Check if the screen should be resized */
-//				m_height = HUC6260_LPF - ( m_blur ? 1 : 0 );
-//				if ( m_height != video_screen_get_height( m_screen ) )
-//				{
-//					rectangle visible_area;
+//          if ( v == 0 )
+//          {
+//              /* Check if the screen should be resized */
+//              m_height = HUC6260_LPF - ( m_blur ? 1 : 0 );
+//              if ( m_height != video_screen_get_height( m_screen ) )
+//              {
+//                  rectangle visible_area;
 //
-//					/* TODO: Set proper visible area parameters */
-//					visible_area.min_x = 64;
-//					visible_area.min_y = 18;
-//					visible_area.max_x = 64 + 1024 + 64 - 1;
-//					visible_area.max_y = 18 + 242 - 1;
+//                  /* TODO: Set proper visible area parameters */
+//                  visible_area.min_x = 64;
+//                  visible_area.min_y = 18;
+//                  visible_area.max_x = 64 + 1024 + 64 - 1;
+//                  visible_area.max_y = 18 + 242 - 1;
 //
-//					video_screen_configure( m_screen, HUC6260_WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( HUC6260_WPF * m_height ) ) );
-//				}
-//			}
+//                  video_screen_configure( m_screen, HUC6260_WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( HUC6260_WPF * m_height ) ) );
+//              }
+//          }
 			break;
 
 		case 0:		/* End of HSync */

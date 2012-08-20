@@ -128,8 +128,8 @@ private:
 	UINT16 m_bat_column;
 	UINT8 m_bat_tile_row[8];
 	/* Internal sprite attribute table. SATB DMA is used to transfer data
-	   from VRAM to this internal table.
-	*/
+       from VRAM to this internal table.
+    */
 	UINT16 m_sat[4*64];
 	int m_sprites_this_line;
 	int m_sprite_row_index;

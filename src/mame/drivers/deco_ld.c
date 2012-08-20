@@ -153,13 +153,13 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int i,spr_offs,x,y,col,fx,fy;
 
 	/*
-	[+0] ---- -x-- flip X
-	[+0] ---- --x- flip Y
-	[+0] ---- ---x enable this sprite
-	[+1] tile number
-	[+2] y coord
-	[+3] x coord
-	*/
+    [+0] ---- -x-- flip X
+    [+0] ---- --x- flip Y
+    [+0] ---- ---x enable this sprite
+    [+1] tile number
+    [+2] y coord
+    [+3] x coord
+    */
 
 	for(i=0;i<0x20;i+=4)
 	{
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
 	MCFG_CPU_PERIODIC_INT(sound_interrupt, 640)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
 	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, rblaster)

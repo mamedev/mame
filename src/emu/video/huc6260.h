@@ -47,7 +47,7 @@ struct _huc6260_interface
 	devcb_write_line				hsync_changed;
 };
 
- 
+
 class huc6260_device :	public device_t,
 						public huc6260_interface
 {

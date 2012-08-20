@@ -39,7 +39,7 @@ public:
 	DECLARE_DRIVER_INIT(ad2083);
 	DECLARE_DRIVER_INIT(devilfsh);
 	DECLARE_DRIVER_INIT(mrkougar);
-	
+
 	DECLARE_DRIVER_INIT(scobra);
 	DECLARE_DRIVER_INIT(stratgyx);
 	DECLARE_DRIVER_INIT(tazmani2);
@@ -51,7 +51,7 @@ public:
 	DECLARE_DRIVER_INIT(hustler);
 	DECLARE_DRIVER_INIT(hustlerd);
 	DECLARE_DRIVER_INIT(billiard);
-};                      
+};
 
 
 /*----------- defined in machine/scramble.c -----------*/

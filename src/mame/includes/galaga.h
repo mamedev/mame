@@ -76,7 +76,7 @@ public:
 	INT32 m_xevious_bs[2];
 	DECLARE_DRIVER_INIT(xevious);
 	DECLARE_DRIVER_INIT(xevios);
-	DECLARE_DRIVER_INIT(battles);	
+	DECLARE_DRIVER_INIT(battles);
 };
 
 

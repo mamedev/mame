@@ -4,7 +4,7 @@ class kaneko_view2_tilemap_device : public device_t
 {
 public:
 	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// used to set values when creating device
 	static void set_gfx_region(device_t &device, int region);
 	static void set_offset(device_t &device, int dx, int dy, int xdim, int ydim);

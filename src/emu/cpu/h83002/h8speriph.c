@@ -1591,7 +1591,7 @@ UINT8 h8s_onchip_reg_read_8_ddr(h83xx_state *h8, int offset)
             {
                 int port = (offset - H8S_IO_P1DR);
                 data = h8->drs[port] & h8->ddrs[port];
-                data |= (h8->io->read_byte(H8_PORT_1 + port) & (h8->ddrs[port] ^ 0xff)); 
+                data |= (h8->io->read_byte(H8_PORT_1 + port) & (h8->ddrs[port] ^ 0xff));
             }
             break;
 

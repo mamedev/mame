@@ -14,8 +14,8 @@ public:
 	static void set_irq_update_callback(device_t &device, s2574_interrupt_callback_func callback);
 
 
-//	int m_gfx_index;
-	
+//  int m_gfx_index;
+
 	DECLARE_READ16_MEMBER( mpu4_vid_scn2674_r );
 	DECLARE_WRITE16_MEMBER( mpu4_vid_scn2674_w );
 

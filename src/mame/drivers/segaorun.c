@@ -312,7 +312,7 @@ Notes:
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 const UINT32 MASTER_CLOCK = XTAL_40MHz;
@@ -322,7 +322,7 @@ const UINT32 MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
 
 
 //**************************************************************************
-//	PPI INTERFACES
+//  PPI INTERFACES
 //**************************************************************************
 
 static I8255_INTERFACE(single_ppi_intf)
@@ -338,12 +338,12 @@ static I8255_INTERFACE(single_ppi_intf)
 
 
 //**************************************************************************
-//	PPI READ/WRITE CALLBACKS
+//  PPI READ/WRITE CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
 //  unknown_port*_r - loggers for reading
-//	unknown ports
+//  unknown ports
 //-------------------------------------------------
 
 READ8_MEMBER( segaorun_state::unknown_porta_r )
@@ -367,7 +367,7 @@ READ8_MEMBER( segaorun_state::unknown_portc_r )
 
 //-------------------------------------------------
 //  unknown_port*_w - loggers for writing
-//	unknown ports
+//  unknown ports
 //-------------------------------------------------
 
 WRITE8_MEMBER( segaorun_state::unknown_porta_w )
@@ -383,7 +383,7 @@ WRITE8_MEMBER( segaorun_state::unknown_portb_w )
 
 //-------------------------------------------------
 //  video_control_w - display enable, ADC select,
-//	sound interrupt control
+//  sound interrupt control
 //-------------------------------------------------
 
 WRITE8_MEMBER( segaorun_state::video_control_w )
@@ -395,7 +395,7 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
     //  D4-D2: (ADC2-0)
     //  D1: (CONT) - affects sprite hardware
     //  D0: Sound section reset (1= normal operation, 0= reset)
-   
+
 	segaic16_set_display_enable(machine(), data & 0x20);
 	m_adc_select = (data >> 2) & 7;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -404,12 +404,12 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 
 
 //**************************************************************************
-// 	MEMORY MAPPING
+//  MEMORY MAPPING
 //**************************************************************************
 
 //-------------------------------------------------
 //  memory_mapper - callback to implement memory
-//	mapping for a given index
+//  mapping for a given index
 //-------------------------------------------------
 
 void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
@@ -422,24 +422,24 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate());
 			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(FUNC(segaorun_state::nop_w), this));
 			break;
-			
+
 		case 4:
 			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::misc_io_r), this), write16_delegate(FUNC(segaorun_state::misc_io_w), this));
 			break;
-		
+
 		case 3:
 			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "spriteram", write16_delegate());
 			break;
-		
+
 		case 2:
 			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_paletteram_w>), this));
 			break;
-		
+
 		case 1:
 			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_tileram_0_w>), this));
 			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_textram_0_w>), this));
 			break;
-			
+
 		case 0:
 			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate());
 			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", 0x00000, write16_delegate());
@@ -450,7 +450,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 
 //-------------------------------------------------
 //  mapper_sound_r - callback when the sound I/O
-//	port on the memory mapper is read
+//  port on the memory mapper is read
 //-------------------------------------------------
 
 UINT8 segaorun_state::mapper_sound_r()
@@ -461,7 +461,7 @@ UINT8 segaorun_state::mapper_sound_r()
 
 //-------------------------------------------------
 //  mapper_sound_w - callback when the sound I/O
-//	port on the memory mapper is written
+//  port on the memory mapper is written
 //-------------------------------------------------
 
 void segaorun_state::mapper_sound_w(UINT8 data)
@@ -472,7 +472,7 @@ void segaorun_state::mapper_sound_w(UINT8 data)
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE HANDLERS
+//  MAIN CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -514,11 +514,11 @@ WRITE16_MEMBER( segaorun_state::nop_w )
 
 
 //**************************************************************************
-//	Z80 SOUND CPU READ/WRITE HANDLERS
+//  Z80 SOUND CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  sound_data_r - handle sound board reads from 
+//  sound_data_r - handle sound board reads from
 //  the sound latch
 //-------------------------------------------------
 
@@ -531,7 +531,7 @@ READ8_MEMBER( segaorun_state::sound_data_r )
 
 
 //**************************************************************************
-//	DRIVER OVERRIDES
+//  DRIVER OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -565,13 +565,13 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			soundlatch_write(param);
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			break;
-		
+
 		case TID_IRQ2_GEN:
 			// set the IRQ2 line
 			m_irq2_state = 1;
 			update_main_irqs();
 			break;
-		
+
 		case TID_SCANLINE:
 		{
 			int scanline = param;
@@ -624,12 +624,12 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //**************************************************************************
-//	CUSTOM I/O HANDLERS
+//  CUSTOM I/O HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  outrun_custom_io_r - custom I/O read handler
-//	for Out Run
+//  for Out Run
 //-------------------------------------------------
 
 READ16_MEMBER( segaorun_state::outrun_custom_io_r )
@@ -663,7 +663,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 
 //-------------------------------------------------
 //  outrun_custom_io_w - custom I/O write handler
-//	for Out Run
+//  for Out Run
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
@@ -704,7 +704,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 
 //-------------------------------------------------
 //  shangon_custom_io_r - custom I/O read handler
-//	for Super Hang-On
+//  for Super Hang-On
 //-------------------------------------------------
 
 READ16_MEMBER( segaorun_state::shangon_custom_io_r )
@@ -734,7 +734,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 
 //-------------------------------------------------
 //  shangon_custom_io_w - custom I/O write handler
-//	for Super Hang-On
+//  for Super Hang-On
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
@@ -770,12 +770,12 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 
 
 //**************************************************************************
-//	INTERNAL HELPERS
+//  INTERNAL HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  update_main_irqs - flush IRQ state to the
-//	CPU device
+//  CPU device
 //-------------------------------------------------
 
 void segaorun_state::update_main_irqs()
@@ -793,7 +793,7 @@ void segaorun_state::update_main_irqs()
 
 //-------------------------------------------------
 //  m68k_reset_callback - callback for when the
-//	main 68000 is reset
+//  main 68000 is reset
 //-------------------------------------------------
 
 void segaorun_state::m68k_reset_callback(device_t *device)
@@ -805,13 +805,13 @@ void segaorun_state::m68k_reset_callback(device_t *device)
 
 
 //**************************************************************************
-//	MAIN CPU MEMORY MAP
+//  MAIN CPU MEMORY MAP
 //**************************************************************************
 
 static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16, segaorun_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
-	
+
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")
@@ -824,7 +824,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SECOND CPU MEMORY MAP
+//  SECOND CPU MEMORY MAP
 //**************************************************************************
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaorun_state )
@@ -839,7 +839,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SOUND CPU MEMORY MAP
+//  SOUND CPU MEMORY MAP
 //**************************************************************************
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaorun_state )
@@ -859,7 +859,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	GENERIC PORT DEFINITIONS
+//  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( outrun_generic )
@@ -910,7 +910,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC PORT DEFINITIONS
+//  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( outrun )
@@ -1041,7 +1041,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND DEFINITIONS
+//  SOUND DEFINITIONS
 //**************************************************************************
 
 static const sega_pcm_interface segapcm_interface =
@@ -1052,7 +1052,7 @@ static const sega_pcm_interface segapcm_interface =
 
 
 //**************************************************************************
-//	GRAPHICS DEFINITIONS
+//  GRAPHICS DEFINITIONS
 //**************************************************************************
 
 static GFXDECODE_START( segaorun )
@@ -1062,7 +1062,7 @@ GFXDECODE_END
 
 
 //**************************************************************************
-//	GENERIC MACHINE DRIVERS
+//  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_START( outrun_base, segaorun_state )
@@ -1107,7 +1107,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC MACHINE DRIVERS
+//  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
@@ -1144,7 +1144,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROM DEFINITIONS
+//  ROM DEFINITIONS
 //**************************************************************************
 
 
@@ -1605,10 +1605,10 @@ ROM_END
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
 //   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
 //
-//	Manual states for this set:
-//  	834-6277-01 (Object data (sprits) EPR type AKA EP-ROM type)
-//  	834-6277-03 (Object data (sprits) MPR type AKA Mask-ROM type)
-//  	834-6277-05 (Object data (sprits) OPR type AKA One Time ROM type)
+//  Manual states for this set:
+//      834-6277-01 (Object data (sprits) EPR type AKA EP-ROM type)
+//      834-6277-03 (Object data (sprits) MPR type AKA Mask-ROM type)
+//      834-6277-05 (Object data (sprits) OPR type AKA One Time ROM type)
 //
 ROM_START( shangon3 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
@@ -1794,7 +1794,7 @@ ROM_END
 //   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, rom would be "OPR")
 //
 ROM_START( shangonle )
-	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code 
+	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-13944.133", 0x000000, 0x10000, CRC(989a80db) SHA1(5026e5cf52d4fd85a0bab6c4ea7a34cf266b2a3b) )
 	ROM_LOAD16_BYTE( "epr-13943.118", 0x000001, 0x10000, CRC(426e3050) SHA1(f332ea76285b4e1361d818cbe5aab0640b4185c3) )
 	ROM_LOAD16_BYTE( "epr-10899.132", 0x020000, 0x10000, CRC(bb3faa37) SHA1(ccf3352255503fd6619e6e116d187a8cd1ff75e6) )
@@ -2103,7 +2103,7 @@ ROM_END
 
 
 //**************************************************************************
-//	CONFIGURATION
+//  CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -2193,7 +2193,7 @@ DRIVER_INIT_MEMBER(segaorun_state,shangon)
 
 
 //**************************************************************************
-//	GAME DRIVERS
+//  GAME DRIVERS
 //**************************************************************************
 
 //    YEAR, NAME,     PARENT,  MACHINE,         INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT

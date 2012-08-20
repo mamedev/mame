@@ -19,7 +19,7 @@ public:
 	/* video-related */
 	n64_rdp *m_rdp;
 	DECLARE_DRIVER_INIT(aleck64);
-	
+
 };
 
 /*----------- devices -----------*/

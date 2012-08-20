@@ -427,7 +427,7 @@ public:
 	DECLARE_DRIVER_INIT(maya);
 	DECLARE_DRIVER_INIT(rongrong);
 	DECLARE_DRIVER_INIT(momotaro);
-	
+
 };
 
 //----------- defined in drivers/dynax.c -----------

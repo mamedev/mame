@@ -941,7 +941,7 @@ SCREEN_UPDATE_RGB32(megadriv)
 	{
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
-		
+
 		if (!vdp->m_use_alt_timing)
 		{
 			srcy = &vdp->m_render_bitmap->pix(y, 0);

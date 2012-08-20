@@ -48,7 +48,7 @@ void segaorun_state::video_start()
 {
 	// compute palette info
 	segaic16_palette_init(0x1000);
-	
+
 	if (m_shangon_video)
 	{
 		// initialize the tile/text layers

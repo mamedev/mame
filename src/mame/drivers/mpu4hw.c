@@ -512,7 +512,7 @@ used in some cabinets instead of the main control.
 */
 WRITE8_MEMBER(mpu4_state::bankswitch_w)
 {
-//	printf("bankswitch_w %02x\n", data);
+//  printf("bankswitch_w %02x\n", data);
 
 	// m_pageset is never even set??
 	m_pageval = (data & 0x03);
@@ -529,7 +529,7 @@ READ8_MEMBER(mpu4_state::bankswitch_r)
 WRITE8_MEMBER(mpu4_state::bankset_w)
 {
 
-//	printf("bankset_w %02x\n", data);
+//  printf("bankset_w %02x\n", data);
 
 	// m_pageset is never even set??
 

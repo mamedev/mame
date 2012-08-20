@@ -59,7 +59,7 @@ void kaneko_grap2_device::device_reset()
 	m_framebuffer_scrollx = 0;
 	m_framebuffer_enable = 0;
 	m_regs1_i = 0x0;
-	
+
 	m_framebuffer_bright1 = 0;
 	m_framebuffer_bright2 = 0;
 }
@@ -147,7 +147,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 	UINT32 address = m_regs1_address_regs[1]| (m_regs1_address_regs[0]<<16);
 	UINT8* rledata = memregion(":gfx2")->base();
 
-//	printf("galpani3_regs1_go_w? %08x\n",address );
+//  printf("galpani3_regs1_go_w? %08x\n",address );
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer, rledata);
 }
 

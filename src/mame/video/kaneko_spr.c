@@ -2,8 +2,8 @@
 
 /*
     Kaneko 16-bit sprites
-	   VU-002 052 151021   ('type 0') (blazeon, berlwall etc., confirmed)
-	   KC-002 L0002 023 9321EK702 ('type 1') (gtmr, bloodwar etc., confirmed)
+       VU-002 052 151021   ('type 0') (blazeon, berlwall etc., confirmed)
+       KC-002 L0002 023 9321EK702 ('type 1') (gtmr, bloodwar etc., confirmed)
 
 
     [ 1024 Sprites ]
@@ -14,11 +14,11 @@
         sprites on the screen
 
 
-	Notes:
-	 - Blaze On has 2 sprite chips, with 2 sets of sprite registers, the
-	   existing code here just handles it as one, ignoring the second
-	   set of registers, we should really be producing 2 sprite bitmaps
-	   and manually mixing them.
+    Notes:
+     - Blaze On has 2 sprite chips, with 2 sets of sprite registers, the
+       existing code here just handles it as one, ignoring the second
+       set of registers, we should really be producing 2 sprite bitmaps
+       and manually mixing them.
 
 */
 
@@ -120,8 +120,8 @@ void kaneko16_sprite_device::set_offsets(device_t &device, int xoffs, int yoffs)
 
     Each sprite is always stuffed in 4 words. There may be some extra
     padding words though
-	
-	Examples are:
+
+    Examples are:
 
     Type 0: shogwarr, blazeon, bakubrkr.
     Type 1: gtmr.
@@ -170,7 +170,7 @@ void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite *s, UIN
 	s->flipx		=		(attr & 0x0200);
 	s->code			+=		(s->y & 1) << 16;	// bloodwar
 }
-	
+
 void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
 {
 	s->flipy		=		(attr & 0x0001);
@@ -346,7 +346,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 	{
 		int flags;
 
-		flags = kaneko16_parse_sprite_type012(machine, i,s, spriteram16, spriteram16_bytes);			
+		flags = kaneko16_parse_sprite_type012(machine, i,s, spriteram16, spriteram16_bytes);
 
 		if (flags == -1)	// End of Sprites
 			break;

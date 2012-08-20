@@ -1,5 +1,5 @@
 /*
- 
+
 H8/3xx: Unknown opcode (PC=1c966) 10f - not a valid H8 or H8S opcode, either bad dump or banked ROM
 maygayep.c  ep_cfallc
 
@@ -13,8 +13,8 @@ H8/3xx: Unknown opcode (PC=8f91) aeb - ADD.L ERs, ERd
 maygayep.c  ep_hogmnc
 
 H8/3xx: Unknown opcode (PC=20000) 6b6e - MOV.B @ERs, Rd
-maygayep.c  ep_wordf 
- 
+maygayep.c  ep_wordf
+
 */
 
 static UINT32 udata32, address24;

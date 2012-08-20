@@ -474,7 +474,7 @@ static void descrambler(UINT8* data, UINT32 size)
     UINT16 v = 0x3ff1;
 
     UINT8 x = 1;
-	
+
 	for (UINT32 it = 0; it < size;)
 	{
 		int t0 = t & 1;

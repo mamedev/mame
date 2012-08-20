@@ -133,8 +133,8 @@ void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const 
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-	//	UINT16 *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
-	//	UINT16 *src2 = vdp->m_render_line_raw;
+	//  UINT16 *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
+	//  UINT16 *src2 = vdp->m_render_line_raw;
 
 		UINT16 *dst = &bitmap.pix(y);
 		UINT8 *pri = &priority_bitmap.pix(y);
@@ -147,7 +147,7 @@ void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const 
 				{
 					switch (pix & 0xc0)
 					{
-						case 0x00:					
+						case 0x00:
 							dst[x] = pix + 0x2000; /* 0x2040 - would be shadow? */
 							break;
 						case 0x40:

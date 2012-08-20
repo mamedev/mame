@@ -1,5 +1,5 @@
 /* mpu4 sets which have been split, and appear to do something useful
- 
+
   I'm trying to keep this file to official Barcrest / BwB rebuilds on mod4 hw
   (licensed versions and bootlegs also included)
 
@@ -8,7 +8,7 @@
 
 /* many sets have the BARCREST or BWB string at FFE0 replaced with other things
   such at 'FATHER CHRISTMAS' are these hacked / bootlegs requiring special hw?
-  
+
   sets with 'D' in the ident code are Datapak sets, and do not play without a datapak connected
   sets with 'Y' seem to require the % key to be set
 
@@ -33,7 +33,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4debug)
 	// this helps with sorting
 	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
 	int size = machine().root_device().memregion( "maincpu" )->bytes();
-	
+
 	for (int j=0;j<size;j+=0x10000)
 	{
 		if (size>0x10000) printf("\nblock 0x%06x:\n",j);

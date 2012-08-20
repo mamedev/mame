@@ -10,11 +10,11 @@ public:
 	static void set_is_jclub2o(device_t &device, int is_jclub2o);
 
 	int m_gfx_index;
-	
+
 	// see if we can handle the difference between this and the st0032 in here, or if we need another
 	// device
 	int m_is_st0032;
-	
+
 	// per-game hack
 	int m_is_jclub2;
 

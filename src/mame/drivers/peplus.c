@@ -574,10 +574,10 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 {
 /*
         Emulating IGT IDO22 Pulse Protocol (IGT Smoke 2.2)
-		ID022 protocol requires a 20ms on/off pulse x times for denomination followed by a 50ms stop pulse.
-		The DBV then waits for at least 3 toggling (ACK) pulses of alternating 20ms each from the game.
-		If no toggling received within 200ms, the bill was rejected by the game (e.g. Max Credits reached).
-		Once toggling received, the DBV stacks the bill and sends two 10ms stacked pulses separated by a 10ms pause.
+        ID022 protocol requires a 20ms on/off pulse x times for denomination followed by a 50ms stop pulse.
+        The DBV then waits for at least 3 toggling (ACK) pulses of alternating 20ms each from the game.
+        If no toggling received within 200ms, the bill was rejected by the game (e.g. Max Credits reached).
+        Once toggling received, the DBV stacks the bill and sends two 10ms stacked pulses separated by a 10ms pause.
 
         TODO: Will need to include IGT IDO23 (IGT 2.5) for Superboard games.
         PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
@@ -614,7 +614,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 			// Fetch Current Denomination
 			m_bv_denomination = ioport("BC")->read();
 
-			m_bv_cycles = curr_cycles;			
+			m_bv_cycles = curr_cycles;
 			m_bv_pulse = 1;
 
 			if (m_bv_denomination == 0)
@@ -623,7 +623,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 				m_bv_state = 1; // Greater than $1 Needs Credit Pulse
 		}
 	}
-	
+
 	switch (m_bv_state)
 	{
 		case 0x00: // Not Active
@@ -642,7 +642,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 				m_bv_pulse = 1;
 
 				m_bv_denomination--;
-				
+
 				if (m_bv_denomination == 0)
 					m_bv_state++; // Done with Credit Pulse
 				else

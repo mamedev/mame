@@ -21,7 +21,7 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
-public:	
+public:
 	DECLARE_DRIVER_INIT(de_2);
 };
 

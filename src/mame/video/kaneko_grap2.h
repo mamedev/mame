@@ -22,7 +22,7 @@ class kaneko_grap2_device : public device_t
 {
 public:
 	kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 
 	int m_chipnum; // used to decide where we write the palette
 
@@ -41,12 +41,12 @@ public:
 	UINT16 m_framebuffer_scrollx;
 	UINT16 m_framebuffer_enable;
 	int m_regs1_i;
-	
+
 	UINT16 m_framebuffer_bright1;
 	UINT16 m_framebuffer_bright2;
 
 	UINT16 m_regs1_address_regs[0x2];
-	
+
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_enable_w) { m_framebuffer_enable = data; }
 
 	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_scrolly_w) { m_framebuffer_scrolly = data; }

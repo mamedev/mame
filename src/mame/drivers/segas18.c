@@ -80,34 +80,34 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 		case 7:
 			mapper.map_as_handler(0x00000, 0x04000, 0xffc000, read16_delegate(FUNC(segas18_state::misc_io_r), this), write16_delegate(FUNC(segas18_state::misc_io_w), this));
 			break;
-			
+
 		case 6:
 			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segas18_state::legacy_wrapper<segaic16_paletteram_w>), this));
 			break;
-			
+
 		case 5:
 			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas18_state::legacy_wrapper<segaic16_tileram_0_w>), this));
 			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas18_state::legacy_wrapper<segaic16_textram_0_w>), this));
 			break;
-		
+
 		case 4:
 			mapper.map_as_ram(0x00000, 0x00800, 0xfff800, "spriteram", write16_delegate());
 			break;
-		
+
 		case 3:
 			mapper.map_as_ram(0x00000, 0x04000, 0xffc000, "workram", write16_delegate());
 			break;
-			
+
 		case 2:
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:	break;	// ???
-				case ROM_BOARD_171_5874:	
+				case ROM_BOARD_171_5874:
 				case ROM_BOARD_171_5987:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
 				default:					assert(false);
 			}
 			break;
-			
+
 		case 1:
 			switch (m_romboard)
 			{
@@ -121,7 +121,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 				default:					assert(false);
 			}
 			break;
-			
+
 		case 0:
 			switch (m_romboard)
 			{
@@ -205,7 +205,7 @@ void segas18_state::machine_reset()
 
 	megadriv_reset_vdp(machine());
 	genvdp_use_cram = 1;
-	
+
 	// if we are running with a real live 8751, we need to boost the interleave at startup
 	if (m_mcu != NULL && m_mcu->type() == I8751)
 		synchronize(TID_INITIAL_BOOST);

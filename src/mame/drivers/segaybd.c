@@ -35,18 +35,18 @@
 
 ****************************************************************************
 
-	Games supported:
+    Games supported:
 
-	    G-LOC Air Battle
-	    G-LOC R360
-	    Galaxy Force 2
-	    Power Drift
-	    Rail Chase
-	    Strike Fighter
+        G-LOC Air Battle
+        G-LOC R360
+        Galaxy Force 2
+        Power Drift
+        Rail Chase
+        Strike Fighter
 
-	Known games currently not dumped:
+    Known games currently not dumped:
 
-	    Galaxy Force
+        Galaxy Force
 
 ****************************************************************************
 
@@ -69,7 +69,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 const UINT32 MASTER_CLOCK = 50000000;
@@ -81,7 +81,7 @@ const UINT32 SOUND_CLOCK = 32215900;
 
 
 //**************************************************************************
-//	YM2151 CHIP CALLBACKS
+//  YM2151 CHIP CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -96,7 +96,7 @@ void segaybd_state::sound_cpu_irq(int state)
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE HANDLERS
+//  MAIN CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -218,7 +218,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
             //  D3 = XRES
             //  D2 = YRES
             //  D1-D0 = ADC0-1
-     		//
+    		//
 			segaic16_set_display_enable(machine(), data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
 				machine().watchdog_reset();
@@ -247,7 +247,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 
 //-------------------------------------------------
 //  sound_data_w - handle writes to sound control
-//	port
+//  port
 //-------------------------------------------------
 
 WRITE16_MEMBER( segaybd_state::sound_data_w )
@@ -259,7 +259,7 @@ WRITE16_MEMBER( segaybd_state::sound_data_w )
 
 
 //**************************************************************************
-//	SOUND Z80 CPU READ/WRITE CALLBACKS
+//  SOUND Z80 CPU READ/WRITE CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -275,7 +275,7 @@ READ8_MEMBER( segaybd_state::sound_data_r )
 
 
 //**************************************************************************
-//	DRIVER OVERRIDES
+//  DRIVER OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -394,7 +394,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 //**************************************************************************
-//	GAME-SPECIFIC OUTPUT CALLBACKS
+//  GAME-SPECIFIC OUTPUT CALLBACKS
 //**************************************************************************
 
 //  TODO: kokoroj2 and jpark (SW2)
@@ -408,7 +408,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 //-------------------------------------------------
 //  gforce2_output_cb2 - output #2 handler for
-//	Galaxy Force
+//  Galaxy Force
 //-------------------------------------------------
 
 void segaybd_state::gforce2_output_cb2(UINT16 data)
@@ -419,7 +419,7 @@ void segaybd_state::gforce2_output_cb2(UINT16 data)
 
 //-------------------------------------------------
 //  gloc_output_cb1 - output #1 handler for
-//	G-Loc
+//  G-Loc
 //-------------------------------------------------
 
 void segaybd_state::gloc_output_cb1(UINT16 data)
@@ -453,7 +453,7 @@ void segaybd_state::gloc_output_cb1(UINT16 data)
 
 //-------------------------------------------------
 //  gloc_output_cb2 - output #2 handler for
-//	G-Loc
+//  G-Loc
 //-------------------------------------------------
 
 void segaybd_state::gloc_output_cb2(UINT16 data)
@@ -466,7 +466,7 @@ void segaybd_state::gloc_output_cb2(UINT16 data)
 
 //-------------------------------------------------
 //  r360_output_cb2 - output #2 handler for
-//	G-Loc R360
+//  G-Loc R360
 //-------------------------------------------------
 
 void segaybd_state::r360_output_cb2(UINT16 data)
@@ -480,7 +480,7 @@ void segaybd_state::r360_output_cb2(UINT16 data)
 
 //-------------------------------------------------
 //  pdrift_output_cb1 - output #1 handler for
-//	Power Drift
+//  Power Drift
 //-------------------------------------------------
 
 void segaybd_state::pdrift_output_cb1(UINT16 data)
@@ -639,7 +639,7 @@ void segaybd_state::pdrift_output_cb1(UINT16 data)
 
 //-------------------------------------------------
 //  pdrift_output_cb2 - output #2 handler for
-//	Power Drift
+//  Power Drift
 //-------------------------------------------------
 
 void segaybd_state::pdrift_output_cb2(UINT16 data)
@@ -651,7 +651,7 @@ void segaybd_state::pdrift_output_cb2(UINT16 data)
 
 //-------------------------------------------------
 //  rchase_output_cb2 - output #2 handler for
-//	Rail Chase
+//  Rail Chase
 //-------------------------------------------------
 
 void segaybd_state::rchase_output_cb2(UINT16 data)
@@ -666,12 +666,12 @@ void segaybd_state::rchase_output_cb2(UINT16 data)
 
 
 //**************************************************************************
-//	INTERNAL HELPERS
+//  INTERNAL HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  update_irqs - flush IRQ state to the various
-//	CPU devices
+//  CPU devices
 //-------------------------------------------------
 
 void segaybd_state::update_irqs()
@@ -679,11 +679,11 @@ void segaybd_state::update_irqs()
 	m_maincpu->set_input_line(2, m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_subx->set_input_line(2, m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_suby->set_input_line(2, m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	m_maincpu->set_input_line(4, m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_subx->set_input_line(4, m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_suby->set_input_line(4, m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	m_maincpu->set_input_line(6, m_timer_irq_state && m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_subx->set_input_line(6, m_timer_irq_state && m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_suby->set_input_line(6, m_timer_irq_state && m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -695,7 +695,7 @@ void segaybd_state::update_irqs()
 
 
 //**************************************************************************
-//	MAIN CPU ADDRESS MAPS
+//  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
@@ -715,7 +715,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SUB CPU ADDRESS MAPS
+//  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16, segaybd_state )
@@ -747,7 +747,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	Z80 SOUND CPU ADDRESS MAPS
+//  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaybd_state )
@@ -767,7 +767,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	GENERIC PORT DEFINITIONS
+//  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( yboard_generic )
@@ -813,7 +813,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC PORT DEFINITIONS
+//  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( gforce2 )
@@ -1183,7 +1183,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND DEFINITIONS
+//  SOUND DEFINITIONS
 //**************************************************************************
 
 static const ym2151_interface ym2151_config =
@@ -1199,7 +1199,7 @@ static const sega_pcm_interface segapcm_interface =
 
 
 //**************************************************************************
-//	GENERIC MACHINE DRIVERS
+//  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_START( yboard, segaybd_state )
@@ -1257,7 +1257,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROM DEFINITIONS
+//  ROM DEFINITIONS
 //**************************************************************************
 
 
@@ -1814,7 +1814,7 @@ ROM_START( pdrifta )
 ROM_END
 
 //*************************************************************************************************************************
-// 	Earlier set based on eprom numbers & Sega Eprom/Mask Rom Locations sheet 421-7708
+//  Earlier set based on eprom numbers & Sega Eprom/Mask Rom Locations sheet 421-7708
 //
 ROM_START( pdrifte )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
@@ -2185,7 +2185,7 @@ ROM_END
 
 
 //**************************************************************************
-//	CONFIGURATION
+//  CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -2258,7 +2258,7 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 
 
 //**************************************************************************
-//	GAME DRIVERS
+//  GAME DRIVERS
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,  MACHINE,INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT

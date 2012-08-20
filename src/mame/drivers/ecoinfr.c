@@ -967,7 +967,7 @@ EC_SBARX_SET( 199?, ec_sbarx__ax,	ec_sbarx,	"iss9401.rom",							0x0000, 0x00800
 EC_SBARX_SET( 199?, ec_sbarx__ay,	ec_sbarx,	"iss9405.rom",							0x0000, 0x008000, CRC(6435586d) SHA1(95f2cda1bc80bb8f7c3d2d2b41abbfd634a88237), "Electrocoin","Super Bar X (Electrocoin) (set 62)" ) // from unknown set
 /* No header (all 0x00) space for one tho */
 EC_SBARX_SET( 199?, ec_sbarx__az,	ec_sbarx,	"iss129.rom",							0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b), "Electrocoin","Super Bar X (Electrocoin) (set 63)" ) // superbarx_issue129_10cash.bin, doesn't do port09 0x40 changed 40
-EC_SBARX_SET( 199?, ec_sbarx__a0,	ec_sbarx,	"superbarx_issue158_sitdown10cash.bin",	0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52), "Electrocoin","Super Bar X (Electrocoin) (set 64)" ) // ^^ 
+EC_SBARX_SET( 199?, ec_sbarx__a0,	ec_sbarx,	"superbarx_issue158_sitdown10cash.bin",	0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52), "Electrocoin","Super Bar X (Electrocoin) (set 64)" ) // ^^
 EC_SBARX_SET( 199?, ec_sbarx__a1,	ec_sbarx,	"iss173.rom",							0x0000, 0x008000, CRC(984f9c18) SHA1(f160eeee6ea70c79502fc68f70cb973e1ca029b8), "Electrocoin","Super Bar X (Electrocoin) (set 65)" )
 EC_SBARX_SET( 199?, ec_sbarx__a2,	ec_sbarx,	"iss2012.rom",							0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059), "Electrocoin","Super Bar X (Electrocoin) (set 66)" )
 EC_SBARX_SET( 199?, ec_sbarx__a3,	ec_sbarx,	"sbx5red",								0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec), "Electrocoin","Super Bar X (Electrocoin) (set 67)" )

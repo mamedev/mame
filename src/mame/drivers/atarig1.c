@@ -1232,7 +1232,7 @@ static void init_g1_common(running_machine &machine, offs_t slapstic_base, int s
 
 DRIVER_INIT_MEMBER(atarig1_state,hydra)     { init_g1_common(machine(), 0x078000, 116, 0); }
 DRIVER_INIT_MEMBER(atarig1_state,hydrap)    { init_g1_common(machine(), 0x000000,   0, 0); }
-                                     
+
 DRIVER_INIT_MEMBER(atarig1_state,pitfight9)  { init_g1_common(machine(), 0x038000, 114, 1); }
 DRIVER_INIT_MEMBER(atarig1_state,pitfight7)  { init_g1_common(machine(), 0x038000, 112, 1); }
 DRIVER_INIT_MEMBER(atarig1_state,pitfight)   { init_g1_common(machine(), 0x038000, 111, 1); }

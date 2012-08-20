@@ -2092,7 +2092,7 @@ $(DRIVERS)/mcr3.o:	$(LAYOUT)/turbotag.lh
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 
 $(DRIVERS)/mpu4mod2sw.o:	$(LAYOUT)/connect4.lh \
-			
+
 $(DRIVERS)/mpu4mod4yam.o: $(LAYOUT)/gamball.lh \
 
 $(DRIVERS)/mpu4hw.o:	$(LAYOUT)/mpu4.lh \

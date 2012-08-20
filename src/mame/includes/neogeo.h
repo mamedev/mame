@@ -200,7 +200,7 @@ public:
 	DECLARE_DRIVER_INIT(kog);
 	DECLARE_DRIVER_INIT(lans2004);
 	DECLARE_DRIVER_INIT(sbp);
-	DECLARE_DRIVER_INIT(mvs);	
+	DECLARE_DRIVER_INIT(mvs);
 	void mvs_install_protection(device_image_interface& image);
 };
 

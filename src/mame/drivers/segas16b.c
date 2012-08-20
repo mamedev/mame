@@ -906,7 +906,7 @@ CPU  - 317-0092  |--------------------------------------------------------------
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 #define MASTER_CLOCK_10MHz				XTAL_10MHz
@@ -916,12 +916,12 @@ CPU  - 317-0092  |--------------------------------------------------------------
 
 
 //**************************************************************************
-//	MEMORY MAPPING
+//  MEMORY MAPPING
 //**************************************************************************
 
 //-------------------------------------------------
 //  memory_mapper - callback to handle mapping
-//	requests
+//  requests
 //-------------------------------------------------
 
 void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
@@ -931,24 +931,24 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 		case 7:	// 16k of I/O space
 			mapper.map_as_handler(0x00000, 0x04000, 0xffc000, m_custom_io_r, m_custom_io_w);
 			break;
-			
+
 		case 6:	// 4k of paletteram
 			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "paletteram", write16_delegate(FUNC(segas16b_state::legacy_wrapper<segaic16_paletteram_w>), this));
 			break;
-			
+
 		case 5:	// 64k of tileram + 4k of textram
 			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas16b_state::legacy_wrapper<segaic16_tileram_0_w>), this));
 			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas16b_state::legacy_wrapper<segaic16_textram_0_w>), this));
 			break;
-		
+
 		case 4:	// 2k of spriteram
 			mapper.map_as_ram(0x00000, 0x00800, 0xfff800, "spriteram", write16_delegate());
 			break;
-		
+
 		case 3:	// 16k or 256k of work RAM
 			mapper.map_as_ram(0x00000, m_workram.bytes(), ~(m_workram.bytes() - 1), "workram", write16_delegate());
 			break;
-			
+
 		case 2:	// 3rd ROM base, or board-specific banking
 			switch (m_romboard)
 			{
@@ -961,7 +961,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 				default:						assert(false);
 			}
 			break;
-			
+
 		case 1:	// 2nd ROM base, banking & math, or sound for Korean games
 			switch (m_romboard)
 			{
@@ -974,7 +974,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 				default:						assert(false);
 			}
 			break;
-			
+
 		case 0:	// 1st ROM base
 			switch (m_romboard)
 			{
@@ -993,7 +993,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 
 //-------------------------------------------------
 //  mapper_sound_r - sound port read from the
-//	memory mapper chip
+//  memory mapper chip
 //-------------------------------------------------
 
 UINT8 segas16b_state::mapper_sound_r()
@@ -1004,7 +1004,7 @@ UINT8 segas16b_state::mapper_sound_r()
 
 //-------------------------------------------------
 //  mapper_sound_w - sound port write from the
-//	memory mapper chip
+//  memory mapper chip
 //-------------------------------------------------
 
 void segas16b_state::mapper_sound_w(UINT8 data)
@@ -1017,12 +1017,12 @@ void segas16b_state::mapper_sound_w(UINT8 data)
 
 
 //**************************************************************************
-//	MAIN CPU READ/WRITE HANDLERS
+//  MAIN CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  rom_5704_bank_w - ROM board 5704 tile bank 
-//	selection
+//  rom_5704_bank_w - ROM board 5704 tile bank
+//  selection
 //-------------------------------------------------
 
 WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
@@ -1034,7 +1034,7 @@ WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
 
 //-------------------------------------------------
 //  rom_5797_bank_math_r - ROM board 5797 custom
-//	math chip reads
+//  math chip reads
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
@@ -1056,7 +1056,7 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 
 //-------------------------------------------------
 //  rom_5797_bank_math_r - ROM board 5797 custom
-//	math chip writes, plus tile bank selection
+//  math chip writes, plus tile bank selection
 //-------------------------------------------------
 
 WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
@@ -1084,7 +1084,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 
 //-------------------------------------------------
 //  unknown_rgn2_r - unknown region 2 reads;
-//	for now treat as a second compare/timer chip
+//  for now treat as a second compare/timer chip
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::unknown_rgn2_r )
@@ -1096,7 +1096,7 @@ READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 
 //-------------------------------------------------
 //  unknown_rgn2_w - unknown region 2 writes;
-//	for now treat as a second compare/timer chip
+//  for now treat as a second compare/timer chip
 //-------------------------------------------------
 
 WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
@@ -1164,8 +1164,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 
 
 //-------------------------------------------------
-//  atomicp_sound_w - write sound data to the 
-//	YM2413 directly from the main CPU
+//  atomicp_sound_w - write sound data to the
+//  YM2413 directly from the main CPU
 //-------------------------------------------------
 
 WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
@@ -1176,12 +1176,12 @@ WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 
 
 //**************************************************************************
-//	SOUND CPU READ/WRITE HANDLERS
+//  SOUND CPU READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  upd7759_control_w - handle writes to the 
-//	uPD7759 control register
+//  upd7759_control_w - handle writes to the
+//  uPD7759 control register
 //-------------------------------------------------
 
 WRITE8_MEMBER( segas16b_state::upd7759_control_w )
@@ -1242,11 +1242,11 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 				bankoffs += ((data & 0x10) >> 4) * 0x20000;
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
-			
+
 			default:
 				assert(false);
 		}
-		
+
 		// set the final bank
 		membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 	}
@@ -1255,7 +1255,7 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 
 //-------------------------------------------------
 //  upd7759_status_r - return the uPD7759 busy
-//	bit in the top bit
+//  bit in the top bit
 //-------------------------------------------------
 
 READ8_MEMBER( segas16b_state::upd7759_status_r )
@@ -1266,12 +1266,12 @@ READ8_MEMBER( segas16b_state::upd7759_status_r )
 
 
 //**************************************************************************
-//	OTHER CALLBACKS
+//  OTHER CALLBACKS
 //**************************************************************************
 
 //-------------------------------------------------
 //  upd7759_generate_nmi - callback to signal an
-//	NMI to the sound CPU
+//  NMI to the sound CPU
 //-------------------------------------------------
 
 void segas16b_state::upd7759_generate_nmi(device_t *device, int state)
@@ -1284,7 +1284,7 @@ void segas16b_state::upd7759_generate_nmi(device_t *device, int state)
 
 //-------------------------------------------------
 //  i8751_main_cpu_vblank - update the fake i8751
-//	state if we have a handler
+//  state if we have a handler
 //-------------------------------------------------
 
 INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
@@ -1297,7 +1297,7 @@ INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
 
 
 //**************************************************************************
-//	DRIVER OVERRIDES
+//  DRIVER OVERRIDES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1341,7 +1341,7 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 
-		// generate a periodic IRQ to the sound CPU		
+		// generate a periodic IRQ to the sound CPU
 		case TID_ATOMICP_SOUND_IRQ:
 			if (++m_atomicp_sound_count >= m_atomicp_sound_divisor)
 			{
@@ -1355,12 +1355,12 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //**************************************************************************
-//	I8751 SIMULATIONS
+//  I8751 SIMULATIONS
 //**************************************************************************
 
 //-------------------------------------------------
 //  altbeast_common_i8751_sim - simulate the I8751
-//	from Altered Beast
+//  from Altered Beast
 //-------------------------------------------------
 
 void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs)
@@ -1402,7 +1402,7 @@ void segas16b_state::altbeast_i8751_sim()
 
 //-------------------------------------------------
 //  ddux_i8751_sim - simulate the I8751
-//	from Dynamite Dux
+//  from Dynamite Dux
 //-------------------------------------------------
 
 void segas16b_state::ddux_i8751_sim()
@@ -1423,7 +1423,7 @@ void segas16b_state::ddux_i8751_sim()
 
 //-------------------------------------------------
 //  goldnaxe_i8751_sim - simulate the I8751
-//	from Golden Axe
+//  from Golden Axe
 //-------------------------------------------------
 
 void segas16b_state::goldnaxe_i8751_sim()
@@ -1457,7 +1457,7 @@ void segas16b_state::goldnaxe_i8751_sim()
 
 //-------------------------------------------------
 //  tturf_i8751_sim - simulate the I8751
-//	from Tough Turf
+//  from Tough Turf
 //-------------------------------------------------
 
 void segas16b_state::tturf_i8751_sim()
@@ -1485,7 +1485,7 @@ void segas16b_state::tturf_i8751_sim()
 
 //-------------------------------------------------
 //  wb3_i8751_sim - simulate the I8751
-//	from Wonderboy III
+//  from Wonderboy III
 //-------------------------------------------------
 
 void segas16b_state::wb3_i8751_sim()
@@ -1506,12 +1506,12 @@ void segas16b_state::wb3_i8751_sim()
 
 
 //**************************************************************************
-//	CUSTOM I/O SPACE HANDLERS
+//  CUSTOM I/O SPACE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  aceattac_custom_io_r - custom I/O read handler
-//	for Ace Attacker
+//  for Ace Attacker
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
@@ -1555,7 +1555,7 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 
 //-------------------------------------------------
 //  dunkshot_custom_io_r - custom I/O read handler
-//	for Dunk Shot
+//  for Dunk Shot
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::dunkshot_custom_io_r )
@@ -1582,7 +1582,7 @@ READ16_MEMBER( segas16b_state::dunkshot_custom_io_r )
 
 //-------------------------------------------------
 //  hwchamp_custom_io_r/w - custom I/O read/write
-//	handlers for Heavyweight Champ
+//  handlers for Heavyweight Champ
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
@@ -1633,7 +1633,7 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 
 //-------------------------------------------------
 //  passshtj_custom_io_r - custom I/O read handler
-//	for Passing Shot
+//  for Passing Shot
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::passshtj_custom_io_r )
@@ -1656,7 +1656,7 @@ READ16_MEMBER( segas16b_state::passshtj_custom_io_r )
 
 //-------------------------------------------------
 //  sdi_custom_io_r - custom I/O read handler
-//	for SDI
+//  for SDI
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::sdi_custom_io_r )
@@ -1678,8 +1678,8 @@ READ16_MEMBER( segas16b_state::sdi_custom_io_r )
 
 
 //-------------------------------------------------
-//  sdi_custom_io_r/w - custom I/O read/write 
-//	handlers for Sukeban Jansi Ryuko
+//  sdi_custom_io_r/w - custom I/O read/write
+//  handlers for Sukeban Jansi Ryuko
 //-------------------------------------------------
 
 READ16_MEMBER( segas16b_state::sjryuko_custom_io_r )
@@ -1721,13 +1721,13 @@ WRITE16_MEMBER( segas16b_state::sjryuko_custom_io_w )
 
 
 //**************************************************************************
-//	MAIN CPU ADDRESS MAPS
+//  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
-	
+
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
@@ -1741,7 +1741,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system16c_map, AS_PROGRAM, 16, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
-	
+
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
@@ -1754,7 +1754,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	SOUND CPU ADDRESS MAPS
+//  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16b_state )
@@ -1777,7 +1777,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	I8751 MCU ADDRESS MAPS
+//  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas16b_state )
@@ -1789,7 +1789,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	GENERIC PORT DEFINITIONS
+//  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( system16b_generic )
@@ -1843,7 +1843,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC PORT DEFINITIONS
+//  GAME-SPECIFIC PORT DEFINITIONS
 //**************************************************************************
 
 static INPUT_PORTS_START( aceattac )
@@ -3257,7 +3257,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND CONFIGURATIONS
+//  SOUND CONFIGURATIONS
 //**************************************************************************
 
 static const upd7759_interface upd7759_config =
@@ -3268,7 +3268,7 @@ static const upd7759_interface upd7759_config =
 
 
 //**************************************************************************
-//	GRAPHICS DECODING
+//  GRAPHICS DECODING
 //**************************************************************************
 
 static GFXDECODE_START( segas16b )
@@ -3278,7 +3278,7 @@ GFXDECODE_END
 
 
 //**************************************************************************
-//	GENERIC MACHINE DRIVERS
+//  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_START( system16b, segas16b_state )
@@ -3369,7 +3369,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	GAME-SPECIFIC MACHINE DRIVERS
+//  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
 static MACHINE_CONFIG_DERIVED( atomicp, system16b ) // 10MHz CPU Clock verified
@@ -3394,7 +3394,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROM definitions
+//  ROM definitions
 //**************************************************************************
 
 
@@ -3894,7 +3894,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Atomic Point
 //
-//  Custom Korean Board - NOT Sega: 
+//  Custom Korean Board - NOT Sega:
 //
 //   CPU: TMP68000P-10
 //   OSC: 25.1748MHz & 20MHz
@@ -6369,7 +6369,7 @@ ROM_END
 
 
 //**************************************************************************
-//	CONFIGURATION
+//  CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -6403,8 +6403,8 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 
 
 //-------------------------------------------------
-//  init_generic_* - ROM board-specific 
-//	initialization
+//  init_generic_* - ROM board-specific
+//  initialization
 //-------------------------------------------------
 
 DRIVER_INIT_MEMBER(segas16b_state,generic_5358_small) { init_generic(ROM_BOARD_171_5358_SMALL); }
@@ -6415,7 +6415,7 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_5797) { init_generic(ROM_BOARD_171_579
 DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 {
 	init_generic(ROM_BOARD_KOREAN);
-	
+
 	// configure special behaviors for the Korean boards
 	m_disable_screen_blanking = true;
 	m_atomicp_sound_divisor = 1;
@@ -6572,7 +6572,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 
 
 //**************************************************************************
-//	GAME DRIVERS
+//  GAME DRIVERS
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,             INPUT,    INIT,               MONITOR,COMPANY,FULLNAME,FLAGS
@@ -6682,7 +6682,7 @@ GAME( 2008, fantzn2xp,  fantzn2x, system16c,           fz2,      segas16b_state,
 
 // Custom Korean Board - these probably belong with the bootlegs...
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
-GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper, 	         ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
+GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,	         ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 
 
 

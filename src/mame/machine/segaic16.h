@@ -132,7 +132,7 @@ private:
 		// construction/destruction
 		decrypt_bank();
 		~decrypt_bank();
-	
+
 		// configuration
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
@@ -253,7 +253,7 @@ private:
 	// internal helpers
 	void execute(bool update_history = false);
 	void interrupt_ack() { if (!m_timer_ack.isnull()) m_timer_ack(); }
-	
+
 	// configuration
 	timer_ack_delegate			m_timer_ack;
 	sound_write_delegate		m_sound_write;

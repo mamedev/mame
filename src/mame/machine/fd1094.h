@@ -17,7 +17,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 // device type definition
@@ -26,7 +26,7 @@ extern const device_type FD1094;
 
 
 //**************************************************************************
-//	TYPE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 class fd1094_device;
@@ -39,11 +39,11 @@ class fd1094_decryption_cache
 public:
 	// construction/destruction
 	fd1094_decryption_cache(fd1094_device &fd1094);
-	
+
 	// getters
 	fd1094_device &fd1094() const { return m_fd1094; }
 	UINT16 *decrypted_opcodes(UINT8 state);
-	
+
 	// operations
 	void reset();
 	void configure(offs_t baseaddress, UINT32 size, offs_t rgnoffset);
@@ -51,10 +51,10 @@ public:
 protected:
 	// internal state
 	fd1094_device &			m_fd1094;
-	UINT32					m_baseaddress;	
+	UINT32					m_baseaddress;
 	UINT32					m_size;
 	UINT32					m_rgnoffset;
-	dynamic_array<UINT16> 	m_decrypted_opcodes[256];
+	dynamic_array<UINT16>	m_decrypted_opcodes[256];
 };
 
 
@@ -68,7 +68,7 @@ public:
 
 	// construction/destruction
 	fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT8 state) { decrypt(baseaddr, size, m_srcbase + regionoffs/2, opcodesptr, state); }
 
@@ -84,7 +84,7 @@ public:
 		STATE_IRQ = 0x200,
 		STATE_RTE = 0x300
 	};
-	
+
 protected:
 	// device overrides
 	virtual void device_start();
@@ -100,7 +100,7 @@ protected:
 	static void cmp_callback(device_t *device, UINT32 val, UINT8 reg);
 	static IRQ_CALLBACK( irq_callback );
 	static void rte_callback(device_t *device);
-	
+
 	// internal state
 	UINT8					m_state;
 	bool					m_irqmode;
@@ -109,8 +109,8 @@ protected:
 	UINT16 *				m_srcbase;
 	UINT32					m_srcbytes;
 	const UINT8 *			m_key;
-	UINT8 					m_masked_opcodes_lookup[2][65536/8/2];
-	
+	UINT8					m_masked_opcodes_lookup[2][65536/8/2];
+
 	// static tables
 	static const UINT16 s_masked_opcodes[];
 };

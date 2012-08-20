@@ -2580,12 +2580,12 @@ DRIVER_INIT_MEMBER(ssv_state,hypreact)     {	init_ssv(machine(), 0);	}
 DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {	init_ssv(machine(), 0); init_hypreac2_common(machine());	}
 DRIVER_INIT_MEMBER(ssv_state,janjans1)     {	init_ssv(machine(), 0);	}
 DRIVER_INIT_MEMBER(ssv_state,keithlcy)     {	init_ssv(machine(), 0);	}
-DRIVER_INIT_MEMBER(ssv_state,meosism)      	{	init_ssv(machine(), 0);	}
-DRIVER_INIT_MEMBER(ssv_state,mslider)      	{	init_ssv(machine(), 0);	}
-DRIVER_INIT_MEMBER(ssv_state,ryorioh)      	{	init_ssv(machine(), 0);	}
+DRIVER_INIT_MEMBER(ssv_state,meosism)   	{	init_ssv(machine(), 0);	}
+DRIVER_INIT_MEMBER(ssv_state,mslider)   	{	init_ssv(machine(), 0);	}
+DRIVER_INIT_MEMBER(ssv_state,ryorioh)   	{	init_ssv(machine(), 0);	}
 DRIVER_INIT_MEMBER(ssv_state,srmp4)        {	init_ssv(machine(), 0);
 //  ((UINT16 *)machine().root_device().memregion("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
-}                                   
+}
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {	init_ssv(machine(), 0);	}
 DRIVER_INIT_MEMBER(ssv_state,stmblade)     {	init_ssv(machine(), 0); init_st010(machine()); }
 DRIVER_INIT_MEMBER(ssv_state,survarts)     {	init_ssv(machine(), 0);	}
@@ -2594,8 +2594,8 @@ DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {	init_ssv(machine(), 0); init_hyprea
 DRIVER_INIT_MEMBER(ssv_state,cairblad)     {	init_ssv(machine(), 0); init_hypreac2_common(machine());	}
 DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {	init_ssv(machine(), 0); init_hypreac2_common(machine());	}
 DRIVER_INIT_MEMBER(ssv_state,twineag2)     {	init_ssv(machine(), 1); init_st010(machine());  }
-DRIVER_INIT_MEMBER(ssv_state,ultrax)       	{	init_ssv(machine(), 1);	}
-DRIVER_INIT_MEMBER(ssv_state,vasara)       	{	init_ssv(machine(), 0);	}
+DRIVER_INIT_MEMBER(ssv_state,ultrax)    	{	init_ssv(machine(), 1);	}
+DRIVER_INIT_MEMBER(ssv_state,vasara)    	{	init_ssv(machine(), 0);	}
 DRIVER_INIT_MEMBER(ssv_state,jsk)          {	init_ssv(machine(), 0);	}
 
 

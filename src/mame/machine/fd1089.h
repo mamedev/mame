@@ -17,7 +17,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 // device type definition
@@ -27,7 +27,7 @@ extern const device_type FD1089B;
 
 
 //**************************************************************************
-//	TYPE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> fd1089_base_device
@@ -38,7 +38,7 @@ class fd1089_base_device : public m68000_device
 public:
 	// construction/destruction
 	fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, char cputype);
-	
+
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, UINT32 size, offs_t regionoffs, UINT16 *opcodesptr, UINT16 *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
 
@@ -52,13 +52,13 @@ protected:
 	UINT8 decode_fd1089b(UINT8 val, UINT8 key, bool opcode);
 	UINT16 decrypt_one(offs_t addr, UINT16 val, const UINT8 *key, bool opcode, char cputype);
 	void decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT16 *dataptr);
-	
+
 	// internal state
 	const UINT8 *			m_key;
 	char					m_cputype;
-	dynamic_array<UINT16> 	m_plaintext;
-	dynamic_array<UINT16> 	m_decrypted_opcodes;
-	
+	dynamic_array<UINT16>	m_plaintext;
+	dynamic_array<UINT16>	m_decrypted_opcodes;
+
 	// internal types
 	struct decrypt_parameters
 	{
@@ -81,7 +81,7 @@ class fd1089a_device : public fd1089_base_device
 public:
 	// construction/destruction
 	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: fd1089_base_device(mconfig, FD1089A, tag, owner, clock, 'A') { } 
+		: fd1089_base_device(mconfig, FD1089A, tag, owner, clock, 'A') { }
 };
 
 
@@ -93,7 +93,7 @@ class fd1089b_device : public fd1089_base_device
 public:
 	// construction/destruction
 	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: fd1089_base_device(mconfig, FD1089B, tag, owner, clock, 'B') { } 
+		: fd1089_base_device(mconfig, FD1089B, tag, owner, clock, 'B') { }
 };
 
 

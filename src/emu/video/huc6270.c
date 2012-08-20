@@ -115,7 +115,7 @@ huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, d
 
 
 /*
-  Read one row of tile data from video ram 
+  Read one row of tile data from video ram
 */
 inline void huc6270_device::fetch_bat_tile_row()
 {
@@ -308,8 +308,8 @@ inline void huc6270_device::handle_vblank()
 		}
 
 		/* Should we initiate a VRAM->SATB DMA transfer.
-		   The timing for this is incorrect.
-		 */
+           The timing for this is incorrect.
+         */
 		if ( m_dvssr_written || ( m_dcr & 0x10 ) )
 		{
 			int i;
@@ -488,7 +488,7 @@ READ16_MEMBER( huc6270_device::next_pixel )
 
 //inline READ16_MEMBER( huc6270_device::time_until_next_event )
 //{
-//	return m_horz_to_go * 8 + m_horz_steps;
+//  return m_horz_to_go * 8 + m_horz_steps;
 //}
 
 
@@ -512,8 +512,8 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 			handle_vblank();
 
 			/* Should we perform VRAM-VRAM dma.
-			   The timing for this is incorrect.
-			 */
+               The timing for this is incorrect.
+             */
 			if ( m_dma_enabled )
 			{
 				int desr_inc = ( m_dcr & 0x0008 ) ? -1 : +1;
@@ -649,11 +649,11 @@ WRITE8_MEMBER( huc6270_device::write )
 				case RCR:		/* raster compare register LSB */
 					m_rcr = ( m_rcr & 0x0300 ) | data;
 //printf("%s: RCR set to %03x\n", machine().describe_context(), m_rcr);
-//					if ( m_raster_count == m_rcr && m_cr & 0x04 )
-//					{
-//						m_status |= HUC6270_RR;
-//						m_irq_changed( ASSERT_LINE );
-//					}
+//                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
+//                  {
+//                      m_status |= HUC6270_RR;
+//                      m_irq_changed( ASSERT_LINE );
+//                  }
 //if (LOG) printf("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
 					break;
 
@@ -740,11 +740,11 @@ WRITE8_MEMBER( huc6270_device::write )
 				case RCR:		/* raster compare register MSB */
 					m_rcr = ( m_rcr & 0x00FF ) | ( ( data & 0x03 ) << 8 );
 //printf("%s: RCR set to %03x\n", machine().describe_context(), m_rcr);
-//					if ( m_raster_count == m_rcr && m_cr & 0x04 )
-//					{
-//						m_status |= HUC6270_RR;
-//						m_irq_changed( ASSERT_LINE );
-//					}
+//                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
+//                  {
+//                      m_status |= HUC6270_RR;
+//                      m_irq_changed( ASSERT_LINE );
+//                  }
 					break;
 
 				case BXR:		/* background x-scroll register MSB */
