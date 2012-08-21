@@ -1,8 +1,15 @@
-/********************************************
+/******************************************************************
  NEC V810 (upd70732) core
   Tomasz Slanina - analog[at]op.pl
 
  Change Log
+ - 21/08/2012 - Fixed SET.F behaviour (Angelo Salese)
+ - 20/08/2012 - Fixed a sign bug with CVT.WS opcode (Angelo Salese)
+ - 16/08/2012 - Added XB, XH, MPYHW, MOVBSU, ORBSU and ANDNBSU opcodes
+                (Angelo Salese)
+ - 19/11/2010 - Fixed interrupt handing and flag position in PSW register
+                (Miodrag Milanovic)
+ - 18/11/2010 - Added bare bones irq support (Miodrag Milanovic)
  - 20/07/2004 - first public release
 
 
@@ -12,9 +19,9 @@
   - traps/interrupts/exceptions
   - bitstring opcodes
   - timing
-  - missing opcodes : reti , trap
+  - missing opcodes : trap, caxi
 
-********************************************/
+******************************************************************/
 
 #include "emu.h"
 #include "debugger.h"
@@ -611,7 +618,7 @@ static UINT32 opDI(v810_state *cpustate,UINT32 op)
 
 static UINT32 opTRAP(v810_state *cpustate,UINT32 op)
 {
-	logerror("V810: TRAP @ %X\n",cpustate->PC-2);
+	printf("V810: TRAP @ %X\n",cpustate->PC-2);
 	return clkIF;
 }
 
