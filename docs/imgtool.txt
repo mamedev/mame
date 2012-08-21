@@ -1,0 +1,577 @@
+Imgtool - A generic image manipulation tool for MESS
+
+Imgtool is a tool for the maintenance and manipulation of disk and other types
+of images that MESS users need to deal with.  Functions include retrieving and
+storing files and CRC checking/validation.
+
+Imgtool is part of the MESS project.  It shares large portions of code with
+MESS/MAME, and its existence would not be if it were not for MESS.  As such,
+the distribution terms are the same as MESS.  Please read mess.txt thoroughly.
+
+Some portions in Imgtool is Copyright (c) 1989, 1993 The Regents of the
+University of California.  All rights reserved.
+
+Using Imgtool
+=============
+
+Imgtool is a command line program that contains several "subcommands" that
+actually do all of the work.  Most commands are invoked in a manner along the
+lines of this:
+
+	imgtool <subcommand> <format> <image> ...
+
+<subcommand> is the name of the subcommand
+<format> is the format of the image
+<image> is the filename of the image
+
+Further details vary with each subcommand.  Also note that not all subcommands
+are applicable or supported for different image formats.
+
+Certain Imgtool subcommands (info, crc, good) make use of the CRC files, so if
+you use these commands, make sure that your CRC directory is set up.
+
+Imgtool Subcommands
+===================
+
+create            Creates an image
+dir               Lists the contents of an image
+get               Gets a single file from an image
+put               Puts a single file on an image (wildcards supported)
+getall            Gets all files off an image
+del               Deletes a file on an image
+info              Retrieves info about an image (by reading CRC files)
+crc               Retrieves info about an image in the same format used by the
+                  CRC files
+good              CRC checks a set of images and for matching images, copy into
+                  a new directory
+listformats       Lists all image file formats supported by imgtool
+listfilters       Lists all filters supported by imgtool
+listdriveroptions Lists all format-specific options for the 'put' and 'create'
+                  commands
+
+Filters
+=======
+Filters are a means to process data being written into or read out of an image
+in a certain way.  Filters can be specified on the get, put, and getall
+commands by specifying --filter=xxxx on the command line.  Currently, only
+three filters are supported:
+
+  ascii           Translates end-of-lines to the appropriate format
+  cocobas         Processes tokenized CoCo BASIC programs
+  dragonbas       Processes tokenized Dragon BASIC programs
+
+Format Info
+===========
+
+rsdos CoCo Disks
+----------------
+Fully implemented.  This format supports two format-specific options on the put
+command:
+
+  --ftype=(basic|data|binary|assembler) Specifies the file type
+  --ascii=(ascii|binary)                Specifies the ASCII flag
+
+cococas CoCo Cassettes
+----------------------
+Both .cas and .wav supported, but read only.
+
+lnx Commodore 64 Lynx Archive
+-----------------------------
+only for early revisions of lynx archivs
+only extraction supported
+not heavily tested
+
+Lynx archivs could and should be handled in a c64 emulation 
+with the native lynx tool
+
+
+t64 Commodore 64/C64S Archive for Tapes
+---------------------------------------
+not heavily tested
+further creation/use of these archivs discouraged
+
+
+c64crt/crt Commodore 64 Cartridge
+---------------------------------
+for professional use only (cartridge dumper)
+not heavily tested
+
+
+d64 Commodore SX64/VC1541/1551/2031 Diskette
+x64 VICE variant of the above
+d71 Commodore 128D/1571 Diskette
+d81 Commodore 65/1565/1581 Diskette
+-----------------------------------
+not heavily tested
+x64: further creation/use discouraged
+
+
+msdos/fat Microsoft DOS Diskette
+--------------------------------
+directories not finished
+not heavily tested
+
+Formatting (low and high level) must be done with the msdos utility format!
+Boot structures must be installed on these disks with the msdos utility sys!
+
+standard parameter for common disk formats:
+type 0: 5 1/4 inch, double density, single sided, 160kb: sectors 8, heads 1, tracks 40
+type 1: 5 1/4 inch, DD, SS, 180kb: sectors 9, heads 1, tracks 40
+type 2: 5 1/4 inch, DD, double sided, 320kb: sectors 8, heads 2, tracks 40
+type 3: 5 1/4 inch, DD, DS, 360kb: sectors 9, heads 2, tracks 40
+type 4: 3 1/2 inch, DD, DS, 720kb: sectors 9, heads 2, tracks 80
+at disk controller necessary for high density
+type 5: 5 1/4 inch, high density, DS, 1.2mb: sectors 15, heads 2, tracks 80
+        3 1/2 inch, HD, DS, 1.2mb: sectors 15, heads 2, tracks 80
+type 6: 3 1/2 inch, HD, DS, 1.44mb: sectors 18, heads 2, tracks 80
+special disk controller necessary for enhanced density
+type 7: 3 1/2 inch, enhanced density, DS, 2.88mb: sectors 36, heads 2, tracks 80
+
+unix with bash: use
+dd if=/dev/zero of=<name.dsk> bs=512 count=$((9*2*40)) 
+to generate standard blank 360kb image
+
+
+msdoshd/fat Microsoft DOS Harddisk/PC Partition Table
+-----------------------------------------------------
+not finished and not working
+(see also unter msdos/fat)
+
+No low level format necessary with image files
+Partitioning must be done with the msdos utility fdisk
+Then you can format each partition with msdos utility format
+
+standard parameter for common disk formats:
+type 0: 20mb standard pc/xt harddisk: 17 sectors, 4 heads, 615 cylinders
+
+unix with bash: use
+dd if=/dev/zero of=<name.dsk> bs=512 count=$((17*4*615)) 
+to generate standard blank 20mb pc xt harddisk image
+
+
+Virtual MSX tape archive
+------------------------
+Converts .tap files from Virtual MSX 1.x to .cas files. It is not
+fault-tolerant. 
+
+
+Virtual MSX Game Master 2 SRAM file
+-----------------------------------
+Very simple, not overly useful but some might want it. Virtual MSX stored the
+SRAM of Konami's Game Master 2 in "gmaster2.ram". To convert this to something
+useful with MESS and other MSX emulators, go:
+
+imgtool getall vmsx_gm2 gmaster2.ram 
+
+You'll get a file called gmaster2.mem, which must place in the correct directory
+of mess to use  (MESS\MEMCARD\GameMaster2 if your Game Master 2 .rom file is
+called GameMaster2.rom). It's ~/.xmess/memcard/GameMaster2.mem for xmess.
+
+
+fMSX style .cas file
+--------------------
+Converts .cas files to .wav files. The MSX driver can use .cas files directly
+so you don't have to convert them. You can use it to export files to a real
+MSX. Connect the MSX to the line out of your computer. Give the apropriate
+command on the MSX (BLOAD "CAS:",R for example) and then play the .wav file
+on your computer. 
+
+imgtool dir fmsx_cas file.cas
+imgtool getall fmsx_cas file.cas
+imgtool get fmsx_cas file.cas file.wav newfile.wav
+
+
+XelaSoft Archive (.xsa)
+-----------------------
+
+The XelaSoft Archive is a compressed file. It can only contain one
+file. Although it can contain any file, it's always used for MSX disk 
+images. The were programs written by XelaSoft which made a dump
+of a disk, and compressing them at the same time. Very useful to store
+a disk dump on another disk. zip/gzip offer much better compression and
+are mainstream, so let's stick with that.
+
+imgtool uses XSA code developed by Alex Wulms/XelaSoft.
+
+http://web.inter.nl.net/users/A.P.Wulms/
+
+
+Various bogus MSX disk images (img/ddi/msx/multidisks)
+------------------------------------------------------
+
+These are formats you might come across, which have no actual added value
+whatsoever. The only format MESS will support, like most other MSX
+emulators, is .dsk (a plain dump without any header information). This
+filetype converts them all to .dsk format.
+
+msx_img are disk images with an extra byte at the beginning. It' 1 (0x01)
+for single-sided images and 2 (0x02) for double-side images. These 
+files are at: ftp://ftp.funet.fi/pub/msx/. The extension is .img
+
+msx_ddi are DiskDupe 5.12 disk images. There is a 0x1800 bytes header
+at the beginning. The CompuJunkS MSX emulator used these files. The header
+often contain garbage so it's simply stripped. The extension is .ddi
+
+msx_msx are disk images with a weird sector order. You can find them
+at: ftp://jazz.snu.ac.kr/pub/msx/. The extension is .msx
+
+msx_mul are "multi disk" images, used by fmsx-dos 1.6. It is simply 
+more than one .dsk image appended to one another. The extension is
+still .dsk, but the file is larger than 720kB (actually always a 
+multiple of 720kB.
+
+
+rom16 16 bit wide rom image
+---------------------------
+allows easy access to even and odd parts
+file even: even bytes
+file odd: odd bytes
+
+
+Amstrad NC100/NC150/NC200 PCMCIA Ram Card Images (crd/card)
+-----------------------------------------------------------
+
+The card filesystem is similar to FAT, but not identical.
+The maximum card size is 1mb, and maximum file size is 64k.
+(Files will be cut at 64k if they are larger - e.g. when putting a large file)
+
+As far as I know there is no directory system, however there is always a 
+system "NC100" directory which points to the root directory. (Like the DOS "."
+directory).
+
+Using imgtool, you can put, get and delete files.
+
+At this time only ascii file type is supported. These files can be loaded
+into the internal wordprocessor,or,if the file is a BASIC listing, it can
+be loaded into basic with "*EXEC <filename>" at the ">" prompt.
+
+From BASIC you can get a directory listing of the card filesystem with "*."
+at the ">" prompt.
+
+The file date information is not supported at this time.
+
+The card filesystem reading/writing in imgtool has not been heavily tested.
+
+
+TI99 floppy disk images (v9t9/pc99fm/pc99mfm/ti99_old)
+------------------------------------------------------
+
+These modules enable you to create and catalog ti99 images, to delete
+individual files and directories, and to get and put files in TIFILE format.
+Note that you cannot create images in pc99 format.
+
+The v9t9 module supports the v9t9 disk images that is used by MESS, the pc99fm
+module supports FM-encoded pc99 images, and the pc99mfm supports MFM-encoded
+pc99 images, and the ti99_old module supports the now obsolete image format
+that was used by MESS versions prior to .69.  The MESS ti99 drivers supports
+the v9t9 disk image format only.  (Note that the old MESS format was identical
+to the V9T9 format for single-sided disks, but that the track order was
+completely different for double-sided disks, which caused the two formats to be
+incompatible for double-sided disk images.  I have changed the format to v9t9
+as this format is used by most other TI99 utilities and emulators.)
+
+The TIFILE format is a file format that is supported by many ti99 utilities: it
+encodes a TI99 file as a flat stream of bytes, which enables to store it on
+file systems that do not support the TI99 file structure and to transmit it
+through networks.  This format uses a data format similar to the one used on
+ti99 floppies (i.e. logical records are grouped in physical records of 256
+bytes), with a custom 128-byte header.
+
+Legal characters for volume and file names are upper case ASCII characters,
+except period ('.') and space (' ').  Lower case characters are not recommended
+because they are not supported by TI99/4.  You had better avoid control
+characters and non-ASCII characters, too.  (Additionally, the NULL character is
+forbidden in file names, but I think nobody in his right sense would even try
+to enter a NULL character in a file name.)  The restriction on the period ('.')
+character may sound strange to users of other OSes, but this character is used
+as a path separator by TI systems.  (As a matter of fact, no TI99 floppy disk
+DSR (except the HFDC DSR) implements disk directories, but other TI systems
+implement this convention extensively.)  Since period is used as the path
+separator, TI99 users often use the slash ('/') or dash ('-') characters as
+file extension separators; note, however, that the use of file extensions is
+never systematic in TI99: you may use file extensions if you find them useful,
+just like you may use any other file naming scheme, but no program enforce or
+require filename extensions as it is often the case in the DOS/windows world.
+
+
+Parameters for create:
+
+--label=...: an optional string of up to 10 characters.
+--sides=[1|2]: 1 for single-sided, 2 for double-sided.
+--tracks=[1-80]: number of track per side.  Should be 40 for a 40-track disk,
+    and 80 for an 80-track disk.
+--sectors=[1-36]: number of sectors per track.  Should be 9 in single density
+    (FM), 18 in double density (MFM), and 36 in high density (MFM).
+--protection=[0|1]: when set to 1, the disk will be protected and some (but not
+    all) TI99 programs won't overwrite the disk.
+--density=[Auto|SD|DD|HD]: you should probably leave this parameter to Auto, so
+    that imgtool picks the correct value automatically (according to the number
+    of sectors per track).  If you really need to, SD forces single density
+    (FM), DD forces double density (MFM), and HD forces high density (MFM).
+
+Supported geometries for create:
+
+  description    |sides|tracks|sectors| size | FDC Compatibility (1)
+                 |     |      |       |      |
+SSSD 48TPI 5"1/4 |  1  |  40  |    9  |  90K | All
+                 |     |      |       |      |
+DSSD 48TPI 5"1/4 |  2  |  40  |    9  | 180K | All
+                 |     |      |       |      |
+DSDD 48TPI 5"1/4 |  2  |  40  |   18  | 360K | SNUG BwG, Myarc HFDC
+                 |     |      |       |      |
+DSDD 96TPI 5"1/4 |  2  |  80  |   18  | 720K | Myarc HFDC (2)
+or DSDD 3"1/2    |     |      |       |      |
+                 |     |      |       |      |
+DSHD 3"1/2       |  2  |  80  |   36  |1.44M | Myarc HFDC (Geneve Only) (3)
+
+(1) Only emulated controllers are listed in this table
+(2) SNUG BwG can read such images, but it will corrupt them when writing new
+    data to them
+(3) You cannot boot from such images (this is because the Geneve MDOS operating
+    system needs to replaces the incomplete HFDC DSR with a better DSR to
+    support HD: since MDOS is not loaded yet at boot time, you cannot boot from
+    a HD disk).
+
+
+Examples:
+
+List the catalog of image test.dsk:
+imgtool dir v9t9 test.dsk
+
+Extract file FILE1 located on image test.dsk:
+imgtool get v9t9 test.dsk FILE1
+
+Extract file FILE1 located in subdirectory SUBDIR1 on image test.dsk:
+imgtool get v9t9 test.dsk SUBDIR1.FILE1
+
+Write file FILE1 on image test.dsk:
+imgtool put v9t9 test.dsk FILE1
+(Note that file FILE1 must not exist before the command is run.  Use the delete
+command first if you need to overwrite an existing file.)
+
+Delete file FILE1 located in subdirectory SUBDIR1 on image test.dsk:
+imgtool delete v9t9 test.dsk SUBDIR1.FILE1
+
+Delete subdirectory SUBDIR1 on image test.dsk:
+imgtool delete v9t9 test.dsk SUBDIR1
+(Subdirectory SUBDIR1 must be empty.)
+
+Create a SSSD image compatible with all controllers:
+imgtool create v9t9 test.dsk --sides=1 --tracks=40 --sectors=9
+
+Create a DSSD image compatible with all controllers:
+imgtool create v9t9 test.dsk --sides=2 --tracks=40 --sectors=9
+
+Create a DSDD image compatible with BwG and HFDC controllers:
+imgtool create v9t9 test.dsk --sides=2 --tracks=40 --sectors=18
+
+Create a 80-track DSDD image compatible with the HFDC controller:
+imgtool create v9t9 test.dsk --sides=2 --tracks=80 --sectors=18
+
+Create a DSHD image compatible with the Geneve with a HFDC controller:
+imgtool create v9t9 test.dsk --sides=2 --tracks=80 --sectors=36
+
+
+TI99 hard disk images (ti99hd)
+------------------------------
+
+This module can catalog ti99 hard disk images, delete individual files and
+directories, and get and put files in TIFILE format.  Only images in HFDC
+format are supported for now (no SCSI format).
+
+
+TI990 disk images (ti990hd)
+---------------------------
+
+This module supports disk images in DNOS format (which appears to be virtually
+identical to DX10 3.x format).  Although the module is named ti990hd, this
+module will work fine with floppy images as well as hard disk images: just make
+sure that the disks are formatted in the proper format, as neither DX10 2.x nor
+TX990 formats are supported.
+
+
+Parameters for create:
+
+The most interesting command is create, as you cannot create new images within
+emulation.
+
+--cylinders: number of cylinders
+--heads: number of heads
+--sectors: number of sectors per track
+--seclen: bytes per sector
+
+
+Known restrictions on geometry:
+
+256 < bytes per sector < 512 (arbitrary restriction, actual TI990s might
+    accept values out of this range)
+bytes per sector must be even
+3 < # cylinders < 2047
+1 < # heads < 31
+1 < sectors per track < 256
+(sectors per track) * (bytes per sector) < 2^17 = 131072 (which implies
+    (sectors per track) < 255 if sectors are 512-byte long)
+
+(There are probably other restrictions, so you had better stick to values
+similar to the ones used by actual disk units...  Also note that according to
+the Spectra 126-Plus manual, ADU size limitations prevent most operating
+systems from supporting units larger than 500MBytes.)
+
+
+Known drive geometries:
+
+(Sources: 946250-9703 p. 3-14, 2270512-9701 p. 11-3, 945250-9701 pp. 5-20
+through 5-28, 946250-9701B pp. 2-1 through 2-3, 2540219A-0001 pp. 4-2 and 4-3,
+2306140-9701 p. 1-15, 223439B-9701 pp. 3-14 and 3-28.  See also "Spectra
+126-Plus Product Reference Manual" by Cipher P/N 8500055 revision A4 page 2-8.)
+
+Disk Type       Units   Size (MB)   Cylinders   Heads   Sectors/Track   Bytes/Sector
+FD800 (min)     1          .244       77         1       26             128
+FD800 (max)     1          .978???    77         2???    26???          256???
+FD1000          1         1.15        77         2       26             288
+DS31/DS32       1         2.81       203         2       24             288
+DS10            2         4.70       408         2(*2)   20             288
+DS25            1        22.3        408         5       38             288
+DS50            1        44.6        815         5       38             288
+DS200           1       169.5        815        19       38             288
+CD1400-32       2        13.5        821(h)      1       64             256
+CD1400-64 (rem) 1        13.5        821(h)      1       64             256
+CD1400-64 (fix) 1        38.5        821(h)      3       64             256
+CD1400-96 (rem) 1        13.5        821(h)      1       64             256
+CD1400-96 (fix) 1        67.3        821(h)      5       64             256
+DS80            1        62.7        803(g)      5       61             256
+DS300           1       238.3        803(c)     19       61             256
+WD800-18        1        18.5        651(b)      3       37             256
+WD800-43        1        43.2        651(b)      7       37             256
+WD800A/38       1        38.5        911(d)      5       33             256
+WD800A/69       1        69.3        911(d)      9       33             256
+WD800A/114      1       114.6        904(d)     15       33             256
+WD500           1         4.92       150(a)      4       32             256
+WD500A          1        17.1        694(a)      3       32             256
+WD900-138       1       138.1        805(e)     10       67             256
+WD900-138/2     2        69.0        805(e)      5(*2)   67             256
+WD900-425       1       425.8        693(e)     24      100             256
+WD900-425/2     2       212.9        693(e)     12(*2)  100             256
+MSU II          1       158.8        957(f)      9       36             512
+MSU IIA         1       332.9       1204(f)     15       36             512
+
+a) some extra cylinders are reserved for diagnostics
+b) 6 extra cylinders are reserved for storage system use (including 2 for
+  diagnostics)
+c) some extra cylinders are reserved for diagnostics, and 10 extra cylinders
+  are reserved to replace bad tracks
+d) 4 extra cylinders are reserved for storage system use (including 2 for
+  diagnostics), and 10 extra cylinders are reserved to replace bad tracks
+e) 16 extra cylinders are reserved for bad track relocation
+f) there are extra cylinders, and the way logical addresses relates to physical
+  address is so complex I don't even want to talk about it
+g) 2 extra cylinders are reserved for diagnostics, and 10 extra cylinders are
+  reserved to replace bad tracks
+h) 2 extra cylinders are reserved for diagnostics
+
+Note that 2270512-9701 and 946250-9703 describe more disk units (namely CMD 16,
+CMD 80, WD800A-43 and WD800A-100 for the former, and WD500-10 for the later).
+Since there are no other references anywhere and DX-10 does not seem to know
+about them, I assume that these models were uncommon.
+
+FD800 is a 8" floppy disc unit that is not emulated, and it is only cited for
+completeness.  (The FD800 controller is connected to the CRU bus instead of the
+TILINE bus, and it is the only disc controller that is supported by non-TILINE
+systems).
+
+FD1000 is a 8" floppy disc unit.
+
+DS31/DS32 was the first hard disk unit for ti990.  The only difference between
+DS31 and DS32 is that DS32 does not require a screwdriver to change the disc
+cartridge.
+
+DS10 has one 5-mb fixed platter and one 5mb disk cartridge.
+
+CD1400-32 and CD1400-96 have a one-platter 16-mb removable unit, and a fixed
+unit (16 mb for CD1400-32 and 80 mb for CD1400-96).
+
+WDxxx units are Winchester drives that connect to a proprietary PBUS bus
+interface.  This bus is a built-in interface in BS300 and BS300A systems, and
+the TPBI card enables any TILINE 990 system to support it.  WD800s are 8"
+drives with integrated tape backup, WD500s are 5"1/4 drives with integrated
+FD1000 backup, and WD900s are 9" drives.  The WD900 controller can optionally
+partition the disc into two partitions: the set-up with no partitioning is
+listed as WD900-138 and WD900-425, whereas the set-up with partitioning is
+listed as WD900-138/2 and WD900-425/2.
+
+MSU II and MSU IIa are SCSI units to be connected to the 990/SCSI controller
+board.
+
+
+Macintosh floppy disk images (mac)
+----------------------------------
+
+This module supports MFS (Macintosh File System) and HFS (Hierarchical File
+System) floppy disk images, either in diskcopy 4.2 or raw image format (the raw
+image format is partially compatible with diskcopy 6 format).
+
+This module can catalog images, and get files in MacBinary format.  You can put
+files on MFS-formatted images, too, but not on HFS-formatted images.
+
+The module does not support folders in MFS format, because MFS folders are not
+documented by Apple.
+
+Extracted files are in MacBinary III format (which is fully compatible with
+MacBinary I and II).  The MacBinary III format joins both macintosh file forks,
+the comment field, and most file info in one single file: it is supported by
+several Macintosh utilities.
+
+
+Texas Instruments calculators variable files
+--------------------------------------------
+
++--------+------------------------------------------+-----------+
+| Format | Description                              | Extension |
++--------+------------------------------------------+-----------+
+| ti85p  | TI-85 program file                       |    85p    |
+| ti85s  | TI-85 string file (also ZShell programs) |    85s    |
+| ti85i  | TI-85 picture file (85-image)            |    85i    |
+| ti85n  | TI-85 real number file                   |    85n    |
+| ti85c	 | TI-85 complex number file                |    85c    |
+| ti85l  | TI-85 list (real or complex)             |    85l    |
+| ti85k  | TI-85 constant file                      |    85k    |
+| ti85m  | TI-85 matrix (real or complex) file      |    85m    |
+| ti85v  | TI-85 vector (real or complex) file      |    85v    |
+| ti85d  | TI-85 graphics database file             |    85d    |
+| ti85e  | TI-85 equation file                      |    85e    |
+| ti85r  | TI-85 range settings file                |    85r    |
+| ti85g	 | TI-85 grouped file                       |    85g    |
+| ti85   | TI-85 generic file                       |    85?    |
+| ti86p  | TI-86 program file                       |    86p    |
+| ti86s  | TI-86 string file                        |    86s    |
+| ti86i  | TI-86 picture file (85-image)            |    86i    |
+| ti86n  | TI-86 real number file                   |    86n    |
+| ti86c  | TI-86 complex number file                |    86c    |
+| ti86l  | TI-86 list (real or complex) file        |    86l    |
+| ti86k	 | TI-86 constant file                      |    86k    |
+| ti86m  | TI-86 matrix (real or complex) file      |    86m    |
+| ti86v  | TI-86 vector (real or complex) file      |    86v    |
+| ti86d  | TI-86 graphics database file             |    86d    |
+| ti86e  | TI-86 equation file                      |    86e    |
+| ti86r  | TI-86 range settings file                |    86r    |
+| ti86g  | TI-86 grouped file                       |    86g    |
+| ti86   | TI-86 generic file                       |    86?    |
++--------+------------------------------------------+-----------+
+
+Grouped formats (ti85g and ti86g) can keep more than one variable.
+Generic formats (ti85 and ti86) can be used for all types of variable files.
+For all types of variable files dir, create, put, get and delete commands are
+supported.
+
+
+Texas Instruments calculators memory backup files
+-------------------------------------------------
+
++--------+------------------------------------------+-----------+
+| Format | Description                              | Extension |
++--------+------------------------------------------+-----------+
+| ti85b  | TI-85 memory backup file                 |    85b    |
++--------+------------------------------------------+-----------+
+
+For TI memory backup files only dir command is supported.
+
