@@ -278,6 +278,8 @@
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 #include "machine/timekpr.h"
+#include "machine/jvshost.h"
+#include "machine/jvsdev.h"
 #include "video/polynew.h"
 #include "sound/rf5c400.h"
 
@@ -285,6 +287,9 @@
 #define GFXFIFO_OUT_VERBOSE		0
 #define M2SFIFO_VERBOSE			0
 #define S2MFIFO_VERBOSE			0
+
+
+/* Cobra Renderer class */
 
 struct cobra_polydata
 {
@@ -354,6 +359,8 @@ private:
 	};
 };
 
+
+/* FIFO class */
 class cobra_fifo
 {
 public:
@@ -401,6 +408,120 @@ private:
 	UINT64 *m_data;
 	event_delegate m_event_callback;
 };
+
+
+/* Cobra JVS Device class */
+
+class cobra_jvs : public jvs_device
+{
+public:
+	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch);
+	virtual bool coin_counters(UINT8 *&buf, UINT8 count);
+};
+
+const device_type COBRA_JVS = &device_creator<cobra_jvs>;
+
+cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: jvs_device(mconfig, COBRA_JVS, "COBRA_JVS", tag, owner, clock)
+{
+
+}
+
+bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
+{
+	printf("jvs switch read: num players %d, bytes %d\n", count_players, bytes_per_switch);
+
+	if (count_players > 2 || bytes_per_switch > 2)
+		return false;
+
+	static const char* player_ports[2] = { ":P1", ":P2" };
+
+	*buf++ = ioport(":TEST")->read_safe(0);
+
+	for (int i=0; i < count_players; i++)
+	{
+		UINT32 pval = ioport(player_ports[i])->read_safe(0);
+		for (int j=0; j < bytes_per_switch; j++)
+		{
+			*buf++ = (UINT8)(pval >> ((1-j) * 8));
+		}
+	}
+	return true;
+}
+
+bool cobra_jvs::coin_counters(UINT8 *&buf, UINT8 count)
+{
+	printf("jvs coin counter read: count %d\n", count);
+
+	if (count > 2)
+		return false;
+
+	*buf++ = 0x00;
+	*buf++ = 0x01;
+
+	return true;
+}
+
+
+class cobra_jvs_host : public jvs_host
+{
+public:
+	cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void write(UINT8, const UINT8 *&rec_data, UINT32 &rec_size);
+
+private:
+	UINT8 m_send[512];
+	int m_send_ptr;
+};
+
+const device_type COBRA_JVS_HOST = &device_creator<cobra_jvs_host>;
+
+cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: jvs_host(mconfig, COBRA_JVS_HOST, "COBRA_JVS_HOST", tag, owner, clock)
+{
+	m_send_ptr = 0;
+}
+
+void cobra_jvs_host::write(UINT8 data, const UINT8 *&rec_data, UINT32 &rec_size)
+{
+	m_send[m_send_ptr++] = data;
+	push(data);
+
+	if (m_send[0] == 0xe0)
+	{
+		if (m_send_ptr > 2)
+		{
+			UINT8 length = m_send[2];
+			if (length == 0xff)
+				length = 4;
+			else
+				length = length + 3;
+
+			if (m_send_ptr >= length)
+			{
+				commit_encoded();
+
+				get_encoded_reply(rec_data, rec_size);
+	
+				m_send_ptr = 0;
+				return;
+			}
+		}
+	}
+	else
+	{
+		m_send_ptr = 0;
+	}
+
+	rec_data = NULL;
+	rec_size = 0;
+}
+
+
+/* Cobra driver class */
 
 class cobra_state : public driver_device
 {
@@ -465,6 +586,12 @@ public:
 	void m2sfifo_event_callback(cobra_fifo::EventType event);
 	void s2mfifo_event_callback(cobra_fifo::EventType event);
 
+	enum
+	{
+		MAIN_INT_M2S = 0x01,
+		MAIN_INT_S2M = 0x02,
+	};
+
 	UINT8 m_m2s_int_enable;
 	UINT8 m_s2m_int_enable;
 	UINT8 m_vblank_enable;
@@ -503,6 +630,7 @@ public:
 	int m_gfx_fifo_loopback;
 	int m_gfx_unknown_v1;
 	int m_gfx_status_byte;
+
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
@@ -510,16 +638,14 @@ public:
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
-	/*
     UINT32 *fb = &m_framebuffer->pix32(scanline);
 
-    UINT32 color = 0xffff0000; // TODO
+    UINT32 color = 0xff000000; // TODO
 
     for (int x = extent.startx; x < extent.stopx; x++)
     {
         fb[x] = color;
     }
-    */
 }
 
 void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -873,6 +999,9 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 
 			if (m_m2s_int_enable & 0x80)
 			{
+				if (!m_m2s_int_mode)
+					m_main_int_active |= MAIN_INT_M2S;
+
 				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 			}
 
@@ -895,6 +1024,7 @@ void cobra_state::s2mfifo_event_callback(cobra_fifo::EventType event)
 	switch (event)
 	{
 		case cobra_fifo::EVENT_EMPTY:
+			m_main_int_active &= ~MAIN_INT_S2M;
 			break;
 
 		case cobra_fifo::EVENT_HALF_FULL:
@@ -1036,13 +1166,8 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 
 		int value = 0x01;
 
-		if (m_s2mfifo->is_empty())		// TODO: this is an interrupt
-		{
-			value |= 0x2;
-		}
-
-		//value |= (m_main_int_active & 2) ? 0x00 : 0x02;
-		value |= (m_main_int_active & 1) ? 0x00 : 0x08;
+		value |= (m_main_int_active & MAIN_INT_S2M) ? 0x00 : 0x02;
+		value |= (m_main_int_active & MAIN_INT_M2S) ? 0x00 : 0x08;
 		value |= (m_gfx_unk_flag & 0x80) ? 0x00 : 0x04;
 
 		r |= (UINT64)(value) << 32;
@@ -1059,6 +1184,9 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		// Main-to-Sub FIFO write data
 
 		m_m2sfifo->push(&space.device(), (UINT8)(data >> 40));
+
+		if (!m_m2s_int_mode)
+			m_main_int_active &= ~MAIN_INT_M2S;
 
 		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
@@ -1082,22 +1210,22 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		{
 			if (!m_m2sfifo->is_half_full())
 			{
-				m_main_int_active |= 1;
+				m_main_int_active |= MAIN_INT_M2S;
 			}
 			else
 			{
-				m_main_int_active &= ~1;
+				m_main_int_active &= ~MAIN_INT_M2S;
 			}
 		}
 		else
 		{
 			if (m_m2sfifo->is_empty())
 			{
-				m_main_int_active |= 1;
+				m_main_int_active |= MAIN_INT_M2S;
 			}
 			else
 			{
-				m_main_int_active &= ~1;
+				m_main_int_active &= ~MAIN_INT_M2S;
 			}
 		}
 
@@ -1133,7 +1261,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		if ((m_s2m_int_enable & 0x80) == 0)
 		{
-			m_main_int_active &= ~2;
+			m_main_int_active &= ~MAIN_INT_S2M;
 
 			// clear the interrupt
 			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -1346,11 +1474,11 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 
 		m_s2mfifo->push(&space.device(), (UINT8)(data >> 24));
 
+		m_main_int_active |= MAIN_INT_S2M;
+
 		// fire off an interrupt if enabled
 		if (m_s2m_int_enable & 0x80)
 		{
-			m_main_int_active |= 2;
-
 			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 	}
@@ -1553,7 +1681,23 @@ static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
 
 static void sub_jvs_w(device_t *device, UINT8 data)
 {
+	cobra_jvs_host *jvs = downcast<cobra_jvs_host *>(device->machine().device("cobra_jvs_host"));
 	printf("sub_jvs_w: %02X\n", data);
+
+	const UINT8 *rec_data;
+	UINT32 rec_size;
+
+	jvs->write(data, rec_data, rec_size);
+
+	if (rec_size > 0)
+	{
+		printf("jvs reply ");
+		for (int i=0; i < rec_size; i++)
+		{
+			printf("%02X ", rec_data[i]);
+		}
+		printf("\n");
+	}
 }
 
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
@@ -1938,13 +2082,13 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 						}
 						else
 						{
-							//render_delegate rd = render_delegate(FUNC(cobra_renderer::render_color_scan), this);
+							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_color_scan), this);
 							for (int i=2; i < units; i++)
 							{
-								//render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
-								draw_point(visarea, vert[i-2], 0xffff0000);
-								draw_point(visarea, vert[i-1], 0xffff0000);
-								draw_point(visarea, vert[i], 0xffff0000);
+								render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
+								//draw_point(visarea, vert[i-2], 0xffff0000);
+								//draw_point(visarea, vert[i-1], 0xffff0000);
+								//draw_point(visarea, vert[i], 0xffff0000);
 							}
 						}
 						break;
@@ -2539,16 +2683,51 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 INPUT_PORTS_START( cobra )
-	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_START("TEST")
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW)			/* Test Button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+
+	PORT_START("P2")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static powerpc_config main_ppc_cfg =
@@ -2627,7 +2806,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
 
-	MCFG_MACHINE_RESET( cobra )
+	MCFG_MACHINE_RESET(cobra)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
@@ -2650,7 +2829,10 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_M48T58_ADD("m48t58")
+
+	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
+	MCFG_JVS_DEVICE_ADD("cobra_jvs", COBRA_JVS, "cobra_jvs_host")
 
 MACHINE_CONFIG_END
 
