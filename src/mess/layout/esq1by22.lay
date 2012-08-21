@@ -1,0 +1,95 @@
+<!-- esq1by24.lay -->
+<!-- 2012-05-27: Initial version.  [R. Belmont / VFDGen 0.1] -->
+
+<mamelayout version="2">
+
+	<element name="vfd0" defstate="0">
+		<led14segsc>
+			<color red="0.45" green="1.0" blue="0.95" />
+		</led14segsc>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+
+		<!-- Background -->
+		<backdrop element="background">
+			<bounds left="0" top="0" right="417" bottom="23" />
+		</backdrop>
+
+		<!-- VFDs -->
+		<bezel name="vfd0" element="vfd0">
+			<bounds left="0" top="0" right="18" bottom="23" />
+		</bezel>
+		<bezel name="vfd1" element="vfd0">
+			<bounds left="19" top="0" right="37" bottom="23" />
+		</bezel>
+		<bezel name="vfd2" element="vfd0">
+			<bounds left="38" top="0" right="56" bottom="23" />
+		</bezel>
+		<bezel name="vfd3" element="vfd0">
+			<bounds left="57" top="0" right="75" bottom="23" />
+		</bezel>
+		<bezel name="vfd4" element="vfd0">
+			<bounds left="76" top="0" right="94" bottom="23" />
+		</bezel>
+		<bezel name="vfd5" element="vfd0">
+			<bounds left="95" top="0" right="113" bottom="23" />
+		</bezel>
+		<bezel name="vfd6" element="vfd0">
+			<bounds left="114" top="0" right="132" bottom="23" />
+		</bezel>
+		<bezel name="vfd7" element="vfd0">
+			<bounds left="133" top="0" right="151" bottom="23" />
+		</bezel>
+		<bezel name="vfd8" element="vfd0">
+			<bounds left="152" top="0" right="170" bottom="23" />
+		</bezel>
+		<bezel name="vfd9" element="vfd0">
+			<bounds left="171" top="0" right="189" bottom="23" />
+		</bezel>
+		<bezel name="vfd10" element="vfd0">
+			<bounds left="190" top="0" right="208" bottom="23" />
+		</bezel>
+		<bezel name="vfd11" element="vfd0">
+			<bounds left="209" top="0" right="227" bottom="23" />
+		</bezel>
+		<bezel name="vfd12" element="vfd0">
+			<bounds left="228" top="0" right="246" bottom="23" />
+		</bezel>
+		<bezel name="vfd13" element="vfd0">
+			<bounds left="247" top="0" right="265" bottom="23" />
+		</bezel>
+		<bezel name="vfd14" element="vfd0">
+			<bounds left="266" top="0" right="284" bottom="23" />
+		</bezel>
+		<bezel name="vfd15" element="vfd0">
+			<bounds left="285" top="0" right="303" bottom="23" />
+		</bezel>
+		<bezel name="vfd16" element="vfd0">
+			<bounds left="304" top="0" right="322" bottom="23" />
+		</bezel>
+		<bezel name="vfd17" element="vfd0">
+			<bounds left="323" top="0" right="341" bottom="23" />
+		</bezel>
+		<bezel name="vfd18" element="vfd0">
+			<bounds left="342" top="0" right="360" bottom="23" />
+		</bezel>
+		<bezel name="vfd19" element="vfd0">
+			<bounds left="361" top="0" right="379" bottom="23" />
+		</bezel>
+		<bezel name="vfd20" element="vfd0">
+			<bounds left="380" top="0" right="398" bottom="23" />
+		</bezel>
+		<bezel name="vfd21" element="vfd0">
+			<bounds left="399" top="0" right="417" bottom="23" />
+		</bezel>
+	</view>
+
+</mamelayout>

@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="background">
+		<rect>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="power_led" defstate="1">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+	<element name="green_led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+	<element name="red_led" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0" blue="0" />
+		</rect>
+	</element>
+
+	<element name="power_str" defstate="0">
+		<text string="POWER">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="25" height="4" />
+		</text>
+	</element>
+	<element name="ready_str" defstate="0">
+		<text string="READY">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="25" height="4" />
+		</text>
+	</element>
+	<element name="paperout_str" defstate="0">
+		<text string="PAPER OUT">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="35" height="4" />
+		</text>
+	</element>
+	<element name="online_str" defstate="0">
+		<text string="ONLINE">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="35" height="4" />
+		</text>
+	</element>
+
+	<view name="Control panel">
+		<bezel element="background">
+			<bounds x="0" y="0" width="67" height="52" />
+		</bezel>
+		<bezel name="power_led" element="power_led">
+			<bounds x="8" y="9" width="8" height="4" />
+		</bezel>
+		<bezel name="power_str" element="power_str">
+			<bounds x="18" y="9" width="17" height="4" />
+		</bezel>
+		<bezel name="ready_led" element="green_led">
+			<bounds x="8" y="20" width="8" height="4" />
+		</bezel>
+		<bezel name="ready_str" element="ready_str">
+			<bounds x="18" y="20" width="17" height="4" />
+		</bezel>
+		<bezel name="paperout_led" element="red_led">
+			<bounds x="8" y="31" width="8" height="4" />
+		</bezel>
+		<bezel name="paperout_str" element="paperout_str">
+			<bounds x="18" y="31" width="25" height="4" />
+		</bezel>
+		<bezel name="online_led" element="green_led">
+			<bounds x="8" y="42" width="8" height="4" />
+		</bezel>
+		<bezel name="online_str" element="online_str">
+			<bounds x="18" y="42" width="18" height="4" />
+		</bezel>
+	</view>
+</mamelayout>

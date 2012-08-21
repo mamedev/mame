@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="calendar">
+		<text string="calendar">
+		<color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="calc">
+		<text string="  calc  ">
+		<color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="expense">
+		<text string="expense ">
+		<color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="data">
+		<text string="  data  ">
+		<color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="apps">
+		<text string="  apps. ">
+		<color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="find">
+		<text string="  find  ">
+		<color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="line">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Standard">
+		<screen index="0">
+			<bounds left="0" top="0" right="160" bottom="266" />
+		</screen>
+
+		<!-- 6 buttons at bottom -->
+		<bezel element="calendar">
+			<bounds left="1" top="243" right="26" bottom="262" />
+		</bezel>
+		<bezel element="calc">
+			<bounds left="27" top="243" right="53" bottom="262" />
+		</bezel>
+		<bezel element="expense">
+			<bounds left="53" top="243" right="80" bottom="262" />
+		</bezel>
+		<bezel element="data">
+			<bounds left="80" top="243" right="107" bottom="262" />
+		</bezel>
+		<bezel element="apps">
+			<bounds left="107" top="243" right="134" bottom="262" />
+		</bezel>
+		<bezel element="find">
+			<bounds left="134" top="243" right="160" bottom="262" />
+		</bezel>
+		<bezel element="line">
+			<bounds left="0" top="240" right="160" bottom="241" />
+		</bezel>
+	</view>
+</mamelayout>

@@ -1,0 +1,54 @@
+/**********************************************************************
+
+    RCA VIP Tiny BASIC VP-700 emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#pragma once
+
+#ifndef __VP700__
+#define __VP700__
+
+#include "emu.h"
+#include "machine/vip_exp.h"
+#include "sound/cdp1863.h"
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> vp700_device
+
+class vp700_device : public device_t,
+					 public device_vip_expansion_card_interface
+{
+public:
+	// construction/destruction
+	vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "vp700"; }
+	virtual void device_start();
+
+	// device_vip_expansion_card_interface overrides
+	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
+
+private:
+	const UINT8 *m_rom;
+};
+
+
+// device type definition
+extern const device_type VP700;
+
+
+#endif

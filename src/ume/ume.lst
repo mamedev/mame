@@ -1,0 +1,14 @@
+/******************************************************************************
+
+    ume.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+#src/mame/mame.lst
+!3do
+!cd32
+!cdimono1
+#src/mess/mess.lst

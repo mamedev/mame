@@ -1,0 +1,58 @@
+/**********************************************************************
+
+    Wang PC-PM031-B Extended Memory Board emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#pragma once
+
+#ifndef __WANGPC_EMB__
+#define __WANGPC_EMB__
+
+
+#include "emu.h"
+#include "machine/wangpcbus.h"
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> wangpc_emb_device
+
+class wangpc_emb_device : public device_t,
+						  public device_wangpcbus_card_interface
+{
+public:
+	// construction/destruction
+	wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "wangpc_emb"; }
+
+	// device_wangpcbus_card_interface overrides
+	virtual UINT16 wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask);
+	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
+	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask);
+	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
+
+private:
+	UINT16 *m_ram;
+	UINT16 m_option;
+	int m_parity_error;
+	int m_parity_odd;
+};
+
+
+// device type definition
+extern const device_type WANGPC_EMB;
+
+
+#endif

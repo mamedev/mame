@@ -1,0 +1,93 @@
+#pragma once
+
+#ifndef __Z88_RAM_H__
+#define __Z88_RAM_H__
+
+#include "emu.h"
+#include "machine/z88cart.h"
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> z88_32k_ram_device
+
+class z88_32k_ram_device : public device_t,
+						   public device_z88cart_interface
+{
+public:
+	// construction/destruction
+	z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "z88_32k_ram"; }
+
+	// z88cart_interface overrides
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual UINT8* get_cart_base();
+	virtual UINT32 get_cart_size() { return 0x8000; }
+
+protected:
+	// internal state
+	UINT8 *		m_ram;
+};
+
+// ======================> z88_128k_ram_device
+
+class z88_128k_ram_device : public z88_32k_ram_device
+{
+public:
+	// construction/destruction
+	z88_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "z88_128k_ram"; }
+
+	// z88cart_interface overrides
+	virtual UINT32 get_cart_size() { return 0x20000; }
+};
+
+// ======================> z88_512k_ram_device
+
+class z88_512k_ram_device : public z88_32k_ram_device
+{
+public:
+	// construction/destruction
+	z88_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "z88_512k_ram"; }
+
+	// z88cart_interface overrides
+	virtual UINT32 get_cart_size() { return 0x80000; }
+};
+
+// ======================> z88_1024k_ram_device
+
+class z88_1024k_ram_device : public z88_32k_ram_device
+{
+public:
+	// construction/destruction
+	z88_1024k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "z88_1024k_ram"; }
+
+	// z88cart_interface overrides
+	virtual UINT32 get_cart_size() { return 0x100000; }
+};
+
+// device type definition
+extern const device_type Z88_32K_RAM;
+extern const device_type Z88_128K_RAM;
+extern const device_type Z88_512K_RAM;
+extern const device_type Z88_1024K_RAM;
+
+#endif  /* __Z88_RAM_H__ */

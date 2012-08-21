@@ -1,0 +1,114 @@
+<!-- 19" display for the Apollo DN3500 -->
+
+<mamelayout version="2">
+
+	<element name="internal_led"> <disk> <color red="1.0" green="1.0" blue="1.0" /> </disk> </element>
+	<element name="external_led"> <disk> <color red="0.666" green="0.555" blue="0.0" /> </disk> </element>
+	<element name="power_led"> <disk> <color red="0.0" green="1.0" blue="0.0" /> </disk> </element>
+
+	<element name="label_a"> <text string="A"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_b"> <text string="B"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_c"> <text string="C"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_d"> <text string="D"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="power_label"> <text string="PWR"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="f1s"> <text string="SHELL"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f1">  <text string="CMD"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f2s"> <text string="CUT"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f2">  <text string="COPY"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f3s"> <text string="UNDO"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f3">  <text string="PASTE"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f4s"> <text string="MOVE"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f4">  <text string="GROW"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="f5s"> <text string="INS"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f5">  <text string="MARK"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f6s"> <text string="LINE"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f6">  <text string="DEL"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f7s"> <text string="CHAR"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f7">  <text string="DEL"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f8s"> <text string=""> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f8">  <text string="AGAIN"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="f9s"> <text string=""> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f9">  <text string="READ"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f10s"> <text string="SAVE"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f10">  <text string="EDIT"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f11s"> <text string="ABORT"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f11">  <text string="EXIT"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f12s"> <text string="HELP"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="f12">  <text string="HOLD"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<view name="Apollo 19&quot; Monochrome">
+
+		<bezel element="background"> <bounds left="0" right="340" top="1024" bottom="1068" /> </bezel>
+		<bezel name="f1s" element="f1s"> <bounds left="0" right="80" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f1"  element="f1"> <bounds left="0" right="80" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f2s" element="f2s"> <bounds left="82" right="162" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f2"  element="f2"> <bounds left="82" right="162" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f3s" element="f3s"> <bounds left="164" right="246" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f3"  element="f3"> <bounds left="164" right="246" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f4s" element="f4s"> <bounds left="248" right="328" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f4"  element="f4"> <bounds left="248" right="328" top="1048" bottom="1064" /> </bezel>
+
+		<bezel element="background"> <bounds left="343" right="682" top="1024" bottom="1068" /> </bezel>
+		<bezel name="f5s" element="f5s"> <bounds left="350" right="430" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f5"  element="f5"> <bounds left="350" right="430" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f6s" element="f6s"> <bounds left="432" right="512" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f6"  element="f6"> <bounds left="432" right="512" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f7s" element="f7s"> <bounds left="514" right="594" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f7"  element="f7"> <bounds left="514" right="594" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f8s" element="f8s"> <bounds left="597" right="677" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f8"  element="f8"> <bounds left="597" right="677" top="1048" bottom="1064" /> </bezel>
+
+		<bezel element="background"> <bounds left="685" right="1023" top="1024" bottom="1068" /> </bezel>
+		<bezel name="f9s" element="f9s"> <bounds left="697" right="777" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f9"  element="f9"> <bounds left="697" right="777" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f10s" element="f10s"> <bounds left="779" right="859" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f10"  element="f10"> <bounds left="779" right="859" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f11s" element="f11s"> <bounds left="861" right="941" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f11"  element="f11"> <bounds left="861" right="941" top="1048" bottom="1064" /> </bezel>
+		<bezel name="f12s" element="f12s"> <bounds left="943" right="1023" top="1030" bottom="1046" /> </bezel>
+		<bezel name="f12"  element="f12"> <bounds left="943" right="1023" top="1048" bottom="1064" /> </bezel>
+
+		<bezel element="background"> <bounds left="1026" right="1279" top="1024" bottom="1068" /> </bezel>
+
+		<bezel name="label_a" element="label_a"> <bounds left="1056" right="1070" top="1030" bottom="1046" /> </bezel>
+		<bezel name="external_led_a" element="external_led"> <bounds left="1074" right="1086" top="1032" bottom="1044" /> </bezel>
+
+		<bezel name="label_b" element="label_b"> <bounds left="1094" right="1106" top="1030" bottom="1046" /> </bezel>
+		<bezel name="external_led_b" element="external_led"> <bounds left="1112" right="1124" top="1032" bottom="1044" /> </bezel>
+
+		<bezel name="label_c" element="label_c"> <bounds left="1132" right="1144" top="1030" bottom="1046" /> </bezel>
+		<bezel name="external_led_c" element="external_led"> <bounds left="1150" right="1162" top="1032" bottom="1044" /> </bezel>
+
+		<bezel name="label_d" element="label_d"> <bounds left="1170" right="1182" top="1030" bottom="1046" /> </bezel>
+		<bezel name="external_led_d" element="external_led"> <bounds left="1188" right="1200" top="1032" bottom="1044" /> </bezel>
+
+		<bezel name="power_label" element="power_label"> <bounds left="1208" right="1240" top="1030" bottom="1046" /> </bezel>
+		<bezel name="power_led" element="power_led"> <bounds left="1246" right="1258" top="1032" bottom="1044" /> </bezel>
+
+		<bezel name="internal_led_1" element="internal_led"> <bounds left="1074" right="1086" top="1050" bottom="1062" /> </bezel>
+		<bezel name="internal_led_2" element="internal_led"> <bounds left="1112" right="1124" top="1050" bottom="1062" /> </bezel>
+		<bezel name="internal_led_3" element="internal_led"> <bounds left="1150" right="1162" top="1050" bottom="1062" /> </bezel>
+		<bezel name="internal_led_4" element="internal_led"> <bounds left="1188" right="1200" top="1050" bottom="1062" /> </bezel>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="1280" height="1024" />
+		</screen>
+	</view>
+
+	<view name="SXGA Screen">
+		<screen index="0">
+			<bounds x="0" y="0" width="1280" height="1024" />
+		</screen>
+	</view>
+
+</mamelayout>
