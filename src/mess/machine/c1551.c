@@ -11,6 +11,7 @@
 
     TODO:
 
+	- paddle expansion port passthru
     - byte latching does not match hardware behavior
       (CPU skips data bytes if implemented per schematics)
 
@@ -101,7 +102,6 @@ READ8_MEMBER( c1551_device::port_r )
 	return data;
 }
 
-
 WRITE8_MEMBER( c1551_device::port_w )
 {
 	/*
@@ -131,7 +131,6 @@ WRITE8_MEMBER( c1551_device::port_w )
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
 }
-
 
 static const m6502_interface m6510t_intf =
 {
@@ -166,7 +165,6 @@ READ8_MEMBER( c1551_device::tcbm_data_r )
 	return m_tcbm_data;
 }
 
-
 WRITE8_MEMBER( c1551_device::tcbm_data_w )
 {
 	/*
@@ -186,7 +184,6 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
 
 	m_tcbm_data = data;
 }
-
 
 READ8_MEMBER( c1551_device::tpi0_pc_r )
 {
@@ -219,7 +216,6 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	return data;
 }
 
-
 WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 {
 	/*
@@ -249,7 +245,6 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 	// read/write mode
 	m_ga->oe_w(BIT(data, 4));
 }
-
 
 static const tpi6525_interface tpi0_intf =
 {
@@ -289,7 +284,6 @@ READ8_MEMBER( c1551_device::tpi1_pb_r )
 	return m_status & 0x03;
 }
 
-
 READ8_MEMBER( c1551_device::tpi1_pc_r )
 {
 	/*
@@ -315,7 +309,6 @@ READ8_MEMBER( c1551_device::tpi1_pc_r )
 	return data;
 }
 
-
 WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 {
 	/*
@@ -336,7 +329,6 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 	// TCBM data valid
 	m_dav = BIT(data, 6);
 }
-
 
 static const tpi6525_interface tpi1_intf =
 {
@@ -443,6 +435,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	  m_tpi0(*this, M6523_0_TAG),
 	  m_tpi1(*this, M6523_1_TAG),
 	  m_ga(*this, C64H156_TAG),
+	  m_pla(*this, PLA_TAG),
 	  m_image(*this, FLOPPY_0),
 	  m_tcbm_data(0xff),
 	  m_status(1),
@@ -515,6 +508,30 @@ void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 
 //-------------------------------------------------
+//  tpi1_selected -
+//-------------------------------------------------
+
+bool c1551_device::tpi1_selected(offs_t offset)
+{
+#ifdef PLA_DUMPED
+	int mux = 0, ras = 0, phi0 = 0, f7 = 0;
+	UINT16 input = A5 << 15 | A6 << 14 | A7 << 13 | A8 << 12 | A9 << 11 | mux << 10 | A10 << 9 | m_dev << 8 | ras << 7 | phi0 << 6 | A15 << 5 | A14 << 4 | A13 << 3 | A12 << 2 | A11 << 1 | f7;
+	UINT8 data = m_pla->read(input);
+	return BIT(data, 0) ? true : false;
+#endif
+
+	offs_t start_address = m_dev ? 0xfee0 : 0xfec0;
+
+	if (offset >= start_address && offset < (start_address + 0x20))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+//-------------------------------------------------
 //  plus4_cd_r - cartridge data read
 //-------------------------------------------------
 
@@ -522,9 +539,7 @@ UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, int ba, int 
 {
 	UINT8 data = 0;
 
-	offs_t start_address = m_dev ? 0xfef0 : 0xfec0;
-
-	if (offset >= start_address && offset < (start_address + 8))
+	if (tpi1_selected(offset))
 	{
 		data = tpi6525_r(m_tpi1, offset & 0x07);
 	}
@@ -539,9 +554,7 @@ UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, int ba, int 
 
 void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	offs_t start_address = m_dev ? 0xfef0 : 0xfec0;
-
-	if (offset >= start_address && offset < (start_address + 8))
+	if (tpi1_selected(offset))
 	{
 		tpi6525_w(m_tpi1, offset & 0x07, data);
 	}
