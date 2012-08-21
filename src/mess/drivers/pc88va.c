@@ -957,6 +957,8 @@ READ8_MEMBER(pc88va_state::upd765_tc_r)
 
 READ8_MEMBER(pc88va_state::pc88va_fdc_r)
 {
+	printf("%08x\n",offset);
+
 	switch(offset*2)
 	{
 		case 0x00: return 0; // FDC mode register
@@ -974,6 +976,7 @@ READ8_MEMBER(pc88va_state::pc88va_fdc_r)
 
 WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 {
+	printf("%08x %02x\n",offset,data);
 	switch(offset*2)
 	{
 		/*
@@ -1407,7 +1410,7 @@ static I8255A_INTERFACE( master_fdd_intf )
 {
 	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B read
+	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pa_r), // Port B read
 	DEVCB_NULL,							// Port B write
 	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
 	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
@@ -1431,7 +1434,7 @@ static I8255A_INTERFACE( slave_fdd_intf )
 {
 	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B read
+	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pa_r), // Port B read
 	DEVCB_NULL,							// Port B write
 	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
@@ -1658,6 +1661,8 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc88va_z80_map)
 	MCFG_CPU_IO_MAP(pc88va_z80_io_map)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
