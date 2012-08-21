@@ -1,0 +1,1297 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- The Following is known to exist but is undumped:
+info from http://www.tatungeinstein.co.uk/front/complete.htm
+
+Business:
+Accounting Suite (A.C.C)
+Accounts (New Miracle Software)
+Administrator (Fydler)
+Advertising Titles Printer (J&amp;K Software)
+Analyser (For Cash Trader - Quest International)
+Appointmaster (Fydler)
+Audio Daystock (A.C.C.)
+Audio Stockmaster (A.C.C.)
+Bakery Package (Discos)
+Bar Sales (Peach Computers Ltd)
+Beef Manager (New Miracle Software)
+Budget System (Surrey Software)
+Business Control (Modular)
+Business Package (Solo Software)
+CAD-CAM (Skytronics)
+Calcstar (Micropro)
+Cash Trader (Quest International)
+CTC Cheque Print (Fydler)
+CTC Data Diary (Fydler)
+CTC PAYE (Fydler)
+CTC Non Vat Accounts (Fydler)
+Calcstar (Xitan/Softsel)
+Carsales (Peach Computers Ltd)
+Cattle Management (Sum-it)
+Chemists (New Miracle Software)
+Circuit Designer (Fydler)
+Club (Peach Computers Ltd)
+Club Membership (New Miracle Software)
+Database (Kuma)
+Datafile (J&amp;K Software)
+Datafile II (J&amp;K Software)
+Datamate (Fydler)
+Datastar (Fydler)
+Datastate (Fydler)
+Datastate II (Fydler)
+Datoel (Fydler)
+DBASE 11 V 2.41 (Tatung)
+DBASE 11 V 2.43 (Softsel)
+DBSTOCK (DB Services)
+Easidata (Kuma)
+Easivat (Kuma)
+Easylabel (A.C.C. Computers)
+Egg Production (Harper Adams College)
+Einstein Simplex (Micro-Simplex)
+Electronic Manager (Tatung)
+Estate Agents (Fydler)
+Extra! Extra! (Soft-Ideas)
+Farm Accounts and Farming (Sum-It)
+Field Management (Sum-It)
+Flock Data (Harper Adams College)
+Friday! (Ashton Tate)
+General Database (Sum-It)
+Genesis Word Processor (Solo Software)
+Hairdressing (Soft Ideas)
+Herd Management (Sum-It)
+Hotel Manager (New Miracle Software)
+Hotel Phone Log (Sharp Cost Telecommuications)
+Infostar (Datastar/Reportstar) - Micropro
+Integrated Accounts (Skytronics)
+Invoice (Kuma)
+Invoicer &amp; Statements (Fydler)
+Landlord (Microtec)
+Mailing (Tatung)
+Mail Merge (Micropro)
+Masterbill Invoice (Fydler)
+Masterbill Order Confirmation (Fydler)
+Masterbill Statement (Fydler)
+Masterbill Delivery Note (Fydler)
+Masterbill Remittance Advice (Fydler)
+Mastermail (Fydler)
+Mastermail Sort (Fydler)
+Micro Landlord (New Miracle Software)
+Micro Pics (Production Control) - Aurora Software
+Micro Simplex (Tatung)
+Microtext (Transdata)
+Miniplan (Fydler)
+Moneyplan (Emsoft)
+Multiplan (Microsoft)
+Networking (Skytronics)
+Newsagents (Direct Computer Sales)
+Nominal Ledger (Skytronics)
+NON-VAT Accounts (Kuma)
+Order Processing (Skytronics)
+Padmede Business Suite (Quest)
+Patient Database (A.C.C.)
+Patient Label (A.C.C.)
+P.A.Y.E./P.11 (Phoenix)
+Payroll (Skytronics)
+Payroll (New Miracle Software)
+Peach Pack (Peach Computers)
+Personnel Records (Skytronics)
+Petrol Accounts (Microtec)
+Phial (New Miracle Software)
+Pig Management (Sum-It)
+Procheque (Proflex)
+Production Control (Skytronics)
+Profit Call (SCT)
+Proflex (Proflex)
+Project Planner (Surrey Software)
+Proledger (Proflex)
+Propay (Proflex)
+Prosales (Proflex)
+Prostock (Proflex)
+Protel (Proflex)
+Purchase Control (Microtec)
+Purchase (Skytronics)
+Purchase Ledger (Skytronics)
+Retirement Home Management (Fydler)
+Sales Ledger (Skytronics)
+Sales Ledger (Microtec)
+Sales Ledger/Invoicing (Skytronics)
+Sales, Nominal &amp; Invoicing (Skytronics)
+Sassy (New Miracle Software)
+S.C.A.N. Draw (Skytronics)
+S.C.A.N. Print (Skytronics)
+S.C.A.N. Plot (Skytronics)
+Screenscript (Screensoft)
+SERQ Mailing System (Fydler)
+Service Department (Microtec)
+Small Business Accounts (Fydler)
+Sow Manager (New Miracle Software)
+Spellstar (Micropro)
+SSSPELL (Surrey Software)
+Starindex (Micropro)
+Statflow (Statistics) - Aurora Software
+Statflow (Demonstration pack) - Aurora Software
+Stock Control (Fydler)
+Stock Control (Skytronics)
+Stock Control &amp; Invoicer (Fydler)
+Supercalc (Xitan/Softsel)
+Supercalc 2 (Xitan/Softsel)
+Supernews (Bubble Bus)
+Supersort (Softsel)
+Superstore (Kuma)
+Superwriter (Softsel)
+Tasprint Einstein (Tasman)
+Tassign Einstein (Tasman)
+Tasword Einstein (Tasman)
+Telepack (New Miracle Software)
+Telerenter (New Miracle Software)
+The Accounting System (Surrey Software)
+The Cracker (Tatung)
+The New DATAFILE 11 (Fydler)
+Total Business Package (Solo Software)
+Use it (Bubble Bus)
+Vid Lib (J&amp;K Software)
+Video Manager (Video Techniques)
+WDPRO (Kuma)
+Word Processor with Spreadsheet (New Miracle Software)
+Wordstar Professional (Micropro)
+Wordstar Professional/Infostar (Micropro)
+
+Communicational:
+Ascom (Xitan)
+BSTAM (Xitan)
+BSTMS (Xitan)
+Communications with Viewdata (Tatung)
+CYNTPL (Orion)
+Hex-In-Hex-Out (Crystal Research)
+Intext (Talbot Computers)
+One-to-One (Screens Micro)
+Telecommunications (Surrey Software)
+Terminal Emulator (Kuma)
+Syntel (Orion)
+
+Educational:
+A.B.C (J&amp;K Software)
+Apollo II Graphics Workshop (Merlin)
+G.E.M. (BBC Basic 7-11 Years) - Fydler
+Helicopter UK (Solo Software)
+Heli Maths/Function Machine (Screensoft)
+Mathemagic/Scoop (Solo Software)
+Maths Tank/Counter Blast (Solo Software)
+Microtext (Transdata Ltd)
+Mr Fixit/Get Lost (Solo Software)
+Modern Maths 16+/Chock A Block (Solo Software)
+Traditional Maths 16+/Cyfax (Solo Software)
+T.N.T (Ten not Two) - J&amp;K Software
+Spell N Build/Word Search (Screensoft)
+
+Games:
+256 Games Pack for Einstein 256 (Merlin)
+3D Noughts and Crosses (Solo Software)
+Agrovator (Syntaxsoft)
+Alice and the March Hare (Orion)
+Attack of the Killer Tomatoes (Merlin)
+Ballyhoo (Infocom)
+Batman (Ocean)
+Beach Head 1 + 2 (Tatung)
+Bell Super Six Games (Bell Software)
+Bell Super 10 Games (Bell Software)
+Buzz Off/Shark Hunter (Electric Software)
+Card Sharp (Emsoft)
+Casino (Emsoft)
+Channel Tunnel (Solo Software)
+Commando Plain/Nightmare Park (Solo Software)
+C.T.C Games Pack (Fydler)
+Cursed Chambers/Zrim (Kuma)
+Cyfax (Solo Software)
+Deadline (Infocom)
+Deadzone (Merlin)
+Doom Manor (Fydler)
+Dr Frankie (Syntaxsoft)
+Dragon's Lair (Merlin/Software Projects)
+Einjong (Merlin)
+Eliminator/Reversi (Merlin)
+Family Pack 1 (Solo Software)
+Fathom's Deep (Merlin)
+Flight Path 737 (Anirog)
+Flight Simulation (Screensoft)
+Football Manager/Pinball (Sharward Services)
+Football Pools Predictor (Bell Software)
+Fruckles/Toado (Merlin)
+Fydler Six Game Pack (P.C.S)
+Games Night (Emsoft)
+Gloop (Merlin)
+Highway Encounter (Vortex)
+House of Usher (Merlin)
+Hyperball (Merlin)
+Impossible Mission (Tatung)
+Infidel (Infocom)
+Interstella Explorer/Miner Dick (Merlin)
+Jet Set Willy/Harvey Smith Showjumping (Software Projects)
+Jet Set Willy 2/Manic Miner (Software Projects)
+Jump Mania (Merlin)
+Kid's Stuff (Merlin)
+Knight Lore (Tatung/Ultimate)
+Le Mans (Electric Software)
+Les Flics (Electric Software)
+Manik Panik/Galaxoids (Solo Software)
+Mayhem (Solo Software)
+Merlin Games Compendium (Merlin)
+Norseman/Backgammon (Electric Software)
+One man and his droid (Tatung)
+Pakman/Millipede (Kuma)
+Panzer Attack (Lothlorian)
+Planetfall (Infocom)
+Polaris (Solo Software)
+Punchy (Tatung Einsoft)
+Quantum (Merlin)
+Reversi (Merlin)
+River Bandit (Merlin)
+Roverball (Merlin)
+Seastalker (Infocom)
+Soho (Emsoft)
+Sorcerer (Infocom)
+Soul of a Robot/F1 Simulator (Merlin)
+Southern Belle (Merlin)
+Space Traveller/Reversi (Merlin)
+Speculator Disks 1,2 and 3 (Syntaxsoft)
+Spellbreaker (Infocom)
+Sprog (Merlin)
+Starbase (Merlin)
+Stock Tycoon (Screensoft)
+Super Six Games (Bell Software)
+Super Ten Games (Bell Software)
+The Kingdom in Chess (Fydler)
+Time Bandits (Orion)
+Tracker (Solo Software)
+Turbo Chess/Draughts (Screensoft)
+Wishbringer (Infocom)
+Witness (Infocom)
+Zexl (Everco)
+Zork 1 (Infocom)
+Zork 3 (Infocom)
+
+Programming:
+Assembler Plus
+Aztec C II (Manx)
+Basic Compiler (Microsoft)
+Basic Interpreter (Microsoft)
+C ++ (Hisoft)
+CBASIC (Digital Research)
+CBASIC Compiler (Digital Research)
+CIS Cobol (Microfocus)
+Cobol (Microsoft)
+CP/M (Digital Research)
+Devpac 80 (Editor/Assembler) - (Hisoft)
+DOS 64 (Synclavia)
+ECO-C (Ecosoft)
+Einsoft BBC Basic (Z80) - (Tatung)
+Fortran (Microsoft)
+Fortran Compiler (Microsoft)
+Hisoft C++ (Hisoft)
+Hisoft Pascal (Hisoft)
+Kuma Forth (Kuma)
+Level II Cobol (Microfocus)
+M2CBasic
+Macro (M80) - Microsoft
+Microfocus Cobol (Xitan)
+Microsoft Basic Compiler (Microsoft)
+Microsoft Basic Interpreter (Microsoft)
+Microsoft Cobol Compiler (Microsoft)
+Microsoft Fortran (Microsoft)
+Microsoft Macro Assembler (Microsoft)
+Micro Prolog (Expert Systems Ltd)
+MTBasic (Softaid)
+muLISP (Microsoft)
+muMATH/muSIMP (Microsoft)
+Multi-Basic (Alcor)
+Nevada Fortran
+Pascal/MT+ (Digital Research)
+PL/1 (Digital Research)
+Pro-Fortran (Prospero)
+Pro-Pascal (Prospero)
+Prolog-1 V2.2 (Expert Systems)
+RM Cobol (Ryan Mcfarland)
+RM-Cobol runtime
+Sourcewriter
+SPP (for Pascal)
+Turbo Pascal
+U.C.S.D P-System Pascal (Eden &amp; Assoc.)
+XBasic (Xitan)
+Zbasic (Hisoft)
+
+Utilities:
+Access Manager (Digital Research)
+Alias (Skytronics)
+Amscopy with Emulator V.20. (Merlin)
+Amtat (ACC Computers)
+Animator CIS (Microfocus)
+Animator Level 11 (Xitan)
+Apollo II Graphics Tutor (Orion)
+Art Processor (Solo Software)
+Assembler Plus Tools (Digital Research)
+Australian Football Pools Predictor (Bell)
+Backup (Xitan)
+Bankmate (Fydler)
+British Football Pools Predictor (Bell)
+CAD-CAM (Skytronics)
+Colour Fantasia (Kuma)
+Config (Merlin)
+CCT/PCB Design (Taurus)
+Data Diary (Phoenix)
+Dataplot + (Xitan)
+Discmod (Kuma)
+Disc Tools (Taurus)
+Display Manager (Digital Research)
+DOS Manager/Sprite Editor (TCS)
+Dr Draw (Digital Research)
+Dr Graph (Digital Research)
+Dsclone (Taurus)
+Edit (Microsoft)
+Fileshare CIS (Xitan)
+Football Pools Predictor (Bell)
+Forms 2 CIS (Microfocus)
+G1UFQ Morse Tutor (Merlin)
+G4VPD Amateur Radio Package (Taurus)
+Gold Shares Portfolio (Bell)
+Graf-Draw (Surrey Software)
+Graphics Dump &amp; Utilities (Force 4 Computers)
+Graphics for the Cracker (Business Comp. Ctr)
+GSX (Digital Research)
+Helping Hand (Taurus)
+Home Budget (Kuma)
+Infobase (Bell)
+Infotext (Bell)
+Man-Add-Jer (Fydler)
+Macro (M80) - Microsoft
+Master Graph (Fydler)
+Master Graph 2 (Fydler)
+M2CBASIC (Digital Research)
+Menugen (Single User) - Softsel
+Menu Manager
+Merlin Transfer (Merlin)
+Microsoft Sorting Utility (Softsel)
+Microstat (Xitan)
+Mouse Art (Emsoft)
+Neil's Utilities (Merlin)
+PC Utility (Taurus)
+Pertmaster (Xitan)
+Pertprinter (Xitan)
+Plink II (Wizard)
+Popup (Surrey Software)
+SBMIT (Taurus)
+SCAT/Einword (Taurus)
+Screen Plus (Syntaxsoft)
+Shark Database (Propas)
+SLRNK (Wizard)
+SLRNK-PLUS (Wizard)
+Sort (Microsoft)
+Sourcewriter (Microfocus)
+SPP (Digital Research)
+Stepper (K.H. Scriven)
+Superdraw (Bell)
+Superquest (Merlin)
+Supersort (Micropro)
+Terminal Emulator (Kuma)
+Wordmaster (Micropro)
+Write Hand Man (Hisoft)
+XASMs (Avocet)
+Xtal Systems (Xtal Research)
+
+-->
+
+<softwarelist name="einstein" description="Tatung Einstein TC-01 disk images">
+
+	<software name="4game" supported="no">
+		<!-- Alt name: 4 Game Disc Arcade -->
+		<description>Konami Four Game Arcade</description>
+		<year>19??</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="4game.dsk" size="225536" crc="19cc28fa" sha1="fed6c4972fc72ac51952f3b800c43f1b1240643b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assembly">
+		<!-- alt name: Assembly Code Tutor -->
+		<description>Assembly Language Course</description>
+		<year>1985</year>
+		<publisher>Glentop</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="assembly.dsk" size="215296" crc="ca014880" sha1="0c512676eb9bd2769459d5f3cf98fa173fe7ae40" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boardelo">
+		<description>Boardello</description>
+		<year>1985</year>
+		<publisher>Bubble Bus</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="boardelo.dsk" size="215296" crc="4f428e86" sha1="1aaecade1d2d7e5ca7ffdd056fe66054d0c1e36d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>Basic Tutorial</description>
+		<year>1984</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="basic.dsk" size="215296" crc="f3433463" sha1="da34ca555b1173b7683c5288209696f1780386c2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castle">
+		<description>Castle Quest &amp; Quest</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="castle.dsk" size="215296" crc="d21a8b66" sha1="cc12ce160e9da03c687f1d325deacf750c63622b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuckie">
+		<description>Chuckie Egg</description>
+		<year>1984</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="chuckie.dsk" size="215296" crc="646a2e35" sha1="0ec273fef5172259a81a3837904450ad03842e42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm">
+		<description>CP/M+</description>
+		<year>19??</year>
+		<publisher>Duncan Elvin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="cpm3.dsk" size="215296" crc="ba285bc6" sha1="862af9d340226fb8f21ab8ae209dba209775bc6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cluedo" supported="no">
+		<description>Cluedo</description>
+		<year>1984</year>
+		<publisher>Leisure Genius</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="cluedo.dsk" size="215296" crc="9c512cd7" sha1="2c0c2db7d7b029b2dac634891429e3b2fc0ab896" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cchamber">
+		<description>Cursed Chambers &amp; ZRIM</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="cchamber.dsk" size="215296" crc="5ed3b3f6" sha1="77deff35d7d68dbf22ebdffe950e0a160a888799" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamond">
+		<description>Dan Diamond Trilogy</description>
+		<year>19??</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="diamond.dsk" size="215296" crc="7995e95b" sha1="af9784f5129c91de29d896cd4ef6eb013abe4b2e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disc">
+		<description>The Disc</description>
+		<year>19??</year>
+		<publisher>Emsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="disk.dsk" size="215296" crc="2a18d569" sha1="45950a6d63d661c4819a53e156da8027055eff42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discodan">
+		<description>Disco Dan</description>
+		<year>1984</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="disco.dsk" size="215296" crc="21006fae" sha1="0c8563fb3b5d92d10f7560ed70558b74b203e2ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="druid" supported="no">
+		<!-- Does not work in MESS-->
+		<description>Druid</description>
+		<year>19??</year>
+		<publisher>Merlin Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="druid.dsk" size="215296" crc="25de2d70" sha1="008fec6fdfa922172cf385166a676c3d76943a71" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eazidraw">
+		<description>Eazidraw</description>
+		<year>1988</year>
+		<publisher>Supasoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="eazidraw.dsk" size="215296" crc="8999581b" sha1="49a00d2489ae0e9bc14cf96d5363b916fe242608" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6in1">
+		<description>Fire!!! / Para-Shoot / Apocalypse / Headache / Gold Miner / Kentucky Derby</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="6in1.dsk" size="215296" crc="ab3cba74" sha1="42c12012e0053d8017cd2c9c07bd38e9b54f2e03" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microplx">
+		<description>Einstein Micro Plox</description>
+		<year>1989</year>
+		<publisher>Henry Philippe</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="microplx.dsk" size="215296" crc="8559318d" sha1="4c585dce341652c37d5066c63864030cd0aaa44b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elite" supported="no">
+		<description>Elite</description>
+		<year>198?</year>
+		<publisher>Firebird</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="elite.dsk" size="215296" crc="17dad062" sha1="e0ee4579e436ea0de01d6dc68e4034a119ee8777" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="merlin8">
+		<description>Escape from Merlin 8</description>
+		<year>19??</year>
+		<publisher>Merlin Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="escape.dsk" size="215296" crc="354f1dc7" sha1="46fff7aaa171c13e370329eed2f8857e3349b74a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fligtsim">
+		<description>Flight Simulation</description>
+		<year>1985</year>
+		<publisher>ScreenSoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="flightsim.dsk" size="215296" crc="9af55027" sha1="a8187166874feca2bdc8463a2c4c8ce923c4cede" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fukung">
+		<description>Fu-Kung in Las Vegas</description>
+		<year>1985</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="fukung.dsk" size="215296" crc="1fa870f3" sha1="c191b77d3a688a0cc7666e82df4ab767c0985bd7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamecomp">
+		<description>Games Compendium</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="games.dsk" size="215296" crc="c3b528b7" sha1="f7065b08ceced334afa94a56bbf9c6f32a9c15f5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gronks">
+		<description>Gronks</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="gronks.dsk" size="215296" crc="706fbb82" sha1="4be0e5f6c901fddbd0d4e3867a4686e24466f9eb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highway" supported="no">
+		<description>Highway Encounter</description>
+		<year>1985</year>
+		<publisher>Orion Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="highway.dsk" size="1722368" crc="6a0b9186" sha1="dc88e7aa2cdf9d066fece5dc10092a41de077075" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitchikr">
+		<description>Hitchhikers Guide to the Galaxy</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="hitchiker.dsk" size="215296" crc="6d67855a" sha1="99f91956d576d815ca28f0f872bbb625d23c9ba8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hustler">
+		<description>Hustler</description>
+		<year>1985</year>
+		<publisher>Bubble Bus</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="hustler.dsk" size="215296" crc="86602255" sha1="964e96a6b800bf609546fc5fbb3ceb12a63c73d8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artuan">
+	<!-- V1.0 -->
+		<description>Island of Artuan</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="artuan.dsk" size="215296" crc="02a10c4b" sha1="e1db7bdfd057ed98416aea91641489a295e6b977" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jswilly">
+		<description>Jet Set Willy</description>
+		<year>19??</year>
+		<publisher>Software Projects</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="willy.dsk" size="215296" crc="0cb80035" sha1="13e0de50a739103b2e3839cf2274510e2440224c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kumautil">
+	<!-- Version 1.0-->
+		<description>Kuma Disc Utility</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="kumautil.dsk" size="215296" crc="49149c08" sha1="ddb0aa5ac4bb63b9d9c90218db7bad794a564ab9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lazyj">
+		<description>Lazy Jones</description>
+		<year>1985</year>
+		<publisher>Terminal Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="lazyjone.dsk" size="215296" crc="fff1af5d" sha1="ed44cace57f25ddf865091f1b9753e8e0555b8c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lesflics">
+		<description>Les Flics</description>
+		<year>1985</year>
+		<publisher>Electric Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="lesflics.dsk" size="215296" crc="8014e1f0" sha1="e0602ee608b7416089e05929b7bb36116a42344f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manicmin">
+		<description>Manic Miner</description>
+		<year>1985</year>
+		<publisher>Software Projects</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="manicmin.dsk" size="215296" crc="074d1c59" sha1="1cb57d05ff38517fa7aa4bcedf56a324e57d57c0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathmag">
+		<description>Mathe-Magic &amp; Scoop</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="mathe.dsk" size="215296" crc="88a08a2f" sha1="bfbdd42f5fb5eeeb97c8ab04b1c8474ce59ddf40" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathsq">
+		<description>Maths Quest &amp; Alphabet Quest</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="mathsq.dsk" size="215296" crc="e90111b1" sha1="0949b404180115fa914d12f37edfb24de4bc83d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maxima">
+		<description>Maxima</description>
+		<year>1985</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="maxima.dsk" size="215296" crc="9af76546" sha1="b8683812dd2f64f5f6048899863cf41ef0f60cc4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopoly" supported="no">
+		<description>Monopoly</description>
+		<year>19??</year>
+		<publisher>Leisure Genius</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="monopoly.dsk" size="215296" crc="28059487" sha1="03681989f41e434388b26e58fdc124de39864f60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicomp">
+		<description>Music Composer</description>
+		<year>1984</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="mcomposer.dsk" size="215296" crc="24a295c6" sha1="dc9682960157204ec5d2938a96a56a271bbffc11" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mworkshp">
+		<description>Music Workshop</description>
+		<year>19??</year>
+		<publisher>Screensoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="mworkshop.dsk" size="215296" crc="a4bfa2ef" sha1="edd4a4aa4ba14f72632099cfe9eaca9519fc0a4a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightmar">
+		<description>Nightmare Park &amp; Commando Plain</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="nightmare.dsk" size="215296" crc="13b56567" sha1="22776fe320f00fb0908ce29a8908f0dc38e0f719" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohmummy">
+		<description>Oh Mummy!</description>
+		<year>1984</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="ohmummy.dsk" size="215296" crc="86ae70c1" sha1="ceb5fb85e83a1af8540a51f70ebac366e0f588d8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peteutil">
+		<description>Pete's Utilities</description>
+		<year>19??</year>
+		<publisher>Merlin Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="peteutil.dsk" size="215296" crc="33f92503" sha1="551a8b97c5bbf1d9f2202f1fee516455d2d67c7b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="progkit">
+		<description>Programmers Kit</description>
+		<year>19??</year>
+		<publisher>Merlin Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="progkit.dsk" size="215296" crc="2feebf86" sha1="e488c6a92706021f94de645206dafaf1beb52b8c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="punchy">
+		<description>Punchy</description>
+		<year>1985</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="punchy.dsk" size="215296" crc="644c1a0a" sha1="ff4c740976a57ec01eb9b11e09af141c20219b02" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocket">
+		<description>Rocket / Giant Maths / Mighty Writer</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="rocket.dsk" size="215296" crc="8ffe425c" sha1="04036decd519566ab407787d9ce837416182d986" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qoko2">
+		<description>Qoko 2</description>
+		<year>19??</year>
+		<publisher>Orion Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="qoko2.dsk" size="215296" crc="bcbd472f" sha1="c53d9272306f119acd9e441ddacb1cd467160cc3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrabble" supported="no">
+		<description>Scrabble</description>
+		<year>1985</year>
+		<publisher>Leisure Genius</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="scrabble.dsk" size="215296" crc="d0925441" sha1="6249757df8309764c3c2577b1e682cba7bb25a0c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="screenpl">
+		<description>Screen Plus</description>
+		<year>1985</year>
+		<publisher>Syntaxsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="screenpl.dsk" size="215296" crc="a2098af2" sha1="bd8afb974470c6d25c35a4610c5c3717b3bb6971" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spactrap">
+		<description>Space Trap</description>
+		<year>1985</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="spactrap.dsk" size="215296" crc="ca2fd938" sha1="a17b65b031eafe359c452c28c1ecd6260a21eb2e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specops">
+		<description>Special Operations</description>
+		<year>198?</year>
+		<publisher>Lothlorien</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="specops.dsk" size="215296" crc="608c9413" sha1="f5cec117a1a4a1c82a678a5a291c55c91617d26f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spelbuld">
+		<description>Spell n' Build</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="spelbuld.dsk" size="215296" crc="f59fbfd8" sha1="2fabe45acc4e830ea66778099adadca1a333239e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spreadsh">
+		<description>Spreadsheet</description>
+		<year>1984</year>
+		<publisher>Kuma Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="speadsht.dsk" size="215296" crc="96f8e1b8" sha1="976e16127b445ef672f4f7008a0e81e9f8dc4bba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starx">
+		<description>Starcross</description>
+		<year>198?</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="star+.dsk" size="215296" crc="fdc09965" sha1="e571189c00bd2f117f84431fb01383debd1d772e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starq">
+		<description>Starquake</description>
+		<year>19??</year>
+		<publisher>Merlin Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="starq.dsk" size="215296" crc="c8e4344f" sha1="884aa4fac99205e6972f089d3c41ce757ad17099" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stepper">
+		<description>Stepper</description>
+		<year>1986</year>
+		<publisher>KH Scriven</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="stepper.dsk" size="215296" crc="bf206229" sha1="98bb1935d18ef060b142d6205443a89ae5a49d14" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schess">
+		<description>Superchess</description>
+		<year>1984</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="schess.dsk" size="215296" crc="330ee711" sha1="ecb705079c67ed7310ace0fd54a17fb938b62aa9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sforth">
+	<!-- Version 1.12 -->
+		<description>SuperFORTH</description>
+		<year>1984</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="sforth.dsk" size="215296" crc="adba426f" sha1="1a7b90ff0f5878594c23c2f2d625df50da3987e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="super6">
+		<description>Super Six Game Pack</description>
+		<year>198?</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="super6.dsk" size="215296" crc="d30f1ed7" sha1="c9d36bec2116db5fa2f376e2f0c52f78ee8b8667" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supstore">
+		<description>Superstore</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="supstor.dsk" size="215296" crc="cc3c0961" sha1="3bf8f107646e7f45ea0a20a8286eb81da73aa78a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suspend">
+		<description>Suspended</description>
+		<year>19??</year>
+		<publisher>A.C.E. Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="supend.dsk" size="215296" crc="90d5482c" sha1="c7f7073ef5b643f38ac06c945bad437fe67602b9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system5">
+		<description>System 5</description>
+		<year>19??</year>
+		<publisher>Crystal Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="system5.dsk" size="215296" crc="d33a17f2" sha1="eeb2a41b244db29fff7b6ac9dde21e860fb018f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys80">
+		<description>System 80</description>
+		<year>19??</year>
+		<publisher>Tatung</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="sys80.dsk" size="215296" crc="e77e6eb0" sha1="0912b399a59003e9fa611f7393f466e27502de25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasprint">
+		<description>Tasprint</description>
+		<year>1985</year>
+		<publisher>Tasman Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="tasprint.dsk" size="215296" crc="c1d1ffd4" sha1="46c9629c62bbe0394d58cd17837efc0011b79b59" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasword">
+		<description>Tasword</description>
+		<year>1985</year>
+		<publisher>Tasman Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="tasword.dsk" size="215296" crc="94c27e94" sha1="5141c45b16fbbb4a6b740b2677e17635f63c8695" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tombkarn">
+		<description>Tombs of Karnak &amp; Encounter</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="tomb.dsk" size="215296" crc="c0efda16" sha1="9f8d07df2a09e189b17ce0ac43e16119f337ef30" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tycoon">
+		<description>Tycoon &amp; Pelmanism</description>
+		<year>198?</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="tycoon.dsk" size="215296" crc="b019ca6d" sha1="06f58afed1e7f8741aa648a001d79ccaa7b78bb5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xanagram">
+		<description>Xanagrams &amp; Quadrax</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="xanagram.dsk" size="215296" crc="1ebdfff2" sha1="9d052b0ae1ab421c7e7e1af4cee61e730235cbd9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xtaldos">
+		<description>Xtaldos 1.31</description>
+		<year>198?</year>
+		<publisher>Tatung</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="xtaldos.dsk" size="215296" crc="833a5fe8" sha1="998da7d4470f52ee353abfd1f5aaf5e4d36ce35b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theatre" supported="no">
+		<description>Theatre Europe</description>
+		<year>19??</year>
+		<publisher>Merlin Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="theatre.dsk" size="215296" crc="b429b7e7" sha1="3c7b1686340204776e734652dbdce807301a7e7a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timetrap">
+		<description>Time Trap</description>
+		<year>1984</year>
+		<publisher>Tatung Einsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="timtrap.dsk" size="215296" crc="93d4de6f" sha1="6f947d5b36be85a8b9773c26e472c9a72c610d50" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snooker">
+		<description>Tournament Snooker</description>
+		<year>198?</year>
+		<publisher>Hard Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="snooker.dsk" size="215296" crc="509a8c66" sha1="ded70d23bb2987c59a9221d2f8271ad249a0f7c8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordproc">
+		<description>Word Processor 40</description>
+		<year>19??</year>
+		<publisher>Surrey Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="wordproc.dsk" size="215296" crc="ebcde8d6" sha1="f8079b7fb1a1422236d3d1a2f5610845c4145a64" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wreck" supported="no">
+		<description>The Wreck</description>
+		<year>19??</year>
+		<publisher>Electric Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="wreck.dsk" size="215296" crc="53fcd39a" sha1="76dd0102565ba64ad6fa885872c81c366a1a4c44" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmaster">
+		<description>X-master</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="xmaster.dsk" size="215296" crc="15f20d52" sha1="31fca29a6de3e06c0209e95bb57b27d14a2aa832" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zen">
+		<!--Version 1.0-->
+		<description>Zen Editor/Assembler</description>
+		<year>19??</year>
+		<publisher>Kuma Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="zen.dsk" size="215296" crc="6026bd29" sha1="214992bf15a1209eefc55a359e4f64743a2c56db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork2">
+		<description>Zork 2</description>
+		<year>19??</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="zen.dsk" size="215296" crc="001fc68d" sha1="35c86af9a47cf16f434d4c1a58e1203170537779" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Star Trek is a Basic Game and it needs to be started with tatung-xtaldos 1.31-->
+<!--
+
+	<software name="msprnt">
+		<description>100 Metres Sprint &amp; Karate</description>
+		<year>19??</year>
+		<publisher>Mario Castro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="msprnt.dsk" size="215296" crc="e19fddea" sha1="92e7f6cf7465ca99d3fea300c14a98fffe825087" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conan">
+		<description>Conan &amp; Boxing</description>
+		<year>19??</year>
+		<publisher>Mario Castro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="conan.dsk" size="215296" crc="841c2f87" sha1="ef27be711470e8f1899002a7d2c135365433a7a1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotto">
+		<description>Lottery</description>
+		<year>2005</year>
+		<publisher>Mario Castro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="lotto.dsk" size="215296" crc="356cbdbb" sha1="dc832b72dda5d3997b22f48f26619eecd809b007" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skijump">
+		<description>Ski-Jump &amp; Nubble Trubble</description>
+		<year>19??</year>
+		<publisher>Mario Castro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="skijump.dsk" size="215296" crc="589a78d2" sha1="e474ef511c440c8c61b8fa4cfd551cfa60e27f51" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>Star Trek</description>
+		<year>19??</year>
+		<publisher>Mario Castro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="startrek.dsk" size="215296" crc="525d1dd2" sha1="0f438ac14b52ff5a5071106b148c81293ba747d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sword">
+		<description>Sword Feud</description>
+		<year>198?</year>
+		<publisher>A.C.E. Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="sword.dsk" size="215296" crc="b871d8f0" sha1="410710023db949bd37d6af41b844650dcfb6cefa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+-->
+
+</softwarelist>

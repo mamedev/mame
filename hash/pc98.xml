@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc98" description="NEC PC-9801 disk images">
+
+	<software name="pc98dosd">
+		<description>PC-98DO+ System Disk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1135952">
+				<rom name="pc-98do+ system disk.d88" size="1135952" crc="d89afef9" sha1="c57a817c376edd55344d7dc00354074eecf83b95" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

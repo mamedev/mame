@@ -1,0 +1,460 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="vc4000" description="Interton VC 4000 cartridges">
+
+	<!-- Cassette 1 -->
+	<software name="carraces">
+		<description>Autorennen / Car Races / Course Automobile</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="carraces.bin" size="2048" crc="5c7f11e0" sha1="0d1cd6f7da36660f19e0b0e9c4312b1c56d5fbc6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 2 -->
+	<software name="blckjack">
+		<description>Blackjack</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="blckjack.bin" size="2048" crc="ec2a91b3" sha1="ba4553d116cffa74a71ef10fbffa4c28c779c836" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 3 -->
+	<software name="paddleg">
+		<description>Ballspiele / Paddle Games / Jeux De Balle</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="paddleg.bin" size="2048" crc="682b876a" sha1="ecc0146c40daa79a13934b8884bc8fd0f96461c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 4 -->
+	<software name="tbattle">
+		<description>Panzerschlacht/Luftkampf / Tank Battle/Air Battle / Bataille De Blindes/Combat Aerien</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="tbattle.bin" size="2048" crc="468e4779" sha1="191d0a1bf399a09525b57dbbca92d83de18003fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 5 -->
+	<software name="mathema1">
+		<description>Mathematik I / Mathematics I / Mathematique I</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mathema1.bin" size="2048" crc="e38e0c03" sha1="d48c8ca8811fa9418d257c92365b88bba0cdffb2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 6 -->
+	<software name="mathema2">
+		<description>Mathematik II / Mathematics II / Mathematique II</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mathema2.bin" size="2048" crc="66c5975e" sha1="efa4a5ebe540efdedec226c0af238c2652ad5b5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 7 -->
+	<software name="airseaba">
+		<description>Luftkampf/Seegefecht / Air/Sea Battle / Combat Aerien/Bataile Navale</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="airseaba.bin" size="2048" crc="f3d37699" sha1="922b9469b2262eb1a135defd5dbc11f33094df5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 8 -->
+	<software name="memory1">
+		<description>Memory I/Motivsuche / Memory I/Flag Capture / Memory I/Recherche De Motifs</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="memory1.bin" size="2048" crc="ea8f717f" sha1="a383ced230178c9c829b82b2793cb036411ccb5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 9 -->
+	<software name="intel1">
+		<description>Intelligenz I / Intelligence I</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="intel1.bin" size="2048" crc="4d3f9cfb" sha1="b8cba1672f5b7286e8895fc6e6c46bbb54fb3f46" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 10 -->
+	<software name="wintersp">
+		<description>Wintersport / Winter Sports / Sports D'Hiver</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="wintersp.bin" size="4096" crc="bdd652b7" sha1="aa3af1df1095aadf9d7428a59847fbef3505d93d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 11 -->
+	<software name="hippodro">
+		<description>Hippodrom / Hippodrome</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="hippodro.bin" size="2048" crc="aaea290f" sha1="0c4dd4f31adccdf02ba783a23ca9debe2c4cee02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 12 -->
+	<software name="hunting">
+		<description>Jagd / Hunting / Chasse</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="hunting.bin" size="2048" crc="31978ad4" sha1="68a21765ae57357c7e5385e57b3caa60f796c0cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 13 -->
+	<software name="chess">
+		<description>Schach / Chess / Les Echecs</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<!-- 1k internal ram -->
+			<dataarea name="rom" size="4096">
+				<rom name="chess.bin" size="4096" crc="e9c53288" sha1="468188fd58aefb9f8e17e72ea4494f4e8219338a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 14 -->
+	<software name="motox">
+		<description>Motocross</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="motocrss.bin" size="4096" crc="55011f0a" sha1="a461b66f6cff37e4038e80da0a205a816abe35d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 15 -->
+	<software name="intel2">
+		<description>Intelligenz II / Intelligence II</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="intel2.bin" size="2048" crc="8ab96827" sha1="58c7cabd14e3cd0505f8ea27aaf08cc8045bc590" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 16 -->
+	<software name="intel3">
+		<description>Intelligenz III / Intelligence III</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="intel3.bin" size="2048" crc="52b8c6e7" sha1="b83fd9679912b0888df38f708dbea80dfe3b8193" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 17 -->
+	<software name="circus">
+		<description>Circus / Cirque</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="circus.bin" size="2048" crc="0ab80f3e" sha1="cff0b7066669aad1e35803767fd98ecef4ea162d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 18 -->
+	<software name="boxing">
+		<description>Boxkampf / Boxing Match / Match De Boxe</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 19 -->
+	<software name="outersc">
+		<description>Krieg im Weltraum / Outer Space Combat / Guerre Dans L'Espace</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="outersc.bin" size="2048" crc="b1c31f9a" sha1="8a2b29af42051f61a22a033c7dd140705cf7bc6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 20 -->
+	<software name="memory2">
+		<description>Memory II / Melodie/Melody / Simon</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="memory2.bin" size="2048" crc="d68da80a" sha1="4cf0f74b4a0d3305c9ffa830c067a054fab25419" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 21 -->
+	<software name="reversi">
+		<description>Intelligenz IV/Attacke (Reversi) / Intelligence IV/Attack (Reversi) / Intelligence IV/Attaque (Reversi)</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="reversi.bin" size="2048" crc="619c07c9" sha1="30c595f60e464a93c69579ae9bffdd42ee2f73e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 22 -->
+	<software name="chess2">
+		<description>Schach II / Chess II / Les Echecs II</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<!-- 1k internal ram -->
+			<dataarea name="rom" size="6144">
+				<!-- redump needed, should be a 4k and a 2k file -->
+				<rom name="chess2.bin" size="6144" crc="1b948aeb" sha1="0da5c4e865ce4a6b0293e51949eb0fb525881cf0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 23 -->
+	<software name="pinball">
+		<description>Flipper / Pinball</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pinball.bin" size="2048" crc="add99c6e" sha1="85b904e5bc37e5a44c88c000307401438285910a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 24 -->
+	<software name="soccer">
+		<description>Fussball / Soccer / Football</description>
+		<year>1979</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="soccer.bin" size="2048" crc="05af8228" sha1="fd4212b955688aec985102d84575cae55bc651eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 25 -->
+	<software name="bowling">
+		<description>Bowling/Kegeln / Bowling/Ninepins / Yeux Quilles</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="bowling.bin" size="2048" crc="a47fe1bf" sha1="e637787ed9d868f85339a413bbf2989a785fa2a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 26 -->
+	<software name="draughts">
+		<description>Dame / Draughts / Dames</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<!-- 1k internal ram -->
+			<dataarea name="rom" size="4096">
+				<rom name="draughts.bin" size="4096" crc="7b868473" sha1="2557172b07c0ebaffe18a345cfa88ef24febecb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 27 -->
+	<software name="golf">
+		<description>Golf</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="golf.bin" size="4096" crc="d399ce07" sha1="41b6c7d3bc8ea2ef9777066dfd74ec2c5932ddb6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 28 -->
+	<software name="cockpit">
+		<description>Cockpit</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="cockpit.bin" size="4096" crc="11dd7f0d" sha1="456e9c5d1d48877e8c5eb5e5499c911a73e30584" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 29 -->
+	<software name="metropol">
+		<description>Metropolis / Hangman</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="metropol.bin" size="4096" crc="a640a330" sha1="3b9b1b5c35d3e2ef909e1498f96026cfb437ea80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 30 -->
+	<software name="solitair">
+		<description>Solitär / Solitaire</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="solitair.bin" size="2048" crc="08209d98" sha1="bf96ceb173f17017b99cf8d38ed55e66b5320260" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 31 -->
+	<software name="casino">
+		<description>Casino</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="casino.bin" size="2048" crc="50fd6a18" sha1="7d2549a3a3373592d2eb88c3a5c9918b32fddafd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 32 -->
+	<software name="invaders">
+		<description>Weltrauminvasoren / Invaders / Invaseur De L'Espace</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="invaders.bin" size="2048" crc="9497204a" sha1="1fba78476ee93f09b6db033ec4d5332498ebc4d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 33 -->
+	<software name="superinv">
+		<description>Super Invaders / Super Invaders / Super Envahisseurs</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="superinv.bin" size="2048" crc="a46c2f9e" sha1="bf851dbd92a539232c89fe2f6c4e2759b61ef3d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 34 (unreleased) -->
+	<!-- Cassette 35 (unreleased) -->
+
+	<!-- Cassette 36 -->
+	<software name="backgamm">
+		<description>Backgammon / Jacquet</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<!-- 1k internal ram -->
+			<dataarea name="rom" size="4096">
+				<rom name="backgamm.bin" size="4096" crc="08cd8135" sha1="942f65a68e4116b1da66df57c09829f9d9b62659" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 37 -->
+	<software name="mnstrman">
+		<description>Monster-Man</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mnstrman.bin" size="4096" crc="27cce96f" sha1="f55798c634be020b46699f2e3e71301230db86d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 38 -->
+	<software name="hyperspa">
+		<description>Hyperspace / Hyperespace</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="hyperspa.bin" size="2048" crc="b3ed1129" sha1="4c0f862f6fa4850e5e7305b90df71f7b899f0c27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cassette 39 (unreleased) -->
+
+	<!-- Cassette 40 -->
+	<software name="suprspac">
+		<description>Super-Space</description>
+		<year>19??</year>
+		<publisher>Interton</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="suprspac.bin" size="4096" crc="306e37bb" sha1="b11e9fed7700d5192b05dfabeca7b23feca64540" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

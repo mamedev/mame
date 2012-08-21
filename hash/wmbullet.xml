@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="wmbullet" description="WaveMate Bullet disk images">
+
+	<software name="cpm22">
+		<description>CP/M 2.2</description>
+		<year>198?</year>
+		<publisher>Digital Research Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="326976">
+				<rom name="cpm22wmb.imd" size="326976" crc="e7f29a98" sha1="f3e4387ab30bc62464d843ea8d6750f210093eb6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm30">
+		<description>CP/M 3.0</description>
+		<year>198?</year>
+		<publisher>Digital Research Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="552583">
+				<rom name="wmb_org.imd" size="552583" crc="358fa850" sha1="ec068ac527fe58f5cedd2ef5d3cb2b61342298d9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmate3">
+		<description>CP/M 3.0 (alt 1)</description>
+		<year>198?</year>
+		<publisher>Digital Research Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="601731">
+				<rom name="wmate3_1024_5s_80t.imd" size="601731" crc="9e010803" sha1="7873e242d65c15ae40ac692da9257481035a2744" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmate4">
+		<description>CP/M 3.0 (alt 2)</description>
+		<year>198?</year>
+		<publisher>Digital Research Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="565921">
+				<rom name="wmate4_1024_5s_80t.imd" size="565921" crc="8086198c" sha1="055c6cb5e7798d9b9b275bae042bbba65400a09d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

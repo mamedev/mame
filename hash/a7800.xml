@@ -1,0 +1,2266 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Atari 7800 Software List
+Prototype information obtained from http://www.atariprotos.com
+Other list info obtained from http://www.atari7800.org and http://www.atariage.com
+
+
+Atari 7800 Known Model Numbers
+
+ATARI
+Centipede                         CX7801
+Asteroids                         CX7802
+Dig Dug                           CX7803
+Food Fight                        CX7804
+Galaga                            CX7805
+Joust                             CX7806
+Ms. Pac-Man                       CX7807
+Pole Position II                  CX7808
+Robotron: 2084 - NTSC only        CX7809
+Xevious                           CX7810
+Desert Falcon                     CX7811
+Millipede                         CX7812 (Not Released)
+Jr. Pac-Man                       CX7813 (Not Released)
+Track & Field                     CX7814 (Not Released)
+Ballblazer                        CX7815
+Rescue on Fractalus - NTSC only   CX7816 (Prototype)
+Crystal Castles                   CX7817 (Not Released)
+Moon Patrol                       CX7818 (Not Released)
+Stargate                          CX7819 (Not Released)
+Choplifter!                       CX7821
+Karateka                          CX7822
+Touchdown Football - NTSC only    CX7823
+One-on-One Basketball             CX7824
+Sky Fox                           CX7825 (Not Released)
+Summer Games - NTSC only          CX7826
+GATO				  CX7827 (Prototype)
+Super Huey UH-IX                  CX7828
+Hat Trick                         CX7829
+Sarge                             CX7830 (Not Released)
+Winter Games - NTSC only          CX7831
+Impossible Mission                CX7832
+Lode Runner                       CX7833 (Not Released)
+RealSports Baseball - NTSC only   CX7834
+                                  CX7835
+Crack'ed                          CX7836
+Dark Chambers                     CX7837
+Commando                          CX7838
+                                  CX7839
+                                  CX7840
+                                  CX7841
+                                  CX7842
+                                  CX7843
+Crossbow                          CX7844
+                                  CX7845
+Ace of Aces                       CX7846
+Mean 18 Golf                      CX7847
+Donkey Kong                       CX7848
+Donkey Kong Junior                CX7849
+Mario Bros.                       CX7850
+Fight Night                       CX7851
+Motor Psycho                      CX7852
+                                  CX7853
+Fatal Run                         CX7854
+Alien Brigade                     CX7855
+Tower Toppler                     CX7856
+Jinks                             CX7857
+Xenophobe                         CX7858
+Barnyard Blaster                  CX7859
+                                  CX7860
+                                  CX7861
+Ikari Warriors                    CX7862
+Mat Mania Challenge               CX7863
+White Water Madness               CX7864 (Not Released)
+                                  CX7865
+                                  CX7866
+                                  CX7867
+Planet Smashers                   CX7868
+Sentinel                          CX7869 (PAL Limited QTY, NTSC Prototype)
+Ninja Golf                        CX7870
+                                  CX7871
+                                  CX7872
+                                  CX7873
+Electrocop                        CX7874
+Meltdown                          CX7875
+                                  CX7876
+                                  CX7877
+                                  CX7878
+Scrapyard Dog                     CX7879
+Basketbrawl                       CX7880
+                                  CX7881
+                                  CX7882
+                                  CX7883
+                                  CX7884
+                                  CX7885
+                                  CX7886
+                                  CX7887
+Klax                              CX7888 (Prototype)
+Midnight Mutants                  CX7889
+Missing in Action - NTSC only     CX7890 (Prototype)
+Pit Fighter - NTSC only           CX7891 (Prototype)
+Rampart                           CX7892 (Prototype)
+
+
+ABSOLUTE
+Kung Fu Master                    AM-039-04
+Title Match Pro Wrestling         AV-041-04
+F-18 Hornet                       AP-044-04
+Pete Rose Baseball                AV-045-04
+Tomcat F-14 Flight Simulator      AV-046-04
+Super Skateboardin'               AV-047-04
+
+
+ACTIVISION
+Rampage - NTSC only               AM-049-03
+Double Dragon                     AM-050-04
+
+
+FROGGO
+Water Ski - NTSC only             FG 2002
+Tank Command - NTSC only          FG 2003
+
+
+TYNESOFT
+Plutos                            Prototype
+Sirius                            Prototype
+
+
+Non-Games
+Atari Diagnostic Test Cartridge - NTSC only       CB101195
+Atari Developement Card                           C300358
+Harry Dodgson 7800 Monitor Cartridge - NTSC only
+7800 High Score Cartridge                         CX78HSC
+
+
+Rumored Atari 7800 Releases
+
+ATARI
+Elevator Action                   CX78??
+Gauntlet                          CX78??
+Gremlins                          CX78??
+Road Riot 4WD                     CX78??
+Steel Talons                      CX78??
+Tempest                           CX78??
+The Eidilon                       CX78??
+Toki                              CX78??
+
+FROGGO
+Night of the Ninja
+Pyromania
+Scorpion Squad
+UFO
+
+TELEGAMES
+Quest for Quintana Roo
+
+
+MODERN RELEASES
+(Homebrew sold on physical cartridges playable on a real hardware Atari 7800)
+
+Asteroids Deluxe (2007)
+Beef Drop (2006)
+Beef Drop VE (2007)               Missing
+B*nQ (2007)
+Combat 1990 (2005)                Missing
+FailSafe (NTSC only?) (2010)      Missing
+Hangly-Man (2006)
+Jr Pac-Man (2009)
+Kessel Attack                     Missing
+Ms Pac-Attack (2006)
+Pac-Man Collection (2006)
+Pac-Man (2006)
+Pac-Man Plus (2006)
+Pac-Pollux (2006)
+Santa Simon (2006)
+Space Duel (2007)
+Space Invaders (2008)
+Star Wars (2007)
+Super Pacman (2008)               Missing
+Wasp (2009)
+
+Notes:
+The Atari 7800, like many early consoles, had cartridges with more than 1 chip on board.  This list currently shows the older (all-in-1)
+type of rom dumps.  Effort will be made at a later date to split them and document the chips/labels/markings on them.
+
+-->
+
+	<softwarelist name="a7800" description="Atari 7800 cartridges">
+
+	<software name="devcard" supported="no">
+		<description>7800 Dev. Card</description>
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="C300358"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-1" />
+			<dataarea name="rom" size="16384">
+				<rom name="devcard.bin" size="16384" crc="3fbe74ce" sha1="4df3657f57e3086bee26fb5c6ea946c509d08553" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagtest" supported="no">
+		<description>7800 Pro System Diagnostic Test (v1.0)</description>
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CB101195"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="diagtest.bin" size="32768" crc="a1eaa7c1" sha1="76ec76c423d88bdf739e673c051c5b9c174881c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceofaceu" cloneof="aceoface">
+		<description>Ace of Aces (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari / NOVA Game Design. Inc.</publisher>
+		<info name="serial" value="CX7846"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="aceoface.bin" size="131072" crc="05a2b94c" sha1="efd20bd321a81d67fb6430d9ba93d23fb90d8029" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceoface">
+		<description>Ace of Aces (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari / NOVA Game Design. Inc.</publisher>
+		<info name="serial" value="CX7846"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="aceofaeu.bin" size="131072" crc="20c5db80" sha1="c43249ba2d38441461e5ffe07ad2e0b46ab1c6df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienbrgu" cloneof="alienbrg">
+		<description>Alien Brigade (NTSC)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7855"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-A" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="147456">
+				<rom name="alienbrg.bin" size="147456" crc="c8849d36" sha1="a8629fac962cc20b263a60bb2d2386d605713387" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienbrg">
+		<description>Alien Brigade (PAL)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7855"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-A" />
+			<dataarea name="rom" size="147456">
+				<rom name="alienbeu.bin" size="147456" crc="6a19f0fe" sha1="990711ae451d901a960af8ad9ae70813f16257b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 3-D Asteroids Rev A, Prototype.  Functionally, the same game, just unencrypted.  Only observed difference is a section of text in the
+     rom states: "IF YOU CAN READ THIS YOU'RE TOO CLOSE. GCC(C) 1984".  Release version only has the text: "TOO CLOSE. GCC(C) 1984"
+-->
+	<software name="asteroid">
+		<description>Asteroids (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7802"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="16384">
+				<rom name="astroids.bin" size="16384" crc="dfb93f40" sha1="d96ec4e043fcdacab367d8a69d29904b3b2896f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astdelux" cloneof="asteroid">
+		<description>Asteroids Deluxe (NTSC)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="asteroids deluxe (ntsc).bin" size="32768" crc="56239d62" sha1="514fb53dcd8c47251fcbe5047bb2d9d13ccf6aef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astdeluxp" cloneof="asteroid">
+		<description>Asteroids Deluxe (PAL)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="asteroids deluxe (pal).bin" size="32768" crc="ab72ea89" sha1="341c7be2823e69e95a61567cb79042c140278c4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballblazu" cloneof="ballblaz">
+		<description>Ballblazer (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Lucasfilm</publisher>
+		<info name="serial" value="CX7815"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-1" />
+			<dataarea name="rom" size="32768">
+				<rom name="ballblzr.bin" size="32768" crc="a4c4808b" sha1="4eb5424360691a38b199d91a0e2c9095d0862dbe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballblaz">
+		<description>Ballblazer (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Lucasfilm</publisher>
+		<info name="serial" value="CX7815"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-1" />
+			<dataarea name="rom" size="32768">
+				<rom name="ballbleu.bin" size="32768" crc="aff85565" sha1="1aa1a508ada1521ae1d373a6860681093e3f851c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barnblstu" cloneof="barnblst">
+		<description>Barnyard Blaster (NTSC)</description>
+		<!-- Final Release Proto - C300051-059A (Matches NTSC)
+                     10/5/88 (#1/U3 27256 SUM16=9676)
+                             (#2/U2 27256 SUM16=0C34)
+                             (#3/U5 27256 SUM16=9172)
+                             (#4/U4 27256 SUM16=6075) -->
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7859"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-3" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="barnyard.bin" size="131072" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barnblst">
+		<description>Barnyard Blaster (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7859"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="barnyaeu.bin" size="131072" crc="02764a86" sha1="a5797cf7e747bbd755c99fde6936caa15fbba6b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Baseball (PAL)</description>
+		<!-- Released in USA as "Pete Rose's Baseball" -->
+		<year>1989</year>
+		<publisher>Absolute Entertainment, Inc</publisher>
+		<info name="serial" value="AV-045-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="bseblleu.bin" size="32768" crc="68d48fdc" sha1="c44fe244206590abc26fbbd520a5726353899e35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beefdrop">
+		<description>Beef Drop (NTSC, Added Pokey Chip)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ken Siders" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-1" />
+			<dataarea name="rom" size="32768">
+				<rom name="bd7800demo.bin" size="32768" crc="7873b949" sha1="a3eaff991cec95040aff53e0c26a862c3dfcc05e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonq">
+		<description>b*nQ (NTSC)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ken Siders" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="bonq.bin" size="49152" crc="3124b41c" sha1="379ae22a8c8a1c518ba5eb29ad0826dd2daca954" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsktbrwlu" cloneof="bsktbrwl">
+		<description>Basketbrawl (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7880"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="bsktbrwl.bin" size="131072" crc="c8b9d7b5" sha1="39877a4c88498bf6656451e3d1acaf7e8638bdfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsktbrwl">
+		<description>Basketbrawl (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7880"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="bsktbreu.bin" size="131072" crc="a4265d4b" sha1="e7ef6b11bb6836ff7d11a25f8d4e2c9361fa69b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centipedu" cloneof="centiped">
+		<description>Centipede (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7801"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="16384">
+				<rom name="centpede.bin" size="16384" crc="020efe25" sha1="c8377ad7fb6afec5c88c14a23a68e2ecebba4e5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped">
+		<description>Centipede (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7801"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="16384">
+				<rom name="centpeeu.bin" size="16384" crc="33f8a8f6" sha1="323f9fc4fde9aa6fcbaac8ae300aaa06bafa745a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopliftu" cloneof="choplift">
+		<description>Choplifter! (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Brøderbund</publisher>
+		<info name="serial" value="CX7821"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="choplift.bin" size="32768" crc="419bff61" sha1="6df15e73494d0a498dd044753a27544214210b14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift">
+		<description>Choplifter! (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Brøderbund</publisher>
+		<info name="serial" value="CX7821"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="choplieu.bin" size="49152" crc="12efeb07" sha1="f2fe1c82e5b333f4c59f76a28a9d379228596d89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commandou" cloneof="commando">
+		<description>Commando (NTSC)</description>
+		<year>1989</year>
+		<publisher>Atari / Data East</publisher>
+		<info name="serial" value="CX7838"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-3" />
+			<dataarea name="rom" size="131072">
+				<rom name="commando.bin" size="131072" crc="cd1a98c5" sha1="f8ae7da650ad38675b81675b77096794a9cd52e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commando">
+		<description>Commando (PAL)</description>
+		<year>1989</year>
+		<publisher>Atari / Data East</publisher>
+		<info name="serial" value="CX7838"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-3" />
+			<dataarea name="rom" size="131072">
+				<rom name="commaneu.bin" size="131072" crc="7c211612" sha1="2bdad24967fe4f5492ae294b1ccf8f148930a419" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crackedu" cloneof="cracked">
+		<description>Crack'ed (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Data East</publisher>
+		<info name="serial" value="CX7836"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="cracked.bin" size="131072" crc="e645fd1f" sha1="664d267d1245d5698cbf6ff0622ee0d629da3a11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracked">
+		<description>Crack'ed (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Data East</publisher>
+		<info name="serial" value="CX7836"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="crackeu.bin" size="131072" crc="50fd19cb" sha1="0c1a7806e431efbf0c826a11b92d74eb45e08661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossbowu" cloneof="crossbow">
+		<description>Crossbow (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari / Exidy</publisher>
+		<info name="serial" value="CX7844"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-A" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="147456">
+				<rom name="crossbow.bin" size="147456" crc="d2ea5686" sha1="d5e47da88e232cd9ea059e133e7c0f13d921a04c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossbow">
+		<description>Crossbow (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari / Exidy</publisher>
+		<info name="serial" value="CX7844"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-A" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="147456">
+				<rom name="crossbeu.bin" size="147456" crc="e93d8894" sha1="f26d292210a91a714b4b87712ff53b8e49da611e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkchamu" cloneof="darkcham">
+		<description>Dark Chambers (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7837"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="darkchmb.bin" size="131072" crc="366777f1" sha1="848077f15114fec31f8290be2583566f4486fe65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkcham">
+		<description>Dark Chambers (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7837"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="darkcheu.bin" size="131072" crc="c93a563e" sha1="2b888c95b31109ffd0441f586ba18f21a3a4f22e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Desert Falcon, 2 known prototypes exist.
+3/9/87  - No-Hit - Missing 1 Chip (27128 SUM16=90DA)
+3/25/87 - Nearly Complete - (27256 SUM16=345C) (27128 SUM16=9815)
+-->
+	<software name="dsrtflcnu" cloneof="dsrtflcn">
+		<description>Desert Falcon (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7811"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dsrtflcn.bin" size="49152" crc="a1dc0899" sha1="725f893f9a98926c627ef37eacc3f241620c3ffc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsrtflcna" cloneof="dsrtflcn">
+		<description>Desert Falcon (NTSC, Alternate)</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7811"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dsrtflcp.bin" size="49152" crc="53e277f6" sha1="bbb8aa88879f2ec6039673ccdbbebebc565346bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsrtflcn">
+		<description>Desert Falcon (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7811"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dsrtfleu.bin" size="49152" crc="33991ee8" sha1="185d104614e23699e074e850d5ab8c36a159071c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Dig Dug - Late Stage WIP Prototype
+8-16-84 (2764 "FF LO 8" SUM16=029E) (2764 "FF HI E" SUM16=845F)
+-->
+	<software name="digdugu" cloneof="digdug">
+		<description>Dig Dug (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari / Namco</publisher>
+		<info name="serial" value="CX7803"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="16384">
+				<rom name="digdugp.bin" size="16384" crc="50cb13f3" sha1="19cee8dc40fabd7022bedc27e4896c09e3cadfdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug">
+		<description>Dig Dug (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari / Namco</publisher>
+		<info name="serial" value="CX7803"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="digdugeu.bin" size="32768" crc="efab7077" sha1="ce05d3270b0e0d36d80a4f0731d0173cb5921bce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongu" cloneof="dkong">
+		<description>Donkey Kong (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari / Nintendo</publisher>
+		<info name="serial" value="CX7848"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dnkykong.bin" size="49152" crc="065e063f" sha1="820c852caa7957179bf7d6faf2e6922dde5a1a8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong">
+		<description>Donkey Kong (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari / Nintendo</publisher>
+		<info name="serial" value="CX7848"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dnkykoeu.bin" size="49152" crc="0a43d1c5" sha1="dc69fa8fdf3fcba8557195358b8d206463652e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjru" cloneof="dkongjr">
+		<description>Donkey Kong Jr. (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari / Nintendo</publisher>
+		<info name="serial" value="CX7849"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dnkykgjr.bin" size="49152" crc="1c5a1082" sha1="e9392259fff682fcc3476009771a3cfd7d5bdb6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjr">
+		<description>Donkey Kong Jr. (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari / Nintendo</publisher>
+		<info name="serial" value="CX7849"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="dnkykjeu.bin" size="49152" crc="c784dbac" sha1="2626a9cd3326b8ce0ee0e834e17a0eedae005669" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragonu" cloneof="ddragon">
+		<description>Double Dragon (NTSC)</description>
+		<year>1989</year>
+		<publisher>Activision / Technos</publisher>
+		<info name="serial" value="AM-050-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="ACTIVISION" />
+			<dataarea name="rom" size="131072">
+				<rom name="dbledrgn.bin" size="131072" crc="aa265865" sha1="c3fb140836a4ed84cda7a999832703e8b72c0d21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon">
+		<description>Double Dragon (PAL)</description>
+		<year>1989</year>
+		<publisher>Activision / Technos</publisher>
+		<info name="serial" value="AM-050-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="ACTIVISION" />
+			<dataarea name="rom" size="131072">
+				<rom name="dbledreu.bin" size="131072" crc="f29abdb2" sha1="210f3ac989549e89425e7677127715aee713af32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f18u" cloneof="f18">
+		<description>F-18 Hornet (NTSC)</description>
+		<year>1988</year>
+		<publisher>Absolute Entertainment</publisher>
+		<info name="serial" value="AP-044-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="ABSOLUTE" />
+			<dataarea name="rom" size="65536">
+				<rom name="f18hornt.bin" size="65536" crc="63d1c7c1" sha1="13a18a6b85db6222b01d37800e5e57db616a85a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f18">
+		<description>F-18 Hornet (PAL)</description>
+		<year>1988</year>
+		<publisher>Absolute Entertainment</publisher>
+		<info name="serial" value="AP044-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="ABSOLUTE" />
+			<dataarea name="rom" size="65536">
+				<rom name="f18horeu.bin" size="65536" crc="e5d714b0" sha1="673d912b2f9ab7a43f95e0e90bd80249b360fe0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fatalrunu" cloneof="fatalrun">
+		<description>Fatal Run (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7854"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="fatalrun.bin" size="131072" crc="a44df354" sha1="69aab1e6ef332c6844c693ac41965e4c33ff822a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fatalrun">
+		<description>Fatal Run (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7854"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="fatalreu.bin" size="131072" crc="2a0a93be" sha1="f23173d2e42bca0767f3d8ecb6bb1c0d23dde996" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightnu" cloneof="fightn">
+		<description>Fight Night (NTSC)</description>
+		<year>1988</year>
+		<publisher>Accolde</publisher>
+		<info name="serial" value="CX7851"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="fghtnght.bin" size="131072" crc="720ebc74" sha1="1e8a8704a77b15e70cbc72b0ae9bc25fb91d7c21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightn">
+		<description>Fight Night (PAL)</description>
+		<year>1988</year>
+		<publisher>Accolde</publisher>
+		<info name="serial" value="CX7851"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="fghtngeu.bin" size="131072" crc="64d9c4be" sha1="ded89f3a4ac0d95aa158c98302b7939e5b89e4c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foodfu" cloneof="foodf">
+		<description>Food Fight (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7804"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="foodfght.bin" size="32768" crc="e64a5cde" sha1="3f5f42d5aaf6ccd4979658a1387aac5933549357" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foodf">
+		<description>Food Fight (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7804"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="foodfgeu.bin" size="49152" crc="c64549ec" sha1="40b8e5eeb9e9ad7239963ed79dc085092ccbec4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galagau" cloneof="galaga">
+		<description>Galaga (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7805"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="galagap.bin" size="32768" crc="1a0a3eb3" sha1="33178d682564d70955e13d0633359e87b512253b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaga">
+		<description>Galaga (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7805"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="galagaeu.bin" size="49152" crc="5990a9f8" sha1="f1ae5df03cf90041380d77c1b49c94611443330b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop1">
+		<description>GATO (NTSC, Prototype, 198801xx)</description>
+		<year>1988</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop1.bin" size="49152" crc="715e1a2f" sha1="e153927b3463148d3fbeef2d28980c281562cc09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop2" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 198712xx)</description>
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop2.bin" size="49152" crc="0f2f66f8" sha1="5784f40216dbc487e80dabd532ae89b2de4bdcc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop3" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 198711xx)</description>
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop3.bin" size="49152" crc="3796705f" sha1="b365d2bf0a5b238eff5f1a4cdc9b7ece2cace38d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop4" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 19870727)</description>
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop4.bin" size="49152" crc="15de2327" sha1="c5793c362a69c7e82191caffa0a830e67fe21dc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop5" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 19870623)</description>
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop5.bin" size="49152" crc="9fa0fbda" sha1="1c536bb5870f315eecbdea6660beb7de9371f0f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop6" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 19870611)</description>
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop6.bin" size="49152" crc="40b629a1" sha1="f644c5d071c49d75e1487cd06b91da778697ff23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop7" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 19870523)</description>
+		<!-- (27256 SUM16=1783) (27128 SUM16=A4D3) -->
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop7.bin" size="49152" crc="b05cf8d2" sha1="78eaa5c8e89129596f2f9a7a4517e51eefbd857f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatop8" cloneof="gatop1">
+		<description>GATO (NTSC, Prototype, 19870424)</description>
+		<year>1987</year>
+		<publisher>Atari / Spectrum Holobyte</publisher>
+		<info name="serial" value="CX7827"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="gatop8.bin" size="49152" crc="e51eb3bc" sha1="e8d29920fe466ea8bfe292e0f135c0e24a48aaad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangly">
+		<description>Hangly-Man (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="hangly-man.bin" size="16384" crc="8560a801" sha1="f8654387ff648abbe1e6d8f49b8f8b33f803b917" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Hat Trick Prototypes
+5/1/87           (27256 SUM16=19B3) (27128 SUM16=AF4D)
+1/20/88 Not Enc. (27256, 27128 - unknown SUM16)
+-->
+	<software name="hattricku" cloneof="hattrick">
+		<description>Hat Trick (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Bally Sente</publisher>
+		<info name="serial" value="CX7829"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="hattrick.bin" size="49152" crc="cf6f4a6c" sha1="14c0cfd01df1c725f399c23810e4854a639fce52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hattrick">
+		<description>Hat Trick (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Bally Sente</publisher>
+		<info name="serial" value="CX7829"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="hattrieu.bin" size="49152" crc="057d9c3c" sha1="0e9fa678bb4aedc7bb7cf5d38fe27556c4c2bbbd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiscore" supported="no">
+		<description>High Score Cartridge</description>
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX78HSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="highscre.bin" size="4096" crc="9be408d3" sha1="a3af676991391a6dd716c79022d4947206b78164" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikariu" cloneof="ikari">
+		<description>Ikari Warriors (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7862"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="ikariwar.bin" size="131072" crc="8a6c1f15" sha1="e368c6c7ffca5ffac314dec1effea4e2c809519a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikari">
+		<description>Ikari Warriors (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7862"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="ikariweu.bin" size="131072" crc="cb621cdc" sha1="275cae6c693d9bd1906fdc684460ec596869bbad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmissu" cloneof="impmiss">
+		<description>Impossible Mission (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Epyx</publisher>
+		<info name="serial" value="CX7832"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="impssble.bin" size="131072" crc="3b1f2f47" sha1="5437c0efb63a349953ec047efe6ec24144ed6914" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss">
+		<description>Impossible Mission (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Epyx</publisher>
+		<info name="serial" value="CX7832"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="impssbeu.bin" size="131072" crc="994af6e0" sha1="9770b61472510aba1cf3ea35ceca1859c3493676" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinksu" cloneof="jinks">
+		<description>Jinks (NTSC)</description>
+		<year>1989</year>
+		<publisher>Atari / Softgold</publisher>
+		<info name="serial" value="CX7857"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="jinks.bin" size="131072" crc="0818d8cd" sha1="472bc12c437b015a9e317bac092529f3295033b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinks">
+		<description>Jinks (PAL)</description>
+		<year>1989</year>
+		<publisher>Atari / Softgold</publisher>
+		<info name="serial" value="CX7857"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="jinkseu.bin" size="131072" crc="9207ed3b" sha1="eb16de0c3d5c4e769ae2314ba21c4dd3bca33c88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jrpacman">
+		<description>Jr. Pac-Man (NTSC)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="jr pac-man (ntsc).bin" size="32768" crc="0198aed4" sha1="f6d51d9c0eaf03c47e1e2d3774fd16c3ba3a59e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joustu" cloneof="joust">
+		<description>Joust (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari / Williams</publisher>
+		<info name="serial" value="CX7806"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="joust.bin" size="32768" crc="2c430bce" sha1="1ccd7c232bcfd5a65d26b9decfe4eceadcbe314c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joust">
+		<description>Joust (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari / Williams</publisher>
+		<info name="serial" value="CX7806"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="jousteu.bin" size="49152" crc="9b3be616" sha1="aae5b9ee00c39d577858aba9d1fd791194be2c0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Karateka "Very close to final" Prototype
+12/23/86 (27128 LO SUM16=3B0E) (27256 HI SUM16=1271)
+NOTES:
+This prototype also has a minor coding change that makes it unplayable in 7800 emulators.  All 7800 games set two bits in a register to
+enable the joystick buttons and then reset another register.  This prototype does not perform the reset on the second register making
+the buttons not work in emulators.
+-->
+	<software name="karatekau" cloneof="karateka">
+		<description>Karateka (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Brøderbund</publisher>
+		<info name="serial" value="CX7822"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="karateka.bin" size="49152" crc="fec21472" sha1="9fb97bbc7dcc610251cee1695c48b82a087f32d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karateka">
+		<description>Karateka (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Brøderbund</publisher>
+		<info name="serial" value="CX7822"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="65536">
+				<rom name="karateeu.bin" size="65536" crc="6c8d9e68" sha1="c5f25c88eefe0c7b3571ab3c3ec5185e537eb151" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klax">
+		<description>Klax (NTSC, Prototype)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7888"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="klax.bin" size="131072" crc="f26621e3" sha1="0ea6a04b8f9713040ce57b6f23a6589f98409d46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfumu" cloneof="kungfum">
+		<description>Kung-Fu Master (NTSC)</description>
+		<year>1989</year>
+		<publisher>Absolute / Data East / Irem</publisher>
+		<info name="serial" value="AM-039-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="kungfums.bin" size="32768" crc="297899bb" sha1="8824bffdf4f30a8191e581752a75259a663092ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfum">
+		<description>Kung-Fu Master (PAL)</description>
+		<year>1989</year>
+		<publisher>Absolute / Data East / Irem</publisher>
+		<info name="serial" value="AM-039-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="kungfueu.bin" size="32768" crc="c1531fc4" sha1="0f0e24246d9e684b7f900a362fb08878b232580c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariou" cloneof="mario">
+		<description>Mario Bros. (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari / Nintendo</publisher>
+		<info name="serial" value="CX7850"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="mariobro.bin" size="49152" crc="8021a13b" sha1="12e04b67094af622641c536379c69ecad2ee98ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario">
+		<description>Mario Bros. (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari / Nintendo</publisher>
+		<info name="serial" value="CX7850"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="mariobeu.bin" size="49152" crc="efad3d9d" sha1="881beff5103713e655fed80b32e0bbd774e78ee8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matmaniau" cloneof="matmania">
+		<description>Mat Mania Challenge (NTSC)</description>
+		<year>1989</year>
+		<publisher>Atari / Technos</publisher>
+		<info name="serial" value="CX7863"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="matmania.bin" size="131072" crc="aba91829" sha1="bb849b603cf1091e4f032936b209ff33fc3b714e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matmania">
+		<description>Mat Mania Challenge (PAL)</description>
+		<year>1989</year>
+		<publisher>Atari / Technos</publisher>
+		<info name="serial" value="CX7863"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="matmaneu.bin" size="131072" crc="065f3873" sha1="119bb784f1a0638cc6778841131ca1766e94a112" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mean18u" cloneof="mean18">
+		<description>Mean 18 (NTSC)</description>
+		<year>1989</year>
+		<publisher>Atari / Accolade</publisher>
+		<info name="serial" value="CX7847"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="mean18.bin" size="131072" crc="cf21d9ac" sha1="a3e50c0e56c9675ffb1b6439f40789bc64c606b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mean18">
+		<description>Mean 18 (PAL)</description>
+		<year>1989</year>
+		<publisher>Atari / Accolade</publisher>
+		<info name="serial" value="CX7847"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="mean18eu.bin" size="131072" crc="3cec4be8" sha1="47702ee71c64af4ada09cd41122c779c7d8d94f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meltdownu" cloneof="meltdown">
+		<description>Meltdown (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7875"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="meltdown.bin" size="131072" crc="4a8f2171" sha1="e601c45aaa1cc25f01493867664c8b9fefeca70e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meltdown">
+		<description>Meltdown (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7875"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="meltdoeu.bin" size="131072" crc="177fc850" sha1="ac448f369c3c6334415095e4ff344fdd73b473be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mia" supported="no">
+		<description>Missing In Action (Prototype)</description>
+		<!-- 5 Chips total 4 x 27256, 1 x 27128) -->
+		<year>1989</year>
+		<publisher>TNT Games</publisher>
+		<info name="serial" value="CX7890"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="147456">
+				<rom name="miaproto.bin" size="147456" crc="ff7a4c60" sha1="26b0b187a43bf9a9397cb5e8b0033e8833f48f88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midnightu" cloneof="midnight">
+		<description>Midnight Mutants (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7879"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="midmutnt.bin" size="131072" crc="187ec84e" sha1="db5ea4c1456f3b403f6b8978432ecbcdac89d432" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midnight">
+		<description>Midnight Mutants (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7879"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="midmuteu.bin" size="131072" crc="7ca6d521" sha1="85f0e0556df65c0732f71ab3f2bbde3615355f72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Motor Psycho
+Prototype (named "Super Stunt Cycle")
+11/3/88 - This particular prototype is nothing more than a static screen demo showing what the game might look like.  The screen also
+shows some looping information about the prototype.  The idea behind the game must have changed dramatically as the final game looks
+almost nothing like the prototype.
+-->
+	<software name="mpsychou" cloneof="mpsycho">
+		<description>Motor Psycho (NTSC)</description>
+		<!-- Final Release Proto - C300051-052A (Matches NTSC)
+                     4/17/90 (#1 27512 SUM16=4EB8)
+                             (#2 27512 SUM16=64B3) -->
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7852"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="mtrpsych.bin" size="131072" crc="1e219482" sha1="b9381f4d0413b6c48e27f26ed94c7a9eb1a49624" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpsycho">
+		<description>Motor Psycho (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7852"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="mtrpsyeu.bin" size="131072" crc="38bb45ba" sha1="3b72d6b3e28ca9182f1f25dc57115d2ec33aa63e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspacatk" cloneof="mspacman">
+		<description>Ms. Pac-Attack (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="miss pac-attack.bin" size="16384" crc="b4557dd7" sha1="446660edd243da39602d1b673ff13a84239b66d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspacmanu" cloneof="mspacman">
+		<description>Ms. Pac-Man (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7807"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="16384">
+				<rom name="mspacman.bin" size="16384" crc="e42fc700" sha1="ff22e21fc953a288453c40eb6fc5378d42b871f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspacman">
+		<description>Ms. Pac-Man (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7807"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="mspacmeu.bin" size="32768" crc="8421033a" sha1="a5b0826a130acf8b8dbc59ef980d40b802c22b30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjaglfu" cloneof="ninjaglf">
+		<description>Ninja Golf (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7870"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="ninjaglf.bin" size="131072" crc="cb48e8dc" sha1="96d0e59e703770eea8d8d9c2c4e5a87ce6f2de76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjaglf">
+		<description>Ninja Golf (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7870"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="ninjageu.bin" size="131072" crc="2b5382b7" sha1="99ce5711e38ff7ef3311216f954cf0ab70e289cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1on1u" cloneof="1on1">
+		<description>One On One (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Electronic Arts</publisher>
+		<info name="serial" value="CX7824"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="oneonone.bin" size="49152" crc="7d9370fb" sha1="5173f892a8d70aeca6c324c138c56208e0db2b98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1on1">
+		<description>One On One (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Electronic Arts</publisher>
+		<info name="serial" value="CX7824"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="oneonoeu.bin" size="49152" crc="7a628295" sha1="01dfc5e4e615cf20ee4f07245285f85684ee445d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseballu" cloneof="baseball">
+		<description>Pete Rose Baseball (NTSC)</description>
+		<year>1989</year>
+		<publisher>Absolute Entertainment, Inc</publisher>
+		<info name="serial" value="AV-045-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="peterose.bin" size="32768" crc="f33d4dfa" sha1="ffb4fbed8d8f28ea71668542b7ebd019955c5a11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pac-Man (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pacman.bin" size="16384" crc="d5d08d7e" sha1="f427806eae13e3c4ab8afdbe366ab1ec219d0047" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrapac" cloneof="pacman">
+		<description>Ultra Pac-Man (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ultra pac-man.bin" size="32768" crc="4baeac35" sha1="63a98f74ada1ce08ee0137e437395cc17b67a4d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paccollu" cloneof="pacman">
+		<description>Pac-Man Collection! (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pac-man collection (ntsc).bin" size="32768" crc="553ea894" sha1="3b579d8827898a94b16225632a9870d22224b6bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paccoll" cloneof="pacman">
+		<description>Pac-Man Collection! (PAL)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pac-man collection (pal).bin" size="32768" crc="74517c71" sha1="ed0414e4b7c5ac10b0d7a5e19ee9c8e9ee61442f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacplus" cloneof="pacman">
+		<description>Pac-Man Plus (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pac-man plus.bin" size="16384" crc="e2dc056e" sha1="7dd18c8c7e82c813531f80ef2fe981c340f41c20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacpolux" cloneof="pacman">
+		<description>Pac-Pollux (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pac-pollux.bin" size="16384" crc="1b3dd167" sha1="2f079cd0fb6d92fd5261fe567ae0a6407a722f44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfight">
+		<description>Pit Fighter (Prototype)</description>
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7891"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="65536">
+				<rom name="pitfghtr.bin" size="65536" crc="a5e75537" sha1="378addef67aca55500f0f5f9f0075dcb177406b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetsmu" cloneof="planetsm">
+		<description>Planet Smashers (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7868"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="planetsm.bin" size="131072" crc="4e3b9e64" sha1="503b975fc1f8edc16110ac2c5b884c4e8b2b6efb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetsm">
+		<description>Planet Smashers (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7868"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="planeteu.bin" size="131072" crc="95dc7e96" sha1="f12cbb576607ec38d6111f4346412ccc5bfbcf42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plutos">
+		<description>Plutos (Prototype)</description>
+		<year>1990</year>
+		<publisher>Tynesoft</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="plutos.bin" size="131072" crc="2f211f7f" sha1="fa55d6a366b237917f18487fc51817394839a3bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polepos2u" cloneof="polepos2">
+		<description>Pole Position II (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Namco</publisher>
+		<info name="serial" value="CX7808"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="polepos2.bin" size="32768" crc="a85fb962" sha1="ccfa6f3f83ddbed2a2fb32735fea316a718fbaaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polepos2">
+		<description>Pole Position II (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Namco</publisher>
+		<info name="serial" value="CX7808"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="pleps2eu.bin" size="32768" crc="d751c7a6" sha1="268e53b5b2117bf853e0aae6adb0b2d3aad8ad5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampage">
+		<description>Rampage (NTSC)</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AM-049-03"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="ACTIVISION" />
+			<dataarea name="rom" size="131072">
+				<rom name="rampage.bin" size="131072" crc="39a316aa" sha1="13745b5eaaab7e2c992f3312285e112cdeb424f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampart" supported="no">
+		<description>Rampart (Prototype)</description>
+		<!-- (2 x 27512 - U1, U2) -->
+		<year>1991</year>
+		<publisher>Imagitec Design</publisher>
+		<info name="serial" value="CX7892"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="rampart.bin" size="131072" crc="e8c2a662" sha1="53516794cb442208af5d54760324c006510553b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractal">
+		<description>Rescue on Fractalus (NTSC, Prototype)</description>
+		<!-- 2 x 27128 - U2 (LO), U3 (HI) -->
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7816"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="32768">
+				<rom name="rescuefr.bin" size="32768" crc="9a74fbf2" sha1="6653022f38e553d475896a918850158eaf8f77ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotron">
+		<description>Robotron: 2084 (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari / Williams</publisher>
+		<info name="serial" value="CX7809"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="robotron.bin" size="32768" crc="cb22305d" sha1="ccc9753cdcbd2a2f8cb7966b8227801ba0bfd41d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rsbaseb">
+		<description>RealSports Baseball (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7834"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="65536">
+				<rom name="rsbsebll.bin" size="65536" crc="b1508030" sha1="9a9f60251d049630099f56d2d3efb013828b8a2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="santasim">
+		<description>Santa Simon (NTSC)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Matthias Luedtke" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="santa simon.bin" size="49152" crc="30d641ff" sha1="610e08f226c66b15ff699b02c736ce5ce7a8a862" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrapdogu" cloneof="scrapdog">
+		<description>Scrapyard Dog (NTSC)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7879"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="scrpyard.bin" size="131072" crc="5cc8c34f" sha1="f2249321d0cc296b9f9e516bbc5ecc9aab56ca22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrapdog">
+		<description>Scrapyard Dog (PAL)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7879"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="scrpyrde.bin" size="131072" crc="46dd9662" sha1="ebfed67cfeebc6a558dbb087e4784e5e5258c2e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sentinelu" cloneof="sentinel">
+		<description>Sentinel (NTSC, Prototype)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7869"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="sentinel.bin" size="131072" crc="2fddad78" sha1="bd7de03a28b168c992bcaa96539c2310f3bfe30c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sentinel">
+		<description>Sentinel (PAL)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7869"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="sentineu.bin" size="131072" crc="47340df9" sha1="6d85a73a56d2f02ff439736eace86691aa613444" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirius">
+		<description>Sirius (Prototype)</description>
+		<year>1990</year>
+		<publisher>Tynesoft</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="sirius.bin" size="131072" crc="65ae616e" sha1="cd9f6dea96f102262065d7472e73121b67f9e244" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacduelu" cloneof="spacduel">
+		<description>Space Duel (NTSC)</description>
+		<year>2007</year>
+		<publisher>Atari Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="space duel (ntsc).bin" size="32768" crc="ef2d2560" sha1="199d06cf7f54bb0a1fa328d3cff955f4bcf90450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacduel">
+		<description>Space Duel (PAL)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="space duel (pal).bin" size="32768" crc="0e6a8443" sha1="03d3c7e6255fc6f1b8bbf6dc3ccdbaf51b7eabf7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinvu" cloneof="spaceinv">
+		<description>Space Invader (NTSC)</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="spaceinvaders (ntsc).bin" size="16384" crc="9c3086eb" sha1="167c06a5d9364f3359bb531d5533f4ff49283d47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
+		<description>Space Invader (PAL)</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="spaceinvaders (pal).bin" size="16384" crc="90d7aad3" sha1="0b17368b9f3328f41d29ca4f0d04ab25e1aad55e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwarsu" cloneof="starwars">
+		<description>Star Wars 7800 (NTSC, Hack)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Gambler172" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="xev78_signed.bin" size="32768" crc="67c8af57" sha1="f76f2a212747e06ac452da8dbeb0ad093b24d793" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars 7800 (PAL, Hack)</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Gambler172" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="star wars 7800.bin" size="32768" crc="8678f1c0" sha1="9ac24aa0563be93d72bcf83c52a8acdbbfc63729" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumgames">
+		<description>Summer Games (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Epyx</publisher>
+		<info name="serial" value="CX7826"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="smmrgame.bin" size="131072" crc="65c6df3f" sha1="31d46b32a2aa8d5bd6028cff1f41037426b22409" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suphueyu" cloneof="suphuey">
+		<description>Super Huey (NTSC)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7828"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="suprhuey.bin" size="49152" crc="71846500" sha1="29aea9e90c446942001fd08d3c4c929f4ce048d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suphuey">
+		<description>Super Huey (PAL)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7828"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="suprhueu.bin" size="49152" crc="6b27ea2c" sha1="469e03ee1e22ef0978c8095a38d662d34a413723" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supskateu" cloneof="supskate">
+		<description>Super Skateboardin' (NTSC)</description>
+		<year>1988</year>
+		<publisher>Absolute Entertainment, Inc.</publisher>
+		<info name="serial" value="AV-047-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="sprskate.bin" size="32768" crc="13b68650" sha1="666d9383c112b66026898e6002b803801e269c51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supskate">
+		<description>Super Skateboardin' (PAL)</description>
+		<year>1988</year>
+		<publisher>Absolute Entertainment, Inc.</publisher>
+		<info name="serial" value="AV-047-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="sprskaeu.bin" size="32768" crc="8f167ba9" sha1="fab349584af7b6b3f9b034af3034f43257e2c25f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank Command (NTSC)</description>
+		<year>1988</year>
+		<publisher>Froggo</publisher>
+		<info name="serial" value="FG2003"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="65536">
+				<rom name="tankcmnd.bin" size="65536" crc="db91b181" sha1="1d2975d754806416a25a821db6a9fe389bf5d946" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prowresu" cloneof="prowres">
+		<description>Title Match Pro Wrestling (NTSC)</description>
+		<year>1989</year>
+		<publisher>Absolute Entertainment, Inc.</publisher>
+		<info name="serial" value="AV-041-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="titlemat.bin" size="32768" crc="bc23c57b" sha1="80d11bcbb953ccd8bf3c3e64162711e7edb95090" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prowres">
+		<description>Title Match Pro Wrestling (PAL)</description>
+		<year>1989</year>
+		<publisher>Absolute Entertainment, Inc.</publisher>
+		<info name="serial" value="AV-041-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="titlemeu.bin" size="32768" crc="16b54d5b" sha1="7ab281c9b69692823b3b6b594856172363c507b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomcatu" cloneof="tomcat">
+		<description>Tomcat - The F-14 Fighter Simulator (NTSC)</description>
+		<year>1989</year>
+		<publisher>Absolute Entertainment, Inc.</publisher>
+		<info name="serial" value="AV-046-04"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="tomcat.bin" size="32768" crc="513cb9ee" sha1="80c615fb60d0004c1accde25e42759572e030928" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomcat">
+		<description>Tomcat - The F-14 Fighter Simulator (PAL)</description>
+		<year>1989</year>
+		<publisher>Absolute Entertainment, Inc.</publisher>
+		<info name="serial" value="AV-046-04"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="tomcateu.bin" size="32768" crc="b01205bf" sha1="825381773593365b5ca7eeca968cca00879eee71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdown">
+		<description>Touchdown Football</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7823"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="tchdown.bin" size="131072" crc="aae12695" sha1="364bf0fef8a67f7e66761c76a3a6a0dd186f04aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towertopu" cloneof="towertop">
+		<description>Tower Toppler (NTSC)</description>
+		<year>1988</year>
+		<publisher>Atari / U.S. Gold</publisher>
+		<info name="serial" value="CX7856"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="65536">
+				<rom name="twrtpllr.bin" size="65536" crc="4407ba04" sha1="53976013986e0ad3694ab9c021420b8172465de7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towertop">
+		<description>Tower Toppler (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari / U.S. Gold</publisher>
+		<info name="serial" value="CX7856"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="65536">
+				<rom name="twrtpleu.bin" size="65536" crc="0f87fd7b" sha1="56e1b795e80382edb376e4536d1dee539d4ac548" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wasp">
+		<description>Wasp (NTSC)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Mark Ball" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="wasp v1.05.bin" size="32768" crc="ae1117dd" sha1="be65bdc225aca4a8bb9a18653da7de78aaac3f80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waterski">
+		<description>Water Ski (NTSC)</description>
+		<year>1988</year>
+		<publisher>Froggo</publisher>
+		<info name="serial" value="FG2002"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="65536">
+				<rom name="waterski.bin" size="65536" crc="930b30df" sha1="621c67c2228843405445222743ba3d7c1f04a3c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingames">
+		<description>Winter Games (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Epyx</publisher>
+		<info name="serial" value="CX7831"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-6" />
+			<dataarea name="rom" size="131072">
+				<rom name="wntrgame.bin" size="131072" crc="8981b531" sha1="b3725d6f0834c68ac62ce13eb9eb0d01d1124e5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenophobu" cloneof="xenophob">
+		<description>Xenophobe (NTSC)</description>
+		<year>1987</year>
+		<publisher>Atari / Bally Midway Mfg. Co.</publisher>
+		<info name="serial" value="CX7858"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="xnophobe.bin" size="131072" crc="5fd9a141" sha1="867adbfd7539ff81e68726ed6f5ff7326409539f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenophob">
+		<description>Xenophobe (PAL)</description>
+		<year>1987</year>
+		<publisher>Atari / Bally Midway Mfg. Co.</publisher>
+		<info name="serial" value="CX7858"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-2" />
+			<dataarea name="rom" size="131072">
+				<rom name="xnophoeu.bin" size="131072" crc="cf0e44f1" sha1="b2cf7d6164d6e5acd47e9f6d7cf60bb0f775b4a3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xeviousu" cloneof="xevious">
+		<description>Xevious (NTSC)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7810"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="32768">
+				<rom name="xevious.bin" size="32768" crc="75fc124f" sha1="1d4f0335b152239553534fcbbacdca273802e3bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xevious">
+		<description>Xevious (PAL)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX7810"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="pcb_type" value="TYPE-0" />
+			<dataarea name="rom" size="49152">
+				<rom name="xevioeu.bin" size="49152" crc="d5ac738b" sha1="81647c8ce432f891328631b57dd3268dd315f8e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,1478 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="msx2_cart" description="MSX2 Cartridges">
+
+<!--
+Information in this list was taken from sources like: the GOODTools, http://gigamix.jp/rom/rom.php
+
+Unless otherwise noted, the information in this list has not been verified by opening cartridges and redumping all the chips.
+
+Mappers:
+M60002-0125SP (48 pin) - 8KB banks
+LZ93A13 (32 pin) - 8KB banks
+
+-->
+
+	<software name="eidolon">
+		<description>The Eidolon</description>
+		<year>1985</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="alt_title" value="アイドロン" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="ponyca0l01" size="131072" crc="14913432" sha1="cd8ee800822ff0cd295621faafafc73be4bacad0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="genchohi">
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
+		<year>19??</year>
+		<publisher>Sakai Mitsuru</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257ASP-10L" /> - 28 pin, battery backed -
+			<dataarea name="rom" size="">
+				<rom name="lh538f96" size="" crc="" sha1="" offset="" /> - 42 pin, 8M -
+			</dataarea>
+			<dataarea name="sram" size="??" />	- battery backed -
+		</part>
+	</software>
+-->
+
+	<software name="genghis">
+		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
+		<year>1988</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-02A" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="tc534000p" size="524288" crc="3b5b3fd8" sha1="8a4bcf0f38c9f243443a4d4865278f695bd83dc8" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="8192" />
+		</part>
+	</software>
+
+	<software name="ashguin2">
+		<description>Ashguine 2: Kokuu no Gajou</description>
+		<year>1987</year>
+		<publisher>Panasoft / T&amp;E Soft</publisher>
+		<info name="alt_title" value="PANA-010 - アシュギーネ 虚空の牙城" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532056" size="262144" crc="47a82d74" sha1="efdf63f01293251dc593163a42f31556fd042282" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashguin3">
+		<description>Ashguine: Fukushuu no Honoo</description>
+		<year>1987</year>
+		<publisher>Panasoft / Micro Cabin</publisher>
+		<info name="alt_title" value="アシュギーネ 復讐の炎" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532064" size="262144" crc="353382ce" sha1="6fd90e7573abdb5a7bd6e4e8dc44db80fc163e30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashguin3a" cloneof="ashguin3">
+		<description>Ashguine: Fukushuu no Honoo (Alt)</description>
+		<year>1987</year>
+		<publisher>Panasoft / Micro Cabin</publisher>
+		<info name="alt_title" value="アシュギーネ 復讐の炎" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532064.0" size="131072" crc="4b3fcd15" sha1="edc60b3cea0d07a642ee8a6af9f885253775602f" offset="0" />
+				<rom name="lh532064.1" size="131072" crc="2e2c013e" sha1="29c50e5ea62613a3a936573ceeeb205d8e19f5d9" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoi2">
+		<description>Arkanoid 2</description>
+		<year>1987</year>
+		<publisher>Nidecom</publisher>
+		<info name="alt_title" value="アルカノイドII" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310bl" size="131072" crc="00d36af6" sha1="1642891b693df616f27431299352e1d7750ac94b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aleste">
+		<description>Aleste</description>
+		<year>1988</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="2M-16KB" />
+			<feature name="mapper" value="MR6401" />
+			<dataarea name="rom" size="262144">
+				<rom name="aleste.rom" size="262144" crc="c29edd84" sha1="12f6f31f495bfb384c9ca9067bfbf8f98af6adf9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="androgyn">
+		<description>Androgynus</description>
+		<year>1988</year>
+		<publisher>Telenet Japan</publisher>
+		<info name="alt_title" value="アンドロギュヌス" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<!-- LZ93A13 with 16KB banks?? -->
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532055" size="262144" crc="c6f74489" sha1="55183b7b7df66950dbb65ef1065d7d987e0fdf5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtishtar">
+		<description>The Return of Ishtar</description>
+		<year>1988</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="イシターの復活" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<!-- LZ93A13 with 16KB banks?? -->
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532084" size="262144" crc="8ee8212c" sha1="d17acc97bf2f853a5fff58da733e4cd53cdaa3ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ishinara">
+		<description>Ishin no Arashi</description>
+		<year>1989</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="維新の嵐" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864PN-12L" />	<!-- battery backed -->
+			<dataarea name="rom" size="524288">
+				<rom name="hn62404p" size="524288" crc="8bc34dca" sha1="6420d61002da325403fcb6f41afb1d348eeba3b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ideyumj">
+		<description>Ide Yousuke Meijin no Jissen Mahjong</description>
+		<year>1988</year>
+		<publisher>Pack in Video</publisher>
+		<info name="alt_title" value="井出洋介名人の実戦麻雀" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230952" size="131072" crc="935f1bde" sha1="219e9acc2c023c25a8bbe9fb7d1764ffcff66034" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inindo">
+		<description>Inindou Datou Nobunaga</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="伊忍道 打倒信長" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-64" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864BSP-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh5380sz" size="1048576" crc="881b3849" sha1="0cc6c30c6918fcf780e57d40f58a4cf2a82225cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aclassmj">
+		<description>Inemuri-ryuu Asada Tetsuya no A-kyuu Mahjong</description>
+		<year>1988</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="居眠り流 阿佐田哲也のA級麻雀" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<!-- LZ93A13 with 16KB banks?? -->
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<!-- R58Y5151 8849 D -->
+				<rom name="r58y5151" size="131072" crc="f5174422" sha1="66508bbdc3b133b9a69ea96789bc134eea46796a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woodypoc">
+		<description>Woody Poco</description>
+		<year>1987</year>
+		<publisher>dB-Soft</publisher>
+		<info name="alt_title" value="うっでぃぽこ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<!-- 16KB banks -->
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<!-- NEC D23C10101C W48 -->
+				<rom name="d23c1010c" size="131072" crc="aea8d064" sha1="ebe20c85c5314957fafc223c26bf393847e3bb03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uruseiya">
+		<description>Urusei Yatsura</description>
+		<year>1987</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="うる星やつら" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534039" size="524288" crc="e564a25f" sha1="92bada2d019fcd6eee6d332a8068a9ddfa30d518" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima">
+		<description>Ultima Exodus</description>
+		<year>1987</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="ウルティマ 恐怖のエクソダス" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M208-03M" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864PN-15L" />
+			<dataarea name="rom" size="262144">
+				<rom name="r68y5552" size="262144" crc="37b9e10f" sha1="18be429f8b5c7bc4775c99292110aa09341cd644" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aressha">
+		<description>A Ressha de Ikou - Take the A Train.</description>
+		<year>1989</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="A列車で行こう" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M216A" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<feature name="sram" value="CXK5864PN-12L" />
+			<dataarea name="rom" size="131072">
+				<!-- PONY CANYON 8929E -->
+				<rom name="atrain.rom" size="131072" crc="c956e1df" sha1="5fd07ed5b7c0492d42ed91a54a0fe80ce6e4e40d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15se">
+		<description>F-15 Strike Eagle</description>
+		<year>1987</year>
+		<publisher>System Soft</publisher>
+		<info name="alt_title" value="F-15ストライクイーグル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="sms_1026" size="131072" crc="53cce88d" sha1="39bc111c953bdf25683db7ff4c0bad79b5c49958" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garakuta">
+		<description>Garakuta</description>
+		<year>1988</year>
+		<publisher>Wachi Software</publisher>
+		<info name="alt_title" value="お絵描きソフト 画楽多" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<!-- 16KB banks -->
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<!-- Is likely to be a single 1Mbit ROM -->
+				<rom name="lh31434" size="65536" crc="33c37313" sha1="f4da2be2ee712ba2e7cccf56fcd15483fe0023ed" offset="0" />
+				<rom size="65536" offset="0x10000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ogre">
+		<description>Ogre</description>
+		<year>1986</year>
+		<publisher>Systemsoft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<!-- 16KB banks -->
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23105d" size="131072" crc="f2544e2e" sha1="c9c272ffa69d3e0af5be42e7636b02dc2af6ea8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grlyblok">
+		<description>Girly Block</description>
+		<year>1988</year>
+		<publisher>Telenet</publisher>
+		<info name="alt_title" value="ガーリーブロック" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230965" size="131072" crc="28094960" sha1="bb99fe7702733ab0f9e8856e91f5ddcb55d30b5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game doesn't boot on regular msx2 driver. Reported to work on hbf700p driver. -->
+	<software name="kikikai">
+		<description>KiKi KaiKai</description>
+		<year>1986</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="奇々怪界" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="IS-02-030-0" />
+			<feature name="mapper" value="BS6202" />
+			<dataarea name="rom" size="131072">
+				<!-- RP231024D 0856 -->
+				<rom name="rp231024d" size="131072" crc="5c859406" sha1="6dd28797f9d1fe7cc041077ebe77d08f2ccc0937" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kisei">
+		<description>Kisei</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="棋聖" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621-8K" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="HBS-G057C" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh5116-15" size="131072" crc="167a53da" sha1="2e2543ac99193f76b4f35463142294c016f0cf3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gambler2">
+		<description>Gambler Jikochuushinha 2 - Jishou! Kyougou Janshi Hen</description>
+		<year>1988</year>
+		<publisher>Gamearts</publisher>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="2M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh53210b" size="262144" crc="eb67d4d6" sha1="1f3f586255dd49b0f912bf41e07e88fe3eb3fb61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quinpl">
+		<description>Quinpl</description>
+		<year>1988</year>
+		<publisher>Bit2</publisher>
+		<info name="alt_title" value="クインプル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M008-E2M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="hn27512p-25" size="131072" crc="8a39b738" sha1="58ad36c600ba8da36796440051df81d54036b0c4" offset="0" />
+				<rom name="m27512zb" size="131072" crc="3c242580" sha1="3d9d0356242a6b5395f4fa9e8473184797d55fe6" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimson">
+		<description>Crimson</description>
+		<year>1987</year>
+		<publisher>Xtal Soft</publisher>
+		<info name="alt_title" value="クリムゾン" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532079" size="262144" crc="8528a795" sha1="a21adba681956ec35816af673a9d4f6c7743253a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cockpit">
+		<description>The Cockpit</description>
+		<year>1987</year>
+		<publisher>Nidecom</publisher>
+		<info name="alt_title" value="ザ・コックピット" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-16KB" />
+			<!-- NEOS MR6401 -->
+			<feature name="mapper" value="MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310bd" size="131072" crc="5f354e65" sha1="e36e16acfdfa76fa72b218da2bebc668db39d21e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- doesn't seem to boot in msx2 driver -->
+	<software name="murdclub" supported="no">
+		<description>Final Mystery Murder Club - Satsujin Club</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="殺人倶楽部" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534060" size="524288" crc="fe797d88" sha1="c1923ab5c5dcaf67af3e23fd1ac42e2d4c61aca7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanacex">
+		<description>Zanac EX</description>
+		<year>1986</year>
+		<publisher>Pony</publisher>
+		<info name="alt_title" value="ザナック EX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="r58y5093" size="131072" crc="d153b2f2" sha1="23e702084e3031158a50a0560746767bbc1b7bee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangoku2">
+		<description>Sangokushi 2</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三国志II" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257SP-12L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh538056" size="1048576" crc="c89b93b5" sha1="25ffc7e8ca90274566c31e10b5998cca6522673a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="jrmate">
+		<description>Jr. Mate</description>
+		<year></year>
+		<publisher>Panasoft</publisher>
+		<info name="alt_title" value="ジュニアメイト" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="JCI-N1S" />
+			<feature name="mapper" value="M60002-0115FP" />
+			<feature name="sram" value="D4464C-20L" />
+			<dataarea name="rom" size="">
+				<rom name="jr_mate_1_v1.0" size="131072" crc="" sha1="" offset="0" />
+				<rom name="jr_mate_2_v1.0" size="131072" crc="" sha1="" offset="0x20000" />
+				<!- Kanji rom ->
+				<rom name="tc531000p-6616" size="131072" crc="" sha1="" offset="0x40000" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="shiryo">
+		<description>Shiryou Sensen - War of the Dead</description>
+		<year>1987</year>
+		<publisher>Victor</publisher>
+		<info name="alt_title" value="死霊戦線" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5164L-10" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532053" size="262144" crc="39e1c37a" sha1="3194153a9c93aa24b37804a764f112bdef091bf8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suikoden">
+		<description>Suikoden - Tenmei no Chikai</description>
+		<year>1989</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="水滸伝 天命の誓い" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864BP-12L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534a1b" size="524288" crc="187d3a21" sha1="de251a0af1df3be18469578dc00d414e572ee33e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble">
+		<description>Scramble Formation</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="スクランブルフォーメーション" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532044" size="262144" crc="226795e0" sha1="24384e63bfe450bce6abd327eae3e27969025379" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zukkoke">
+		<description>Zukkoke Yajikita Onmitsu Douchuu</description>
+		<year>1987</year>
+		<publisher>HAL</publisher>
+		<info name="alt_title" value="ずっこけやじきた隠密道中" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23108j" size="131072" crc="d0ececc6" sha1="094d11ebf8a20b6bfc07902c7f136bdd18b1e7ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supdaisn">
+		<description>Super Daisenryaku</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="SUPER大戦略" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M116-03A" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<feature name="sram" value="HM6116LP-3" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532097" size="262144" crc="8df9945a" sha1="d1cc2a77fb17608d542c50e2a1404cf5b4231521" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="striton">
+		<description>Super Triton</description>
+		<year>1986</year>
+		<publisher>Xain soft</publisher>
+		<info name="alt_title" value="スーパートリトーン" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="831000-20" size="131072" crc="cbb00ef1" sha1="795d47c6aae378d0d5bedc9f104a597bcc1ee16b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srunner">
+		<description>Super Runner</description>
+		<year>1987</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="スーパーランナー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />	<!-- MR6401 -->
+			<dataarea name="rom" size="131072">
+				<rom name="r59y5111-w82" size="131072" crc="5a5be701" sha1="3202af113265e67e130a0b948dc167a9f9e9cc79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikima2">
+		<description>Seikima II Special - Akuma no Gyakushuu</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- LH231083 8729 D -->
+				<rom name="lh231083" size="131072" crc="e37b681e" sha1="c74a5a6164536750d6b3ea90e19798ab6fad79d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xevious">
+		<description>Xevious - Fardraut Saga</description>
+		<year>1989</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<!-- SHARP MSX2 XV-F 8852 D -->
+				<rom name="msx2_xv-f" size="262144" crc="97591725" sha1="f84d7fc089b31440cac1f4fbee3d45b2f6c90e37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoids">
+		<description>Zoids - Chuuou Tairiku no Tatakai</description>
+		<year>1988</year>
+		<publisher>Toshiba EMI</publisher>
+		<info name="alt_title" value="ゾイド 中央大陸の戦い" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230956" size="131072" crc="2605031e" sha1="d526249c1a35cf1174300df75bc28662f579290a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daikokai">
+		<description>Daikoukai Jidai</description>
+		<year>1990</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="大航海時代" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5160-10L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534g63" size="524288" crc="ec7a8012" sha1="2a4aef32db28c059c30f5f972f1c09708ef6ce62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daisenr">
+		<description>Daisenryaku</description>
+		<year>1986</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="大戦略" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621N" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<feature name="sram" value="LH5116-15" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh531073" size="131072" crc="a987a0d8" sha1="10c38f91d8f5db2438414ea58f26dcac78352088" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- doesn't seem to work -->
+	<software name="dynabowl" supported="no">
+		<description>Dynamite Bowl</description>
+		<year>1987</year>
+		<publisher>Toshiba EMI</publisher>
+		<info name="alt_title" value="ダイナマイトボウル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="ps-2021g" size="131072" crc="9935e9bd" sha1="bd70b00ccb8fafca883c7160585e9c5920cca58f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteka2">
+		<description>Taiyou no Shinden - Asteka II</description>
+		<year>1987</year>
+		<publisher>Falcom</publisher>
+		<info name="alt_title" value="太陽の神殿 アステカII" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864PN-15LL" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532057" size="262144" crc="ae82a874" sha1="414fd2a22076f45502c2329b45bda9f8730dcaae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- doesn't seem to work -->
+	<software name="dires" supported="no">
+		<description>Dires</description>
+		<year>1988</year>
+		<publisher>Bothtec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621-8K" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="CXK5816PS-12L" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh531090" size="131072" crc="5acbd591" sha1="1ba6b699b4e34c23ee60db4e58e1265dc03f0b50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drwn4078">
+		<description>Darwin 4078</description>
+		<year>1987</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ダーウィン4078" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024" size="131072" crc="7098faf0" sha1="d4da7236bd09d735dcb92127c73e43b3ca94dd7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doublvis">
+		<description>Double Vision</description>
+		<year>1988</year>
+		<publisher>Hard</publisher>
+		<info name="alt_title" value="ダブル・ヴィジョン" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532048" size="262144" crc="e1148738" sha1="87a7fa43602f74c47151e79f1aaf7f641331ba51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teiketsu">
+		<description>Teitoku no Ketsudan</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="提督の決断" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257SP-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh53804y" size="1048576" crc="c31f459c" sha1="b2ce0bc86f82f727db956dfbbe2a3fd0cb72f5fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1988</year>
+		<publisher>BPS</publisher>
+		<info name="alt_title" value="テトリス" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M-008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<!-- LH2307D7 8934 E -->
+				<rom name="lh2307d7" size="131072" crc="aa598dfd" sha1="af310ee21b5534f32ea92c0ae34a44d828d157a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tengoku">
+		<description>Tengoku Yoitoko</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="天国よいとこ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />	<!-- Also seen with TAS-1M016S with 16KB mapper? -->
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23109a" size="131072" crc="7e637801" sha1="00c70cf37c71cb8f99567ae407ff6dd52c4774c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashguine">
+		<description>Densetsu no Seisenshi Ashguine</description>
+		<year>1987</year>
+		<publisher>Bit2</publisher>
+		<info name="alt_title" value="伝説の聖戦士 アシュギーネ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh531080" size="131072" crc="3cb34efb" sha1="f57b46154cf0711e3f5218e00f67c375d95d1d5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topzip">
+		<description>Topple Zip</description>
+		<year>1988</year>
+		<publisher>Bothtec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="cxk381000" size="131072" crc="96b33497" sha1="e3036a7bc6ed3ece1c85d5e37fb2ff39ba98ba47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dquest">
+		<description>Dragon Quest</description>
+		<year>1986</year>
+		<publisher>enix</publisher>
+		<info name="alt_title" value="ドラゴンクエスト" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="cxk381000" size="131072" crc="7729e7a9" sha1="5577e483caca553cfbfc0cba26f3ab2444569f81" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dquest2">
+		<description>Dragon Quest II - Akuryou no Kamigami</description>
+		<year>1987</year>
+		<publisher>Enix</publisher>
+		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532073" size="262144" crc="0bf0c3f5" sha1="05280f0a26ac5c42ab63b80a487bb909683e7461" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesnt boot in msx2 driver -->
+	<software name="dslayer4" supported="no">
+		<description>Dragon Slayer IV - Drasle Family</description>
+		<year>1987</year>
+		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ドラゴンスレイヤーIV" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532037" size="262144" crc="98095852" sha1="6d7a8ea1b283ecc1cc94c359e5f053a6e82ab3f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbuster">
+		<description>Dragon Buster</description>
+		<year>1987</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="ドラゴンバスター" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="namcot_msx2_db" size="131072" crc="49252882" sha1="ecbf33a376a7a108176f8d1009d042e01519241c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjakun">
+		<description>Ninja Kun - Ashura no Shou</description>
+		<year>1987</year>
+		<publisher>HAL</publisher>
+		<info name="alt_title" value="忍者くん 阿修羅の章" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310as" size="131072" crc="f56a00e6" sha1="5c278deb1390eb45c79b7667b1ea1c54183123ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobuseng">
+		<description>Nobunaga no Yabou - Sengoku Gun'yuu Den</description>
+		<year>1989</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望　戦国群雄伝" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5264T-L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534a76" size="524288" crc="69c11d81" sha1="89943ae938fb308f4b5149ebc0cbea597b9b0223" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobuzenk">
+		<description>Nobunaga no Yabou - Zenkokuban</description>
+		<year>1987</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望 全国版" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5164-10" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534045" size="524288" crc="653f1c73" sha1="fbfdd89ec183ceae63d3d66b0ab45faa951b525a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobubufu">
+		<description>Nobunaga no Yabou - Bushou Fuuunroku</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望 武将風雲録" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK52857SP-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh53806j" size="1048576" crc="0ff8e2c7" sha1="cb6bd26961387def757c7faeec7563d77d404d01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- does not seem to work in the generic msx2 driver -->
+	<software name="hardball" supported="no">
+		<description>Hardball</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- G 060CA 8737 D or G 060C 8744 D -->
+				<rom name="g_060c" size="131072" crc="1d7040af" sha1="32151ddc4303290c09889bf8107493dd34296043" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide3">
+		<description>Hydlide 3</description>
+		<year>1987</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ハイドライド3" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="hydlide3_4m-rom" size="524288" crc="00db86c8" sha1="f182d4785e3eed00292f7ff4795c9dcc6c990a0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Looks like a bad dump: contains "mega rom loader" messages -->
+	<software name="pacmania" supported="no">
+		<description>Pac-Mania</description>
+		<year>1989</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<!-- SHARP MSX2 PN 8929 D -->
+				<rom name="msx2_pn" size="262144" crc="7df16fc8" sha1="d5902afbd8dfb1ea96fc8cf4d62cf6e4fa40d4f7" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="バブルボブル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231596" size="131072" crc="6524d9fc" sha1="e73946f1f26589d77926276ca4f9dbee60c53fde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Does not work in the generic msx2 driver -->
+	<software name="victnin2" supported="no">
+		<description>Victorious Nine II - Koukou Yakyuu Hen</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="ビクトリアス・ナインII 高校野球編" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-!M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23109h" size="131072" crc="94ebc319" sha1="7ed1308179c41ae62cfb46124ab0ce22d8b0513b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fireball">
+		<description>Fire Ball</description>
+		<year>1987</year>
+		<publisher>Hummingbird Soft</publisher>
+		<info name="alt_title" value="ファイア・ボール" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M-008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230941" size="131072" crc="cdcdc6c0" sha1="cdeadd6cf7bf5b53aa7d901446b0ce586542c580" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famiparo">
+		<description>Famicle Parodic</description>
+		<year>1988</year>
+		<publisher>Bit2</publisher>
+		<info name="alt_title" value="ファミクルパロディック" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532074" size="262144" crc="0e03847b" sha1="f12ad34dc3b4279da0fc7094f3d50d6b8bb517dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famibill">
+		<description>Family Billiards</description>
+		<year>1987</year>
+		<publisher>Pack-in-Video</publisher>
+		<info name="alt_title" value="ファミリービリヤード" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8K" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<!-- Not sure if dump is correct?? -->
+				<rom name="m27512zb" size="65536" crc="7c867d98" sha1="924fcf87b3747dae06e621975903ee73c42016f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famiboxi">
+		<description>Family Boxing</description>
+		<year>1988</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ファミリーボクシング" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="IS-03-001-0" />
+			<feature name="mapper" value="BS6202" />
+			<dataarea name="rom" size="262144">
+				<!-- HBS-G066C SHARP 8822 D -->
+				<rom name="hbs-g066c" size="262144" crc="7030f2ab" sha1="d78d763e72e23418f31dc3ce91deea1e8ee10490" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantzon2">
+		<description>Fantasy Zone II - The Tears of OPA-OPA</description>
+		<year>1987</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-2M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="r68y-5815" size="262144" crc="1bdfaeeb" sha1="a58ca651f4c12bf07cf3840d5e37b534f5fc075e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fleetco2">
+		<description>Fleet Commander II - Tasogare no Kaiiki</description>
+		<year>1990</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="フリートコマンダーII 黄昏の海域" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="FLEET COMMANDER II" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="fleetco2.bin" size="262144" crc="9f152e9b" sha1="8cbfd94324f297a418e7eec6920dfead7b9bed08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="projcta2">
+		<description>Project A2 - Shijou Saidai no Hyouteki</description>
+		<year>1987</year>
+		<publisher>Pony</publisher>
+		<info name="alt_title" value="プロジェクトA2 史上最大の標的" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- PONYCA R58Y5109 RP231024D -->
+				<rom name="rp231024d" size="131072" crc="1b285fe3" sha1="418f6248221c79039fe6c44fc5a9514842e3ec71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Does not work in generic msx2 driver -->
+	<software name="profmjg" supported="no">
+		<description>Professional Mahjong Gokuu</description>
+		<year>1988</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀悟空" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621N" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="CXK5861PS-12L" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="2abb1ec4" sha1="81143d2a8ef7cc593a604f3cc890312b42bdff01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famista">
+		<description>Pro Yakyuu Family Stadium - Pennant Race</description>
+		<year>1989</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="プロ野球ファミリースタジアム ペナントレース" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="msx2_fs" size="262144" crc="356b7d2a" sha1="970e26f3c2c085e39267115991add6ccc6e9ff80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proyakyu">
+		<description>Pro Yakyuu Fan</description>
+		<year>1987</year>
+		<publisher>Telenet</publisher>
+		<info name="alt_title" value="プロ野球FAN" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532055" size="262144" crc="c065bc29" sha1="f52690157a51c662ffdf4ae3592ada93d7be4032" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holein1s">
+		<description>Hole in One Special</description>
+		<year>1987</year>
+		<publisher>Hal</publisher>
+		<info name="alt_title" value="ホール・イン・ワン スペシャル" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="m5m231001_219p" size="131072" crc="f35df283" sha1="facb967717c21fed9b375481908aa337b3361c45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="borfesu">
+		<description>Borfesu to Gonin no Akuma - An Adventure Story</description>
+		<year>1987</year>
+		<publisher>Xtal Soft</publisher>
+		<info name="alt_title" value="ボルフェスと5人の悪魔" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231066" size="131072" crc="e040e8a1" sha1="16c3ced0fb2e360bc7c43d372a0a30eb6bd3963d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kitahei">
+		<description>Honkaku Shougi Kitahei</description>
+		<year>1986</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="本格将棋 棋太平" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="0767af40" sha1="b74f759ba3837968a04e9b64321b47cf087e76ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stramars">
+		<description>Strategic Mars</description>
+		<year>1989</year>
+		<publisher>db-Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230949" size="131072" crc="4a3abb65" sha1="dc56cff1211bacd94f59e188e44a58d6f40a0c26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<!- see http://msx.jpn.org/tagoo/s_check.cgi?LINE=1026 (disk version of this software?) ->
+	<software name="">
+		<description>Michelangelo 2</description>
+		<year>1987</year>
+		<publisher></publisher>
+		<info name="alt_title" value="ミケランジェロⅡ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="mississp">
+		<description>Mississippi Satsujin Jiken</description>
+		<year>1987</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="ミシシッピー殺人事件" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310aa" size="131072" crc="3f69a464" sha1="d53a8efefe3714269538a91e5256c2938fe13239" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikkoku">
+		<description>Maison Ikkoku</description>
+		<year>1987</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="めぞん一刻" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh5320z1" size="262144" crc="f4d127c0" sha1="ee501fde62b25ddd1c82798ee1b233b8813e717b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikkokuk">
+		<description>Maison Ikkoku Kanketsu Hen</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="めぞん一刻 完結篇" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534082" size="524288" crc="94191aae" sha1="55fb4e3d3a762b613b635ee9745d92f0f3711272" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moeronet">
+		<description>Moero! Nettou Yakyuu'88</description>
+		<year>1988</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="燃えろ！！熱闘野球’８８" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="JX-16" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="d23c2001c" size="262144" crc="68745c64" sha1="1cbd5c7849f97dea1e3375a842f784ff9283310c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monmonmo">
+		<description>Mon Mon Monster</description>
+		<year>1989</year>
+		<publisher>Hot-B</publisher>
+		<info name="alt_title" value="ンモンモンスター" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="IS-02-030-0" />
+			<feature name="mapper" value="BS6202" />
+			<dataarea name="rom" size="131072">
+				<rom name="monmonmonster.bin" size="131072" crc="ebccb796" sha1="ab087d04eb5c2c8894758c7cee32ccafd80989a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yaksa">
+		<description>Yaksa</description>
+		<year>1987</year>
+		<publisher>Wolf Team</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="wolf_07" size="262144" crc="ff974ee3" sha1="3e57fad130be79223068ab29f1e77ecb7f2ad237" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyuotory">
+		<description>Kyouto Ryuu no Tera Satsujin Jiken</description>
+		<year>1988</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="京都龍の寺殺人事件" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532065" size="262144" crc="dcb1a61e" sha1="f9486dd810d6321bad4bc9d7703a67d630167f98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yuureikn">
+		<description>Yuurei-kun</description>
+		<year>1988</year>
+		<publisher>system Sacom</publisher>
+		<info name="alt_title" value="幽霊君" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh53201l" size="262144" crc="712ae3c6" sha1="efed48854beb2803d9f2b5644edff2aacf7c6af9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eurosens">
+		<description>Europa Sensen</description>
+		<year>1992</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="ヨーロッパ戦線" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257SP-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh538a36" size="1048576" crc="413d4700" sha1="475c3af7495922759a5f424d2e22d7e4073d5992" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rastan">
+		<description>Rastan Saga</description>
+		<year>1988</year>
+		<publisher>Tatio</publisher>
+		<info name="alt_title" value="ラスタン・サーガ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532069" size="262144" crc="84461e73" sha1="f787271597abbcb1297e4e8a4a9561959a195649" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emperor">
+		<description>L'Empereur</description>
+		<year>1990</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="ランペルール" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5160-10L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534g2s" size="524288" crc="c7521809" sha1="22f5998b4de47bf2ccc077d5881ac448e6b0484d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retjelda">
+		<description>Return of Jelda</description>
+		<year>1987</year>
+		<publisher>Carry Lab</publisher>
+		<info name="alt_title" value="リターン・オブ・ジェルダ" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23109y" size="131072" crc="5ccc09ab" sha1="59f679c5ebf75de98b5e909da9182dbd80413364" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lupin">
+		<description>Lupin the Third - Cagliostro no Shiro</description>
+		<year>1987</year>
+		<publisher>toho</publisher>
+		<info name="alt_title" value="ルパン三世 カリオストロの城" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231062" size="131072" crc="c4096e6b" sha1="e89fc7437d8f9aed1640689a32ebbf047699b147" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="replicrt">
+		<description>Replicart</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="レプリカート" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="MSX-2MX" />
+			<feature name="mapper" value="BS6101" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="6eee12c4" sha1="afb693fd0a138cfc59a2bf81eabd7ca2abd4e162" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- does not seem to work in the generic msx2 driver -->
+	<software name="relics" supported="no">
+		<description>Relics</description>
+		<year>1986</year>
+		<publisher>Bothtec</publisher>
+		<info name="alt_title" value="レリクス" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="cxkk381000" size="262144" crc="babc68f2" sha1="02c3ec94190c6fce6fa4984d92be48b2697e7706" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="royalbld">
+		<description>Royal Blood</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="ロイヤルブラッド" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-64" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5168D-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh538a01" size="1048576" crc="fb9e42e1" sha1="522a53034cf40448d441683f3308fcb4b65e6d7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romancia">
+		<description>Romancia</description>
+		<year>1986</year>
+		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ロマンシア" />
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="MSX-2MX" />
+			<feature name="mapper" value="BS6101-16" />
+			<dataarea name="rom" size="131072">
+				<!-- CXK831000 and 831000-20 seen -->
+				<rom name="cxk831000" size="131072" crc="17f9ee7f" sha1="b63fc17c1d004ca4d7f3b1ef8962210a779ca665" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="">
+		<description></description>
+		<year></year>
+		<publisher></publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="" />
+			<feature name="mapper" value="" />
+			<dataarea name="rom" size="">
+				<rom name="" size="" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+</softwarelist>

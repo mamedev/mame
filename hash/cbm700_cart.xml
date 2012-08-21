@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+-->
+<softwarelist name="cbm700_cart" description="Commodore 700 cartridges">
+
+	<software name="calcresu" supported="no">
+		<description>Calc Result</description>
+		<year>198?</year>
+		<publisher>Handic Software</publisher>
+		<part name="cart" interface="cbm700_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="calc_result-bx700.bin" size="0x2000" crc="4775ebb3" sha1="5c6928a9cd8a3ce6a1d11221292b832295d6543e" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="1070662">
+				<rom name="calc_result_700_bx_single_version_v1.0.d82" size="1070662" crc="244a2122" sha1="44661ed8e3307bb967f97ce1f5a247ca3cded0b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

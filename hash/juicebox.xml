@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="juicebox" description="Mattel Juice Box SmartMedia Flash ROM">
+
+<!-- Undumped items
+
+* H???? - Juice Box Music Video
+* H2682 - Juiceware Animated Assortment
+* H2684 - Ed, Edd n Eddy vol.1
+* H2686 - Winx Club
+* H2687 - The Grim Adventures of Billy and Mandy vol.1
+* H2688 - Vans Triple Crown vol.1
+* H2689 - Vans Triple Crown vol.2
+* H2690 - Vans Pipeline Masters
+* H2692 - Teenage Mutant Ninja Turtles vol.1
+* H2694 - Trading Spaces vol.1
+* H2698 - WWE Rey Mysterio vol.1
+* H2701 - Dexter's Laboratory vol.1
+* H2702 - WWE Chris Benoit vol.1
+* H2706 - MyScene Jammin in Jamaica vol.1
+* H2707 - MyScene Masquerade Madness
+* H2708 - WWE Eugene vol.1
+* H2709 - Music Video Liz Phair Skye Bnip Stacie
+-->
+
+	<software name="kidsnedo">
+		<description>Codename: Kids Next Door</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2683" />
+		<part name="memc" interface="smartmedia">
+			<dataarea name="rom" size="34604032">
+				<rom name="kidsnedo.smc" size="34604032" crc="e917e1f2" sha1="42c56a8b9a2ae076956b98e8bd71e1dfd841d002" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yugioh">
+		<description>Yu-Gi-Oh!</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2685" />
+		<part name="memc" interface="smartmedia">
+			<dataarea name="rom" size="34604032">
+				<rom name="yugioh.smc" size="34604032" crc="0a97c7d6" sha1="1b2375c9ef1bbd5cae0c3f0ac20511a36523e86a" offset="0x00000"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

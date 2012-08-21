@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="cd32" description="Amiga CD-32 CD-ROM list">
+
+	<!--- Just a test list -->
+
+	<!-- This was a cloneCD image - mounted with Daemon tools, rips to .toc/.bin with burnatonce in full RAW mode -->
+	<!-- a EC error was reported, so it might have protection -->
+	<software name="clockwsr" supported="no">
+		<description>Clockwiser</description>
+		<year>19??</year>
+		<publisher>Rasputin</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="clockwiser" sha1="01a622e5b6a710eeef828b0f5807dad94de3798f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="vital" supported="no">
+		<description>Vital Light</description>
+		<year>1994</year>
+		<publisher>Millennium</publisher>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vital light (1994)(millennium)[!][10328981]" sha1="89921bfda42deab7a73e4c55ea4244673788a1bd"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="iq151_flop" description="IQ-151 disk images">
+	<software name="mikros">
+	<!--
+		How to load MIKROS:
+		- Use the modified CP/M Monitor (-bios 2)
+		- execute GFFF8 into the monitor
+		- Select the drive where the disk is mounted (0 or 1)
+	-->
+		<description>MIKROS v2.2</description>
+		<year>198?</year>
+		<publisher>VÚVT Žilina</publisher>
+        <info name="usage" value="Execute GFFF8 in the monitor (requires CP/M monitor)"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="iq151_fdd1.iqd" size="256256" crc="47d0473d" sha1="43952153a1417ce5a35c2838d878e2b9d6710c17" offset="0x00000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="iq151_fdd2.iqd" size="256256" crc="5f1c5cc2" sha1="51184fc9e705eccb600d6db255959ecb94a6305c" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="rx78" description="Gundam RX-78 cartridges">
+	<software name="basic">
+		<description>BS-BASIC</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bs-basic.bin" size="16384" crc="e52b383f" sha1="6ebbff7eb718822cad3c1216882df5d9f2d3a03f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

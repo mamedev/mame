@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="v1050" description="Visual Technology Visual 1050 Disk Images">
+	<software name="cpm3">
+		<description>CP/M Plus v3.0 (BIOS 1.1)</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="CP2768-1"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333493">
+				<rom name="cpm disk1.imd" size="333493" crc="63d4df2c" sha1="4b54c6dbca25ce7dcf5f129c89363ad5120633de" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Additional Files -->
+			<dataarea name="flop" size="331979">
+				<rom name="cpm disk2.imd" size="331979" crc="39b9bd5a" sha1="c4c6ea52c983eda9282954e5fc9c7935bedfac14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm3b14" cloneof="cpm3">
+		<description>CP/M Plus v3.0 (BIOS 1.4)</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="CP2768-1"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358022">
+				<rom name="cpm_plus.imd" size="358022" crc="4bdb61ce" sha1="ef7ead3043135ea2d32795baa9ba0bc5f5695d87" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Additional Files -->
+			<dataarea name="flop" size="364682">
+				<rom name="cpm_add.imd" size="364682" crc="3b190357" sha1="c733db6d9592088f7b655a156edefbf5b6834555" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multplan">
+		<description>Multiplan v1.06</description>
+		<year>1982</year>
+		<publisher>Microsoft</publisher>
+		<info name="serial" value="12768"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="340134">
+				<rom name="multiplan.imd" size="340134" crc="208d8691" sha1="59fc9aeb7b6153d984d60650f04815024a89dfff" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar v3.30</description>
+		<year>1982</year>
+		<publisher>MicroPro</publisher>
+		<info name="serial" value="XW8293FJ"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="345760">
+				<rom name="wordstar.imd" size="345760" crc="7edebcf2" sha1="f05cb6cf17c0b374f361e015439109424a416f67" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgraph">
+		<description>DR Graph v1.01P</description>
+		<!-- Date: 06 Sept 1983 -->
+		<year>1983</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="5005-0768-000001"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="296192">
+				<rom name="drgraph.imd" size="296192" crc="6e2f4584" sha1="7a397df02bc26ccc72d36208dc4273ba06ba32f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbasic">
+		<description>CBASIC and Demonstration v2.8</description>
+		<!-- Compiled: May 1983 -->
+		<year>1983</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="3000-0768-000001"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="342198">
+				<rom name="cbasic and demostration.imd" size="342198" crc="d1bdf16c" sha1="999e905464efdff62acf8ae36f2d792d12274259" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

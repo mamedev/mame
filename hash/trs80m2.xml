@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="trs80m2" description="Tandy TRS-80 Model II disk images">
+	<software name="cpm22">
+		<!-- Requires 64K RAM -->
+		<description>CP/M 2.2</description>
+		<year>1983</year>
+		<publisher>Pickles &amp; Trout</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="318931">
+				<rom name="cpm22.imd" size="318931" crc="10bce6d2" sha1="8912ef448725774d8a10bfa484342a8dfa81a824" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsdos631">
+		<description>LS-DOS v6.3.1A</description>
+		<year>1990</year>
+		<publisher>Misosys</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="813136">
+				<rom name="l2-631a.dmk" size="813136" crc="1e17cd43" sha1="58369a29043513e62098ee1a8bdfd820ebf8a95b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos12">
+		<description>TRSDOS v1.2</description>
+		<year>1979</year>
+		<publisher>Tandy</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="108758">
+				<rom name="trsdos12.imd" size="108758" crc="972ebc01" sha1="cd97fd0c9e1969cc917d1ed4eb573703c84cb8e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos20" cloneof="tdos12">
+		<description>TRSDOS v2.0a</description>
+		<year>1980</year>
+		<publisher>Tandy</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="146181">
+				<rom name="tdos20a.imd" size="146181" crc="b6d2fa9a" sha1="a93accf032b19cdd0122ccf45ba0af90d44f0f84" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="146079">
+				<rom name="tdos20b.imd" size="146079" crc="decce25d" sha1="97f06369d66abbd5d46cdc6f5e22c32e04a9d686" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_8">
+			<dataarea name="flop" size="131043">
+				<rom name="tdoscalc.imd" size="131043" crc="78c1666e" sha1="72e438da397aac4da099c76860426247440f07fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profile2">
+		<description>PROFILE II</description>
+		<year>1980</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="26-4512" />
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="215804">
+				<rom name="profile2.imd" size="215804" crc="8997532d" sha1="b0b7c738f5e23b7631741475bec25df2451c2a63" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="script">
+		<description>SCRIPTSIT 2.0</description>
+		<year>1981</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="26-4531" />
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="227787">
+				<rom name="script.imd" size="227787" crc="1cec0e85" sha1="73bfa56e2382ca04fd42f5b108699a1d9904dba2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenix32">
+		<description>XENIX v3.2</description>
+		<year>1987</year>
+		<publisher>Tandy</publisher>
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Upgrade 3.x to 3.2"/>
+			<dataarea name="flop" size="618693">
+				<rom name="xenix1.imd" size="618693" crc="0b28867d" sha1="275e642d0f1396012051a1a40d4c1f6b7932f049" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Install Boot 3.2"/>
+			<dataarea name="flop" size="598600">
+				<rom name="xenix2.imd" size="598600" crc="3befd970" sha1="d6b13a10b8b08bd783d45f6250c3369e30781ec5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_8">
+			<feature name="part_id" value="Install Install1 3.2"/>
+			<dataarea name="flop" size="622494">
+				<rom name="xenix3.imd" size="622494" crc="1935aa13" sha1="5b7dc78b509a3ccadcfc64c4e7521bc03a9c7ea0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_8">
+			<feature name="part_id" value="Install Install2 3.2"/>
+			<dataarea name="flop" size="619428">
+				<rom name="xenix4.imd" size="619428" crc="d716b5b3" sha1="96d54e3efc2831682995f0638da2634b373fc194" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_8">
+			<feature name="part_id" value="File Maintenance_disk 3.2"/>
+			<dataarea name="flop" size="1255478">
+				<rom name="xenix5.imd" size="1255478" crc="18a55fe6" sha1="38ac84cb2ea47140210335dc706c3a04c5df627c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenix30d">
+		<description>Xenix Development System v3.0</description>
+		<year>1985</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="260-6402" />
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="622499">
+				<rom name="devsys01of14.imd" size="622499" crc="44c85394" sha1="81a3a7c395595edd9c743572b4736362aa1695b8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="618926">
+				<rom name="devsys02of14.imd" size="618926" crc="de5e97f7" sha1="6282a9248a0b7685204530ff70e8832aeaa5e295" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_8">
+			<dataarea name="flop" size="620970">
+				<rom name="devsys03of14.imd" size="620970" crc="8771520a" sha1="9b83da4609562e8b1e4e88f688b00f7771766326" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_8">
+			<dataarea name="flop" size="409927">
+				<rom name="devsys04of14.imd" size="409927" crc="b9d71b10" sha1="0c577fae74fb79a3943fe2d37c52358a9694a177" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_8">
+			<dataarea name="flop" size="573447">
+				<rom name="devsys05of14.imd" size="573447" crc="5cf99c5c" sha1="d5bcfedc1f5180f0c2a3613f3ba9d5cd3b06c5d4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_8">
+			<dataarea name="flop" size="496797">
+				<rom name="devsys06of14.imd" size="496797" crc="caa562d5" sha1="955d4ccd4475fbf38653f5082f8f59f8da1df0be" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_8">
+			<dataarea name="flop" size="614323">
+				<rom name="devsys07of14.imd" size="614323" crc="b79dddf9" sha1="e8847de6e87c239a8976395411643a9b77ac0b88" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_8">
+			<dataarea name="flop" size="605129">
+				<rom name="devsys08of14.imd" size="605129" crc="1ebb5305" sha1="7d778c33539f34e8d3fb6828178f46c08cf3dbc2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_8">
+			<dataarea name="flop" size="623014">
+				<rom name="devsys09of14.imd" size="623014" crc="27e502e1" sha1="61afc2c4bb45d4ca712dc8b6a9f8844225f25717" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_8">
+			<dataarea name="flop" size="603597">
+				<rom name="devsys10of14.imd" size="603597" crc="a94c89fd" sha1="39152da3c8f6bd32efe6c65cb6893a6df0ae68a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_8">
+			<dataarea name="flop" size="619949">
+				<rom name="devsys11of14.imd" size="619949" crc="b3e0d3d3" sha1="8717fbf90451d82ffc3a5b51a9321c2f9abd0025" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_8">
+			<dataarea name="flop" size="623526">
+				<rom name="devsys12of14.imd" size="623526" crc="0fc79c44" sha1="033417932b711490c0399a984b2bd9e80d788599" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_8">
+			<dataarea name="flop" size="624548">
+				<rom name="devsys13of14.imd" size="624548" crc="6a0e1790" sha1="dd12a00e9db8c1581d8404c75f26cd3d1236a8c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_8">
+			<dataarea name="flop" size="623526">
+				<rom name="devsys14of14.imd" size="623526" crc="24d1cab5" sha1="f4769719ac2dd2d67f556238b74a4e0c99569a60" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

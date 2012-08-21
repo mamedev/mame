@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mac_hdd" description="Mac Harddisk list">
+	<software name="mac608">
+		<description>System Software 6.0.8</description>
+		<year>1988</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac608" sha1="0eff82806f671484ec0c91cdc95ad90aa3157885" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac700">
+		<description>System Software 7.0</description>
+		<year>1991</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac700" sha1="a4c7777125331339afcd47dda5adca26ff57a427" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac701">
+		<description>System Software 7.0.1</description>
+		<year>1991</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac701" sha1="f867db45d7543ba87ca0e762bc920fe11d2a0753" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac711">
+		<description>System Software 7.1.1</description>
+		<year>1993</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac711" sha1="b1625378d1ba00861a07ebe47f4b6b54c849c61f" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac750">
+		<description>System Software 7.5</description>
+		<year>1994</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac750" sha1="9b59a611f0fddd560bc8b72c1dae07d0f2e10dcc" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac753">
+		<description>System Software 7.5.3 Revision 2</description>
+		<year>1996</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac753" sha1="757e4c69281993871bb7a199583f8f0c042c0ac7" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac755">
+		<description>System Software 7.5.5</description>
+		<year>1996</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac755" sha1="45990ff07419555d576eaa4f2293d62e74d055b6" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac760">
+		<description>System Software 7.6</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac760" sha1="7e5ac00619dbf2395611f19658fab8e029d64bc7" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac761">
+		<description>System Software 7.6.1</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">
+			<diskarea name="harddriv">
+				<disk name="mac761" sha1="fa41734a26c37dea26f5d5590a8545afe26005ac" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

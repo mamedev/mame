@@ -1,0 +1,1997 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+  Missing Cartridges
+
+  * World Championsip Baseball (Mattel, 1983)
+  * BASIC (Mattel, 1980)
+
+-->
+
+
+<softwarelist name="intv" description="Intellivision cartridges">
+
+	<software name="backgamm">
+		<description>ABPA Backgammon</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1119"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="abpa backgammon.50" size="0x2000" crc="a60e25fc" sha1="71b305f30283a11ccd594071a7e9ea06db6a2071" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addc">
+		<description>Advanced Dungeons &amp; Dragons Cartridge</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3410"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x3000">
+				<rom name="advanced dungeons and dragons.50" size="0x3000" crc="9d4355aa" sha1="4783cf6d52748e1cc4eb463033b79aee72db28cf" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addtot">
+		<description>Advanced Dungeons &amp; Dragons: Treasure of Tarmin</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5300"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="add - treasure of tarmin.50" size="0x4000" crc="16c3b62f" sha1="deffe81ac52caa93401ca2aaed734a1fb69c498d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armorbtl">
+		<description>Armor Battle</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1121"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="armor battle.50" size="0x2000" crc="6f91fbc1" sha1="8bf07ba83bd0de42393187c6a3df60b8e341505d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrosm">
+		<description>Astro Smash</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3605"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="astro smash.50" size="0x2000" crc="fab2992c" sha1="d3529cad339b3fd5c67b4f503e9360188be9d3e8" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis">
+		<description>Atlantis</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720006"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="4800" size="0x4000">
+				<rom name="atlantis.48" size="0x4000" crc="13ff363c" sha1="094b207668c03a6d903270490f495ddc237cd8d7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autorace">
+		<description>Auto Racing</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1113"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="auto racing.50" size="0x2000" crc="b35c1101" sha1="2e3461853f60a1928c5c93bb23deb9229e0230c9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b17bomb">
+		<description>B-17 Bomber</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3884"/>
+		<info name="usage" value="Uses Intellivoice"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="b-17 bomber.50" size="0x4000" crc="5f612afb" sha1="8b9b7d938590ede5fe651f165f405ffc9e41cabd" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="b-17 bomber.d0" size="0x2000" crc="3e932009" sha1="f0fcc934ba19a9e88b470a99a2d984820369c57c" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Major League Baseball</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="2614"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="baseball.50" size="0x2000" crc="dab36628" sha1="5e83a945f231f55d5ddfa9527f9b94da06e77058" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketbl">
+		<description>NBA Basketball</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="2615"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="basketball.50" size="0x2000" crc="81e7fb8c" sha1="9c855e864cf926dfd3d09c071e499d7ccd537908" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beamridr">
+		<description>Beamrider</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-005-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="beamrider.50" size="0x4000" crc="eaf650cc" sha1="1faa1d401bc7484492f3e1de433ed73019cbb5b5" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beauty">
+		<description>Beauty &amp; the Beast</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720007"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="4800" size="0x4000">
+				<rom name="beauty and the beast.48" size="0x4000" crc="c047d487" sha1="1b6fd19e745e50e8ea679bd5adfb719d1f276bc5" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockrun">
+		<description>Blockade Runner</description>
+		<year>1983</year>
+		<publisher>Interphase</publisher>
+		<info name="serial" value="8010001"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="blockade runner.50" size="0x4000" crc="b03f739b" sha1="c82058d9678fe2453b0f9b7a4a0864af802f6eb9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrestlng">
+		<description>Body Slam Super Pro Wrestling</description>
+		<year>1988</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9009"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="body slam - super pro wrestling.50" size="0x4000" crc="6b0e89c8" sha1="18193484e0a4995d3ffd9826a9dc3b6579950acf" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="body slam - super pro wrestling.90" size="0x4000" crc="79800b37" sha1="abc79afabc4273c01657de04de567e34b479bc70" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombsqd">
+		<description>Bomb Squad</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3883"/>
+		<info name="usage" value="Uses Intellivoice"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="bomb squad.50" size="0x4000" crc="6f34430f" sha1="2c101e5241856691debc75b8012e35e696689c3d" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="bomb squad.d0" size="0x2000" crc="f99180e1" sha1="8d4a7ca33fc9ac5db8b1bdcf8806d899c898ae03" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling">
+		<description>PBA Bowling</description>
+		<year>1980</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3333"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="bowling.50" size="0x2000" crc="169e3584" sha1="71a2bf83f18fdbf4db3af66681fcfa506bf0d31c" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxing">
+		<description>Boxing</description>
+		<year>1980</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1819"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="boxing.50" size="0x2000" crc="ab87c16f" sha1="24a10945009acadfe502a5bd5fb5b960885716f4" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bnj">
+		<description>Bump 'n' Jump</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4688"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="bump n jump.50" size="0x4000" crc="6f667338" sha1="bdb657130dc9421fad842bbbc9ba7ac380ed0c86" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="bump n jump.d0" size="0x2000" crc="96265252" sha1="3919925e229e7ec57d726245f13c034f78b7d863" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="bump n jump.f0" size="0x2000" crc="038df644" sha1="cb60703bffcbfaec77098a9525136c32cbe260f8" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btime">
+		<description>BurgerTime!</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4549"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="burgertime.50" size="0x4000" crc="43806375" sha1="eacd83365da40a1a3d6c77ca2da4a0393460e02f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buzbombr">
+		<description>Buzz Bombers</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4436"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="buzz bombers.50" size="0x4000" crc="fa492bbd" sha1="a0ef9a23976de6ee88c1f970a6585ded2a2b8c04" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carnival">
+		<description>Carnival</description>
+		<year>1982</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2488"/>
+		<info name="usage" value="Will not run on Intellivision 2"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="carnival.50" size="0x2000" crc="43870908" sha1="13aa104e884701d74e144b85b9583579d1980e80" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped">
+		<description>Centipede</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="serial" value="70254"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="6000" size="0x4000">
+				<rom name="centipede.60" size="0x4000" crc="d5363b8c" sha1="97c69dc3da5aee80e6ef1baf90b6c3ec8025abff" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctennis">
+		<description>Championship Tennis</description>
+		<year>1985</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8200"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="championship tennis.50" size="0x4000" crc="59d1eaf3" sha1="e836a9712238843a2e319d8d9618b58373ebacbd" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x4000">
+				<rom name="championship tennis.d0" size="0x4000" crc="c7dd6388" sha1="446514366065262ea9658e4ba399e84b2a249fb8" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkers">
+		<description>Checkers</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1120"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="checkers.50" size="0x2000" crc="36e1d858" sha1="4fef3342c0e7100113b4022e4395ad552fddacf1" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>USCF Chess</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3412"/>
+		<info name="usage" value="This cart has unique Left and Right overlays"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="ro-3-9505-359 + ro-3-9506-011.50" size="0x4000" crc="752fd927" sha1="4ccf494f9664d5b9e05237d1bc2eee8a7830f067" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000_RAM8" size="0x400">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="csspgolf">
+		<description>Chip Shot: Super Pro Golf</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8900"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="chip shot - super pro golf.50" size="0x4000" crc="0488dc76" sha1="9094f89777e7aa4d4caea7f35c91ee5403e14877" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="chip shot - super pro golf.90" size="0x4000" crc="6089038d" sha1="23390658f2c634ba5a3d1f40d72854c44ba3deb0" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commando">
+		<description>Commando</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9000"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="commando.50" size="0x4000" crc="2b6d633d" sha1="777e5a0e7033b5f80197eb069cd204e62d09eb63" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="commando.90" size="0x4000" crc="fc44ea3c" sha1="5a95ea2924d3b0bfc4e353d6ffc4966f4bdfcd58" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congo">
+		<description>Congo Bongo</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="006-06"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x6000">
+				<rom name="congo bongo.50" size="0x6000" crc="4b23a757" sha1="3d467d13e34e231971e8aef86968f199c145b9b2" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender">
+		<description>Defender</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="serial" value="70252"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x6000">
+				<rom name="defender.50" size="0x6000" crc="d8f99aa2" sha1="85af8649c04198b00cecdea2661192db6631dc80" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demonatk">
+		<description>Demon Attack</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720005"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="4800" size="0x4000">
+				<rom name="demon attack.48" size="0x4000" crc="5e6a8cd8" sha1="d6054e8ead16f3e076c26880fe641543e8519e18" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demoblue">
+		<description>Demonstration Cartridge (blue)</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1682-0950"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x3000">
+				<rom name="blue demo cart.50" size="0x3000" crc="c99e7554" sha1="faa9b42fabc84f26ca15d296f9a5e16f36e465c2" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demored">
+		<description>Demonstration Cartridge (red)</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5032-0710"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="red revised demo cart.50" size="0x4000" crc="0487675c" sha1="1744dd7db17b715cd2ef1c1b315d412ea6e20163" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demogrn">
+		<description>Demonstration Cartridge (green)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5823-0210"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="green demo cart.50" size="0x4000" crc="52609fec" sha1="780183183d4d1fc1a23a9a0435788c3b750003d1" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x4000">
+				<rom name="green demo cart.d0" size="0x4000" crc="9b37afbe" sha1="ad5d06b040f2ddea2b4ab9f0e98d77ee7c310498" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demoint">
+		<description>International Demonstration Cartridge</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="international demo cart.50" size="0x4000" crc="5d575728" sha1="b663031fff53ff36942c5f325d25e913dd8367f1" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="international demo cart.d0" size="0x2000" crc="7a837bc9" sha1="dcc708901b391fc62bf799fa2e9db4551f93ba8f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug">
+		<description>Dig Dug</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9005"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="dig dug.50" size="0x4000" crc="dcee5827" sha1="0cd925a9e42c8cba27462b10e8925a0d64aa8870" offset="0000"/>
+			</dataarea>
+			<dataarea name="7000" size="0x2000">
+				<rom name="dig dug.70" size="0x2000" crc="42e97dbe" sha1="5c8181af208daa76c0b992ce4d78fb918f752cae" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x2000">
+				<rom name="dig dug.90" size="0x2000" crc="04ff025d" sha1="52e4f152b68238b3a102aeec4efa789462de2cc5" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diner">
+		<description>Diner</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8800"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="diner.50" size="0x4000" crc="1190a27c" sha1="594b1474396a5414d40d367a8d7c8f783eae701c" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="diner.90" size="0x4000" crc="16e17499" sha1="e2b5569606030ba26d0dcd0a6e3c3e338f23d70a" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong">
+		<description>Donkey Kong</description>
+		<year>1982</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2471"/>
+		<info name="usage" value="Will not run on Intellivision 2"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="donkey kong.50" size="0x2000" crc="c30f61c0" sha1="93807afeee023ce6c787b073705c8bf32bbd8abf" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjr">
+		<description>Donkey Kong Jr</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2671"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="donkey kong jr.50" size="0x4000" crc="6df61a9f" sha1="9d983308ef7051eef0c324e696776a6f9b9c38d4" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dracula">
+		<description>Dracula</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720018"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="dracula.50" size="0x4000" crc="84bedcc1" sha1="d211da07ab620854ee7a2de3bc103d71d649612f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnfire">
+		<description>Dragonfire</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720010"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="dragonfire.50" size="0x2000" crc="af8718a1" sha1="dd6b105c7de9f29e98f11466b063b477af7c3260" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dfactor">
+		<description>The Dreadnaught Factor</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-004-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="dreadnaught factor.50" size="0x4000" crc="3b99b889" sha1="f8a3224023b0dd27bc4a38b722e2d8016b08ce73" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfun">
+		<description>Electric Company: Math Fun</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="2613"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="electric company - math fun.50" size="0x2000" crc="54a3fc11" sha1="6cdb18d1dd3cd57058263904934b37d4713342e6" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordfun">
+		<description>Electric Company: Word Fun</description>
+		<year>1980</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1122"/>
+		<info name="usage" value="Will not run on Intellivision 2"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="electric company - word fun.50" size="0x2000" crc="c9eaacab" sha1="d3934c328465f0fb423e6a43fcc57018b78da6b9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fathom">
+		<description>Fathom</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720026"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="fathom.50" size="0x4000" crc="4221ede7" sha1="49646878c9698c9749b3665110acde0906b8f69c" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>NFL Football</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="2610"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="football.50" size="0x2000" crc="4b91cf16" sha1="525dffeb7b53c88bd2e8076c421388ed72e2c90d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogbog">
+		<description>Frog Bog</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5301"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="frog bog.50" size="0x2000" crc="37222762" sha1="58842e4425ad5a8f6ec65528c4b485039057f289" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB6300"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="frogger.50" size="0x2000" crc="d27495e9" sha1="c84f2a2f0007de06057f7e22a489f76def482c86" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf">
+		<description>PGA Golf</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1816"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="golf.50" size="0x2000" crc="ff87faec" sha1="5bbbdadb74fe62546594a4778928cf1287016083" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="htrails">
+		<description>Happy Trails</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-003-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="happy trails.50" size="0x2000" crc="4b8c5932" sha1="5bd74fd0246da1441f4af76dc9592f7809f8a821" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hockey">
+		<description>NHL Hockey</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1114"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="hockey.50" size="0x2000" crc="76564a13" sha1="3395c6764f60d90d96966b28ee96742b5782d59f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horserac">
+		<description>Horse Racing</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1123"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="horse racing.50" size="0x2000" crc="b5c7f25d" sha1="bd024190395a6d5c9aecadb49d59511e265ff7b3" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hvrforce">
+		<description>Hover Force</description>
+		<year>1986</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8500"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="hover force.50" size="0x4000" crc="4c3644b8" sha1="4cf770275315480d11c2bb8506fe49175e4f1a68" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x6000">
+				<rom name="hover force.90" size="0x6000" crc="75d45110" sha1="f7d9d7c932be1cbf65dcfff0cfdab9e8b8f86661" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="hover force.d0" size="0x2000" crc="ed7c8fac" sha1="140986d67ba22e5c344e27ac74fa3e14f35097e7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icetrek">
+		<description>Ice Trek</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720012"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="ice trek.50" size="0x4000" crc="4f3e3f69" sha1="d70bd2d71227faba51de575df110818ed50bdee7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koolaidm">
+		<description>Kool-Aid Man</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4675"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="kool-aid man.50" size="0x4000" crc="8c9819a2" sha1="9ceab1a49090c4d8b55b3e85c845b1d3a5537ddb" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladybug">
+		<description>Lady Bug</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2483"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="lady bug.50" size="0x4000" crc="a6840736" sha1="ca3f0d52fc077c98becefe3e566895807840152a" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lfun1">
+		<description>Learning Fun I: Math Master Factor Fun</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9002"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="learning fun i.50" size="0x4000" crc="2c5fd5fa" sha1="6eeaeb4ca39d30b6255814cd9f92cf8d092c393d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lfun2">
+		<description>Learning Fun II: Word Wizard Memory Fun</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9006"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="learning fun ii.50" size="0x4000" crc="632f6adf" sha1="134af61bc7b06489d35a7474f8a29ef80db6f332" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lnc">
+		<description>Lock 'n' Chase</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5637"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x3000">
+				<rom name="lock n chase (6k).50" size="0x3000" crc="04977992" sha1="08454a5f7b44730aa8249623785dd7a6471ab98f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lnc2" cloneof="lnc">
+		<description>Lock 'n' Chase (later version)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5637"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="lock n chase (later version).50" size="0x4000" crc="5c7e9848" sha1="ac889a1d76b40be1a7e7562c8cb8b3f9d00f3728" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locomotn">
+		<description>Loco-Motion</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4438"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="loco-motion.50" size="0x4000" crc="6b6e80ee" sha1="a5479d68f90d77234b6acc4d7ee93a356d5fd961" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masters">
+		<description>Masters of the Universe: The Power of He-Man</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4689"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="masters of the universe.50" size="0x4000" crc="143e8ca2" sha1="0f54ee719269ac96443ceab78f96224ce1516296" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="masters of the universe.d0" size="0x2000" crc="9c94b9f8" sha1="b18daefc51c709e7f0e20df0b937faded3a51fe9" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="masters of the universe.f0" size="0x2000" crc="7655e78a" sha1="c11533e250ab71ea27d0fec0225ddfbd69b17c41" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missionx">
+		<description>Mission X</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="4437"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="mission x.50" size="0x4000" crc="11fb9974" sha1="2e6760f418f4e54a244fe1baa57e573573cc1b7d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msurgeon">
+		<description>Microsurgeon</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720013"/>
+		<info name="usage" value="This cart has unique Left and Right overlays"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="4800" size="0x4000">
+				<rom name="microsurgeon.48" size="0x4000" crc="e806ad91" sha1="1390f0076470504037720b20f84404d502988231" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motox">
+		<description>Motocross</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3411"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="motocross.50" size="0x4000" crc="5f6e1af6" sha1="109e0a05e73239962ded327827c7957960802744" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmskiing">
+		<description>Mountain Madness Super Pro Skiing</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9007"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="mountain madness - super pro skiing.50" size="0x4000" crc="6b5ea9c4" sha1="7cbb5fce8b9d44412b98d32a5ea752ec51590785" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtrap">
+		<description>Mouse Trap</description>
+		<year>1982</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2479"/>
+		<info name="usage" value="Will not run on Intellivision 2"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="mouse trap.50" size="0x2000" crc="598662f2" sha1="fd942dde74c6006a70dbc6902a2e0ed416edaa55" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nstalker">
+		<description>Night Stalker</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5305"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="night stalker.50" size="0x2000" crc="7334cd44" sha1="13e321593daf93c2e3e964a05e43e4bb21da6ea6" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="novablst">
+		<description>Nova Blast</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720022"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="nova blast.50" size="0x4000" crc="5ee2cc2a" sha1="ca18f2938168ec681ee34cb25a08c87b752a5024" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pac-Man (Atarisoft)</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="serial" value="70251"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x6000">
+				<rom name="pac-man.50" size="0x6000" crc="a21c31c3" sha1="66ddc9c56edee06564c1252c7c6bc3123da8c31d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmana" cloneof="pacman">
+		<description>Pac-Man (INTV)</description>
+		<year>1983</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8000"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x6000">
+				<rom name="pac-man - intv.50" size="0x6000" crc="6e4e8eb4" sha1="48023975e4ba875b745b5b9aac0fb562922b50c3" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5356"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="pinball.50" size="0x4000" crc="eea1a9a7" sha1="89a725d2c404a27ce5f931a896c1f411ea6707bd" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="pinball.d0" size="0x2000" crc="ce21806d" sha1="532cb88d9a6797ca218c5364275cb57691eb1322" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall">
+		<description>Pitfall!</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-002-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="pitfall.50" size="0x2000" crc="9c75efcc" sha1="1f4087be2c0a51ed08e49e6498794a9d26dc0d65" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poker">
+		<description>Las Vegas Poker &amp; Blackjack</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="2611"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="poker and blackjack.50" size="0x2000" crc="604611c0" sha1="a6c03e253e615a06f838e623df5f557636fdf8e1" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polepos">
+		<description>Pole Position</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9004"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="pole position.50" size="0x4000" crc="f57537c2" sha1="2fe2c9f0823c0040ba7731749d84063f41032da6" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="pole position.90" size="0x4000" crc="ee3027cc" sha1="90dbe6347c50e83c330c4dd526ecddd54fa174dc" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeye">
+		<description>Popeye</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB6370"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="popeye.50" size="0x4000" crc="c51464e0" sha1="fc468df3ab11c52f157a0c6b881c61f43cb5c88a" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbert">
+		<description>Q*bert</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB6360"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="q-bert.50" size="0x4000" crc="d8c9856a" sha1="60132870a1bf5f5b9d0aa19b4dd9c13a94702f70" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5304"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="reversi.50" size="0x2000" crc="c7bb1b0e" sha1="3eea6f5c02942eb3ac96967e3b667911459d09f8" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riveraid">
+		<description>River Raid</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-007-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="river raid.50" size="0x4000" crc="8910c37a" sha1="6c1aa94983c25ed484cc85dadabf0102b5c46726" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roulette">
+		<description>Las Vegas Roulette</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1118"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="roulette.50" size="0x2000" crc="48d74d3c" sha1="b7773c3cc93afe4820287c3f1c14345a1a14e1ee" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdealer">
+		<description>Royal Dealer</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5303"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x3000">
+				<rom name="royal dealer.50" size="0x3000" crc="0458a491" sha1="918e59d79672577b8b327c5d00c95d03e5e0c920" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safecrkr">
+		<description>Safecracker</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720025"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="safecracker.50" size="0x4000" crc="47aa7977" sha1="a6a60d4c17866a790351eebec9603890deeda0ff" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seabattl">
+		<description>Sea Battle</description>
+		<year>1980</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1818"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="sea battle.50" size="0x2000" crc="99ae29a9" sha1="ccb48a11f3cbfa580f2c6a1012c8d794eee9a5ec" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sewersam">
+		<description>Sewer Sam</description>
+		<year>1983</year>
+		<publisher>Interphase</publisher>
+		<info name="serial" value="8010002"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="sewer sam.50" size="0x4000" crc="e0f0d3da" sha1="e7c2aff48dac09f2c04b867c00a587c00c0c541f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shark">
+		<description>Shark! Shark!</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5387"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="shark shark.50" size="0x4000" crc="2a4c761d" sha1="53d10e890571ef67d39874582f3668b29c580590" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrpshot">
+		<description>Sharp Shot</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5638"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="sharp shot.50" size="0x2000" crc="ff7cb79e" sha1="0a0230a5c06f3593d683458aec3d81654904f16d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skiing">
+		<description>U.S. Ski Team Skiing</description>
+		<year>1980</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1817"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="skiing.50" size="0x2000" crc="f093e801" sha1="f93df55f45ee9b589db5763cefe6742860b38e79" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slamdunk">
+		<description>Slam Dunk Super Pro Basketball</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9001"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="slam dunk - super pro basketball.50" size="0x4000" crc="e090be37" sha1="f9d1d53968f99372aa5923164e68a648308682ec" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="slam dunk - super pro basketball.90" size="0x4000" crc="7e596f89" sha1="c508ca7e7ac6f1fe65a345ccda0ae333872a7624" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slapshot">
+		<description>Slap Shot Super Pro Hockey</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9003"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="slap shot - super pro hockey.50" size="0x4000" crc="ba68ff28" sha1="35e27d918cad45129fcc3924fbb4f2fef8f31776" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snafu">
+		<description>Snafu</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3758"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="snafu.50" size="0x2000" crc="8f959a6e" sha1="9d5c237c7fb1cf3c444f916e84ee4180d9732c4c" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccer">
+		<description>NASL Soccer</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1683"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="soccer.50" size="0x2000" crc="dbab54ca" sha1="3524384c2e096f22b7cb9608e0a8b9c78f4ef458" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacearm">
+		<description>Space Armada</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3759"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="space armada.50" size="0x2000" crc="e8b8eba5" sha1="2d8ddc0881b63b2f691a97eab182ed4c3ca56816" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacebtl">
+		<description>Space Battle</description>
+		<year>1979</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="2612"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="space battle.50" size="0x2000" crc="f95504e0" sha1="d6036c7e7c0da20878fd7acc9f6b476135d1e8d1" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacehwk">
+		<description>Space Hawk</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5136"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="space hawk.50" size="0x2000" crc="39d3b895" sha1="e7e4b8ad30ee69cd9e75f2b3e3d94b75e7288110" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sspartan">
+		<description>Space Spartans</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3416"/>
+		<info name="usage" value="Uses Intellivoice"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="space spartans.50" size="0x4000" crc="3784dc52" sha1="954d5911a3a41e8f9b4664ab4f60484b2d2648b3" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vball">
+		<description>Spiker! Super Pro Volleyball</description>
+		<year>1988</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9102"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="spiker super pro volleyball.50" size="0x4000" crc="e9648c61" sha1="f36b7b8b69d5dea70a769ed44efee67f2df3cb7e" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="spiker super pro volleyball.90" size="0x4000" crc="0e0653ec" sha1="5c87a1b43bd88358e91efa8bd72f4121c96e63a2" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbuggies">
+		<description>Stadium Mud Buggies</description>
+		<year>1988</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9100"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="stadium mud buggies.50" size="0x4000" crc="dbad22a8" sha1="774264e61849e9dbfb111f618a07296ff8399b52" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="stadium mud buggies.90" size="0x4000" crc="c526a9d0" sha1="0a1b012719f4b7a89fa57ef6ee4d7f8e556b10f7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stampede">
+		<description>Stampede</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-001-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="stampede.50" size="0x2000" crc="2deacd15" sha1="31cf8f77d889c48d2b31670e58b2ec38187f2748" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starstrk">
+		<description>Star Strike</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5161"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="star strike.50" size="0x2000" crc="72e11fca" sha1="17c37fbc5ff14c55931ae27e21603dff3db66dbe" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esb">
+		<description>Star Wars: The Empire Strikes Back</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB6050"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="star wars - the empire strikes back.50" size="0x2000" crc="d5b0135a" sha1="b2995abe45c57e85c36927ba82c428bfbe06cb70" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subhunt">
+		<description>Sub Hunt</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3408"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="sub hunt.50" size="0x4000" crc="3d9949ea" sha1="8b09884a69f4aa8663f42a201dd70df98f4da0fc" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scobra">
+		<description>Super Cobra</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB6320"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="super cobra.50" size="0x4000" crc="7c32c9b8" sha1="9eced3a6d0ca3a303793d96050dbec2ab1f35df6" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decathln">
+		<description>Super Pro Decathlon</description>
+		<year>1988</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="9008"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="super pro decathlon.50" size="0x4000" crc="f128951f" sha1="e8ab54118bebfeb0f9385c9ec200a4b95a9ad280" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="super pro decathlon.90" size="0x4000" crc="fd979dc9" sha1="b0529b35e78a945df2e874bebbe770e3929d2f97" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spftball">
+		<description>Super Pro Football</description>
+		<year>1986</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8400"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="super pro football.50" size="0x4000" crc="33f5103f" sha1="8322893973edbb4d9a231b5a8931914b72294d29" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="super pro football.90" size="0x4000" crc="c9227e76" sha1="dd85452f73f1d97c7871fd26eec334bc6cb1caa2" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swordsas">
+		<description>Swords &amp; Serpents</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720009"/>
+		<info name="usage" value="This cart has unique Left and Right overlays"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="swords and serpents.50" size="0x4000" crc="15e88fce" sha1="6beb8682f75e2616009faeabc08e88871fc172bd" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>Tennis</description>
+		<year>1980</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="1814"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="tennis.50" size="0x2000" crc="03e9e62e" sha1="e500b803cba6e73228a919fdedc109f0022cee3a" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thinice">
+		<description>Thin Ice</description>
+		<year>1986</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8300"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="thin ice.50" size="0x4000" crc="0d2e9e57" sha1="211c6012c7d1a1216282bead1b01c58101dd11be" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="thin ice.d0" size="0x2000" crc="ab5d151b" sha1="807276b1180f8c90e10f5ba4c1a7cdec2b08e458" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="thin ice.f0" size="0x2000" crc="bc59178e" sha1="72d7ccbc4e00becae6ad0887da76f583eafbb895" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thcastle">
+		<description>Thunder Castle</description>
+		<year>1986</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="4469"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="thunder castle.50" size="0x4000" crc="f77a5612" sha1="9a0b509b328aa0e9feff16cc0ce42150c8619e6c" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="thunder castle.d0" size="0x2000" crc="b2e18fed" sha1="2a6ba9e022bd5684eb7c2c38bdc267dee3e5b85a" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="thunder castle.f0" size="0x2000" crc="f305da4e" sha1="9be241701112e5fe9a3cbec874e64826fd02e25c" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towerofd">
+		<description>Tower of Doom</description>
+		<year>1987</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8600"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="tower of doom.50" size="0x4000" crc="fc49ce10" sha1="5de3bb1ec6f1a30d94b58abb3a594e3f6202e9f0" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="tower of doom.90" size="0x4000" crc="df232856" sha1="7a612c7316b6fa56171fcfc6243cae5b097429db" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="tower of doom.d0" size="0x2000" crc="67a60cee" sha1="3b30d44d0b61bedb167f517440eb2662a2df69cf" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="tower of doom.f0" size="0x2000" crc="f683cbe6" sha1="6bea72aab5398dd0cd5c13eab57fc2f9d23fb952" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="traction">
+		<description>Triple Action</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="3760"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="triple action.50" size="0x2000" crc="1ac989e2" sha1="6c1011b98ac76653632fd13e93466802f7d4dea9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trchalng">
+		<description>Triple Challenge</description>
+		<year>1986</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8700"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="triple challenge.50" size="0x4000" crc="29e67951" sha1="b843bda4e0be8e2a11e766961d4145e2e6d8c199" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="triple challenge.90" size="0x4000" crc="52ad0eda" sha1="cfe303f4942e8f1fe64510ac74839e47b5d2d8dc" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000_RAM8" size="0x400">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trondd">
+		<description>TRON Deadly Discs</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5391"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="tron - deadly discs.50" size="0x2000" crc="ca447bbd" sha1="a84392c29a69a7bff5f1b521a0e836622405180a" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tronmat">
+		<description>TRON Maze-A-Tron</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5392"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="tron - maze-a-tron.50" size="0x4000" crc="7a558cf5" sha1="8d4eba89b8edb4c51ff0e2e4914e73f2a07bc9a6" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tronss">
+		<description>TRON Solar Sailer</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5393"/>
+		<info name="usage" value="Uses Intellivoice"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="tron - solar sailer.50" size="0x4000" crc="96b2681e" sha1="08880cf77ed6ab9a20b9a2161ac2bb998b42bc78" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="tron - solar sailer.d0" size="0x2000" crc="0e45e775" sha1="a6d317c3e342c53d6ddbbf7bd774a84a6b44dfb8" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tropical">
+		<description>Tropical Trouble</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720017"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="tropical trouble.50" size="0x4000" crc="6f23a741" sha1="63fadc61f9fe850bead7df76ed915ea00e569cb5" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="truckin">
+		<description>Truckin'</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720023"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="truckin.50" size="0x4000" crc="734f3260" sha1="b4ca75d4b6c4e937aa021e23e0fb98ef707705c7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo">
+		<description>Turbo</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2473"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="turbo.50" size="0x4000" crc="275f3512" sha1="23a4aafcbf5449ef0f8a684e2f87e85761e83af7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tutankhm">
+		<description>Tutankham</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB6340"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="tutankham.50" size="0x4000" crc="6fa698b3" sha1="12a96e4111082f1cf5bee27f850f28e20009681b" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utopia">
+		<description>Utopia</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5149"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="utopia.50" size="0x2000" crc="f9e0789e" sha1="d72d2a9817e75039d57b1ec877dfe2b96a306b61" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vectron">
+		<description>Vectron</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<info name="serial" value="5788"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="vectron.50" size="0x4000" crc="9ac88229" sha1="937300637b3fba2126be4ee119b9f1e902b9f15b" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="vectron.d0" size="0x2000" crc="eeaed70a" sha1="ef78c2159eb810853ba0e2c2bd0f27d15de8f7c3" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="venture">
+		<description>Venture</description>
+		<year>1982</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2477"/>
+		<info name="usage" value="Will not run on Intellivision 2"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="venture.50" size="0x4000" crc="6efa67b2" sha1="ec7c70dbec461c9ec5ce0d37290c5ed7116d537c" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwater">
+		<description>White Water!</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720024"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="white water.50" size="0x4000" crc="f1ed7d27" sha1="b3c429b046a75384e02568708b7029e725073dc7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worldcup">
+		<description>World Cup Football</description>
+		<year>1985</year>
+		<publisher>INTV</publisher>
+		<info name="serial" value="8100"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="world cup football.50" size="0x4000" crc="ec17636c" sha1="f96ce3b97e2250d5a37710c55f59e29319f2cf28" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="world cup football.d0" size="0x2000" crc="0d5be7c7" sha1="9a03652e525316ec9e889b0989d22a35fb6a8358" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="world cup football.f0" size="0x2000" crc="4bb2b777" sha1="82ae81c3eb35e7e7e53c4f81a86bdf5ac3d925ff" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwhomper">
+		<description>Worm Whomper</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="M-006-03"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="worm whomper.50" size="0x2000" crc="24b667b9" sha1="e1f3c3aab41cb1850771cd566acd6fe4c1161041" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon">
+		<description>Zaxxon</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2487"/>
+		<info name="usage" value="Will not run on Intellivision 2"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="zaxxon.50" size="0x4000" crc="15c65dc5" sha1="e46a7e8d118b33a0a17130cf27bc8a4b1d2f93e2" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Unreleased / Prototypes / Homebrew -->
+
+	<software name="allstar">
+		<description>All Star Major League Baseball (Prototype)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="all star major league baseball.50" size="0x4000" crc="4a7e080a" sha1="ee2edd084c371d39dfcd725ed4aa5679e0c34a27" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="all star major league baseball.d0" size="0x2000" crc="31325854" sha1="fe7b5f3969e214ac23d20c5c137dc23f4515108d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airstrk">
+		<description>Air Strike (Prototype)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="air strike.50" size="0x2000" crc="2c668249" sha1="45d4cc27ccb966b007c3c2d32766f568f613319f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brickout">
+		<description>Brickout! (Unreleased)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="brickout.50" size="0x2000" crc="9f85015b" sha1="12895e3e9ce094e393fe996383be1d48ba5be77f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift">
+		<description>Choplifter! (Prototype)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="choplifter.50" size="0x4000" crc="b05cd576" sha1="61205b84aa3673d7a50da4f92ed0ed78e34ac951" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x3000">
+				<rom name="choplifter.d0" size="0x3000" crc="9b09666e" sha1="a024e5189e52ae07aa666fdcba612a6e9d7da4bc" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pool">
+		<description>Deep Pockets: Super Pro Pool and Billiards (Unreleased)</description>
+		<year>1990</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="deep pockets - super pro pool and billiards.50" size="0x4000" crc="4f4fb03f" sha1="ce0bd5a79474dadf9f025edf121c466c2686ce75" offset="0000"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="deep pockets - super pro pool and billiards.90" size="0x4000" crc="233c364d" sha1="e87a81345822f3417830f181169970c9aefaf9e3" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gftgold">
+		<description>Go for the Gold! (Prototype)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="go for the gold.50" size="0x4000" crc="dbca82c5" sha1="d68c49bdc62674f51fa26218a4e1422ec46bd41d" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridshk">
+		<description>Grid Shock (Prototype)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="grid shock.50" size="0x2000" crc="291ac826" sha1="b7a811a854dacd5e1b8e809baa5ce6ca1168ab53" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hheggs">
+		<description>Happy Holidays: Easter Eggcitement (Prototype)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="happy holidays - easter eggcitement.50" size="0x2000" crc="20ace89d" sha1="b5d4e3b153a79fe34b07281a033e87445af6dbd0" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhsanta">
+		<description>Happy Holidays: Santa's Helper (Prototype)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="happy holidays - santas helper.50" size="0x2000" crc="e221808c" sha1="58c55d4708155e687bf4d359a5a1a66ff97a7ca7" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhtrick">
+		<description>Happy Holidays: Trick or Treat (Prototype)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="happy holidays - trick or treat.50" size="0x2000" crc="4830f720" sha1="c94a09bd76b65366717c39cbf42c60afb34b37cc" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hlights">
+		<description>Hypnotic Lights (Prototype)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="hypnotic lights.50" size="0x2000" crc="a3147630" sha1="7aa48d1249d52a51223e99a98799b01f46cfc3d9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingotm">
+		<description>King of the Mountain (Unreleased)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="king of the mountain.50" size="0x4000" crc="3b689be9" sha1="794f7fbf5592a1c4962264db3b21d543763462ad" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x4000">
+				<rom name="king of the mountain.d0" size="0x4000" crc="45e7021d" sha1="3e6c17470ce5a92b28fa476c94ae0b84ab01e9c2" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="landbttl">
+		<description>Land Battle (Unreleased)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="land battle.50" size="0x4000" crc="3825c25b" sha1="97073f31a8c9b5b04e773fcb145c4235a4712ff7" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000_RAM8" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="league">
+		<description>League of Light (Prototype)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="league of light.50" size="0x4000" crc="b4287b95" sha1="ea729d124f02b87e3357ae62cce0f49242073141" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magic">
+		<description>Magic Carousel (Prototype)</description>
+		<year>1983</year>
+		<publisher>INTV</publisher>
+		<info name="usage" value="Uses Intellivoice"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="magic carousel.50" size="0x4000" crc="a1b985d2" sha1="2fdeb148f4376f1fa8eeff3a887465dfd8ffbb7d" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x4000">
+				<rom name="magic carousel.d0" size="0x4000" crc="86bc2541" sha1="997a9b9ecb88df4f90f1f8c3cbf817c057c4a933" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masters2">
+		<description>Masters of the Universe II (Prototype)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="masters of the universe ii.50" size="0x4000" crc="bab638f2" sha1="a7ab293fc906d18db415f647634be2f2bed1e93a" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blowout">
+		<description>Party Line: Blow Out (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="blowout.50" size="0x2000" crc="f98d2330" sha1="20db3279fb6b792799722e5157c20d5b5227e059" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="blowout.d0" size="0x2000" crc="f257a189" sha1="3bfc013252af2b05c35be21b01ebaeadd5ce4d0b" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardhat">
+		<description>Party Line: Hard Hat (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="hard hat.50" size="0x4000" crc="b6a3d4de" sha1="88c68c9766932df8ef11f5110881fa9b6954d965" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrubble">
+		<description>Robot Rubble (Prototype)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="robot rubble.50" size="0x4000" crc="243b0812" sha1="d2d93bb89701906793a696b8b07a514fcff7428b" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacecad">
+		<description>Party Line: Space Cadet (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="space cadet.50" size="0x4000" crc="f8ef3e5a" sha1="f3cfbe285a12194ef2f6087fc70d0ed887c4ec91" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshuttle">
+		<description>Space Shuttle (Prototype)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="space shuttle.50" size="0x4000" crc="b16905d6" sha1="ec276c57a954c9bbe032ed166de660e77a7087be" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x4000">
+				<rom name="space shuttle.d0" size="0x4000" crc="4b497d5e" sha1="1bc4d9af71b01cae44099297aeb0f00056463b03" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssoccer">
+		<description>Super Soccer (Unreleased)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="super soccer.50" size="0x4000" crc="02a2fb6c" sha1="b7f75755f019f5f89f99942924bc22bb2c78bd1e" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="super soccer.d0" size="0x2000" crc="fd061aff" sha1="2425e6bb365d3d617e80e29580f098eeb5af779b" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="super soccer.f0" size="0x2000" crc="3348dc4b" sha1="c723206a8f5b8e445b7ca45ad4bf05d1b36a5ab9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeover">
+		<description>Takeover (Unreleased)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="takeover.50" size="0x2000" crc="1f584a69" sha1="47057bd3811689692ac9ef3deed7248e01a5f4f5" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imitc">
+		<description>IMI Test Cartridge</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="7000" size="0x2000">
+				<rom name="imi test cart.70" size="0x2000" crc="7217ca7b" sha1="2ca1ef7426e62c50dfd5b375428cf09e76600944" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mte201">
+		<description>MTE-201 Test Cartridge</description>
+		<year>1978</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x2000">
+				<rom name="mte-201.50" size="0x2000" crc="dab36628" sha1="5e83a945f231f55d5ddfa9527f9b94da06e77058" offset="0000"/>
+			</dataarea>
+			<dataarea name="7000" size="0x2000">
+				<rom name="mte-201.70" size="0x2000" crc="5f0d7486" sha1="f4174fdbcd4639bc7356f93552dda913d86e18ac" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4tris">
+		<description>4-Tris (Download Version)</description>
+		<year>2000</year>
+		<publisher>IntelligentVision</publisher>
+		<info name="serial" value="9111"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="4-tris.50" size="0x4000" crc="b91488e2" sha1="d3d1ea456991a5dd71804f62f59e88debd9cd86f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minehntr">
+		<description>Minehunter (Download Version)</description>
+		<year>2004</year>
+		<publisher>IntelligentVision</publisher>
+		<info name="serial" value="9113"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="minehunter.50" size="0x4000" crc="a9f1d874" sha1="4bbac2b5264f4d357e7223b2373b078c622c08a9" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sgr">
+		<description>SameGame &amp; Robots (Download Version)</description>
+		<year>2005</year>
+		<publisher>IntelligentVision</publisher>
+		<info name="serial" value="9114"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="samegame and robots.50" size="0x4000" crc="9092f2e6" sha1="0c29a0b4de011874f27c517f1f9ef16b16fdb4fc" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="samegame and robots.d0" size="0x2000" crc="675698d3" sha1="dbcc9090a3614a86dfa9747079857fe6e0c65b97" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="samegame and robots.f0" size="0x2000" crc="1a198ae9" sha1="8553cdaae55e2c0d579a0f06f857c79323d7efb6" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stonix">
+		<description>Stonix (Download Version)</description>
+		<year>2005</year>
+		<publisher>IntelligentVision</publisher>
+		<info name="serial" value="9112"/>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+				<rom name="stonix.50" size="0x4000" crc="9af3ca58" sha1="46302bcdc15afc28968649cbdeb804e0190c251e" offset="0000"/>
+			</dataarea>
+			<dataarea name="D000" size="0x2000">
+				<rom name="stonix.d0" size="0x2000" crc="9c5c4301" sha1="3eb7cb8a62080ff8ac2ac83c888cf5155a97d991" offset="0000"/>
+			</dataarea>
+			<dataarea name="F000" size="0x2000">
+				<rom name="stonix.f0" size="0x2000" crc="baea7cb2" sha1="83a49852a6612be840e8ae75302784b99251946f" offset="0000"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

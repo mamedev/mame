@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="ti99_cart" description="TI-99/4A cartridges">
+
+	<!--
+		This is just the start of the software list for the TI. About 350
+		cartridges wait to be inserted here.
+
+		Currently we only support the cartridge types "standard" and "paged"
+		which is the type of the majority of cartridges. The RAM-based cartridges
+		(with NVRAM) may follow later (in particular MiniMemory).
+
+		Alternatively, RPK support will continue to be available for all
+		cartridges.
+
+		Note that the sizes of the grom data areas should not be bigger than
+		the included dump, as the region size determines how many GROMs are
+		included as subdevices. (OTOH, the additional GROMs would just be
+		empty, so no big trouble expected.)
+
+		MAME/MESS policy requires the names of the software to be at max 8
+		characters, so this means the RPKs need to be renamed to <name>.zip for
+		each cartridge to be used.
+	-->
+
+	<!-- Common type -->
+	<software name="invaders">
+		<description>TI Invaders</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="id" value="PHM 3053"/>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="standard" />
+			<dataarea name="rom_socket" size="0x2000">
+				<rom name="phm3053c.bin" size="0x2000" crc="e7463430" sha1="b1cc3454aa5437447edb1fc1f48ec7da20e87377" offset="0x0000" />
+			</dataarea>
+			<dataarea name="grom_socket" size="0x2000">
+				<rom name="phm3053g.bin" size="0x2000" crc="9d1d9eaa" sha1="afb31bd69eed1e7e5e08a6fed98c8babed509fa9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- GROM-only -->
+	<software name="wumpus">
+		<description>Hunt the wumpus</description>
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="id" value="PHM 3023"/>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="standard" />
+			<dataarea name="grom_socket" size="0x2000">
+				<rom name="phm3023g.bin" size="0x2000" crc="6a5a3f97" sha1="4569d2f1eaba7b1736b1146c3863bd8c3d231040" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ROM-only -->
+	<software name="defender">
+		<description>Defender</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="standard" />
+			<dataarea name="rom_socket" size="0x2000">
+				<rom name="defendc.bin" size="0x2000" crc="c51b0a8b" sha1="df4c3dd9ee5195a768a11721d86f6a164faa87a5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- With paging (PCB type "paged") -->
+	<software name="exbasic">
+		<description>TI Extended Basic</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="id" value="PHM 3026"/>
+		<info name="version" value="110"/>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="paged" />
+			<dataarea name="rom_socket" size="0x2000">
+				<rom name="phm3026c.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+			</dataarea>
+			<dataarea name="rom2_socket" size="0x2000">
+				<rom name="phm3026d.bin" size="0x2000" crc="44c4d8a8" sha1="db2850db78431d89de85dd573e6df76151b25aba" offset="0x0000" />
+			</dataarea>
+			<dataarea name="grom_socket" size="0x8000">
+				<rom name="phm3026g.bin" size="0x8000" crc="1a977b8c" sha1="ac30cc0ba075661b9c853b3fda47b4f4accbe25c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

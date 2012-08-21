@@ -1,0 +1,721 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+
+Are the following undumped?
+* Battlesphere - by ScatoLOGIC, 2000
+* Breakout 2000 - by Telegames, 1996
+* Protector - by Songbird Productions, 1999
+
+-->
+<softwarelist name="jaguar" description="Atari Jaguar cartridges">
+	<software name="aircars" supported="no">
+		<description>Air Cars</description>
+		<year>1997</year>
+		<publisher>ICD</publisher>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<!-- The original dump, released in a custom .j01 format, was the following one
+				<rom name="air cars.j01" size="2097152" crc="cbfd822a" sha1="9d1ecdb230f94d8145520ba03d187a19d6851a75" offset="000000" />
+				-->
+				<rom name="air cars.j64" size="2097152" crc="237d5643" sha1="1842ba3823131d48623f733709eac85e770868df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avsp" supported="no">
+		<description>Alien vs Predator</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9008E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="alien vs predator (world).j64" size="4194304" crc="dc187f82" sha1="fd8c89250ebc1e403838b2e589d1f69e3fe2fe02" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atarikar" supported="no">
+		<description>Atari Karts</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9091E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="atari karts (world).j64" size="4194304" crc="e28756de" sha1="9c96e6c2195ce56aa930e677a041b35bd9b8bc7e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mutntpng" supported="no">
+		<description>Attack of the Mutant Penguins</description>
+		<year>1996</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9072E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="attack of the mutant penguins (world).j64" size="2097152" crc="cd5bf827" sha1="01dc37e7a9d03246a93bcb8c6a3116cb6391ed31" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlesp" supported="no">
+		<description>Battle Sphere Gold</description>
+		<year>2002</year>
+		<publisher>ScatoLOGIC</publisher>
+		<info name="serial" value="J0201G"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="battle sphere gold (world).j64" size="4194304" crc="67f9ab3a" sha1="49716a6a3a4c6abeea36040f26c4e8cf2a545df7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brutalsp" supported="no">
+		<description>Brutal Sports Football</description>
+		<year>1994</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="JA100"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="brutal sports football (world).j64" size="2097152" crc="bcb1a4bf" sha1="cdfefdf28dd9127f7a9425088a1ee3ea88dfb618" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubsy" supported="no">
+		<description>Bubsy in Fractured Furry Tales</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9020E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="bubsy in fractured furry tales (world).j64" size="2097152" crc="2e17d5da" sha1="752d6e1ed185f9db49230f42319a573a44e32397" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cfodder" supported="no">
+		<description>Cannon Fodder</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="serial" value="02763-00162"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="cannon fodder (world).j64" size="2097152" crc="bda405c6" sha1="0c195676be099f4594ce1d5a38303f6cce899dc5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chekflag" supported="no">
+		<description>Checkered Flag</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9007E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="checkered flag (world).j64" size="2097152" crc="fa7775ae" sha1="4d0cc8d248a8bd0fc4b8169c5d5772e59c073c59" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clubdriv" supported="no">
+		<description>Club Drive</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9003E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="club drive (world).j64" size="2097152" crc="eee8d61d" sha1="6588f7d677463d0ef10cf905d44a2581fd9dd055" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybermor1" cloneof="cybermor" supported="no">
+		<description>Cybermorph (Rev. 1)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9000"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="cybermorph (world) (rev 1).j64" size="2097152" crc="bde67498" sha1="e00ab55f555fd1fe63b4fce66a9b8ffe3485963e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybermor" supported="no">
+		<description>Cybermorph (Rev. 2)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9000E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="cybermorph (world) (rev 2).j64" size="1048576" crc="ecf854e7" sha1="c9aa59769df207d85d9212d619c266c793c9063b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender" supported="no">
+		<description>Defender 2000</description>
+		<year>1996</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9041E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="defender 2000 (world).j64" size="4194304" crc="27594c6a" sha1="13a4084bd5be1cca21d83d4c26b5b8e5cf1a3e30" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doom" supported="no">
+		<description>Doom</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9029E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="doom (world).j64" size="4194304" crc="5e2cdbc0" sha1="20ddf412e42a50d526cbbb6411bf0ec4516db283" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon5" supported="no">
+		<description>Double Dragon V - The Shadow Falls</description>
+		<year>1995</year>
+		<publisher>Tradewest</publisher>
+		<info name="serial" value="21941"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="double dragon v - the shadow falls (world).j64" size="2097152" crc="348e6449" sha1="d66b4e5f9ac27d53f0d781c741e420698630b9fc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragon" supported="no">
+		<description>Dragon - The Bruce Lee Story</description>
+		<year>1994</year>
+		<publisher>Virgin Interactibe</publisher>
+		<info name="serial" value="J9036E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dragon - the bruce lee story (world).j64" size="2097152" crc="8fea5ab0" sha1="da7f5dac4317ab0258f54da436abb8d89e530f27" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinodude" supported="no">
+		<description>Evolution - Dino Dudes</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9006"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="evolution - dino dudes (world).j64" size="2097152" crc="0ec5369d" sha1="179b511464abcda5a5de9f971bd5cb5775d8c313" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feverpit" supported="no">
+		<description>Fever Pitch Soccer</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9106E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="fever pitch soccer (world) (en,fr,de,es,it).j64" size="2097152" crc="3615af6a" sha1="5be3da69a64b779d064d139968fadbe1c475c715" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fforlife1" cloneof="fforlife" supported="no">
+		<description>Fight for Life (Alt)</description>
+		<year>1996</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9037E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="fight for life (world) (alt).j64" size="4194304" crc="c6c7ba62" sha1="686176f5a7bdaef690d853523a338beb8a93d244" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fforlife" supported="no">
+		<description>Fight for Life</description>
+		<year>1996</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9037E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="fight for life (world).j64" size="4194304" crc="b14c4753" sha1="9f5b8844d58bb1c174da4824eabbfd8616ba28d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flashb" supported="no">
+		<description>Flashback - The Quest for Identity</description>
+		<year>1995</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="serial" value="43175-79126"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="flashback - the quest for identity (world) (en,fr).j64" size="2097152" crc="de55dcc7" sha1="824613451be0b99020fc02e5dba15c45e76fc8c2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipout" supported="no">
+		<description>Flip Out!</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9040E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="flip out! (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hstrike" supported="no">
+		<description>Hover Strike</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9009E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="hover strike (world).j64" size="2097152" crc="4899628f" sha1="94e615e7a57f7c08645322870121bb32310298f5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperfrc" supported="no">
+		<description>Hyper Force</description>
+		<year>2000</year>
+		<publisher>Songboard Productions</publisher>
+		<info name="serial" value="CF3003"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="hyper force (world).j64" size="2097152" crc="f0360db3" sha1="037396347d65d1a8b56e7db361d737ab2070118f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iwar" supported="no">
+		<description>I-War</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9043E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="i-war (world).j64" size="2097152" crc="97eb4651" sha1="3db485aaa28a817f468739a85e3f25741c3855ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ironsold" supported="no">
+		<description>Iron Soldier (v1.04)</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9026E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="iron soldier (world) (v1.04).j64" size="2097152" crc="08f15576" sha1="8bdefc60dd1734315e1c145e29abf41800f908cb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ironsol2" supported="no">
+		<description>Iron Soldier 2</description>
+		<year>1997</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="JA810"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="iron soldier 2 (world).j64" size="2097152" crc="d6c19e34" sha1="47b9580eb9eea121cf080cdbdc4afe7fb7a19ab5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kasumi" supported="no">
+		<description>Kasumi Ninja</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9012E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="kasumi ninja (world).j64" size="4194304" crc="0957a072" sha1="2327112b9c6f9b0e49c55def0adb8119ee39ce29" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missil3d" supported="no">
+		<description>Missile Command 3D</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9097E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="missile command 3d (world).j64" size="2097152" crc="da9c4162" sha1="3ea9053a63a3b0165ccec91e85f0e699a998dc0a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbajamte" supported="no">
+		<description>NBA Jam T.E. - Tournament Edition</description>
+		<year>1996</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9089E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="nba jam t.e. (world).j64" size="4194304" crc="0ac83d77" sha1="b9c8ff2d26fe1e91ecd6d59b9f3f76c5b5650f26" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinballf" supported="no">
+		<description>Pinball Fantasies</description>
+		<year>1995</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="serial" value="J0144E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pinball fantasies (world).j64" size="2097152" crc="5cff14ab" sha1="4733cf2ede2713467f2a80b052ab94edf6dfe534" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall" supported="no">
+		<description>Pitfall - The Mayan Adventure</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9101E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="pitfall - the mayan adventure (world).j64" size="4194304" crc="817a2273" sha1="25611b1cff1384db72cc5422dbe70555e5bbd32c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pdrive" supported="no">
+		<description>Power Drive Rally</description>
+		<year>1995</year>
+		<publisher>Time Warner Interactive</publisher>
+		<info name="serial" value="31763-11153"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="power drive rally (world).j64" size="2097152" crc="1660f070" sha1="75ee0ab0daba31284a1dff27f3c247885f5a427a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="protect" supported="no">
+		<description>Protector - Special Edition</description>
+		<year>2002</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF3004"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="protector - special edition (world).j64" size="2097152" crc="a56d0798" sha1="ddea86820dcaa1a67bd82cf8023f9b3c494357b0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raiden" supported="no">
+		<description>Raiden</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9005"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="raiden (world).j64" size="2097152" crc="0509c85e" sha1="9d2f894da3f25944c2f33e3a109ae8d0d951d329" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rayman" supported="no">
+		<description>Rayman</description>
+		<year>1995</year>
+		<publisher>Ubisoft</publisher>
+		<info name="serial" value="C3669T"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="rayman (world).j64" size="4194304" crc="a9f8a00e" sha1="d22912992fd966365a1221886e0fc5303ef04a59" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruinerp" supported="no">
+		<description>Ruiner Pinball</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9061E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="ruiner pinball (world).j64" size="2097152" crc="5b6bb205" sha1="e0db2fdea7f95743c1ef452b7d289f5fe8158e33" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sensible" supported="no">
+		<description>Sensible Soccer - International Edition</description>
+		<year>199?</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="JA250"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sensible soccer - international edition (world).j64" size="2097152" crc="5a101212" sha1="f0914be41331e3045bbc04225044dc3c73fd9de1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyhamm" supported="no">
+		<description>Skyhammer</description>
+		<year>2000</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF3001"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="skyhammer (world).j64" size="4194304" crc="3c044941" sha1="34a9941459e3b66c836f25b3ef55303734b9583e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccerkd" supported="no">
+		<description>Soccer Kid</description>
+		<year>2000</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF3002"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="soccer kid (world).j64" size="2097152" crc="42a13ec5" sha1="a738a2df47f09c3bfdeddfc01b35f3e8b5c5d99c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacewar" supported="no">
+		<description>Space War 2000</description>
+		<year>2001</year>
+		<publisher>B&amp;C Computervisions</publisher>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="space war 2000 (world).j64" size="4194304" crc="53df6440" sha1="b5da0b1231a6e6532268c4e04f74e56f047dd5a5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sburnout" supported="no">
+		<description>Super Burnout</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9052E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super burnout (world).j64" size="2097152" crc="6f8b2547" sha1="9a58bc0c8843fd00a2871c01b91fec206408bf80" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superx3d" supported="no">
+		<description>SuperCross 3D</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9044E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="supercross 3d (world).j64" size="2097152" crc="ec22f572" sha1="c71e0bc9eeed8670c6e7ccc7a0fe3b815d7bac83" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syndicat" supported="no">
+		<description>Syndicate</description>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="8002-SYNJAG"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="syndicate (world).j64" size="2097152" crc="58272540" sha1="a226086571c857f3796fd664bbc2c8fe99c78224" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tempst2k" supported="no">
+		<description>Tempest 2000</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9010E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="tempest 2000 (world).j64" size="2097152" crc="6b2b95ad" sha1="3828d2f953224d06b5fe7ab3644d6a75fdfe79e3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="themeprk" supported="no">
+		<description>Theme Park</description>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="8001-TPKJAG"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="theme park (world).j64" size="2097152" crc="47ebc158" sha1="24da4fe776ae9daa86cf643c703ec0f399c77521" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="totalcar" supported="no">
+		<description>Total Carnage</description>
+		<year>2005</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF3006"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="total carnage (world).j64" size="4194304" crc="c654681b" sha1="4566b33799a7c65b3e9643383d0282172ff619a5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towers2" supported="no">
+		<description>Towers II - Plight of the Stargazer</description>
+		<year>1996</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="JA256"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="towers ii (world).j64" size="2097152" crc="caf33bd6" sha1="f8c14fab50ab04a025d15c3410a6698f6e4c61d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trevmcfr" supported="no">
+		<description>Trevor McFur in the Crescent Galaxy</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9001"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="trevor mcfur in the crescent galaxy (world).j64" size="2097152" crc="1e451446" sha1="88e86085932af10dfb8c94032f73a5992a30b55c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troyaik" supported="no">
+		<description>Troy Aikman NFL Football</description>
+		<year>1995</year>
+		<publisher>Williams Entertainment</publisher>
+		<info name="serial" value="21942"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="troy aikman nfl football (world).j64" size="2097152" crc="38a130ed" sha1="4c6a6432ea0bc198f900f4ebdb8a3a7a34475d84" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultravor1" cloneof="ultravor" supported="no">
+		<description>Ultra Vortek (v0.94, Prototype)</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9082E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="ultra vortek (world) (v0.94) (beta).j64" size="4194304" crc="a27823d8" sha1="e3bd433bc4a573f3b05652239a6614c3878a04d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultravor" supported="no">
+		<description>Ultra Vortek</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9082E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="ultra vortek (world).j64" size="4194304" crc="0f6a1c2c" sha1="311e41ebba1b78f514bf16789ddb7e7e8dfb47ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valdiser" supported="no">
+		<description>Val d'Is&#232;re Skiing and Snowboarding</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9060E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="val d'isere skiing and snowboarding (world).j64" size="2097152" crc="c9608717" sha1="02253d93eef375c8334f1f77a2d8b72fff7a94c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whitemen" supported="no">
+		<description>White Men Can't Jump</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9070E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="white men can't jump (world).j64" size="4194304" crc="14915f20" sha1="4d16596ac2d991435599e1fe03292adfb25c346d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolfn3d" supported="no">
+		<description>Wolfenstein 3D</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9028"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="wolfenstein 3d (world).j64" size="2097152" crc="e91bd644" sha1="ee553176f0a32683b517b84b12c6fae13c15c3d0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worms" supported="no">
+		<description>Worms</description>
+		<year>1998</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="JA103"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="worms (world).j64" size="2097152" crc="6eb774eb" sha1="641b07f93e8df03ab8b9bf1e8dc56e2889f247f8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zero5" supported="no">
+		<description>Zero 5</description>
+		<year>1997</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="J4011"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="zero 5 (world).j64" size="2097152" crc="61c7eec0" sha1="b68de2cd49cb70e92f2415837edfa7ab46770a78" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zool2" supported="no">
+		<description>Zool 2</description>
+		<year>1994</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9042E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="zool 2 (world).j64" size="2097152" crc="8975f48b" sha1="32ff3811f8f6df8a2bb56165c62227a3a480e55c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoop" supported="no">
+		<description>Zoop!</description>
+		<year>1996</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="J9109E"/>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="zoop! (world).j64" size="1048576" crc="c5562581" sha1="52ec786f7536ab043dc24725af94068cad2b0ec3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

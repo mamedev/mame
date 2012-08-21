@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Option ROM booting instructions:
+
+1. Start BASIC
+2. Type CALL 61167,2
+-->
+<softwarelist name="tandy200" description="Tandy 200 Option ROMs">
+  <software name="r2c">
+    <description>ROM2/Cleuseau</description>
+    <year>198?</year>
+    <publisher>Polar Engineering</publisher>
+
+    <part name="cart" interface="tandy200_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="r2c200.bin" size="0x8000" crc="f0fb2d77" sha1="48c07cf283c327b5f703acc51c844cc347c8ecf6" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tword">
+    <description>T-Word with Sardine v1.33</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="tandy200_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="sard200.bin" size="0x8000" crc="3e853cf6" sha1="30b2b1ce50d00f75364a9ecd7a4283a6bc26c70d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tsdos">
+    <description>TS-DOS v4.00</description>
+    <year>1987</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="tandy200_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="tsdos200.bin" size="0x8000" crc="94444744" sha1="0580347ca123ad88e0042eb94d4393a9bc133a15" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ur2">
+    <description>The Ultimate ROM II v2.11</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="tandy200_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="ur2200.bin" size="0x8000" crc="771d4fdf" sha1="09bbe0c8cf690a62748ab1c9ffd82ba4c9388305" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>

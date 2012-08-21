@@ -1,0 +1,440 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+Carts released in Japan
+
+1. Dig Dug (ディグダグ )
+2. Tank Battalion (タンクバタリアン)
+3. Bosconian (ボスコニアン)
+4. Galax (ギャラックス)
+5. Power Pac (パワーパック)
+6. Warp Warp (ワープ&ワープ)
+7. Super Cobra (スーパーコブラ)
+8. Guttang Guttong (ガッタンゴットン)
+9. Moon Patrol (ムーンパトロール)
+10. Step Up (ステップアップ)
+11. Pooyan (プーヤン)
+12. Heavy Boxing (ヘビーボクシング)
+13. コミカルスキー [Fun Ski?]
+14. Real Tennis (リアルテニス)
+15. Word Maze (ワードメイズ)
+16. Wonder Hole (ワンダーホール)
+17. Apploon (アップルーン)
+18. Up Up Balloon (アップアップバルーン)
+19. Mappy (マッピー)
+20.  ??
+21. Dream Shopper (ドリームショッパー)
+22. Eskimon (エスキモン)
+23. Funny Mouse (ファニーマウス)
+24. Jankyo (ジャン狂)
+
+Simulation Games (probably separate series, box has red stripes!)
+
+- Fruit Search
+- Dragon Attack
+- Pit Chaser
+
+
+Super Adventure Series (cart + tape games)
+
+- Super Adventure (スーパーアドベンチャー ) [cart]
+- O I Tasukete Kure (おーいたすけてくれ ) [tape]
+- Ni gero Ni gero Ni gero (にげろにげろにげろ ) [tape]
+
+
+Programs:
+
+- P-Editor (also available as tape)
+- M-Editor
+
+
+Learning Soft:
+
+- Mogura-Tataki Keyboard Renshu (by Stratford Soft)
+
+
+Programming Languages:
+
+ - FLAC
+ - FLAC-II
+ - BASIC-I
+ - BASIC-G
+ - BASIC-F
+ - DISK BASIC
+
+
+what about European carts?
+and why some of the dumps below have weird size?
+
+
+-->
+
+<softwarelist name="m5" description="Sord M5 cartridges">
+
+<!-- Games -->
+	<software name="fruitsrc">
+		<description>Fruit Search</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fruit search (1983)(takara)(jp).bin" size="4096" crc="333ac50f" sha1="a838fbf0bc4513d3b6bcc3165f1eac33ca27d6fa" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnatck">
+		<description>Dragon Attack</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="dragon attack (1983)(takara)(jp).bin" size="4096" crc="5862d06c" sha1="f2707ad6dd564df01e7f81a21a00842e17cd49a4" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankbtl">
+		<description>Tank Battalion</description>
+		<year>1980</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="2" />
+		<info name="alt_title" value="タンクバタリアン" />
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tank battlaion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scobra">
+		<description>Super Cobra</description>
+		<year>1981</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="7" />
+		<info name="alt_title" value="スーパーコブラ" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="super cobra (1981)(konami)(jp).bin" size="8192" crc="55cbd90b" sha1="d29f1d1d88a0b6738b68cf8d2406fbf1f05ba39b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gutangtn">
+		<description>Guttang Gottong</description>
+		<year>1981</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="8" />
+		<info name="alt_title" value="ガッタンゴットン" />
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8448">
+				<rom name="guttang gottong (1981)(konami)(jp).bin" size="8448" crc="0f70fa69" sha1="4e4900f42cbc76e4e795ed32ee18b2e27246e90f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stepup">
+		<description>Step Up</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="10" />
+		<info name="alt_title" value="ステップアップ" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="step up (1983)(takara)(jp).bin" size="8192" crc="942cc7e8" sha1="9f61df71b6080c8ef5085b659179a10e2777a957" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooyan">
+		<description>Pooyan</description>
+		<year>1982</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="11" />
+		<info name="alt_title" value="プーヤン" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pooyan (1982)(konami)(jp).bin" size="8192" crc="ded8b4f4" sha1="4c9e58e52d336b4c01a24e3ca2e62fb7757407fd" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heavybox">
+		<description>Heavy Boxing</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="12" />
+		<info name="alt_title" value="ヘビーボクシング" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="heavy boxing (1983)(takara)(jp).bin" size="8192" crc="19540dce" sha1="388838ed501bcc3a9fd18e32488f13a6ce6a0689" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtennis">
+		<description>Real Tennis</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="14" />
+		<info name="alt_title" value="リアルテニス" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="real tennis (1983)(takara)(jp).bin" size="8192" crc="ed80d6c9" sha1="03f3385b360c3573edab1fca53f82b4d6a4f8736" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordmaze">
+		<description>Word Maze</description>
+		<year>1983</year>
+		<publisher>Sord</publisher>
+		<info name="serial" value="15" />
+		<info name="alt_title" value="ワードメイズ" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="word maze (19xx)(sord)(jp).bin" size="8192" crc="fda88e0d" sha1="a0fbe727bfca773d3cc193eb7a9c77e7b418b0a2" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wondhole">
+		<description>Wonder Hole</description>
+		<year>1982</year>
+		<publisher>Irem</publisher>
+		<info name="serial" value="16" />
+		<info name="alt_title" value="ワンダーホール" />
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8320">
+				<rom name="wonder hole (1982)(irem)(jp).bin" size="8320" crc="aba2cece" sha1="bcb7442c6d320eb166e224c3ac0f50514906ad4c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upupball" supported="no">
+		<description>Up Up Balloon</description>
+		<year>1983</year>
+		<publisher>Takara ~ Monkey Punch</publisher>
+		<info name="serial" value="18" />
+		<info name="alt_title" value="アップアップバルーン" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8320">
+				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8320" crc="68c85890" sha1="0c94d2d55a6a6e66531137e124f2e0a3a176b252" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eskimon">
+		<description>Eskimon</description>
+		<year>1984</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="22" />
+		<info name="alt_title" value="エスキモン" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="eskimon (1984)(takara)(jp).bin" size="8192" crc="96931021" sha1="115eee645e5213c16ad4a27bbeed5e2f3fa4be22" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funnym">
+		<description>Funny Mouse</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="23" />
+		<info name="alt_title" value="ファニーマウス" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="funny mouse (1983)(takara)(jp).bin" size="8192" crc="94145074" sha1="43c2a1a5959ab8057c7d149472512a0c7996c798" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Program + Languages -->
+	<software name="basicf">
+		<description>BASIC-F</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="20480">
+				<rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicg">
+		<description>BASIC-G</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="basic-g (198x)(sord)(jp).bin" size="16384" crc="107b5ddc" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basici">
+		<description>BASIC-I</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="basic-i (198x)(sord)(jp).bin" size="8192" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falc">
+		<description>FALC</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="falc (198x)(sord)(jp).bin" size="16384" crc="78037f97" sha1="4cd917388a626d38dd8b16834c2e610d0ba6d505" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peditor">
+		<description>P-Editor</description>
+		<year>198?</year>
+		<publisher>Sord</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="zzz-unk-pdesigne.bin" size="16384" crc="af987f7b" sha1="3a4cffc8d81a384f8bb2dfebf5e02cda1f0c7e21" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Unidentified items -->
+	<software name="basicw">
+        <!-- is this legit?!? might it be Disk BASIC? -->
+		<description>BASIC-W</description>
+		<year>198?</year>
+		<publisher>Sord?</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="20480">
+				<rom name="basic-w (198x)(sord)(jp).bin" size="20480" crc="2b1087cf" sha1="aa8d7c6c405e1360f074590abdc3d82df07cb564" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="m5term">
+        <!-- is this legit?!? might it be M-Editor? -->
+		<description>M5 Terminal</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="7168">
+				<rom name="m5 terminal (19xx)(-).bin" size="7168" crc="2b73c483" sha1="53c093d4c3c5ba990bf8673963f9ff529e99a252" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zacbanic">
+		<description>Zac Banic</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="4400">
+				<rom name="zac banic (19xx)(-).bin" size="4400" crc="fd421eea" sha1="6c3d5c15817617508de5f994c0a980ff6c6ca303" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Baseball</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="10904">
+				<rom name="baseball (19xx)(-).bin" size="10904" crc="46e94dae" sha1="56d11bb9e4e8431ff4f6dfa592b096dd613084c3" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drops">
+		<description>Drops</description>
+		<year>1986</year>
+		<publisher>SPC</publisher>
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="6176">
+				<rom name="drops (1986)(spc)(jp).bin" size="6176" crc="fa321348" sha1="e9a44e12eed9d51cdb40ce4b6f1cb19a1ebed35d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjack">
+		<description>Jumping Jack</description>
+		<year>1986</year>
+		<publisher>SPC</publisher>
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="5920">
+				<rom name="jumping jack (1986)(spc)(jp).bin" size="5920" crc="49030973" sha1="c8716276fe6c4b0808078086f505efce1137afc9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchess">
+		<description>Masterchess</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="masterchess (19xx)(-).bin" size="12288" crc="c10a6e96" sha1="5dd24aae17c3a293ae91ef5086c1c4f3e59263ed" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k RAM" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="6392">
+				<rom name="reversi (19xx)(games of skill).bin" size="6392" crc="ca2cd257" sha1="a048a1055d175ace09155e50da0387986e150f92" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- these come from TOSEC: they do not work and it's not clear where they
+come from... they might be eventually removed -->
+
+<!-- the first contains Czech text strings so it might be a real Czech cart,
+but we need more info -->
+	<software name="unk_maze" supported="no">
+		<description>Unknown CSMAZE</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8448">
+				<rom name="zzz-unk-csmaze.bin" size="8448" crc="b7c9705b" sha1="f07f531eef82fd5b0d914c176d52b38814c36e3b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This displays garbage charset when launched with ramsize 36k or 68k -->
+	<software name="unk_intr" supported="no">
+		<description>Unknown Intruder</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k or more RAM?" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="5376">
+				<rom name="zzz-unk-intruder.bin" size="5376" crc="12859c5d" sha1="fd8fc752be6afcbf016f8a33e21ad9e1b7c50c48" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

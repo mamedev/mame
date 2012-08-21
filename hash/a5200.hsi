@@ -1,0 +1,928 @@
+<hashfile>
+	<!-- use A13MIRRORING for 16kb cartridge which do not work without it -->
+	<!-- (normally 16kb cartridges ignore address line A14, but ...) -->
+	<!-- BOUNTYBOB for special bountybob cartridge with bankswitching -->
+	<!-- This MESS CRC file is based on a generated one from Cowering's Good databases -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="4019ecec" name="Astro Chase (Parker Brothers-First Star Software) (U)">
+		<year>1982</year>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="8d2aaab5" name="Asteroids">
+		<extrainfo>TYPE16</extrainfo>
+	</hash>
+	<hash crc32="ce07d9ad" name="Atari Diagnostics V2.3 (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="def2a207" name="Ballblazer (Atari-Lucasfilm Games) (U)">
+		<year>1984</year>
+		<manufacturer>Atari-Lucasfilm</manufacturer>
+		<extrainfo>TYPE32</extrainfo>
+	</hash>
+	<hash crc32="94d97d14" name="Ballblazer (Atari-Lucasfilm Games) (PAL)">
+		<year>1984</year>
+		<manufacturer>Atari-Lucasfilm</manufacturer>
+	</hash>
+	<hash crc32="21d19c8f" name="Barroom Baseball (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>TYPE32.24</extrainfo>
+	</hash>
+	<hash crc32="b3b8e314" name="Battlezone (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="9bae58dc" name="Beamrider (Activision) (PAL)">
+		<year>1984</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="be3cd348" name="Berzerk (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="13734e17" name="Blueprint (CBS) (PAL)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="0624e6e7" name="Blueprint (1982)">
+		<year>1982</year>
+		<status>Is this name complete?</status>
+		<extrainfo>TYPE16</extrainfo>
+	</hash>
+	<hash crc32="4e75738a" name="Boogie Prototype">
+		<extrainfo>TYPE8</extrainfo>
+	</hash>
+	<hash crc32="57e7945e" name="Bounty Bob (Big Five Software) (U)">
+		<year>1984</year>
+		<manufacturer>Big Five Software</manufacturer>
+		<status>not working, bankswitching incomplete</status>
+		<extrainfo>BOUNTYBOB</extrainfo>
+	</hash>
+	<hash crc32="04807705" name="Buck Rogers - Planet of Zoom (Sega) (U)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="20df4927" name="Buck Rogers - Planet of Zoom (Sega) (PAL)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="536a70fe" name="Centipede (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="9ad53bbc" name="Choplifter (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Sega</manufacturer>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="82b91800" name="Congo Bongo (Sega) (U)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<status>A13MIRRORING</status>
+	</hash>
+	<hash crc32="f1f42bbd" name="Congo Bongo (Sega) (PAL)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="fd541c80" name="Countermeasure (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="f43e7cd0" name="Decathlon (Activision) (U)">
+		<year>1984</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="bd52623b" name="Defender (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="6a687f9c" name="Dig Dug (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="460def2d" name="Dreadnaught Factor, The (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="7a182f89" name="Frisky Tom">
+		<extrainfo>A13MIRRORING?</extrainfo>
+	</hash>
+	<hash crc32="ae7e3444" name="Frogger (Parker Brothers) (PAL)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="0af19345" name="Frogger 2 - Threedeep! (Parker Brothers) (U)">
+		<year>1984</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="0fe438b3" name="Frogger 2 - Threedeep! (Parker Brothers) (PAL)">
+		<year>1984</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<status>0x1000-0x1fff mirrored</status>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="dc1437d0" name="Frogger 2 - Threedeep! (Parker Brothers) (PAL)">
+		<year>1984</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<status>0x1000-0x1fff empty, same as 0fe438b3</status>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="3ef4a23f" name="Galaxian (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e955db74" name="Gorf (CBS) (U)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="15d0cfc2" name="Gremlins (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>TYPE32.24</extrainfo>
+	</hash>
+	<hash crc32="063ec2c4" name="Gremlins (Atari) (PAL)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cfd4a7f9" name="Gyruss (Parker Brothers) (U)">
+		<year>1982</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="18a73af3" name="H.E.R.O. (Activision) (PAL)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d9ae4518" name="James Bond 007 (Parker Brothers) (U)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="bfd30c01" name="Joust (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="7c30592c" name="Jr Pac-Man (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+		<status>A13MIRRORING?</status>
+	</hash>
+	<hash crc32="2c676662" name="Jungle Hunt (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="420f5d0b" name="KABOOM! (Activision) (U)">
+		<year>1983</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="ecfa624f" name="Kangaroo (Atari) (PAL)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="673c989f" name="Kangaroo (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="8fe3bb2c" name="Keystone Kapers (Activision) (U)">
+		<year>1984</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="ee702214" name="K-razy Shootout (CBS) (U)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="83517703" name="Last Starfighter, The (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="84df4925" name="Looney Tunes Hotel (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="6b3f1179" name="Mario Brothers (Atari) (PAL)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="873742f1" name="Mario Brothers (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="9fb13411" name="Meebzork (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="240a1e1a" name="Megamania (Activision) (U)">
+		<year>1983</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="ab8e035b" name="Meteorites (Electra Concepts) (U)">
+		<year>1983</year>
+		<manufacturer>Electra Concepts</manufacturer>
+	</hash>
+	<hash crc32="931a454a" name="Microgammon SB (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="969cfe1a" name="Millipede (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="7df1adfb" name="Miner 2049 (Big Five Software) (U)">
+		<year>1983</year>
+		<manufacturer>Big Five Software</manufacturer>
+	</hash>
+	<hash crc32="c597c087" name="Miniature Golf (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="44d3ff6f" name="Missile Command (Atari) (PAL)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2a640143" name="Montezuma's Revenge (Parker Brothers) (U)">
+		<year>1984</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="d0b2f285" name="Moon Patrol (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="0f24243c" name="Mountain King (Sunrise Software) (U)">
+		<year>1984</year>
+		<manufacturer>Sunrise Software</manufacturer>
+	</hash>
+	<hash crc32="aa55f9be" name="Mr. Do's Castle (Parker Brothers) (U)">
+		<year>1984</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="752f5efd" name="Ms. Pac-Man (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="8873ef51" name="Pacman (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="59983c40" name="Pacman Jr">
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="e8b130c4" name="PAM Diagnostics">
+		<extrainfo>A13MIRRORING?</extrainfo>
+	</hash>
+	<hash crc32="7ea86e87" name="PAM SALT v1.0 (1982) (Atari) (U).a52"/>
+	<manufacturer>Atari</manufacturer>
+	<hash crc32="e4f8ba8c" name="Pengo (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="28278cd6" name="Pete's Diagnostics (1982) (Atari) (U).a52"/>
+	<year>1982</year>
+	<manufacturer>Atari</manufacturer>
+	<hash crc32="4b910461" name="Pitfall II - The Lost Caverns (Activision) (U)">
+		<year>1984</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="b2887833" name="Pitfall! (Activision) (U)">
+		<year>1982</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="abc2d1e4" name="Pole Position (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="a18a9a40" name="Popeye (Parker Brothers) (U)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="3fe4a401" name="Q-bert (Parker Brothers) (U)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="aea6d2c2" name="QIX (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<status>0x0000-0x0fff empty</status>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="b5f3402b" name="Quest for Quintana Roo (Sunrise Software) (U)">
+		<year>1984</year>
+		<manufacturer>Sunrise Software</manufacturer>
+	</hash>
+	<hash crc32="de0fa87c" name="Realsports Baseball (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>first 8kb mirror of 2nd 8kb</status>
+	</hash>
+	<hash crc32="44166592" name="Realsports Baseball (Atari) (U) [a1]">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>first 8kb empty</status>
+	</hash>
+	<hash crc32="c90196fa" name="Realsports Basketball (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>last byte different</status>
+	</hash>
+	<hash crc32="db834f88" name="Realsports Basketball (Atari) (U) [a1]">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>last byte different</status>
+	</hash>
+	<hash crc32="4336c2cc" name="Realsports Football (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="ecbd1853" name="Realsports Soccer (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="3d75d4dc" name="Realsports Soccer (Atari) (U) [a1]">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<status>these are really different</status>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="10f33c90" name="Realsports Tennis (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="762c591b" name="Rescue on Fractulus (Atari-Lucasfilm Games) (U)">
+		<year>1984</year>
+		<manufacturer>Atari-Lucasfilm</manufacturer>
+	</hash>
+	<!-- river raid -->
+	<hash crc32="a97606ab" name="Road Runner (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="4252abd9" name="Robotron 2084 (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b68d61e8" name="Space Dungeon (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="de5c354a" name="Space Invaders (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="387365dc" name="Space Shuttle - A Journey Into Space (Activision) (U)">
+		<year>1983</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="db982c2f" name="Spitfire (Prototype) (U)">
+		<year>1984</year>
+		<status>complete different</status>
+	</hash>
+	<hash crc32="3c311303" name="Spitfire (Prototype) (U)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="73b5b6fb" name="Sport Goofy (Atari) (U) [a]">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="1d1cee27" name="Stargate (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="7d819a9f" name="Star Raiders (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="69f23548" name="Star Trek - Strategic Operations Simulator (Sega) (U)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="0675f0a5" name="Star Wars - ROTJ - Death Star Battle (Parker Bros) (U)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="75f566df" name="Star Wars - The Arcade Game (Parker Bros) (U)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+		<extrainfo>A13MIRRORING?</extrainfo>
+	</hash>
+	<hash crc32="a0642110" name="Super Breakout (Atari) (U)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="97debcd2" name="Super Cobra (Parker Bros) (U)">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="0a4ddb1e" name="Super Pacman (Prototype)"/>
+	<hash crc32="1187342f" name="Tempest Prototype"/>
+	<hash crc32="0ba22ece" name="Track 'N Field (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="caaea0a4" name="Vanguard (Atari) (U)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="d6f7ddfd" name="Wizard of Wor (CBS) (U)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="b8faaec3" name="Xari Arena">
+		<extrainfo>A13MIRRORING</extrainfo>
+	</hash>
+	<hash crc32="382634dc" name="Xevious (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3cd986c5" name="Yellow Submarine Prototype"/>
+	<!-- zaxxon PAL, NTSC -->
+	<hash crc32="da228530" name="Zenji (Atari) (U)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2959d827" name="Zone Ranger (Activision) (U)">
+		<year>1984</year>
+	</hash>
+	<!-- these are also overdumps -->
+	<hash crc32="ad95c112" name="Jum's Pong (PD)">
+		<status>bad address mask 0x3000</status>
+	</hash>
+	<hash crc32="71db5b70" name="Hello World (PD)">
+		<status>bad address mask 0x3000</status>
+	</hash>
+	<hash crc32="06a35db7" name="Player &amp; Missile Graphics Demo (PD)">
+		<status>bad address mask 0x3000</status>
+	</hash>
+	<hash crc32="74e6a611" name="Bounty Bob (4 banks at 4000-4Fff) (Big Five Software) (U)">
+		<year>1984</year>
+		<status>part 1 of 3; merge with the other 2 parts</status>
+	</hash>
+	<hash crc32="efa4915d" name="Bounty Bob (4 banks at 5000-5Fff) (Big Five Software) (U)">
+		<year>1984</year>
+		<status>part 2 of 3; merge with the other 2 parts</status>
+	</hash>
+	<hash crc32="02931055" name="Bounty Bob (A000-BFff) (Big Five Software) (U)">
+		<year>1984</year>
+		<status>part 3 of 3; merge with the other 2 parts</status>
+	</hash>
+	<hash crc32="4248d3e3" name="a5200 bios"/>
+	<hash crc32="3469d418" name="loderunner.o">
+		<year>atari lynx object</year>
+	</hash>
+	<hash crc32="58d0fcfb" name="pong5.o">
+		<year>atari lynx object</year>
+	</hash>
+	<hash crc32="a261fcbc" name="t_tris_set2.o">
+		<year>atari lynx object</year>
+	</hash>
+	<!-- overdumped -->
+	<hash crc32="71fa5a79" name="Beamrider (Activision) (PAL) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="cc740e26" name="Berzerk (Atari) (U) [o1]">
+		<year>1983</year>
+		<status>first 16kbyte empty</status>
+	</hash>
+	<hash crc32="69584e01" name="Blueprint (CBS) (PAL) [a1] [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="613b9379" name="Blueprint (CBS) (PAL) [o1]">
+		<year>1982</year>
+		<status>first 16 kbyte empty</status>
+	</hash>
+	<hash crc32="746c3b89" name="Blueprint (CBS) (U)">
+		<year>1982</year>
+		<status>TYPE32.16</status>
+	</hash>
+	<hash crc32="7a9d9f85" name="Boogie Prototype">
+		<extrainfo>TYPE16.8</extrainfo>
+	</hash>
+	<hash crc32="0851d277" name="Choplifter (Atari) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="a993c86e" name="Countermeasure (Atari) (U) [a1] [o1]">
+		<year>1983</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="1f9ed238" name="Decathlon (Activision) (U) [o1]">
+		<year>1984</year>
+		<status>bad address line 0x4000</status>
+	</hash>
+	<hash crc32="ebad58ba" name="Defender (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>bad address line</status>
+	</hash>
+	<hash crc32="d29bb9a9" name="Dig Dug (Atari) (U) [a1] [o1]">
+		<year>1983</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="7226fee6" name="Dreadnaught Factor, The (Atari) (U) [o1]">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="7936aa92" name="Frogger (Parker Brothers) (PAL) [o1]">
+		<year>1983</year>
+		<status>first 16kbyte empty</status>
+	</hash>
+	<hash crc32="0b7e77fc" name="Frogger (Parker Brothers) (PAL) [o1]">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="110d6fbc" name="Frogger 2 - Threedeep! (Parker Brothers) (PAL) [a1] [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="d4977e3b" name="Galaxian (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="a6dfa355" name="Galaxian (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>first 16kb empty</status>
+	</hash>
+	<hash crc32="97b15243" name="Gorf (CBS) (U) [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="f145a21c" name="H.E.R.O. (Activision) (PAL) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="6b9b16dc" name="Joust (Atari) (U) [a1] [o1]">
+		<year>1983</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="fdccde25" name="Jungle Hunt (Atari) (U) [a1] [o1]">
+		<year>1983</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="8591be3d" name="KABOOM! (Activision) (U) [o1]">
+		<year>1983</year>
+		<status>4 times the same</status>
+	</hash>
+	<hash crc32="db292060" name="Kangaroo (Atari) (PAL) [a1] [o1]">
+		<year>1982</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="e905ed94" name="Keystone Kapers (Activision) (U) [o1]">
+		<year>1984</year>
+		<status>first 16kbyte empty</status>
+	</hash>
+	<hash crc32="02cdfc70" name="K-razy Shootout (CBS) (U) [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="3761527f" name="Last Starfighter, The (Atari) (U) [o1]">
+		<year>1984</year>
+		<status>bad address line 0x4000</status>
+	</hash>
+	<hash crc32="b1cec23f" name="Looney Tunes Hotel (Atari) (U) [a1]">
+		<year>1983</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="74163d4b" name="Megamania (Activision) (U) [o1]">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="6287fd9b" name="Meteorites (Electra Concepts) (U)">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="960ce5e2" name="Microgammon SB (Atari) (U)">
+		<year>1983</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="fcb208a3" name="Millipede (Atari) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="f03d6b06" name="Miner 2049 (Big Five Software) (U)">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="621f8e89" name="Miniature Golf (Atari) (U)">
+		<year>1983</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="d3f15631" name="Missile Command (Atari) (PAL) [o1]">
+		<year>1983</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="bcf677fb" name="Montezuma's Revenge (Parker Brothers) (U) [a1] [o1]">
+		<year>1984</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="a8c7d41e" name="Moon Patrol (Atari) (U)">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="f6c6feaa" name="Mountain King (Sunrise Software) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="4992f047" name="Mountain King (Sunrise Software) (U) [o1]">
+		<year>1984</year>
+		<status>4 times the same</status>
+	</hash>
+	<hash crc32="457fb9b3" name="Mr. Do's Castle (Parker Brothers) (U)">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="0d367519" name="Mr. Do's Castle (Parker Brothers) (U) [a1] [o1]">
+		<year>1984</year>
+		<status>first half empty</status>
+		<extrainfo>TYPE32.8.A13MIRRORED </extrainfo>
+	</hash>
+	<hash crc32="e9e2c34b" name="Ms. Pac-Man (Atari) (U) [a1] [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="e7952627" name="Pacman (Atari) (U) [a1] [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="a3a8850a" name="PAM SALT v1.0 (1982) (Atari) (U).a52">
+		<status>1st and 2nd half identical</status>
+	</hash>
+	<hash crc32="e9f826bd" name="Pete's Diagnostics (1982) (Atari) (U).a52">
+		<status>1st and 2nd half identical</status>
+	</hash>
+	<hash crc32="72066f45" name="Pitfall! (Activision) (U) [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="14db6854" name="Pitfall II - The Lost Caverns (Activision) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="3c33f26e" name="Q-bert (Parker Brothers) (U) [o1]">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="85f750d4" name="QIX (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="9dbf341f" name="Quest for Quintana Roo (Sunrise Software) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="13c459d5" name="Realsports Soccer (Atari) (U) [a2] [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<!-- football in goodtools, after shrinking same id as realsports football -->
+	<hash crc32="7a182f89" name="Realsports Football (Atari) (U)">
+		<year>1982</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<!-- soccer in goodtools, after shrinking same id as realsports soccer -->
+	<hash crc32="295435b6" name="realsports Soccer (U) (Atari)">
+		<year>1982</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="1b38dac0" name="Road Runner (Atari) (U) [a1] [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="301a76b7" name="Robotron 2084 (Atari) (U) [a1] [o1]">
+		<year>1983</year>
+		<status>first 16kbyte empty</status>
+	</hash>
+	<hash crc32="ec80b709" name="Robotron 2084 (Atari) (U) [o1]">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="218e1be4" name="Space Invaders (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>first 16kbyte empty</status>
+	</hash>
+	<hash crc32="53c6c68a" name="Space Invaders (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="404aedac" name="Space Shuttle - A Journey Into Space (Activision) (U)">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="ede41a3f" name="Sport Goofy (Atari) (U) [a1]">
+		<year>1983</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="3229c915" name="Stargate (Atari) (U)">
+		<year>1984</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="bf574b31" name="Star Raiders (Atari) (U) [a1] [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="6f4a78f6" name="Super Breakout (Atari) (U) [a1] [o1]">
+		<year>1982</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="1d02a598" name="Super Breakout (Atari) (U) [o1]">
+		<year>1982</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="f0a99787" name="Super Cobra (Parker Bros) (U) [o1]">
+		<year>1983</year>
+		<status>first 16kbyte empty</status>
+	</hash>
+	<hash crc32="82e14ae9" name="Super Cobra (Parker Bros) (U) [o1]">
+		<year>1983</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="519a9574" name="Star Trek - Strategic Operations Simulator (Sega) (U) [o1]">
+		<year>1983</year>
+		<status>bad address line 0x2000</status>
+	</hash>
+	<hash crc32="08c8ed8a" name="Star Wars - ROTJ - Death Star Battle (Parker Bros) (U) [o1]">
+		<year>1983</year>
+		<status>bad address line 0x6000</status>
+	</hash>
+	<hash crc32="203d9cde" name="Track 'N Field (Atari) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="a4bf0093" name="Wizard of Wor (CBS) (U)">
+		<year>1982</year>
+		<status>first 16kb empty</status>
+	</hash>
+	<hash crc32="78861424" name="Xari Arena (Atari) (U)">
+		<year>1983</year>
+		<status>bad address mask 0x2000</status>
+	</hash>
+	<hash crc32="12cc298f" name="Yellow Submarine Prototype">
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="1ab5e425" name="Zenji (Atari) (U) [o1]">
+		<year>1984</year>
+		<status>bad address lines 0x6000</status>
+	</hash>
+	<hash crc32="ca1a962a" name="Zenji (Atari) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<hash crc32="02c9abc6" name="Zone Ranger (Activision) (U) [o1]">
+		<year>1984</year>
+		<status>first and second half identical</status>
+	</hash>
+	<!-- [bad dumps] -->
+	<!-- some bad dumps from the good database missing -->
+	<hash crc32="b4293435" name="8bkyte 0xff (useless)"/>
+	<hash crc32="be3cd348" name="Berzerk (Atari) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="a3f12cce" name="Buck Rogers - Planet of Zoom (Sega) (PAL) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+		<extrainfo>TYPE32.16</extrainfo>
+	</hash>
+	<hash crc32="c8035788" name="Buck Rogers - Planet of Zoom (Sega) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="28ec8516" name="Congo Bongo (Sega) (PAL) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="7bb360f5" name="Congo Bongo (Sega) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+		<extrainfo>TYPE32.16</extrainfo>
+	</hash>
+	<hash crc32="6e70b70b" name="James Bond 007 (Parker Brothers) (PAL) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="4f1374b7" name="James Bond 007 (Parker Brothers) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump (weak)</status>
+		<extrainfo>TYPE32.16.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="3ecc921e" name="Jr Pac-Man (Atari) (U) [b1]">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="4da19779" name="Jr Pac-Man (Atari) (U) [b2]">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="7f7ea877" name="Mr. Do's Castle (Parker Brothers) (U) [a1]">
+		<year>1984</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE16.8</extrainfo>
+	</hash>
+	<hash crc32="1cee2326" name="Popeye (Parker Brothers) (U) [a1]">
+		<year>1983</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.16.A13MIRRORED (first half is ok!?)</extrainfo>
+	</hash>
+	<hash crc32="2ffe9622" name="Q-bert (Parker Brothers) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="6615d5db" name="River Raid (Activision) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="c36cc9b2" name="Xari Arena (Atari) (U) [b1]">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="22163e26" name="Keystone Kapers [b1]">
+		<status>bad dump</status>
+		<extrainfo>TYPE32.8.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="02d9b87a" name="Beamrider (Activision) (U)">
+		<year>1984</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.16.A14MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="40d08988" name="Blueprint (1982) CBS) (U) [a1]">
+		<manufacturer>bad dump (weak)</manufacturer>
+		<status>TYPE32.16.A14MIRRORED</status>
+	</hash>
+	<hash crc32="1062ef6a" name="Frogger (Parker Brothers) (U)">
+		<year>1983</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE16.8</extrainfo>
+	</hash>
+	<hash crc32="1418c44a" name="Frogger 2 - Threedeep! (Parker Brothers) (U) [a1]">
+		<year>1984</year>
+		<status>bad dump(weak)</status>
+		<extrainfo>TYPE32.16.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="9af4db28" name="H.E.R.O. (Activision) (U)">
+		<year>1984</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.16.A14MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="fecb2a41" name="Kangaroo (Atari) (U) [a1]">
+		<year>1982</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.16.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="57761b66" name="Looney Tunes Hotel (Atari) (U) [o]">
+		<year>1983</year>
+		<status>bad dump (8kb of 16kbyte real data)</status>
+	</hash>
+	<hash crc32="915d6952" name="Missile Command (Atari) (U)">
+		<year>1983</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.8.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="7bb4a0ab" name="Sport Goofy (Atari) (U) [o]">
+		<year>1983</year>
+		<status>bad overdump (8kb instead of 16kb realdata)</status>
+	</hash>
+	<hash crc32="8304aefc" name="Zaxxon (Sega) (U)">
+		<year>1984</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.16.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="741746d1" name="Zaxxon (Sega) (U) (PAL)">
+		<year>1984</year>
+		<status>bad dump (weak)</status>
+		<extrainfo>TYPE32.16.A13MIRRORED</extrainfo>
+	</hash>
+	<hash crc32="b9ea8f11" name="Looney Tunes Hotel (Atari) (U)">
+		<year>1983</year>
+		<status>bad dump (8kb instead of 16kbyte data)</status>
+	</hash>
+	<hash crc32="97486a66" name="Sport Goofy (Atari) (U)">
+		<year>1983</year>
+		<status>bad dump (8kb instead of 16kbyte data)</status>
+	</hash>
+</hashfile>
+
+

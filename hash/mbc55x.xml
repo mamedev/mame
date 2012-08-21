@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="mbc55x" description="Sanyo MBC-550 and MBC-555 disk images">
+
+	<software name="msdos125">
+		<description>Dos V1.25</description>
+		<year>198?</year>
+		<publisher>Sanyo / Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="msdos125" size="163840" crc="1ea744cc" sha1="dd8b41bb67d0b888cd70ded4b61701708caa5dac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="larn">
+		<description>Larn</description>
+		<year>1986</year>
+		<publisher>Noah Morgan</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="larn.img" size="368640" crc="a57add87" sha1="696a0fb800d89d59a22381ddd399f1548fbd3646" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picasso">
+		<description>Picasso</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="picasso.img" size="368640" crc="b4dad321" sha1="3d5555f5d7d6f49bb51e334c86783611dc131e06" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211">
+		<description>Dos V2.11</description>
+		<year>198?</year>
+		<publisher>Sanyo / Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="microsoft ms-dos 2.11 (sanyo).img" size="368640" crc="b64b0c3c" sha1="35a9a1e62ccefa3c66d912b4d58c1a132cd757d2" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softse05">
+		<description>Soft Sector Disk 05</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="softse05.img" size="368640" crc="a5252da6" sha1="a840d6e2ef9aa840898cd02ec0eca217b1abef3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cashman">
+		<description>Cashman</description>
+		<year>1984</year>
+		<publisher>Michtron</publisher>
+		<info name="programmer" value="Bill Dunlevy" />
+		<info name="release" value="198401xx" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="34844">
+				<rom name="cashman.td0" size="34844" crc="baecaef3" sha1="0a17be5ea8864e6bc9074acbea39d28a2828d53d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demonsd">
+		<description>Demon Seed</description>
+		<year>1984</year>
+		<publisher>Michtron</publisher>
+		<info name="programmer" value="Phil Mackenzie &amp; Jeff Sorensen" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="29464">
+				<rom name="demonsd.td0" size="29464" crc="11d9577b" sha1="15a5927809aa5762a6289386935d1a2c24e8d239" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- contains Zork 1, 2 and 3 -->
+	<software name="zork">
+		<description>Zork Compilation</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="zork.dsk" size="368640" crc="9b7daf44" sha1="34ca63dde2b4a85bac2e6391ca4d588e06058039" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

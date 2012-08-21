@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ql_cass" description="Sinclair QL Microdrive images">
+
+	<software name="abacus">
+		<description>Abacus</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+
+		<part name="cass1" interface="ql_cass">
+			<dataarea name="cass" size="174930">
+				<rom name="abacus.mdv" size="174930" crc="332ec1d0" sha1="344245a775471a10aea485f1d083cc72d1ea1e45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archive">
+		<description>Archive</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+
+		<part name="cass1" interface="ql_cass">
+			<dataarea name="cass" size="174930">
+				<rom name="archive.mdv" size="174930" crc="7bb41d9a" sha1="3d7dcd11b9c807b0db68a7ad35a76621d4771b14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easel">
+		<description>Easel</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+
+		<part name="cass1" interface="ql_cass">
+			<dataarea name="cass" size="174930">
+				<rom name="easel.mdv" size="174930" crc="d0fb3a25" sha1="e0e34e1b7e2b98c224f9da7e79a6bf6ac106dcb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quill">
+		<description>Quill</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+
+		<part name="cass1" interface="ql_cass">
+			<dataarea name="cass" size="174930">
+				<rom name="quill.mdv" size="174930" crc="8b9a7097" sha1="0b449544a5b2391f04dddd4f18338d36ac018943" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

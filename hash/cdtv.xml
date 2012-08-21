@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="cdtv" description="Amiga CDTV CD-ROM list">
+
+	<!-- Below titles were read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
+
+	<software name="advmisys" supported="no">
+		<description>Advanced Military Systems</description>
+		<year>1991</year>
+		<publisher>Dominion</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="advanced_military_systems" sha1="4b362db61f9bb8e8b78b09303c0b41c6e7338bdd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cdremix2" supported="no">
+		<description>CD Remix Version II</description>
+		<year>1991</year>
+		<publisher>Microdeal</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdremix_ii" sha1="f6f482ce6b53b5cb0fc3df0bbb447abea7d5a8ff"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chaosand" supported="no">
+		<description>Chaos in Andromeda - Eyes of the Eagle</description>
+		<year>1992</year>
+		<publisher>On-Line</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chaos_in_andromeda" sha1="573b8b81c336e3a72460ccca226d3ec69993c90e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cubulus" supported="no">
+		<description>Cubulus &amp; Magic Serpent</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cubulus_magic_serpent" sha1="14dcce3ec0536d54d4832ff8acaf3805808b45e2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pandora" supported="no">
+		<description>Pandora's CD v1.0</description>
+		<year>1993</year>
+		<publisher>Optonica</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pandoras_cd" sha1="1962d53ddf8aefa684fc5b74920432073ceb0699"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Likely a good dump, gave the same result when reading multiple times -->
+	<software name="shiftrix" supported="no">
+		<description>Shiftrix &amp; Lettrix</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shiftrix_lettrix" sha1="696acf15b0e9c30d95195db7c99029692978827d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="townona" supported="no">
+		<description>Town With No Name</description>
+		<year>1992</year>
+		<publisher>On-Line</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="town_with_no_name" sha1="6591cde09a5a24dd3b4f22af98ee6727c1714861"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Controls are a bit odd to figure out, but these both appear to work -->
+	<software name="turrican">
+		<description>Turrican</description>
+		<year>1991</year>
+		<publisher>Rainbow Arts</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turrican" sha1="58caee214235e499d94f89f7ef6246cd548a9bd3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="turricn2">
+		<description>Turrican II</description>
+		<year>1991</year>
+		<publisher>Rainbow Arts</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turrican2" sha1="f7d371e43e5f82314330972a3ce531c4b9ae811e"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

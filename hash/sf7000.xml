@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sf7000" description="Sega Super Control Station SF-7000 disk images">
+	<software name="102examp">
+		<description>Progs for Yeno (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="102 example programs for yeno (sf-7000).sf7" size="163840" crc="993fddf9" sha1="c757b08499f9cf08090c9cb83be7ce421be8c7ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadepk">
+		<description>Complete Arcade Pack Collection</description>
+		<year>1986</year>
+		<publisher>Poseidon</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="complete arcade pack collection # sf-7000.sf7" size="163840" crc="ad19c0a0" sha1="e12dd5f93df9f536ce4e6f7c445467358c31145a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crocky">
+		<description>Crocky</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="crocky &amp; basic level iiib (sf-7000) [b1].sf7" size="163840" crc="c98e8e96" sha1="115040e3d548220ca6270054822dcff6b137b7de" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuxsoci">
+		<description>Jeux de societe (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french board games (sf-7000).sf7" size="163840" crc="a93df954" sha1="c335412db8ed6b4c9a25efcf7f21d54eaff13080" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuxeduc">
+		<description>Jeux educatifs (Fra)</description>
+		<year>1990</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french educational games (sf-7000).sf7" size="163840" crc="3afbcb9c" sha1="3cd6d69318fb9a3b8ebccf41436175137794dd29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utildao">
+		<description>Utilitaires DAO (Fra)</description>
+		<year>1991</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french electricity utils (sf-7000).sf7" size="163840" crc="634fca3e" sha1="8a293c8646e96d95dd34977cdac0c1ea78e7b0ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuxdiv1">
+		<description>Jeux divers 1 (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french games 1 (sf-7000).sf7" size="163840" crc="1d1a96ef" sha1="a855f9604ffdb14c3437b16a67f56d643c61d7bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuxdiv2">
+		<description>Jeux divers 2 (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french games 2 (sf-7000).sf7" size="163840" crc="06fc874e" sha1="c4341db107c02c314466661ae39be8b2a9ff8a57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphism">
+		<description>Graphisme (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french graphic example programs (sf-7000).sf7" size="163840" crc="52d68a52" sha1="588b1e0f4b20214841dc5dcf060ab35539eb7687" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musique">
+		<description>Musique (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="french musique (sf-7000).sf7" size="163840" crc="a8c5b0b3" sha1="7b7379131af99677ce4727fab249cd3eac3c4764" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldpack">
+		<description>Gold Pack</description>
+		<year>19??</year>
+		<publisher>Scorpion</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="froggy [+cube it].sf7" size="163840" crc="67d2f298" sha1="55625ec47e9be66ff632361823c233d7cae0c839" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="gold miner-cyco bikes.sf7" size="163840" crc="cba16c6e" sha1="a41cabd0bdc9d63e5940e310f5f3919c911fb48d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gragames">
+		<description>Grandstand Games</description>
+		<year>19??</year>
+		<publisher>Grandstand</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="grandstand tape compilation - educational &amp; business programs (19xx)(-)[p].sf7" size="163840" crc="615d8d76" sha1="34531b2af48641887bc3df27fd481c1600b97872" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grtcgame">
+		<description>Grandstand Tape Compilation: Games</description>
+		<year>19??</year>
+		<publisher>Grandstand</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="grandstand tape compilation - games (19xx)(-)[p].sf7" size="163840" crc="a200b487" sha1="1bd76012d273df2ecf4a0c9c49514b7d91646004" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamikaze">
+		<description>Kamikaze (Fra)</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="kamikaze # sf-7000.sf7" size="163840" crc="7654e077" sha1="8995356ea9dcca2fbbbf33dc730e391b29b138a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monitor">
+		<description>Monitor + LM games and tools (Fra)</description>
+		<year>1991</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="loriciel's z-80 utilities disk (sf-7000).sf7" size="163840" crc="326b7348" sha1="2c1e2568a9c15801cf467971098a16899771bb12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olympiad">
+		<description>Olympiades</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="olympiades (sf-7000).sf7" size="163840" crc="95d917dd" sha1="41f24aa32ee30263221176da281562c6d83fb51e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poseidon">
+		<description>Poseidon Wars, Space Panic, Rambo</description>
+		<year>1991</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="poseidon wars - space panic - rambo # sf-7000.sf7" size="163840" crc="5ca7b5c4" sha1="909d6335034cf9e241d7fc4c8074a280b5c4112f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="segabase">
+		<description>Sega Base v1.0</description>
+		<year>1984</year>
+		<publisher>Hudson</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="sega base v1.0 (1984)(hudson).sf7" size="163840" crc="8c0d8d02" sha1="13b894cfa295e30df961a25ace3d9062d63adc36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>Sega Disk BASIC v1.0p</description>
+		<year>1984</year>
+		<publisher>Mitec</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="sega disk basic v1.0p (sf-7000).sf7" size="163840" crc="50a2a040" sha1="1e3c0651757d304ba1184e43f1cb1ce1ca3be22e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicf" cloneof="basic">
+		<description>Sega Disk BASIC v1.0p (Fra)</description>
+		<year>1984</year>
+		<publisher>Yeno</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="sega disk basic v1.0p with yeno demo (sf-7000).sf7" size="163840" crc="ffdbcd97" sha1="c7c55da3c2f0fa90895f8b2802bad2606ff16578" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logo">
+		<description>Sega LOGO v1.0e</description>
+		<year>1984</year>
+		<publisher>Sega</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="sega logo v1.0e (sf-7000) [!].sf7" size="163840" crc="a7b1da17" sha1="1a54fbf5bd1442a96e7806249a6812ea2006e092" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic11" cloneof="basic">
+		<description>Sega Disk BASIC v1.1p</description>
+		<year>1984</year>
+		<publisher>Mitec</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="sega sc-3000 disk basic v1.1p (1984)(mitec).sf7" size="163840" crc="7f51ef65" sha1="037c3d09b3d9e898a79514c3885bf6e42d28dd4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprjeux">
+		<description>Super jeux Yeno (Fra)</description>
+		<year>19??</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="super jeux yeno examples (sf-7000).sf7" size="163840" crc="85307975" sha1="36cc8301384537a700ec4ae85d2a24d0c5d1bd11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yenodraw">
+		<description>Yeno Draw (Fra)</description>
+		<year>1991</year>
+		<publisher>Marc Le Douarain</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="yeno draw (side 1) (sf-7000).sf7" size="163840" crc="e2956dd0" sha1="327b9ac2a35714dc9f920e2fef4f1a24a2259f7d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="yeno draw (side 2) (sf-7000).sf7" size="163840" crc="be53243a" sha1="9f693e4cdb9eb89c167e7291bcfd9c1bb2ffc5ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucal">
+		<description>HuCAL</description>
+		<year>1984</year>
+		<publisher>Sega</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="163840">
+				<rom name="hucal_sc-3000.sf7" size="163840" crc="5aeee6ee" sha1="93e7e8e3b752400e212f83ee0a3dee99b91599ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

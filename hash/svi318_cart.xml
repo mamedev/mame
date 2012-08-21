@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
+
+These Cartridges is not dumped:
+Just Write JR. SD294C
+Amoured Assault SD233C // Was availible on Cartridge and/or Tape
+
+
+-->
+
+<softwarelist name="svi318_cart" description="Spectravision SVI-318 Cartridge">
+
+	<software name="flipper">
+		<description>Flipper Slipper</description>
+		<!--ID-No: SD291C-->
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="flipper slipper.rom" size="32768" crc="f0c51214" sha1="7acd00c9053fbf7f7d698485759d170a483b123d" offset="0x0000" />
+			</dataarea>
+		</part>
+
+	</software>
+
+	<software name="ffreddy">
+		<description>Frantic Freddy</description>
+		<!--ID-No: SD232C-->
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="frantic freddy.rom" size="32768" crc="cb553ee5" sha1="60adadb294d5492dfe6ada4b0710c5c31ef3e69c" offset="0x0000" />
+			</dataarea>
+		</part>
+
+	</software>
+
+	<!-- According to the SVI Official Catalog this was released as a tape only, But a cart dump does exist
+	<software name="mentor">
+		<description>Music Mentor</description>
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="music mentor.rom" size="32768" crc="ba0c3d3c" sha1="0ebb91dcc99c0c361d8855387079bc62a41d05d8" offset="0x0000" />
+			</dataarea>
+		</part>
+
+	</software>
+	-->
+
+	<software name="sectora">
+		<description>Sector Aplha</description>
+		<!--ID-No: SD220C-->
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sector alpha.rom" size="32768" crc="015f29ff" sha1="c48266a71e940b903d446561f629b58f3fc9cc8c" offset="0x0000" />
+			</dataarea>
+		</part>
+
+	</software>
+
+	<software name="scrsfrce">
+		<description>Super Cross Force</description>
+		<!--ID-No: SD237C-->
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="supercross.rom" size="32768" crc="8d9d1db3" sha1="73f750d454b32d7bf6bb1c966135a022ce1de92a" offset="0x0000" />
+			</dataarea>
+		</part>
+
+	</software>
+
+</softwarelist>

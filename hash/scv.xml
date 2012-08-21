@@ -1,0 +1,431 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+The Epoch Super Cassette Vision was also released in Europe under the Yeno
+brand. About half of the games released in Japan were also released in Europe.
+
+Information found at http://www.rhod.fr/yeno_epoch.html
+
+    Japan
+    01 Astro Wars
+    02 Battle in Galaxy
+    03 Super Golf
+    04 Super Mahjong
+    05 Super Baseball
+    06 Punch Boy
+    07 Elevator Fight
+    08 Lupin III
+    09 Nebula
+    10 Wheelie Racer
+    11 Boulder Dash
+    12 Miner 2049er
+    13 Super Soccer
+    14 Comic Circus
+    15 Milky Princess
+    16 Pop & Chips
+    17 Kung Fu Road
+    18 Star Speeder
+    19 Ton Ton Ball
+    20 Super Professor
+    21 Japanese Chess
+    22 Doraemon
+    23 Basic
+    24 Dragon Slayer
+    25 Professional Wrestling
+    26 Wai Wai Monster Land
+    27 Dragon Ball
+    28 Mappy
+    29 Sky Kid
+    30 Pole Position II
+
+    Europe
+    01 Astro Wars
+    02 Battle in Galaxy
+    03 Super Golf
+    04 Punchy Boy
+    05 Elevator Fight
+    06 Lupin III
+    07 Nebula
+    08 Wheelie Racer
+    09 Miner 2049er
+    10 Boulder Dash
+    11 Super Soccer
+    12 Comic Circus
+    13 Pop & Chips
+    14 Kung Fu Road
+    15 Star Speeder
+    16 Ton Ton Ball
+-->
+
+<softwarelist name="scv" description="Epoch Super Cassette Vision cartridges">
+	<software name="astrwrs">
+		<description>Astro Wars - Invader from Space</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astrwrs.bin" size="8192" crc="2dbdb166" sha1="53a9a308b6f0bcb2137704f70657698719551b5e" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrwrs2">
+		<description>Astro Wars II - Battle in Galaxy</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astrwrs2.bin" size="8192" crc="34781de1" sha1="b419f2fccf3b2fbd360da2833064d2ea8bd6500b" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>BASIC Nyuumon</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="basic.bin" size="32768" crc="ca965c2b" sha1="c68e2b81dec2c83e2aa5626c8df4011eada45245" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- name taken from boxart -->
+	<software name="baseball">
+		<description>Super Baseball</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="baseball.bin" size="16384" crc="56f1c473" sha1="37a1dce6c1921950c588d6492cd1b57feb615175" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash">
+		<description>Boulder Dash</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="boulder_dash.bin" size="16384" crc="e045884c" sha1="55942e5b7824314b072b7b40c6b72db0d5404189" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comicirc">
+		<description>Comic Circus</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="comic_circus.bin" size="16384" crc="ea55faed" sha1="2e4ceb2bf68d26c263c3d1c63f7e2143ef2355bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraemon">
+		<description>Doraemon</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="doraemon.0" size="32768" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a" offset="0" />
+				<rom name="doraemon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="0x8000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="dball">
+        <description>Dragon Ball - Dragon Dai Hikyou</description>
+        <year>1986</year>
+        <publisher>Epoch</publisher>
+        <part name="cart" interface="scv_cart">
+            <dataarea name="rom" size="131072">
+                <rom name="dragonba.bin" size="131072" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+	<software name="dslayer">
+		<description>Dragon Slayer</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dragonsl.bin" size="32768" crc="5971940f" sha1="c6e67e05d365fa81d3d9a3ad66d41bfeb1c3dd0d" offset="0" />
+			</dataarea>
+			<!-- 8KB? RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="elevfght">
+		<description>Elevator Fight</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="elevfght.bin" size="16384" crc="72dd6031" sha1="8b2c185408309ee1e75d40299c003041db17b133" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- unknown whether the rom differs between Japan and Euro versions and which this is if so -->
+	<software name="kungfurd">
+		<description>Nekketsu Kung Fu Road / Kung Fu Road</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+            <dataarea name="rom" size="65536">
+                <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
+				<rom size="24576" offset="0x8000" loadflag="reload" />
+                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0xe000" />
+            </dataarea>
+		</part>
+	</software>
+
+	<software name="lupin3">
+		<description>Lupin III</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="lupin3.bin" size="16384" crc="16d7eb4a" sha1="62698c7c9d9723f74214626a4211a3c3f34e9dd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mappy">
+		<description>Mappy</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mappy.bin" size="32768" crc="605829bb" sha1="70dc025ab3f32e18fd6f373dc47c9aa7fb9d48f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="milkyprn">
+		<description>Milky Princess</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mlkprncs.bin" size="32768" crc="b2457990" sha1="b6234f99e474abd87a22a4b691b66bcb12e664cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mine2049">
+		<description>Miner 2049er</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="miner_2049er.bin" size="16384" crc="b0ffc6e2" sha1="0414878f4aedade180b273257497c1d11cdccb2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="y2mnstld">
+	<!-- Alt. Title: Wai Wai Monster Land -->
+		<description>Y² Monster Land</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="y2mnstld.bin" size="131072" crc="3ac28fe0" sha1="5ae7796ad35a7c537de11ebd3cfe3868d67235a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nebula">
+		<description>Nebula</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="nebula.bin" size="16384" crc="5e6a4caf" sha1="699eaf434e73a42e71adf52426b22f0dd85e2897" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nebulaa" cloneof="nebula">
+		<description>Nebula (alt)</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="nebulaa.bin" size="16384" crc="efb4bdcd" sha1="94a4b9a92d6f9a5f4a68721be4cc35920ca32628" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polepos2">
+		<description>Pole Position II</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="polepos2.bin" size="131072" crc="cb69903d" sha1="472900d7b7fa6cdf30014731dcc925ef5ca65499" offset="0" />
+			</dataarea>
+			<!-- 4KB RAM on cartridge -->
+			<dataarea name="ram" size="4096" />
+		</part>
+	</software>
+
+	<software name="popchips">
+		<description>Pop &amp; Chips</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="popchips.bin" size="32768" crc="cc4fb04d" sha1="5979abd6051d531eafe1ea3b37c97ce2e3e97f8e" offset="0" />
+			</dataarea>
+			<!-- 8KB RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="prowrest">
+		<description>Professional Wrestling</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="prowrest.bin" size="131072" crc="5b1fb2a8" sha1="55fe356c04ce3db83cb3148d867cc8b8060cbb48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="punchboy">
+		<description>Punch Boy</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="punchboy.bin" size="16384" crc="4107f03a" sha1="e7391c71ba7deede3db22191ea058ccf429d7bb5" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rgmahjon">
+		<description>Real Graphic Mahjongg</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="real_graphic_mahjong.bin" size="16384" crc="d3d9106c" sha1="7190ff2944c1ffbde6866e720417b86b3844ffa2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skykid">
+		<description>Sky Kid</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="skykid.bin" size="65536" crc="f49f2085" sha1="7342fe10d38c79ed12fbfa94b5fd4bf1266c2571" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspdr">
+		<description>Star Speeder</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0" />
+				<rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="0x8000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shogi">
+		<description>Shougi Nyuumon</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="shoginyu.bin" size="32768" crc="84005c4c" sha1="bd6681013dbbae94c03e501932836db07943468e" offset="0" />
+			</dataarea>
+			<!-- 8KB RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="sansupyu">
+		<description>Super Sansuu Puter</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sansupyuta.bin" size="32768" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- jpn cart, name taken from boxart -->
+	<software name="soccer">
+		<description>Super Soccer</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="soccer.bin" size="16384" crc="8283907c" sha1="61e4b8e43cc593b3a2e838c08f6dad6cca77d712" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- maybe pal, name taken from boxart -->
+	<software name="soccera" cloneof="soccer">
+		<description>Super Soccer (alt)</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="soccera.bin" size="16384" crc="590eeefd" sha1="951ecd2a1d2e7d900c13e91ff028723a9df9e60e" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- name taken from boxart -->
+	<software name="suprgolf">
+		<description>Super Golf</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="suprgolf.bin" size="16384" crc="0c0581c9" sha1="2d3ab09907a4a9c5d66306f316c7211f498cbcc2" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttball">
+		<description>Ton Ton Ball</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ttball.bin" size="16384" crc="7f873bfa" sha1="093235ac2234c4c4e78a2addaab780d7a2cbe004" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheelrcr">
+		<description>Wheelie Racer</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="wheelrcr.bin" size="16384" crc="9d9b29db" sha1="479f767384e7b7bfe58eeadd67dbe642fe8a2fcf" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

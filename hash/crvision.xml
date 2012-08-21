@@ -1,0 +1,531 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Many thanks to Luca Antignano for the help with this software list -->
+<!--
+A couple of comments about the 6k/8k images:
+- game code occupies 6k, but there can be different chips inside the actual carts:
+  1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
+  actually accesses only the first 2k and the final 4k.
+There have been found carts where the remaining part is empty, and carts where the lower
+2k are repeated (see the Alt dumps below), but the dumps are basically the same and
+a Creativision would not see the difference between them.
+
+-->
+
+<!--
+Notes from MADrigal:
+1. In real carts, roms sometimes are EPROMs with a sticker, but the same data could
+well be found on EPROMs with no stickers or with a different sticker (due to different
+manufacturers producing the carts). same argument applies to the EPROM specific types
+(by Toshiba, Hitachi or General Instruments) and production date. As a result these
+info are mostly confusing when not misleading and it's probably safer not to list them
+based on a specific model
+2. Concerning the usage of "Alt ROM config" in some games below: there exist at least
+4 different PCB types for Creativision carts and *each* of them can have 1, 2 or 3 ROM
+chips. The choice of PCB for each game and the presence of ROMs split into different sizes
+follows no pattern and was probably based only on the chip availability at manufacturing
+time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
+-->
+
+<!-- Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones). -->
+<softwarelist name="crvision" description="V-Tech Creativision cartridges">
+
+	<software name="airsea">
+		<description>Air/Sea Attack</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8008" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="airsea.bin" size="4096" crc="81a9257d" sha1="1fbc52f335c0d8bb96578a6ba764f5631c41fd36" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astropin">
+		<description>Astro Pinball</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8014" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astropin.bin" size="8192" crc="d03c0603" sha1="e7cb096d4d16fd8193f7e39c2f73bdf0930c9654" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astropina" cloneof="astropin">
+		<description>Astro Pinball (Alt ROM config)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8014" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astropina_01.bin" size="4096" crc="93794d02" sha1="922152e70d614180d7e5614d61c5ced913ecfcd3" offset="0x0000" />
+				<rom name="astropina_02.bin" size="4096" crc="aacba2e2" sha1="cf2fffe9ca93e1935efba5d264471b1a0b792971" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- astrop1 differs from astropin only in the 1st byte.
+        This image came from FunnyMu < 0.43, and it might be
+        a bad dump (astropin has been confirmed good) -->
+	<software name="astropinb" cloneof="astropin">
+		<description>Astro Pinball (Bad?)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8014" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astropinb.bin" size="8192" crc="cf7bdfc2" sha1="38bcc856d604567dc6453205a8f858bdf2000330" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autochas">
+		<description>Auto Chase</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8006" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="autochas.bin" size="8192" crc="bd091ee0" sha1="369dc9aa55dd2c09376be840f8ebeca450db8b9c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autochasa" cloneof="autochas">
+		<description>Auto Chase (Alt ROM config)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8006" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="autochas_01.bin" size="4096" crc="fad237b9" sha1="7762d1b5e12bdc5f32157e6ea820da3566b2c3cd" offset="0x0000" />
+				<rom name="autochas_02.bin" size="4096" crc="bebde090" sha1="b8af1085bdb47bcc8cf9e667313ab3bcf4cc99ea" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Reminder: Basic got found both in PCB with 2 chips (4k+8k) and in PCB with 3 chips (4k+4k+4k)... split accordingly! -->
+	<software name="basico2">
+		<description>Creativision Basic (1982, Release 2)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8011" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="basic82a_01.bin" size="4096" crc="9b2aeef8" sha1="73950bf03abc8f6646a8d283e12760de453eddf2" offset="0x0000" />
+				<rom name="basic82a_02.bin" size="4096" crc="d713b2d1" sha1="e1af1debb8a05f38aaf14dc79cacbc713f02e6fd" offset="0x1000" />
+				<rom name="basic82a_03.bin" size="4096" crc="37cbda91" sha1="3dfcad03f9a87496196dfe08eff4192b845abf6b" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basico3">
+		<description>Creativision Basic (1982, Release 1)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8011" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="basic82b_01.bin" size="4096" crc="5ee092d0" sha1="c02b0a7e81a2f43a704376381c167b7c6632119c" offset="0x0000" />
+				<rom name="basic82b_02.bin" size="4096" crc="19a12d7e" sha1="181c27465e7e2da58e7432eaa0ae03e186b6c365" offset="0x1000" />
+				<rom name="basic82b_03.bin" size="4096" crc="bbffb7e2" sha1="7d63b24eacabf6b156c07fa48e77531010747134" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basico1">
+		<description>Creativision Basic (1983, Release 1)</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8011" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="basic83_01.bin" size="8192" crc="3ce2a7ca" sha1="f2171867767d0b658eea0b072aa1891869073bb9" offset="0x0000" />
+				<rom name="basic83_02.bin" size="4096" crc="40f388b9" sha1="989a54e92768baae81cd179808adf1f9943212ee" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>Basic V.1 (1983, Release 2)</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8011" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="basicram_01.bin" size="4096" crc="5ee092d0" sha1="c02b0a7e81a2f43a704376381c167b7c6632119c" offset="0x0000" />
+				<rom name="basicram_02.bin" size="4096" crc="76e661db" sha1="ad0aff12c7bee9dd4f256942614b7e99586698f5" offset="0x1000" />
+				<rom name="basicram_03.bin" size="4096" crc="2a5f9ce8" sha1="deedfaa7f0df92beffeab2c84fc503e6b7b9a262" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopper">
+		<description>Chopper Rescue</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8021" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="18432">
+				<rom name="chopper_01.bin" size="8192" crc="23a6bb47" sha1="748e4c98ed419999063edfe98f26f9e86c877962" offset="0x0000" />
+				<rom name="chopper_02.bin" size="8192" crc="3980d7ed" sha1="abac0f2a0b73ab5c45e1a617f7c862408086eb66" offset="0x2000" />
+				<rom name="chopper_03.bin" size="2048" crc="0c7b3025" sha1="80aedbcf03153a814a95616e8353ed6e64fd3cbb" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazych">
+		<description>Crazy Chicky</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8001" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="crazych.bin" size="4096" crc="b1b5bfe5" sha1="c0eed370267644d142a42de6201f7ac6d275104d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazypuc">
+		<description>Crazy Pucker ~ Crazy Moonie ~ Crazy Chewy</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8001" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="crazypuc.bin" size="4096" crc="c673be37" sha1="0762ba98e9a08b7e6063e2a54734becd83df6eb3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepsea">
+		<description>Deep Sea Adventure (6k Cart)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8013" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="6144">
+				<rom name="deeps6k_01.bin" size="4096" crc="5112b792" sha1="af917b6ab438b87cde5325d27ccf94c4544c4c9e" offset="0x0000" />
+				<rom name="deeps6k_02.bin" size="2048" crc="2410042a" sha1="e3813c79b8e504f10d6bfc8a6d39ea284fbc26b6" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepseaa" cloneof="deepsea">
+		<description>Deep Sea Adventure (8k Cart)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8013" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="deeps8k.bin" size="8192" crc="2e0ddd86" sha1="d25f82aab473d4c7850ab626ae92d1eac69dbb32" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locomot">
+		<description>Locomotive (10k cart)</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8020" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="10240">
+				<rom name="locom10k_01.bin" size="8192" crc="5d2e1c6e" sha1="f327434889ac91397c61cdacb88d21cd0df256ce" offset="0x0000" />
+				<rom name="locom10k_02.bin" size="2048" crc="a4e5c224" sha1="ffa0fcb1fa524ee51e63017412007881a50b8971" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locomota" cloneof="locomot">
+		<description>Locomotive (12k cart)</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8020" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="locom12k_01.bin" size="8192" crc="5d2e1c6e" sha1="f327434889ac91397c61cdacb88d21cd0df256ce" offset="0x0000" />
+				<rom name="locom12k_02.bin" size="4096" crc="62c6b8e0" sha1="2ebf87eaf6a60bc0d79020a20360916a2c1f0f80" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousepuz">
+		<description>Mouse Puzzle</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8015" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mousepuz.bin" size="8192" crc="e954c46b" sha1="c3aa8077756a6101009645711687edd59bf90a98" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousepuza" cloneof="mousepuz">
+		<description>Mouse Puzzle (Alt ROM config)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8015" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mousepuza_01.bin" size="4096" crc="42fa1f8b" sha1="d8da4361cd2c3eb87abb41c4a05ee5136ac1b8b0" offset="0x0000" />
+				<rom name="mousepuza_02.bin" size="4096" crc="09f79bd9" sha1="8325d9b017eab11e24c637599961736b6c25e24e" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicmak">
+		<description>Music Maker</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8016" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="musicmak_01.bin" size="8192" crc="47ac1882" sha1="bdf343bff5436a4b91ffad20971c3b1c05711307" offset="0x0000" />
+				<rom name="musicmak_02.bin" size="4096" crc="e8caa6d2" sha1="9d3d95e18416fbe0ab30b7d5e3e2518b6a520323" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetd">
+		<description>Planet Defender (6k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8005" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="6144">
+				<rom name="planetd_01.bin" size="4096" crc="71cffcdd" sha1="cd72a22d44c9a4be2346847b8ef6e32d929533ae" offset="0x0000" />
+				<rom name="planetd_02.bin" size="2048" crc="734528a9" sha1="39772785538bb7ee061c9bcaa14768328d45674d" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetd1" cloneof="planetd">
+		<description>Planet Defender (8k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8005" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="planet8k.bin" size="8192" crc="4457c7b3" sha1="0be7935db55ecf3e70b96e071ecbc489bd22dc73" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetd2" cloneof="planetd">
+		<description>Planet Defender (8k Cart, Bad?)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="planetd2.bin" size="8192" crc="4b463c18" sha1="1fd80a3921f2487d9eee2b6d8bb3955d22857d0e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="policej">
+		<description>Police Jump</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8009" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="policej.bin" size="8192" crc="db3d50b2" sha1="0fe6d15c973c73b53c33945e213bc2671ff5d7df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="policeja" cloneof="policej">
+		<description>Police Jump (Alt ROM config)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8009" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="policej_01.bin" size="4096" crc="c6c4e3f4" sha1="8d4f056f77d79b0a9a76d14772f76a0b81b526c6" offset="0x0000" />
+				<rom name="policej_02.bin" size="4096" crc="bd48d4dc" sha1="20e11659285172e6579d57d6a1a769818762c856" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccer">
+		<description>Soccer</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8017" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="soccer_01.bin" size="8192" crc="9247087c" sha1="3fe1364024895f8f0e83235a429f884a8831553e" offset="0x0000" />
+				<rom name="soccer_02.bin" size="4096" crc="de284150" sha1="a07befd3a2b1689b2d493ab84928d3aa109f88e6" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicinv">
+		<description>Sonic Invader</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8003" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="sonicinv.bin" size="4096" crc="767a1f38" sha1="d77f49bfa951ce0ba505ad4f05f3d0adb697811f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stoneage">
+		<description>Stone Age</description>
+		<year>1984</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="stoneage.bin" size="8192" crc="74365e94" sha1="dafe57b0ea5da7431bd5b0393bae7cf256c9a562" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankatk">
+		<description>Tank Attack (6k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8002" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="6144">
+				<rom name="tankatk_01.bin" size="4096" crc="3bd183ff" sha1="c5b7c59ea282238550acd5055fb197aa83163eea" offset="0x0000" />
+				<rom name="tankatk_02.bin" size="2048" crc="114a3a00" sha1="54a7ae46ab79109cbda7401204e3cec13a0b6152" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankatka" cloneof="tankatk">
+		<description>Tank Attack (8k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8002" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tankat8k.bin" size="8192" crc="2621ffca" sha1="f3c69a848f1246faf6f9558c0badddd3db626e5f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>Tennis (Wimbledon, 6k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8004" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="6144">
+				<rom name="tens6k_01.bin" size="4096" crc="42d5be57" sha1="e8ddc68c418f43dacc9170c335bd66bd7802821c" offset="0x0000" />
+				<rom name="tens6k_02.bin" size="2048" crc="9fac0db1" sha1="ecfb92eb58f916d5b5520bb351c71fc78837a165" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
+	<software name="tennisa" cloneof="tennis">
+		<description>Tennis (Wimbledon, 8k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8004" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tens8k.bin" size="8192" crc="8bed8745" sha1="690a4dcb412e517b172ec5b44c86863ef63b1246" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennisb" cloneof="tennis">
+		<description>Tennis (Wimbledon, 8k Cart, Alt ROM config)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8004" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tens8k_01.bin" size="4096" crc="bfa874cd" sha1="91d1f66ac850728b65045c61b403fb52557336be" offset="0x0000" />
+				<rom name="tens8k_02.bin" size="4096" crc="42d5be57" sha1="e8ddc68c418f43dacc9170c335bd66bd7802821c" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenniscs" cloneof="tennis">
+		<description>Tennis (Coca Cola / Sprite, 8k cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="8004" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tenscs8k.bin" size="8192" crc="098d1cbb" sha1="7ea0c5aa6072e2c9eab711f278fd939986a92602" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennisd" cloneof="tennis">
+		<description>Tennis (Dick Smith, 6k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="Y-1620" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="6144">
+				<rom name="tensds6k_01.bin" size="4096" crc="97ab341a" sha1="7cf7ea8a2f70bdbd165a9a523fe50f15b36c9a0e" offset="0x0000" />
+				<rom name="tensds6k_02.bin" size="2048" crc="d669020b" sha1="523bf43e6c237d04e9649bf7beb1da278a346752" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
+	<software name="tennisda" cloneof="tennis">
+		<description>Tennis (Dick Smith, 8k Cart)</description>
+		<year>1981</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="Y-1620" />
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tensds8k.bin" size="8192" crc="c914c092" sha1="7b64efddb590332c192f6c4a6accce85a6d402c3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
+        on the real machine. It was dumped and released to the public in ~2002,
+        when FunnyMu emulator (written by Paul Hayter) was released -->
+	<software name="hapmon">
+		<description>Hapmon</description>
+		<year>198?</year>
+		<publisher>Richard Hayter</publisher>
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="hapmon.bin" size="4096" crc="15d07b96" sha1="89359dca952bc90644dfd7f546c184a8165faa14" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These contain the same data as chopper, but in a different order (which is not handled properly by emulators). I'm listing these here to document checksums.
+	<software name="chopper2" cloneof="chopper">
+		<description>Chopper Rescue (Alt 2)</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="18432">
+				<rom name="chopper rescue (alt).rom" size="18432" crc="48e7e8b8" sha1="037088f15830fdd43081edddc5d683318d67ee01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopper1" cloneof="chopper">
+		<description>Chopper Rescue (Alt)</description>
+		<year>1983</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<part name="cart" interface="crvision_cart">
+			<dataarea name="rom" size="18432">
+				<rom name="chopper rescue.rom" size="18432" crc="14179570" sha1="fde339c8dbd44b3332e888cd24d3d492cf066b94" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+</softwarelist>

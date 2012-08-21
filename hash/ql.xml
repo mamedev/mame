@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ql" description="Sinclair QL ROMs">
+	<software name="tk2_210">
+		<description>Toolkit II v2.10</description>
+		<year>1985</year>
+		<publisher>Tony Tebby</publisher>
+
+		<part name="cart" interface="ql_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="tk2_210.bin" size="0x4000" crc="b53efc95" sha1="8f033523141050e1ab8dc93d0e70f897037e6ef5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tk2_212">
+		<description>Toolkit II v2.12</description>
+		<year>2005</year>
+		<publisher>Tony Tebby</publisher>
+
+		<part name="cart" interface="ql_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="tk2_212.bin" size="0x4000" crc="076a331c" sha1="da87b88fbe56dc1e27be46a6719a88bdec7d914e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tk2_213">
+		<description>Toolkit II v2.13</description>
+		<year>2009</year>
+		<publisher>Tony Tebby</publisher>
+
+		<part name="cart" interface="ql_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="tk2_213.bin" size="0x4000" crc="70f522e0" sha1="7c9b67db8ce5cc32090fc59c553982f2eed4d967" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

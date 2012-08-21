@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pb2000c" description="Casio PB-2000C Memory card">
+	<software name="prolog">
+		<description>PROLOG interpreter (OM-51P)</description>
+		<year>1989</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pb2000c_card">
+			<dataarea name="rom" size="0x20000">
+				<rom name="prolog.bin" size="0x10000" crc="c64243bc" sha1="8f3fc028a81d844127a95a4839739a0e10340ca9" offset="0x00000" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="basic">
+		<description>BASIC interpreter (OM-53B)</description>
+		<year>1989</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pb2000c_card">
+			<dataarea name="rom" size="0x20000">
+				<rom name="basic.bin" size="0x10000" crc="dd9cc2bd" sha1="b89741d208ee43d0b177ce1ffaf11395bbaa8e24" offset="0x00000" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+  Only 10 cartridge titles were released to be used with the ZX Spectrum "Interface 2" peripheral.
+
+  7 unreleased prototypes are included in this collection.
+
+-->
+<softwarelist name="spectrum" description="Sinclair ZX Spectrum cartridges">
+
+	<software name="backgamm">
+		<description>Backgammon</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<info name="developer" value="Psion Software" />
+		<info name="serial" value="G22/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="backgammon.rom" size="16384" crc="40e78b48" sha1="e6ede60bb5e08d7ead8343f8078834d2afb49c30" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<info name="developer" value="Psion Software" />
+		<info name="serial" value="G10/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chess.rom" size="16384" crc="08c6a8c6" sha1="bba6d31ff54d3009cc61ae767973aab492bb104c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cookie">
+		<description>Cookie</description>
+		<year>1983</year>
+		<publisher>Ultimate Play the Game ~ Sinclair Research</publisher>
+		<info name="serial" value="G30/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="cookie.rom" size="16384" crc="7108e9a8" sha1="fa5753133daa2a6b122948adf604c12ab70e2ce9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horacesp">
+		<description>Horace &amp; the Spiders</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<info name="developer" value="Psion Software" />
+		<info name="serial" value="G24/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="horace and the spider.rom" size="16384" crc="8ce28ffe" sha1="805fcdf83c74937adffab97027310d8c8e431c5a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horace">
+		<description>Hungry Horace</description>
+		<year>1982</year>
+		<publisher>Sinclair Research</publisher>
+		<info name="developer" value="Psion Software" />
+		<info name="serial" value="G13/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="hungry horace.rom" size="16384" crc="bef35699" sha1="00129d9a5094a91a6e7392245be5121d5d17adf0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetpac">
+		<description>Jet Pac</description>
+		<year>1983</year>
+		<publisher>Ultimate Play the Game ~ Sinclair Research</publisher>
+		<info name="serial" value="G27/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="jetpac.rom" size="16384" crc="1d194e5b" sha1="0f0ddb79bb6b052846e0419df231df44184fbca6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planet">
+		<description>Planetoids</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<info name="developer" value="Psion Software" />
+		<info name="serial" value="G12/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="planetoids.rom" size="16384" crc="06e43fa2" sha1="da3041aa2f14abda0d2966e44fd2fd144bb3aa72" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pssst">
+		<description>Pssst</description>
+		<year>1983</year>
+		<publisher>Ultimate Play the Game ~ Sinclair Research</publisher>
+		<info name="serial" value="G28/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pssst.rom" size="16384" crc="464cd4f6" sha1="cebafa93c110eabb4b343e7a34175d77d0fd0797" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacerai">
+		<description>Space Raiders</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<info name="developer" value="Psion Software" />
+		<info name="serial" value="G9/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="space raiders.rom" size="16384" crc="a570bd3d" sha1="f8359abdf50360261099460e48d440738109af1d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tranzam">
+		<description>Tranz Am</description>
+		<year>1983</year>
+		<publisher>Ultimate Play the Game ~ Sinclair Research</publisher>
+		<info name="serial" value="G29/R" />
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tranzam.rom" size="16384" crc="03da9be7" sha1="caf4441730a7032375d82edf385d5ac7f65c1dcd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Prototypes -->
+
+	<software name="gyruss">
+		<description>Gyruss (Prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="gyruss.rom" size="16384" crc="0dd3bceb" sha1="9745d1ee713b2c6d319752aee523105905cbf562" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="locomotn">
+		<description>Loco Motion (Prototype)</description>
+		<year>1984</year>
+		<publisher>Amazon Systems</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="loco motion.rom" size="16384" crc="33b8ae50" sha1="230294b652250b975a84b8618a68a8e60729cc2b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="montezum">
+		<description>Montezuma's Revenge (Prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="montezuma's revenge.rom" size="16384" crc="ff8d7dc3" sha1="b700e37f7e24adea6ba12cf0e935307bd006b9c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="montezum1" cloneof="montezum">
+		<description>Montezuma's Revenge (Prototype, Alt)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="montezuma's revenge (prot).rom" size="16384" crc="5d73082e" sha1="e8f1b6e6b8c8eb6de6a0c6d271351ca7056a39af" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeye">
+		<description>Popeye (Prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="popeye.rom" size="16384" crc="85c189c1" sha1="5c185c7e3eed2c3379bf74bf522f95c32a730278" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbert">
+		<description>Q*Bert (Prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="qbert.rom" size="16384" crc="5de868db" sha1="777872a80411fd9c9653cc9c6dea1506b833d6b2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jedi">
+		<description>Return Of The Jedi - Death Star Battle (Prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="return of the jedi - death star battle.rom" size="16384" crc="5f5bf622" sha1="71e55eecb5f38338af8826ae743509d35250f20e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars (Prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="star wars.rom" size="16384" crc="732c6f5d" sha1="0ade16899c2e815ddfea6782618b0cdf760e6d54" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars1" cloneof="starwars">
+		<description>Star Wars (Prototype, Alt)</description>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="star wars[a].rom" size="16384" crc="90b61858" sha1="29cbda204ea20d42429a723afe2d00b9edd0a04d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Test cartridge -->
+
+	<software name="zxtest">
+		<description>ZX Spectrum Test Cartridge</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="system test rom.rom" size="8192" crc="730bba9e" sha1="9e162a027e64ab57ccbedb7da86c2afc7ee44749" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

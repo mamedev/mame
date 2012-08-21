@@ -1,0 +1,976 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tiki100" description="TIKI-100 Disk Images">
+	<software name="assist">
+		<description>Assistent</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="assist.dsk" size="409600" crc="8f80fad3" sha1="664c8d7b44edab6eae32e46a597f544323b46b9e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>Kontiki Basic</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92160">
+				<rom name="basic.dsk" size="92160" crc="8ee788e4" sha1="2856ae39544d781b1721c81089ba0be2315ec6d8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basis">
+		<description>Basis</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="basis.dsk" size="204800" crc="23ef2326" sha1="8419fb5f1a272cabb0f049caa21058b4806c2a01" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjelker">
+		<description>Bjelker (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="bjelker.dsk" size="409600" crc="430c3224" sha1="22abd426965e0f8f68581a19ce25fadefbc5f1f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brage">
+		<description>Brage (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="brage.dsk" size="409600" crc="a15307a2" sha1="546eb9030eff0789327cec13aae8f3edfef31353" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brok">
+		<description>Brøk (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="brok.dsk" size="204800" crc="fb5f0d5a" sha1="4519321637193fe9cb29637a434a2d3c39ce3008" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brum2">
+		<description>Brum-II (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="brum-iid.dsk" size="204800" crc="b62be27b" sha1="1e8ec44ff452424a8e7e7f376cbba8947abe6f9c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="brum-iip.dsk" size="204800" crc="ac0a7384" sha1="43e0db5872613dc535c0c1ac9b0f41ee10c9fb16" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbeks">
+		<description>CB-eksempler (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="cb-eks.dsk" size="409600" crc="c00defdc" sha1="9c1547f8956dff74ce193339069599ab5937bd12" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conset">
+		<description>Conset (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="conset.dsk" size="409600" crc="add05b6a" sha1="c6a309bd29e13ef37fb4b44ec1a9144d68b8706f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dataflor">
+		<description>Dataflora (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="dataflor.dsk" size="409600" crc="35abe5ec" sha1="66d28589da24b713355f8c4ba8e522d0a92d974b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbase2">
+		<description>Dbase II v2.4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="dbase.dsk" size="409600" crc="09b4fbcf" sha1="9583d10786a48d98cad56bc954c22e418bfcc3f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dgraf">
+		<description>Daisygraf (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="dgraf.dsk" size="409600" crc="f3c77843" sha1="f40558f03fefcc2bd1e10a857cd76028c0d4b266" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosgbib">
+		<description>DOS-GBIB (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="dos-gbib.dsk" size="368640" crc="fd2a2a42" sha1="95ec3af7cbbfbabd440ae1fbbbbd7310bd5d550a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosml">
+		<description>DOS ML (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="dos-ml.dsk" size="368640" crc="9084184a" sha1="e4d8de3fc0882616e749e4fa0feaac3964ac424e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drlogo">
+		<description>Dr. Logo (Beta)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="drlogo.dsk" size="409600" crc="e0b77156" sha1="4832dd628664f99b4fb084d74bfe0f811a1e3f62" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsgbib">
+		<description>KP/M GBIB (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="ds_gbib.dsk" size="409600" crc="96d14216" sha1="1760e402744912a6937962e43d3fe92334a53a24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dyr">
+		<description>Dyr (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="dyr.dsk" size="204800" crc="f35e370e" sha1="ad466fff83ca8a74df3f5e74c100a776ec08cac9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engheis">
+		<description>Engelsk-heis (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="engelsk-heis.dsk" size="204800" crc="3a979612" sha1="6c22aa46e922d776d483321cfe293ab9d7ddb51b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engsvoop">
+		<description>Engelsk-svoop (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="engelsk-svoop.dsk" size="204800" crc="4a6762c3" sha1="e70bb846b544d96a0999fb2a71ab44a9b17cd2a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eurogeo">
+		<description>Euro-geo (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="eurogeo.dsk" size="204800" crc="40f4a631" sha1="1bc724edf696adbaf0449429b46e6bee9ccea74c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="europa">
+		<description>Europa (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="europa.dsk" size="204800" crc="b110da59" sha1="550f41d2260fe1864d842741aef52b8fc7dc547f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farge">
+		<description>Farge (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="farge.dsk" size="204800" crc="9d69062c" sha1="d87d6fa1bbab680c2c75699192c01932a5b4f962" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feilfinn">
+		<description>Feilfinn (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="feilfinn.dsk" size="409600" crc="a9f099a7" sha1="19d8fb5dd66cfae71ef057f2a398367fbf2cb9db" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="femten">
+		<description>Femten spillet (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="femten.dsk" size="409600" crc="202d5972" sha1="58459cc2d8a79918bb5fcf9f262af5abb6a9226a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fgraf">
+		<description>Funksjonsgraf (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="fgraf.dsk" size="409600" crc="af4f6821" sha1="b55011795678d7507d8d38eb532bc0ada2503b43" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fls">
+		<description>Fix lix smx (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="fls.dsk" size="409600" crc="4fc4c072" sha1="6efbd0dcb2f8ed51eb3358b215410986b60f4d94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flytte">
+		<description>Flytte (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="flytte.dsk" size="204800" crc="9f19c356" sha1="e72e7ae6959163f44db424da13bc1b2c3422fd8a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grammatk">
+		<description>Grammatikk (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="grammatikk.dsk" size="204800" crc="6a8cf440" sha1="1276c0b99b1e3dd2c4eb704f998e2d54d9d3b13d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heisinst">
+		<description>Heis-install (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="heis-install_40.dsk" size="204800" crc="cbb65416" sha1="624ebc6cf712ad20824fe2d5bd4f061e35e987f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="heis-install_80.dsk" size="204800" crc="f7b4a172" sha1="939717beda6f9dddde1b41093c83f1be6a23358e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="husk">
+		<description>Husk (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="husk.dsk" size="204800" crc="b36acf06" sha1="67f36adee29470fd40f4b7aceefd69b1c4cc249c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Tiki-Invaders (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="invaders.dsk" size="204800" crc="10a9a21a" sha1="5b6325248809fc356d5341f3698de1667dd9059c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeg">
+		<description>Jeg (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="jeg.dsk" size="204800" crc="2ea3ebcd" sha1="3aadf2bb3156350cc846b572c0902bc22bae9ef4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="Kermit">
+		<description>KERMIT (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="kermit.dsk" size="409600" crc="44a30870" sha1="27c4e3cc3cf52aacb04ccbaa32654156179430d1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kom">
+		<description>Kommunikasjonsprogram (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="kom.dsk" size="204800" crc="6acffc16" sha1="4cf18b562f08118964e05f896f482b3546bb2875" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpm11">
+		<description>KP/M 1.1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="kpm11.dsk" size="204800" crc="48980bb7" sha1="a7e36ffb782f2f88ca09657d2a6da69b02ab51e1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpm115" cloneof="kpm11">
+		<description>KP/M 1.15</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="kpm115.dsk" size="204800" crc="9dc38eeb" sha1="8094d2d3591f8e74d6e3381dedee46954b9b3f9b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpm117" cloneof="kpm11">
+		<description>KP/M 1.17</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="kpm117.dsk" size="204800" crc="435e8947" sha1="e4244954f8012ae66e747f2fbb7e220428b33a56" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kryssord">
+		<description>Kryssord (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="kryssord.dsk" size="409600" crc="ac177b7b" sha1="68641ab8dc6e13440468b634a113c4473159e2cc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kud1v21">
+		<description>KUD 1 v2.1 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="kud1v21.dsk" size="409600" crc="fec1b3f7" sha1="ce32200182bc79ad973a546b5d12f52fc922ed29" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kud2v21">
+		<description>KUD 2 v2.1 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="kud2v21.dsk" size="409600" crc="0fceb4d0" sha1="24feff6c1d3291846bf1352e1bca8fe33a179c76" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kud3v21">
+		<description>KUD 3 v2.1 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="kud3v21.dsk" size="409600" crc="f7adeb75" sha1="12486da7fddf9bd2c012795eda09da11c8fd8bec" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legge">
+		<description>Legge sammen (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="legge_sammen.dsk" size="204800" crc="1d74611b" sha1="be81607d73125b3ea7dee84f1443c35b0e8072f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnimst">
+		<description>Magnimaster (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="magnimaster.dsk" size="204800" crc="cc087c39" sha1="0826c0414731bc0def776c6cf51b70b1c359571c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matemat1">
+		<description>Matematikk 1 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="matematikk1.dsk" size="204800" crc="289aee7f" sha1="f0c5164967e0355d852b4960ed7445ed7ffee6a1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matemat2">
+		<description>Matematikk 2 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="matematikk2.dsk" size="204800" crc="047fc998" sha1="f32334938c4dd83b580ce5569e3b600f094fe92d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matemat3">
+		<description>Matematikk 3 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="matematikk3.dsk" size="204800" crc="dd70c67c" sha1="d058d20f86c41b35a5f111f965c7e1e14f74683e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mattelom">
+		<description>Matte Lom (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="matte_lom.dsk" size="204800" crc="a90fbf24" sha1="48aa7642f584b3593a4b68816f6f8931bd2a69cf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matterog">
+		<description>Matte Rogalandsdata (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="matte_rogdata.dsk" size="204800" crc="444585d1" sha1="9f02ecfb1eeeecd675cb378ecbc6a965a67b3afc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mscopy">
+		<description>MS-Copy</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="mscopy.dsk" size="204800" crc="a176faad" sha1="ff2a206deae5b8b5b87f360a27b59875880b067c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos">
+		<!-- 16 bit -->
+		<description>MS-DOS v2.11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="msdos.dsk" size="368640" crc="4475dfa0" sha1="f925a7d60df8291c5b8aaa140a01933bba4a10c0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muslyd">
+		<description>Musedrivere og lydmodul for PASCAL (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="muslyd.dsk" size="409600" crc="ba792214" sha1="7207d473959a2120b6ef18631c586b3dc16af3f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norgeo">
+		<description>Norgesgeografi (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="nor-geo.dsk" size="409600" crc="f560d885" sha1="ee713d046acf1189ed455c0c12b410f2ba674fbb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norskdag">
+		<description>Norsk dagros (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="norsk-dagros.dsk" size="204800" crc="264582da" sha1="78662cebbf816035a99b0fcd7ea6cbe2c55fc1c3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norskgeo">
+		<description>Norsk geo heis (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="norsk-geo-heis.dsk" size="204800" crc="efcf3c34" sha1="cf4e559e0c68613965be9407fc4018a33d4b576c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norsktri">
+		<description>Norsk trim 1 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="norsk-trim_1.dsk" size="204800" crc="a9cf3faa" sha1="4aca2d7cd8d27631383c701fa9c0ff1946dd2bf2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norsklom">
+		<description>Norsk lom (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="norsk_lom.dsk" size="204800" crc="b80039cf" sha1="4382f13bad675ec4b92d21d0ca700bbe2007d208" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="norskrog">
+		<description>Norsk rogdata (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="norsk_rogdata.dsk" size="204800" crc="bf7cbf33" sha1="c46b2b027a3d71ce1e608677c9c3317d16009971" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdstat">
+		<description>NSD-Stat (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="nsd-stat.dsk" size="409600" crc="70c32e53" sha1="b7fac4a050d539b0b05e733fa05beb20e27072dc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ofag">
+		<description>Ofag (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="ofag.dsk" size="204800" crc="93539e5f" sha1="9096bdae7be14b0f6544e7f24d0e84a2b150d571" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oppgaver">
+		<description>Oppgaver (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="oppgaver.dsk" size="204800" crc="1c8e635b" sha1="c4007860f6b28309968a24203c094b9b3f128f3c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orac">
+		<description>Orac (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="orac.dsk" size="204800" crc="c3e5bfdd" sha1="b9dba9c8b8c4ee3d49609ccc4517470329bfeecb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ord1">
+		<description>Ord1 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="ord1.dsk" size="204800" crc="2c2f9f0d" sha1="c580fba7afdd6340289508db05d1320d16b7443a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ord2">
+		<description>Ord2 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="ord2.dsk" size="204800" crc="dbb0e0d9" sha1="ae5979d7045605c798f221da4600f41b05b096ba" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ordklass">
+		<description>Ordklasser (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="ordklass.dsk" size="409600" crc="3ee6065e" sha1="100fd9f99656b9739a19e0ad9a2734c684000f94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ovtast">
+		<description>Øv-tastatur (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="ov-tast.dsk" size="409600" crc="36d822c6" sha1="21a5c405649c2226fd3dcdc27ed9e097c514e0b9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="regnetre">
+		<description>Regnetrener (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="regnetrener.dsk" size="409600" crc="c7d0c2b4" sha1="20b72cdf65a2740c3068a5666974266aec9a3462" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rettulf">
+		<description>Rettulf (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="rettulf.dsk" size="409600" crc="3122e868" sha1="ae909a499fd1440fd7f4edd9ee64c87b0f14205e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rf">
+		<description>Ruteress og Formel (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="rf.dsk" size="409600" crc="fccdb425" sha1="9c081369a1947e189a455af835605987a1b5da39" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skjuler">
+		<description>Skjul farger (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="skjuler.dsk" size="409600" crc="05b632e0" sha1="10bf83274ce3a538752221ec7eeae7b98b18579d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spill1">
+		<description>Spill (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="spill1.dsk" size="204800" crc="cb2171cd" sha1="d7549dc2f251f4454a6745c2826b9f20eb98cadf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="storbrum">
+		<description>Stor brum (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="stor-brum.dsk" size="409600" crc="ebb6ced7" sha1="2cf44adcd1311af9e50151a0b9ab0933d5e94bf3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tartist">
+		<description>TIKI-Artist (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tartist.dsk" size="409600" crc="17f0b19e" sha1="985e54ab31b7ae95498826e81b9916ecc3799068" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tast">
+		<description>Tast (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tast.dsk" size="409600" crc="6dc2fad5" sha1="0910994357da6792869c8aec3230e6664ff6177d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tegne">
+		<description>Tegne (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="tegne.dsk" size="204800" crc="08d82a87" sha1="0839c8373eeee4bda129580e04cbc3b6ab2de069" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telle">
+		<description>Telle (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="telle.dsk" size="204800" crc="f7d1031c" sha1="f1d9b85551762df309f6e0d8667e9b302bb4a70b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tikibas">
+		<description>Tiki-bas (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tikibas.dsk" size="409600" crc="1e4001e0" sha1="6d555d87f57180e1952d5209663378386e76d26f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tkjer208">
+		<description>TIKO-Kjerne v2.08r (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="tiko208r-200k.dsk" size="204800" crc="81908dda" sha1="7f1e95924309368d1be112ec16fb6d85e2590bfc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tiko208r-400k.dsk" size="409600" crc="625a9680" sha1="cd133391ddccb4edb031d555a83b4f8a07c5edb7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tikos20">
+		<description>TIKOS systemdiskett v2.0/24 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tikos20.dsk" size="409600" crc="44ac5d24" sha1="25b8002738ae729539032a8eee49c64d316640cf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeplan">
+		<description>Timeplan (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="timeplan.dsk" size="409600" crc="6338f616" sha1="194e4f769ce90552bbe906c1e781e80b71176c3e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tkjer401">
+		<description>TIKO-Kjerne v4.01 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tkjer401.dsk" size="409600" crc="9049393a" sha1="e79dbb6325e55a162184705d6f6536b76be483cf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tp310a">
+		<description>Turbo Pascal v3.10a</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tp310a.dsk" size="409600" crc="da023e3e" sha1="5f6c0acaaf821632be5aaf5e45f3395d86e3952e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal">
+		<description>Turbo Pascal</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tpascal.dsk" size="409600" crc="3538995d" sha1="4a1357d3b778f34e343c33c274c0c6f587668f0f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trespill">
+		<description>Tre spill (og tre til) (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="trespill.dsk" size="409600" crc="133ca04c" sha1="2d8c04f610cb28c971add339808e99435583b7c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uni2">
+		<description>Uni2 (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="uni2.dsk" size="204800" crc="3e69f38b" sha1="e47821cf0e3f324de9965d8cdcba801ab8e6fb52" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verdgeo">
+		<description>Verdensgeografi (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="verdensgeografi.dsk" size="204800" crc="1f91b849" sha1="182e5d7df6239387be194dda49469280aab21655" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcsys">
+		<description>Winchester systemdiskett (Nor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="wcsys.dsk" size="819200" crc="d536cdad" sha1="44174f9618ec088aea42f95d4afa3b0fb9d94519" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="wordstar.dsk" size="204800" crc="e3ff829d" sha1="1f2a6bf08eb41819b9699950f26058a1d5ad6b3c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

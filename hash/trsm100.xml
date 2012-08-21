@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Option ROM booting instructions:
+
+1. Start BASIC
+2. Type CALL 63012 (regular titles) or CALL 63013,1 (Traveling Software titles)
+-->
+<softwarelist name="trsm100" description="TRS-80 Model 100 Option ROMs">
+  <software name="r2c">
+    <description>ROM2/Cleuseau</description>
+    <year>198?</year>
+    <publisher>Polar Engineering</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="r2c100.bin" size="0x8000" crc="3adacaa6" sha1="6ddf43047a819eb88367ebe6ace1a0166e6dbb03" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tsrandom">
+    <description>TS-RANDOM v1.3</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="rand100.bin" size="0x8000" crc="87781c9c" sha1="7749c1ecbf877151eba2e25f154b06c57324b25c" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tword">
+    <description>T-Word with Sardine v1.34</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="sard100.bin" size="0x8000" crc="ad08d509" sha1="4488cf7f90f1a121ee68ce1db10d45a75c112934" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="multipln">
+    <description>Microsoft Multiplan v1.00</description>
+    <year>1983</year>
+    <publisher>Tandy/Radio Shack</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="multipln.bin" size="0x8000" crc="58e7052d" sha1="02298ab5e319b352dd60f281632b0a8d18f5c916" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="is">
+    <description>Interactive Solutions</description>
+    <year>1984</year>
+    <publisher>Tandy/Radio Shack</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="is100.bin" size="0x8000" crc="b8e734ec" sha1="338ffe692f29c2e846bbc4343bc958ed3f9d3bc2" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tsdos">
+    <description>TS-DOS v4.00</description>
+    <year>1987</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="tsdos100.bin" size="0x8000" crc="b359d304" sha1="2b8105b8a46c3f6a90f46f567fffea18fa974c63" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ur2">
+    <description>The Ultimate ROM II v2.12</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="ur2100.bin" size="0x8000" crc="2e3ebe41" sha1="b685f58cf3befa3f2ca5d076c4fa90aa348e634a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cardfile">
+    <description>Card File Program</description>
+    <year>1989</year>
+    <publisher>Tony B. Anderson</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="crdfil.bin" size="0x8000" crc="b77a6ec5" sha1="a42291bda195fe567faa6200ba6083771902702b" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="logit">
+    <description>Log-It 100 v1.1</description>
+    <year>1985</year>
+    <publisher>Abby Levine / Barry Minnerly</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="logit100.bin" size="0x2000" crc="49561afe" sha1="6a21091fd4ed258d65dce13616d8e961abb1f4b4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ramplus">
+    <description>RAM+ v2.5</description>
+    <year>1985</year>
+    <publisher>PCSG</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="ramplus.bin" size="0x2000" crc="1369956a" sha1="d8e55a232ae141a9e56aa9a27b166f10f342fead" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="bp" supported="no">
+    <description>Booster Pack</description>
+    <year>198?</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="trsm100_cart">
+      <dataarea name="rom" size="0x30000">
+        <rom name="bp1.bin" size="0x8000" crc="2a4ea4c8" sha1="fa46c038d6bca5f1f3cf6fac89a4e60dcbb5d3ff" offset="0x00000" />
+        <rom name="bp2.bin" size="0x8000" crc="2293043b" sha1="79d2609e9b2bc2e88cccc55a2c57e523b3b66197" offset="0x08000" />
+        <rom name="sard1bp.bin" size="0x8000" crc="1e545076" sha1="0e6bb627464ca2fb503dbb5fc31bea81d7cd1cd0" offset="0x10000" />
+        <rom name="sard2bp.bin" size="0x8000" crc="4d53a912" sha1="2db1bb726e085ab8b804cbef0ba21615cc12a48b" offset="0x18000" />
+        <rom name="sard3bp.bin" size="0x8000" crc="03ec495d" sha1="ee0904599fbcf45b6138f9f28f45ae27a6a67ba2" offset="0x20000" />
+        <rom name="sard4bp.bin" size="0x8000" crc="4a06dbf8" sha1="52207043ed236c2c6a378083ddaeabab668db3d5" offset="0x28000" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>

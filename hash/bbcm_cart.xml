@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Master ROM Cartridges -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
+-->
+
+<softwarelist name="bbcm_cart" description="BBC Master Cartridges">
+
+	<software name="demo">
+		<description>BBC Master Demonstration Cartridge</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="bbcmasterdemonstrationcartridge_1.rom" size="16384" crc="fc40c0e8" md5="78a5b44e07347161dcaad623bad6363f" sha1="970ff4721e707f3c843f4fb09ce7f03e7ab265ae" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="bbcmasterdemonstrationcartridge_2.rom" size="16384" crc="2e73522d" md5="3055ea6d2aa5467236c50188cbf95a69" sha1="ff39620d93b18fd36a4718474495211a46ef8184" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

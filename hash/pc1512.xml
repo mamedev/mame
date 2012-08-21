@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc1512" description="Amstrad PC1512 diskettes">
+	<!--
+	Missing software that supports PC1512 special features:
+
+	20,000 Leagues Under the Sea
+	Bob Morane: Science Fiction 1
+	The Carl Lewis Challenge
+	Die Hard 2: Die Harder
+	Dragonfly
+	Feud
+	Flags
+	Gnome Ranger
+	The Great Escape
+	Iznogoud
+	Legend of Djel
+	Lemmings
+	Maupiti Island
+	Metal Mutant
+	Nil Dieu Vivant
+	Oh No! More Lemmings
+	Prohibition
+	Time and Magik: The Trilogy
+
+	Deluxe Paint II
+	GEM 1st Word Plus
+	GEM Write
+	Wordstar 1512
+	-->
+	<software name="amstcoll">
+		<description>The Amstrad PC Collection</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="The Dam Busters"/>
+			<dataarea name="flop" size="163840">
+				<rom name="the dam busters.img" size="163840" crc="3e71ae20" sha1="0f5cad41a0f089acabab54a00cf6fe66ef3ed08c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<!-- has unemulated on-disk protection -->
+			<feature name="part_id" value="Bruce Lee"/>
+			<dataarea name="flop" size="184320">
+				<rom name="bruce lee.img" size="184320" crc="7b9059bb" sha1="2651c7a5c35b6c449e0d74167c3813ca27f10169" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="PSI-5 Trading Company"/>
+			<dataarea name="flop" size="368640">
+				<rom name="psi-5 trading company.img" size="368640" crc="172e3c60" sha1="cb5308e47acc7e146747a2e2a014381860392b05" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Tag-Team Wrestling"/>
+			<dataarea name="flop" size="163840">
+				<rom name="tag-team wrestling.img" size="163840" crc="2d5286b0" sha1="98bec017cd7d9ac254eaa71d631dc02e1a3903f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="applicat">
+		<description>Applications (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Applications"/>
+			<dataarea name="flop" size="368640">
+				<rom name="applicat.img" size="368640" crc="c4b982a7" sha1="1b1c1cbf5a954b249b6efe1f9ff0fb08634a131f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Calcomat"/>
+			<dataarea name="flop" size="368640">
+				<rom name="calcomat.img" size="368640" crc="3082316c" sha1="ef29472dbe70d240747318656f5ebdb526d2e3a3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Evolution"/>
+			<dataarea name="flop" size="368640">
+				<rom name="evolutio.img" size="368640" crc="7f451c23" sha1="79a0fc7c6820b3ea321705e31cdd99d0633fbafc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Superbase"/>
+			<dataarea name="flop" size="368640">
+				<rom name="superbas.img" size="368640" crc="6f7b533b" sha1="447268862d37175e1a118fdddc9fe029d5bf48da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system">
+		<description>Amstrad PC1512 System Discs</description>
+		<year>1986</year>
+		<publisher>Amstrad</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46001.img" size="368640" crc="d8090373" sha1="4dbe5b78196389546410ad136d815456bc4593f3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46002.img" size="368640" crc="801c6584" sha1="20e1b46eda0a24c89127e4dd6f46a203b4f3a091" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46003.img" size="368640" crc="b8b5338b" sha1="28d6a6af565a222573c42cb615d398775c908ee2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46004.img" size="368640" crc="adf8c856" sha1="6de8d6f44e0e28546ed0432ed63c90e5fe6a658d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 5 (Hard Disk Utilities)"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46005.img" size="368640" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system_fr" cloneof="system">
+		<description>Amstrad PC1512 System Discs (Fra)</description>
+		<year>1986</year>
+		<publisher>Amstrad</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46001f.img" size="368640" crc="dab66cc5" sha1="831888c390829511e52d96c25e70907aa646132d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46002f.img" size="368640" crc="89aa0859" sha1="b5b913401d2dca6b20d8ce2d68ffd7a35a046778" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46003f.img" size="368640" crc="068ffaab" sha1="f1525af95b7b1996517475490c4cc2ed27bebfae" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46004f.img" size="368640" crc="c9576eaa" sha1="7eb65b49838a4f284b38c83b7c0ea0e00bef41f9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 5 (Hard Disk Utilities)"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46005f.img" size="368640" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Acorn Electron ROM Cartridges -->
+
+<!-- This list contains all known cartridges for the Acorn Electron. The Plus 1 expansion unit is required to add the two cartridge slots. -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
+-->
+
+<softwarelist name="electron_cart" description="Acorn Electron Cartridges">
+
+	<!-- Games -->
+
+	<software name="ctodoom">
+		<description>Countdown to Doom</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="countdowntodoom_1.rom" size="16384" crc="f8720e7e" md5="d0ef3b431adf7de2302707d6240988c0" sha1="eb414b81760d38c0a0d58a34dc70c2462c12e23c" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="countdowntodoom_2.rom" size="16384" crc="bfad0059" md5="8334224175a23f42ca9a0676d4f9b4df" sha1="421a4c6f1ecef42ebf7ddba9765e24eaeb8c20e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopper">
+		<description>Hopper</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="hopper.rom" size="16384" crc="18db837e" md5="d3351da3aed3fa411e268224302a4ab8" sha1="fa3c6b17fd1ce2efd0115e370f6f6e0b528a05e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snapper">
+		<description>Snapper</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="snapper.rom" size="16384" crc="08befbda" md5="764f4e71ee3b586affd523c3d0c067cb" sha1="7db762c705f64e91ab7fe8797e14d1213bc90de1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshipcom">
+		<description>Starship Command</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="starshipcommand_1.rom" size="16384" crc="e39ada2d" md5="968337d8fbdaf94428f264d7db07dbf9" sha1="9dfa6d622e37d5115cbeaae9c9a4e978f85f2683" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="starshipcommand_2.rom" size="16384" crc="cc91f570" md5="166782b9fe2719451ffce311bd6c7a1e" sha1="b51a49717d43676c6cfc14be80f54202b4875607" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo">
+		<description>Electron Demonstration Cartridge</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="electrondemonstrationcartridge.rom" size="16384" crc="4f4eb0be" md5="8e551fed60d1c6ad902526dd7e205a58" sha1="c7514fc7204ab8ff34b4805cff1fdb187d87fe82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treeknow">
+		<description>Tree of Knowledge</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="treeofknowledge_1.rom" size="16384" crc="c09522e0" md5="c8da89a4784e41c8780cbf94fb945da9" sha1="5b107be7a57a01b2719e9953e163f16825a026ab" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="treeofknowledge_2.rom" size="16384" crc="e21ea237" md5="08444d98018980e2f24d8347e41ac570" sha1="cc7b911e0e32866b8739144b198561753d0a89b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Languages -->
+
+	<software name="lisp">
+		<description>LISP</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="lisp_1.rom" size="16384" crc="fda4c546" md5="30af3ba220903b1827aa84999015da55" sha1="24c7062fc3666cd6814d72e417146e32eb995b04" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="lisp_2.rom" size="16384" crc="2eb56fc0" md5="e8b99392c1fb23010c51e3641b21ff2e" sha1="bdf09e553578d27a0cc202d409484dd8c2c3c085" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logo">
+		<description>Logo</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="logo-v1.0e_1.rom" size="16384" crc="a0defcf9" md5="94bdaae941349f81ce38fecec2025f24" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="logo-v1.0e_2.rom" size="16384" crc="753ab82e" md5="2551d70d95c915723346a2b82904e191" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>ISO-Pascal</description>
+		<year>1985</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="pascal_1.rom" size="16384" crc="c4adeb8c" md5="38d1f9f367705277ae9680fc5e349181" sha1="ed5226520136ffa1212317ad5ab9d09c2a04b88d" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="pascal_2.rom" size="16384" crc="3c368f1c" md5="6e7df0a2325b7e6c7f88593dc0ef1f1d" sha1="1b226ba8bf7bcc63d3f454c47f4c009f9dcac280" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Business -->
+
+	<software name="view">
+		<description>View</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" md5="11e879cb06938d3f42d080a17f06bb3d" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vwsheet">
+		<description>ViewSheet</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="viewsheet-v1.0e.rom" size="16384" crc="356fe589" md5="d96ad778fef8b67ab55c1738fc5ec907" sha1="146b3fb6cc9843a64c4e29a69f80db8980fab043" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

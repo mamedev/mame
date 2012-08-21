@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Option ROM booting instructions:
+
+1. Start BASIC
+2. Type POKE 63911,1:EXEC 62394
+-->
+<softwarelist name="pc8201" description="NEC PC-8201(A) Option ROMs">
+  <software name="r2c">
+    <description>ROM2/Cleuseau</description>
+    <year>198?</year>
+    <publisher>Polar Engineering</publisher>
+
+    <part name="cart" interface="pc8201_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="r2cnec.bin" size="0x8000" crc="66a30b04" sha1="8e9aaccf70f73dee1d86060d11587b80437866e1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tword">
+    <description>T-Word with Sardine v1.33</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="pc8201_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="sardnec.bin" size="0x8000" crc="cca9fac7" sha1="8e99f3fe916c011243a28769785e99ab9eecc261" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tsdos">
+    <description>TS-DOS v4.00</description>
+    <year>1987</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="pc8201_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="tsdosnec.bin" size="0x8000" crc="5aa603c9" sha1="bc0d334517008c5b22b71686badf9e689f77a5a8" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ur2">
+    <description>The Ultimate ROM II v2.11</description>
+    <year>1986</year>
+    <publisher>Traveling Software</publisher>
+
+    <part name="cart" interface="pc8201_cart">
+      <dataarea name="rom" size="0x8000">
+        <rom name="ur2nec.bin" size="0x8000" crc="cf4335e2" sha1="1304d8661783e90ebf8631d572127b7cd1b073d3" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>

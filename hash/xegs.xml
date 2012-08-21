@@ -1,0 +1,470 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+Compiled by K1W1
+-->
+
+<!--
+  Re-released games for XEGS not shown here but available on a800.xml
+  - Donkey Kong - Atari (RX8031)
+  - Eastern Front (1941) - Atari (RX8039)
+
+  Missing Cartridge
+     - Xenophobe (Prototype) - Atari (1989)
+
+  XE Demo Cartridge (CA400201) contained 4 Games
+  - One on One (Same as the retail cartridge)
+  - Ms. PacMan (Same as the retail cartridge, see a800 list)
+  - Joust (Same as the retail cartridge, see a800 list)
+  - Flight Simulator 2 (Proper demo version, included on this list)
+
+-->
+
+<softwarelist name="xegs" description="Atari XE Game System cartridges">
+
+<!-- ROM's that have been dumped from at least 2 independant sources and have the same CRC's, have been marked as "Verified". -->
+
+	<software name="aceoface">
+		<description>Ace of Aces</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8099" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="ace of aces (atari)(1988)(rx8099).rom" size="131072" crc="ebad3ddb" sha1="7d87658412d983b368b9f6c75d3d6be05485acf9" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airball">
+		<description>Airball</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8109" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="airball (atari)(1988)(rx8109).rom" size="131072" crc="a0ccb3c1" sha1="e397ec3fd8ebfb9626c56e63c9186846f87ad57b" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon">
+		<description>Archon: The Light and the Dark</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8092" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="archon (atari)(1987)(rx8092).rom" size="32768" crc="2636829f" sha1="bfb2782a117cf3efd5b71e225052f737658864c4" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballblaz">
+		<description>Ballblazer</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8064" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="ballblazer (atari)(1987)(rx8064).rom" size="65536" crc="820e5ce5" sha1="16820a57a10fd779ed160e8a25471882e23a719b" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barnblst">
+		<description>Barnyard Blaster</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8086" />
+		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="barnyard blaster (atari)(1987)(rx8086).rom" size="131072" crc="13ae30ed" sha1="e4b22790fce8e2e0f7c972960aec692b7fd5e016" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzone">
+		<description>BattleZone</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8077" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="battlezone (atari)(1987)(rx8077).rom" size="65536" crc="692515f2" sha1="de57b3d79a5bb44e7d0af66abe3b9d643865b360" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluemax">
+		<description>Blue Max</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8081" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="blue max (atari)(1987)(rx8081).rom" size="32768" crc="003f41ac" sha1="e25be072ae435588724ac9c5d314baf77efd3d96" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bughunt">
+		<description>Bug Hunt</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8087" />
+		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
+			<dataarea name="rom" size="65536">
+				<rom name="bug hunt (atari)(1987)(rx8087).rom" size="65536" crc="246f3872" sha1="48eeec190dbb27e1311938498b087088077dd530" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift" supported="partial">
+		<description>Choplifter!</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8096" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="choplifter! (atari)(1987)(rx8096).rom" size="65536" crc="d426eccc" sha1="03600f288ecedaa61fe7976dfe32ce9a6fdfe03e" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commando">
+		<description>Commando (Prototype)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="commando (atari)(1988)(proto).rom" size="131072" crc="28288df4" sha1="fe546d4a7be4644e85dd1eef55a8cf273f6b2aaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimbstr">
+		<description>Crime Buster</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8104" />
+		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="crime buster (atari)(1988)(rx8104).rom" size="131072" crc="143fbad9" sha1="d936dee2676d4fb8ea84960bf6c7cef707dc45a2" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossbow" supported="partial">
+		<description>Crossbow</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8088" />
+		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
+			<dataarea name="rom" size="131072">
+				<rom name="crossbow (atari)(1988)(rx8088).rom" size="131072" crc="0557a91f" sha1="7778002227315ab9fa3410b3a686634877cdd22e" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccastles">
+		<description>Crystal Castles</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8102" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="crystal castles (atari)(1988)(rx8102).rom" size="32768" crc="998fa803" sha1="be8532d6f1c4024bc13bf7ea01832f07d387623d" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkcham">
+		<description>Dark Chambers</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8101" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="dark chambers (atari)(1988)(rx8101).rom" size="65536" crc="fa2f132c" sha1="cc602bee2c589e78332f729dfe08832763aec714" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midmagic">
+		<description>David's Midnight Magic</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8083" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="david's midnight magic (atari)(1987)(rx8083).rom" size="65536" crc="b7ca61a2" sha1="cf7b224a4477597c872da00aebb3dcf11955b569" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deflktor">
+		<description>Deflektor (Prototype)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="deflektor (atari)(1988)(proto).rom" size="65536" crc="e4ed154e" sha1="44949d6ac68b3c155a58461292cccbe9bded5a21" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsrtflcn">
+		<description>Desert Falcon</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8089" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="desert falcon (atari)(1988)(rx8089).rom" size="65536" crc="a8f9324d" sha1="fd4666796a4498339835d75ddb63c7b99d1d93bb" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightn">
+		<description>Fight Night</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8085" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="fight night (atari)(1987)(rx8085).rom" size="131072" crc="4440d167" sha1="e6d26417365c6ed89b84683a73b31a7423b1a1fb" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flgtsim2" supported="partial">
+		<description>Flight Simulator 2</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8091" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="flight simulator 2 (atari)(1987)(rx8091).rom" size="131072" crc="10cfc489" sha1="2b3a785d134251272ab606e6b9b2cd9eb25f6714" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flgtsim2d" cloneof="flgtsim2">
+		<description>Flight Simulator 2 (Demo Cartridge)</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CA400201" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="flight simulator 2 (demo).rom" size="65536" crc="5133a213" sha1="d1087e8d47a106555670d0aa40d97e90d0cd407a" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foodf">
+		<description>Food Fight</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8079" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="food fight (atari)(1987)(rx8079).rom" size="32768" crc="4236f0ea" sha1="79aafc04d41d5167502b4ea74c531f9c2e706580" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gato">
+		<description>GATO Submarine Simulation</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8090" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="gato (atari)(1987)(rx8090).rom" size="131072" crc="ab06a3f5" sha1="cabb1effa554d915521b2a49961d8e61b67ec9b3" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardball">
+		<description>Hardball!</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8084" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="hardball! (atari)(1987)(rx8084).rom" size="65536" crc="bf0c6df2" sha1="8a8556b2398168a557bc04e37f1f3a26bc066147" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaglnest">
+		<description>Into the Eagle's Nest</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8114" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="into the eagle's nest (atari)(1988)(rx8114).rom" size="32768" crc="f31321c2" sha1="61d6f9264947481bc49cd47441e8fa5c8ed5fc55" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karateka">
+		<description>Karateka</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8095" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="karateka (atari)(1988)(rx8095).rom" size="131072" crc="97646f16" sha1="23d1ab351201d5a7aaeade45bd64860ff3af90f5" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldrun">
+		<description>Lode Runner</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8082" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="lode runner (atari)(1987)(rx8082).rom" size="65536" crc="b9a89bbd" sha1="9c59cf69f1c248fb673a3712ec7e35b1a0c42523" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario">
+		<description>Mario Bros.</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8103" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="mario bros. (atari)(1988)(rx8103).rom" size="65536" crc="7ba07c34" sha1="7acfd4a8205cbfe9528ab86bb53c2bb791a69bd6" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mean18">
+		<description>Mean 18 (Prototype)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="mean 18 (atari)(1988)(proto).rom" size="131072" crc="0ee74a89" sha1="4597d669cd1551a4459cba8e023a7fae8e9a9c18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midimaze" supported="partial">
+		<description>MIDI Maze (Prototype)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="midi maze (atari)(1988)(proto).rom" size="131072" crc="193a53f6" sha1="9748bd366a8b79a2c962104098b03916501d005e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="necroman">
+		<description>Necromancer</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8108" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="necromancer (atari)(1988)(rx8108).rom" size="16384" crc="39250ff2" sha1="995d78c380697118b4e2a030844994015385262a" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1on1">
+		<description>One-on-One</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8093" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="one-on-one (atari)(1987)(rx8093).rom" size="32768" crc="ab060567" sha1="d7eb0ed496db4de878c0f1688aa06ade2e3a4bb2" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractal">
+		<description>Rescue on Fractalus!</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8063" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="rescue on fractalus! (atari)(1987)(rx8063).rom" size="65536" crc="1ca549ad" sha1="36bc00b2e4452855d0681c50cdec2403ffb2a6bb" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starrai2">
+		<description>Star Raiders II</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8078" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="star raiders ii (atari)(1987)(rx8078).rom" size="32768" crc="737d4196" sha1="7e04d33d17a5dfcab5e41fca4ae6880730583dce" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumgames">
+		<description>Summer Games</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8098" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="summer games (atari)(1987)(rx8098).rom" size="131072" crc="95e6932d" sha1="7082c5304cfdb2ecc2421a4feb36f4dfc0c62132" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thundfox">
+		<description>Thunderfox</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="RX8113" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="thunderfox (atari)(1988)(rx8113).rom" size="65536" crc="b15ccef2" sha1="6ce6431474d7189f30820768f3cafee54d1ddf6e" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towertop">
+		<description>Tower Toppler (Prototype)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="tower toppler (atari)(1988)(proto).rom" size="65536" crc="6b5333bd" sha1="adc0fee6f79ac00b357b3cab76fcaa872647f1c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="xenophob">
+		<description>Xenophobe (Reproduction)</description>
+		<year>2010</year>
+		<publisher>Video 61 / Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="xenophobe (repro).bin" size="131072" crc="68466666" sha1="109271ce4333b6a7d3030ea5c82a5e63eb4a99df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

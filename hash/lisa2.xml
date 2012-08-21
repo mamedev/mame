@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+-->
+<softwarelist name="lisa2" description="Apple Lisa 2">
+
+	<software name="multplan">
+		<description>Multiplan Version 2.10B</description>
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+		<info name="usage" value="Needs Xenix 3.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="multiplan.image" size="419284" crc="c7590670" sha1="b5546f6e411b03a81bc6cd7e045db2c5ec18e7a7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lyrix">
+		<description>Lyrix Version 3.10</description>
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lyrix disk 1.image" size="419284" crc="6b3fd3b3" sha1="98eca24fa27977f9c43e8c701eb7548b203bbd2c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lyrix disk 2.image" size="419284" crc="40357282" sha1="65a204f9db07957b6ece1d1d7dd32056459975c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="xenixos">
+		<description>Xenix OS 3.0 Release 1.0</description>
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="boot.image" size="419284" crc="a7b8c85d" sha1="1cf08ff18ef127ac6616ad9610975a5ac47a75a7" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd1.image" size="419284" crc="30a9bb70" sha1="db571dd331f4916d5488efe9ef0b01339d6a5b00" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd2.image" size="419284" crc="f4fe0e91" sha1="4b4eef6230a90f36e16be977a389a601733e6d7e" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd3.image" size="419284" crc="f5a83402" sha1="7cbdfd7500680fe9b12725f0c9954a383ffb7efe" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd4.image" size="419284" crc="be15190c" sha1="282bbbc54c28c526f1ac5cc116602e8190a6f303" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd5.image" size="419284" crc="b3c784af" sha1="2defad773ea568e351602d5320a176d79b83e4da" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd6.image" size="419284" crc="153afe56" sha1="9f764b932f493c894692c8bcf0b0c13346139f24" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd7.image" size="419284" crc="d1b64294" sha1="d970a9174d0416330b0f61468c11cd9d5e2eeadc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="xenixdev">
+		<description>Xenix Development System 3.0 Release 1.0</description>
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd1.image" size="419284" crc="c2d530cc" sha1="0525361d8e99166a7257c8c477da1a45b5c0a33c" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd2.image" size="419284" crc="11b78849" sha1="e7b868881edab71d2013aa410ef11c68b73c8b52" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd3.image" size="419284" crc="968f6091" sha1="9493f901544b44d1f017fe2ff19ddee916fd4d18" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd4.image" size="419284" crc="c2c39504" sha1="832271e27b84601d5e174a9ff40bf08a604faeeb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="xenixtxt">
+		<description>Xenix Text Processing System</description>
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="textprocd1.image" size="419284" crc="a3f12f8b" sha1="79c1d1ea27174968175a231ec14b2a4487795954" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="textprocd2.image" size="419284" crc="8fc79b87" sha1="cf1962ce161523971ce9906fc163fc2771203be3" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="textprocd3.image" size="419284" crc="7dd9f1b3" sha1="216d9a3c634ba90bb69f3e955e6669a62e876b6c" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="textprocd4.image" size="419284" crc="1be2a3ac" sha1="fd0a14bc64aafd7db8395953cf1bb4bcf959da95" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

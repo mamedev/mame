@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="kc_cart" description="VEB Mikroelektronik KC 85 cartridges">
+	<software name="basic">
+		<description>BASIC (M006)</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cart" interface="kc_cart">
+			<feature name="slot" value="m006"/>
+			<feature name="cart_id" value="0xfc" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="m006.bin" size="0x4000" crc="d7c43af0" sha1="68d8c0d19e9dab213b0d27506728a8badebd734b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="texor">
+		<description>Texor (M012)</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cart" interface="kc_cart">
+		<feature name="cart_id" value="0xfb" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="m012.bin" size="0x2000" crc="02263b40" sha1="b1fe2880dab227a277243161377a4e41f1d3f67e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth">
+		<description>FORTH (M026)</description>
+		<year>1989</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cart" interface="kc_cart">
+		<feature name="cart_id" value="0xfb" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="m026.bin" size="0x2000" crc="501dfa5f" sha1="6e95a5a16e555c1e768b27dfa5216a2b648c2297" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="develop">
+		<description>Development (M027)</description>
+		<year>1989</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cart" interface="kc_cart">
+		<feature name="cart_id" value="0xfb" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="m027.bin" size="0x2000" crc="16a61a21" sha1="04fe21279ebcf07e2dae4b9a462a43023b117e6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typestar">
+		<description>TypeStar (M033)</description>
+		<year>1990</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cart" interface="kc_cart">
+			<feature name="slot" value="m033"/>
+			<feature name="cart_id" value="0x01" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="m033.bin" size="0x4000" crc="4f24ad1e" sha1="95dec095fb23fcd19ab61d37a643b179b9e513a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

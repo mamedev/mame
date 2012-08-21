@@ -1,0 +1,465 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="alice32" description="Matra Alice 32 Cassette">
+	<software name="alberthe">
+		<description>Al*berthe</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="16944">
+				<rom name="alberthe.k7" size="16944" crc="be94b3e9" sha1="9fc5ad212d32e6b3500644407bc01d2c49f4e7f3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alicetel">
+		<description>Alicetel</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="4952">
+				<rom name="alicetel.k7" size="4952" crc="b239548a" sha1="8bf37ede930d4f2b081ace5dd48e54664e6a3fcc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budget">
+		<description>Budget Familial</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="17775">
+				<rom name="budget.k7" size="17775" crc="3d8d713e" sha1="7d84787bdd274f0f5f7d93075a291b090d89e43c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calc">
+		<description>Calc</description>
+		<year>1985</year>
+		<publisher>Power Soft</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="18139">
+				<rom name="calc.k7" size="18139" crc="c8842ec8" sha1="b24754e5ec04e852e270b6f25580215f2d1c95a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cassmetr">
+		<description>Casse-Tete dans le Metro</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="71006">
+				<rom name="cassmetr.k7" size="71006" crc="a10e2c4d" sha1="9574d3e653889a1d87b24620cb89ee7ff1ac303f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colorm">
+		<description>Color-Mind</description>
+		<year>1984</year>
+		<publisher>Edicial</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="3779">
+				<rom name="colorm.k7" size="3779" crc="5ca66e27" sha1="4b29a72224bc6abefe0a8f96f96ae5c7b052d9ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coloric">
+		<description>Coloric</description>
+		<year>1984</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="14326">
+				<rom name="coloric.k7" size="14326" crc="79fc3639" sha1="8257d0016bae78d65d153bf8e7a9bc30cbd68477" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crocky">
+		<description>Crocky</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="17099">
+				<rom name="crocky.k7" size="17099" crc="9dce43d1" sha1="fa0dd622279af32ed0f4025940ce42891e0efe36" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decouva">
+		<description>Decouvrez Alice</description>
+		<year>1984</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="89657">
+				<rom name="decouvrez.k7" size="89657" crc="12061af5" sha1="ba3294b1d28a6fa00170a08705f611d033396623" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dessine">
+		<description>Dessine Moi</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="30808">
+				<rom name="dessine.k7" size="30808" crc="d45d9df8" sha1="8f1891c1fd0a973943212df41f65cc2b0090d050" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dialsaut">
+		<description>Dialogue Avec une Sauterelle</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="27977">
+				<rom name="dialsaut.k7" size="27977" crc="2bb5fc63" sha1="a7d3b1d9c22789bcdd4507962944f4ea44aada4a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maths1">
+		<description>Faire le Point-BAC Maths 1</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<part name="cass1" interface="alice32_cass">
+			<dataarea name="cass" size="79023">
+				<rom name="maths1_a.k7" size="79023" crc="6201e166" sha1="56dfc93b81aa47f8b5c0336b66ebba4486d2149e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="alice32_cass">
+			<dataarea name="cass" size="79023">
+				<rom name="maths1_b.k7" size="98152" crc="0a68e9c4" sha1="263c82d01e5883cf78c591b598f5fa5bf4d0c585" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maths2">
+		<description>Faire le Point-BAC Maths 2</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<part name="cass1" interface="alice32_cass">
+			<dataarea name="cass" size="79023">
+				<rom name="maths2_a.k7" size="48261" crc="c1393f3e" sha1="9f758c048f98817f26a5943b415786c25ab76174" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="alice32_cass">
+			<dataarea name="cass" size="79023">
+				<rom name="maths2_b.k7" size="68317" crc="87e841df" sha1="4edcf1aa149852fd4dd55d8d4dc271deac42e9da" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxion">
+		<description>Galaxion</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="15561">
+				<rom name="galaxion.k7" size="15561" crc="688ed5ab" sha1="706c2c59e77dbd9b8842f95a32cb2b2c797cb5d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geofra" supported="no">
+		<description>Geographie Francaise</description>
+		<year>1984</year>
+		<publisher>Infogames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="37161">
+				<rom name="geofra.k7" size="37161" crc="b451cf63" sha1="875c6b80587181863b9627b866b261b456a78a5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gestfich">
+		<description>Gestion de Fichiers</description>
+		<year>1985</year>
+		<publisher>Power Soft</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="15519">
+				<rom name="gestfich.k7" size="15519" crc="b13d2baa" sha1="e177c598c3c3204805661750ba918e1ce235dea9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibasic1">
+		<description>Initiationau Basic 1</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="41490">
+				<rom name="ibasic1.k7" size="41490" crc="9aa60a36" sha1="eb10cafdd03dec1d4914fc1d67281f03ac34151d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibasic2">
+		<description>Initiationau Basic 2</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="39657">
+				<rom name="ibasic2.k7" size="39657" crc="fd764f4a" sha1="83d0bca98a5458e78e4eea24994f4221868a0751" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibasic3">
+		<description>Initiation au Basic 3</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="33705">
+				<rom name="ibasic3.k7" size="33705" crc="a7f3468c" sha1="ad10fd219b55d1a5620733c4a882b179eeee5ef5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibasic4">
+		<description>Initiationau Basic 4</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="12358">
+				<rom name="ibasic4.k7" size="12358" crc="3d1e46a3" sha1="c51f29c54e91419598feeb00f5ece3affc50f272" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeulys">
+		<description>Jeu Des 6 Lys</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="33569">
+				<rom name="jeulys.k7" size="33569" crc="3367828f" sha1="17ec0dd064bf0a409da98978a3baa13472dc318e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kangou" supported="no">
+		<description>Kangourou</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="19842">
+				<rom name="kangou.k7" size="19842" crc="03540880" sha1="2a05cd95243973b12fc06a9a8f9e289ab0bc3b1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheninf" supported="no">
+		<description>La Chenille Infernale</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="17369">
+				<rom name="cheninf.k7" size="17369" crc="53551ad2" sha1="ce2f15b0f75e0edb91022fa349486c8b21cb55f7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clesons">
+		<description>La Cle des Sons</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="17312">
+				<rom name="clesons.k7" size="17312" crc="55f2b9a3" sha1="7590fc5c13dc6c964caf53218c61166dfb536df8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greno">
+		<description>La Grenouille a m'Alice</description>
+		<year>1985</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="32164">
+				<rom name="greno.k7" size="32164" crc="6be7bd4f" sha1="03a28fa0f043a035f262db48c3637f2ed73ef1e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marelle">
+		<description>La Marelle</description>
+		<year>1985</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="35788">
+				<rom name="marelle.k7" size="35788" crc="d3ebabb9" sha1="94fff6c4983af5163e0c60f371c903eb331ba4b6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cfran1">
+		<description>Le Cartable Francais 1</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="18428">
+				<rom name="cfran1.k7" size="18428" crc="920b9ac5" sha1="0c884d87cd08c65b54a4242c2a9d80457b4939f8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cfran2">
+		<description>Le Cartable Francais 2</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="18607">
+				<rom name="cfran2.k7" size="18607" crc="eb5f5309" sha1="7581b3167d4ea436cfa16b4ea6aedc5ca3a225ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmaths1">
+		<description>Le Cartable Maths 1</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="19482">
+				<rom name="cmaths1.k7" size="19482" crc="04647faf" sha1="b9166495a7df95b146ed3ef81fdba828c4761734" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmaths2">
+		<description>Le Cartable Maths 2</description>
+		<year>198?</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="19027">
+				<rom name="cmaths2.k7" size="19027" crc="92e5e402" sha1="a48ae7878f77780721e54ce6663a9101b0b4cdd9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motexpl">
+		<description>Le Moteur a Explosion</description>
+		<year>1984</year>
+		<publisher>Infogrames</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="17003">
+				<rom name="motexpl.k7" size="17003" crc="5e7ac97b" sha1="758598404ebbfef760f556395246769bfc427651" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pphinx">
+		<description>Le Phinx d'or</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="21580">
+				<rom name="pphinx.k7" size="21580" crc="79131090" sha1="e39225c953555a9d0077b5c814a3ee5c182e58f0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavevins">
+		<description>Ma Cave a Vins</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="28144">
+				<rom name="cavevins.k7" size="28144" crc="6a80f39d" sha1="908dd2224d6f6681f33e8c7edb7a6e65a209763e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multipli">
+		<description>Multiplication Casse-tete</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="44315">
+				<rom name="multipli.k7" size="44315" crc="fdecd1ae" sha1="bfc2c029dc7bbaf8462c628dba2ccc2e9f57456d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murbri">
+		<description>Mur de Briques</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="4813">
+				<rom name="murbri.k7" size="4813" crc="475f43ff" sha1="8b3fcf882eb886fbe5c3dd225d317338546c1ba5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planvol">
+		<description>Plan de Vol</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="22728">
+				<rom name="planvol.k7" size="22728" crc="fedec942" sha1="7836b8a36048cbe3f2128f10f5b33fe9dc91319a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sousmar">
+		<description>Sous-Marin</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="4051">
+				<rom name="sousmar.k7" size="4051" crc="a0a1a1ad" sha1="363ae04cdccad69bdf29e6e0ba79107db0b3a320" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank</description>
+		<year>1985</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="16108">
+				<rom name="tank.k7" size="16108" crc="38319244" sha1="93c1d9d7030c079e5780fb917d4da596190924f1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="textra">
+		<description>T'extra</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="7769">
+				<rom name="textra.k7" size="7769" crc="ef64062d" sha1="145e763d62d96c716708f946a59559466888da86" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="affor">
+		<description>Une Affaire en Or</description>
+		<year>1985</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="44635">
+				<rom name="affor.k7" size="44635" crc="04abf351" sha1="607f9d17b3dc7f3ef59f7b7de057440f071ea5ab" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwar3">
+		<description>World War III</description>
+		<year>1985</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="20989">
+				<rom name="wwar3.k7" size="20989" crc="a7e839c3" sha1="9c40fc007a603f44e5ca95a43cc4c65676a9aef8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

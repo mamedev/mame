@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ibm5150_cass" description="IBM PC/XT tape images">
+
+	<software name="diag">
+		<description>IBM Advanced Diagnostics for the IBM PC 5150</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<part name="cass1" interface="ibm5150_cass">
+			<dataarea name="cass" size="40121900">
+				<rom name="ibm_pc_diagnostics_cassette.wav" size="40121900" crc="59351cf6" sha1="b7f03fadb2ff8c7dfe8dd0ff9b694c1b437e23b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

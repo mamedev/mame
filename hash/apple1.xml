@@ -1,0 +1,441 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="apple1" description="Apple 1 tape images">
+
+	<software name="basic">
+		<description>Apple I Basic</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6644780">
+				<rom name="apple1basic.wav" size="6644780" crc="cd5cf5a4" sha1="ef58e776683581ea6af869ee7775fc0d3ad577b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version does seem to work better than the above, so we include it temporarily until we fix the subtle bug causing the parent not to be loaded properly -->
+	<software name="basica" cloneof="basic">
+		<description>Apple I Basic (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="3663918">
+				<rom name="apple1bas.wav" size="3663918" crc="1914635e" sha1="e5f112bec9236d42c3b5618df0d4607053b0078f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adventur">
+		<description>Adventure</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.30FFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="12990288">
+				<rom name="adventure.wav" size="12990288" crc="21d4f61d" sha1="c62ab301ebc9fe6984d6707ab4cda903992fc8a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aslite">
+		<description>Applesoft Lite</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 6000.7EFFR, enter at 6000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9679664">
+				<rom name="applesoft lite.wav" size="9679664" crc="098614ca" sha1="1b99eea4ef1bd0155615fb49f5d1f6a6f17d9ae4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apple30">
+		<description>Apple 30th</description> <!-- Graphics demo -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.FFFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="5279280">
+				<rom name="apple30th.wav" size="5279280" crc="eec88347" sha1="bf9000c304510322c968e4e42a1d0d0276ae352f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asmchess">
+		<description>ASMmchess</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.BFFR, enter at 300R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4117948">
+				<rom name="asmmchess.wav" size="4117948" crc="72a2127c" sha1="6abb19063981426efebe9a6ea048146808cb0be4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codebrkr">
+		<description>Codebreaker</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.BFFRE000.EFFFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9793532">
+				<rom name="codebreaker.wav" size="9793532" crc="f461367a" sha1="7833cc84f4579f3d975bd8f6c9c9d5ede1863feb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="life">
+		<description>Life</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 2000.21FFR, enter at 2000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="2283920">
+				<rom name="life.wav" size="2283920" crc="06af2136" sha1="b6ffbd59af44f0e82ea91ca3cb6c4d319f221b33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llander">
+		<description>Lunar Lander</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.0A00R, enter at 0300R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="3350056">
+				<rom name="lunar lander.wav" size="3350056" crc="3c87f6cd" sha1="de99cf33433e9b53b74920f3be258a4ce295ca2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastmind">
+		<description>Mastermind</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.03FFR, enter at 0300R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="1196032">
+				<rom name="mastermind.wav" size="1196032" crc="b44936a4" sha1="8acb9ee5fe7ee100620c2de5c95d50a7c69c881a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microchs">
+		<description>Microchess</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 1000.18FFR, enter at 1000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4052152">
+				<rom name="microchess.wav" size="4052152" crc="9b3ca487" sha1="2317cc4a7609ebaaf2ef9e23b5f11eda4d1fbf29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pasart">
+		<description>Pasart</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.5FFR, enter at 300R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="2471520">
+				<rom name="pasart.wav" size="2471520" crc="84c241ce" sha1="c122719952e9acb77891e078366cacd47e77688d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typtutor">
+		<description>TypingTutor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 280.15FFR, enter at 280R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6446872">
+				<rom name="typingtutor.wav" size="6446872" crc="296a327d" sha1="d89e95b710833697eaddb5badc16be6c2e29e726" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Other games require BASIC to be loaded first -->
+
+	<software name="aceyduc">
+		<description>AceyDucey</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="5736772">
+				<rom name="aceyducey.wav" size="5736772" crc="793422b8" sha1="4e9c5610164efbae963e8b5988ff62f41a053020" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alicetel">
+		<description>Apple I Enhanced Checkers</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9179180">
+				<rom name="applei enhanced checkers.wav" size="9179180" crc="faed6233" sha1="a86f20520642ee9d3a174d6aad1a08080830284e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckjack">
+		<description>Blackjack</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.0FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="5751412">
+				<rom name="blackjack.wav" size="5751412" crc="7e230c17" sha1="1268ee558f8b745c765df714e245c7f7f56002ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling">
+		<description>Bowling</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6837948">
+				<rom name="bowling.wav" size="6837948" crc="22383368" sha1="ef33153f66dc37f238c3fe646106742cdc86fa23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buzzword">
+		<description>Buzzword</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6824368">
+				<rom name="buzzword.wav" size="6824368" crc="2c040f8e" sha1="5811e662672be7f3a0b757ec129e896c53da6d6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columns">
+		<description>Columns</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10948604">
+				<rom name="columns.wav" size="10948604" crc="6122e49e" sha1="50161f6707b63c6579ccd30cfe5537dc2852ae11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="concentr">
+		<description>Concentration</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10773674">
+				<rom name="concentration.wav" size="10773674" crc="30f252f4" sha1="4ded5cb6bfa074944fe7a4e56a7d01c3b30ce918" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="craps">
+		<description>Craps</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6867496">
+				<rom name="craps.wav" size="6867496" crc="d9675f54" sha1="f7d7f4b3672316b9b1a5bfb20e6209ffb65b8c3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dealnod">
+		<description>Deal or No Deal</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="18392504">
+				<rom name="deal or no deal.wav" size="18392504" crc="28ad3585" sha1="bf59a22794a755c711b429f6633135402cd12e36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eliza">
+		<description>ELIZA</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="18453608">
+				<rom name="eliza.wav" size="18453608" crc="c8cf353e" sha1="aaec29bd2da471facbeb2f6c5292278a62b48f4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>Football</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR400.2FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="14613756">
+				<rom name="football.wav" size="14613756" crc="12613822" sha1="6f062f02cc9250427a5d94e593983353ab1ed272" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamurabi">
+		<description>Hamurabi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6953140">
+				<rom name="hamurabi.wav" size="6953140" crc="9760bd93" sha1="294b57fc0970ce0844dc615ff017ead11b1ebba1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman">
+		<description>Hangman</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10573754">
+				<rom name="hangman.wav" size="10573754" crc="d2926fb9" sha1="42bcde5ac2e44f24f82dc781a33186e71d1d3ed4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hilo">
+		<description>HiLo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="3067904">
+				<rom name="hilo.wav" size="3067904" crc="21024b5d" sha1="acc525e0a5cea33d1c4e77673045e94e2608c1ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llandera" cloneof="llander">
+		<description>Lunar Lander (ASCII Graphics)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.0FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9205804">
+				<rom name="lunarlander (ascii graphics).wav" size="9205804" crc="becc6aff" sha1="2204b5002e17b8cbf79c232334cc4502680cbf29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix</description> <!-- Graphics demo -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4098404">
+				<rom name="matrix.wav" size="4098404" crc="6d2221be" sha1="dc4497142f6c7704d1e0325263c087bcd805a5c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slots">
+		<description>Slots</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="6929500">
+				<rom name="slots.wav" size="6929500" crc="dd90caea" sha1="5b69702d45d7288f4d8b3e74fe39ed74235ad122" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>Star Trek</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="11126828">
+				<rom name="startrek.wav" size="11126828" crc="42d7ff61" sha1="508d585d824e75f6ef77a818e238948187e3dc73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="start2k3">
+		<description>Star Trek 2003</description>
+		<year>19??</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="18338436">
+				<rom name="startrek2003.wav" size="18338436" crc="659d91a9" sha1="7754c0883a342f68023ebed198b27359dc602f56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stopwtch">
+		<description>Stopwatch</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.0FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4191014">
+				<rom name="stopwatch.wav" size="4191014" crc="4a3d6dde" sha1="980ff8a49db18f52a852aafc75e6e831580bf79f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trek2">
+		<description>TREK II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.2FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="8022016">
+				<rom name="trek ii.wav" size="8022016" crc="3d9f5163" sha1="9671f060e417b7715f83fa57cc33588192604017" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordx">
+		<description>WordCross</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="7294204">
+				<rom name="wordcross.wav" size="7294204" crc="1330687d" sha1="433587c369cc82dbc6ac6d4a35a36f9225df63aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wumpus">
+		<description>Wumpus</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="3729408">
+				<rom name="wumpus.wav" size="3729408" crc="83cb19a5" sha1="cb3c98b1963a2688ccc8315d0f8866bf572743b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

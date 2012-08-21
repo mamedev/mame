@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+Compiled by K1W1 (thanks to Robbbert)
+-->
+
+<!--
+
+The Exidy Sorcerer was the first computer to use cartridge software and Exidy used 8 Track music cartridges to encase the ROM Pacs.
+Four cartridges were made for this computer one of which was a hardware device, the "EPROM Burner Pac (DP 2001)".
+
+-->
+
+<softwarelist name="sorcerer_cart" description="Exidy Sorcerer cartridges">
+
+	<software name="basicpac">
+		<description>Exidy Standard Basic v1.0</description>
+		<year>1978</year>
+		<publisher>Exidy Inc.</publisher>
+		<info name="serial" value="DP 2002" />
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="exidy standard basic v1.rom" size="8192" crc="3468d561" sha1="d9e6d50b97b6777720ca32c31760ed3d62dbe3fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devpac">
+		<description>Exidy Z80 Development Pac</description>
+		<year>1979</year>
+		<publisher>Exidy Inc.</publisher>
+		<info name="serial" value="DP 2003" />
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="exidy z80 development pac.rom" size="8192" crc="dc738618" sha1="fe5290c4e8a5fd40f5d7263f7a32c67159904723" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordpac">
+		<description>Exidy Word Processor Pac</description>
+		<year>1978</year>
+		<publisher>Exidy Inc.</publisher>
+		<info name="serial" value="DP 2004" />
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="exidy word processor pack.rom" size="8192" crc="da999745" sha1="6acd340b4030c42f2292568a097aea11c7f17152" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicm">
+		<description>Exidy Standard Modified Basic v1.01</description>
+		<!-- Unofficial Hack Release -->
+		<year>1980</year>
+		<publisher>Software Source</publisher>
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="basic mod v.101.rom" size="8192" crc="638ee239" sha1="cc21fddcccc7005f1a4390448897f7250a965f62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicb">
+		<description>Basic (Rev. B)</description>
+		<!-- Unofficial Hack Release -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="basic rev.b.rom" size="8192" crc="792ce8ad" sha1="ebf00fdcf028ce9131ca62d81b8fd80a9055d114" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

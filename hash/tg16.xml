@@ -1,0 +1,1060 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tg16" description="NEC Turbografx 16 cartridges">
+	<software name="aeroblst">
+		<description>Aero Blasters</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="aero blasters (usa).pce" size="524288" crc="b03e0b32" sha1="23b7da6a6067563af5fdf303d83adeae818cdcdf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airzonk">
+		<description>Air Zonk</description>
+		<year>1992</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="air zonk (usa).pce" size="524288" crc="933d5bcc" sha1="1ee94b6016ffdf996409955287e8799019a68658" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acrush">
+		<description>Alien Crush</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="alien crush (usa).pce" size="262144" crc="ea488494" sha1="1bfa4b5139612b0c33e3282c23e56c1dfc08ed52" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballistx">
+		<description>Ballistix</description>
+		<year>1992</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="ballistix (usa).pce" size="262144" crc="420fa189" sha1="8f65c5b459b477adc97ab7809ca8e85329f25769" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlroyl">
+		<description>Battle Royale</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="battle royale (usa).pce" size="524288" crc="e70b01af" sha1="07b39d5315aa07bf880b89b10dc3c01ed7ced5ab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blazlazr">
+		<description>Blazing Lazers</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="blazing lazers (usa).pce" size="393216" crc="b4a1b0f6" sha1="13712aaee596ad96ab743d5e82ed96895089afeb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blodwolf">
+		<description>Bloody Wolf</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bloody wolf (usa).pce" size="524288" crc="37baf6bc" sha1="45f8762414fb6b581b6159908cc35b2607ecf237" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombmn93">
+		<description>Bomberman '93</description>
+		<year>1990</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bomberman '93 (usa).pce" size="524288" crc="56171c1c" sha1="709b47de6e0ebc18fb80c951d5cfaa6ce82d6ce0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombman">
+		<description>Bomberman</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="bomberman (usa).pce" size="262144" crc="5f6f3c2a" sha1="dc63680e579764bbacb7f07514f4f49ab888d3b1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonk3">
+		<description>Bonk III - Bonk's Big Adventure</description>
+		<year>1993</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bonk iii - bonk's big adventure (usa).pce" size="1048576" crc="5a3f76d8" sha1="b966df0281f7fab4536afc166278e1bec0d926c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonk">
+		<description>Bonk's Adventure</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="bonk's adventure (usa).pce" size="393216" crc="599ead9b" sha1="403c4fbdb617cea5b8cd0c8d06ae988f6aef93bd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonk2">
+		<description>Bonk's Revenge</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bonk's revenge (usa).pce" size="524288" crc="14250f9a" sha1="1f6c2766507d72fb55fbf84d2a8b45cf86709c0b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxyboy">
+		<description>Boxyboy</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="boxyboy (usa).pce" size="131072" crc="605be213" sha1="7e165324d735a20156fd90ac97d0bf1c115e0a02" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bravoman">
+		<description>Bravoman</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bravoman (usa).pce" size="524288" crc="cca08b02" sha1="6fb31af03a5370c5c9bc280e0f8f8169d114150b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cadash">
+		<description>Cadash</description>
+		<year>1991</year>
+		<publisher>Working Designs</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="cadash (usa).pce" size="524288" crc="bb0b3aef" sha1="31c9692ba8c7eab995a6d3ab1e2079b69b47847f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forevbox">
+		<description>Champions Forever Boxing</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="champions forever boxing (usa).pce" size="524288" crc="15ee889a" sha1="db7005b4679276bc65d04a45da131db7b47bae75" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chewman">
+		<description>Chew Man Fu</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="chew man fu (usa).pce" size="262144" crc="8cd13e9a" sha1="5c742fe5d5af5628ba0e598cb88abd892dc87682" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chinawar">
+		<description>China Warrior</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="china warrior (usa).pce" size="262144" crc="a2ee361d" sha1="1933869f66f30da4bc07b9ff6b6c2897b32088f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cratermz">
+		<description>Cratermaze</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="cratermaze (usa).pce" size="262144" crc="9033e83a" sha1="2fa767e37f3d2a272861f969bdc7a3435f207fbf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybrcore">
+		<description>Cyber Core</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="cyber core (usa).pce" size="393216" crc="4cfb6e3e" sha1="d0765259b06b12dfda66d8b861954ebc62022440" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkwing">
+		<description>Darkwing Duck</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="darkwing duck (usa).pce" size="524288" crc="4ac97606" sha1="8c0cf2b058daef3ff5438808bfd48b9393c23b58" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daviscup">
+		<description>Davis Cup Tennis</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="davis cup tennis (usa).pce" size="524288" crc="9edab596" sha1="7e3ad77375d9c62e060cd6f6e57493196a4a739d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deadmoon">
+		<description>Dead Moon</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="dead moon (usa).pce" size="524288" crc="f5d98b0b" sha1="b289533a795ef874cc9bac158e3035101f892475" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepblue">
+		<description>Deep Blue</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="deep blue (usa).pce" size="262144" crc="16b40b44" sha1="91b8dd861d848033bb95b0c8c5e878ee827fef41" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devlcrsh">
+		<description>Devil's Crush - Naxat Pinball</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="devil's crush - naxat pinball (usa).pce" size="393216" crc="157b4492" sha1="1c54fb80e5acf82d7346dd7f2e8db8c74c58f4ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddungw">
+		<description>Double Dungeons - W</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="double dungeons - w (usa).pce" size="262144" crc="4a1a8c60" sha1="4e81f6cfa47ed941922492889be432041ff99e25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dspirit">
+		<description>Dragon Spirit</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="dragon spirit (usa).pce" size="262144" crc="086f148c" sha1="3bdd082360335232715633b469da71ab2597279d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragcrse">
+		<description>Dragon's Curse</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="dragon's curse (usa).pce" size="262144" crc="7d2c4b09" sha1="39b382725e38d6303ae2b19f1cabbd96ca661b07" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dropoff">
+		<description>Drop.Off</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="drop.off (usa).pce" size="262144" crc="fea27b32" sha1="54bb6ea11aca4ca6a16ba439828ba1f6fada3623" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungexpl">
+		<description>Dungeon Explorer</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="dungeon explorer (usa).pce" size="393216" crc="4ff01515" sha1="d6d18128d55d886a9b6a8c8ea65af76e783001f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falcon">
+		<description>Falcon</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="falcon (usa).pce" size="524288" crc="0bc0a12b" sha1="f02871ef343a59723f1eaf7aee36c626f15e12b2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantzone">
+		<description>Fantasy Zone</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="fantasy zone (usa).pce" size="262144" crc="e8c3573d" sha1="7c419163d860691dfea9720639921190e20e3c97" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finallap">
+		<description>Final Lap Twin</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="final lap twin (usa).pce" size="393216" crc="26408ea3" sha1="7ec6e816c4d89943d06dc88108ee415ed1f57be9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaga90">
+		<description>Galaga '90</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="galaga '90 (usa).pce" size="262144" crc="2909dec6" sha1="ff73a144eb2da537d0e1a3c8c56ef197fd6ce1ce" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostman">
+		<description>Ghost Manor</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ghost manor (usa).pce" size="524288" crc="2db4c1fd" sha1="7092a265599194a280eca9314b496079cc49dcbd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunboat">
+		<description>Gunboat</description>
+		<year>1992</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gunboat (usa).pce" size="524288" crc="f370b58e" sha1="0df6ede67061f5bca487fa01a8ea71640ef673a5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitice">
+		<description>Hit the Ice - VHL - The Official Video Hockey League</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="hit the ice - vhl the official video hockey league (usa).pce" size="393216" crc="8b29c3aa" sha1="19f201ffeb790c4d5685e5241cf5b37c25e15480" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impossam">
+		<description>Impossamole</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="impossamole (usa).pce" size="524288" crc="e2470f5f" sha1="bda974dfebe28c125f081363da3bbe96777404d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jjnjeff">
+		<description>J.J. &amp; Jeff</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="j.j. &amp; jeff (usa).pce" size="262144" crc="e01c5127" sha1="18ae2d9031f49e54145d83ff90df4189c36adef1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nicklaus">
+		<description>Jack Nicklaus' Turbo Golf</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="jack nicklaus' turbo golf (usa).pce" size="262144" crc="83384572" sha1="49d240ec70e4f7cc98a14e4e4e5a0857bc1ee737" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jchan">
+		<description>Jackie Chan's Action Kung Fu</description>
+		<year>1992</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="jackie chan's action kung fu (usa).pce" size="524288" crc="9d2f6193" sha1="33ee18e3cd6ba59ffca70fa7a1322d6e44a08682" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keithcor">
+		<description>Keith Courage in Alpha Zones</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="keith courage in alpha zones (usa).pce" size="262144" crc="474d7a72" sha1="09f37cf6ddbbf202994d88ac62225ca027e791ac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingcasn">
+		<description>King of Casino</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="king of casino (usa).pce" size="262144" crc="2f2e2240" sha1="b3bca08f73e6e1949b1f969a3d3e8a71b705673a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klax">
+		<description>Klax</description>
+		<year>1990</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="klax (usa).pce" size="262144" crc="0f1b59b4" sha1="4f032fdf7d836d021315bcd9b9903fdad4907f31" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loht">
+		<description>Legend of Hero Tonma</description>
+		<year>1991</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="legend of hero tonma (usa).pce" size="524288" crc="3c131486" sha1="a87586ae18bd36f1c32e08b8b7a55afc6532fb3e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legaxe2">
+		<description>The Legendary Axe II</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="legendary axe ii, the (usa).pce" size="262144" crc="220ebf91" sha1="3d537fbd2a7181639d297b829ce3f7d7556e831b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legaxe">
+		<description>The Legendary Axe</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="legendary axe, the (usa).pce" size="262144" crc="2d211007" sha1="fc9829a802e400a088652b331e8522472f7ab2a0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magchase">
+		<description>Magical Chase</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magical chase (usa).pce" size="524288" crc="95cd2979" sha1="50c940cc9b52167cb99dd760c25079a19fc0aa2b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miltrymd">
+		<description>Military Madness</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="military madness (usa).pce" size="393216" crc="93f316f7" sha1="01cf6be3fc11af874d25fc64bfb74f2f044f1bce" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="motoroad">
+		<description>Moto Roader</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="moto roader (usa).pce" size="262144" crc="e2b0d544" sha1="bd92a8e6a1e860305a0943878a3b4a56ddde5478" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neutopia">
+		<description>Neutopia</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="neutopia (usa).pce" size="393216" crc="a9a94e1b" sha1="95d5fdbd6c9d6da2f288312309c2badd92f89cf4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neutopi2">
+		<description>Neutopia II</description>
+		<year>1992</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="786432">
+				<rom name="neutopia ii (usa).pce" size="786432" crc="c4ed4307" sha1="d916c84955438b6fdfaea5b7696472ce479d4ff1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advislnd">
+		<description>New Adventure Island</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="new adventure island (usa).pce" size="524288" crc="756a1802" sha1="bea7a4e5445d3a4f8610524471b83216e57f48e2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightcr">
+		<description>Night Creatures</description>
+		<year>1992</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="night creatures (usa).pce" size="524288" crc="c159761b" sha1="16c4b43f92f5bc6c99fe84f71daff76cf1c0d0a6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nspirit">
+		<description>Ninja Spirit</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ninja spirit (usa).pce" size="524288" crc="de8af1c1" sha1="515eb414fc404d798206faad33fbcc5985fbbccb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="griffon">
+		<description>Order of the Griffon</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="order of the griffon (usa).pce" size="524288" crc="fae0fc60" sha1="bbfdcaaed7ed9c96364e3ca36807b9ac3bac8622" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ordyne">
+		<description>Ordyne</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ordyne (usa).pce" size="524288" crc="e7bf2a74" sha1="06880cfeaf9a495cefa49e8c4fc2e94887d1543b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacland">
+		<description>Pac-land</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="pac-land (usa).pce" size="262144" crc="d6e30ccd" sha1="ff74f1812196ec5c64df4b9a78a4697d3b53ef1a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panzakb">
+		<description>Panza Kick Boxing</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="panza kick boxing (usa).pce" size="524288" crc="a980e0e9" sha1="b21023fcf1b16b8ef9890e8087bab71a43253700" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parasol">
+		<description>Parasol Stars - The Story of Bubble Bobble III</description>
+		<year>1991</year>
+		<publisher>Working Designs</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="parasol stars - the story of bubble bobble iii (usa).pce" size="393216" crc="e6458212" sha1="c87524b4bd6e628e6f0551e8e50fded206ebe137" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgolf">
+		<description>Power Golf</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="power golf (usa).pce" size="393216" crc="ed1d3843" sha1="a9a05cacbcae9031fc95b54ace08864a97affd6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psychos">
+		<description>Psychosis</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="psychosis (usa).pce" size="262144" crc="6cc10824" sha1="1cfcfc95bb01b24755e1fc9c3dfea393cb3cc3a9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtype">
+		<description>R-Type</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="r-type (usa).pce" size="524288" crc="91ce5156" sha1="7e3d4dc9e8d880ac8d813fa69af0c6804b75cd9a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raiden">
+		<description>Raiden</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="786432">
+				<rom name="raiden (usa).pce" size="786432" crc="bc59c31e" sha1="910e7346976b7a6e83ddb7e68b49d33ced9dbc2c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samuraig">
+		<description>Samurai-Ghost</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="samurai-ghost (usa).pce" size="524288" crc="77a924b7" sha1="f6f26d8e4caafa7378f2756dd46569de4042dbbb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shockman">
+		<description>Shockman</description>
+		<year>1992</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="shockman (usa).pce" size="524288" crc="2774462c" sha1="f3e0f9546afe257748496a652f138dbc318bed05" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidearms">
+		<description>Sidearms - Hyper Dyne</description>
+		<year>1989</year>
+		<publisher>Radiance Software</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sidearms - hyper dyne (usa).pce" size="262144" crc="d1993c9f" sha1="773a372ef5ee599ebd6f048fddb86739e255583e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silentd">
+		<description>Silent Debuggers</description>
+		<year>1991</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="silent debuggers (usa).pce" size="524288" crc="fa7e5d66" sha1="c010ba9ff55a2558bba94ac39aa0160c76daff0c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sinistrn">
+		<description>Sinistron</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="sinistron (usa).pce" size="393216" crc="4f6e2dbd" sha1="65defeeecfe60564a214b6572f94243fcfea78e0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soldblad">
+		<description>Soldier Blade</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="soldier blade (usa).pce" size="524288" crc="4bb68b13" sha1="3b4cc242f68a1d61c83a1a0dbdee23d2ae8f1427" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="somerass">
+		<description>Somer Assault</description>
+		<year>1992</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="somer assault (usa).pce" size="524288" crc="8fcaf2e9" sha1="bb6b5a59106bd60fbe7b1d7def7f73253440b49a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbeach">
+		<description>Sonic Spike - World Championship Beach Volleyball</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sonic spike - world championship beach volleyball (usa).pce" size="262144" crc="f74e5eb3" sha1="5a74eead0593190979028ef99a19519bab00b3ab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharrier">
+		<description>Space Harrier</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="space harrier (usa).pce" size="524288" crc="43b05eb8" sha1="948e6a5c30dcf945ab8332009ae4fa3ab231255a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="splatth">
+		<description>Splatterhouse</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="splatterhouse (usa).pce" size="524288" crc="d00ca74f" sha1="e2167b5d67a065ec97763d3ee843ac2b2328c082" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sssoldr">
+		<description>Super Star Soldier</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="super star soldier (usa).pce" size="524288" crc="db29486f" sha1="e0c487782e155b1cf50f5fb4c8d6a24be0301a6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svolley">
+		<description>Super Volleyball</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super volleyball (usa).pce" size="262144" crc="245040b3" sha1="de71722255d0136b47f63e93bedb2ed8b3d0d4f0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chasehq">
+		<description>Taito Chase H.Q.</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="taito chase h.q. (usa).pce" size="393216" crc="9298254c" sha1="d29a7440573324b5560185e6e012cb54a77e88f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taknhoop">
+		<description>Takin' It to the Hoop</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="takin' it to the hoop (usa).pce" size="262144" crc="e9d51797" sha1="1f36230efde7025730c1a0dbf3aa47b887440ecd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespin">
+		<description>TaleSpin</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="talespin (usa).pce" size="524288" crc="bae9cecc" sha1="987d16a0f329fc6831fc9b6dea1234684925aab4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tigerrod">
+		<description>Tiger Road</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="tiger road (usa).pce" size="393216" crc="985d492d" sha1="2535994f2be5d7b80cf5725505a4b8e30daef236" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timcrus">
+		<description>Time Cruise</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="time cruise (usa).pce" size="524288" crc="02c39660" sha1="55557a972375e58e5fcc5ee113d0ca40b332bbb2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeball">
+		<description>Timeball</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="timeball (usa).pce" size="131072" crc="5d395019" sha1="bd11ef42d932a1cf89fe7dc81a2f4b7a3ee06e4e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tricky">
+		<description>Tricky Kick</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="tricky kick (usa).pce" size="262144" crc="48e6fd34" sha1="3fb1ba72af0e7ae33e35ae30ce0b7319adece208" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turrican">
+		<description>Turrican</description>
+		<year>1991</year>
+		<publisher>Ballistic</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="turrican (usa).pce" size="262144" crc="eb045edf" sha1="a5830c0d5cd94e3c6f33e1799bb123857400b1bc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvbasket">
+		<description>TV Sports Basketball</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tv sports basketball (usa).pce" size="524288" crc="ea54d653" sha1="6c0fdeafa9dc1c4b7f935866e5bc620dd3151f3c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvfootbl">
+		<description>TV Sports Football</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="tv sports football (usa).pce" size="393216" crc="5e25b557" sha1="b73f44ad60e0f4b13c6b80f5509cb51245cc8106" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvhockey">
+		<description>TV Sports Hockey</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="tv sports hockey (usa).pce" size="393216" crc="97fe5bcf" sha1="f5cde3af4fac59e402a9c96c4adbbc9e55ce5936" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veigues">
+		<description>Veigues - Tactical Gladiator</description>
+		<year>1990</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="veigues - tactical gladiator (usa).pce" size="393216" crc="99d14fb7" sha1="88a858feeba77031e7d2fb85e563aafcbd9b0b39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="victoryr">
+		<description>Victory Run</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="victory run (usa).pce" size="262144" crc="85cbd045" sha1="bab16031a16490415cedd5ba47cbe4cadc3d8727" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vigilant">
+		<description>Vigilante</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="393216">
+				<rom name="vigilante (usa).pce" size="393216" crc="79d49a0d" sha1="f77d83af4f1e733faf813b5e78ecc2cbb19d3b25" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcbasebl">
+		<description>World Class Baseball</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="world class baseball (usa).pce" size="262144" crc="4186d0c0" sha1="fab372a908533fd444b6c829f881f2de103d93b6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wctennis">
+		<description>World Court Tennis</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="world court tennis (usa).pce" size="262144" crc="a4457df0" sha1="d302676c409a59628935298b95c7ba43359b29bb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wscomp">
+		<description>World Sports Competition</description>
+		<year>1992</year>
+		<publisher>TTI</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="world sports competition (usa).pce" size="524288" crc="4b93f0ac" sha1="1f301c468197c382c98692712db2fdee0a29525f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yobro">
+		<description>Yo, Bro</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="yo, bro (usa).pce" size="524288" crc="3ca7db48" sha1="efff8d352af6c1d08899bac77fc3ddc994e0a3ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scdsys">
+		<description>Turbografx CD Super System Card (v3.0)</description>
+		<year>19??</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="[cd] turbografx cd super system card (usa) (v3.0).pce" size="262144" crc="2b5b75fe" sha1="d02611d99921986147c753df14c7349b31d71950" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdsys">
+		<description>Turbografx CD System Card (v2.0)</description>
+		<year>19??</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="[cd] turbografx cd system card (usa) (v2.0).pce" size="262144" crc="ff2a5ec3" sha1="2bea3dac98f84b2f2f469fa77ea720b8770d598d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

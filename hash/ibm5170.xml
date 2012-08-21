@@ -1,0 +1,851 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Missing files come here
+-->
+<softwarelist name="ibm5170" description="IBM PC/AT disk images">
+<!-- OS Disks -->
+
+	<software name="msdos5">
+		<description>MS-Dos 5.0</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="msds5d1.img" size="737280" crc="c54fe610" sha1="27756a10edbe33f76ff2239062af05dbfdc93979" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="msds5d2.img" size="737280" crc="9aa5c1a4" sha1="15cc58e267601b30a594372aea1ff3dbb73ea335" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="msds5d3.img" size="737280" crc="6248317a" sha1="c7ff3a04eb01cab3efb05b6b52ec8b8a36b9b269" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622">
+		<description>MS-DOS 6.22 (OEM)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="disk1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="adbd36fe" sha1="3fb0df208670ea5fafae451661017391a381bc9d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="417eb8b3" sha1="63e670bb166995a7a1124c8f2b540355eed3bbd8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="6a158e98" sha1="b8493fc000f405ba7a1a89503178482328616e01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dos622" cloneof="msdos622">
+		<!-- Make Original Disks images from an Acer recovery CD, dated 07-13-1994 -->
+		<description>MS-DOS 6.22 (Acer Recovery CD)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="disk1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1a.img" size="1474560" crc="69d8cfdd" sha1="30b4b2e99b26b0e5e7dbe61b9892e45fe751a3e8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2a.img" size="1474560" crc="76258952" sha1="1f268c5487f31982848461b9d628ef10b552c849" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3a.img" size="1474560" crc="808b208d" sha1="06de13364e906c4ed69f19627ae0e682eb419078" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="21b6d623" sha1="2f096a5d9cd00677de3aca30b01b52b24776c59a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622sup" cloneof="msdos622">
+	<!-- Added Bad_Dump status, as questions remains on how they were dumped -->
+	<!-- Missing from this group: the 360kb Disk set-->
+		<description>MS-DOS 6.22 (Supplemental Disk)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="disk1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk 1 (1.4mb).img" size="1474560" crc="ac432292" sha1="a60876af212ffc9dd38529ee327adea4b10448f5" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1 (720kb).img" size="737280" crc="6a73c20b" sha1="46b05c8fc4b53f2ebeaecc0deb27e5384ccefc99" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="disk3" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="disk 2 (720kb).img" size="737280" crc="2626ae5b" sha1="9f80740f91d62996952ced0fa69dc83bd1521567" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win95b">
+		<description>Microsoft Windows 95 (Bootdisk)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws95b.img" size="1474560" crc="f2c099fa" sha1="f167b7193f0e62f4f7b27255fdc70ac7d6278c47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wndws98b">
+		<description>Microsoft Windows 98 (Bootdisk)</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws98b.img" size="1474560" crc="955fc373" sha1="9f5d64261c7f51de704d6d1486dced51b45cbec3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winmeb">
+		<description>Microsoft Windows ME (Bootdisk)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndwsmeb.img" size="1474560" crc="5a17894f" sha1="724e02eac97046e6c92b73f7707b57707ab76f5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winxpb">
+	    <!-- output of the "Create an MS-DOS startup disk" option in Windows XP's format dialog -->
+	    <!-- extracted from C:\Windows\system32\diskcopy.dll version 6.0.2900.5512 -->
+		<description>Microsoft Windows XP MS-DOS startup disk</description>
+		<year>2005</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="winxpb.img" size="1474560" crc="10e3084d" sha1="3812f09e46c4bdd1c802f8540cc643366d9a1e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Shell Disks -->
+
+	<software name="win104">
+		<description>Microsoft Windows Version 1.04</description>
+		<year>1987</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="setup.img" size="368640" crc="543002fa" sha1="262b7ec211667fb906e8e28a2d37a251ae585f0c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="build.img" size="368640" crc="69c9754f" sha1="216a5b85473757a974677042debbf1c291e7abd4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="utilities.img" size="368640" crc="09742c32" sha1="43223c6a018bec0931ac827f98defbaa93201d25" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="font.img" size="368640" crc="7eb3dc00" sha1="cae0315a5f20aa875a97ebdcb10f1bb71dabf915" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="desktop_applications.img" size="368640" crc="740b5158" sha1="d92b17b233ec090b88fd76bdafd2c1f8f8da533a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="write program.img" size="368640" crc="26f3b21b" sha1="71ed3a707bb0636196f20e001c4628b088a360ba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer.img" size="368640" crc="d9265486" sha1="7ef9ef830be23d34022d26dbe01c8394eada8c57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win31">
+		<description>Microsoft Windows Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31.img" size="1474560" crc="a7439136" sha1="b243a849227b8df3c4a180b25203e6c2bfce66c4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31d2.img" size="1474560" crc="2cc5295d" sha1="1d2487804f8394ab56a052c2ddd8b3a64e53f948" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31d3.img" size="1474560" crc="892950b1" sha1="c4b7a19a78653e56dfe9c51c97e53fbbad686bd2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31d4.img" size="1474560" crc="5797606e" sha1="779aaf9301b5ce765da2f9e097c33b341a794d77" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31d5.img" size="1474560" crc="502572df" sha1="491e4ded78154a09866d738be59b17f55afdbba2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31d6.img" size="1474560" crc="c1aad0d9" sha1="c858848ed3a05e78e2b19e98bd6d0d927656f7b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wndws31d7.img" size="1474560" crc="5ff44136" sha1="f913487b28eb35c9faab52eb46a8c14012c592f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Application Disks -->
+
+
+
+<!-- Application Disks -->
+
+	<software name="scrlmous">
+		<description>Genius Scroll Mouse</description>
+		<year>2004</year>
+		<publisher>KYE Systems Corp.</publisher>
+		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wdel3">
+		<description>WinDelete 3.0</description>
+		<year>1996</year>
+		<publisher>IMSI</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="wdel3.img" size="1474560" crc="9c2e76b9" sha1="b6b6f18726ce0f4ae1aeb2c33b8e4793ca15f87a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Game Disks -->
+
+	<software name="amd80gad">
+		<description>AMD 80C287 Game and Demo</description>
+		<year>199?</year>
+		<publisher>AMD</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1270016">
+				<rom name="amd-80c287-demo.dsk" size="1270016" crc="ee65696c" sha1="1df293a2fc61fdca728f60d973b5175f0d9c4427" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bibadv">
+		<description>Bible Adventures</description>
+		<year>1992</year>
+		<publisher>Wisdom Tree, Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="bibleadv.img" size="737280" crc="9832b695" sha1="4fb12b6d73b64d76a7526740ad81748c2a4d8df7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bibpaint">
+		<description>Bible Paint and Learn</description>
+		<year>1992</year>
+		<publisher>Ark Multimedia Publishing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="paint_learn.img" size="737280" crc="4e9572cd" sha1="9073a9858bd94ec23ca1b3cd4497e106268568ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipdale">
+		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
+		<year>1990</year>
+		<publisher>Hi-Tech Expressions, Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="chip and dale.img" size="368640" crc="5393ba1b" sha1="775683872ea2ef6a81fde73e4d9737f204636362" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="eschell">
+		<description>Escape From Hell</description>
+		<year>1990</year>
+		<publisher>Electronic Arts, Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="74856caa" sha1="fab7f8e551bcf735952b95237d2531e6d1bbb645" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="ac41fa21" sha1="37b354219a8db98f6e45f17ca938189078afffb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incrmach">
+		<description>Incredible Machine</description>
+		<year>1993</year>
+		<publisher>Dynamix/Sierra</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indycar">
+		<description>IndyCar Racing</description>
+		<year>1993</year>
+		<publisher>Papyrus Publishing Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="c2006f5c" sha1="cf599de208d42bc6b87d1d0fa30a02a43209cef2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="e3498668" sha1="a19f16c825b10105a6fce21f10176eccc23af520" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raptor12">
+		<description>Raptor - Call of the Shadows</description>
+		<year>1994</year>
+		<publisher>Apogee Software, Ltd.</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="c4a8a748" sha1="b5377abe6a142d1dc3ff7019d2e77dd009799d3f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="9b3b7f22" sha1="79f93a72a9c9375ce5bc21b0b84d703ccb8100cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="05443ceb" sha1="3b8bd610d90677a830f9b4e297e4a89343cb86a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf">
+		<description>Street Fighter</description>
+		<year>1988</year>
+		<publisher>Capcom Co., Ltd.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="street fighter.img" size="737280" crc="838baa9e" sha1="ef14c9638208e04fcc819ebc7908c7611a929624" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simant">
+		<description>SimAnt</description>
+		<year>1991</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="simant.img" size="737280" crc="a909b075" sha1="3036c42da40576e0dcdc78238f9154aad1474232" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="simantd2.img" size="737280" crc="77b35cd5" sha1="4283c141e768cc27f2b1d5d8d33a8181a23f89ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcityc">
+		<description>SimCity Classic</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlife">
+		<description>SimLife</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="simlife.img" size="737280" crc="59898bed" sha1="346ae9fb47fe2a0324e2df8f1f77c09dd5c3d8ec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="simlifed2.img" size="737280" crc="6e704c65" sha1="fc2e641147584f3a5675083edbd0cee355db3ba6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2k">
+		<description>Sim City 2000  (Ver 1.00)</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd1.img" size="1474560" crc="934c0301" sha1="d5e68ee9a4b1d5146b93d7c08b99c099463ef37a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd2.img" size="1474560" crc="a749874b" sha1="e1e0ad1b7ffa28a1da86d8b44a59d318588b0f6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2ka" cloneof="simcit2k">
+		<description>Sim City 2000 (Ver 1.01)</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd1 (a).img" size="1474560" crc="81f95788" sha1="d387dd7356bcf7ec28b356039fdcdb44575325c2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd2 (b).img" size="1474560" crc="1ee7e285" sha1="6044db835d54457ac5fff092b4d29b7847524986" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2ksc1" cloneof="simcit2k">
+		<description>SimCity 2000 Scenarios Volume 1 - Great Disasters</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="scenario vol 1.img" size="1474560" crc="0eacae3e" sha1="398bfef77a18ac6650be433b0988b9620442d9d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swxwing">
+		<description>Star Wars - X-Wing - Space Combat Simulator</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="8e8f9d0b" sha1="c98d3d8560f9d6ef9f8052f75928b4e2a93164e7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="adb091f3" sha1="5b6be2f738b21aea59a089c8e7d5bda852d6f5af" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="9d516d11" sha1="c7c1cf18af49153aec0f14cbb8df32db33c150db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="5981f879" sha1="85dc83fecdb8b754c8d10c8579e0e644435eb7be" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="3af204de" sha1="8984ca008b4948b1c9066c9314f6c0e80c085fe4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swxwingbw" cloneof="swxwing">
+		<description>Star Wars - X-Wing B-Wing Expansion</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="bwing.img" size="1474560" crc="91d0f97a" sha1="edb745afa6376808314364e08c3000594edf2c3b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swxwingip" cloneof="swxwing">
+	<!-- Was once Virus Infected -->
+		<description>Star Wars - X-Wing Imperial Pursuit</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="xwing.img" size="1474560" crc="34eebdb6" sha1="fcee862c9b2460aed9cbf3b46657ad4e4eff5dcd" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swtiefgt">
+		<description>Star Wars - TIE Fighter</description>
+		<year>1994</year>
+		<publisher>LucasArts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="swtiefgt.img" size="1474560" crc="b850f9a2" sha1="a439a1c8a600e77fe572b10779905a59ffdfaf62" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="swtiefgtd2.img" size="1474560" crc="70ce3029" sha1="803b58d8aa94d6b5eb8e0b118e1934fefef11bce" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="swtiefgtd3.img" size="1474560" crc="e084c30d" sha1="710cff3865fe5d84c8d44cf3ef2b1ca0121d147a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="swtiefgtd4.img" size="1474560" crc="5cc5ec97" sha1="a21fbeaab34f82db9a51381975d314f845bf2c26" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="swtiefgtd5.img" size="1474560" crc="7751ed1f" sha1="4fc14b87a62ab1db717227ef3ad9343ce3aa7193" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcgps">
+		<description>World Circuit - Grand Prix Simulation</description>
+		<year>1992</year>
+		<publisher>MicroProse Ltd.</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="Disc Code" value="4861A" />
+			<dataarea name="flop" size="1474560">
+				<rom name="diska.img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="Disc Code" value="4861B" />
+			<dataarea name="flop" size="1474560">
+				<rom name="diskb.img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="Disc Code" value="4861C" />
+			<dataarea name="flop" size="1474560">
+				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- Coverdisks -->
+
+	<!-- PC Gamer Germany -->
+	<!-- October 1992 undumped
+	<info name="Contents" value="Soul Magican / Atom Demo" />-->
+
+	<software name="pcga9211">
+		<description>PC Games Coverdisk (November 1992) (German)</description>
+		<year>1992</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Gobliins 2 Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames11-92.img" size="737280" crc="f4d79314" sha1="2698ff66cf8d53774d9d09ec26f42514272ef9a6" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- December 1992 undumped
+	<info name="Contents" value="Ween the Prophecy Demo" />-->
+
+	<software name="pcga9301">
+		<description>PC Games Coverdisk (January 1993) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="History-Line 1914-1918 Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames01-93.img" size="737280" crc="7597e279" sha1="7fde2fd85e9362ae7223855e60a95508917a96a1" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcga9302">
+		<description>PC Games Coverdisk (February 1993) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Oxyd Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames02-93.img" size="737280" crc="518c19d3" sha1="a071a3c78b7bc30cc04263c925c72887ed36146d" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- March 1993 undumped
+	<info name="Contents" value="Ween the Prophecy Demo" />-->
+
+	<!-- April 1993 undumped
+	<info name="Contents" value="Zool Demo" />-->
+
+	<!-- May 1993 undumped
+	<info name="Contents" value="Tornado Demo" />-->
+
+	<software name="pcga9306">
+		<description>PC Games Coverdisk (June 1993) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Skat 2010 Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames06-93.img" size="737280" crc="60e3fd08" sha1="01d36ceb390c85b724031a1d62c04a5681efdddf" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcga9307">
+		<description>PC Games Coverdisk (July 1993) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Syndicate Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames07-93.img" size="737280" crc="d5e48d7b" sha1="cc73c5aa2d35b0e19874bff0d6cacae24fc699b4" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcga9308">
+		<description>PC Games Coverdisk (August 1993) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Pinball Dreams Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames08-93.img" size="737280" crc="5c97c2dd" sha1="612dda3f5d2431fff0398f7f1aaf3a89a0d11a66" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- September 1993 undumped
+	<info name="Contents" value="Ambush at Sorinor Demo" />-->
+
+	<software name="pcga9310">
+		<description>PC Games Coverdisk (October 1993) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="The Lost Vikings Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames10-93.img" size="737280" crc="889763d3" sha1="e50ac372d72b23e06a5a516e895a98f66987317f" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- November 1993 undumped
+	<info name="Contents" value="Energie Manager Demo" />-->
+
+	<!-- December 1993 undumped
+	<info name="Contents" value="Micro Machines Demo" />-->
+
+	<!-- January 1994 undumped
+	<info name="Contents" value="Android Demo" />-->
+
+	<software name="pcga9402">
+		<description>PC Games Coverdisk (February 1994) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Magic Boy / Oxyd Magnum Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames02-94.img" size="737280" crc="9f2d7737" sha1="65d61d1d827f9e954a6e1f21082e33f81ff1ae01" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- March 1994 undumped
+	<info name="Contents" value="Pinball Fantasies Demo" />-->
+
+	<software name="pcga9404">
+		<description>PC Games Coverdisk (April 1994) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Beneath a Steel Sky Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames04-94.img" size="737280" crc="de1257c6" sha1="be2584f9181758f17e6559ebfeec62437b5a56ab" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcga9405">
+		<description>PC Games Coverdisk (May 1994) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Mad News Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames05-94.img" size="737280" crc="79596853" sha1="0baaa8f39c91b7623ae7c8b87e45afcc7e10b2a3" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcga9406">
+		<description>PC Games Coverdisk (June 1994) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Die Siedler Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames06-94.img" size="737280" crc="0062b36b" sha1="a68b9201c6f723896fe3ac44177e4daab8d8ebcd" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- July 1994 undumped
+	<info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />-->
+
+	<!-- August 1994 undumped
+	<info name="Contents" value="Der Clou Demo / 3 New Doom Level" />-->
+
+	<!-- September 1994 undumped
+	<info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />-->
+
+	<!-- October 1994 undumped
+	<info name="Contents" value="Cool Spot / Cheat It Demo" />-->
+
+	<!-- November 1994 undumped
+	<info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />-->
+
+	<!-- December 1994 undumped
+	<info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />-->
+
+	<software name="pcga9501">
+		<description>PC Games Coverdisk (January 1995) (German)</description>
+		<year>1993</year>
+		<publisher>PC Games</publisher>
+		<info name="contents" value="Universe / Cheat it Demo" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="pcgames01-95.img" size="737280" crc="12e12534" sha1="091393557c281cc2e659b8fd089e9b98845a5dec" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Needs a drastic redump from Original Disks-->
+
+	<software name="airduel">
+		<description>Air Duel - 80 Years of Dogfighting</description>
+		<year>1993</year>
+		<publisher>MicroProse Ltd.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="diskb.img" size="1474560" crc="56e219e0" sha1="41afccc7f5ece6e090246e334ca1add3581f2350" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="diskc.img" size="1474560" crc="2e3fc2c2" sha1="7470d282463fe6fc40b4ed3833ee3e52b16c7805" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem3">
+		<description>GEM/3</description>
+		<year>1988</year>
+		<publisher>Digital Research Inc.</publisher>
+		<info name="alt_title" value="GEM Application Environment Services Version 3.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="screend1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="screend2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printerd1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printerd2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printerd3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

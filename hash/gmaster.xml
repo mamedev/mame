@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Undumped:
+- Bomb Disposer
+- Car Racing
+- Invader
+- Move It
+- S-Race
+- Soccer (Fuss-Ball)
+- Tank War
+-->
+<softwarelist name="gmaster" description="Hartung Game Master cartridges">
+	<software name="bublboy" supported="no">
+		<description>Bubble Boy</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bubbleboy.bin" size="16384" crc="edd0679d" sha1="5f6f81b1a5ba6d21e5fb5bc38aa9ee0770b46b97" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cg2020" supported="no">
+		<description>Continental Galaxy 2020</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="cg2020.bin" size="16384" crc="fedec9d5" sha1="f2afe09e8b6368cf2fb956afe7fd055107f943ee" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungeon">
+		<description>Dungeon Adventure</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dungeona.bin" size="32768" crc="60afb4b5" sha1="6048a84ac5a5a51a6522c662398e44cdf2934588" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fallbloc">
+		<description>Falling Block!</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="fallblock.bin" size="8192" crc="58e409fb" sha1="f6f7e3dae361fbd56d4a8457d81bb4f3828c48aB" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobang" supported="no">
+		<description>Go Bang</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="gobang.bin" size="16384" crc="fda2c4e6" sha1="959c16b1657154bb352cb4d6a3e177d7b46850c6" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hspace">
+		<description>Hyper Space</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hyperspace.bin" size="32768" crc="95e0ceac" sha1="b3f95ea3dbc881262e734a2e35feb44a1ddd5641" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfu" supported="no">
+		<description>Kung Fu Challenge</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="kungfu.bin" size="32768" crc="3ea0670b" sha1="01647f87f59f2b05bb46f7bdb2fab38bcd8e3d6e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball" supported="no">
+		<description>Pin Ball</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pinball.bin" size="32768" crc="f5ffc768" sha1="1a30e6b969a8f3824e1aae0bbeb38dabbc75da8b" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scastle" supported="no">
+		<description>Space Castle</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="scastle.bin" size="16384" crc="11d734f1" sha1="6b213a19fc65e967b1b6beba4c4e9e1491b59268" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennism" supported="no">
+		<description>Tennis Master</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tennism.bin" size="32768" crc="48d425cf" sha1="080642009569d7cfdb3d1afe0ce5315842ce4ae8" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uchamp">
+		<description>Urban Champion</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="urbanchamp.bin" size="32768" crc="d53e6cac" sha1="0bea8b120b3cb02136519010cb217fd0b819617d" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

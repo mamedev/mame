@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ibm5140" description="IBM PC 5140 Convertible Disk Images">
+
+	<software name="starter">
+		<description>5140 Starter Disk with App Selector</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="5140 starter disk with app selector.ima" size="737280" crc="7ab4d598" sha1="b6ba39970db4cb1628d080a7b070e3ca4fb39ee5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advdiags">
+		<description>Advanced Diags</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="advanced diags.ima" size="737280" crc="bd4d7f93" sha1="a11216975cc3f31d10c91b9dd575206b49caa18d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

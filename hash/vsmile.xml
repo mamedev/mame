@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+-->
+<softwarelist name="vsmile" description="VTech V.Smile V.Disc images">
+
+<!--
+
+- Known V.Smile games (thanks to Team Europe)
+
+
+V.Reader:                     80-28****
+V.Smile Motion:               80-08****
+V.Smile Smartbook Software:   80-089***
+V.Smile:                      80-092***
+V.Flash (V.Smile Pro):        80-093***
+
+
+
+Language:
+********0 = US
+********1 =
+********2 = Netherlands
+********3 = UK
+********4 = Germany
+********5 = France
+********7 = Spain
+
+
+
+80-084000(US)   | Action Mania
+80-084004(GER)  | Sportskanone
+80-084005(FRA)  | Sporti Folies
+80-084020(US)   | Dora’s Fix It Adventure
+80-084023(UK)   | Dora's Fix-It Adventure
+80-084025(FRA)  | Les Adventures De Dora Apprentie Mecano
+80-084024(GER)  | Doras Reparatur-Abenteuer
+80-084040(US)   | Scooby-Doo - Funland Frenzy
+80-084043(UK)   | Scooby-Doo - Funland Frenzy
+80-084045(FRA)  | Scooby-Doo - Panique A Funland
+80-084060(US)   | Thomas - Engines Working Together
+80-084063(UK)   | Thomas - Engines Working Together
+80-084064(GER)  | Thomas - Freunde halten zusammen
+80-084080(US)   | Wall-E
+80-084083(UK)   | Wall-E
+80-084084(GER)  | Wall-E
+80-084085(FRA)  | Wall-E
+80-084087(SPA)  | Wall-E
+80-084100(US)   | Wonder Pets - Save the Animals!
+80-084120(US)   | Kung Fu Panda
+80-084124(GER)  | Kung Fu Panda - Der Weg des Panda
+80-084125(FRA)  | Kung Fu Panda - La mission de Po
+80-084140(US)   | Spidey & Friends
+80-084144(GER)  | Spider-Man & Freunde - Geheime Missionen
+80-084160(US)   | Little Einsteins
+80-084164(GER)  | Kleine Einsteins
+80-084180(US)   | Mickey Mouse Clubhouse
+80-084184(GER)  | Micky Maus Wunderhaus
+80-084200(US)   | Nascar Academy - Race Car Superstar
+80-084220(US)   | Snow Park Challenge
+80-084224(GER)  | Wintersport
+80-084240(US)   | Ni Hao Kai Lan
+80-084264(GER)  | Mein erster Hund
+80-084280(US)   | Wild Waves
+80-084300(US)   | Soccer Challenge
+80-084304(GER)  | Fußball Meisterschaft
+80-084324(GER)  | TinkerBell
+80-084340(US)   | Up!
+80-084344(GER)  | Oben
+80-084360(US)   | Handy Manny
+80-084364(GER)  | Meister Manny's Werkzeugkiste
+80-084380(US)   | Winnie the Pooh - Honey Hunt
+80-084384(GER)  | Winnie Puuh - Die Honigjagd
+80-084400(US)   | Cars
+80-084404(GER)  | Cars - Vollgas in Radiator Springs
+80-084420(US)   | Toy Story 3
+80-084424(GER)  | Toy Story 3
+80-084440(USA)  | Monsters vs. Aliens
+80-084444(GER)  | Monsters vs. Aliens
+80-084484(GER)  | Küss den Frosch
+80-084500(US)   | Shrek 4
+80-084504(GER)  | Für immer Shrek
+80-084540(US)   | Super Why to the Rescue! The Beach Day Mystery
+80-084604(GER)  | Cinderella - Lernen im Märchenland
+80-084624(GER)  | Findet Nemo - Nemos Unterwasserabenteuer
+
+80-089000(US)   | Spider-Man &amp; Friends Where is Hulk?
+80-089020(US)   | Toy Story 2
+80-089040(US)   | Dora the Explorer
+
+80-090000(US)   | Up
+80-090000(GER)  | Oben
+80-090020(US)   | Handy Manny
+80-090024(GER)  | Meister Manny's Werkzeugkiste
+80-090040(US)   | Wow Wow Wubbzy
+80-090144(GER)  | Mein erster Hund
+80-090164(GER)  | Monsters vs. Aliens
+80-090183(UK)   | Wonder Pets! - Save the Animals
+80-090224(GER)  | Dolphis Wasserabenteuer
+80-090260(US)   | Disney Fairies: Tinker Bell
+
+80-092004(GER)  | Abenteuer im ABC Park
+80-092020(US)   | The Adventures of Little Red Riding Hood
+80-092024(GER)  | Entdecke die Welt von Rotkäppchen
+80-092060(US)   | Winnie The Pooh: Honey Hunt
+80-092064(GER)  | Winnie Puuh - Die Honigjagd
+80-092084(GER)  | Micky - Mickys magisches Abenteuer
+80-092100(US)   | The Lion King: Simba's Big Adventure
+80-092104(GER)  | Der König der Löwen - Simbas großes Abenteuer
+80-092120(US)   | The Little Mermaid
+80-092124(GER)  | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer
+80-092127(SPA)  | La Sirenita - El Vieje Fantástico de Ariel
+80-092140(US)   | Spider-Man & Friends - Secret Missions
+80-092144(GER)  | Spider-Man & Freunde - Geheime Missionen
+80-092160(US)   | Scooby-Doo! Funland Frenzy
+80-092180(US)   | Care Bears - A Lesson in Caring
+80-092200(US)   | Aladdin - Aladdin's Wonders of the World
+80-092220(US)   | Toy Story 2
+80-092240(US)   | Cinderella - Cinderella's Magic Wishes
+80-092244(GER)  | Cinderella - Lernen im Märchenland | 2007
+80-092260(US)   | Elmo's World - Elmo's Big Discoveries
+80-092264(GER)  | Elmo's großes Abenteuer
+80-092265(FRA)  | Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo
+80-092280(US)   | Dora The Explorer
+80-092300(US)   | Bob the Builder: Bob's busy day
+80-092304(GER)  | Bob der Baumeister - Achtung Baustelle
+80-092320(US)   | The Wiggles - It's Wiggle Time!
+80-092340(US)   | Thomas The Tank: Engines Working Together
+80-092360(US)   | Zayzoo My Alien Classmate
+80-092384(GER)  | Barney - Erlebnis-Reise
+80-092400(US)   | Blue's Clues Collection Day
+80-092420(US)   | Finding Nemo
+80-092424(GER)  | Findet Nemo
+80-092440(US)   | Spongebob Squarepants: A Day In The Life of A Sponge
+80-092460(US)   | Sesame Street
+80-092480(US)   | Batman: Gotham City Rescue
+80-092500(US)   | Whiz Kid Wheels
+80-092520(US)   | Spider-Man & Friends Doc Ock's Challenge
+80-092540(US)   | Noddy
+80-092544(GER)  | Noddy
+80-092564(GER)  | 101 Dalmatiner
+80-092580(US)   | Backyardigans
+80-092600(US)   | Shrek 2
+80-092620(US)   | Lil' Bratz - Friends, Fashion and Fun
+80-092640(US)   | Superman
+80-092660(US)   | Cars: Rev It Up In Radiator Springs
+80-092662(NL)   | Cars - Spektakel in Radiator Springs
+80-092664(GER)  | Cars
+80-092820(US)   | Soccer
+80-092824(GER)  | Fußball Schule
+80-092840(US)   | Wall-E
+80-092860(US)   | Shrek the Third: Arthur's School Day Adventure
+80-092880(US)   | Ratatouille
+80-092882(NL)   | Ratatouille
+80-092884(GER)  | Ratatouille - Remys neue Rezepte
+80-092885(FRA)  | Ratatouille - Les nouvelles recettes de Rémy
+80-092900(US)   | Go Diego Go
+80-092920(US)   | Cranium - Partyland Park
+80-092960(US)   | Kung Fu Panda
+80-092980(US)   | Little Einsteins
+
+80-093000(US)   | The Crystal Ball Adventure
+80-093020(US)   | The Incredibles - Mission Incredibles
+80-093040(US)   | Spongebob - Idea Sponge
+80-093044(GER)  | SpongeBob - Ein Schwamm voller Ideen
+80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
+80-093080(US)   | Scooby-Doo! Ancient Adventure
+80-093100(US)   | Cars - In The Fast Lane
+80-093104(GER)  | Cars - Auf der Überholspur
+80-093120(US)   | Wacky Race on Jumpin' Bean Island
+80-093124(GER)  | Das verrückte Rennen auf der Hüpf-Bohnen-Insel
+80-093140(US)   | Shrek 3
+80-093144(GER)  | Shrek - Der Dritte
+80-093160(US)   | Bratz - The Secret Necklace
+80-093204(GER)  | Multisports
+
+80-280000(US)   | Animated E-Book Cartridge - Shrek's Vacation
+80-280100(US)   | Animated E-Book Cartridge - Toy Story 3
+80-280200(US)   | Animated E-Book Cartridge - Mr. Men/Little Miss
+80-280300(US)   | Animated E-Book Cartridge - Tinkerbell and The Great Fairy Rescue
+80-280400(US)   | Animated E-Book Cartridge - Scooby Doo
+80-280600(US)   | Animated E-Book Cartridge - Olivia
+80-280700(US)   | Animated E-Book Cartridge - The Little Engine That Could
+80-280900(US)   | Animated E-Book Cartridge - Dora and the Three Little Pigs
+80-281000(US)   | Animated E-Book Cartridge - Mickey Mouse Clubhouse
+80-281100(US)   | Animated E-Book Cartridge - Disney Princess
+80-281200(US)   | Animated E-Book Cartridge - Cars
+80-281300(US)   | Animated E-Book Cartridge - Sesame Street The Happy Scientists
+80-281400(US)   | Animated E-Book Cartridge - SpongeBob SquarePants Model Sponge
+80-281500(US)   | Animated E-Book Cartridge - Tangled
+80-281600(US)   | Animated E-Book Cartridge - Chuggington - Babysitter Brewster
+80-281700(US)   | Animated E-Book Cartridge - Penguins of Madagascar
+80-281800(US)   | Animated E-Book Cartridge - Kung Fu Panda 2
+80-281900(US)   | Animated E-Book Cartridge - Cars 2
+80-282000(US)   | Animated E-Book Cartridge - Winnie the Pooh
+
+-->
+
+    <!-- disk mounted as 93020 -->
+	<software name="incredib">
+		<description>The Incredibles - Mission Incredible (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093020" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
+			</diskarea>
+		</part>
+	</software>
+
+    <!-- disk mounted as 93080_001 -->
+	<software name="scoobyaa">
+		<description>Scooby-Doo! Ancient Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093080" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
+			</diskarea>
+		</part>
+	</software>
+
+    <!-- disk mounted as 93060_001 -->
+	<software name="spidey93">
+		<description>The Amazing Spider-Man - Countdown to Doom (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093060" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093060"  sha1="89f5072904114211890604dd6693ee70d787996b"/>
+			</diskarea>
+		</part>
+	</software>
+
+    <!-- disk mounted as 93120_003 -->
+	<software name="wacky931">
+		<description>Wacky Race on Jumpin' Bean Island (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093120" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093120"  sha1="dbc128608e64d40aaf3456aac2c0dd07e0f73ef4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="carsg">
+		<description>Cars - Auf der Überholspur (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093104" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093104" sha1="3b627613a40e22028902e1569099bc67a5ed97be" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shrekg">
+		<description>Shrek - Der Dritte (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093144" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093144" sha1="4d5b671f26a8ed4ab58444848428210c44b81c45" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msportg">
+		<description>Multisports (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093204" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093204" sha1="ddabd616d8d00bd02c6313a524a2dcef299362b3" />
+			</diskarea>
+		</part>
+	</software>
+
+
+</softwarelist>

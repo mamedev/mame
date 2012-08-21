@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="abc800" description="Luxor ABC 800 disk images">
+	<software name="basope10">
+		<description>Basope v1.0 (Finland)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="51302">
+				<rom name="basope10.td0" size="51302" crc="8a27ee8c" sha1="04b0c6d03f0f1ba89b1ada86d4c9cebd889a83ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graf16">
+		<!-- 68 20027-41 -->
+		<description>Grafiikka 800 v1.6 (Finland)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="59476">
+				<rom name="graf16.td0" size="59476" crc="e622b7a9" sha1="e8113c05633a5e47f0a918828a4f7e4729680047" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kronstat">
+		<description>Kronstat v2.1</description>
+		<year>198?</year>
+		<publisher>ABC-klubben</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="186394">
+				<rom name="kronstat.td0" size="186394" crc="0531a3fb" sha1="fc487008d193165dd2feca131114450e62aa6b4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ord800">
+		<description>ORD 800 v2.4 (Sweden)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="65069">
+				<rom name="ord800.td0" size="65069" crc="c18e7944" sha1="5dbbd05f954370a23c3a2ab279e1afe09b029414" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prommis">
+		<description>PROMMIS v6.2 (Sweden)</description>
+		<year>198?</year>
+		<publisher>ELlogik</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="51535">
+				<rom name="pr800_62.td0" size="51535" crc="b6935ddf" sha1="c5c45d4ed1557ae8fa8813896dfa34f215fee8f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="red800">
+		<description>Bokforing 800 v2.0 (Sweden)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="141304">
+				<rom name="red800.td0" size="141304" crc="47fb91c9" sha1="a93c5499b546dce56eb19e254479e8b4feef0c53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sana800">
+		<!-- 68 20037-56 -->
+		<description>Sana 800 v2.3 (Finland)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="50916">
+				<rom name="sana23.td0" size="50916" crc="f50eed61" sha1="cf18d22798f03348de6acf701232e8091370d4b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tty800">
+		<!-- RUN"TTY" -->
+		<description>TTY800 v1.5 (Sweden) (no autoboot)</description>
+		<year>1983</year>
+		<publisher>Front-Line</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="40815">
+				<rom name="tty800.td0" size="40815" crc="b7c23baf" sha1="9b72c40d859cf549316e565b9dd60ec64bb7a23d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tty800ub">
+		<description>TTY800 v1.5 (Sweden)</description>
+		<year>1983</year>
+		<publisher>Front-Line</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="53398">
+				<rom name="tty800ub.td0" size="53398" crc="1a88baeb" sha1="2bcfda8a819b748c4cb54b6495082a3b9980dca6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catnetl">
+		<!-- RUN"CATNETL" -->
+		<description>CAT800L v8.6 for CATNET v1.3</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="32173">
+				<rom name="catnetl.td0" size="32173" crc="bc671658" sha1="1a2f4cdd2c0be20cdccaa7123b5493c4bb0ef850" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys10fi">
+		<!-- RUN"LIB" -->
+		<description>Systeemilevy ABC800 v1.0 (Finland)</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="22884">
+				<rom name="sys10fi.td0" size="22884" crc="524dc681" sha1="81a3e8f791bf57345705a871ea4ca8c00502951c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys10sw">
+		<!-- RUN"LIB" -->
+		<!-- 68 29011-41 -->
+		<description>Systemskiva ABC800 v1.0 (Sweden)</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="24026">
+				<rom name="sys10sw.td0" size="24026" crc="8f49bb1d" sha1="27c9186dd1363b74344ff70a6abffe613e7091ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd619">
+		<!-- RUN"LIB" -->
+		<description>System disk v6.19 for UFD-DOS</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="119474">
+				<rom name="ufd619.td0" size="119474" crc="d3f9487e" sha1="ad22609421d9abb4c803899b405d087ff3b91c38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd619a6">
+		<description>System disk v6.19a6 for UFD-DOS</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="136796">
+				<rom name="ufd619a6.td0" size="136796" crc="0244874e" sha1="26d188d04bf78ccb6abf087b8577c3e7dd423940" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo11">
+		<!-- 68 20018-41 -->
+		<description>Demo ABC800 v1.1</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="85140">
+				<rom name="demo11.td0" size="85140" crc="77fd2490" sha1="ba953cf6496633c449b2b49ad707469a763e1fd3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal10">
+		<!-- 68 29067-43 -->
+		<description>Pascal 800 v1.04</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="77214">
+				<rom name="pascal10.td0" size="77214" crc="5ded710c" sha1="66be481e7bff83c1dc3c7c7af85bc34f6813dc6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

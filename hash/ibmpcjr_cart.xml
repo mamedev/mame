@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ibmpcjr_cart" description="IBM PC Jr cartridges">
+<!--
+Known cartridge software according to http://www.brutman.com/PCjr/pcjr_options.html:
+
+*QuickSilver (Synectics)
+Compatibility Cartridge (PC Enterprises)
+Combo Cartridge (PC Enterprises) - v1.0, v2.0, and v3.0 are known to exist
+Configuration Cartridge (PC Enterprises) - Has dipswitches on cart
+Configuration Cartridge Plus (PC Enterprises) - Has dipswitches and LEDs on cart
+jrVideo (PC Enterprises)
+Keyboard Buffer (PC Enterprises)
+*PC ID (Racore)
+Clock Cartridge (Integrity Technology) - Clock/calendar chip on cartridge (Dallas DS1215)
+Blank Cartridge (Integrity Technology) - Blank cartridge
+
+*ColorPaint (Krepec)
+*Cartridge BASIC (Microsoft)
+*Lotus 123jr (Lotus Development)
+Electric Desk (Alpha)
+Andrew Tobias: Managing Your Money (MECA)
+
+*ScubaVenture (Gebelli)
+*River Raid (Activision)
+*PitFall II (Activision)
+*Mouser (Gebelli)
+Demon Attack (Imagic)
+Micro Surgeon (Imagic)
+*CrossFire (Sierra OnLine)
+*Mine Shaft (Sierra OnLine)
+
+FaceMaker (Spinaker)
+KinderComp (Spinaker)
+Fraction Fever (Spinaker)
+-->
+
+	<software name="basic">
+		<description>Cartridge BASIC</description>
+		<year>1983</year>
+		<publisher>Microsoft</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="basic.bin" size="32768" crc="8fc2a724" sha1="216915e954d393e42a30d1eb8666371439dcbd38" offset="0" />
+				<rom size="32768" offset="0x8000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colorpnt">
+		<description>ColorPaint</description>
+		<year>1984</year>
+		<publisher>IBM</publisher>
+		<info name="usage" value="Boot from a DOS floppy and type 'G'" />
+		<sharedfeat name="requirement" value="ibmpcjr_flop:dos2"/>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="colorpnt.bin" size="65536" crc="0dcdef20" sha1="5aeee32a4ec4dd1aeea9a02b3d174a2f294d13b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xfire">
+		<description>CrossFire</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="crosfire.bin" size="8192" crc="8c52b5ca" sha1="6a012cddb8188f157790f9ff633862f514ecdf8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotus123">
+		<description>Lotus 123jr</description>
+		<year>1984</year>
+		<publisher>Lotus Development</publisher>
+		<info name="usage" value="Mount both carts and a DOS floppy and type 'TUTOR'" />
+		<sharedfeat name="requirement" value="ibmpcjr_flop:dos2"/>
+		<part name="cart1" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mineshft">
+		<description>Mine Shaft</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mineshft.bin" size="8192" crc="ed70ef88" sha1="73ee013a3ae3d5648e712718b2414e87edbadb1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mouser">
+		<description>Mouser</description>
+		<year>1983</year>
+		<publisher>Gebelli</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mouser.bin" size="8192" crc="cf392a67" sha1="cbcdcf8c7d5d4e143145ab1dd7fdc04948ebc194" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This rom acts as a bios replacement, this is not yet supported by the driver -->
+	<software name="pc_id" supported="no">
+		<description>PC ID</description>
+		<year>19??</year>
+		<publisher>Racore</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="pc_id.bin" size="65536" crc="08898215" sha1="399a30a6ef60d5dc21a4bf869e56a1730696d173" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall2">
+		<description>Pitfall II</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pitfall2.bin" size="16384" crc="5359b9f8" sha1="a4a5e8bee86a6824869996cfe3bba24dd7b31a14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This rom acts as a bios replacement, this is not yet supported by the driver -->
+	<software name="quiksilv" supported="no">
+		<description>QuickSilver</description>
+		<year>19??</year>
+		<publisher>Synectics</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="quiksilv.bin" size="65536" crc="86aaa1c4" sha1="b3d7e8ce5de17441891e0b71e5261ed01a169dc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riveraid">
+		<description>River Raid</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="rivrraid.bin" size="16384" crc="7c122e43" sha1="b1e425ebe03b50688a3f78b4dc11d89b26e1441d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scubavnt">
+		<description>ScubaVenture</description>
+		<year>1983</year>
+		<publisher>Gebelli</publisher>
+		<part name="cart" interface="ibmpcjr_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="scubavnt.bin" size="8192" crc="5d400806" sha1="af8ce72fe1348114dddd89a32540c19e85a9144c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

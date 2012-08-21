@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Kof95 and Ultraman require additional ROM cartridges to work! -->
+
+<softwarelist name="sat_cart" description="Sega Saturn Cartridges">
+
+	<!-- The header would indicate this is the same for both regions -->
+	<software name="kof95" supported="no">
+		<description>The King of Fighters '95 (Euro, Jpn) (Support Cartridge)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="sat_cart">
+			<dataarea name="cart" size="0x200000">
+				<rom name="kof95 (je).rom" size="0x200000" crc="90412e10" sha1="a67cd4f550751f8b91de2b8b74528ab4e0c11c77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only the CD for this seems to be dumped? The support cart is missing... -->
+	<software name="ultraman" supported="no">
+		<description>Ultraman (Jpn) (Support Cartridge)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="sat_cart">
+			<dataarea name="cart" size="0x200000">
+				<rom name="ultraman (j).rom" size="0x200000" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="test1f">
+		<description>Test Menu v1.0f</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sat_cart">
+			<dataarea name="cart" size="0x80000">
+				<rom name="sega saturn test menu v1.0f.bin" size="0x80000" crc="17031c7a" sha1="433cb101bb6e61873778dfcd61a65c72ec552dd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- weird size... is it a bad dump? -->
+	<software name="ar">
+		<description>Action Replay</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sat_cart">
+			<dataarea name="cart" size="84069">
+				<rom name="action replay rom.bin" size="84069" crc="cc518d69" sha1="8c091285a2fc863c8b3e6e9e5849a8a3469e02ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

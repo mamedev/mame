@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="uzebox" description="Uzebox internal EPROM contents">
+	<software name="arkanoid" supported="no">
+		<description>Arkanoid</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="58542">
+				<rom name="arkanoid.bin" size="58542" crc="aa90ca49" sha1="b6b3e0b841a7bdf3c7d076488e70de6e4696ff0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="bitmapd" supported="no">
+		<description>Bitmap Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="13904">
+				<rom name="bitmapdemo.bin" size="13904" crc="09202c5a" sha1="1e3824af445a8be6d4fab243a20700c0f112fb42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="drmario" supported="no">
+		<description>Dr Mario</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="53388">
+				<rom name="drmario.bin" size="53388" crc="2f9e1b61" sha1="c17584862b92d2a8035af4edce171a46faf1bcc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="maze" supported="no">
+		<description>Maze</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="15456">
+				<rom name="maze.bin" size="15456" crc="47dbed06" sha1="a39f56c9697654af3b3503dd9ddd64da572f0181" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="megatris" supported="no">
+		<description>Megatris</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60546">
+				<rom name="megatris.bin" size="60546" crc="a00f3b32" sha1="edfd556e465b275aee36626bd506738f3e8f21db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="musicdmo" supported="no">
+		<description>Music Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="47016">
+				<rom name="musicdemo.bin" size="47016" crc="1a39fec9" sha1="621cf419c6af9d412b96d815ba57e722fb86eb49" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="sdcardd" supported="no">
+		<description>SD Card Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="14130">
+				<rom name="sdcarddemo.bin" size="14130" crc="d97ec156" sha1="3928b9c6c3f51fb0912200303cb610a28f91e950" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="sprited" supported="no">
+		<description>Sprite Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="64222">
+				<rom name="spritedemo.bin" size="64222" crc="39a75fa4" sha1="fb975e4b8e17fedf48d16734442af50ed7a0ab0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="smariod" supported="no">
+		<description>Super Mario Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="55706">
+				<rom name="supermariodemo.bin" size="55706" crc="73acd5bf" sha1="c780457243fbd20d2dc3006a0dcbae040bad9b72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="tutorial" supported="no">
+		<description>Tutorial</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="12922">
+				<rom name="tutorial.bin" size="12922" crc="bd50dbf9" sha1="19928861eb5d0d7aa1c90fb6d90cc0a293a75fdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="uzeamp" supported="no">
+		<description>UzeAmp</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="35306">
+				<rom name="uzeamp.bin" size="35306" crc="6e26137e" sha1="b81f8948906543579a7b0341948f68889069a0db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="vectord" supported="no">
+		<description>Vector Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="14296">
+				<rom name="vectordemo.bin" size="14296" crc="a77eb938" sha1="f1082aeffc74b230ca9724e1f4a9907371e1213f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="videod" supported="no">
+		<description>Video Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="7430">
+				<rom name="videodemo.bin" size="7430" crc="6b8c8fae" sha1="c7bbc62fe170c5179d44993bbb0869a5ba09ae4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="wamole" supported="no">
+		<description>Whack-a-Mole</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="40128">
+				<rom name="whack-a-mole.bin" size="40128" crc="bbd75c6e" sha1="8600b21b3b00a3759adb210435db5b3558f78f38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

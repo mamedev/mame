@@ -1,0 +1,365 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="c128_flop" description="Commodore 128 diskettes">
+
+	<!-- Games -->
+
+	<software name="amfv">
+		<description>A Mind Forever Voyaging (R77)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="a_mind_forever_voyaging_s1[infocom_1985](c128)(!).g64" size="333744" crc="b5fbf19d" sha1="10643b56627ce79f88b2a679b4436f473fe6bc72" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="a_mind_forever_voyaging_s2[infocom_1985](c128)(!).g64" size="333744" crc="86df6654" sha1="8e9ad293aed7f077ba22d885f8abc61d98d08e4a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byondzrk">
+		<description>Beyond Zork: The Coconut of Quendor (R47)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="beyond_zork_s1[infocom_1987](c128)(!).g64" size="333744" crc="1ac04818" sha1="3b3e601951f1fd8a4ba2152ce3c8b14393547b21" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="beyond_zork_s2[infocom_1987](c128)(!).g64" size="333744" crc="15b30575" sha1="f2852c8912c9e4742ee62b698fa140158276fa6d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bureaucr">
+		<description>Bureaucracy: A Paranoid Fantasy (R116)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="bureaucracy_s1[infocom_1987](r116)(c128).g64" size="333744" crc="0ef108e3" sha1="097f68ada1e0a8ed14a3107d1e844f4b17e12e19" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="bureaucracy_s2[infocom_1987](r116)(c128).g64" size="333744" crc="53c3f86a" sha1="957b89aa30f38037e4931fc7968c45e7d5042c81" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bureaucra" cloneof="bureaucr">
+		<description>Bureaucracy: A Paranoid Fantasy (R86)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 1"/>
+			<dataarea name="flop" size="333744">
+				<rom name="bureaucracy_s1[infocom_1987](r86)(c128)(!).g64" size="333744" crc="203155b4" sha1="896b5aeb2573ca6da3976fd17db4c1785ce460ed" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Story Disk Side 2"/>
+			<dataarea name="flop" size="333744">
+				<rom name="bureaucracy_s2[infocom_1987](r86)(c128)(!).g64" size="333744" crc="aeae424a" sha1="7e7934cc2d0c040bccf27f515ea55ac7e18d1e22" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastv8">
+		<description>The Last V-8</description>
+		<year>1985</year>
+		<publisher>Mastertronic</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="the_last_v8[mastertronic_1985](c128).g64" size="333744" crc="34ee8b20" sha1="3d752a5f4924cf48689270f5f9464cc9529d7aa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockyhor">
+		<description>The Rocky Horror Show</description>
+		<year>1987</year>
+		<publisher>CRL</publisher>
+		<info name="protection" value="fat" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rocky_horror_show[crl_1987](c128).g64" size="333744" crc="cd1915f9" sha1="792756c0ae514b55ab4e06a2f4601f9cd1edf7c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thaibxng">
+		<description>Thai Boxing</description>
+		<year>1986</year>
+		<publisher>Anco</publisher>
+		<info name="protection" value="fat" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="thai_boxing[anco_1986](c128)(fat).g64" size="333744" crc="6a29ef3a" sha1="ca317c6f44e940c38e1f537d88e66c52c6968885" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Applications -->
+
+	<software name="basic128">
+		<description>BASIC-128 v1.03</description>
+		<year>1985</year>
+		<publisher>Abacus</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basic-128[abacus_1985](v1_03).g64" size="333744" crc="94047950" sha1="a1cd6e8302699684e0eaa8bccc0de6ad70918397" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbr128">
+		<description>Big Blue Reader 128</description>
+		<year>1991</year>
+		<publisher>SOGWAP</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="big_blue_reader_128[sogwap_1989](v3_12).g64" size="333744" crc="57d64987" sha1="8de9b32074ad13277d1e6e3f910adce234c8c9bd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buddy128">
+		<description>Buddy System 128 v10</description>
+		<year>1992</year>
+		<publisher>Chris Miller</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="buddy128.g64" size="333744" crc="6f4326a2" sha1="750490f1aaa445ca603282642ed3e4976029982a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128tutr">
+		<description>Commodore 128 Tutorial</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="commodore_128_tutorial[cbm_1985[.g64" size="333744" crc="0a807511" sha1="270a4f0efb950184fa53bb86ad1535192c94bb5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cadpak">
+		<description>CADPAK-128</description>
+		<year>1986</year>
+		<publisher>Abacus</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Joystick/Keyboard Version"/>
+			<dataarea name="flop" size="333744">
+				<rom name="cadpak-128_s1[abacus_1986].g64" size="333744" crc="db4d7d19" sha1="555f0605cd9acb37186cdc72950fad74925ae576" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Mouse Version"/>
+			<dataarea name="flop" size="333744">
+				<rom name="cadpak-128_s2[abacus_1986].g64" size="333744" crc="5c99bc8e" sha1="cf4818c00495910ed8720c72d3c416ae123af9b2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commterm">
+		<description>Comm Term 64/128</description>
+		<year>1986</year>
+		<publisher>Anchor Automation</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="comm_term_64_128[anchor_automation_1987].g64" size="333744" crc="c9462996" sha1="c71ee5e1c71a1770bc569b96794d555fc8c3d08b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datamgr">
+		<description>Data Manager 128</description>
+		<year>1984</year>
+		<publisher>Timeworks</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="333744">
+				<rom name="data_manager_128_s1[timeworks_1984].g64" size="333744" crc="ef5793e1" sha1="18f97719615308a0d3aacd3561ce645a65e1b84c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="333744">
+				<rom name="data_manager_128_s2[timeworks_1984].g64" size="333744" crc="fbf7cf7f" sha1="2d2aa58bd1a71cffd5d6765a9b79af867d12ecc4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enhsidpl">
+		<description>Enhanced SidPlayer (128 Version)</description>
+		<year>198?</year>
+		<publisher>Compute!</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="enhanced_sid_player_128_version[compute!_198x].g64" size="333744" crc="284e224c" sha1="8057964665c16330a3283fdd44205a17075711a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fasthack">
+		<description>Fast Hack'em 128 v6.00</description>
+		<year>1988</year>
+		<publisher>Basement Boys</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="fast_hack_em_128[basement_boys_1988](v6_00).g64" size="333744" crc="4af25fa0" sha1="b6f829654116feb69155876cb7ad182be15a9474" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos20">
+		<description>GEOS 128 v2.0</description>
+		<year>1988</year>
+		<publisher>Berkeley</publisher>
+		<info name="protection" value="signature" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="333744">
+				<rom name="geos_128_2_0_s1_system[berkeley_1988].g64" size="333744" crc="17827ed0" sha1="57384ad5a3b55c56b96fbdf78f61a2da1aef862c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Demo"/>
+			<dataarea name="flop" size="333744">
+				<rom name="geos_128_2_0_s2_demo[berkeley_1988].g64" size="333744" crc="6170c1af" sha1="13fa33b7993ce47274c4d6ff91fd1f9837d388d3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Backup"/>
+			<dataarea name="flop" size="333744">
+				<rom name="geos_128_2_0_s3_backup[berkeley_1988].g64" size="333744" crc="b6cd4bfa" sha1="fa3d0d1b06ec16b6fcff68e6572c9260fbc5ae6b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Apps"/>
+			<dataarea name="flop" size="333744">
+				<rom name="geos_128_2_0_s4_apps[berkeley_1988].g64" size="333744" crc="889bb845" sha1="2a549943851ee608c31dcad53ee0595cb0ef5ffa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Write Utils"/>
+			<dataarea name="flop" size="333744">
+				<rom name="geos_128_2_0_s5_write_utils[berkeley_1988].g64" size="333744" crc="6f704079" sha1="1c61723ff24ffc02f57e90f7377c3e700d1e02a6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="GEOSpell"/>
+			<dataarea name="flop" size="333744">
+				<rom name="geos_128_2_0_s6_geospell[berkeley_1988].g64" size="333744" crc="7df9ec72" sha1="211828b78afdeab3246302951750062c256ca1b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jane">
+		<description>Jane</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Application Disk"/>
+			<dataarea name="flop" size="333744">
+				<rom name="jane__s1_application_disk[cbm_1985](c128).g64" size="333744" crc="21df7137" sha1="6a8536a6c64120a3ad93bd741145a7355a323143" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Help Disk"/>
+			<dataarea name="flop" size="333744">
+				<rom name="jane__s2_help_disk[cbm_1985](c128).g64" size="333744" crc="90fdc6b9" sha1="6be4610651a7c1e8b803cd4fb7212943e52d597d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach128">
+		<description>MACH 128 Utility Disk</description>
+		<year>1985</year>
+		<publisher>Access</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="mach_128[access_1985].g64" size="333744" crc="9cb01daa" sha1="47c5f1dc1a242edbff1ff51a0e89f89019f5aacd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="merlin">
+		<description>Merlin 128 Macro Assembler v1.10</description>
+		<year>1987</year>
+		<publisher>Roger Wagner Publishing</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="merlin_128_macro_assembler[roger_wagner_pub_1987](v1_10)(c128).g64" size="333744" crc="ab9a0899" sha1="55d112b3fe01b56f593d7f7dde3458279a1bf834" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petspeed">
+		<description>Petspeed 128 v2.2</description>
+		<year>1986</year>
+		<publisher>Systems Software</publisher>
+		<info name="protection" value="codesheet" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="petspeed_128[systems_software_1986](v2_2).g64" size="333744" crc="64be27bc" sha1="08050d19159dbe566e16f85586cebc142dc83773" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spascal">
+		<description>Super Pascal 128 v6.1</description>
+		<year>19??</year>
+		<publisher>Data Becker</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="super_pascal_128[data_becker_19xx](v6_1).g64" size="333744" crc="32716bcb" sha1="6c4a0fed4f5f3fc3961d12922d563307d8de6399" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superc">
+		<description>Super C 128 v3.02</description>
+		<year>1985</year>
+		<publisher>Data Becker</publisher>
+		<info name="protection" value="none" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="super_c_128_[data_becker_1985](v3_02).g64" size="333744" crc="b0208ed2" sha1="9e21cf8b2bfdbe7de62a935579cd2ea16d3e2711" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

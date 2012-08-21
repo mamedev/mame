@@ -1,0 +1,3249 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pico" description="Sega Pico cartridges">
+
+<!--
+
+Undumped known games
+(list based on lists at
+http://www2.plala.or.jp/master_s/pico/soft/pico_soft.html
+http://segaretro.org/
+with a lot of tweaks)
+
+
+Published by Sega/Sega Toys (HPC-6*** serial codes)
+
+* ハローキティのたのしいぶとうかい - Hello Kitty no Tanoshii Butoukai (Sega - 19930326 - HPC-6002)
+* ひらけ！ポンキッキ パーティをひらこう！ - Hirake! Ponkikki Paatei wo Hirakou! (Sega - 199307xx - HPC-6003)
+* ラえもん のびたとまいごのきょうりゅう - Doraemon - Nobita to Maigo no Kyouryuu (Sega - 1993xxxx - HPC-6004)
+* ドナルドのおばけたいじ - Donald no Obake Taiji (Sega - 1993xxxx - HPC-6005)
+* けろけろけろっぴのハリキリうんどうかい - Kerokero Keroppi no Harikiri Undoukai (Sega - 1993xxxx - HPC-6006)
+* ミーミとタータのワイワイおえかきどうぶつえん - Miimi to Taata no Waiwai Oekaki Doubutsuen (Sega - 1993xxxx - HPC-6007)
+* ペンギンうきうき びっくりすいぞくかん めいろ・パズル - Penguin Ukiuki Bikkuri Suizokukan Meiro Puzzle (Sega - 1994xxxx - HPC-6008)
+* ソニック☆ザ☆ヘッジホッグ ゲームワールド - Sonic the Hedgehog Gameworld (Sega - 199408xx - HPC-6010)
+* ドレミファアニマルズの たのしいえんそうかい - Doremifa Animaruzu no Tanoshiien Soukai (Sega - 1994xxxx - HPC-6011)
+* それいけ! アンパンマン えいごとなかよし ようちえんでABC - Soreike! Anpanman - Eigo to Nakayoshi Youchiende ABC (Sega - 1994 - HPC-6012)
+* ３丁目のタマ モモちゃんはどこ！ - 3-choume no Tama Momo-chan wa Doko! (Sega - 199407xx - HPC-6013)
+* 愛と夢と冒険 サンリオピューロランド - Ai to Yume to Bouken Sanrio Puroland! (Sega - 199410xx - HPC-6014)
+* スヌーピーのがくげいかい - Snoopy no Gakugeikai (Sega - 19951027 - HPC-6016)
+* めざせプロ野球 - Mezase Pro Yakyuu (Sega - 1995xxxx - HPC-6021)
+* 魔法騎士 レイアース マジックナイトたんじょう - Mahou Kishi Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
+* 世界名作劇場 - Sekai Meisaku Gekijou (Sega - 19950725 - HPC-6024)
+* NHKおかあさんといっしょ げんきなこあつまれ！ - NHK Okaasan to Issho Genki na Koatsumare! (Sega - 19951125 - HPC-6025)
+* サンリオピューロランドで ダンスカーニバル みんなで おりょうり おさいほう - Sanrio Puroland de Dance Carnival Minna de Oryouri Osaihou (Sega - 19951027 - HPC-6026)
+* ぺたぺたちょっきん あそべるずかん <どうぶつ> - Petapeta Chokkinna Soberuzukan ~Doubutsu~ (Sega - 199511xx - HPC-6028)
+* おんがくだいすきスヌーピー  - Ongaku Daisuki Snoopy (Sega - 1996xxxx - HPC-6030)
+* サンリオカーニバル たのしいカードづくり - Sanrio Carnival Tanoshii Card Dukuri (Sega - 19951130 - HPC-6031)
+* ゆかいな森のパケット - Yukai na Mori no Paketto (Sega - 199512xx - HPC-6034)
+* 怪盗セイント･テール セイントテールとワン･ツー･スリー! - Kaitou Saint Tail - Saint Tail to One, Two, Three! (Sega - ???? - HPC-6035)
+* バーバパパのうちゅうりょこう - Barbapapa no Uchuu Ryokou (Sega - 1996xxxx - HPC-6036)
+* みんなでおどろう オズのまほうつかい  - Minna de Odorou - Ozu no Mahou Tsukai (Sega - ???? - HPC-6037)
+* 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
+* ハローキティのすてきなおたんじょうび  - Hello Kitty no Suteki nao Tanjoubi (Sega - 1997xxxx - HPC-6040)
+* よべばこたえる　ドラえもん のびたとひみつどうぐをみつけよう! - Yobeba Kotaeru Doraemon - Nobita to Himitsu Douguwomitsukeyou! (Sega - ???? - HPC-6041)
+* ぬりえだいすき! ダンボのわくわくサーカス! - Nurie Daisuki! Dumbo no Wakuwaku Saakasu! (Sega - 1997xxxx - HPC-6044)
+* もしもしピコ セット だれがでるかな?もしもしピコで テレビとおしゃべり! <同梱> - Moshimoshi Pico Set with Darega Derukana? Moshimoshi Pico de Terebi Tooshaberi! (Sega - 1997xxxx - HPC-6046)
+* パケット２ ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
+* みんなでカラオケ! うたってピコ セット いっしょにうたおう すきなうた！ <同梱> - Minna de Karaoke! Utatte Pico Set with Isshoni Utaou Sukinauta! (Sega - 1997xxxx - HPC-6049)
+* キーボードピコ２ セット さわってみよう！ よいこのはじめてキーボード <同梱> - Keyboard Pico 2 Set with Sawatte Miyou! Yoiko no Hajimete Keyboard (Sega - 199712xx - HPC-6052)
+* さわってみよう！ よいこのはじめてキーボード - Sawattemiyou! Yoiko no Hajimete Keyboard (Sega - 199712xx - HPC-6053)
+* プーさんとたのしいなかまたち - Pooh-san to Tanoshii na Kamatachi (Sega - ???? - HPC-6054)
+* スペースピコ 宇宙冒険 スペースシャトルパイロット セット - Space Pico - Uchuu Bouken Space Shuttle Pilot Set (Sega - 199712xx - HPC-6058)
+* はじめまシリーズ5 けろけろけろっぴのハリキリうんどうかい - Hajimema Series 5 - Kerokero Keroppi no Harikiri Undoukai (Sega - 1998xxxx - HPC-6059) [reprint HPC-6006]
+* はじめまシリーズ6 クイズにチャレンジ！ ドラえもん - Hajimema Series 6 - Quiz ni Challenge! Doraemon (Sega - 1998xxxx - HPC-6060) [reprint HPC-6020]
+* はじめまシリーズ2 ハローキティのたのしいぶとうかい - Hajimema Series 2 - Hello Kitty no Tanoshii Butoukai (Sega - 1998xxxx - HPC-6061) [reprint HPC-6002]
+* はじめまシリーズ2 ハローキティのたのしいぶとうかい - Hajimema Series 1 - Donald no Obake Taiji (Sega - 1998xxxx - HPC-6062) [reprint HPC-6005]
+* はじめまシリーズ3 ゴジラ どきどき怪獣島！ - Hajimema Series 3 - Godzilla Dokidoki Kaijuu Shima! (Sega - 1998xxxx - HPC-????) [reprint HPC-6027]
+* おえかきピコ <タブレットのみ> - Oekaki Pico ~Tablet no Mi~ (Sega - ???? - HPC-????)
+* ペコラのだいぼうけん まぼろしのアイスクリームをさがせ! - Pecola no Daibouken Maboroshi no Ice Cream wo Sagase! (Sega - 1998xxxx - HPC-6066)
+* NHKおかあさんといっしょ ドレミファど～なっつ! おえかき だーいすき！ おもしろ おえかき だいしゅうごう! - NHK Okaasan to Issho - Doremifa Donuts! Oekaki Daisuki! Omoshiro Oekaki Daishuugou! (Sega - 1998xxxx - HPC-6068)
+* いっしょにうたおう! ドラえもん わくわくカラオケ - Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega Toys - 1999xxxx - HPC-6073)
+* リズムピコ ピッピちゃん と リズム遊び - Rhythm Pico with Pippi-chan to Rhythm Asobi (Sega Toys - 1999xxxx - HPC-6074)
+* 6000人の先生たちがつくった たのしい小学校探検１ - 6000-nin no Sensei Tachiga Tsukutta Tanoshii Shougakkou Tanken 1 (Sega - 199909xx - HPC-6075)
+* クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
+* 白雪姫 ～しらゆきひめ～ - Shirayukihime (Sega Toys - 199909xx - HPC-6077)
+* 6000人の先生たちがつくった たのしい小学校探検２ - 6000-nin no Sensei Tachiga Tsukutta Tanoshii Shougakkou Tanken 2 (Sega - ???? - HPC-6078)
+* McDonald's マクドナルドであそぼ！ - McDonald's - McDonald de Asobo (Sega Toys - 2000xxxx - HPC-6079)
+* バグズ・ライフ - A Bug's Life (Sega Toys - ???? - HPC-6080)
+* いつでもいっしょ ドラえもん セット - Itsudemo Issho Doraemon Set (Sega Toys - ???? - HPC-6081)
+* フィッシングピコ ドナルドのアドベンチャーフィッシング セット - Fishing Pico - Donald no Adventure Fishing Set (Sega Toys - 2000xxxx - HPC-6082)
+* キティとみんなの キーボードピコ サンリオピューロランドにいこう！ キティとみんなのはじめてキーボード!<同梱>！ - Kitty to Minna no Keyboard Pico Sanrio Puroland ni Ikou! with Kitty to Minna no Hajimete Keyboard (Sega Toys - 2000xxxx - HPC-6084)
+* しましまとらのしまじろう たのしいいちにち - Shimashimatora no Shimajiro Tanoshii Ichi Nichi (Sega Toys - 200006xx - HPC-6085)
+* トミカピコ セット ぼくらのまちトミカタウンであそぼう! - Tomica Pico Set Bokura no Machi Tomica Town de Asobou! (Sega Toys - 200007xx - HPC-6086)
+* スージーちゃんとマービー おてつだい だ～いすき！ - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
+* トイストーリー２ ウッディ そうさく だいさくせん!! - Toy Story 2 - Woody Sousaku Daisakusen!! (Sega Toys - ???? - HPC-6090)
+* それいけ!アンパンマン アンパンマンとすうじあそび - Soreike! Anpanman - Anpanman to Suuji Asobi (Sega Toys - ???? - HPC-6091)
+* ぐ～チョコランタン みんなでおえかき！たのしいあそびも いっぱい! - Goo Choco Lantern - Minna de Oekaki! Tanoshii Asobi mo Ippai! (Sega Toys - 2001xxxx - HPC-6092)
+* コンビニでおかいもの！ - Conveni de Okaimono! (Sega Toys - ???? - HPC-6094)
+* やさしくおてあて ピコクリニック! かんごふさんピコ - Yasashiku Oteate Pico Clinic! Kangofusan Pico (Sega Toys - 2001xxxx - HPC-6095)
+* ハローキティとマクドナルドであそぼ！ - Hello Kitty to McDonald de Asobo! (Sega Toys - 20011001 - HPC-????)
+* パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
+* リカちゃんになりたい！ - Likka-chan ni Naritai! (Sega Toys - 200110xx - HPC-6098)
+* プラレール・ピコ プラレールであそぼう！ - Plarail - Pico Plarail de Asobou! (Sega Toys - 20010921 - HPC-6099)
+* アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! <同梱> - Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu! (Sega Toys - 20020124 - HPC-6102)
+* ECCジュニアの はじめてえいご Vol.１ - Patty And Her Family パティちゃんファミリー - ECC Junior no Hajimete Eigo Vol. 1 - Patty And Her Family - Patty-chan Family (Sega Toys - 20020307 - HPC-6103)
+* ECCジュニアの はじめてえいご Vol.２ - Patty Goes On A Picnic パティちゃんのピクニック - ECC Junior no Hajimete Eigo Vol. 2 - Patty Goes On A Picnic - Patty-chan no Picnic (Sega Toys - 20020307 - HPC-6104)
+* ECCジュニアの はじめてえいご Vol.３ - Happy Birthday, Patty! パティちゃんのお誕生日 - ECC Junior no Hajimete Eigo Vol. 3 - Happy Birthday, Patty! - Patty-chan no Otanjoubi (Sega Toys - 20020307 - HPC-6105)
+* ECCジュニアの はじめてえいご Vol.４ - Patty Loves Animals 動物大好き、パティちゃん - ECC Junior no Hajimete Eigo Vol. 4 - Patty Loves Animals - Doubutsu Daisuki, Patty-chan (Sega Toys - 200207xx - HPC-6106)
+* ECCジュニアの はじめてえいご Vol.５ - Merry Christmas, Patty! メリークリスマス、パティちゃん - ECC Junior no Hajimete Eigo Vol. 5 - Merry Christmas, Patty! - Merry Christmas, Patty-chan (Sega Toys - 200207xx - HPC-6107)
+* ECCジュニアの はじめてえいご Vol.６ - Patty Goes to the Amusement Park パティちゃん遊園地に行く - ECC Junior no Hajimete Eigo Vol. 6 - Patty Goes to the Amusement Park - Patty-chan Yuuenchi ni Iku (Sega Toys - 200207xx - HPC-6108)
+* おせわしましょ！ あかちゃんピコ - Osewashimasho! Akachan Pico (Sega Toys - 20020701 - HPC-6109)
+* ミニモニ。テレビにでるんだぴょん！ - Mini Moni. Terebi ni Derundapyon! (Sega Toys - 20020613 - HPC-6110)
+* コスメピコ もっとかわいくなりたいな - Kosume Pico Motto Kawai Kunaritaina! (Sega Toys - 20020604 - HPC-6112)
+* ポケットモンスター すうじをつかまえよう！ - Pocket Monsters Suuji wo Tsukamaeyou! (Sega Toys - 200208xx - HPC-6113)
+* トミカ・ピコ レスキューパーキング きんきゅうしゅつどう！ はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
+* ハローキティのたのしいおみせやさん - Hello Kitty no Tanoshii Omiseyasan (Sega Toys - 200211xx - HPC-6117)
+* ダンスピコ はしっておどって超ハッピー! - Dance Pico with Hashitte Odotte Chou Happy! (Sega Toys - 200302xx - HPC-6118)
+* 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
+* ミニモニ。小学校へ行くんだぴょん！ - Mini Moni. Shougakkou he Iku Ndapyon! (Sega Toys - 200303xx - HPC-6120)
+* ドライブピコ ゴーゴー!カーナビツーリング! ＜同梱＞ - Drive Pico with Go Go! Car Navi Touring! (Sega Toys - 20030620 - HPC-6121)
+* ミニモニ。えいごであそぶんだぴょん！ - Mini Moni. Eigo de Asobu Ndapyon! (Sega Toys - 200305xx - HPC-6122)
+* サンリオピューロランドで ダンスカーニバル みんなで おりょうり おさいほう<10th> - Sanrio Puroland de Dance Carnival Minna de Oryouri Osaihou ~10th Anniversary Edition~ (Sega Toys - 200305xx - HPC-6123) [reprint HPC-6026]
+* ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
+* McDonald's マクドナルドであそぼ！<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
+* ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
+* トイストーリー２ ウッディ そうさく だいさくせん!!<10th> - Toy Story 2 - Woody Sousaku Daisakusen!! ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6127) [reprint HPC-6090]
+* それいけ! アンパンマン えいごとなかよし２ たのしいカーニバル<10th> - Soreike! Anpanman - Eigo to Nakayoshi 2 Tanoshii Carnival ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6128) [reprint HPC-6017]
+* ミッキーと大きな古時計<10th> - Mickey To Ooki na Furudokei ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6129) [reprint HPC-6023]
+* プーさんのいちにち<10th> - Pooh-san no Ichi Nichi ~10th Anniversary Edition~ (Sega Toys - 200309xx - HPC-6130) [reprint HPC-6019]
+* それいけ!アンパンマン アンパンマンの知恵のワールド - Soreike! Anpanman: Anpanman no Chie no World (Sega Toys - 20030718 - HPC-6131)
+* おりょうりだいすき! キッチンピコ - Oryouri Daisuki! Kitchen Pico (Sega Toys - 20030718 - HPC-6132)
+* キキ＆ララ 星のかずあそび - Kiki & Lala: Hoshi no Kazu Asobi (Sega Toys - 20030912 - HPC-6133)
+* それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
+* ディズニープリンセス　プリンセスになりたい! - Disney Princesses - Princesses ni Naritai (Sega Toys - 20031209 - HPC-6136)
+* くまのプーさん たのしいたしざんひきざん - Kuma no Pooh-san Tanoshii Tashizan Hikizan (Sega Toys - 20040311 - HPC-6137)
+* ディズニープリンセス アリエル - Disney Princesses - Ariel (Sega Toys - 20040426 - HPC-6138)
+* ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
+* 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS Best Selection (Sega Toys - 2004xxxx - HPC-????)
+* 七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream Best Selection (Sega Toys - 2004xxxx - HPC-????)
+* とっとこハム太郎 とっとこたのしく あいうえお ～まぼろしの ひかるたねを みつけるのだっ!～ - Tottoko Hamtaro Tottoko Tanoshi Kuaiueo ~Maboroshi no Hikaru Tane wo Mitsukerunodatsu!~ (Sega Toys - 20040514 - HPC-6142)
+* ペットといっしょに たのしくあそぼ♪ パソコンピコ - Pet to Issho ni Tanoshiku Asobo (kigou) Pasokon Pico (Sega Toys - 200408xx - HPC-6144)
+* ディズニープリンセス すてきにレッスン！ ひらがな･カタカナ - Disney Princess Suteki ni Ressun! Hiragana-Katakana (Sega Toys - 20041018 - HPC-6145)
+* それいけ! アンパンマン アンパンマンのひとりでできちゃった！ - Soreike! Anpanman: Anpanman no Hitori de Dekichatta! (Sega Toys - 20050204 - HPC-6146)
+* マルチドライブ エキサイティング！ はたらくのりものたち <同梱> - Maruchi Drive with Exciting! Hataraku Norimono-tachi (Sega - ???? - HPC-????)
+
+to be verified
+* アンパンマンのもしもしピコ セット それいけ!アンパンマン アンパンマンとでんわであそぼう！<同梱> - Anpanman no Moshimoshi Pico Set with Soreike! Anpanman - Anpanman to Denwa de Asobou! (Sega - 199712xx - HPC-6050) [is the serial correct, or is it 6051 like reported for the single cart?]
+* ドラえもんのうたってピコ セット いっしょにうたおう! ドラえもん わくわくカラオケ <同梱> - Doraemon no Utatte Pico Set with Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega - 1999xxxx - HPC-6072) [is the serial correct, or is it 6073 like reported for the single cart?]
+
+Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
+
+* 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS (Pony Canyon - ???? - T-75010)
+* 黄金勇者ゴルドラン ひみつ大百科 - Ougon Yuusha Gorudoran Himitsu Daihyakka (Takara - 19950825 - T-103020)
+* 忍者戦隊カクレンジャー - Ninja Sentai Kakuranger (Bandai - ???? - T-133???)
+* クレヨンしんちゃんのオラといっしょにあそぼうよ! - Crayon Shin-chan no Ora to Issho ni Asobou yo! (Bandai - ???? - T-133020)
+* それいけ! アンパンマンのおはなしだいすきアンパンマン - Soreike! Anpanman no Ohanashi Daisuki Anpanman (Bandai - 1994xxxx - T-133030)
+* 美少女戦士セーラームーンＳ - Bishoujo Senshi Sailor Moon S (Bandai - ???? - T-133040)
+* 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
+* きかんしゃトーマスにのって - Kikansha Thomas ni Notte (Bandai - 1994xxxx - T-133060)
+* クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
+* NHKおかあさんといっしょドレミファど～なっつ！ あそびいっぱい うたいっぱい! - NHK Okaasan to Issho Doremifa Donuts! Asobi Ippai Utaippai! (Bandai - ???? - T-133090)
+* 楽しく遊んで能力アップ!! たのしい幼稚園 '95年度版 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien '95-nendo Han (Bandai - 19950725 - T-133100)
+* ウルトラヒーロー - UltraHero (Bandai - 1995xxxx - T-133110)
+* それいけ!アンパンマンのメダリンピックワールド - Soreike! Anpanman no Medarin Pikku World (Bandai - 19951117 - T-133120)
+* 美少女戦士セーラームーンスーパーズ - Bishoujo Senshi Sailor Moon SuperS (Bandai - 19951019 - T-133130)
+* いっしょにはしろうきかんしゃトーマス - Issho ni Hashirou Kikansha Thomas (Bandai - ???? - T-133140)
+* 忍たま乱太郎 - Nintama Rantarou (Bandai - ???? - T-133150)
+* BFビーファイターカブト - BF B-Fighter Kabuto (Bandai - 1996xxxx - T-133170)
+* ゲゲゲの鬼太郎 - Gegege no Kitarou (Bandai - ???? - T-133180)
+* 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
+* キューティーハニー - Cutey Honey (Bandai - 1997xxxx - T-133230)
+* それいけ！アンパンマンのみんなできょうそうアンパンマン！ - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
+* ウルトラマンダイナ - Ultraman Dyna (Bandai - 1998xxxx - T-133260)
+* 夢のクレヨン王国 - Yume no Crayon Oukoku (Bandai - 1998xxxx - T-133270)
+* 新ウルトラヒーロー - Shin Ultrahero (Bandai - 1998xxxx - T-133280)
+* おえかきロボコン!! - Oekaki Robokon!! (Bandai - 1999xxxx - T-133290)
+* それいけ!アンパンマンのメダリンピックワールド２ - Soreike! Anpanman no Medarin Pikku World 2 (Bandai - ???? - T-133300)
+* おじゃる丸 - Ojarumaru (Bandai - 1999xxxx - T-133310)
+* おジャ魔女どれみ＃ - Ojamajo Doremi# (Bandai - 2000xxxx - T-133330)
+* うんてんトーマス　デラックスセット - Unten Thomas Track Set (Bandai - 200004xx - T-133???)
+* ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
+* アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
+* も～っと！おジャ魔女どれみ - Mo~tto! Ojamajo Doremi (Bandai - 200106xx - T-133370)
+* 新ウルトラマンピコ ウルトラファイティングベース - Shin Ultraman Pico Ultraman Fighting Best (Bandai - 200110xx - T-133380)
+* どうぶつピコ ハムスターランド <初回限定･ハムスター人形付属> - Doubutsu Pico Hamster Land ~Shokai Gentei-Hamster Ningyou Fuzoku~ (Bandai - 20020315 - T-133390)
+* おジャ魔女どれみ ドッカ～ン！ - Ojamajo Doremi Dokka~n! (Bandai - 200205xx - T-133410)
+* 新世紀ウルトラマン伝説 - Shinseiki Ultraman Densetsu (Bandai - 200209xx - T-133420)
+* 明日のナージャ - Ashita no Nadja (Bandai - 200303xx - T-133430)
+* 爆竜戦隊アバレンジャー - Bakuryuu Sentai Abaranger (Bandai - 200304xx - T-133440)
+* 仮面ライダーファイズ555 - Kamen Rider Fives 555 (Bandai - 200305xx - T-133450)
+* それいけ!アンパンマンの メダリンピックワールド２ <Best Selection> - Soreike! Anpanman no Medarin Pikku World 2 Best Selection (Bandai - 20040713 - T-133460) [reprint T-133300]
+* 特捜戦隊デカレンジャー - Tokusou Sentai Dekaranger (Bandai - 200406xx - T-133470)
+* ふたりはプリキュア - Futari wa Pretty Cure (Bandai - 200406xx - T-133480)
+* いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
+* 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
+* はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
+* 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
+* 学研ピコで学習 １年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
+* 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
+* ウルトラマンキッズ とびだせ！スペースピクニック - Ultraman Kids Tobidase! Space Picnic (GE - 199511xx - T-170020)
+* 児童英検対応ソフト ムーミンとえいご たんじょうびのおくりもの - Jidou Eiken Taiou Soft Muumin to Eigo Tanjoubi no Okurimono (Obunsha - 19950624 - T-181010)
+* はたらくくるま ダイヤペットだいしゅうごう - Hataraku Kuruma Daiya Pet Daishuugou (Yonezawa - 19950925 - T-193010)
+* でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
+* シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
+* ドラえもん タイムマシンで大冒険! - Doraemon Time Machine de Daibouken! (Shogakukan - 19951027 - T-226010)
+* ドラえもん ようちえんはたのしいな - Doraemon Youchien Hata no Shiina (Shogakukan - ???? - T-226020)
+* ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
+* ドラえもん かぞえて･かんたん かず とけい - Doraemon Kazoete-Kanzan Kazu Tokei (Shogakukan - ???? - T-226050)
+* のりものスタジオ ゴーゴー！のりスタ あそびマッチョ！ - Norimo no Stage - Go Go! Noristar Asobi Maccho (Shogakukan - 200211xx - T-226070)
+* とっとこハム太郎 おえかきいっぱい! ハムちゃんず! - Tottoko Hamtaro Oekaki Ippai! Ham Chance! (Shogakukan - ???? - T-226080)
+* ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
+* ドラえもん 知育あそび ドラランド - Doraemon Chiiku Asobi Dorarando (Shogakukan - 20030718 - T-226100)
+* ドラえもん ようちえんはたのしいな<Best Selection> - Doraemon Youchien Hata no Shiina ~Best Selection~ (Shogakukan - 20040213 - T-226110)
+* 里中満智子のたのしいおりがみ - Satonaka Machiko no Tanoshii Origami (Nayuta - 199511xx - T-227010)
+* ミッキーの東京ディズニーランド・スタンプラリー - Mickey no Tokyo Disneyland Stamp Rally (Kodansha - ???? - T-255010)
+* 東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ<10th> - Tokyo Disneyland Toon Town Mickey no Boku wa Untenshu ~10th Anniversary Edition~ (Kodansha - 200305xx - T-255080)
+* くもんの すくすくれっすん 1から30までのすうじ - Kumon no Sukusuku Ressun 1-Kara 30-made no Suuji (Kumon - 2001xxxx - T-300010)
+* くもんの すくすくれっすん はじめてのひらがな - Kumon no Sukusuku Ressun Hajimete no Hiragana (Kumon - 20020124 - T-300020)
+* 右脳開発シリーズ11 平成教育委員会Jr. - Unou Kaihatsu Series 11 Heisei Kyouikuiinkai Jr. (Imagineer - 19960102 - T-150130)
+* 右脳開発シリーズ5 ハローキティのすてきなたからもの - Unou Kaihatsu Series 5 Hello Kitty no Suteki na Takaramono (Imagineer - 19951104 - T-150???)
+* 右脳開発シリーズ10 ノンタンといっしょ わいわいにっぽん - Unou Kaihatsu Series 10 Nontan to Issho Waiwai Nihon (Imagineer - 19960102 - T-150???)
+* 左脳開発シリーズ1 図形認識 - Sanou Kaihatsu Series 1 Zukei Ninshiki (Imagineer - 19950831 - T-150210)
+* 左脳開発シリーズ2 数量・計算 - Sanou Kaihatsu Series 2 Suuryou - Keisan (Imagineer - 19951002 - T-150230)
+* 左脳開発シリーズ5 迷路・記憶 (CD付き) - Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Imagineer - 19951208 - T-150240)
+* 左脳開発シリーズ4 推理・構成 - Sanou Kaihatsu Series 4 Suiri - Kousei (Imagineer - 19951208 - T-150250)
+* 左脳開発シリーズ6 応用問題 - Sanou Kaihatsu Series 6 Ouyoumondai (Imagineer - 19951208 - T-150260)
+* 平成教育委員会Jr. めざせ優等生 - Heisei Kyouikuiinkai Jr. Mezase Yuutousei (Imagineer - 19951201 - T-150270)
+* 左脳開発シリーズ 探索・感性・記憶 - Sanou Kaihatsu Series Tansaku-Kansei-Kioku (Imagineer - Existence unconfirmed!)
+
+
+Games for the MIXT BOOK PLAYER COPERA
+
+* メロディランド - Melody Land (Yamaha - 199312xx - MMGS-1)
+* ドレミファ伝説 - Doremifa Densetsu (Yamaha - 199312xx - MMGS-2)
+* コペラのタイムマシン - Copera no Time Machine (Yamaha - ???? - MMGS-3)
+* おっとカタチッチ - Otto Katachicchi (Yamaha - ???? - MMGS-4)
+* おうたのキャンバス - Outa no Kyanbasu (Yamaha - ???? - MMGS-5)
+* マイクとあそぼう とびだせミルキーウェイ - Maiku to Asobou Tobidase Milky Way (Yamaha - 1994xxxx - MMGS-7)
+* おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
+* コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
+* 冒険！メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
+
+-->
+
+<!-- Releases -->
+	<software name="101dalmaj" cloneof="101dalma">
+		<description>101piki Wanchan - Wanchan Dai Koushin (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6039"/>
+		<info name="alt_title" value="101匹わんちゃん わんちゃんだいこうしん!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19623 J32" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-19623 j32.ic1" size="1048576" crc="27bb0b0a" sha1="f9e2bde5351f34cd565c03a1cad3d1baedd8c7c3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn">
+		<description>A Year At Pooh Corner (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49021-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17009-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17009-h.ic1" size="524288" crc="333e88d2" sha1="65581aa9b77a5011039ff88a5b282c77ef0c9e81" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorng" cloneof="poohcorn" supported="no">
+		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornf" cloneof="poohcorn" supported="no">
+		<description>Une Année en Compagnie de Winnie l'Ourson (Fra)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49021-09" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17789-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17789-h.ic1" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornj" cloneof="poohcorn">
+		<description>Pooh-san no Ichi Nichi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6019"/>
+		<info name="alt_title" value="プーさんのいちにち"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner (japan).bin" size="524288" crc="bd9626b7" sha1="6d9dd74c9b1b22bd173d00be88ce87d3e32bde55" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ahirupek">
+		<description>Ahiru no Pekkle no Kazoete Miyou (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150110"/>
+		<info name="release" value="19951104"/>
+		<info name="alt_title" value="右脳開発シリーズ6 アヒルのペックルのかぞえてみよう"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18196 J22" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18196 j22.ic1" size="1048576" crc="6ff09f8e" sha1="4b496b47aa0d0ea74c85712515c76d3e99f28fb4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanrioag">
+		<description>Ai to Yume no Kuni - Sanrio Puroland - Asobi na Gara Oboeyou! Hiragana Katakana (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6045"/>
+		<info name="alt_title" value="あいとゆめのくに サンリオピューロランドあそびながらおぼえよう!ひらがな カタカナ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19826 J41" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-19826 j41.ic1" size="1048576" crc="6859c975" sha1="5df847c8140f0c8762d6959ecfdb5f53c70ee0bc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanriocd">
+		<description>Ai to Yume no Kuni - Sanrio Puroland - Chanto Dekirukana? Minna to Tanoshii Oyuugikai (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6056"/>
+		<info name="alt_title" value="あいとゆめのくに サンリオピューロランド ちゃんと できるかな? みんなと たのしい おゆうぎかい"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ai to yume no kuni sanrio pyuurorando chanto dekirukana minna to tanoshii oyuugikai (japan).bin" size="1048576" crc="0087112a" sha1="ce47f2a5d941597475ea1565d76d7d6c0fbf1338" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was also released together with many prototypes as Proto build 1995-01-31, meaning that after that date development was complete -->
+	<software name="berenstb">
+		<description>The Berenstain Bears' A School Day (USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49036-00" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17854 J03" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17854 j03.ic1" size="1048576" crc="e92af9f1" sha1="f4ae09a8a0e11cd8bec95ec3ac3908ce6da7a30f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbi" cloneof="berenstb">
+		<description>Un Giorno di Scuola degli Orsi Berenstain (Ita)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="un giorno di scuola degli orsi berenstain (italy).bin" size="1048576" crc="61b889a2" sha1="64b537616207b3e98dfb700f98b63e61284ced13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbs" cloneof="berenstb">
+		<description>Un Día en la Escuela con los Ositos Berenstain (Spa)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49036-06" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-18581 J39" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18581 j39.ic1" size="1048576" crc="0ec21b68" sha1="06bb9053e3a9a6eb3e56475964ad4d745f92617f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biroboka">
+		<description>Bi-Robo Kabutakku (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133240"/>
+		<info name="alt_title" value="ビーロボカブタック"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bi-robo kabutakku (japan).bin" size="524288" crc="df504ee6" sha1="392128b92f38b7aabb59c0253bc2a85b34ab677c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chibim">
+		<description>Chibi Maruko-chan - Issho ni Asobou yo (Jpn)</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="T-103010"/>
+		<info name="release" value="19950725"/>
+		<info name="alt_title" value="ちびまる子ちゃん いっしょにあそぼうよ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18117-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18117-h.ic1" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copekono">
+		<description>Copera no Kono Otonaani (Jpn)</description>
+		<year>1994</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-6"/>
+		<info name="alt_title" value="コペラのこのおとなあに"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17438 J11" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17438 j11.ic1" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This same file had also been released as Prototype, but it just means it was a final build... -->
+	<software name="dolucky">
+		<description>Dolucky no Oekaki House (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150030"/>
+		<info name="release" value="19951205"/>
+		<info name="alt_title" value="右脳開発シリーズ8 ドラッキーのおえかきハウス"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17804-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17804-h.ic1" size="524288" crc="4ce7b75d" sha1="aa906392c97cb12792a8cd026fdcb12d61490cf8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="donaldts">
+		<description>Donald no Terebi Show (Jpn, Rev. 2)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6033-02"/>
+		<info name="release" value="199512xx"/>
+		<info name="alt_title" value="ドナルドのテレビショー"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18678 J43" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18678 j43.ic1" size="1048576" crc="c11a2b37" sha1="9d3d17c0ec4798730bba4670bef1723ed6a46b98" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraabc">
+		<description>Doraemon - Eigo de Asobou ABC! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Shogakukan</publisher>
+		<info name="serial" value="T-226060"/>
+		<info name="alt_title" value="ドラえもん えいごであそぼう ＡＢＣ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="efd5d261" sha1="5addf4ea6cd6c022286a7979f758478eec0331f0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraeiu">
+		<description>Doraemon Ensoku-Imohori-Undoukai (Jpn)</description>
+		<year>199?</year>
+		<publisher>Shogakukan</publisher>
+		<info name="serial" value="T-226030"/>
+		<info name="alt_title" value="ドラえもん えんそく･いもほり･うんどうかい"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-20221 J50" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-20221 j50.ic1" size="1048576" crc="7d9ebcee" sha1="cf626fe6f25435e42ce0c4cdfc8a4d335f64fe76" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doranmdt">
+		<description>Doraemon - Nobita no Machinaka Dokidoki Tanken! (Jpn)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6009"/>
+		<info name="alt_title" value="ドラえもん のびたのまちなか ドキドキ たんけん!"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="doraemon - nobita no machinaka dokidoki tanken! (japan).bin" size="524288" crc="314f6cb4" sha1="69d3c5754ccbcde0737455bf7bf0eee4ec610972" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpwdrive">
+		<description>Saa Shuppatsuda! Ken-chan to Pepe no Wanpaku Drive (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6033"/>
+		<info name="alt_title" value="ドライブピコ さあしゅっぱつだ! ケンちゃんとペペのわんぱくドライブ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="saashuppatsuda! ken-chan to pepe no wanpaku drive (japan).bin" size="1048576" crc="1eb9b7f6" sha1="bed4ce255b139f0e71eb3197a058075e0c051aa1" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojr">
+		<description>Ecco Jr. and the Great Ocean Treasure Hunt! (USA)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49022-00" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17007-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17007-h.ic1" size="524288" crc="c8862213" sha1="0eaa54e3e67469efbdb3737c8dee3b1f11fd04ed" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrg" cloneof="eccojr">
+		<description>Ecco Jr. und die große Schatzsuche im Ozean! (Ger)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. und die grosse schatzsuche im ozean! (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrf" cloneof="eccojr">
+		<description>Ecco Jr. et la Chasse au Trésor Sous-marine! (Fra)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49022-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. et la chasse au tresor sous-marine! (france).bin" size="524288" crc="1b7b3825" sha1="64706b5f1240941a4989db96dab432aed6009e0a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrs" cloneof="eccojr">
+		<description>Ecco Jr. y la Gran Búsqueda del Tesoro en el Océano! (Spa)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49022-06" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17735-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17735-h.ic1" size="524288" crc="f11b9f3f" sha1="7b518e8c6b97cc68958084b65cbe3a74f34df914" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrj" cloneof="eccojr">
+		<description>Ecco Jr. and the Great Ocean Treasure Hunt! (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150060"/>
+		<info name="release" value="19951031"/>
+		<info name="alt_title" value="右脳開発シリーズ2 ＥＣＣＯ Ｊｒ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17853-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17853-h.ic1" size="524288" crc="8130f126" sha1="fa9b1f7602dca7d3ac3d579421b41da4ceb943a7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gabucho">
+		<description>Gabucho Tsuri Gakkou Yatta ne! Boku Hatsuri Meijn (Jpn)</description>
+		<year>1998</year>
+		<publisher>Yonezawa</publisher>
+		<info name="serial" value="T-193050"/>
+		<info name="alt_title" value="ガブッチョつりがっこう やったね!ぼくはつりめいじん"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="gabucho tsuri gakkou yatta ne! boku hatsuri meijn (japan).bin" size="1048576" crc="33a61b64" sha1="9f0a87a6baf060323b1f7b08fa905ce76cf5c1c9" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanchi">
+		<description>Gakken Anpanman to Chinou Up! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6115"/>
+		<info name="release" value="200209xx"/>
+		<info name="alt_title" value="学研 アンパンマンと知能アップ！"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="2a8da73b" sha1="eff1447d20fa7532af948df8267261e51d14589c" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkeabc">
+		<description>Gakken no Obenkyou Soft - Eigo ABC (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169060"/>
+		<info name="alt_title" value="学研のおべんきょうソフト えいご ＡＢＣ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19309 J15" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-19309 j15.ic1" size="1048576" crc="1259f360" sha1="82ffe0b0b6b0131f06e4f4cb6b535ee45559f0f4" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkehir">
+		<description>Gakken no Obenkyou Soft - Hiragana (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169020-01"/>
+		<info name="alt_title" value="学研のおべんきょうソフト ひらがな"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18684 J06" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18684 j06.ic1" size="1048576" crc="1eb0ba1c" sha1="8ab5239a99ce2c97cfe0c4ec786538c8a153a71d" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkekan">
+		<description>Gakken no Obenkyou Soft - Kanji (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169010"/>
+		<info name="alt_title" value="学研のおべんきょうソフト かんじ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17508-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17508-t.ic1" size="524288" crc="68aacb63" sha1="40ae0e0b6f644511e8864acd1d1965de8151c7a6" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkekak">
+		<description>Gakken no Obenkyou Soft - Kakezan Kuku (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169040"/>
+		<info name="alt_title" value="学研のおべんきょうソフト かけざん 九九"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18698 J37" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18698 j37.ic1" size="1048576" crc="6470b56e" sha1="6f5af8dfcdcea5f79a451e611e23b3e88432ef81" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkekaz">
+		<description>Gakken no Obenkyou Soft - Kazu-Suuji (Jpn)</description>
+		<year>1995</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169050"/>
+		<info name="release" value="199512xx"/>
+		<info name="alt_title" value="学研のおべんきょうソフト かず･すうじ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="MPR-18585-16MX" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-18585-16mx.ic1" size="2097152" crc="dd4f5471" sha1="0eb13ae5f4b4649b107f4e105c3ae63475b75ee8" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picokag1">
+		<description>Gakken Pico de Kagaku 1 - Hakken Mushi no Himitsu (Jpn)</description>
+		<year>199?</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169090"/>
+		<info name="alt_title" value="学研ピコで科学1 はっけんむしのひみつ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9KO-0043-RV" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9ko-0043-rv.ic1" size="2097152" crc="26029ad3" sha1="6c01cf26acc58307ac2f0f74a6c64a96318db3bb" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was in bundle with the Kantan Wakuwaku Keyboard in the "Keyboard Pico Set" -->
+	<software name="gsoy">
+		<description>Game wo Shinagara Oboe You! Kantan Wakuwaku Keyboard (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6042"/>
+		<info name="alt_title" value="ゲームをしながら覚えよう! かんたん わくわく キーボード"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="game wo shinagara oboe you! kantan wakuwaku keyboard (japan).bin" size="1048576" crc="57e973f7" sha1="ffd6289f41a95ed04cb04ef40041fa9fcc4f1661" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comphero">
+		<description>Ganbare! Bokura no Compati Heroes (Jpn)</description>
+		<year>1996</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="T-206010"/>
+		<info name="alt_title" value="がんばれ!ぼくらのコンパチヒーローズ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19067-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19067-t.ic1" size="524288" crc="bbae26f2" sha1="eb28ad4558efd2b20e5b26ba0ccd81781a275fe0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrangr">
+		<description>Gekisou Sentai CarRanger (Jpn)</description>
+		<year>199?</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133160"/>
+		<info name="alt_title" value="激走戦隊カーレンジャー"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18883-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18883-t.ic1" size="524288" crc="8ed536bc" sha1="b4f276d4ecc300b38b73bf1d7030f6820786fe55" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konichan">
+		<description>Go! Go! Koni-chan! Dokidoki World (Jpn)</description>
+		<year>199?</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133210"/>
+		<info name="alt_title" value="ゴー！ゴー！コニーちゃん！ ドキドキワールド！"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19727-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19727-t.ic1" size="524288" crc="b8d9a5cc" sha1="0727fe4c7050e9ef3baa74bf153258c435232ac6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="godzilla">
+		<description>Godzilla - Dokidoki Kaijuu Shima (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6027"/>
+		<info name="release" value="19950725"/>
+		<info name="alt_title" value="ゴジラ どきどき怪獣島"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="gojira dokidoki kaijuu shima (japan).bin" size="1048576" crc="fd8a2715" sha1="47c8357c16d76dd067063c4fe61e579c8bc0e13c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlj" cloneof="hucklowl">
+		<description>Richard Scarry's - Huckle to Lowly (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150070"/>
+		<info name="release" value="19951031"/>
+		<info name="alt_title" value="右脳開発シリーズ1 Richard Scarry's ハックルとローリー"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17858 J02" />
+			<dataarea name="flop" size="1048576">
+				<rom name="mpr-17858 j02.ic1" size="1048576" crc="1b46e52f" sha1="83f33c26ec829d85b3226f85b2e0da78f7f65ff2" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was also released together with many prototypes as Proto build 19940510-D, meaning that probably after that date development was complete.
+But how do later protos fit with this theory? Maybe the later protos were from the Euro or Jpn versions? -->
+	<software name="hucklowl">
+		<description>Richard Scarry's - Huckle and Lowly's Busiest Day Ever (USA)</description>
+		<year>1994</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49028-00" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-16714 J02" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16714 j02.ic1" size="1048576" crc="42007e92" sha1="ce0b387427226baa4067d6eacebe90cef760a18e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlf" cloneof="hucklowl">
+		<description>Richard Scarry's - Une Journee Bien Remplie pour Cassis et Asticot (Fra)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49028-09" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17779 J19" />
+			<dataarea name="flop" size="1048576">
+				<rom name="mpr-17779 j19.ic1" size="1048576" crc="53f94256" sha1="9d9cdd8281e7dadb6668f35692e42fbde74d6349" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowli" cloneof="hucklowl">
+		<description>Richard Scarry's - La Giornata Indaffaratissima di Sandrino e Zigo-Zago (Ita)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="richard scarry's - la giornata indaffaratissima di sandrino e zigo-zago (italy).bin" size="1048576" crc="2573131a" sha1="0e5c14fe1fd3360b9269fdf219decb7ef4480304" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowls" cloneof="hucklowl">
+		<description>Richard Scarry's - El Día Más Ajetreado de las Vidas de Felipe y Gusy (Spa)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49028-06" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17778 J18" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17778 j18.ic1" size="1048576" crc="d529aacd" sha1="e65c808a51499c254ec24cbf9fb611a10e7505ff" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hkittymo">
+		<description>Hello Kitty no Machi he Odekake (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150080"/>
+		<info name="release" value="19951031"/>
+		<info name="alt_title" value="右脳開発シリーズ3 ハローキティのまちへおでかけ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17859 J19" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17859 j19.ic1" size="1048576" crc="3f336747" sha1="28e866688fed6e7c0a82c3f1e91f205600afcf68" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamenrid">
+		<description>Kamen Rider Agito &amp; Kuuga - Wild Battle (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133360"/>
+		<info name="release" value="200104xx"/>
+		<info name="alt_title" value="仮面ライダーアギト&amp;クウガワイルドバトル"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="kamen rider agito &amp; kuuga wild battle (japan).bin" size="1048576" crc="316596dc" sha1="18dc0756e0c61a397fe88d06c5915d543440d16e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanshuno">
+		<description>Kanshuu Unou Image Training - Hiragana - Katakana (Jpn)</description>
+		<year>2000</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="T-075020"/>
+		<info name="release" value="200004xx"/>
+		<info name="alt_title" value="七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム (Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream)"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="9KO-0019-MK-08" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9ko-0019-mk-08.ic1" size="1048576" crc="8e12c06d" sha1="88d1f8ce5ef824f1a989bed02f4dbf9b7861ee05" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kawai3s">
+		<description>Kawaii Nakama wo Sodate you! 3-tsu no Shippo (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6055"/>
+		<info name="alt_title" value="かわいいなかまを育てよう! ３つのしっぽ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="MPR-20905-S" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-20905-s.ic1" size="2097152" crc="a6dea807" sha1="0a5cb3a917880b755465d3bd9d110dffcb52a2a3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keroiro">
+		<description>Kero Kero Keroppi no Irokatachi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150100"/>
+		<info name="release" value="19951104"/>
+		<info name="alt_title" value="右脳開発シリーズ4 けろけろけろっぴのいろかたち"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18013 J11" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18013 j11.ic1" size="1048576" crc="37dae2f5" sha1="874e8d0466e0585fa7db3b70df871875ddf29cb2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kitereda">
+		<description>Kiteretsu Daihyakka - Edo ni Itte Kiteretsu Saisamaniau Nari (Jpn)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6015"/>
+		<info name="alt_title" value="キテレツ大百科 えどにいってキテレツさいさまにあうナリ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17436-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17436-h.ic1" size="524288" crc="85f80871" sha1="e13ad62f7dbd270f74a4dbbe881d1ca619899d31" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kumapooh">
+		<description>Kuma no Pooh-san - Christopher Robin wo Sagase (Jpn)</description>
+		<year>1998</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255040"/>
+		<info name="alt_title" value="くまのプーさん クリストファー･ロビンを さがせ!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-21835-S" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-21835-s.ic1" size="1048576" crc="40e2cdfc" sha1="14f757263f138cbe02e03c48748935224805edf1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legofun">
+		<description>Lego Fun to Build (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6032"/>
+		<info name="release" value="199512xx"/>
+		<info name="alt_title" value="ＬＥＧＯ ＦＵＮ ＴＯ ＢＵＩＬＤ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18686-U" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18686-u.ic1" size="1048576" crc="cbcc377c" sha1="2f269325deef0db0a14e3b0d3cdf9a0c06436a70" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking" supported="no">
+		<description>The Lion King - Adventures at Pride Rock (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="the lion king - adventures at pride rock (europe).bin" size="1048576" crc="a7b92dc1" sha1="7f20cd3bec73624f93c8235887ad82f33a78077e"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkings" cloneof="lionking" supported="no">
+		<description>Las Aventuras del Rey León (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="49037-06"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18571 J32" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18571 j32.ic1" size="1048576" crc="ca5534bc" sha1="f3eb0844b49329e2f522e595d887adee7171e88b"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra">
+		<description>Magic Crayons (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49026-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17005-H" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17005-h.ic1" size="1048576" crc="a443512b" sha1="08a3236fa54a6a4993baf5cf4c1ffbd77739c6bf" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickbmt">
+		<description>Mickey no Boku wa Meitantei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255050"/>
+		<info name="alt_title" value="ミッキーのぼくはめいたんてい"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9KO-0021-MX" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9ko-0021-mx.ic1" size="2097152" crc="2eb957b3" sha1="b11e35b71a3d24fddad746b60c1f79ea011d39c1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickybk">
+		<description>Mickey no Yukai na Bouken (Jpn)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6001"/>
+		<info name="release" value="19930626"/>
+		<info name="alt_title" value="ミッキーのゆかいなぼうけん"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-15644-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-15644-h.ic1" size="524288" crc="5a6767a9" sha1="bb35a699c883121dbe5b16877531c2ba8e1d2242" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickofrd">
+		<description>Mickey to Ooki na Furudokei (Jpn, Rev. 2)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6023-02"/>
+		<info name="alt_title" value="ミッキーと大きな古時計"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17900 J04" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17900 j04.ic1" size="1048576" crc="cb331903" sha1="c790d72aef37a835e977231e8097c1f4950a1b11" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickuts">
+		<description>Mickey to Utau Tori no Shima (Jpn)</description>
+		<year>1998</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255030"/>
+		<info name="alt_title" value="ミッキーとうたうとりのしま ミニーをさがしてわくわくだいぼうけん! (Mickey to Utau Tori no Shima - Minnie wo Sagashite Wakuwaku Daibouken!)"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-21120-S" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-21120-s.ic1" size="1048576" crc="643700aa" sha1="d47298e7dab451218cede56fd758401e356e6b2b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst">
+		<description>Mickey's Blast into the Past (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49024-00" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17008-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17008-h.ic1" size="524288" crc="2628f6ef" sha1="1d04a40d353f71061b206d893d2d8e7864a2faee" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblstg" cloneof="mickblst" supported="no">
+		<description>Mickey - Ausflug in die Vergangenheit (Ger)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey - ausflug in die vergangenheit (germany).bin" size="524288" crc="627ea96c" sha1="eab3c41aef6c30adc82e92e143ffc0360118b99e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblstf" cloneof="mickblst" supported="no">
+		<description>Mickey - Fait un Voyage Eclair Dans Le Passé (Fra)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49024-09" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17784-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17784-h.ic1" size="524288" crc="fafee898" sha1="6cacd57339ad8dcdbc40f08abffb6fa0f00b5ae5" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This same file had also been released as Prototype, but it just means it was a final build... -->
+	<software name="mukabana">
+		<description>Nihon Mukashi Banashi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150040"/>
+		<info name="release" value="19951205"/>
+		<info name="alt_title" value="右脳開発シリーズ9 日本昔ばなし"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17803-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17803-h.ic1" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mushikin">
+		<description>Mushiking Atsumete Asobou Kouchuu Zukan (Jpn)</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6147"/>
+		<info name="release" value="20050428"/>
+		<info name="alt_title" value="甲虫王者ムシキング あつめてあそぼう甲虫図鑑"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mushiking atsumete asobou kouchuu zukan (japan).bin" size="2097152" crc="37c59a71" sha1="2ba57037e9155d3537c2d204de5f873f67a8a3a6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cssbattl">
+		<description>Ninja Sentai Hurricanger &amp; Hyakujuu Sentai Gaoranger - Chou Sentai Super Battle (Jpn)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133400"/>
+		<info name="release" value="200204xx"/>
+		<info name="alt_title" value="忍者戦隊ハリケンジャー&amp;百獣戦隊ガオレンジャー 超戦隊スーパーバトル"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ninja sentai hurricanger &amp; hyakujuu sentai gaoranger chou sentai super battle (japan).bin" size="1048576" crc="e3da2ace" sha1="006f5442ab0798cff18067ad948265a22595fe35" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hairsaln">
+		<description>Oshare Pico Suteki ni Henshin! Naruchan no Oshare Hair Salon (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6088"/>
+		<info name="release" value="200008xx"/>
+		<info name="alt_title" value="おしゃれピコ すてきにへんしん！ るなちゃんのおしゃれヘアサロン"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="oshare pico suteki ni henshin! naruchan no oshare hair salon (japan).bin" size="2097152" crc="376cfa05" sha1="ff7b03a62620ea668ab41fe731af07b78db984fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="padding">
+		<description>Paddington no Sekai Ryokou (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6029"/>
+		<info name="alt_title" value="パディントン のせかいりょこう"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18889 J49" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18889 j49.ic1" size="1048576" crc="ac96a86d" sha1="58a8f00c0156271c5de7fa890c88a3aeaef6397e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzl">
+		<description>Pepe's Puzzles (USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49035-00" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17811-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17811-h.ic1" size="524288" crc="41e5618a" sha1="faf327f39af6e6f8957b307eacbd940fd02919a4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peterpan">
+		<description>Peter Pan - Neverland e Ikou! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6047"/>
+		<info name="release" value="199709xx"/>
+		<info name="alt_title" value="ピーターパン ネバーランドへ いこう!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-20085-S" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-20085-s.ic1" size="1048576" crc="e91ef80a" sha1="68acb94634912e38d3d25385bd00b3832042eedc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psoccer">
+		<description>Pico Soccer - Mezase Soccer Senshu (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6018"/>
+		<info name="alt_title" value="ピコサッカー めざせサッカーせんしゅ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17844 J17" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17844 j17.ic1" size="1048576" crc="02c3c4fd" sha1="94a10f18bcf6bea864f8223638850a55aa2be285" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pocahont">
+		<description>Pocahontas (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pocahontas (europe).bin" size="1048576" crc="deefbfd9" sha1="8376f01619def050fa7a2f53d48aa32ab0e860cd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemon">
+		<description>Pocket Monsters Advance Generation - Minna De Pico - Pokemon Waiwai Battle! (Jpn)</description>
+		<year>2004</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6143"/>
+		<info name="release" value="20040713"/>
+		<info name="alt_title" value="ポケットモンスター アドバンスジェネレーション みんなでピコ ポケモンわいわいバトル!"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monsters advance generation minna de pico pokemon waiwai battle! (japan).bin" size="2097152" crc="c3b77d13" sha1="97b88d0b09376b108d611e036e415c37d67bb943" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohhaji">
+		<description>Pooh-san no Hajimete no Eigo (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255060-01"/>
+		<info name="alt_title" value="プーさんの はじめてのえいご"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="265a764a" sha1="a6fc3b973518678caf89605f841cad6407c7e861" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profpico" supported="no">
+		<description>Professor Pico und das Malkasten Puzzle (Ger)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="professor pico und das malkasten puzzle (germany).bin" size="524288" crc="d2b063ed" sha1="429777d4b1204e3341bb83d72e0eb361a9f3623e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profpicof" cloneof="profpico" supported="no">
+		<description>Professeur Pico et la Machine a Couleurs (Fra)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49041-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="professeur pico et la machine a couleurs (france).bin" size="524288" crc="2870805c" sha1="cec40575c1ddbb9c73241346b9e6510820c28b7a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profpicoi" cloneof="profpico" supported="no">
+		<description>Professor Pico e l'Enigma della Scatola di Pastelli (Ita)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49041-13" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17939-U" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17939-u.ic1" size="524288" crc="8aa99b73" sha1="831816248c39133f5251b0a4bf5d92515932d536" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quizdora">
+		<description>Quiz ni Challenge! Doraemon (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6020"/>
+		<info name="alt_title" value="クイズにチャレンジ！ ドラえもん"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17530-U" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17530-u.ic1" size="1048576" crc="876a43a8" sha1="50214e02c82f9d85efc2dcbca6e1c82dd86b7854" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpkuruma">
+		<description>Race ni de Youyo! Ken-chan to Pepe Boku no Kuruma de Daibouken (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6043"/>
+		<info name="alt_title" value="レースにでようよ! ケンちゃんとペペ ぼくのクルマで大ぼうけん"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="race ni deyou yo! ken-chan to pepe boku no kuruma de daibouken (japan).bin" size="1048576" crc="466c69db" sha1="af6dde5231081e91e88235765ab3d340d783ddd3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sailortp">
+		<description>Bishoujou Senshi Sailor Moon - Sailor Stars Tokimeki Party (Jpn)</description>
+		<year>199?</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133190"/>
+		<info name="alt_title" value="美少女戦士セーラームーン セーラースターズ ときめきパーティ"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sailor stars tokimeki party (japan).bin" size="524288" crc="a503503d" sha1="6737ba2590e6dc48b125ff9725a55430465f707c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk3">
+		<description>Sanou Kaihatsu Series 3 Hikaku - Bunrui (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150220"/>
+		<info name="release" value="19951002"/>
+		<info name="alt_title" value="左脳開発シリーズ3 比較・分類"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18304-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18304-t.ic1" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magschol">
+		<description>Scholastic's The Magic School Bus (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49038-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18587-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18587-t.ic1" size="524288" crc="e6ef55f9" sha1="927e48f24745732235de4745d3acf1656750e12b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shimayum">
+		<description>Shimajiro to Yume no Kuni he Daibouken! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6116"/>
+		<info name="release" value="200210xx"/>
+		<info name="alt_title" value="しまじろうと ゆめのくにへ だいぼうけん！"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="shimajirou to yume no kunihe daibouken! (japan).bin" size="4194304" crc="00239298" sha1="606f6794cc18120684eff36f06e29a3d2f373b93" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sodatete">
+		<description>Sodatete Manabu - Doubutsu Oukoku! (Jpn)</description>
+		<year>1996</year>
+		<publisher>Yonezawa</publisher>
+		<info name="serial" value="T-193030"/>
+		<info name="alt_title" value="そだててまなぶ どうぶつ王国!"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sodatete manabu doubutsu oukoku! (japan).bin" size="524288" crc="40d9252e" sha1="6783a8a25bf1f71ceb7b109ddce89c94e5f492b7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanman">
+		<description>Soreike! Anpanman - Anpanman to Denwa de Asobou! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6051"/>
+		<info name="release" value="199712xx"/>
+		<info name="alt_title" value="それいけ!アンパンマン アンパンマンとでんわであそぼう！"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="anpanman no moshimoshi pico set with soreike! anpanman anpanman to denwa de asobou! (japan).bin" size="2097152" crc="f2e1d899" sha1="b5b06d19a41c677afa046e47ad674242c765de06" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmka">
+		<description>Soreike! Anpanman - Anpanman to Kotoba Asobi (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6071"/>
+		<info name="alt_title" value="それいけ!アンパンマン アンパンマンとことばあそび"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="MPR-21837-S" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-21837-s.ic1" size="2097152" crc="9ccd5cae" sha1="99bcf3eb0ca4671629739bd575e2356634cee466" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmtd">
+		<description>Soreike! Anpanman - Anpanman to Tanoshii Drive! (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6067"/>
+		<info name="alt_title" value="アンパンマンのドライブピコ それいけ!アンパンマン アンパンマンとたのしいドライブ！ (Anpanman no Drive Pico with Soreike! Anpanman - Anpanman to Tanoshii Drive!)"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-21077-S" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-21077-s.ic1" size="1048576" crc="ad3ef418" sha1="000808ad7fa7120976f2d579c23ce8662e721b92" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmtk">
+		<description>Soreike! Anpanman - Eigo to Nakayoshi 2 - Tanoshii Carnival (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6017"/>
+		<info name="alt_title" value="それいけ! アンパンマン えいごとなかよし２ たのしいカーニバル"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17522 J13" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-17522 j13.ic1" size="1048576" crc="1b28d597" sha1="b61bb5b7ef0572b50c806d4a7ea01f8db04f814d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmga">
+		<description>Soreike! Anpanman no Game de Asobou Anpanman (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133010"/>
+		<info name="alt_title" value="それいけ! アンパンマンのｹﾞｰﾑであそぼうアンパンマン"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-16369-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-16369-h.ic1" size="524288" crc="75bd0685" sha1="bd721f6aa96d1c258019b93cf041354887cae389" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was also released together with many prototypes as Proto build 701b-19940702-1716, meaning that probably after that date development was complete.
+But how do later protos fit with this theory? Maybe the later protos were from the Euro or Jpn versions? -->
+	<software name="tailsmm">
+		<description>Tails and the Music Maker (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49023-00"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17006-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17006-h.ic1" size="524288" crc="982154ab" sha1="807ee1ed88ffdd780754043d836a848864155844" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmg" cloneof="tailsmm">
+		<description>Tails und der Musikant (Ger)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails und der musikant (germany).bin" size="524288" crc="8edf7d4c" sha1="0b477e485a143b5bab7d26925bd587b0f3da2695" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmf" cloneof="tailsmm">
+		<description>Tails et le Faiseur de Musique (Fra)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49023-09" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17726-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17726-h.ic1" size="524288" crc="8cec50fa" sha1="3f1ec0e7e55c7b1c1e4577f516c24ab1068d77ef" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmms" cloneof="tailsmm">
+		<description>Tails y el Músico (Spa)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49023-06" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17725-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17725-h.ic1" size="524288" crc="1281c3a4" sha1="832a77f8e6c59b8d0e3bbc606b6b93aa303857b6" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmj" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150050"/>
+		<info name="release" value="19951205"/>
+		<info name="alt_title" value="右脳開発シリーズ7 Tails and the Music Maker"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17852-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17852-h.ic1" size="524288" crc="0a9665e7" sha1="6b5f6e8775188e93a4ff572163c8d3452fe8fe13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanoyouc">
+		<description>4 5 6 Tanoshii Youchien (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133050"/>
+		<info name="alt_title" value="楽しく遊んで能力アップ!!たのしい幼稚園"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tanoshi ku asonde nouryoku appu!! tanoshii youchien (japan).bin" size="524288" crc="ae02801d" sha1="19c061ba15c32ac4a9ee321263e36a87bb48157d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tokyodtt">
+		<description>Tokyo Disneyland Toon Town - Mickey no Boku wa Untenshu (Jpn)</description>
+		<year>200?</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255020"/>
+		<info name="alt_title" value="東京ディズニーランド トゥーンタウン ミッキーの ぼくは うんてんしゅ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-20209-S" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-20209-s.ic1" size="1048576" crc="029c2d9f" sha1="301b2db8dca36b6aaeaa6d00e91c2f0b870b08cf" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tokyosea">
+		<description>Tokyo DisneySea - Mickey to Asobou! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Kodansha</publisher>
+		<info name="serial" value="T-255070"/>
+		<info name="release" value="200210xx"/>
+		<info name="alt_title" value="東京ディズニーシー ミッキーとあそぼう！"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK IC1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block ic1.ic1" size="2097152" crc="38b713b3" sha1="ad29728e7421d4b7505159dc69ba5978964c6c35" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamtnaka">
+		<description>Tottoko Hamtaro - Haru-Natsu-Aki-Fuyu - Tottoko Nakayoshi! Ham Chance! (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6101"/>
+		<info name="release" value="200112xx"/>
+		<info name="alt_title" value="とっとこハム太郎 はる･なつ･あき･ふゆ とっとこなかよし! ハムちゃんず!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="71f39f19" sha1="faa6a6c997c9a5a8f9da30b0db44df01097c12b8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultratig">
+		<description>Ultraman Tiga (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133200"/>
+		<info name="alt_title" value="ウルトラマンティガ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19657-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19657-t.ic1" size="524288" crc="35be2a19" sha1="7270c0594f0e18a3c6cf2b2a190c2999b643cd19" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultravkg">
+		<description>Ultraman vs. Kaijuu Gundan!! (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133070"/>
+		<info name="alt_title" value="ウルトラマン VSかいじゅうぐんだん!!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17507-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17507-h.ic1" size="524288" crc="7f90e769" sha1="e650590a209a396fff6f3ebd7cd22ac9a62e42db" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrag" cloneof="magiccra">
+		<description>Zauberbuntstifte (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="zauberbuntstifte (germany).bin" size="524288" crc="3218ba97" sha1="40f6585ea1a79ce96097388115c639cf8c4ccdc3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Prototypes -->
+	<software name="101dalma">
+		<description>101 Dalmatians (Prototype, 19960817-U)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 17, 1996 - u).bin" size="1048576" crc="602e237a" sha1="915d44cbc0d0f04be485609c1367a1d47f140942" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma2" cloneof="101dalma">
+	<!-- is this the released version too? -->
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960817-B)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 17, 1996 - b).bin" size="1048576" crc="d271f727" sha1="bbbb351396ae9c636092efc6780dd1f80f4ca854" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma3" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960816)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 16, 1996).bin" size="1048576" crc="f0269662" sha1="7f7186de1a79427078a682aeca222e7df9994ffc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma4" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960814)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 14, 1996).bin" size="1048576" crc="16d9431c" sha1="e37c7b85b9c57301a9223507457ca0a78f7e4b24" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma5" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960718)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - jul 18, 1996).bin" size="1048576" crc="849abcb2" sha1="950888fd46a956c93baa3e938ee264b2de58055e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma6" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960705)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - jul 05, 1996).bin" size="1048576" crc="3d17bfdc" sha1="8aef447eb11567ba3663d89ad417987a6d5b8cbf" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma7" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960703)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - jul 03, 1996).bin" size="1048576" crc="29d31f1e" sha1="7f8cfd2778876dd7ca03fa0a89a0da66bd7cf483" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma8" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960531)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - may 31, 1996).bin" size="1048576" crc="ea6fe243" sha1="15d9a25c6350640aae1a65b41d293bde436252d9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma9" cloneof="101dalma">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960521)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - may 21, 1996).bin" size="1048576" crc="2c5eee07" sha1="1a909fb832d2b04d062f5c35f7ab1ed106573a5a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101pikiwp" cloneof="101dalma">
+		<description>101 Piki Wan-chan (Jpn, Prototype, 19960817)</description> <!-- aka Math Antics With 101 Dalmatians (Prototype, 19960817-J) -->
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 piki wan-chan rev 19960817 (1996)(appaloosa interactive - sega)(jp)(beta).bin" size="1048576" crc="cdc4dba2" sha1="ee1b794f03ee02124e22c4050f686f4f7b6e06df" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19941220)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="berenstain bears' a school day, the rev 19941220 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="2994dcee" sha1="6019bf5829925389b44414697e7329f8c2056437" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp1" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950106)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="berenstain bears' a school day, the rev 19950106 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="5dac3ecf" sha1="246e18fcbc271798f531944a6291ac6c9bb5840c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp2" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950113)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950113 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="291aa0bd" sha1="5677d64a2fd2ffa2baa1fd434f419407b5d47b5e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp3" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950116)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950116 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="56173be7" sha1="ccce25815ccff4468b42f8317025b5b66916645e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp4" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950126)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950126 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="098c3510" sha1="ab20a8063cd3650158a20572ae08048dc979a3e1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp5" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950127)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950127 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="4709d1cf" sha1="a6c0f0df6bb69aafcbdb49fd0ff5ef3ca7585cd9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstbp6" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950130)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950130 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="7b53784f" sha1="7128cea20f0695b69d552d5220097f4f4993ebef" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayon">
+		<description>Crayon Shinchan Oekaki Note (Jpn, Prototype 1)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta).bin" size="1048576" crc="60656906" sha1="1e816a3f775b2bb5a5ae9b432ee026e65dad54d6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayona" cloneof="crayon">
+		<description>Crayon Shinchan Oekaki Note (Jpn, Prototype 2)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta)[a].bin" size="524288" crc="843c3af4" sha1="878733ffb5b0464f82f102f8500650bfe0b4add4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayonb" cloneof="crayon">
+		<description>Crayon Shinchan Oekaki Note (Jpn, Prototype 3)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta)[a2].bin" size="524288" crc="39d4c64b" sha1="52e115feb9d303993ca46aa36aa94a427f0ee141" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkohik">
+		<description>Gakken no Obenkyou Soft Tasizan Hikizan (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Gakken</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gakken no obenkyou soft tasizan hikizan (1995)(chips - gakken)(jp)(beta).bin" size="524288" crc="25639a73" sha1="d0a768236e21d05ea1734691ab9031ea7a4b3e47" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiseiky">
+		<description>Heisei Kyouiku Iinkai Jr. (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="heisei kyouiku iinkai jr. (1995)(-)(jp)(beta).bin" size="524288" crc="6e3e29b9" sha1="93c46585343e48e089ede74896f66b0006896c66" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiseite">
+		<description>Heisei Tensai Bakabon - Minna de Family Resturant ni Ikunoda (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="heisei ten sai baka bon minna de famiri-restutoranni-kun (1995)(-)(jp)(beta).bin" size="524288" crc="3656af85" sha1="708cd58d6182a4f2448be3d2db97943c063a04f9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlp" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19941004)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048472">
+				<rom name="huckle and lowly's busiest day ever rev 19941004 (1994)(realtime associates - sega)(beta).bin" size="1048472" crc="f0d08ce0" sha1="46213ef731dc66325e824b620e05577b1b4a9718" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpa" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940919)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048472">
+				<rom name="huckle and lowly's busiest day ever rev 19940919 (1994)(realtime associates - sega)(beta).bin" size="1048472" crc="74cadb40" sha1="7a87c09d5827df096ad8572da3a67a3913762589" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpb" cloneof="hucklowl">
+		<description>La Journee La Plus Occupee de Huckle et Lowly (Fra, Prototype, 19940721)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1023740">
+				<rom name="huckle and lowly's busiest day ever (prototype - jul 21, 1994) (f).bin" size="1023740" crc="026ca6f0" sha1="0e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpd" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-D)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta)[a3].bin" size="1048576" crc="9a128886" sha1="c28b84f3ea1ada7accbc777683b55c3831c4ec9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpe" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-C)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta)[a2].bin" size="1048576" crc="bdd9c8fb" sha1="99223589cb5117cd8a82d780033545dcf0e53c8a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpf" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="782ea694" sha1="0f17bdd2747faf6a2c3bfe7846279b6ec02b8f60" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpg" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="a6bf6009" sha1="930cebb1af06fff37f0b03a1f5eb695f2581ffa5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlph" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940506-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940506 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="98840154" sha1="73df6e4fbf2f40efd73fa2268833c9a59e9398a1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpi" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940506-A)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940506 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="a271864c" sha1="8acead7e6af488b320d4abb7fce51d2fa0fd49b6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpj" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-D)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1994)(realtime associates - sega)(beta)[a3].bin" size="1048576" crc="3491bda7" sha1="a8ba90e9f5071e7191c334ba1ce968fcef9d8ff8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpk" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-C)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1994)(realtime associates - sega)(beta)[a2].bin" size="1048576" crc="828c773f" sha1="9c99abeac92bb7a536ea9c12c4f061ad13201261" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpl" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="a79e8c5a" sha1="baf0ec378647144948db072d32f926f188bf69e7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpm" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-A)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="61b37530" sha1="10ce4256b5843c0323835a760f91d1f176e7db24" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpn" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940427)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940427 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="11f32054" sha1="310683305721f63cd2a50db9464b5cf27fd877ad" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpo" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-E)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940426 (1994)(realtime associates - sega)(beta)[a2].bin" size="1048576" crc="fbc61621" sha1="c6392ccd79f1140739c42e476fd0c878a3680f75" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpp" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-D, Lower Half Broken)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="huckle and lowly's busiest day ever (prototype - apr 26, 1994 - d) (lower half broken).bin" size="524288" crc="5ea4c99c" sha1="86971ce70727fd3d8b52ba37fa9b7fe2d462037d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpq" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940426 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="f20535c5" sha1="f2dc08c8b0e4be40fec865e6530ffca7a474b6db" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpr" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-A)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940426 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="f325ab55" sha1="efaab9cb359acb46034b5e21ce8f5a4c2f8450e5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlps" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940424)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048472">
+				<rom name="huckle and lowly's busiest day ever rev 19940424 (1994)(realtime associates - sega)(beta).bin" size="1048472" crc="4e032111" sha1="7e0966ef8dfd19102a8682f1d8f6ebd41a6903f0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpt" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940422)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940422 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="2bfb25ac" sha1="227a2b1c36044ea4141d49eba006e927ecdd3337" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlpu" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940302)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="667784">
+				<rom name="huckle and lowly's busiest day ever rev 19940502 (1994)(realtime associates - sega)(beta).bin" size="667784" crc="265ad2d0" sha1="de457d6e1c6037a2c165c0f65037aadd9c73042c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kikansha">
+		<description>Kikansha Thomas ni Notte (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="kikansha thomas ni notte (1995)(bandai)(jp)(beta).bin" size="524288" crc="32f926ac" sha1="cf7cce404c013c57bfb0e80c5da3213af64dd505" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp8" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950419)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950419 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="97effc7b" sha1="9df5d484be194516604b901349dee19fa30ee2f7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp7" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950425)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950425 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="b948be65" sha1="0a7a95ef14997bc617b137e4e7da5cc3762bc516" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp6" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950501)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1042622">
+				<rom name="lion king, the - adventures at pride rock rev 19950501 (1995)(realtime associates - sega)(beta).bin" size="1042622" crc="d5ecd5fd" sha1="29f505bb944cec4b09e6a2baf7dd72427f9d1574" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp5" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950516)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1036340">
+				<rom name="lion king, the - adventures at pride rock rev 19950516 (1995)(realtime associates - sega)(beta).bin" size="1036340" crc="6fbfd61b" sha1="35b1ff9b842271055fea434406eb6d0d2dafcb0f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp4" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950517)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1036340">
+				<rom name="lion king, the - adventures at pride rock rev 19950517 (1995)(realtime associates - sega)(beta).bin" size="1036340" crc="f943083f" sha1="fc2bb183b0aed8ad6134fd345d83d43fef924a27" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp3" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950522)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950522 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="3ad71894" sha1="92f6f45a4f635d42824fb6fb23b34854d47cf82d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp2" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950615)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1036340">
+				<rom name="lion king, the - adventures at pride rock rev 19950615 (1995)(realtime associates - sega)(beta).bin" size="1036340" crc="0588d13c" sha1="0814754b867eb61f1e546910c4fd063960a85e62" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingp1" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950616)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950616 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="66d90805" sha1="6f571135acf76fa540b25c1670410d5d9fe016d8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap" cloneof="magiccra">
+		<description>Magic Crayons (Prototype)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons (1994)(sega)(beta).bin" size="524288" crc="f4ba1e9b" sha1="8d77011f2349eb14b51e76c08474817a0f318f99" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap1" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940614)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="514778">
+				<rom name="magic crayons rev 19940614 (1994)(sega)(beta).bin" size="514778" crc="8d4c66f4" sha1="f9f8a87a19ba36e2852f9f5c8a062345f2a4d7a6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap2" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940623)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="515290">
+				<rom name="magic crayons rev 19940623 (1994)(sega)(beta).bin" size="515290" crc="d4604e6e" sha1="ea7f41f2e6f0a24c6c06531cb20e40139ae0efb8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap3" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940630)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons rev 19940630 (1994)(sega)(beta).bin" size="524288" crc="51a06b4e" sha1="402cedcc402a72222f2e718493e38bf9a206df84" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap4" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940926)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="515222">
+				<rom name="magic crayons rev 19940926 (1994)(sega)(beta).bin" size="515222" crc="579ca72b" sha1="eb755371b32e5c83bb347942e84b3f9e5fb8fd4c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap5" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19941006)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="515222">
+				<rom name="magic crayons rev 19941006 (1994)(sega)(beta).bin" size="515222" crc="864d2c7c" sha1="718975648c1184954ed2aa6fbefc724fb99b98a5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap6" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19941011)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons rev 19941011 (1994)(sega)(beta).bin" size="524288" crc="f9d086fd" sha1="8e22b5d6153da0f5458a5cd38c5169baa82df540" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrap7" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19941012)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons rev 19941012 (1994)(sega)(beta).bin" size="524288" crc="efa0da47" sha1="5b234db6399a72c718bc60ff8fa6e39b88420322" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst1" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940608)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey's blast into the past rev 19940608 (1994)(sega)(beta).bin" size="1048576" crc="a9dbf978" sha1="f6fba5c1992a4b5f7109845706f02a76184bf3ba" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst2" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940721)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey's blast into the past rev 19940721 (1994)(sega)(beta).bin" size="1048576" crc="a0ae9860" sha1="595c464b9aa104db104a58f9b5d73f006e438c9f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst3" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940723)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey's blast into the past rev 19940723 (1994)(sega)(beta).bin" size="1048576" crc="d78baabc" sha1="baf6ccf28557b148f984ed58cafca1c55496e245" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst4" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940725)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past rev 19940725 (1994)(sega)(beta).bin" size="524288" crc="1a2760fe" sha1="d19812e54b2a0c6b086bea861c4209841eb0adac" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst5" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940801)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past rev 19940801 (1994)(sega)(beta).bin" size="524288" crc="90b047f6" sha1="8596cdb62ff03a2f602344a16b61a1f487fa7c96" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst6" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940809)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past rev 19940809 (1994)(sega)(beta).bin" size="524288" crc="08f46903" sha1="c0414c1524567fef2ddbff1762b8cce9803b81a0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo">
+	<!-- is this the released version too? -->
+		<description>Musical Zoo (Prototype, 19950217-B)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="musical zoo rev 19950217 (1995)(sega)(beta).bin" size="524288" crc="35add3d0" sha1="a9f0f50c0631c4be34b6e71f76d67ef156ac2552" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo1" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950217)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950217 (1995)(sega)(beta)[a].bin" size="519992" crc="6159cbe2" sha1="16650fa84e5fcb4ffaf9a8ae4abbeb5920ef41c4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo2" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950209)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950209 (1995)(sega)(beta).bin" size="519992" crc="7fda0399" sha1="62e5e5d86d6e9854c9498af44235f4d205c66f14" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo3" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950208)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="musical zoo rev 19950208 (1995)(sega)(beta).bin" size="524288" crc="7bb5a2a0" sha1="a0f69509ac85a761b1f52b752608c9ac1806dea8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo4" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950105)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950105 (1995)(sega)(beta).bin" size="519992" crc="5591682a" sha1="9573036713284a579e3df4506b70f03e9cf224e8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo5" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950104)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950104 (1995)(sega)(beta).bin" size="519992" crc="1c5ddba2" sha1="e1cdf0b23c09b3ebe74032d533aeb4be4c495a2a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo6" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19941220)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524238">
+				<rom name="musical zoo rev 19941220 (1995)(sega)(beta).bin" size="524238" crc="f3f402a1" sha1="7be6d664097d8608a3ebb0513d83e6c55692b5f8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbasebal">
+		<description>Pico Baseball (Jpn, Prototype)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico baseball (1994)(sega)(jp)(beta).bin" size="1048576" crc="a9802c1e" sha1="e966e16409bfeaa369362625c59aab216b65b6c6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penguki">
+		<description>Penguin Ukiuki Bikkuri Suizokukan Meiro Puzzle (Jpn, Prototype, 19950210)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pengin ukiuki bi kkurisuizokukan meiropazuru rev 19950210 (1994)(sega)(jp)(beta).bin" size="1048576" crc="a4a143cb" sha1="a17a6524f382b771f4f7ac1f46d7e45836300dda" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzlp" cloneof="pepepuzl">
+		<description>Pepe's Puzzles (Prototype, 19950224)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="523930">
+				<rom name="pepe's puzzles rev 19950224 (1995)(sega)(beta).bin" size="523930" crc="e72d9d76" sha1="4f91ed645a177d41ff145a9b4b4a7024ea9025e5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzlp1" cloneof="pepepuzl">
+		<description>Pepe's Puzzles (Prototype, 19950220)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="544254">
+				<rom name="pepe's puzzles rev 19950220 (1995)(sega)(beta).bin" size="544254" crc="e0618f30" sha1="493e165f8bcf98f98039b9c56d4a8dcf744cb178" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzlp2" cloneof="pepepuzl">
+		<description>Pepe's Puzzles (Prototype, 19950210)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="603388">
+				<rom name="pepe's puzzles rev 19950218 (1995)(sega)(beta).bin" size="603388" crc="f32f45e5" sha1="26900e4f0a7b7c25b6acdc33a1a7c819fe1a543a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picosamp">
+	<!-- is this the released version too? -->
+		<description>Pico Storyware Sampler (Prototype, 19960625)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico storyware sampler rev 19960625 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="85c4f26b" sha1="d3342d20002fed586b43e26b29aefe15138d98ae" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picosamp1" cloneof="picosamp">
+		<description>Pico Storyware Sampler (Prototype, 19960614)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico storyware sampler rev 19960614 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="fa847f2c" sha1="a18ecc5e20d1f1c076ac76b77e2258e8045968f1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picosamp2" cloneof="picosamp">
+		<description>Pico Storyware Sampler (Prototype, 19960607)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico storyware sampler rev 19960607 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="3cccf1d5" sha1="9eb71e27714efa060d1d70753376f5e4ba7c203c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornp" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940809)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940809 (1994)(sega)(beta).bin" size="524288" crc="56ad7b29" sha1="0cdfb0a8b07c9d0169aa70f1f9fa3520d6bd65f7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornp1" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940725)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="514644">
+				<rom name="a year at pooh corner rev 19940725 (1994)(sega)(beta).bin" size="514644" crc="93915a98" sha1="d76c9d3ded9e7374c128569470f9744a9a76e308" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornp2" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940723)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940723 (1994)(sega)(beta).bin" size="524288" crc="6379c899" sha1="819bfe1214b0ef9897380b657d264558792c4a43" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornp3" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940721)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940721 (1994)(sega)(beta).bin" size="524288" crc="eb81b2d3" sha1="0bec28cd6215c77e389c8d4214ab32255b26aeff" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornp4" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940711)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940711 (1994)(sega)(beta).bin" size="524288" crc="640feed2" sha1="0eacbc0dcb43de09aaa18764988056a839a3577e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornp5" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940608)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="a year at pooh corner rev 19940608 (1994)(sega)(beta).bin" size="1048576" crc="d4881455" sha1="48f104073567c96ccf8451dc5fc9c85bcbebf0ec" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornj1" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner (1995)(sega)(jp)(beta).bin" size="524288" crc="a47878a1" sha1="16ab6f13bc8da6161f20600434db4111a16044d2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psoccerp" cloneof="psoccer">
+		<description>Pico Soccer Mezase Soccer Senshu (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pico soccer mezase soccer senshu (1995)(sega)(jp)(beta).bin" size="524288" crc="d9849eb8" sha1="ba61a1c98aa5d03958ba745282086637680b13b2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopy">
+		<description>Snoopy no Gakugeikai (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="snoopy no gakugeikai (1995)(sega)(jp)(beta).bin" size="524288" crc="b76cd97c" sha1="6d6b49249cd4513d59e1c863fed5f273113d7e9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld (1996)(sega)(us).bin" size="524288" crc="e472a795" sha1="839d8be99eabf371bb992166471c877db6f6e265" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam1" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960808, 07.46)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960808-0746 (1996)(sega)(us)(beta).bin" size="524288" crc="4363a1e2" sha1="935b925c7a6ed36519b756f33aa2ce2240610471" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam2" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960802, 08.08)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960802-0808 (1996)(sega)(us)(beta).bin" size="524288" crc="c2cbfe99" sha1="c0d0eb5db0d34aa75f9be68d75f3b99d0aa2e193" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam3" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960719, 01.27)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960719-0127 (1996)(sega)(us)(beta).bin" size="524288" crc="ef774132" sha1="3a6dc10517df2d037f716e59c13675bebf0e4246" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam4" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960701, 11.05)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960701-1105 (1996)(sega)(us)(beta).bin" size="524288" crc="ddcdf94b" sha1="7ebab6cd9fc42a598082f2ab442700b414e41d9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmp" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 1004, 19941005, 12.55)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="495190">
+				<rom name="tails and the music maker rev 1004-19941005-1255 (1994)(sega)(beta).bin" size="495190" crc="57714ba7" sha1="3dfb122ab384847712dbd3fd41c6509f7d19c363" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmp1" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0927, 19940927, 14.20)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="495190">
+				<rom name="tails and the music maker rev 0927-19940927-1420 (1994)(sega)(beta).bin" size="495190" crc="beb97cf3" sha1="3b6b392f5845a61f018d8edb5121b293ab1f32c9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the file below came with the wrong name: it should either be "proto 0725, 19940726" or be "proto 0625, 19940626"... -->
+	<software name="tailsmmp2" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0725, 19940626, 10.44)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="495126">
+				<rom name="tails and the music maker rev 0725-19940626-1044 (1994)(sega)(beta).bin" size="495126" crc="ebbae9ce" sha1="02dbbf88a190f6c068d3f4e39488010cd2a2601a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmp3" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0722, 19940722, 21.49)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 0722-19940722-2149 (1994)(sega)(beta).bin" size="524288" crc="f8246157" sha1="4f011b6055e484ddfe81acd03da8fff436b824f2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmp5" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0623, 19940624, 07.55)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 0623-19940624-0755 (1994)(sega)(beta).bin" size="524288" crc="17a8af59" sha1="e7e69600262eda55a9be6bde248c6f9401d5833f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmp6" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0608, 19940608, 16.55)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 0608-19940608-1655 (1994)(sega)(beta).bin" size="524288" crc="f83ec5e8" sha1="39914965a38350b1bef720d39576d20943e8e4a4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+
+The following ones have been dumped by Cowering, but I'm not sure if they are already available. In the meanwhile, I document here the entries for future inclusion.
+Notice that most of these will become parent, when the dumps surface
+
+	<software name="6000nin">
+		<description>6000-nin no Sensei-tachi ga Tsukutta Tanoshii Shougakkou Tanken 1 (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="6000-nin no Sensei-tachi ga Tsukutta Tanoshii Shougakkou Tanken 1 (J).bin"
+ size="????" crc="d62e3372" sha1="71804b391ca24d6de1775cfdf0d5a21f7d90b768" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jackjill">
+		<description>Adventures in Letterland with Jack &amp; Jill (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom  name="Adventures in Letterland with Jack &amp; Jill (U).bin" size="????" crc="e846858b" sha1="fe4412ba81673894167841f47780a3f67d93c4e7" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abarangr">
+		<description>Bakuryuu Sentai Abaranger (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Bakuryuu Sentai Abaranger (J).bin" size="????" crc="0bd73cf6" sha1="df12e28a2f1e49f51d2d8968d38993f2f93b648c" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayola">
+		<description>Crayola Crayons - Create a World (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Crayola Crayons - Create a World (U).bin" size="????" crc="04fc1c21" sha1="88738c2b5b6302385fbaad60af1221cf70cf0f93" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dprinnari">
+		<description>Disney Princess - Princess ni Naritai! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Disney Princess - Princess ni Naritai! (J).bin" size="????" crc="64b1906b" sha1="0d2f19d9d2d96faf97aafca82f2e05fe9fc1ace8" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dprinarel">
+		<description>Disney Princess Ariel (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Disney Princess Ariel (J).bin" size="????" crc="581361f7" sha1="921ad22eee062dd053c24590cbf05a9c4d591882" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraland">
+		<description>Doraemon - Chiiku Asobi Dora-Land (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Doraemon - Chiiku Asobi Dora-Land (J).bin" size="????" crc="a83470ca" sha1="e37f722d4c04cb965bbebd3da22b9f97f836c315" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraeiu">
+		<description>Doraemon - Ensoku Imohori Undoukai (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Doraemon - Ensoku Imohori Undoukai (J).bin" size="????" crc="7d9ebcee" sha1="cf626fe6f25435e42ce0c4cdfc8a4d335f64fe76" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doranmk">
+		<description>Doraemon - Nobita to Maigo no Kyouryuu (Jpn, Rev. 2)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Doraemon - Nobita to Maigo no Kyouryuu (J) (REV02).bin" size="????" crc="190dadbe" sha1="4ba7a3b30033f1c5b5adfd3ec7a1500ac912790d" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doratimm">
+		<description>Doraemon - Time Machine de Daibouken (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Doraemon - Time Machine de Daibouken (J).bin" size="????" crc="7010775a" sha1="acfa501eddbad82dffbc75a988c7413b97b952c2" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorayuta">
+		<description>Doraemon - Youchien wa Tanoshii na (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Doraemon - Youchien wa Tanoshii na (J).bin" size="????" crc="c68c35c0" sha1="df2a97a73cff3c097d16a18cd673177d6824c7ab" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exchatan">
+		<description>Exciting! Hataraku Norimono-tachi (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Exciting! Hataraku Norimono-tachi (J).bin" size="????" crc="eaf2b204" sha1="3d572469af1e38b748452894a55566ac23892523" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gccaper">
+		<description>The Great Counting Caper with The 3 Blind Mice (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Great Counting Caper with The 3 Blind Mice, The (U).bin" size="????" crc="06dc8145" sha1="76a27504a36f7d4b68892e56f7586a26326d0878" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hellokso">
+		<description>Hello Kitty no Suteki na O-tanjoubi (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Hello Kitty no Suteki na O-tanjoubi (J).bin" size="????" crc="45ded176" sha1="a451d2674a3d7aa88b8a0befb96f48b55ff77bc1" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hellokmd">
+		<description>Hello Kitty to McDonald de Asobo! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Hello Kitty to McDonald de Asobo! (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohj">
+		<description>Kuma no Pooh-san - Tanoshii Tashizan - Hikizan (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Kuma no Pooh-san - Tanoshii Tashizan - Hikizan (J).bin" size="????" crc="eda6b93c" sha1="5dc53a2b40bb3f11181862c819a9fd4d02e77d9c" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking">
+		<description>Lion King - Adventure at Pride Rock (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Lion King - Adventure at Pride Rock (U).bin" size="????" crc="2c0db3b9" sha1="2da72b5ab41d95675163850bab11e38d7e8a098d" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdonald">
+		<description>McDonald de Asobo! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="McDonald de Asobo! (J).bin" size="????" crc="474d946e" sha1="3615cf2f28133c3d35003bef16a517d5379e9c20" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeystp">
+		<description>Mickey no Tokyo Disneyland Stamp Rally (Jpn, Rev. 1)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Mickey no Tokyo Disneyland Stamp Rally (J) (REV01).bin" size="????" crc="f3d95a84" sha1="25d7b87e42e69e49d813b7f49888696dd5924c51" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minnaoo">
+		<description>Minna de O-ryouri O-saihou (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Minna de O-ryouri O-saihou (J).bin" size="????" crc="b69e3baa" sha1="ea7b9e819e282d7be83b07a5ca6258f01fb77541" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgo">
+		<description>Muppets on the Go! (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Muppets on the Go! (U).bin" size="????" crc="d686b96e" sha1="731ad3ab65f1681f48594cad86e1a1adb9f57829" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopyj">
+		<description>Ongaku Daisuki Snoopy (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Ongaku Daisuki Snoopy (J).bin" size="????" crc="287e866f" sha1="28c9dc463534e7e152890e0c2a105f149dca34cd" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plarail">
+		<description>Plarail Pico - Plarail de Asobou! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Plarail Pico - Plarail de Asobou! (J).bin" size="????" crc="442298ee" sha1="e40812561106e177b7874e6f7827aaad26b1740d" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pocahont">
+		<description>Pocahontas - Riverbend Adventures (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Pocahontas - Riverbend Adventures (U).bin" size="????" crc="edf2218b" sha1="b2c70bb26f9fed925b6beab27db73d8fc7e21cd7" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemnag">
+		<description>Pocket Monster Advance Generation - Hiragana Katakana Kakechatta! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Pocket Monster Advance Generation - Hiragana Katakana Kakechatta! (J) [!p].bin" size="????" crc="b98fd3d5" sha1="08fe3ab34e4f0328d2240b540e40979c0d74dfd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohhaji">
+		<description>Pooh-san no Hajimete no Eigo (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Pooh-san no Hajimete no Eigo (J).bin" size="????" crc="7e4f093c" sha1="29bffce1aecaa7cc439ad18a23ecb4d5c919ad65" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlf" cloneof="hucklowl">
+		<description>Richard Scarry's - Huckle and Lowly's Busiest Day Ever (Fra)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Richard Scarry's - Huckle and Lowly's Busiest Day Ever (F) [!p].bin" size="????" crc="126ca6f0" sha1="1e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sks1aynz">
+		<description>Sanou Kaihatsu Series 1 - Atama ga Yoku Naru - Zukei Ninshiki (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Sanou Kaihatsu Series 1 - Atama ga Yoku Naru - Zukei Ninshiki (J) [!p].bin" size="????" crc="e81acb46" sha1="f4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sks4ayns">
+		<description>Sanou Kaihatsu Series 4 - Atama ga Yoku Naru - Suiri - Kousei (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Sanou Kaihatsu Series 4 - Atama ga Yoku Naru - Suiri - Kousei (J) [!p].bin" size="????" crc="f81acb46" sha1="04a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imagtrn">
+		<description>Sansuu - Eigo de Mojars ni Chousen - Image Training for the Right Side of the Brain (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Sansuu - Eigo de Mojars ni Chousen - Image Training for the Right Side of the Brain (J).bin" size="????" crc="42a578a8" sha1="5ca5f0ef8741acb5d58ce0f61e6789ec2adb00ea" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sesame">
+		<description>Sesame Street - Alphabet Avenue (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Sesame Street - Alphabet Avenue (U).bin" size="????" crc="ca1bbeef" sha1="62ce7f387eb9f61bdef3f74df8aff98106b022da" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shimyume">
+		<description>Shima Shima Tora no Shimajirou - Shimajirou to Yume no Kuni e Daibouken (J)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Shima Shima Tora no Shimajirou - Shimajirou to Yume no Kuni e Daibouken (J) [!p].bin" size="????" crc="9782b08f" sha1="d95bdc33fa3108e6e60a9b4bccf6d53c7b36329d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shimtano">
+		<description></description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Shima Shima Tora no Shimajirou - Tanoshii Ichinichi (J).bin" size="????" crc="d228a783" sha1="1b2c4a81c88a86274f0a24f63ae4ee59339b8e67" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="curkids">
+		<description>Smart Alex and Smart Alice - Curious Kids (USA)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Smart Alex and Smart Alice - Curious Kids (U).bin" size="????" crc="8b5e7490" sha1="1d809139fd2926107a9fae6270b10615c6f6477f" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonigamj" cloneof="sonicgam">
+		<description>Sonic The Hedgehog's Gameworld (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Sonic The Hedgehog's Gameworld (J).bin" size="????" crc="df7a9599" sha1="6af6bf20056ccac6ecdc0ebad323eaf4bffb5963" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpnmmw">
+		<description>Soreike! Anpanman no Medalympic World (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Soreike! Anpanman no Medalympic World (J).bin" size="????" crc="eda45344" sha1="d7a63c7fe9682c3271452fdaab816ed51cb9da17" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpnmmw2">
+		<description>Soreike! Anpanman no Medalympic World 2 (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Soreike! Anpanman no Medalympic World 2 (J).bin" size="????" crc="3c57e47d" sha1="4335e65d238c46a286e2d0ce8d821d35799ab76a" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name= anpnmoda"">
+		<description>Soreike! Anpanman no Ohanashi Daisuki Anpanman (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Soreike! Anpanman no Ohanashi Daisuki Anpanman (J).bin" size="????" crc="6ed63704" sha1="b443d6d5ec4109c3239b860eac5ab024ffb68d1e" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomica">
+		<description>Tomica Pico - Bokura no Machi Tomica Town de Asobou! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Tomica Pico - Bokura no Machi Tomica Town de Asobou! (J).bin" size="????" crc="a1ace3b8" sha1="57c3da145e97ffd94397c2c265efd05ae4e43dd9" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tottokoh">
+		<description>Tottoko Hamtarou - Oekaki Ippai! Ham-chans! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Tottoko Hamtarou - Oekaki Ippai! Ham-chans! (J).bin" size="????" crc="c71101d8" sha1="6e7c1ceeedf9c8ed641a7332fb1fe1a06d48fc17" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2">
+		<description>Toy Story 2 - Woody Sousaku Daisakusen!! (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Toy Story 2 - Woody Sousaku Daisakusen!! (J).bin" size="????" crc="dcea1ca1" sha1="fb1618898e0b3ea860bf5e4b6cf6ec257f4c5da9" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultradd">
+		<description></description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Ultraman Dyna D (J).bin" size="????" crc="501e97d9" sha1="b1bec7fa1fca53205fc7fec2547c8da4da4928b2" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrakds">
+		<description></description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="????">
+				<rom name="Ultraman Kids - Tobidase! Space Picnic (J).bin" size="????" crc="093357d5" sha1="4a9bf5f5352933bb18da5f7a33da83589a04241c" offset="000000" >
+			</dataarea>
+		</part>
+	</software>
+
+-->
+</softwarelist>

@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Master Tapes -->
+
+<!-- I believe all the Cassette images here are original, so some may require the manuals for additional copy protection. -->
+
+<!-- Loading Instructions:
+
+      If the system has a disk drive (which the BBC Master does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
+
+      To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
+-->
+
+<softwarelist name="bbcm_cass" description="BBC Master Cassette Images">
+
+	<!-- Games -->
+
+	<software name="crazyrid">
+		<description>Crazy Rider</description>
+        <year>1987</year>
+		<publisher>Superior Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="45446">
+				<rom name="crazyrider_bbcmaster(1987)(superior).uef" size="45446" crc="42b7b61d" sha1="45bb11e0889452ea4dcd896b96a2c584483900d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="exile">
+		<description>Exile</description>
+        <year>1988</year>
+		<publisher>Superior Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="53768">
+				<rom name="exile_bbcmaster(1988)(superior).uef" size="53768" crc="25060f4d" sha1="ecdf9a346a6c536a15b4341d5a31eb72a3779ba8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="reptonin">
+		<description>Repton Infinity</description>
+        <year>1988</year>
+		<publisher>Superior Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="118611">
+				<rom name="reptoninfinity_bbcmaster(1988)(superior).uef" size="118611" crc="0e0ab9ad" sha1="5d7dde6d9738bdd0cdda7bbdcbc8edccc3fb2d58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="strykrun">
+		<description>Strykers Run</description>
+        <year>1986</year>
+		<publisher>Superior Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="46446">
+				<rom name="strykersrun_bbcmaster(1986)(superior).uef" size="46446" crc="5f20d209" sha1="440f88ca522cb550d9ebb8127c0826c424fcf0de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="welcome">
+		<description>Welcome</description>
+        <year>198?</year>
+		<publisher>BBC Soft</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<dataarea name="cass" size="28803">
+				<rom name="welcome-bbcmaster-side1_bm.uef" size="28803" crc="29076f21" sha1="d56ddebc09166687e89fd1210d87a98ddaf37272" offset="0" />
+			</dataarea>
+		</part>
+        <part name="cass2" interface="bbc_cass">
+			<dataarea name="cass" size="38565">
+				<rom name="welcome-bbcmaster-side2_bm.uef" size="38565" crc="ac51d83c" sha1="c6cfd8ddbff42f983fbf0aa341cd49844025995b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

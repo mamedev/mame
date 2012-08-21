@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--  Needed to be dump:
+	IBM PCjr club disk library (only an extracted collection exist)
+-->
+<softwarelist name="ibmpcjr_flop" description="IBM PCjr disk images">
+
+	<!-- OS -->
+	<software name="dos2">
+		<description>IBM PC-DOS Version 2.00</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="dos2.ima" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Apps -->
+	<software name="wordstar">
+		<description>Wordstar for PCjr (Release 1.00)</description>
+		<year>1987</year>
+		<publisher>Micropro International</publisher>
+		<info name="usage" value="boot from DOS 2 and then load wordstar" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 1.ima" size="368640" crc="81b95671" sha1="a5f33403b1e3762e6b1c2c84b279e093eec9501f" offset="0x00000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 2.ima" size="368640" crc="d5c84856" sha1="ef138f490f302e687827b71b8d254143d870f895" offset="0x00000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 3.ima" size="368640" crc="49884404" sha1="11c8c7d638ba00a1e42844a1efb09fd6f75ac7d4" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explore">
+		<description>Exploring The IBM PCjr</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="exploring the ibm pcjr.ima" size="163840" crc="409ff73f" sha1="453ae5f3fa7781ece7d421dd973ce54204b9c99d" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sampler">
+		<description>IBM PCjr Sampler</description>
+		<year>198?</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="ibm pcjr sampler.ima" size="368640" crc="c36607b3" sha1="a1d99d975aaed9746056fa1c06563cf08d1a8bc5" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- will be moved to the pc softlist oneday when one is created. These was sold also for the IBM PCjr-->
+	<software name="nortutil">
+		<description>The Norton Utilities 3.10</description>
+		<year>1986</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="usage" value="boot from DOS 2 and then load, using: nc /d1" />
+		<!-- marked as bad since source is questionable, needs a redump -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="norton utilities 310.ima" size="368640" crc="b27b8cbb" sha1="34b5973fe5354a08b4d2a987473f82cd82a581cd" offset="0x00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="procm24">
+		<description>ProComm (Version 2.4.3)</description>
+		<year>1988</year>
+		<publisher>Datastorm Technologies, Inc.</publisher>
+		<info name="usage" value="boot from DOS 2 and then load, using: prcmpgm" />
+		<!-- marked as bad since source is questionable, needs a redump -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="procomm 243.ima" size="368640" crc="63c75c78" sha1="cc3f293349d3458d4577221f15eb121c18465109" offset="0x00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal3">
+		<description>Turbo Pascal 3.02A</description>
+		<year>1985</year>
+		<publisher>Borland Inc.</publisher>
+		<info name="usage" value="boot from DOS 2 and then load, using: prcmpgm" />
+		<!-- marked as bad since source is questionable, needs a redump -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="turbo pascal 302.ima" size="368640" crc="07fafb7e" sha1="1358d6082b0d44107ef1411f3a2c251cef7eb922" offset="0x00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zbasic4">
+		<description>ZBasic 4.02</description>
+		<year>1987</year>
+		<publisher>Zedcor, Inc.</publisher>
+		<info name="usage" value="boot from DOS 2 and then load, using: prcmpgm" />
+		<!-- marked as bad since source is questionable, needs a redump -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="zbasic 402.ima" size="368640" crc="c8d0b1a0" sha1="ac264cb7267f54acf6d6619e4f782f781674c5e0" offset="0x00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Games -->
+	<software name="kingqst">
+		<description>King's Quest</description>
+		<year>1984</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="king's quest.ima" size="368640" crc="524c1991" sha1="f6159d955959bf421774ed85df09b50026fa5a81" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

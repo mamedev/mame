@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="wangpc" description="Wang PC disk images">
+	<software name="boot">
+		<description>Boot disk</description>
+		<year>1985</year>
+		<publisher>Wang</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="bootdisk.img" size="368640" crc="ca822bf0" sha1="c0a60e47bd76d981922cde199f639cf9ead02336" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

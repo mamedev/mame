@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+	Missing dumps:
+
+	325201-01	C16/C116/plus4 Burn In
+	325057-01	C16/C116/plus4 DIAGNOSE
+	325062-01	C16/C116/plus4 Diagnostic Test
+-->
+<softwarelist name="plus4_cart" description="Commodore Plus/4 cartridges">
+
+	<!-- Games -->
+
+	<software name="atomicmi">
+		<description>Atomic Mission</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T116005" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317042-01.u1" size="0x4000" crc="a059fccb" sha1="e919531d016596ec1a2fd349bbe6691716297f35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jackattk">
+		<description>Jack Attack</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T116002" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM                        |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+
+		ROM     - MOS 23128 "317040-01 (C) 1984 CBM 26011D-722"
+		-->
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317040-01.u1" size="0x4000" crc="6b624fec" sha1="ba54810ef1089fdf56b74536f9d679a80ace2dc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piratead">
+		<description>Pirate Adventure</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T116004" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317041-01.u1" size="0x4000" crc="a903dc53" sha1="410ccb6b304ca30e852fdc6ec33d9dacd7de3493" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strngeod">
+		<description>Strange Odyssey</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T116006" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM                        |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+
+		ROM     - MOS 23128 "317043-01 (C) 1984 CBM 26011D-787"
+		-->
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317043-01.u1" size="0x4000" crc="994c9b98" sha1="30a0707efe24f58525bffc228085f412d574fa3b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viduzzle">
+		<description>Viduzzles</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T116001" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM                        |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+
+		ROM     - MOS 23128 "317050-02 (C) 1984 CBM"
+		-->
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317050-02.u1" size="0x4000" crc="eaaa44ed" sha1="97c269ab7b57a5ddfe65a06c29986c6ccb3aeb2b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Applications -->
+
+	<software name="calcplus">
+		<description>Calc/Plus</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T112003" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="calc-lo" size="0x4000" crc="8a085df6" sha1="2b8c748d7be725a1e4106b9cca167bd85786b809" offset="0" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="calc-hi" size="0x4000" crc="772803a9" sha1="49810afc29476cc2b2750d96beabd003cffbd5a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c16kbtut">
+		<description>Commodore 16 Keyboard Tutorial</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T113016" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="kb-lo" size="0x4000" crc="c999369c" sha1="fea0b7df5ccec5ce05390c650ff5f4ea878bd468" offset="0" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="kb-hi" size="0x4000" crc="a617e188" sha1="8754ecc8b6ce2652eea4b997fb1f3ff9d3d7c9cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diag264p" supported="no">
+		<description>Diag 264 (PAL)</description>
+		<year>2012</year>
+		<publisher>crock</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="diag264c_pal.bin" size="0x4000" crc="c314c674" sha1="4acadaf84ecc3eb252ad765fdab583c45e771fd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diag264n" cloneof="diag264p" supported="no">
+		<description>Diag 264 (NTSC)</description>
+		<year>2012</year>
+		<publisher>crock</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="diag264c_ntsc.bin" size="0x4000" crc="9398ae1c" sha1="d75a28a1a9727914620d57157768c3a84b23544a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finadvis">
+		<description>Financial Advisor</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T232001" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317048-01.u1" size="0x4000" crc="5b0e82ae" sha1="0f1b8b20331c8c502fed507eca5d66683667757b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logo">
+		<description>LOGO: A Language for Learning</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T263001" />
+		<info name="video" value="NTSC" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317046-01.u1" size="0x4000" crc="216fc5a8" sha1="6e22c082ef2659af4eb10f8acb14175941c9edc9" offset="0" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="317047-01.u2" size="0x4000" crc="4b7e5c5a" sha1="f2d4fdafef12762c96b88f06bb5d91644f54e5c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="utility.d64" size="174848" crc="f4d84692" sha1="2850fb13b27b400167d80f2d755481835e3033b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic7">
+		<description>Octasoft BASIC 7.0 (Hun)</description>
+		<year>1988</year>
+		<publisher>Novotrade</publisher>
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c2l" size="0x4000">
+				<rom name="basic7" size="0x4000" crc="e900a1d5" sha1="5f96bdeffa42c18e869d9d045df65d98a4e561eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scriptpl">
+		<description>Script/Plus</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T112001" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM0                       |
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM1                       |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+
+		ROM0    - MOS 23128 "317051-01 (C) 1984 CBM 26011D-723"
+		ROM1    - MOS 23128 "317052-01 (C) 1984 CBM 26011D-724"
+		-->
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="317051-01.u1" size="0x4000" crc="d1679eea" sha1="d6d0d8f7feb16cdba650696683c02fcf62422f4a" offset="0" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="317052-01.u2" size="0x4000" crc="ad0696d9" sha1="5d7c6d0f2c732c92ca8f8f98486e08137824a4a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speedy">
+		<description>Speedy</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="speedy.u1" size="0x2000" crc="74f180bc" sha1="79a4b19c50bc9a85c0356a3d2d7453b2d1d8266f" offset="0" />
+				<rom size="0x2000" offset="0x2000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbopls">
+		<description>TurboPlus</description>
+		<year>1987</year>
+		<publisher>Kingsoft</publisher>
+		<info name="author" value="Andreas Arens" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="turboplus.u1" size="0x2000" crc="88b40daf" sha1="bb02e863193b9f7731e9bf5b554bb1e743a0a573" offset="0" />
+				<rom size="0x2000" offset="0x2000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
