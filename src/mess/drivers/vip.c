@@ -56,7 +56,7 @@ Notes:
 
     TODO:
 
-    - Tiny BASIC
+    - ASCII keyboard
     - cassette loading
     - 20K RAM for Floating Point BASIC
     - VP-111 has 1K RAM, no byte I/O, no expansion
@@ -266,16 +266,13 @@ READ8_MEMBER( vip_state::read )
 
     UINT8 data = m_exp->program_r(space, offset, cs, cdef, &minh);
 
-    if (!minh)
+    if (cs)
     {
-        if (cs)
-        {
-            data = memregion(CDP1802_TAG)->base()[offset & 0x1ff];
-        }
-        else
-        {
-            data = m_ram->pointer()[offset & m_ram->mask()];
-        }
+        data = memregion(CDP1802_TAG)->base()[offset & 0x1ff];
+    }
+    else if (!minh)
+    {
+        data = m_ram->pointer()[offset & m_ram->mask()];
     }
 
     return data;
@@ -708,6 +705,9 @@ void vip_state::machine_reset()
 
     // internal speaker
     m_beeper->set_output_gain(0, ioport("BEEPER")->read() ? 0.80 : 0);
+
+    // clear byte I/O latch
+    m_byteio_data = 0;
 }
 
 

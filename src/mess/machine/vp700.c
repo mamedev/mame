@@ -72,7 +72,7 @@ UINT8 vp700_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 {
 	UINT8 data = 0xff;
 
-	if (cs)
+	if (offset < 0x1000)
 	{
 		*minh = 1;
 

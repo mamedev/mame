@@ -44,7 +44,7 @@ protected:
 
 	// device_vip_byteio_port_interface overrides
 	virtual UINT8 vip_in_r();
-	virtual int vip_ef3_r();
+	virtual int vip_ef4_r();
 
 private:
 	UINT8 m_keydata;

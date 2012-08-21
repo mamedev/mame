@@ -25,7 +25,10 @@ const device_type VP620 = &device_creator<vp620_device>;
 WRITE8_MEMBER( vp620_device::kb_w )
 {
 	m_keydata = data;
-
+	
+	m_slot->inst_w(0);
+	m_slot->inst_w(1);
+	
 	m_keystb = ASSERT_LINE;
 }
 
@@ -96,7 +99,7 @@ UINT8 vp620_device::vip_in_r()
 //  vip_ef3_r - EF3 flag read
 //-------------------------------------------------
 
-int vp620_device::vip_ef3_r()
+int vp620_device::vip_ef4_r()
 {
 	int state = m_keystb;
 
