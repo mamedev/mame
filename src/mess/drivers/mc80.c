@@ -15,7 +15,7 @@ Real workings of keyboard need to be understood and implemented.
 static ADDRESS_MAP_START(mc8020_mem, AS_PROGRAM, 8, mc80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("p_videoram")// 1KB RAM ZRE
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("videoram")// 1KB RAM ZRE
 	AM_RANGE(0x2000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
