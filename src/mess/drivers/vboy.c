@@ -11,11 +11,12 @@
 	- 100us / 20us timers
 	- sound
     - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
+	- 3dtetris: missing gameplay (writes to framebuffer?)
     - boundh: game is way too fast
     - galactic: ball goes out of bounds sometimes?
+	- golf: black screen on attract mode/gameplay
     - marioten: title screen logo is misplaced if Mario completes his animation
     - nesterfb: ball stops when thrown
-    - panicbom: brightness 10 overflows
     - redalarm: gameplay doesn't work
     - spaceinv: Taito logo only if you press the button, framebuffer?
     - spaceinv: missing shots
