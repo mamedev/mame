@@ -4,6 +4,10 @@
 
   Driver file to handle emulation of the NEC PC-FX.
 
+  - BIOS error codes (guesses):
+    - Blue screen = MCU pad communication error
+    - Cyan screen = ?
+
 ***************************************************************************/
 
 
@@ -12,6 +16,14 @@
 #include "video/huc6261.h"
 #include "video/huc6270.h"
 
+typedef struct _pcfx_pad_t pcfx_pad_t;
+
+struct _pcfx_pad_t
+{
+	UINT8 ctrl[2];
+	UINT8 status[2];
+	UINT16 latch[2];
+};
 
 class pcfx_state : public driver_device
 {
@@ -19,9 +31,11 @@ public:
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_huc6261(*this, "huc6261")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<huc6261_device> m_huc6261;
 
 	virtual void machine_reset();
 
@@ -32,8 +46,12 @@ public:
 	UINT16 m_irq_pending;
 	UINT8 m_irq_priority[8];
 
+	pcfx_pad_t m_pad;
+
 	DECLARE_READ16_MEMBER( irq_read );
 	DECLARE_WRITE16_MEMBER( irq_write );
+	DECLARE_READ16_MEMBER( pad_r );
+	DECLARE_WRITE16_MEMBER( pad_w );
 	inline void check_irqs();
 	inline void set_irq_line(int line, int state);
 	DECLARE_WRITE_LINE_MEMBER( irq8_w );
@@ -57,14 +75,79 @@ static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")	/* ROM */
 ADDRESS_MAP_END
 
+READ16_MEMBER( pcfx_state::pad_r )
+{
+	UINT16 res;
+	UINT8 port_type = ((offset<<1) & 0x80) >> 7;
+
+	if(((offset<<1) & 0x40) == 0)
+	{
+		// status
+		/*
+		---- x---
+		---- ---x incoming data state (0=available)
+		*/
+		res = m_pad.status[port_type];
+		//printf("STATUS %d\n",port_type);
+	}
+	else
+	{
+		// received data
+		//printf("RX %d\n",port_type);
+		res = m_pad.latch[port_type] >> ((offset<<1) & 2) ? 16 : 0;
+
+		if(((offset<<1) & 0x02) == 0)
+			m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
+	}
+
+	return res;
+}
+
+static TIMER_CALLBACK(pad_func)
+{
+	pcfx_state *state = machine.driver_data<pcfx_state>();
+	const char *const padnames[] = { "P1", "P2" };
+
+	state->m_pad.latch[param] = machine.root_device().ioport(padnames[param])->read();
+	state->m_pad.status[param] |= 8;
+	state->m_pad.ctrl[param] &= ~1; // ack TX line
+	// TODO: pad IRQ
+}
+
+WRITE16_MEMBER( pcfx_state::pad_w )
+{
+	UINT8 port_type = ((offset<<1) & 0x80) >> 7;
+
+	if(((offset<<1) & 0x40) == 0)
+	{
+		// control
+		/*
+		---- -x-- receiver enable
+		---- --x- enable multi-tap
+		---- ---x enable send (0->1 transition)
+		*/
+		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
+		{
+			machine().scheduler().timer_set(attotime::from_msec(1), FUNC(pad_func), port_type); // TODO: time
+		}
+
+		m_pad.ctrl[port_type] = data & 7;
+		//printf("%04x CONTROL %d\n",data,port_type);
+	}
+	else
+	{
+		// transmitted data
+		//printf("%04x TX %d\n",data,port_type);
+	}
+}
 
 static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
-	AM_RANGE( 0x00000000, 0x000000FF ) AM_NOP	/* PAD */
+	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff)	/* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP	/* HuC6230 */
 	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP	/* HuC6271 */
 	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )	/* HuC6261 */
-	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xff )	/* HuC6270-A */
-	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xff )	/* HuC6270-B */
+	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff )	/* HuC6270-A */
+	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff )	/* HuC6270-B */
 	AM_RANGE( 0x00000600, 0x000006FF ) AM_NOP	/* HuC6272 */
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
 	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )	/* Interrupt controller */
@@ -74,6 +157,16 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pcfx )
+	/*
+	xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
+	*/
+	PORT_START("P1")
+	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -194,12 +287,12 @@ inline void pcfx_state::set_irq_line(int line, int state)
 {
 	if ( state )
 	{
-printf("Setting irq line %d\n", line);
+//printf("Setting irq line %d\n", line);
 		m_irq_pending |= ( 1 << ( 15 - line ) );
 	}
 	else
 	{
-printf("Clearing irq line %d\n", line);
+//printf("Clearing irq line %d\n", line);
 		m_irq_pending &= ~( 1 << ( 15 - line ) );
 	}
 	check_irqs();
@@ -279,6 +372,7 @@ void pcfx_state::machine_reset()
 
 UINT32 pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	m_huc6261->video_update( bitmap, cliprect );
 	return 0;
 }
 
