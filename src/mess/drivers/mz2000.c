@@ -27,6 +27,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
+#include "formats/mz_cas.h"
 
 
 
@@ -749,6 +750,16 @@ static const struct pit8253_config mz2000_pit8253_intf =
 	}
 };
 
+
+static const cassette_interface mz2000_cassette_interface =
+{
+	mz700_cassette_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	"mz_cass",
+	NULL
+};
+
 static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -763,8 +774,10 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 
 	MCFG_MB8877_ADD("mb8877a",mz2000_mb8877a_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2000_flop")
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, mz2000_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","mz2000_cass")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
