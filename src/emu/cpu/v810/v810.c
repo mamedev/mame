@@ -1068,8 +1068,8 @@ static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 
 //      printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
 
-		dstbit = cpustate->R26;
-		srcbit = cpustate->R27;
+		dstbit = cpustate->R26 & 0x1f;
+		srcbit = cpustate->R27 & 0x1f;
 		size =  cpustate->R28;
 		dst = cpustate->R29 & ~3;
 		src = cpustate->R30 & ~3;
