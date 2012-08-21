@@ -1906,14 +1906,14 @@ ROM_START( toutrun )
 ROM_END
 
 //*************************************************************************************************************************
-//  Turbo Outrun (Upright version?? According to service mode dipswitch screen it's a Cockpit)
+//  Turbo Outrun (Cockpit version)
 //  CPU: FD1094 (317-0107)
 //  GAME BD   834-6919-02
 //   CPU BD   837-6905
 //   VIDEO BD 837-6906
 //
-//  Must set Cabinet Type dipswitch (DSW-B 1&2 to both ON) to Cockpit
-//  Must set Turbo Switch dipswitch (DSW-B 4 to OFF) to Use Turbo Shifter
+//  Must set Cabinet Type dipswitch (DSW-B 1&2 to both ON) to Cockpit - Other settings show "no use"
+//  Must set Turbo Switch dipswitch (DSW-B 4 to OFF) to Use Turbo Shifter - Other settings show "no use"
 //
 ROM_START( toutrun3 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -1974,13 +1974,13 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Turbo Outrun (Cockpit version)
-//  CPU: FD1094 (317-????) - Manual doesn't state the FD1094 317 number??
+//  CPU: FD1094 (317-0106)
 //  GAME BD   834-6919-01
 //   CPU BD   837-6905
 //   VIDEO BD 837-6906
 //
-//  Must set Cabinet Type dipswitch (DSW-B 1&2 to both ON) to Cockpit
-//  Must set Turbo Switch dipswitch (DSW-B 4 to OFF) to Use Turbo Shifter
+//  Must set Cabinet Type dipswitch (DSW-B 1&2 to both ON) to Cockpit - Other settings show "no use"
+//  Must set Turbo Switch dipswitch (DSW-B 4 to OFF) to Use Turbo Shifter - Other settings show "no use"
 //
 ROM_START( toutrun2 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -1992,7 +1992,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
-	ROM_LOAD( "317-unknown-toutrun2.key", 0x0000, 0x2000, NO_DUMP )	// FD1094 number unknown and not dumped
+	ROM_LOAD( "317-0106.key", 0x0000, 0x2000, CRC(a4e33916) SHA1(61d13bf85e13c15642d143ea79afa501980d672f) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
 	ROM_LOAD16_BYTE( "opr-12295.76", 0x000000, 0x10000, CRC(d43a3a84) SHA1(362c98f62c205b6b40b7e8a4ba107745b547b984) )
@@ -2208,6 +2208,6 @@ GAME( 1987, shangon2, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon
 GAME( 1987, shangon1, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) // bad program rom
 GAME( 1991, shangonle,shangon, shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega", "Limited Edition Hang-On", 0 )
 GAMEL(1989, toutrun,  0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrun3, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (upright, FD1094 317-0107)", 0,                   layout_outrun )
-GAMEL(1989, toutrun2, toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) // FD1094 CPU not decrypted
+GAMEL(1989, toutrun3, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0107)", 0,                   layout_outrun )
+GAMEL(1989, toutrun2, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0106)", 0,                   layout_outrun )
 GAMEL(1989, toutrun1, toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )
