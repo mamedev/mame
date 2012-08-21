@@ -285,9 +285,75 @@ static UINT32 opCMPi(v810_state *cpustate,UINT32 op)	// cmpi imm5,r2
 static UINT32 opSETFi(v810_state *cpustate,UINT32 op)	// setf imm5,r2
 {
 	UINT32 op1=I5(op);
-	UINT32 op2=cpustate->PSW&0xf;
+	UINT8 res=0;
 	op1&=0xf;
-	SETREG(cpustate,GET2,(op1==op2)?1:0);
+	switch(op1)
+	{
+		case 0: //bv
+			res=GET_OV;
+			break;
+
+		case 1: //bl
+			res=GET_CY;
+			break;
+
+		case 2: //be
+			res=GET_Z;
+			break;
+
+		case 3: //bnh
+			res=GET_Z||GET_CY;
+			break;
+
+		case 4: //bn
+			res=GET_S;
+			break;
+
+		case 5: //br
+			res=1;
+			break;
+
+		case 6: //blt
+			res=GET_S^GET_OV;
+			break;
+
+		case 7: //ble
+			res=GET_Z||(GET_S^GET_OV);
+		break;
+
+		case 8: //bnv
+			res=!GET_OV;
+		break;
+
+		case 9: //bnl
+			res=!GET_CY;
+		break;
+
+		case 10: //bne
+			res=!GET_Z;
+		break;
+
+		case 11: //bh
+			res=!(GET_Z||GET_CY);
+		break;
+
+		case 12: //bp
+			res=!GET_S;
+		break;
+
+		case 13: //nop
+
+			break;
+
+		case 14: //bge
+			res=!(GET_OV^GET_S);
+		break;
+
+		case 15: //bgt
+			res=!(GET_Z||(GET_OV^GET_S));
+			break;
+	}
+	SETREG(cpustate,GET2,res);
 	return clkIF;
 }
 
@@ -563,7 +629,7 @@ static UINT32 opRETI(v810_state *cpustate,UINT32 op)
 
 static UINT32 opHALT(v810_state *cpustate,UINT32 op)
 {
-	logerror("V810: HALT @ %X",cpustate->PC-2);
+	printf("V810: HALT @ %X",cpustate->PC-2);
 	return clkIF;
 }
 
@@ -691,6 +757,7 @@ static UINT32 opINB(v810_state *cpustate,UINT32 op)	// in.b disp16[reg1],reg2
 
 static UINT32 opCAXI(v810_state *cpustate,UINT32 op)	// caxi disp16[reg1],reg2
 {
+	printf("V810 CAXI execute\n");
 	cpustate->PC+=2;
 	return clkIF;
 }
@@ -822,6 +889,8 @@ static UINT32 opDIVr(v810_state *cpustate,UINT32 op)	// div r1,r2
 		SET_OV((op1^op2^GETREG(cpustate,GET2)) == 0x80000000);
 		CHECK_ZS(GETREG(cpustate,GET2));
 	}
+	else
+		printf("DIVr divide by zero?\n");
 	return clkIF;
 }
 
@@ -836,6 +905,8 @@ static UINT32 opDIVUr(v810_state *cpustate,UINT32 op)	// divu r1,r2
 		SET_OV((op1^op2^GETREG(cpustate,GET2)) == 0x80000000);
 		CHECK_ZS(GETREG(cpustate,GET2));
 	}
+	else
+		printf("DIVUr divide by zero?\n");
 	return clkIF;
 }
 
@@ -883,6 +954,8 @@ static void opDIVF(v810_state *cpustate,UINT32 op)
 	SET_OV(0);
 	if(val1!=0)
 		val2/=val1;
+	else
+		printf("DIVF divide by zero?\n");
 	SET_Z((val2==0.0)?1:0);
 	SET_S((val2<0.0)?1:0);
 	SETREG(cpustate,GET2,f2u(val2));
