@@ -6,7 +6,7 @@
 
   - BIOS error codes (guesses):
     - Blue screen = MCU pad communication error
-    - Cyan screen = ?
+    - Cyan screen = SCSI communication error (current one)
 
 ***************************************************************************/
 
@@ -152,6 +152,7 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
 	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )	/* Interrupt controller */
 	AM_RANGE( 0x00000F00, 0x00000FFF ) AM_NOP
+	AM_RANGE( 0x00780000, 0x007FFFFF ) AM_ROM AM_REGION("scsi_rom", 0 )
 	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP	/* HuC6273 */
 ADDRESS_MAP_END
 
@@ -287,12 +288,12 @@ inline void pcfx_state::set_irq_line(int line, int state)
 {
 	if ( state )
 	{
-//printf("Setting irq line %d\n", line);
+printf("Setting irq line %d\n", line);
 		m_irq_pending |= ( 1 << ( 15 - line ) );
 	}
 	else
 	{
-//printf("Clearing irq line %d\n", line);
+printf("Clearing irq line %d\n", line);
 		m_irq_pending &= ~( 1 << ( 15 - line ) );
 	}
 	check_irqs();
@@ -408,6 +409,8 @@ ROM_END
 ROM_START( pcfxga )
 	ROM_REGION( 0x100000, "user1", 0 )
 	ROM_LOAD( "pcfxga.rom", 0x000000, 0x100000, CRC(41c3776b) SHA1(a9372202a5db302064c994fcda9b24d29bb1b41c) )
+
+	ROM_REGION( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
 ROM_END
 
 
