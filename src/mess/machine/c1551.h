@@ -20,6 +20,8 @@
 #include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
+#include "machine/c1541.h"
+#include "machine/cbmipt.h"
 #include "machine/pls100.h"
 #include "machine/plus4exp.h"
 
@@ -48,17 +50,24 @@ public:
 
 	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
+
 	DECLARE_READ8_MEMBER( tcbm_data_r );
 	DECLARE_WRITE8_MEMBER( tcbm_data_w );
 	DECLARE_READ8_MEMBER( yb_r );
 	DECLARE_WRITE8_MEMBER( yb_w );
 	DECLARE_READ8_MEMBER( tpi0_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
+
 	DECLARE_READ8_MEMBER( tpi1_pa_r );
 	DECLARE_WRITE8_MEMBER( tpi1_pa_w );
 	DECLARE_READ8_MEMBER( tpi1_pb_r );
 	DECLARE_READ8_MEMBER( tpi1_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
+
+	DECLARE_READ8_MEMBER( exp_dma_r );
+	DECLARE_WRITE8_MEMBER( exp_dma_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_aec_w );
 
 protected:
     // device-level overrides
@@ -70,6 +79,7 @@ protected:
     // device_plus4_expansion_card_interface overrides
 	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	virtual UINT32 plus4_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void plus4_breset_w(int state);
 
 private:
@@ -81,6 +91,7 @@ private:
 	required_device<c64h156_device> m_ga;
 	required_device<pls100_device> m_pla;
 	required_device<legacy_floppy_image_device> m_image;
+	required_device<plus4_expansion_slot_device> m_exp;
 
 	// TCBM bus
 	UINT8 m_tcbm_data;						// data

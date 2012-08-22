@@ -11,13 +11,11 @@
 
     TODO:
 
-	- paddle expansion port passthru
     - byte latching does not match hardware behavior
       (CPU skips data bytes if implemented per schematics)
 
 */
 
-#include "c1541.h"
 #include "c1551.h"
 
 
@@ -31,6 +29,7 @@
 #define M6523_1_TAG		"ci_u2"
 #define C64H156_TAG		"u6"
 #define PLA_TAG			"u1"
+
 
 enum
 {
@@ -368,6 +367,39 @@ static C64H156_INTERFACE( ga_intf )
 
 
 //-------------------------------------------------
+//  PLUS4_EXPANSION_INTERFACE( expansion_intf )
+//-------------------------------------------------
+
+READ8_MEMBER( c1551_device::exp_dma_r )
+{
+	return m_slot->dma_cd_r(offset);
+}
+
+WRITE8_MEMBER( c1551_device::exp_dma_w )
+{
+	m_slot->dma_cd_w(offset, data);
+}
+
+WRITE_LINE_MEMBER( c1551_device::exp_irq_w )
+{
+	m_slot->irq_w(state);
+}
+
+WRITE_LINE_MEMBER( c1551_device::exp_aec_w )
+{
+	m_slot->aec_w(state);
+}
+
+static PLUS4_EXPANSION_INTERFACE( expansion_intf )
+{
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_dma_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_dma_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_aec_w)
+};
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1551 )
 //-------------------------------------------------
 
@@ -383,6 +415,8 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, expansion_intf, plus4_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
 
@@ -437,6 +471,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	  m_ga(*this, C64H156_TAG),
 	  m_pla(*this, PLA_TAG),
 	  m_image(*this, FLOPPY_0),
+	  m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
 	  m_tcbm_data(0xff),
 	  m_status(1),
 	  m_dav(1),
@@ -465,6 +500,7 @@ void c1551_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_dav));
 	save_item(NAME(m_ack));
+	save_item(NAME(m_dev));
 }
 
 
@@ -537,7 +573,7 @@ bool c1551_device::tpi1_selected(offs_t offset)
 
 UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	UINT8 data = 0;
+	UINT8 data = m_exp->cd_r(space, offset, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 
 	if (tpi1_selected(offset))
 	{
@@ -558,6 +594,18 @@ void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, i
 	{
 		tpi6525_w(m_tpi1, offset & 0x07, data);
 	}
+
+	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
+}
+
+
+//-------------------------------------------------
+//  plus4_screen_update - screen update
+//-------------------------------------------------
+
+UINT32 c1551_device::plus4_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_exp->screen_update(screen, bitmap, cliprect);
 }
 
 
@@ -571,6 +619,8 @@ void c1551_device::plus4_breset_w(int state)
 	{
 		device_reset();
 	}
+
+	m_exp->breset_w(state);
 }
 
 
