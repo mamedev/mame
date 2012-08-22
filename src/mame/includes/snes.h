@@ -527,8 +527,11 @@ public:
 	DECLARE_WRITE8_MEMBER( snes_oam_write );
 	DECLARE_READ8_MEMBER( snes_cgram_read );
 	DECLARE_WRITE8_MEMBER( snes_cgram_write );
+	DECLARE_READ8_MEMBER( snes_vram_read );
+	DECLARE_WRITE8_MEMBER( snes_vram_write );
 	UINT16 *m_snes_oam;		/* Object Attribute Memory */
-	UINT16 *m_snes_cgram;		/* Character Graphics RAM */
+	UINT16 *m_snes_cgram;	/* Palette RAM */
+	UINT8  *m_snes_vram;	/* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
 };
 
