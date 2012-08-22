@@ -525,7 +525,10 @@ public:
 
 	DECLARE_READ8_MEMBER( snes_oam_read );
 	DECLARE_WRITE8_MEMBER( snes_oam_write );
+	DECLARE_READ8_MEMBER( snes_cgram_read );
+	DECLARE_WRITE8_MEMBER( snes_cgram_write );
 	UINT16 *m_snes_oam;		/* Object Attribute Memory */
+	UINT16 *m_snes_cgram;		/* Character Graphics RAM */
 
 };
 

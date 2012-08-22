@@ -131,7 +131,6 @@ enum
 };
 
 static UINT8  *snes_vram;		/* Video RAM (Should be 16-bit, but it's easier this way) */
-static UINT16 *snes_cgram;		/* Colour RAM */
 
 /*****************************************
  * snes_get_bgcolor()
@@ -150,7 +149,7 @@ inline UINT16 snes_state::snes_get_bgcolor( UINT8 direct_colors, UINT16 palette,
 		c |= ((palette & 0x04) >> 1) | ((palette & 0x08) << 3) | ((palette & 0x10) << 8);
 	}
 	else
-		c = snes_cgram[(palette + color) % FIXED_COLOUR];
+		c = m_snes_cgram[(palette + color) % FIXED_COLOUR];
 
 	return c;
 }
@@ -289,7 +288,7 @@ inline void snes_state::snes_draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, U
 			/* Only draw if we have a colour (0 == transparent) */
 			if (clr)
 			{
-				c = snes_cgram[(pal + clr) % FIXED_COLOUR];
+				c = m_snes_cgram[(pal + clr) % FIXED_COLOUR];
 				blend = (pal + clr < 192) ? 1 : 0;
 				snes_set_scanline_pixel(screen, pos, c, priority, SNES_OAM, blend);
 			}
@@ -1429,7 +1428,7 @@ inline void snes_state::snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 pr
 				if (b > 0x1f) b = 0;
 			}
 			/* only halve if the color is not the back colour */
-			if (BIT(snes_ppu.color_modes, 6) && (subscreen->buffer[offset] != snes_cgram[FIXED_COLOUR]))
+			if (BIT(snes_ppu.color_modes, 6) && (subscreen->buffer[offset] != m_snes_cgram[FIXED_COLOUR]))
 			{
 				r >>= 1;
 				g >>= 1;
@@ -1441,17 +1440,17 @@ inline void snes_state::snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 pr
 			if (!BIT(snes_ppu.color_modes, 7))
 			{
 				/* 0x00 add */
-				r = (*colour & 0x1f) + (snes_cgram[FIXED_COLOUR] & 0x1f);
-				g = ((*colour & 0x3e0) >> 5) + ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
-				b = ((*colour & 0x7c00) >> 10) + ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
+				r = (*colour & 0x1f) + (m_snes_cgram[FIXED_COLOUR] & 0x1f);
+				g = ((*colour & 0x3e0) >> 5) + ((m_snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
+				b = ((*colour & 0x7c00) >> 10) + ((m_snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
 				clip_max = 1;
 			}
 			else
 			{
 				/* 0x80: sub */
-				r = (*colour & 0x1f) - (snes_cgram[FIXED_COLOUR] & 0x1f);
-				g = ((*colour & 0x3e0) >> 5) - ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
-				b = ((*colour & 0x7c00) >> 10) - ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
+				r = (*colour & 0x1f) - (m_snes_cgram[FIXED_COLOUR] & 0x1f);
+				g = ((*colour & 0x3e0) >> 5) - ((m_snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
+				b = ((*colour & 0x7c00) >> 10) - ((m_snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
 				if (r > 0x1f) r = 0;
 				if (g > 0x1f) g = 0;
 				if (b > 0x1f) b = 0;
@@ -1536,11 +1535,11 @@ void snes_state::snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &
 		for (ii = 0; ii < SNES_SCR_WIDTH; ii++)
 		{
 			if (snes_ppu.mode == 5 || snes_ppu.mode == 6 || snes_ppu.pseudo_hires)
-				scanlines[SNES_SUBSCREEN].buffer[ii] = snes_cgram[0];
+				scanlines[SNES_SUBSCREEN].buffer[ii] = m_snes_cgram[0];
 			else
-				scanlines[SNES_SUBSCREEN].buffer[ii] = snes_cgram[FIXED_COLOUR];
+				scanlines[SNES_SUBSCREEN].buffer[ii] = m_snes_cgram[FIXED_COLOUR];
 
-			scanlines[SNES_MAINSCREEN].buffer[ii] = snes_cgram[0];
+			scanlines[SNES_MAINSCREEN].buffer[ii] = m_snes_cgram[0];
 		}
 
 		/* Prepare OAM for this scanline */
@@ -1665,7 +1664,7 @@ VIDEO_START( snes )
 #endif
 
 	snes_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
-	snes_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
+	state->m_snes_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
 	state->m_snes_oam = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
 
 	/* Inititialize registers/variables */
@@ -1689,8 +1688,8 @@ VIDEO_START( snes )
 	/* Init VRAM */
 	memset(snes_vram, 0, SNES_VRAM_SIZE);
 
-	/* Init Colour RAM */
-	memset((UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
+	/* Init Character Graphics RAM */
+	memset((UINT8 *)state->m_snes_cgram, 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
 	memset(state->m_snes_oam, 0xff, SNES_OAM_SIZE);
@@ -1784,7 +1783,7 @@ VIDEO_START( snes )
 	state_save_register_global(machine, snes_ppu.stat77_flags);
 
 	state_save_register_global_pointer(machine, snes_vram, SNES_VRAM_SIZE);
-	state_save_register_global_pointer(machine, snes_cgram, SNES_CGRAM_SIZE/2);
+	state_save_register_global_pointer(machine, state->m_snes_cgram, SNES_CGRAM_SIZE/2);
 	state_save_register_global_pointer(machine, state->m_snes_oam, SNES_OAM_SIZE/2);
 }
 
@@ -2037,7 +2036,7 @@ WRITE8_MEMBER( snes_state::snes_oam_write )
  solution adopted by BSNES without enabling it.
 *************************************************/
 
-static READ8_HANDLER( snes_cgram_read )
+READ8_MEMBER( snes_state::snes_cgram_read )
 {
 	UINT8 res = 0;
 	offset &= 0x1ff;
@@ -2053,7 +2052,7 @@ static READ8_HANDLER( snes_cgram_read )
 	}
 #endif
 
-	res = ((UINT8 *)snes_cgram)[offset];
+	res = ((UINT8 *)m_snes_cgram)[offset];
 
 	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr).
 	// Highest bit is simply ignored.
@@ -2063,7 +2062,7 @@ static READ8_HANDLER( snes_cgram_read )
 	return res;
 }
 
-static WRITE8_HANDLER( snes_cgram_write )
+WRITE8_MEMBER( snes_state::snes_cgram_write )
 {
 	offset &= 0x1ff;
 
@@ -2086,7 +2085,7 @@ static WRITE8_HANDLER( snes_cgram_write )
 	if (offset & 0x01)
 		data &= 0x7f;
 
-	((UINT8 *)snes_cgram)[offset] = data;
+	((UINT8 *)m_snes_cgram)[offset] = data;
 }
 
 READ8_HANDLER( snes_ppu_read )
@@ -2182,11 +2181,11 @@ READ8_HANDLER( snes_ppu_read )
 			}
 		case RCGDATA:	/* Read data from CGRAM */
 			if (!(state->m_cgram_address & 0x01))
-				snes_ppu.ppu2_open_bus = snes_cgram_read(space, state->m_cgram_address);
+				snes_ppu.ppu2_open_bus = state->snes_cgram_read(*space, state->m_cgram_address);
 			else
 			{
 				snes_ppu.ppu2_open_bus &= 0x80;
-				snes_ppu.ppu2_open_bus |= snes_cgram_read(space, state->m_cgram_address) & 0x7f;
+				snes_ppu.ppu2_open_bus |= state->snes_cgram_read(*space, state->m_cgram_address) & 0x7f;
 			}
 
 			state->m_cgram_address = (state->m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
@@ -2469,7 +2468,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			state->m_cgram_address = data << 1;
 			break;
 		case CGDATA:	/* Data for colour RAM */
-			snes_cgram_write(space, state->m_cgram_address, data);
+			state->snes_cgram_write(*space, state->m_cgram_address, data);
 			state->m_cgram_address = (state->m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:	/* Window mask settings for BG1-2 */
@@ -2613,9 +2612,9 @@ WRITE8_HANDLER( snes_ppu_write )
 				UINT8 r, g, b;
 
 				/* Get existing value. */
-				r = snes_cgram[FIXED_COLOUR] & 0x1f;
-				g = (snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5;
-				b = (snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10;
+				r = state->m_snes_cgram[FIXED_COLOUR] & 0x1f;
+				g = (state->m_snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5;
+				b = (state->m_snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10;
 				/* Set new value */
 				if (data & 0x20)
 					r = data & 0x1f;
@@ -2623,7 +2622,7 @@ WRITE8_HANDLER( snes_ppu_write )
 					g = data & 0x1f;
 				if (data & 0x80)
 					b = data & 0x1f;
-				snes_cgram[FIXED_COLOUR] = (r | (g << 5) | (b << 10));
+				state->m_snes_cgram[FIXED_COLOUR] = (r | (g << 5) | (b << 10));
 			} break;
 		case SETINI:	/* Screen mode/video select */
 			snes_ppu.interlace = (data & 0x01) ? 2 : 1;
