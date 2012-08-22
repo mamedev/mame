@@ -483,6 +483,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 
 	MCFG_I8251_ADD("kbdser", i8251_intf)
 	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(4800))
