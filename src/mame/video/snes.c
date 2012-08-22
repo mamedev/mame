@@ -1873,16 +1873,16 @@ inline UINT32 snes_get_vram_address( running_machine &machine )
 	{
 		UINT32 rem = addr & state->m_vram_fgr_mask;
 		UINT32 faddr = (addr & ~state->m_vram_fgr_mask) + (rem >> state->m_vram_fgr_shift) + ((rem & (state->m_vram_fgr_count - 1)) << 3);
-		return faddr;
+		return faddr << 1;
 	}
 
-	return addr;
+	return addr << 1;
 }
 
 READ8_MEMBER( snes_state::snes_vram_read )
 {
 	UINT8 res = 0;
-	offset &= 0x1ffff;
+	offset &= 0xffff; // only 64KB are present on SNES
 
 	if (snes_ppu.screen_disabled)
 		res = m_snes_vram[offset];
@@ -1914,7 +1914,7 @@ READ8_MEMBER( snes_state::snes_vram_read )
 
 WRITE8_MEMBER( snes_state::snes_vram_write )
 {
-	offset &= 0x1ffff;
+	offset &= 0xffff; // only 64KB are present on SNES, Robocop 3 relies on this
 
 	if (snes_ppu.screen_disabled)
 		m_snes_vram[offset] = data;
@@ -2149,7 +2149,7 @@ READ8_HANDLER( snes_ppu_read )
 			return snes_ppu.ppu1_open_bus;
 		case RVMDATAL:	/* Read data from VRAM (low) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine()) << 1;
+				UINT32 addr = snes_get_vram_address(space->machine());
 				snes_ppu.ppu1_open_bus = state->m_vram_read_buffer & 0xff;
 
 				if (!state->m_vram_fgr_high)
@@ -2164,7 +2164,7 @@ READ8_HANDLER( snes_ppu_read )
 			}
 		case RVMDATAH:	/* Read data from VRAM (high) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine()) << 1;
+				UINT32 addr = snes_get_vram_address(space->machine());
 				snes_ppu.ppu1_open_bus = (state->m_vram_read_buffer >> 8) & 0xff;
 
 				if (state->m_vram_fgr_high)
@@ -2399,7 +2399,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			{
 				UINT32 addr;
 				state->m_vmadd = (state->m_vmadd & 0xff00) | (data << 0);
-				addr = snes_get_vram_address(space->machine()) << 1;
+				addr = snes_get_vram_address(space->machine());
 				state->m_vram_read_buffer = state->snes_vram_read(*space, addr);
 				state->m_vram_read_buffer |= (state->snes_vram_read(*space, addr + 1) << 8);
 			}
@@ -2408,14 +2408,14 @@ WRITE8_HANDLER( snes_ppu_write )
 			{
 				UINT32 addr;
 				state->m_vmadd = (state->m_vmadd & 0x00ff) | (data << 8);
-				addr = snes_get_vram_address(space->machine()) << 1;
+				addr = snes_get_vram_address(space->machine());
 				state->m_vram_read_buffer = state->snes_vram_read(*space, addr);
 				state->m_vram_read_buffer |= (state->snes_vram_read(*space, addr + 1) << 8);
 			}
 			break;
 		case VMDATAL:	/* 2118: Data for VRAM write (low) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine()) << 1;
+				UINT32 addr = snes_get_vram_address(space->machine());
 				state->snes_vram_write(*space, addr, data);
 
 				if (!state->m_vram_fgr_high)
@@ -2424,7 +2424,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			return;
 		case VMDATAH:	/* 2119: Data for VRAM write (high) */
 			{
-				UINT32 addr = snes_get_vram_address(space->machine()) << 1;
+				UINT32 addr = snes_get_vram_address(space->machine());
 				state->snes_vram_write(*space, addr + 1, data);
 
 				if (state->m_vram_fgr_high)

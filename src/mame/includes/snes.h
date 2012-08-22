@@ -503,6 +503,7 @@ public:
 	inline void snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT8 direct_colors, UINT16 pal, UINT8 hires );
 	inline UINT32 snes_get_tmap_addr( UINT8 layer, UINT8 tile_size, UINT32 base, UINT32 x, UINT32 y );
 	inline void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a, UINT8 color_depth, UINT8 hires, UINT8 offset_per_tile, UINT8 direct_colors );
+	UINT32 snes_get_vram_address( void );
 	void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a );
 	void snes_update_obsel( void );
 	void snes_oam_list_build( void );
