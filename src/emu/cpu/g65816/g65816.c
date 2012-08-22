@@ -555,6 +555,15 @@ static CPU_INIT( 5a22 )
 	cpustate->cpu_type = CPU_TYPE_5A22;
 }
 
+static CPU_RESET( 5a22 )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
+
+	CPU_RESET_CALL(g65816);
+
+	cpustate->fastROM = 0;
+}
+
 CPU_SET_INFO( _5a22 )
 {
 	g65816i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
@@ -576,6 +585,7 @@ CPU_GET_INFO( _5a22 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(_5a22);		break;
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(5a22);	break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(5a22);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "5A22");			break;
