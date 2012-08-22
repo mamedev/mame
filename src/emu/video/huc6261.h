@@ -46,6 +46,8 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
+	inline UINT32 yuv2rgb(UINT32 yuv);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -74,6 +76,7 @@ private:
 
 	emu_timer	*m_timer;
 	bitmap_rgb32	*m_bmp;
+	INT32	m_uv_lookup[65536][3];
 };
 
 

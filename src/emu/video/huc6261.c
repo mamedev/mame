@@ -41,8 +41,46 @@ void huc6261_device::device_config_complete()
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock)
 {
+	// Set up UV lookup table
+	for ( int ur = 0; ur < 256; ur++ )
+	{
+		for ( int vr = 0; vr < 256; vr++ )
+		{
+			INT32 r,g,b;
+			INT32 u = ur - 128;
+			INT32 v = vr - 128;
+
+			r =              - 1.13983 * v;
+			g = -0.35465 * u - 0.58060 * v;
+			b =  2.03211 * u;
+
+			m_uv_lookup[ ( ur << 8 ) | vr ][0] = r;
+			m_uv_lookup[ ( ur << 8 ) | vr ][1] = g;
+			m_uv_lookup[ ( ur << 8 ) | vr ][2] = b;
+		}
+	}
 }
 
+
+inline UINT32 huc6261_device::yuv2rgb(UINT32 yuv)
+{
+	INT32 r, g, b;
+	UINT8 y = yuv >> 16;
+	UINT16 uv = yuv & 0xffff;
+
+	r = y + m_uv_lookup[uv][0];
+	g = y + m_uv_lookup[uv][1];
+	b = y + m_uv_lookup[uv][2];
+
+	if ( r < 0 ) r = 0;
+	if ( g < 0 ) g = 0;
+	if ( b < 0 ) b = 0;
+	if ( r > 255 ) r = 255;
+	if ( g > 255 ) g = 255;
+	if ( b > 255 ) b = 255;
+
+	return ( r << 16 ) | ( g << 8 ) | b;
+}
 
 void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -58,11 +96,11 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
-			m_pixel_data = 0; //m_get_next_pixel_data( 0, 0xffff );
+			m_pixel_data = m_huc6270_b->next_pixel( *machine().memory().first_space(), 0, 0xffff );
 			g_profiler.stop();
 		}
 
-		bitmap_line[ h ] = m_palette[ m_pixel_data ];
+		bitmap_line[ h ] = yuv2rgb( ( ( m_palette[m_pixel_data] & 0xff00 ) << 8 ) | ( ( m_palette[m_pixel_data] & 0xf0 ) << 8 ) | ( ( m_palette[m_pixel_data] & 0x0f ) << 4 ) );
 		m_pixel_clock = ( m_pixel_clock + 1 ) % m_pixels_per_clock;
 		h = ( h + 1 ) % HUC6261_WPF;
 
