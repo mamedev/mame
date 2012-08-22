@@ -775,13 +775,7 @@ WRITE8_HANDLER( snes_w_io )
 				space->machine().scheduler().timer_set(space->machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
 			break;
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
-			/* FIXME: Need to adjust the speed only during access of banks 0x80+
-             * Currently we are just increasing it no matter what */
-//          state->m_maincpu->set_clock_scale((data & 0x1) ? 1.335820896 : 1.0 );
-#ifdef SNES_DBG_REG_W
-			if ((data & 0x1) != (snes_ram[MEMSEL] & 0x1))
-				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );
-#endif
+			cpu_set_reg(state->m_maincpu, _5A22_FASTROM, data & 1);
 			break;
 		case TIMEUP:	// IRQ Flag is cleared on both read and write
 			snes_ram[TIMEUP] = 0;

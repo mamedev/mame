@@ -365,6 +365,7 @@ static CPU_INIT( g65816 )
 	device->save_item(NAME(cpustate->ir));
 	device->save_item(NAME(cpustate->irq_delay));
 	device->save_item(NAME(cpustate->stopped));
+	device->save_item(NAME(cpustate->fastROM));
 
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(g65816_restore_state), cpustate));
 }
@@ -496,6 +497,7 @@ CPU_GET_INFO( g65816 )
 				cpustate->flag_m & MFLAG_SET ? 'M':'.',
 				cpustate->flag_x & XFLAG_SET ? 'X':'.',
 				cpustate->flag_d & DFLAG_SET ? 'D':'.',
+
 				cpustate->flag_i & IFLAG_SET ? 'I':'.',
 				cpustate->flag_z == 0        ? 'Z':'.',
 				cpustate->flag_c & CFLAG_SET ? 'C':'.');
@@ -525,7 +527,7 @@ CPU_GET_INFO( g65816 )
 }
 
 /*
-SNES specific, used to handle master cycles
+SNES specific, used to handle master cycles, based off byuu's BSNES code
 */
 
 int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr)
@@ -534,7 +536,7 @@ int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr)
 		return 0;
 
 	if(addr & 0x408000) {
-		if(addr & 0x800000) return (1) ? 6 : 8; // TODO: fastROM setting
+		if(addr & 0x800000) return (cpustate->fastROM & 1) ? 6 : 8;
 		return 8;
 	}
 	if((addr + 0x6000) & 0x4000) return 8;
@@ -553,20 +555,37 @@ static CPU_INIT( 5a22 )
 	cpustate->cpu_type = CPU_TYPE_5A22;
 }
 
+CPU_SET_INFO( _5a22 )
+{
+	g65816i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+
+	switch (state)
+	{
+		case CPUINFO_INT_REGISTER + _5A22_FASTROM:		g65816_set_reg(cpustate, _5A22_FASTROM, info->i); break;
+
+		default:										CPU_SET_INFO_CALL(g65816);				break;
+	}
+}
 
 CPU_GET_INFO( _5a22 )
 {
+	g65816i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(_5a22);		break;
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(5a22);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "5A22");			break;
+		case CPUINFO_INT_REGISTER + _5A22_FASTROM:		info->i = g65816_get_reg(cpustate, _5A22_FASTROM); break;
+		case CPUINFO_STR_REGISTER + _5A22_FASTROM:		sprintf(info->s, "fastROM:%d", cpustate->fastROM & 1 ? 1 : 0); break;
 
 		default:										CPU_GET_INFO_CALL(g65816);				break;
 	}
 }
+
 
 DEFINE_LEGACY_CPU_DEVICE(G65816, g65816);
 DEFINE_LEGACY_CPU_DEVICE(_5A22, _5a22);

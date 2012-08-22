@@ -91,6 +91,7 @@ struct _g65816i_cpu_struct
 	uint flag_c;		/* Carry Flag */
 	uint line_irq;		/* Status of the IRQ line */
 	uint line_nmi;		/* Status of the NMI line */
+	uint fastROM;		/* SNES specific */
 	uint ir;			/* Instruction Register */
 	uint irq_delay;		/* delay 1 instruction before checking irq */
 	device_irq_acknowledge_callback int_ack; /* Interrupt Acknowledge */
