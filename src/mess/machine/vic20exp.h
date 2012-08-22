@@ -57,8 +57,8 @@
 	const vic20_expansion_slot_interface (_name) =
 
 
-#define MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, VIC20_EXPANSION_SLOT, 0) \
+#define MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, VIC20_EXPANSION_SLOT, _clock) \
     MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 

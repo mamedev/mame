@@ -220,6 +220,14 @@ void vic20_expansion_slot_device::device_start()
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
 	m_out_res_func.resolve(m_out_res_cb, *this);
+
+	// inherit bus clock
+	if (clock() == 0)
+	{
+		vic20_expansion_slot_device *root = machine().device<vic20_expansion_slot_device>(VIC20_EXPANSION_SLOT_TAG);
+		assert(root);
+		set_unscaled_clock(root->clock());
+	}
 }
 
 

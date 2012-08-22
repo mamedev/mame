@@ -202,6 +202,14 @@ void c64_expansion_slot_device::device_start()
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
 	m_out_dma_func.resolve(m_out_dma_cb, *this);
 	m_out_reset_func.resolve(m_out_reset_cb, *this);
+
+	// inherit bus clock
+	if (clock() == 0)
+	{
+		c64_expansion_slot_device *root = machine().device<c64_expansion_slot_device>(C64_EXPANSION_SLOT_TAG);
+		assert(root);
+		set_unscaled_clock(root->clock());
+	}
 }
 
 

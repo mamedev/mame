@@ -821,7 +821,6 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, expansion_intf, vic20_expansion_cards, NULL, NULL)
 	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
 
 	// software lists
@@ -862,6 +861,9 @@ static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	// devices
+	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6560_CLOCK, expansion_intf, vic20_expansion_cards, NULL, NULL)
+
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
@@ -888,6 +890,9 @@ static MACHINE_CONFIG_DERIVED( vic20_pal, vic20_common )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT( vic20 )
+
+	// devices
+	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6561_CLOCK, expansion_intf, vic20_expansion_cards, NULL, NULL)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

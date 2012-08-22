@@ -190,6 +190,14 @@ C64 SERIAL BUS
     5)  Tei minimum must be 80us for external device to be a listener.
 */
 
+/*
+
+	TODO:
+
+	- refactor into an actual daisy chain instead of this convenient hack
+
+*/
+
 #include "cbmiec.h"
 
 

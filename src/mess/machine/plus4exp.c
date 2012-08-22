@@ -234,6 +234,14 @@ void plus4_expansion_slot_device::device_start()
 	m_out_dma_cd_func.resolve(m_out_dma_cd_cb, *this);
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_aec_func.resolve(m_out_aec_cb, *this);
+
+	// inherit bus clock
+	if (clock() == 0)
+	{
+		plus4_expansion_slot_device *root = machine().device<plus4_expansion_slot_device>(PLUS4_EXPANSION_SLOT_TAG);
+		assert(root);
+		set_unscaled_clock(root->clock());
+	}
 }
 
 

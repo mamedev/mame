@@ -9,9 +9,9 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/vic10exp.h"
 #include "formats/cbm_crt.h"
 #include "formats/imageutl.h"
+#include "machine/vic10exp.h"
 
 
 
@@ -164,6 +164,14 @@ void vic10_expansion_slot_device::device_start()
 	m_out_sp_func.resolve(m_out_sp_cb, *this);
 	m_out_cnt_func.resolve(m_out_cnt_cb, *this);
 	m_out_res_func.resolve(m_out_res_cb, *this);
+
+	// inherit bus clock
+	if (clock() == 0)
+	{
+		vic10_expansion_slot_device *root = machine().device<vic10_expansion_slot_device>(VIC10_EXPANSION_SLOT_TAG);
+		assert(root);
+		set_unscaled_clock(root->clock());
+	}
 }
 
 

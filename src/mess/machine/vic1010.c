@@ -50,12 +50,12 @@ static VIC20_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vic1010 )
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot1", expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot2", expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot3", expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot4", expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot5", expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot6", expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_EXPANSION_SLOT_ADD("slot1", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_EXPANSION_SLOT_ADD("slot2", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_EXPANSION_SLOT_ADD("slot3", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_EXPANSION_SLOT_ADD("slot4", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_EXPANSION_SLOT_ADD("slot5", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_EXPANSION_SLOT_ADD("slot6", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
 

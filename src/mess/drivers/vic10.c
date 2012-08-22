@@ -634,7 +634,7 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6566_CLOCK, cia_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
-	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, expansion_intf, vic10_expansion_cards, NULL, NULL)
+	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, expansion_intf, vic10_expansion_cards, NULL, NULL)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic10")
