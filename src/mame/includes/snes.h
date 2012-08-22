@@ -523,6 +523,10 @@ public:
 	inline void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens );
 	void snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline );
 
+	DECLARE_READ8_MEMBER( snes_oam_read );
+	DECLARE_WRITE8_MEMBER( snes_oam_write );
+	UINT16 *m_snes_oam;		/* Object Attribute Memory */
+
 };
 
 /* Special chips, checked at init and used in memory handlers */

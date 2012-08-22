@@ -132,7 +132,6 @@ enum
 
 static UINT8  *snes_vram;		/* Video RAM (Should be 16-bit, but it's easier this way) */
 static UINT16 *snes_cgram;		/* Colour RAM */
-static UINT16 *snes_oam;		/* Object Attribute Memory */
 
 /*****************************************
  * snes_get_bgcolor()
@@ -843,7 +842,7 @@ void snes_state::snes_update_obsel( void )
 
 void snes_state::snes_oam_list_build( void )
 {
-	UINT8 *oamram = (UINT8 *)snes_oam;
+	UINT8 *oamram = (UINT8 *)m_snes_oam;
 	INT16 oam = 0x1ff;
 	UINT16 oam_extra = oam + 0x20;
 	UINT16 extra = 0;
@@ -1658,6 +1657,7 @@ void snes_state::snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &
 
 VIDEO_START( snes )
 {
+	snes_state *state = machine.driver_data<snes_state>();
 	int i,j;
 
 #if SNES_LAYER_DEBUG
@@ -1666,7 +1666,7 @@ VIDEO_START( snes )
 
 	snes_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
 	snes_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
-	snes_oam = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
+	state->m_snes_oam = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
 
 	/* Inititialize registers/variables */
 	snes_ppu.update_windows = 1;
@@ -1693,7 +1693,7 @@ VIDEO_START( snes )
 	memset((UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
-	memset(snes_oam, 0xff, SNES_OAM_SIZE);
+	memset(state->m_snes_oam, 0xff, SNES_OAM_SIZE);
 
 	for (i = 0; i < 6; i++)
 	{
@@ -1785,7 +1785,7 @@ VIDEO_START( snes )
 
 	state_save_register_global_pointer(machine, snes_vram, SNES_VRAM_SIZE);
 	state_save_register_global_pointer(machine, snes_cgram, SNES_CGRAM_SIZE/2);
-	state_save_register_global_pointer(machine, snes_oam, SNES_OAM_SIZE/2);
+	state_save_register_global_pointer(machine, state->m_snes_oam, SNES_OAM_SIZE/2);
 }
 
 SCREEN_UPDATE_RGB32( snes )
@@ -1977,7 +1977,7 @@ static WRITE8_HANDLER( snes_vram_write )
  to choose the high/low byte of the snes_oam word.
 *************************************************/
 
-static READ8_HANDLER( snes_oam_read )
+READ8_MEMBER( snes_state::snes_oam_read )
 {
 	offset &= 0x1ff;
 
@@ -1986,16 +1986,16 @@ static READ8_HANDLER( snes_oam_read )
 
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = space->machine().primary_screen->vpos();
+		UINT16 v = machine().primary_screen->vpos();
 
 		if (v < snes_ppu.beam.last_visible_line)
 			offset = 0x010c;
 	}
 
-	return (snes_oam[offset] >> (snes_ram[OAMDATA] << 3)) & 0xff;
+	return (m_snes_oam[offset] >> (snes_ram[OAMDATA] << 3)) & 0xff;
 }
 
-static WRITE8_HANDLER( snes_oam_write )
+WRITE8_MEMBER( snes_state::snes_oam_write )
 {
 	offset &= 0x1ff;
 
@@ -2004,16 +2004,16 @@ static WRITE8_HANDLER( snes_oam_write )
 
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = space->machine().primary_screen->vpos();
+		UINT16 v = machine().primary_screen->vpos();
 
 		if (v < snes_ppu.beam.last_visible_line)
 			offset = 0x010c;
 	}
 
 	if (!(snes_ram[OAMDATA]))
-		snes_oam[offset] = (snes_oam[offset] & 0xff00) | (data << 0);
+		m_snes_oam[offset] = (m_snes_oam[offset] & 0xff00) | (data << 0);
 	else
-		snes_oam[offset] = (snes_oam[offset] & 0x00ff) | (data << 8);
+		m_snes_oam[offset] = (m_snes_oam[offset] & 0x00ff) | (data << 8);
 }
 
 /*************************************************
@@ -2141,7 +2141,7 @@ READ8_HANDLER( snes_ppu_read )
 			snes_latch_counters(space->machine());
 			return snes_open_bus_r(space, 0);		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
-			snes_ppu.ppu1_open_bus = snes_oam_read(space, snes_ppu.oam.address);
+			snes_ppu.ppu1_open_bus = state->snes_oam_read(*space, snes_ppu.oam.address);
 			snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
 			if (!snes_ram[OAMDATA])
 			{
@@ -2274,7 +2274,7 @@ WRITE8_HANDLER( snes_ppu_write )
 			break;
 		case OAMDATA:	/* Data for OAM write (DW) */
 			if (snes_ppu.oam.address >= 0x100)
-				snes_oam_write(space, snes_ppu.oam.address, data);
+				state->snes_oam_write(*space, snes_ppu.oam.address, data);
 			else
 			{
 				if (!snes_ram[OAMDATA])
@@ -2284,9 +2284,9 @@ WRITE8_HANDLER( snes_ppu_write )
 					// in this case, we not only write data to the upper byte of the word,
 					// but also snes_ppu.oam.write_latch to the lower byte (recall that
 					// snes_ram[OAMDATA] is used to select high/low byte)
-					snes_oam_write(space, snes_ppu.oam.address, data);
+					state->snes_oam_write(*space, snes_ppu.oam.address, data);
 					snes_ram[OAMDATA] = 0;
-					snes_oam_write(space, snes_ppu.oam.address, snes_ppu.oam.write_latch);
+					state->snes_oam_write(*space, snes_ppu.oam.address, snes_ppu.oam.write_latch);
 					snes_ram[OAMDATA] = 1;
 				}
 			}
