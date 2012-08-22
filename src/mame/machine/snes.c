@@ -13,6 +13,10 @@
   Thanks to Anomie for invaluable technical information.
   Thanks to byuu for invaluable technical information.
 
+  TODO:
+  - DMA takes some Master CPU clock cycles that aren't taken into account
+    for now.
+
 ***************************************************************************/
 #define __MACHINE_SNES_C
 
@@ -54,8 +58,6 @@ struct snes_cart_info snes_cart;
 #include "machine/snessdd1.c"
 #include "machine/snes7110.c"
 #include "machine/snesbsx.c"
-
-#define USE_CYCLE_STEAL 1
 
 // ST-010 and ST-011 RAM interface
 UINT8 st010_read_ram(snes_state *state, UINT16 addr)
@@ -892,70 +894,6 @@ address               |         |          |       |     |         |        |   
 
 */
 
-#if USE_CYCLE_STEAL
-/*FIXME: missing work RAM access steal / we need to do this less "aggressive" otherwise we lose too much CPU horsepower, why? */
-static int snes_bank_0x00_0x3f_cycles(running_machine &machine,UINT32 offset)
-{
-/*
- $00-$3F | $0000-$1FFF | Slow  | Address Bus A + /WRAM (mirror $7E:0000-$1FFF)
-         | $2000-$20FF | Fast  | Address Bus A
-         | $2100-$21FF | Fast  | Address Bus B
-         | $2200-$3FFF | Fast  | Address Bus A
-         | $4000-$41FF | XSlow | Internal CPU registers (see Note 1 below)
-         | $4200-$43FF | Fast  | Internal CPU registers (see Note 1 below)
-         | $4400-$5FFF | Fast  | Address Bus A
-         | $6000-$7FFF | Slow  | Address Bus A
-         | $8000-$FFFF | Slow  | Address Bus A + /CART
-         */
-
-	if(((offset & 0xff00) == 0x4000) || ((offset & 0xff00) == 0x4100))
-		return 0; //TODO: 12
-	if(((offset & 0xff00) == 0x4200) || ((offset & 0xff00) == 0x4300))
-		return 0; //TODO: 6
-
-	if((offset & 0xff00) <= 0x1f00)
-		return 0; //TODO: 8
-
-	if((offset & 0xff00) >= 0x6000)
-		return 8;
-
-	return 0; //TODO: 6
-}
-
-static int snes_bank_0x80_0xbf_cycles(running_machine &machine,UINT32 offset)
-{
-/*
- $80-$BF | $0000-$1FFF | Slow  | Address Bus A + /WRAM (mirror $7E:0000-$1FFF)
-         | $2000-$20FF | Fast  | Address Bus A
-         | $2100-$21FF | Fast  | Address Bus B
-         | $2200-$3FFF | Fast  | Address Bus A
-         | $4000-$41FF | XSlow | Internal CPU registers (see Note 1 below)
-         | $4200-$43FF | Fast  | Internal CPU registers (see Note 1 below)
-         | $4400-$5FFF | Fast  | Address Bus A
-         | $6000-$7FFF | Slow  | Address Bus A
-         | $8000-$FFFF | Note2 | Address Bus A + /CART
-*/
-
-
-	if(((offset & 0xff00) == 0x4000) || ((offset & 0xff00) == 0x4100))
-		return 0; //TODO: 12
-
-	if(((offset & 0xff00) == 0x4200) || ((offset & 0xff00) == 0x4300))
-		return 0; //TODO: 6
-
-	if((offset & 0xff00) <= 0x1f00)
-		return 0; //TODO: 8
-
-	if(((offset & 0xff00) >= 0x6000) && ((offset & 0xff00) <= 0x7f00))
-		return 0; //TODO: 8
-
-	if(((offset & 0xff00) >= 0x8000) && ((offset & 0xff00) <= 0xff00))
-		return (snes_ram[MEMSEL] & 1) ? 6 : 8;
-
-	return 0; //TODO: 6
-}
-#endif
-
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
 {
@@ -1006,11 +944,6 @@ READ8_HANDLER( snes_r_bank1 )
 		value = (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 	else
 		value = snes_ram[offset];
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
-	#endif
 
 	return value;
 }
@@ -1074,11 +1007,6 @@ READ8_HANDLER( snes_r_bank2 )
 	else
 		value = snes_ram[0x300000 + offset];
 
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
-	#endif
-
 	return value;
 }
 
@@ -1116,11 +1044,6 @@ READ8_HANDLER( snes_r_bank3 )
 	}
 	else											/* Mode 21 & 25 + SuperFX games */
 		value = snes_ram[0x400000 + offset];
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -8);
-	#endif
 
 	return value;
 }
@@ -1166,11 +1089,6 @@ READ8_HANDLER( snes_r_bank4 )
 	else if (state->m_cart[0].mode & 0x0a)					/* Mode 21 & 25 */
 		value = snes_ram[0x600000 + offset];
 
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -8);
-	#endif
-
 	return value;
 }
 
@@ -1203,11 +1121,6 @@ READ8_HANDLER( snes_r_bank5 )
 	}
 	else
 		value = snes_ram[0x700000 + offset];
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -8);
-	#endif
 
 	return value;
 }
@@ -1253,11 +1166,6 @@ READ8_HANDLER( snes_r_bank6 )
 		value = (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 	else
 		value = snes_ram[0x800000 + offset];
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
-	#endif
 
 	return value;
 }
@@ -1318,11 +1226,6 @@ READ8_HANDLER( snes_r_bank7 )
 	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -((snes_ram[MEMSEL] & 1) ? 6 : 8));
-	#endif
-
 	return value;
 }
 
@@ -1376,11 +1279,6 @@ WRITE8_HANDLER( snes_w_bank1 )
 			dsp_set_sr(data);
 	else
 		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset );
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
-	#endif
 }
 
 /* 0x300000 - 0x3fffff */
@@ -1438,11 +1336,6 @@ WRITE8_HANDLER( snes_w_bank2 )
 			dsp_set_sr(data);
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x300000);
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -snes_bank_0x00_0x3f_cycles(space->machine(), offset));
-	#endif
 }
 
 /* 0x600000 - 0x6fffff */
@@ -1479,11 +1372,6 @@ WRITE8_HANDLER( snes_w_bank4 )
 	}
 	else if (state->m_cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x600000);
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -8);
-	#endif
 }
 
 /* 0x700000 - 0x7dffff */
@@ -1506,11 +1394,6 @@ WRITE8_HANDLER( snes_w_bank5 )
 	}
 	else if (state->m_cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x700000);
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -8);
-	#endif
 }
 
 
@@ -1562,11 +1445,6 @@ WRITE8_HANDLER( snes_w_bank6 )
 			dsp_set_sr(data);
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0x800000);
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -snes_bank_0x80_0xbf_cycles(space->machine(), offset));
-	#endif
 }
 
 
@@ -1617,11 +1495,6 @@ WRITE8_HANDLER( snes_w_bank7 )
 	}
 	else if (state->m_cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(&space->device()),offset + 0xc00000);
-
-	#if USE_CYCLE_STEAL
-	if(!space->debugger_access())
-		device_adjust_icount(&space->device(), -((snes_ram[MEMSEL] & 1) ? 6 : 8));
-	#endif
 }
 
 
@@ -2143,12 +2016,6 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 {
 	snes_state *state = space->machine().driver_data<snes_state>();
 
-	#if USE_CYCLE_STEAL
-	/* every byte transfer takes 8 master cycles */
-//  FIXME: this cycle steal makes Final Fantasy VI (III in US) very glitchy!
-//  device_adjust_icount(&space->device(),-8);
-	#endif
-
 	if (state->m_dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
 	{
 		if (bbus == 0x2180 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000))
@@ -2355,11 +2222,6 @@ static void snes_dma( address_space *space, UINT8 channels )
 
 	/* FIXME: we also need to round to the nearest 8 master cycles */
 
-	#if USE_CYCLE_STEAL
-	/* overhead steals 8 master cycles, correct? */
-	device_adjust_icount(&space->device(),-8);
-	#endif
-
 	/* Assume priority of the 8 DMA channels is 0-7 */
 	for (i = 0; i < 8; i++)
 	{
@@ -2468,18 +2330,9 @@ static void snes_dma( address_space *space, UINT8 channels )
 			/* We're done, so write the new abus back to the registers */
 			state->m_dma_channel[i].src_addr = abus;
 			state->m_dma_channel[i].trans_size = 0;
-
-			#if USE_CYCLE_STEAL
-			/* active channel takes 8 master cycles */
-			device_adjust_icount(&space->device(),-8);
-			#endif
 		}
 	}
 
-	/* finally, take yet another 8 master cycles for the aforementioned overhead */
-	#if USE_CYCLE_STEAL
-	device_adjust_icount(&space->device(),-8);
-	#endif
 }
 
 READ8_HANDLER( superfx_r_bank1 )

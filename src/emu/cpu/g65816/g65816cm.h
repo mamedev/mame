@@ -103,6 +103,7 @@ struct _g65816i_cpu_struct
 	void (*set_reg)(g65816i_cpu_struct *cpustate, int regnum, uint val);
 	void (*set_line)(g65816i_cpu_struct *cpustate, int line, int state);
 	int  (*execute)(g65816i_cpu_struct *cpustate, int cycles);
+	int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr);
 	uint source;
 	uint destination;
 	int ICount;
@@ -114,6 +115,7 @@ extern uint (*const g65816i_get_reg[])(g65816i_cpu_struct *cpustate, int regnum)
 extern void (*const g65816i_set_reg[])(g65816i_cpu_struct *cpustate, int regnum, uint val);
 extern void (*const g65816i_set_line[])(g65816i_cpu_struct *cpustate, int line, int state);
 extern int (*const g65816i_execute[])(g65816i_cpu_struct *cpustate, int cycles);
+extern int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr);
 
 #define REGISTER_A		cpustate->a		/* Accumulator */
 #define REGISTER_B		cpustate->b		/* Accumulator hi byte */
@@ -244,6 +246,7 @@ INLINE void g65816i_set_execution_mode(g65816i_cpu_struct *cpustate, uint mode)
 #define CLK_W_SIY		5
 
 #define CLK(A)			CLOCKS -= (cpustate->cpu_type == CPU_TYPE_G65816 ? A : A*6)
+#define CLK_BUS(A)		CLOCKS -= A
 #define USE_ALL_CLKS()	CLOCKS = 0
 
 

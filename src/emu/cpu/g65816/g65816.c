@@ -143,6 +143,9 @@ extern void g65816i_set_reg_E(g65816i_cpu_struct *cpustate, int regnum, uint val
 extern void g65816i_set_line_E(g65816i_cpu_struct *cpustate, int line, int state);
 extern int  g65816i_execute_E(g65816i_cpu_struct *cpustate, int cycles);
 
+extern int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr);
+
+
 void (*const *const g65816i_opcodes[5])(g65816i_cpu_struct *cpustate) =
 {
 	g65816i_opcodes_M0X0,
@@ -524,6 +527,22 @@ CPU_GET_INFO( g65816 )
 /*
 SNES specific, used to handle master cycles
 */
+
+int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr)
+{
+	if(cpustate->cpu_type == CPU_TYPE_G65816)
+		return 0;
+
+	if(addr & 0x408000) {
+		if(addr & 0x800000) return (1) ? 6 : 8; // TODO: fastROM setting
+		return 8;
+	}
+	if((addr + 0x6000) & 0x4000) return 8;
+	if((addr - 0x4000) & 0x7e00) return 6;
+
+	return 12;
+}
+
 
 static CPU_INIT( 5a22 )
 {

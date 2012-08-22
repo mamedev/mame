@@ -59,12 +59,14 @@
 INLINE uint g65816i_read_8_normal(g65816i_cpu_struct *cpustate, uint address)
 {
 	address = ADDRESS_65816(address);
+	CLOCKS -= (bus_5A22_cycle_burst(cpustate,address));
 	return g65816_read_8(address);
 }
 
 INLINE uint g65816i_read_8_immediate(g65816i_cpu_struct *cpustate, uint address)
 {
 	address = ADDRESS_65816(address);
+	CLOCKS -= (bus_5A22_cycle_burst(cpustate,address));
 	return g65816_read_8_immediate(address);
 }
 
@@ -76,6 +78,7 @@ INLINE uint g65816i_read_8_direct(g65816i_cpu_struct *cpustate, uint address)
 #else
 	address = ADDRESS_65816(address);
 #endif
+	CLOCKS -= (bus_5A22_cycle_burst(cpustate,address));
 	return g65816_read_8(address);
 }
 
@@ -90,6 +93,7 @@ INLINE uint g65816i_read_8_vector(g65816i_cpu_struct *cpustate, uint address)
 INLINE void g65816i_write_8_normal(g65816i_cpu_struct *cpustate, uint address, uint value)
 {
 	address = ADDRESS_65816(address);
+	CLOCKS -= (bus_5A22_cycle_burst(cpustate,address));
 	g65816_write_8(address, MAKE_UINT_8(value));
 }
 
@@ -101,6 +105,7 @@ INLINE void g65816i_write_8_direct(g65816i_cpu_struct *cpustate, uint address, u
 #else
 	address = ADDRESS_65816(address);
 #endif
+	CLOCKS -= (bus_5A22_cycle_burst(cpustate,address));
 	g65816_write_8(address, MAKE_UINT_8(value));
 }
 
