@@ -1013,8 +1013,8 @@ void snes_state::snes_update_objects_rto( UINT16 curline )
 		pal = oam_spritelist[active_sprite].pal;
 
 		/* Adjust y, if past maximum position (for sprites which overlap between top & bottom) */
-		if (y >= 256 * snes_ppu.interlace)
-			y -= 256 * snes_ppu.interlace;
+		if (y >= (0x100 - 16) * snes_ppu.interlace)
+			y -= (0x100) * snes_ppu.interlace;
 
 		if (curline >= y && curline < (y + (height << 3)))
 		{
