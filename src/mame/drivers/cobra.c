@@ -280,13 +280,14 @@
 #include "machine/timekpr.h"
 #include "machine/jvshost.h"
 #include "machine/jvsdev.h"
+#include "video/konicdev.h"
 #include "video/polynew.h"
 #include "sound/rf5c400.h"
 
 #define GFXFIFO_IN_VERBOSE		0
 #define GFXFIFO_OUT_VERBOSE		0
-#define M2SFIFO_VERBOSE			0
-#define S2MFIFO_VERBOSE			0
+#define M2SFIFO_VERBOSE			1
+#define S2MFIFO_VERBOSE			1
 
 
 /* Cobra Renderer class */
@@ -564,6 +565,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sub_ata1_w);
 	DECLARE_READ32_MEMBER(sub_psac2_r);
 	DECLARE_WRITE32_MEMBER(sub_psac2_w);
+	DECLARE_WRITE32_MEMBER(sub_psac_palette_w);
 
 	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
 	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
@@ -630,6 +632,8 @@ public:
 	int m_gfx_fifo_loopback;
 	int m_gfx_unknown_v1;
 	int m_gfx_status_byte;
+
+	bool m_has_psac;
 
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
@@ -765,6 +769,14 @@ VIDEO_START( cobra )
 SCREEN_UPDATE_RGB32( cobra )
 {
 	cobra_state *cobra = screen.machine().driver_data<cobra_state>();
+
+	if (cobra->m_has_psac)
+	{
+		device_t *k001604 = screen.machine().device("k001604");
+
+		k001604_draw_back_layer(k001604, bitmap, cliprect);
+		k001604_draw_front_layer(k001604, bitmap, cliprect);
+	}
 
 	cobra->m_renderer->display(&bitmap, cliprect);
 	return 0;
@@ -1652,6 +1664,13 @@ WRITE32_MEMBER(cobra_state::sub_comram_w)
 	COMBINE_DATA(m_comram[page] + offset);
 }
 
+WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
+{
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	data = m_generic_paletteram_32[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+}
+
 READ32_MEMBER(cobra_state::sub_psac2_r)
 {
 	m_sub_psac_count++;
@@ -1691,12 +1710,19 @@ static void sub_jvs_w(device_t *device, UINT8 data)
 
 	if (rec_size > 0)
 	{
+		/*
 		printf("jvs reply ");
 		for (int i=0; i < rec_size; i++)
 		{
 			printf("%02X ", rec_data[i]);
 		}
 		printf("\n");
+		*/
+
+		for (int i=0; i < rec_size; i++)
+		{
+			ppc4xx_spu_receive_byte(device, rec_data[i]);
+		}
 	}
 }
 
@@ -1707,14 +1733,15 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16_LEGACY("rfsnd", rf5c400_r, rf5c400_w, 0xffffffff)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
-	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_RAM											// PSAC RAM
-	AM_RANGE(0x78240000, 0x78241fff) AM_MIRROR(0x80000000) AM_RAM											// PSAC unknown
+	AM_RANGE(0x78200000, 0x782000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)				// PSAC registers
+	AM_RANGE(0x78210000, 0x78217fff) AM_MIRROR(0x80000000) AM_RAM_WRITE(sub_psac_palette_w) AM_SHARE("paletteram")						// PSAC palette RAM
+	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)			// PSAC tile RAM
+	AM_RANGE(0x78240000, 0x7827ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_char_r, k001604_char_w)			// PSAC character RAM
 	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_psac2_r, sub_psac2_w)			// PSAC
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk7e_r, sub_debug_w)
 	AM_RANGE(0x7e040000, 0x7e041fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)				// TMS57002?
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
-//  AM_RANGE(0x7e240000, 0x7e27ffff) AM_MIRROR(0x80000000) AM_RAM                                           // PSAC (ROZ) in Racing Jam.
 //  AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
 //  AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
 	AM_RANGE(0x7e380000, 0x7e380003) AM_MIRROR(0x80000000) AM_READWRITE(sub_mainbd_r, sub_mainbd_w)
@@ -2745,6 +2772,14 @@ static powerpc_config gfx_ppc_cfg =
 };
 
 
+static const k001604_interface cobra_k001604_intf =
+{
+	0, 1,	/* gfx index 1 & 2 */
+	0, 1,	/* layer_size, roz_size */
+	0		/* slrasslt hack */
+};
+
+
 static void ide_interrupt(device_t *device, int state)
 {
 	cobra_state *cobra = device->machine().driver_data<cobra_state>();
@@ -2830,6 +2865,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_M48T58_ADD("m48t58")
+
+	MCFG_K001604_ADD("k001604", cobra_k001604_intf)		// on the LAN board in Racing Jam DX
 
 	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
 	MCFG_JVS_DEVICE_ADD("cobra_jvs", COBRA_JVS, "cobra_jvs_host")
@@ -2957,6 +2994,8 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 
 	// hd patches
 	// 0x18932c = 0x38600000            skips check_one_scene()
+
+	m_has_psac = false;
 }
 
 DRIVER_INIT_MEMBER(cobra_state,racjamdx)
@@ -2967,7 +3006,7 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 	{
 		UINT32 *rom = (UINT32*)machine().root_device().memregion("user2")->base();
 
-		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
+		//rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 		rom[0x62ddc / 4] = 0x60000000;			// skip lanc_hardcheck()
 
 
@@ -3034,6 +3073,8 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 		rom[0x0e] = (UINT8)(sum >> 8);
 		rom[0x0f] = (UINT8)(sum);
 	}
+
+	m_has_psac = true;
 }
 
 /*****************************************************************************/
