@@ -352,6 +352,46 @@ static void add_info(software_list *swlist, char *feature_name, char *feature_va
 }
 
 /*-------------------------------------------------
+ add_other_info (same as add_info, but its target
+ is softinfo->other_info)
+ -------------------------------------------------*/
+
+static void add_other_info(software_list *swlist, char *info_name, char *info_value)
+{
+	software_info *info = swlist->softinfo;
+	feature_list *new_entry;
+
+	/* First allocate the new entry */
+	new_entry = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
+
+	if ( new_entry )
+	{
+		new_entry->next = NULL;
+		new_entry->name = info_name;
+		new_entry->value = info_value ? info_value : info_name;
+
+		/* Add new feature to end of feature list */
+		if ( info->other_info )
+		{
+			feature_list *list = info->other_info;
+			while ( list->next != NULL )
+			{
+				list = list->next;
+			}
+			list->next = new_entry;
+		}
+		else
+		{
+			info->other_info = new_entry;
+		}
+	}
+	else
+	{
+		/* Unable to allocate memory */
+	}
+}
+
+/*-------------------------------------------------
     add_software_part
 -------------------------------------------------*/
 
@@ -536,8 +576,43 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				text_dest = (char **) &swlist->softinfo->publisher;
 			else if (!strcmp(tagname, "info"))
 			{
-				// the "info" field (containing info about actual developers, etc.) is not currently stored.
-				// full support will be added, but for the moment frontend have to get this info from the xml directly
+				const char *str_info_name = NULL;
+				const char *str_info_value = NULL;
+				for ( ; attributes[0]; attributes += 2 )
+				{
+					if ( !strcmp( attributes[0], "name" ) )
+						str_info_name = attributes[1];
+					else if ( !strcmp( attributes[0], "value" ) )
+						str_info_value = attributes[1];
+					else
+						unknown_attribute(swlist, attributes[0]);
+				}
+
+				if ( str_info_name && swlist->softinfo )
+				{
+					char *name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_info_name ) + 1 ) * sizeof(char) );
+					char *value = NULL;
+
+					if ( !name )
+						return;
+
+					strcpy( name, str_info_name );
+
+					if ( str_info_value )
+					{
+						value = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_info_value ) + 1 ) * sizeof(char) );
+
+						if ( !value )
+							return;
+
+						strcpy( value, str_info_value );
+
+						add_other_info( swlist, name, value );
+					}
+				} else {
+					parse_error(&swlist->state, "%s: Incomplete other_info definition (line %lu)\n",
+						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+				}
 			}
 			else if (!strcmp(tagname, "sharedfeat"))
 			{

@@ -1121,6 +1121,12 @@ void cli_frontend::output_single_softlist(FILE *out,software_list *list, const c
 		fprintf( out, "\t\t\t<year>%s</year>\n", xml_normalize_string( swinfo->year ) );
 		fprintf( out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string( swinfo->publisher ) );
 
+		feature_list *flist = swinfo->other_info;
+		while ( flist ) {
+			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist->name, flist->value );
+			flist = flist->next;
+		}
+
 		for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
 		{
 			fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
