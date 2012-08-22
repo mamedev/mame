@@ -494,6 +494,35 @@ public:
 	DECLARE_DRIVER_INIT(snes_hirom);
 	DECLARE_DRIVER_INIT(snes_mess);
 	DECLARE_DRIVER_INIT(snesst);
+
+	inline UINT16 snes_get_bgcolor( UINT8 direct_colors, UINT16 palette, UINT8 color );
+	inline void snes_set_scanline_pixel( int screen, INT16 x, UINT16 color, UINT8 priority, UINT8 layer, int blend );
+	inline void snes_draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority );
+	inline void snes_draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority );
+	inline void snes_draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UINT8 priority );
+	inline void snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT8 direct_colors, UINT16 pal, UINT8 hires );
+	inline UINT32 snes_get_tmap_addr( UINT8 layer, UINT8 tile_size, UINT32 base, UINT32 x, UINT32 y );
+	inline void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a, UINT8 color_depth, UINT8 hires, UINT8 offset_per_tile, UINT8 direct_colors );
+	void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a );
+	void snes_update_obsel( void );
+	void snes_oam_list_build( void );
+	int is_sprite_on_scanline( UINT16 curline, UINT8 sprite );
+	void snes_update_objects_rto( UINT16 curline );
+	void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8 priority_oam2, UINT8 priority_oam3 );
+	void snes_update_mode_0( UINT16 curline );
+	void snes_update_mode_1( UINT16 curline );
+	void snes_update_mode_2( UINT16 curline );
+	void snes_update_mode_3( UINT16 curline );
+	void snes_update_mode_4( UINT16 curline );
+	void snes_update_mode_5( UINT16 curline );
+	void snes_update_mode_6( UINT16 curline );
+	void snes_update_mode_7( UINT16 curline );
+	void snes_draw_screens( UINT16 curline );
+	void snes_update_windowmasks( void );
+	void snes_update_offsets( void );
+	inline void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens );
+	void snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline );
+
 };
 
 /* Special chips, checked at init and used in memory handlers */
