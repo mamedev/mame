@@ -6,7 +6,14 @@
         12/05/2009 Skeleton driver.
         01/09/2011 Modernised, added a keyboard to mc8020
 
-Real workings of keyboard need to be understood and implemented.
+Real workings of mc8020 keyboard need to be understood and implemented.
+
+mc8030: very little info available. The area from FFD8-FFFF is meant for
+interrupt vectors and so on, but most of it is zeroes. Appears the keyboard
+is an ascii keyboard with built-in beeper. It communicates via the SIO,
+which needs a rewrite to become useful. The asp ctc needs at least 2
+triggers. The purpose of the zve pio is unknown. The system uses interrupts
+for various things, but none of that is working.
 
 ****************************************************************************/
 
@@ -39,14 +46,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc8030_io, AS_IO, 8, mc80_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x80, 0x84) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_device, read, write)
-	//AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_device, read, write)
-	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0xff00) AM_WRITE(mc8030_zve_write_protect_w)
+	AM_RANGE(0x30, 0x3f) AM_MIRROR(0xff00) AM_NOP //"mass storage"
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_device, read, write) // user CTC
+	AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_device, read, write) // PIO unknown usage
+	AM_RANGE(0x88, 0x8f) AM_MIRROR(0xff00) AM_WRITE(mc8030_zve_write_protect_w)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(mc8030_vis_w) AM_MASK(0xffff)
-	//AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80ctc_device, read, write)
-	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_device, read, write)
-	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_device, read, write)
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80sio_device, read, write) // keyboard & IFSS?
+	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_device, read, write) // sio bauds, KMBG? and kbd
+	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_device, read, write) // external bus
 	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(mc8030_eprom_prog_w)
 ADDRESS_MAP_END
 
@@ -140,6 +147,17 @@ static TIMER_DEVICE_CALLBACK( mc8020_kbd )
 	}
 }
 
+// this is a guess there is no information available
+static const z80_daisy_config mc8030_daisy_chain[] =
+{
+	{ "asp_ctc" },		/* System ctc */
+	{ "asp_pio" },		/* System pio */
+	{ "asp_sio" },		/* sio */
+	{ "zve_pio" },		/* User pio */
+	{ "zve_ctc" },		/* User ctc */
+	{ NULL }
+};
+
 static MACHINE_CONFIG_START( mc8020, mc80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
@@ -170,6 +188,7 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(mc8030_mem)
 	MCFG_CPU_IO_MAP(mc8030_io)
+	MCFG_CPU_CONFIG(mc8030_daisy_chain)
 
 	MCFG_MACHINE_RESET(mc8030)
 
