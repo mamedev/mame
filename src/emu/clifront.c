@@ -1123,7 +1123,7 @@ void cli_frontend::output_single_softlist(FILE *out,software_list *list, const c
 
 		feature_list *flist = swinfo->other_info;
 		while ( flist ) {
-			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist->name, flist->value );
+			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist->name, xml_normalize_string( flist->value ) );
 			flist = flist->next;
 		}
 
