@@ -714,7 +714,7 @@ buildtools: maketree $(BUILD)
 # $(SRC)/emu, as well as all the OSD objects and anything in the $(OBJ) tree
 depend: maketree $(MAKEDEP_TARGET)
 	@echo Rebuilding depend.mak...
-	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... src/$(TARGET) > depend.mak
+	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... src/$(TARGET) > depend_$(TARGET).mak
 
 tools: maketree $(TOOLS)
 
@@ -824,4 +824,4 @@ endif
 # optional dependencies file
 #-------------------------------------------------
 
--include depend.mak
+-include depend_$(TARGET).mak
