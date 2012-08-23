@@ -90,10 +90,13 @@ READ16_MEMBER( pcfx_state::pad_r )
 	{
 		// received data
 		//printf("RX %d\n",port_type);
-		res = m_pad.latch[port_type] >> ((offset<<1) & 2) ? 16 : 0;
+		res = m_pad.latch[port_type] >> (((offset<<1) & 2) ? 16 : 0);
 
 		if(((offset<<1) & 0x02) == 0)
+		{
 			m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
+			//set_irq_line(11, 0);
+		}
 	}
 
 	return res;
@@ -108,6 +111,7 @@ static TIMER_CALLBACK(pad_func)
 	state->m_pad.status[param] |= 8;
 	state->m_pad.ctrl[param] &= ~1; // ack TX line
 	// TODO: pad IRQ
+//	state->set_irq_line(11, 1);
 }
 
 WRITE16_MEMBER( pcfx_state::pad_w )
@@ -158,8 +162,89 @@ static INPUT_PORTS_START( pcfx )
 	xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
 	*/
 	PORT_START("P1")
-	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0fffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID
+	PORT_DIPNAME( 0x01000000, 0x01000000, "1" )
+	PORT_DIPSETTING(    0x01000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x010000, "2" )
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "3" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) // *
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) // *
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("RUN button")
+	PORT_DIPNAME( 0x01, 0x01, "4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("P2")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -284,12 +369,12 @@ inline void pcfx_state::set_irq_line(int line, int state)
 {
 	if ( state )
 	{
-printf("Setting irq line %d\n", line);
+//printf("Setting irq line %d\n", line);
 		m_irq_pending |= ( 1 << ( 15 - line ) );
 	}
 	else
 	{
-printf("Clearing irq line %d\n", line);
+//printf("Clearing irq line %d\n", line);
 		m_irq_pending &= ~( 1 << ( 15 - line ) );
 	}
 	check_irqs();
