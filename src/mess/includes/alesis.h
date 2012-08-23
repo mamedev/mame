@@ -10,6 +10,7 @@
 #define _ALESIS_H_
 
 #include "cpu/mcs51/mcs51.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/hd44780.h"
 #include "imagedev/cassette.h"
