@@ -237,6 +237,7 @@ SOUNDS += AWACS
 DRVLIBS += \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/act.a \
+	$(MESSOBJ)/alesis.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apf.a \
@@ -592,6 +593,10 @@ $(MESSOBJ)/act.a:				\
 	$(MESS_MACHINE)/apricotkb.o	\
 	$(MESS_DRIVERS)/victor9k.o	\
 	$(MESS_MACHINE)/victor9kb.o	\
+
+$(MESSOBJ)/alesis.a:			\
+	$(MESS_DRIVERS)/alesis.o	\
+	$(MESS_AUDIO)/alesis.o		\
 
 $(MESSOBJ)/amiga.a:				\
 	$(MESS_MACHINE)/amigacrt.o	\
@@ -1922,7 +1927,6 @@ $(MESSOBJ)/test.a:				\
 	$(MESS_DRIVERS)/zexall.o	\
 
 $(MESSOBJ)/skeleton.a:			\
-	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_DRIVERS)/alphatro.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\

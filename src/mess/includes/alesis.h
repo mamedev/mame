@@ -1,0 +1,86 @@
+/***************************************************************************
+
+    Alesis HR-16 and SR-16 drum machines
+
+****************************************************************************/
+
+#pragma once
+
+#ifndef _ALESIS_H_
+#define _ALESIS_H_
+
+#include "cpu/mcs51/mcs51.h"
+#include "sound/dac.h"
+#include "video/hd44780.h"
+#include "imagedev/cassette.h"
+#include "rendlay.h"
+
+#define MCFG_ALESIS_DM3AG_ADD(_tag,_clock) \
+	MCFG_DEVICE_ADD( _tag, ALESIS_DM3AG, _clock )
+
+
+// ======================> alesis_dm3ag_device
+
+class alesis_dm3ag_device :	public device_t
+{
+
+public:
+	// construction/destruction
+	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	// device interface
+	DECLARE_WRITE8_MEMBER(write);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	static const device_timer_id TIMER_DAC_UPDATE = 1;
+	required_device<dac_device> m_dac;
+
+	emu_timer *	m_dac_update_timer;
+	INT8 *		m_samples;
+	bool		m_output_active;
+	int			m_count;
+	UINT32		m_cur_sample;
+	UINT8		m_cmd[5];
+};
+
+
+// ======================> alesis_state
+
+class alesis_state : public driver_device
+{
+public:
+	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_cassette(*this, CASSETTE_TAG)
+		{ }
+
+	optional_device<cassette_image_device> m_cassette;
+
+	virtual void palette_init();
+	virtual void machine_reset();
+
+	DECLARE_DRIVER_INIT(hr16);
+	DECLARE_WRITE8_MEMBER( led_w );
+	DECLARE_WRITE8_MEMBER( kb_matrix_w );
+	DECLARE_READ8_MEMBER( kb_r );
+	DECLARE_READ8_MEMBER( p3_r );
+	DECLARE_WRITE8_MEMBER( p3_w );
+
+private:
+	UINT8		m_kb_matrix;
+};
+
+// device type definition
+extern const device_type ALESIS_DM3AG;
+
+#endif	// _ALESIS_H_
+
