@@ -150,6 +150,9 @@
 #define M6522_1_TAG		"ucd4"
 #define C64H156_TAG		"64h156"
 
+#define MC6821_TAG      "pia"
+#define CENTRONICS_TAG  "centronics"
+
 
 enum
 {
@@ -171,6 +174,7 @@ const device_type SX1541 = &device_creator<sx1541_device>;
 const device_type FSD2 = &device_creator<fsd2_device>;
 const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_device>;
 const device_type C1541_PROFESSIONAL_DOS_V1 = &device_creator<c1541_professional_dos_v1_device>;
+const device_type C1541_PROLOGIC_DOS_CLASSIC = &device_creator<c1541_prologic_dos_classic_device>;
 
 
 //-------------------------------------------------
@@ -214,6 +218,10 @@ void base_c1541_device::device_config_complete()
 
     case TYPE_1541_PROFESSIONAL_DOS_V1:
         m_shortname = "c1541pd";
+        break;
+
+    case TYPE_1541_PROLOGIC_DOS_CLASSIC:
+        m_shortname = "c1541pdc";
         break;
 	}
 }
@@ -348,6 +356,21 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( c1541pdc )
+//-------------------------------------------------
+
+ROM_START( c1541pdc )
+    ROM_REGION( 0x8000, M6502_TAG, 0 )
+    ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+    ROM_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
+    ROM_LOAD( "kernal.bin", 0x4000, 0x4000, CRC(79032ed5) SHA1(0ca4d5ef41c7e3d18d8945476d1481573af3e27c) )
+
+    ROM_REGION( 0x2000, "mmu", 0 )
+    ROM_LOAD( "mmu.bin", 0x0000, 0x2000, CRC(4c41392c) SHA1(78846af2ee6a56fceee44f9246659685ab2cbb7e) )
+ROM_END
+
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
@@ -379,6 +402,9 @@ const rom_entry *base_c1541_device::device_rom_region() const
 
     case TYPE_1541_PROFESSIONAL_DOS_V1:
         return ROM_NAME( c1541pd );
+
+    case TYPE_1541_PROLOGIC_DOS_CLASSIC:
+        return ROM_NAME( c1541pdc );
 	}
 }
 
@@ -420,6 +446,22 @@ static ADDRESS_MAP_START( c1541pd_mem, AS_PROGRAM, 8, base_c1541_device )
     AM_RANGE(0xa000, 0xbfff) AM_RAM
     AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x0000)
     AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( c1541pdc_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( c1541pdc_mem, AS_PROGRAM, 8, c1541_prologic_dos_classic_device )
+    AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
+    AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
+    AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
+    AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+    AM_RANGE(0x8800, 0x9fff) AM_RAM
+    AM_RANGE(0xa000, 0xb7ff) AM_ROM AM_REGION(M6502_TAG, 0x0000)
+    AM_RANGE(0xb800, 0xb80f) AM_READWRITE(pia_r, pia_w)
+    AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)
 ADDRESS_MAP_END
 
 
@@ -728,6 +770,68 @@ const floppy_interface c1541_floppy_interface =
 
 
 //-------------------------------------------------
+//  pia6821_interface pia0_intf
+//-------------------------------------------------
+
+READ8_MEMBER( c1541_prologic_dos_classic_device::pia_r )
+{
+    return m_pia->read(space, (offset >> 2) & 0x03);
+}
+
+WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_w )
+{
+    m_pia->write(space, (offset >> 2) & 0x03, data);
+}
+
+WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pa_w )
+{
+    /*
+    
+        bit     description
+    
+        0       1/2 MHz
+        1       
+        2       
+        3       35/40 tracks
+        4       
+        5       
+        6       
+        7       Hi
+    
+    */
+}
+
+READ8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_r )
+{
+    return m_parallel_data;
+}
+
+WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
+{
+    m_parallel_data = data;
+
+    m_centronics->write(space, 0, data);
+}
+
+static const pia6821_interface pia_intf =
+{
+    DEVCB_NULL,
+    DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_prologic_dos_classic_device, pia_pb_r),
+    DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r),
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+
+    DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_prologic_dos_classic_device, pia_pa_w),
+    DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_prologic_dos_classic_device, pia_pb_w),
+    DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1541 )
 //-------------------------------------------------
 
@@ -796,6 +900,25 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_DRIVER( c1541pdc )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c1541pdc )
+    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+    MCFG_CPU_PROGRAM_MAP(c1541pdc_mem)
+    MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+
+    MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
+    MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+
+    MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
+    MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+    MCFG_PIA6821_ADD(MC6821_TAG, pia_intf)
+    MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
@@ -815,6 +938,9 @@ machine_config_constructor base_c1541_device::device_mconfig_additions() const
 
     case TYPE_1541_PROFESSIONAL_DOS_V1:
         return MACHINE_CONFIG_NAME( c1541pd );
+
+    case TYPE_1541_PROLOGIC_DOS_CLASSIC:
+        return MACHINE_CONFIG_NAME( c1541pdc );
 	}
 }
 
@@ -845,7 +971,7 @@ inline void base_c1541_device::set_iec_data()
 //  base_c1541_device - constructor
 //-------------------------------------------------
 
-base_c1541_device::base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
       device_c64_floppy_parallel_interface(mconfig, *this),
@@ -867,7 +993,7 @@ base_c1541_device::base_c1541_device(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 
 c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, C1540, "C1540", tag, owner, clock, TYPE_1540) { }
+    : base_c1541_device(mconfig, C1540, "C1540", tag, owner, clock, TYPE_1540) { }
 
 
 //-------------------------------------------------
@@ -875,7 +1001,7 @@ c1540_device::c1540_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, C1541, "C1541", tag, owner, clock, TYPE_1541) { }
+    : base_c1541_device(mconfig, C1541, "C1541", tag, owner, clock, TYPE_1541) { }
 
 
 //-------------------------------------------------
@@ -883,7 +1009,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock, TYPE_1541C) {  }
+    : base_c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock, TYPE_1541C) {  }
 
 
 //-------------------------------------------------
@@ -891,7 +1017,7 @@ c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, C1541II, "C1541-II", tag, owner, clock, TYPE_1541II) {  }
+    : base_c1541_device(mconfig, C1541II, "C1541-II", tag, owner, clock, TYPE_1541II) {  }
 
 
 //-------------------------------------------------
@@ -899,7 +1025,7 @@ c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, TYPE_SX1541) { }
+    : base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, TYPE_SX1541) { }
 
 
 //-------------------------------------------------
@@ -907,7 +1033,7 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, TYPE_FSD2) { }
+    : base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, TYPE_FSD2) { }
 
 
 //-------------------------------------------------
@@ -915,7 +1041,7 @@ fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, TYPE_1541_DOLPHIN_DOS) {  }
+    : base_c1541_device(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, TYPE_1541_DOLPHIN_DOS) {  }
 
 
 //-------------------------------------------------
@@ -923,7 +1049,19 @@ c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig
 //-------------------------------------------------
 
 c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    :base_c1541_device(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, TYPE_1541_PROFESSIONAL_DOS_V1) {  }
+    : base_c1541_device(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, TYPE_1541_PROFESSIONAL_DOS_V1) {  }
+
+
+//-------------------------------------------------
+//  c1541_prologic_dos_classic_device - constructor
+//-------------------------------------------------
+
+c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, TYPE_1541_PROLOGIC_DOS_CLASSIC),
+      m_pia(*this, MC6821_TAG),
+      m_centronics(*this, CENTRONICS_TAG)
+{
+}
 
 
 //-------------------------------------------------

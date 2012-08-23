@@ -20,8 +20,10 @@
 #include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
-#include "machine/cbmiec.h"
+#include "machine/6821pia.h"
 #include "machine/c64_bn1541.h"
+#include "machine/cbmiec.h"
+#include "machine/ctronics.h"
 
 
 
@@ -58,7 +60,8 @@ public:
 
 		// extended hardware
 		TYPE_1541_DOLPHIN_DOS,
-		TYPE_1541_PROFESSIONAL_DOS_V1
+		TYPE_1541_PROFESSIONAL_DOS_V1,
+		TYPE_1541_PROLOGIC_DOS_CLASSIC
 	};
 
 	// not really public
@@ -200,6 +203,28 @@ public:
 };
 
 
+// ======================> c1541_prologic_dos_classic_device
+
+class c1541_prologic_dos_classic_device :  public base_c1541_device
+{
+public:
+    // construction/destruction
+    c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    // not really public
+    DECLARE_READ8_MEMBER( pia_r );
+    DECLARE_WRITE8_MEMBER( pia_w );
+
+	DECLARE_WRITE8_MEMBER( pia_pa_w );
+	DECLARE_READ8_MEMBER( pia_pb_r );
+	DECLARE_WRITE8_MEMBER( pia_pb_w );
+
+protected:
+	required_device<pia6821_device> m_pia;
+	required_device<centronics_device> m_centronics;
+};
+
+
 // device type definition
 extern const device_type C1540;
 extern const device_type C1541;
@@ -209,6 +234,7 @@ extern const device_type SX1541;
 extern const device_type FSD2;
 extern const device_type C1541_DOLPHIN_DOS;
 extern const device_type C1541_PROFESSIONAL_DOS_V1;
+extern const device_type C1541_PROLOGIC_DOS_CLASSIC;
 
 
 // floppy interface
