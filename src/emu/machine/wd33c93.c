@@ -843,19 +843,6 @@ void wd33c93_write_data(int bytes, UINT8 *pData)
 	}
 }
 
-void *wd33c93_get_device(int id)
-{
-	void *ret;
-
-	if (devices[id])
-	{
-		devices[id]->GetDevice( &ret );
-		return ret;
-	}
-
-	return NULL;
-}
-
 void wd33c93_clear_dma(void)
 {
 	/* indicate DMA completed by clearing the transfer count */

@@ -877,7 +877,10 @@ DRIVER_INIT_MEMBER(twinkle_state,twinkle)
 static MACHINE_RESET( twinkle )
 {
 	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(machine.device("cdda"), am53cf96_get_device(SCSI_ID_4));
+	void *cdrom;
+	scsidev_device *scsidev = machine.device<scsidev_device>("cdrom0");
+	scsidev->GetDevice( &cdrom );
+	cdda_set_cdrom(machine.device("cdda"), cdrom);
 }
 
 static void spu_irq(device_t *device, UINT32 data)

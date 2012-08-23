@@ -16,8 +16,6 @@ extern void lsi53c810_init(running_machine &machine, const struct LSI53C810inter
 extern void lsi53c810_read_data(int bytes, UINT8 *pData);
 extern void lsi53c810_write_data(int bytes, UINT8 *pData);
 
-extern void *lsi53c810_get_device(int id);
-
 READ8_HANDLER( lsi53c810_reg_r );
 WRITE8_HANDLER( lsi53c810_reg_w );
 

@@ -737,21 +737,6 @@ void lsi53c810_write_data(int bytes, UINT8 *pData)
 	}
 }
 
-void *lsi53c810_get_device(int id)
-{
-	void *ret;
-
-	if (devices[id])
-	{
-		logerror("lsi53c810: fetching dev pointer for SCSI ID %d\n", id);
-		devices[id]->GetDevice( &ret );
-
-		return ret;
-	}
-
-	return NULL;
-}
-
 /*************************************
  *
  *  Disassembler

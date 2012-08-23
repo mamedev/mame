@@ -264,18 +264,3 @@ void am53cf96_write_data(int bytes, UINT8 *pData)
 		logerror("53cf96: request for unknown device SCSI ID %d\n", last_id);
 	}
 }
-
-// get the device handle (HD or CD) for the specified SCSI ID
-void *am53cf96_get_device(int id)
-{
-	void *ret;
-
-	if (devices[id])
-	{
-		logerror("53cf96: fetching dev pointer for SCSI ID %d\n", id);
-		devices[id]->GetDevice( &ret );
-		return ret;
-	}
-
-	return NULL;
-}
