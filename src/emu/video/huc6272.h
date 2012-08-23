@@ -45,12 +45,19 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
-	inline UINT32 read_word(offs_t address);
-	inline void write_word(offs_t address, UINT32 data);
+	inline UINT32 read_dword(offs_t address);
+	inline void write_dword(offs_t address, UINT32 data);
 	UINT8 m_register;
 	UINT32 m_kram_addr_r, m_kram_addr_w;
 	UINT16 m_kram_inc_r,m_kram_inc_w;
 	UINT8 m_kram_page_r,m_kram_page_w;
+	UINT32 m_page_setting;
+
+	struct{
+		UINT8 addr;
+		UINT8 ctrl;
+		UINT16 data[16];
+	}m_micro_prg;
 
 	const address_space_config		m_space_config;
 };

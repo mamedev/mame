@@ -16,7 +16,7 @@
 // device type definition
 const device_type huc6272 = &device_creator<huc6272_device>;
 
-static ADDRESS_MAP_START( huc6272_vram, AS_0, 16, huc6272_device )
+static ADDRESS_MAP_START( huc6272_vram, AS_0, 32, huc6272_device )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -40,9 +40,9 @@ const address_space_config *huc6272_device::memory_space_config(address_spacenum
 //  read_dword - read a dword at the given address
 //-------------------------------------------------
 
-inline UINT32 huc6272_device::read_word(offs_t address)
+inline UINT32 huc6272_device::read_dword(offs_t address)
 {
-	return space()->read_word(address << 1);
+	return space()->read_dword(address << 2);
 }
 
 
@@ -50,9 +50,9 @@ inline UINT32 huc6272_device::read_word(offs_t address)
 //  write_dword - write a dword at the given address
 //-------------------------------------------------
 
-inline void huc6272_device::write_word(offs_t address, UINT32 data)
+inline void huc6272_device::write_dword(offs_t address, UINT32 data)
 {
-	space()->write_word(address << 1, data);
+	space()->write_dword(address << 2, data);
 }
 
 //**************************************************************************
@@ -66,7 +66,7 @@ inline void huc6272_device::write_word(offs_t address, UINT32 data)
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, huc6272, "huc6272", tag, owner, clock),
 	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 16, 32, 0, NULL, *ADDRESS_MAP_NAME(huc6272_vram))
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, NULL, *ADDRESS_MAP_NAME(huc6272_vram))
 {
 
 }
@@ -110,7 +110,26 @@ READ32_MEMBER( huc6272_device::read )
 	UINT32 res = 0;
 
 	if((offset & 1) == 0)
+	{
+		/*
+		xxxx xxxx ---- ---- ---- ---- ---- ---- Sub Channel Buffer
+		---- ---- x--- ---- ---- ---- ---- ---- SCSI RST flag
+		---- ---- -x-- ---- ---- ---- ---- ---- SCSI BUSY flag
+		---- ---- --x- ---- ---- ---- ---- ---- SCSI REQ flag
+		---- ---- ---x ---- ---- ---- ---- ---- SCSI MSG flag
+		---- ---- ---- x--- ---- ---- ---- ---- SCSI CD flag
+		---- ---- ---- -x-- ---- ---- ---- ---- SCSI IO flag
+		---- ---- ---- --x- ---- ---- ---- ---- SCSI SEL flag
+		---- ---- ---- ---- -x-- ---- ---- ---- SCSI IRQ pending
+		---- ---- ---- ---- --x- ---- ---- ---- DMA IRQ pending
+		---- ---- ---- ---- ---x ---- ---- ---- CD Sub Channel IRQ pending
+		---- ---- ---- ---- ---- x--- ---- ---- Raster IRQ pending
+		---- ---- ---- ---- ---- -x-- ---- ---- ADPCM IRQ pending
+		---- ---- ---- ---- ---- ---- -xxx xxxx register read-back
+		*/
 		res = m_register & 0x7f;
+		res |= (0) << 16;
+	}
 	else
 	{
 		switch(m_register)
@@ -127,8 +146,12 @@ READ32_MEMBER( huc6272_device::read )
 				break;
 
 			case 0x0e:
-				res = read_word((m_kram_addr_r)|(m_kram_page_r<<18));
+				res = read_dword((m_kram_addr_r)|(m_kram_page_r<<18));
 				m_kram_addr_r += (m_kram_inc_r & 0x100) ? ((m_kram_inc_r & 0xff) - 0x100) : (m_kram_inc_r & 0xff);
+				break;
+
+			case 0x0f:
+				res = m_page_setting;
 				break;
 			//default: printf("%04x\n",m_register);
 		}
@@ -145,6 +168,16 @@ WRITE32_MEMBER( huc6272_device::write )
 	{
 		switch(m_register)
 		{
+
+			case 0x09: // DMA addr
+				//printf("%08x DMA ADDR\n",data);
+				break;
+			case 0x0a: // DMA size
+				//printf("%08x DMA SIZE\n",data);
+				break;
+			case 0x0b: // DMA status
+				//printf("%08x DMA STATUS\n",data);
+				break;
 			/*
 			---- ---- ---- ---- ----
 			*/
@@ -161,11 +194,35 @@ WRITE32_MEMBER( huc6272_device::write )
 				break;
 
 			case 0x0e: // KRAM write VRAM
-				write_word((m_kram_addr_w)|(m_kram_page_w<<18),data & 0xffff); /* TODO: there are some 32-bits accesses during BIOS? */
+				write_dword((m_kram_addr_w)|(m_kram_page_w<<18),data); /* TODO: there are some 32-bits accesses during BIOS? */
 				m_kram_addr_w += (m_kram_inc_w & 0x100) ? ((m_kram_inc_w & 0xff) - 0x100) : (m_kram_inc_w & 0xff);
 				break;
 
-			//default: printf("%04x %04x\n",m_register,data);
+			/*
+			---x ---- ---- ---- ADPCM page setting
+			---- ---x ---- ---- RAINBOW page setting
+			---- ---- ---x ---- BG page setting
+			---- ---- ---- ---x SCSI page setting
+			*/
+			case 0x0f:
+				m_page_setting = data;
+				break;
+
+			case 0x13:
+				m_micro_prg.addr = data & 0xf;
+				break;
+
+			case 0x14:
+				m_micro_prg.data[m_micro_prg.addr] = data & 0xffff;
+				m_micro_prg.addr++;
+				m_micro_prg.addr &= 0xf;
+				break;
+
+			case 0x15:
+				m_micro_prg.ctrl = data & 1;
+				break;
+
+			//default: printf("%04x %04x %08x\n",m_register,data,mem_mask);
 		}
 	}
 }
