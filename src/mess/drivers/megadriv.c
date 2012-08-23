@@ -487,12 +487,12 @@ MACHINE_CONFIG_END
 	/* temp, rom should only be visible here when one of the regs is set, tempo needs it */ \
 	/* ROM_CART_LOAD("cart", 0x000000, 0x400000, ROM_NOMIRROR) */ \
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100) \
-	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */ \
+	ROM_REGION32_BE( 0x400000, "master", 0 ) /* SH2 Code */ \
 	ROM_SYSTEM_BIOS( 0, "retail", "Mars Version 1.0 (retail)" ) \
 	ROMX_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 1, "sdk", "Mars Version 1.0 (early sdk)" ) \
 	ROMX_LOAD( "32x_m_bios_sdk.bin", 0x000000,  0x000800, BAD_DUMP CRC(c7102c53) SHA1(ed73a47f186b373b8eff765f84ef26c3d9ef6cb0), ROM_BIOS(2) ) \
-	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */ \
+	ROM_REGION32_BE( 0x400000, "slave", 0 ) /* SH2 Code */ \
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) ) \
 
 
@@ -638,10 +638,10 @@ ROM_START( 32x_scd )
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 
-	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
+	ROM_REGION32_BE( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
 	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
 
-	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
+	ROM_REGION32_BE( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
 ROM_END
 

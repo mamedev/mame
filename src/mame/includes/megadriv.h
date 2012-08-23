@@ -15,6 +15,7 @@
 #include "cpu/ssp1601/ssp1601.h"
 
 #include "machine/megavdp.h"
+#include "machine/mega32x.h"
 #include "video/315_5124.h"
 
 #define MASTER_CLOCK_NTSC 53693175
@@ -420,10 +421,7 @@ public:
 
 };
 
-// Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions
-// when using the DRC core.  Needs further investigation, the non-DRC core works either
-// way
-#define _32X_SWAP_MASTER_SLAVE_HACK
+
 
 extern int _32x_is_connected;
 extern cpu_device *_32x_master_cpu;
@@ -431,12 +429,7 @@ extern cpu_device *_32x_slave_cpu;
 
 // called from out main scanline timers...
 
-extern int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
-extern MACHINE_RESET( _32x );
-ADDRESS_MAP_EXTERN( sh2_main_map, driver_device );
-ADDRESS_MAP_EXTERN( sh2_slave_map, driver_device );
-extern emu_timer *_32x_pwm_timer;
-extern TIMER_CALLBACK( _32x_pwm_callback );
+
 
 extern int megadrive_vblank_flag;
 extern int genesis_scanline_counter;

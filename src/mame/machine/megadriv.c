@@ -1032,11 +1032,6 @@ MACHINE_RESET( megadriv )
 		MACHINE_RESET_CALL( segacd );
 	}
 
-
-	if(_32x_is_connected)
-	{
-		MACHINE_RESET_CALL(_32x);
-	}
 }
 
 void megadriv_stop_scanline_timer(running_machine &machine)
@@ -1237,45 +1232,21 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( megadpal, driver_device )
+MACHINE_CONFIG_START( megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD(md_pal)
 MACHINE_CONFIG_END
 
 
 
-static const sh2_cpu_core sh2_conf_master = { 0, NULL, _32x_fifo_available_callback };
-static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callback };
 
 MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 
-#ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
-#endif
-
-	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
-	MCFG_CPU_CONFIG(sh2_conf_slave)
-
-#ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
-#endif
-
-	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
-	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
-	//
-	// boosting the interleave here actually makes Kolibri run incorrectly however, that
-	// one works best just boosting the interleave on communications?!
-	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
-
 
 	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
@@ -1286,59 +1257,27 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DAC_ADD("lch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-
-	MCFG_DAC_ADD("rch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 
-#ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
-#endif
-
-	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
-	MCFG_CPU_CONFIG(sh2_conf_slave)
-
-#ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
-	MCFG_CPU_CONFIG(sh2_conf_master)
-#endif
-
-	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
-	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
-	//
-	// boosting the interleave here actually makes Kolibri run incorrectly however, that
-	// one works best just boosting the interleave on communications?!
-	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7)
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DAC_ADD("lch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-
-	MCFG_DAC_ADD("rch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -1410,7 +1349,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_CDROM_ADD( "cdrom", scd_cdrom)
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 
-	MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
+	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 MACHINE_CONFIG_END
 
 
@@ -1434,14 +1373,14 @@ static void megadriv_init_common(running_machine &machine)
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu = machine.device<cpu_device>("32x_master_sh2");
+	_32x_master_cpu = machine.device<cpu_device>(_32X_MASTER_TAG);
 	if (_32x_master_cpu != NULL)
 	{
 		printf("32x MASTER SH2 cpu found '%s'\n", _32x_master_cpu->tag() );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu = machine.device<cpu_device>("32x_slave_sh2");
+	_32x_slave_cpu = machine.device<cpu_device>(_32X_SLAVE_TAG);
 	if (_32x_slave_cpu != NULL)
 	{
 		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
@@ -1456,11 +1395,7 @@ static void megadriv_init_common(running_machine &machine)
 		_32x_is_connected = 0;
 	}
 
-	if(_32x_is_connected)
-	{
-		_32x_pwm_timer = machine.scheduler().timer_alloc(FUNC(_32x_pwm_callback));
-		_32x_pwm_timer->adjust(attotime::never);
-	}
+
 
 	sega_cd_connected = 0;
 	segacd_wordram_mapped = 0;

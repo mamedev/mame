@@ -4519,6 +4519,7 @@ src/mame/machine/mcr.c svneol=native#text/plain
 src/mame/machine/mcr68.c svneol=native#text/plain
 src/mame/machine/md_cart.c svneol=native#text/plain
 src/mame/machine/mega32x.c svneol=native#text/plain
+src/mame/machine/mega32x.h svneol=native#text/plain
 src/mame/machine/megacd.c svneol=native#text/plain
 src/mame/machine/megadriv.c svneol=native#text/plain
 src/mame/machine/megasvp.c svneol=native#text/plain
