@@ -4273,6 +4273,7 @@ src/mame/layout/fashion.lay svneol=native#text/plain
 src/mame/layout/fhunter.lay svneol=native#text/plain
 src/mame/layout/finallap.lay svneol=native#text/plain
 src/mame/layout/firebeat.lay svneol=native#text/plain
+src/mame/layout/flicker.lay svneol=native#text/plain
 src/mame/layout/fortecrd.lay svneol=native#text/plain
 src/mame/layout/galaxi.lay -text svneol=native#plain/text
 src/mame/layout/gamball.lay svneol=native#text/plain

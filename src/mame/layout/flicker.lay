@@ -1,0 +1,87 @@
+<!-- flicker.lay -->
+
+<!-- 2012-08-22: Initial version.  [Robbbert] -->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="P0"><text string="Ball"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P2"><text string="Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<view name="Default Layout">
+
+		<!-- Background -->
+		<backdrop element="background">
+			<bounds left="0" top="0" right="674" bottom="194" />
+		</backdrop>
+
+		<!-- LEDs -->
+		<bezel name="digit15" element="digit">
+			<bounds left="10" top="45" right="44" bottom="84" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds left="54" top="45" right="88" bottom="84" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds left="98" top="45" right="132" bottom="84" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds left="142" top="45" right="176" bottom="84" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds left="186" top="45" right="220" bottom="84" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds left="230" top="45" right="264" bottom="84" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="410" top="45" right="444" bottom="84" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="454" top="45" right="488" bottom="84" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="498" top="45" right="532" bottom="84" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="542" top="45" right="576" bottom="84" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="586" top="45" right="620" bottom="84" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="630" top="45" right="664" bottom="84" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="123" top="145" right="157" bottom="184" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="528" top="145" right="562" bottom="184" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="311" top="145" right="345" bottom="184" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="355" top="145" right="389" bottom="184" />
+		</bezel>
+		<bezel element="P0"><bounds left="120" right="160" top="110" bottom="135" /></bezel>
+		<bezel element="P1"><bounds left="320" right="380" top="110" bottom="135" /></bezel>
+		<bezel element="P2"><bounds left="520" right="570" top="110" bottom="135" /></bezel>
+		<bezel element="P3"><bounds left="100" right="200" top="10" bottom="35" /></bezel>
+		<bezel element="P4"><bounds left="500" right="600" top="10" bottom="35" /></bezel>
+	</view>
+</mamelayout>
