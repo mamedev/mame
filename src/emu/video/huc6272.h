@@ -16,7 +16,7 @@ Template for skeleton device
 //**************************************************************************
 
 #define MCFG_HUC6272_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, huc6272, _freq) \
+	MCFG_DEVICE_ADD(_tag, huc6272, _freq)
 
 
 //**************************************************************************
@@ -25,21 +25,34 @@ Template for skeleton device
 
 // ======================> huc6272_device
 
-class huc6272_device :	public device_t
+class huc6272_device :	public device_t,
+						public device_memory_interface
 {
 public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
+
 
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+private:
+	inline UINT32 read_word(offs_t address);
+	inline void write_word(offs_t address, UINT32 data);
+	UINT8 m_register;
+	UINT32 m_kram_addr_r, m_kram_addr_w;
+	UINT16 m_kram_inc_r,m_kram_inc_w;
+	UINT8 m_kram_page_r,m_kram_page_w;
+
+	const address_space_config		m_space_config;
 };
 
 

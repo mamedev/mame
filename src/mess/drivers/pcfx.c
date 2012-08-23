@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )	/* HuC6261 */
 	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff )	/* HuC6270-A */
 	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff )	/* HuC6270-B */
-	AM_RANGE( 0x00000600, 0x000006FF ) AM_DEVREADWRITE16( "huc6272", huc6272_device, read, write, 0xffff )	/* HuC6272 */
+	AM_RANGE( 0x00000600, 0x000006FF ) AM_DEVREADWRITE( "huc6272", huc6272_device, read, write )	/* HuC6272 */
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
 	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )	/* Interrupt controller */
 	AM_RANGE( 0x00000F00, 0x00000FFF ) AM_NOP
