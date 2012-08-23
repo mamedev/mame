@@ -165,7 +165,6 @@ public:
 	void abort_timeslice();
 	void trigger(int trigid, attotime after = attotime::zero);
 	void boost_interleave(attotime timeslice_time, attotime boost_duration);
-//  void make_active() { m_cothread.make_active(); }
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = NULL);
@@ -210,7 +209,6 @@ private:
 	device_execute_interface *	m_executing_device;			// pointer to currently executing device
 	device_execute_interface *	m_execute_list;				// list of devices to be executed
 	attotime					m_basetime;					// global basetime; everything moves forward from here
-//  cothread                    m_cothread;                 // core scheduler thread
 
 	// list of active timers
 	emu_timer *					m_timer_list;				// head of the active list

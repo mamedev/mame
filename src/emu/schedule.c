@@ -343,7 +343,6 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_executing_device(NULL),
 	m_execute_list(NULL),
 	m_basetime(attotime::zero),
-//  m_cothread(co_active()),
 	m_timer_list(NULL),
 	m_timer_allocator(machine.respool()),
 	m_callback_timer(NULL),
