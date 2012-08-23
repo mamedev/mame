@@ -289,15 +289,16 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/huc6260.o		\
 	$(EMUVIDEO)/huc6261.o		\
 	$(EMUVIDEO)/huc6270.o		\
-	$(EMUVIDEO)/i8275.o			\
+	$(EMUVIDEO)/huc6272.o		\
+	$(EMUVIDEO)/i8275.o		\
 	$(EMUVIDEO)/k053250.o		\
 	$(EMUVIDEO)/mc6845.o		\
 	$(EMUVIDEO)/msm6255.o		\
 	$(EMUVIDEO)/pc_cga.o		\
 	$(EMUVIDEO)/cgapal.o		\
 	$(EMUVIDEO)/pc_vga.o		\
-	$(EMUVIDEO)/poly.o			\
-	$(EMUVIDEO)/psx.o			\
+	$(EMUVIDEO)/poly.o		\
+	$(EMUVIDEO)/psx.o		\
 	$(EMUVIDEO)/ramdac.o		\
 	$(EMUVIDEO)/resnet.o		\
 	$(EMUVIDEO)/rgbutil.o		\
