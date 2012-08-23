@@ -49,6 +49,7 @@ private:
 	INT8 *		m_samples;
 	bool		m_output_active;
 	int			m_count;
+	int			m_shift;
 	UINT32		m_cur_sample;
 	UINT8		m_cmd[5];
 };

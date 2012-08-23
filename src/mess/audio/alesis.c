@@ -6,8 +6,6 @@
     - volume
     - panning
     - output 2
-    - fix 16-bit output to DAC (currently samples are only shifted by 8)
-    - remove noise during patterns recording
 
 ****************************************************************************/
 
@@ -70,6 +68,7 @@ void alesis_dm3ag_device::device_reset()
 	m_output_active = false;
 	m_count = 0;
 	m_cur_sample = 0;
+	m_shift = 0;
 	memset(m_cmd, 0, sizeof(m_cmd));
 }
 
@@ -82,10 +81,20 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 	{
 		INT16 sample = m_samples[m_cur_sample++];
 
-		// FIXME
-		sample <<= 8;
+		if (sample == -128 && m_shift)
+		{
+			/*
+                The HR-16 seems to use a simple scheme to generate 16-bit samples from its 8-bit sample ROMs.
+                When the sound starts the 8-bit sample is sent to the most significant bits of the DAC and every
+                time a -1 sample is found the data is shifted one position to right.
+            */
+			sample = m_samples[m_cur_sample++];
+			m_shift--;
 
-		m_dac->write_signed16(sample + 0x8000);
+			if (LOG)	logerror("DM3AG '%s' shift: %02x\n", tag(), m_shift);
+		}
+
+		m_dac->write_signed16((sample << m_shift) + 0x8000);
 
 		// every block ends with three or more -1 samples
 		if (m_cur_sample == 0xfffff || (m_samples[m_cur_sample-1] == -128 && m_samples[m_cur_sample] == -128 && m_samples[m_cur_sample+1] == -128))
@@ -122,6 +131,7 @@ WRITE8_MEMBER(alesis_dm3ag_device::write)
 		if (m_cur_sample > 0)
 		{
 			m_output_active = true;
+			m_shift = 8;
 
 			if (LOG)
 			{
