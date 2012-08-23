@@ -3,6 +3,7 @@
   Tomasz Slanina - analog[at]op.pl
 
  Change Log
+ - 23/08/2012 - Implemented remaining BSU opcodes (Angelo Salese)
  - 21/08/2012 - Fixed SET.F behaviour (Angelo Salese)
  - 20/08/2012 - Fixed a sign bug with CVT.WS opcode (Angelo Salese)
  - 16/08/2012 - Added XB, XH, MPYHW, MOVBSU, ORBSU and ANDNBSU opcodes
@@ -17,7 +18,7 @@
     - CY flag in few floating point opcodes
         (all floating point opcodes are NOT tested!)
   - traps/interrupts/exceptions
-  - bitstring opcodes
+  - bitstring opcodes currently makes the emulation to drop to 0%
   - timing
   - missing opcodes : trap, caxi
 
@@ -1091,6 +1092,22 @@ static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 
 				W_W(cpustate,dst,tmp);
 				break;
+			case 0x9: // ANDBSU
+				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
+				dsttmp = R_W(cpustate,dst);
+
+				tmp = dsttmp & (~(srctmp << dstbit));
+
+				W_W(cpustate,dst,tmp);
+				break;
+			case 0xa: // XORBSU
+				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
+				dsttmp = R_W(cpustate,dst);
+
+				tmp = dsttmp ^ (srctmp << dstbit);
+
+				W_W(cpustate,dst,tmp);
+				break;
 			case 0xb: // MOVBSU
 				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
 				dsttmp = (R_W(cpustate,dst) & ~(1 << dstbit));
@@ -1099,11 +1116,35 @@ static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 
 				W_W(cpustate,dst,tmp);
 				break;
+			case 0xc: // ORNBSU
+				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
+				dsttmp = R_W(cpustate,dst);
+
+				tmp = dsttmp | (srctmp << dstbit);
+
+				W_W(cpustate,dst,tmp);
+				break;
 			case 0xd: // ANDNBSU
 				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
 				dsttmp = R_W(cpustate,dst);
 
 				tmp = dsttmp & (~(srctmp << dstbit));
+
+				W_W(cpustate,dst,tmp);
+				break;
+			case 0xe: // XORNBSU
+				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
+				dsttmp = R_W(cpustate,dst);
+
+				tmp = dsttmp ^ (srctmp << dstbit);
+
+				W_W(cpustate,dst,tmp);
+				break;
+			case 0xf: // NOTBSU
+				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
+				dsttmp = (R_W(cpustate,dst) & ~(1 << dstbit));
+
+				tmp = (srctmp << dstbit) | dsttmp;
 
 				W_W(cpustate,dst,tmp);
 				break;
@@ -1261,7 +1302,7 @@ static CPU_EXECUTE( v810 )
 
 	if (cpustate->irq_state != CLEAR_LINE) {
 		if (!(GET_NP | GET_EP | GET_ID)) {
-			if (cpustate->irq_line >=((cpustate->PSW & 0xF0000) >> 16)) {
+			if (cpustate->irq_line >((cpustate->PSW & 0xF0000) >> 16)) {
 				take_interrupt(cpustate);
 			}
 		}

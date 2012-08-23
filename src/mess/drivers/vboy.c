@@ -11,18 +11,22 @@
 	- 100us / 20us timers
 	- sound
     - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
-	- 3dtetris: missing gameplay (writes to framebuffer?)
+	- 3dtetris: missing gfxs on gameplay (writes to framebuffer)
     - boundh: game is way too fast
     - galactic: ball goes out of bounds sometimes?
-	- golf: black screen on attract mode/gameplay
+	- golf: missing gfxs on gameplay (writes to framebuffer)
     - marioten: title screen logo is misplaced if Mario completes his animation
-    - nesterfb: ball stops when thrown
+    - nesterfb: once that you hit the pins, animation phase takes a while to start
     - redalarm: gameplay doesn't work
     - spaceinv: Taito logo only if you press the button, framebuffer?
     - spaceinv: missing shots
-	- vlab: doesn't boot (irq issue?)
-    - wariolnd: brightness gets suddently darker during intro, CPU bug?
-	- waterwld: doesn't accept start input at title screen;
+    - telerobo: crashes if you die
+    - telerobo: hangs after winning first match;
+    - telerobo: when you beat your opponent, the winning animation has a gfx bug
+      (HBias negative numbers?)
+   	- vlab: doesn't boot (irq issue?)
+    - wariolnd: brightness gets suddently darker during intro.
+	- waterwld: doesn't accept start input at title screen (regression, it used to work);
 
 ****************************************************************************/
 
@@ -118,7 +122,7 @@ public:
 	int *m_ovr_map;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
-	UINT8 m_display_count;
+	UINT8 m_drawfb;
 	UINT8 m_row_num;
 	attotime m_input_latch_time;
 
@@ -474,6 +478,9 @@ static SCREEN_UPDATE_IND16( vboy_left )
 	bitmap.fill(state->m_vip_regs.BKCOL, cliprect);
 	int cur_spt;
 
+	if(!(state->m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
+		return 0;
+
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
 		if (state->display_world(i, bitmap, false, cur_spt)) break;
@@ -486,6 +493,9 @@ static SCREEN_UPDATE_IND16( vboy_right )
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	bitmap.fill(state->m_vip_regs.BKCOL, cliprect);
 	int cur_spt;
+
+	if(!(state->m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
+		return 0;
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
@@ -660,6 +670,10 @@ READ16_MEMBER( vboy_state::vip_r )
 		---- ---- x--- ---- FCLK
         ---- ---- -x-- ---- SCANRDY (active low)
 		---- ---- --xx xx-- DPBSY (current framebuffer displayed)
+		---- ---- --10 00-- RFB1
+		---- ---- --01 00-- LFB1
+		---- ---- --00 10-- RFB0
+		---- ---- --00 01-- LFB0
 		---- ---- ---- --x- DISP
 */
 		case 0x20:	//DPSTTS
@@ -670,12 +684,13 @@ READ16_MEMBER( vboy_state::vip_r )
 
 			if(m_vip_regs.DPCTRL & 2)
 			{
-				UINT8 DPBSY = machine().rand() & 3;
-
-				if(DPBSY & 2)
-					res |= 0x20;
-				else if(DPBSY & 1)
-					res |= 0x08;
+				if(m_row_num < 224/8)
+				{
+					if(m_displayfb == 0)
+						res |= 0x0c;
+					else
+						res |= 0x30;
+				}
 			}
 
 			res |= 0x40;
@@ -708,14 +723,13 @@ READ16_MEMBER( vboy_state::vip_r )
             ---- ---- ---- --x- XPEN (starts drawing at beginning of game frame)
             ---- ---- ---- ---x XPRST (force drawing process to idle)
             */
-			UINT8 drawfb = ((m_displayfb ^ 1) + 1) << 2;
 			UINT16 res;
 
 			//printf("%d\n",row_num);
 
 			res =  m_vip_regs.XPSTTS & 0x00f3; // empty ^^'
-			if(m_vip_regs.XPCTRL & 2 && m_row_num < 224/8) // screen active
-				res |= drawfb;
+			if(m_vip_regs.XPCTRL & 2 && m_row_num > 224/8) // screen active
+				res |= m_drawfb << 2;
 
 			if(m_row_num < 224/8)
 			{
@@ -1086,6 +1100,8 @@ static MACHINE_RESET(vboy)
 	state->m_vboy_regs.wcr = 0xfc;
 	state->m_vboy_regs.kcr = 0x4c;
 	state->m_vip_regs.DPCTRL = 2; // ssquash relies on this at boot otherwise no frame_start irq is fired
+	state->m_displayfb = 0;
+	state->m_drawfb = 0;
 }
 
 
@@ -1158,27 +1174,33 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 
 		m_frame_count++;
 
-		m_display_count ++;
-		m_display_count &= 3;
-
 		if(m_frame_count > m_vip_regs.FRMCYC)
 		{
 			m_set_irq(0x0008); // GAME_START
 			m_frame_count = 0;
 		}
 
-		if(m_vip_regs.XPCTRL & 2)
+		if(m_vip_regs.DPCTRL & 2)
 			m_displayfb ^= 1;
 	}
 
 	if(scanline == 224)
+	{
+		m_drawfb = 3;
 		m_set_irq(0x4000); // XPEND
+	}
 
 	if(scanline == 232)
+	{
+		m_drawfb &= ~1;
 		m_set_irq(0x0002); // LFBEND
+	}
 
 	if(scanline == 240)
+	{
+		m_drawfb &= ~2;
 		m_set_irq(0x0004); // RFBEND
+	}
 
 	if(scanline == 248)
 	{
