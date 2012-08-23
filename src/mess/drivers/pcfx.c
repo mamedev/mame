@@ -4,10 +4,6 @@
 
   Driver file to handle emulation of the NEC PC-FX.
 
-  - BIOS error codes (guesses):
-    - Blue screen = MCU pad communication error
-    - Cyan screen = SCSI communication error (current one)
-
 ***************************************************************************/
 
 
@@ -22,7 +18,7 @@ struct _pcfx_pad_t
 {
 	UINT8 ctrl[2];
 	UINT8 status[2];
-	UINT16 latch[2];
+	UINT32 latch[2];
 };
 
 class pcfx_state : public driver_device
@@ -233,10 +229,10 @@ WRITE16_MEMBER( pcfx_state::irq_write )
 		// ----------xxx--- Priority level interrupt 14
 		// -------------xxx Priority level interrupt 15
 		case 0x80/4:
-			m_irq_priority[4] = ( data >> 0 ) & 0x07;
-			m_irq_priority[5] = ( data >> 3 ) & 0x07;
-			m_irq_priority[6] = ( data >> 6 ) & 0x07;
-			m_irq_priority[7] = ( data >> 9 ) & 0x07;
+			m_irq_priority[7] = ( data >> 0 ) & 0x07;
+			m_irq_priority[6] = ( data >> 3 ) & 0x07;
+			m_irq_priority[5] = ( data >> 6 ) & 0x07;
+			m_irq_priority[4] = ( data >> 9 ) & 0x07;
 			check_irqs();
 			break;
 
@@ -246,10 +242,10 @@ WRITE16_MEMBER( pcfx_state::irq_write )
 		// ----------xxx--- Priority level interrupt 10
 		// -------------xxx Priority level interrupt 11
 		case 0xC0/4:
-			m_irq_priority[0] = ( data >> 0 ) & 0x07;
-			m_irq_priority[1] = ( data >> 3 ) & 0x07;
-			m_irq_priority[2] = ( data >> 6 ) & 0x07;
-			m_irq_priority[3] = ( data >> 9 ) & 0x07;
+			m_irq_priority[3] = ( data >> 0 ) & 0x07;
+			m_irq_priority[2] = ( data >> 3 ) & 0x07;
+			m_irq_priority[1] = ( data >> 6 ) & 0x07;
+			m_irq_priority[0] = ( data >> 9 ) & 0x07;
 			check_irqs();
 			break;
 	}

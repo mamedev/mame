@@ -285,7 +285,7 @@ WRITE16_MEMBER( huc6261_device::write )
 				// ----x----------- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
 				// -----x---------- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
 				// ------x--------- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
-				// -------x-------- Enable HuC6270 BG: 0 - disabled, 1 - enabled 
+				// -------x-------- Enable HuC6270 BG: 0 - disabled, 1 - enabled
 				// --------x------- Number of SPR colors?: 0 - 16, 1 - 256
 				// ---------x------ Number of BG colors?: 0 - 16, 1 - 256
 				// ------------x--- Dot clock: 0 - 5MHz, 1 - 7MHz
