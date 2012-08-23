@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE16_MEMBER( irq_write );
 	DECLARE_READ16_MEMBER( pad_r );
 	DECLARE_WRITE16_MEMBER( pad_w );
+	DECLARE_READ8_MEMBER( extio_r );
+	DECLARE_WRITE8_MEMBER( extio_w );
+
 	inline void check_irqs();
 	inline void set_irq_line(int line, int state);
 	DECLARE_WRITE_LINE_MEMBER( irq8_w );
@@ -58,15 +61,28 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq13_w );
 	DECLARE_WRITE_LINE_MEMBER( irq14_w );
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
-
 };
 
 
+READ8_MEMBER(pcfx_state::extio_r)
+{
+	address_space *io_space = m_maincpu->memory().space(AS_IO);
+
+	return io_space->read_byte(offset);
+}
+
+WRITE8_MEMBER(pcfx_state::extio_w)
+{
+	address_space *io_space = m_maincpu->memory().space(AS_IO);
+
+	io_space->write_byte(offset, data);
+}
+
 static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM	/* RAM */
-	AM_RANGE( 0x80700000, 0x807FFFFF ) AM_NOP	/* EXTIO */
-	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP
-	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP
+//	AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)	/* EXTIO */
+	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP	/* BackUp RAM */
+	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP	/* Extended BackUp RAM */
 	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP	/* PIO */
 	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")	/* ROM */
 ADDRESS_MAP_END
@@ -141,6 +157,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 	}
 }
 
+
 static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff)	/* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP	/* HuC6230 */
@@ -152,6 +169,7 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
 	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )	/* Interrupt controller */
 	AM_RANGE( 0x00000F00, 0x00000FFF ) AM_NOP
+//	AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
 	AM_RANGE( 0x00780000, 0x007FFFFF ) AM_ROM AM_REGION("scsi_rom", 0 )
 	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP	/* HuC6273 */
 ADDRESS_MAP_END
