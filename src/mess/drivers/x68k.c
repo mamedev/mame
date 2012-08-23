@@ -2531,15 +2531,15 @@ static const floppy_interface x68k_floppy_interface =
 
 static const SCSIConfigTable x68k_scsi_devtable =
 {
-	7,                                      /* 7 SCSI devices */
+	7, /* 7 SCSI devices */
 	{
-		{ SCSI_ID_0, "harddisk0" },
-		{ SCSI_ID_1, "harddisk1" },
-		{ SCSI_ID_2, "harddisk2" },
-		{ SCSI_ID_3, "harddisk3" },
-		{ SCSI_ID_4, "harddisk4" },
-		{ SCSI_ID_5, "harddisk5" },
-		{ SCSI_ID_6, "harddisk6" },
+		{ "harddisk0" },
+		{ "harddisk1" },
+		{ "harddisk2" },
+		{ "harddisk3" },
+		{ "harddisk4" },
+		{ "harddisk5" },
+		{ "harddisk6" },
 	}
 };
 
@@ -2834,13 +2834,13 @@ static MACHINE_CONFIG_START( x68ksupr, x68k_state )
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
 	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk3", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk4", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk5", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk6", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("harddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("harddisk6", SCSIHD, SCSI_ID_6)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( x68kxvi, x68k_state )
@@ -2854,13 +2854,13 @@ static MACHINE_CONFIG_START( x68kxvi, x68k_state )
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
 	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk3", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk4", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk5", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk6", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("harddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("harddisk6", SCSIHD, SCSI_ID_6)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( x68030, x68k_state )
@@ -2875,13 +2875,13 @@ static MACHINE_CONFIG_START( x68030, x68k_state )
 	MCFG_NVRAM_ADD_0FILL("nvram32")
 
 	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk3", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk4", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk5", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk6", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("harddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("harddisk6", SCSIHD, SCSI_ID_6)
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )

@@ -991,9 +991,9 @@ static const floppy_interface v1050_floppy_interface =
 
 static const SCSIConfigTable sasi_dev_table =
 {
-	1,
+	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, "harddisk0" }
+		{ "harddisk0" }
 	}
 };
 
@@ -1123,7 +1123,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
     MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
 	MCFG_TIMER_ADD(TIMER_ACK_TAG, sasi_ack_tick)
 	MCFG_TIMER_ADD(TIMER_RST_TAG, sasi_rst_tick)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
 
 	// keyboard
 	MCFG_V1050_KEYBOARD_ADD()

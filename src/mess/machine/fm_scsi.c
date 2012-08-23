@@ -78,7 +78,8 @@ void fmscsi_device::device_start()
     // initialise SCSI devices, if any present
     for(x=0;x<scsidevs->devs_present;x++)
     {
-		m_SCSIdevices[scsidevs->devices[x].scsiID] = machine().device<scsidev_device>( scsidevs->devices[x].tag );
+		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[x].tag );
+		m_SCSIdevices[device->GetDeviceID()] = device;
     }
 
     // allocate read timer

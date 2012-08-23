@@ -145,9 +145,9 @@ ADDRESS_MAP_END
 
 static const SCSIConfigTable sasi_dev_table =
 {
-	1,
+	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, "harddisk0" }
+		{ "harddisk0" }
 	}
 };
 
@@ -473,7 +473,7 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_4MHz/4, via_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
 MACHINE_CONFIG_END
 
 

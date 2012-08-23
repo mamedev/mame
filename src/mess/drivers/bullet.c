@@ -1026,9 +1026,9 @@ static const wd17xx_interface bulletf_fdc_intf =
 
 static const SCSIConfigTable scsi_dev_table =
 {
-	1,
+	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, "harddisk0" }
+		{ "harddisk0" }
 	}
 };
 
@@ -1215,7 +1215,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
     MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")

@@ -222,7 +222,8 @@ void am53cf96_init( running_machine &machine, const struct AM53CF96interface *in
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		devices[interface->scsidevs->devices[i].scsiID] = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
+		scsidev_device *device = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
+		devices[device->GetDeviceID()] = device;
 	}
 
 	state_save_register_global_array(machine, scsi_regs);

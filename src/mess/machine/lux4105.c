@@ -32,9 +32,9 @@ const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
 
 static const SCSIConfigTable sasi_dev_table =
 {
-	1,
+	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, "harddisk0" }
+		{ "harddisk0" }
 	}
 };
 

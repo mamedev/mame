@@ -154,8 +154,8 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_3)
 
 	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL, false )	/* FIXME */
 

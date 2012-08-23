@@ -852,7 +852,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_4, "cdrom0" } /* SCSI ID 4, CD-ROM */
+		{ "cdrom0" }
 	}
 };
 
@@ -914,7 +914,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_MACHINE_RESET( twinkle )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)
 
-	MCFG_DEVICE_ADD("cdrom0", SCSICD, 0)
+	MCFG_SCSIDEV_ADD("cdrom0", SCSICD, SCSI_ID_4)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)

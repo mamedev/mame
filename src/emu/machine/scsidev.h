@@ -23,6 +23,10 @@ public:
 	virtual void ReadData( UINT8 *data, int dataLength );
 	virtual void SetPhase( int phase );
 	virtual void GetPhase( int *phase );
+	virtual int GetDeviceID();
+
+	// configuration helpers
+	static void static_set_deviceid(device_t &device, int _scsiID);
 
 protected:
 	// device-level overrides
@@ -32,6 +36,7 @@ private:
 	UINT8 command[16];
 	int commandLength;
 	int phase;
+	int scsiID;
 };
 
 extern int SCSILengthFromUINT8( UINT8 *length );
@@ -43,5 +48,22 @@ extern int SCSILengthFromUINT16( UINT8 *length );
 #define SCSI_PHASE_STATUS ( 3 )
 #define SCSI_PHASE_MESSAGE_OUT ( 6 )
 #define SCSI_PHASE_MESSAGE_IN ( 7 )
+
+// SCSI IDs
+enum
+{
+	SCSI_ID_0 = 0,
+	SCSI_ID_1,
+	SCSI_ID_2,
+	SCSI_ID_3,
+	SCSI_ID_4,
+	SCSI_ID_5,
+	SCSI_ID_6,
+	SCSI_ID_7
+};
+
+#define MCFG_SCSIDEV_ADD(_tag, _type, _id) \
+	MCFG_DEVICE_ADD(_tag, _type, 0) \
+	scsidev_device::static_set_deviceid(*device, _id);
 
 #endif

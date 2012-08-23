@@ -1497,10 +1497,10 @@ static void scsi_irq(running_machine &machine, int state)
 
 static const SCSIConfigTable dev_table =
 {
-	2,                                      /* 1 SCSI device */
+	2, /* 2 SCSI devices */
 	{
-		{ SCSI_ID_1, "harddisk1" },
-		{ SCSI_ID_4, "cdrom" }  /* SCSI ID 4, using CD 0, and it's a CD-ROM */
+		{ "harddisk1" },
+		{ "cdrom" }
 	}
 };
 
@@ -1691,8 +1691,8 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )

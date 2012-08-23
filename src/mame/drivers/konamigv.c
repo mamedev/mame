@@ -296,7 +296,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_4, ":cdrom", } /* SCSI ID 4, CD-ROM */
+		{ ":cdrom", }
 	}
 };
 
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
+	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_4)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL_53_693175MHz )

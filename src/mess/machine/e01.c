@@ -264,9 +264,9 @@ static const wd17xx_interface fdc_intf =
 
 static const SCSIConfigTable scsi_dev_table =
 {
-	1,
+	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, "harddisk0" }
+		{ "harddisk0" }
 	}
 };
 
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

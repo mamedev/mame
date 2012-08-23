@@ -2293,8 +2293,10 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 
 static const SCSIConfigTable dev_table =
 {
-	1,                                      /* 1 SCSI device */
-	{ { SCSI_ID_1, ":cdrom" } } /* SCSI ID 2, CD-ROM */
+	1, /* 1 SCSI device */
+	{
+		{ ":cdrom" }
+	}
 };
 
 static const struct WD33C93interface scsi_intf =
@@ -2542,7 +2544,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 	MCFG_CPU_CONFIG(sh2_conf_cps3)
 
-	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
+	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

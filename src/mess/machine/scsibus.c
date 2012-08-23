@@ -948,7 +948,8 @@ void init_scsibus(device_t *device, int sectorbytes)
     for (devno = 0; devno < scsidevs->devs_present; devno++)
     {
         LOG(1,"SCSIBUS:init devno=%d \n",devno);
-        bus->devices[scsidevs->devices[devno].scsiID] = device->machine().device<scsidev_device>( scsidevs->devices[devno].tag );
+		scsidev_device *scsidev = device->machine().device<scsidev_device>( scsidevs->devices[devno].tag );
+		bus->devices[scsidev->GetDeviceID()] = scsidev;
     }
 
 	bus->sectorbytes = sectorbytes;

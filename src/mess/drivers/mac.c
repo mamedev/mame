@@ -816,10 +816,10 @@ static const applefdc_interface mac_iwm_interface =
 
 static const SCSIConfigTable dev_table =
 {
-	2,                                      /* 2 SCSI devices */
+	2, /* 2 SCSI devices */
 	{
-	 { SCSI_ID_6, "harddisk1" },  /* SCSI ID 6, using harddisk1 */
-	 { SCSI_ID_5, "harddisk2" }   /* SCSI ID 5, using harddisk2 */
+		{ "harddisk1" },
+		{ "harddisk2" }
 	}
 };
 
@@ -941,8 +941,8 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
@@ -1006,8 +1006,8 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1054,8 +1054,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1105,8 +1105,8 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1304,8 +1304,8 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1355,8 +1355,8 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1426,8 +1426,8 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1597,8 +1597,8 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1649,8 +1649,8 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	MCFG_NCR539X_ADD(MAC_539X_1_TAG, C7M, mac_539x_intf)
 
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

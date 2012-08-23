@@ -306,7 +306,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, ":disk" } /* SCSI ID 0, HDD */
+		{ ":disk" }
 	}
 };
 
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
 
-	MCFG_DEVICE_ADD("disk", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("disk", SCSIHD, SCSI_ID_0)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )

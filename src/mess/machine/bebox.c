@@ -994,8 +994,8 @@ static const SCSIConfigTable dev_table =
 {
 	2, /* 2 SCSI devices */
 	{
-		{ SCSI_ID_0, "harddisk1" },	/* SCSI ID 0, using HD 0, HD */
-		{ SCSI_ID_3, "cdrom" }	/* SCSI ID 3, using CHD 0, CD-ROM */
+		{ "harddisk1" },
+		{ "cdrom" }
 	}
 };
 

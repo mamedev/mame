@@ -21,13 +21,13 @@ static const SCSIConfigTable x68k_scsiext_devtable =
 {
 	7,                                      /* 7 SCSI devices */
 	{
-		{ SCSI_ID_0, ":exp:cz6bs1:extharddisk0" },
-		{ SCSI_ID_1, ":exp:cz6bs1:extharddisk1" },
-		{ SCSI_ID_2, ":exp:cz6bs1:extharddisk2" },
-		{ SCSI_ID_3, ":exp:cz6bs1:extharddisk3" },
-		{ SCSI_ID_4, ":exp:cz6bs1:extharddisk4" },
-		{ SCSI_ID_5, ":exp:cz6bs1:extharddisk5" },
-		{ SCSI_ID_6, ":exp:cz6bs1:extharddisk6" },
+		{ ":exp:cz6bs1:extharddisk0" },
+		{ ":exp:cz6bs1:extharddisk1" },
+		{ ":exp:cz6bs1:extharddisk2" },
+		{ ":exp:cz6bs1:extharddisk3" },
+		{ ":exp:cz6bs1:extharddisk4" },
+		{ ":exp:cz6bs1:extharddisk5" },
+		{ ":exp:cz6bs1:extharddisk6" },
 	}
 };
 
@@ -55,13 +55,13 @@ const rom_entry *x68k_scsiext_device::device_rom_region() const
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( x68k_scsiext )
 	MCFG_MB89352A_ADD("mb89352_ext",x68k_scsiext_intf)
-	MCFG_DEVICE_ADD("extharddisk0", SCSIHD, 0)
-	MCFG_DEVICE_ADD("extharddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("extharddisk2", SCSIHD, 0)
-	MCFG_DEVICE_ADD("extharddisk3", SCSIHD, 0)
-	MCFG_DEVICE_ADD("extharddisk4", SCSIHD, 0)
-	MCFG_DEVICE_ADD("extharddisk5", SCSIHD, 0)
-	MCFG_DEVICE_ADD("extharddisk6", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("extharddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("extharddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("extharddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("extharddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("extharddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("extharddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("extharddisk6", SCSIHD, SCSI_ID_6)
 MACHINE_CONFIG_END
 
 machine_config_constructor x68k_scsiext_device::device_mconfig_additions() const

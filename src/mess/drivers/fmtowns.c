@@ -2627,13 +2627,13 @@ static const rf5c68_interface rf5c68_intf =
 
 static const SCSIConfigTable towns_scsi_devtable =
 {
-	5,                                      /* 5 SCSI devices */
+	5, /* 5 SCSI devices */
 	{
-		{ SCSI_ID_0, "harddisk0" },
-		{ SCSI_ID_1, "harddisk1" },
-		{ SCSI_ID_2, "harddisk2" },
-		{ SCSI_ID_3, "harddisk3" },
-		{ SCSI_ID_4, "harddisk4" },
+		{ "harddisk0" },
+		{ "harddisk1" },
+		{ "harddisk2" },
+		{ "harddisk3" },
+		{ "harddisk4" },
 	}
 };
 
@@ -2721,11 +2721,11 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk1", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk2", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk3", SCSIHD, 0)
-	MCFG_DEVICE_ADD("harddisk4", SCSIHD, 0)
+	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
 	MCFG_FMSCSI_ADD("scsi",towns_scsi_config)
 
 	MCFG_UPD71071_ADD("dma_1",towns_dma_config)

@@ -160,8 +160,8 @@ void ncr539x_device::device_start()
 	// try to open the devices
 	for (i = 0; i < scsidevs->devs_present; i++)
 	{
-		m_scsi_devices[scsidevs->devices[i].scsiID] = machine().device<scsidev_device>( scsidevs->devices[i].tag );
-		assert( m_scsi_devices[scsidevs->devices[i].scsiID] != NULL );
+		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		m_scsi_devices[device->GetDeviceID()] = device;
 	}
 
 	m_operation_timer = timer_alloc(0, NULL);
@@ -232,11 +232,8 @@ void ncr539x_device::scan_devices()
 	// try to open the devices
 	for (i = 0; i < scsidevs->devs_present; i++)
 	{
-		// if a device wasn't already allocated
-		if (!m_scsi_devices[scsidevs->devices[i].scsiID])
-		{
-			m_scsi_devices[scsidevs->devices[i].scsiID] = machine().device<scsidev_device>( scsidevs->devices[i].tag );
-		}
+		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		m_scsi_devices[device->GetDeviceID()] = device;
 	}
 }
 

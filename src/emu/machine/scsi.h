@@ -10,7 +10,6 @@
 
 typedef struct scsiconfigitem
 {
-	int scsiID;
 	const char *tag;
 } SCSIConfigItem;
 
@@ -21,18 +20,5 @@ typedef struct scsiconfigtable
 	int devs_present;
 	const SCSIConfigItem devices[SCSI_MAX_DEVICES];
 } SCSIConfigTable;
-
-// SCSI IDs
-enum
-{
-	SCSI_ID_0 = 0,
-	SCSI_ID_1,
-	SCSI_ID_2,
-	SCSI_ID_3,
-	SCSI_ID_4,
-	SCSI_ID_5,
-	SCSI_ID_6,
-	SCSI_ID_7
-};
 
 #endif

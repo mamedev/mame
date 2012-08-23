@@ -708,7 +708,8 @@ void lsi53c810_init(running_machine &machine, const struct LSI53C810interface *i
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		devices[interface->scsidevs->devices[i].scsiID] = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
+		scsidev_device *device = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
+		devices[device->GetDeviceID()] = device;
 	}
 }
 

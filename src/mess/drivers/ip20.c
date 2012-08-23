@@ -483,8 +483,10 @@ static void scsi_irq(running_machine &machine, int state)
 
 static const SCSIConfigTable dev_table =
 {
-        1,                                      /* 1 SCSI device */
-        { { SCSI_ID_6, "cdrom" } } /* SCSI ID 6, CD-ROM */
+	1, /* 1 SCSI device */
+	{
+		{ "cdrom" }
+	}
 };
 
 static const struct WD33C93interface scsi_intf =
@@ -613,7 +615,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
-	MCFG_DEVICE_ADD("cdrom", SCSICD, 0)
+	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_6)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END

@@ -127,7 +127,8 @@ void ncr5380_device::device_start()
 	// try to open the devices
 	for (i = 0; i < scsidevs->devs_present; i++)
 	{
-		m_scsi_devices[scsidevs->devices[i].scsiID] = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		m_scsi_devices[device->GetDeviceID()] = device;
 	}
 }
 
