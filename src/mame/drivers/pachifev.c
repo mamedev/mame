@@ -143,8 +143,8 @@ static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8, pachifev_state )
     AM_RANGE(0xff08, 0xff08) AM_READ_PORT("DSW3")
     AM_RANGE(0xff10, 0xff10) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
     AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-    AM_RANGE(0xff20, 0xff20) AM_DEVWRITE_LEGACY("sn76_1", sn76496_w)
-    AM_RANGE(0xff30, 0xff30) AM_DEVWRITE_LEGACY("sn76_2", sn76496_w)
+    AM_RANGE(0xff20, 0xff20) AM_DEVWRITE("y2404_1", y2404_new_device, write)
+    AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("y2404_2", y2404_new_device, write)
     AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
     AM_RANGE(0xff50, 0xff50) AM_WRITENOP /* unknown */
     AM_RANGE(0xfffa, 0xfffb) AM_NOP /* decrementer */
@@ -244,6 +244,23 @@ static INPUT_PORTS_START( pachifev )
     PORT_START("PLUNGER_P2")
     PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(4) PORT_CENTERDELTA(0xff) PORT_COCKTAIL
 INPUT_PORTS_END
+
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
 
 
 #if USE_MSM
@@ -378,10 +395,12 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
     MCFG_SOUND_CONFIG(msm5205_config)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
-    MCFG_SOUND_ADD("sn76_1", Y2404, XTAL_10_738635MHz/3) /* guess */
+    MCFG_SOUND_ADD("y2404_1", Y2404_NEW, XTAL_10_738635MHz/3) /* guess */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-    MCFG_SOUND_ADD("sn76_2", Y2404, XTAL_10_738635MHz/3) /* guess */
+	MCFG_SOUND_CONFIG(psg_intf)
+    MCFG_SOUND_ADD("y2404_2", Y2404_NEW, XTAL_10_738635MHz/3) /* guess */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 ROM_START( pachifev )

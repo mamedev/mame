@@ -46,8 +46,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mrdo_state )
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
-	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("u8106_1", u8106_new_device, write)
+	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE("u8106_2", u8106_new_device, write)
 	AM_RANGE(0x9803, 0x9803) AM_READ(mrdo_SECRE_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
@@ -164,6 +164,22 @@ static GFXDECODE_START( mrdo )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_START( mrdo, mrdo_state )
 
@@ -186,11 +202,13 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", U8106, MAIN_CLOCK/2)	/* sn76489-equivalent?, Verified */
+	MCFG_SOUND_ADD("u8106_1", U8106_NEW, MAIN_CLOCK/2)	/* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", U8106, MAIN_CLOCK/2)	/* sn76489-equivalent?, Verified */
+	MCFG_SOUND_ADD("u8106_2", U8106_NEW, MAIN_CLOCK/2)	/* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 
