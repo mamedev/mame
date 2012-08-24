@@ -268,7 +268,7 @@ ROM_START( c1541 )
     ROM_SYSTEM_BIOS( 9, "tt34", "TurboTrans v3.4" )
     ROMX_LOAD( "ttd34.uab5", 0x0000, 0x8000, CRC(518d34a1) SHA1(4d6ffdce6ab122e9627b0a839861687bcd4e03ec), ROM_BIOS(10) )
     ROM_SYSTEM_BIOS( 10, "digidos", "DigiDOS" )
-    ROMX_LOAD( "digidos.uab5", 0x0000, 0x8000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(11) )
+    ROMX_LOAD( "digidos.uab5", 0x0000, 0x2000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(11) )
 ROM_END
 
 
