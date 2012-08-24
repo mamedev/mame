@@ -81,11 +81,8 @@ class vboy_state : public driver_device
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_l_frame_0(*this,"l_frame_0"),
-		  m_l_frame_1(*this,"l_frame_1"),
-		  m_r_frame_0(*this,"r_frame_0"),
-		  m_r_frame_1(*this,"r_frame_1") { }
+		  m_maincpu(*this, "maincpu")
+		  { }
 
 	required_device<cpu_device> m_maincpu;
 
@@ -103,12 +100,20 @@ public:
 	DECLARE_READ16_MEMBER(vboy_font3_r);
 	DECLARE_WRITE16_MEMBER(vboy_bgmap_w);
 	DECLARE_READ16_MEMBER(vboy_bgmap_r);
+	DECLARE_READ8_MEMBER(vboy_lfb0_r);
+	DECLARE_READ8_MEMBER(vboy_lfb1_r);
+	DECLARE_READ8_MEMBER(vboy_rfb0_r);
+	DECLARE_READ8_MEMBER(vboy_rfb1_r);
+	DECLARE_WRITE8_MEMBER(vboy_lfb0_w);
+	DECLARE_WRITE8_MEMBER(vboy_lfb1_w);
+	DECLARE_WRITE8_MEMBER(vboy_rfb0_w);
+	DECLARE_WRITE8_MEMBER(vboy_rfb1_w);
 	UINT16 *m_font;
 	UINT16 *m_bgmap;
-	required_shared_ptr<UINT32> m_l_frame_0;
-	required_shared_ptr<UINT32> m_l_frame_1;
-	required_shared_ptr<UINT32> m_r_frame_0;
-	required_shared_ptr<UINT32> m_r_frame_1;
+	UINT8 *m_l_frame_0;
+	UINT8 *m_l_frame_1;
+	UINT8 *m_r_frame_0;
+	UINT8 *m_r_frame_1;
 	UINT16 *m_world;
 	UINT16 *m_columntab1;
 	UINT16 *m_columntab2;
@@ -123,7 +128,6 @@ public:
 	UINT8 m_drawfb;
 	UINT8 m_row_num;
 	attotime m_input_latch_time;
-
 	void m_timer_tick(UINT8 setting);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
 	void m_set_irq(UINT16 irq_vector);
@@ -151,6 +155,12 @@ static VIDEO_START( vboy )
 	// Allocate memory for temporary screens
 	state->m_bg_map = auto_alloc_array_clear(machine, int, 0x1000*0x1000);
 	state->m_ovr_map = auto_alloc_array_clear(machine, int, 8*8);
+
+	// Allocate memory for framebuffers
+	state->m_l_frame_0 = auto_alloc_array_clear(machine, UINT8, 0x6000);
+	state->m_l_frame_1 = auto_alloc_array_clear(machine, UINT8, 0x6000);
+	state->m_r_frame_0 = auto_alloc_array_clear(machine, UINT8, 0x6000);
+	state->m_r_frame_1 = auto_alloc_array_clear(machine, UINT8, 0x6000);
 
 	state->m_font  = auto_alloc_array_clear(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
@@ -484,6 +494,27 @@ static SCREEN_UPDATE_IND16( vboy_left )
 	for(int i=31; i>=0; i--)
 		if (state->display_world(i, bitmap, false, cur_spt)) break;
 
+	if(0)
+	{
+		int x,y;
+
+		for(y=0;y<224;y++)
+		{
+			for(x=0;x<384;x++)
+			{
+				UINT8 pen;
+				UINT8 pix;
+				int yi;
+
+				pen = state->m_l_frame_1[(x*0x40)+(y >> 2)];
+				yi = ((y & 0x3)*2);
+				pix = (pen >> yi) & 3;
+
+				bitmap.pix16(y, x) = screen.machine().pens[pix & 3];
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -798,8 +829,6 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					logerror("Error writing INTPND\n");
 					break;
 		case 0x02:	//INTENB
-					if(data & 0x2000)
-						printf("SBHIT active\n");
 					m_vip_regs.INTENB = data;
 					m_set_irq(0);
 					//printf("%04x ENB\n",data);
@@ -1002,15 +1031,25 @@ READ16_MEMBER( vboy_state::vboy_bgmap_r )
 	return m_bgmap[offset];
 }
 
+READ8_MEMBER( vboy_state::vboy_lfb0_r ) { return m_l_frame_0[offset]; }
+READ8_MEMBER( vboy_state::vboy_lfb1_r ) { return m_l_frame_1[offset]; }
+READ8_MEMBER( vboy_state::vboy_rfb0_r ) { return m_r_frame_0[offset]; }
+READ8_MEMBER( vboy_state::vboy_rfb1_r ) { return m_r_frame_1[offset]; }
+WRITE8_MEMBER( vboy_state::vboy_lfb0_w ) { m_l_frame_0[offset] = data; }
+WRITE8_MEMBER( vboy_state::vboy_lfb1_w ) { m_l_frame_1[offset] = data; }
+WRITE8_MEMBER( vboy_state::vboy_rfb0_w ) { m_r_frame_0[offset] = data; }
+WRITE8_MEMBER( vboy_state::vboy_rfb1_w ) { m_r_frame_1[offset] = data; }
+
+
 static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
-	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_SHARE("l_frame_0") // L frame buffer 0
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_READWRITE8(vboy_lfb0_r,vboy_lfb0_w,0xffffffff) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
-	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_SHARE("l_frame_1") // L frame buffer 1
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_READWRITE8(vboy_lfb1_r,vboy_lfb1_w,0xffffffff) // L frame buffer 1
 	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
-	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_SHARE("r_frame_0") // R frame buffer 0
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_READWRITE8(vboy_rfb0_r,vboy_rfb0_w,0xffffffff)  // R frame buffer 0
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
-	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_SHARE("r_frame_1") // R frame buffer 1
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_READWRITE8(vboy_rfb1_r,vboy_rfb1_w,0xffffffff)  // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
@@ -1201,9 +1240,9 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 		m_set_irq(0x0004); // RFBEND
 	}
 
-	if(scanline == 248)
+	if(m_row_num == ((m_vip_regs.XPCTRL & 0x1f00) >> 8))
 	{
-		//m_set_irq(0x2000); // SBHIT
+		m_set_irq(0x2000); // SBHIT
 	}
 
 }
