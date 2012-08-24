@@ -440,33 +440,6 @@ DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 
 /****************************************** SegaCD & 32X emulation ****************************************/
 
-/* Very preliminary skeleton code from David Haywood, borrowed for MESS by Fabio Priuli */
-/* These are only included to document BIOS informations currently available */
-
-DRIVER_INIT_MEMBER(md_cons_state,mess_32x)
-{
-	DRIVER_INIT_CALL(_32x);
-	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 1;
-	megadrive_region_pal = 0;
-}
-
-DRIVER_INIT_MEMBER(md_cons_state,mess_32x_eur)
-{
-	DRIVER_INIT_CALL(_32x);
-	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 1;
-	megadrive_region_pal = 1;
-}
-
-
-DRIVER_INIT_MEMBER(md_cons_state,mess_32x_jpn)
-{
-	DRIVER_INIT_CALL(_32x);
-	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 0;
-	megadrive_region_pal = 0;
-}
 
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
 	MCFG_FRAGMENT_ADD( _32x_cartslot )
@@ -896,9 +869,9 @@ CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md, md_cons_state,  
 CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
-CONS( 1994, 32x,        0,         0,      ms_32x,          md, md_cons_state, mess_32x,      "Sega",   "32X (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, md_cons_state, mess_32x_eur,  "Sega",   "32X (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32xj,       32x,       0,      ms_32x,          md, md_cons_state, mess_32x_jpn,  "Sega",   "32X (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32x,        0,         0,      ms_32x,          md, md_cons_state, genesis,      "Sega",   "Genesis with 32X (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, md_cons_state, md_eur,		 "Sega",   "Mega Drive with 32X (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1994, 32xj,       32x,       0,      ms_32x,          md, md_cons_state, md_jpn,		 "Sega",   "Mega Drive with 32X (Japan, NTSC)", GAME_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
 CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
@@ -915,7 +888,7 @@ CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md, md_cons_state,  
 CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,	   mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,	   genesis,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
 
 // this is a standalone system based on the md-like hardware (same vdp etc.)
 

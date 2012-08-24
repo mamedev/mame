@@ -371,12 +371,9 @@ public:
 
 	DECLARE_DRIVER_INIT(genesis);
 	DECLARE_DRIVER_INIT(mess_md_common);
-	DECLARE_DRIVER_INIT(_32x);
 	DECLARE_DRIVER_INIT(md_eur);
 	DECLARE_DRIVER_INIT(md_jpn);
-	DECLARE_DRIVER_INIT(mess_32x);
-	DECLARE_DRIVER_INIT(mess_32x_eur);
-	DECLARE_DRIVER_INIT(mess_32x_jpn);
+
 };
 
 class pico_state : public md_cons_state
