@@ -304,18 +304,6 @@ public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag) { }
 
-	UINT8 m_m50458_rom_bank;
-	UINT8 m_vblank_bit;
-	DECLARE_READ8_MEMBER(nss_eeprom_r);
-	DECLARE_WRITE8_MEMBER(nss_eeprom_w);
-	DECLARE_READ8_MEMBER(m50458_r);
-	DECLARE_WRITE8_MEMBER(m50458_w);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port02_r);
-	DECLARE_READ8_MEMBER(port03_r);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(port82_w);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 };
@@ -374,152 +362,119 @@ bp 6dce onward looks bogus, but it's probably the way it's intended to be
 M50458 charset is checked at 1382, a word checksum is provided at offsets 0xffe-0xfff of the given ROM
 
 */
+/*
+Nocash info: http://nocash.emubase.de/fullsnes.htm
+map
+0x0000 - 0x7fff BIOS
+0x8000 - 0x8fff RAM
+0x9000 - 0x9fff RAM with write protection
+0xa000          EEPROM Read
+  7   EEPROM Data In (0=Low=Zero, 1=High=One)
+  6   EEPROM Ready   (0=Low=Busy, 1=High=Ready)
+  5-0 Unknown/unused
+0xc000 - 0xdfff instruction ROM
+0xe000          EEPROM Write
+  7   Unknown/set     (should be always 1)
+  6-5 Unknown/unused  (should be always 0)
+  4   EEPROM Clock    (0=Low=Clock, 1=High=Idle) ;(Data In/Out must be stable
+  3   EEPROM Data Out (0=Low=Zero, 1=High=One)   ;on raising CLK edge)
+  2-1 Unknown/unused  (should be always 0)       ;(and updated on falling edge)
+  0   EEPROM Select   (0=High=No, 1=Low=Select)
+0xe000 - 0xffff PROM Input & Output & Program Code (protection RP5H01, used also in earlier Nintendo systems)
+Data Write:
+  7-5  Unknown/unused
+  4    PROM Test Mode (0=Low=6bit Address, 1=High=7bit Address)
+  3    PROM Clock     (0=Low, 1=High) ;increment address on 1-to-0 transition
+  2-1  Unknown/unused
+  0    PROM Address Reset (0=High=Reset to zero, 1=Low=No Change)
 
-READ8_MEMBER(nss_state::nss_eeprom_r)
-{
-	return 0x40; // eeprom read bit
-}
+Data Read and Opcode Fetch:
 
-WRITE8_MEMBER(nss_state::nss_eeprom_w)
-{
-	/*
-    x--- ---- EEPROM CS bit?
-    ---x ---- EEPROM clock bit?
-    ---- x--- EEPROM write bit
-    ---- ---x EEPROM reset bit? (active low)
-    */
+  7-5  Always set (MSBs of RST Opcode)
+  4    PROM Counter Out (0=High=One, 1=Low=Zero) ;PROM Address Bit5
+  3    PROM Data Out    (0=High=One, 1=Low=Zero)
+  2-0  Always set (LSBs of RST Opcode)
 
-//  printf("EEPROM write %02x\n",data);
-}
+i/o
+Input
+0x00 Joypad
+  7   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
+  6   Vblank or Vsync or so       (0=What, 1=What?)
+  5   Button "Joypad Button B?"   (0=Released, 1=Pressed)
+  4   Button "Joypad Button A"    (0=Released, 1=Pressed)
+  3   Button "Joypad Down"        (0=Released, 1=Pressed)
+  2   Button "Joypad Up"          (0=Released, 1=Pressed)
+  1   Button "Joypad Left"        (0=Released, 1=Pressed)
+  0   Button "Joypad Right"       (0=Released, 1=Pressed)
+0x01 Front-Panel Buttons and Game Over Flag
+  7   From SNES Port 4016h.W.Bit2 (0=Game Over Flag, 1=Normal) (Inverted!)
+  6   Button "Restart"            (0=Released, 1=Pressed) ;-also resets SNES?
+  5   Button "Page Up"            (0=Released, 1=Pressed)
+  4   Button "Page Down"          (0=Released, 1=Pressed)
+  3   Button "Instructions"       (0=Released, 1=Pressed)
+  2   Button "Game 3"             (0=Released, 1=Pressed) ;\if present (single
+  1   Button "Game 2"             (0=Released, 1=Pressed) ; cartridge mode does
+  0   Button "Game 1"             (0=Released, 1=Pressed) ;/without them)
+0x02 Coin and Service Button Inputs
+  7-3 Unknown/unused (maybe the (unused) Test button hides here)
+  2   Service Button (1=Pressed: Add Credit; with INST button: Config)
+  1   Coin Input 2   (1=Coin inserted in coin-slot 2)
+  0   Coin Input 1   (1=Coin inserted in coin-slot 1)
+0x03 RTC
+Output
+0x00/0x80 NMI Control and RAM protect
+  7-4 Unknown/unused      (should be always 0)
+  3     Maybe SNES CPU/PPU reset (usually same as Port 01h.W.Bit1)
+  2   RAM at 9000h-9FFFh  (0=Disable/Protect, 1=Enable/Unlock)
+  1   Looks like maybe somehow NMI Related ?    ;\or one of these is PC10-style
+  0   Looks like NMI Enable                     ;/hardware-watchdog reload?
+0x01/0x81 Unknown and Slot Select
+  7     Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
+  6   Unknown/unused        (should be always 0)
+  5   SNES Sound Mute       (0=Normal, 1=Mute) (for optional mute in demo mode)
+  4   Unknown  ;from INST-ROM flag! (Lo/HiROM, 2-player, zapper, volume or so?)
+  3-2 Slot Select        (0..2 for Slot 1..3) (mapping to both SNES and Z80)
+  1     Maybe SNES CPU pause?  (cleared on deposit coin to continue) (1=Run)
+  0     Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
+0x02/0x82 RTC and OSD
+0x03/0x83 Unknown and LED control
+  7     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
+  6     Layer OSD Enable?
+  5-4 Unknown/unused (should be always 0)
+  3   LED Instructions (0=Off, 1=On)  ;-glows in demo (prompt for INST button)
+  2   LED Game 3       (0=Off, 1=On)  ;\
+  1   LED Game 2       (0=Off, 1=On)  ; blinked when enough credits inserted
+  0   LED Game 1       (0=Off, 1=On)  ;/
+0x84 Coin Counter Outputs
+  7-2 Unknown/unused (should be always 0)
+  1   Coin Counter 2 (0=No change, 1=Increment external counter)
+  0   Coin Counter 1 (0=No change, 1=Increment external counter)
+0x05 Unknown
+0x07 SNES Watchdog / Acknowledge SNES Joypad Read Flag
+
+SNES part:
+0x4100 DSW
+0x4016 bit 0 Joypad Strobe?
+0x4016 bit 2 Game Over Flag
 
 
-READ8_MEMBER(nss_state::m50458_r)
-{
 
-	if(m_m50458_rom_bank)
-	{
-		UINT8 *gfx_rom = memregion("m50458_gfx")->base();
-
-		return gfx_rom[offset & 0xfff];
-	}
-	else
-	{
-		UINT8 *gfx_ram = memregion("m50458_vram")->base();
-
-		return gfx_ram[offset & 0xfff];
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER(nss_state::m50458_w)
-{
-
-	if(m_m50458_rom_bank)
-		logerror("Warning: write to M50458 GFX ROM!\n");
-	else
-	{
-		UINT8 *gfx_ram = memregion("m50458_vram")->base();
-
-		gfx_ram[offset & 0xfff] = data;
-	}
-}
-
+*/
 
 static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM // vram perhaps?
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(m50458_r,m50458_w) // M50458 vram & GFX rom routes here
-	AM_RANGE(0xa000, 0xa000) AM_READ(nss_eeprom_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(nss_eeprom_w)
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM AM_REGION("ibios_rom", 0x6000)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER(nss_state::port00_r)
-{
 
-	/*
-    -x-- ---- almost certainly tied to the vblank signal
-    */
-
-
-	m_vblank_bit^=0x40;
-
-	return m_vblank_bit | 0xbf;
-}
-
-
-READ8_MEMBER(nss_state::port01_r)
-{
-	return 0xff;
-}
-
-READ8_MEMBER(nss_state::port02_r)
-{
-	/*
-    ---- -x-- (makes the BIOS to jump at 0x4258, sets 0x80 bit 1 and then jumps to unmapped area of the BIOS (bankswitch?))
-    ---- ---x
-    */
-
-	return 0xfb;
-}
-
-READ8_MEMBER(nss_state::port03_r)
-{
-	/*
-    x--- ---- EEPROM2 read bit
-    ---- ---x tested at 7006, some status bit
-
-    */
-
-	return 0xfe;
-}
-
-WRITE8_MEMBER(nss_state::port80_w)
-{
-
-	/*
-    ---- -x-- written when 0x9000-0x9fff is read, probably a bankswitch
-    ---- --x- see port 0x02 note
-    ---- ---x BIOS bankswitch
-    */
-
-	membank("bank1")->set_entry(data & 1);
-	m_m50458_rom_bank = data & 4;
-}
-
-WRITE8_MEMBER(nss_state::port82_w)// EEPROM2?
-{
-	/*
-    ---- x--- EEPROM2 clock bit?
-    ---- -x-- EEPROM2 write bit
-    ---- --x- EEPROM2 CS bit?
-    */
-}
 
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
-	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-	AM_RANGE(0x03, 0x03) AM_READ(port03_r)
-	AM_RANGE(0x72, 0x72) AM_WRITENOP //?
-	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(port82_w)
-	AM_RANGE(0xea, 0xea) AM_WRITENOP //?
 
 ADDRESS_MAP_END
 
 static MACHINE_START( nss )
 {
-	nss_state *state = machine.driver_data<nss_state>();
-	UINT8 *ROM = state->memregion("bios")->base();
-
-	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
-	state->membank("bank1")->set_entry(0);
-
-	state->m_m50458_rom_bank = 0;
+//	nss_state *state = machine.driver_data<nss_state>();
 
 	MACHINE_START_CALL(snes);
 }
@@ -722,8 +677,8 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x10000,           "addons", ROMREGION_ERASE00)		/* add-on chip ROMs (DSP1 will be needed if we dump the NSS version of Super Mario Kart)*/\
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) \
 	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
-	ROM_LOAD("nss-c.dat"  , 0x10000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
-	ROM_LOAD("nss-ic14.02", 0x18000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
+	ROM_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
+	ROM_LOAD("nss-ic14.02", 0x10000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
 	ROM_REGION( 0x1200, "chargen", ROMREGION_ERASEFF ) \
 	ROM_LOAD("m50458_char.bin",     0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) ) \
 	ROM_REGION( 0x1000, "m50458_gfx", ROMREGION_ERASEFF ) \
@@ -740,8 +695,9 @@ ROM_START( nss )
 
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", ROMREGION_ERASEFF )
-ROM_END
 
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( nss_actr )
 	NSS_BIOS
@@ -752,6 +708,9 @@ ROM_START( nss_actr )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "act-rais.ic8", 0x0000, 0x8000, CRC(08b38ce6) SHA1(4cbb7fd28d98ffef0f17747201625883af954e3a) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+    ROM_LOAD( "security.prm", 0x000000, 0x000010, CRC(4b74ac55) SHA1(51ea71b06367b4956a4b737385e2d4d15bd43980) )
 ROM_END
 
 ROM_START( nss_con3 )
@@ -763,6 +722,9 @@ ROM_START( nss_con3 )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "contra3.ic8", 0x0000, 0x8000, CRC(0fbfa23b) SHA1(e7a1a78a58c64297e7b9623350ec57aed8035a4f) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, NO_DUMP )
 ROM_END
 
 ROM_START( nss_adam )
@@ -774,6 +736,9 @@ ROM_START( nss_adam )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "addams.ic8", 0x0000, 0x8000, CRC(57c7f72c) SHA1(2e3642b4b5438f6c535d6d1eb668e1663062cf78) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, CRC(154d10c2) SHA1(6829e149c341b753ee9bc72055c0634db4e81884) )
 ROM_END
 
 ROM_START( nss_aten )
@@ -785,6 +750,9 @@ ROM_START( nss_aten )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "amtennis.ic8", 0x0000, 0x8000, CRC(d2cd3926) SHA1(49fc253b1b9497ef1374c7db0bd72c163ffb07e7) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010,CRC(3e640fa2) SHA1(ac530610a9d4979f070d5f57dfd4886c530aa20f) )
 ROM_END
 
 ROM_START( nss_rob3 )
@@ -796,6 +764,9 @@ ROM_START( nss_rob3 )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "robocop3.ic8", 0x0000, 0x8000, CRC(90d13c51) SHA1(6751dab14b7d178350ac333f07dd2c3852e4ae23) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, NO_DUMP )
 ROM_END
 
 ROM_START( nss_ncaa )
@@ -807,6 +778,9 @@ ROM_START( nss_ncaa )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "ncaa.ic8", 0x0000, 0x8000, CRC(b9fa28d5) SHA1(bc538bcff5c19eae4becc6582b5c111d287b76fa) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, CRC(a2e9ad5b) SHA1(a41f82451fc185f8e989a0d4f38700dc7813bb50) )
 ROM_END
 
 ROM_START( nss_skin )
@@ -818,6 +792,9 @@ ROM_START( nss_skin )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "skins.ic8", 0x0000, 0x8000, CRC(9f33d5ce) SHA1(4d279ad3665bd94c7ca9cb2778572bed42c5b298) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, CRC(86f8cd1d) SHA1(d567d194058568f4ae32b7726e433918b06bca54) )
 ROM_END
 
 ROM_START( nss_lwep )
@@ -829,6 +806,9 @@ ROM_START( nss_lwep )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "nss-lw.ic8", 0x0000, 0x8000, CRC(1acc1d5d) SHA1(4c8b100ac5847915aaf3b5bfbcb4f632606c97de) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, CRC(e9755c14) SHA1(d8dbebf3536dcbd18c50ba11a6b729dc7085f74b) )
 ROM_END
 
 ROM_START( nss_ssoc )
@@ -839,6 +819,9 @@ ROM_START( nss_ssoc )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "s-soccer.ic3", 0x0000, 0x8000, CRC(c09211c3) SHA1(b274a57f93ae0a8774664df3d3615fb7dbecfa2e) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, NO_DUMP )
 ROM_END
 
 ROM_START( nss_smw )
@@ -849,6 +832,9 @@ ROM_START( nss_smw )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "mw.ic3", 0x0000, 0x8000, CRC(f2c5466e) SHA1(e116f01342fcf359498ed8750741c139093b1fb2) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, NO_DUMP )
 ROM_END
 
 ROM_START( nss_fzer )
@@ -859,6 +845,9 @@ ROM_START( nss_fzer )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "fz.ic7", 0x0000, 0x8000, CRC(48ae570d) SHA1(934f9fec47dcf9e49936388968d2db50c69950da) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, CRC(9650a7d0) SHA1(59d57ab2720cff3a24105a7250560c41def45acc) )
 ROM_END
 
 ROM_START( nss_sten )
@@ -869,7 +858,12 @@ ROM_START( nss_sten )
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "st.ic3", 0x0000, 0x8000, CRC(8880596e) SHA1(ec6d68fc2f51f7d94f496cd72cf898db65324542) )
+
+	ROM_REGION( 0x10, "rp5h01", ROMREGION_ERASE00 )
+	ROM_LOAD( "security.prm", 0x000000, 0x000010, NO_DUMP )
 ROM_END
+
+
 
 GAME( 199?, nss,       0,     nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 1992, nss_actr,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // sound sometimes dies, timing issues
