@@ -120,6 +120,7 @@
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
+    - Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item)
     - Mr. Pro Yakyuu
     - PC-8034 (app)
     - PC-8037SR (app)
