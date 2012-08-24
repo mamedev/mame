@@ -4,23 +4,24 @@ Destiny (c) 1983 Data East Corporation
 
 driver by Angelo Salese
 
-A fortune-teller machine with 24 characters LED-array and a printer.
+A fortune-teller machine with 20 green 5x7 LED dot matrix display and a printer.
 M6809 CPU, 2KB RAM
 It is not Y2K compliant.
 
 Rough cpanel sketch:
 
-    [LED-array dispay]          CLEAR ENTER
-                                7  8  9  0
+    [LED-array dispay]          1  2  3  M
                                 4  5  6  F
-                                1  2  3  M
+                                7  8  9  0
+                                CLEAR ENTER
 
 To control system buttons (SYSTEM, lower nibble), hold one down and then
 push the main service button F2.
 
 
 TODO:
-- Emulate the graphics with genuine artwork display;
+- Identify display controller and dump the character ROM,
+  then emulate the graphics with genuine artwork display;
 - Printer emulation;
 - Exact sound & irq frequency;
 
