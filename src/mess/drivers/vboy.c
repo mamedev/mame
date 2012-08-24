@@ -22,8 +22,6 @@
     - spaceinv: missing shots
     - telerobo: crashes if you die
     - telerobo: hangs after winning first match;
-    - telerobo: when you beat your opponent, the winning animation has a gfx bug
-      (HBias negative numbers?)
    	- vlab: doesn't boot (irq issue?)
     - wariolnd: brightness gets suddently darker during intro.
 	- waterwld: doesn't accept start input at title screen (regression, it used to work);
@@ -287,15 +285,16 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mo
 		for(x=0;x<=w;x++)
 		{
 			int src_x,src_y;
-			INT16 y1 = (y+gy);
-			INT16 x1 = (x+gx);
+			INT32 y1 = (y+gy);
+			INT32 x1 = (x+gx);
 			int pix = 0;
 
 			x1 += right ? -gp : gp;
-			if (mode==1)
-				x1 += (INT16)vboy_paramtab[y*2+(right ^ 1)];
 
 			src_x = x+mx;
+			if (mode==1)
+				src_x += (INT16)vboy_paramtab[y*2+(right ^ 1)];
+
 			src_y = y+my;
 			src_x += right ? -mp : mp;
 
@@ -475,7 +474,7 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, bool right, int &
 static SCREEN_UPDATE_IND16( vboy_left )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	bitmap.fill(state->m_vip_regs.BKCOL, cliprect);
+	bitmap.fill(screen.machine().pens[state->m_vip_regs.BKCOL], cliprect);
 	int cur_spt;
 
 	if(!(state->m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
@@ -491,7 +490,7 @@ static SCREEN_UPDATE_IND16( vboy_left )
 static SCREEN_UPDATE_IND16( vboy_right )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	bitmap.fill(state->m_vip_regs.BKCOL, cliprect);
+	bitmap.fill(screen.machine().pens[state->m_vip_regs.BKCOL], cliprect);
 	int cur_spt;
 
 	if(!(state->m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
