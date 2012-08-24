@@ -4,6 +4,7 @@
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+//#include "zac-proto.lh"
 
 class zac_proto_state : public driver_device
 {
@@ -13,6 +14,10 @@ public:
 		  m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(out0_w);
+	DECLARE_WRITE8_MEMBER(out1_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 protected:
 
 	// devices
@@ -26,14 +31,60 @@ public:
 
 
 static ADDRESS_MAP_START( zac_proto_map, AS_PROGRAM, 8, zac_proto_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
+	AM_RANGE(0x0c00, 0x0dff) AM_RAM
+	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("PL0")
+	AM_RANGE(0x0e01, 0x0e01) AM_READ_PORT("PL1")
+	AM_RANGE(0x0e02, 0x0e02) AM_READ_PORT("PL2")
+	AM_RANGE(0x0e03, 0x0e03) AM_READ_PORT("PL3")
+	AM_RANGE(0x0e04, 0x0e04) AM_READ_PORT("PL4")
+	AM_RANGE(0x0e05, 0x0e05) AM_READ_PORT("PL5")
+	AM_RANGE(0x0e06, 0x0e06) AM_READ_PORT("PL6")
+	AM_RANGE(0x0e07, 0x0e07) AM_READ_PORT("PL7")
+	AM_RANGE(0x0e00, 0x0e01) AM_WRITE(out0_w)
+	AM_RANGE(0x0e02, 0x0e06) AM_WRITE(digit_w)
+	AM_RANGE(0x0e07, 0x0e08) AM_WRITE(sound_w)
+	AM_RANGE(0x0e09, 0x0e16) AM_WRITE(out1_w)
+	AM_RANGE(0x1400, 0x1bff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_proto )
+	// playfield inputs
+	PORT_START("PL0")
+	PORT_START("PL1")
+	PORT_START("PL2")
+	PORT_START("PL3")
+	PORT_START("PL4")
+	// dipswitches
+	PORT_START("PL5")
+	PORT_START("PL6")
+	PORT_START("PL7")
 INPUT_PORTS_END
+
+WRITE8_MEMBER( zac_proto_state::out0_w )
+{
+}
+
+WRITE8_MEMBER( zac_proto_state::out1_w )
+{
+}
+
+// need to implement blanking of leading zeroes
+WRITE8_MEMBER( zac_proto_state::digit_w )
+{
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	offset<<=1;
+	output_set_digit_value(offset++, patterns[data&15]);
+	output_set_digit_value(offset, patterns[data>>4]);
+}
+
+WRITE8_MEMBER( zac_proto_state::sound_w )
+{
+}
 
 void zac_proto_state::machine_reset()
 {
+	output_set_digit_value(10, 0x3f); // units shows zero all the time
 }
 
 DRIVER_INIT_MEMBER(zac_proto_state,zac_proto)
@@ -44,6 +95,9 @@ static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCMP, 1000000)
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
+
+	/* Video */
+	//MCFG_DEFAULT_LAYOUT(layout_zac_proto)
 MACHINE_CONFIG_END
 
 /*--------------------------------
