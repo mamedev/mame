@@ -8,9 +8,6 @@
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
     TODO:
-	- 100us / 20us timers
-	- sound
-    - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
 	- 3dtetris: missing gfxs on gameplay (writes to framebuffer)
     - boundh: game is way too fast
     - galactic: ball goes out of bounds sometimes?
@@ -24,8 +21,7 @@
     - telerobo: hangs after winning first match;
    	- vlab: doesn't boot (irq issue?)
     - wariolnd: brightness gets suddently darker during intro.
-	- waterwld: doesn't accept start input at title screen (regression, it used to work);
-
+\
 ****************************************************************************/
 
 #include "emu.h"
