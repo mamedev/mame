@@ -439,12 +439,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 	</software>
 
 	<!-- Developers: Nintendo R&D1 -->
-	<software name="wariolnd" supported="no">
+	<software name="wariolnd" supported="yes">
 		<description>Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Jpn)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="VUE-VWCJ-JPN, VUE-VWCJ-USA"/>
 		<info name="release" value="19951201 (JPN), 199511xx (USA)"/>
+		<sharedfeat name="eeprom" value="Yes"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="virtual boy wario land (japan, usa).bin" size="2097152" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" offset="000000" />
@@ -459,6 +460,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<publisher>Ocean</publisher>
 		<info name="serial" value="VUE-VWEE-USA"/>
 		<info name="release" value="19951221"/>
+		<sharedfeat name="eeprom" value="No"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="waterworld (usa).bin" size="2097152" crc="82a95e51" sha1="dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2" offset="000000" />

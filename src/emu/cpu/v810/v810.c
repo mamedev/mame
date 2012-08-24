@@ -1302,7 +1302,7 @@ static CPU_EXECUTE( v810 )
 
 	if (cpustate->irq_state != CLEAR_LINE) {
 		if (!(GET_NP | GET_EP | GET_ID)) {
-			if (cpustate->irq_line >((cpustate->PSW & 0xF0000) >> 16)) {
+			if (cpustate->irq_line >=((cpustate->PSW & 0xF0000) >> 16)) {
 				take_interrupt(cpustate);
 			}
 		}

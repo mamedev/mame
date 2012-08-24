@@ -133,6 +133,11 @@ public:
 	void m_timer_tick(void);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
 	void m_set_irq(UINT16 irq_vector);
+	UINT8 *m_nvptr;
+	UINT32 m_vboy_sram[0x10000/4];
+	device_t *m_nvimage;
+	DECLARE_READ32_MEMBER(sram_r);
+	DECLARE_WRITE32_MEMBER(sram_w);
 
 	void m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask);
 
@@ -1084,8 +1089,8 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
-	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
-	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
+//	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
+	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("cartridge", 0) /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
@@ -1114,7 +1119,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 //  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
-	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
+	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("cartridge", 0) /* ROM */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -1138,6 +1143,27 @@ static INPUT_PORTS_START( vboy )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
 INPUT_PORTS_END
 
+static void vboy_machine_stop(running_machine &machine)
+{
+	vboy_state *state = machine.driver_data<vboy_state>();
+
+	// only do this if the cart loader detected some form of backup
+	if (state->m_nvptr != NULL)
+	{
+		device_image_interface *image = dynamic_cast<device_image_interface *>(state->m_nvimage);
+		image->battery_save(state->m_nvptr, 0x10000);
+	}
+}
+
+static MACHINE_START( vboy )
+{
+//	vboy_state *state = machine.driver_data<vboy_state>();
+
+	/* add a hook for battery save */
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_machine_stop),&machine));
+
+//	state->m_vboy_sram = auto_alloc_array(machine, UINT32, 0x10000/4);
+}
 
 static MACHINE_RESET(vboy)
 {
@@ -1204,7 +1230,8 @@ static TIMER_DEVICE_CALLBACK( timer_pad_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-    device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	if((state->m_vboy_regs.kcr & 0x80) == 0)
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 static PALETTE_INIT( vboy )
@@ -1313,6 +1340,91 @@ static GFXDECODE_START( vboy )
 	GFXDECODE_ENTRY( "pcg",     0x00000, vboy_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
+typedef struct _vboy_pcb  vboy_pcb;
+struct _vboy_pcb
+{
+	const char              *pcb_name;
+	int                     pcb_id;
+};
+
+READ32_MEMBER(vboy_state::sram_r)
+{
+	return m_vboy_sram[offset];
+}
+
+WRITE32_MEMBER(vboy_state::sram_w)
+{
+	COMBINE_DATA(&m_vboy_sram[offset]);
+}
+
+#define VBOY_CHIP_NONE 0
+#define	VBOY_CHIP_SRAM 1
+
+static const vboy_pcb pcb_list[] =
+{
+	{"No",    VBOY_CHIP_NONE},
+	{"Yes",   VBOY_CHIP_SRAM}
+};
+
+
+static int vboy_get_pcb_id(const char *pcb)
+{
+	int	i;
+
+	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
+	{
+		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
+			return pcb_list[i].pcb_id;
+	}
+
+	return 0;
+}
+
+
+static DEVICE_IMAGE_LOAD( vboy_cart )
+{
+	vboy_state *state = image.device().machine().driver_data<vboy_state>();
+	UINT32 chip = 0;
+	UINT8 *ROM = image.device().machine().root_device().memregion("cartridge")->base();
+	UINT32 cart_size;
+
+	state->m_nvptr = (UINT8 *)NULL;
+	if (image.software_entry() == NULL)
+	{
+		cart_size = image.length();
+		image.fread(ROM, cart_size);
+	}
+	else
+	{
+		const char *pcb_name;
+		cart_size = image.get_software_region_length("rom");
+		memcpy(ROM, image.get_software_region("rom"), cart_size);
+
+		pcb_name = image.get_feature("eeprom");
+		if (pcb_name == NULL)
+			chip = 0;
+		else
+			chip = vboy_get_pcb_id(pcb_name);
+
+	}
+
+	if(chip & VBOY_CHIP_SRAM)
+	{
+		state->m_nvptr = (UINT8 *)&state->m_vboy_sram;
+
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x06000000, 0x0600ffff, read32_delegate(FUNC(vboy_state::sram_r),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x06000000, 0x0600ffff, write32_delegate(FUNC(vboy_state::sram_w),state));
+
+		image.battery_load(state->m_nvptr, 0x10000, 0x00);
+		state->m_nvimage = image;
+	}
+	else
+	{
+		state->m_nvimage = NULL;
+	}
+
+	return IMAGE_INIT_PASS;
+}
 
 static MACHINE_CONFIG_START( vboy, vboy_state )
 
@@ -1323,6 +1435,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer_l", vboy_scanlineL, "3dleft", 0, 1)
 	//MCFG_TIMER_ADD_SCANLINE("scantimer_r", vboy_scanlineR, "3dright", 0, 1)
 
+	MCFG_MACHINE_START(vboy)
 	MCFG_MACHINE_RESET(vboy)
 
     // programmable timer
@@ -1352,6 +1465,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("vb,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("vboy_cart")
+	MCFG_CARTSLOT_LOAD(vboy_cart)
 
 	MCFG_GFXDECODE(vboy)
 
@@ -1367,8 +1481,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vboy )
-	ROM_REGION( 0x200000, "user1", 0 )
-	ROM_CART_LOAD("cart", 0x0000, 0x200000, ROM_MIRROR)
+	ROM_REGION( 0x2000000, "cartridge", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x8000, "pcg", ROMREGION_ERASE00 )
 ROM_END
