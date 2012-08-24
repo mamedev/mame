@@ -66,13 +66,14 @@ public:
 	UINT32 get_len() { return image->get_track_size(cyl, ss ^ 1); }
 
 	void mon_w(int state);
-	int  ready_r();
+	bool ready_r();
 	double get_pos();
 
-	int wpt_r() { return wpt; }
+	bool wpt_r() { return output_format == 0; }
 	int dskchg_r() { return dskchg; }
 	bool trk00_r() { return cyl != 0; }
 	int idx_r() { return idx; }
+	bool ss_r() { return ss; }
 
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
@@ -160,6 +161,28 @@ protected:
 	virtual void hook_load(astring filename, bool softlist);
 };
 
+class floppy_3_ssdd : public floppy_image_device {
+public:
+	floppy_3_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_3_ssdd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_3_ssdd"; }
+	virtual const char *image_interface() const { return "floppy_3"; }
+protected:
+	virtual void setup_characteristics();
+};
+
+class floppy_3_dsdd : public floppy_image_device {
+public:
+	floppy_3_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_3_dsdd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_3_dsdd"; }
+	virtual const char *image_interface() const { return "floppy_3"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_35_dd : public floppy_image_device {
 public:
 	floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -204,6 +227,17 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class floppy_525_ssdd : public floppy_image_device {
+public:
+	floppy_525_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_525_ssdd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_525_ssdd"; }
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_525_dd : public floppy_image_device {
 public:
 	floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -215,6 +249,16 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class floppy_525_qd : public floppy_image_device {
+public:
+	floppy_525_qd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_525_qd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_525_qd"; }
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
 
 class floppy_525_hd : public floppy_image_device {
 public:
@@ -223,6 +267,17 @@ public:
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 	virtual void device_config_complete() { m_shortname = "floppy_525_hd"; }
 	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
+class floppy_8_sssd : public floppy_image_device {
+public:
+	floppy_8_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_8_sssd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_8_sssd"; }
+	virtual const char *image_interface() const { return "floppy_8"; }
 protected:
 	virtual void setup_characteristics();
 };
@@ -248,11 +303,16 @@ private:
 
 // device type definition
 extern const device_type FLOPPY_CONNECTOR;
+extern const device_type FLOPPY_3_SSDD;
+extern const device_type FLOPPY_3_DSDD;
 extern const device_type FLOPPY_35_DD;
 extern const device_type FLOPPY_35_DD_NOSD;
 extern const device_type FLOPPY_35_HD;
 extern const device_type FLOPPY_35_ED;
+extern const device_type FLOPPY_525_SSDD;
 extern const device_type FLOPPY_525_DD;
+extern const device_type FLOPPY_525_QD;
 extern const device_type FLOPPY_525_HD;
+extern const device_type FLOPPY_8_SSSD;
 
 #endif /* FLOPPY_H */

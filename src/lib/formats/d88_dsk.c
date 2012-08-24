@@ -376,3 +376,220 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+
+
+/***************************************************************************
+
+    Copyright Olivier Galibert
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
+
+/*********************************************************************
+
+    formats/d88_dsk.h
+
+    D88 disk images
+
+*********************************************************************/
+
+#include "emu.h"
+#include "d88_dsk.h"
+
+d88_format::d88_format()
+{
+}
+
+const char *d88_format::name() const
+{
+	return "d88";
+}
+
+const char *d88_format::description() const
+{
+	return "D88 disk image";
+}
+
+const char *d88_format::extensions() const
+{
+	return "d77,d88,1dd";
+}
+
+int d88_format::identify(io_generic *io, UINT32 form_factor)
+{
+	int size = io_generic_size(io);
+	UINT8 h[32];
+	
+	io_generic_read(io, h, 0, 32);
+	if((LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x1c)) == size) &&
+	   (h[0x1b] == 0x00 || h[0x1b] == 0x10 || h[0x1b] == 0x20 || h[0x1b] == 0x30 || h[0x1b] == 0x40))
+		return 100;
+
+	return 0;
+}
+
+bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	UINT8 h[32];
+	
+	io_generic_read(io, h, 0, 32);
+
+	int cell_count = 0;
+	int track_count = 0;
+	int head_count = 0;
+	switch(h[0x1b]) {
+	case 0x00:
+		cell_count = 100000;
+		track_count = 42;
+		head_count = 2;
+		image->set_variant(floppy_image::DSDD);
+		break;
+
+	case 0x10:
+		cell_count = 100000;
+		track_count = 82;
+		head_count = 2;
+		image->set_variant(floppy_image::DSQD);
+		break;
+
+	case 0x20:
+		cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
+		track_count = 82;
+		head_count = 2;
+		image->set_variant(floppy_image::DSHD);
+		break;
+
+	case 0x30:
+		cell_count = 100000;
+		track_count = 42;
+		head_count = 1;
+		image->set_variant(floppy_image::SSDD);
+		break;
+
+	case 0x40:
+		cell_count = 100000;
+		track_count = 82;
+		head_count = 1;
+		image->set_variant(floppy_image::SSQD);
+		break;
+	}
+
+	if(!head_count)
+		return false;
+
+	UINT32 track_pos[164];
+	io_generic_read(io, track_pos, 32, 164*4);
+
+	for(int track=0; track < track_count; track++)
+		for(int head=0; head < head_count; head++) {
+			int pos = LITTLE_ENDIANIZE_INT32(track_pos[track * head_count + head]);
+			if(!pos)
+				continue;
+
+			UINT32 track_data[210000];
+			UINT8 sect_data[65536];
+			int tpos = 0;
+
+			// gap 4a , IAM and gap 1
+			for(int i=0; i<80; i++) mfm_w(track_data, tpos, 8, 0x4e);
+			for(int i=0; i<12; i++) mfm_w(track_data, tpos, 8, 0x00);
+			for(int i=0; i< 3; i++) raw_w(track_data, tpos, 16, 0x5224);
+			mfm_w(track_data, tpos, 8, 0xfc);
+			for(int i=0; i<50; i++) mfm_w(track_data, tpos, 8, 0x4e);
+
+			// Updated after reading the first header
+			int sector_count = 1;
+			int gap3 = 84;
+			for(int i=0; i<sector_count; i++) {
+				UINT8 hs[16];
+				io_generic_read(io, hs, pos, 16);
+				UINT16 size = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hs+14));
+				io_generic_read(io, sect_data, pos+16, size);
+				pos += 16+size;
+
+				if(i == 0) {
+					sector_count = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hs+4));
+					if(size < 512)
+						gap3 = form_factor == floppy_image::FF_35 ? 54 : 50;
+					else
+						gap3 = form_factor == floppy_image::FF_35 ? 84 : 80;
+				}
+
+				int cpos;
+				UINT16 crc;
+				// sync and IDAM and gap 2
+				for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
+				cpos = tpos;
+				for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
+				mfm_w(track_data, tpos, 8, 0xfe);
+				mfm_w(track_data, tpos, 8, hs[0]);
+				mfm_w(track_data, tpos, 8, hs[1]);
+				mfm_w(track_data, tpos, 8, hs[2]);
+				mfm_w(track_data, tpos, 8, hs[3]);
+				crc = calc_crc_ccitt(track_data, cpos, tpos);
+				mfm_w(track_data, tpos, 16, crc);
+				for(int j=0; j<22; j++) mfm_w(track_data, tpos, 8, 0x4e);
+
+				// sync, DAM, data and gap 3
+				for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
+				cpos = tpos;
+				for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
+				mfm_w(track_data, tpos, 8, 0xfb);
+				for(int j=0; j<size; j++) mfm_w(track_data, tpos, 8, sect_data[j]);
+				crc = calc_crc_ccitt(track_data, cpos, tpos);
+				mfm_w(track_data, tpos, 16, crc);
+				for(int j=0; j<gap3; j++) mfm_w(track_data, tpos, 8, 0x4e);
+			}
+
+			// Gap 4b
+
+			if(tpos > cell_count)
+				throw emu_fatalerror("d88_format: Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, tpos);
+			while(tpos < cell_count-15) mfm_w(track_data, tpos, 8, 0x4e);
+			raw_w(track_data, tpos, cell_count-tpos, 0x9254 >> (16+tpos-cell_count));
+
+			generate_track_from_levels(track, head, track_data, cell_count, 0, image);
+		}
+
+	return true;
+}
+
+
+bool d88_format::save(io_generic *io, floppy_image *image)
+{
+	return true;
+}
+
+bool d88_format::supports_save() const
+{
+	return true;
+}
+
+const floppy_format_type FLOPPY_D88_FORMAT = &floppy_image_format_creator<d88_format>;

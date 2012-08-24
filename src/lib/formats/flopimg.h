@@ -608,15 +608,19 @@ public:
 	//! Form factors
 	enum {
 		FF_UNKNOWN  = 0x00000000, //!< Unknown, useful when converting
+		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
+		FF_8        = 0x20202038, //!< "8   " 8 inch disk
 	};
 
 	//! Variants
 	enum {
 		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density
-		SSDD  = 0x44445353, //!< "DSSD", Double-sided single-density
-		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K)
+		SSDD  = 0x44445353, //!< "SSDD", Single-sided double-density
+		SSQD  = 0x44515353, //!< "SSQD", Single-sided quad-density
+		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
+		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
 		DSED  = 0x44455344, //!< "DSED", Double-sided extra-density (2880K)
 	};
