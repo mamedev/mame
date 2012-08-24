@@ -875,7 +875,7 @@ void floppy_525_dd::setup_characteristics()
 {
 	form_factor = floppy_image::FF_525;
 	tracks = 42;
-	sides = 1;
+	sides = 2;
 	set_rpm(300);
 }
 

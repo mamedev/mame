@@ -142,7 +142,7 @@ static const duart68681_config ht68k_duart68681_config =
 };
 
 static SLOT_INTERFACE_START( ht68k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 
@@ -160,10 +160,10 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", ht68k_floppies, "525hd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", ht68k_floppies, "525hd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", ht68k_floppies, "525hd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", ht68k_floppies, "525hd", 0, ht68k_state::floppy_formats)	
+	MCFG_FLOPPY_DRIVE_ADD("fd0", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)	
 MACHINE_CONFIG_END
 
 /* ROM definition */
