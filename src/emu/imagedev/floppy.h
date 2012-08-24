@@ -215,6 +215,18 @@ protected:
 	virtual void setup_characteristics();
 };
 
+
+class floppy_525_hd : public floppy_image_device {
+public:
+	floppy_525_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_525_hd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_525_hd"; }
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_connector: public device_t,
 						public device_slot_interface
 {
@@ -241,5 +253,6 @@ extern const device_type FLOPPY_35_DD_NOSD;
 extern const device_type FLOPPY_35_HD;
 extern const device_type FLOPPY_35_ED;
 extern const device_type FLOPPY_525_DD;
+extern const device_type FLOPPY_525_HD;
 
 #endif /* FLOPPY_H */

@@ -17,6 +17,7 @@ const device_type FLOPPY_35_DD_NOSD = &device_creator<floppy_35_dd_nosd>;
 const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
 const device_type FLOPPY_35_ED = &device_creator<floppy_35_ed>;
 const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
+const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock),
@@ -883,4 +884,31 @@ void floppy_525_dd::handled_variants(UINT32 *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 	variants[var_count++] = floppy_image::SSDD;
+}
+
+floppy_525_hd::floppy_525_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_525_HD, "5.25\" high density floppy drive", tag, owner, clock)
+{
+}
+
+floppy_525_hd::~floppy_525_hd()
+{
+}
+
+void floppy_525_hd::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 82;
+	sides = 2;
+	set_rpm(300);
+}
+
+void floppy_525_hd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::DSDD;
+	variants[var_count++] = floppy_image::DSHD;
+	
 }
