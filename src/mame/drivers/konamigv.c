@@ -190,7 +190,7 @@ READ32_MEMBER(konamigv_state::mb89371_r)
 
 static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE_LEGACY(am53cf96_r, am53cf96_w)
+	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
 	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
@@ -209,6 +209,8 @@ ADDRESS_MAP_END
 
 static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size )
 {
+	am53cf96_device *am53cf96 = state->machine().device<am53cf96_device>("am53cf96");
+
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -227,12 +229,12 @@ static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size
 		if( n_this < 2048 / 4 )
 		{
 			/* non-READ commands */
-			am53cf96_read_data( n_this * 4, sector_buffer );
+			am53cf96->dma_read_data( n_this * 4, sector_buffer );
 		}
 		else
 		{
 			/* assume normal 2048 byte data for now */
-			am53cf96_read_data( 2048, sector_buffer );
+			am53cf96->dma_read_data( 2048, sector_buffer );
 			n_this = 2048 / 4;
 		}
 		n_size -= n_this;
@@ -254,6 +256,8 @@ static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size
 
 static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_size )
 {
+	am53cf96_device *am53cf96 = state->machine().device<am53cf96_device>("am53cf96");
+
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -283,7 +287,7 @@ static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_siz
 			n_this--;
 		}
 
-		am53cf96_write_data( n_this * 4, sector_buffer );
+		am53cf96->dma_write_data( n_this * 4, sector_buffer );
 	}
 }
 
@@ -309,9 +313,6 @@ static const struct AM53CF96interface scsi_intf =
 DRIVER_INIT_MEMBER(konamigv_state,konamigv)
 {
 	psx_driver_init(machine());
-
-	/* init the scsi controller and hook up it's DMA */
-	am53cf96_init(machine(), &scsi_intf);
 }
 
 static MACHINE_START( konamigv )
@@ -355,6 +356,8 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_MACHINE_RESET( konamigv )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_AM53CF96_ADD("am53cf96", scsi_intf);
 
 	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_4)
 

@@ -177,7 +177,7 @@ READ32_MEMBER(konamigq_state::pcmram_r)
 
 static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE_LEGACY(am53cf96_r, am53cf96_w)
+	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE(soundr3k_w)
 	AM_RANGE(0x1f100010, 0x1f10001f) AM_READ(soundr3k_r)
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
@@ -260,6 +260,8 @@ static const k054539_interface k054539_config =
 
 static void scsi_dma_read( konamigq_state *state, UINT32 n_address, INT32 n_size )
 {
+	am53cf96_device *am53cf96 = state->machine().device<am53cf96_device>("am53cf96");
+
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -275,7 +277,7 @@ static void scsi_dma_read( konamigq_state *state, UINT32 n_address, INT32 n_size
 		{
 			n_this = n_size;
 		}
-		am53cf96_read_data( n_this * 4, sector_buffer );
+		am53cf96->dma_read_data( n_this * 4, sector_buffer );
 		n_size -= n_this;
 
 		i = 0;
@@ -328,9 +330,6 @@ static MACHINE_START( konamigq )
 {
 	konamigq_state *state = machine.driver_data<konamigq_state>();
 
-	/* init the scsi controller and hook up it's DMA */
-	am53cf96_init(machine, &scsi_intf);
-
 	state->save_pointer(NAME(state->m_p_n_pcmram), 0x380000);
 	state->save_item(NAME(state->m_sndto000));
 	state->save_item(NAME(state->m_sndtor3k));
@@ -357,6 +356,8 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_MACHINE_RESET( konamigq )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
+
+	MCFG_AM53CF96_ADD("am53cf96", scsi_intf);
 
 	MCFG_SCSIDEV_ADD("disk", SCSIHD, SCSI_ID_0)
 
