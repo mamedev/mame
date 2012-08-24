@@ -267,6 +267,8 @@ ROM_START( c1541 )
     ROMX_LOAD( "rolo27.uab5", 0x0000, 0x2000, CRC(171c7962) SHA1(04c892c4b3d7c74750576521fa081f07d8ca8557), ROM_BIOS(9) )
     ROM_SYSTEM_BIOS( 9, "tt34", "TurboTrans v3.4" )
     ROMX_LOAD( "ttd34.uab5", 0x0000, 0x8000, CRC(518d34a1) SHA1(4d6ffdce6ab122e9627b0a839861687bcd4e03ec), ROM_BIOS(10) )
+    ROM_SYSTEM_BIOS( 10, "digidos", "DigiDOS" )
+    ROMX_LOAD( "digidos.uab5", 0x0000, 0x8000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(11) )
 ROM_END
 
 
@@ -409,6 +411,26 @@ const rom_entry *base_c1541_device::device_rom_region() const
 }
 
 
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( c1541_prologic_dos_classic_device::read )
+{
+    return 0;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( c1541_prologic_dos_classic_device::write )
+{
+}
+
+
 //-------------------------------------------------
 //  ADDRESS_MAP( c1541_mem )
 //-------------------------------------------------
@@ -454,14 +476,15 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( c1541pdc_mem, AS_PROGRAM, 8, c1541_prologic_dos_classic_device )
-    AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
+    AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
+/*  AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
     AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
     AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
     AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
     AM_RANGE(0x8800, 0x9fff) AM_RAM
     AM_RANGE(0xa000, 0xb7ff) AM_ROM AM_REGION(M6502_TAG, 0x0000)
     AM_RANGE(0xb800, 0xb80f) AM_READWRITE(pia_r, pia_w)
-    AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)
+    AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)*/
 ADDRESS_MAP_END
 
 
@@ -853,15 +876,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c1541c )
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MCFG_CPU_PROGRAM_MAP(c1541_mem)
-    MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+    MCFG_FRAGMENT_ADD(c1541)
 
-	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541c_via0_intf)
-	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+    MCFG_DEVICE_MODIFY(M6522_0_TAG)
+    MCFG_DEVICE_CONFIG(c1541c_via0_intf)
 MACHINE_CONFIG_END
 
 
@@ -870,15 +888,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c1541dd )
-    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+    MCFG_FRAGMENT_ADD(c1541)
+
+    MCFG_CPU_MODIFY(M6502_TAG)
     MCFG_CPU_PROGRAM_MAP(c1541dd_mem)
-    MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
-
-    MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
-    MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
-
-    MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
-    MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 
 
@@ -887,15 +900,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c1541pd )
-    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+    MCFG_FRAGMENT_ADD(c1541)
+
+    MCFG_CPU_MODIFY(M6502_TAG)
     MCFG_CPU_PROGRAM_MAP(c1541pd_mem)
-    MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
-
-    MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
-    MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
-
-    MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
-    MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 
 
@@ -904,15 +912,11 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c1541pdc )
-    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+    MCFG_FRAGMENT_ADD(c1541)
+
+    MCFG_CPU_MODIFY(M6502_TAG)
     MCFG_CPU_PROGRAM_MAP(c1541pdc_mem)
-    MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-    MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
-    MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
-
-    MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
-    MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
     MCFG_PIA6821_ADD(MC6821_TAG, pia_intf)
     MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_CONFIG_END
@@ -1093,6 +1097,12 @@ void fsd2_device::device_start()
 
         rom[offset] = data;
     }
+}
+
+void c1541_prologic_dos_classic_device::device_start()
+{
+    // find memory regions
+    m_mmu_rom = memregion("mmu")->base();
 }
 
 

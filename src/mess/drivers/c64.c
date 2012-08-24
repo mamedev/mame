@@ -2,6 +2,7 @@
 
     TODO:
 
+	- sort out kernals between PAL/NTSC
     - tsuit215 test failures
 
         - CPUPORT (0=FF 1=FF 0=00 1=FF 1=FF 1=FF, AFTER 00 17, RIGHT 00 DF)
@@ -1150,51 +1151,15 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
+	MCFG_FRAGMENT_ADD(ntsc)
+
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_MODIFY(M6510_TAG)
 	MCFG_CPU_CONFIG(sx64_cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
-
-	// video hardware
-	MCFG_MOS6567_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CBM_IEC_BUS_ADD(iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_DEVICE_REMOVE("iec8")
 	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
@@ -1203,51 +1168,11 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
-	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG(sx64_cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
-
-	// video hardware
-	MCFG_MOS6567_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_FRAGMENT_ADD(ntsc_sx)
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CBM_IEC_BUS_ADD(iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, sx1541_iec_devices, "sx1541", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_DEVICE_REMOVE("iec9")
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 8, sx1541_iec_devices, "sx1541", NULL)
 MACHINE_CONFIG_END
 
 
@@ -1255,49 +1180,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc_c, c64c_state )
-	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
-
-	// video hardware
-	MCFG_MOS8562_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
-	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
-	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+static MACHINE_CONFIG_DERIVED_CLASS( ntsc_c, ntsc, c64c_state )
 MACHINE_CONFIG_END
 
 
@@ -1356,51 +1239,15 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( pal_sx, sx64_state )
+	MCFG_FRAGMENT_ADD(pal)
+
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_MODIFY(M6510_TAG)
 	MCFG_CPU_CONFIG(sx64_cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
-
-	// video hardware
-	MCFG_MOS6569_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CBM_IEC_BUS_ADD(iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_DEVICE_REMOVE("iec8")
 	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
@@ -1408,49 +1255,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal_c, c64c_state )
-	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
-
-	// video hardware
-	MCFG_MOS8565_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
-	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
-	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+static MACHINE_CONFIG_DERIVED_CLASS( pal_c, pal, c64c_state )
 MACHINE_CONFIG_END
 
 
@@ -1570,6 +1375,10 @@ ROM_START( c64n )
 	ROMX_LOAD( "exos4.u4", 0x0000, 0x2000, CRC(d5cf83a9) SHA1(d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7), ROM_BIOS(27) )
 	ROM_SYSTEM_BIOS(27, "pdc", "ProLogic-DOS Classic" )
 	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(28) )
+	ROM_SYSTEM_BIOS(28, "digidos", "DigiDOS" )
+	ROMX_LOAD( "digidos.u4", 0x0000, 0x4000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(29) )
+	ROM_SYSTEM_BIOS(29, "magnum", "Magnum Load" )
+	ROMX_LOAD( "magnum.u4", 0x0000, 0x4000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(30) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -1780,21 +1589,21 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                        FULLNAME                                     FLAGS
-COMP( 1982,	c64n,	0,  	0,		ntsc,		c64, driver_device,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",						0 )
-COMP( 1982,	c64j,	c64n,	0,		ntsc,		c64, driver_device,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						0 )
-COMP( 1982,	c64p,	c64n,	0,		pal,		c64, driver_device,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						0 )
-COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw, driver_device,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	0 )
-COMP( 1983, pet64,	c64n,	0,  	pet64,  	c64, driver_device, 	0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					0 )
-COMP( 1983, edu64,  c64n,	0,  	pet64,  	c64, driver_device, 	0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						0 )
-COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64, driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				0 )
-COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64, driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				0 )
-COMP( 1984, vip64,	c64n,	0,		pal_sx,		c64sw, driver_device,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					0 )
-COMP( 1984, dx64,	c64n,	0,		ntsc_dx,	c64, driver_device,		0,		"Commodore Business Machines", "DX-64 (NTSC)",								0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
+COMP( 1982,	c64n,	0,  	0,		ntsc,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64j,	c64n,	0,		ntsc,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64p,	c64n,	0,		pal,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
+COMP( 1983, pet64,	c64n,	0,  	pet64,  	c64, 	driver_device, 		0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					GAME_SUPPORTS_SAVE )
+COMP( 1983, edu64,  c64n,	0,  	pet64,  	c64, 	driver_device, 		0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64, 	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				GAME_SUPPORTS_SAVE )
+COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64, 	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				GAME_SUPPORTS_SAVE )
+COMP( 1984, vip64,	c64n,	0,		pal_sx,		c64sw, 	driver_device,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					GAME_SUPPORTS_SAVE )
+COMP( 1984, dx64,	c64n,	0,		ntsc_dx,	c64, 	driver_device,		0,		"Commodore Business Machines", "DX-64 (NTSC)",								GAME_SUPPORTS_SAVE )
 //COMP(1983, clipper,  c64,  0, c64pal,  clipper, XXX_CLASS, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //COMP(1983, tesa6240, c64,  0, c64pal,  c64, XXX_CLASS,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
-COMP( 1986, c64cn,	c64n,	0,  	ntsc_c,		c64, driver_device,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)",						0 )
-COMP( 1986, c64cp,	c64n,	0,  	pal_c,		c64, driver_device,		0,		"Commodore Business Machines", "Commodore 64C (PAL)",						0 )
-COMP( 1986, c64csw,	c64n,	0,  	pal_c,		c64sw, driver_device,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)",			0 )
-COMP( 1986, c64g,	c64n,	0,		pal_c,		c64, driver_device,		0,		"Commodore Business Machines", "Commodore 64G (PAL)",						0 )
-CONS( 1990, c64gs,	c64n,	0,		pal_gs,		c64gs, driver_device,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)",			0 )
+COMP( 1986, c64cn,	c64n,	0,  	ntsc_c,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1986, c64cp,	c64n,	0,  	pal_c,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (PAL)",						GAME_SUPPORTS_SAVE )
+COMP( 1986, c64csw,	c64n,	0,  	pal_c,		c64sw, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
+COMP( 1986, c64g,	c64n,	0,		pal_c,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64G (PAL)",						GAME_SUPPORTS_SAVE )
+CONS( 1990, c64gs,	c64n,	0,		pal_gs,		c64gs, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)",			GAME_SUPPORTS_SAVE )
