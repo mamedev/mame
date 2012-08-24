@@ -80,30 +80,39 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 	if (m_output_active)
 	{
 		INT16 sample = m_samples[m_cur_sample++];
+		int count = 0;
 
-		if (sample == -128 && m_shift)
+		while (sample == -128)
 		{
-			/*
-                The HR-16 seems to use a simple scheme to generate 16-bit samples from its 8-bit sample ROMs.
-                When the sound starts the 8-bit sample is sent to the most significant bits of the DAC and every
-                time a -1 sample is found the data is shifted one position to right.
-            */
-			sample = m_samples[m_cur_sample++];
-			m_shift--;
+			count++;
 
-			if (LOG)	logerror("DM3AG '%s' shift: %02x\n", tag(), m_shift);
+			if (count == 1 && m_shift)
+			{
+				/*
+                    The HR-16 seems to use a simple scheme to generate 16-bit samples from its 8-bit sample ROMs.
+                    When the sound starts the 8-bit sample is sent to the most significant bits of the DAC and every
+                    time a -1 sample is found the data is shifted one position to right.
+                */
+				m_shift--;
+
+				if (LOG)	logerror("DM3AG '%s' shift: %02x\n", tag(), m_shift);
+			}
+
+			// every block ends with three or more -1 samples
+			if (m_cur_sample == 0xfffff || count >= 3)
+			{
+				m_output_active = false;
+				sample = 0;
+
+				if (LOG)	logerror("DM3AG '%s' stop: %d, len: %d\n", tag(), m_cur_sample, m_cur_sample-((m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f)));
+
+				break;
+			}
+
+			sample = m_samples[m_cur_sample++];
 		}
 
 		m_dac->write_signed16((sample << m_shift) + 0x8000);
-
-		// every block ends with three or more -1 samples
-		if (m_cur_sample == 0xfffff || (m_samples[m_cur_sample-1] == -128 && m_samples[m_cur_sample] == -128 && m_samples[m_cur_sample+1] == -128))
-		{
-			m_output_active = false;
-			m_dac->write_signed16(0x8000);
-
-			if (LOG)	logerror("DM3AG '%s' stop: %d\n", tag(), m_cur_sample-((m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f)));
-		}
 	}
 }
 
