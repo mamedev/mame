@@ -698,8 +698,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- doesn't seem to work -->
-	<software name="dires" supported="no">
+	<software name="dires">
 		<description>Dires</description>
 		<year>1988</year>
 		<publisher>Bothtec</publisher>
@@ -928,8 +927,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver -->
-	<software name="hardball" supported="no">
+	<software name="hardball">
 		<description>Hardball</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
