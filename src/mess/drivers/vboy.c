@@ -758,16 +758,13 @@ READ16_MEMBER( vboy_state::vip_r )
 			//printf("%d\n",row_num);
 
 			res =  m_vip_regs.XPSTTS & 0x00f3; // empty ^^'
-			if(m_vip_regs.XPCTRL & 2 && m_row_num > 224/8) // screen active
-				res |= m_drawfb << 2;
+			res |= m_drawfb << 2;
 
 			if(m_row_num < 224/8)
 			{
 				res |= 0x8000;
 				res |= m_row_num<<8;
 			}
-			//if(m_vip_regs.DPCTRL & 2)
-			//  res |= ((row_num)<<8);
 
 			return res;
 		}
@@ -1224,19 +1221,21 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 
 	if(scanline == 224)
 	{
-		m_drawfb = 3;
+		if(m_displayfb)
+			m_drawfb = 1;
+		else
+			m_drawfb = 2;
 		m_set_irq(0x4000); // XPEND
 	}
 
 	if(scanline == 232)
 	{
-		m_drawfb &= ~1;
+		m_drawfb = 0;
 		m_set_irq(0x0002); // LFBEND
 	}
 
 	if(scanline == 240)
 	{
-		m_drawfb &= ~2;
 		m_set_irq(0x0004); // RFBEND
 	}
 
