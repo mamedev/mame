@@ -490,7 +490,7 @@ MSX_SLOT_RESET(ascii8)
 {
 	int i;
 
-	for (i=0; i<4; i++) state->m_banks[i] = i;
+	for (i=0; i<4; i++) state->m_banks[i] = 0;
 }
 
 MSX_SLOT_MAP(ascii8)
@@ -649,7 +649,7 @@ MSX_SLOT_RESET(ascii8_sram)
 {
 	int i;
 
-	for (i=0; i<4; i++) state->m_banks[i] = i;
+	for (i=0; i<4; i++) state->m_banks[i] = 0;
 }
 
 static UINT8 *ascii8_sram_bank_select (msx_state *drvstate, slot_state *state, int bankno)
@@ -809,7 +809,7 @@ MSX_SLOT_RESET(ascii16_sram)
 {
 	int i;
 
-	for (i=0; i<2; i++) state->m_banks[i] = i;
+	for (i=0; i<2; i++) state->m_banks[i] = 0;
 }
 
 static UINT8 *ascii16_sram_bank_select (msx_state *drvstate, slot_state *state, int bankno)

@@ -108,7 +108,6 @@ DEVICE_IMAGE_LOAD (msx_cart)
 			{
 				{ "M60002-0125SP",		false,		SLOT_ASCII8 },
 				{ "M60002-0125SP",		true,		SLOT_ASCII8_SRAM },
-				{ "M60002-0125SP-KON",	false,		SLOT_KONAMI_SCC },
 				{ "LZ93A13",			false,		SLOT_ASCII8 },
 				{ "LZ93A13",			true,		SLOT_ASCII8_SRAM },
 				{ "LZ93A13-16",			false,		SLOT_ASCII16 },
