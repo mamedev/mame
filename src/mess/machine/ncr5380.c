@@ -122,10 +122,8 @@ void ncr5380_device::device_start()
 	save_item(NAME(m_d_limit));
 	save_item(NAME(m_next_req_flag));
 
-	int i;
-
 	// try to open the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
+	for (int i = 0; i < scsidevs->devs_present; i++)
 	{
 		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
 		m_scsi_devices[device->GetDeviceID()] = device;

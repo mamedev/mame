@@ -149,8 +149,6 @@ ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, d
 
 void ncr539x_device::device_start()
 {
-	int i;
-
 	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
 
 	// resolve line callbacks
@@ -158,7 +156,7 @@ void ncr539x_device::device_start()
 	m_out_drq_func.resolve(m_out_drq_cb, *this);
 
 	// try to open the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
+	for (int i = 0; i < scsidevs->devs_present; i++)
 	{
 		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
 		m_scsi_devices[device->GetDeviceID()] = device;
@@ -192,7 +190,12 @@ void ncr539x_device::device_reset()
 	m_out_irq_func(CLEAR_LINE);
 	m_out_drq_func(CLEAR_LINE);
 
-	scan_devices();
+	// try to open the devices
+	for (int i = 0; i < scsidevs->devs_present; i++)
+	{
+		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		m_scsi_devices[device->GetDeviceID()] = device;
+	}
 }
 
 void ncr539x_device::dma_read_data(int bytes, UINT8 *pData)
@@ -222,18 +225,6 @@ void ncr539x_device::dma_write_data(int bytes, UINT8 *pData)
 		{
 			logerror("ncr539x: write to unknown device SCSI ID %d\n", m_last_id);
 		}
-	}
-}
-
-void ncr539x_device::scan_devices()
-{
-	int i;
-
-	// try to open the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
-	{
-		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
-		m_scsi_devices[device->GetDeviceID()] = device;
 	}
 }
 

@@ -60,8 +60,6 @@ fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, dev
 
 void fmscsi_device::device_start()
 {
-	int x;
-
     m_input_lines = 0;
     m_output_lines = 0;
     m_data = 0;
@@ -76,7 +74,7 @@ void fmscsi_device::device_start()
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
     // initialise SCSI devices, if any present
-    for(x=0;x<scsidevs->devs_present;x++)
+    for(int x=0;x<scsidevs->devs_present;x++)
     {
 		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[x].tag );
 		m_SCSIdevices[device->GetDeviceID()] = device;

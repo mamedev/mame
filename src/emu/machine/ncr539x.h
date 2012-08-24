@@ -40,9 +40,6 @@ public:
 	void dma_read_data(int bytes, UINT8 *pData);
 	void dma_write_data(int bytes, UINT8 *pData);
 
-	void *get_scsi_device(int id);
-
-	void scan_devices();
 protected:
 	// device-level overrides
 	virtual void device_start();

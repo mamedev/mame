@@ -781,8 +781,6 @@ READ8_HANDLER(wd33c93_r)
 
 void wd33c93_init( running_machine &machine, const struct WD33C93interface *interface )
 {
-	int i;
-
 	// save interface pointer for later
 	intf = interface;
 
@@ -790,7 +788,7 @@ void wd33c93_init( running_machine &machine, const struct WD33C93interface *inte
 	memset(devices, 0, sizeof(devices));
 
 	// try to open the devices
-	for (i = 0; i < interface->scsidevs->devs_present; i++)
+	for (int i = 0; i < interface->scsidevs->devs_present; i++)
 	{
 		scsidev_device *device = machine.device<scsidev_device>( interface->scsidevs->devices[i].tag );
 		devices[device->GetDeviceID()] = device;

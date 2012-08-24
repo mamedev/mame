@@ -942,10 +942,9 @@ void init_scsibus(device_t *device, int sectorbytes)
 {
     scsibus_t               *bus = get_token(device);
     const SCSIConfigTable   *scsidevs = bus->interface->scsidevs;
-	int                     devno;
 
     // try to open the devices
-    for (devno = 0; devno < scsidevs->devs_present; devno++)
+    for (int devno = 0; devno < scsidevs->devs_present; devno++)
     {
         LOG(1,"SCSIBUS:init devno=%d \n",devno);
 		scsidev_device *scsidev = device->machine().device<scsidev_device>( scsidevs->devices[devno].tag );

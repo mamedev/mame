@@ -56,7 +56,6 @@ public:
 	void ncr5380_read_data(int bytes, UINT8 *pData);
 	void ncr5380_write_data(int bytes, UINT8 *pData);
 
-	void *ncr5380_get_scsi_device(int id);
 protected:
 	// device-level overrides
 	virtual void device_start();

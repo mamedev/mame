@@ -137,8 +137,6 @@ mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, d
 
 void mb89352_device::device_start()
 {
-	int i;
-
 	m_phase = SCSI_PHASE_BUS_FREE;
     m_target = 0;
     m_command_index = 0;
@@ -158,7 +156,7 @@ void mb89352_device::device_start()
     m_transfer_timer = timer_alloc(TIMER_TRANSFER);
 
 	// try to open the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
+	for (int i = 0; i < scsidevs->devs_present; i++)
 	{
 		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
 		m_SCSIdevices[device->GetDeviceID()] = device;
