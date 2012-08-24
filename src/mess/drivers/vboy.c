@@ -81,9 +81,11 @@ class vboy_state : public driver_device
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+          m_maintimer(*this, "timer_main"),
 		  m_maincpu(*this, "maincpu")
 		  { }
 
+    required_device<timer_device> m_maintimer;
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_READ32_MEMBER(io_r);
@@ -128,7 +130,7 @@ public:
 	UINT8 m_drawfb;
 	UINT8 m_row_num;
 	attotime m_input_latch_time;
-	void m_timer_tick(UINT8 setting);
+	void m_timer_tick(void);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
 	void m_set_irq(UINT16 irq_vector);
 
@@ -594,7 +596,7 @@ WRITE32_MEMBER( vboy_state::io_w )
 		case 0x14:	// KHB (Keypad High Byte)
 			//logerror("Ilegal write: offset %02x should be only read\n", offset);
 			break;
-		case 0x18:	// TLB (Timer Low Byte)
+        case 0x18:	// TLB (Timer Low Byte)
 			m_vboy_regs.tlb = data;
 			m_vboy_timer.latch = m_vboy_regs.tlb | (m_vboy_timer.latch & 0xff00);
 			break;
@@ -611,16 +613,35 @@ WRITE32_MEMBER( vboy_state::io_w )
                 ---- --x- timer is zero flag
                 ---- ---x enables timer
             */
-			if(data & 1)
-			{
-				m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
-				m_vboy_regs.thb = m_vboy_timer.latch >> 8;
-				m_vboy_timer.count = m_vboy_timer.latch;
-			}
+            if (!(data & 0x08))
+            {
+                device_set_input_line(m_maincpu, 1, CLEAR_LINE);
+            }
 
-			m_vboy_regs.tcr = (data & 0xfd) | (0xe4) | (m_vboy_regs.tcr & 2);	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
-			if(data & 4)
-				m_vboy_regs.tcr &= 0xfd;
+            if (data & 1)
+            {
+                m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
+                m_vboy_regs.thb = m_vboy_timer.latch >> 8;
+                m_vboy_timer.count = m_vboy_timer.latch;
+
+                // only start timer if tcr & 1 is 1 and wasn't before?
+                if (!(m_vboy_regs.tcr & 1))
+                {
+                    if (data & 0x10)
+                    {
+                        m_maintimer->adjust(attotime::from_hz(50000));
+                    }
+                    else
+                    {
+                        m_maintimer->adjust(attotime::from_hz(10000));
+                    }
+
+                }
+            }
+
+            m_vboy_regs.tcr = (data & 0xfd) | (0xe4) | (m_vboy_regs.tcr & 2);	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+            if(data & 4)
+                m_vboy_regs.tcr &= 0xfd;
 			break;
 		case 0x24:	// WCR (Wait State Control Reg)
 			m_vboy_regs.wcr = data | 0xfc;	// according to docs: bits 2 to 7 are unused and set to 1.
@@ -1137,42 +1158,53 @@ static MACHINE_RESET(vboy)
 	state->m_vip_regs.DPCTRL = 2; // ssquash relies on this at boot otherwise no frame_start irq is fired
 	state->m_displayfb = 0;
 	state->m_drawfb = 0;
+
+    state->m_vboy_timer.count = 0;
+    state->m_maintimer->adjust(attotime::never);
 }
 
 
-void vboy_state::m_timer_tick(UINT8 setting)
+void vboy_state::m_timer_tick()
 {
-	if(m_vboy_regs.tcr & 1 && ((m_vboy_regs.tcr & 0x10) == setting))
-	{
-		if(m_vboy_timer.count != 0)
-		{
-			m_vboy_timer.count--;
-			m_vboy_regs.tlb = m_vboy_timer.count & 0xff;
-			m_vboy_regs.thb = m_vboy_timer.count >> 8;
-		}
-		else
-		{
-			m_vboy_timer.count = m_vboy_timer.latch;
-			//printf("Zero timer trigger\n");
-			m_vboy_regs.tcr |= 0x02;
-			if(m_vboy_regs.tcr & 8)
-				device_set_input_line(m_maincpu, 1, HOLD_LINE);
-		}
-	}
+    if(m_vboy_timer.count > 0)
+    {
+        m_vboy_timer.count--;
+        m_vboy_regs.tlb = m_vboy_timer.count & 0xff;
+        m_vboy_regs.thb = m_vboy_timer.count >> 8;
+    }
+
+    if (m_vboy_timer.count == 0)
+    {
+        m_vboy_timer.count = m_vboy_timer.latch;
+        m_vboy_regs.tcr |= 0x02;
+        if(m_vboy_regs.tcr & 8)
+        {
+            device_set_input_line(m_maincpu, 1, ASSERT_LINE);
+        }
+    }
+
+    if (m_vboy_regs.tcr & 0x10)
+    {
+        m_maintimer->adjust(attotime::from_hz(50000));
+    }
+    else
+    {
+        m_maintimer->adjust(attotime::from_hz(10000));
+    }
 }
 
-static TIMER_DEVICE_CALLBACK( timer_100us_tick )
+static TIMER_DEVICE_CALLBACK( timer_main_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-	state->m_timer_tick(0x00);
+    state->m_timer_tick();
 }
 
-static TIMER_DEVICE_CALLBACK( timer_20us_tick )
+static TIMER_DEVICE_CALLBACK( timer_pad_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-	state->m_timer_tick(0x10);
+    device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 static PALETTE_INIT( vboy )
@@ -1293,8 +1325,11 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	MCFG_MACHINE_RESET(vboy)
 
-	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(1000))
-	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_msec(20))
+    // programmable timer
+	MCFG_TIMER_ADD("timer_main", timer_main_tick)
+
+    // pad ready, which should be once per VBL
+	MCFG_TIMER_ADD_PERIODIC("timer_pad", timer_pad_tick, attotime::from_hz(50.038029f))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)
