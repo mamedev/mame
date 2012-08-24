@@ -32,9 +32,9 @@ Unless otherwise noted, the information in this list has not been verified by op
 		<info name="alt_title" value="アニマルランド殺人事件" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
-			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="mapper" value="M60002-0125SP-KON" />	<!-- M60002-0125SP hooked up to work like a konami scc mapper?? -->
 			<dataarea name="rom" size="131072">
-				<rom name="lh231077" size="131072" crc="15a0f98a" sha1="495876c504bdc4de24860ea15b25dda8f3b06c49" offset="0" />
+				<rom name="lh231077" size="131072" crc="aee2363d" sha1="db33011d006201b3bd3bbc4c7c952da2990f36e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
