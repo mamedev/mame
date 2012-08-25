@@ -767,35 +767,132 @@ ROM_START( galsnewk ) /* EXPRO-02 PCB, Korean title is "Ddang Dda Meok Gi" */
 ROM_END
 
 
-ROM_START( fantasia )
+/*
+
+Fantasia (c) 1994  Comad & New Japan System
+
+940429
++--------------------------------------+
+|TDA2003 2 62256 62256                 |
+|        1 62256 62256                 |
+|VR1 M6295 62256 62256                 |
+|          62256 62256                 |
+|          62256 62256                 |
+|J                                SCR1*|
+|A                                SCR2*|
+|M                                  17 |
+|M                                     |
+|A                1020 6264 6264       |
+|             6   62256   3  7         |
+|DSWA         8   62256   4  8         |
+|             0           5  9         |
+|DSWB 12MHz   0           6  10  12  15|
+|     16MHz   0          13  16  11  14|
++--------------------------------------+
+
+   CPU: MC68000P10
+ Sound: OKI M6295 (rebaged as AD-65)
+ Video: TI TFC1020AFN-084C
+   OSC: 16MHz & 12MHz
+   DSW: 8-way switch x 2
+Memory: HY62C256P-15, HY6264ALP-10
+   VR1: Sound adjust pot
+
+
+940307
++--------------------------------------+
+|TDA2003 1 62256 62256                 |
+|VR1     2 62256 62256                 |
+|      M6295                           |
+|                                      |
+|                                      |
+|J                   62256 62256       |
+|A                   62256 62256    17 |
+|M                   62256 62256  OBJ2*|
+|M                         6264   OBJ3*|
+|A               1020 1020 6264        |
+|             6                        |
+|DSWA         8   62256   3   7        |
+|             0   62256   4   8  11  14|
+|DSWB 12MHz   0   SPA*    5   9  12  15|
+|     16MHz   0   SPA*    6  10  13  16|
++--------------------------------------+
+
+   CPU: MC68000P10
+ Sound: OKI M6295 (rebaged as AD-65)
+ Video: TI TFC1020AFN-084C x 2
+   OSC: 16MHz & 12MHz
+   DSW: 8-way switch x 2
+Memory: KM62256BLP-8, HY6264ALP-10
+   VR1: Sound adjust pot
+
+* denotes unpopulated positions
+
+*/
+
+ROM_START( fantasia ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD940429 MADE IN KOREA */
 	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "prog2_16.rom", 0x000000, 0x80000, CRC(e27c6c57) SHA1(420b66928c46e76fa2496f221691dd6c34542287) )
-	ROM_LOAD16_BYTE( "prog1_13.rom", 0x000001, 0x80000, CRC(68d27413) SHA1(84cb7d6523325496469d621f6f4da1b719162147) )
-	ROM_LOAD16_BYTE( "iscr6_09.rom", 0x100000, 0x80000, CRC(2a588393) SHA1(ef66ed94dd40a95a9b0fb5c3b075c1f654f60927) )
-	ROM_LOAD16_BYTE( "iscr5_05.rom", 0x100001, 0x80000, CRC(6160e0f0) SHA1(faec9d082c9039885afa4560aa87c05e9ecb5217) )
-	ROM_LOAD16_BYTE( "iscr4_08.rom", 0x200000, 0x80000, CRC(f776b743) SHA1(bd4d666ede454a56181e109745ac4b3203b2a87c) )
-	ROM_LOAD16_BYTE( "iscr3_04.rom", 0x200001, 0x80000, CRC(5df0dff2) SHA1(62ebd3c79f2e8ab30d6862cc4bf80f1b56f1f572) )
-	ROM_LOAD16_BYTE( "iscr2_07.rom", 0x300000, 0x80000, CRC(5707d861) SHA1(33f1cff693dfcb04edbf8738d3ea2a1884e6ff0c) )
-	ROM_LOAD16_BYTE( "iscr1_03.rom", 0x300001, 0x80000, CRC(36cb811a) SHA1(403cef012990b0e01b481b8afc6b5811e7137833) )
-	ROM_LOAD16_BYTE( "imag2_10.rom", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
-	ROM_LOAD16_BYTE( "imag1_06.rom", 0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
+	ROM_LOAD16_BYTE( "16.pro2",  0x000000, 0x80000, CRC(e27c6c57) SHA1(420b66928c46e76fa2496f221691dd6c34542287) ) /* PCB location is silkscreened under EPROM sockets */
+	ROM_LOAD16_BYTE( "13.pro1",  0x000001, 0x80000, CRC(68d27413) SHA1(84cb7d6523325496469d621f6f4da1b719162147) )
+	ROM_LOAD16_BYTE( "9.bg7",    0x100000, 0x80000, CRC(2a588393) SHA1(ef66ed94dd40a95a9b0fb5c3b075c1f654f60927) )
+	ROM_LOAD16_BYTE( "5.bg3",    0x100001, 0x80000, CRC(6160e0f0) SHA1(faec9d082c9039885afa4560aa87c05e9ecb5217) )
+	ROM_LOAD16_BYTE( "8.bg6",    0x200000, 0x80000, CRC(f776b743) SHA1(bd4d666ede454a56181e109745ac4b3203b2a87c) )
+	ROM_LOAD16_BYTE( "4.bg2",    0x200001, 0x80000, CRC(5df0dff2) SHA1(62ebd3c79f2e8ab30d6862cc4bf80f1b56f1f572) )
+	ROM_LOAD16_BYTE( "7.bg5",    0x300000, 0x80000, CRC(5707d861) SHA1(33f1cff693dfcb04edbf8738d3ea2a1884e6ff0c) )
+	ROM_LOAD16_BYTE( "3.bg1",    0x300001, 0x80000, CRC(36cb811a) SHA1(403cef012990b0e01b481b8afc6b5811e7137833) )
+	ROM_LOAD16_BYTE( "10.imag2", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
+	ROM_LOAD16_BYTE( "6.imag1",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* sprites */
-	ROM_LOAD( "obj1_17.rom",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
+	ROM_LOAD( "17.scr3",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
+	/* SCR1 and SCR2 are unpopulated */
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-	ROM_LOAD( "mus-1_01.rom", 0x00000, 0x80000, CRC(22955efb) SHA1(791c18d1aa0c10810da05c199108f51f99fe1d49) )
-	ROM_RELOAD(               0x40000, 0x80000 )
-	ROM_LOAD( "mus-2_02.rom", 0xc0000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
+	ROM_LOAD( "2.music1", 0x00000, 0x80000, CRC(22955efb) SHA1(791c18d1aa0c10810da05c199108f51f99fe1d49) )
+	ROM_RELOAD(           0x40000, 0x80000 )
+	ROM_LOAD( "1.music2", 0xc0000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* tiles - encrypted */
-	ROM_LOAD16_BYTE( "gscr2_15.rom", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
-	ROM_LOAD16_BYTE( "gscr1_12.rom", 0x000000, 0x80000, CRC(4bd25be6) SHA1(9834f081c0390ccaa1234efd2393b6495e946c64) )
-	ROM_LOAD16_BYTE( "gscr4_14.rom", 0x100001, 0x80000, CRC(4e7e6ed4) SHA1(3e9e942e3de398edc8ac9f82769c3f41708d3741) )
-	ROM_LOAD16_BYTE( "gscr3_11.rom", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
+	ROM_LOAD16_BYTE( "15.obj3", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
+	ROM_LOAD16_BYTE( "12.obj1", 0x000000, 0x80000, CRC(4bd25be6) SHA1(9834f081c0390ccaa1234efd2393b6495e946c64) )
+	ROM_LOAD16_BYTE( "14.obj4", 0x100001, 0x80000, CRC(4e7e6ed4) SHA1(3e9e942e3de398edc8ac9f82769c3f41708d3741) )
+	ROM_LOAD16_BYTE( "11.obj2", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
+ROM_END
+
+
+ROM_START( fantasiaa ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD 940307 MADE IN KOREA */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "prog2_16.ue17",  0x000000, 0x80000, CRC(0b41ad10) SHA1(386b59f6892cdd2f90df86dc77172919079f0200) )
+	ROM_LOAD16_BYTE( "prog1_13.ud17",  0x000001, 0x80000, CRC(a3748726) SHA1(8dc922e01edb777eb853f40556315a34e1aced62) )
+	ROM_LOAD16_BYTE( "i-scr6_9.ue16b", 0x100000, 0x80000, CRC(2a588393) SHA1(ef66ed94dd40a95a9b0fb5c3b075c1f654f60927) ) /* ROMS 3 through 10 contain the same data */
+	ROM_LOAD16_BYTE( "i-scr5_5.ue16a", 0x100001, 0x80000, CRC(6160e0f0) SHA1(faec9d082c9039885afa4560aa87c05e9ecb5217) ) /* just in different PCB locations */
+	ROM_LOAD16_BYTE( "i-scr4_8.ue15b", 0x200000, 0x80000, CRC(f776b743) SHA1(bd4d666ede454a56181e109745ac4b3203b2a87c) )
+	ROM_LOAD16_BYTE( "i-scr3_4.ue15a", 0x200001, 0x80000, CRC(5df0dff2) SHA1(62ebd3c79f2e8ab30d6862cc4bf80f1b56f1f572) )
+	ROM_LOAD16_BYTE( "i-scr2_7.ue14b", 0x300000, 0x80000, CRC(5707d861) SHA1(33f1cff693dfcb04edbf8738d3ea2a1884e6ff0c) )
+	ROM_LOAD16_BYTE( "i-scr1_3.ue14a", 0x300001, 0x80000, CRC(36cb811a) SHA1(403cef012990b0e01b481b8afc6b5811e7137833) )
+	ROM_LOAD16_BYTE( "imag2_10.ue20b", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
+	ROM_LOAD16_BYTE( "imag1_6.ue20a",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )	/* sprites */
+	ROM_LOAD( "obj1_17.u5",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) ) /* same data, different PCB location */
+	/* U4 OBJ2 18 and U3 OBJ3 19 are unpopulated */
+
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "music1_1.ub6", 0x00000, 0x80000, CRC(af0be817) SHA1(5c8897dcd9957add19ff9553c01ce03fec68b354) ) /* This sound sample is different???? */
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "music2_2.uc6", 0xc0000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) ) /* same data, different PCB location */
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
+
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* tiles - encrypted */
+	ROM_LOAD16_BYTE( "g-scr2_15.ul16b", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) ) /* same data, different PCB location */
+	ROM_LOAD16_BYTE( "g-scr1_12.ul16a", 0x000000, 0x80000, CRC(4bd25be6) SHA1(9834f081c0390ccaa1234efd2393b6495e946c64) )
+	ROM_LOAD16_BYTE( "g-scr4_14.ul19b", 0x100001, 0x80000, CRC(4e7e6ed4) SHA1(3e9e942e3de398edc8ac9f82769c3f41708d3741) )
+	ROM_LOAD16_BYTE( "g-scr3_11.ul19a", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
 ROM_END
 
 /*************************************
@@ -841,9 +938,10 @@ DRIVER_INIT_MEMBER(expro02_state,galsnew)
  *
  *************************************/
 
-GAME( 1990, galsnew,  0,       galsnew, galsnew, expro02_state,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, expro02_state, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewj, galsnew, galsnew, galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
-GAME( 1990, galsnewk, galsnew, galsnew, galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Inter license)", "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnew,   0,        galsnew,  galsnew,  expro02_state, galsnew, ROT90, "Kaneko",                  "Gals Panic (US, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnewa,  galsnew,  galsnew,  galsnewa, expro02_state, galsnew, ROT90, "Kaneko",                  "Gals Panic (Export, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnewj,  galsnew,  galsnew,  galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Taito license)",  "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
+GAME( 1990, galsnewk,  galsnew,  galsnew,  galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Inter license)",  "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
 
-GAME( 1994, fantasia, 0,       fantasia,fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasia,  0,        fantasia, fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasiaa, fantasia, fantasia, fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
