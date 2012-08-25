@@ -52,6 +52,7 @@ private:
 	UINT16 m_kram_inc_r,m_kram_inc_w;
 	UINT8 m_kram_page_r,m_kram_page_w;
 	UINT32 m_page_setting;
+	UINT8 m_bgmode[4];
 
 	struct{
 		UINT8 addr;

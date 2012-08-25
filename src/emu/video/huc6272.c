@@ -208,6 +208,28 @@ WRITE32_MEMBER( huc6272_device::write )
 				m_page_setting = data;
 				break;
 
+			//
+			// xxxx ---- ---- ---- BG3 mode setting
+			// ---- xxxx ---- ---- BG2 mode setting
+			// ---- ---- xxxx ---- BG1 mode setting
+			// ---- ---- ---- xxxx BG0 mode setting
+			//
+			// 0001 - 4 color palette
+			// 0010 - 16 color palette
+			// 0011 - 256 color palette
+			// 0100 - 64k color
+			// 0101 - 16M color
+			// 1001 - 4 color palette block mode
+			// 1010 - 16 color palette block mode
+			// 1011 - 256 color palette block mode
+			// others - unused/invalid
+			case 0x10:
+				m_bgmode[0] = data & 0x0f;
+				m_bgmode[1] = ( data >> 4 ) & 0x0f;
+				m_bgmode[2] = ( data >> 8 ) & 0x0f;
+				m_bgmode[3] = ( data >> 12 ) & 0x0f;
+				break;
+
 			case 0x13:
 				m_micro_prg.addr = data & 0xf;
 				break;
