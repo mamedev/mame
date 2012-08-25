@@ -24,9 +24,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I2CMEM_ADD( _tag, _interface ) \
+#define MCFG_I2CMEM_ADD( _tag, _config ) \
 	MCFG_DEVICE_ADD( _tag, I2CMEM, 0 ) \
-	i2cmem_device::static_set_interface(*device, _interface);
+	MCFG_DEVICE_CONFIG( _config )
 
 
 //**************************************************************************
@@ -55,9 +55,6 @@ public:
 	// construction/destruction
 	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
 
-	// inline configuration
-	static void static_set_interface(device_t &device, const i2cmem_interface &interface);
-
 	// I/O operations
 	void set_e0_line( int state );
 	void set_e1_line( int state );
@@ -70,7 +67,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
 

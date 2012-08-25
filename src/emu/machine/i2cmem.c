@@ -97,18 +97,6 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 
 
 //-------------------------------------------------
-//  static_set_interface - set the device
-//  configuration
-//-------------------------------------------------
-
-void i2cmem_device::static_set_interface(device_t &device, const i2cmem_interface &interface)
-{
-	i2cmem_device &i2cmem = downcast<i2cmem_device &>(device);
-	static_cast<i2cmem_interface &>(i2cmem) = interface;
-}
-
-
-//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -116,17 +104,14 @@ void i2cmem_device::static_set_interface(device_t &device, const i2cmem_interfac
 
 void i2cmem_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const i2cmem_interface *intf = reinterpret_cast<const i2cmem_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<i2cmem_interface *>(this) = *intf;
+	}
+
 	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void i2cmem_device::device_validity_check(validity_checker &valid) const
-{
 }
 
 
