@@ -296,6 +296,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
+#include "video/m50458.h"
 #include "includes/snes.h"
 
 
@@ -529,6 +530,7 @@ WRITE8_MEMBER(nss_state::rtc_osd_w)
 	---- ---x  RTC /CS           (0=Low/Select, 1=High/No)
 */
 	/* TODO */
+	ioport("RTC_OSD")->write(data, 0xff);
 }
 
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
@@ -593,6 +595,11 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+
+	PORT_START("RTC_OSD")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_clock_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, write_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_cs_line)
 
 	PORT_START("SERIAL1_DATA1_L")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
@@ -719,22 +726,10 @@ static const gfx_layout nss_char_layout_16x18 =
 	16*18
 };
 
-static const gfx_layout nss_char_layout_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 
 /* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( nss )
 	GFXDECODE_ENTRY( "chargen",   0x00000, nss_char_layout_16x18,    0, 1 )
-	GFXDECODE_ENTRY( "m50458_gfx",   0x00000, nss_char_layout_16x16,    0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( snes, nss_state )
@@ -783,6 +778,8 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 
 	MCFG_EEPROM_ADD("eeprom", nss_eeprom_intf)
 
+	MCFG_M50458_ADD("m50458",4000000) /* TODO: clock */
+
 	MCFG_GFXDECODE( nss )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_MACHINE_START( nss )
@@ -806,7 +803,6 @@ MACHINE_CONFIG_END
 	ROM_LOAD("m50458_char.bin",     0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) ) \
 	ROM_REGION( 0x1000, "m50458_gfx", ROMREGION_ERASEFF ) \
 	ROM_LOAD("m50458_char_mod.bin", 0x0000, 0x1000, BAD_DUMP CRC(8c4326ef) SHA1(21a63c5245ff7f3f70cb45e217b3045b19d0d799) ) \
-	ROM_REGION( 0x1000, "m50458_vram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF) \
 	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 
